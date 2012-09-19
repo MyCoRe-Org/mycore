@@ -825,6 +825,23 @@
     </xsl:if>
   </xsl:template>
 
+  <!-- view default metadata -->
+  <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.modsDefaultType">
+    <xsl:param name="mods-type" select="'report'" />
+    <div id="title_box" class="detailbox floatbox">
+      <h4 id="title_switch" class="block_switch open">
+        <xsl:value-of select="i18n:translate(concat('component.mods.metaData.dictionary.', $mods-type))" />
+      </h4>
+      <xsl:call-template name="printMetaDate.mods.titleContent" />
+    </div>
+
+    <xsl:if test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:abstract">
+      <xsl:call-template name="printMetaDate.mods.abstractContent" />
+    </xsl:if>
+
+    <xsl:call-template name="printMetaDate.mods.categoryContent" />
+  </xsl:template>
+  <!-- END: view default metadata -->
 
   <!-- view report metadata -->
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.report">
@@ -1430,7 +1447,7 @@
   </xsl:template>
   <!-- END: view article metadata -->
 
-  <!-- view av nedia metadata -->
+  <!-- view av media metadata -->
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="present.av">
     <div id="title_box" class="detailbox floatbox">
       <h4 id="title_switch" class="block_switch open">
