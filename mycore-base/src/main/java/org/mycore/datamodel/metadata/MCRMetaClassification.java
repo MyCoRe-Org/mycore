@@ -192,6 +192,10 @@ public class MCRMetaClassification extends MCRMetaDefault {
         if (!super.isValid()) {
             return false;
         }
+        if (category == null) {
+            LOGGER.warn(getSubTag() + ": category is not yet set");
+            return false;
+        }
         return true;
     }
 
