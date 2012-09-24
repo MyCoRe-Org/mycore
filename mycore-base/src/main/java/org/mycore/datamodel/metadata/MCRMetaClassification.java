@@ -26,6 +26,7 @@ package org.mycore.datamodel.metadata;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRException;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 /**
  * This class implements all method for handling with the MCRMetaClassification
@@ -41,17 +42,10 @@ import org.mycore.common.MCRException;
  *          2008) $
  */
 public class MCRMetaClassification extends MCRMetaDefault {
-    /** The length of the classification ID * */
-    public static final int MAX_CLASSID_LENGTH = MCRObjectID.MAX_LENGTH;
-
-    public static final int MAX_CATEGID_LENGTH = 128;
-
     private static final Logger LOGGER = Logger.getLogger(MCRMetaClassification.class);
 
     // MCRMetaClassification data
-    protected String classid;
-
-    protected String categid;
+    protected MCRCategoryID category;
 
     /**
      * This is the constructor. <br>
@@ -60,8 +54,6 @@ public class MCRMetaClassification extends MCRMetaDefault {
      */
     public MCRMetaClassification() {
         super();
-        classid = "";
-        categid = "";
     }
 
     /**
@@ -87,12 +79,35 @@ public class MCRMetaClassification extends MCRMetaDefault {
     }
 
     /**
+     * This is the constructor. <br>
+     * The language element was set to <b>en </b>. The subtag element was set to
+     * the value of <em>set_subtag<em>. If the
+     * value of <em>set_subtag</em> is null or empty an exception was throwed.
+     * The type element was set to an empty string.
+     * the <em>set_classid</em> and the <em>categid</em> must be not null
+     * or empty!
+     * @param set_subtag       the name of the subtag
+     * @param set_inherted     a value >= 0
+     * @param set_type         the type attribute
+     * @param category         a category id
+     *
+     * @exception MCRException if the set_subtag value is empty, too long or not a MCRObjectID
+     */
+    public MCRMetaClassification(String set_subtag, int set_inherted, String set_type, MCRCategoryID category) throws MCRException {
+        super(set_subtag, null, set_type, set_inherted);
+        if (category == null) {
+            throw new MCRException("Category is not set in " + getSubTag());
+        }
+        this.category = category;
+    }
+
+    /**
      * The method return the classification ID.
      * 
      * @return the classId
      */
     public final String getClassId() {
-        return classid;
+        return category.getRootID();
     }
 
     /**
@@ -101,7 +116,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
      * @return the categId
      */
     public final String getCategId() {
-        return categid;
+        return category.getID();
     }
 
     /**
@@ -123,17 +138,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
         if (set_categid == null || (set_categid = set_categid.trim()).length() == 0) {
             throw new MCRException("The categid is empty.");
         }
-
-        if (set_classid.length() > MAX_CLASSID_LENGTH) {
-            throw new MCRException("The classid "+ set_classid +" is too long.");
-        }
-
-        if (set_categid.length() > MAX_CATEGID_LENGTH) {
-            throw new MCRException("The categid "+set_categid+" is too long.");
-        }
-
-        classid = set_classid;
-        categid = set_categid;
+        category = new MCRCategoryID(set_categid, set_categid);
     }
 
     /**
@@ -166,8 +171,8 @@ public class MCRMetaClassification extends MCRMetaDefault {
     @Override
     public Element createXML() throws MCRException {
         Element elm = super.createXML();
-        elm.setAttribute("classid", classid);
-        elm.setAttribute("categid", categid);
+        elm.setAttribute("classid", getClassId());
+        elm.setAttribute("categid", getCategId());
 
         return elm;
     }
@@ -187,14 +192,6 @@ public class MCRMetaClassification extends MCRMetaDefault {
         if (!super.isValid()) {
             return false;
         }
-        if (classid == null || classid.length() == 0) {
-            LOGGER.warn(getSubTag() + ": classid is null or empty");
-            return false;
-        }
-        if (categid == null || categid.length() == 0) {
-            LOGGER.warn(getSubTag() + ": categid is null or empty");
-            return false;
-        }
         return true;
     }
 
@@ -203,7 +200,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
      */
     @Override
     public MCRMetaClassification clone() {
-        return new MCRMetaClassification(subtag, inherited, type, classid, categid);
+        return new MCRMetaClassification(subtag, inherited, type, category);
     }
 
     /**
@@ -212,8 +209,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
     @Override
     public void debug() {
         super.debugDefault();
-        LOGGER.debug("ClassID            = " + classid);
-        LOGGER.debug("CategID            = " + categid);
+        LOGGER.debug("Category            = " + category);
         LOGGER.debug(" ");
     }
 }
