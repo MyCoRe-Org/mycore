@@ -52,9 +52,8 @@ public class MCRImageTiler implements Runnable, Closeable {
         MCRShutdownHandler.getInstance().addCloseable(this);
         runLock = new ReentrantLock();
         try {
-            Class<? extends MCRTilingAction> tilingActionImpl = (Class<? extends MCRTilingAction>) Class.forName(MCRConfiguration
-                .instance()
-                .getString(MCRIView2Tools.CONFIG_PREFIX + "MCRTilingActionImpl", MCRTilingAction.class.getName()));
+            Class<? extends MCRTilingAction> tilingActionImpl = (Class<? extends MCRTilingAction>) Class.forName(MCRConfiguration.instance().getString(
+                MCRIView2Tools.CONFIG_PREFIX + "MCRTilingActionImpl", MCRTilingAction.class.getName()));
             tilingActionConstructor = tilingActionImpl.getConstructor(MCRTileJob.class);
         } catch (Exception e) {
             LOGGER.error("Error while initializing", e);
@@ -94,7 +93,7 @@ public class MCRImageTiler implements Runnable, Closeable {
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
         boolean activated = MCRConfiguration.instance().getBoolean(MCRIView2Tools.CONFIG_PREFIX + "LocalTiler.activated", true);
         LOGGER.info("Local Tiling is " + (activated ? "activated" : "deactivated"));
-        LOGGER.info("Supported image file types for reading: "+Arrays.toString(ImageIO.getReaderFormatNames()));
+        LOGGER.info("Supported image file types for reading: " + Arrays.toString(ImageIO.getReaderFormatNames()));
         if (activated) {
             int tilingThreadCount = Integer.parseInt(MCRIView2Tools.getIView2Property("TilingThreads"));
             ThreadFactory slaveFactory = new ThreadFactory() {
@@ -125,53 +124,57 @@ public class MCRImageTiler implements Runnable, Closeable {
             };
             LOGGER.info("TilingMaster is started");
             while (running) {
-                while (activeThreads.get() < tilingThreadCount) {
-                    runLock.lock();
-                    try {
-                        if (!running)
-                            break;
-                        Session session = sessionFactory.getCurrentSession();
-                        Transaction transaction = session.beginTransaction();
-                        MCRTileJob job = null;
+                try {
+                    while (activeThreads.get() < tilingThreadCount) {
+                        runLock.lock();
                         try {
-                            job = tq.poll();
-                            transaction.commit();
-                        } catch (HibernateException e) {
-                            LOGGER.error("Error while getting next tiling job.", e);
-                            if (transaction != null) {
-                                transaction.rollback();
+                            if (!running)
+                                break;
+                            Session session = sessionFactory.getCurrentSession();
+                            Transaction transaction = session.beginTransaction();
+                            MCRTileJob job = null;
+                            try {
+                                job = tq.poll();
+                                transaction.commit();
+                            } catch (HibernateException e) {
+                                LOGGER.error("Error while getting next tiling job.", e);
+                                if (transaction != null) {
+                                    transaction.rollback();
+                                }
+                            } finally {
+                                session.close();
+                            }
+                            if (job != null && !tilingServe.isShutdown()) {
+                                LOGGER.info("Creating:" + job.getPath());
+                                tilingServe.execute(getTilingAction(job));
+                            } else {
+                                try {
+                                    synchronized (tq) {
+                                        if (running) {
+                                            LOGGER.debug("No Picture in TilingQueue going to sleep");
+                                            //fixes a race conditioned deadlock situation
+                                            //do not wait longer than 60 sec. for a new MCRTileJob
+                                            tq.wait(60000);
+                                        }
+                                    }
+                                } catch (InterruptedException e) {
+                                    LOGGER.error("Image Tiling thread was interrupted.", e);
+                                }
                             }
                         } finally {
-                            session.close();
+                            runLock.unlock();
                         }
-                        if (job != null && !tilingServe.isShutdown()) {
-                            LOGGER.info("Creating:" + job.getPath());
-                            tilingServe.execute(getTilingAction(job));
-                        } else {
-                            try {
-                                synchronized (tq) {
-                                    if (running) {
-                                        LOGGER.debug("No Picture in TilingQueue going to sleep");
-                                        //fixes a race conditioned deadlock situation
-                                        //do not wait longer than 60 sec. for a new MCRTileJob
-                                        tq.wait(60000);
-                                    }
-                                }
-                            } catch (InterruptedException e) {
-                                LOGGER.error("Image Tiling thread was interrupted.", e);
-                            }
+                    } // while(tilingServe.getActiveCount() < tilingServe.getCorePoolSize())
+                    if (activeThreads.get() < tilingThreadCount)
+                        try {
+                            LOGGER.info("Waiting for a tiling job to finish");
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            LOGGER.error("Image Tiling thread was interrupted.", e);
                         }
-                    } finally {
-                        runLock.unlock();
-                    }
-                } // while(tilingServe.getActiveCount() < tilingServe.getCorePoolSize())
-                if (activeThreads.get() < tilingThreadCount)
-                    try {
-                        LOGGER.info("Waiting for a tiling job to finish");
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        LOGGER.error("Image Tiling thread was interrupted.", e);
-                    }
+                } catch (Throwable e) {
+                    LOGGER.error("Keep running while catching exceptions.", e);
+                }
             } // while(running)
         }
         LOGGER.info("Tiling thread finished");
@@ -231,9 +234,9 @@ public class MCRImageTiler implements Runnable, Closeable {
             }
         }
     }
-    
+
     @Override
-    public int getPriority(){
+    public int getPriority() {
         return MCRShutdownHandler.Closeable.DEFAULT_PRIORITY - 1;
     }
 }
