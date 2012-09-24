@@ -138,7 +138,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
         if (set_categid == null || (set_categid = set_categid.trim()).length() == 0) {
             throw new MCRException("The categid is empty.");
         }
-        category = new MCRCategoryID(set_categid, set_categid);
+        category = new MCRCategoryID(set_classid, set_categid);
     }
 
     /**
