@@ -99,7 +99,7 @@ public class MCRThumbnailServlet extends MCRServlet {
                 pathInfo = pathInfo.substring(1);
             final String derivate = pathInfo.substring(0, pathInfo.indexOf('/'));
             String imagePath = pathInfo.substring(derivate.length());
-            LOGGER.info("derivate: " + derivate + ", image: " + imagePath);
+            LOGGER.debug("derivate: " + derivate + ", image: " + imagePath);
             File iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, imagePath);
             LOGGER.info("IView2 file: " + iviewFile.getAbsolutePath());
             BufferedImage thumbnail = getThumbnail(iviewFile);
@@ -114,7 +114,7 @@ public class MCRThumbnailServlet extends MCRServlet {
                 job.getResponse().setContentType("image/png");
                 job.getResponse().setDateHeader("Last-Modified", iviewFile.lastModified());
                 Date expires = new Date(System.currentTimeMillis() + MCRTileServlet.MAX_AGE * 1000);
-                LOGGER.info("Last-Modified: " + new Date(iviewFile.lastModified()) + ", expire on: " + expires);
+                LOGGER.debug("Last-Modified: " + new Date(iviewFile.lastModified()) + ", expire on: " + expires);
                 job.getResponse().setDateHeader("Expires", expires.getTime());
                 ServletOutputStream sout = job.getResponse().getOutputStream();
                 try {
@@ -138,7 +138,7 @@ public class MCRThumbnailServlet extends MCRServlet {
                 return;
             }
         } finally {
-            LOGGER.info("Finished sending " + job.getRequest().getPathInfo());
+            LOGGER.debug("Finished sending " + job.getRequest().getPathInfo());
         }
     }
 

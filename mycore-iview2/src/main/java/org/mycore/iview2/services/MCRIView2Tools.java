@@ -187,7 +187,7 @@ public class MCRIView2Tools {
             double zoomFactor = Math.pow(2, (imageProps.getZoomlevel() - zoomLevel));
             int maxX = (int) Math.ceil((imageProps.getWidth() / zoomFactor) / MCRImage.getTileSize());
             int maxY = (int) Math.ceil((imageProps.getHeight() / zoomFactor) / MCRImage.getTileSize());
-            LOGGER.info(MessageFormat.format("Image size:{0}x{1}, tiles:{2}x{3}", imageProps.getWidth(), imageProps.getHeight(), maxX, maxY));
+            LOGGER.debug(MessageFormat.format("Image size:{0}x{1}, tiles:{2}x{3}", imageProps.getWidth(), imageProps.getHeight(), maxX, maxY));
             BufferedImage sampleTile = readTile(iviewImage, reader, zoomLevel, maxX - 1, 0);
             int xDim = ((maxX - 1) * MCRImage.getTileSize() + sampleTile.getWidth());
             int yDim = ((maxY - 1) * MCRImage.getTileSize() + readTile(iviewImage, reader, zoomLevel, 0, maxY - 1).getHeight());
