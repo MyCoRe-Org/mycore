@@ -29,6 +29,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -49,6 +50,8 @@ import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
 import org.mycore.iview2.services.MCRIView2Tools;
+
+import com.sun.jersey.api.core.HttpResponseContext;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -102,14 +105,19 @@ public class MCRThumbnailServlet extends MCRServlet {
             LOGGER.debug("derivate: " + derivate + ", image: " + imagePath);
             File iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, imagePath);
             LOGGER.info("IView2 file: " + iviewFile.getAbsolutePath());
+            if (!iviewFile.exists()) {
+                job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND,
+                    MessageFormat.format("Could not find iview2 file for {0}/{1}", derivate, imagePath));
+                return;
+            }
             BufferedImage thumbnail = getThumbnail(iviewFile);
-            
+
             String centerThumb = job.getRequest().getParameter("centerThumb");
             if (thumbnail != null) {
-                if(!"no".equals(centerThumb)) {
+                if (!"no".equals(centerThumb)) {
                     thumbnail = centerThumbnail(thumbnail);
                 }
-                
+
                 job.getResponse().setHeader("Cache-Control", "max-age=" + MCRTileServlet.MAX_AGE);
                 job.getResponse().setContentType("image/png");
                 job.getResponse().setDateHeader("Last-Modified", iviewFile.lastModified());
