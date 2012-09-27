@@ -190,55 +190,6 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="/mycoreobject" mode="breadCrumb" priority="1">
-
-    <ul class="breadcrumb">
-      <li class="first">
-        <a href="{$WebApplicationBaseURL}content/main/classifications/bmelv_genres.xml">
-          <xsl:value-of select="i18n:translate('editor.search.bmelv.genre')" />
-        </a>
-      </li>
-      <xsl:variable name="obj_host">
-        <xsl:value-of select="$objectHost" />
-      </xsl:variable>
-      <xsl:if test="./structure/parents">
-        <xsl:variable name="parent_genre">
-          <xsl:apply-templates mode="mods-type" select="document(concat('mcrobject:',./structure/parents/parent/@xlink:href))/mycoreobject" />
-        </xsl:variable>
-        <li>
-          <xsl:value-of select="i18n:translate(concat('component.mods.metaData.dictionary.', $parent_genre))" />
-          <xsl:text>: </xsl:text>
-          <xsl:apply-templates select="./structure/parents">
-            <xsl:with-param name="obj_host" select="$obj_host" />
-            <xsl:with-param name="obj_type" select="'this'" />
-          </xsl:apply-templates>
-          <xsl:apply-templates select="./structure/parents">
-            <xsl:with-param name="obj_host" select="$obj_host" />
-            <xsl:with-param name="obj_type" select="'before'" />
-          </xsl:apply-templates>
-          <xsl:apply-templates select="./structure/parents">
-            <xsl:with-param name="obj_host" select="$obj_host" />
-            <xsl:with-param name="obj_type" select="'after'" />
-          </xsl:apply-templates>
-        </li>
-      </xsl:if>
-
-      <xsl:variable name="internal_genre">
-        <xsl:apply-templates mode="mods-type" select="." />
-      </xsl:variable>
-      <li>
-        <xsl:value-of select="i18n:translate(concat('component.mods.metaData.dictionary.', $internal_genre))" />
-      </li>
-      <xsl:if test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']">
-        <li>
-          <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']"
-            mode="printModsClassInfo" />
-        </li>
-      </xsl:if>
-    </ul>
-
-  </xsl:template>
-
   <xsl:template mode="mods-type" match="/mycoreobject">
     <xsl:choose>
       <xsl:when
