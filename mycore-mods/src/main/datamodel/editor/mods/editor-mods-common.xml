@@ -1075,20 +1075,23 @@
 
   <helpPopup id="mods.identifier.help" width="400px" height="250px">
     <label xml:lang="de">
-      Ein Identifier ist ein eindeutiger und dauerhafter Identifikator für eine digitale Ressource oder ein physisches Werk.
-      Es können auch
-      mehrere unterschiedliche Identifikatoren (DOI, URN, URI ...) angegeben werden.
-      <br />
-      ISBN ist immer in Form der ISBN13 anzugeben - mit Bindestrichen! Liegt nur die ISBN10 vor, so muss diese entsprechend konvertiert
-      werden
-      (978 davor schreiben und Prüfziffer anpassen). Einen Online-Konverter gibt es z.B. hier:
-      <a href="http://www.isbn.org/converterpub.asp">http://www.isbn.org/converterpub.asp</a>
-      .
-      <br />
-      Falls eine DOI des Verlages vorhanden ist, ist diese in jedem Fall anzugeben.
+      <p>
+        Ein Identifier ist ein eindeutiger und dauerhafter Identifikator für eine digitale Ressource oder ein physisches Werk.
+        Es können auch mehrere unterschiedliche Identifikatoren (DOI, URN, URI ...) angegeben werden.
+      </p>
+      <p>
+        ISBN ist immer in Form der ISBN13 anzugeben - mit Bindestrichen! Liegt nur die ISBN10 vor, so muss diese entsprechend konvertiert
+        werden (978 davor schreiben und Prüfziffer anpassen). Einen Online-Konverter gibt es z.B. hier:
+        <a href="http://www.isbn.org/converterpub.asp">http://www.isbn.org/converterpub.asp</a>
+      </p>
+      <p>
+        Falls eine DOI des Verlages vorhanden ist, ist diese in jedem Fall anzugeben. Soll die PPN angegeben werden, so ist der
+        PPN-Zitierlink als URI einzutragen.
+      </p>
+      
     </label>
     <label xml:lang="en">
-      Identifier (ggf. mehrere, URN, DOI,...)
+      Identifier (URN, DOI,...)
     </label>
   </helpPopup>
   <!-- Identifier END -->
