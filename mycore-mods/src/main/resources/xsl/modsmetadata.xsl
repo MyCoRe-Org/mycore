@@ -1005,12 +1005,21 @@
       </div>
     </div>
 
+    <xsl:if test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:abstract">
+      <xsl:call-template name="printMetaDate.mods.abstractContent" />
+    </xsl:if>
+
     <xsl:if
       test="(./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:language) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:publisher) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:edition) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateOther) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:place/mods:placeTerm) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:physicalDescription/mods:extent) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[not(@type='conference')]) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition) or
@@ -1023,6 +1032,7 @@
           <table class="metaData">
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
             <xsl:call-template name="printMetaDate.mods.permalink" />
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" />
             </xsl:call-template>
@@ -1030,12 +1040,22 @@
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:publisher" />
             </xsl:call-template>
             <xsl:call-template name="printMetaDate.mods">
+              <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:edition" />
+            </xsl:call-template>
+            <xsl:apply-templates mode="present"
+              select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:physicalDescription/mods:extent" />
+            <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateOther" />
               <xsl:with-param name="sep" select="'; '" />
             </xsl:call-template>
+            <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification" />
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes"
                 select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:place/mods:placeTerm" />
+            </xsl:call-template>
+            <xsl:call-template name="printMetaDate.mods">
+              <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject" />
+              <xsl:with-param name="sep" select="'; '" />
             </xsl:call-template>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition" />
