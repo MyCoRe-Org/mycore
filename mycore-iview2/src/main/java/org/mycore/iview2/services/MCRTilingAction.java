@@ -76,7 +76,7 @@ public class MCRTilingAction implements Runnable {
             transaction.commit();
         } catch (Exception e) {
             LOGGER.error("Error while getting next tiling job.", e);
-            if (transaction != null) {
+            if (transaction != null && transaction.isActive()) {
                 transaction.rollback();
             }
         } finally {
