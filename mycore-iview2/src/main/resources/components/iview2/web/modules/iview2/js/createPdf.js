@@ -251,13 +251,7 @@ iview.Pdf.Controller = function(parent) {
     url : that.parent.properties.pdfCreatorURI + "?getRestrictions",
     crossDomain : true,
     complete : function(jqXHR, textStatus) {
-      alert("complete: " + textStatus);
       jQuery.support.cors = corsSupport;
-    },
-    error : function(jqXHR, textStatus, errorThrown) {
-      alert("error");
-      alert("status: " + textStatus);
-      alert("cause:" + errorThrown);
     },
     success : function(data) {
       that.maxPages = data.maxPages;
