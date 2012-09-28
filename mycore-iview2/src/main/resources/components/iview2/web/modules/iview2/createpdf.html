@@ -22,7 +22,7 @@
           <tr>
             <td rowspan=2>
               <div id="printPreview">
-                <img class="previewImage" onload="iview.resizeImage(this, '170px', '220px')" style="margin-top: 30px"
+                <img class="previewImage" onload="iview.Pdf.resizeImage(this, '170px', '220px')" style="margin-top: 30px"
                   src="" />
               </div>
             </td>
@@ -36,12 +36,11 @@
                   name="pages" value="" class="manual" /> <label for="manual" class="mcri18n">component.iview2.createPdf.range.manual</label>
                 <input class="manualInput" style="width: 8em;">
                 <div class="validation" />
-              </fieldset></td>
+              </fieldset>
+            </td>
           </tr>
           <tr>
             <td style="text-align: right; vertical-align: bottom;">
-              <!--           <input type="button" style="background-size: 10px 10px; background: no-repeat url('http://lists.freedesktop.org/archives/tango-artists/attachments/20051206/3614f9f6/dialog-cancel.svg');" value="Abbrechen"/> -->
-              <!--           <input type="button" style="background-size: 10px 10px; background: no-repeat url('http://lists.freedesktop.org/archives/tango-artists/attachments/20051206/3614f9f6/dialog-ok.svg');" value="OK"/> -->
               <input type="button" class="simplemodal-close mcri18n" value="component.iview2.createPdf.cancel" /> <input
               type="submit" class="ok mcri18n" value="component.iview2.createPdf.submit" />
             </td>

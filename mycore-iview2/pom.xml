@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <artifactId>mycore</artifactId>
     <groupId>org.mycore</groupId>
@@ -10,7 +11,7 @@
   <artifactId>mycore-iview2</artifactId>
   <name>MyCoRe IView2</name>
   <build>
-  
+
     <plugins>
       <plugin>
         <groupId>com.samaxes.maven</groupId>
@@ -37,8 +38,8 @@
               <jsSourceFiles>
                 <jsSourceFile>Utils.js</jsSourceFile>
                 <!--General Util Funktionen-->
-		<jsSourceFile>cache.js</jsSourceFile>
-		<!-- JavaScript Caching functionality -->
+                <jsSourceFile>cache.js</jsSourceFile>
+        		<!-- JavaScript Caching functionality -->
                 <jsSourceFile>jquery.mousewheel.min.js</jsSourceFile>
                 <!-- JQuery Mousewheel support -->
                 <jsSourceFile>jquery.tree.min.js</jsSourceFile>
@@ -48,6 +49,8 @@
                 <jsSourceFile>jquery.mcri18n.js</jsSourceFile>
                 <!-- Compatibility Library for browsers that do not support ECMA-Script 5th Edition -->
                 <jsSourceFile>ecma5compat.js</jsSourceFile>
+                <!-- CORS support in IE -->
+                <jsSourceFile>xdr.js</jsSourceFile>
                 <!-- i18n Module -->
                 <jsSourceFile>i18n.js</jsSourceFile>
                 <jsSourceFile>PanoJS.js</jsSourceFile>
@@ -87,9 +90,9 @@
                 
                 <!--  Model, Controller, View -->
                 <!--  needs Event.js -->
-                
+
                 <jsSourceFile>iview2.toolbar/ToolbarManager.js</jsSourceFile>
-                
+
                 <jsSourceFile>iview2.toolbar/ToolbarModel.js</jsSourceFile>
                 <jsSourceFile>iview2.toolbar/ToolbarButtonsetModel.js</jsSourceFile>
                 <jsSourceFile>iview2.toolbar/ToolbarDividerModel.js</jsSourceFile>

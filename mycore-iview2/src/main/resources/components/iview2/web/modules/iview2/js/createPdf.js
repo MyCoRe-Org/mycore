@@ -5,16 +5,40 @@
  */
 iview.Pdf = {};
 
-  /**
-   * @public
-   * @function
-   * @name openPdfCreator
-   * @memberOf iview.General
-   * @description opens PDF creator dialog
-   * @param {button}
-   *          button to which represents the PDF creator in the toolbar
-   */
-iview.IViewInstance.prototype.openPdfCreator = function pdf_openPdfCreator(){
+/**
+ * @public
+ * @function
+ * @memberOf iview.Pdf
+ * @description adjusts image css style properties so that image is resized with correct aspect ration
+ * @param {object}
+ *          image Object
+ * @param {string}
+ *          max-width (css-value)
+ * @param {string}
+ *          max-height (css-value)
+ */
+iview.Pdf.resizeImage = function(img, width, height) {
+  if (img.height > img.width) {
+    img.style.height = height;
+    img.style.width = "auto";
+  } else {
+    img.style.height = "auto";
+    img.style.width = width;
+  }
+};
+
+iview.Pdf.enabled = !!(jQuery.support.cors || window.XDomainRequest);
+
+/**
+ * @public
+ * @function
+ * @name openPdfCreator
+ * @memberOf iview.General
+ * @description opens PDF creator dialog
+ * @param {button}
+ *          button to which represents the PDF creator in the toolbar
+ */
+iview.IViewInstance.prototype.openPdfCreator = function pdf_openPdfCreator() {
   var that = this;
   if (typeof this.getPdfCtrl === "undefined") {
     this.getPdfCtrl = function() {
@@ -31,7 +55,8 @@ iview.IViewInstance.prototype.openPdfCreator = function pdf_openPdfCreator(){
         this.viewerContainer,
         this.properties.webappBaseUri + "modules/iview2",
         this.properties.pdfCreatorURI,
-        this.properties.webappBaseUri + "servlets/MCRMETSServlet/" + this.properties.derivateId + "?XSL.Style=" + this.properties.pdfCreatorStyle,
+        this.properties.webappBaseUri + "servlets/MCRMETSServlet/" + this.properties.derivateId + "?XSL.Style="
+            + this.properties.pdfCreatorStyle,
         function() {
           that.getPdfCtrl().initView(i18n);
         });
@@ -59,14 +84,21 @@ iview.IViewInstance.prototype.openPdfCreator = function pdf_openPdfCreator(){
  */
 iview.Pdf.View = function(id, parent, basePath, pdfCreatorURI, pdfSourceXML, callback) {
   this.id = id;
-
-  this.pdfCreator = jQuery('<div>').addClass(id).addClass('pdfCreator').appendTo(parent).load(basePath + '/createpdf.html .modal-content',
-      function() {
-        var form = jQuery("form", this)[0];
-        form.action = pdfCreatorURI;
-        form.mets.value = pdfSourceXML;
-        callback();
-      });
+  if (iview.Pdf.enabled) {
+    this.pdfCreator = jQuery('<div>').addClass(id).addClass('pdfCreator').appendTo(parent)
+        .load(basePath + '/createpdf.html .modal-content', function() {
+          var form = jQuery("form", this)[0];
+          form.action = pdfCreatorURI;
+          form.mets.value = pdfSourceXML;
+          callback();
+        });
+  } else {
+    this.pdfCreator = jQuery('<div>').addClass(id).addClass('pdfCreator').appendTo(parent).load(basePath
+        + '/browserUpgrade.html .modal-content',
+        function() {
+          callback();
+        });
+  }
 };
 
 iview.Pdf.View.prototype = {
@@ -186,9 +218,9 @@ iview.Pdf.View.prototype = {
   },
 
   setCurrentPageText : function(text, currentPage) {
-    var cP = jQuery("input.currentPage", this.getPdfCreator())[0];
-    cP.value = currentPage;
-    cP.nextElementSibling.innerHTML = text + currentPage;
+    var cP = jQuery("input.currentPage", this.getPdfCreator());
+    cP.val(currentPage);
+    cP.next().html(text + currentPage);
   },
 
   setMaxPageNumber : function(lastPage) {
@@ -211,10 +243,23 @@ iview.Pdf.Controller = function(parent) {
   this.order = parent.PhysicalModel._order;
   this.maxPages = 0;
   var that = this;
+  var corsSupport = jQuery.support.cors;
+  jQuery.support.cors = true;
   jQuery.ajax({
-    url : this.parent.properties.pdfCreatorURI + "?getRestrictions",
+    type : 'GET',
+    dataType: 'json',
+    url : that.parent.properties.pdfCreatorURI + "?getRestrictions",
+    crossDomain : true,
+    complete : function(jqXHR, textStatus) {
+      alert("complete: " + textStatus);
+      jQuery.support.cors = corsSupport;
+    },
+    error : function(jqXHR, textStatus, errorThrown) {
+      alert("error");
+      alert("status: " + textStatus);
+      alert("cause:" + errorThrown);
+    },
     success : function(data) {
-      data = jQuery.parseJSON(data);
       that.maxPages = data.maxPages;
     }
   });
@@ -232,17 +277,19 @@ iview.Pdf.Controller.prototype = {
    */
   initView : function(i18n) {
     this.i18n = i18n;
-    var pdfEl = this.view.getPdfCreator();
-    var that = this;
-    jQuery("input[type=radio]", pdfEl).focus(function() {
-      that.validateRangeInput(this);
-    });
-    jQuery("input.manualInput", pdfEl).change(function() {
-      that.changeManualInput(this);
-    });
-    jQuery("form", pdfEl).submit(function(event) {
-      return iview.Pdf.Controller.validateForm(event.target, that.maxPages, that.i18n);
-    });
+    if (iview.Pdf.enabled) {
+      var pdfEl = this.view.getPdfCreator();
+      var that = this;
+      jQuery("input[type=radio]", pdfEl).focus(function() {
+        that.validateRangeInput(this);
+      });
+      jQuery("input.manualInput", pdfEl).change(function() {
+        that.changeManualInput(this);
+      });
+      jQuery("form", pdfEl).submit(function(event) {
+        return iview.Pdf.Controller.validateForm(event.target, that.maxPages, that.i18n);
+      });
+    }
     jQuery(".mcri18n").mcrI18N(i18n);
     this.show();
   },
@@ -282,8 +329,8 @@ iview.Pdf.Controller.prototype = {
       return;
     }
     var imgPath = this.order[first]._href;
-    this.view.displayPreview(this.parent.properties.webappBaseUri + "servlets/MCRTileServlet/" + this.parent.properties.derivateId + "/" + imgPath
-        + "/0/0/0.jpg");
+    this.view.displayPreview(this.parent.properties.webappBaseUri + "servlets/MCRTileServlet/" + this.parent.properties.derivateId + "/"
+        + imgPath + "/0/0/0.jpg");
   },
 
   /**
@@ -296,14 +343,16 @@ iview.Pdf.Controller.prototype = {
     this.parent.viewerBean.disableInputHandler();
     var that = this;
     var cP = this.parent.PhysicalModel._curPos;
-    this.i18n.executeWhenLoaded(function(i) {
-      that.view.setCurrentPageText(i.translate("createPdf.range.currentPage") + ":", cP);
-    });
-    this.view.setMaxPageNumber(this.parent.PhysicalModel._pageCount);
-    this.displayPreview(String(cP));
+    if (iview.Pdf.enabled) {
+      this.i18n.executeWhenLoaded(function(i) {
+        that.view.setCurrentPageText(i.translate("createPdf.range.currentPage") + ":", cP);
+      });
+      this.view.setMaxPageNumber(this.parent.PhysicalModel._pageCount);
+      this.displayPreview(String(cP));
+    }
     this.view.show(function() {
       // on close:
-      that.parent.enableInputHandler();
+      that.parent.viewerBean.enableInputHandler();
     });
   }
 

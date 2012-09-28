@@ -16,13 +16,13 @@ div.validation {
 	text-align: center;
 }
 
-#printForm .simplemodal-close {
+#createpdf-container input.simplemodal-close {
 	padding-left: 24px;
 	height: 28px;
 	background: 2px 2px no-repeat url('dialog-cancel.png');
 }
 
-#printForm .ok {
+#createpdf-container input.ok {
 	padding-left: 24px;
 	height: 28px;
 	background: 2px 2px no-repeat url('dialog-ok.png');
@@ -57,7 +57,7 @@ div.modal-content,div.modal-data {
 }
 
 #createpdf-container a {
-	color: #ddd;
+	color: #444;
 }
 
 #createpdf-container .modal-title {
