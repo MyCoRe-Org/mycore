@@ -288,7 +288,7 @@
       </xsl:choose>
       <!--*** Editor Buttons ************************************* -->
       <xsl:if
-        test="((./structure/children/child) and not($mods-type='series' or $mods-type='journal' or $mods-type='confpro')) or (./structure/derobjects/derobject)">
+        test="((./structure/children/child) and not($mods-type='series' or $mods-type='journal' or $mods-type='confpro' or $mods-type='book')) or (./structure/derobjects/derobject)">
         <div id="derivate_box" class="detailbox">
           <h4 id="derivate_switch" class="block_switch">
             <a name="derivate_box"></a>
@@ -517,7 +517,7 @@
           </xsl:if>
           <xsl:if test="$objectHost = 'local'">
             <xsl:for-each select="./structure/derobjects/derobject">
-              <table cellpadding="0" cellspacing="0" border="0" width="100%">
+              <table class="derobjects">
                 <tr>
                   <td valign="top" align="left">
                     <xsl:variable select="@xlink:href" name="deriv" />
