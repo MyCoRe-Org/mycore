@@ -373,7 +373,8 @@
           <label xml:lang="de">Bitte geben Sie den Namen der Person (&lt;Name, Vorname&gt;) an oder die GND-ID (Personen)!</label>
           <label xml:lang="en">Please insert person or corporation name alternativly insert GND-ID (person).</label>
         </condition>
-        <condition id="mods.name.validPnd" xsl="(string-length(translate(.,'- ',''))>=11 or string(number(translate(.,'- Xx','')))='NaN') or (count(document(concat('http://d-nb.info/gnd/',translate(.,' ',''),'/about/rdf'))/*[local-name()='RDF'])=1)">
+        <condition id="mods.name.validPnd"
+          xsl="(string-length(translate(.,'- ',''))>=11 or string(number(translate(.,'- Xx','')))='NaN') or (count(document(concat('http://d-nb.info/gnd/',translate(.,' ',''),'/about/rdf'))/*[local-name()='RDF'])=1)">
           <label>GND erkannt, aber die GND scheint ungültig zu sein.</label>
         </condition>
       </textfield>
@@ -390,7 +391,8 @@
     </cell>
     <cell col="2" row="1" anchor="NORTHEAST" var="nameOrPND">
       <textfield width="31" maxlength="128">
-        <condition id="mods.name.optional.validPnd" xsl="(string-length(translate(.,'- ',''))>=11 or string(number(translate(.,'- Xx','')))='NaN') or (count(document(concat('http://d-nb.info/gnd/',translate(.,' ',''),'/about/rdf'))/*[local-name()='RDF'])=1)">
+        <condition id="mods.name.optional.validPnd"
+          xsl="(string-length(translate(.,'- ',''))>=11 or string(number(translate(.,'- Xx','')))='NaN') or (count(document(concat('http://d-nb.info/gnd/',translate(.,' ',''),'/about/rdf'))/*[local-name()='RDF'])=1)">
           <label>GND erkannt, aber die GND scheint ungültig zu sein.</label>
         </condition>
       </textfield>
@@ -449,7 +451,8 @@
               </cell>
               <cell col="2" row="1" anchor="NORTHEAST" var="nameOrPND">
                 <textfield width="31" maxlength="128">
-                  <condition id="mods.person.publisher.validPnd" xsl="(string-length(translate(.,'- ',''))>=11 or string(number(translate(.,'- Xx','')))='NaN') or (count(document(concat('http://d-nb.info/gnd/',translate(.,' ',''),'/about/rdf'))/*[local-name()='RDF'])=1)">
+                  <condition id="mods.person.publisher.validPnd"
+                    xsl="(string-length(translate(.,'- ',''))>=11 or string(number(translate(.,'- Xx','')))='NaN') or (count(document(concat('http://d-nb.info/gnd/',translate(.,' ',''),'/about/rdf'))/*[local-name()='RDF'])=1)">
                     <label>GND erkannt, aber die GND scheint ungültig zu sein.</label>
                   </condition>
                 </textfield>
@@ -1077,7 +1080,8 @@
     <label xml:lang="de">
       <p>
         Ein Identifier ist ein eindeutiger und dauerhafter Identifikator für eine digitale Ressource oder ein physisches Werk.
-        Es können auch mehrere unterschiedliche Identifikatoren (DOI, URN, URI ...) angegeben werden.
+        Es können
+        auch mehrere unterschiedliche Identifikatoren (DOI, URN, URI ...) angegeben werden.
       </p>
       <p>
         ISBN ist immer in Form der ISBN13 anzugeben - mit Bindestrichen! Liegt nur die ISBN10 vor, so muss diese entsprechend konvertiert
@@ -1088,7 +1092,7 @@
         Falls eine DOI des Verlages vorhanden ist, ist diese in jedem Fall anzugeben. Soll die PPN angegeben werden, so ist der
         PPN-Zitierlink als URI einzutragen.
       </p>
-      
+
     </label>
     <label xml:lang="en">
       Identifier (URN, DOI,...)
@@ -1415,7 +1419,11 @@
       <repeater min="1" pos="right">
         <panel>
           <cell anchor="NORTHWEST" var="@year">
-            <textfield width="4" maxlength="4" />
+            <textfield width="4" maxlength="4">
+              <condition id="char.year" type="datetime" format="yyyy">
+                <label xml:lang="de">Bitte geben Sie ein vierstellige Jahreszahl ein.</label>
+              </condition>
+            </textfield>
           </cell>
           <cell col="2" anchor="NORTHWEST" ref="TFzeile10" var="@factor" />
           <cell col="3" anchor="NORTHWEST" var="@refereed">
@@ -1434,6 +1442,9 @@
               </item>
             </list>
           </cell>
+          <condition id="yearRequiredForCharacteristics" xsl="count(@year)=1 or (count(@factor)=0 and count(@refereed)=0)">
+            <label xml:lang="de">Es muss ein Jahr angegeben werden</label>
+          </condition>
         </panel>
       </repeater>
     </cell>
