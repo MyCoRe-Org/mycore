@@ -71,6 +71,11 @@ public class MCRTransformerPipe extends MCRParameterizedTransformer {
     }
 
     @Override
+    public String getEncoding() {
+        return transformers.get(transformers.size() - 1).getEncoding();
+    }
+
+    @Override
     protected String getDefaultExtension() {
         return transformers.get(transformers.size() - 1).getDefaultExtension();
     }
