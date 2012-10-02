@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -59,8 +58,8 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.fo.MCRFoFactory;
 import org.mycore.common.fo.MCRFoFormatterInterface;
-import org.mycore.common.xsl.MCRTemplatesSource;
 import org.mycore.common.xsl.MCRParameterCollector;
+import org.mycore.common.xsl.MCRTemplatesSource;
 import org.mycore.common.xsl.MCRXSLTransformerFactory;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.xml.sax.SAXParseException;
@@ -78,20 +77,8 @@ public class MCRLayoutService {
 
     private static final MCRLayoutService SINGLETON = new MCRLayoutService();
 
-    private ThreadLocal<HashMap<String, String>> transformMap = new ThreadLocal<HashMap<String, String>>() {
-
-        @Override
-        protected HashMap<String, String> initialValue() {
-            return new HashMap<String, String>();
-        }
-    };
-
     public static MCRLayoutService instance() {
         return SINGLETON;
-    }
-
-    public Map<String, String> getCurrentTransformationMap() {
-        return transformMap.get();
     }
 
     /**
@@ -292,13 +279,11 @@ public class MCRLayoutService {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Result result = new StreamResult(out);
         try {
-            transformMap.get().clear();
             transformer.transform(xml, result);
         } catch (TransformerException ex) {
             String msg = "Error while transforming XML using XSL stylesheet: " + ex.getMessageAndLocation();
             throw new MCRException(msg, ex);
         } finally {
-            transformMap.get().clear();
             out.close();
         }
 
@@ -347,12 +332,9 @@ public class MCRLayoutService {
     private JDOMResult transform(Source xml, Transformer transformer) throws IOException, MCRException {
         JDOMResult result = new JDOMResult();
         try {
-            transformMap.get().clear();
             transformer.transform(xml, result);
         } catch (TransformerException ex) {
             LOGGER.error("Error while transforming XML using XSL stylesheet: " + ex.getMessageAndLocation(), ex);
-        } finally {
-            transformMap.get().clear();
         }
         return result;
     }

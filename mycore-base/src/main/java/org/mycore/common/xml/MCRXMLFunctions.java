@@ -662,17 +662,6 @@ public class MCRXMLFunctions {
         return MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateID)).getOwnerID().toString();
     }
 
-    public static String getVariable(String key) {
-        String value = MCRLayoutService.instance().getCurrentTransformationMap().get(key);
-        return value != null ? value : "";
-    }
-
-    public static String putVariable(String key, String value) {
-        String oldValue = MCRLayoutService.instance().getCurrentTransformationMap().put(key, value);
-        LOGGER.debug("old value: " + oldValue);
-        return oldValue != null ? oldValue : "";
-    }
-
     /**
      * @param uri the uri to resolve
      * @return
