@@ -31,6 +31,7 @@ import java.util.StringTokenizer;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.xsl.MCRParameterCollector;
 
 /**
  * Transforms MCRContent by using a pipe of multiple transformers.
@@ -40,7 +41,7 @@ import org.mycore.common.content.MCRContent;
  * 
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRTransformerPipe extends MCRContentTransformer {
+public class MCRTransformerPipe extends MCRParameterizedTransformer {
 
     /** List of transformers to execute */
     private List<MCRContentTransformer> transformers = new ArrayList<MCRContentTransformer>();
@@ -61,10 +62,7 @@ public class MCRTransformerPipe extends MCRContentTransformer {
 
     @Override
     public MCRContent transform(MCRContent content) throws IOException {
-        for (MCRContentTransformer transformer : transformers)
-            content = transformer.transform(content);
-
-        return content;
+        return transform(content, new MCRParameterCollector());
     }
 
     @Override
@@ -80,5 +78,17 @@ public class MCRTransformerPipe extends MCRContentTransformer {
     @Override
     public String getFileExtension() {
         return transformers.get(transformers.size() - 1).getFileExtension();
+    }
+
+    @Override
+    public MCRContent transform(MCRContent source, MCRParameterCollector parameter) throws IOException {
+        for (MCRContentTransformer transformer : transformers) {
+            if (transformer instanceof MCRParameterizedTransformer) {
+                source = ((MCRParameterizedTransformer) transformer).transform(source, parameter);
+            } else {
+                source = transformer.transform(source);
+            }
+        }
+        return source;
     }
 }
