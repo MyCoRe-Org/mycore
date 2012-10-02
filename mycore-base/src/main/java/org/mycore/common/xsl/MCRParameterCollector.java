@@ -23,8 +23,8 @@
 package org.mycore.common.xsl;
 
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -48,7 +48,7 @@ public class MCRParameterCollector {
     private final static Logger LOGGER = Logger.getLogger(MCRParameterCollector.class);
 
     /** The collected parameters */
-    private Properties parameters = new Properties();
+    private Map<String, String> parameters = new HashMap<String, String>();
 
     /**
      * Collects parameters The collecting of parameters is done in steps,
@@ -111,7 +111,7 @@ public class MCRParameterCollector {
     /**
      * Sets the parameter only if it starts with "XSL." and is not empty
      */
-    private void setXSLParameter(String name, Object value) {
+    private void setXSLParameter(String name, String value) {
         if (name.startsWith("XSL.") && (value != null) && (!value.toString().isEmpty()))
             parameters.put(name.substring(4), value);
     }
@@ -120,14 +120,17 @@ public class MCRParameterCollector {
      * Returns the parameter with the given name
      */
     public String getParameter(String name, String defaultValue) {
-        return parameters.getProperty(name, defaultValue);
+        String val = parameters.get(name);
+        return (val == null) ? defaultValue : val;
     }
 
     /**
      * Copies all MCRConfiguration properties as XSL parameters.
      */
     private void setFromConfiguration() {
-        parameters.putAll(MCRConfiguration.instance().getProperties());
+        for (Map.Entry<Object, Object> property : MCRConfiguration.instance().getProperties().entrySet()) {
+            parameters.put(property.getKey().toString(), property.getValue().toString());
+        }
     }
 
     /**
@@ -138,7 +141,7 @@ public class MCRParameterCollector {
         for (@SuppressWarnings("unchecked")
         Enumeration<String> e = session.getAttributeNames(); e.hasMoreElements();) {
             String name = e.nextElement();
-            setXSLParameter(name, session.getAttribute(name));
+            setXSLParameter(name, session.getAttribute(name).toString());
         }
     }
 
@@ -149,7 +152,7 @@ public class MCRParameterCollector {
     private void setFromSession(MCRSession session) {
         for (Map.Entry<Object, Object> entry : session.getMapEntries()) {
             String key = entry.getKey().toString();
-            setXSLParameter(key, entry.getValue());
+            setXSLParameter(key, entry.getValue().toString());
         }
     }
 
@@ -177,7 +180,7 @@ public class MCRParameterCollector {
             if (!(name.endsWith(".SESSION"))) {
                 final Object attributeValue = request.getAttribute(name);
                 if (attributeValue != null) {
-                    setXSLParameter(name, attributeValue);
+                    setXSLParameter(name, attributeValue.toString());
                 }
             }
         }
@@ -210,10 +213,10 @@ public class MCRParameterCollector {
     }
 
     private void debugSessionParameters() {
-        LOGGER.debug("XSL.HttpSession =" + parameters.getProperty("HttpSession"));
-        LOGGER.debug("XSL.JSessionID =" + parameters.getProperty("JSessionID"));
-        LOGGER.debug("XSL.CurrentUser =" + parameters.getProperty("CurrentUser"));
-        LOGGER.debug("XSL.Referer =" + parameters.getProperty("Referer"));
+        LOGGER.debug("XSL.HttpSession =" + parameters.get("HttpSession"));
+        LOGGER.debug("XSL.JSessionID =" + parameters.get("JSessionID"));
+        LOGGER.debug("XSL.CurrentUser =" + parameters.get("CurrentUser"));
+        LOGGER.debug("XSL.Referer =" + parameters.get("Referer"));
     }
 
     /** Sets the request and referer URL */
@@ -257,13 +260,8 @@ public class MCRParameterCollector {
      *            the Transformer object thats parameters should be set
      */
     public void setParametersTo(Transformer transformer) {
-        Enumeration<?> names = parameters.propertyNames();
-
-        while (names.hasMoreElements()) {
-            String name = names.nextElement().toString();
-            String value = parameters.getProperty(name);
-
-            transformer.setParameter(name, value);
+        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+            transformer.setParameter(entry.getKey(), entry.getValue());
         }
     }
 }
