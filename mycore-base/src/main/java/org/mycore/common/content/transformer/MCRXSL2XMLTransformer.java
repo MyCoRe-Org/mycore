@@ -39,6 +39,7 @@ import org.jdom.transform.JDOMResult;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.MCRXMLContent;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -104,6 +105,11 @@ public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
     @Override
     protected String getDefaultExtension() {
         return "xml";
+    }
+
+    @Override
+    public String getEncoding() {
+        return MCRXMLContent.ENCODING;
     }
 
 }

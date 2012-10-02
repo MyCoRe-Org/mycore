@@ -72,6 +72,15 @@ public abstract class MCRContentTransformer {
     public String getMimeType() {
         return mimeType;
     }
+    
+    /**
+     * Returns the encoding of characters in the binary stream.
+     * 
+     * Will return null if the encoding is unknown or the results does not represent character data.
+     */
+    public String getEncoding() {
+        return null;
+    }
 
     /**
      * Returns the file extension that is usually related to the transformed content.

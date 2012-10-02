@@ -49,8 +49,13 @@ public class MCRToPrettyXML extends MCRContentTransformer {
         } catch (JDOMException e) {
             throw new IOException(e);
         }
-        content.setFormat(Format.getPrettyFormat().setEncoding("UTF-8"));
+        content.setFormat(Format.getPrettyFormat().setEncoding(getEncoding()));
         return content;
+    }
+
+    @Override
+    public String getEncoding() {
+        return MCRXMLContent.ENCODING;
     }
     
     @Override

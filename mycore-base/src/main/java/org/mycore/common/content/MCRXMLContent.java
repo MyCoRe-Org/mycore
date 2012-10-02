@@ -38,6 +38,7 @@ import org.mycore.common.MCRConfiguration;
  */
 public abstract class MCRXMLContent extends MCRContent {
 
+    public static final String ENCODING = "UTF-8";
     /** 
      * The default format used when outputting XML as a byte stream.
      * By default, content is outputted using UTF-8 encoding.
@@ -48,7 +49,7 @@ public abstract class MCRXMLContent extends MCRContent {
     static {
         boolean prettyXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.PrettyXML", true);
         defaultFormat = prettyXML ? Format.getPrettyFormat().setIndent("  ") : Format.getRawFormat();
-        defaultFormat.setEncoding("UTF-8");
+        defaultFormat.setEncoding(ENCODING);
     }
 
     /** The default format used when outputting this XML as a byte stream */

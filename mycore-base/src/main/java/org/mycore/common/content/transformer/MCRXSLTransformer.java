@@ -40,6 +40,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.xml.MCRURIResolver;
@@ -107,6 +108,16 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     }
 
     @Override
+    public String getEncoding() {
+        return getOutputProperty("encoding");
+    }
+
+    @Override
+    public String getMimeType() {
+        return getOutputProperty("media-type");
+    }
+
+    @Override
     public MCRContent transform(MCRContent source) throws IOException {
         return transform(source, new MCRParameterCollector());
     }
@@ -158,7 +169,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         return new MCRByteContent(baos.toByteArray());
     }
 
-    private LinkedList<TransformerHandler> getTransformHandlerList(MCRParameterCollector parameterCollector) throws TransformerConfigurationException, SAXException {
+    private LinkedList<TransformerHandler> getTransformHandlerList(MCRParameterCollector parameterCollector) throws TransformerConfigurationException,
+        SAXException {
         checkTemplateUptodate();
         LinkedList<TransformerHandler> xslSteps = new LinkedList<TransformerHandler>();
         for (Templates template : templates) {
@@ -183,6 +195,16 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         reader.setEntityResolver(URI_RESOLVER);
         reader.setContentHandler(transformHandlerList.getFirst());
         return reader;
+    }
+
+    private String getOutputProperty(String propertyName) {
+        try {
+            checkTemplateUptodate();
+            Templates lastTemplate = templates[templates.length - 1];
+            return lastTemplate.getOutputProperties().getProperty(propertyName);
+        } catch (Exception e) {
+            throw new MCRException(e);
+        }
     }
 
 }
