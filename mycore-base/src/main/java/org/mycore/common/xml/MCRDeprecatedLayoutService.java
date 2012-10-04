@@ -86,7 +86,7 @@ public class MCRDeprecatedLayoutService {
         MCRContent content = new MCRJDOMContent(jdom);
         String docType = content.getDocType();
         MCRParameterCollector parameters = new MCRParameterCollector(req);
-        String resourceName = SINGLETON.getResourceName(req, parameters, docType);
+        String resourceName = getResourceName(req, parameters, docType);
         if (resourceName == null) {
             new org.jdom.output.XMLOutputter().output(jdom, out);
         } else {
@@ -136,6 +136,46 @@ public class MCRDeprecatedLayoutService {
     @Deprecated
     public void doLayout(HttpServletRequest req, HttpServletResponse res, File file) throws IOException {
         SINGLETON.doLayout(req, res, new MCRFileContent(file));
+    }
+
+    private static String getResourceName(HttpServletRequest req, MCRParameterCollector parameters, String docType) {
+        String style = parameters.getParameter("Style", "default");
+        LOGGER.debug("MCRLayoutService using style " + style);
+
+        String styleName = buildStylesheetName(docType, style);
+        boolean resourceExist = false;
+        try {
+            resourceExist = MCRXMLResource.instance().exists(styleName, MCRDeprecatedLayoutService.class.getClassLoader());
+            if (resourceExist) {
+                return styleName;
+            }
+        } catch (Exception e) {
+            throw new MCRException("Error while loading stylesheet: " + styleName, e);
+        }
+
+        // If no stylesheet exists, forward raw xml instead
+        // You can transform raw xml code by providing a stylesheed named
+        // [doctype]-xml.xsl now
+        if (style.equals("xml") || style.equals("default")) {
+            return null;
+        }
+        throw new MCRException("XSL stylesheet not found: " + styleName);
+    }
+
+    /**
+     * Builds the filename of the stylesheet to use, e. g. "playlist-simple.xsl"
+     */
+    private static String buildStylesheetName(String docType, String style) {
+        StringBuffer filename = new StringBuffer("xsl/").append(docType);
+
+        if (!"default".equals(style)) {
+            filename.append("-");
+            filename.append(style);
+        }
+
+        filename.append(".xsl");
+
+        return filename.toString();
     }
 
 }

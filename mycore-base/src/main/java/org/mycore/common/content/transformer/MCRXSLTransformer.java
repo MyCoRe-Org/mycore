@@ -38,6 +38,7 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -62,6 +63,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     private static final MCRURIResolver URI_RESOLVER = MCRURIResolver.instance();
 
+    private static Logger LOGGER = Logger.getLogger(MCRXSLTransformer.class);
+
     /** The compiled XSL stylesheet */
     protected MCRTemplatesSource[] templateSources;
 
@@ -71,9 +74,15 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     protected SAXTransformerFactory tFactory;
 
+    public MCRXSLTransformer(String... stylesheets) {
+        this();
+        setStylesheets(stylesheets);
+    }
+
     public MCRXSLTransformer() {
         super();
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        LOGGER.info("Transformerfactory: " + transformerFactory.getClass().getName());
         transformerFactory.setURIResolver(URI_RESOLVER);
         if (transformerFactory.getFeature(SAXSource.FEATURE) && transformerFactory.getFeature(SAXResult.FEATURE)) {
             this.tFactory = (SAXTransformerFactory) transformerFactory;
@@ -101,8 +110,10 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     private void checkTemplateUptodate() throws TransformerConfigurationException, SAXException {
         for (int i = 0; i < templateSources.length; i++) {
-            if (modified[i] < templateSources[i].getLastModified()) {
+            long lastModified = templateSources[i].getLastModified();
+            if (modified[i] < lastModified) {
                 templates[i] = tFactory.newTemplates(templateSources[i].getSource());
+                modified[i] = lastModified;
             }
         }
     }
@@ -205,6 +216,25 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         } catch (Exception e) {
             throw new MCRException(e);
         }
+    }
+
+    /* (non-Javadoc)
+     * @see org.mycore.common.content.transformer.MCRContentTransformer#getFileExtension()
+     */
+    @Override
+    public String getFileExtension() {
+        String fileExtension = super.getFileExtension();
+        if (fileExtension != null) {
+            return fileExtension;
+        }
+        //until we have a better solution
+        if ("text/html".equals(getMimeType())) {
+            return "html";
+        }
+        if ("text/xml".equals(getMimeType())) {
+            return "xml";
+        }
+        return null;
     }
 
 }

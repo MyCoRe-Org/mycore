@@ -22,17 +22,15 @@
 
 package org.mycore.common.xml;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.text.MessageFormat;
 import java.util.Hashtable;
 import java.util.Map;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -49,8 +47,8 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.fo.MCRFoFactory;
-import org.mycore.common.fo.MCRFoFormatterInterface;
+import org.mycore.common.content.transformer.MCRContentTransformer;
+import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.common.xsl.MCRTemplatesSource;
 import org.mycore.common.xsl.MCRXSLTransformerFactory;
@@ -87,15 +85,85 @@ public class MCRLayoutService extends MCRDeprecatedLayoutService {
         res.flushBuffer();
     }
 
-    public void doLayout(HttpServletRequest req, HttpServletResponse res, MCRContent con) throws IOException {
-        String docType = con.getDocType();
-        MCRParameterCollector parameters = new MCRParameterCollector(req);
-        String resourceName = getResourceName(req, parameters, docType);
-        if (resourceName == null) {
-            sendXML(req, res, con);
+    public void doLayout(HttpServletRequest req, HttpServletResponse res, MCRContent source) throws IOException {
+        MCRParameterCollector parameter = new MCRParameterCollector(req);
+        String docType = source.getDocType();
+        String transformerId = parameter.getParameter("Transformer", null);
+        if (transformerId == null) {
+            String style = parameter.getParameter("Style", "default");
+            transformerId = MessageFormat.format("{0}-{1}", docType, style);
+        }
+        MCRContentTransformer transformer = MCRLayoutTransformerFactory.getTransformer(transformerId);
+        String filename = getFileName(req, parameter);
+        try {
+            transform(res, transformer, source, parameter, filename);
+        } catch (IOException ex) {
+            LOGGER.error("IOException while XSL-transforming XML document", ex);
+        } catch (MCRException ex) {
+            // Check if it is an error page to suppress later recursively
+            // generating an error page when there is an error in the stylesheet
+            if (!"mcr_error".equals(docType)) {
+                throw ex;
+            }
+
+            String msg = "Error while generating error page!";
+            LOGGER.warn(msg, ex);
+            res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
+        }
+    }
+
+    private String getFileName(HttpServletRequest req, MCRParameterCollector parameter) {
+        String filename = parameter.getParameter("FileName", null);
+        if (filename != null) {
+            if (req.getServletPath().contains(filename)) {
+                //filter out MCRStaticXMLFileServlet as it defines "FileName"
+                return extractFileName(req.getServletPath());
+            }
+            return filename;
+        }
+        if (req.getPathInfo() != null) {
+            return extractFileName(req.getPathInfo());
+        }
+        return MessageFormat.format("{0}-{1}", extractFileName(req.getServletPath()), System.currentTimeMillis());
+    }
+
+    private String extractFileName(String filename) {
+        int filePosition = filename.lastIndexOf('/') + 1;
+        filename = filename.substring(filePosition);
+        filePosition = filename.lastIndexOf('.');
+        if (filePosition > 0) {
+            filename = filename.substring(0, filePosition);
+        }
+        return filename;
+    }
+
+    private void transform(HttpServletResponse response, MCRContentTransformer transformer, MCRContent source, MCRParameterCollector parameter, String filename)
+        throws IOException {
+        String fileExtension = transformer.getFileExtension();
+        if (fileExtension != null && fileExtension.length() > 0) {
+            filename += "." + fileExtension;
+        }
+        response.setHeader("Content-Disposition", "inline;filename=\"" + filename + "\"");
+        String ct = transformer.getMimeType();
+        String enc = transformer.getEncoding();
+        if (enc != null) {
+            response.setCharacterEncoding(enc);
+            response.setContentType(ct + "; charset=" + enc);
         } else {
-            transform(res, con.getSource(), docType, parameters,
-                    MCRXSLTransformerFactory.getTransformer(new MCRTemplatesSource(resourceName)));
+            response.setContentType(ct);
+        }
+        LOGGER.debug("MCRLayoutService starts to output " + response.getContentType());
+        ServletOutputStream servletOutputStream = response.getOutputStream();
+        long start = System.currentTimeMillis();
+        try {
+            if (transformer instanceof MCRParameterizedTransformer) {
+                MCRParameterizedTransformer paramTransformer = (MCRParameterizedTransformer) transformer;
+                paramTransformer.transform(source, servletOutputStream, parameter);
+            } else {
+                transformer.transform(source, servletOutputStream);
+            }
+        } finally {
+            LOGGER.debug("MCRContent transformation took " + (System.currentTimeMillis() - start) + " ms.");
         }
     }
 
@@ -116,82 +184,6 @@ public class MCRLayoutService extends MCRDeprecatedLayoutService {
         return new DOMSource(out.getNode());
     }
 
-    private void transform(HttpServletResponse res, Source sourceXML, String docType, MCRParameterCollector parameters,
-            Transformer transformer) throws IOException {
-        parameters.setParametersTo(transformer);
-
-        try {
-            transform(sourceXML, transformer, res);
-        } catch (IOException ex) {
-            LOGGER.error("IOException while XSL-transforming XML document", ex);
-        } catch (MCRException ex) {
-            // Check if it is an error page to suppress later recursively
-            // generating an error page when there is an error in the stylesheet
-            if (!"mcr_error".equals(docType)) {
-                throw ex;
-            }
-
-            String msg = "Error while generating error page!";
-            LOGGER.warn(msg, ex);
-            res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
-        }
-    }
-
-    /**
-     * Transforms XML input with the given XSL stylesheet and sends the output
-     * as HTTP Servlet Response to the client browser.
-     * 
-     * @param xml
-     *            the XML input document
-     * @param xsl
-     *            the compiled XSL stylesheet
-     * @param transformer
-     *            the XSL transformer to use
-     * @param response
-     *            the response object to send the result to
-     */
-    private void transform(Source xml, Transformer transformer, HttpServletResponse response) throws IOException, MCRException {
-
-        // Set content type from "<xsl:output media-type = "...">
-        // Set char encoding from "<xsl:output encoding = "...">
-        String ct = transformer.getOutputProperty("media-type");
-        String enc = transformer.getOutputProperty("encoding");
-        response.setCharacterEncoding(enc);
-        response.setContentType(ct + "; charset=" + enc);
-
-        LOGGER.debug("MCRLayoutService starts to output " + response.getContentType());
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Result result = new StreamResult(out);
-        try {
-            transformer.transform(xml, result);
-        } catch (TransformerException ex) {
-            String msg = "Error while transforming XML using XSL stylesheet: " + ex.getMessageAndLocation();
-            throw new MCRException(msg, ex);
-        } finally {
-            out.close();
-        }
-
-        OutputStream sos = response.getOutputStream();
-        byte[] bytes = out.toByteArray();
-
-        if ("application/pdf".equals(ct)) // extra XSL-FO step
-        {
-            MCRFoFormatterInterface fopper = MCRFoFactory.getFoFormatter();
-            ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-            try {
-                fopper.transform(in, sos);
-                in.close();
-                sos.close();
-            } catch (Exception ex) {
-                throw new MCRException("Could not render XSL-FO to PDF", ex);
-            }
-        } else {
-            sos.write(bytes);
-            sos.close();
-        }
-    }
-
     /**
      * @param xml the document source to transform
      * @param resourceName the name of the stylesheet to invoke (fullqualified name)
@@ -204,63 +196,12 @@ public class MCRLayoutService extends MCRDeprecatedLayoutService {
         if (xml == null || resourceName == null) {
             return null;
         }
-        return transform(xml, MCRXSLTransformerFactory.getTransformer(new MCRTemplatesSource(resourceName)));
-    }
-
-    /**
-     * @param xml
-     * @param transformer
-     * @return
-     * @throws IOException
-     * @throws MCRException
-     */
-    private JDOMResult transform(Source xml, Transformer transformer) throws IOException, MCRException {
         JDOMResult result = new JDOMResult();
         try {
-            transformer.transform(xml, result);
+            MCRXSLTransformerFactory.getTransformer(new MCRTemplatesSource(resourceName)).transform(xml, result);
         } catch (TransformerException ex) {
             LOGGER.error("Error while transforming XML using XSL stylesheet: " + ex.getMessageAndLocation(), ex);
         }
         return result;
-    }
-
-    String getResourceName(HttpServletRequest req, MCRParameterCollector parameters, String docType) {
-        String style = parameters.getParameter("Style", "default");
-        LOGGER.debug("MCRLayoutService using style " + style);
-
-        String styleName = buildStylesheetName(docType, style);
-        boolean resourceExist = false;
-        try {
-            resourceExist = MCRXMLResource.instance().exists(styleName, this.getClass().getClassLoader());
-            if (resourceExist) {
-                return styleName;
-            }
-        } catch (Exception e) {
-            throw new MCRException("Error while loading stylesheet: " + styleName, e);
-        }
-
-        // If no stylesheet exists, forward raw xml instead
-        // You can transform raw xml code by providing a stylesheed named
-        // [doctype]-xml.xsl now
-        if (style.equals("xml") || style.equals("default")) {
-            return null;
-        }
-        throw new MCRException("XSL stylesheet not found: " + styleName);
-    }
-
-    /**
-     * Builds the filename of the stylesheet to use, e. g. "playlist-simple.xsl"
-     */
-    private String buildStylesheetName(String docType, String style) {
-        StringBuffer filename = new StringBuffer("xsl/").append(docType);
-
-        if (!"default".equals(style)) {
-            filename.append("-");
-            filename.append(style);
-        }
-
-        filename.append(".xsl");
-
-        return filename.toString();
     }
 }

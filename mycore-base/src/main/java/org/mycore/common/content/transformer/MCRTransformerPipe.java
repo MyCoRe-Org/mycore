@@ -25,6 +25,7 @@ package org.mycore.common.content.transformer;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -42,6 +43,14 @@ import org.mycore.common.xsl.MCRParameterCollector;
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRTransformerPipe extends MCRParameterizedTransformer {
+
+    /**
+     * @param transformers
+     */
+    public MCRTransformerPipe(MCRContentTransformer... transformers) {
+        super();
+        this.transformers.addAll(Arrays.asList(transformers));
+    }
 
     /** List of transformers to execute */
     private List<MCRContentTransformer> transformers = new ArrayList<MCRContentTransformer>();
