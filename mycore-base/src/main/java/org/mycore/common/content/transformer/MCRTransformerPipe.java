@@ -44,12 +44,14 @@ import org.mycore.common.xsl.MCRParameterCollector;
  */
 public class MCRTransformerPipe extends MCRParameterizedTransformer {
 
-    /**
-     * @param transformers
-     */
     public MCRTransformerPipe(MCRContentTransformer... transformers) {
-        super();
+        this();
         this.transformers.addAll(Arrays.asList(transformers));
+    }
+
+    /* needed for MCRConfiguration.getInstanceOf() to work */
+    public MCRTransformerPipe() {
+        super();
     }
 
     /** List of transformers to execute */
