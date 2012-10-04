@@ -60,7 +60,7 @@ public class MCRLayoutTransformerFactory {
             return transformer;
         }
         //try to get configured transformer
-        transformer = MCRContentTransformerFactory.getTransformer(id.replace("-default", ""));
+        transformer = MCRContentTransformerFactory.getTransformer(id.replaceAll("-default$", ""));
         if (transformer != null) {
             transformers.put(id, transformer);
             return transformer;
@@ -69,13 +69,19 @@ public class MCRLayoutTransformerFactory {
     }
 
     private static MCRContentTransformer buildLayoutTransformer(String id) {
+        String idStripped = id.replaceAll("-default$", "");
+        LOGGER.info("Configure property MCR.ContentTransformer." + idStripped + ".Class if you do not want to use default behaviour.");
         String stylesheet = getResourceName(id);
         if (stylesheet == null) {
+            LOGGER.info("Using noop transformer for " + idStripped);
             return NOOP_TRANSFORMER;
         }
         MCRContentTransformer transformer = new MCRXSLTransformer(stylesheet);
         if ("application/pdf".equals(transformer.getMimeType())) {
             transformer = new MCRTransformerPipe(transformer, fopper);
+            LOGGER.info("Using styleshet '" + stylesheet + "' for " + idStripped + " and MCRFopper for PDF output.");
+        } else {
+            LOGGER.info("Using styleshet '" + stylesheet + "' for " + idStripped);
         }
         transformers.put(id, transformer);
         return transformer;
@@ -85,7 +91,7 @@ public class MCRLayoutTransformerFactory {
      * Builds the filename of the stylesheet to use, e. g. "playlist-simple.xsl"
      */
     private static String buildStylesheetName(String id) {
-        return MessageFormat.format("xsl/{0}.xsl", id.replace("-default", ""));
+        return MessageFormat.format("xsl/{0}.xsl", id.replaceAll("-default$", ""));
     }
 
     private static String getResourceName(String id) {
@@ -104,6 +110,7 @@ public class MCRLayoutTransformerFactory {
         // You can transform raw xml code by providing a stylesheed named
         // [doctype]-xml.xsl now
         if (id.endsWith("-xml") || id.endsWith("-default")) {
+            LOGGER.warn("XSL stylesheet not found: " + styleName);
             return null;
         }
         throw new MCRException("XSL stylesheet not found: " + styleName);
