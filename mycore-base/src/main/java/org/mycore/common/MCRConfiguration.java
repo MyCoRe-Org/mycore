@@ -161,10 +161,10 @@ public class MCRConfiguration {
      * 
      */
     public final void systemModified() {
-        if(!lastModifiedFile.exists()) {
+        if (!lastModifiedFile.exists()) {
             try {
                 createLastModifiedFile();
-            } catch(IOException ioException) {
+            } catch (IOException ioException) {
                 throw new MCRException("Could not change modify date of file " + lastModifiedFile.getAbsolutePath(), ioException);
             }
         } else if (!lastModifiedFile.setLastModified(System.currentTimeMillis())) {
@@ -504,6 +504,9 @@ public class MCRConfiguration {
 
                         break;
                     }
+                }
+                if (o == null) {
+                    throw e;
                 }
             }
         } catch (Throwable t) {
