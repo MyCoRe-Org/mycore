@@ -30,6 +30,7 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.provider.local.LocalFile;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
+import org.mycore.common.MCRDevNull;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
@@ -42,6 +43,8 @@ import org.mycore.common.content.MCRStreamContent;
  * 
  */
 public class MCRFile extends MCRStoredNode {
+
+    private static final MCRDevNull DEV_NULL = new MCRDevNull();
 
     private final static Logger LOGGER = Logger.getLogger(MCRFile.class);
 
@@ -149,7 +152,7 @@ public class MCRFile extends MCRStoredNode {
         data.removeChildren("file");
         data.removeChildren("directory");
         MCRContentInputStream cis = getContent().getContentInputStream();
-        MCRUtils.copyStream(cis, null);
+        MCRUtils.copyStream(cis, DEV_NULL);
         cis.close();
         String md5 = cis.getMD5String();
         if (!md5.equals(data.getAttributeValue("md5"))) {
