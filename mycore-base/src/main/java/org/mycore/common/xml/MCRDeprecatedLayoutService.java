@@ -26,7 +26,7 @@ import org.xml.sax.SAXParseException;
 public class MCRDeprecatedLayoutService {
     final static Logger LOGGER = Logger.getLogger(MCRDeprecatedLayoutService.class);
 
-    private static final MCRLayoutService SINGLETON = MCRLayoutService.instance();
+    private static final MCRLayoutService SINGLETON = new MCRLayoutService();
 
     MCRDeprecatedLayoutService() {
     };
