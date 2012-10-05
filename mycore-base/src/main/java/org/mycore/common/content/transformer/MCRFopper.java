@@ -73,7 +73,7 @@ public class MCRFopper extends MCRContentTransformer {
     }
 
     @Override
-    protected String getDefaultExtension() {
+    public String getFileExtension() {
         return "pdf";
     }
 }
