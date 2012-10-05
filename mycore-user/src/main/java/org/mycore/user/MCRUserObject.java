@@ -49,7 +49,7 @@ abstract class MCRUserObject {
     public static final int id_len = 20;
 
     /** The maximum length of a password */
-    public static final int password_len = 128;
+    public static final int password_len = 32;
 
     /** The maximum length of a decription */
     public static final int description_len = 200;

@@ -1081,7 +1081,7 @@ public class MCRUserMgr {
         if (reqUser == null) { // We do not have this user in the cache
 
             // Check for userID length
-            if (userID.length() > 30) {
+            if (userID.length() > MCRUser.id_len) {
                 throw new MCRException("userID (input) too long");
             }
             // Check for invalid characters
@@ -1497,7 +1497,7 @@ public class MCRUserMgr {
      * @return true if the user exists, else return false
      */
     public final boolean existUser(String user) {
-        if (user == null || user.length() > 30 || user.indexOf("'") !=-1  || user.trim().indexOf(" ") != -1) {
+        if (user == null || user.length() > MCRUser.id_len || user.indexOf("'") !=-1  || user.trim().indexOf(" ") != -1) {
             return false;
         }
         

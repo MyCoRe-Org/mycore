@@ -59,7 +59,7 @@
           <xsl:when test="$direction = 'rtl' ">
             <tr>
               <td class="inputField-rtl">
-                <input name="uid" type="text" maxlength="30"/>
+                <input name="uid" type="text" maxlength="20"/>
               </td>
               <td class="inputCaption-rtl">
                 <xsl:value-of select="concat(i18n:translate('component.userlogin.tasks.login.account'),' ')"/>
@@ -68,7 +68,7 @@
             <tr height="5px"/>
             <tr>
               <td class="inputField-rtl">
-                <input name="pwd" type="password" maxlength="30"/>
+                <input name="pwd" type="password" maxlength="32"/>
               </td>
               <td class="inputCaption-rtl">
                 <xsl:value-of select="concat(i18n:translate('component.userlogin.tasks.login.password'),' ')"/>
@@ -81,7 +81,7 @@
                 <xsl:value-of select="concat(i18n:translate('component.userlogin.tasks.login.account'),' :')"/>
               </td>
               <td class="inputField">
-                <input name="uid" type="text" maxlength="30"/>
+                <input name="uid" type="text" maxlength="20"/>
               </td>
             </tr>
             <tr height="5px"/>            
@@ -90,7 +90,7 @@
                 <xsl:value-of select="concat(i18n:translate('component.userlogin.tasks.login.password'),' :')"/>
               </td>
               <td class="inputField">
-                <input name="pwd" type="password" maxlength="30"/>
+                <input name="pwd" type="password" maxlength="32"/>
               </td>
             </tr>
           </xsl:otherwise>
