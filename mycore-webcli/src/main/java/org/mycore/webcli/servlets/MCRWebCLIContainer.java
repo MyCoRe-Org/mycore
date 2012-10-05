@@ -28,6 +28,7 @@ import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -115,7 +116,7 @@ class MCRWebCLIContainer {
      * 
      * @return the queue of commands yet to be processed
      */
-    public LinkedList<String> getCommandQueue() {
+    public CopyOnWriteArrayList<String> getCommandQueue() {
         return processCallable.commands;
     }
 
@@ -207,7 +208,7 @@ class MCRWebCLIContainer {
 
         ConcurrentLinkedQueue<LoggingEvent> logs;
 
-        LinkedList<String> commands;
+        CopyOnWriteArrayList<String> commands;
 
         HttpSession hsession;
 
@@ -216,7 +217,7 @@ class MCRWebCLIContainer {
         Log4JGrabber logGrabber;
 
         public ProcessCallable(MCRSession session, HttpSession hsession) {
-            this.commands = new LinkedList<String>();
+            this.commands = new CopyOnWriteArrayList<String>();
             this.session = session;
             this.hsession = hsession;
             this.logs = new ConcurrentLinkedQueue<LoggingEvent>();
@@ -330,7 +331,7 @@ class MCRWebCLIContainer {
                 // don't let session expire
                 hsession.setMaxInactiveInterval(-1);
                 while (!commands.isEmpty()) {
-                    String command = commands.poll();
+                    String command = commands.remove(0);
                     if (!processCommand(command, continueIfOneFailes)) {
                         if (!continueIfOneFailes) {
                             return false;
