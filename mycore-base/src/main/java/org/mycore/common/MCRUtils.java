@@ -57,6 +57,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -376,50 +377,20 @@ public class MCRUtils {
      * @param target
      *            out the OutputStream to write the bytes to, may be null
      * @return true if Inputstream copied successfully to OutputStream
+     * @deprecated Use {@link IOUtils#copy(InputStream, OutputStream)} instead
      */
     public static boolean copyStream(InputStream source, OutputStream target) {
         if (source == null) {
             throw new MCRException("InputStream source is null.");
         }
-
         try {
-            // R E A D / W R I T E by chunks
-            int chunkSize = 63 * 1024;
-
-            // code will work even when chunkSize = 0 or chunks = 0;
-            // Even for small files, we allocate a big buffer, since we
-            // don't know the size ahead of time.
-            byte[] ba = new byte[chunkSize];
-
-            // keep reading till hit eof
-            while (true) {
-                int bytesRead = readBlocking(source, ba, 0, chunkSize);
-
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug(MCRUtils.class.getName() + ".copyStream(): " + bytesRead + " bytes read");
-                }
-
-                if (bytesRead > 0) {
-                    if (target != null) {
-                        target.write(ba, 0 /* offset in ba */, bytesRead /*
-                                                                                                                        * bytes
-                                                                                                                        * to
-                                                                                                                        * write
-                                                                                                                        */);
-                    }
-                } else {
-                    break; // hit eof
-                }
-            } // end while
-
+            int bytesRead = IOUtils.copy(source, target);
+            LOGGER.debug("copyStream(): " + bytesRead + " bytes read");
             // C L O S E, done by caller if wanted.
         } catch (IOException e) {
-            LOGGER.debug("IOException caught while copying streams:");
-            LOGGER.debug(e.getClass().getName() + ": " + e.getMessage());
-            LOGGER.debug(e);
+            LOGGER.error("IOException caught while copying streams:", e);
             return false;
         }
-
         // all was ok
         return true;
     } // end copy
@@ -434,6 +405,7 @@ public class MCRUtils {
      * @param target
      *            out the OutputStream to write the bytes to, may be null
      * @return true if Inputstream copied successfully to OutputStream
+     * @deprecated Use {@link IOUtils#copy(Reader, Writer)} instead
      */
     public static boolean copyReader(Reader source, Writer target) {
         if (source == null) {
@@ -441,40 +413,12 @@ public class MCRUtils {
         }
 
         try {
-            // R E A D / W R I T E by chunks
-            int chunkSize = 63 * 1024;
-
-            // code will work even when chunkSize = 0 or chunks = 0;
-            // Even for small files, we allocate a big buffer, since we
-            // don't know the size ahead of time.
-            char[] ca = new char[chunkSize];
-
-            // keep reading till hit eof
-            while (true) {
-                int charsRead = readBlocking(source, ca, 0, chunkSize);
-
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug(MCRUtils.class.getName() + ".copyReader(): " + charsRead + " characters read");
-                }
-
-                if (charsRead > 0) {
-                    if (target != null) {
-                        target.write(ca, 0 /* offset in ba */, charsRead /*
-                                                                                                                        * bytes
-                                                                                                                        * to
-                                                                                                                        * write
-                                                                                                                        */);
-                    }
-                } else {
-                    break; // hit eof
-                }
-            } // end while
-
-            // C L O S E, done by caller if wanted.
+            int bytesRead = IOUtils.copy(source, target);
+            LOGGER.debug("copyReader(): " + bytesRead + " bytes read");
         } catch (IOException e) {
+            LOGGER.error("IOException while copy reader:", e);
             return false;
         }
-
         // all was ok
         return true;
     } // end copy
