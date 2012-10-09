@@ -57,6 +57,7 @@ iview.IViewInstance.prototype.openPdfCreator = function pdf_openPdfCreator() {
         this.properties.pdfCreatorURI,
         this.properties.webappBaseUri + "servlets/MCRMETSServlet/" + this.properties.derivateId + "?XSL.Style="
             + this.properties.pdfCreatorStyle,
+        this.properties.objectId,
         function() {
           that.getPdfCtrl().initView(i18n);
         });
@@ -82,7 +83,7 @@ iview.IViewInstance.prototype.openPdfCreator = function pdf_openPdfCreator() {
  * @param {Object}
  *          permalink represents the main node of the permalink view
  */
-iview.Pdf.View = function(id, parent, basePath, pdfCreatorURI, pdfSourceXML, callback) {
+iview.Pdf.View = function(id, parent, basePath, pdfCreatorURI, pdfSourceXML, fileName, callback) {
   this.id = id;
   if (iview.Pdf.enabled) {
     this.pdfCreator = jQuery('<div>').addClass(id).addClass('pdfCreator').appendTo(parent)
@@ -90,6 +91,7 @@ iview.Pdf.View = function(id, parent, basePath, pdfCreatorURI, pdfSourceXML, cal
           var form = jQuery("form", this)[0];
           form.action = pdfCreatorURI;
           form.mets.value = pdfSourceXML;
+          form.name.value = fileName;
           callback();
         });
   } else {
