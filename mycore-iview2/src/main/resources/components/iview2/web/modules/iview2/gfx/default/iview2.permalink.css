@@ -1,18 +1,19 @@
 /* Permalink */
 
 .viewerContainer.max .permalinkArea {
-	display:none;
-	font-weight:normal;
-	height:40px;
-	left:400px;
-	opacity:0.85;
-	position:absolute;
-	text-align:left;
-	width:400px;
-	padding:5px;
-	background-color:#EEE;
+	display: none;
+	font-weight: normal;
+	height: 40px;
+	left: 400px;
+	top: 42px;
+	opacity: 0.85;
+	position: absolute;
+	text-align: left;
+	width: 400px;
+	padding: 5px;
+	background-color: #EEE;
 	border: 1px solid #AAA;
-	z-index:50;
+	z-index: 50;
 }
 
 .viewerContainer .permalinkArea .content {

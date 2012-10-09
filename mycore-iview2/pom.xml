@@ -47,6 +47,8 @@
                 <jsSourceFile>jquery.simplemodal.js</jsSourceFile>
                 <!-- JQuery MCRI18N support -->
                 <jsSourceFile>jquery.mcri18n.js</jsSourceFile>
+                <!-- jgestures -->
+                <jsSourceFile>jgestures.js</jsSourceFile>
                 <!-- Compatibility Library for browsers that do not support ECMA-Script 5th Edition -->
                 <jsSourceFile>ecma5compat.js</jsSourceFile>
                 <!-- CORS support in IE -->
@@ -62,8 +64,6 @@
                 <jsSourceFile>currentImage.js</jsSourceFile>
                 <!-- new API ends -->
                 <jsSourceFile>chapter.js</jsSourceFile>
-                <!-- Chapter -->
-                <jsSourceFile>thumbnailPanel.js</jsSourceFile>
                 <!-- Galerie Klasse -->
                 <jsSourceFile>overview.js</jsSourceFile>
                 <!--Übersichtsbild Klasse-->
@@ -75,8 +75,13 @@
                 <jsSourceFile>iview2.METS/PhysicalModel.js</jsSourceFile>
                 <jsSourceFile>iview2.METS/PhysicalModelProvider.js</jsSourceFile>
                 <!-- METS unter Klassen -->
-                <jsSourceFile>scrollBars.js</jsSourceFile>
-                <!--Scrollbar Klasse-->
+                <jsSourceFile>iview2.thumbnailPanel/thumbnailPanelController.js</jsSourceFile>
+                <jsSourceFile>iview2.thumbnailPanel/thumbnailPanelView.js</jsSourceFile>
+                <!-- Thumbnail Panel Klassen -->
+                <jsSourceFile>iview2.scrollbar/scrollbarController.js</jsSourceFile>
+                <jsSourceFile>iview2.scrollbar/scrollbarView.js</jsSourceFile>
+                <jsSourceFile>iview2.scrollbar/scrollbarEvent.js</jsSourceFile>
+                <!--Scrollbar Klassen-->
                 <jsSourceFile>XML.js</jsSourceFile>
                 <!--XML Funktionen-->
                 <jsSourceFile>urnOverlay.js</jsSourceFile>
