@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedList;
+import java.util.TooManyListenersException;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Templates;
@@ -39,6 +40,8 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.log4j.Logger;
+import org.apache.xalan.trace.TraceManager;
+import org.apache.xalan.transformer.TransformerImpl;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -47,6 +50,7 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.common.xsl.MCRTemplatesSource;
+import org.mycore.common.xsl.MCRTraceListener;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
@@ -64,6 +68,10 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     private static final MCRURIResolver URI_RESOLVER = MCRURIResolver.instance();
 
     private static Logger LOGGER = Logger.getLogger(MCRXSLTransformer.class);
+
+    private static MCRTraceListener TRACE_LISTENER = new MCRTraceListener();
+
+    private static boolean TRACE_LISTENER_ENABLED = Logger.getLogger(MCRTraceListener.class).isDebugEnabled();
 
     /** The compiled XSL stylesheet */
     protected MCRTemplatesSource[] templateSources;
@@ -187,6 +195,15 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         for (Templates template : templates) {
             TransformerHandler handler = tFactory.newTransformerHandler(template);
             parameterCollector.setParametersTo(handler.getTransformer());
+            if (TRACE_LISTENER_ENABLED) {
+                TransformerImpl transformer = (TransformerImpl) handler.getTransformer();
+                TraceManager traceManager = transformer.getTraceManager();
+                try {
+                    traceManager.addTraceListener(TRACE_LISTENER);
+                } catch (TooManyListenersException e) {
+                    LOGGER.warn("Could not add MCRTraceListener.", e);
+                }
+            }
             if (!xslSteps.isEmpty()) {
                 Result result = new SAXResult(handler);
                 xslSteps.getLast().setResult(result);
