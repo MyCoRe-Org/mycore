@@ -88,7 +88,7 @@ ToolbarManager.prototype = {
 	 *  so these changes will perform after each instancing such a model
 	 * @param		{String} modeId defines the id of a special model
 	 * @param		{String} operation defines the change operation which should be performed after instancing
-	 */   
+	 */
     change : function(modelId, operation) {
     	if (!this.changes[modelId]) {
     		this.changes[modelId] = 'model.' + operation;

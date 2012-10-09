@@ -106,7 +106,7 @@
             this.refreshImageDimensions();
             this.redrawPreview.width = this.context2D.canvas.width;
             this.redrawPreview.height = this.context2D.canvas.height;
-            if (zoomLevelChanged || moveOutOfScreen || scaleChanged) {
+            if (zoomLevelChanged || moveOutOfScreen || scaleChanged || (moveVector.xOff == 0 && moveVector.yOff==0)) {
                 // something happened that needs to redraw all tiles
                 this.clearCanvas();
                 jQuery(scope).trigger(iview.Canvas.BEFORE_DRAW_EVENT);

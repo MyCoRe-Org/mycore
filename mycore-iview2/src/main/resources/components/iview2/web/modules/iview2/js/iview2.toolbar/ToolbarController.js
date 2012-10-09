@@ -65,8 +65,9 @@ ToolbarController.prototype.addView = function(view) {
       button.setSubtypeState = function(state) {
         that.perform("setSubtypeState", state, args.parentName, args.elementName);
       };
-      if (args.elementName == "openThumbnailPanel") {
-        iview.ThumbnailPanel.openThumbnailPanel(that.getViewer(), button);
+      if (args.elementName == "openThumbnailPanel" && that.getViewer().ThumbnailPanel != null) {
+    	  that.getViewer().ThumbnailPanel.toggleView(button);
+    	  that.getViewer().ThumbnailPanel.setSelected(that.getViewer().PhysicalModel._curPos);
       } else if (args.elementName == "openChapter") {
         iview.chapter.openChapter(that.getViewer(), button);
       }
@@ -86,7 +87,7 @@ ToolbarController.prototype.addView = function(view) {
       }
     } else if (args.parentName == "urnHandles") {
         if (args.elementName == "urn") {
-          iview.urn.urnButtonClicked();
+          that.getViewer().urn.urnButtonClicked();
         }
     } else if (args.parentName == "pdfHandles") {
       if (args.elementName == "createPdf") {
