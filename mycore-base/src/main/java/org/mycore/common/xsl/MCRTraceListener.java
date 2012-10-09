@@ -51,68 +51,70 @@ public class MCRTraceListener implements TraceListener {
      * html.
      */
     public void trace(TracerEvent ev) {
-        ElemTemplateElement ete = ev.m_styleNode; // Current position in
-        // stylesheet
+        if (LOGGER.isDebugEnabled()) {
+            ElemTemplateElement ete = ev.m_styleNode; // Current position in
+            // stylesheet
 
-        StringBuffer log = new StringBuffer();
+            StringBuilder log = new StringBuilder();
 
-        // Find the name of the stylesheet file currently processed
-        try {
-            StringTokenizer st = new StringTokenizer(ete.getBaseIdentifier(), "/\\");
-            String stylesheet = null;
-            while (st.hasMoreTokens()) {
-                stylesheet = st.nextToken();
+            // Find the name of the stylesheet file currently processed
+            try {
+                StringTokenizer st = new StringTokenizer(ete.getBaseIdentifier(), "/\\");
+                String stylesheet = null;
+                while (st.hasMoreTokens()) {
+                    stylesheet = st.nextToken();
+                }
+                if (stylesheet != null) {
+                    log.append(" ").append(stylesheet);
+                }
+            } catch (Exception ignored) {
             }
-            if (stylesheet != null) {
-                log.append(" ").append(stylesheet);
-            }
-        } catch (Exception ignored) {
-        }
 
-        // Output current line number and column number
-        log.append(" line " + ete.getLineNumber() + " col " + ete.getColumnNumber());
+            // Output current line number and column number
+            log.append(" line " + ete.getLineNumber() + " col " + ete.getColumnNumber());
 
-        // Find the name of the xsl:template currently processed
-        try {
-            ElemTemplate et = ev.m_processor.getCurrentTemplate();
-            log.append(" in <xsl:template");
-            if (et.getMatch() != null) {
-                log.append(" match=\"" + et.getMatch().getPatternString() + "\"");
+            // Find the name of the xsl:template currently processed
+            try {
+                ElemTemplate et = ev.m_processor.getCurrentTemplate();
+                log.append(" in <xsl:template");
+                if (et.getMatch() != null) {
+                    log.append(" match=\"" + et.getMatch().getPatternString() + "\"");
+                }
+                if (et.getName() != null) {
+                    log.append(" name=\"" + et.getName().getLocalName() + "\"");
+                }
+                if (et.getMode() != null) {
+                    log.append(" mode=\"" + et.getMode().getLocalName() + "\"");
+                }
+                log.append(">");
+            } catch (Exception ignored) {
             }
-            if (et.getName() != null) {
-                log.append(" name=\"" + et.getName().getLocalName() + "\"");
-            }
-            if (et.getMode() != null) {
-                log.append(" mode=\"" + et.getMode().getLocalName() + "\"");
-            }
-            log.append(">");
-        } catch (Exception ignored) {
-        }
 
-        // Output name of the xsl or html element currently processed
-        log.append(" " + ete.getTagName());
-        LOGGER.debug("Trace" + log.toString());
+            // Output name of the xsl or html element currently processed
+            log.append(" " + ete.getTagName());
+            LOGGER.debug("Trace" + log.toString());
 
-        // Output xpath of current xml source node in context
-        StringBuffer path = new StringBuffer();
-        Node node = ev.m_sourceNode;
-        if (node != null) {
-            path.append(node.getLocalName());
-            while ((node = node.getParentNode()) != null) {
-                path.insert(0, node.getLocalName() + "/");
-            }
-        }
-        if (path.length() > 0) {
-            LOGGER.debug("Source " + path.toString());
-        }
-        try {
-            if ("true".equals(ev.m_processor.getParameter("DEBUG"))) {
-                ev.m_processor.getResultTreeHandler().comment(log.toString() + " ");
-                if (path.length() > 0) {
-                    ev.m_processor.getResultTreeHandler().comment(" source " + path.toString() + " ");
+            // Output xpath of current xml source node in context
+            StringBuilder path = new StringBuilder();
+            Node node = ev.m_sourceNode;
+            if (node != null) {
+                path.append(node.getLocalName());
+                while ((node = node.getParentNode()) != null) {
+                    path.insert(0, node.getLocalName() + "/");
                 }
             }
-        } catch (Exception ignored) {
+            if (path.length() > 0) {
+                LOGGER.debug("Source " + path.toString());
+            }
+            try {
+                if ("true".equals(ev.m_processor.getParameter("DEBUG"))) {
+                    ev.m_processor.getResultTreeHandler().comment(log.toString() + " ");
+                    if (path.length() > 0) {
+                        ev.m_processor.getResultTreeHandler().comment(" source " + path.toString() + " ");
+                    }
+                }
+            } catch (Exception ignored) {
+            }
         }
     }
 
@@ -121,7 +123,7 @@ public class MCRTraceListener implements TraceListener {
      * mode.
      */
     public void generated(GenerateEvent ev) {
-        if (ev.m_eventtype == 12) {
+        if (LOGGER.isDebugEnabled() && ev.m_eventtype == 12) {
             LOGGER.debug("Output " + new String(ev.m_characters, ev.m_start, ev.m_length).trim());
         }
     }
@@ -132,14 +134,15 @@ public class MCRTraceListener implements TraceListener {
      * mode.
      */
     public void selected(SelectionEvent ev) {
-        String log = "Selection <xsl:" + ev.m_styleNode.getTagName() + " " + ev.m_attributeName + "=\"" + ev.m_xpath.getPatternString()
-                + "\">";
-        LOGGER.debug(log);
-        try {
-            if ("true".equals(ev.m_processor.getParameter("DEBUG"))) {
-                ev.m_processor.getResultTreeHandler().comment(" " + log + " ");
+        if (LOGGER.isDebugEnabled()) {
+            String log = "Selection <xsl:" + ev.m_styleNode.getTagName() + " " + ev.m_attributeName + "=\"" + ev.m_xpath.getPatternString() + "\">";
+            LOGGER.debug(log);
+            try {
+                if ("true".equals(ev.m_processor.getParameter("DEBUG"))) {
+                    ev.m_processor.getResultTreeHandler().comment(" " + log + " ");
+                }
+            } catch (SAXException ignored) {
             }
-        } catch (SAXException ignored) {
         }
     }
 }
