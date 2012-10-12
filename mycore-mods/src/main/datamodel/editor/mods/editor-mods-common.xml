@@ -1419,8 +1419,8 @@
       <repeater min="1" pos="right">
         <panel>
           <cell anchor="NORTHWEST" var="@year">
-            <textfield width="4" maxlength="4">
-              <condition id="char.year" type="datetime" format="yyyy">
+            <textfield width="4" maxlength="4" id="char.year">
+              <condition id="char.year.cond" type="datetime" format="yyyy">
                 <label xml:lang="de">Bitte geben Sie ein vierstellige Jahreszahl ein.</label>
               </condition>
             </textfield>
