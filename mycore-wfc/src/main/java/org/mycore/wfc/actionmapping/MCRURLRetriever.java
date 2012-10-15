@@ -159,7 +159,7 @@ public final class MCRURLRetriever {
     private static String getParentCollection(String collection) {
         MCRCategoryID categoryId = new MCRCategoryID(MCRConstants.COLLECTION_CLASS_ID.getRootID(), collection);
         List<MCRCategory> parents = CATEGORY_DAO.getParents(categoryId);
-        if (parents.isEmpty()) {
+        if (parents == null || parents.isEmpty()) {
             return null;
         }
         return parents.iterator().next().getId().getID();
