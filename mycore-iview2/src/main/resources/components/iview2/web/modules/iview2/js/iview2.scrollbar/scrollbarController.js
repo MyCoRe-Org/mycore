@@ -141,13 +141,15 @@ iview.Scrollbar = iview.Scrollbar || {};
 	 *            type "positionChanged" || "sizeChanged"
 	 */
 	iview.Scrollbar.Controller.prototype._fireEvent = function(type) {
-		var xValue = null, yValue = null;
-		if (type == "positionChanged") {
-			xValue = this._view.getPosition().x;
-			yValue = this._view.getPosition().y;
-		} else if (type == "sizeChanged") {
-			xValue = this._view.getSize().width;
-			yValue = this._view.getSize().height;
+		var xValue = null, yValue = null, pos, size;
+		if (type === "positionChanged") {
+		  pos = this._view.getPosition();
+			xValue = pos.x;
+			yValue = pos.y;
+		} else if (type === "sizeChanged") {
+		  size = this._view.getSize();
+			xValue = size.width;
+			yValue = size.height;
 		} else {
 			return;
 		}
