@@ -7,9 +7,7 @@
       this.name = null;
       this.height = 0;
       this.width = 0;
-      this.x = 0;
-      this.y = 0;
-	    this.curWidth = 0;
+	  this.curWidth = 0;
       this.curHeight = 0;
       this.viewer = iviewInst;
       this.zoomInfo = new iview.ZoomInformation(iviewInst);
@@ -50,11 +48,7 @@
       jQuery(this).trigger(iview.CurrentImage.CHANGE_EVENT);
     };
     
-    constructor.prototype.setPos = function ci_setPos(position) {
-    	this.x = position.x;
-    	this.y = position.y;
-    	jQuery(this).trigger(iview.CurrentImage.POS_CHANGE_EVENT);
-    };
+
     
     return constructor;
 

@@ -177,27 +177,32 @@
 
 					});
 
-			jQuery(iViewInst.viewerContainer).bind(
-					"maximize.viewerContainer",
-					function(e) {
-						var store = getStorageAcces();
-						var toolBarVisible = store
-								.getStoragePair(that._URN_TOOLBAR_STORAGE_KEY);
-						if (that.hasUrn && toolBarVisible != "false") {
-							that._view.setUrnToolbarVisible(true);
-							that._view.setUrnButtonVisible(false, false);
-							that.updateUrn();
-						} else {
-							if (that.hasUrn) {
-								that._view.setUrnButtonVisible(true, false);
-								that.updateUrn();
-							} else {
-								that._view.setUrnButtonVisible(false, false);
-								that._view.removeUrnButton();
-							}
-							that._view.setUrnToolbarVisible(false);
-						}
-					});
+			var initalize = function (e) {
+				var store = getStorageAcces();
+				var toolBarVisible = store
+						.getStoragePair(that._URN_TOOLBAR_STORAGE_KEY);
+				if (that.hasUrn && toolBarVisible != "false") {
+					that._view.setUrnToolbarVisible(true);
+					that._view.setUrnButtonVisible(false, false);
+					that.updateUrn();
+				} else {
+					if (that.hasUrn) {
+						that._view.setUrnButtonVisible(true, false);
+						that.updateUrn();
+					} else {
+						that._view.setUrnButtonVisible(false, false);
+						that._view.removeUrnButton();
+					}
+					that._view.setUrnToolbarVisible(false);
+				}
+			};
+			
+			if(!iViewInst.viewerContainer.isMax()) {
+				jQuery(iViewInst.viewerContainer).bind("maximize.viewerContainer",initalize);
+			} else {
+				initalize();
+			}
+			
 
 			jQuery(this._view).bind(this._view.EVENT_ClosePressed, function() {
 				if (that.hasUrn) {

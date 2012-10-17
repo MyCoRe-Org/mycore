@@ -37,11 +37,15 @@ iview.Scrollbar = iview.Scrollbar || {};
 	 * @this {iview.Scrollbar.Controller}
 	 * @param {x,
 	 *            y} newPosition The new Position that should be set.
-	 * 
+	 * @param {bool} notify Should the event fired ?
 	 */
 	iview.Scrollbar.Controller.prototype.setPosition = function(newPosition) {
+		var oldPosition = this.getPosition();
+		if(newPosition.x == oldPosition.x && newPosition.y == oldPosition.y){
+			return;
+		}
+		
 		this._view.setPosition(newPosition);
-		this._fireEvent("positionChanged");
 	};
 
 	/**

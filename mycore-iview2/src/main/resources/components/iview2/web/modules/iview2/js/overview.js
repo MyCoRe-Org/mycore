@@ -517,20 +517,21 @@ iview.overview.importOverview = function(viewer) {
 		model.setSize({'x': this.curWidth, 'y': this.curHeight});
 		model.setRatio({'x': viewerBean.width / this.curWidth, 'y': viewerBean.height / this.curHeight});
 		model.setPos({
-			'x': - (this.x / Math.pow(2, zoomInfo.curZoom))*zoomInfo.scale,
-			'y': - (this.y / Math.pow(2, zoomInfo.curZoom))*zoomInfo.scale});
-	}
+			'x': - (-viewerBean.x / Math.pow(2, zoomInfo.curZoom))*zoomInfo.scale,
+			'y': - (-viewerBean.y / Math.pow(2, zoomInfo.curZoom))*zoomInfo.scale});
+	};
 
 	jQuery(currentImage).bind(iview.CurrentImage.DIMENSION_EVENT, function() {
 		adaptOverview.call(this);
 	}).bind(iview.CurrentImage.CHANGE_EVENT, function() {
 		model.setSrc(viewerBean.tileUrlProvider.assembleUrl(0,0,0));
-	}).bind(iview.CurrentImage.POS_CHANGE_EVENT, function() {
-		model.setPos({
-			'x': - (this.x / Math.pow(2, zoomInfo.curZoom))/zoomInfo.scale,
-			'y': - (this.y / Math.pow(2, zoomInfo.curZoom))/zoomInfo.scale});
-	})
+	});
+
 	jQuery(viewerBean.viewer).bind("reinit.viewer", function() {
 		adaptOverview.call(currentImage);
+	}).bind("move.viewer", function() {
+		model.setPos({
+			'x': - (-this.backingBean.x / Math.pow(2, zoomInfo.curZoom))/zoomInfo.scale,
+			'y': - (-this.backingBean.y / Math.pow(2, zoomInfo.curZoom))/zoomInfo.scale});
 	});
-}
+};

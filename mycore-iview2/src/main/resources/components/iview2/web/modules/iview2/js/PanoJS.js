@@ -354,7 +354,11 @@ PanoJS.prototype = {
 		
 		this.motion = motion;
 		this.updateScreen();
-		jQuery(this.viewer).trigger("move.viewer", {'x': this.iview.viewerBean.x, 'y': this.iview.viewerBean.y});
+		
+		if(viewerPosX != this.iview.viewerBean.x || viewerPosY != this.iview.viewerBean.y){
+			jQuery(this.viewer).trigger("move.viewer", {'x': this.iview.viewerBean.x, 'y': this.iview.viewerBean.y});
+		}
+		
 	},
 	
 	updateScreen : function() {

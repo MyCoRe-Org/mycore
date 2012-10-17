@@ -88,6 +88,21 @@
 		constructor.prototype.onImageChangeHandler = function ii_onImageChangeHandler() {
 			this.processImageProperties();
 
+			if (this.scrollBar != null) {
+				this.scrollBar.setSize({
+					"width" : this.currentImage.curWidth,
+					"height" : this.currentImage.curHeight
+				});
+				this.scrollBar.setPosition({
+					"x" : this.viewerBean.x,
+					"y" : this.viewerBean.y
+				});
+				
+			}
+			if (this.ThumbnailPanel != null) {
+				this.ThumbnailPanel
+						.setSelected(this.PhysicalModel.getCurPos());
+			}
 		};
 
 		/**
@@ -95,6 +110,18 @@
 		 */
 		constructor.prototype.onViewerZoomHandler = function ii_onImageZoomHandler() {
 			viewerZoomed.apply(this, arguments);
+			if (this.scrollBar != null) {
+
+				this.scrollBar.setSize({
+					"width" : this.currentImage.curWidth,
+					"height" : this.currentImage.curHeight
+				});
+
+				this.scrollBar.setPosition({
+					"x" : this.viewerBean.x,
+					"y" : this.viewerBean.y
+				});
+			}
 		};
 
 		/**
@@ -105,27 +132,64 @@
 		 *            event
 		 */
 		constructor.prototype.onViewerMoveHandler = function ii_onImageMoveHandler(
-				jq, event) {
-			/*
-			 * TODO somehow is this function triggered in IE7+ multiple times
-			 * (the number of images in div.well often) after the first
-			 * mousepress+mousemove occured. The jsfiddle
-			 * http://jsfiddle.net/cPjZV/3/ seems not to have this problem,
-			 * which looks like its caused from within our code. When those
-			 * pseudo arguments occur they're missing our move object, so we
-			 * check for that
-			 */
-			// if (arguments.length < 2) return;
-			if (event == null || event.x == null || event.y == null) {
-				return;
-			}
-
-			this.currentImage.setPos({
-				'x' : -event.x,
-				'y' : -event.y
-			});
+				jq, event) {			
+			if(this.scrollBar != null){
+				this.scrollBar.setPosition(event);
+			};
 		};
 
+		/**
+		 * Will be called if the Viewer will be maximized
+		 * @param one (true if first time maximized)
+		 */
+		constructor.prototype.onMaximizeViewerContainer = function ii_onMaximizeViewerContainer(one){
+			var that = this;
+			if(one){
+				if (this.properties.useOverview) {
+					iview.overview.importOverview(this);
+				}
+				
+				var scrollbarContainer = jQuery("<div class=\"scrollBar\" />");
+				this.scrollBar = new iview.Scrollbar.Controller(
+								  scrollbarContainer.appendTo(this.viewerContainer));
+				
+				var scrollbarEvent = function(jq, e) {
+					if (e.getEventType() == "positionChanged") {
+						
+						that.viewerBean.positionTiles({
+							"x" : that.viewerBean.x - e.getXValue(),
+							"y" : that.viewerBean.y - e.getYValue()
+						});
+						
+					}
+				};
+				this.scrollBar.registerEventHandler(scrollbarEvent);
+				
+				this.scrollBar.setSize({
+					"width" : that.currentImage.curWidth,
+					"height" : that.currentImage.curHeight
+				});
+				
+				jQuery(window).resize(function() {
+					//
+					var sizeX = that.viewerBean.width + 13;
+					var sizeY = that.viewerBean.height + 13;
+
+					scrollbarContainer.css({
+						"width" : sizeX + "px"
+					});
+					scrollbarContainer.css({
+						"height" : sizeY + "px"
+					});
+
+				});
+			}
+			
+			this.addDimensionSubstract(true, 'scrollbar', 13);
+			this.addDimensionSubstract(false, 'scrollbar', 13);
+			
+		};
+		
 		/**
 		 * @method
 		 * @memberOf {IViewInstance}
@@ -137,10 +201,13 @@
 		 */
 		constructor.prototype.initaliseComponents = function ii_initaliseComponents(
 				container) {
+			var that = this;
+			
 			this.viewerContainer = container;
 			this.viewerContainer.isMax = function() {
 				return jQuery(this).hasClass("max");
 			};
+			
 			this.overview = jQuery.extend(this.overview || {}, {
 				'loaded' : (this.overview || {}).loaded || false,
 				'parent' : container
@@ -156,6 +223,7 @@
 
 			this.scrollBar = null;
 			this.thumbnailPanel = null;
+			
 			this.context = new iview.Context(this.viewerContainer, this);
 			this.currentImage = new iview.CurrentImage(this);
 			this.substractsDimension = {
@@ -168,6 +236,15 @@
 					'entries' : []
 				}
 			};
+			
+			jQuery(this.viewerContainer).one( "maximize.viewerContainer", function() {
+				that.onMaximizeViewerContainer(true);
+				jQuery(that.viewerContainer).bind( "maximize.viewerContainer", function() {
+					that.onMaximizeViewerContainer(false);
+				});
+			});
+			
+			
 			// other components which are lowering the width and the height of
 			// the viewer, can be applyed here
 			jQuery(this).trigger(iview.IViewInstance.INIT_COMPONENTS_EVENT,
@@ -175,6 +252,8 @@
 
 		};
 
+		
+		
 		/**
 		 * @description Sets the Default properties and applys extra properties.
 		 * @exception throws
@@ -309,112 +388,14 @@
 			// needs to be registered before any other listener for this event
 			var viewerBean = this.viewerBean;
 
-			jQuery(viewerBean.viewer).bind("zoom.viewer", function() {
+			jQuery(document).delegate(viewerBean.viewer, "zoom.viewer", function() {
 				that.onViewerZoomHandler(arguments);
-			}).bind("move.viewer", function(jq, event) {
+			});
+			jQuery(viewerBean.viewer).bind("move.viewer", function(jq, event) {
 				that.onViewerMoveHandler(jq, event);
 			});
 
-			jQuery(this.viewerContainer)
-					.one(
-							"maximize.viewerContainer",
-							function() {
-								if (that.properties.useOverview) {
-									iview.overview.importOverview(that);
-								}
-								// iview.scrollbar.importScrollbars(that);
-								var scrollbarContainer = jQuery("<div class=\"scrollBar\" />");
-								that.scrollBar = new iview.Scrollbar.Controller(
-										scrollbarContainer
-												.appendTo(that.viewerContainer));
-
-								var scrollbarEvent = function(jq, e) {
-									if (e.getEventType() == "positionChanged") {
-										that.scrollBar
-												.unRegisterEventHandler(scrollbarEvent);
-										that.viewerBean.positionTiles({
-											"x" : that.viewerBean.x
-													- e.getXValue(),
-											"y" : that.viewerBean.y
-													- e.getYValue()
-										});
-										that.scrollBar
-												.registerEventHandler(scrollbarEvent);
-									}
-								}
-
-								that.scrollBar
-										.registerEventHandler(scrollbarEvent);
-								that.scrollBar.setSize({
-									"width" : that.currentImage.curWidth,
-									"height" : that.currentImage.curHeight
-								});
-
-								jQuery(that.viewerBean.viewer).bind(
-										"move.viewer", function(jq, e) {
-											that.scrollBar.setPosition(e);
-										});
-
-								jQuery(that.currentImage)
-										.bind(
-												iview.CurrentImage.CHANGE_EVENT,
-												function() {
-													that.scrollBar
-															.setSize({
-																"width" : that.currentImage.curWidth,
-																"height" : that.currentImage.curHeight
-															});
-													that.scrollBar
-															.setPosition({
-																"x" : that.viewerBean.x,
-																"y" : that.viewerBean.y
-															});
-													if (that.ThumbnailPanel != null) {
-														that.ThumbnailPanel
-																.setSelected(that.PhysicalModel
-																		.getCurPos());
-													}
-												});
-
-								jQuery(that.viewerContainer)
-										.bind(
-												"zoom.viewer",
-												function(jq, event) {
-													that.scrollBar
-															.setSize({
-																"width" : that.currentImage.curWidth,
-																"height" : that.currentImage.curHeight
-															});
-													that.scrollBar
-															.setPosition({
-																"x" : that.viewerBean.x,
-																"y" : that.viewerBean.y
-															});
-												});
-
-								jQuery(window).resize(function() {
-									//
-									var sizeX = that.viewerBean.width + 13;
-									var sizeY = that.viewerBean.height + 13;
-
-									scrollbarContainer.css({
-										"width" : sizeX + "px"
-									});
-									scrollbarContainer.css({
-										"height" : sizeY + "px"
-									});
-
-								});
-
-								that.addDimensionSubstract(true, 'scrollbar',
-										13);
-								that.addDimensionSubstract(false, 'scrollbar',
-										13);
-							}).bind("minimize.viewerContainer", function() {
-						if (that.ThumbnailPanel != null) {
-							that.ThumbnailPanel.hideView();
-						}
-					});
+		
 
 			if (this.properties.useParam
 					&& !isNaN(parseInt(URL.getParam("zoom")))) {
