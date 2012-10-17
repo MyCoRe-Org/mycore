@@ -41,6 +41,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRContentStore;
 import org.mycore.datamodel.ifs.MCRContentStoreFactory;
+import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.xml.sax.SAXException;
@@ -486,6 +487,16 @@ public class MCRIFSCommands {
         } finally {
             session.close();
         }
+    }
+
+    @MCRCommand(syntax = "delete ifs node {0}", help = "deletes ifs node {0} recursivly")
+    public void deleteIFSNode(String nodeID) {
+        MCRFilesystemNode node = MCRFilesystemNode.getNode(nodeID);
+        if (node == null) {
+            LOGGER.warn("IFS Node " + nodeID + " does not exist.");
+        }
+        LOGGER.info(MessageFormat.format("Deleting IFS Node {0}: {1}{2}", nodeID, node.getOwnerID(), node.getAbsolutePath()));
+        node.delete();
     }
 
     /**
