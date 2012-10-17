@@ -26,7 +26,7 @@ public class SolrUtils {
      * 
      * @return the number of hits or 0 in case there are 0 hits or an error occured
      */
-    public long getNumHits(String solrQuery) {
+    public static long getNumHits(String solrQuery) {
         SolrQuery q = new SolrQuery(solrQuery);
         q.setRows(0);
         CommonsHttpSolrServer solrServer = SolrServerFactory.getSolrServer();
