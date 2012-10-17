@@ -494,6 +494,7 @@ public class MCRIFSCommands {
         MCRFilesystemNode node = MCRFilesystemNode.getNode(nodeID);
         if (node == null) {
             LOGGER.warn("IFS Node " + nodeID + " does not exist.");
+            return;
         }
         LOGGER.info(MessageFormat.format("Deleting IFS Node {0}: {1}{2}", nodeID, node.getOwnerID(), node.getAbsolutePath()));
         node.delete();
