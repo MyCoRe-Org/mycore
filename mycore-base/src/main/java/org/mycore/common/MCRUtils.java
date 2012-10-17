@@ -51,6 +51,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Vector;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -66,12 +67,16 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.ifs.MCRDirectory;
+import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.ifs2.MCRContentInputStream;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.language.MCRLanguageFactory;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.Attributes;
@@ -1041,6 +1046,40 @@ public class MCRUtils {
         } finally {
             if (contentInputStream != null) {
                 contentInputStream.close();
+            }
+        }
+    }
+
+    /**
+     * @param derivate the id of the derivate
+     * 
+     * @return the list of {@link MCRFile}s contained by the given derivate id, or an empty list if the derivate id is invalid
+     */
+    public static List<MCRFile> getFiles(String derivate) {
+        List<MCRFile> fList = new Vector<MCRFile>();
+        if (derivate == null || derivate.length() == 0 || MCRMetadataManager.exists(MCRObjectID.getInstance(derivate))) {
+            return fList;
+        }
+
+        MCRFilesystemNode node = MCRFilesystemNode.getRootNode(derivate);
+        if (node instanceof MCRDirectory) {
+            processNode(node, fList);
+        }
+        return fList;
+    }
+
+    /**
+     * @see {@link MCRUtils#getFiles(String)}
+     * */
+    private static void processNode(MCRFilesystemNode node, List<MCRFile> fList) {
+        MCRDirectory dir = (MCRDirectory) node;
+        MCRFilesystemNode[] children = dir.getChildren();
+        for (MCRFilesystemNode child : children) {
+            if (child instanceof MCRDirectory) {
+                processNode(child, fList);
+            }
+            if (child instanceof MCRFile) {
+                fList.add((MCRFile) child);
             }
         }
     }
