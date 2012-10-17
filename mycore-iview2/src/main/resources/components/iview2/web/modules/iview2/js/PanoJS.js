@@ -538,10 +538,10 @@ PanoJS.prototype = {
 		//TODO Viewer depends on currentImage to correctly position the image after zoom
 		var dimensionsAfter = {'width' : currentImage.curWidth, 'height' :  currentImage.curHeight};
 							
-		this.x = this.getNewViewerPosition(this.width, oldX, dimensionsBefore.width, dimensionsAfter.width);
-		this.y = this.getNewViewerPosition(this.height, oldY, dimensionsBefore.height, dimensionsAfter.height);			
+		var newx = this.getNewViewerPosition(this.width, oldX, dimensionsBefore.width, dimensionsAfter.width);
+		var newy = this.getNewViewerPosition(this.height, oldY, dimensionsBefore.height, dimensionsAfter.height);			
 
-		this.positionTiles();
+		this.positionTiles({'x' : this.x - newx, 'y' : this.y - newy});
 	},
 	
 	/**
