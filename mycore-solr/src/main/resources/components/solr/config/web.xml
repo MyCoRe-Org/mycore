@@ -1,0 +1,9 @@
+<servlet>
+  <servlet-name>SolrSearchServlet</servlet-name>
+  <servlet-class>org.mycore.solr.search.SolrSearchServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+  <servlet-name>SolrSearchServlet</servlet-name>
+  <url-pattern>/servlets/search</url-pattern>
+</servlet-mapping>
