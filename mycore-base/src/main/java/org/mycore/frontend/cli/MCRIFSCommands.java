@@ -490,7 +490,7 @@ public class MCRIFSCommands {
     }
 
     @MCRCommand(syntax = "delete ifs node {0}", help = "deletes ifs node {0} recursivly")
-    public void deleteIFSNode(String nodeID) {
+    public static void deleteIFSNode(String nodeID) {
         MCRFilesystemNode node = MCRFilesystemNode.getNode(nodeID);
         if (node == null) {
             LOGGER.warn("IFS Node " + nodeID + " does not exist.");
