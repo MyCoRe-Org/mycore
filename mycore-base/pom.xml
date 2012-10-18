@@ -189,6 +189,10 @@
       <artifactId>junit</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.dbunit</groupId>
+      <artifactId>dbunit</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.jdom</groupId>
       <artifactId>jdom</artifactId>
     </dependency>

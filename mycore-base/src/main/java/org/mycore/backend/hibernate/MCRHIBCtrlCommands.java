@@ -29,11 +29,46 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.dbunit.DatabaseUnitException;
+import org.dbunit.database.DatabaseConfig;
+import org.dbunit.database.DatabaseConnection;
+import org.dbunit.database.DatabaseSequenceFilter;
+import org.dbunit.database.QueryDataSet;
+import org.dbunit.database.search.TablesDependencyHelper;
+import org.dbunit.dataset.DataSetException;
+import org.dbunit.dataset.FilteredDataSet;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.datatype.DefaultDataTypeFactory;
+import org.dbunit.dataset.datatype.IDataTypeFactory;
+import org.dbunit.dataset.filter.ITableFilter;
+import org.dbunit.dataset.stream.IDataSetProducer;
+import org.dbunit.dataset.stream.StreamingDataSet;
+import org.dbunit.dataset.xml.FlatDtdDataSet;
+import org.dbunit.dataset.xml.FlatXmlProducer;
+import org.dbunit.dataset.xml.FlatXmlWriter;
+import org.dbunit.ext.db2.Db2DataTypeFactory;
+import org.dbunit.ext.h2.H2DataTypeFactory;
+import org.dbunit.ext.hsqldb.HsqldbDataTypeFactory;
+import org.dbunit.ext.mssql.MsSqlDataTypeFactory;
+import org.dbunit.ext.mysql.MySqlDataTypeFactory;
+import org.dbunit.ext.oracle.Oracle10DataTypeFactory;
+import org.dbunit.ext.oracle.OracleDataTypeFactory;
+import org.dbunit.ext.postgresql.PostgresqlDataTypeFactory;
+import org.dbunit.operation.DatabaseOperation;
+import org.dbunit.operation.TransactionOperation;
+import org.dbunit.util.search.SearchException;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
@@ -47,6 +82,18 @@ import org.hibernate.EntityMode;
 import org.hibernate.HibernateException;
 import org.hibernate.ReplicationMode;
 import org.hibernate.Session;
+import org.hibernate.StatelessSession;
+import org.hibernate.dialect.DB2Dialect;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.dialect.H2Dialect;
+import org.hibernate.dialect.HSQLDialect;
+import org.hibernate.dialect.MySQLDialect;
+import org.hibernate.dialect.Oracle10gDialect;
+import org.hibernate.dialect.Oracle8iDialect;
+import org.hibernate.dialect.PostgreSQLDialect;
+import org.hibernate.dialect.SQLServerDialect;
+import org.hibernate.dialect.resolver.DialectFactory;
+import org.hibernate.mapping.Table;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
@@ -54,6 +101,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -84,27 +132,31 @@ public class MCRHIBCtrlCommands extends MCRAbstractCommands {
         MCRCommand com = null;
 
         com = new MCRCommand("init hibernate", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.createTables",
-                "The command creates all tables for MyCoRe by hibernate.");
+            "The command creates all tables for MyCoRe by hibernate.");
         addCommand(com);
         com = new MCRCommand("export acl rules to file {0}", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.exportAccessRules String",
-                "Exports all ACL rules to a given file.");
+            "Exports all ACL rules to a given file.");
         addCommand(com);
         com = new MCRCommand("import acl rules from file {0}", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.importAccessRules String",
-                "Imports all ACL rules from a given file.");
+            "Imports all ACL rules from a given file.");
         addCommand(com);
-        com = new MCRCommand("export acl mappings to file {0}",
-                "org.mycore.backend.hibernate.MCRHIBCtrlCommands.exportAccessMappings String", "Exports all ACL mappings to a given file.");
+        com = new MCRCommand("export acl mappings to file {0}", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.exportAccessMappings String",
+            "Exports all ACL mappings to a given file.");
         addCommand(com);
-        com = new MCRCommand("import acl mappings from file {0}",
-                "org.mycore.backend.hibernate.MCRHIBCtrlCommands.importAccessMappings String",
-                "Imports all ACL mappings from a given file.");
+        com = new MCRCommand("import acl mappings from file {0}", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.importAccessMappings String",
+            "Imports all ACL mappings from a given file.");
         addCommand(com);
         com = new MCRCommand("export entity {0} to file {1}", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.exportEntity String String",
-                "Exports an entity (fully qualified class name) to a given file.");
+            "Exports an entity (fully qualified class name) to a given file.");
         addCommand(com);
-        com = new MCRCommand("import entity {0} from file {1}",
-                "org.mycore.backend.hibernate.MCRHIBCtrlCommands.importEntity String String",
-                "Imports an entity (fully qualified class name) from a given file.");
+        com = new MCRCommand("import entity {0} from file {1}", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.importEntity String String",
+            "Imports an entity (fully qualified class name) from a given file.");
+        addCommand(com);
+        com = new MCRCommand("export database to file {0}", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.exportDatabase String",
+            "Exports complete database to a given file.");
+        addCommand(com);
+        com = new MCRCommand("import database from file {0}", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.importDatabase String",
+            "Imports backup from a given file to database.");
         addCommand(com);
     }
 
@@ -150,8 +202,8 @@ public class MCRHIBCtrlCommands extends MCRAbstractCommands {
     }
 
     @SuppressWarnings("unchecked")
-    private static void exportFile(String file, String rootTag, Class persistedClass) throws FileNotFoundException,
-            UnsupportedEncodingException, IOException, SAXException {
+    private static void exportFile(String file, String rootTag, Class persistedClass) throws FileNotFoundException, UnsupportedEncodingException, IOException,
+        SAXException {
         File exportFile = new File(file);
         if (exportFile.exists() && exportFile.isDirectory()) {
             throw new MCRException(exportFile.getAbsolutePath() + " is a directory.");
@@ -222,6 +274,180 @@ public class MCRHIBCtrlCommands extends MCRAbstractCommands {
             }
         });
         xmlReader.read(importFile);
+    }
+
+    public static void exportDatabase(String outputFileName) throws HibernateException, DatabaseUnitException, SQLException, IOException {
+        File outputFile = new File(outputFileName);
+        Iterator<Table> tableMappings = MCRHIBConnection.instance().getConfiguration().getTableMappings();
+        List<String> exportTables = new LinkedList<String>();
+        while (tableMappings.hasNext()) {
+            exportTables.add(tableMappings.next().getName());
+        }
+        exportDatabase(outputFile);
+    }
+
+    public static void exportDatabase(File outputFile, String... rootTables) throws HibernateException, DatabaseUnitException, SQLException, IOException {
+        DatabaseConnection jdbcConnection = getDatabaseConnection();
+        try {
+            IDataSet exportSet = getExportDataSet(jdbcConnection, rootTables);
+            exportDataSet(outputFile, exportSet);
+        } finally {
+            jdbcConnection.close();
+        }
+    }
+
+    private static DatabaseConnection getDatabaseConnection() throws DatabaseUnitException, SQLException {
+        MCRHIBConnection mcrhibConnection = MCRHIBConnection.instance();
+        int batchSize = Integer.parseInt(mcrhibConnection.getConfiguration().getProperties().getProperty("jdbc.batch_size", "0"), 10);
+        StatelessSession session = mcrhibConnection.getSessionFactory().openStatelessSession();
+        Connection jdbcConnection = session.connection();
+        DatabaseMetaData metaData = jdbcConnection.getMetaData();
+        DatabaseConnection databaseConnection = new DatabaseConnection(jdbcConnection);
+        DatabaseConfig databaseConfig = databaseConnection.getConfig();
+        databaseConfig.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, getDataTypeFactory());
+        if (metaData.supportsBatchUpdates() && batchSize > 1) {
+            LOGGER.info("JDBC Batch support detected. Batch size: " + batchSize);
+            databaseConfig.setProperty(DatabaseConfig.FEATURE_BATCHED_STATEMENTS, true);
+            databaseConfig.setProperty(DatabaseConfig.PROPERTY_BATCH_SIZE, batchSize);
+        } else {
+            databaseConfig.setProperty(DatabaseConfig.FEATURE_BATCHED_STATEMENTS, false);
+        }
+        databaseConfig.setProperty(DatabaseConfig.FEATURE_CASE_SENSITIVE_TABLE_NAMES, true);
+        return databaseConnection;
+    }
+
+    public static void importDatabase(String inputFileName) throws DatabaseUnitException, SQLException {
+        File inputFile = new File(inputFileName);
+        importDatabase(inputFile);
+    }
+
+    public static void importDatabase(File inputFileName) throws DatabaseUnitException, SQLException {
+        File dtdFile = getDTDFile(inputFileName);
+        boolean dtdMetadata = dtdFile.exists();
+        InputSource xmlSource = new InputSource(inputFileName.toURI().toString());
+        IDataSetProducer producer = new FlatXmlProducer(xmlSource, dtdMetadata);
+        IDataSet dataSet = new StreamingDataSet(producer);
+        DatabaseConnection databaseConnection = getDatabaseConnection();
+        try {
+            Connection jdbcConnection = databaseConnection.getConnection();
+            DatabaseMetaData metaData = jdbcConnection.getMetaData();
+            metaData.supportsTransactions();
+            DatabaseOperation operation;
+            if (metaData.supportsTransactions()) {
+                LOGGER.info(metaData.getDatabaseProductName() + " v" + metaData.getDatabaseProductVersion() + " does not support transactions.");
+                operation = DatabaseOperation.INSERT;
+            } else {
+                LOGGER.info("Importing with transaction support");
+                operation = new TransactionOperation(DatabaseOperation.INSERT);
+            }
+            operation.execute(databaseConnection, dataSet);
+        } finally {
+            databaseConnection.close();
+        }
+    }
+
+    private static IDataTypeFactory getDataTypeFactory() {
+        Properties properties = MCRHIBConnection.instance().getConfiguration().getProperties();
+        Dialect dialect = DialectFactory.buildDialect(properties);
+        if (dialect == null) {
+            LOGGER.info("Could not detect Hibernate dialect: " + properties);
+            return new DefaultDataTypeFactory();
+        }
+        if (dialect instanceof HSQLDialect) {
+            LOGGER.info("HSQLDB detected.");
+            return new HsqldbDataTypeFactory();
+        }
+        if (dialect instanceof DB2Dialect) {
+            LOGGER.info("DB2 detected.");
+            return new Db2DataTypeFactory();
+        }
+        if (dialect instanceof MySQLDialect) {
+            LOGGER.info("MySQL detected.");
+            return new MySqlDataTypeFactory();
+        }
+        if (dialect instanceof PostgreSQLDialect) {
+            LOGGER.info("PostgreSQL detected.");
+            return new PostgresqlDataTypeFactory();
+        }
+        if (dialect instanceof H2Dialect) {
+            LOGGER.info("H2 detected.");
+            return new H2DataTypeFactory();
+        }
+        if (dialect instanceof SQLServerDialect) {
+            LOGGER.info("MS SQLServer detected.");
+            return new MsSqlDataTypeFactory();
+        }
+        if (dialect instanceof Oracle10gDialect) {
+            LOGGER.info("Oracle 10 detected.");
+            return new Oracle10DataTypeFactory();
+        }
+        if (dialect instanceof Oracle8iDialect) {
+            LOGGER.info("Oracle <10 detected.");
+            return new OracleDataTypeFactory();
+        }
+        LOGGER.info("Unsupported Hibernate dialect: " + dialect.getClass());
+        return new DefaultDataTypeFactory();
+    }
+
+    private static IDataSet getExportDataSet(DatabaseConnection jdbcConnection, String... rootTables) throws SQLException, SearchException, DataSetException {
+        ITableFilter filter = new DatabaseSequenceFilter(jdbcConnection);
+        IDataSet dataSet;
+        if (rootTables.length == 0) {
+            dataSet = jdbcConnection.createDataSet();
+        } else {
+            String[] depTableNames = TablesDependencyHelper.getAllDependentTables(jdbcConnection, rootTables);
+            dataSet = jdbcConnection.createDataSet(depTableNames);
+        }
+        return getExportableOrder(jdbcConnection, filter, dataSet);
+    }
+
+    private static IDataSet getExportableOrder(DatabaseConnection jdbcConnection, ITableFilter filter, IDataSet dataSet) throws DataSetException {
+        FilteredDataSet baseSet = new FilteredDataSet(filter, dataSet);
+        String[] tableNames = baseSet.getTableNames();
+        QueryDataSet qDataSet = new QueryDataSet(jdbcConnection);
+        for (String tableName : tableNames) {
+            qDataSet.addTable(tableName, getQuery(tableName));
+        }
+        return qDataSet;
+    }
+
+    private static String getQuery(String tableName) {
+        String uCaseName = tableName.toUpperCase();
+        if (uCaseName.endsWith("MCRCATEGORY")) {
+            return MessageFormat.format("select * from {0} order by level asc", tableName);
+        }
+        return null;
+    }
+
+    private static void exportDataSet(File outputFile, IDataSet exportSet) throws FileNotFoundException, IOException, DataSetException {
+        File dtdFile = getDTDFile(outputFile);
+        FileOutputStream dout = new FileOutputStream(dtdFile);
+        try {
+            LOGGER.info("Writing DTD to " + dtdFile.getAbsolutePath());
+            FlatDtdDataSet.write(exportSet, dout);
+        } finally {
+            dout.close();
+        }
+        FileOutputStream fout = new FileOutputStream(outputFile);
+        try {
+            LOGGER.info("Writing XML to " + outputFile.getAbsolutePath());
+            FlatXmlWriter datasetWriter = new FlatXmlWriter(fout);
+            datasetWriter.setDocType(dtdFile.getName());
+            datasetWriter.write(exportSet);
+        } finally {
+            fout.close();
+        }
+    }
+
+    private static File getDTDFile(File outputFile) {
+        String dtdFileName = outputFile.getName();
+        int pos = dtdFileName.lastIndexOf(".");
+        if (pos > 0) {
+            dtdFileName = dtdFileName.substring(0, pos);
+        }
+        dtdFileName += ".dtd";
+        File dtdFile = new File(outputFile.getParent(), dtdFileName);
+        return dtdFile;
     }
 
 }
