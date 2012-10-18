@@ -17,12 +17,17 @@ iview.thumbnailPanel = iview.thumbnailPanel || {};
 		this._handler = new Array();
 	};
 	
-	iview.thumbnailPanel.View.prototype.visible = function(__visible) {
+	iview.thumbnailPanel.View.prototype.visible = function(__visible, animation) {
 		if (__visible == this._visible) {
 			return;
 		}
-
-		jQuery(this._container).slideToggle();
+		
+		if(typeof animation == "undefined" || animation == true){
+			jQuery(this._container).slideToggle();
+		} else {
+			jQuery(this._container).toggle();
+		}
+		
 		this._visible = __visible;
 	};
 

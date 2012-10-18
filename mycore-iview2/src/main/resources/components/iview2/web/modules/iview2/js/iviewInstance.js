@@ -188,6 +188,12 @@
 			this.addDimensionSubstract(false, 'scrollbar', 13);
 			
 		};
+		constructor.prototype.onMinimizeViewerContainer = function ii_onMinimizeViewerContainer(){
+			if (this.ThumbnailPanel != null) {
+				this.ThumbnailPanel.hideView(false);
+			}
+		};
+
 		
 		/**
 		 * @method
@@ -241,8 +247,9 @@
 				jQuery(that.viewerContainer).bind( "maximize.viewerContainer", function() {
 					that.onMaximizeViewerContainer(false);
 				});
+			}).bind( "minimize.viewerContainer", function() {
+				that.onMinimizeViewerContainer();
 			});
-			
 			
 			// other components which are lowering the width and the height of
 			// the viewer, can be applyed here

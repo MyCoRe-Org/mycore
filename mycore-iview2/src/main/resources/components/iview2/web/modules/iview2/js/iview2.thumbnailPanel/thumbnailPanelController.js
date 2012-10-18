@@ -52,13 +52,13 @@ iview.thumbnailPanel = iview.thumbnailPanel || {};
 		});
 	};
 
-	iview.thumbnailPanel.Controller.prototype.showView = function() {
-		this._view.visible(true);
+	iview.thumbnailPanel.Controller.prototype.showView = function(animation) {
+		this._view.visible(true, animation);
 		this._view.reinit();
 	};
 
-	iview.thumbnailPanel.Controller.prototype.hideView = function() {
-		this._view.visible(false);
+	iview.thumbnailPanel.Controller.prototype.hideView = function(animation) {
+		this._view.visible(false, animation);
 	};
 
 	iview.thumbnailPanel.Controller.prototype.toggleView = function(button) {
