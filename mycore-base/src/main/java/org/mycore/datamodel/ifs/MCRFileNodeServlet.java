@@ -37,7 +37,6 @@ import org.jdom.Document;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRJDOMContent;
@@ -124,11 +123,7 @@ public class MCRFileNodeServlet extends MCRServlet {
         LOGGER.info("MCRFileNodeServlet: request path = " + requestPath);
 
         if (requestPath == null) {
-            String msg = "Error: HTTP request path is null";
-            LOGGER.error(msg);
-            errorPage(request, response, HttpServletResponse.SC_BAD_REQUEST, msg, new MCRException("No path was given in the request"),
-                    false);
-
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error: HTTP request path is null");
             return false;
         }
         return true;
@@ -156,19 +151,14 @@ public class MCRFileNodeServlet extends MCRServlet {
         }
 
         if (root == null) {
-            String msg = "Error: No root node found for owner ID " + ownerID;
-            LOGGER.error(msg);
-            errorPage(request, response, HttpServletResponse.SC_NOT_FOUND, msg, new MCRException(msg), false);
-
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "No root node found for owner ID " + ownerID);
             return;
         }
 
         if (root instanceof MCRFile) {
             if (request.getPathInfo().length() > ownerID.length() + 1) {
                 // request path is too long
-                String msg = "Error: No such file or directory " + request.getPathInfo();
-                LOGGER.error(msg);
-                errorPage(request, response, HttpServletResponse.SC_NOT_FOUND, msg, new MCRException(msg), false);
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Error: No such file or directory " + request.getPathInfo());
                 return;
             }
             sendFile(job, (MCRFile) root);
@@ -181,9 +171,7 @@ public class MCRFileNodeServlet extends MCRServlet {
         MCRFilesystemNode node = dir.getChildByPath(path);
 
         if (node == null) {
-            String msg = "Error: No such file or directory " + path;
-            LOGGER.error(msg);
-            errorPage(request, response, HttpServletResponse.SC_NOT_FOUND, msg, new MCRException(msg), false);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Error: No such file or directory " + path);
             return;
         } else if (node instanceof MCRFile) {
             sendFile(job, (MCRFile) node);
@@ -193,7 +181,7 @@ public class MCRFileNodeServlet extends MCRServlet {
             return;
         }
     }
-    
+
     /**
      *  retrieves the derivate ID of the owning derivate from request path.
      *  @param request - the http request object
@@ -214,20 +202,20 @@ public class MCRFileNodeServlet extends MCRServlet {
         }
         return ownerID.toString();
     }
-    
+
     /**
      *  Retrieves the path of the file to display from request path.
      *  @param request - the http request object
      */
-    protected static String getPath(HttpServletRequest request){
-    	String ownerID = getOwnerID(request);
-    	int pos = ownerID.length() + 1;
+    protected static String getPath(HttpServletRequest request) {
+        String ownerID = getOwnerID(request);
+        int pos = ownerID.length() + 1;
         StringBuffer path = new StringBuffer(request.getPathInfo().substring(pos));
         if (path.length() > 1 && path.charAt(path.length() - 1) == '/') {
             path.deleteCharAt(path.length() - 1);
         }
-        if(path.length()==0){
-        	return "/";
+        if (path.length() == 0) {
+            return "/";
         }
         return path.toString();
     }
@@ -304,8 +292,7 @@ public class MCRFileNodeServlet extends MCRServlet {
      * 
      * see its overwritten in jspdocportal
      */
-    protected void errorPage(HttpServletRequest req, HttpServletResponse res, int error, String msg, Exception ex, boolean xmlstyle)
-            throws IOException {
+    protected void errorPage(HttpServletRequest req, HttpServletResponse res, int error, String msg, Exception ex, boolean xmlstyle) throws IOException {
         generateErrorPage(req, res, error, msg, ex, xmlstyle);
     }
 }
