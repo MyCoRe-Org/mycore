@@ -1,5 +1,6 @@
 package org.mycore.frontend.classeditor.mocks;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -144,6 +145,10 @@ public class CategoryDAOMock implements MCRCategoryDAO {
 
     @Override
     public void setLabel(MCRCategoryID id, MCRLabel label) {
+    }
+    
+    @Override
+    public void setURI(MCRCategoryID id, URI uri) {
     }
 
     @Override

@@ -23,6 +23,7 @@
  **/
 package org.mycore.datamodel.classifications2.impl;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -475,6 +476,15 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             category.getLabels().remove(oldLabel);
         }
         category.getLabels().add(label);
+        session.update(category);
+        updateTimeStamp();
+        updateLastModified(category.getRootID());
+    }
+
+    public void setURI(MCRCategoryID id, URI uri) {
+        Session session = getHibConnection().getSession();
+        MCRCategoryImpl category = getByNaturalID(session, id);
+        category.setURI(uri);
         session.update(category);
         updateTimeStamp();
         updateLastModified(category.getRootID());

@@ -23,6 +23,7 @@
  **/
 package org.mycore.datamodel.classifications2;
 
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -219,6 +220,16 @@ public interface MCRCategoryDAO {
      *            to be set or updated
      */
     public abstract void setLabel(MCRCategoryID id, MCRLabel label);
+
+    /**
+     * Sets or updates the URI from a Category.
+     * 
+     * @param id
+     *            ID of the category
+     * @param uri
+     *            to be set or updated
+     */
+    public abstract void setURI(MCRCategoryID id, URI uri);
 
     /**
      * allows to determine when the last change was made to the categories.
