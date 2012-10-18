@@ -27,7 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.Vector;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerFactory;
@@ -414,7 +413,6 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         MCRQuery q = new MCRQuery(urnCond);
         MCRResults result = MCRQueryManager.search(q);
 
-        List<String> ownerIds = new Vector<String>();
         for (MCRHit hit : result) {
             MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(hit.getID()));
             MCRDirectory difs = MCRDirectory.getRootDirectory(der.getId().toString());
@@ -426,10 +424,9 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
                 } else {
                     LOGGER.info("URN Derivate with mets :" + der);
 
-                    
                     Map<String, String> urnFileMap = der.getUrnMap();
                     if (urnFileMap.size() > 0) {
-                        MCRMetsSave.updateMetsOnUrnGenerate(der, urnFileMap);
+                        MCRMetsSave.updateMetsOnUrnGenerate(der.getId(), urnFileMap);
                     }
                 }
             }

@@ -53,10 +53,10 @@ public class MCRSaveMETSServlet extends MCRServlet {
         String jsontree = job.getRequest().getParameter("jsontree");
         JsonObject json = new JsonParser().parse(jsontree).getAsJsonObject();
         // extract derivate id from json object (root id of the tree)
-        String derivateId = job.getRequest().getParameter("derivate");
+        MCRObjectID derivateId = MCRObjectID.getInstance(job.getRequest().getParameter("derivate"));
 
         // checking access right
-        if (!MCRAccessManager.checkPermission(MCRObjectID.getInstance(derivateId), "writedb")) {
+        if (!MCRAccessManager.checkPermission(derivateId, "writedb")) {
             LOGGER.warn("Creating Mets object for derivate with id " + derivateId + " failed. Unsufficient privileges.");
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
@@ -64,22 +64,19 @@ public class MCRSaveMETSServlet extends MCRServlet {
 
         LOGGER.debug(jsontree);
 
-        MCRMetsProvider mp = new MCRMetsProvider(derivateId);
+        MCRMetsProvider mp = new MCRMetsProvider(derivateId.toString());
         LOGGER.info("Creating Mets object for derivate with id " + derivateId);
         Mets mets = mp.toMets(json);
         LOGGER.info("Creating Mets object for derivate with id " + derivateId + " was succesful");
 
         LOGGER.info("Validating METS document ...");
-        boolean isComplete = isComplete(mets, derivateId);
+        boolean isComplete = isComplete(mets, derivateId.toString());
         if (!(mets.isValid() && isComplete)) {
             LOGGER.error("Validating METS document failed");
-            String notCompleteErrorMsg = "It appears not all files owned by derivate " + derivateId
-                    + " are referenced within the mets.xml.";
+            String notCompleteErrorMsg = "It appears not all files owned by derivate " + derivateId + " are referenced within the mets.xml.";
 
-            job.getResponse().sendError(
-                    HttpServletResponse.SC_BAD_REQUEST,
-                    "The METS document provided is not valid. See server log for details. "
-                            + (isComplete == false ? notCompleteErrorMsg : ""));
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST,
+                "The METS document provided is not valid. See server log for details. " + (isComplete == false ? notCompleteErrorMsg : ""));
             return;
         }
         LOGGER.info("Validating METS document was successful");
@@ -129,8 +126,7 @@ public class MCRSaveMETSServlet extends MCRServlet {
                 }
 
                 if (fileGroup.contains(node.getPath().substring(derivateId.length() + 1)) == false) {
-                    LOGGER.warn(MessageFormat.format("{0} does not appear in {1}!", node.getPath().substring(derivateId.length() + 1),
-                            derivateId));
+                    LOGGER.warn(MessageFormat.format("{0} does not appear in {1}!", node.getPath().substring(derivateId.length() + 1), derivateId));
                     return false;
                 }
             }

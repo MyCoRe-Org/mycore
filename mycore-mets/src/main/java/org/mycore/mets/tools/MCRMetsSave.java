@@ -23,6 +23,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -62,7 +63,7 @@ public class MCRMetsSave {
      * @param document
      * @param derivateId
      */
-    public static void saveMets(Document document, String derivateId) {
+    public static void saveMets(Document document, MCRObjectID derivateId) {
         File tmp = null;
         /* save temporary file */
         try {
@@ -74,8 +75,7 @@ public class MCRMetsSave {
         // add the file to the existing derivate in ifs
         String fileName = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
         LOGGER.info("Storing file content from \"" + tmp.getName() + "\" to derivate \"" + derivateId + "\"");
-        MCRFile uploadFile = new MCRFile(fileName, MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateId))
-                .receiveDirectoryFromIFS());
+        MCRFile uploadFile = new MCRFile(fileName, MCRMetadataManager.retrieveMCRDerivate(derivateId).receiveDirectoryFromIFS());
         uploadFile.setContentFrom(tmp);
 
         // delete temporary file
@@ -110,15 +110,16 @@ public class MCRMetsSave {
      *            a handle for the file to add to the mets.xml
      * @throws Exception
      */
-    public static void updateMetsOnFileAdd(MCRDerivate derivate, MCRFile file) throws Exception {
-        Document mets = getCurrentMets(derivate);
+    public static void updateMetsOnFileAdd(MCRFile file) throws Exception {
+        MCRObjectID derivateID = MCRObjectID.getInstance(file.getOwnerID());
+        Document mets = getCurrentMets(derivateID.toString());
         if (mets == null) {
-            LOGGER.info("Derivate with id \"" + derivate.getId().toString() + "\" has no mets file. Nothing to do");
+            LOGGER.info("Derivate with id \"" + derivateID + "\" has no mets file. Nothing to do");
             return;
         }
         mets = MCRMetsSave.updateOnFileAdd(mets, file);
         if (mets != null)
-            MCRMetsSave.saveMets(mets, derivate.getId().toString());
+            MCRMetsSave.saveMets(mets, derivateID);
     }
 
     /**
@@ -127,9 +128,13 @@ public class MCRMetsSave {
      * @throws JDOMException
      * @throws IOException
      */
-    private static Document getCurrentMets(MCRDerivate derivate) throws JDOMException, IOException {
+    private static Document getCurrentMets(String derivateID) throws JDOMException, IOException {
         String mf = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
-        MCRFilesystemNode metsDocNode = derivate.receiveDirectoryFromIFS().getChild(mf);
+        MCRDirectory rootDir = MCRDirectory.getRootDirectory(derivateID);
+        if (rootDir == null) {
+            return null;
+        }
+        MCRFilesystemNode metsDocNode = rootDir.getChild(mf);
         if (!(metsDocNode instanceof MCRFile)) {
             return null;
         }
@@ -152,8 +157,8 @@ public class MCRMetsSave {
             String fileId = org.mycore.mets.model.files.File.PREFIX_MASTER + uuid;
 
             /* add to file section "use=master" */
-            org.mycore.mets.model.files.File f = new org.mycore.mets.model.files.File(fileId, MimetypesFileTypeMap.getDefaultFileTypeMap()
-                    .getContentType(new File(file.getName())));
+            org.mycore.mets.model.files.File f = new org.mycore.mets.model.files.File(fileId, MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(
+                new File(file.getName())));
             FLocat fLocat = new FLocat(LOCTYPE.URL, file.getName());
             f.setFLocat(fLocat);
 
@@ -165,8 +170,7 @@ public class MCRMetsSave {
             /* add to structMap physical */
             xp = XPath.newInstance("mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[last()]/@ORDER");
             Attribute orderAttribute = (Attribute) xp.selectSingleNode(mets);
-            PhysicalSubDiv div = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE,
-                    orderAttribute.getIntValue() + 1);
+            PhysicalSubDiv div = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE, orderAttribute.getIntValue() + 1);
             div.add(new Fptr(fileId));
 
             // actually alter the mets document
@@ -203,15 +207,16 @@ public class MCRMetsSave {
      *            a handle for the file to add to the mets.xml
      * @throws Exception
      */
-    public static void updateMetsOnFileDelete(MCRDerivate derivate, MCRFile file) throws Exception {
-        Document mets = getCurrentMets(derivate);
+    public static void updateMetsOnFileDelete(MCRFile file) throws Exception {
+        MCRObjectID derivateID = MCRObjectID.getInstance(file.getOwnerID());
+        Document mets = getCurrentMets(derivateID.toString());
         if (mets == null) {
-            LOGGER.info("Derivate with id \"" + derivate.getId().toString() + "\" has no mets file. Nothing to do");
+            LOGGER.info("Derivate with id \"" + derivateID + "\" has no mets file. Nothing to do");
             return;
         }
         mets = MCRMetsSave.updateOnFileDelete(mets, file);
         if (mets != null)
-            MCRMetsSave.saveMets(mets, derivate.getId().toString());
+            MCRMetsSave.saveMets(mets, derivateID);
     }
 
     /**
@@ -220,17 +225,17 @@ public class MCRMetsSave {
      * @param fileUrnMap a {@link Map} wich contains the file as key and the urn as  as value
      * @throws Exception
      */
-    public static void updateMetsOnUrnGenerate(MCRDerivate derivate, Map<String, String> fileUrnMap) throws Exception {
-        Document mets = getCurrentMets(derivate);
+    public static void updateMetsOnUrnGenerate(MCRObjectID derivateID, Map<String, String> fileUrnMap) throws Exception {
+        Document mets = getCurrentMets(derivateID.toString());
         if (mets == null) {
-            LOGGER.info(MessageFormat.format("Derivate with id \"{0}\" has no mets file. Nothing to do", derivate.getId().toString()));
+            LOGGER.info(MessageFormat.format("Derivate with id \"{0}\" has no mets file. Nothing to do", derivateID));
             return;
         }
         LOGGER.info(MessageFormat.format("Update {0} URNS in Mets.xml", fileUrnMap.size()));
 
         Mets metsObject = new Mets(mets);
         updateURNsInMetsDocument(metsObject, fileUrnMap);
-        saveMets(metsObject.asDocument(), derivate.getId().toString());
+        saveMets(metsObject.asDocument(), derivateID);
     }
 
     /**
@@ -377,14 +382,14 @@ public class MCRMetsSave {
      */
     @Deprecated
     public static void updateMetsOnFileAdd(MCRDerivate derivate, String filename) throws Exception {
-        Document mets = getCurrentMets(derivate);
+        Document mets = getCurrentMets(derivate.getId().toString());
         if (mets == null) {
             LOGGER.info("Derivate with id \"" + derivate.getId().toString() + "\" has no mets file. Nothing to do");
             return;
         }
         mets = MCRMetsSave.updateOnFileAdd(mets, filename);
         if (mets != null)
-            MCRMetsSave.saveMets(mets, derivate.getId().toString());
+            MCRMetsSave.saveMets(mets, derivate.getId());
     }
 
     /**
@@ -403,8 +408,8 @@ public class MCRMetsSave {
             String fileId = org.mycore.mets.model.files.File.PREFIX_MASTER + uuid;
 
             /* add to file section "use=master" */
-            org.mycore.mets.model.files.File f = new org.mycore.mets.model.files.File(fileId, MimetypesFileTypeMap.getDefaultFileTypeMap()
-                    .getContentType(new File(filename)));
+            org.mycore.mets.model.files.File f = new org.mycore.mets.model.files.File(fileId, MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(
+                new File(filename)));
             FLocat fLocat = new FLocat(FLocat.LOCTYPE_URL, filename);
             f.setFLocat(fLocat);
 
@@ -416,8 +421,7 @@ public class MCRMetsSave {
             /* add to structMap physical */
             xp = XPath.newInstance("mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[last()]/@ORDER");
             Attribute orderAttribute = (Attribute) xp.selectSingleNode(mets);
-            PhysicalSubDiv div = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE,
-                    orderAttribute.getIntValue() + 1);
+            PhysicalSubDiv div = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE, orderAttribute.getIntValue() + 1);
             div.add(new Fptr(fileId));
 
             // actually alter the mets document

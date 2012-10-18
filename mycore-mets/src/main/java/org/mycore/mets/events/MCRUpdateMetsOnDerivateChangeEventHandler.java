@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -32,13 +33,13 @@ public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBa
             return;
         }
 
-        MCRDerivate owner = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(file.getOwnerID()));
-        if (!owner.receiveDirectoryFromIFS().hasChild(mets)) {
+        MCRDirectory rootDir = MCRDirectory.getRootDirectory(file.getOwnerID());
+        if (rootDir == null || !rootDir.hasChild(mets)) {
             return;
         }
 
         try {
-            MCRMetsSave.updateMetsOnFileDelete(owner, file);
+            MCRMetsSave.updateMetsOnFileDelete(file);
         } catch (Exception e) {
             LOGGER.error("Error while updating mets file", e);
         }
@@ -53,13 +54,14 @@ public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBa
             return;
         }
 
-        MCRDerivate owner = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(file.getOwnerID()));
+        MCRObjectID derivateID = MCRObjectID.getInstance(file.getOwnerID());
+        MCRDerivate owner = MCRMetadataManager.retrieveMCRDerivate(derivateID);
         if (!owner.receiveDirectoryFromIFS().hasChild(mets)) {
             return;
         }
 
         try {
-            MCRMetsSave.updateMetsOnFileAdd(owner, file);
+            MCRMetsSave.updateMetsOnFileAdd(file);
         } catch (Exception e) {
             LOGGER.error("Error while updating mets file", e);
         }
@@ -70,7 +72,7 @@ public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBa
         try {
             Map<String, String> urnFileMap = der.getUrnMap();
             if (urnFileMap.size() > 0) {
-                MCRMetsSave.updateMetsOnUrnGenerate(der, urnFileMap);
+                MCRMetsSave.updateMetsOnUrnGenerate(der.getId(), urnFileMap);
             } else {
                 LOGGER.debug("There are no URN to insert");
             }
