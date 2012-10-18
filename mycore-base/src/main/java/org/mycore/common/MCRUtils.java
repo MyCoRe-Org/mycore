@@ -46,6 +46,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -137,40 +138,33 @@ public class MCRUtils {
             return null;
         }
 
-        GregorianCalendar calendar = new GregorianCalendar();
-        boolean test = false;
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        formatter.setLenient(false);
 
+        Date d = null;
         try {
-            calendar.setTime(formatter.parse(indate));
-            test = true;
+            d = formatter.parse(indate);
+            if (d != null) {
+                return indate;
+            }
         } catch (ParseException e) {
+            LOGGER.debug("Could not parse input date \"" + indate + "\"");
         }
 
-        if (!test) {
-            for (DateFormat df : DATE_FORMAT) {
-                df.setLenient(false);
+        // try other date formats
+        for (DateFormat df : DATE_FORMAT) {
+            // btw. not threadsafe
+            df.setLenient(false);
 
-                try {
-                    calendar.setTime(df.parse(indate));
-                    test = true;
-                } catch (ParseException e) {
-                }
-
-                if (test) {
-                    break;
-                }
+            try {
+                return formatter.format(df.parse(indate));
+            } catch (ParseException e) {
+                LOGGER.debug("Could not parse date " + indate);
+                LOGGER.debug("Will try next date format");
             }
         }
 
-        if (!test) {
-            return null;
-        }
-
-        formatter.setCalendar(calendar);
-
-        return formatter.format(calendar.getTime());
+        LOGGER.warn("Could not parse date " + indate);
+        return null;
     }
 
     /**
