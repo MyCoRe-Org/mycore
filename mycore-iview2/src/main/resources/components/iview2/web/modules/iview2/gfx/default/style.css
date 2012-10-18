@@ -653,10 +653,12 @@ div.thumbnail>img {
 
 .viewerContainer>div.scrollx {
 	overflow-x: scroll;
+	-webkit-overflow-scrolling: touch;
 }
 
 .viewerContainer>div.scrolly {
 	overflow-y: scroll;
+	-webkit-overflow-scrolling: touch;
 }
 
 .viewerContainer.min>div.scrollBar {
