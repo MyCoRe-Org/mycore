@@ -109,7 +109,6 @@
 		 * @description Handler that is automatic called when the viewer zooms
 		 */
 		constructor.prototype.onViewerZoomHandler = function ii_onImageZoomHandler() {
-			viewerZoomed.apply(this, arguments);
 			if (this.scrollBar != null) {
 
 				this.scrollBar.setSize({
@@ -393,6 +392,8 @@
 			});
 			jQuery(viewerBean.viewer).bind("move.viewer", function(jq, event) {
 				that.onViewerMoveHandler(jq, event);
+			}).bind("zoom.viewer", function(){ // onViewerZoom handler runs to late cause its a delegate
+				viewerZoomed.apply(that, arguments);
 			});
 
 		
