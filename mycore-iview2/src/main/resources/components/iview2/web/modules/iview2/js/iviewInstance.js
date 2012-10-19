@@ -131,7 +131,9 @@
 		 *            event
 		 */
 		constructor.prototype.onViewerMoveHandler = function ii_onImageMoveHandler(
-				jq, event) {			
+				jq, event) {	
+			
+			
 			if(this.scrollBar != null){
 				this.scrollBar.setPosition(event);
 			};
@@ -164,13 +166,10 @@
 				};
 				this.scrollBar.registerEventHandler(scrollbarEvent);
 				
-				this.scrollBar.setSize({
-					"width" : that.currentImage.curWidth,
-					"height" : that.currentImage.curHeight
-				});
+
 				
 				jQuery(window).resize(function() {
-					//
+					//TODO: bm
 					var sizeX = that.viewerBean.width + 13;
 					var sizeY = that.viewerBean.height + 13;
 
@@ -183,6 +182,23 @@
 
 				});
 			}
+			
+			var scrollbarContainer = this.scrollBar.getContainer();
+			
+			this.scrollBar.setSize({
+				"width" : that.currentImage.curWidth,
+				"height" : that.currentImage.curHeight
+			});
+			
+			var sizeX = that.viewerBean.width + 13;
+			var sizeY = that.viewerBean.height + 13;
+
+			scrollbarContainer.css({
+				"width" : sizeX + "px"
+			});
+			scrollbarContainer.css({
+				"height" : sizeY + "px"
+			});
 			
 			this.addDimensionSubstract(true, 'scrollbar', 13);
 			this.addDimensionSubstract(false, 'scrollbar', 13);
@@ -480,6 +496,7 @@
 									.trigger(
 											iview.IViewInstance.INIT_PHYSICAL_MODEL_EVENT,
 											this);
+
 						},
 						error : function(request, status, exception) {
 							that.removeNavigationButtons();
@@ -712,6 +729,21 @@
 			// that they possibly need adaptation of their own view
 			jQuery(viewerBean.viewer).trigger("reinit.viewer");
 
+			var sizeX = viewerBean.width + 13;
+			var sizeY = viewerBean.height + 13;
+
+			if(scrollbarContainer!=null){
+				var scrollbarContainer = this.scrollBar.getContainer();
+				scrollbarContainer.css({
+					"width" : sizeX + "px"
+				});
+				scrollbarContainer.css({
+					"height" : sizeY + "px"
+				});	
+			}
+			
+
+			
 			viewerBean.x = 0;
 			viewerBean.y = 0;
 			if (!isNaN(URL.getParam("x")) && !isNaN(URL.getParam("x"))) {
@@ -722,6 +754,7 @@
 			} else {
 				viewerBean.positionTiles();
 			}
+			
 			// TODO: align image and toolbar to the center
 		};
 

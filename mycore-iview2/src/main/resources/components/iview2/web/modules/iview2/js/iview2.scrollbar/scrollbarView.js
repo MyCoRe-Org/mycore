@@ -45,6 +45,7 @@ iview.Scrollbar = iview.Scrollbar || {};
 	 */
 	iview.Scrollbar.View.prototype.setPosition = function sbv_setPosition(
 			position) {
+		
 		this._container.scrollTop(position.y);
 		this._container.scrollLeft(position.x);
 	};
@@ -69,12 +70,14 @@ iview.Scrollbar = iview.Scrollbar || {};
 	 * @see {iview.Scrollbar.Controller.setSize}
 	 */
 	iview.Scrollbar.View.prototype.setSize = function sbv_setSize(size) {
+		var bak = this.getPosition();
 		this._spacer.css({
 			"width" : size.width + "px",
 			"height" : size.height + "px",
 			"padding" : "0px",
 			"margin" : "0px"
 		});
+		this.setPosition(bak);
 	};
 
 	/**
