@@ -3,7 +3,7 @@ define([
 	"dojo/data/ItemFileWriteStore"
 ], function(declare, itemFileWriteStore) {
 
-return declare("dojoclasses.SimpleRESTStore", itemFileWriteStore, {
+return declare("mycore.classification.SimpleRESTStore", itemFileWriteStore, {
 	constructor: function(/* object */ keywordParameters){
 		this.settings = keywordParameters.settings;
 	},

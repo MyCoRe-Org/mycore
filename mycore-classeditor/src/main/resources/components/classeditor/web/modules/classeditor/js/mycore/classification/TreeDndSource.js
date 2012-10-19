@@ -3,7 +3,7 @@ define([
 	"dijit/tree/dndSource"
 ], function(declare, dndSource) {
 
-return declare("dojoclasses.TreeDndSource", dndSource, {
+return declare("mycore.classification.TreeDndSource", dndSource, {
 	onMouseDown: function(e) {
 		// this is a workaround to fix dnd support in tree
 		// the id is only set if the scrollbar is hit, this allows us
@@ -30,4 +30,3 @@ return declare("dojoclasses.TreeDndSource", dndSource, {
 	}
 });
 });
-

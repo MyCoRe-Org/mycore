@@ -9,7 +9,8 @@
   <artifactId>mycore-classeditor</artifactId>
   <name>MyCoRe Classification Editor</name>
 
-  <build>
+  <!-- TODO: build minified version of classeditor -->
+  <!--<build>
     <plugins>
       <plugin>
         <groupId>com.samaxes.maven</groupId>
@@ -25,7 +26,7 @@
               <webappTargetDir>${project.build.outputDirectory}/components/classeditor/web/modules/classeditor</webappTargetDir>
               <jsSourceDir>components/classeditor/web/modules/classeditor/js</jsSourceDir>
               <jsSourceFiles>
-                <jsSourceFile>dojoclasses/dojoClasses.js</jsSourceFile>
+                <jsSourceFile>mycore/dojoClasses.js</jsSourceFile>
                 <jsSourceFile>CategoryEditorPane.js</jsSourceFile>
                 <jsSourceFile>ClassificationUtils.js</jsSourceFile>
                 <jsSourceFile>Editor.js</jsSourceFile>
@@ -47,7 +48,7 @@
         </executions>
       </plugin>
     </plugins>
-  </build>
+  </build>-->
   <dependencies>
     <dependency>
       <groupId>org.mycore</groupId>

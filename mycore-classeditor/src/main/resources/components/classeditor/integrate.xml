@@ -21,5 +21,6 @@
     			propertyfile="${build.config}/mycore.properties"
     			key="MCR.Jersey.resource.packages"
     			value="org.mycore.frontend.classeditor.resources" />
+  	
   </target>
 </project>

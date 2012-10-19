@@ -12,7 +12,7 @@
   <xsl:param name="classeditor.showId" select="false()" />
 
   <!-- Variables -->
-  <xsl:variable name="classeditor.dojoVersion" select="'1.7.3'" />
+  <xsl:variable name="classeditor.dojoVersion" select="'1.8.0'" />
 
   <xsl:variable name="classeditor.resourceURL" select="concat($WebApplicationBaseURL, 'rsc/classifications/')" />
   <xsl:variable name="classeditor.webURL" select="concat($WebApplicationBaseURL, 'modules/classeditor')"/>
@@ -50,7 +50,7 @@
         isDebug: false,
         parseOnLoad: true,
         packages: [
-          {name: "dojoclasses", location: classeditor.settings.jsURL + "/dojoclasses"}
+          {name: "mycore", location: classeditor.settings.jsURL + "/mycore"}
         ],
         dojoBlankHtmlUrl: classeditor.settings.webURL + "/blank.html"
       };
@@ -58,48 +58,27 @@
   </xsl:template>
 
   <xsl:template name="classeditor.includeDojoJS">
-    <script src="http://ajax.googleapis.com/ajax/libs/dojo/{$classeditor.dojoVersion}/dojo/dojo.js"></script>
-    <script type="text/javascript" src="{$classeditor.jsURL}/dojoInclude.js"></script>
+    <xsl:choose>
+      <xsl:when test="$classeditor.debug = true()">
+        <script src="http://ajax.googleapis.com/ajax/libs/dojo/{$classeditor.dojoVersion}/dojo/dojo.js.uncompressed.js"></script>  
+      </xsl:when>
+      <xsl:otherwise>
+        <script src="http://ajax.googleapis.com/ajax/libs/dojo/{$classeditor.dojoVersion}/dojo/dojo.js"></script>  
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="classeditor.includeJS">
     <xsl:choose>
       <xsl:when test="$classeditor.debug = true()">
-        <script type="text/javascript" src="{$classeditor.jsURL}/classificationEditor.js"></script>
+<!--    <script type="text/javascript" src="{$classeditor.jsURL}/classificationEditor.js"></script> -->
+        <script type="text/javascript" src="{$classeditor.jsURL}/lib/mycore-dojo.js.uncompressed.js"></script>
       </xsl:when>
       <xsl:otherwise>
-        <script type="text/javascript" src="{$classeditor.jsURL}/classificationEditor.min.js"></script>
+<!--    <script type="text/javascript" src="{$classeditor.jsURL}/classificationEditor.min.js"></script> -->
+        <script type="text/javascript" src="{$classeditor.jsURL}/lib/mycore-dojo.js"></script>
       </xsl:otherwise>
     </xsl:choose>
-  </xsl:template>
-
-  <xsl:template name="classeditor.includeDynamicCSS">
-    <!-- we need to load the css dynamic and put it into the head -->
-    <script type="text/javascript" src="{$classeditor.jsURL}/async.min.js"></script>
-    <script type="text/javascript">
-      require(["dojo/dom-construct", "dojo/query", "dojo/NodeList-manipulate"], function(domConstruct, query) {
-        classeditor.includeDojoCSS = function(callback) {
-          classeditor.loadCSS("http://ajax.googleapis.com/ajax/libs/dojo/"+classeditor.dojoVersion +"/dijit/themes/claro/claro.css", callback);
-        };
-        classeditor.includeCSS = function(callback) {
-          classeditor.loadCSS(classeditor.settings.cssURL + "/classificationEditor.css", callback);
-        };
-        classeditor.loadCSS = function(/*String*/ href, /*function*/ callback) {
-          var css = domConstruct.create('link', {
-            "rel": "stylesheet",
-            "type": "text/css",
-            "href": href,
-            "onload": function() {
-              callback(null, true);
-            },
-            "onerror": function(err) {
-              callback({error: err, href: href}, false);
-            }
-          });
-          query("head").append(css);
-        };
-      });
-    </script>
   </xsl:template>
 
   <xsl:template name="classeditor.includeDojoCSS">

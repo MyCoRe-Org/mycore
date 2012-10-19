@@ -241,9 +241,9 @@ public class MCRClassificationEditorResource {
             LOGGER.error("while import classification", exc);
             return "<html><body><textarea>error</textarea></body></html>";
         }
-        // this is an hack to support iframe loading via ajax
-        // the benefit is to load file input form data without reloading the page
-        // maybe its better to create a separate method importClassificationIFrame or so
+        // This is a hack to support iframe loading via ajax.
+        // The benefit is to load file input form data without reloading the page.
+        // Maybe its better to create a separate method importClassificationIFrame.
         // @see http://livedocs.dojotoolkit.org/dojo/io/iframe - Additional Information
         return "<html><body><textarea>200</textarea></body></html>";
     }
@@ -342,6 +342,7 @@ public class MCRClassificationEditorResource {
             for (MCRLabel mcrLabel : labels) {
                 getCategoryDAO().setLabel(categ.getId(), mcrLabel);
             }
+            getCategoryDAO().setURI(categ.getId(), categ.getURI());
             if (newParentID != null) {
                 getCategoryDAO().moveCategory(categ.getId(), newParentID, categ.getPositionInParent());
             }
