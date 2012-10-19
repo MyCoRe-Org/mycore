@@ -31,6 +31,9 @@ iview.Scrollbar = iview.Scrollbar || {};
 
 	};
 
+	iview.Scrollbar.Controller.SCROLLBAR_WIDTH = 13;
+	iview.Scrollbar.Controller.SCROLLBAR_HEIGHT = 13;
+	
 	/**
 	 * Set the position of the scrollbar. Updates the view.
 	 * 

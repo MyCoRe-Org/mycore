@@ -169,9 +169,8 @@
 
 				
 				jQuery(window).resize(function() {
-					//TODO: bm
-					var sizeX = that.viewerBean.width + 13;
-					var sizeY = that.viewerBean.height + 13;
+					var sizeX = that.viewerBean.width + iview.Scrollbar.Controller.SCROLLBAR_WIDTH;
+					var sizeY = that.viewerBean.height + iview.Scrollbar.Controller.SCROLLBAR_HEIGHT;
 
 					scrollbarContainer.css({
 						"width" : sizeX + "px"
@@ -190,8 +189,8 @@
 				"height" : that.currentImage.curHeight
 			});
 			
-			var sizeX = that.viewerBean.width + 13;
-			var sizeY = that.viewerBean.height + 13;
+			var sizeX = that.viewerBean.width + iview.Scrollbar.Controller.SCROLLBAR_WIDTH;
+			var sizeY = that.viewerBean.height + iview.Scrollbar.Controller.SCROLLBAR_HEIGHT;
 
 			scrollbarContainer.css({
 				"width" : sizeX + "px"
@@ -200,8 +199,8 @@
 				"height" : sizeY + "px"
 			});
 			
-			this.addDimensionSubstract(true, 'scrollbar', 13);
-			this.addDimensionSubstract(false, 'scrollbar', 13);
+			this.addDimensionSubstract(true, 'scrollbar', iview.Scrollbar.Controller.SCROLLBAR_WIDTH);
+			this.addDimensionSubstract(false, 'scrollbar', iview.Scrollbar.Controller.SCROLLBAR_HEIGHT);
 			
 		};
 		constructor.prototype.onMinimizeViewerContainer = function ii_onMinimizeViewerContainer(){
@@ -729,8 +728,8 @@
 			// that they possibly need adaptation of their own view
 			jQuery(viewerBean.viewer).trigger("reinit.viewer");
 
-			var sizeX = viewerBean.width + 13;
-			var sizeY = viewerBean.height + 13;
+			var sizeX = viewerBean.width + iview.Scrollbar.Controller.SCROLLBAR_WIDTH;
+			var sizeY = viewerBean.height + iview.Scrollbar.Controller.SCROLLBAR_HEIGHT;
 
 			if(scrollbarContainer!=null){
 				var scrollbarContainer = this.scrollBar.getContainer();
