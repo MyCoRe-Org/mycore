@@ -62,13 +62,18 @@
  */
 
 ;(function (factory) {
-  if (typeof define === 'function' && define.amd) {
-    // AMD. Register as an anonymous module.
-    define(['jquery'], factory);
-  } else {
-    // Browser globals
+/* Matthias:
+ *  Disabled the following code lines because of side effects with AMD loader
+ *  system of dojo. If activated, dojo tries to load jquery as module with
+ *  the wrong URL.
+ */
+//  if (typeof define === 'function' && define.amd) {
+//    // AMD. Register as an anonymous module.
+//    define(['jquery'], factory);
+//  } else {
+//    // Browser globals
     factory(jQuery);
-  }
+//  }
 }
 (function ($) {
   var d = [],
