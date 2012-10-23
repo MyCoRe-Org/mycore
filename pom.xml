@@ -1220,6 +1220,7 @@
     <module>mycore-wfc</module>
     <module>mycore-z3950</module>
     <module>mycore-zoomify</module>
+    <module>mycore-solr</module>
     <module>mycore-complete</module>
     <module>iview2-addons</module>
   </modules>
