@@ -25,12 +25,14 @@ package org.mycore.backend.hibernate;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
 import org.mycore.common.MCRPersistenceException;
@@ -45,10 +47,8 @@ import org.mycore.datamodel.ifs.MCRFilesystemNode;
  * 
  */
 public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
-    protected String table;
-
-    // logger
-    static Logger logger = Logger.getLogger(MCRHIBLinkTableStore.class.getName());
+    // LOGGER
+    private static Logger LOGGER = Logger.getLogger(MCRHIBLinkTableStore.class);
 
     private Session getSession() {
         return MCRHIBConnection.instance().getSession();
@@ -123,27 +123,18 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
         session.saveOrUpdate(fs);
     }
 
-    @SuppressWarnings("unchecked")
     public String retrieveRootNodeID(String ownerID) throws MCRPersistenceException {
         Session session = getSession();
-        if (ownerID.equals("imgCache")) {
-            //TODO: use projection to retrieve ID
-            StringBuffer sb = new StringBuffer("from MCRFSNODES where OWNER = '").append(ownerID).append("' and PID is NULL");
-            List<MCRFSNODES> l = session.createQuery(sb.toString()).list();
-            if (l.size() < 1) {
-                logger.warn("There is no fsnode with OWNER = " + ownerID);
-                return null;
-            }
-            return l.get(0).getId();
-        } else {
-            StringBuffer sb = new StringBuffer("select id from MCRFSNODES where OWNER = '").append(ownerID).append("' and PID is NULL");
-            String nodeID = (String) session.createQuery(sb.toString()).uniqueResult();
-            if (nodeID == null) {
-                logger.warn("There is no fsnode with OWNER = " + ownerID);
-                return null;
-            }
-            return nodeID;
+        Criteria c = session.createCriteria(MCRFSNODES.class);
+        c.add(Restrictions.isNull("pid"));
+        c.add(Restrictions.eq("owner", ownerID));
+        c.setProjection(Projections.property("id"));
+        String nodeID = (String) c.uniqueResult();
+        if (nodeID == null) {
+            LOGGER.warn("There is no fsnode with OWNER = " + ownerID);
+            return null;
         }
+        return nodeID;
     }
 
     public MCRFilesystemNode retrieveChild(String parentID, String name) {
@@ -163,17 +154,17 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
     @SuppressWarnings("unchecked")
     public List<MCRFilesystemNode> retrieveChildren(String parentID) throws MCRPersistenceException {
         Session session = getSession();
-        List<MCRFSNODES> l = session.createQuery("from MCRFSNODES where PID = '" + parentID + "'").list();
+        Criteria c = session.createCriteria(MCRFSNODES.class);
+        c.add(Restrictions.eq("pid", parentID));
+        List<MCRFSNODES> l = c.list();
+        if (l.size() == 0) {
+            return Collections.EMPTY_LIST;
+        }
 
         List<MCRFilesystemNode> list = new ArrayList<MCRFilesystemNode>(l.size());
-        if (l.size() == 0) {
-            return list;
+        for (MCRFSNODES node : l) {
+            list.add(buildNode(node));
         }
-
-        for (int t = 0; t < l.size(); t++) {
-            list.add(buildNode(l.get(t)));
-        }
-
         return list;
     }
 
@@ -186,7 +177,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
         Session session = getSession();
         MCRFSNODES node = (MCRFSNODES) session.get(MCRFSNODES.class, ID);
         if (node == null) {
-            logger.warn("There is no FSNODE with ID = " + ID);
+            LOGGER.warn("There is no FSNODE with ID = " + ID);
             return null;
         }
 
@@ -197,8 +188,8 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
         GregorianCalendar greg = new GregorianCalendar();
         greg.setTime(node.getDate());
 
-        return MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(), node.getOwner(), node.getName(),
-                node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(), node.getFctid(), node.getMd5(),
-                node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
+        return MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(), node.getOwner(), node.getName(), node.getLabel(),
+            node.getSize(), greg, node.getStoreid(), node.getStorageid(), node.getFctid(), node.getMd5(), node.getNumchdd(), node.getNumchdf(),
+            node.getNumchtd(), node.getNumchtf());
     }
 }
