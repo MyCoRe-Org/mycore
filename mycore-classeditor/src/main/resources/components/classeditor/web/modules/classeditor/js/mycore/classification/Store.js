@@ -32,7 +32,8 @@ return declare("mycore.classification.Store", [Evented, _SettingsMixin], {
 
     load: function(/*function*/ onSuccess, /*function*/ onError) {
 		var url = this.settings.resourceURL + this.classificationId;
-		if(this.classificationId != null && this.classificationId != "" && categoryId != null && categoryId != "") {
+		if(this.classificationId != null && this.classificationId != "" &&
+				this.categoryId != null && this.categoryId != "") {
 			url += "/" + categoryId;
 		}
 		xhr(url, {handleAs: "json"}).then(lang.hitch(this, function(items) {

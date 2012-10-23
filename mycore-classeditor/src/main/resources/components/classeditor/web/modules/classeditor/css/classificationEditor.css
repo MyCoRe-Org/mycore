@@ -1,14 +1,24 @@
 @CHARSET "UTF-8";
 
+/****************************************
+* Overwrite some dojo css
+****************************************/
+.classeditor .dijitSplitterCover {
+	/*by default on 3, but causes white overlay on dragging*/
+	z-index: 1 !important;
+}
 .classeditor > .dijitContainer {
 	width: 100%;
 	height: 100%;
 }
 
-.align-right {
+/****************************************
+* general settings
+****************************************/
+.classeditor .align-right {
 	float: right !important;
 }
-.align-left {
+.classeditor .align-left {
 	float: left !important;
 }
 
@@ -18,13 +28,13 @@
 .classeditorDialog .dijitDialogPaneContent {
 	padding: 0px;
 }
+
 .claro .dijitDialogUnderlay {
 	background-color: black;
 }
 
-.classeditor {
+.classeditor.mainDialog {
 	height: 700px;
-	font-family: Helvetica,sans-serif;
 }
 
 .classeditor.dijitContentPane {
@@ -102,22 +112,24 @@
 	text-align: right;
 	width: 32px;
 }
-
-.settingsDialog {
+/*******************************************************
+* Dialogs
+********************************************************/
+.classeditor.settingsDialog {
 	width: 450px;
 }
-.settingsDialog .dijitDialogTitle {
+.classeditor.settingsDialog .dijitDialogTitle {
 	padding: 0 1px 0 20px;
 	background-image: url(../img/settings_16.png);
 	background-repeat: no-repeat;
 }
-.settingsDialog h1 {
+.classeditor.settingsDialog h1 {
 	font-size: 14px;
 }
-.settingsDialog .dijitTextBox {
+.classeditor.settingsDialog .dijitTextBox {
 	width: 332px;
 }
-.settingsDialog label {
+.classeditor.settingsDialog label {
 	padding-left: 5px;
 }
 .confirmImportDialog {
@@ -125,92 +137,92 @@
 	font-size: 110%;
 }
 
-.exportDialog .dijitDialogTitle {
+.classeditor.exportDialog .dijitDialogTitle {
 	padding: 0 1px 0 20px;
 	background-image: url(../img/classification_16.png);
 	background-repeat: no-repeat;
 }
-.exportDialog .content .classTextArea {
+.classeditor.exportDialog .content .classTextArea {
 	width: 600px;
 	height: 400px;
 }
-.exportDialog .content .exportButton {
+.classeditor.exportDialog .content .exportButton {
 	display: block;
 }
 
 /*******************************************************
 * Icons
 ********************************************************/
-.icon12 {
+.classeditor .icon12 {
 	background-repeat: no-repeat;
 	background-position: center center;
 	width: 12px;
 	height: 12px;
 }
-.icon16 {
+.classeditor .icon16 {
 	background-repeat: no-repeat;
 	background-position: center center;
 	width: 16px;
 	height: 16px;
 }
-.icon22 {
+.classeditor .icon22 {
 	background-repeat: no-repeat;
 	background-position: center center;
 	width: 22px;
 	height: 22px;
 }
-.addIcon12 {
+.classeditor .addIcon12 {
 	background-image: url(../img/add_12.png);
 }
-.removeIcon12 {
+.classeditor .removeIcon12 {
 	background-image: url(../img/remove_12.png);
 }
-.addIcon16 {
+.classeditor .addIcon16 {
 	background-image: url(../img/add_16.png);
 }
-.addDisabledIcon16 {
+.classeditor .addDisabledIcon16 {
 	background-image: url(../img/addDisabled_16.png);
 }
-.removeIcon16 {
+.classeditor .removeIcon16 {
 	background-image: url(../img/remove_16.png);
 }
-.removeDisabledIcon16 {
+.classeditor .removeDisabledIcon16 {
 	background-image: url(../img/removeDisabled_16.png);
 }
-.exportClassIcon16 {
+.classeditor .exportClassIcon16 {
 	background-image: url(../img/classification_16.png);
 }
-.exportClassDisabledIcon16 {
+.classeditor .exportClassDisabledIcon16 {
 	background-image: url(../img/classificationDisabled_16.png);
 }
-.root {
+.classeditor .root {
 	background-image: url(../img/root_22.png);
 }
-.classification {
+.classeditor .classification {
 	background-image: url(../img/classification_22.png);
 }
-.category {
+.classeditor .category {
 	background-image: url(../img/category_22.png);
 }
-.category2 {
+.classeditor .category2 {
 	background-image: url(../img/category2_22.png);
 }
-.saveIcon {
+.classeditor .saveIcon {
 	background-image: url(../img/save_16.png);
 }
-.saveDisabledIcon {
+.classeditor .saveDisabledIcon {
 	background-image: url(../img/saveDisabled_16.png);
 }
-.settingsIcon {
+.classeditor .settingsIcon {
 	background-image: url(../img/settings_16.png);
 }
-.folder {
+.classeditor .folder {
 	background-image: url(../img/folder_16.png);
 }
-.refreshIcon {
+.classeditor .refreshIcon {
 	background-image: url(../img/refresh_16.png);
 }
-.loading {
+.classeditor .loading {
 	backgroundImage: url(../img/loading.gif);
 	backgroundPosition: center center;
 	backgroundRepeat: no-repeat;

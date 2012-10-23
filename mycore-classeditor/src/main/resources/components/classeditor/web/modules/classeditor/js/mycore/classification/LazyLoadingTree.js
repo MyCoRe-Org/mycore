@@ -246,7 +246,7 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 		var selectedNode = this.tree.lastFocused;
 		var selectedItem = selectedNode.item;
 		// get root id
-		var rootId = getClassificationId(selectedItem);
+		var rootId = classUtil.getClassificationId(selectedItem);
 		var rootIdRequestPath = rootId.length > 0 ? "/" + rootId : "";
 		// get new category id
 		var xhrArgs = {
