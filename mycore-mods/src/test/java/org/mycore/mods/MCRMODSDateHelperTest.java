@@ -85,7 +85,7 @@ public class MCRMODSDateHelperTest extends MCRTestCase {
     }
 
     @Test
-    public void testW3CDTFDate() {
+    public void testW3CDTFDate10() {
         String date = "2011-09-29";
         Element element = new Element("date").setText(date);
 
@@ -95,6 +95,24 @@ public class MCRMODSDateHelperTest extends MCRTestCase {
         assertEquals(29, parsed.get(Calendar.DAY_OF_MONTH));
 
         MCRMODSDateHelper.setDate(element, parsed, "w3cdtf-10");
+        assertEquals("w3cdtf", element.getAttributeValue("encoding"));
+        assertEquals(date, element.getText());
+    }
+
+    @Test
+    public void testW3CDTFDate19() {
+        String date = "2011-09-29T13:14:15";
+        Element element = new Element("date").setText(date);
+
+        GregorianCalendar parsed = MCRMODSDateHelper.getCalendar(element);
+        assertEquals(2011, parsed.get(Calendar.YEAR));
+        assertEquals(9 - 1, parsed.get(Calendar.MONTH));
+        assertEquals(29, parsed.get(Calendar.DAY_OF_MONTH));
+        assertEquals(13, parsed.get(Calendar.HOUR_OF_DAY));
+        assertEquals(14, parsed.get(Calendar.MINUTE));
+        assertEquals(15, parsed.get(Calendar.SECOND));
+
+        MCRMODSDateHelper.setDate(element, parsed, "w3cdtf-19");
         assertEquals("w3cdtf", element.getAttributeValue("encoding"));
         assertEquals(date, element.getText());
     }

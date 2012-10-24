@@ -44,19 +44,19 @@ public class MCRMODSDateHelper {
 
     static {
         formats.put("w3cdtf-10", "yyyy-MM-dd");
-        formats.put("w3cdtf-19", "yyyy-MM-ddTHH:m:ss");
+        formats.put("w3cdtf-19", "yyyy-MM-dd'T'HH:m:ss");
         formats.put("marc-4", "yyyy");
         formats.put("iso8601-4", "yyyy");
         formats.put("iso8601-7", "yyyy-MM");
         formats.put("iso8601-8", "yyyyMMdd");
-        formats.put("iso8601-15", "yyyyMMddTHHmmss");
+        formats.put("iso8601-15", "yyyyMMdd'T'HHmmss");
 
         // Try to guess encoding from date length 
         formats.put("unknown-4", "yyyy");
         formats.put("unknown-8", "yyyyMMdd");
         formats.put("unknown-10", "yyyy-MM-dd");
-        formats.put("unknown-19", "yyyy-MM-ddTHH:m:ss");
-        formats.put("unknown-15", "yyyyMMddTHHmmss");
+        formats.put("unknown-19", "yyyy-MM-dd'T'HH:m:ss");
+        formats.put("unknown-15", "yyyyMMdd'T'HHmmss");
     }
 
     public static Date getDate(Element element) {
