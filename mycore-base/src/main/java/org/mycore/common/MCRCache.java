@@ -200,7 +200,7 @@ public class MCRCache<K,V> {
      *            the key for the object you want to get from this cache
      * @return the cached object, or null
      */
-    public synchronized Object get(K key) {
+    public synchronized V get(K key) {
         if (key == null) {
             throw new MCRUsageException("The value of the argument key is null.");
         }
@@ -246,8 +246,8 @@ public class MCRCache<K,V> {
      *            the timestamp to check that the cache entry is up to date
      * @return the cached object, or null
      */
-    public synchronized Object getIfUpToDate(K key, long time) {
-        Object value = get(key);
+    public synchronized V getIfUpToDate(K key, long time) {
+        V value = get(key);
 
         if (value == null) {
             return null;
