@@ -6,7 +6,7 @@
   <list id="language" type="dropdown" default="en">
     <include uri="classification:editor:-1:children:rfc4646" cacheable="false" />
   </list>
-  
+
   <!-- typeOfResource -->
   <text id="mods.typeOfResource.label" i18n="component.mods.metaData.dictionary.typeOfResource" />
   <panel id="mods.typeOfResource">
@@ -656,7 +656,7 @@
 
     </label>
   </helpPopup>
-  
+
   <!-- Datum der Veröffentlichung END -->
 
   <!-- Datum der Erstellung [text] -->
@@ -936,6 +936,10 @@
                 <label xml:lang="de">DOI</label>
                 <label xml:lang="en">DOI</label>
               </item>
+              <item value="project">
+                <label xml:lang="de">Projekt-Nr.</label>
+                <label xml:lang="en">project id</label>
+              </item>
               <item value="intern_old">
                 <label xml:lang="de">intern</label>
                 <label xml:lang="en">intern</label>
@@ -984,6 +988,10 @@
                 <label xml:lang="de">DOI</label>
                 <label xml:lang="en">DOI</label>
               </item>
+              <item value="project">
+                <label xml:lang="de">Projekt-Nr.</label>
+                <label xml:lang="en">project id</label>
+              </item>
               <item value="intern_old">
                 <label xml:lang="de">intern</label>
                 <label xml:lang="en">intern</label>
@@ -1023,6 +1031,10 @@
                 <label xml:lang="de">DOI</label>
                 <label xml:lang="en">DOI</label>
               </item>
+              <item value="project">
+                <label xml:lang="de">Projekt-Nr.</label>
+                <label xml:lang="en">project id</label>
+              </item>
               <item value="intern_old">
                 <label xml:lang="de">intern</label>
                 <label xml:lang="en">intern</label>
@@ -1053,10 +1065,6 @@
                 <label xml:lang="de">ISSN</label>
                 <label xml:lang="en">ISSN</label>
               </item>
-              <item value="intern_old">
-                <label xml:lang="de">intern</label>
-                <label xml:lang="en">intern</label>
-              </item>
               <item value="doi">
                 <label xml:lang="de">DOI</label>
                 <label xml:lang="en">DOI</label>
@@ -1064,6 +1072,14 @@
               <item value="uri">
                 <label xml:lang="de">URI</label>
                 <label xml:lang="en">URI</label>
+              </item>
+              <item value="project">
+                <label xml:lang="de">Projekt-Nr.</label>
+                <label xml:lang="en">project id</label>
+              </item>
+              <item value="intern_old">
+                <label xml:lang="de">intern</label>
+                <label xml:lang="en">intern</label>
               </item>
               <item value="unknown">
                 <label xml:lang="de">Unbekannt</label>
@@ -1167,7 +1183,7 @@
     </label>
   </helpPopup>
   <!-- Bei Postern -> Größe [text] END -->
- 
+
   <!-- pub_genre -->
   <text id="mods.genre.kindOfReport.label" i18n="component.mods.metaData.dictionary.genre" />
 
@@ -1210,8 +1226,8 @@
     <label xml:lang="en">Select an entry from the list.</label>
   </helpPopup>
   <!-- thesis_genre END -->
-  
-  
+
+
   <!-- Konferenztitel -->
   <text id="mods.nameConference.label" i18n="component.mods.metaData.dictionary.conference.title" />
   <panel id="mods.nameConference">
@@ -1360,7 +1376,7 @@
     <label xml:lang="en">Volume Count</label>
   </helpPopup>
   <!-- Bandzählung END -->
-  
+
   <!-- Bandzählung -->
   <text id="mods.article.coverage.label">
     <label xml:lang="de">Seiten von-bis</label>
