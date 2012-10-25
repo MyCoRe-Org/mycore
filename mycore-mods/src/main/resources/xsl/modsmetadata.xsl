@@ -74,7 +74,7 @@
     </xsl:variable>
     <xsl:choose>
       <xsl:when
-        test="string-length($formatted)&gt;2 
+        test="string-length($formatted)&gt;2
                       and starts-with($formatted, '?')
                       and substring($formatted,string-length($formatted),1)='?'">
         <xsl:value-of select="translate($formatted, '?', '')" />
@@ -219,7 +219,7 @@
         <div class="c85l">
           <table class="metaData">
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
-            
+
             <!-- mods:name grouped by mods:role/mods:roleTerm -->
             <xsl:for-each
               select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[not(@ID) and count(. | key('name-by-role',mods:role/mods:roleTerm)[1])=1]">
@@ -514,7 +514,7 @@
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="mods:identifier[@type='uri' or @type='doi']" mode="present">
+  <xsl:template match="mods:identifier[@type='uri' or @type='doi' or @type='urn']" mode="present">
     <tr>
       <td valign="top" class="metaname">
         <xsl:choose>
@@ -536,6 +536,11 @@
           </xsl:when>
           <xsl:when test="@type='doi' and not(contains($link,'http'))">
             <a href="http://dx.doi.org/{$link}">
+              <xsl:value-of select="$link" />
+            </a>
+          </xsl:when>
+          <xsl:when test="@type='urn' and not(contains($link,'http'))">
+            <a href="http://nbn-resolving.de/{$link}">
               <xsl:value-of select="$link" />
             </a>
           </xsl:when>
@@ -686,7 +691,7 @@
         </td>
       </tr>
     </xsl:if>
-    
+
     <xsl:for-each select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']">
       <tr>
         <td valign="top" class="metaname">
@@ -725,7 +730,7 @@
       </xsl:for-each>
     </xsl:variable>
     <xsl:variable select="xalan:nodeset($objectTypes)/id[not(.=following::id)]" name="unique-ids" />
-    <!-- the for-each would iterate over <id> with root not beeing /mycoreobject so we save the current node in variable context to access 
+    <!-- the for-each would iterate over <id> with root not beeing /mycoreobject so we save the current node in variable context to access
       needed nodes -->
     <xsl:variable select="/mycoreobject" name="context" />
     <xsl:for-each select="$unique-ids">
