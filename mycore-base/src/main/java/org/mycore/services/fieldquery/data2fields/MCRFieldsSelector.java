@@ -24,7 +24,6 @@
 package org.mycore.services.fieldquery.data2fields;
 
 import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.metadata.MCRBase;
 
 public class MCRFieldsSelector {
 
@@ -59,8 +58,8 @@ public class MCRFieldsSelector {
 
 class MCRFieldsSelectorBase extends MCRFieldsSelector {
 
-    public MCRFieldsSelectorBase(String index, MCRBase base, String sourceType) {
-        super(index, base.getId().getTypeId(), sourceType);
+    public MCRFieldsSelectorBase(String index, String objectType, String sourceType) {
+        super(index, objectType, sourceType);
     }
 }
 

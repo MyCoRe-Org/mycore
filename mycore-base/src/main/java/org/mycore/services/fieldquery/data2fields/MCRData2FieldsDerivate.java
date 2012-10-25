@@ -23,6 +23,8 @@
 
 package org.mycore.services.fieldquery.data2fields;
 
+import org.mycore.common.content.MCRBaseContent;
+import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRDerivate;
 
 public class MCRData2FieldsDerivate extends MCRIndexEntryBuilder {
@@ -30,8 +32,8 @@ public class MCRData2FieldsDerivate extends MCRIndexEntryBuilder {
     public MCRData2FieldsDerivate(String index, MCRDerivate derivate) {
         entry.setEntryID(derivate.getId().toString());
 
-        MCRFieldsSelector selector = new MCRFieldsSelectorBase(index, derivate, "derivateMetadata");
-        MCRXMLSource xmlSource = new MCRJDOMSource(derivate.createXML());
+        MCRFieldsSelector selector = new MCRFieldsSelectorBase(index, "derivate", "derivateMetadata");
+        MCRContent xmlSource = new MCRBaseContent(derivate);
         slaves.add(new MCRData2FieldsXML(xmlSource, selector));
     }
 }

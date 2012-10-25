@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandler;
 import org.mycore.common.events.MCREventHandlerBase;
@@ -90,15 +91,23 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
 
     @Override
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
-        MCRIndexEntry entry = new MCRData2FieldsFile(index, file).buildIndexEntry();
-        addToIndex(entry);
+        try {
+            MCRIndexEntry entry = new MCRData2FieldsFile(index, file).buildIndexEntry();
+            addToIndex(entry);
+        } catch (Exception e) {
+            throw new MCRException(e);
+        }
     }
 
     @Override
     protected void handleFileUpdated(MCREvent evt, MCRFile file) {
-        MCRIndexEntry entry = new MCRData2FieldsFile(index, file).buildIndexEntry();
-        removeFromIndex(entry);
-        addToIndex(entry);
+        try {
+            MCRIndexEntry entry = new MCRData2FieldsFile(index, file).buildIndexEntry();
+            removeFromIndex(entry);
+            addToIndex(entry);
+        } catch (Exception e) {
+            throw new MCRException(e);
+        }
     }
 
     @Override

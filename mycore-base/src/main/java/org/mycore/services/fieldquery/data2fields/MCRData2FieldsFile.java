@@ -23,6 +23,7 @@
 
 package org.mycore.services.fieldquery.data2fields;
 
+import java.io.IOException;
 import java.util.Collection;
 
 import org.mycore.common.MCRCache;
@@ -32,7 +33,7 @@ import org.mycore.datamodel.ifs.MCRFile;
 
 public class MCRData2FieldsFile extends MCRIndexEntryBuilder {
 
-    public MCRData2FieldsFile(String index, final MCRFile file) {
+    public MCRData2FieldsFile(String index, final MCRFile file) throws IOException {
         entry.setEntryID(file.getID());
         entry.setReturnID(getReturnID(file));
 
@@ -45,14 +46,14 @@ public class MCRData2FieldsFile extends MCRIndexEntryBuilder {
     /** Maybe fieldquery is used in application without link table manager */
     private static boolean noLinkTableManager;
 
-    private static MCRCache RETURN_ID_CACHE;
+    private static MCRCache<String, String> RETURN_ID_CACHE;
 
     static {
         MCRConfiguration config = MCRConfiguration.instance();
         noLinkTableManager = config.getString("MCR.Persistence.LinkTable.Store.Class", null) == null;
 
         int cacheSize = MCRConfiguration.instance().getInt("MCR.Searcher.ReturnID.Cache", 100);
-        RETURN_ID_CACHE = new MCRCache(cacheSize, MCRData2FieldsFile.class.getName());
+        RETURN_ID_CACHE = new MCRCache<String, String>(cacheSize, MCRData2FieldsFile.class.getName());
     }
 
     private String getReturnID(MCRFile file) {
@@ -61,7 +62,7 @@ public class MCRData2FieldsFile extends MCRIndexEntryBuilder {
         }
 
         String ownerID = file.getOwnerID();
-        String returnID = (String) RETURN_ID_CACHE.get(ownerID);
+        String returnID = RETURN_ID_CACHE.get(ownerID);
         if (returnID != null) {
             return returnID;
         }

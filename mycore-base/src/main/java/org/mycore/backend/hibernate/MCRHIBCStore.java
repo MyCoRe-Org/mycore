@@ -33,6 +33,8 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.mycore.backend.hibernate.tables.MCRCSTORE;
 import org.mycore.common.MCRException;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRStreamContent;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRContentStore;
 import org.mycore.datamodel.ifs.MCRFileReader;
@@ -126,6 +128,11 @@ public class MCRHIBCStore extends MCRContentStore {
         @SuppressWarnings("unchecked")
         List<MCRCSTORE> l = session.createQuery("from MCRCSTORE where storageid=" + storageID).list();
         return !l.isEmpty();
+    }
+
+    @Override
+    protected MCRContent doRetrieveMCRContent(MCRFileReader file) throws IOException {
+        return new MCRStreamContent(doRetrieveContent(file));
     }
 
 }

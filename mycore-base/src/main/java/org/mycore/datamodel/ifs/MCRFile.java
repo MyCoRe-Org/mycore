@@ -28,6 +28,7 @@ import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUsageException;
+import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.common.MCRISO8601Date;
@@ -389,6 +390,14 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         storageID = null;
         storeID = null;
         avExtender = null;
+    }
+    
+    /**
+     * Returns the content of this file as MCRContent instance.
+     * @throws IOException
+     */
+    public MCRContent getContent() throws IOException {
+        return getContentStore().doRetrieveMCRContent(this);
     }
 
     /**

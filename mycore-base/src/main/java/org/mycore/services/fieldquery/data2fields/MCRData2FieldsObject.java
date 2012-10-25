@@ -23,6 +23,8 @@
 
 package org.mycore.services.fieldquery.data2fields;
 
+import org.mycore.common.content.MCRBaseContent;
+import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRObject;
 
 public class MCRData2FieldsObject extends MCRIndexEntryBuilder {
@@ -30,12 +32,13 @@ public class MCRData2FieldsObject extends MCRIndexEntryBuilder {
     public MCRData2FieldsObject(String index, MCRObject object) {
         entry.setEntryID(object.getId().toString());
 
-        MCRXMLSource xmlSource = new MCRJDOMSource(object.createXML());
+        MCRContent content = new MCRBaseContent(object);
 
-        MCRFieldsSelector selector = new MCRFieldsSelectorBase(index, object, "objectMetadata");
-        slaves.add(new MCRData2FieldsXML(xmlSource, selector));
+        String typeId = object.getId().getTypeId();
+        MCRFieldsSelector selector = new MCRFieldsSelectorBase(index, typeId, "objectMetadata");
+        slaves.add(new MCRData2FieldsXML(content, selector));
 
-        selector = new MCRFieldsSelectorBase(index, object, "objectCategory");
-        slaves.add(new MCRData2FieldsXML(xmlSource, selector));
+        selector = new MCRFieldsSelectorBase(index, typeId, "objectCategory");
+        slaves.add(new MCRData2FieldsXML(content, selector));
     }
 }

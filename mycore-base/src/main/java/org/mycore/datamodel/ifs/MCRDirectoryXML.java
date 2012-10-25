@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.content.MCRContent;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -168,9 +169,9 @@ public class MCRDirectoryXML {
 
             if (withAdditionalData) {
                 try {
-                    Document additional = element.getAllAdditionalData();
+                    MCRContent additional = element.getAllAdditionalData();
                     if (additional != null) {
-                        node.addContent(additional.detachRootElement());
+                        node.addContent(additional.asXML().detachRootElement());
                     }
                 } catch (Exception ignored) {
                 }

@@ -1,6 +1,6 @@
 /*
- * $Revision$ 
- * $Date$
+ * $Id$
+ * $Revision: 5697 $ $Date: Oct 25, 2012 $
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -21,27 +21,18 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.services.fieldquery.data2fields;
+package org.mycore.common.content;
 
-import javax.xml.transform.Source;
+import org.mycore.datamodel.metadata.MCRBase;
 
-import org.jdom.Document;
-import org.jdom.transform.JDOMSource;
+/**
+ * @author Thomas Scheffler (yagee)
+ *
+ */
+public class MCRBaseContent extends MCRJDOMContent {
 
-interface MCRXMLSource {
-    public Source getSourceXML() throws Exception;
-}
-
-class MCRJDOMSource implements MCRXMLSource {
-    
-    Document jdom;
-    
-    public MCRJDOMSource( Document jdom )
-    {
-      this.jdom = jdom;    
+    public MCRBaseContent(MCRBase base) {
+        super(base.createXML());
     }
-    
-    public Source getSourceXML(){
-        return new JDOMSource( jdom );
-    }
+
 }

@@ -19,6 +19,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.mycore.common.MCRUsageException;
+import org.mycore.common.content.MCRContent;
 
 
 
@@ -477,12 +478,12 @@ public abstract class MCRFilesystemNode {
      * @throws JDOMException
      *             if the XML data can not be parsed
      */
-    public Document getAllAdditionalData() throws IOException, JDOMException {
+    public MCRContent getAllAdditionalData() throws IOException {
         MCRFile dataFile = MCRFile.getRootFile(ID);
         if (dataFile == null || dataFile.getSize() == 0) {
             return null;
         } else {
-            return dataFile.getContentAsJDOM();
+            return dataFile.getContent();
         }
     }
 

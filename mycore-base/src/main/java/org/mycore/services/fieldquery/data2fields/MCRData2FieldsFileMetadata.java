@@ -23,13 +23,15 @@
 
 package org.mycore.services.fieldquery.data2fields;
 
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.ifs.MCRFile;
 
 public class MCRData2FieldsFileMetadata extends MCRData2FieldsDelegating {
 
     public MCRData2FieldsFileMetadata(String index, MCRFile file) {
         MCRFieldsSelector selector = new MCRFieldsSelectorFile(index, file, "fileMetadata");
-        MCRXMLSource xmlSource = new MCRJDOMSource(file.createXML());
+        MCRContent xmlSource = new MCRJDOMContent(file.createXML());
         slaves.add(new MCRData2FieldsXML(xmlSource, selector));
     }
 }

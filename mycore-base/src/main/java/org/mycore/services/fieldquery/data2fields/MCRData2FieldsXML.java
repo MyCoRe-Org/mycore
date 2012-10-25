@@ -37,6 +37,8 @@ import org.jdom.Element;
 import org.jdom.transform.JDOMResult;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
@@ -56,15 +58,15 @@ public class MCRData2FieldsXML implements MCRData2Fields {
         factory.setURIResolver(MCRURIResolver.instance());
     }
 
-    private MCRXMLSource xmlSource;
+    private MCRContent xmlSource;
 
     private MCRFieldsSelector selector;
 
     public MCRData2FieldsXML(String index, Document xml) {
-        this(new MCRJDOMSource(xml), new MCRFieldsSelector(index, xml.getRootElement().getName(), "xml"));
+        this(new MCRJDOMContent(xml), new MCRFieldsSelector(index, xml.getRootElement().getName(), "xml"));
     }
 
-    public MCRData2FieldsXML(MCRXMLSource xmlSource, MCRFieldsSelector selector) {
+    public MCRData2FieldsXML(MCRContent xmlSource, MCRFieldsSelector selector) {
         this.xmlSource = xmlSource;
         this.selector = selector;
     }
@@ -72,7 +74,7 @@ public class MCRData2FieldsXML implements MCRData2Fields {
     public void addFieldValues(MCRIndexEntry entry) {
         Source sourceXML = null;
         try {
-            sourceXML = xmlSource.getSourceXML();
+            sourceXML = xmlSource.getSource();
         } catch (Exception ignored) {
         }
 

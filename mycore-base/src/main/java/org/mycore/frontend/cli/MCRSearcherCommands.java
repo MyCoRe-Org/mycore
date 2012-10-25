@@ -37,6 +37,7 @@ import org.mycore.backend.hibernate.tables.MCRFSNODES;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.content.MCRContent;
 import org.mycore.common.xml.MCRXMLResource;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -49,6 +50,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRSearcherFactory;
+import org.mycore.services.fieldquery.data2fields.MCRData2FieldsContent;
 import org.mycore.services.fieldquery.data2fields.MCRData2FieldsDerivate;
 import org.mycore.services.fieldquery.data2fields.MCRData2FieldsFile;
 import org.mycore.services.fieldquery.data2fields.MCRData2FieldsObject;
@@ -74,13 +76,10 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
 
     public MCRSearcherCommands() {
         super();
-        addCommand(new MCRCommand("rebuild metadata index", "org.mycore.frontend.cli.MCRSearcherCommands.repairMetaIndex",
-                "Repairs metadata index"));
-        addCommand(new MCRCommand("rebuild content index", "org.mycore.frontend.cli.MCRSearcherCommands.repairContentIndex",
-                "Repairs metadata index"));
-        addCommand(new MCRCommand("save searchfields of index {0} to stylesheet file {1}",
-                "org.mycore.frontend.cli.MCRSearcherCommands.saveXSL String String",
-                "Generates XSL file {0} that is used to index metadata."));
+        addCommand(new MCRCommand("rebuild metadata index", "org.mycore.frontend.cli.MCRSearcherCommands.repairMetaIndex", "Repairs metadata index"));
+        addCommand(new MCRCommand("rebuild content index", "org.mycore.frontend.cli.MCRSearcherCommands.repairContentIndex", "Repairs metadata index"));
+        addCommand(new MCRCommand("save searchfields of index {0} to stylesheet file {1}", "org.mycore.frontend.cli.MCRSearcherCommands.saveXSL String String",
+            "Generates XSL file {0} that is used to index metadata."));
     }
 
     static class RepairIndex {
@@ -172,24 +171,15 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             for (String id : mcrxmlTableManager.listIDs()) {
                 MCRObjectID mcrid = MCRObjectID.getInstance(id);
                 try {
-                    addMetaToIndex(mcrid, searcherList);
+                    for (MCRSearcher searcher : searcherList) {
+                        String indexID = searcher.getIndex();
+                        MCRContent content = mcrxmlTableManager.retrieveContent(mcrid);
+                        MCRIndexEntryBuilder builder = new MCRData2FieldsContent(indexID, content, mcrid);
+                        searcher.addToIndex(builder.buildIndexEntry());
+                    }
                 } catch (Exception ex) {
                     LOGGER.error("Could not add metadata", ex);
                 }
-            }
-        }
-
-        private void addMetaToIndex(MCRObjectID id, List<MCRSearcher> searcherList) {
-            for (MCRSearcher searcher : searcherList) {
-                String indexID = searcher.getIndex();
-                MCRBase base = MCRMetadataManager.retrieve(id);
-
-                MCRIndexEntryBuilder builder;
-                if (base instanceof MCRDerivate)
-                    builder = new MCRData2FieldsDerivate(indexID, (MCRDerivate) base);
-                else
-                    builder = new MCRData2FieldsObject(searcher.getIndex(), (MCRObject) base);
-                searcher.addToIndex(builder.buildIndexEntry());
             }
         }
 
@@ -210,21 +200,25 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             ScrollableResults results = fileCriteria.scroll(ScrollMode.FORWARD_ONLY);
             try {
                 while (results.next()) {
-                    MCRFSNODES node = (MCRFSNODES) results.get(0);
-                    GregorianCalendar greg = new GregorianCalendar();
-                    greg.setTime(node.getDate());
-                    MCRFile file = (MCRFile) MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(),
-                            node.getOwner(), node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(),
-                            node.getFctid(), node.getMd5(), node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
-                    addFileToIndex(file, false, searcherList);
-                    session.evict(node);
+                    try {
+                        MCRFSNODES node = (MCRFSNODES) results.get(0);
+                        GregorianCalendar greg = new GregorianCalendar();
+                        greg.setTime(node.getDate());
+                        MCRFile file = (MCRFile) MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(), node.getOwner(),
+                            node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(), node.getFctid(), node.getMd5(),
+                            node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
+                        addFileToIndex(file, false, searcherList);
+                        session.evict(node);
+                    } catch (Exception ex) {
+                        LOGGER.error("Could not add metadata", ex);
+                    }
                 }
             } finally {
                 results.close();
             }
         }
 
-        private void addFileToIndex(MCRFile file, boolean update, List<MCRSearcher> searcherList) {
+        private void addFileToIndex(MCRFile file, boolean update, List<MCRSearcher> searcherList) throws IOException, JDOMException {
             for (MCRSearcher searcher : searcherList) {
                 MCRIndexEntry entry = new MCRData2FieldsFile(searcher.getIndex(), file).buildIndexEntry();
                 if (update)

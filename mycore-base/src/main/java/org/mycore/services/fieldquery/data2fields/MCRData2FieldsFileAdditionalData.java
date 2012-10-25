@@ -23,22 +23,17 @@
 
 package org.mycore.services.fieldquery.data2fields;
 
-import javax.xml.transform.Source;
+import java.io.IOException;
 
-import org.jdom.transform.JDOMSource;
+import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.ifs.MCRFile;
 
-public class MCRData2FieldsFileAdditionalData extends MCRData2FieldsDelegating implements MCRXMLSource {
+public class MCRData2FieldsFileAdditionalData extends MCRData2FieldsDelegating {
 
-    private MCRFile file;
-
-    public MCRData2FieldsFileAdditionalData(String index, final MCRFile file) {
-        this.file = file;
+    public MCRData2FieldsFileAdditionalData(String index, final MCRFile file) throws IOException {
         MCRFieldsSelector selector = new MCRFieldsSelectorFile(index, file, "fileAdditionalData");
-        slaves.add(new MCRData2FieldsXML(this, selector));
+        MCRContent content = file.getAllAdditionalData();
+        slaves.add(new MCRData2FieldsXML(content, selector));
     }
 
-    public Source getSourceXML() throws Exception {
-        return new JDOMSource(file.getAllAdditionalData());
-    }
 }

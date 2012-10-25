@@ -36,6 +36,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.content.MCRContent;
 
 /**
  * Stores the content of MCRFiles in a persistent datastore. This can be a
@@ -191,7 +192,7 @@ public abstract class MCRContentStore {
      * @param target
      *            the OutputStream to write the file content to
      * @deprecated
-     *        use doRetrieveContent(MCRFileReader file) instead
+     *        use {@link #doRetrieveMCRContent(MCRFileReader)} instead
      */
     @Deprecated
     public void retrieveContent(MCRFileReader file, OutputStream target) throws MCRException {
@@ -219,7 +220,7 @@ public abstract class MCRContentStore {
      * @param target
      *          the OutputStream to write the file content to
      * @deprecated 
-     *          use doRetrieveContent(MCRFileReader file) instead
+     *          use {@link #doRetrieveMCRContent(MCRFileReader)} instead
      */
     @Deprecated
     protected abstract void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception;
@@ -232,8 +233,20 @@ public abstract class MCRContentStore {
      * @param file
      *            the MCRFile thats content should be retrieved
      * @since 1.3
+     * @deprecated use {@link #doRetrieveMCRContent(MCRFileReader)} instead
      */
     protected abstract InputStream doRetrieveContent(MCRFileReader file) throws IOException;
+    
+    /**
+     * Retrieves the content of an MCRFile. Uses the
+     * StorageID to indentify the place where the file content was stored in
+     * this store instance.
+     * 
+     * @param file
+     *            the MCRFile thats content should be retrieved
+     * @since 2.2
+     */
+    protected abstract MCRContent doRetrieveMCRContent(MCRFileReader file) throws IOException;
 
     /**
      * Retrieves the content of an MCRFile as an InputStream.
