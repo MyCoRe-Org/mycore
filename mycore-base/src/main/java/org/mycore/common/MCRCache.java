@@ -45,37 +45,37 @@ import org.mycore.services.mbeans.MCRJMXBridge;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
-public class MCRCache {
+public class MCRCache<K,V> {
     /**
      * For each object in the cache, there is one MCRCacheEntry object
      * encapsulating it. The cache uses a double-linked list of MCRCacheEntries
      * and holds references to the most and least recently used entry.
      */
-    class MCRCacheEntry {
+    static class MCRCacheEntry<K,V> {
         /** The entry before this one, more often used than this entry */
-        MCRCacheEntry before;
+        MCRCacheEntry<K,V> before;
 
         /** The entry after this one, less often used than this entry */
-        MCRCacheEntry after;
+        MCRCacheEntry<K,V> after;
 
         /** The key for this object, to be used for removing the object */
-        Object key;
+        K key;
 
         /** The timestamp when this object was placed in the cache */
         long time;
 
         /** The stored object encapsulated by this entry */
-        Object object;
+        V value;
     }
 
     /** The most recently used object * */
-    protected MCRCacheEntry mru;
+    protected MCRCacheEntry<K,V> mru;
 
     /** The least recently used object * */
-    protected MCRCacheEntry lru;
+    protected MCRCacheEntry<K,V> lru;
 
     /** A hashtable for looking up a cached object by a given key */
-    protected Hashtable<Object, MCRCacheEntry> index = new Hashtable<Object, MCRCacheEntry>();
+    protected Hashtable<K, MCRCacheEntry<K,V>> index = new Hashtable<K, MCRCacheEntry<K,V>>();
 
     /** The number of requests to get an object from this cache */
     protected long gets = 0;
@@ -91,10 +91,6 @@ public class MCRCache {
 
     /** Tch type string for the MCRCacheJMXBridge */
     protected String type;
-
-    /** The constructor */
-    private MCRCache() {
-    };
 
     /**
      * Creates a new cache with a given capacity.
@@ -118,15 +114,15 @@ public class MCRCache {
      * 
      * @param key
      *            the non-null key to store the object under
-     * @param obj
+     * @param value
      *            the non-null object to be put into the cache
      */
-    public synchronized void put(Object key, Object obj) {
+    public synchronized void put(K key, V value) {
         if (key == null) {
-            throw new MCRUsageException("The value of the argument key is null.");
+            throw new NullPointerException("The key of a cache entry may not be null.");
         }
-        if (obj == null) {
-            throw new MCRUsageException("The value of the argument obj is null.");
+        if (value == null) {
+            throw new NullPointerException("The value of a cache entry may not be null.");
         }
 
         if (capacity == 0) {
@@ -141,8 +137,8 @@ public class MCRCache {
             remove(lru.key);
         }
 
-        MCRCacheEntry added = new MCRCacheEntry();
-        added.object = obj;
+        MCRCacheEntry<K,V> added = new MCRCacheEntry<K,V>();
+        added.value = value;
         added.key = key;
         added.time = System.currentTimeMillis();
         index.put(key, added);
@@ -164,7 +160,7 @@ public class MCRCache {
      * @param key
      *            the key for the object you want to remove from this cache
      */
-    public synchronized void remove(Object key) {
+    public synchronized void remove(K key) {
         if (key == null) {
             throw new MCRUsageException("The value of the argument key is null.");
         }
@@ -173,7 +169,7 @@ public class MCRCache {
             return;
         }
 
-        MCRCacheEntry removed = index.get(key);
+        MCRCacheEntry<K,V> removed = index.get(key);
 
         if (removed == lru) {
             lru = removed.after;
@@ -187,7 +183,7 @@ public class MCRCache {
             removed.after.before = removed.before;
         }
 
-        removed.object = null;
+        removed.value = null;
         removed.key = null;
         removed.time = 0;
         removed.before = null;
@@ -204,7 +200,7 @@ public class MCRCache {
      *            the key for the object you want to get from this cache
      * @return the cached object, or null
      */
-    public synchronized Object get(Object key) {
+    public synchronized Object get(K key) {
         if (key == null) {
             throw new MCRUsageException("The value of the argument key is null.");
         }
@@ -217,7 +213,7 @@ public class MCRCache {
 
         hits++;
 
-        MCRCacheEntry found = index.get(key);
+        MCRCacheEntry<K,V> found = index.get(key);
 
         if (found != mru) {
             found.after.before = found.before;
@@ -234,7 +230,7 @@ public class MCRCache {
             mru = found;
         }
 
-        return found.object;
+        return found.value;
     }
 
     /**
@@ -250,14 +246,14 @@ public class MCRCache {
      *            the timestamp to check that the cache entry is up to date
      * @return the cached object, or null
      */
-    public synchronized Object getIfUpToDate(Object key, long time) {
+    public synchronized Object getIfUpToDate(K key, long time) {
         Object value = get(key);
 
         if (value == null) {
             return null;
         }
 
-        MCRCacheEntry found = index.get(key);
+        MCRCacheEntry<K,V> found = index.get(key);
 
         if (found.time >= time) {
             return value;
@@ -351,7 +347,7 @@ public class MCRCache {
      * Clears the cache by removing all entries from the cache
      */
     public synchronized void clear() {
-        index = new Hashtable<Object, MCRCacheEntry>();
+        index = new Hashtable<K, MCRCacheEntry<K,V>>();
         size = 0;
         mru = lru = null;
     }
@@ -375,7 +371,7 @@ public class MCRCache {
      * A small sample program for testing this class.
      */
     public static void main(String[] args) {
-        MCRCache cache = new MCRCache(4, "Small Sample Program");
+        MCRCache<String,String> cache = new MCRCache<String,String>(4, "Small Sample Program");
         System.out.println(cache);
         cache.put("a", "Anton");
         cache.put("b", "Bohnen");
@@ -398,7 +394,7 @@ public class MCRCache {
     /**
      * Returns an iterable list of keys to the cached objects. 
      */
-    public List<Object> keys() {
+    public List<K> keys() {
         return Collections.list(index.keys());
     }
 }

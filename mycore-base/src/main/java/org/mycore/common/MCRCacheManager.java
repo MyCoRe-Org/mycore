@@ -32,9 +32,10 @@ package org.mycore.common;
  */
 public class MCRCacheManager implements MCRCacheManagerMBean {
 
+    @SuppressWarnings("rawtypes")
     private final MCRCache cache;
 
-    public MCRCacheManager(final MCRCache cache) {
+    public MCRCacheManager(@SuppressWarnings("rawtypes") final MCRCache cache) {
         this.cache = cache;
     }
 
