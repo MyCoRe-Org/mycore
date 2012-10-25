@@ -139,6 +139,12 @@ public class SolrIndexer extends MCRLuceneSearcher {
         LOGGER.info("=======================");
 
         List<String> list = MCRXMLMetadataManager.instance().listIDs();
+
+        if (list.size() == 0) {
+            LOGGER.info("No documents to index");
+            return;
+        }
+
         long tStart = System.currentTimeMillis();
         LOGGER.info("Solr: sending " + list.size() + " objects to solr for reindexing");
         MCRXMLMetadataManager metadataMgr = MCRXMLMetadataManager.instance();
@@ -166,6 +172,11 @@ public class SolrIndexer extends MCRLuceneSearcher {
         LOGGER.info("======================");
 
         List<String> list = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
+        if (list.size() == 0) {
+            LOGGER.info("No derivates to index");
+            return;
+        }
+
         long tStart = System.currentTimeMillis();
 
         LOGGER.info("Solr: sending content of files of " + list.size() + " derivates to solr for reindexing");
