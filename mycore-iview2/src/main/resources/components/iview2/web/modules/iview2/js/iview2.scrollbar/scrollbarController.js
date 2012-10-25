@@ -44,7 +44,7 @@ iview.Scrollbar = iview.Scrollbar || {};
 	 */
 	iview.Scrollbar.Controller.prototype.setPosition = function(newPosition) {
 		var oldPosition = this.getPosition();
-		if(newPosition.x == oldPosition.x && newPosition.y == oldPosition.y){
+		if(typeof newPosition != "undefined" && newPosition.x == oldPosition.x && newPosition.y == oldPosition.y){
 			return;
 		}
 		

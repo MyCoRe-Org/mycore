@@ -317,10 +317,9 @@
 		constructor.prototype.applyProperties = function() {
 			var that = this;
 
-			// Blank needs to be loaded as blank, so the level is filled. Else
-			// it lays not ontop; needed for IE
+			// IE ignores surface if background is transparent
 			var surface = this.context.viewer.find(".surface");
-			surface.css("background", "transparent");
+			surface.css({"background" : "white", "opacity":0.001});
 			
 			surface.mousewheel(function(jq, e) {
 			

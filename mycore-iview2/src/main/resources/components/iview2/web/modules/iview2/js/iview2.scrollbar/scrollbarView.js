@@ -45,9 +45,11 @@ iview.Scrollbar = iview.Scrollbar || {};
 	 */
 	iview.Scrollbar.View.prototype.setPosition = function sbv_setPosition(
 			position) {
+		if(typeof position != "undefined"){
+			this._container.scrollTop(position.y);
+			this._container.scrollLeft(position.x);
+		}
 		
-		this._container.scrollTop(position.y);
-		this._container.scrollLeft(position.x);
 	};
 
 	/**
