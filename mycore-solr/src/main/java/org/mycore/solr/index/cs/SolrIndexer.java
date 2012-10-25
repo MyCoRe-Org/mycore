@@ -200,6 +200,15 @@ public class SolrIndexer extends MCRLuceneSearcher {
     }
 
     /**
+     * Drops the current solr index.
+     */
+    public static void dropIndex() throws Exception {
+        LOGGER.info("Dropping solr index...");
+        SolrServerFactory.getSolrServer().deleteByQuery("*:*");
+        LOGGER.info("Dropping solr index...done");
+    }
+
+    /**
      * Sends a signal to the remote solr server to optimize its index. 
      */
     static void optimize() {
