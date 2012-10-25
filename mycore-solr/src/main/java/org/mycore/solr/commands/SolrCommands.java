@@ -30,7 +30,7 @@ public class SolrCommands extends MCRAbstractCommands {
                 "rebuilds solr's metadata and content index");
         addCommand(com);
 
-        com = new MCRCommand("drop solr index", "org.mycore.solr.index.cs.dropIndex", "Deletes an existing index from solr");
+        com = new MCRCommand("drop solr index", "org.mycore.solr.index.cs.SolrIndexer.dropIndex", "Deletes an existing index from solr");
         addCommand(com);
     }
 }
