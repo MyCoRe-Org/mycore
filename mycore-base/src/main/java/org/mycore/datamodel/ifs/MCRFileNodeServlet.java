@@ -266,7 +266,7 @@ public class MCRFileNodeServlet extends MCRServlet {
      */
     private void sendDirectory(HttpServletRequest req, HttpServletResponse res, MCRDirectory dir) throws IOException {
         LOGGER.info("MCRFileNodeServlet: Sending listing of directory " + dir.getName());
-        Document jdom = MCRDirectoryXML.getInstance().getDirectoryXML(dir, false);
+        Document jdom = MCRDirectoryXML.getInstance().getDirectoryXML(dir);
         layoutDirectory(req, res, jdom);
 
     }

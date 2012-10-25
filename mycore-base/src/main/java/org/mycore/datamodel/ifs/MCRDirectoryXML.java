@@ -58,6 +58,18 @@ public class MCRDirectoryXML {
 
     protected static MCRDirectoryXML SINGLETON;
 
+    /** 
+     * If true, XML output of FileNodeServlet directory listing and 
+     * IFS resolver will include additional data of extenders.
+     * 
+     * Set with MCR.IFS.IncludeAdditionalDataByDefault, default is false 
+     */
+    protected final static boolean WITH_ADDITIONAL_DATA_DEFAULT;
+
+    static {
+        WITH_ADDITIONAL_DATA_DEFAULT = MCRConfiguration.instance().getBoolean("MCR.IFS.IncludeAdditionalDataByDefault", false);
+    }
+    
     /**
      *  
      */
@@ -73,6 +85,13 @@ public class MCRDirectoryXML {
         return SINGLETON;
     }
 
+    /**
+     * Sends the contents of an MCRDirectory as XML data to the client
+     */
+    protected Document getDirectoryXML(MCRDirectory dir) {
+        return getDirectoryXML(dir, WITH_ADDITIONAL_DATA_DEFAULT);
+    }
+    
     /**
      * Sends the contents of an MCRDirectory as XML data to the client
      */
@@ -212,6 +231,13 @@ public class MCRDirectoryXML {
         xTime.addContent(time);
     }
 
+    /**
+     * Handles the HTTP request
+     */
+    public Document getDirectory(String requestPath) {
+        return getDirectory(requestPath, WITH_ADDITIONAL_DATA_DEFAULT);
+    }
+    
     /**
      * Handles the HTTP request
      */

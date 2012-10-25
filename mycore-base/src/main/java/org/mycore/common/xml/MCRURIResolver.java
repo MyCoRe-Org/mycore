@@ -866,7 +866,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             if (i > 0) {
                 path = path.substring(0, i);
             }
-            return MCRDirectoryXML.getInstance().getDirectory(path, false).getRootElement();
+            return MCRDirectoryXML.getInstance().getDirectory(path).getRootElement();
         }
 
     }
