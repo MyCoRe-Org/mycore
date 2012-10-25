@@ -26,7 +26,7 @@ public class SolrCommands extends MCRAbstractCommands {
                 "rebuilds solr's content index");
         addCommand(com);
 
-        com = new MCRCommand("rebuild solr metadata and content index", "org.mycore.solr.index.cs.rebuildMetadataAndContentIndex",
+        com = new MCRCommand("rebuild solr metadata and content index", "org.mycore.solr.index.cs.SolrIndexer.rebuildMetadataAndContentIndex",
                 "rebuilds solr's metadata and content index");
         addCommand(com);
 
