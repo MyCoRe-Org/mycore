@@ -111,19 +111,14 @@
   </xsl:template>
   
   <xsl:template name="userStatus">
-    <xsl:if test="/mcr_user/@invalid_password='true' or /mcr_user/@unknown_user='true' or /mcr_user/@user_disabled='true'">
+    <xsl:if test="/mcr_user/@userOrPasswordInvalid='true' or /mcr_user/@user_disabled='true'">
       <p class="status">
         <xsl:value-of select="i18n:translate('component.userlogin.tasks.login.failed')"/>
       </p>
     </xsl:if>
-    <xsl:if test="/mcr_user/@invalid_password='true'">
+    <xsl:if test="/mcr_user/@userOrPasswordInvalid='true'">
       <p class="status">
-        <xsl:value-of select="i18n:translate('component.userlogin.tasks.login.invalidPwd')"/>
-      </p>
-    </xsl:if>
-    <xsl:if test="/mcr_user/@unknown_user='true'">
-      <p class="status">
-        <xsl:value-of select="i18n:translate('component.userlogin.tasks.login.userUnknown')"/>
+        <xsl:value-of select="i18n:translate('component.userlogin.tasks.login.invalidPwdOrUser')"/>
       </p>
     </xsl:if>
     <xsl:if test="/mcr_user/@user_disabled='true'">

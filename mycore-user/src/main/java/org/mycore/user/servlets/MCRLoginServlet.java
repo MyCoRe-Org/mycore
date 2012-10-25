@@ -79,7 +79,7 @@ public class MCRLoginServlet extends MCRServlet {
 
         if (uid != null) {
             if (!MCRUserMgr.instance().existUser(uid)) {
-                root.setAttribute("unknown_user", "true");
+                root.setAttribute("userOrPasswordInvalid", "true");
             } else if (MCRUserMgr.instance().login(uid, pwd)) {
                 //user logged in
                 LOGGER.info("MCRLoginServlet: user " + uid + " logged in successfully.");
@@ -89,7 +89,7 @@ public class MCRLoginServlet extends MCRServlet {
                 return;
             } else {
                 //password is wrong
-                root.setAttribute("invalid_password", "true");
+                root.setAttribute("userOrPasswordInvalid", "true");
             }
         }
         root.addContent(new org.jdom.Element("backto_url").addContent(backto_url));
