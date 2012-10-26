@@ -16,11 +16,12 @@ package org.mycore.frontend.cli;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.hibernate.CacheMode;
@@ -42,18 +43,12 @@ import org.mycore.common.xml.MCRXMLResource;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileMetadataManager;
-import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRSearcherFactory;
 import org.mycore.services.fieldquery.data2fields.MCRData2FieldsContent;
-import org.mycore.services.fieldquery.data2fields.MCRData2FieldsDerivate;
 import org.mycore.services.fieldquery.data2fields.MCRData2FieldsFile;
-import org.mycore.services.fieldquery.data2fields.MCRData2FieldsObject;
 import org.mycore.services.fieldquery.data2fields.MCRIndexEntry;
 import org.mycore.services.fieldquery.data2fields.MCRIndexEntryBuilder;
 import org.mycore.services.fieldquery.data2fields.MCRXSLBuilder;
@@ -200,30 +195,32 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             ScrollableResults results = fileCriteria.scroll(ScrollMode.FORWARD_ONLY);
             try {
                 while (results.next()) {
-                    try {
-                        MCRFSNODES node = (MCRFSNODES) results.get(0);
-                        GregorianCalendar greg = new GregorianCalendar();
-                        greg.setTime(node.getDate());
-                        MCRFile file = (MCRFile) MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(), node.getOwner(),
-                            node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(), node.getFctid(), node.getMd5(),
-                            node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
-                        addFileToIndex(file, false, searcherList);
-                        session.evict(node);
-                    } catch (Exception ex) {
-                        LOGGER.error("Could not add metadata", ex);
-                    }
+                    MCRFSNODES node = (MCRFSNODES) results.get(0);
+                    GregorianCalendar greg = new GregorianCalendar();
+                    greg.setTime(node.getDate());
+                    MCRFile file = (MCRFile) MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(), node.getOwner(),
+                        node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(), node.getFctid(), node.getMd5(),
+                        node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
+                    addFileToIndex(file, false, searcherList);
+                    session.evict(node);
                 }
             } finally {
                 results.close();
             }
         }
 
-        private void addFileToIndex(MCRFile file, boolean update, List<MCRSearcher> searcherList) throws IOException, JDOMException {
+        private void addFileToIndex(MCRFile file, boolean update, List<MCRSearcher> searcherList) {
             for (MCRSearcher searcher : searcherList) {
-                MCRIndexEntry entry = new MCRData2FieldsFile(searcher.getIndex(), file).buildIndexEntry();
-                if (update)
-                    searcher.removeFromIndex(entry);
-                searcher.addToIndex(entry);
+                MCRIndexEntry entry;
+                try {
+                    entry = new MCRData2FieldsFile(searcher.getIndex(), file).buildIndexEntry();
+                    if (update) {
+                        searcher.removeFromIndex(entry);
+                    }
+                    searcher.addToIndex(entry);
+                } catch (IOException e) {
+                    LOGGER.error(MessageFormat.format("Could not index file {0}{1} with searcher: {2}", file.getOwnerID(), file.getAbsolutePath(), searcher.getID()), e);
+                }
             }
         }
 
