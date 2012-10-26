@@ -1488,9 +1488,18 @@
   <text id="mods.location.url.label" i18n="component.mods.metaData.dictionary.url" />
   <panel id="mods.location.url">
     <cell anchor="NORTHWEST" var="mods:url">
-      <panel>
-        <cell id="mods.location.url.text" ref="TFzeile512" />
-      </panel>
+      <repeater min="1" pos="right">
+        <panel>
+          <cell col="1" row="1" anchor="NORTHEAST">
+            <text i18n="component.mods.metaData.dictionary.url.address" />
+          </cell>
+          <cell col="2" row="1" id="mods.location.url.text2" ref="TFzeile512" />
+          <cell col="1" row="2" anchor="NORTHEAST">
+            <text i18n="component.mods.metaData.dictionary.url.display" />
+          </cell>
+          <cell col="1" row="2" id="mods.location.url.displayLabel.text2" ref="TFzeile512" var="@displayLabel" />
+        </panel>
+      </repeater>
     </cell>
   </panel>
 

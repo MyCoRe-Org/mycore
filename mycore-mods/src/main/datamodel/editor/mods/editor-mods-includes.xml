@@ -72,7 +72,7 @@
     <cell row="40" col="1" anchor="NORTHEAST" ref="mods.submissionAtInstitute.label" style="padding-bottom:10px;" />
     <cell row="40" col="2" anchor="NORTHWEST" ref="mods.submissionAtInstitute" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="40" col="3" anchor="NORTHWEST" ref="mods.submissionAtInstitute.help" />
-    <!-- Institution END --> 
+    <!-- Institution END -->
   </include>
 
   <include id="thesis_genre">
@@ -144,9 +144,6 @@
     <cell row="145" col="1" anchor="NORTHEAST" ref="mods.location.url.label" />
     <cell row="145" col="2" anchor="NORTHWEST" ref="mods.location.url" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
     <cell row="145" col="3" anchor="NORTHWEST" ref="mods.location.url.help" />
-    <cell row="146" col="1" anchor="NORTHEAST" ref="mods.location.url.displayLabel.label" style="padding-bottom:10px;" />
-    <cell row="146" col="2" anchor="NORTHWEST" ref="mods.location.url.displayLabel" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
-    <cell row="146" col="3" anchor="NORTHWEST" ref="mods.location.url.displayLabel.help" />
     <!-- URL END -->
   </include>
 

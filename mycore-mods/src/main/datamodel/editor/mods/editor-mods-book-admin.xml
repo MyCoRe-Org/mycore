@@ -50,7 +50,7 @@
     <cell row="25" col="2" anchor="NORTHWEST" ref="mods.subtitle" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo" />
     <cell row="25" col="3" anchor="NORTHWEST" ref="mods.subtitle.help" />
     <!-- pub_subtitle [text] END -->
-    
+
     <!-- pub_autor_dok_txt [text] and reviewer -->
     <cell row="30" col="1" class="mandatory" anchor="NORTHEAST" ref="mods.person.label" />
     <cell row="30" col="2" anchor="NORTHWEST" ref="mods.person" var="metadata/def.modsContainer/modsContainer/mods:mods" />
@@ -103,68 +103,65 @@
     <cell row="100" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
       <text id="book.more" i18n="component.mods.metaData.dictionary.categorybox" />
     </cell>
-    
+
     <!-- LANGUAGE -->
     <cell row="120" col="1"  class="mandatory" anchor="NORTHEAST" ref="mods.languageTerm.label" style="padding-top:5px;"/>
     <cell row="120" col="2" anchor="NORTHWEST" ref="mods.languageTerm" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" style="padding-top:5px;" />
     <cell row="120" col="3" anchor="NORTHWEST" ref="mods.languageTerm.help" style="padding-top:5px;"/>
     <!-- LANGUAGE END -->
-    
+
     <!-- Abstract -->
     <cell row="130" col="1" anchor="NORTHEAST" ref="mods.abstract.label" />
     <cell row="130" col="2" anchor="NORTHWEST" ref="mods.abstract" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="130" col="3" anchor="NORTHWEST" ref="mods.abstract.help" />
     <!-- Abstract END -->
-    
+
     <!-- Extent|Part -->
     <cell row="140" col="1" anchor="NORTHEAST" ref="mods.book.part.extent.label" />
     <cell row="140" col="2" anchor="NORTHWEST" ref="mods.book.part.extent" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="140" col="3" anchor="NORTHWEST" ref="mods.book.part.extent.help" />
     <!-- Extent|Part END -->
-    
+
     <!-- pub_klassifik -->
     <cell row="150" col="1" anchor="NORTHEAST" ref="mods.ddc.label" />
     <cell row="150" col="2" anchor="NORTHWEST" ref="mods.ddc.optional" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="150" col="3" anchor="NORTHWEST" ref="mods.ddc.help" />
     <!-- pub_klassifik END -->
-    
+
     <!-- Stichworte -->
     <cell row="160" col="1" anchor="NORTHEAST" ref="mods.subject.label" />
     <cell row="160" col="2" anchor="NORTHWEST" ref="mods.subject" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="160" col="3" anchor="NORTHWEST" ref="mods.subject.help" />
     <!-- Stichworte END -->
-    
+
     <!-- Rechte -->
     <cell row="170" col="1" anchor="NORTHEAST" ref="mods.rights.label" />
     <cell row="170" col="2" anchor="NORTHWEST" ref="mods.rights" var="metadata/def.modsContainer/modsContainer/mods:mods" />
     <cell row="170" col="3" anchor="NORTHWEST" ref="mods.rights.help" />
     <!-- Rechte END -->
-    
+
     <!-- Identifier Panel -->
     <cell row="200" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
       <text id="book.identifier" i18n="component.mods.metaData.dictionary.identifier.box" />
     </cell>
-    
+
     <!-- Identifier -->
     <cell row="210" col="1" anchor="NORTHEAST" ref="mods.identifier.label" style="padding-top:5px;"/>
     <cell row="210" col="2" anchor="NORTHWEST" ref="mods.identifier" var="metadata/def.modsContainer/modsContainer/mods:mods" style="padding-top:5px;"/>
     <cell row="210" col="3" anchor="NORTHWEST" ref="mods.identifier.help" style="padding-top:5px;"/>
     <!-- Identifier END -->
-    
+
     <!-- URL -->
     <cell row="220" col="1" anchor="NORTHEAST" ref="mods.location.url.label" />
     <cell row="220" col="2" anchor="NORTHWEST" ref="mods.location.url" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
     <cell row="220" col="3" anchor="NORTHWEST" ref="mods.location.url.help" />
-    <cell row="230" col="1" anchor="NORTHEAST" ref="mods.location.url.displayLabel.label" />
-    <cell row="230" col="2" anchor="NORTHWEST" ref="mods.location.url.displayLabel" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:location" />
-    <cell row="230" col="3" anchor="NORTHWEST" ref="mods.location.url.displayLabel.help" />
     <!-- URL END -->
-    
+
     <!-- Interne Daten -->
     <cell row="300" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
       <text id="book.internals" i18n="component.mods.metaData.dictionary.institution.box" />
     </cell>
-    
+
     <!-- application specific internal data -->
     <cell row="310" col="1" colspan="3" anchor="NORTHWEST" ref="mods.internals" var="metadata/def.modsContainer/modsContainer/mods:mods" style="padding-top:5px;" />
 
