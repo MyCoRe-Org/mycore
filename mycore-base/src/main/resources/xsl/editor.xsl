@@ -598,21 +598,21 @@
 <!-- ========================================================================= -->
 <!-- ======== helpHover ======== -->
 <xsl:template match="helpHover">
-    	<div class="helpHover">
-    	   <a href="#">?<span> 	 
-              <xsl:attribute name="style"> 	 
-                 <xsl:if test="@width"> 	 
-                    <xsl:text>width:</xsl:text> 	 
-                    <xsl:value-of select="@width"/> 	 
-                    <xsl:text>;</xsl:text> 	 
-                 </xsl:if> 	 
-                 <xsl:if test="@height"> 	 
-                    <xsl:text>height:</xsl:text> 	 
-                    <xsl:value-of select="@height"/> 	 
-                    <xsl:text>;</xsl:text> 	 
-                </xsl:if> 	 
-           </xsl:attribute> 	 
-           <xsl:call-template name="output.label" /> 	 
+      <div class="helpHover">
+         <a href="#">?<span>   
+              <xsl:attribute name="style">   
+                 <xsl:if test="@width">    
+                    <xsl:text>width:</xsl:text>    
+                    <xsl:value-of select="@width"/>    
+                    <xsl:text>;</xsl:text>   
+                 </xsl:if>   
+                 <xsl:if test="@height">   
+                    <xsl:text>height:</xsl:text>   
+                    <xsl:value-of select="@height"/>   
+                    <xsl:text>;</xsl:text>   
+                </xsl:if>    
+           </xsl:attribute>    
+           <xsl:call-template name="output.label" />   
          </span></a>
        </div> 
 </xsl:template>
@@ -1226,17 +1226,22 @@
 
 <!-- ======== html select list option ======== -->
 
-<xsl:variable name="editor.list.indent">
-  <xsl:text disable-output-escaping="yes">&amp;nbsp;&amp;nbsp;&amp;nbsp;</xsl:text>
-</xsl:variable>
+<xsl:variable name="editor.list.indent">8</xsl:variable>
 
 <xsl:template match="item">
   <xsl:param name="vars"    />
   <xsl:param name="default" />
-  <xsl:param name="indent" select="''"/>
+  <xsl:param name="indent" select="number('0')"/>
 
   <option value="{@value}">
   
+    <xsl:if test="$indent != ''">
+      <xsl:attribute name="style">
+        <xsl:text>padding-left: </xsl:text>
+        <xsl:value-of select="$indent"/>
+        <xsl:text>px;</xsl:text>
+      </xsl:attribute>
+    </xsl:if>
     <xsl:choose>
       <xsl:when test="$vars[@value=current()/@value]">
         <xsl:attribute name="selected">selected</xsl:attribute>
@@ -1249,7 +1254,6 @@
       </xsl:when>
     </xsl:choose>
     
-    <xsl:value-of select="$indent" disable-output-escaping="yes"/>
     <xsl:call-template name="output.label" />
   </option>
 
@@ -1258,7 +1262,7 @@
   <xsl:apply-templates select="item">
     <xsl:with-param name="vars"    select="$vars"    />
     <xsl:with-param name="default" select="$default" />
-    <xsl:with-param name="indent"  select="concat($editor.list.indent,$indent)" />
+    <xsl:with-param name="indent"  select="$indent + $editor.list.indent" />
   </xsl:apply-templates>
 </xsl:template>
 
