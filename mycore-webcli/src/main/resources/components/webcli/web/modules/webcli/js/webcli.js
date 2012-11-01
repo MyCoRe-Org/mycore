@@ -4,7 +4,7 @@ dojo.require("dijit.layout.LayoutContainer");
 dojo.require("dijit.layout.TabContainer");
 dojo.require("dijit.layout.ContentPane");
 dojo.require("dijit.form.Button");
-dojo.require("dijit.Menu");
+dojo.require("dijit.DropDownMenu");
 dojo.require("dijit.Toolbar");
 dojo.require("dijit.form.CheckBox");
 dojo.require("dijit.form.Slider");
@@ -244,8 +244,11 @@ var webcli={
 				webcli.logDebug("removing "+" = "+widget);
 				menu.removeChild(widget);
 			});
+			var templateString = '<div style="max-height: 500px; overflow-y: auto; overflow-x: hidden">' + new dijit.DropDownMenu().templateString + '</div>';
 			dojo.forEach(webcli.commands.knownCommands, function(commandGroup){
-				var submenu= new dijit.Menu({});
+				var submenu = new dijit.DropDownMenu({
+				  templateString: templateString
+				});
 				var popup=new dijit.PopupMenuItem({
 					label: commandGroup.name,
 					popup: submenu
