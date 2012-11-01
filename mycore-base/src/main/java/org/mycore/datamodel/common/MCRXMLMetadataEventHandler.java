@@ -23,8 +23,10 @@
 
 package org.mycore.datamodel.common;
 
+import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 
@@ -48,7 +50,7 @@ public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected final void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        metaDataManager.create(obj.getId(), obj.createXML(), obj.getService().getDate("modifydate"));
+        handleStoreEvent(evt, obj);
     }
 
     /**
@@ -62,7 +64,7 @@ public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected final void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        metaDataManager.update(obj.getId(), obj.createXML(), obj.getService().getDate("modifydate"));
+        handleStoreEvent(evt, obj);
     }
 
     /**
@@ -76,7 +78,7 @@ public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected final void handleObjectDeleted(MCREvent evt, MCRObject obj) {
-        metaDataManager.delete(obj.getId());
+        handleStoreEvent(evt, obj);
     }
 
     /**
@@ -89,7 +91,7 @@ public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected final void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
-        metaDataManager.create(der.getId(), der.createXML(), der.getService().getDate("modifydate"));
+        handleStoreEvent(evt, der);
     }
 
     /**
@@ -103,7 +105,7 @@ public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected final void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
-        metaDataManager.update(der.getId(), der.createXML(), der.getService().getDate("modifydate"));
+        handleStoreEvent(evt, der);
     }
 
     /**
@@ -117,7 +119,35 @@ public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected final void handleDerivateDeleted(MCREvent evt, MCRDerivate der) {
-        metaDataManager.delete(der.getId());
+        handleStoreEvent(evt, der);
+    }
+
+    /* (non-Javadoc)
+     * @see org.mycore.common.events.MCREventHandlerBase#handleObjectRepaired(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
+     */
+    @Override
+    protected final void handleObjectRepaired(MCREvent evt, MCRObject obj) {
+        handleStoreEvent(evt, obj);
+    }
+
+    /* (non-Javadoc)
+     * @see org.mycore.common.events.MCREventHandlerBase#handleDerivateRepaired(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRDerivate)
+     */
+    @Override
+    protected final void handleDerivateRepaired(MCREvent evt, MCRDerivate der) {
+        handleStoreEvent(evt, der);
+    }
+
+    private final void handleStoreEvent(MCREvent evt, MCRBase obj) {
+        MCRBaseContent content = new MCRBaseContent(obj);
+        if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
+            metaDataManager.update(obj.getId(), content, obj.getService().getDate("modifydate"));
+        } else if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
+            metaDataManager.create(obj.getId(), content, obj.getService().getDate("modifydate"));
+        } else if (evt.getEventType().equals(MCREvent.DELETE_EVENT)) {
+            metaDataManager.delete(obj.getId());
+        }
+        evt.put("content", content);
     }
 
 }

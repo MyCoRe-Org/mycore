@@ -21,13 +21,17 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandler;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.services.fieldquery.data2fields.MCRData2FieldsContent;
 import org.mycore.services.fieldquery.data2fields.MCRData2FieldsDerivate;
 import org.mycore.services.fieldquery.data2fields.MCRData2FieldsFile;
 import org.mycore.services.fieldquery.data2fields.MCRData2FieldsObject;
@@ -123,31 +127,33 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
 
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        index(obj);
+        MCRIndexEntry entry = getEntry(obj, getContentFromEvent(evt));
+        addToIndex(entry);
     }
 
     @Override
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
-        MCRIndexEntry entry = new MCRData2FieldsDerivate(index, der).buildIndexEntry();
+        MCRIndexEntry entry = getEntry(der, getContentFromEvent(evt));
         addToIndex(entry);
     }
 
     @Override
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        removeFromIndex(obj);
-        index(obj);
+        MCRIndexEntry entry = getEntry(obj, getContentFromEvent(evt));
+        removeFromIndex(entry);
+        addToIndex(entry);
     }
 
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
-        MCRIndexEntry entry = new MCRData2FieldsDerivate(index, der).buildIndexEntry();
+        MCRIndexEntry entry = getEntry(der, getContentFromEvent(evt));
         removeFromIndex(entry);
         addToIndex(entry);
     }
 
     @Override
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
-        removeFromIndex(obj);
+        removeFromIndex(obj.getId());
     }
 
     @Override
@@ -158,18 +164,17 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
 
     @Override
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
-        removeFromIndex(obj);
-        index(obj);
+        handleObjectUpdated(evt, obj);
     }
 
     @Override
     protected void handleDerivateRepaired(MCREvent evt, MCRDerivate der) {
-        handleDerivateCreated(evt, der);
+        handleDerivateUpdated(evt, der);
     }
 
     @Override
     protected void undoObjectCreated(MCREvent evt, MCRObject obj) {
-        removeFromIndex(obj);
+        removeFromIndex(obj.getId());
     }
 
     @Override
@@ -179,7 +184,7 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
 
     @Override
     protected void undoObjectDeleted(MCREvent evt, MCRObject obj) {
-        index(obj);
+        handleObjectCreated(evt, obj);
     }
 
     @Override
@@ -187,13 +192,25 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
         handleDerivateCreated(evt, der);
     }
 
-    protected void index(MCRObject obj) {
-        MCRIndexEntry entry = new MCRData2FieldsObject(index, obj).buildIndexEntry();
-        addToIndex(entry);
+    private MCRContent getContentFromEvent(MCREvent evt) {
+        return (MCRContent) evt.get("content");
     }
 
-    protected void removeFromIndex(MCRObject obj) {
-        String entryID = obj.getId().toString();
+    protected MCRIndexEntry getEntry(MCRBase base, MCRContent content) {
+        MCRIndexEntry entry = null;
+        if (content != null) {
+            LOGGER.info("Using event stored content to index: " + base.getId());
+            entry = new MCRData2FieldsContent(index, content, base.getId()).buildIndexEntry();
+        } else if (base instanceof MCRObject) {
+            entry = new MCRData2FieldsObject(index, (MCRObject) base).buildIndexEntry();
+        } else if (base instanceof MCRDerivate) {
+            entry = new MCRData2FieldsDerivate(index, (MCRDerivate) base).buildIndexEntry();
+        }
+        return entry;
+    }
+
+    protected void removeFromIndex(MCRObjectID id) {
+        String entryID = id.toString();
         removeFromIndex(entryID);
     }
 
