@@ -26,6 +26,7 @@ package org.mycore.datamodel.ifs2;
 import java.io.IOException;
 import java.util.Date;
 
+import org.apache.commons.vfs.FileContent;
 import org.apache.commons.vfs.FileObject;
 import org.jdom.JDOMException;
 import org.mycore.common.MCRUsageException;
@@ -140,8 +141,13 @@ public class MCRStoredMetadata {
      * @throws IOException 
      */
     public Date getLastModified() throws IOException {
-        long time = fo.getContent().getLastModifiedTime();
-        return new Date(time);
+        FileContent fileContent = fo.getContent();
+        try {
+            long time = fileContent.getLastModifiedTime();
+            return new Date(time);
+        } finally {
+            fileContent.close();
+        }
     }
 
     /**
@@ -152,7 +158,12 @@ public class MCRStoredMetadata {
      */
     public void setLastModified(Date date) throws IOException {
         if (!isDeleted()) {
-            fo.getContent().setLastModifiedTime(date.getTime());
+            FileContent fileContent = fo.getContent();
+            try {
+                fo.getContent().setLastModifiedTime(date.getTime());
+            } finally {
+                fileContent.close();
+            }
         }
     }
 
