@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>mycore-parent</artifactId>
@@ -10,7 +11,7 @@
   <packaging>pom</packaging>
   <version>2.1.80-SNAPSHOT</version>
   <name>MyCoRe</name>
-  
+
   <!-- Keep the description on a single line. Otherwise Maven might generate a corrupted MANIFEST.MF (see http://jira.codehaus.org/browse/MJAR-4) -->
   <description>MyCoRe is a system for the development of institutional content repositories, publication servers, image collections,
     archives, or similar repositories. Applications based on MyCoRe use a common core, which provides the functionality typically
@@ -617,6 +618,11 @@
         <version>3.6.1</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpmime</artifactId>
+        <version>4.2.2</version>
+      </dependency>
+      <dependency>
         <groupId>xerces</groupId>
         <artifactId>xercesImpl</artifactId>
         <version>2.11.0</version>
@@ -662,11 +668,11 @@
         <artifactId>commons-fileupload</artifactId>
         <version>1.2.2</version>
       </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      <version>4.1</version>
-    </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>4.1</version>
+      </dependency>
       <dependency>
         <groupId>com.drewnoakes</groupId>
         <artifactId>metadata-extractor</artifactId>
