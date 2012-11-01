@@ -204,7 +204,7 @@ public class SolrIndexer extends MCRLuceneSearcher {
     /**
      * Rebuilds and optimizes solr's metadata and content index. 
      */
-    public static void rebuildMetadataAndContentIndex() {
+    public static void rebuildMetadataAndContentIndex() throws Exception {
         SolrIndexer.rebuildMetadataIndex();
         SolrIndexer.rebuildContentIndex();
         SolrIndexer.optimize();
@@ -222,7 +222,7 @@ public class SolrIndexer extends MCRLuceneSearcher {
     /**
      * Sends a signal to the remote solr server to optimize its index. 
      */
-    static void optimize() {
+    public static void optimize() {
         try {
             LOGGER.info("Sending optimize request to solr");
             SolrServerFactory.getSolrServer().optimize();
