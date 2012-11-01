@@ -6,7 +6,7 @@ package org.mycore.solr.utils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.mycore.solr.SolrServerFactory;
@@ -29,7 +29,7 @@ public class SolrUtils {
     public static long getNumHits(String solrQuery) {
         SolrQuery q = new SolrQuery(solrQuery);
         q.setRows(0);
-        CommonsHttpSolrServer solrServer = SolrServerFactory.getSolrServer();
+        HttpSolrServer solrServer = SolrServerFactory.getSolrServer();
         long numFound = 0;
         try {
             QueryResponse queryResponse = solrServer.query(q);

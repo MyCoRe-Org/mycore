@@ -33,7 +33,7 @@ import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.util.Version;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrDocumentList;
 import org.jdom.Element;
 import org.mycore.backend.lucene.MCRBuildLuceneQuery;
@@ -79,7 +79,7 @@ public class LuceneSolrAdapter {
 
             LOGGER.info("Legacy Query transformed by \"" + LuceneSolrAdapter.class.getCanonicalName() + "\" to \"" + luceneQuery.toString()
                     + "\"");
-            CommonsHttpSolrServer solrServer = SolrServerFactory.getSolrServer();
+            HttpSolrServer solrServer = SolrServerFactory.getSolrServer();
             SolrQuery q = LuceneSolrAdapter.applySortOptions(new SolrQuery(luceneQuery.toString()), sortBy);
             q.setIncludeScore(true);
             q.setRows(maxResults == 0 ? Integer.MAX_VALUE : maxResults);

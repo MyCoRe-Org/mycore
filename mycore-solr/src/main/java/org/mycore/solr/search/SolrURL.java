@@ -11,7 +11,7 @@ import java.net.URLEncoder;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 
 /**
  * Convenience class for holding the parameters for the solr search url.
@@ -23,7 +23,7 @@ public class SolrURL {
 
     public static final String VERSION_2_2 = "2.2";
 
-    private CommonsHttpSolrServer solrServer;
+    private HttpSolrServer solrServer;
 
     private String q, fixedURLPart, sortOptions;
 
@@ -34,7 +34,7 @@ public class SolrURL {
     /**
      * @param solrServer the solr server to use
      */
-    public SolrURL(CommonsHttpSolrServer solrServer) {
+    public SolrURL(HttpSolrServer solrServer) {
         this.solrServer = solrServer;
         start = 0;
         rows = 10;
@@ -48,7 +48,7 @@ public class SolrURL {
      * @param solrServer
      * @param returnScore specify whether to return the score with results;
      */
-    public SolrURL(CommonsHttpSolrServer solrServer, boolean returnScore) {
+    public SolrURL(HttpSolrServer solrServer, boolean returnScore) {
         this(solrServer);
         this.returnScore = returnScore;
     }

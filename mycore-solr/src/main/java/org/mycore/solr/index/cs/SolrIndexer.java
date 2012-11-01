@@ -8,7 +8,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.jdom.Document;
 import org.mycore.backend.lucene.MCRLuceneSearcher;
@@ -33,9 +33,14 @@ import org.mycore.solr.legacy.LuceneSolrAdapter;
 public class SolrIndexer extends MCRLuceneSearcher {
     private static final Logger LOGGER = Logger.getLogger(SolrIndexer.class);
 
-    static CommonsHttpSolrServer solrServer = SolrServerFactory.getSolrServer();
+    static HttpSolrServer solrServer = null;
 
-    static ExecutorService executorService = Executors.newFixedThreadPool(10);
+    static ExecutorService executorService = null;
+
+    static {
+        solrServer = SolrServerFactory.getSolrServer();
+        executorService = Executors.newFixedThreadPool(10);
+    }
 
     @Override
     synchronized protected void handleObjectCreated(MCREvent evt, MCRObject obj) {

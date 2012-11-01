@@ -35,10 +35,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.impl.BinaryRequestWriter;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.jdom.Element;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -47,6 +45,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.solr.SolrServerFactory;
 
 /**
  * This servlet provides a way to visually navigate through the tree of
@@ -62,14 +61,11 @@ public class MCRClassificationBrowserSolr extends MCRServlet {
 
     private static final Logger LOGGER = Logger.getLogger(MCRClassificationBrowserSolr.class);
 
-    private static CommonsHttpSolrServer SOLR_SERVER;
+    private static HttpSolrServer SOLR_SERVER;
 
-    //TODO put this to a factory
     static {
         try {
-            String solrServerUrl = MCRConfiguration.instance().getString("MCR.Solr.Server.URL", "http://127.0.0.1:8080/solr");
-            SOLR_SERVER = new CommonsHttpSolrServer(solrServerUrl);
-            SOLR_SERVER.setRequestWriter(new BinaryRequestWriter());
+            SOLR_SERVER = SolrServerFactory.getSolrServer();
         } catch (Exception e) {
             LOGGER.error("Error creating solr server object", e);
         } finally {
