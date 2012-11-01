@@ -1051,7 +1051,7 @@ public class MCRUtils {
      */
     public static List<MCRFile> getFiles(String derivate) {
         List<MCRFile> fList = new Vector<MCRFile>();
-        if (derivate == null || derivate.length() == 0 || MCRMetadataManager.exists(MCRObjectID.getInstance(derivate))) {
+        if (derivate == null || derivate.length() == 0 || !(MCRMetadataManager.exists(MCRObjectID.getInstance(derivate)))) {
             return fList;
         }
 
