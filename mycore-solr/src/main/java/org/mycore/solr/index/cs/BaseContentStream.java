@@ -7,9 +7,9 @@ import java.io.IOException;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.jdom.Document;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.solr.SolrServerFactory;
-
 
 /**
  * Content stream suitable for wrapping {@link MCRBase} and {@link Document} objects. 
@@ -19,12 +19,11 @@ import org.mycore.solr.SolrServerFactory;
  */
 public class BaseContentStream extends AbstractSolrContentStream {
 
-    private byte[] asByteArray;
+    private MCRContent content;
 
     /***/
     protected BaseContentStream() {
         super();
-        asByteArray = null;
     }
 
     /**
@@ -36,6 +35,15 @@ public class BaseContentStream extends AbstractSolrContentStream {
         sourceInfo = objectOrDerivate.getClass().getSimpleName();
         contentType = "text/xml";
         source = objectOrDerivate;
+    }
+
+    /**
+     * @param objectOrDerivate
+     * @param content
+     */
+    public BaseContentStream(MCRBase objectOrDerivate, MCRContent content) {
+        this(objectOrDerivate);
+        this.content = content;
     }
 
     /**
@@ -53,14 +61,22 @@ public class BaseContentStream extends AbstractSolrContentStream {
 
     @Override
     protected void setup() {
+        byte[] inputStreamSrc = new byte[0];
         SolrAppender solrAppender = new SolrAppender();
-        if (source instanceof MCRBase) {
-            asByteArray = MCRUtils.getByteArray(solrAppender.transform(((MCRBase) source).createXML()));
+
+        if (source instanceof MCRBase && content != null) {
+            try {
+                inputStreamSrc = MCRUtils.getByteArray(solrAppender.transform(content.getSource()));
+            } catch (Exception e) {
+                LOGGER.error("Could not get source object from " + content.getClass(), e);
+            }
+        } else if (source instanceof MCRBase) {
+            inputStreamSrc = MCRUtils.getByteArray(solrAppender.transform(((MCRBase) source).createXML()));
         } else if (source instanceof Document) {
-            asByteArray = MCRUtils.getByteArray(solrAppender.transform((Document) source));
+            inputStreamSrc = MCRUtils.getByteArray(solrAppender.transform((Document) source));
         }
-        length = asByteArray.length;
-        inputStream = new BufferedInputStream(new ByteArrayInputStream(asByteArray));
+        length = inputStreamSrc.length;
+        inputStream = new BufferedInputStream(new ByteArrayInputStream(inputStreamSrc));
     }
 
     protected void index() {

@@ -13,6 +13,7 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.jdom.Document;
 import org.mycore.backend.lucene.MCRLuceneSearcher;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -87,7 +88,8 @@ public class SolrIndexer extends MCRLuceneSearcher {
         long tStart = System.currentTimeMillis();
         try {
             LOGGER.trace("Solr: submitting data of\"" + objectOrDerivate.getId().toString() + "\" for indexing");
-            AbstractSolrContentStream contentStream = new BaseContentStream(objectOrDerivate);
+
+            AbstractSolrContentStream contentStream = new BaseContentStream(objectOrDerivate, (MCRContent) evt.get("content"));
             executorService.submit(contentStream);
             LOGGER.trace("Solr: submitting data of\"" + objectOrDerivate.getId().toString() + "\" for indexing done in "
                     + (System.currentTimeMillis() - tStart) + "ms ");
