@@ -29,6 +29,7 @@
         <xsl:call-template name="iViewLinkPrev">
           <xsl:with-param name="derivates" select="./arr[@name='derivates']/str" />
           <xsl:with-param name="mcrid" select="$identifier" />
+          <xsl:with-param name="derivateLinks" select="./arr[@name='derivateLink']/str" />
         </xsl:call-template>
       </td>
     </tr>
@@ -57,6 +58,7 @@
   <xsl:template name="iViewLinkPrev">
     <xsl:param name="derivates" />
     <xsl:param name="mcrid" />
+    <xsl:param name="derivateLinks" />
 
     <xsl:for-each select="$derivates">
       <xsl:variable name="firstSupportedFile">
@@ -82,6 +84,26 @@
         </a>
       </xsl:if>
     </xsl:for-each>
+
+    <!-- display linked images -->
+    <xsl:for-each select="$derivateLinks[string-length(.) &gt; 0]">
+      <xsl:variable name="derivate" select="substring-before(. , '/')" />
+      <xsl:variable name="pageToDisplay" select="concat('/', substring-after(., '/'))" />
+      <a>
+        <xsl:attribute name="href">
+            <xsl:value-of
+          select="concat($WebApplicationBaseURL,'receive/',$mcrid,'?jumpback=true&amp;maximized=true&amp;page=',$pageToDisplay,'&amp;derivate=', $derivate)" />
+          </xsl:attribute>
+        <xsl:attribute name="title">
+            <xsl:value-of select="i18n:translate('metaData.iView')" />
+          </xsl:attribute>
+        <xsl:call-template name="iview2.getImageElement">
+          <xsl:with-param select="$derivate" name="derivate" />
+          <xsl:with-param select="$pageToDisplay" name="imagePath" />
+        </xsl:call-template>
+      </a>
+    </xsl:for-each>
+
   </xsl:template>
 
 
