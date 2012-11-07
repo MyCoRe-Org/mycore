@@ -264,7 +264,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         };
     }
 
-    private static Hashtable<String, String> getParameterMap(String key) {
+    public static Hashtable<String, String> getParameterMap(String key) {
         String[] param;
         StringTokenizer tok = new StringTokenizer(key, "&");
         Hashtable<String, String> params = new Hashtable<String, String>();
