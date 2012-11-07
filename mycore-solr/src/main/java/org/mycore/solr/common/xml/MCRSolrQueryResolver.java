@@ -53,6 +53,7 @@ public class MCRSolrQueryResolver implements URIResolver {
         SAXBuilder builder = new SAXBuilder();
         try {
             Document doc = builder.build(solrURL.openStream());
+            doc.getRootElement().setName("solr-results");
             return new JDOMSource(doc);
         } catch(Exception exc) {
             LOGGER.error("Unable to build solr document", exc);
