@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.jdom.Document;
-import org.mycore.backend.lucene.MCRLuceneSearcher;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCREvent;
@@ -23,6 +22,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRResults;
+import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRSortBy;
 import org.mycore.solr.SolrServerFactory;
 import org.mycore.solr.legacy.LuceneSolrAdapter;
@@ -31,7 +31,7 @@ import org.mycore.solr.legacy.LuceneSolrAdapter;
  * @author shermann
  *
  */
-public class SolrIndexer extends MCRLuceneSearcher {
+public class SolrIndexer extends MCRSearcher {
     private static final Logger LOGGER = Logger.getLogger(SolrIndexer.class);
 
     static HttpSolrServer solrServer = null;
@@ -41,6 +41,11 @@ public class SolrIndexer extends MCRLuceneSearcher {
     static {
         solrServer = SolrServerFactory.getSolrServer();
         executorService = Executors.newFixedThreadPool(10);
+    }
+    
+    @Override
+    public boolean isIndexer() {
+        return true;
     }
 
     @Override
