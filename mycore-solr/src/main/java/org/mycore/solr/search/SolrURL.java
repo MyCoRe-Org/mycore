@@ -25,7 +25,7 @@ public class SolrURL {
 
     private HttpSolrServer solrServer;
 
-    private String q, fixedURLPart, sortOptions;
+    private String q, fixedURLPart, sortOptions, wt;
 
     private int start, rows;
 
@@ -39,6 +39,7 @@ public class SolrURL {
         start = 0;
         rows = 10;
         q = null;
+        wt = null;
         fixedURLPart = "/select/?version=2.2";
         sortOptions = new String();
         returnScore = false;
@@ -59,7 +60,7 @@ public class SolrURL {
     public URL getUrl() {
         try {
             return new URL(solrServer.getBaseURL() + fixedURLPart + "&q=" + URLEncoder.encode(q, "UTF-8") + "&start=" + start + "&rows="
-                    + rows + "&sort=" + URLEncoder.encode(sortOptions, "UTF-8") + (returnScore ? "&fl=*,score" : ""));
+                    + rows + "&sort=" + URLEncoder.encode(sortOptions, "UTF-8") + (returnScore ? "&fl=*,score" : "") + (wt != null ? "&wt=" + wt : ""));
         } catch (Exception urlException) {
             LOGGER.error("Error building solr url", urlException);
         }
@@ -103,7 +104,22 @@ public class SolrURL {
         if (sortOptions.length() > 0) {
             sortOptions += ",";
         }
-        sortOptions += sortBy + " " + order;
+        sortOptions += sortBy + " " + (order != null ? order : "desc");
+    }
+
+    /**
+     * Adds a sort option to the solr url
+     * 
+     * @param sort the sort option e.g. 'maintitle desc'
+     */
+    public void addSortOption(String sort) {
+        if(sort == null || sort.equals("")) {
+            return;
+        }
+        if (sortOptions.length() > 0) {
+            sortOptions += ",";
+        }
+        sortOptions += sort;
     }
 
     /**
@@ -160,6 +176,17 @@ public class SolrURL {
      */
     public void setReturnScore(boolean yesOrNo) {
         this.returnScore = yesOrNo;
+    }
+
+    /**
+     * The wt (writer type) parameter is used by Solr to determine which QueryResponseWriter should be
+     * used to process the request. Valid values are any of the names specified by <queryResponseWriter... />
+     * declarations in solrconfig.xml. The default value is "standard" (xml).
+     * 
+     * @param wt
+     */
+    public void setWriterType(String wt) {
+        this.wt = wt;
     }
 
     /**
