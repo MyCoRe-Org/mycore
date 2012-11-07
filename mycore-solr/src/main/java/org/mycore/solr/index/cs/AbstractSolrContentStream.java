@@ -1,6 +1,5 @@
 package org.mycore.solr.index.cs;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -8,10 +7,12 @@ import java.io.Reader;
 import java.text.SimpleDateFormat;
 
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.common.util.ContentStream;
 import org.apache.solr.common.util.ContentStreamBase;
 import org.hibernate.Session;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.solr.SolrServerFactory;
 
 /**
  * Wraps objects to be sent to solr in a content stream.
@@ -20,75 +21,65 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
  * 
  * @author shermann
  * */
-abstract public class AbstractSolrContentStream extends ContentStreamBase implements Runnable {
+abstract public class AbstractSolrContentStream<T> extends ContentStreamBase implements Runnable {
     public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
 
     final static Logger LOGGER = Logger.getLogger(AbstractSolrContentStream.class);
 
-    protected long length;
-
-    protected String name, sourceInfo, contentType;
-
     protected InputStream inputStream;
 
-    protected Object source;
+    protected boolean setup;
+
+    protected T source;
 
     protected AbstractSolrContentStream() {
         super();
-        length = -1;
         inputStream = null;
+        setup = false;
     }
 
     /**
      * Sets certain properties on a contentStream object. Subclasses must overide this method.
      */
-    abstract protected void setup();
+    abstract protected void setup() throws IOException;
 
     /**
      * @return the source object (the one provided to the constructor)
      */
-    public Object getSource() {
+    public T getSource() {
         return this.source;
     }
 
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getSourceInfo() {
-        return sourceInfo;
-    }
-
-    @Override
-    public String getContentType() {
-        return contentType;
-    }
-
-    @Override
-    public Long getSize() {
-        if (length == -1) {
+    private void doSetup() throws IOException {
+        if (!setup) {
             setup();
+            setup = true;
         }
-        return Long.valueOf(length);
     }
 
     @Override
     public InputStream getStream() throws IOException {
-        if (inputStream == null) {
-            setup();
-        }
-
+        doSetup();
         return inputStream;
     }
 
     @Override
     public Reader getReader() throws IOException {
-        if (inputStream == null) {
-            setup();
+        doSetup();
+        return new InputStreamReader(getStream());
+    }
+
+    /* (non-Javadoc)
+     * @see org.apache.solr.common.util.ContentStreamBase#getSize()
+     */
+    @Override
+    public Long getSize() {
+        try {
+            doSetup();
+        } catch (IOException e) {
+            LOGGER.error("Could not setup content stream.", e);
         }
-        return new BufferedReader(new InputStreamReader(getStream()));
+        return super.getSize();
     }
 
     /**
@@ -130,5 +121,19 @@ abstract public class AbstractSolrContentStream extends ContentStreamBase implem
     /**
      * Invokes an index request for the current content stream.
      */
-    protected abstract void index();
+
+    protected void index() {
+        try {
+            LOGGER.trace("Solr: indexing data of\"" + getName() + "\"");
+            long tStart = System.currentTimeMillis();
+            ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest("/update/xslt");
+            updateRequest.addContentStream(this);
+            updateRequest.setParam("tr", "object2fields.xsl");
+    
+            SolrServerFactory.getSolrServer().request(updateRequest);
+            LOGGER.trace("Solr: indexing data of\"" + getName() + "\" (" + (System.currentTimeMillis() - tStart) + "ms)");
+        } catch (Exception ex) {
+            LOGGER.error("Error sending content to solr through content stream " + this, ex);
+        }
+    }
 }

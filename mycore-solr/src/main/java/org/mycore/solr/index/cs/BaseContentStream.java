@@ -1,15 +1,13 @@
 package org.mycore.solr.index.cs;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.jdom.Document;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.solr.SolrServerFactory;
 
 /**
  * Content stream suitable for wrapping {@link MCRBase} and {@link Document} objects. 
@@ -17,9 +15,9 @@ import org.mycore.solr.SolrServerFactory;
  * @author shermann
  *
  */
-public class BaseContentStream extends AbstractSolrContentStream {
+public class BaseContentStream extends AbstractSolrContentStream<MCRContent> {
 
-    private MCRContent content;
+    private MCRContentTransformer transformer;
 
     /***/
     protected BaseContentStream() {
@@ -28,69 +26,23 @@ public class BaseContentStream extends AbstractSolrContentStream {
 
     /**
      * @param objectOrDerivate
-     */
-    public BaseContentStream(MCRBase objectOrDerivate) {
-        this();
-        name = objectOrDerivate.getId().toString();
-        sourceInfo = objectOrDerivate.getClass().getSimpleName();
-        contentType = "text/xml";
-        source = objectOrDerivate;
-    }
-
-    /**
-     * @param objectOrDerivate
      * @param content
      */
-    public BaseContentStream(MCRBase objectOrDerivate, MCRContent content) {
-        this(objectOrDerivate);
-        this.content = content;
-    }
-
-    /**
-     * @param doc
-     * @param name 
-     * @throws IOException
-     */
-    public BaseContentStream(Document doc, String name) throws IOException {
+    public BaseContentStream(String id, MCRContent content) {
         this();
-        this.name = name;
-        this.sourceInfo = doc.getClass().getName();
-        contentType = "text/xml";
-        source = doc;
+        this.name = id;
+        this.sourceInfo = content.getSystemId();
+        transformer = SolrAppender.getTransformer();
+        this.contentType = transformer.getMimeType();
+        this.source = content;
     }
 
     @Override
-    protected void setup() {
-        byte[] inputStreamSrc = new byte[0];
-        SolrAppender solrAppender = new SolrAppender();
-
-        if (source instanceof MCRBase && content != null) {
-            try {
-                inputStreamSrc = MCRUtils.getByteArray(solrAppender.transform(content.getSource()));
-            } catch (Exception e) {
-                LOGGER.error("Could not get source object from " + content.getClass(), e);
-            }
-        } else if (source instanceof MCRBase) {
-            inputStreamSrc = MCRUtils.getByteArray(solrAppender.transform(((MCRBase) source).createXML()));
-        } else if (source instanceof Document) {
-            inputStreamSrc = MCRUtils.getByteArray(solrAppender.transform((Document) source));
-        }
-        length = inputStreamSrc.length;
-        inputStream = new BufferedInputStream(new ByteArrayInputStream(inputStreamSrc));
-    }
-
-    protected void index() {
-        try {
-            LOGGER.trace("Solr: indexing data of\"" + getName() + "\"");
-            long tStart = System.currentTimeMillis();
-            ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest("/update/xslt");
-            updateRequest.addContentStream(this);
-            updateRequest.setParam("tr", "object2fields.xsl");
-
-            SolrServerFactory.getSolrServer().request(updateRequest);
-            LOGGER.trace("Solr: indexing data of\"" + getName() + "\" (" + (System.currentTimeMillis() - tStart) + "ms)");
-        } catch (Exception ex) {
-            LOGGER.error("Error sending content to solr through content stream " + this, ex);
-        }
+    protected void setup() throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream(64*1024);
+        transformer.transform(source, out);
+        byte[] byteArray = out.toByteArray();
+        this.size = (long) byteArray.length;
+        inputStream = new ByteArrayInputStream(byteArray);
     }
 }

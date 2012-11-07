@@ -22,7 +22,7 @@ import experimental.solr.payloadsupport.analyzers.XML2StringWithPayloadProvider;
  * @author shermann
  *
  */
-public class FileContentStream extends AbstractSolrContentStream {
+public class FileContentStream extends AbstractSolrContentStream<MCRFile> {
 
     /**
      * @param file
@@ -39,7 +39,7 @@ public class FileContentStream extends AbstractSolrContentStream {
     @Override
     protected void setup() {
         MCRFile file = ((MCRFile) source);
-        length = file.getSize();
+        size = file.getSize();
         try {
             if (!"alto.xml".equals(file.getName())) {
                 inputStream = new BufferedInputStream(file.getContentAsInputStream());

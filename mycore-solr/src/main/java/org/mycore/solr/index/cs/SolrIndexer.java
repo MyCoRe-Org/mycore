@@ -10,8 +10,8 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.jdom.Document;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -42,7 +42,7 @@ public class SolrIndexer extends MCRSearcher {
         solrServer = SolrServerFactory.getSolrServer();
         executorService = Executors.newFixedThreadPool(10);
     }
-    
+
     @Override
     public boolean isIndexer() {
         return true;
@@ -93,11 +93,14 @@ public class SolrIndexer extends MCRSearcher {
         long tStart = System.currentTimeMillis();
         try {
             LOGGER.trace("Solr: submitting data of\"" + objectOrDerivate.getId().toString() + "\" for indexing");
-
-            AbstractSolrContentStream contentStream = new BaseContentStream(objectOrDerivate, (MCRContent) evt.get("content"));
+            MCRContent content = (MCRContent) evt.get("content");
+            if (content == null) {
+                content = new MCRBaseContent(objectOrDerivate);
+            }
+            BaseContentStream contentStream = new BaseContentStream(objectOrDerivate.getId().toString(), content);
             executorService.submit(contentStream);
             LOGGER.trace("Solr: submitting data of\"" + objectOrDerivate.getId().toString() + "\" for indexing done in "
-                    + (System.currentTimeMillis() - tStart) + "ms ");
+                + (System.currentTimeMillis() - tStart) + "ms ");
         } catch (Exception ex) {
             LOGGER.error("Error creating transfer thread", ex);
         }
@@ -105,7 +108,7 @@ public class SolrIndexer extends MCRSearcher {
 
     @Override
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
-        AbstractSolrContentStream contentStream = null;
+        FileContentStream contentStream = null;
         try {
             LOGGER.trace("Solr: submitting file \"" + file.getAbsolutePath() + " (" + file.getID() + ")\" for indexing");
             /* extract metadata with tika */
@@ -163,8 +166,7 @@ public class SolrIndexer extends MCRSearcher {
         for (String id : list) {
             try {
                 LOGGER.info("Solr: submitting data of\"" + id + "\" for indexing");
-                Document xml = metadataMgr.retrieveXML(MCRObjectID.getInstance(id));
-                AbstractSolrContentStream contentStream = new BaseContentStream(xml, id);
+                BaseContentStream contentStream = new BaseContentStream(id, metadataMgr.retrieveContent(MCRObjectID.getInstance(id)));
                 executorService.submit(contentStream);
             } catch (Exception ex) {
                 LOGGER.error("Error creating transfer thread", ex);
@@ -172,7 +174,7 @@ public class SolrIndexer extends MCRSearcher {
         }
         long tStop = System.currentTimeMillis();
         LOGGER.info("Solr: submitted data of " + list.size() + " objects for indexing done in " + (tStop - tStart) + "ms ("
-                + ((float) (tStop - tStart) / list.size()) + " ms/object)");
+            + ((float) (tStop - tStart) / list.size()) + " ms/object)");
     }
 
     /**
@@ -196,7 +198,7 @@ public class SolrIndexer extends MCRSearcher {
 
             List<MCRFile> files = MCRUtils.getFiles(derivate);
             LOGGER.info("Sending files (" + files.size() + ") for derivate \"" + derivate + "\"");
-            AbstractSolrContentStream contentStream = null;
+            FileContentStream contentStream = null;
             for (MCRFile file : files) {
                 try {
                     LOGGER.trace("Solr: submitting file \"" + file.getAbsolutePath() + " (" + file.getID() + ")\" for indexing");
@@ -210,7 +212,7 @@ public class SolrIndexer extends MCRSearcher {
 
         long tStop = System.currentTimeMillis();
         LOGGER.info("Solr: submitted data of " + list.size() + " derivates for indexing done in " + (tStop - tStart) + "ms ("
-                + ((float) (tStop - tStart) / list.size()) + " ms/derivate)");
+            + ((float) (tStop - tStart) / list.size()) + " ms/derivate)");
     }
 
     /**

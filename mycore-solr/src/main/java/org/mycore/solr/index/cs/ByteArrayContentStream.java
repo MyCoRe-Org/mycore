@@ -4,7 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-public class ByteArrayContentStream extends BaseContentStream {
+public class ByteArrayContentStream extends AbstractSolrContentStream<byte[]> {
 
     /**
      * @param xmlAsByteArr
@@ -22,7 +22,7 @@ public class ByteArrayContentStream extends BaseContentStream {
 
     @Override
     protected void setup() {
-        length = ((byte[]) source).length;
-        inputStream = new BufferedInputStream(new ByteArrayInputStream(((byte[]) source)));
+        size = (long)(source).length;
+        inputStream = new ByteArrayInputStream((source));
     }
 }
