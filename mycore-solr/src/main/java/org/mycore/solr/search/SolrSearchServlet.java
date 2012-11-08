@@ -17,7 +17,6 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.solr.SolrServerFactory;
 
-
 /**
  * @author shermann
  *
@@ -54,7 +53,7 @@ public class SolrSearchServlet extends MCRServlet {
 
         MCRContent streamContent = null;
         try {
-            streamContent = new MCRStreamContent(solrURL.openStream());
+            streamContent = new MCRStreamContent(solrURL.openStream(), solrURL.getUrl().toString());
             LOGGER.info("Getting query results took " + (System.currentTimeMillis() - tStart) + " ms");
             getLayoutService().doLayout(job.getRequest(), job.getResponse(), streamContent);
         } finally {
