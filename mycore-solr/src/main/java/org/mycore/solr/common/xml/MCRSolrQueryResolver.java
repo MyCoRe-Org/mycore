@@ -52,9 +52,8 @@ public class MCRSolrQueryResolver implements URIResolver {
             MCRStreamContent result = new MCRStreamContent(solrURL.openStream(), solrURL.getUrl().toString());
             return result.getSource();
         } catch (Exception exc) {
-            LOGGER.error("Unable to build solr document", exc);
+            throw new TransformerException(exc);
         }
-        return null;
     }
 
 }
