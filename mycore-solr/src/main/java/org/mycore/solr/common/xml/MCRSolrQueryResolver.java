@@ -1,5 +1,6 @@
 package org.mycore.solr.common.xml;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Hashtable;
@@ -51,8 +52,8 @@ public class MCRSolrQueryResolver implements URIResolver {
         try {
             MCRStreamContent result = new MCRStreamContent(solrURL.openStream(), solrURL.getUrl().toString());
             return result.getSource();
-        } catch (Exception exc) {
-            throw new TransformerException(exc);
+        } catch (IOException e) {
+            throw new TransformerException(e);
         }
     }
 
