@@ -53,8 +53,7 @@ public class MCRSolrQueryResolver implements URIResolver {
             MCRStreamContent result = new MCRStreamContent(solrURL.openStream(), solrURL.getUrl().toString());
             return result.getSource();
         } catch (IOException e) {
-            throw new TransformerException(e);
+            throw new TransformerException("Unable to get input stream from solr", e);
         }
     }
-
 }
