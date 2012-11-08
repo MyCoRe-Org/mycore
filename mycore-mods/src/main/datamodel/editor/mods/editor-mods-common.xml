@@ -340,7 +340,7 @@
         <panel>
           <hidden var="@type" default="code" />
           <cell col="1" var="@mcr:categId">
-            <list type="dropdown" default="ger">
+            <list type="dropdown" default="de">
               <include ref="pleaseSelect" />
               <include uri="classification:editorComplete:-1:children:rfc4646" cacheable="false" />
             </list>
@@ -632,7 +632,12 @@
     <cell anchor="NORTHWEST" var="mods:dateIssued">
       <panel>
         <cell anchor="NORTHWEST">
-          <textfield width="20" maxlength="20" />
+          <textfield d="mods.dateIssued.text2" width="20" maxlength="20" >
+            <condition id="mods.dateIssued.cond2" type="datetime" format="yyyy-MM-dd;yyyy-MM;yyyy">
+              <label xml:lang="de">Tragen Sie hier das Datum der Veröffentlichung im ISO Format mit Bindestrich (YYYY-MM-DD) ein.</label>
+              <label xml:lang="en">Enter the date of publication here in the ISO Format (YYYY-MM-DD).</label>
+            </condition>
+          </textfield>
         </cell>
       </panel>
     </cell>
@@ -1582,7 +1587,7 @@
   <helpPopup id="mods.rights.help" width="400px" height="250px">
     <label xml:lang="de">
       Unter welchen Rechten stellen Sie Ihr Dokument hier ein? Weitere Informationen finden Sie unter
-      http://de.wikipedia.org/wiki/Alle_Rechte_vorbehalten
+      <a href="http://de.wikipedia.org/wiki/Alle_Rechte_vorbehalten"> http://de.wikipedia.org/wiki/Alle_Rechte_vorbehalten </a>
       bzw. http://creativecommons.org/licenses/
     </label>
     <label xml:lang="en">
