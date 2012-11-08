@@ -9,9 +9,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
-import org.jdom.transform.JDOMSource;
+import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.solr.SolrServerFactory;
 import org.mycore.solr.search.SolrURL;
@@ -43,19 +41,17 @@ public class MCRSolrQueryResolver implements URIResolver {
 
         SolrURL solrURL = new SolrURL(SolrServerFactory.getSolrServer());
         solrURL.setQueryParamter(query);
-        if(start != null) {
+        if (start != null) {
             solrURL.setStart(Integer.valueOf(start));
         }
-        if(rows != null) {
+        if (rows != null) {
             solrURL.setRows(Integer.valueOf(rows));
         }
         solrURL.addSortOption(sort);
-        SAXBuilder builder = new SAXBuilder();
         try {
-            Document doc = builder.build(solrURL.openStream());
-            doc.getRootElement().setName("solr-results");
-            return new JDOMSource(doc);
-        } catch(Exception exc) {
+            MCRStreamContent result = new MCRStreamContent(solrURL.openStream(), solrURL.getUrl().toString());
+            return result.getSource();
+        } catch (Exception exc) {
             LOGGER.error("Unable to build solr document", exc);
         }
         return null;
