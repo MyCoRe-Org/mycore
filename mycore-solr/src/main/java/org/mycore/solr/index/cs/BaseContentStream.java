@@ -41,7 +41,12 @@ public class BaseContentStream extends AbstractSolrContentStream<MCRContent> {
     protected void setup() throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream(64 * 1024);
         transformer.transform(source, out);
-        source.getInputStream().close();
+        try {
+            source.getInputStream().close();
+        } catch (IOException ex) {
+            LOGGER.warn("Could not close input stream for id " + source.getSystemId());
+        }
+
         byte[] byteArray = out.toByteArray();
         this.size = (long) byteArray.length;
         inputStream = new ByteArrayInputStream(byteArray);
