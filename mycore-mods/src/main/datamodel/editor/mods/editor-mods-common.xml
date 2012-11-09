@@ -1588,10 +1588,10 @@
     <label xml:lang="de">
       Unter welchen Rechten stellen Sie Ihr Dokument hier ein? Weitere Informationen finden Sie unter
       <a href="http://de.wikipedia.org/wiki/Alle_Rechte_vorbehalten"> http://de.wikipedia.org/wiki/Alle_Rechte_vorbehalten </a>
-      bzw. http://creativecommons.org/licenses/
+      bzw. <a href="http://creativecommons.org/licenses/"> http://creativecommons.org/licenses/ </a>
     </label>
     <label xml:lang="en">
-      Rights/Licenses, e.g. CC. For more information see http://creativecommons.org/licenses/
+      Rights/Licenses, e.g. CC. For more information see <a href="http://creativecommons.org/licenses/"> http://creativecommons.org/licenses/ </a>
     </label>
   </helpPopup>
   <!-- Rights END -->
