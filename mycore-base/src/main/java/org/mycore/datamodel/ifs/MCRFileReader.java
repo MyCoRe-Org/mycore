@@ -83,4 +83,9 @@ public interface MCRFileReader {
      * Returns the content type of this file
      */
     public MCRFileContentType getContentType();
+    
+    /**
+     * Returns the ID of the owner of this file
+     */
+    public String getOwnerID();
 }
