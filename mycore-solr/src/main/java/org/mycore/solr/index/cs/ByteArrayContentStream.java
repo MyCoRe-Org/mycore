@@ -1,6 +1,5 @@
 package org.mycore.solr.index.cs;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
