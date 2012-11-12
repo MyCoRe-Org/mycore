@@ -3,6 +3,7 @@ package org.mycore.solr.index.cs;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.text.MessageFormat;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
@@ -12,8 +13,6 @@ import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.SolrServerFactory;
-
-import com.ibm.icu.text.MessageFormat;
 
 import experimental.solr.payloadsupport.analyzers.XML2StringWithPayloadProvider;
 
