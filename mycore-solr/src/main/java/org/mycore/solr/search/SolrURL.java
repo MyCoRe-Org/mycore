@@ -25,7 +25,7 @@ public class SolrURL {
 
     private HttpSolrServer solrServer;
 
-    private String q, fixedURLPart, sortOptions, wt;
+    private String urlQuery, q, fixedURLPart, sortOptions, wt;
 
     private int start, rows;
 
@@ -46,6 +46,20 @@ public class SolrURL {
     }
 
     /**
+     * Creates a new solr url using your own url query. Be aware that you cannot
+     * use the SolrURL setter methods to edit your request. Only the urlQuery is
+     * used.
+     * 
+     * @param solrServer the solr server to use
+     * @param urlQuery e.g. q=allMeta:Hello&rows=20&defType=edismax
+     */
+    public SolrURL(HttpSolrServer solrServer, String urlQuery) {
+        this.solrServer = solrServer;
+        this.fixedURLPart = "/select/?version=2.2";
+        this.urlQuery = urlQuery;
+    }
+
+    /**
      * @param solrServer
      * @param returnScore specify whether to return the score with results;
      */
@@ -59,8 +73,12 @@ public class SolrURL {
      */
     public URL getUrl() {
         try {
-            return new URL(solrServer.getBaseURL() + fixedURLPart + "&q=" + URLEncoder.encode(q, "UTF-8") + "&start=" + start + "&rows="
-                    + rows + "&sort=" + URLEncoder.encode(sortOptions, "UTF-8") + (returnScore ? "&fl=*,score" : "") + (wt != null ? "&wt=" + wt : ""));
+            if(this.urlQuery == null) {
+                return new URL(solrServer.getBaseURL() + fixedURLPart + "&q=" + URLEncoder.encode(q, "UTF-8") + "&start=" + start + "&rows="
+                        + rows + "&sort=" + URLEncoder.encode(sortOptions, "UTF-8") + (returnScore ? "&fl=*,score" : "") + (wt != null ? "&wt=" + wt : ""));
+            } else {
+                return new URL(solrServer.getBaseURL() + fixedURLPart + "&" + urlQuery);
+            }
         } catch (Exception urlException) {
             LOGGER.error("Error building solr url", urlException);
         }
