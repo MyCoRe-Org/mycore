@@ -39,7 +39,7 @@ public class BaseContentStream extends AbstractSolrContentStream<MCRContent> {
 
     @Override
     protected void setup() throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream(64*1024);
+        ByteArrayOutputStream out = new ByteArrayOutputStream(64 * 1024);
         transformer.transform(source, out);
         byte[] byteArray = out.toByteArray();
         this.size = (long) byteArray.length;

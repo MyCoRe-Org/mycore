@@ -28,8 +28,14 @@ abstract public class AbstractSolrContentStream<T> extends ContentStreamBase imp
     final static Logger LOGGER = Logger.getLogger(AbstractSolrContentStream.class);
 
     static String TRANSFORM = null;
-    
+
+    static {
+        TRANSFORM = MCRConfiguration.instance().getString("MCR.Module-solr.transform", "object2fields.xsl");
+    }
+
     protected InputStream inputStream;
+
+    protected InputStreamReader streamReader;
 
     protected boolean setup;
 
@@ -38,11 +44,8 @@ abstract public class AbstractSolrContentStream<T> extends ContentStreamBase imp
     protected AbstractSolrContentStream() {
         super();
         inputStream = null;
+        streamReader = null;
         setup = false;
-    }
-
-    static {
-        TRANSFORM = MCRConfiguration.instance().getString("MCR.Module-solr.transform" , "object2fields.xsl");
     }
 
     /**
@@ -73,12 +76,12 @@ abstract public class AbstractSolrContentStream<T> extends ContentStreamBase imp
     @Override
     public Reader getReader() throws IOException {
         doSetup();
-        return new InputStreamReader(getStream());
+        if (streamReader == null) {
+            streamReader = new InputStreamReader(getStream());
+        }
+        return streamReader;
     }
 
-    /* (non-Javadoc)
-     * @see org.apache.solr.common.util.ContentStreamBase#getSize()
-     */
     @Override
     public Long getSize() {
         try {
@@ -104,6 +107,23 @@ abstract public class AbstractSolrContentStream<T> extends ContentStreamBase imp
     }
 
     /**
+     * Invokes an index request for the current content stream.
+     */
+    protected void index() {
+        try {
+            LOGGER.trace("Solr: indexing data of\"" + getName() + "\"");
+            long tStart = System.currentTimeMillis();
+            ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest("/update/xslt");
+            updateRequest.addContentStream(this);
+            updateRequest.setParam("tr", TRANSFORM);
+            SolrServerFactory.getSolrServer().request(updateRequest);
+            LOGGER.trace("Solr: indexing data of\"" + getName() + "\" (" + (System.currentTimeMillis() - tStart) + "ms)");
+        } catch (Exception ex) {
+            LOGGER.error("Error sending content to solr through content stream " + this, ex);
+        }
+    }
+
+    /**
      * Invoke this method if you want to index the object asynchronous.
      * */
     @Override
@@ -122,25 +142,6 @@ abstract public class AbstractSolrContentStream<T> extends ContentStreamBase imp
                 LOGGER.error("Error closing underlying streams in " + getClass(), e);
             }
             session.close();
-        }
-    }
-
-    /**
-     * Invokes an index request for the current content stream.
-     */
-
-    protected void index() {
-        try {
-            LOGGER.trace("Solr: indexing data of\"" + getName() + "\"");
-            long tStart = System.currentTimeMillis();
-            ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest("/update/xslt");
-            updateRequest.addContentStream(this);
-            updateRequest.setParam("tr", TRANSFORM);
-
-            SolrServerFactory.getSolrServer().request(updateRequest);
-            LOGGER.trace("Solr: indexing data of\"" + getName() + "\" (" + (System.currentTimeMillis() - tStart) + "ms)");
-        } catch (Exception ex) {
-            LOGGER.error("Error sending content to solr through content stream " + this, ex);
         }
     }
 }
