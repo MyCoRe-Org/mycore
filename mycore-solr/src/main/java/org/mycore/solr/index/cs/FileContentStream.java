@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -12,8 +13,9 @@ import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.SolrServerFactory;
 
-import experimental.solr.payloadsupport.analyzers.XML2StringWithPayloadProvider;
+import com.ibm.icu.text.MessageFormat;
 
+import experimental.solr.payloadsupport.analyzers.XML2StringWithPayloadProvider;
 
 /**
  * Content stream suitable for wrapping {@link MCRFile}.
@@ -28,6 +30,7 @@ public class FileContentStream extends AbstractSolrContentStream<MCRFile> {
      * @param file
      * @throws IOException
      */
+
     public FileContentStream(MCRFile file) throws IOException {
         super();
         name = file.getAbsolutePath();
@@ -63,16 +66,19 @@ public class FileContentStream extends AbstractSolrContentStream<MCRFile> {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.mycore.solr.index.cs.AbstractSolrContentStream#index()
+     */
     protected void index() {
         try {
-            MCRFile file = (MCRFile) getSource();
-            if ("alto.xml".equals(file.getName())) {
-                indexFileWithPayload(file);
-            } else {
-                indexRawFile(file);
+            if (!(source instanceof MCRFile)) {
+                return;
             }
-        } catch (Exception ex) {
-            LOGGER.error("Error sending content to solr", ex);
+            indexRawFile((MCRFile) source);
+        } catch (SolrServerException solrEx) {
+            LOGGER.error(MessageFormat.format("Error sending file content to solr: \n{0}", (MCRFile) source), solrEx);
+        } catch (IOException ioEx) {
+            LOGGER.error(MessageFormat.format("Error sending file content to solr: \n{0}", (MCRFile) source), ioEx);
         }
     }
 
@@ -80,7 +86,7 @@ public class FileContentStream extends AbstractSolrContentStream<MCRFile> {
      * @param file
      * @throws Exception
      */
-    private void indexRawFile(MCRFile file) throws Exception {
+    private void indexRawFile(MCRFile file) throws SolrServerException, IOException {
         String solrID = file.getID();
         LOGGER.trace("Solr: indexing file \"" + file.getAbsolutePath() + " (" + solrID + ")\"");
         /* create the update request object */
