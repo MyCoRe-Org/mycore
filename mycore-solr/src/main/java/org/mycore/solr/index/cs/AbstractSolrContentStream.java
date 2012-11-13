@@ -27,11 +27,7 @@ abstract public class AbstractSolrContentStream<T> extends ContentStreamBase imp
 
     final static Logger LOGGER = Logger.getLogger(AbstractSolrContentStream.class);
 
-    static String TRANSFORM = null;
-
-    static {
-        TRANSFORM = MCRConfiguration.instance().getString("MCR.Module-solr.transform", "object2fields.xsl");
-    }
+    static String STYLESHEET = MCRConfiguration.instance().getString("MCR.Module-solr.transform", "object2fields.xsl");
 
     protected InputStream inputStream;
 
@@ -105,7 +101,7 @@ abstract public class AbstractSolrContentStream<T> extends ContentStreamBase imp
             long tStart = System.currentTimeMillis();
             ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest("/update/xslt");
             updateRequest.addContentStream(this);
-            updateRequest.setParam("tr", TRANSFORM);
+            updateRequest.setParam("tr", STYLESHEET);
             SolrServerFactory.getSolrServer().request(updateRequest);
             LOGGER.trace("Solr: indexing data of\"" + getName() + "\" (" + (System.currentTimeMillis() - tStart) + "ms)");
         } catch (Exception ex) {
