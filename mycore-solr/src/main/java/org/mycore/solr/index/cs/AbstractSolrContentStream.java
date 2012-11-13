@@ -92,20 +92,6 @@ abstract public class AbstractSolrContentStream<T> extends ContentStreamBase imp
         return super.getSize();
     }
 
-    /**
-     * Closes the underlying reader and input streams.
-     * 
-     * @throws IOException
-     */
-    public void close() throws IOException {
-        if (inputStream != null) {
-            inputStream.close();
-        }
-        if (streamReader != null) {
-            streamReader.close();
-        }
-    }
-
     public String toString() {
         return this.name + " (" + sourceInfo + ")";
     }
@@ -140,11 +126,6 @@ abstract public class AbstractSolrContentStream<T> extends ContentStreamBase imp
         } catch (Exception ex) {
             LOGGER.error("Error executing index task for object " + getSourceInfo(), ex);
         } finally {
-            try {
-                close();
-            } catch (IOException e) {
-                LOGGER.error("Error closing underlying streams in " + getClass(), e);
-            }
             session.close();
         }
     }
