@@ -56,6 +56,17 @@ public class MCRStreamContent extends MCRContent {
         return in;
     }
 
+    /**
+     * Closes the encapsulated {@link InputStream}.
+     * 
+     * @throws IOException
+     */
+    public void close() throws IOException {
+        if (in != null) {
+            in.close();
+        }
+    }
+
     @Override
     public MCRContentInputStream getContentInputStream() throws IOException {
         if (!(in instanceof MCRContentInputStream))
