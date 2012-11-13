@@ -98,8 +98,12 @@ abstract public class AbstractSolrContentStream<T> extends ContentStreamBase imp
      * @throws IOException
      */
     public void close() throws IOException {
-        getReader().close();
-        getStream().close();
+        if (inputStream != null) {
+            inputStream.close();
+        }
+        if (streamReader != null) {
+            streamReader.close();
+        }
     }
 
     public String toString() {
