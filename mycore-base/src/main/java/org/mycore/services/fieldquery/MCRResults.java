@@ -330,6 +330,14 @@ public class MCRResults implements Iterable<MCRHit> {
                 return new MCRResults();
             }
         }
+        //result with less hits first to speed up intersect
+        Arrays.sort(others, new Comparator<MCRResults>() {
+
+            @Override
+            public int compare(MCRResults o1, MCRResults o2) {
+                return o1.getNumHits() - o2.getNumHits();
+            }
+        });
         final MCRResults firstResult = others[0];
         MCRResults totalResult = new MCRResults();
         final List<MCRResults> subResultList = Arrays.asList(others).subList(1, others.length);
