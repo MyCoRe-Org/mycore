@@ -149,9 +149,9 @@ final public class MCRObject extends MCRBase {
         // get object ID from DOM
         org.jdom.Element jdom_element_root = jdom_document.getRootElement();
         mcr_id = MCRObjectID.getInstance(jdom_element_root.getAttributeValue("ID"));
-        mcr_label = jdom_element_root.getAttributeValue("label").trim();
+        mcr_label = jdom_element_root.getAttributeValue("label");
 
-        if (mcr_label.length() > MAX_LABEL_LENGTH) {
+        if (mcr_label != null && (mcr_label = mcr_label.trim()).length() > MAX_LABEL_LENGTH) {
             mcr_label = mcr_label.substring(0, MAX_LABEL_LENGTH);
         }
 
