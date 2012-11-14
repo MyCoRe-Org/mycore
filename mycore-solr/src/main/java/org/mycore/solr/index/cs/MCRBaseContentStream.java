@@ -15,12 +15,12 @@ import org.mycore.datamodel.metadata.MCRBase;
  * @author shermann
  *
  */
-public class BaseContentStream extends AbstractSolrContentStream<MCRContent> {
+public class MCRBaseContentStream extends MCRAbstractSolrContentStream<MCRContent> {
 
     private MCRContentTransformer transformer;
 
     /***/
-    protected BaseContentStream() {
+    protected MCRBaseContentStream() {
         super();
     }
 
@@ -28,11 +28,11 @@ public class BaseContentStream extends AbstractSolrContentStream<MCRContent> {
      * @param objectOrDerivate
      * @param content
      */
-    public BaseContentStream(String id, MCRContent content) {
+    public MCRBaseContentStream(String id, MCRContent content) {
         this();
         this.name = id;
         this.sourceInfo = content.getSystemId();
-        transformer = SolrAppender.getTransformer();
+        transformer = MCRSolrAppender.getTransformer();
         this.contentType = transformer.getMimeType();
         this.source = content;
     }

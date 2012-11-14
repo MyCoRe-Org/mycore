@@ -24,22 +24,22 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRSortBy;
-import org.mycore.solr.SolrServerFactory;
-import org.mycore.solr.legacy.LuceneSolrAdapter;
+import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.legacy.MCRLuceneSolrAdapter;
 
 /**
  * @author shermann
  *
  */
-public class SolrIndexer extends MCRSearcher {
-    private static final Logger LOGGER = Logger.getLogger(SolrIndexer.class);
+public class MCRSolrIndexer extends MCRSearcher {
+    private static final Logger LOGGER = Logger.getLogger(MCRSolrIndexer.class);
 
     static HttpSolrServer solrServer = null;
 
     static ExecutorService executorService = null;
 
     static {
-        solrServer = SolrServerFactory.getSolrServer();
+        solrServer = MCRSolrServerFactory.getSolrServer();
         executorService = Executors.newFixedThreadPool(10);
     }
 
@@ -97,7 +97,7 @@ public class SolrIndexer extends MCRSearcher {
             if (content == null) {
                 content = new MCRBaseContent(objectOrDerivate);
             }
-            BaseContentStream contentStream = new BaseContentStream(objectOrDerivate.getId().toString(), content);
+            MCRBaseContentStream contentStream = new MCRBaseContentStream(objectOrDerivate.getId().toString(), content);
             executorService.submit(contentStream);
             LOGGER.trace("Solr: submitting data of\"" + objectOrDerivate.getId().toString() + "\" for indexing done in "
                 + (System.currentTimeMillis() - tStart) + "ms ");
@@ -108,11 +108,11 @@ public class SolrIndexer extends MCRSearcher {
 
     @Override
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
-        FileContentStream contentStream = null;
+        MCRFileContentStream contentStream = null;
         try {
             LOGGER.trace("Solr: submitting file \"" + file.getAbsolutePath() + " (" + file.getID() + ")\" for indexing");
             /* extract metadata with tika */
-            contentStream = new FileContentStream(file);
+            contentStream = new MCRFileContentStream(file);
             executorService.submit(contentStream);
         } catch (Exception ex) {
             LOGGER.error("Error creating transfer thread", ex);
@@ -166,7 +166,7 @@ public class SolrIndexer extends MCRSearcher {
         for (String id : list) {
             try {
                 LOGGER.info("Solr: submitting data of\"" + id + "\" for indexing");
-                BaseContentStream contentStream = new BaseContentStream(id, metadataMgr.retrieveContent(MCRObjectID.getInstance(id)));
+                MCRBaseContentStream contentStream = new MCRBaseContentStream(id, metadataMgr.retrieveContent(MCRObjectID.getInstance(id)));
                 executorService.submit(contentStream);
             } catch (Exception ex) {
                 LOGGER.error("Error creating transfer thread", ex);
@@ -198,11 +198,11 @@ public class SolrIndexer extends MCRSearcher {
 
             List<MCRFile> files = MCRUtils.getFiles(derivate);
             LOGGER.info("Sending files (" + files.size() + ") for derivate \"" + derivate + "\"");
-            FileContentStream contentStream = null;
+            MCRFileContentStream contentStream = null;
             for (MCRFile file : files) {
                 try {
                     LOGGER.trace("Solr: submitting file \"" + file.getAbsolutePath() + " (" + file.getID() + ")\" for indexing");
-                    contentStream = new FileContentStream(file);
+                    contentStream = new MCRFileContentStream(file);
                     executorService.submit(contentStream);
                 } catch (Exception ex) {
                     LOGGER.error("Error creating transfer thread", ex);
@@ -219,9 +219,9 @@ public class SolrIndexer extends MCRSearcher {
      * Rebuilds and optimizes solr's metadata and content index. 
      */
     public static void rebuildMetadataAndContentIndex() throws Exception {
-        SolrIndexer.rebuildMetadataIndex();
-        SolrIndexer.rebuildContentIndex();
-        SolrIndexer.optimize();
+        MCRSolrIndexer.rebuildMetadataIndex();
+        MCRSolrIndexer.rebuildContentIndex();
+        MCRSolrIndexer.optimize();
     }
 
     /**
@@ -229,7 +229,7 @@ public class SolrIndexer extends MCRSearcher {
      */
     public static void dropIndex() throws Exception {
         LOGGER.info("Dropping solr index...");
-        SolrServerFactory.getSolrServer().deleteByQuery("*:*");
+        MCRSolrServerFactory.getSolrServer().deleteByQuery("*:*");
         LOGGER.info("Dropping solr index...done");
     }
 
@@ -239,7 +239,7 @@ public class SolrIndexer extends MCRSearcher {
     public static void optimize() {
         try {
             LOGGER.info("Sending optimize request to solr");
-            SolrServerFactory.getSolrServer().optimize();
+            MCRSolrServerFactory.getSolrServer().optimize();
         } catch (Exception ex) {
             LOGGER.error("Could not optimize solr index", ex);
         }
@@ -251,7 +251,7 @@ public class SolrIndexer extends MCRSearcher {
     @SuppressWarnings("rawtypes")
     public MCRResults search(MCRCondition condition, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) {
         LOGGER.warn("Processing legacy query \"" + condition.toString() + "\"");
-        MCRResults result = LuceneSolrAdapter.search(condition, maxResults, sortBy, addSortData);
+        MCRResults result = MCRLuceneSolrAdapter.search(condition, maxResults, sortBy, addSortData);
         return result;
     }
 }

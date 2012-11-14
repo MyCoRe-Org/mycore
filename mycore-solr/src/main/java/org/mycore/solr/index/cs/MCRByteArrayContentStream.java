@@ -3,7 +3,7 @@ package org.mycore.solr.index.cs;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-public class ByteArrayContentStream extends AbstractSolrContentStream<byte[]> {
+public class MCRByteArrayContentStream extends MCRAbstractSolrContentStream<byte[]> {
 
     /**
      * @param xmlAsByteArr
@@ -11,7 +11,7 @@ public class ByteArrayContentStream extends AbstractSolrContentStream<byte[]> {
      * @param sourceInfo
      * @throws IOException
      */
-    public ByteArrayContentStream(byte[] xmlAsByteArr, String name) throws IOException {
+    public MCRByteArrayContentStream(byte[] xmlAsByteArr, String name) throws IOException {
         super();
         this.name = name;
         this.sourceInfo = xmlAsByteArr.getClass().getName();

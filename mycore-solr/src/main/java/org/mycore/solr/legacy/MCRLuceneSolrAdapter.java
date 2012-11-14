@@ -45,7 +45,7 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSortBy;
-import org.mycore.solr.SolrServerFactory;
+import org.mycore.solr.MCRSolrServerFactory;
 
 
 /**
@@ -53,7 +53,7 @@ import org.mycore.solr.SolrServerFactory;
  *
  */
 @SuppressWarnings("deprecation")
-public class LuceneSolrAdapter {
+public class MCRLuceneSolrAdapter {
     /**/
     private static final Logger LOGGER = Logger.getLogger(MCRBuildLuceneQuery.class);
 
@@ -75,12 +75,12 @@ public class LuceneSolrAdapter {
             List<Element> f = new ArrayList<Element>();
             f.add(condition.toXML());
 
-            Query luceneQuery = LuceneSolrAdapter.buildLuceneQuery(null, true, f, new HashSet<String>());
+            Query luceneQuery = MCRLuceneSolrAdapter.buildLuceneQuery(null, true, f, new HashSet<String>());
 
-            LOGGER.info("Legacy Query transformed by \"" + LuceneSolrAdapter.class.getCanonicalName() + "\" to \"" + luceneQuery.toString()
+            LOGGER.info("Legacy Query transformed by \"" + MCRLuceneSolrAdapter.class.getCanonicalName() + "\" to \"" + luceneQuery.toString()
                     + "\"");
-            HttpSolrServer solrServer = SolrServerFactory.getSolrServer();
-            SolrQuery q = LuceneSolrAdapter.applySortOptions(new SolrQuery(luceneQuery.toString()), sortBy);
+            HttpSolrServer solrServer = MCRSolrServerFactory.getSolrServer();
+            SolrQuery q = MCRLuceneSolrAdapter.applySortOptions(new SolrQuery(luceneQuery.toString()), sortBy);
             q.setIncludeScore(true);
             q.setRows(maxResults == 0 ? Integer.MAX_VALUE : maxResults);
 

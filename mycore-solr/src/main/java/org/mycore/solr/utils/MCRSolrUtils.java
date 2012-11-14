@@ -9,15 +9,15 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
-import org.mycore.solr.SolrServerFactory;
+import org.mycore.solr.MCRSolrServerFactory;
 
 /**
  * @author shermann
  *
  */
-public class SolrUtils {
+public class MCRSolrUtils {
 
-    private static Logger LOGGER = Logger.getLogger(SolrUtils.class);
+    private static Logger LOGGER = Logger.getLogger(MCRSolrUtils.class);
 
     /**
      * Get the number of hits for a given solr query.
@@ -29,7 +29,7 @@ public class SolrUtils {
     public static long getNumHits(String solrQuery) {
         SolrQuery q = new SolrQuery(solrQuery);
         q.setRows(0);
-        HttpSolrServer solrServer = SolrServerFactory.getSolrServer();
+        HttpSolrServer solrServer = MCRSolrServerFactory.getSolrServer();
         long numFound = 0;
         try {
             QueryResponse queryResponse = solrServer.query(q);
@@ -49,6 +49,6 @@ public class SolrUtils {
     public static SolrDocumentList getQueryResults(String query, int rows) throws SolrServerException {
         SolrQuery q = new SolrQuery(query);
         q.setRows(rows);
-        return SolrServerFactory.getSolrServer().query(q).getResults();
+        return MCRSolrServerFactory.getSolrServer().query(q).getResults();
     }
 }

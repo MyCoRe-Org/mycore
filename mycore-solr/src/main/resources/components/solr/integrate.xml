@@ -7,6 +7,6 @@
     <mcr:config action="addInclude"
                 propertyfile="${build.config}/mycore.properties"
                 key="MCR.CLI.Classes.Internal"
-                value="org.mycore.solr.commands.SolrCommands" />
+                value="org.mycore.solr.commands.MCRSolrCommands" />
   </target>
 </project>

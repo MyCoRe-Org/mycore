@@ -1,7 +1,7 @@
 /**
  * 
  */
-package experimental.solr.payloadsupport.encoder;
+package org.mycore.solr.experimental.payload.encoder;
 
 import org.apache.lucene.analysis.payloads.PayloadEncoder;
 import org.apache.lucene.index.Payload;
@@ -10,7 +10,7 @@ import org.apache.lucene.index.Payload;
  * @author shermann
  *
  */
-public class CoordinatePayloadEncoder implements PayloadEncoder {
+public class MCRCoordinatePayloadEncoder implements PayloadEncoder {
 
     @Override
     public Payload encode(char[] buffer) {

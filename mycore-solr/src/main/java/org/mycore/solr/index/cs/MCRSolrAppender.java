@@ -10,7 +10,7 @@ import org.mycore.common.content.transformer.MCRXSLTransformer;
  * @author shermann
  *
  */
-public class SolrAppender {
+public class MCRSolrAppender {
 
     private static MCRXSLTransformer transformer = new MCRXSLTransformer("xsl/mycoreobject-solr.xsl");
 

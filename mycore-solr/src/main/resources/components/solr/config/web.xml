@@ -1,6 +1,6 @@
 <servlet>
   <servlet-name>SolrSearchServlet</servlet-name>
-  <servlet-class>org.mycore.solr.search.SolrSearchServlet</servlet-class>
+  <servlet-class>org.mycore.solr.search.MCRSolrSearchServlet</servlet-class>
 </servlet>
 
 <servlet-mapping>

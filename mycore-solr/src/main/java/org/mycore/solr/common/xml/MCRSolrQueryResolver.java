@@ -8,8 +8,8 @@ import javax.xml.transform.URIResolver;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.content.MCRStreamContent;
-import org.mycore.solr.SolrServerFactory;
-import org.mycore.solr.search.SolrURL;
+import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.search.MCRSolrURL;
 
 /**
  * 
@@ -22,7 +22,7 @@ public class MCRSolrQueryResolver implements URIResolver {
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         String urlQuery = href.substring(href.indexOf(":") + 1);
-        SolrURL solrURL = new SolrURL(SolrServerFactory.getSolrServer(), urlQuery);
+        MCRSolrURL solrURL = new MCRSolrURL(MCRSolrServerFactory.getSolrServer(), urlQuery);
         try {
             MCRStreamContent result = new MCRStreamContent(solrURL.openStream(), solrURL.getUrl().toString());
             return result.getSource();

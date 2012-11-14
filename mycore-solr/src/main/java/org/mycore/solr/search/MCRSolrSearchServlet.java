@@ -15,17 +15,17 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.solr.SolrServerFactory;
+import org.mycore.solr.MCRSolrServerFactory;
 
 /**
  * @author shermann
  *
  */
-public class SolrSearchServlet extends MCRServlet {
+public class MCRSolrSearchServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = Logger.getLogger(SolrSearchServlet.class);
+    private static final Logger LOGGER = Logger.getLogger(MCRSolrSearchServlet.class);
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
@@ -44,7 +44,7 @@ public class SolrSearchServlet extends MCRServlet {
 
         long tStart = System.currentTimeMillis();
 
-        SolrURL solrURL = new SolrURL(SolrServerFactory.getSolrServer(), true);
+        MCRSolrURL solrURL = new MCRSolrURL(MCRSolrServerFactory.getSolrServer(), true);
         solrURL.setQueryParamter(query.getQuery());
         solrURL.setStart(start);
         solrURL.setRows(rows);
@@ -72,7 +72,7 @@ public class SolrSearchServlet extends MCRServlet {
      * @param job
      */
     @SuppressWarnings("unchecked")
-    private void addSortOptions(SolrURL solrURL, MCRServletJob job) {
+    private void addSortOptions(MCRSolrURL solrURL, MCRServletJob job) {
         // set sort field and sort order
         Enumeration<String> parameterNames = job.getRequest().getParameterNames();
 

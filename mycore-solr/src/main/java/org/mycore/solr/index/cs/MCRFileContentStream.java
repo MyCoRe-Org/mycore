@@ -10,7 +10,7 @@ import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.solr.SolrServerFactory;
+import org.mycore.solr.MCRSolrServerFactory;
 
 /**
  * Content stream suitable for wrapping {@link MCRFile}.
@@ -19,14 +19,14 @@ import org.mycore.solr.SolrServerFactory;
  * @author shermann
  *
  */
-public class FileContentStream extends AbstractSolrContentStream<MCRFile> {
+public class MCRFileContentStream extends MCRAbstractSolrContentStream<MCRFile> {
 
     /**
      * @param file
      * @throws IOException
      */
 
-    public FileContentStream(MCRFile file) throws IOException {
+    public MCRFileContentStream(MCRFile file) throws IOException {
         super();
         name = file.getAbsolutePath();
         sourceInfo = file.getClass().getSimpleName();
@@ -46,7 +46,7 @@ public class FileContentStream extends AbstractSolrContentStream<MCRFile> {
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.solr.index.cs.AbstractSolrContentStream#index()
+     * @see org.mycore.solr.index.cs.MCRAbstractSolrContentStream#index()
      */
     protected void index() {
         try {
@@ -87,14 +87,14 @@ public class FileContentStream extends AbstractSolrContentStream<MCRFile> {
         updateRequest.setParam("literal.object_type", "data_file");
         updateRequest.setParam("literal.file_name", file.getName());
         updateRequest.setParam("literal.object_project", MCRObjectID.getInstance(file.getOwnerID()).getProjectId());
-        updateRequest.setParam("literal.modifydate", AbstractSolrContentStream.DATE_FORMATTER.format(file.getLastModified().getTime()));
+        updateRequest.setParam("literal.modifydate", MCRAbstractSolrContentStream.DATE_FORMATTER.format(file.getLastModified().getTime()));
 
         LOGGER.trace("Solr: sending binary data (" + file.getAbsolutePath() + " (" + solrID + "), size is " + file.getSizeFormatted()
                 + ") to solr server.");
         long t = System.currentTimeMillis();
 
         /* actually send the request */
-        SolrServerFactory.getSolrServer().request(updateRequest);
+        MCRSolrServerFactory.getSolrServer().request(updateRequest);
         LOGGER.trace("Solr: sending binary data \"" + file.getAbsolutePath() + " (" + solrID + ")\"" + " done in "
                 + (System.currentTimeMillis() - t) + "ms");
     }

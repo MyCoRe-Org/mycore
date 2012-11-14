@@ -18,8 +18,8 @@ import org.apache.solr.client.solrj.impl.HttpSolrServer;
  * 
  * @author shermann
  */
-public class SolrURL {
-    private static final Logger LOGGER = Logger.getLogger(SolrURL.class);
+public class MCRSolrURL {
+    private static final Logger LOGGER = Logger.getLogger(MCRSolrURL.class);
 
     public static final String VERSION_2_2 = "2.2";
 
@@ -34,7 +34,7 @@ public class SolrURL {
     /**
      * @param solrServer the solr server to use
      */
-    public SolrURL(HttpSolrServer solrServer) {
+    public MCRSolrURL(HttpSolrServer solrServer) {
         this.solrServer = solrServer;
         start = 0;
         rows = 10;
@@ -47,13 +47,13 @@ public class SolrURL {
 
     /**
      * Creates a new solr url using your own url query. Be aware that you cannot
-     * use the SolrURL setter methods to edit your request. Only the urlQuery is
+     * use the MCRSolrURL setter methods to edit your request. Only the urlQuery is
      * used.
      * 
      * @param solrServer the solr server to use
      * @param urlQuery e.g. q=allMeta:Hello&rows=20&defType=edismax
      */
-    public SolrURL(HttpSolrServer solrServer, String urlQuery) {
+    public MCRSolrURL(HttpSolrServer solrServer, String urlQuery) {
         this.solrServer = solrServer;
         this.fixedURLPart = "/select/?version=2.2";
         this.urlQuery = urlQuery;
@@ -63,7 +63,7 @@ public class SolrURL {
      * @param solrServer
      * @param returnScore specify whether to return the score with results;
      */
-    public SolrURL(HttpSolrServer solrServer, boolean returnScore) {
+    public MCRSolrURL(HttpSolrServer solrServer, boolean returnScore) {
         this(solrServer);
         this.returnScore = returnScore;
     }

@@ -1,4 +1,4 @@
-package experimental.solr.payloadsupport.indexer;
+package org.mycore.solr.experimental.payload.indexer;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,12 +12,12 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
+import org.mycore.solr.experimental.payload.analyzers.MCRPayloadAnalyzer;
+import org.mycore.solr.experimental.payload.analyzers.MCRXML2StringWithPayloadProvider;
 
-import experimental.solr.payloadsupport.analyzers.PayloadAnalyzer;
-import experimental.solr.payloadsupport.analyzers.XML2StringWithPayloadProvider;
 
 
-public class TestIndexer {
+public class MCRTestIndexer {
     private IndexWriter writer;
 
     /**
@@ -30,16 +30,16 @@ public class TestIndexer {
         /* where the data resides*/
         String DATA_DIR = "/home/shermann/lucene-test/";
 
-        TestIndexer indexer = new TestIndexer(INDEX_DIR);
+        MCRTestIndexer indexer = new MCRTestIndexer(INDEX_DIR);
 
         int numIndexed = indexer.index(DATA_DIR);
         System.out.println("Indexed " + numIndexed + " documents");
         indexer.close();
     }
 
-    public TestIndexer(String indexDir) throws Exception {
+    public MCRTestIndexer(String indexDir) throws Exception {
         Directory dir = FSDirectory.open(new File(indexDir));
-        PayloadAnalyzer payloadAnalyzer = new PayloadAnalyzer(Version.LUCENE_CURRENT);
+        MCRPayloadAnalyzer payloadAnalyzer = new MCRPayloadAnalyzer(Version.LUCENE_CURRENT);
         IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_CURRENT, payloadAnalyzer);
         writer = new IndexWriter(dir, config);
     }
@@ -79,7 +79,7 @@ public class TestIndexer {
      */
     private Document getDocument(File f) throws Exception {
         Document doc = new Document();
-        XML2StringWithPayloadProvider keywordsWithPayloadProvider = new XML2StringWithPayloadProvider(f);
+        MCRXML2StringWithPayloadProvider keywordsWithPayloadProvider = new MCRXML2StringWithPayloadProvider(f);
         doc.add(new Field("alto", new StringReader(keywordsWithPayloadProvider.getFlatDocument()), TermVector.WITH_POSITIONS_OFFSETS));
         doc.add(new Field("x", f.getCanonicalPath(), Field.Store.YES, Field.Index.NOT_ANALYZED));
         return doc;

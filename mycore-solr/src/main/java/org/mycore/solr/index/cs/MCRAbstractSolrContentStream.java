@@ -13,7 +13,7 @@ import org.apache.solr.common.util.ContentStreamBase;
 import org.hibernate.Session;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.solr.SolrServerFactory;
+import org.mycore.solr.MCRSolrServerFactory;
 
 /**
  * Wraps objects to be sent to solr in a content stream.
@@ -22,10 +22,10 @@ import org.mycore.solr.SolrServerFactory;
  * 
  * @author shermann
  * */
-abstract public class AbstractSolrContentStream<T> extends ContentStreamBase implements Runnable {
+abstract public class MCRAbstractSolrContentStream<T> extends ContentStreamBase implements Runnable {
     public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
 
-    final static Logger LOGGER = Logger.getLogger(AbstractSolrContentStream.class);
+    final static Logger LOGGER = Logger.getLogger(MCRAbstractSolrContentStream.class);
 
     static String STYLESHEET = MCRConfiguration.instance().getString("MCR.Module-solr.transform", "object2fields.xsl");
 
@@ -37,7 +37,7 @@ abstract public class AbstractSolrContentStream<T> extends ContentStreamBase imp
 
     protected T source;
 
-    protected AbstractSolrContentStream() {
+    protected MCRAbstractSolrContentStream() {
         super();
         inputStream = null;
         streamReader = null;
@@ -102,7 +102,7 @@ abstract public class AbstractSolrContentStream<T> extends ContentStreamBase imp
             ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest("/update/xslt");
             updateRequest.addContentStream(this);
             updateRequest.setParam("tr", STYLESHEET);
-            SolrServerFactory.getSolrServer().request(updateRequest);
+            MCRSolrServerFactory.getSolrServer().request(updateRequest);
             LOGGER.trace("Solr: indexing data of\"" + getName() + "\" (" + (System.currentTimeMillis() - tStart) + "ms)");
         } catch (Exception ex) {
             LOGGER.error("Error sending content to solr through content stream " + this, ex);

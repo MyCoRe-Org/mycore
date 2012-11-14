@@ -1,7 +1,7 @@
 /**
  * 
  */
-package experimental.solr.payloadsupport.analyzers;
+package org.mycore.solr.experimental.payload.analyzers;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,7 +20,7 @@ import org.jdom.xpath.XPath;
  * @author shermann
  *
  */
-public class XML2StringWithPayloadProvider {
+public class MCRXML2StringWithPayloadProvider {
 
     private Document xmlSource;
 
@@ -30,14 +30,14 @@ public class XML2StringWithPayloadProvider {
      * @param source
      * @throws FileNotFoundException
      */
-    public XML2StringWithPayloadProvider(File source) throws FileNotFoundException {
+    public MCRXML2StringWithPayloadProvider(File source) throws FileNotFoundException {
         this(new FileInputStream(source));
     }
 
     /**
      * @param source
      */
-    public XML2StringWithPayloadProvider(InputStream source) {
+    public MCRXML2StringWithPayloadProvider(InputStream source) {
         try {
             createDocument(source);
         } catch (Exception e) {

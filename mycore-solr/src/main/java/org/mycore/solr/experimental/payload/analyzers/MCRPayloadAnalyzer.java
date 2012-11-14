@@ -1,4 +1,4 @@
-package experimental.solr.payloadsupport.analyzers;
+package org.mycore.solr.experimental.payload.analyzers;
 
 import java.io.Reader;
 
@@ -9,17 +9,17 @@ import org.apache.lucene.analysis.WhitespaceTokenizer;
 import org.apache.lucene.analysis.payloads.DelimitedPayloadTokenFilter;
 import org.apache.lucene.analysis.payloads.PayloadEncoder;
 import org.apache.lucene.util.Version;
+import org.mycore.solr.experimental.payload.encoder.MCRCoordinatePayloadEncoder;
 
-import experimental .solr.payloadsupport.encoder.CoordinatePayloadEncoder;
 
 
-public class PayloadAnalyzer extends Analyzer {
+public class MCRPayloadAnalyzer extends Analyzer {
     private PayloadEncoder encoder;
 
     private Version version;
 
-    public PayloadAnalyzer(Version version) {
-        this.encoder = new CoordinatePayloadEncoder();
+    public MCRPayloadAnalyzer(Version version) {
+        this.encoder = new MCRCoordinatePayloadEncoder();
         this.version = version;
     }
 

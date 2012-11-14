@@ -18,15 +18,15 @@ import org.mycore.frontend.indexbrowser.lucene.MCRIIndexBrowserSearcher;
 import org.mycore.frontend.indexbrowser.lucene.MCRIndexBrowserConfig;
 import org.mycore.frontend.indexbrowser.lucene.MCRIndexBrowserEntry;
 import org.mycore.frontend.indexbrowser.lucene.MCRIndexBrowserIncomingData;
-import org.mycore.solr.SolrServerFactory;
+import org.mycore.solr.MCRSolrServerFactory;
 
 /**
  * @author shermann
  *
  */
-public class SolrIndexBrowser implements MCRIIndexBrowserSearcher {
+public class MCRSolrIndexBrowser implements MCRIIndexBrowserSearcher {
 
-    protected static final Logger LOGGER = Logger.getLogger(SolrIndexBrowser.class);
+    protected static final Logger LOGGER = Logger.getLogger(MCRSolrIndexBrowser.class);
 
     private MCRIndexBrowserIncomingData browseData;
 
@@ -40,7 +40,7 @@ public class SolrIndexBrowser implements MCRIIndexBrowserSearcher {
      * @param browseData
      * @param indexConfig
      */
-    public SolrIndexBrowser(MCRIndexBrowserIncomingData browseData, MCRIndexBrowserConfig indexConfig) {
+    public MCRSolrIndexBrowser(MCRIndexBrowserIncomingData browseData, MCRIndexBrowserConfig indexConfig) {
         this.browseData = browseData;
         this.indexConfig = indexConfig;
         results = new LinkedList<MCRIndexBrowserEntry>();
@@ -53,7 +53,7 @@ public class SolrIndexBrowser implements MCRIIndexBrowserSearcher {
         solrQuery.setRows(20);
 
         try {
-            HttpSolrServer solrServer = SolrServerFactory.getSolrServer();
+            HttpSolrServer solrServer = MCRSolrServerFactory.getSolrServer();
             QueryResponse queryResponse = solrServer.query(solrQuery);
             SolrDocumentList docs = queryResponse.getResults();
             results = createResultList(docs);

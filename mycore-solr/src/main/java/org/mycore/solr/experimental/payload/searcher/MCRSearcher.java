@@ -1,7 +1,7 @@
 /**
  * 
  */
-package experimental.solr.payloadsupport.searcher;
+package org.mycore.solr.experimental.payload.searcher;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,22 +28,22 @@ import org.apache.lucene.search.payloads.PayloadSpanUtil;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
+import org.mycore.solr.experimental.payload.analyzers.MCRPayloadAnalyzer;
 
-import experimental.solr.payloadsupport.analyzers.PayloadAnalyzer;
 
 
 /**
  * @author shermann
  *
  */
-public class Searcher {
+public class MCRSearcher {
 
     public static void main(String arg[]) throws Exception {
         String indexDir = "/home/shermann/lucene-test/index";
         String q = "Silvio Haus";
 
-        Searcher.search(indexDir, q);
-        //Searcher.printPayloads(indexDir);
+        MCRSearcher.search(indexDir, q);
+        //MCRSearcher.printPayloads(indexDir);
     }
 
     /**
@@ -56,7 +56,7 @@ public class Searcher {
         IndexReader reader = IndexReader.open(dir);
         IndexSearcher indexSearcher = new IndexSearcher(reader);
 
-        QueryParser parser = new QueryParser(Version.LUCENE_CURRENT, "alto", new PayloadAnalyzer(Version.LUCENE_CURRENT));
+        QueryParser parser = new QueryParser(Version.LUCENE_CURRENT, "alto", new MCRPayloadAnalyzer(Version.LUCENE_CURRENT));
         Query query = parser.parse(q);
 
         System.out.print("Start searching...");
