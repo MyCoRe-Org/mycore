@@ -80,12 +80,11 @@ public class FileContentStream extends AbstractSolrContentStream<MCRFile> {
         /* set the additional parameters */
         updateRequest.setParam("literal.id", solrID);
         updateRequest.setParam("literal.owner", file.getOwnerID());
-
         if (idOfMCRObjectForDerivate != null) {
             updateRequest.setParam("literal.derivate_owner", idOfMCRObjectForDerivate);
         }
-
         updateRequest.setParam("literal.path", file.getAbsolutePath());
+        updateRequest.setParam("literal.object_type", "data_file");
         updateRequest.setParam("literal.file_name", file.getName());
         updateRequest.setParam("literal.object_project", MCRObjectID.getInstance(file.getOwnerID()).getProjectId());
         updateRequest.setParam("literal.modifydate", AbstractSolrContentStream.DATE_FORMATTER.format(file.getLastModified().getTime()));
