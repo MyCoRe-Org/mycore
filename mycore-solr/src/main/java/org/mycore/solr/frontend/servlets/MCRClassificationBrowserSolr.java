@@ -45,7 +45,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.solr.SolrServerFactory;
+import org.mycore.solr.MCRSolrServerFactory;
 
 /**
  * This servlet provides a way to visually navigate through the tree of
@@ -65,7 +65,7 @@ public class MCRClassificationBrowserSolr extends MCRServlet {
 
     static {
         try {
-            SOLR_SERVER = SolrServerFactory.getSolrServer();
+            SOLR_SERVER = MCRSolrServerFactory.getSolrServer();
         } catch (Exception e) {
             LOGGER.error("Error creating solr server object", e);
         } finally {
