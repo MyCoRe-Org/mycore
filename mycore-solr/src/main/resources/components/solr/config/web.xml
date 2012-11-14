@@ -1,9 +1,19 @@
 <servlet>
-  <servlet-name>SolrSearchServlet</servlet-name>
+  <servlet-name>MCRSolrSearchServlet</servlet-name>
   <servlet-class>org.mycore.solr.search.MCRSolrSearchServlet</servlet-class>
 </servlet>
 
+<servlet>
+  <servlet-name>MCRSolrSelectProxyServlet</servlet-name>
+  <servlet-class>org.mycore.solr.search.MCRSolrSelectProxyServlet</servlet-class>
+</servlet>
+
 <servlet-mapping>
-  <servlet-name>SolrSearchServlet</servlet-name>
+  <servlet-name>MCRSolrSearchServlet</servlet-name>
   <url-pattern>/servlets/search</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+  <servlet-name>MCRSolrSelectProxyServlet</servlet-name>
+  <url-pattern>/servlets/SolrSelectProxy</url-pattern>
 </servlet-mapping>
