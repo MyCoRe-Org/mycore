@@ -1,20 +1,16 @@
 package org.mycore.solr.index.cs;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.SolrServerFactory;
-
-import experimental.solr.payloadsupport.analyzers.XML2StringWithPayloadProvider;
 
 /**
  * Content stream suitable for wrapping {@link MCRFile}.
@@ -43,23 +39,7 @@ public class FileContentStream extends AbstractSolrContentStream<MCRFile> {
         MCRFile file = ((MCRFile) source);
         size = file.getSize();
         try {
-            if (!"alto.xml".equals(file.getName())) {
-                inputStream = new BufferedInputStream(file.getContentAsInputStream());
-            } else {
-                XML2StringWithPayloadProvider payloadProvider = new XML2StringWithPayloadProvider(file.getContentAsInputStream());
-                Document payloads = new Document(new Element("payloads"));
-                Element payload = payloads.getRootElement();
-
-                payload.setAttribute("id", file.getID());
-                payload.setAttribute("owner", file.getOwnerID());
-                payload.setAttribute("path", file.getAbsolutePath());
-                payload.setAttribute("file_name", file.getName());
-                payload.setAttribute("object_type", "file");
-                payload.setAttribute("modifydate", DATE_FORMATTER.format(file.getLastModified().getTime()));
-                payload.addContent(new Element("payload").setText(payloadProvider.getFlatDocument()));
-
-                inputStream = new BufferedInputStream(new ByteArrayInputStream(MCRUtils.getByteArray(payloads)));
-            }
+            inputStream = new BufferedInputStream(file.getContentAsInputStream());
         } catch (IOException ex) {
             throw new RuntimeException("Error initializing MCRObjectContentStream", ex);
         }
@@ -87,6 +67,11 @@ public class FileContentStream extends AbstractSolrContentStream<MCRFile> {
      */
     private void indexRawFile(MCRFile file) throws SolrServerException, IOException {
         String solrID = file.getID();
+        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(file.getOwnerID()));
+        String idOfMCRObjectForDerivate = null;
+        if (derivate != null) {
+            idOfMCRObjectForDerivate = derivate.getOwnerID().toString();
+        }
         LOGGER.trace("Solr: indexing file \"" + file.getAbsolutePath() + " (" + solrID + ")\"");
         /* create the update request object */
         ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest("/update/extract");
@@ -95,6 +80,11 @@ public class FileContentStream extends AbstractSolrContentStream<MCRFile> {
         /* set the additional parameters */
         updateRequest.setParam("literal.id", solrID);
         updateRequest.setParam("literal.owner", file.getOwnerID());
+
+        if (idOfMCRObjectForDerivate != null) {
+            updateRequest.setParam("literal.derivate_owner", idOfMCRObjectForDerivate);
+        }
+
         updateRequest.setParam("literal.path", file.getAbsolutePath());
         updateRequest.setParam("literal.file_name", file.getName());
         updateRequest.setParam("literal.object_project", MCRObjectID.getInstance(file.getOwnerID()).getProjectId());
@@ -108,24 +98,5 @@ public class FileContentStream extends AbstractSolrContentStream<MCRFile> {
         SolrServerFactory.getSolrServer().request(updateRequest);
         LOGGER.trace("Solr: sending binary data \"" + file.getAbsolutePath() + " (" + solrID + ")\"" + " done in "
                 + (System.currentTimeMillis() - t) + "ms");
-    }
-
-    /**
-     * @param file
-     * @throws Exception
-     */
-    private void indexFileWithPayload(MCRFile file) throws Exception {
-        try {
-            LOGGER.trace("Solr: indexing payload data of\"" + getName() + "\"");
-            long tStart = System.currentTimeMillis();
-            ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest("/update/xslt");
-            updateRequest.addContentStream(this);
-            updateRequest.setParam("tr", "payloads2fields.xsl");
-
-            SolrServerFactory.getSolrServer().request(updateRequest);
-            LOGGER.trace("Solr: indexing data of\"" + getName() + "\" (" + (System.currentTimeMillis() - tStart) + "ms)");
-        } catch (Exception ex) {
-            LOGGER.error("Error sending content to solr through content stream " + this, ex);
-        }
     }
 }
