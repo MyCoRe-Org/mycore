@@ -29,9 +29,10 @@ import java.io.InputStream;
 import org.mycore.datamodel.ifs2.MCRContentInputStream;
 
 /**
- * Reads MCRContent from an input stream.
- * Typically, this content is not reusable, so that
- * content can only be read once.
+ * Reads MCRContent from an input stream. Typically, this content is not reusable, so that
+ * content can only be read once. Please be aware that an instance of this object contains an 
+ * open input stream. Thus one has to invoke {@link MCRStreamContent#getInputStream()#close()} when 
+ * finished with this object.
  * 
  * @author Frank L\u00FCtzenkichen
  */
@@ -54,17 +55,6 @@ public class MCRStreamContent extends MCRContent {
     @Override
     public InputStream getInputStream() {
         return in;
-    }
-
-    /**
-     * Closes the encapsulated {@link InputStream}.
-     * 
-     * @throws IOException
-     */
-    public void close() throws IOException {
-        if (in != null) {
-            in.close();
-        }
     }
 
     @Override
