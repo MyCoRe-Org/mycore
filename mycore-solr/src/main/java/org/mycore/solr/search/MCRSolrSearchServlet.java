@@ -40,7 +40,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
      */
     private List<String> createReservedParameterKeys() {
         String[] params = new String[] { "q", "sort", "start", "rows", "pageDoc", "pageScore", "fq", "cache", "fl", "glob", "debug",
-                "explainOther", "defType", "timeAllowed", "omitHeader" };
+                "explainOther", "defType", "timeAllowed", "omitHeader", "sortOrder" };
 
         List<String> parameter = Arrays.asList(params);
         List<String> readOnlyParameter = Collections.unmodifiableList(parameter);
