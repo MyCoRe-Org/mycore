@@ -24,7 +24,7 @@ public class MCRSolrServerFactory {
         } catch (Error error) {
             LOGGER.error("Error creating solr server object", error);
         } finally {
-            LOGGER.info("Solr: using server at address \"" + _solrServer.getBaseURL() + "\"");
+            LOGGER.info("Solr: using server at address \"" + _solrServer != null ? _solrServer.getBaseURL() : "n/a" + "\"");
         }
     }
 
