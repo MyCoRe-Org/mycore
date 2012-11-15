@@ -7,7 +7,7 @@
   &html-output;
   <xsl:include href="MyCoReLayout.xsl" />
   <xsl:param name="WebApplicationBaseURL" />
-  <xsl:param name="MCR.Solr.Server.URL" />
+  <xsl:param name="MCR.Module-solr.ServerURL" />
   <xsl:variable name="PageTitle" select="i18n:translate('component.solr.expertsearch.headline')" />
 
   <xsl:template match="search-expert">
@@ -71,7 +71,7 @@
             </td>
           </tr>
 
-          <xsl:variable name="availableFields" select="document(concat($MCR.Module-solr.ServerUR, 'admin/luke'))" />
+          <xsl:variable name="availableFields" select="document(concat($MCR.Module-solr.ServerURL, 'admin/luke'))" />
           <xsl:for-each select="$availableFields/response/lst[@name='fields']/lst">
             <xsl:sort select="@name" />
             <tr>
