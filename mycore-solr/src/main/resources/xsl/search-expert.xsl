@@ -12,7 +12,7 @@
 
   <xsl:template match="search-expert">
     <p id="expertSearchFormContainer">
-      <form id="expertSearchForm" action="../servlets/search" method="get" accept-charset="UTF-8">
+      <form id="expertSearchForm" action="/servlets/SolrSelectProxy" method="get" accept-charset="UTF-8">
         <input type="hidden" name="start" value="0" />
 
         <table class="editor">
