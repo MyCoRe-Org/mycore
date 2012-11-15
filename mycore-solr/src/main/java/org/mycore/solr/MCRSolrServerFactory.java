@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.impl.BinaryRequestWriter;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.solr.utils.MCRSolrUtils;
 
 /**
  * @author shermann
@@ -16,7 +17,7 @@ public class MCRSolrServerFactory {
 
     static {
         try {
-            String solrServerUrl = MCRConfiguration.instance().getString("MCR.Solr.Server.URL", "http://127.0.0.1:8080/solr");
+            String solrServerUrl = MCRSolrUtils.getSolrPropertyValue("ServerURL");
             _solrServer = new HttpSolrServer(solrServerUrl);
             _solrServer.setRequestWriter(new BinaryRequestWriter());
         } catch (Exception e) {

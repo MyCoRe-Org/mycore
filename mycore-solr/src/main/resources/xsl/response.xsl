@@ -186,7 +186,7 @@
           </xsl:variable>
           <td>
             <a title="{i18n:translate('searchResults.prevPage')}"
-              href="{concat($WebApplicationBaseURL,'servlets/search?q=', $query, '&amp;start=', $startRecordPrevPage, '&amp;rows=', $rows)}">&lt;</a>
+              href="{concat($WebApplicationBaseURL,'servlets/SolrSelectProxy?q=', $query, '&amp;start=', $startRecordPrevPage, '&amp;rows=', $rows)}">&lt;</a>
           </td>
         </xsl:if>
 
@@ -195,7 +195,7 @@
         </xsl:variable>
         <xsl:if test="$startRecordNextPage &lt; $hits">
           <td>
-            <a title="{i18n:translate('searchResults.nextPage')}" href="{concat($WebApplicationBaseURL,'servlets/search?q=', $query, '&amp;start=', $start + $rows, '&amp;rows=', $rows)}">&gt;</a>
+            <a title="{i18n:translate('searchResults.nextPage')}" href="{concat($WebApplicationBaseURL,'servlets/SolrSelectProxy?q=', $query, '&amp;start=', $start + $rows, '&amp;rows=', $rows)}">&gt;</a>
           </td>
         </xsl:if>
       </tr>

@@ -1,24 +1,22 @@
 package org.mycore.solr.search;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Vector;
 
-import javax.servlet.http.HttpServletRequest;
+import java.net.URLEncoder;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrQuery.ORDER;
-import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRStreamContent;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.solr.MCRSolrServerFactory;
 
 /**
- * @author shermann
+ * @author mcrshofm
  *
  */
 public class MCRSolrSearchServlet extends MCRServlet {
@@ -27,112 +25,110 @@ public class MCRSolrSearchServlet extends MCRServlet {
 
     private static final Logger LOGGER = Logger.getLogger(MCRSolrSearchServlet.class);
 
+    private List<String> reservedParameterKeys;
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+
+        reservedParameterKeys = createReservedParameterKeys();
+    }
+
+    /**
+     * Creates a list with all parameters that can be used within a select request to solr.
+     * @return the list.
+     */
+    private List<String> createReservedParameterKeys() {
+        String[] params = new String[] { "q", "sort", "start", "rows", "pageDoc", "pageScore", "fq", "cache", "fl", "glob", "debug",
+                "explainOther", "defType", "timeAllowed", "omitHeader" };
+
+        List<String> parameter = Arrays.asList(params);
+        List<String> readOnlyParameter = Collections.unmodifiableList(parameter);
+        return readOnlyParameter;
+    }
+
+    /**
+     * 
+     * @return A list of all Parameters that can be used within a select request to solr.
+     *          <strong>WARNING: the list should not be modified</strong>
+     */
+    protected List<String> getReservedParameters() {
+        return reservedParameterKeys;
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
-        SolrQuery query = createQuery(job.getRequest());
-        LOGGER.debug("Generated query of request is: " + query.getQuery());
+        // "split of" reserved parameters
+        Map<String, String[]> reservedParameters = getFilteredParameterList(job.getRequest().getParameterMap(), false);
+        Map<String, String[]> queryParameters = getFilteredParameterList(job.getRequest().getParameterMap(), true);
 
-        int start = 0;
-        int rows = 10;
+        String q = URLEncoder.encode(buildQueryParameter(queryParameters),"UTF-8");
+        LOGGER.info("Generated Query is : " + q);
 
-        try {
-            start = Integer.valueOf(job.getRequest().getParameter("start"));
-            rows = Integer.valueOf(job.getRequest().getParameter("rows"));
-        } catch (Exception e) {
-            LOGGER.error("Could not apply values for \"row\" and \"start\". Using defaults start=" + start + " and rows=" + rows, e);
-        }
+        String otherParameters = buildParameterString(reservedParameters);
+        LOGGER.info("SolrReserved Parameter Query is : " + otherParameters);
 
-        long tStart = System.currentTimeMillis();
+        String url = MCRServlet.getServletBaseURL() + "SolrSelectProxy?q=" + q + otherParameters;
+        
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(url));
 
-        MCRSolrURL solrURL = new MCRSolrURL(MCRSolrServerFactory.getSolrServer(), true);
-        solrURL.setQueryParamter(query.getQuery());
-        solrURL.setStart(start);
-        solrURL.setRows(rows);
-
-        addSortOptions(solrURL, job);
-
-        MCRContent streamContent = null;
-        try {
-            streamContent = new MCRStreamContent(solrURL.openStream(), solrURL.getUrl().toString());
-            LOGGER.info("Getting query results took " + (System.currentTimeMillis() - tStart) + " ms");
-            getLayoutService().doLayout(job.getRequest(), job.getResponse(), streamContent);
-        } finally {
-            try {
-                if (streamContent != null) {
-                    streamContent.getInputStream().close();
-                }
-            } catch (IOException ex) {
-                LOGGER.warn("Could not close input stream", ex);
-            }
-        }
     }
 
-    /**
-     * @param solrURL
-     * @param job
-     */
-    @SuppressWarnings("unchecked")
-    private void addSortOptions(MCRSolrURL solrURL, MCRServletJob job) {
-        // set sort field and sort order
-        Enumeration<String> parameterNames = job.getRequest().getParameterNames();
-
-        List<String> keys = new Vector<String>();
-        while (parameterNames.hasMoreElements()) {
-            String p = (String) parameterNames.nextElement();
-            if (p.startsWith("sortBy")) {
-                keys.add(p);
-            }
-        }
-
-        String[] sortedKeys = keys.toArray(new String[0]);
-        Arrays.sort(sortedKeys);
-
-        for (String key : sortedKeys) {
-            String order = "sortBy".equals(key) ? "" : "_" + key.split("_")[1];
-
-            String sortBy = job.getRequest().getParameter(key);
-            String sortOrder = job.getRequest().getParameter("sortOrder" + order);
-
-            if (sortBy != null && sortOrder != null) {
-                solrURL.addSortOption(sortBy, ORDER.valueOf(sortOrder).toString());
-            }
-        }
-    }
-
-    /**
-     * @param request
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    private SolrQuery createQuery(HttpServletRequest request) {
-        String q = request.getParameter("q");
-        // default query
-        if (q != null && q.length() == 0) {
-            return new SolrQuery("*:*");
-        }
-
-        if (q != null && q.length() > 0) {
-            return new SolrQuery(q);
-        }
-
-        Enumeration<String> parameterNames = request.getParameterNames();
+    protected String buildParameterString(Map<String, String[]> parameters) {
         StringBuilder qBuilder = new StringBuilder();
 
-        while (parameterNames.hasMoreElements()) {
-            String p = parameterNames.nextElement();
-            // ignore these
-            if ("rows".equals(p) || "start".equals(p) || p.startsWith("sort") || p.equals("XSL.Style")) {
-                continue;
+        for (Entry<String, String[]> currentParameter : parameters.entrySet()) {
+            for (String parameterValue : currentParameter.getValue()) {
+                qBuilder.append("&").append(currentParameter.getKey()).append("=").append(parameterValue);
             }
-
-            // get the value for the actual parameter and ensure it is not null
-            String v = request.getParameter(p);
-            if (v.length() == 0) {
-                continue;
-            }
-
-            qBuilder.append(" +" + p + ":" + v);
         }
-        return new SolrQuery(qBuilder.toString().trim());
+
+        return qBuilder.toString();
+
+    }
+
+    /**
+     * Builds the Query for the solr request (without q=)
+     * @param parametersForQuery the parameter that should appear in the query
+     * @return the value of q
+     */
+    protected String buildQueryParameter(Map<String, String[]> parametersForQuery) {
+        StringBuilder qBuilder = new StringBuilder();
+
+        for (Entry<String, String[]> currentParameter : parametersForQuery.entrySet()) {
+            for (String parameterValue : currentParameter.getValue()) {
+                if (parameterValue.length() > 0) {
+                    qBuilder.append(" +");
+                    qBuilder.append(currentParameter.getKey());
+                    qBuilder.append(":");
+                    qBuilder.append(parameterValue);
+                }
+            }
+        }
+        
+        return qBuilder.toString();
+    }
+
+    /**
+     * Filters the requestParameter for the generation of q= or for the generation of the reserved Parameters.
+     * @param requestParameter the parameters of the Request. The map wont modified.
+     * @param queryGeneration <strong>true</strong> map filtered for generation of q= 
+     *                         <strong>false</strong> for the generation of reserved parameters
+     * @return a filtered list
+     */
+    protected Map<String, String[]> getFilteredParameterList(Map<String, String[]> requestParameter, boolean queryGeneration) {
+        Map<String, String[]> filteredParameterList = new HashMap<String, String[]>();
+        List<String> reservedParameters = getReservedParameters();
+
+        for (Entry<String, String[]> currentEntry : requestParameter.entrySet()) {
+            String parameterKey = currentEntry.getKey();
+            boolean reservedParameter = reservedParameters.contains(parameterKey) || parameterKey.startsWith("XSL.");
+            if (!reservedParameter && queryGeneration || reservedParameter && !queryGeneration) {
+                filteredParameterList.put(parameterKey, currentEntry.getValue());
+            }
+        }
+
+        return filteredParameterList;
     }
 }
