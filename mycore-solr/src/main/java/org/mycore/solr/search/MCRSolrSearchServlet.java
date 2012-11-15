@@ -107,6 +107,10 @@ public class MCRSolrSearchServlet extends MCRServlet {
             }
         }
         
+        if(qBuilder.length()>0){
+            qBuilder.deleteCharAt(0);
+        }
+        
         return qBuilder.toString();
     }
 
