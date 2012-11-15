@@ -1,6 +1,5 @@
 package org.mycore.solr.search;
 
-
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,11 +39,8 @@ public class MCRSolrSearchServlet extends MCRServlet {
      */
     private List<String> createReservedParameterKeys() {
         String[] params = new String[] { "q", "sort", "start", "rows", "pageDoc", "pageScore", "fq", "cache", "fl", "glob", "debug",
-                "explainOther", "defType", "timeAllowed", "omitHeader", "sortOrder" };
-
-        List<String> parameter = Arrays.asList(params);
-        List<String> readOnlyParameter = Collections.unmodifiableList(parameter);
-        return readOnlyParameter;
+                "explainOther", "defType", "timeAllowed", "omitHeader", "sortOrder", "sortBy" };
+        return Collections.unmodifiableList(Arrays.asList(params));
     }
 
     /**
@@ -63,14 +59,14 @@ public class MCRSolrSearchServlet extends MCRServlet {
         Map<String, String[]> reservedParameters = getFilteredParameterList(job.getRequest().getParameterMap(), false);
         Map<String, String[]> queryParameters = getFilteredParameterList(job.getRequest().getParameterMap(), true);
 
-        String q = URLEncoder.encode(buildQueryParameter(queryParameters),"UTF-8");
+        String q = URLEncoder.encode(buildQueryParameter(queryParameters), "UTF-8");
         LOGGER.info("Generated Query is : " + q);
 
         String otherParameters = buildParameterString(reservedParameters);
         LOGGER.info("SolrReserved Parameter Query is : " + otherParameters);
 
         String url = MCRServlet.getServletBaseURL() + "SolrSelectProxy?q=" + q + otherParameters;
-        
+
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(url));
 
     }
@@ -106,11 +102,11 @@ public class MCRSolrSearchServlet extends MCRServlet {
                 }
             }
         }
-        
-        if(qBuilder.length()>0){
+
+        if (qBuilder.length() > 0) {
             qBuilder.deleteCharAt(0);
         }
-        
+
         return qBuilder.toString();
     }
 
