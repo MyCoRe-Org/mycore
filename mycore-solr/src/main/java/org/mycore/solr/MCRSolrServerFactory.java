@@ -3,7 +3,6 @@ package org.mycore.solr;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.impl.BinaryRequestWriter;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.solr.utils.MCRSolrUtils;
 
 /**
