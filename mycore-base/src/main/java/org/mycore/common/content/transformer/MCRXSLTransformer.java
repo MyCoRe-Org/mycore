@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedList;
+import java.util.Properties;
 import java.util.TooManyListenersException;
 
 import javax.xml.transform.Result;
@@ -128,12 +129,12 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     @Override
     public String getEncoding() {
-        return getOutputProperty("encoding");
+        return getOutputProperty("encoding", "UTF-8");
     }
 
     @Override
     public String getMimeType() {
-        return getOutputProperty("media-type");
+        return getOutputProperty("media-type", "text/xml");
     }
 
     @Override
@@ -225,11 +226,19 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         return reader;
     }
 
-    private String getOutputProperty(String propertyName) {
+    private String getOutputProperty(String propertyName, String defaultValue) {
         try {
             checkTemplateUptodate();
             Templates lastTemplate = templates[templates.length - 1];
-            return lastTemplate.getOutputProperties().getProperty(propertyName);
+            Properties outputProperties = lastTemplate.getOutputProperties();
+            if (outputProperties == null) {
+                return defaultValue;
+            }
+            String value = outputProperties.getProperty(propertyName);
+            if (value == null) {
+                return defaultValue;
+            }
+            return value;
         } catch (Exception e) {
             throw new MCRException(e);
         }
