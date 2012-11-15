@@ -71,7 +71,7 @@
             </td>
           </tr>
 
-          <xsl:variable name="availableFields" select="document(concat($MCR.Solr.Server.URL, '/admin/luke'))" />
+          <xsl:variable name="availableFields" select="document(concat($MCR.Module-solr.ServerUR, 'admin/luke'))" />
           <xsl:for-each select="$availableFields/response/lst[@name='fields']/lst">
             <xsl:sort select="@name" />
             <tr>
