@@ -339,6 +339,7 @@ public class MCRResults implements Iterable<MCRHit> {
             }
         });
         final MCRResults firstResult = others[0];
+        firstResult.fetchAllHits();
         MCRResults totalResult = new MCRResults();
         final List<MCRResults> subResultList = Arrays.asList(others).subList(1, others.length);
         //merge everything together
@@ -346,6 +347,7 @@ public class MCRResults implements Iterable<MCRHit> {
             boolean complete = true;
             final String key = hit.getKey();
             for (MCRResults other : subResultList) {
+                other.fetchAllHits();
                 MCRHit otherHit = other.getHit(key);
                 if (otherHit == null) {
                     complete = false;
@@ -370,6 +372,7 @@ public class MCRResults implements Iterable<MCRHit> {
     public static MCRResults union(MCRResults... others) {
         MCRResults totalResult = new MCRResults();
         for (MCRResults other : others) {
+            other.fetchAllHits();
             for (MCRHit hit : other) {
                 totalResult.addHit(hit);
             }
@@ -402,5 +405,9 @@ public class MCRResults implements Iterable<MCRHit> {
      */
     public boolean isReadonly() {
         return false; // default implementation
+    }
+
+    public void fetchAllHits() {
+        
     }
 }

@@ -107,27 +107,35 @@ class MCRLuceneResults extends MCRResults {
     @Override
     protected MCRHit getHit(String key) {
         if (!loadComplete) {
-            sharedIndexContext.getIndexReadLock().lock();
-            try {
-                IndexSearcher indexSearcher;
-                try {
-                    indexSearcher = sharedIndexContext.getSearcher();
-                } catch (IOException e) {
-                    throw new MCRException(e);
-                }
-                for (int i = 0; i < getNumHits(); i++) {
-                    inititializeTopDoc(i, indexSearcher);
-                }
-            } finally {
-                sharedIndexContext.getIndexReadLock().unlock();
-            }
+            fetchAllHits();
         }
         return super.getHit(key);
     }
 
     @Override
+    public void fetchAllHits() {
+        sharedIndexContext.getIndexReadLock().lock();
+        try {
+            IndexSearcher indexSearcher;
+            try {
+                indexSearcher = sharedIndexContext.getSearcher();
+            } catch (IOException e) {
+                throw new MCRException(e);
+            }
+            int numHits = getNumHits();
+            for (int i = 0; i < numHits; i++) {
+                if (super.getHit(i) == null) {
+                    inititializeTopDoc(i, indexSearcher);
+                }
+            }
+        } finally {
+            sharedIndexContext.getIndexReadLock().unlock();
+        }
+    }
+
+    @Override
     public MCRHit getHit(int i) {
-        if (i < 0 || i > topDocs.totalHits) {
+        if (i < 0 || i > getNumHits()) {
             return null;
         }
         MCRHit hit = super.getHit(i);
@@ -166,7 +174,7 @@ class MCRLuceneResults extends MCRResults {
                 if (i < topDocs.scoreDocs.length) {
                     hit = getMCRHit(topDocs.scoreDocs[i], indexSearcher);
                 } else {
-                    LOGGER.warn("There is no such result anymore: "+i);
+                    LOGGER.warn("There is no such result anymore: " + i);
                     return reQuery;
                 }
             } catch (IOException ioe) {
