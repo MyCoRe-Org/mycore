@@ -49,6 +49,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xsl.MCRErrorListener;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.common.xsl.MCRTemplatesSource;
 import org.mycore.common.xsl.MCRTraceListener;
@@ -93,6 +94,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         LOGGER.info("Transformerfactory: " + transformerFactory.getClass().getName());
         transformerFactory.setURIResolver(URI_RESOLVER);
+        transformerFactory.setErrorListener(MCRErrorListener.getInstance());
         if (transformerFactory.getFeature(SAXSource.FEATURE) && transformerFactory.getFeature(SAXResult.FEATURE)) {
             this.tFactory = (SAXTransformerFactory) transformerFactory;
         } else {
@@ -121,7 +123,11 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         for (int i = 0; i < templateSources.length; i++) {
             long lastModified = templateSources[i].getLastModified();
             if (modified[i] < lastModified) {
-                templates[i] = tFactory.newTemplates(templateSources[i].getSource());
+                SAXSource source = templateSources[i].getSource();
+                templates[i] = tFactory.newTemplates(source);
+                if (templates[i] == null) {
+                    throw new TransformerConfigurationException("XSLT Stylesheet could not be compiled: " + templateSources[i].getURL());
+                }
                 modified[i] = lastModified;
             }
         }

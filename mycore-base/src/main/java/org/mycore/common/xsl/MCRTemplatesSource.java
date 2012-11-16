@@ -76,6 +76,15 @@ public class MCRTemplatesSource {
         return resource;
     }
 
+    public URL getURL() {
+        try {
+            return MCRXMLResource.instance().getURL(resource, MCRXSLTransformerFactory.class.getClassLoader());
+        } catch (IOException e) {
+            LOGGER.warn("Could not determine URL of resource " + resource, e);
+            return null;
+        }
+    }
+
     /** Returns the timestamp the XSL file was last modified on the filesystem. */
     public long getLastModified() {
         try {
