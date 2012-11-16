@@ -42,8 +42,8 @@
           <xsl:when test="str[@name='object_type'] = 'data_file'">
             <xsl:call-template name="iViewLinkPrev">
               <xsl:with-param name="derivates" select="./str[@name='file_owner']" />
-              <xsl:with-param name="mcrid" select="./str[@name='derivate_owner'])" />
-              <xsl:with-param name="fileName" select="./str[@name='file_path'])" />
+              <xsl:with-param name="mcrid" select="./str[@name='derivate_owner']" />
+              <xsl:with-param name="fileName" select="./str[@name='file_path']" />
             </xsl:call-template>
           </xsl:when>
           <xsl:otherwise>
