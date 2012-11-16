@@ -19,11 +19,13 @@ import org.mycore.solr.MCRSolrServerFactory;
 
 public class MCRXMLContentSolrStream extends ContentStreamBase {
     final static Logger LOGGER = Logger.getLogger(MCRXMLContentSolrStream.class);
-    static String TRANSFORM =  MCRConfiguration.instance().getString("MCR.Module-solr.transform", "object2fields.xsl");
-    
+
+    static String TRANSFORM = MCRConfiguration.instance().getString("MCR.Module-solr.transform", "object2fields.xsl");
+
     private MCRContent content;
+
     private Element mcrObjs;
-    
+
     public MCRXMLContentSolrStream() {
         mcrObjs = new Element("mcrObjs");
     }
@@ -34,26 +36,23 @@ public class MCRXMLContentSolrStream extends ContentStreamBase {
         setSourceInfo(content.getSystemId());
         setContentType(MCRSolrAppender.getTransformer().getMimeType());
     }
-    
-    public void addMCRObj(String id){
+
+    public void addMCRObj(String id) {
         Document mcrObjXML = MCRXMLMetadataManager.instance().retrieveXML(MCRObjectID.getInstance(id));
         mcrObjs.addContent(mcrObjXML.getRootElement().detach());
-        if(mcrObjs.getChildren().size() == 100){
-            setContent(mcrObjs);
-            index();
-            mcrObjs = new Element("mcrObjs");
-        }
     }
-    
-    private void index() {
+
+    void index() {
         try {
             LOGGER.trace("Solr: indexing data of\"" + getName() + "\"");
+            setContent(mcrObjs);
             long tStart = System.currentTimeMillis();
             ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest("/update/xslt");
             updateRequest.addContentStream(this);
             updateRequest.setParam("tr", TRANSFORM);
             MCRSolrServerFactory.getConcurrentSolrServer().request(updateRequest);
             LOGGER.trace("Solr: indexing data of\"" + getName() + "\" (" + (System.currentTimeMillis() - tStart) + "ms)");
+            mcrObjs = new Element("mcrObjs");
         } catch (Exception ex) {
             LOGGER.error("Error sending content to solr through content stream " + this, ex);
         }

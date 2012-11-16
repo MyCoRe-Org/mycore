@@ -19,7 +19,6 @@ import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearcher;
@@ -100,7 +99,7 @@ public class MCRSolrIndexer extends MCRSearcher {
             MCRBaseContentStream contentStream = new MCRBaseContentStream(objectOrDerivate.getId().toString(), content);
             executorService.submit(contentStream);
             LOGGER.trace("Solr: submitting data of\"" + objectOrDerivate.getId().toString() + "\" for indexing done in "
-                + (System.currentTimeMillis() - tStart) + "ms ");
+                    + (System.currentTimeMillis() - tStart) + "ms ");
         } catch (Exception ex) {
             LOGGER.error("Error creating transfer thread", ex);
         }
@@ -162,21 +161,27 @@ public class MCRSolrIndexer extends MCRSearcher {
 
         long tStart = System.currentTimeMillis();
         LOGGER.info("Solr: sending " + list.size() + " objects to solr for reindexing");
-//        MCRXMLMetadataManager metadataMgr = MCRXMLMetadataManager.instance();
+
         MCRXMLContentSolrStream contentSolrStream = new MCRXMLContentSolrStream();
+        int threshold = 0;
         for (String id : list) {
             try {
                 LOGGER.info("Solr: submitting data of\"" + id + "\" for indexing");
-//                MCRBaseContentStream contentStream = new MCRBaseContentStream(id, metadataMgr.retrieveContent(MCRObjectID.getInstance(id)));
-//                executorService.submit(contentStream);
                 contentSolrStream.addMCRObj(id);
+                if (++threshold % 100 == 0) {
+                    contentSolrStream.index();
+                }
             } catch (Exception ex) {
                 LOGGER.error("Error creating transfer thread", ex);
             }
         }
+        /* index remaining docs*/
+        if (++threshold % 100 != 0) {
+            contentSolrStream.index();
+        }
         long tStop = System.currentTimeMillis();
         LOGGER.info("Solr: submitted data of " + list.size() + " objects for indexing done in " + (tStop - tStart) + "ms ("
-            + ((float) (tStop - tStart) / list.size()) + " ms/object)");
+                + ((float) (tStop - tStart) / list.size()) + " ms/object)");
     }
 
     /**
@@ -214,7 +219,7 @@ public class MCRSolrIndexer extends MCRSearcher {
 
         long tStop = System.currentTimeMillis();
         LOGGER.info("Solr: submitted data of " + list.size() + " derivates for indexing done in " + (tStop - tStart) + "ms ("
-            + ((float) (tStop - tStart) / list.size()) + " ms/derivate)");
+                + ((float) (tStop - tStart) / list.size()) + " ms/derivate)");
     }
 
     /**
