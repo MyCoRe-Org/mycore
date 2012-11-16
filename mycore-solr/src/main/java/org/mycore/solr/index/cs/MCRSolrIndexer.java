@@ -10,6 +10,8 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.jdom.Document;
+import org.jdom.Element;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
@@ -19,6 +21,7 @@ import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearcher;
@@ -162,22 +165,26 @@ public class MCRSolrIndexer extends MCRSearcher {
         long tStart = System.currentTimeMillis();
         LOGGER.info("Solr: sending " + list.size() + " objects to solr for reindexing");
 
-        MCRXMLContentSolrStream contentSolrStream = new MCRXMLContentSolrStream();
-        int threshold = 0;
+        Element mcrObjColector = new Element("mcrObjs");
+        MCRXMLMetadataManager mcrxmlMetadataManager = MCRXMLMetadataManager.instance();
+        MCRXMLSolrIndexer mcrxmlSolrIndexer = new MCRXMLSolrIndexer();
         for (String id : list) {
             try {
                 LOGGER.info("Solr: submitting data of\"" + id + "\" for indexing");
-                contentSolrStream.addMCRObj(id);
-                if (++threshold % 100 == 0) {
-                    contentSolrStream.index();
+                Document mcrObjXML = mcrxmlMetadataManager.retrieveXML(MCRObjectID.getInstance(id));
+                mcrObjColector.addContent(mcrObjXML.getRootElement().detach());
+                
+                if (mcrObjColector.getChildren().size() % 100 == 0) {
+                    mcrxmlSolrIndexer.index(new MCRXMLContentCollectorStream(mcrObjColector));
+                    mcrObjColector = new Element("mcrObjs");
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error creating transfer thread", ex);
             }
         }
         /* index remaining docs*/
-        if (++threshold % 100 != 0) {
-            contentSolrStream.index();
+        if (mcrObjColector.getChildren().size() > 0) {
+            mcrxmlSolrIndexer.index(new MCRXMLContentCollectorStream(mcrObjColector));
         }
         long tStop = System.currentTimeMillis();
         LOGGER.info("Solr: submitted data of " + list.size() + " objects for indexing done in " + (tStop - tStart) + "ms ("
