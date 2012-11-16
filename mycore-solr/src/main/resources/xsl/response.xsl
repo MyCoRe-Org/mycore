@@ -6,10 +6,11 @@
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:xalan="http://xml.apache.org/xalan" exclude-result-prefixes="xalan i18n encoder">
   &html-output;
   <xsl:include href="MyCoReLayout.xsl" />
+  <xsl:include href="xslInclude:solrResponse"/>
 
   <xsl:param name="WebApplicationBaseURL" />
   <xsl:variable name="PageTitle" select="'Suchergebnisse'" />
-
+  
   <xsl:template match="doc">
     <xsl:variable name="identifier" select="str[@name='id']" />
 
