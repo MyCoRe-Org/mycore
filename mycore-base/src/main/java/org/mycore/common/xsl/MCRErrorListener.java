@@ -46,6 +46,7 @@ public class MCRErrorListener implements ErrorListener {
      */
     @Override
     public void warning(TransformerException exception) throws TransformerException {
+        exception = unwrapException(exception);
         LOGGER.warn("Exception while XSL transformation.", exception);
     }
 
@@ -54,6 +55,7 @@ public class MCRErrorListener implements ErrorListener {
      */
     @Override
     public void error(TransformerException exception) throws TransformerException {
+        exception = unwrapException(exception);
         LOGGER.error("Exception while XSL transformation.", exception);
         throw exception;
     }
@@ -63,8 +65,21 @@ public class MCRErrorListener implements ErrorListener {
      */
     @Override
     public void fatalError(TransformerException exception) throws TransformerException {
+        exception = unwrapException(exception);
         LOGGER.fatal("Exception while XSL transformation.", exception);
         throw exception;
+    }
+
+    private TransformerException unwrapException(TransformerException exception) {
+        TransformerException e = exception;
+        Throwable cause = e.getCause();
+        while (cause != null) {
+            if (cause instanceof TransformerException) {
+                return unwrapException((TransformerException) cause);
+            }
+            cause = cause.getCause();
+        }
+        return e;
     }
 
 }
