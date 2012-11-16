@@ -22,7 +22,11 @@
  */
 package org.mycore.buildtools.cargo;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -32,6 +36,9 @@ import org.codehaus.cargo.module.merge.MergeProcessor;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
 /**
  * This class implements a merger for MyCoRe's searchfields.xml.
@@ -66,7 +73,22 @@ public class SearchfieldsXMLMerger implements MergeProcessor {
 	 * adds another searchfield.xml as org.jdom.Document
 	 */
 	public void addMergeItem(Object o) throws MergeException {
-		searchfieldFileList.add((Document) o);
+		if(o instanceof ByteArrayInputStream){
+			ByteArrayInputStream bais = (ByteArrayInputStream) o;
+			try{
+				BufferedReader br = new BufferedReader(new InputStreamReader(bais, "UTF-8"));
+				SAXBuilder sb = new SAXBuilder();
+				//sb.setIgnoringElementContentWhitespace(false);
+				Document doc = sb.build(br);
+				searchfieldFileList.add(doc);
+			}
+			catch(Exception e){
+				throw new MergeException("Error reading searchfields.xml", e);
+			}		
+		}
+		else{
+			throw new MergeException("Please specify a <file> subelement which contains the searchfields.xml");
+		}
 	}
 
 	@Override
@@ -101,7 +123,11 @@ public class SearchfieldsXMLMerger implements MergeProcessor {
 				Document deltaDoc = searchfieldFileList.get(i);
 				mergeSearchfields(returnDoc, deltaDoc);
 			}
-			return returnDoc;
+			
+			XMLOutputter xmlOut = new XMLOutputter(Format.getRawFormat());
+			StringWriter sw = new StringWriter();
+			xmlOut.output(returnDoc, sw);
+			return new ByteArrayInputStream(sw.toString().getBytes("UTF-8"));
 		} catch (Exception e) {
 			return null;
 		}

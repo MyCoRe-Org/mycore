@@ -104,7 +104,7 @@ public class MCRMergeSearchfieldsXMLTask extends Task {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setValidating(false);
-            factory.setIgnoringElementContentWhitespace(true);
+            factory.setIgnoringElementContentWhitespace(false);
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document docBase = builder.parse(new InputSource(new InputStreamReader(new FileInputStream(new File(base)), "UTF-8")));
             docBase.normalize();

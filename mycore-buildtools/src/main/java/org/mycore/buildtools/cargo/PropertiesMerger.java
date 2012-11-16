@@ -87,11 +87,9 @@ public class PropertiesMerger implements MergeProcessor {
 			baseProps.store(sw, "These Properties were merged by org.mycore.buildtools.cargo.PropertiesMerger");
 			
 			//property files should always be ISO-8859-1 encoded in Java
-			ByteArrayInputStream bais = new ByteArrayInputStream(sw.toString()
-					.getBytes("ISO-8859-1"));
-			return bais;
+			return new ByteArrayInputStream(sw.toString().getBytes("ISO-8859-1"));		
 		} catch (Exception e) {
-			return null;
+			throw new MergeException("Error merging properties", e);
 		}
 	}
 }

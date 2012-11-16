@@ -12,9 +12,9 @@
 	<condition property="ant.library.dir" value="${ant.home}/lib">
 			<os family="unix" />
 	</condition>
-	<property name="env.MYCORE_HOME" location="./../../../../../mycore" />
+	<property name="env.MYCORE_HOME" location="./../../target" />
     <path id="classpath_buildtools">
-        <fileset dir="${env.MYCORE_HOME}/lib" includes="*.jar" />
+        <fileset dir="${env.MYCORE_HOME}" includes="*.jar" />
     </path>
 	<target name="test">
 		<taskdef name="mergesearchfields" classname="org.mycore.buildtools.anttasks.MCRMergeSearchfieldsXMLTask"

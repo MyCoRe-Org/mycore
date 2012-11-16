@@ -5,5 +5,19 @@
     <field name="identifier" objects="document" source="objectMetadata" type="identifier" value="text()" xpath="/mycoreobject/metadata/identifiers/identifier"/>
     <field name="ddc" objects="document" source="objectCategory" type="identifier" value="@ID" xpath="/mycoreobject/metadata/subjects/subject"/>
     <!-- ... -->
+    <field name="name" objects="mods" sortable="true"
+            source="objectMetadata" type="name">
+            <xsl:if test="/mycoreobject/metadata/def.modsContainer/modsContainer/mods:mods/mods:name">
+                <mcr:name>
+                    <xsl:for-each select="/mycoreobject/metadata/def.modsContainer/modsContainer/mods:mods/mods:name">
+                        <xsl:for-each select="mods:namePart|mods:displayForm">
+                            <xsl:value-of select="text()"/>
+                            <xsl:text>    </xsl:text>
+                        </xsl:for-each>
+                    </xsl:for-each>
+                </mcr:name>
+            </xsl:if>
+            
+            </field>
   </index>
 </searchfields>
