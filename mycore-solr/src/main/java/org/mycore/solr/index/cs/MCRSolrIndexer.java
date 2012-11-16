@@ -162,12 +162,14 @@ public class MCRSolrIndexer extends MCRSearcher {
 
         long tStart = System.currentTimeMillis();
         LOGGER.info("Solr: sending " + list.size() + " objects to solr for reindexing");
-        MCRXMLMetadataManager metadataMgr = MCRXMLMetadataManager.instance();
+//        MCRXMLMetadataManager metadataMgr = MCRXMLMetadataManager.instance();
+        MCRXMLContentSolrStream contentSolrStream = new MCRXMLContentSolrStream();
         for (String id : list) {
             try {
                 LOGGER.info("Solr: submitting data of\"" + id + "\" for indexing");
-                MCRBaseContentStream contentStream = new MCRBaseContentStream(id, metadataMgr.retrieveContent(MCRObjectID.getInstance(id)));
-                executorService.submit(contentStream);
+//                MCRBaseContentStream contentStream = new MCRBaseContentStream(id, metadataMgr.retrieveContent(MCRObjectID.getInstance(id)));
+//                executorService.submit(contentStream);
+                contentSolrStream.addMCRObj(id);
             } catch (Exception ex) {
                 LOGGER.error("Error creating transfer thread", ex);
             }

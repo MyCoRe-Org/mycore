@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreobject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink"
+  xsi:noNamespaceSchemaLocation="datamodel-test.xsd" ID="jportal_test_00031348" label="jportal_test_00031348" version="Version 1.3">
+  <structure>
+    <children class="MCRMetaLinkID">
+      <child inherited="0" xlink:type="locator" xlink:href="jportal_testChild_00059557" xlink:title="jportal_testChild_00059557" />
+      <child inherited="0" xlink:type="locator" xlink:href="jportal_testChild_00059558" xlink:title="jportal_testChild_00059558" />
+    </children>
+    <parents class="MCRMetaLinkID">
+      <parent inherited="0" xlink:type="locator" xlink:href="jportal_parent_00031344" />
+    </parents>
+  </structure>
+  <metadata>
+    <maintitles class="MCRMetaLangText" heritable="true" notinherit="false">
+      <maintitle type="main" inherited="0" form="plain">Nr. III</maintitle>
+      <maintitle inherited="1" form="plain">1824</maintitle>
+      <maintitle inherited="2" form="plain">ISIS</maintitle>
+    </maintitles>
+    <hidden_positions class="MCRMetaLangText" heritable="false" notinherit="false">
+      <hidden_position inherited="0" form="plain">003</hidden_position>
+    </hidden_positions>
+    <derivateLinks class="MCRMetaDerivateLink" heritable="false" notinherit="false">
+      <derivateLink inherited="0" xlink:type="locator" xlink:href="jportal_derivate_00218073/Isis_1824_Bd01_165.tif" />
+    </derivateLinks>
+    <dates class="MCRMetaISO8601Date" heritable="true" notinherit="false">
+      <date type="published" inherited="1">1824</date>
+      <date type="published_from" inherited="2">1817</date>
+      <date type="published_until" inherited="2">1848</date>
+    </dates>
+    <rubrics class="MCRMetaClassification" heritable="false" notinherit="false">
+      <rubric inherited="0" classid="jportal_class_00000027" categid="00018000" />
+      <rubric inherited="0" classid="jportal_class_00000027" categid="00051000" />
+    </rubrics>
+    <hidden_jpjournalsID class="MCRMetaLangText" heritable="true" notinherit="false">
+      <hidden_jpjournalID inherited="2" form="plain">jportal_jpjournal_00000024</hidden_jpjournalID>
+    </hidden_jpjournalsID>
+  </metadata>
+  <service>
+    <servdates class="MCRMetaISO8601Date">
+      <servdate type="createdate" inherited="0">2006-10-20T10:17:42.920Z</servdate>
+      <servdate type="modifydate" inherited="0">2012-04-27T12:11:26.245Z</servdate>
+    </servdates>
+  </service>
+</mycoreobject>
