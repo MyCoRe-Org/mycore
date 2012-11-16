@@ -168,7 +168,27 @@ public class MCRConfiguration {
                 throw new MCRException("Could not change modify date of file " + lastModifiedFile.getAbsolutePath(), ioException);
             }
         } else if (!lastModifiedFile.setLastModified(System.currentTimeMillis())) {
-            throw new MCRException("Could not change modify date of file " + lastModifiedFile.getAbsolutePath());
+            // a problem occurs, when a linux user other than the file owner
+            // tries to change the last modified date
+            // @see Java Bug:
+            // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4466073
+            // fixable in Java7 with setTimes() method of new file system API
+            // workaround for now: try to recreate the file
+            // @author Robert Stephan
+            FileOutputStream fout = null;
+            try {
+                try {
+                    fout = new FileOutputStream(lastModifiedFile);
+                    fout.write(new byte[0]);
+                    lastModifiedFile.setWritable(true, false);
+                } finally {
+                    if (fout != null) {
+                        fout.close();
+                    }
+                }
+            } catch (IOException e) {
+                throw new MCRException("Could not change modify date of file " + lastModifiedFile.getAbsolutePath(), e);
+            }
         }
     }
 
@@ -221,6 +241,8 @@ public class MCRConfiguration {
                     fout.close();
                 }
             }
+            //allow other users to change this file
+            lastModifiedFile.setWritable(true, false);
         }
     }
 
