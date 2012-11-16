@@ -30,6 +30,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xml.MCRXMLResource;
@@ -213,7 +214,7 @@ public class MCRSWFResolver implements URIResolver {
         // create a XML JDOM tree with master tag mcr_workflow
         // prepare the transformer stylesheet
         String xslfile = "xsl/mycoreobject-" + base + "-to-workflow.xsl";
-        Document styleSheet = MCRXMLResource.instance().getResource(xslfile);
+        MCRContent styleSheet = MCRXMLResource.instance().getResource(xslfile);
         if (styleSheet == null) {
             xslfile = "xsl/mycoreobject-" + type + "-to-workflow.xsl";
             styleSheet = MCRXMLResource.instance().getResource(xslfile);
@@ -244,7 +245,7 @@ public class MCRSWFResolver implements URIResolver {
 
         // initialize transformer
         MCRXSLTransformation transform = MCRXSLTransformation.getInstance();
-        TransformerHandler handler = transform.getTransformerHandler(transform.getStylesheet(new JDOMSource(styleSheet)));
+        TransformerHandler handler = transform.getTransformerHandler(transform.getStylesheet(styleSheet.getSource()));
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("DefaultLang", DefaultLang);
         parameters.put("CurrentLang", lang);

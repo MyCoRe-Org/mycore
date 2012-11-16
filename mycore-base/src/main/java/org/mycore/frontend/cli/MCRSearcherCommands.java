@@ -52,6 +52,7 @@ import org.mycore.services.fieldquery.data2fields.MCRData2FieldsFile;
 import org.mycore.services.fieldquery.data2fields.MCRIndexEntry;
 import org.mycore.services.fieldquery.data2fields.MCRIndexEntryBuilder;
 import org.mycore.services.fieldquery.data2fields.MCRXSLBuilder;
+import org.xml.sax.SAXParseException;
 
 /**
  * provides static methods to manipulate MCRSearcher indexes.
@@ -90,6 +91,8 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
                 createNewIndexFor(searcherList);
                 closeSearchers(searcherList);
 
+            } catch (SAXParseException e) {
+                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (JDOMException e) {
@@ -104,7 +107,7 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             }
         }
 
-        private List<MCRSearcher> clearAndInitSearchers() throws IOException, JDOMException {
+        private List<MCRSearcher> clearAndInitSearchers() throws IOException, JDOMException, SAXParseException {
             List<MCRSearcher> searcherList = new ArrayList<MCRSearcher>();
             for (String index : getIndexes()) {
                 if (isIndexType(index, mechanism.getIndexType())) {
@@ -135,8 +138,9 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             return luceneIndexes;
         }
 
-        private boolean isIndexType(String index, String type) throws IOException, JDOMException {
-            Document searchFields = MCRXMLResource.instance().getResource("searchfields.xml");
+        private boolean isIndexType(String index, String type) throws IOException, JDOMException, SAXParseException {
+            MCRContent searchFieldsContent = MCRXMLResource.instance().getResource("searchfields.xml");
+            Document searchFields = searchFieldsContent.asXML();
             final String indexKey = MCRConfiguration.instance().getString(SEARCHER_PROPERTY_START + index + SEARCHER_INDEX_SUFFIX);
             for (Object indexElement : searchFields.getRootElement().getChildren("index", MCRConstants.MCR_NAMESPACE)) {
                 final Element indexE = (Element) indexElement;
@@ -219,7 +223,8 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
                     }
                     searcher.addToIndex(entry);
                 } catch (IOException e) {
-                    LOGGER.error(MessageFormat.format("Could not index file {0}{1} with searcher: {2}", file.getOwnerID(), file.getAbsolutePath(), searcher.getID()), e);
+                    LOGGER.error(
+                        MessageFormat.format("Could not index file {0}{1} with searcher: {2}", file.getOwnerID(), file.getAbsolutePath(), searcher.getID()), e);
                 }
             }
         }

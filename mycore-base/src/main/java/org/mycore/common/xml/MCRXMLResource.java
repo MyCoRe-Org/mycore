@@ -31,12 +31,12 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
 import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRURLContent;
 
 /**
  * provides a cache for reading XML resources.
@@ -48,14 +48,14 @@ import org.mycore.common.MCRUtils;
  */
 public class MCRXMLResource {
 
-    private volatile static MCRCache resourceCache;
+    private volatile static MCRCache<String, CacheEntry> resourceCache;
 
     private static MCRXMLResource instance = new MCRXMLResource();
 
     private static Logger LOGGER = Logger.getLogger(MCRXMLResource.class);
 
     private MCRXMLResource() {
-        resourceCache = new MCRCache(MCRConfiguration.instance().getInt("MCR.MCRXMLResource.Cache.Size", 100), "XML resources");
+        resourceCache = new MCRCache<String, CacheEntry>(MCRConfiguration.instance().getInt("MCR.MCRXMLResource.Cache.Size", 100), "XML resources");
     }
 
     /**
@@ -65,14 +65,30 @@ public class MCRXMLResource {
         return instance;
     }
 
+    public URL getURL(String name) throws IOException {
+        return getURL(name, MCRXMLResource.class.getClassLoader());
+    }
+
+    public URL getURL(String name, ClassLoader classLoader) throws IOException {
+        URLConnection con = getResourceURLConnection(name, classLoader);
+        if (con == null) {
+            return null;
+        }
+        try {
+            return con.getURL();
+        } finally {
+            closeURLConnection(con);
+        }
+    }
+
     /**
-     * Returns JDOM Document using ClassLoader of MCRXMLResource class
+     * Returns MCRContent using ClassLoader of MCRXMLResource class
      * 
      * @param name
      *            resource name
      * @see MCRXMLResource#getResource(String, ClassLoader)
      */
-    public Document getResource(String name) throws IOException, JDOMException {
+    public MCRContent getResource(String name) throws IOException, JDOMException {
         return getResource(name, this.getClass().getClassLoader());
     }
 
@@ -88,7 +104,7 @@ public class MCRXMLResource {
     }
 
     /**
-     * Returns parsed XML resource as JDOM Document.
+     * Returns MCRContent of resource.
      * 
      * A cache is used to avoid reparsing if the source of the resource did not
      * change.
@@ -104,24 +120,24 @@ public class MCRXMLResource {
      * @throws JDOMException
      *             if resource cannot be parsed
      */
-    public Document getResource(String name, ClassLoader classLoader) throws IOException, JDOMException {
+    public MCRContent getResource(String name, ClassLoader classLoader) throws IOException {
         URLConnection con = getResourceURLConnection(name, classLoader);
         if (con == null) {
             return null;
         }
         try {
             LOGGER.debug(name + " last modified: " + con.getLastModified());
-            CacheEntry entry = (CacheEntry) resourceCache.getIfUpToDate(name, con.getLastModified());
+            CacheEntry entry = resourceCache.getIfUpToDate(name, con.getLastModified());
             if (entry != null && entry.resourceURL.equals(con.getURL())) {
                 LOGGER.debug("Using cached resource " + name);
-                return entry.doc;
+                return entry.content;
             }
             entry = new CacheEntry();
             resourceCache.put(name, entry);
             entry.resourceURL = con.getURL();
-            Document doc = getDocument(entry.resourceURL);
-            entry.doc = doc;
-            return entry.doc;
+            MCRContent content = getDocument(entry.resourceURL);
+            entry.content = content;
+            return entry.content;
         } finally {
             closeURLConnection(con);
         }
@@ -167,12 +183,9 @@ public class MCRXMLResource {
         return con;
     }
 
-    private Document getDocument(URL url) throws JDOMException, IOException {
-        SAXBuilder builder = new SAXBuilder();
-        builder.setValidation(false);
-        builder.setEntityResolver(MCRURIResolver.instance());
-        Document doc = builder.build(url);
-        return doc;
+    private MCRContent getDocument(URL url) {
+        MCRContent content = new MCRURLContent(url);
+        return content;
     }
 
     public long getLastModified(String name, ClassLoader classLoader) throws IOException {
@@ -196,7 +209,7 @@ public class MCRXMLResource {
     private static class CacheEntry {
         URL resourceURL;
 
-        Document doc;
+        MCRContent content;
     }
 
     private void closeURLConnection(URLConnection con) throws IOException {
