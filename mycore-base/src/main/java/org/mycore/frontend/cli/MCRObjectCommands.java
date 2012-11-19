@@ -92,126 +92,153 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         MCRCommand com = null;
 
-        com = new MCRCommand("delete objects matching {0}", "org.mycore.frontend.cli.MCRObjectCommands.deleteByQuery String",
-            "Deletes all objects matching the query given in parameter {0}");
+        com = new MCRCommand("delete objects matching {0}",
+                "org.mycore.frontend.cli.MCRObjectCommands.deleteByQuery String",
+                "Deletes all objects matching the query given in parameter {0}");
         addCommand(com);
 
-        com = new MCRCommand("delete all objects of type {0}", "org.mycore.frontend.cli.MCRObjectCommands.deleteAllObjects String",
-            "Removes MCRObjects in the number range between the MCRObjectID {0} and {1}.");
+        com = new MCRCommand("delete all objects of type {0}",
+                "org.mycore.frontend.cli.MCRObjectCommands.deleteAllObjects String",
+                "Removes MCRObjects in the number range between the MCRObjectID {0} and {1}.");
         addCommand(com);
 
-        com = new MCRCommand("delete object from {0} to {1}", "org.mycore.frontend.cli.MCRObjectCommands.deleteFromTo String String",
-            "Removes MCRObjects in the number range between the MCRObjectID {0} and {1}.");
+        com = new MCRCommand("delete object from {0} to {1}",
+                "org.mycore.frontend.cli.MCRObjectCommands.deleteFromTo String String",
+                "Removes MCRObjects in the number range between the MCRObjectID {0} and {1}.");
         addCommand(com);
 
-        com = new MCRCommand("delete object {0}", "org.mycore.frontend.cli.MCRObjectCommands.delete String", "Removes a MCRObject with the MCRObjectID {0}");
+        com = new MCRCommand("delete object {0}", "org.mycore.frontend.cli.MCRObjectCommands.delete String",
+                "Removes a MCRObject with the MCRObjectID {0}");
         addCommand(com);
 
-        com = new MCRCommand("list objects matching {0}", "org.mycore.frontend.cli.MCRObjectCommands.listIdsMatchingQuery String",
-            "Lists all objects matching the query given in parameter {0}");
+        com = new MCRCommand("list objects matching {0}",
+                "org.mycore.frontend.cli.MCRObjectCommands.listIdsMatchingQuery String",
+                "Lists all objects matching the query given in parameter {0}");
         addCommand(com);
 
-        com = new MCRCommand("load object from file {0}", "org.mycore.frontend.cli.MCRObjectCommands.loadFromFile String",
-            "Adds a MCRObject form the file {0} to the system.");
+        com = new MCRCommand("load object from file {0}",
+                "org.mycore.frontend.cli.MCRObjectCommands.loadFromFile String",
+                "Adds a MCRObject form the file {0} to the system.");
         addCommand(com);
 
-        com = new MCRCommand("load all objects from directory {0}", "org.mycore.frontend.cli.MCRObjectCommands.loadFromDirectory String",
-            "Loads all MCRObjects form the directory {0} to the system.");
+        com = new MCRCommand("load all objects from directory {0}",
+                "org.mycore.frontend.cli.MCRObjectCommands.loadFromDirectory String",
+                "Loads all MCRObjects form the directory {0} to the system.");
         addCommand(com);
 
-        com = new MCRCommand("update object from file {0}", "org.mycore.frontend.cli.MCRObjectCommands.updateFromFile String",
-            "Updates a MCRObject form the file {0} in the system.");
+        com = new MCRCommand("update object from file {0}",
+                "org.mycore.frontend.cli.MCRObjectCommands.updateFromFile String",
+                "Updates a MCRObject form the file {0} in the system.");
         addCommand(com);
 
-        com = new MCRCommand("update all objects from directory {0}", "org.mycore.frontend.cli.MCRObjectCommands.updateFromDirectory String",
-            "Updates all MCRObjects form the directory {0} in the system.");
+        com = new MCRCommand("update all objects from directory {0}",
+                "org.mycore.frontend.cli.MCRObjectCommands.updateFromDirectory String",
+                "Updates all MCRObjects form the directory {0} in the system.");
         addCommand(com);
 
-        com = new MCRCommand("export object from {0} to {1} to directory {2} with {3}",
-            "org.mycore.frontend.cli.MCRObjectCommands.export String String String String",
-            "Stores all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet {3}-object.xsl. For {3} save is the default.");
+        com = new MCRCommand(
+                "export object from {0} to {1} to directory {2} with {3}",
+                "org.mycore.frontend.cli.MCRObjectCommands.export String String String String",
+                "Stores all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet {3}-object.xsl. For {3} save is the default.");
         addCommand(com);
 
-        com = new MCRCommand(EXPORT_OBJECT_TO_DIRECTORY_COMMAND, "org.mycore.frontend.cli.MCRObjectCommands.export String String String",
-            "Stores the MCRObject with the MCRObjectID {0} to the directory {1} with the stylesheet {2}-object.xsl. For {2} save is the default.");
+        com = new MCRCommand(
+                EXPORT_OBJECT_TO_DIRECTORY_COMMAND,
+                "org.mycore.frontend.cli.MCRObjectCommands.export String String String",
+                "Stores the MCRObject with the MCRObjectID {0} to the directory {1} with the stylesheet {2}-object.xsl. For {2} save is the default.");
         addCommand(com);
 
-        com = new MCRCommand("export all objects of type {0} to directory {1} with {2}",
-            "org.mycore.frontend.cli.MCRObjectCommands.exportAllObjectsOfType String String String",
-            "Stores all MCRObjects of type {0} to directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.");
+        com = new MCRCommand(
+                "export all objects of type {0} to directory {1} with {2}",
+                "org.mycore.frontend.cli.MCRObjectCommands.exportAllObjectsOfType String String String",
+                "Stores all MCRObjects of type {0} to directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.");
         addCommand(com);
 
-        com = new MCRCommand("export all objects of base {0} to directory {1} with {2}",
-            "org.mycore.frontend.cli.MCRObjectCommands.exportAllObjectsOfBase String String String",
-            "Stores all MCRObjects of base {0} to directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.");
+        com = new MCRCommand(
+                "export all objects of base {0} to directory {1} with {2}",
+                "org.mycore.frontend.cli.MCRObjectCommands.exportAllObjectsOfBase String String String",
+                "Stores all MCRObjects of base {0} to directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.");
         addCommand(com);
 
         com = new MCRCommand("get last ID for base {0}", "org.mycore.frontend.cli.MCRObjectCommands.getLastID String",
-            "Returns the last used MCRObjectID for the ID base {0}.");
+                "Returns the last used MCRObjectID for the ID base {0}.");
         addCommand(com);
 
         com = new MCRCommand("get next ID for base {0}", "org.mycore.frontend.cli.MCRObjectCommands.getNextID String",
-            "Returns the next free MCRObjectID for the ID base {0}.");
+                "Returns the next free MCRObjectID for the ID base {0}.");
         addCommand(com);
 
         com = new MCRCommand("check file {0}", "org.mycore.frontend.cli.MCRObjectCommands.checkXMLFile String",
-            "Checks the data file {0} against the XML Schema.");
+                "Checks the data file {0} against the XML Schema.");
         addCommand(com);
 
-        com = new MCRCommand("repair metadata search of type {0}", "org.mycore.frontend.cli.MCRObjectCommands.repairMetadataSearch String",
-            "Reads the SQL store table of MCRObject XML files for the type {0} and restore them to the search store.");
+        com = new MCRCommand("repair metadata search of type {0}",
+                "org.mycore.frontend.cli.MCRObjectCommands.repairMetadataSearch String",
+                "Reads the SQL store table of MCRObject XML files for the type {0} and restore them to the search store.");
         addCommand(com);
 
-        com = new MCRCommand("repair metadata search of ID {0}", "org.mycore.frontend.cli.MCRObjectCommands.repairMetadataSearchForID String",
-            "Read the SQL store table of MCRObject XML files with MCRObjectID {0} and restore them to the search store.");
+        com = new MCRCommand("repair metadata search of ID {0}",
+                "org.mycore.frontend.cli.MCRObjectCommands.repairMetadataSearchForID String",
+                "Read the SQL store table of MCRObject XML files with MCRObjectID {0} and restore them to the search store.");
         addCommand(com);
 
-        com = new MCRCommand("select objects with query {0}", "org.mycore.frontend.cli.MCRObjectCommands.selectObjectsWithQuery String",
-            "Select MCRObjects with MCRQueryString {0}.");
+        com = new MCRCommand("select objects with query {0}",
+                "org.mycore.frontend.cli.MCRObjectCommands.selectObjectsWithQuery String",
+                "Select MCRObjects with MCRQueryString {0}.");
         addCommand(com);
 
-        com = new MCRCommand("list selected", "org.mycore.frontend.cli.MCRObjectCommands.listSelected", "Prints the id of selected objects");
+        com = new MCRCommand("list selected", "org.mycore.frontend.cli.MCRObjectCommands.listSelected",
+                "Prints the id of selected objects");
         addCommand(com);
 
-        com = new MCRCommand("delete selected", "org.mycore.frontend.cli.MCRObjectCommands.deleteSelected", "Removes selected MCRObjects.");
+        com = new MCRCommand("delete selected", "org.mycore.frontend.cli.MCRObjectCommands.deleteSelected",
+                "Removes selected MCRObjects.");
         addCommand(com);
 
-        com = new MCRCommand("export selected to directory {0} with {1}", "org.mycore.frontend.cli.MCRObjectCommands.exportSelected String String",
-            "Stores selected MCRObjects to the directory {0} with the stylesheet {1}-object.xsl. For {1} save is the default.");
+        com = new MCRCommand("export selected to directory {0} with {1}",
+                "org.mycore.frontend.cli.MCRObjectCommands.exportSelected String String",
+                "Stores selected MCRObjects to the directory {0} with the stylesheet {1}-object.xsl. For {1} save is the default.");
         addCommand(com);
 
-        com = new MCRCommand("remove selected from searchindex {0}", "org.mycore.frontend.cli.MCRObjectCommands.removeFromSearchindex String",
-            "Remove selected MCRObjects from searchindex {0}.");
+        com = new MCRCommand("remove selected from searchindex {0}",
+                "org.mycore.frontend.cli.MCRObjectCommands.removeFromSearchindex String",
+                "Remove selected MCRObjects from searchindex {0}.");
         addCommand(com);
 
         com = new MCRCommand("check selected in sql store", "org.mycore.frontend.cli.MCRObjectCommands.checkSelected",
-            "Checks existence of selected MCRObjects in SQL store and deletes missing ones from search index.");
+                "Checks existence of selected MCRObjects in SQL store and deletes missing ones from search index.");
         addCommand(com);
 
-        com = new MCRCommand("check metadata search of type {0}", "org.mycore.frontend.cli.MCRObjectCommands.checkMetadataSearch String",
-            "Checks existence of MCRObjects of type {0} in search index and rapairs missing ones in search index.");
+        com = new MCRCommand("check metadata search of type {0}",
+                "org.mycore.frontend.cli.MCRObjectCommands.checkMetadataSearch String",
+                "Checks existence of MCRObjects of type {0} in search index and rapairs missing ones in search index.");
         addCommand(com);
 
-        com = new MCRCommand("set mode {0} of searcher for index {1}", "org.mycore.frontend.cli.MCRObjectCommands.notifySearcher String String",
-            "Notify Searcher of Index {1} what is going on {0}.");
+        com = new MCRCommand("set mode {0} of searcher for index {1}",
+                "org.mycore.frontend.cli.MCRObjectCommands.notifySearcher String String",
+                "Notify Searcher of Index {1} what is going on {0}.");
         addCommand(com);
 
-        com = new MCRCommand("list revisions of {0}", "org.mycore.frontend.cli.MCRObjectCommands.listRevisions String", "List revisions of MCRObject.");
+        com = new MCRCommand("list revisions of {0}", "org.mycore.frontend.cli.MCRObjectCommands.listRevisions String",
+                "List revisions of MCRObject.");
         addCommand(com);
 
-        com = new MCRCommand("restore {0} to revision {1}", "org.mycore.frontend.cli.MCRObjectCommands.restoreToRevision String int",
-            "Restores the selected MCRObject to the selected revision.");
+        com = new MCRCommand("restore {0} to revision {1}",
+                "org.mycore.frontend.cli.MCRObjectCommands.restoreToRevision String int",
+                "Restores the selected MCRObject to the selected revision.");
         addCommand(com);
 
         com = new MCRCommand("xslt {0} with file {1}", "org.mycore.frontend.cli.MCRObjectCommands.xslt String String",
-            "transforms a mycore object {0} with the given file {1}");
+                "transforms a mycore object {0} with the given file {1}");
         addCommand(com);
 
-        com = new MCRCommand("transform selected with file {0}", "org.mycore.frontend.cli.MCRObjectCommands.transformSelected String",
-            "xsl transforms selected MCRObjects");
+        com = new MCRCommand("transform selected with file {0}",
+                "org.mycore.frontend.cli.MCRObjectCommands.transformSelected String",
+                "xsl transforms selected MCRObjects");
         addCommand(com);
-        com = new MCRCommand("set parent of {0} to {1}", "org.mycore.frontend.cli.MCRObjectCommands.replaceParent String String",
-            "replaces a parent of an object (first parameter) to the given new one (second parameter)");
+        com = new MCRCommand("set parent of {0} to {1}",
+                "org.mycore.frontend.cli.MCRObjectCommands.replaceParent String String",
+                "replaces a parent of an object (first parameter) to the given new one (second parameter)");
         addCommand(com);
     }
 
@@ -257,6 +284,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.info(mcrId + " deleted.");
         } catch (MCRException ex) {
             LOGGER.error("Can't delete " + mcrId + ".", ex);
+        } catch (MCRActiveLinkException ex) {
+            LOGGER.error("Can't delete " + mcrId + " cause the object is referenced by other.");
         }
     }
 
@@ -272,25 +301,25 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         int from_i = 0;
         int to_i = 0;
 
-        try {
-            MCRObjectID from = MCRObjectID.getInstance(IDfrom);
-            MCRObjectID to = MCRObjectID.getInstance(IDto);
-            from_i = from.getNumberAsInteger();
-            to_i = to.getNumberAsInteger();
+        MCRObjectID from = MCRObjectID.getInstance(IDfrom);
+        MCRObjectID to = MCRObjectID.getInstance(IDto);
+        from_i = from.getNumberAsInteger();
+        to_i = to.getNumberAsInteger();
 
-            if (from_i > to_i) {
-                throw new MCRException("The from-to-interval is false.");
-            }
+        if (from_i > to_i) {
+            throw new MCRException("The from-to-interval is false.");
+        }
 
-            for (int i = from_i; i < to_i + 1; i++) {
-                String id = MCRObjectID.formatID(from.getProjectId(), from.getTypeId(), i);
-                if (MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
+        for (int i = from_i; i < to_i + 1; i++) {
+            String id = MCRObjectID.formatID(from.getProjectId(), from.getTypeId(), i);
+            if (MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
+                try {
                     delete(id);
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage());
+                    LOGGER.debug(e.getStackTrace());
                 }
             }
-        } catch (MCRException ex) {
-            LOGGER.debug(ex.getStackTraceAsString());
-            LOGGER.error(ex.getMessage());
         }
     }
 
@@ -325,7 +354,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            if true, object will be updated, else object is created
      * @throws MCRActiveLinkException
      */
-    private static final List<String> processFromDirectory(String directory, boolean update) throws MCRActiveLinkException {
+    private static final List<String> processFromDirectory(String directory, boolean update)
+            throws MCRActiveLinkException {
         File dir = new File(directory);
 
         if (!dir.isDirectory()) {
@@ -359,7 +389,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    public static final boolean loadFromFile(String file) throws MCRActiveLinkException, MCRException, SAXParseException, IOException {
+    public static final boolean loadFromFile(String file) throws MCRActiveLinkException, MCRException,
+            SAXParseException, IOException {
         return loadFromFile(file, true);
     }
 
@@ -374,7 +405,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    public static final boolean loadFromFile(String file, boolean importMode) throws MCRActiveLinkException, MCRException, SAXParseException, IOException {
+    public static final boolean loadFromFile(String file, boolean importMode) throws MCRActiveLinkException,
+            MCRException, SAXParseException, IOException {
         return processFromFile(new File(file), false, importMode);
     }
 
@@ -387,7 +419,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    public static final boolean updateFromFile(String file) throws MCRActiveLinkException, MCRException, SAXParseException, IOException {
+    public static final boolean updateFromFile(String file) throws MCRActiveLinkException, MCRException,
+            SAXParseException, IOException {
         return updateFromFile(file, true);
     }
 
@@ -402,7 +435,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    public static final boolean updateFromFile(String file, boolean importMode) throws MCRActiveLinkException, MCRException, SAXParseException, IOException {
+    public static final boolean updateFromFile(String file, boolean importMode) throws MCRActiveLinkException,
+            MCRException, SAXParseException, IOException {
         return processFromFile(new File(file), true, importMode);
     }
 
@@ -419,8 +453,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    private static final boolean processFromFile(File file, boolean update, boolean importMode) throws MCRActiveLinkException, MCRException, SAXParseException,
-        IOException {
+    private static final boolean processFromFile(File file, boolean update, boolean importMode)
+            throws MCRActiveLinkException, MCRException, SAXParseException, IOException {
         if (!file.getName().endsWith(".xml")) {
             LOGGER.warn(file + " ignored, does not end with *.xml");
             return false;
@@ -597,7 +631,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws TransformerFactoryConfigurationError
      * @throws TransformerConfigurationException
      */
-    private static final Transformer getTransformer(String style) throws TransformerFactoryConfigurationError, TransformerConfigurationException {
+    private static final Transformer getTransformer(String style) throws TransformerFactoryConfigurationError,
+            TransformerConfigurationException {
         String xslfile = DEFAULT_TRANSFORMER;
         if (style != null && style.trim().length() != 0) {
             xslfile = style + "-object.xsl";
@@ -655,8 +690,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    private static final boolean exportMCRObject(File dir, Transformer trans, String nid) throws FileNotFoundException, TransformerException, IOException,
-        MCRException, SAXParseException {
+    private static final boolean exportMCRObject(File dir, Transformer trans, String nid) throws FileNotFoundException,
+            TransformerException, IOException, MCRException, SAXParseException {
         byte[] xml = null;
         try {
             // if object do'snt exist - no exception is catched!
@@ -883,7 +918,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
         List<String> commandList = new ArrayList<String>();
         for (String mcrId : getSelectedObjectIDs()) {
-            commandList.add(new StringBuffer("xslt ").append(mcrId).append(" with file ").append(xslFilePath).toString());
+            commandList.add(new StringBuffer("xslt ").append(mcrId).append(" with file ").append(xslFilePath)
+                    .toString());
         }
         return commandList;
     }
@@ -902,15 +938,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
         List<String> cmds = new ArrayList<String>(getSelectedObjectIDs().size());
         for (String id : getSelectedObjectIDs()) {
-            cmds.add(new StringBuilder("export object from ")
-                .append(id)
-                .append(" to ")
-                .append(id)
-                .append(" to directory ")
-                .append(dirname)
-                .append(" with ")
-                .append(style)
-                .toString());
+            cmds.add(new StringBuilder("export object from ").append(id).append(" to ").append(id)
+                    .append(" to directory ").append(dirname).append(" with ").append(style).toString());
         }
         return cmds;
     }
@@ -1088,7 +1117,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         if (results == null) {
             return;
         }
-        File deletedItems = new File(System.getenv("HOME") + File.separator + System.currentTimeMillis() + "_deleted_objects.txt");
+        File deletedItems = new File(System.getenv("HOME") + File.separator + System.currentTimeMillis()
+                + "_deleted_objects.txt");
         FileWriter fw = new FileWriter(deletedItems);
         try {
             fw.write("query=" + source + "\n\n");
@@ -1103,7 +1133,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             fw.close();
         }
 
-        LOGGER.info("A list with the identifiers of the deleted items has been saved to " + deletedItems.getAbsolutePath());
+        LOGGER.info("A list with the identifiers of the deleted items has been saved to "
+                + deletedItems.getAbsolutePath());
     }
 
     /**
@@ -1133,7 +1164,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         if (results == null) {
             return;
         }
-        File matchingItems = new File(System.getenv("HOME") + File.separator + System.currentTimeMillis() + "_matched.txt");
+        File matchingItems = new File(System.getenv("HOME") + File.separator + System.currentTimeMillis()
+                + "_matched.txt");
         FileWriter fw = new FileWriter(matchingItems);
         try {
             fw.write("query=" + qSource + "\n\n");
@@ -1148,7 +1180,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             fw.close();
         }
 
-        LOGGER.info("A list with the identifiers matching query \"" + qSource + "\" has been saved to " + matchingItems.getAbsolutePath());
+        LOGGER.info("A list with the identifiers matching query \"" + qSource + "\" has been saved to "
+                + matchingItems.getAbsolutePath());
     }
 
     /**
@@ -1205,7 +1238,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws MCRPersistenceException 
      * @throws MCRActiveLinkException
      */
-    public static void replaceParent(String sourceId, String newParentId) throws MCRPersistenceException, MCRActiveLinkException {
+    public static void replaceParent(String sourceId, String newParentId) throws MCRPersistenceException,
+            MCRActiveLinkException {
         // child
         MCRObject sourceMCRObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(sourceId));
         // old parent
