@@ -17,8 +17,6 @@ import org.mycore.datamodel.metadata.MCRBase;
  */
 public class MCRBaseContentStream extends MCRAbstractSolrContentStream<MCRContent> {
 
-    private MCRContentTransformer transformer;
-
     /***/
     protected MCRBaseContentStream() {
         super();
@@ -32,17 +30,21 @@ public class MCRBaseContentStream extends MCRAbstractSolrContentStream<MCRConten
         this();
         this.name = id;
         this.sourceInfo = content.getSystemId();
-        transformer = MCRSolrAppender.getTransformer();
-        this.contentType = transformer.getMimeType();
+        this.contentType = getTransformer().getMimeType();
         this.source = content;
     }
 
     @Override
     protected void setup() throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream(64 * 1024);
-        transformer.transform(source, out);
+        getTransformer().transform(source, out);
         byte[] byteArray = out.toByteArray();
         this.size = (long) byteArray.length;
         inputStream = new ByteArrayInputStream(byteArray);
     }
+
+    public MCRContentTransformer getTransformer() {
+        return MCRSolrAppender.getTransformer();
+    }
+
 }

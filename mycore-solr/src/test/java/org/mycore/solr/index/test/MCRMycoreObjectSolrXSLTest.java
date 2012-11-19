@@ -20,10 +20,12 @@ import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamSource;
 
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMResult;
+import org.jdom.transform.JDOMSource;
 import org.jdom.xpath.XPath;
 import org.junit.Test;
 
@@ -78,7 +80,10 @@ public class MCRMycoreObjectSolrXSLTest {
         String styleSheetPath = MessageFormat.format("{0}xsl{0}mycoreobject-solr.xsl", File.separator);
         InputStream stylesheetAsStream = getClass().getResourceAsStream(styleSheetPath);
         
-        Templates templates = TransformerFactory.newInstance().newTemplates(new StreamSource(stylesheetAsStream));
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        URIResolver mockIncludeResolver = new MockURIResolver();
+        transformerFactory.setURIResolver(mockIncludeResolver);
+        Templates templates = transformerFactory.newTemplates(new StreamSource(stylesheetAsStream));
         Transformer transformer = templates.newTransformer();
         URIResolver resolver = new MockResolver();
         transformer.setURIResolver(resolver);
@@ -94,6 +99,15 @@ public class MCRMycoreObjectSolrXSLTest {
             String testFilePath = File.separator + MCRMycoreObjectSolrXSLTest.class.getSimpleName() + File.separator + "mockClassification.xml";
             InputStream testXMLAsStream = getClass().getResourceAsStream(testFilePath);
             return new StreamSource(testXMLAsStream);
+        }
+
+    }
+
+    public class MockURIResolver implements URIResolver {
+
+        @Override
+        public Source resolve(String arg0, String arg1) throws TransformerException {
+            return new JDOMSource(new Element("empty"));
         }
 
     }

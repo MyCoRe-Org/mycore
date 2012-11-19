@@ -2,6 +2,8 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:xalan="http://xml.apache.org/xalan">
 
+  <xsl:include href="xslInclude:solr-export" />
+
   <xsl:template match="*">
     <xsl:apply-templates />
   </xsl:template>
@@ -15,14 +17,19 @@
       <xsl:apply-templates mode="mcr2Source" select="//mycoreobject"/>
     </solr-document-container>
   </xsl:template>
-  
+
   <xsl:template mode="mcr2Source" match="mycoreobject">
       <source>
         <xsl:copy-of select="." />
         <user>
           <xsl:apply-templates />
+          <xsl:apply-templates mode="user-application" />
         </user>
       </source>
+  </xsl:template>
+
+  <!-- overwrite this in your application -->
+  <xsl:template match="node()" mode="user-application">
   </xsl:template>
 
   <xsl:template match="*[@class='MCRMetaClassification']/*">
