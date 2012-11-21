@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycorederivate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:noNamespaceSchemaLocation="datamodel-derivate.xsd" ID="jportal_derivate_00222741" label="data object from jportal_jpvolume_00024979" version="2.0">
+  <derivate display="true">
+    <linkmetas class="MCRMetaLinkID" heritable="false">
+      <linkmeta inherited="0" xlink:type="locator" xlink:href="jportal_jpvolume_00024979" />
+    </linkmetas>
+    <internals class="MCRMetaIFS" heritable="false">
+      <internal inherited="0" maindoc="SHZ_1910_240.pdf" ifsid="fk030e0h00pu0s53" />
+    </internals>
+  </derivate>
+  <service>
+    <servdates class="MCRMetaISO8601Date">
+      <servdate type="createdate" inherited="0">2012-05-24T14:08:33.036Z</servdate>
+      <servdate type="modifydate" inherited="0">2012-05-24T14:08:33.036Z</servdate>
+    </servdates>
+  </service>
+</mycorederivate>
