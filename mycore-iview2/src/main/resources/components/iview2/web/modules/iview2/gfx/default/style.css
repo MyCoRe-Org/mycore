@@ -658,6 +658,7 @@ div.thumbnail>img {
 
 .viewerContainer.min>div.scrollBar {
 	overflow: hidden;
+	display: none;
 }
 
 .viewerContainer.min>thumbnailOverview {
