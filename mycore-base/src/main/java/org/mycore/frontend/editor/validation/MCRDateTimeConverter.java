@@ -10,6 +10,7 @@ import org.mycore.common.MCRException;
 
 public class MCRDateTimeConverter {
 
+    private static final Date CHECK_DATE = new Date(0l);
     private List<SimpleDateFormat> formats = new ArrayList<SimpleDateFormat>();
 
     public MCRDateTimeConverter(MCRValidator validator) {
@@ -26,7 +27,7 @@ public class MCRDateTimeConverter {
 
     public Date string2date(String input) throws MCRException {
         for (SimpleDateFormat format : formats) {
-            if (format.toPattern().length() != input.length())
+            if (format.format(CHECK_DATE).length() != input.length())
                 continue;
             try {
                 ParsePosition pp = new ParsePosition(0);
