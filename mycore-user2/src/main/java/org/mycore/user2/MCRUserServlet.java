@@ -38,6 +38,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -251,6 +252,13 @@ public class MCRUserServlet extends MCRServlet {
                 user.setOwner(owner);
             } else {
                 user.setOwner(null);
+            }
+            String validUntilText = u.getChildTextTrim("validUntil");
+            if (validUntilText == null || validUntilText.length() == 0) {
+                user.setValidUntil(null);
+            } else {
+                MCRISO8601Date date = new MCRISO8601Date(validUntilText);
+                user.setValidUntil(date.getDate());
             }
         } else { // save read user of creator
             user.setRealm(MCRRealmFactory.getLocalRealm());
