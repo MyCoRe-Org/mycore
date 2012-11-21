@@ -161,7 +161,7 @@ public class MCRIView2Tools {
      * @param derivateId
      * @return true if all files in belonging to the derivate are tiled, false otherwise
      */
-    public boolean isCompletelyTiled(String derivateId) {
+    public static boolean isCompletelyTiled(String derivateId) {
         if (!MCRMetadataManager.exists(MCRObjectID.getInstance(derivateId))) {
             return false;
         }
