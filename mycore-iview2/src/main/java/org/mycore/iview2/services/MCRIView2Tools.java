@@ -40,6 +40,7 @@ import org.apache.log4j.Logger;
 import org.jdom.JDOMException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
@@ -155,6 +156,26 @@ public class MCRIView2Tools {
     }
 
     /**
+     * Checks for a given derivate id whether all files in that derivate are tiled.
+     * 
+     * @param derivateId
+     * @return true if all files in belonging to the derivate are tiled, false otherwise
+     */
+    public boolean isCompletelyTiled(String derivateId) {
+        if (!MCRMetadataManager.exists(MCRObjectID.getInstance(derivateId))) {
+            return false;
+        }
+        for (MCRFile f : MCRUtils.getFiles(derivateId)) {
+            if (MCRIView2Tools.isFileSupported(f)) {
+                if (!MCRIView2Tools.isTiled(f)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
      * @param file image file
      * @return true if {@link MCRImage#getTiledFile(File, String, String)} exists
      * @see #getTileDir()
@@ -187,7 +208,8 @@ public class MCRIView2Tools {
             double zoomFactor = Math.pow(2, (imageProps.getZoomlevel() - zoomLevel));
             int maxX = (int) Math.ceil((imageProps.getWidth() / zoomFactor) / MCRImage.getTileSize());
             int maxY = (int) Math.ceil((imageProps.getHeight() / zoomFactor) / MCRImage.getTileSize());
-            LOGGER.debug(MessageFormat.format("Image size:{0}x{1}, tiles:{2}x{3}", imageProps.getWidth(), imageProps.getHeight(), maxX, maxY));
+            LOGGER.debug(MessageFormat.format("Image size:{0}x{1}, tiles:{2}x{3}", imageProps.getWidth(), imageProps.getHeight(), maxX,
+                    maxY));
             BufferedImage sampleTile = readTile(iviewImage, reader, zoomLevel, maxX - 1, 0);
             int xDim = ((maxX - 1) * MCRImage.getTileSize() + sampleTile.getWidth());
             int yDim = ((maxY - 1) * MCRImage.getTileSize() + readTile(iviewImage, reader, zoomLevel, 0, maxY - 1).getHeight());
