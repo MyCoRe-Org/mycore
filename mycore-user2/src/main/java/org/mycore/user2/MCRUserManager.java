@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.InstantiationException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
@@ -460,6 +461,7 @@ public class MCRUserManager {
 
     private static MCRUser getByNaturalID(Session session, String userName, String realmId) {
         final Criteria criteria = getUserCriteria(session);
+        criteria.setFetchMode("owner", FetchMode.JOIN);
         return (MCRUser) criteria.setCacheable(true).add(getUserRealmCriterion(userName, realmId)).uniqueResult();
     }
 
