@@ -1,6 +1,8 @@
 package org.mycore.solr.search;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,27 +22,158 @@ import org.mycore.frontend.servlets.MCRServletJob;
  */
 public class MCRSolrSearchServlet extends MCRServlet {
 
+    private enum SolrParameterGroup {
+        SolrParameter, QueryParameter, TypeParameter
+    }
+
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = Logger.getLogger(MCRSolrSearchServlet.class);
-
-    private List<String> reservedParameterKeys;
-
-    @Override
-    public void init() throws ServletException {
-        super.init();
-
-        reservedParameterKeys = createReservedParameterKeys();
-    }
 
     /**
      * Creates a list with all parameters that can be used within a select request to solr.
      * @return the list.
      */
-    private List<String> createReservedParameterKeys() {
+    private static List<String> solrParameterKeys() {
         String[] params = new String[] { "q", "sort", "start", "rows", "pageDoc", "pageScore", "fq", "cache", "fl", "glob", "debug",
                 "explainOther", "defType", "timeAllowed", "omitHeader", "sortOrder", "sortBy" };
         return Collections.unmodifiableList(Arrays.asList(params));
+    }
+
+    private List<String> reservedParameterKeys;
+
+    protected String buildQueryParameter(Map<String, String[]> queryParameters, Map<String, String[]> typeParameters) {
+
+        List<String> typeSelectedParameter = new ArrayList<String>();
+        StringBuilder queryBuilder = new StringBuilder();
+
+        //at first we add all parameters that are member of types
+        for (Entry<String, String[]> currentTypeEntry : typeParameters.entrySet()) {
+            StringBuilder subFqBuilder = new StringBuilder();
+
+            subFqBuilder.append("&fq={!join from=returnId to=id}");
+
+            for (String typeMember : currentTypeEntry.getValue()) {
+                String[] memberValues = queryParameters.get(typeMember);
+                typeSelectedParameter.add(typeMember);
+                if (memberValues != null) {
+                    for (String currentValue : memberValues) {
+                        if (currentValue.length() == 0) {
+                            currentValue = "*";
+                        }
+                        try {
+                            subFqBuilder.append(buildQueryPart(typeMember, currentValue));
+                        } catch (UnsupportedEncodingException e) {
+                        } // impossible(UTF-8)
+
+                    }
+                }
+            }
+
+            queryBuilder.append(subFqBuilder.toString());
+        }
+        queryBuilder.append("&q=");
+
+        // then we add all others that are not added yet
+        for (Entry<String, String[]> currentParameter : queryParameters.entrySet()) {
+            // check the parameter is not added yet
+            if (!typeSelectedParameter.contains(currentParameter.getKey())) {
+                for (String parameterValue : currentParameter.getValue()) {
+                    if (parameterValue.length() > 0) {
+                        try {
+                            queryBuilder.append(buildQueryPart(currentParameter.getKey(), parameterValue));
+                        } catch (UnsupportedEncodingException e) {
+                        } // impossible(UTF-8)
+                    }
+                }
+            }
+        }
+
+        return queryBuilder.toString();
+    }
+
+    private String buildQueryPart(String fieldName, String value) throws UnsupportedEncodingException {
+        StringBuilder sb = new StringBuilder();
+        sb.append("%2B");
+        sb.append(URLEncoder.encode(fieldName, "UTF-8"));
+        sb.append(":");
+        sb.append(URLEncoder.encode(value, "UTF-8"));
+        sb.append("%20");
+        return sb.toString();
+    }
+
+    protected String buildSolrParameterString(Map<String, String[]> parameters) {
+        StringBuilder qBuilder = new StringBuilder();
+
+        for (Entry<String, String[]> currentParameter : parameters.entrySet()) {
+            for (String parameterValue : currentParameter.getValue()) {
+                qBuilder.append("&").append(currentParameter.getKey()).append("=").append(parameterValue);
+            }
+        }
+        if (qBuilder.length() > 0) {
+            qBuilder.deleteCharAt(0);
+        }
+
+        return qBuilder.toString();
+
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    protected void doGetPost(MCRServletJob job) throws Exception {
+        Map<String, String[]> solrParameters = new HashMap<String, String[]>();
+        Map<String, String[]> queryParameters = new HashMap<String, String[]>();
+        Map<String, String[]> typeParameters = new HashMap<String, String[]>();
+
+        extractParameterList(job.getRequest().getParameterMap(), queryParameters, solrParameters, typeParameters);
+
+        String q = buildQueryParameter(queryParameters, typeParameters);
+        LOGGER.info("Generated Query is : " + q);
+
+        String otherParameters = buildSolrParameterString(solrParameters);
+        LOGGER.info("SolrParameter Parameter Query is : " + otherParameters);
+
+        String url = MCRServlet.getServletBaseURL() + "SolrSelectProxy?" + otherParameters + q;
+
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(url));
+
+    }
+
+
+    protected void extractParameterList(Map<String, String[]> requestParameter, Map<String, String[]> queryParameter,
+            Map<String, String[]> solrParameter, Map<String, String[]> typeParameter) {
+        for (Entry<String, String[]> currentEntry : requestParameter.entrySet()) {
+            String parameterName = currentEntry.getKey();
+            SolrParameterGroup parameterGroup = getParameterType(parameterName);
+
+            switch (parameterGroup) {
+            case SolrParameter:
+                solrParameter.put(parameterName, currentEntry.getValue());
+                break;
+            case TypeParameter:
+                typeParameter.put(parameterName, currentEntry.getValue());
+                break;
+            case QueryParameter:
+                queryParameter.put(parameterName, currentEntry.getValue());
+                break;
+            }
+        }
+
+    }
+
+    /**
+     * Returns the {@link SolrParameterGroup} for a specific parameter name
+     * @param parameterName the name of the parameter
+     * @return 
+     */
+    private SolrParameterGroup getParameterType(String parameterName) {
+        if (isTypeParameter(parameterName)) {
+            return SolrParameterGroup.TypeParameter;
+        } else if (isSolrParameter(parameterName)) {
+            return SolrParameterGroup.SolrParameter;
+        } else {
+            return SolrParameterGroup.QueryParameter;
+        }
     }
 
     /**
@@ -52,83 +185,34 @@ public class MCRSolrSearchServlet extends MCRServlet {
         return reservedParameterKeys;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    protected void doGetPost(MCRServletJob job) throws Exception {
-        // "split of" reserved parameters
-        Map<String, String[]> reservedParameters = getFilteredParameterList(job.getRequest().getParameterMap(), false);
-        Map<String, String[]> queryParameters = getFilteredParameterList(job.getRequest().getParameterMap(), true);
+    public void init() throws ServletException {
+        super.init();
 
-        String q = URLEncoder.encode(buildQueryParameter(queryParameters), "UTF-8");
-        LOGGER.info("Generated Query is : " + q);
-
-        String otherParameters = buildParameterString(reservedParameters);
-        LOGGER.info("SolrReserved Parameter Query is : " + otherParameters);
-
-        String url = MCRServlet.getServletBaseURL() + "SolrSelectProxy?q=" + q + otherParameters;
-
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(url));
-
-    }
-
-    protected String buildParameterString(Map<String, String[]> parameters) {
-        StringBuilder qBuilder = new StringBuilder();
-
-        for (Entry<String, String[]> currentParameter : parameters.entrySet()) {
-            for (String parameterValue : currentParameter.getValue()) {
-                qBuilder.append("&").append(currentParameter.getKey()).append("=").append(parameterValue);
-            }
-        }
-
-        return qBuilder.toString();
-
+        reservedParameterKeys = solrParameterKeys();
     }
 
     /**
-     * Builds the Query for the solr request (without q=)
-     * @param parametersForQuery the parameter that should appear in the query
-     * @return the value of q
+     * Detects if a parameter is a solr Parameter
+     * @param parameterName the name of the parameter
+     * @return true if the parameter is a solr parameter
      */
-    protected String buildQueryParameter(Map<String, String[]> parametersForQuery) {
-        StringBuilder qBuilder = new StringBuilder();
-
-        for (Entry<String, String[]> currentParameter : parametersForQuery.entrySet()) {
-            for (String parameterValue : currentParameter.getValue()) {
-                if (parameterValue.length() > 0) {
-                    qBuilder.append(" +");
-                    qBuilder.append(currentParameter.getKey());
-                    qBuilder.append(":");
-                    qBuilder.append(parameterValue);
-                }
-            }
+    private boolean isSolrParameter(String parameterName) {
+        if (reservedParameterKeys.contains(parameterName)) {
+            return true;
         }
-
-        if (qBuilder.length() > 0) {
-            qBuilder.deleteCharAt(0);
-        }
-
-        return qBuilder.toString();
+        return false;
     }
 
     /**
-     * Filters the requestParameter for the generation of q= or for the generation of the reserved Parameters.
-     * @param requestParameter the parameters of the Request. The map wont modified.
-     * @param queryGeneration <strong>true</strong> map filtered for generation of q= 
-     *                         <strong>false</strong> for the generation of reserved parameters
-     * @return a filtered list
+     * Detects if a parameter is a Type Parameter
+     * @param parameterName the name of the parameter
+     * @return true if the parameter is a type parameter
      */
-    protected Map<String, String[]> getFilteredParameterList(Map<String, String[]> requestParameter, boolean queryGeneration) {
-        Map<String, String[]> filteredParameterList = new HashMap<String, String[]>();
-        List<String> reservedParameters = getReservedParameters();
-
-        for (Entry<String, String[]> currentEntry : requestParameter.entrySet()) {
-            String parameterKey = currentEntry.getKey();
-            boolean reservedParameter = reservedParameters.contains(parameterKey) || parameterKey.startsWith("XSL.");
-            if (!reservedParameter && queryGeneration || reservedParameter && !queryGeneration) {
-                filteredParameterList.put(parameterKey, currentEntry.getValue());
-            }
+    private boolean isTypeParameter(String parameterName) {
+        if (parameterName.startsWith("solr.type.")) {
+            return true;
         }
-
-        return filteredParameterList;
+        return false;
     }
 }
