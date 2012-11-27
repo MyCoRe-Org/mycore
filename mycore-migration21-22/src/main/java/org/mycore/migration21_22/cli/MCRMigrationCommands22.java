@@ -11,11 +11,13 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.transform.JDOMResult;
 import org.jdom.transform.JDOMSource;
 import org.jdom.xpath.XPath;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.xml.MCRXSLTransformation;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -53,6 +55,36 @@ public class MCRMigrationCommands22 extends MCRAbstractCommands {
                 LOGGER.info("Migrated xlink for " + mcrid);
             } else {
                 LOGGER.info("No xlink migration for " + mcrid);
+            }
+        }
+    }
+    
+    @MCRCommand(help="Replace ':' in categID with '_'", syntax="fix colone in categID")
+    public static void fixCategID() throws JDOMException, TransformerException{
+        Session dbSession = MCRHIBConnection.instance().getSession();
+        dbSession.createSQLQuery("update MCRCATEGORY set CATEGID=replace(categid,':','-') where CATEGID like '%:%'").executeUpdate();
+        
+        MCRXMLMetadataManager xmlMetaManager = MCRXMLMetadataManager.instance();
+        List<String> listIDs = xmlMetaManager.listIDs();
+        
+        InputStream resourceAsStream = MCRMigrationCommands22.class.getResourceAsStream("/xsl/replaceColoneInCategID.xsl");
+        Source stylesheet = new StreamSource(resourceAsStream);
+        Transformer xsltTransformer = MCRXSLTransformation.getInstance().getStylesheet(stylesheet).newTransformer();
+
+        XPath xlinkLabel = XPath.newInstance("/mycoreobject/metadata/*[@class='MCRMetaClassification']/*[contains(@categid,':')]");
+        for (String ID : listIDs) {
+            MCRObjectID mcrid = MCRObjectID.getInstance(ID);
+            Document mcrObjXML = xmlMetaManager.retrieveXML(mcrid);
+            if (!xlinkLabel.selectNodes(mcrObjXML).isEmpty()) {
+                Source xmlSource = new JDOMSource(mcrObjXML);
+                JDOMResult jdomResult = new JDOMResult();
+                xsltTransformer.transform(xmlSource, jdomResult);
+                Document migratedMcrObjXML = jdomResult.getDocument();
+
+                xmlMetaManager.update(mcrid, migratedMcrObjXML, new Date());
+                LOGGER.info("Replace ':' in categID for " + mcrid);
+            } else {
+                LOGGER.info("Nothing to replace for " + mcrid);
             }
         }
     }
