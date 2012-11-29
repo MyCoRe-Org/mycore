@@ -1220,6 +1220,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         Document doc = MCRXMLMetadataManager.instance().retrieveXML(mcrId);
         // do XSL transform
         Transformer transformer = TransformerFactory.newInstance().newTransformer(new StreamSource(xslFile));
+        transformer.setURIResolver(MCRURIResolver.instance());
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
         transformer.setOutputProperty(OutputKeys.INDENT, "no");
         JDOMResult result = new JDOMResult();
