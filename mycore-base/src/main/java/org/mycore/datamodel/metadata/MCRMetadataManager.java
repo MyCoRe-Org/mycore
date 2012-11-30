@@ -512,12 +512,11 @@ public final class MCRMetadataManager {
         // get the old Item
         MCRObject old = new MCRObject();
 
-        try {
-            old = MCRMetadataManager.retrieveMCRObject(mcrObject.getId());
-        } catch (final Exception pe) {
+        if (!MCRMetadataManager.exists(mcrObject.getId())) {
             MCRMetadataManager.create(mcrObject);
             return;
-        }
+        } else
+            old = MCRMetadataManager.retrieveMCRObject(mcrObject.getId());
 
         // clean the structure
         mcrObject.getStructure().clearChildren();
