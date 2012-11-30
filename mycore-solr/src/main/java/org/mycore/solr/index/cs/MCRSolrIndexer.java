@@ -43,7 +43,7 @@ public class MCRSolrIndexer extends MCRSearcher {
     /** The executer service used for submitting the index requests. */
     final static ExecutorService executorService = Executors.newFixedThreadPool(10);
 
-    /** Specify how many documents at a time will be submitted to solr at once when rebuilding the metadata index. Default is 100. */
+    /** Specify how many documents will be submitted to solr at a time when rebuilding the metadata index. Default is 100. */
     final static int BULK_SIZE = MCRConfiguration.instance().getInt("MCR.Module-solr.bulk.size", 100);
 
     @Override
