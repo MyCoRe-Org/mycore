@@ -12,6 +12,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
@@ -36,14 +37,14 @@ import org.mycore.solr.legacy.MCRLuceneSolrAdapter;
 public class MCRSolrIndexer extends MCRSearcher {
     private static final Logger LOGGER = Logger.getLogger(MCRSolrIndexer.class);
 
-    static HttpSolrServer solrServer = null;
+    /** The Server used for indexing. */
+    final static HttpSolrServer solrServer = MCRSolrServerFactory.getSolrServer();
 
-    static ExecutorService executorService = null;
+    /** The executer service used for submitting the index requests. */
+    final static ExecutorService executorService = Executors.newFixedThreadPool(10);
 
-    static {
-        solrServer = MCRSolrServerFactory.getSolrServer();
-        executorService = Executors.newFixedThreadPool(10);
-    }
+    /** Specify how many documents at a time will be submitted to solr at once when rebuilding the metadata index. Default is 100. */
+    final static int BULK_SIZE = MCRConfiguration.instance().getInt("MCR.Module-solr.bulk.size", 100);
 
     @Override
     public boolean isIndexer() {
@@ -158,37 +159,39 @@ public class MCRSolrIndexer extends MCRSearcher {
         List<String> list = MCRXMLMetadataManager.instance().listIDs();
 
         if (list.size() == 0) {
-            LOGGER.info("No documents to index");
+            LOGGER.info("Sorry, no documents to index");
             return;
         }
 
         long tStart = System.currentTimeMillis();
         LOGGER.info("Solr: sending " + list.size() + " objects to solr for reindexing");
 
-        Element mcrObjColector = new Element("mcrObjs");
-        MCRXMLMetadataManager mcrxmlMetadataManager = MCRXMLMetadataManager.instance();
-        MCRXMLSolrIndexer mcrxmlSolrIndexer = new MCRXMLSolrIndexer();
+        Element objCollector = new Element("mcrObjs");
+        MCRXMLMetadataManager metadataMgr = MCRXMLMetadataManager.instance();
+        MCRXMLSolrIndexer xmlSolrIndexer = new MCRXMLSolrIndexer();
+
         for (String id : list) {
             try {
                 LOGGER.info("Solr: submitting data of\"" + id + "\" for indexing");
-                Document mcrObjXML = mcrxmlMetadataManager.retrieveXML(MCRObjectID.getInstance(id));
-                mcrObjColector.addContent(mcrObjXML.getRootElement().detach());
-                
-                if (mcrObjColector.getChildren().size() % 100 == 0) {
-                    mcrxmlSolrIndexer.index(new MCRXMLContentCollectorStream(mcrObjColector));
-                    mcrObjColector = new Element("mcrObjs");
+                Document mcrObjXML = metadataMgr.retrieveXML(MCRObjectID.getInstance(id));
+                objCollector.addContent(mcrObjXML.getRootElement().detach());
+
+                if (objCollector.getChildren().size() % BULK_SIZE == 0) {
+                    xmlSolrIndexer.index(new MCRXMLContentCollectorStream(objCollector));
+                    objCollector = new Element("mcrObjs");
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error creating transfer thread", ex);
             }
         }
         /* index remaining docs*/
-        if (mcrObjColector.getChildren().size() > 0) {
-            mcrxmlSolrIndexer.index(new MCRXMLContentCollectorStream(mcrObjColector));
+        if (objCollector.getChildren().size() > 0) {
+            xmlSolrIndexer.index(new MCRXMLContentCollectorStream(objCollector));
         }
         long tStop = System.currentTimeMillis();
-        LOGGER.info("Solr: submitted data of " + list.size() + " objects for indexing done in " + (tStop - tStart) + "ms ("
-                + ((float) (tStop - tStart) / list.size()) + " ms/object)");
+        int durationInSeconds = (int) (tStop - tStart) / 1000;
+        LOGGER.info("Solr: submitted data of " + list.size() + " objects for indexing done in " + durationInSeconds + "s ("
+                + Math.ceil((tStop - tStart) / list.size()) + " ms/object)");
     }
 
     /**
