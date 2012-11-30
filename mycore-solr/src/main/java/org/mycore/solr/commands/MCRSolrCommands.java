@@ -30,6 +30,11 @@ public class MCRSolrCommands extends MCRAbstractCommands {
                 "rebuilds solr's content index");
         addCommand(com);
 
+        com = new MCRCommand("restricted rebuild solr metadata index for objecttype {0}",
+                "org.mycore.solr.index.cs.MCRSolrIndexer.rebuildMetadataIndex String",
+                "rebuilds solr's metadata index for the given type in {0}");
+        addCommand(com);
+
         com = new MCRCommand("optimize solr index", "org.mycore.solr.index.cs.MCRSolrIndexer.optimize",
                 "An optimize is like a hard commit except that it forces all of the index segments to be merged into a single segment first. "
                         + "Depending on the use cases, this operation should be performed infrequently (like nightly), "

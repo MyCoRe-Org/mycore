@@ -152,11 +152,27 @@ public class MCRSolrIndexer extends MCRSearcher {
      * Rebuilds solr's metadata index.
      */
     public static void rebuildMetadataIndex() {
+        rebuildMetadataIndex(MCRXMLMetadataManager.instance().listIDs());
+    }
+
+    /**
+     * Rebuilds solr's metadata index only for objects of the given type.
+     * 
+     * @param type of the objects to index
+     */
+    public static void rebuildMetadataIndex(String type) {
+        List<String> identfiersOfType = MCRXMLMetadataManager.instance().listIDsOfType(type);
+        rebuildMetadataIndex(identfiersOfType);
+    }
+
+    /**
+     * Rebuilds solr's metadata index.
+     * @param list list of identifiers of the objects to index
+     */
+    public static void rebuildMetadataIndex(List<String> list) {
         LOGGER.info("=======================");
         LOGGER.info("Building Metadata Index");
         LOGGER.info("=======================");
-
-        List<String> list = MCRXMLMetadataManager.instance().listIDs();
 
         if (list.size() == 0) {
             LOGGER.info("Sorry, no documents to index");
@@ -190,7 +206,7 @@ public class MCRSolrIndexer extends MCRSearcher {
         }
         long tStop = System.currentTimeMillis();
         int durationInSeconds = (int) (tStop - tStart) / 1000;
-        LOGGER.info("Solr: submitted data of " + list.size() + " objects for indexing done in " + durationInSeconds + "s ("
+        LOGGER.info("Solr: submitted data of " + list.size() + " objects for indexing done in " + durationInSeconds + " seconds ("
                 + Math.ceil((tStop - tStart) / list.size()) + " ms/object)");
     }
 
