@@ -201,7 +201,9 @@ public class MCRSolrIndexer extends MCRSearcher {
             }
         }
         /* index remaining docs*/
-        if (objCollector.getChildren().size() > 0) {
+        int remaining = objCollector.getChildren().size();
+        LOGGER.trace("Indexing almost done. Only " + remaining + " object(s) remaining");
+        if (remaining > 0) {
             xmlSolrIndexer.index(new MCRXMLContentCollectorStream(objCollector));
         }
         long tStop = System.currentTimeMillis();
