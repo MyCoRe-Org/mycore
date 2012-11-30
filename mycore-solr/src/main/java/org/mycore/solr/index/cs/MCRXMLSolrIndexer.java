@@ -8,8 +8,11 @@ import org.mycore.solr.MCRSolrServerFactory;
 
 public class MCRXMLSolrIndexer {
     final static Logger LOGGER = Logger.getLogger(MCRXMLSolrIndexer.class);
-    
+
     static String TRANSFORM = MCRConfiguration.instance().getString("MCR.Module-solr.transform", "object2fields.xsl");
+    static {
+        LOGGER.info(MCRXMLSolrIndexer.class.getName() + " will use " + TRANSFORM);
+    }
 
     public void index(ContentStreamBase stream) {
         try {
