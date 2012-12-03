@@ -24,10 +24,10 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.jdom.Element;
 import org.mycore.common.MCRException;
 
@@ -51,11 +51,11 @@ public class MCRObjectDerivate {
 
     private final ArrayList<MCRMetaLangText> titles;
 
-    private final ArrayList<Element> files;
-
     private String derivateURN;
 
     private boolean display;
+
+    private List<MCRFileMetadata> files;
 
     /**
      * This is the constructor of the MCRObjectDerivate class. All data are set
@@ -66,7 +66,7 @@ public class MCRObjectDerivate {
         externals = new ArrayList<MCRMetaLink>();
         internals = null;
         titles = new ArrayList<MCRMetaLangText>();
-        files = new ArrayList<Element>();
+        files = Collections.emptyList();
         display = true;
     }
 
@@ -113,7 +113,7 @@ public class MCRObjectDerivate {
         if (titlesElement != null) {
             @SuppressWarnings("unchecked")
             List<Element> titleList = titlesElement.getChildren();
-            for (Element titleElement:titleList) {
+            for (Element titleElement : titleList) {
                 MCRMetaLangText text = new MCRMetaLangText();
                 text.setFromDOM(titleElement);
                 if (text.isValid()) {
@@ -131,27 +131,11 @@ public class MCRObjectDerivate {
             }
             @SuppressWarnings("unchecked")
             List<Element> filesInList = filesetElements.getChildren();
-            for (int i = 0; i < filesInList.size(); i++) {
-                Element currentFromList = filesInList.get(i);
-                Element file = new Element("file");
-                Element urn = new Element("urn");
-
-                String value = currentFromList.getAttributeValue("name");
-                if (value != null) {
-                    file.setAttribute("name", value);
-                    value = null;
+            if (!filesInList.isEmpty()) {
+                files = new ArrayList<MCRFileMetadata>(filesInList.size());
+                for (Element file : filesInList) {
+                    files.add(new MCRFileMetadata(file));
                 }
-
-                value = currentFromList.getAttributeValue("ifsid");
-                if (value != null) {
-                    file.setAttribute("ifsid", value);
-                    value = null;
-                }
-
-                urn.addContent(currentFromList.getChild("urn").getText());
-
-                file.addContent(urn);
-                this.files.add(file);
             }
         }
 
@@ -296,15 +280,15 @@ public class MCRObjectDerivate {
             elm.addContent(titEl);
         }
 
-        if (files.size() != 0) {
+        if (this.derivateURN != null || !files.isEmpty()) {
             Element fileset = new Element("fileset");
 
             if (this.derivateURN != null) {
-                fileset.setAttribute("urn", derivateURN);
+                fileset.setAttribute("urn", this.derivateURN);
             }
 
-            for (int i = 0; i < files.size(); i++) {
-                fileset.addContent(((Element) files.get(i).clone()).detach());
+            for (MCRFileMetadata file : files) {
+                fileset.addContent(file.createXML());
             }
             elm.addContent(fileset);
         }
