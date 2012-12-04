@@ -201,17 +201,17 @@ public abstract class MCRBase {
     }
 
     /**
-     * This methode set the object ID.
+     * This method set the object ID.
      * 
      * @param id
      *            the object ID
      */
-    public final void setId(MCRObjectID id) {
+    public void setId(MCRObjectID id) {
         mcr_id = id;
     }
 
     /**
-     * This methode set the object label.
+     * This method set the object label.
      * 
      * @param label
      *            the object label

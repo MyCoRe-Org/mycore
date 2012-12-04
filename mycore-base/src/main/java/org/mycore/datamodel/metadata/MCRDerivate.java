@@ -68,6 +68,7 @@ final public class MCRDerivate extends MCRBase {
      */
     public MCRDerivate() throws MCRException, MCRConfigurationException {
         super();
+        mcr_derivate = new MCRObjectDerivate(getId());
     }
 
     /**
@@ -279,5 +280,11 @@ final public class MCRDerivate extends MCRBase {
      */
     public MCRObjectID getOwnerID() {
         return this.getDerivate().getMetaLink().getXLinkHrefID();
+    }
+
+    @Override
+    public void setId(MCRObjectID id) {
+        super.setId(id);
+        this.mcr_derivate.setDerivateID(id);
     }
 }

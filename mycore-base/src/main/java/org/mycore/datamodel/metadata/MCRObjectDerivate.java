@@ -423,4 +423,8 @@ public class MCRObjectDerivate {
     public String getURN() {
         return derivateURN;
     }
+
+    void setDerivateID(MCRObjectID id) {
+        this.derivateID=id;
+    }
 }
