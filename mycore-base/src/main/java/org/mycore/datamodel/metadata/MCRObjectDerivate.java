@@ -30,6 +30,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
+import org.mycore.datamodel.ifs.MCRFile;
 
 /**
  * This class implements all methode for handling one derivate data.
@@ -57,17 +59,25 @@ public class MCRObjectDerivate {
 
     private List<MCRFileMetadata> files;
 
+    private MCRObjectID derivateID;
+
     /**
      * This is the constructor of the MCRObjectDerivate class. All data are set
      * to null.
      */
-    public MCRObjectDerivate() {
+    public MCRObjectDerivate(MCRObjectID derivateID) {
         linkmeta = null;
         externals = new ArrayList<MCRMetaLink>();
         internals = null;
         titles = new ArrayList<MCRMetaLangText>();
         files = Collections.emptyList();
         display = true;
+        this.derivateID = derivateID;
+    }
+
+    public MCRObjectDerivate(MCRObjectID derivateID, Element derivate) {
+        this(derivateID);
+        setFromDOM(derivate);
     }
 
     /**
@@ -77,7 +87,7 @@ public class MCRObjectDerivate {
      * @param derivate
      *            a list of relevant DOM elements for the derivate
      */
-    public final void setFromDOM(org.jdom.Element derivate) {
+    private final void setFromDOM(org.jdom.Element derivate) {
         // Link to Metadata part
         org.jdom.Element linkmeta_element = derivate.getChild("linkmetas").getChild("linkmeta");
         MCRMetaLinkID link = new MCRMetaLinkID();
@@ -217,6 +227,73 @@ public class MCRObjectDerivate {
         return internals;
     }
 
+    public final MCRFileMetadata getOrCreateFileMetadata(MCRFile file) {
+        if (file == null) {
+            throw new NullPointerException("file may not be null");
+        }
+        int fileCount = files.size();
+        String path = file.getAbsolutePath();
+        for (int i = 0; i < fileCount; i++) {
+            MCRFileMetadata fileMetadata = files.get(i);
+            int compare = fileMetadata.getName().compareTo(path);
+            if (compare < 0) {
+                continue;
+            } else if (compare == 0) {
+                return fileMetadata;
+            } else {
+                //we need to create entry here
+                MCRFileMetadata newFileMetadata = new MCRFileMetadata(path, file.getID(), null, null);
+                files.add(i, newFileMetadata);
+                return newFileMetadata;
+            }
+        }
+        //add path to end of list;
+        if (files.isEmpty()) {
+            files = new ArrayList<MCRFileMetadata>();
+        }
+        MCRFileMetadata newFileMetadata = new MCRFileMetadata(path, file.getID(), null, null);
+        files.add(newFileMetadata);
+        return newFileMetadata;
+    }
+
+    public final MCRFileMetadata getOrCreateFileMetadata(String path) {
+        if (path == null) {
+            throw new NullPointerException("path may not be null");
+        }
+        int fileCount = files.size();
+        for (int i = 0; i < fileCount; i++) {
+            MCRFileMetadata fileMetadata = files.get(i);
+            int compare = fileMetadata.getName().compareTo(path);
+            if (compare < 0) {
+                continue;
+            } else if (compare == 0) {
+                return fileMetadata;
+            } else {
+                //we need to create entry here
+                MCRFileMetadata newFileMetadata = createFileMetadata(path);
+                files.add(i, newFileMetadata);
+                return newFileMetadata;
+            }
+        }
+        //add path to end of list;
+        if (files.isEmpty()) {
+            files = new ArrayList<MCRFileMetadata>();
+        }
+        MCRFileMetadata newFileMetadata = createFileMetadata(path);
+        files.add(newFileMetadata);
+        return newFileMetadata;
+    }
+
+    private MCRFileMetadata createFileMetadata(String path) {
+        MCRFile mcrFile = MCRFile.getMCRFile(derivateID, path);
+        if (mcrFile == null) {
+            throw new MCRPersistenceException("File does not exist: " + derivateID + path);
+        }
+        String ifs = mcrFile.getID();
+        MCRFileMetadata newFileMetadata = new MCRFileMetadata(path, ifs, null, null);
+        return newFileMetadata;
+    }
+
     /**
      * This method set the metadata internals (the IFS data)
      * 
@@ -286,7 +363,7 @@ public class MCRObjectDerivate {
             if (this.derivateURN != null) {
                 fileset.setAttribute("urn", this.derivateURN);
             }
-
+            Collections.sort(files);
             for (MCRFileMetadata file : files) {
                 fileset.addContent(file.createXML());
             }
@@ -337,5 +414,13 @@ public class MCRObjectDerivate {
      */
     public void setDisplayEnabled(boolean display) {
         this.display = display;
+    }
+
+    public void setURN(String urn) {
+        derivateURN = urn;
+    }
+
+    public String getURN() {
+        return derivateURN;
     }
 }

@@ -36,7 +36,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
  * @author Thomas Scheffler (yagee)
  * @see MCRObjectDerivate;
  */
-public class MCRFileMetadata {
+public class MCRFileMetadata implements Comparable<MCRFileMetadata> {
 
     private Collection<MCRCategoryID> categories;
 
@@ -129,6 +129,11 @@ public class MCRFileMetadata {
 
     public void setIfsid(String ifsid) {
         this.ifsid = ifsid;
+    }
+
+    @Override
+    public int compareTo(MCRFileMetadata o) {
+        return this.name.compareTo(o.name);
     }
 
 }

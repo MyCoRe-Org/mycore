@@ -20,6 +20,7 @@ import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRFileMetadata;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRMetaInterface;
 import org.mycore.datamodel.metadata.MCRMetaLangText;
@@ -267,7 +268,7 @@ public class MCRURNAdder {
                 list.add(new Attribute(attributeName, attributeValue));
             } else {
                 list.add(new Attribute(attributeName, attributeValue, namespace.equals("xml") ? Namespace.XML_NAMESPACE : MCRConstants
-                        .getStandardNamespace(namespace)));
+                    .getStandardNamespace(namespace)));
             }
         }
         return list;
@@ -324,8 +325,8 @@ public class MCRURNAdder {
                 LOGGER.info("Assigning urn " + parentURN.toString() + " to " + derivate.getId().toString());
                 MCRURNManager.assignURN(parentURN.toString(), derivate.getId().toString(), " ", " ");
             } catch (Exception ex) {
-                LOGGER.error("Assigning base urn " + parentURN.toString() + parentURN.checksum() + " to derivate "
-                        + derivate.getId().toString() + " failed.", ex);
+                LOGGER.error("Assigning base urn " + parentURN.toString() + parentURN.checksum() + " to derivate " + derivate.getId().toString() + " failed.",
+                    ex);
                 return false;
             }
 
@@ -339,42 +340,38 @@ public class MCRURNAdder {
             /* generate the urn based on the parent urn */
             String setId = derivate.getId().getNumberAsString();
             MCRURN[] urnToSet = urnProvider.generateURN(pairs.size(), parentURN, setId);
-            Element fileset = new Element("fileset");
-            fileset.setAttribute("urn", parentURN.toString());
+            derivate.getDerivate().setURN(parentURN.toString());
             for (int i = 0; i < pairs.size(); i++) {
                 MCRPair<String, MCRFile> current = pairs.get(i);
-                
+
                 /* mets files should not get an urn assigned */
                 String metsFileName = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
                 if (current.getRightComponent().getName().equals(metsFileName)) {
                     continue;
                 }
-                
+
                 LOGGER.info("Assigning urn " + urnToSet[i] + urnToSet[i].checksum() + " to " + current.getLeftComponent()
-                        + current.getRightComponent().getName());
+                    + current.getRightComponent().getName());
                 /* save the urn in the database here */
                 try {
-                    MCRURNManager.assignURN(urnToSet[i].toString() + urnToSet[i].checksum(), derivate.getId().toString(),
-                            current.getLeftComponent(), current.getRightComponent().getName());
+                    MCRURNManager.assignURN(urnToSet[i].toString() + urnToSet[i].checksum(), derivate.getId().toString(), current.getLeftComponent(), current
+                        .getRightComponent()
+                        .getName());
                     /*
                      * updating the fileset element, with the current file and
                      * urn
                      */
-                    addToFilesetElement(fileset, urnToSet[i], current);
+                    MCRFileMetadata fileMetadata = derivate.getDerivate().getOrCreateFileMetadata(current.getRightComponent());
+                    fileMetadata.setUrn(urnToSet[i].toString() + String.valueOf(urnToSet[i].checksum()));
                 } catch (Exception ex) {
                     LOGGER.error("Assigning urn " + urnToSet[i] + urnToSet[i].checksum() + " to " + current.getLeftComponent()
-                            + current.getRightComponent().getName() + " failed.", ex);
-                    fileset = null;
+                        + current.getRightComponent().getName() + " failed.", ex);
+                    handleError(derivate);
+                    return false;
                 }
             }
 
-            /* an error has occured */
-            if (fileset == null) {
-                handleError(derivate);
-                return false;
-            } else {
-                updateDerivateInDB(derivate, fileset);
-            }
+            updateDerivateInDB(derivate);
         }
         return true;
     }
@@ -393,38 +390,27 @@ public class MCRURNAdder {
         MCRObjectID id = MCRObjectID.getInstance(derivateId);
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(id);
 
-        Document xml = derivate.createXML();
-        XPath xp = XPath.newInstance("./mycorederivate/derivate/fileset");
-        Object obj = xp.selectSingleNode(xml);
-        if (obj == null) {
-            LOGGER.error("No fileset element in derivate. URN assignment to single file canceled");
+        MCRObjectDerivate objectDerivate = derivate.getDerivate();
+        if (objectDerivate.getURN() == null) {
+            LOGGER.error("No URN for derivate. URN assignment to single file canceled");
             return false;
         }
 
         MCRIURNProvider provider = getURNProvider();
-        MCRURN base = MCRURN.valueOf(((Element) obj).getAttribute("urn").getValue());
+        MCRURN base = MCRURN.valueOf(objectDerivate.getURN());
         int fileCount = getFilesWithURNCount(derivate) + 1;
         MCRURN[] u = provider.generateURN(1, base, derivate.getId().getNumberAsString() + "-" + fileCount);
-        u[0].attachChecksum();
+        MCRURN urn = u[0];
+        urn.attachChecksum();
 
-        LOGGER.info("Assigning urn " + u[0] + " to " + path);
+        LOGGER.info("Assigning urn " + urn + " to " + path);
         int i = path.lastIndexOf("/");
         String file = path.substring(i + 1);
         String pathDb = path.substring(0, i + 1);
 
-        MCRURNManager.assignURN(u[0].toString(), derivateId, pathDb, file);
-
-        // reference to fileset element
-        Element fs = (Element) obj;
-        // reference to the new file element
-        Element f = new Element("file");
-        f.setAttribute("name", path).setAttribute("ifsid", fileId);
-        f.addContent(new Element("urn").setText(u[0].toString()));
-        fs.addContent(f);
-
-        MCRDerivate update = new MCRDerivate(xml);
-        MCRMetadataManager.updateMCRDerivateXML(update);
-
+        MCRURNManager.assignURN(urn.toString(), derivateId, pathDb, file);
+        objectDerivate.getOrCreateFileMetadata(path).setUrn(urn.toString());
+        MCRMetadataManager.updateMCRDerivateXML(derivate);
         return true;
     }
 
@@ -436,8 +422,7 @@ public class MCRURNAdder {
         XPath xp = XPath.newInstance("./mycorederivate/derivate/fileset");
         Object obj = xp.selectSingleNode(xml);
         if (obj == null) {
-            throw new Exception("No 'fileset' element within derivate '" + derivate.getId()
-                    + "' found. Single file urn assignment not possible");
+            throw new Exception("No 'fileset' element within derivate '" + derivate.getId() + "' found. Single file urn assignment not possible");
         }
         Element fileset = (Element) obj;
         int size = fileset.getChildren("file").size();
@@ -483,8 +468,7 @@ public class MCRURNAdder {
                 return true;
             }
         }
-        LOGGER.warn("URN assignment failed as the object type " + givenType + " is not in the list of allowed objects. See property \""
-                + propertyName + "\"");
+        LOGGER.warn("URN assignment failed as the object type " + givenType + " is not in the list of allowed objects. See property \"" + propertyName + "\"");
         return false;
     }
 
@@ -521,17 +505,6 @@ public class MCRURNAdder {
         }
     }
 
-    /** Adds a file element to the fileset element */
-    private void addToFilesetElement(Element fileset, MCRURN urn, MCRPair<String, MCRFile> currentFile) throws Exception {
-        Element fileElement = new Element("file");
-        fileElement.setAttribute("name", currentFile.getRightComponent().getAbsolutePath());
-        fileElement.setAttribute("ifsid", currentFile.getRightComponent().getID());
-        Element urnElement = new Element("urn");
-        urnElement.addContent(urn.toString() + String.valueOf(urn.checksum()));
-        fileElement.addContent(urnElement);
-        fileset.addContent(fileElement);
-    }
-
     /**
      * @param file
      * @return the path of the given file, the path terminates with an
@@ -559,29 +532,14 @@ public class MCRURNAdder {
      * Updates the derivate in the database and does the appropriate error
      * handling if needed
      */
-    private void updateDerivateInDB(MCRDerivate derivate, Element fileset) {
-        if (derivate == null || fileset == null)
-            return;
-        MCRObjectDerivate objDer = derivate.getDerivate();
-        alterDerivateDOM(objDer, fileset);
-
+    private void updateDerivateInDB(MCRDerivate derivate) {
         try {
             // just update modified XML here, no new import of files pleaze
             MCRMetadataManager.updateMCRDerivateXML(derivate);
         } catch (Exception ex) {
-            LOGGER.error("An exception occured while updating the object " + derivate.getId()
-                    + " in database. The adding of the fileset element failed.", ex);
+            LOGGER.error("An exception occured while updating the object " + derivate.getId() + " in database. The adding of the fileset element failed.", ex);
             handleError(derivate);
         }
-    }
-
-    /** Adds the fileset element to the derivate element */
-    private void alterDerivateDOM(MCRObjectDerivate objDer, Element fileset) {
-        Element dom = objDer.createXML();
-        if (dom != null && dom.getName().equals("derivate")) {
-            dom.addContent(fileset);
-        }
-        objDer.setFromDOM(dom);
     }
 
 }

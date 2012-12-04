@@ -55,7 +55,7 @@ final public class MCRDerivate extends MCRBase {
     private static final Logger LOGGER = Logger.getLogger(MCRDerivate.class);
 
     // the object content
-    private final MCRObjectDerivate mcr_derivate;
+    private MCRObjectDerivate mcr_derivate;
 
     /**
      * This is the constructor of the MCRDerivate class. It make an instance of
@@ -68,8 +68,6 @@ final public class MCRDerivate extends MCRBase {
      */
     public MCRDerivate() throws MCRException, MCRConfigurationException {
         super();
-        // Derivate class
-        mcr_derivate = new MCRObjectDerivate();
     }
 
     /**
@@ -143,7 +141,7 @@ final public class MCRDerivate extends MCRBase {
 
         // get the derivate data of the object
         jdom_element = jdom_element_root.getChild("derivate");
-        mcr_derivate.setFromDOM(jdom_element);
+        mcr_derivate = new MCRObjectDerivate(mcr_id, jdom_element);
 
         // get the service data of the object
         jdom_element = jdom_element_root.getChild("service");
@@ -178,14 +176,14 @@ final public class MCRDerivate extends MCRBase {
      */
     public Map<String, String> getUrnMap() {
         Map<String, String> fileUrnMap = new HashMap<String, String>();
-        
+
         try {
             XPath filesetPath = XPath.newInstance("./mycorederivate/derivate/fileset");
             Object obj = filesetPath.selectSingleNode(this.createXML());
             if (obj == null) {
                 return fileUrnMap;
             }
-            
+
             Element result = (Element) obj;
             String urn = result.getAttributeValue("urn");
 
@@ -199,7 +197,7 @@ final public class MCRDerivate extends MCRBase {
                     String currentFile = currentFileElement.getAttributeValue("name");
                     fileUrnMap.put(currentFile, currentUrn);
                 }
-            } 
+            }
         } catch (JDOMException ex) {
             LOGGER.error("Read derivate XML cause error", ex);
         }
@@ -263,6 +261,10 @@ final public class MCRDerivate extends MCRBase {
     public boolean isValid() {
         if (!super.isValid()) {
             LOGGER.warn("MCRBase.isValid() == false;");
+            return false;
+        }
+        if (mcr_derivate == null) {
+            LOGGER.warn("No MCRObjectDerivate instance present.");
             return false;
         }
         if (!getDerivate().isValid()) {
