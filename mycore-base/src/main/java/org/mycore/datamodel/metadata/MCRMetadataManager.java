@@ -585,16 +585,7 @@ public final class MCRMetadataManager {
                 MCRMetadataManager.fireUpdateEvent(parent);
             } catch (final Exception e) {
                 LOGGER.error("Error while store child ID in parent object.", e);
-                try {
-                    MCRMetadataManager.delete(mcrObject);
-                    LOGGER.error("Child object was removed.");
-                } catch (final MCRActiveLinkException e1) {
-                    // it shouldn't be possible to have allready links to this
-                    // object
-                    LOGGER.error("Error while deleting child object.", e1);
-                }
-
-                return;
+                throw new RuntimeException(e);
             }
         }
 
