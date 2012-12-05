@@ -64,15 +64,15 @@ public class MCRJSONProviderServlet extends MCRServlet {
         String json = null;
 
         if (metsDocument == null || !useExistingMets) {
-            LOGGER.info("Creating default mets!");
             metsDocument = getBaseMetsXML(derivate);
         }
 
-        LOGGER.info("Creating initial JSONObject for derivate with id \"" + derivate + "\"");
+        LOGGER.info("Creating JSON for derivate with id \"" + derivate + "\"");
+
         MCRJSONProvider provider = new MCRJSONProvider(metsDocument, derivate);
         json = provider.getJson();
 
-        LOGGER.info("Generation of JSON (" + getClass().getSimpleName() + ") took " + (System.currentTimeMillis() - start) + " ms");
+        LOGGER.debug("Generation of JSON (" + getClass().getSimpleName() + ") took " + (System.currentTimeMillis() - start) + " ms");
         HttpServletResponse response = job.getResponse();
         response.setContentType("application/x-json");
         response.setCharacterEncoding(MCRConfiguration.instance().getString("MCR.Request.CharEncoding", "UTF-8"));
