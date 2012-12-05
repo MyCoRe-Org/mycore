@@ -88,6 +88,10 @@ import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRStoredMetadata;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRFileMetadata;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.services.fieldquery.MCRFieldDef;
@@ -133,7 +137,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
     final static String SESSION_OBJECT_NAME = "URI_RESOLVER_DEBUG";
 
-    private MCRCache bytesCache;
+    private MCRCache<String, byte[]> bytesCache;
 
     private ThreadLocal<TransformerFactory> transformerFactories = new ThreadLocal<TransformerFactory>() {
 
@@ -153,7 +157,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     private MCRURIResolver() {
         MCRConfiguration config = MCRConfiguration.instance();
         int cacheSize = config.getInt(CONFIG_PREFIX + "StaticFiles.CacheSize", 100);
-        bytesCache = new MCRCache(cacheSize, "URIResolver Resources");
+        bytesCache = new MCRCache<String, byte[]>(cacheSize, "URIResolver Resources");
         SUPPORTED_SCHEMES = Collections.unmodifiableMap(getResolverMapping());
     }
 
@@ -214,6 +218,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         supportedSchemes.put("versioninfo", new MCRVersionInfoResolver());
         supportedSchemes.put("deletedMcrObject", new MCRDeletedObjectResolver());
         supportedSchemes.put("fieldsXSL", new MCRFieldsXSLResolver());
+        supportedSchemes.put("fileMeta", new MCRFileMetadataResolver());
         supportedSchemes.put("basket", new org.mycore.frontend.basket.MCRBasketResolver());
         supportedSchemes.put("language", new org.mycore.datamodel.language.MCRLanguageResolver());
         return supportedSchemes;
@@ -379,7 +384,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     }
 
     private InputStream getCachedResource(String classResource) throws IOException {
-        byte[] bytes = (byte[]) bytesCache.get(classResource);
+        byte[] bytes = bytesCache.get(classResource);
 
         if (bytes == null) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -951,7 +956,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
         private static final String SORT_CONFIG_PREFIX = CONFIG_PREFIX + "Classification.Sort.";
 
-        private static MCRCache categoryCache = new MCRCache(MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Classification.CacheSize", 1000),
+        private static MCRCache<String, Element> categoryCache = new MCRCache<String, Element>(MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Classification.CacheSize", 1000),
             "URIResolver categories");
 
         private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
@@ -974,7 +979,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         public Element resolveElement(String uri) {
             LOGGER.debug("start resolving " + uri);
             String cacheKey = getCacheKey(uri);
-            Element returns = (Element) categoryCache.getIfUpToDate(cacheKey, getSystemLastModified());
+            Element returns = categoryCache.getIfUpToDate(cacheKey, getSystemLastModified());
             if (returns == null) {
                 returns = getClassElement(uri);
                 categoryCache.put(cacheKey, returns);
@@ -1522,5 +1527,31 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             return new JDOMSource(stylesheet);
         }
 
+    }
+
+    private static class MCRFileMetadataResolver implements URIResolver {
+
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            String[] parts = href.split(":");
+            String completePath = parts[1];
+            String[] pathParts = completePath.split("/", 2);
+            MCRObjectID derivateID = MCRObjectID.getInstance(pathParts[0]);
+            MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
+            MCRObjectDerivate objectDerivate = derivate.getDerivate();
+            if (pathParts.length == 1) {
+                //only derivate is given;
+                Element fileset = new Element("fileset");
+                if (objectDerivate.getURN() != null) {
+                    fileset.setAttribute("urn", objectDerivate.getURN());
+                    for (MCRFileMetadata fileMeta : objectDerivate.getFileMetadata()) {
+                        fileset.addContent(fileMeta.createXML());
+                    }
+                }
+                return new JDOMSource(fileset);
+            }
+            MCRFileMetadata fileMetadata = objectDerivate.getOrCreateFileMetadata("/" + pathParts[1]);
+            return new JDOMSource(fileMetadata.createXML());
+        }
     }
 }

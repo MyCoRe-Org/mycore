@@ -293,6 +293,10 @@ public class MCRObjectDerivate {
         return newFileMetadata;
     }
 
+    public List<MCRFileMetadata> getFileMetadata() {
+        return Collections.unmodifiableList(files);
+    }
+
     /**
      * This method set the metadata internals (the IFS data)
      * 
@@ -424,6 +428,6 @@ public class MCRObjectDerivate {
     }
 
     void setDerivateID(MCRObjectID id) {
-        this.derivateID=id;
+        this.derivateID = id;
     }
 }
