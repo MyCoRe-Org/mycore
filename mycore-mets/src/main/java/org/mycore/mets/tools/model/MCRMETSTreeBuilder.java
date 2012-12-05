@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.mycore.mets.model.Mets;
@@ -150,14 +151,14 @@ public class MCRMETSTreeBuilder {
     }
 
     /**
-     * Creates the Folders and add them to the root node. Works recursive.
+     * Creates the folders and add them to the root node. Works recursive.
      * @param root the root node to add the folders.
      * @param metsFolderList the folders that should be added to the root node.
      */
     private void buildFolderTree(MCRMETSNode root, List<LogicalSubDiv> metsFolderList) {
         for (LogicalSubDiv metsFolder : metsFolderList) {
             MCRMETSNode metsStructureFolder = new MCRMETSNode();
-            metsStructureFolder.setId(metsFolder.getLabel());
+            metsStructureFolder.setId(UUID.randomUUID().toString());
             metsStructureFolder.setName(metsFolder.getLabel());
             metsStructureFolder.setType("category");
             metsStructureFolder.setStructureType(metsFolder.getType());
@@ -172,7 +173,7 @@ public class MCRMETSTreeBuilder {
     }
 
     /**
-     * Detects the files wich arent present in the struct map and adds them to the root node.
+     * Detects the files which are not present in the struct map and adds them to the root node.
      * The hidden elements gets the hide true attribute.
      * @param root the node were the {@link MCRMETSNode} should be added.
      */
@@ -184,7 +185,7 @@ public class MCRMETSTreeBuilder {
             String currentFileId = (String) fileIdIterator.next();
             if (!idDivMap.containsKey(currentFileId.replace("master_", "phys_")) && !idDivMap.containsKey("phys_" + currentFileId)){
                 LOGGER.info(MessageFormat.format("{0} is a hidden File!", currentFileId));
-                // file doesnt apear in structmap -> hidden file
+                // file does not appear in structmap -> hidden file
                 File metsFile = this.idFileMap.get(currentFileId);
 
                 MCRMETSNode destinationNode = new MCRMETSNode();
