@@ -49,13 +49,12 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
             try {
                 LOGGER.info("Adding URN to single file");
                 String path = job.getRequest().getParameter("path");
-                String fileId = job.getRequest().getParameter("fileId");
-                if (path == null || fileId == null) {
+                if (path == null) {
                     job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + USERERRORPAGE));
                     return;
                 }
 
-                urnAdder.addURNToSingleFile(object, path, fileId);
+                urnAdder.addURNToSingleFile(object, path);
             } catch (Exception e) {
                 LOGGER.error("Error while assigning urn to single file", e);
             }

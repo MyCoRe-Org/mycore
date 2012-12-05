@@ -242,7 +242,7 @@ public class MCRObjectDerivate {
                 return fileMetadata;
             } else {
                 //we need to create entry here
-                MCRFileMetadata newFileMetadata = new MCRFileMetadata(path, file.getID(), null, null);
+                MCRFileMetadata newFileMetadata = new MCRFileMetadata(path, null, null);
                 files.add(i, newFileMetadata);
                 return newFileMetadata;
             }
@@ -251,7 +251,7 @@ public class MCRObjectDerivate {
         if (files.isEmpty()) {
             files = new ArrayList<MCRFileMetadata>();
         }
-        MCRFileMetadata newFileMetadata = new MCRFileMetadata(path, file.getID(), null, null);
+        MCRFileMetadata newFileMetadata = new MCRFileMetadata(path, null, null);
         files.add(newFileMetadata);
         return newFileMetadata;
     }
@@ -289,8 +289,7 @@ public class MCRObjectDerivate {
         if (mcrFile == null) {
             throw new MCRPersistenceException("File does not exist: " + derivateID + path);
         }
-        String ifs = mcrFile.getID();
-        MCRFileMetadata newFileMetadata = new MCRFileMetadata(path, ifs, null, null);
+        MCRFileMetadata newFileMetadata = new MCRFileMetadata(path, null, null);
         return newFileMetadata;
     }
 

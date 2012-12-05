@@ -44,11 +44,8 @@ public class MCRFileMetadata implements Comparable<MCRFileMetadata> {
 
     private String name;
 
-    private String ifsid;
-
     public MCRFileMetadata(Element file) {
         this.name = file.getAttributeValue("name");
-        this.ifsid = file.getAttributeValue("ifsid");
         this.urn = file.getChildText("urn");
         @SuppressWarnings("unchecked")
         List<Element> categoryElements = file.getChildren("category");
@@ -63,17 +60,16 @@ public class MCRFileMetadata implements Comparable<MCRFileMetadata> {
     }
 
     public MCRFileMetadata() {
-        this(null, null, null, null);
+        this(null, null, null);
     }
 
     /**
      * @param urn
      * @param categories
      */
-    public MCRFileMetadata(String name, String ifsid, String urn, Collection<MCRCategoryID> categories) {
+    public MCRFileMetadata(String name, String urn, Collection<MCRCategoryID> categories) {
         super();
         setName(name);
-        setIfsid(ifsid);
         setUrn(urn);
         setCategories(categories);
     }
@@ -81,7 +77,6 @@ public class MCRFileMetadata implements Comparable<MCRFileMetadata> {
     public Element createXML() {
         Element file = new Element("file");
         file.setAttribute("name", name);
-        file.setAttribute("ifsid", ifsid);
         if (urn != null) {
             Element urn = new Element("urn");
             urn.setText(this.urn);
@@ -121,14 +116,6 @@ public class MCRFileMetadata implements Comparable<MCRFileMetadata> {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getIfsid() {
-        return ifsid;
-    }
-
-    public void setIfsid(String ifsid) {
-        this.ifsid = ifsid;
     }
 
     @Override

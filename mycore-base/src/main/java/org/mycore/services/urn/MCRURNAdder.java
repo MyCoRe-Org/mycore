@@ -382,9 +382,9 @@ public class MCRURNAdder {
      * @param path
      *            the path to the file including the filename
      */
-    public boolean addURNToSingleFile(String derivateId, String path, String fileId) throws Exception {
-        if (derivateId == null || path == null || fileId == null) {
-            LOGGER.error("null not allowed as parameter. derivate=" + derivateId + ", path=" + path + ", fileId=" + fileId);
+    public boolean addURNToSingleFile(String derivateId, String path) throws Exception {
+        if (derivateId == null || path == null) {
+            LOGGER.error("null not allowed as parameter. derivate=" + derivateId + ", path=" + path);
             return false;
         }
         MCRObjectID id = MCRObjectID.getInstance(derivateId);
