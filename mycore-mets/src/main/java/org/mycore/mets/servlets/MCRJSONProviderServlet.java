@@ -18,6 +18,7 @@
  */
 package org.mycore.mets.servlets;
 
+import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -76,9 +77,10 @@ public class MCRJSONProviderServlet extends MCRServlet {
         HttpServletResponse response = job.getResponse();
         response.setContentType("application/x-json");
         response.setCharacterEncoding(MCRConfiguration.instance().getString("MCR.Request.CharEncoding", "UTF-8"));
-        response.getWriter().print(json);
-        response.getWriter().flush();
-
+        PrintWriter writer = response.getWriter();
+		writer.print(json);
+        writer.flush();
+        writer.close();
         return;
     }
 

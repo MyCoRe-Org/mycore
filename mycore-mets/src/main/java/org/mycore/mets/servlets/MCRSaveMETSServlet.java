@@ -34,6 +34,7 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.mets.model.Mets;
 import org.mycore.mets.model.files.FileGrp;
+import org.mycore.mets.tools.MCRJSONProvider;
 import org.mycore.mets.tools.MCRMetsProvider;
 import org.mycore.mets.tools.MCRMetsSave;
 
@@ -116,7 +117,7 @@ public class MCRSaveMETSServlet extends MCRServlet {
     private boolean isComplete(FileGrp fileGroup, MCRDirectory ifs, String derivateId) {
         try {
             for (MCRFilesystemNode node : ifs.getChildren()) {
-                if (node.getName().equals("mets.xml")) {
+                if (node.getName().equals(MCRJSONProvider.DEFAULT_METS_FILENAME)) {
                     continue;
                 }
                 if (node instanceof MCRDirectory && !isComplete(fileGroup, (MCRDirectory) node, derivateId)) {
