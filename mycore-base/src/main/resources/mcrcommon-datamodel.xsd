@@ -56,6 +56,12 @@
   <xs:attributeGroup name="MCRMetaBoolean">
     <xs:attributeGroup ref="baseMetaAttributes" />
   </xs:attributeGroup>
+  <xs:attributeGroup name="MCRMetaIFS">
+    <xs:attributeGroup ref="baseMetaAttributes" />
+    <xs:attribute type="xs:string" use="optional" name="sourcepath" />
+    <xs:attribute type="xs:string" use="required" name="maindoc" />
+    <xs:attribute type="xs:string" use="optional" name="ifsid" />
+  </xs:attributeGroup>
   <xs:attributeGroup name="MCRMetaISO8601Date">
     <xs:attribute name="format">
       <xs:simpleType>
@@ -204,7 +210,7 @@
         <xs:extension base="xs:string">
           <xs:attribute name="inherited" use="required" type="xs:integer" fixed="0" />
           <xs:attribute name="type" type="xs:string" />
-          <xs:attributeGroup ref="MCRMetaLangText"/>
+          <xs:attributeGroup ref="MCRMetaLangText" />
         </xs:extension>
       </xs:simpleContent>
     </xs:complexType>

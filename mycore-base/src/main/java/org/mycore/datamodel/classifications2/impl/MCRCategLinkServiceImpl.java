@@ -39,6 +39,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
@@ -336,5 +337,16 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         q.setParameter("objectID", reference.getObjectID());
         q.setParameter("type", reference.getType());
         return !q.list().isEmpty();
+    }
+
+    @Override
+    public Collection<MCRCategLinkReference> getReferences(String type) {
+        Session session = HIB_CONNECTION_INSTANCE.getSession();
+        Criteria criteria = session.createCriteria(LINK_CLASS);
+        criteria.add(Restrictions.eq("objectReference.type", type));
+        criteria.setProjection(Projections.property("objectReference"));
+        @SuppressWarnings("unchecked")
+        List<MCRCategLinkReference> result = criteria.list();
+        return result;
     }
 }

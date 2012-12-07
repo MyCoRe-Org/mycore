@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema elementFormDefault="qualified" attributeFormDefault="qualified" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xalan="http://xml.apache.org/xalan"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <xs:include schemaLocation="mcrcommon-datamodel.xsd" />
+  <!-- Needed as mycoreobject is incomplete but defined in mcrcommon-datamodel.xsd -->
+  <xs:element name="structure" type="xs:ID" />
+  <xs:element name="metadata" type="xs:ID" />
+  
+  <xs:element name="mycorederivate">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="derivate" />
+        <xs:element ref="service" minOccurs="0" />
+      </xs:all>
+      <xs:attribute name="ID" use="required" type="xs:NCName" />
+      <xs:attribute name="label" type="xs:string" />
+      <xs:attribute name="version" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="derivate">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="linkmetas" />
+        <xs:element ref="externals" minOccurs="0" />
+        <xs:element ref="internals" minOccurs="0" />
+        <xs:element ref="titles" minOccurs="0" />
+        <xs:element ref="fileset" minOccurs="0" />
+      </xs:all>
+      <xs:attribute name="display" type="xs:boolean" use="optional" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="linkmetas">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="linkmeta" />
+      </xs:sequence>
+      <xs:attribute name="class" use="required" type="xs:NCName" fixed="MCRMetaLinkID" />
+      <xs:attribute name="notinherit" type="xs:boolean" />
+      <xs:attribute name="heritable" type="xs:boolean" fixed="false" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="linkmeta">
+    <xs:complexType>
+      <xs:attributeGroup ref="MCRMetaLink" />
+      <xs:attributeGroup ref="notInherited" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="externals">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="external" />
+      </xs:sequence>
+      <xs:attribute name="class" use="required" type="xs:NCName" fixed="MCRMetaLink" />
+      <xs:attribute name="notinherit" type="xs:boolean" />
+      <xs:attribute name="heritable" type="xs:boolean" fixed="false" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="external">
+    <xs:complexType>
+      <xs:attributeGroup ref="MCRMetaLinkID" />
+      <xs:attributeGroup ref="notInherited" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="internals">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="internal" />
+      </xs:sequence>
+      <xs:attribute name="class" use="required" type="xs:NCName" fixed="MCRMetaIFS" />
+      <xs:attribute name="notinherit" type="xs:boolean" />
+      <xs:attribute name="heritable" type="xs:boolean" fixed="false" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="internal">
+    <xs:complexType>
+      <xs:attributeGroup ref="MCRMetaIFS" />
+      <xs:attributeGroup ref="notInherited" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="titles">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="title" />
+      </xs:sequence>
+      <xs:attribute name="class" use="required" type="xs:NCName" fixed="MCRMetaLangText" />
+      <xs:attribute name="notinherit" type="xs:boolean" />
+      <xs:attribute name="heritable" type="xs:boolean" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="title">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attributeGroup ref="MCRMetaLangText" />
+          <xs:attributeGroup ref="notInherited" />
+          <xs:attribute name="type" type="xs:string" />
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="fileset">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="file">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element minOccurs="0" type="xs:anyURI" name="urn" />
+              <xs:element minOccurs="0" maxOccurs="unbounded" name="category">
+                <xs:complexType>
+                  <xs:attribute name="id" type="xs:string" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute type="xs:string" name="name" />
+            <xs:attribute use="optional" type="xs:string" name="ifsid" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute use="optional" type="xs:anyURI" name="urn" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -25,6 +25,7 @@ package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -295,6 +296,23 @@ public class MCRObjectDerivate {
 
     public List<MCRFileMetadata> getFileMetadata() {
         return Collections.unmodifiableList(files);
+    }
+
+    /**
+     * Deletes file metadata of file idendified by absolute path.
+     * @param path {@link MCRFile#getAbsolutePath()}
+     * @return true if metadata was deleted and false if file has no metadata.
+     */
+    public boolean deleteFileMetaData(String path){
+        Iterator<MCRFileMetadata> it=files.iterator();
+        while (it.hasNext()){
+            MCRFileMetadata metadata=it.next();
+            if (metadata.getName().equals(path)){
+                it.remove();
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Collection;
 import java.util.GregorianCalendar;
 
 import org.jdom.Document;
@@ -31,8 +32,12 @@ import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
+import org.mycore.datamodel.classifications2.MCRCategLinkReference;
+import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.services.urn.MCRURNManager;
 
 /**
  * Represents a stored file with its metadata and content.
@@ -111,8 +116,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     /*
      * Internal constructor, do not use on your own.
      */
-    MCRFile(String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, String storeID,
-            String storageID, String fctID, String md5) {
+    MCRFile(String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, String storeID, String storageID,
+        String fctID, String md5) {
         super(ID, parentID, ownerID, name, label, size, date);
 
         this.storageID = storageID;
@@ -391,7 +396,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         storeID = null;
         avExtender = null;
     }
-    
+
     /**
      * Returns the content of this file as MCRContent instance.
      * @throws IOException
@@ -518,7 +523,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 
         return MCRFileContentTypeFactory.getType(contentTypeID);
     }
-    
+
     /**
      * checks if the file still exists in the underlying content store and the md5 sum still matches. 
      * @return true if it passes md5 sum check, else false
@@ -549,11 +554,23 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         root.setAttribute("id", getID());
         root.setAttribute("owner", getOwnerID());
         root.setAttribute("name", getName());
-        root.setAttribute("path", getAbsolutePath());
+        String absolutePath = getAbsolutePath();
+        root.setAttribute("path", absolutePath);
         root.setAttribute("size", Long.toString(getSize()));
         root.setAttribute("extension", getExtension());
         root.setAttribute("contentTypeID", getContentTypeID());
         root.setAttribute("contentType", getContentType().getLabel());
+        String urn = MCRURNManager.getURNForFile(getOwnerID(), absolutePath);
+        if (urn != null) {
+            root.setAttribute("urn", urn);
+        }
+        Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.getInstance().getLinksFromReference(
+            getCategLinkReference(MCRObjectID.getInstance(getOwnerID()), absolutePath));
+        for (MCRCategoryID category : linksFromReference) {
+            Element catEl = new Element("category");
+            catEl.setAttribute("id", category.toString());
+            root.addContent(catEl);
+        }
 
         MCRISO8601Date iDate = new MCRISO8601Date();
         iDate.setDate(getLastModified().getTime());
@@ -589,6 +606,11 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         } catch (Exception ex) {
             return null;
         }
+    }
+
+    public static MCRCategLinkReference getCategLinkReference(MCRObjectID derivateID, String path) {
+        MCRCategLinkReference ref = new MCRCategLinkReference(path, derivateID.toString());
+        return ref;
     }
 
 }

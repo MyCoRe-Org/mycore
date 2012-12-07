@@ -8,9 +8,7 @@
  **/
 package org.mycore.datamodel.classifications2.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImplTest.DAO;
 import static org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImplTest.WORLD_CLASS_RESOURCE_NAME;
 
@@ -102,7 +100,11 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         addTestLinks();
         startNewTransaction();
         SERVICE.deleteLink(LONDON_REFERENCE);
-        assertEquals("Link count does not match.", testLinks.size() - 1, SESSION_FACTORY.getCurrentSession().createCriteria(MCRCategoryLink.class).list().size());
+        assertEquals("Link count does not match.", testLinks.size() - 1, SESSION_FACTORY
+            .getCurrentSession()
+            .createCriteria(MCRCategoryLink.class)
+            .list()
+            .size());
     }
 
     /**
@@ -113,7 +115,11 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         addTestLinks();
         startNewTransaction();
         SERVICE.deleteLinks(Arrays.asList(LONDON_REFERENCE, ENGLAND_REFERENCE));
-        assertEquals("Link count does not match.", testLinks.size() - 2, SESSION_FACTORY.getCurrentSession().createCriteria(MCRCategoryLink.class).list().size());
+        assertEquals("Link count does not match.", testLinks.size() - 2, SESSION_FACTORY
+            .getCurrentSession()
+            .createCriteria(MCRCategoryLink.class)
+            .list()
+            .size());
     }
 
     /**
@@ -124,8 +130,8 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         addTestLinks();
         startNewTransaction();
         MCRCategoryLink link = testLinks.iterator().next();
-        assertTrue("Did not find category: " + link.getCategory().getId(), SERVICE.getLinksFromReference(link.getObjectReference()).contains(
-                link.getCategory().getId()));
+        assertTrue("Did not find category: " + link.getCategory().getId(),
+            SERVICE.getLinksFromReference(link.getObjectReference()).contains(link.getCategory().getId()));
     }
 
     /**
@@ -136,8 +142,8 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         addTestLinks();
         startNewTransaction();
         MCRCategoryLink link = testLinks.iterator().next();
-        assertTrue("Did not find object: " + link.getObjectReference(), SERVICE.getLinksFromCategory(link.getCategory().getId()).contains(
-                link.getObjectReference().getObjectID()));
+        assertTrue("Did not find object: " + link.getObjectReference(),
+            SERVICE.getLinksFromCategory(link.getCategory().getId()).contains(link.getObjectReference().getObjectID()));
     }
 
     /**
@@ -221,6 +227,26 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         assertTrue("Jena should be in Germany", SERVICE.isInCategory(jena, germany.getId()));
         assertTrue("Jena should be in Europe", SERVICE.isInCategory(jena, europe.getId()));
         assertFalse("Jena should not be in Asia", SERVICE.isInCategory(jena, asia.getId()));
+    }
+
+    @Test
+    public void getReferences() {
+        addTestLinks();
+        startNewTransaction();
+        String type = "state";
+        Collection<MCRCategLinkReference> references = SERVICE.getReferences(type);
+        assertNotNull("Did not return a collection", references);
+        assertFalse("Collection is empty", references.isEmpty());
+        for (MCRCategLinkReference ref : references) {
+            assertEquals("Type of reference is not correct.", type, ref.getType());
+        }
+        int counter = 0;
+        for (MCRCategoryLink link : testLinks) {
+            if (link.getObjectReference().getType().equals(type)) {
+                counter++;
+            }
+        }
+        assertEquals("Collection is not complete", counter, references.size());
     }
 
     private void loadWorldClassification() throws URISyntaxException, MCRException, SAXParseException, IOException {
