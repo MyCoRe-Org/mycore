@@ -104,9 +104,9 @@
       <xsl:for-each select="file/category">
         <xsl:variable name="uri" select="concat('classification:metadata:0:parents:',@id)" />
         <xsl:for-each select="document($uri)//category">
-          <mcr:category xmlns:mcr="http://www.mycore.org/">
+          <mcr:fileCategory xmlns:mcr="http://www.mycore.org/">
             <xsl:value-of select="concat(/mycoreclass/@ID,':',@ID)" />
-          </mcr:category>
+          </mcr:fileCategory>
         </xsl:for-each>
       </xsl:for-each>
     </field>
