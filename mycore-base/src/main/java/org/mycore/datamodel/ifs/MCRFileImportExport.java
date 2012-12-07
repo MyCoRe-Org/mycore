@@ -12,10 +12,13 @@ package org.mycore.datamodel.ifs;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRArgumentChecker;
+import org.mycore.common.MCRDevNull;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRUtils;
 
 /**
  * Imports or exports complete directory trees with all contained files and subdirectories between the local host's filesystem and the internal MCRDirectory
@@ -25,6 +28,9 @@ import org.mycore.common.MCRUtils;
  * @version $Revision$ $Date$
  */
 public class MCRFileImportExport {
+
+    private static Logger LOGGER = Logger.getLogger(MCRFileImportExport.class);
+
     /**
      * Imports the contents of a local file or directory into a newly created MCRDirectory that is owned by the given owner ID. The new MCRDirectory will have
      * the same name as the owner ID. If the local object is a file, a MCRFile with the same name will be created or updated in that MCRDirectory. If the local
@@ -48,15 +54,18 @@ public class MCRFileImportExport {
         try // Try to import local content into this new directory
         {
             importFiles(local, dir);
-        } catch (MCRException mex) // If anything goes wrong
+        } catch (Exception ex) // If anything goes wrong
         {
             try {
                 dir.delete();
             } // Try to delete all content stored so far
             catch (Exception ignored) {
+                LOGGER.error("Exception while deleting MCRDirectory for derivate: " + ownerID, ignored);
             }
-
-            throw mex;
+            if (ex instanceof RuntimeException) {
+                throw (RuntimeException) ex;
+            }
+            throw new MCRException(ex);
         }
 
         return dir;
@@ -75,21 +84,14 @@ public class MCRFileImportExport {
      * @param ownerID
      *            the ID of the logical owner of the content that will be stored
      * @return a new MCRDirectory that will contain all imported files and directories as instances of MCRFilesystemNode children.
+     * @throws IOException 
      */
-    public static MCRDirectory addFiles(File local, String ownerID) {
+    public static MCRDirectory addFiles(File local, String ownerID) throws IOException {
         MCRArgumentChecker.ensureNotEmpty(ownerID, "owner ID");
 
         // Get the existing parent directory
         MCRDirectory dir = MCRDirectory.getRootDirectory(ownerID);
-
-        try // Try to import local content into this new directory
-        {
-            importFiles(local, dir);
-        } catch (MCRException mex) // If anything goes wrong
-        {
-            throw mex;
-        }
-
+        importFiles(local, dir);
         return dir;
     }
 
@@ -105,8 +107,9 @@ public class MCRFileImportExport {
      *            the local file or directory
      * @param dir
      *            an existing MCRDirectory where to store the imported contents of the local filesystem.
+     * @throws IOException 
      */
-    public static void importFiles(File local, MCRDirectory dir) {
+    public static void importFiles(File local, MCRDirectory dir) throws IOException {
         MCRArgumentChecker.ensureNotNull(local, "local file");
 
         String path = local.getPath();
@@ -141,10 +144,7 @@ public class MCRFileImportExport {
 
                 MCRContentInputStream cis = new MCRContentInputStream(fin);
 
-                if (!MCRUtils.copyStream(cis, null)) {
-                    String msg = "Error while reading local file " + local.getPath();
-                    throw new MCRException(msg);
-                }
+                IOUtils.copy(cis, new MCRDevNull());
 
                 String local_md5 = cis.getMD5String();
 
