@@ -99,8 +99,8 @@
     <field name="avFrameRate" type="decimal" source="fileMetadata" xpath="file/@frameRate" value="." />
     <field name="avDuration" type="time" source="fileMetadata" xpath="file/@duration" value="." />
     <field name="avMediaType" type="identifier" source="fileMetadata" xpath="file/@mediaType" value="." />
-    <field name="urn" type="identifier" source="fileMetadata" xpath="file/@urn" value="." />
-    <field name="category" type="identifier" source="fileMetadata">
+    <field name="fileURN" type="identifier" source="fileMetadata" xpath="file/@urn" value="." />
+    <field name="fileCategory" type="identifier" source="fileMetadata">
       <xsl:for-each select="file/category">
         <xsl:variable name="uri" select="concat('classification:metadata:0:parents:',@id)" />
         <xsl:for-each select="document($uri)//category">
