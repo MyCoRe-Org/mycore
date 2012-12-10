@@ -44,6 +44,8 @@ public class MCRVFSContent extends MCRContent {
 
     private FileObject fo;
 
+    private static final Logger LOGGER = Logger.getLogger(MCRVFSContent.class);
+
     public MCRVFSContent(FileObject fo) throws IOException {
         this.fo = fo;
         setSystemId(fo.getURL().toString());
@@ -65,14 +67,22 @@ public class MCRVFSContent extends MCRContent {
     @Override
     public InputStream getInputStream() throws IOException {
         final FileContent content = fo.getContent();
-        final String uri = fo.getName().getURI();
-        final Logger logger = Logger.getLogger(MCRVFSContent.class);
-        final String id = toString().substring(toString().indexOf('@'));
-        logger.info(id + ": returning InputStream of " + uri, new IOException("open"));
+        if (LOGGER.isDebugEnabled()) {
+            final String uri = fo.getName().getURI();
+            final String id = toString().substring(toString().indexOf('@'));
+            LOGGER.debug(id + ": returning InputStream of " + uri, new IOException("open"));
+            return new FilterInputStream(content.getInputStream()) {
+                @Override
+                public void close() throws IOException {
+                    LOGGER.debug(id + ": closing Inputstream of " + uri, new IOException("close"));
+                    super.close();
+                    content.close();
+                }
+            };
+        }
         return new FilterInputStream(content.getInputStream()) {
             @Override
             public void close() throws IOException {
-                logger.info(id + ": closing Inputstream of " + uri, new IOException("close"));
                 super.close();
                 content.close();
             }
