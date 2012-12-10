@@ -219,9 +219,16 @@ public abstract class MCRContent {
      * @return document type as String
      */
     public String getDocType() throws IOException {
+        if (!isReusable()) {
+            throw new IOException("Cannot determine DOCTYPE as it would destroy underlaying InputStream.");
+        }
         MCRContentInputStream cin = getContentInputStream();
-        byte[] header = cin.getHeader();
-        return MCRUtils.parseDocumentType(new ByteArrayInputStream(header));
+        try {
+            byte[] header = cin.getHeader();
+            return MCRUtils.parseDocumentType(new ByteArrayInputStream(header));
+        } finally {
+            cin.close();
+        }
     }
 
     /**
