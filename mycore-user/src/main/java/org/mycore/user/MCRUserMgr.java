@@ -953,7 +953,6 @@ public class MCRUserMgr {
             if (loginUser.getPassword().equals(passwd)) {
                 MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
                 mcrSession.setUserInformation(new MCRUserRoleProvider(loginUser));
-                mcrSession.setLoginTime();
                 return true;
             }
             return false;

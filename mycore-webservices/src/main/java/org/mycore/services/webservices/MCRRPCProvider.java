@@ -55,7 +55,6 @@ public class MCRRPCProvider extends RPCProvider {
     protected Object invokeMethod(final MessageContext mc, Method method, Object obj, Object[] argValues) throws Exception {
         int count = counter.incrementAndGet();
         MCRSession session = MCRSessionMgr.getCurrentSession();
-        session.setLoginTime();
 
         MCRUserInformation uiGuest = MCRSystemUserInformation.getGuestInstance();
         MCRUserInformation uiContext = new MCRUserInformation() {

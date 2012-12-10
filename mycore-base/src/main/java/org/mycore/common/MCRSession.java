@@ -131,7 +131,7 @@ public class MCRSession implements Cloneable {
         constructingStackTrace = t.getStackTrace();
     }
 
-    public final void setLoginTime() {
+    protected final void setLoginTime() {
         loginTime = System.currentTimeMillis();
         lastAccessTime = loginTime;
         thisAccessTime = loginTime;
@@ -442,6 +442,7 @@ public class MCRSession implements Cloneable {
      */
     public void setUserInformation(MCRUserInformation userSystemAdapter) {
         this.userInformation = userSystemAdapter;
+        setLoginTime();
     }
 
 }
