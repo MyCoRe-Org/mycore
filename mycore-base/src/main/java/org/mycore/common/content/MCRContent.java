@@ -60,6 +60,11 @@ public abstract class MCRContent {
     protected String systemId;
 
     /**
+     * Holds the docType of the current content
+     */
+    protected String docType;
+
+    /**
      * Sets the systemID of the current content
      */
     void setSystemId(String systemId) {
@@ -219,6 +224,9 @@ public abstract class MCRContent {
      * @return document type as String
      */
     public String getDocType() throws IOException {
+        if (docType != null) {
+            return docType;
+        }
         if (!isReusable()) {
             throw new IOException("Cannot determine DOCTYPE as it would destroy underlaying InputStream.");
         }

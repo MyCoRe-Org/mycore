@@ -49,8 +49,6 @@ public class MCRJAXBContent<T> extends MCRXMLContent {
 
     T jaxbObject;
 
-    private String docType;
-
     /**
      * @param ctx
      * @param jaxbObject
@@ -115,14 +113,6 @@ public class MCRJAXBContent<T> extends MCRXMLContent {
         } catch (Exception e) {
             throw new IOException(e);
         }
-    }
-
-    /* (non-Javadoc)
-     * @see org.mycore.common.content.MCRContent#getDocType()
-     */
-    @Override
-    public String getDocType() throws IOException {
-        return docType;
     }
 
     /* (non-Javadoc)

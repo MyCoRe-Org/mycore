@@ -47,6 +47,7 @@ public class MCRJDOMContent extends MCRXMLContent {
      */
     public MCRJDOMContent(Document jdom) {
         this.jdom = jdom;
+        super.docType = jdom.getDocType() == null ? jdom.getRootElement().getName() : jdom.getDocType().getElementName();
     }
 
     /**
@@ -78,10 +79,5 @@ public class MCRJDOMContent extends MCRXMLContent {
     @Override
     public Document asXML() {
         return (Document) (jdom.clone());
-    }
-
-    @Override
-    public String getDocType() {
-        return jdom.getDocType() == null ? jdom.getRootElement().getName() : jdom.getDocType().getElementName();
     }
 }

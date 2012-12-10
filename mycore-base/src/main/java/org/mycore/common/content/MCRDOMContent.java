@@ -48,6 +48,7 @@ public class MCRDOMContent extends MCRXMLContent {
      */
     public MCRDOMContent(Document dom) {
         this.dom = dom;
+        super.docType = dom.getDoctype() == null ? dom.getDocumentElement().getLocalName() : dom.getDoctype().getName();
     }
 
     @Override
@@ -71,10 +72,5 @@ public class MCRDOMContent extends MCRXMLContent {
     @Override
     public org.jdom.Document asXML() throws JDOMException {
         return new DOMBuilder().build(dom);
-    }
-
-    @Override
-    public String getDocType() {
-        return dom.getDoctype() == null ? dom.getDocumentElement().getLocalName() : dom.getDoctype().getName();
     }
 }
