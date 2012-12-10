@@ -245,6 +245,12 @@ public abstract class MCRContent {
      * thats content can be read more than once without consuming the stream.
      */
     public MCRContent getReusableCopy() throws IOException {
-        return this;
+        if (isReusable()) {
+            return this;
+        } else {
+            MCRContent copy = new MCRByteContent(asByteArray());
+            copy.setSystemId(systemId);
+            return copy;
+        }
     }
 }

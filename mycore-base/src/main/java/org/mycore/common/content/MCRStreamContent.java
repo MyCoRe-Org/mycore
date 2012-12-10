@@ -72,11 +72,4 @@ public class MCRStreamContent extends MCRContent {
     public boolean isReusable() {
         return false;
     }
-
-    @Override
-    public MCRContent getReusableCopy() throws IOException {
-        MCRContent copy = new MCRByteContent(asByteArray());
-        copy.setSystemId(systemId);
-        return copy;
-    }
 }
