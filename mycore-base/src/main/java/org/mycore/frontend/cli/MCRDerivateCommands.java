@@ -668,8 +668,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      */
     public static void repairDerivateSearchForID(String id) {
         LOGGER.info("Start the repair for the ID " + id);
-        MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(id));
-        MCRDirectory rootifs = MCRDirectory.getRootDirectory(der.getId().toString());
+        MCRDirectory rootifs = MCRDirectory.getRootDirectory(MCRObjectID.getInstance(id).toString());
         doForChildren(rootifs);
         LOGGER.info("Repaired " + id);
     }
