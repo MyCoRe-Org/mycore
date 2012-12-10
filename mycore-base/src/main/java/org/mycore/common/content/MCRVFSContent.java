@@ -63,11 +63,11 @@ public class MCRVFSContent extends MCRContent {
         final String uri = fo.getName().getURI();
         final Logger logger = Logger.getLogger(MCRVFSContent.class);
         final String id = toString().substring(toString().indexOf('@'));
-        logger.info(id + ": returning InputStream of " + uri);
+        logger.info(id + ": returning InputStream of " + uri, new IOException("open"));
         return new FilterInputStream(content.getInputStream()) {
             @Override
             public void close() throws IOException {
-                logger.info(id + ": closing Inputstream of " + uri);
+                logger.info(id + ": closing Inputstream of " + uri, new IOException("close"));
                 super.close();
                 content.close();
             }
