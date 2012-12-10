@@ -144,7 +144,7 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
         if (exists(id)) {
             return (MCRVersionedMetadata) super.retrieve(id);
         } else {
-            return new MCRVersionedMetadata(this, getSlot(id), id);
+            return new MCRVersionedMetadata(this, getSlot(id), id, super.forceDocType);
         }
     }
 
@@ -165,6 +165,6 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
 
     @Override
     protected MCRVersionedMetadata buildMetadataObject(FileObject fo, int id) {
-        return new MCRVersionedMetadata(this, fo, id);
+        return new MCRVersionedMetadata(this, fo, id, super.forceDocType);
     }
 }

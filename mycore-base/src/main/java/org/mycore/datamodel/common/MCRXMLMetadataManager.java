@@ -268,6 +268,8 @@ public class MCRXMLMetadataManager {
 
         config.set(configPrefix + "BaseDir", typeDir.getAbsolutePath());
         config.set(configPrefix + "ForceXML", true);
+        config.set(configPrefix + "ForceDocType", objectType.equals("derivate") ? "mycorederivate" : "mycoreobject");
+
         MCRStoreManager.createStore(baseID, impl);
     }
 

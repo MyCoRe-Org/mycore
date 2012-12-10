@@ -80,8 +80,8 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      * @param id
      *            the id of the metadata object
      */
-    MCRVersionedMetadata(MCRMetadataStore store, FileObject fo, int id) {
-        super(store, fo, id);
+    MCRVersionedMetadata(MCRMetadataStore store, FileObject fo, int id, String docType) {
+        super(store, fo, id, docType);
         // TODO: set revision of existing data at retrieve()
     }
 

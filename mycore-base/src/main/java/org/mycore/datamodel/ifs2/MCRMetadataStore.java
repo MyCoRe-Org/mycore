@@ -26,6 +26,7 @@ package org.mycore.datamodel.ifs2;
 import java.io.IOException;
 
 import org.apache.commons.vfs.FileObject;
+import org.apache.log4j.Logger;
 import org.jdom.JDOMException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
@@ -54,6 +55,8 @@ public class MCRMetadataStore extends MCRStore {
      */
     protected boolean forceXML = true;
 
+    protected String forceDocType;
+
     /**
      * Initializes a new metadata store instance.
      * 
@@ -66,6 +69,10 @@ public class MCRMetadataStore extends MCRStore {
         prefix = type + "_";
         suffix = ".xml";
         forceXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.Store." + type + ".ForceXML", true);
+        if (forceXML) {
+            forceDocType = MCRConfiguration.instance().getString("MCR.IFS2.Store." + type + ".ForceDocType", null);
+            Logger.getLogger(MCRMetadataStore.class).info("Set doctype for " + type + " to " + forceDocType);
+        }
     }
 
     /**
@@ -80,6 +87,10 @@ public class MCRMetadataStore extends MCRStore {
         prefix = config.getID() + "_";
         suffix = ".xml";
         forceXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.Store." + config.getID() + ".ForceXML", true);
+        if (forceXML) {
+            forceDocType = MCRConfiguration.instance().getString("MCR.IFS2.Store." + config.getID() + ".ForceDocType", null);
+            Logger.getLogger(MCRMetadataStore.class).info("Set doctype for " + config.getID() + " to " + forceDocType);
+        }
     }
 
     protected boolean shouldForceXML() {
@@ -151,6 +162,6 @@ public class MCRMetadataStore extends MCRStore {
      *            the ID of the metadata object
      */
     protected MCRStoredMetadata buildMetadataObject(FileObject fo, int id) {
-        return new MCRStoredMetadata(this, fo, id);
+        return new MCRStoredMetadata(this, fo, id, forceDocType);
     }
 }

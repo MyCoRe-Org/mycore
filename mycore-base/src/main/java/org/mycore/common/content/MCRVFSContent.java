@@ -57,6 +57,11 @@ public class MCRVFSContent extends MCRContent {
         this(uri.toURL());
     }
 
+    public MCRVFSContent(FileObject fo, String docType) throws IOException {
+        this(fo);
+        super.docType = docType;
+    }
+
     @Override
     public InputStream getInputStream() throws IOException {
         final FileContent content = fo.getContent();

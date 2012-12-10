@@ -50,6 +50,8 @@ public class MCRStoredMetadata {
     /** The store this document is stored in */
     protected MCRMetadataStore store;
 
+    private String docType;
+
     /**
      * Creates a new stored metadata object
      * 
@@ -59,11 +61,14 @@ public class MCRStoredMetadata {
      *            the file object storing the data
      * @param id
      *            the ID of the metadata document
+     * @param docType
+     *            if not null overwrites any detected doctype
      */
-    MCRStoredMetadata(MCRMetadataStore store, FileObject fo, int id) {
+    MCRStoredMetadata(MCRMetadataStore store, FileObject fo, int id, String docType) {
         this.store = store;
         this.id = id;
         this.fo = fo;
+        this.docType = docType;
     }
 
     /**
@@ -113,7 +118,7 @@ public class MCRStoredMetadata {
      * @return the stored XML document
      */
     public MCRContent getMetadata() throws IOException {
-        return new MCRVFSContent(fo);
+        return new MCRVFSContent(fo, docType);
     }
 
     /**
