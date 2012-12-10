@@ -23,13 +23,16 @@
 
 package org.mycore.common.content;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 
+import org.apache.commons.vfs.FileContent;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;
+import org.apache.log4j.Logger;
 
 /**
  * Reads MCRContent from Apache Commons Virtual Filesystem (VFS) sources.
@@ -56,6 +59,17 @@ public class MCRVFSContent extends MCRContent {
 
     @Override
     public InputStream getInputStream() throws IOException {
-        return fo.getContent().getInputStream();
+        final FileContent content = fo.getContent();
+        final String uri = fo.getName().getURI();
+        final Logger logger = Logger.getLogger(MCRVFSContent.class);
+        logger.info(toString() + ": returning InputStream of " + uri);
+        return new FilterInputStream(content.getInputStream()) {
+            @Override
+            public void close() throws IOException {
+                logger.info(toString() + ": closing Inputstream of " + uri);
+                super.close();
+                content.close();
+            }
+        };
     }
 }
