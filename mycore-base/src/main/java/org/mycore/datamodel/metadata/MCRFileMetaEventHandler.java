@@ -33,6 +33,7 @@ import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.frontend.cli.MCRDerivateCommands;
 
 /**
  * Handles category links to files
@@ -49,7 +50,7 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
         List<MCRFileMetadata> fileMetadata = objectDerivate.getFileMetadata();
         for (MCRFileMetadata metadata : fileMetadata) {
             Collection<MCRCategoryID> categories = metadata.getCategories();
-            if (!categories.isEmpty()){
+            if (!categories.isEmpty()) {
                 MCRCategLinkReference linkReference = MCRFile.getCategLinkReference(derivateID, metadata.getName());
                 CATEGLINK_SERVICE.setLinks(linkReference, categories);
             }
@@ -60,6 +61,7 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
         handleDerivateDeleted(evt, der);
         handleDerivateCreated(evt, der);
+        MCRDerivateCommands.repairDerivateSearchForID(der.getId().toString());
     }
 
     @Override
