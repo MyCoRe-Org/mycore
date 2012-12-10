@@ -41,11 +41,13 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRAccessManager {
 
-    private static final MCRAccessInterface ACCESS_IMPL = (MCRAccessInterface) MCRConfiguration.instance().getSingleInstanceOf(
-            "MCR.Access.Class", MCRAccessBaseImpl.class.getName());
+    private static final MCRAccessInterface ACCESS_IMPL = (MCRAccessInterface) MCRConfiguration.instance().getSingleInstanceOf("MCR.Access.Class",
+        MCRAccessBaseImpl.class.getName());
 
     private static final MCRAccessCheckStrategy ACCESS_STRATEGY = (MCRAccessCheckStrategy) MCRConfiguration.instance().getInstanceOf(
-            "MCR.Access.Strategy.Class", MCRDerivateIDStrategy.class.getName());
+        "MCR.Access.Strategy.Class", MCRDerivateIDStrategy.class.getName());
+
+    private static final MCRAccessCacheManager ACCESS_CACHE = new MCRAccessCacheManager();
 
     public static final Logger LOGGER = Logger.getLogger(MCRAccessManager.class);
 
@@ -198,7 +200,12 @@ public class MCRAccessManager {
      * @return true if the permission for the id is given
      */
     public static boolean checkPermission(String id, String permission) {
-        return ACCESS_STRATEGY.checkPermission(id, permission);
+        Boolean value = ACCESS_CACHE.isPermitted(id, permission);
+        if (value == null) {
+            value = ACCESS_STRATEGY.checkPermission(id, permission);
+            ACCESS_CACHE.cachePermission(id, permission, value);
+        }
+        return value;
     }
 
     /**
@@ -210,7 +217,12 @@ public class MCRAccessManager {
      * @return true if the permission exist
      */
     public static boolean checkPermission(String permission) {
-        return getAccessImpl().checkPermission(permission);
+        Boolean value = getAccessImpl().checkPermission(permission);
+        if (value == null) {
+            value = ACCESS_STRATEGY.checkPermission(null, permission);
+            ACCESS_CACHE.cachePermission(null, permission, value);
+        }
+        return value;
     }
 
     /**
