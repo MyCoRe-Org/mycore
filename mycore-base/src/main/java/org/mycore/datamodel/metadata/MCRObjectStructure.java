@@ -281,10 +281,8 @@ public class MCRObjectStructure {
             }
         }
         if (!MCRMetadataManager.exists(href)) {
-            LOGGER.warn("Cannot find derivate " + href.toString() + " , will it add anyway.");
-
+            LOGGER.warn("Cannot find derivate " + href.toString() + " , will add it anyway.");
         }
-
         derivates.add(add_derivate);
         return true;
     }
