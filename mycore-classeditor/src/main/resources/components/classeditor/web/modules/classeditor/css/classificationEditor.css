@@ -35,6 +35,7 @@
 
 .classeditor.mainDialog {
 	height: 700px;
+	background-color: white;
 }
 
 .classeditor.dijitContentPane {
@@ -215,6 +216,12 @@
 }
 .classeditor .settingsIcon {
 	background-image: url(../img/settings_16.png);
+}
+.classeditor .fullscreenIcon {
+	background-image: url(../img/fullscreen_16.png);
+}
+.classeditor .minimizeIcon {
+	background-image: url(../img/minimize_16.png);
 }
 .classeditor .folder {
 	background-image: url(../img/folder_16.png);

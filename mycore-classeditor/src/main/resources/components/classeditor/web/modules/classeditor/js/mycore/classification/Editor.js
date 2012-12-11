@@ -6,7 +6,10 @@ define([
 	"mycore/classification/_SettingsMixin",
 	"dojo/text!./templates/Editor.html",
 	"dojo/on", // on
+	"dojo/dom", // byId
+	"dojo/query",
 	"dojo/_base/lang", // hitch, clone
+	"dojo/dom-construct",
 	"mycore/common/I18nManager",
 	"dijit/Toolbar",
 	"dijit/layout/ContentPane",
@@ -18,7 +21,7 @@ define([
 	"mycore/classification/TreePane",
 	"mycore/common/I18nStore",
 	"mycore/classification/SettingsDialog"
-], function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _SettingsMixin, template, on, lang, i18n) {
+], function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _SettingsMixin, template, on, dom, query, lang, domConstruct, i18n) {
 
 	/**
 	 * Create a new instance of the classification editor.
@@ -69,6 +72,7 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 		on(this.saveButton, "click", lang.hitch(this, this.onSaveClicked));
 		on(this.refreshButton, "click", lang.hitch(this, this.onRefreshClicked));
 		on(this.settingsButton, "click", lang.hitch(this, this.onSettingsClicked));
+		on(this.fullscreenButton, "click", lang.hitch(this, this.onFullscreenClicked));
 		// tree events
 		on(this.treePane.tree, "itemSelected", lang.hitch(this, this.onTreeItemSelected));
 		on(this.treePane.tree, "itemAdded", lang.hitch(this, this.onTreeItemAddedOrMoved));
@@ -102,7 +106,7 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 
 	onTreeItemAddedOrMoved: function(args) {
 		this.store.updateSaveArray("update", args.item, args.parent);
-		this.updateToolbar(true);
+		this.updateToolbar();
 	},
 
 	onTreeItemsRemoved: function(args) {
@@ -110,7 +114,7 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 			this.store.updateSaveArray("delete", args.items[i]);
 		}
 		this.categoryEditorPane.set("disabled", true);
-		this.updateToolbar(true);
+		this.updateToolbar();
 	},
 
 	onCategoryEditorLabelChanged: function(args) {
@@ -129,7 +133,7 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 		this.store.setValue(item, type, value);
 		this.store.setValue(item, "modified", true);
 		this.store.updateSaveArray("update", item);
-		this.updateToolbar(true);
+		this.updateToolbar();
 	},
 
 	onSaveClicked: function() {
@@ -145,6 +149,15 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 
 	onSettingsClicked: function() {
 		this.openSettingsDialog();
+	},
+
+	onFullscreenClicked: function() {
+		this.toggleFullscreen();
+		this.fullscreenButton.set("hovering", false);
+		// because fullscreen is not applied instantly
+		setTimeout(lang.hitch(this, function() {
+			this.updateToolbar();
+		}), 300);
 	},
 
 	onSettingsDialogClose: function() {
@@ -172,7 +185,7 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 	},
 
 	onStoreSaved: function() {
-		this.updateToolbar(false);
+		this.updateToolbar();
 		this.categoryEditorPane.update();
 		alert(i18n.getFromCache("component.classeditor.save.successfull"));
 	},
@@ -205,28 +218,71 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 			lang.hitch(this, function(store) {
 				this.treePane.tree.createTree(store);
 				this.treePane.updateToolbar();
+				this.updateToolbar();
 			}),
 			lang.hitch(this, function(error) {
 				alert(error);
 				this.treePane.updateToolbar();
+				this.updateToolbar();
 			})
 		);
 		this.categoryEditorPane.set("disabled", true);
-		this.updateToolbar(false);
 	},
 
-	updateToolbar: function(/*boolean*/ dirty) {
-		if(dirty) {
+	updateToolbar: function() {
+		if(this.store.isDirty()) {
 			this.saveButton.set("disabled", false);
 			this.saveButton.set("iconClass", "icon16 saveIcon");
 		} else {
 			this.saveButton.set("disabled", true);
 			this.saveButton.set("iconClass", "icon16 saveDisabledIcon");
 		}
+		if(this.isFullscreen()) {
+			this.fullscreenButton.set("iconClass", "icon16 minimizeIcon");
+		} else {
+			this.fullscreenButton.set("iconClass", "icon16 fullscreenIcon");
+		}
+
 	},
 
 	openSettingsDialog: function() {
 		this.settingsDialog.show(this.store.isDirty());
+	},
+
+	toggleFullscreen: function() {
+		var fullscreen = this.isFullscreen();
+		// toggle fullscreen
+		if (this.domNode.requestFullScreen) {
+			if (!fullscreen) {
+				this.domNode.requestFullscreen();
+			} else {
+				document.exitFullScreen();
+			}
+		} else if (this.domNode.mozRequestFullScreen) {
+			if (!fullscreen) {
+				this.domNode.mozRequestFullScreen();
+			} else {
+				document.mozCancelFullScreen();
+			}
+		} else if (this.domNode.webkitRequestFullScreen) {
+			if (!fullscreen) {
+				this.domNode.webkitRequestFullScreen();
+			} else {
+				document.webkitCancelFullScreen();
+			}
+		}
+		// move outer div's
+		if(fullscreen) {
+			dojo.place(this.settingsDialog.domNode, query("body")[0]);
+			dojo.place(this.treePane.exportDialog.domNode, query("body")[0]);
+		} else {
+			dojo.place(this.settingsDialog.domNode, this.domNode);
+			dojo.place(this.treePane.exportDialog.domNode, this.domNode);
+		}
+	},
+
+	isFullscreen: function() {
+		return document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
 	}
 
 });

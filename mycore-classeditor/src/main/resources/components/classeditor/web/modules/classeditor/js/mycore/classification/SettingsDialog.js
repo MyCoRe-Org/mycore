@@ -52,6 +52,8 @@ return declare("mycore.classification.SettingsDialog", [Dialog, _Templated, _Set
 		i18n.resolve(this.languageSelectLabel);
 		i18n.resolve(this.miscLabel);
 		i18n.resolve(this.showIdCheckBox);
+		// set defaults
+	    this.showIdCheckBox.set("value", this.settings.showId ? this.settings.showId : false);
 		// confirm dialog
 		this.confirmImportDialog.set("title", i18n.getFromCache("component.classeditor.settings.beforeSubmitTitle"));
 		this.confirmImportDialog.closeButtonNode.title = i18n.getFromCache("component.classeditor.dialog.close");

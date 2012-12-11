@@ -33,6 +33,10 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
     	this.inherited(arguments);
     },
 
+    onSettingsReady: function() {
+    	this.showIdInLabel = this.settings.showId ? this.settings.showId : false;
+    },
+
     createTree: function(store) {
     	this.store = store;
 
