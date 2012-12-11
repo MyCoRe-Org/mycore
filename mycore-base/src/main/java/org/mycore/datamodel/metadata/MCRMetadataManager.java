@@ -133,7 +133,10 @@ public final class MCRMetadataManager {
     }
 
     /**
-     * @param mcrObject
+     * Creates (object does currently not exist in the repository) or updates (object exists already in the repository) 
+     * the given object in the repository. 
+     * 
+     * @param mcrBase
      * @throws MCRPersistenceException
      * @throws MCRActiveLinkException 
      */
