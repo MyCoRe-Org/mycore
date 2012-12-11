@@ -287,7 +287,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             method.invoke(this, new Object[] { job, cd });
             return;
         } catch (Exception e) {
-            LOGGER.error("Error while execution of method " + mytodo, e);
+            LOGGER.error("Error while executing method " + mytodo, e);
         }
 
         sb = new StringBuffer();
