@@ -137,7 +137,7 @@ public final class MCRMetadataManager {
      * @throws MCRPersistenceException
      * @throws MCRActiveLinkException 
      */
-    public static final void updateOrcreate(final MCRBase mcrBase) throws MCRPersistenceException, MCRActiveLinkException {
+    public static final void createOrUpdate(final MCRBase mcrBase) throws MCRPersistenceException, MCRActiveLinkException {
         if (mcrBase instanceof MCRObject) {
             if (!exists(mcrBase.getId())) {
                 create((MCRObject) mcrBase);
