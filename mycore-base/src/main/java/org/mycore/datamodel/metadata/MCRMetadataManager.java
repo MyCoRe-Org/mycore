@@ -133,6 +133,29 @@ public final class MCRMetadataManager {
     }
 
     /**
+     * @param mcrObject
+     * @throws MCRPersistenceException
+     * @throws MCRActiveLinkException 
+     */
+    public static final void updateOrcreate(final MCRBase mcrBase) throws MCRPersistenceException, MCRActiveLinkException {
+        if (mcrBase instanceof MCRObject) {
+            if (!exists(mcrBase.getId())) {
+                create((MCRObject) mcrBase);
+            } else {
+                update((MCRObject) mcrBase);
+            }
+        } else {
+            if (mcrBase instanceof MCRDerivate) {
+                if (!exists(mcrBase.getId())) {
+                    create((MCRDerivate) mcrBase);
+                } else {
+                    update((MCRDerivate) mcrBase);
+                }
+            }
+        }
+    }
+
+    /**
      * Stores the object.
      * 
      * @param mcrObject
