@@ -24,16 +24,18 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.frontend.cli.MCRDerivateCommands;
 
 /**
  * Handles category links to files
@@ -42,6 +44,8 @@ import org.mycore.frontend.cli.MCRDerivateCommands;
  */
 public class MCRFileMetaEventHandler extends MCREventHandlerBase {
     private static MCRCategLinkService CATEGLINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
+
+    private static Logger LOGGER = Logger.getLogger(MCRFileMetaEventHandler.class);
 
     @Override
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
@@ -59,9 +63,26 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
+        HashSet<MCRCategLinkReference> before = new HashSet<MCRCategLinkReference>();
+        before.addAll(CATEGLINK_SERVICE.getReferences(der.getId().toString()));
+
         handleDerivateDeleted(evt, der);
         handleDerivateCreated(evt, der);
-        MCRDerivateCommands.repairDerivateSearchForID(der.getId().toString());
+
+        HashSet<MCRCategLinkReference> after = new HashSet<MCRCategLinkReference>();
+        after.addAll(CATEGLINK_SERVICE.getReferences(der.getId().toString()));
+        HashSet<MCRCategLinkReference> combined = new HashSet<MCRCategLinkReference>(before);
+        combined.addAll(after);
+        for (MCRCategLinkReference ref : combined) {
+            MCRFile file = MCRFile.getMCRFile(der.getId(), ref.getObjectID());
+            if (file == null) {
+                LOGGER.warn("File is linked to category but does not exist:" + der.getId() + ref.getObjectID());
+                continue;
+            }
+            MCREvent fileEvent = new MCREvent(MCREvent.FILE_TYPE, MCREvent.REPAIR_EVENT);
+            evt.put("file", file);
+            MCREventManager.instance().handleEvent(fileEvent);
+        }
     }
 
     @Override
