@@ -354,16 +354,16 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         LOGGER.info("Reading file " + file + " ...");
 
-        MCRDerivate mycore_obj = new MCRDerivate(file.toURI());
-        mycore_obj.setImportMode(importMode);
+        MCRDerivate derivate = new MCRDerivate(file.toURI());
+        derivate.setImportMode(importMode);
 
         // Replace relative path with absolute path of files
-        if (mycore_obj.getDerivate().getInternals() != null) {
-            String path = mycore_obj.getDerivate().getInternals().getSourcePath();
+        if (derivate.getDerivate().getInternals() != null) {
+            String path = derivate.getDerivate().getInternals().getSourcePath();
             path = path.replace('/', File.separatorChar).replace('\\', File.separatorChar);
             if (path.trim().length() <= 1) {
                 // the path is the path name plus the name of the derivate -
-                path = mycore_obj.getId().toString().toLowerCase();
+                path = derivate.getId().toString().toLowerCase();
             }
             File sPath = new File(path);
 
@@ -376,19 +376,19 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 }
             }
 
-            mycore_obj.getDerivate().getInternals().setSourcePath(path);
+            derivate.getDerivate().getInternals().setSourcePath(path);
             LOGGER.info("Source path --> " + path);
         }
 
-        LOGGER.info("Label --> " + mycore_obj.getLabel());
+        LOGGER.info("Label --> " + derivate.getLabel());
 
         if (update) {
-            MCRMetadataManager.update(mycore_obj);
-            LOGGER.info(mycore_obj.getId().toString() + " updated.");
+            MCRMetadataManager.update(derivate);
+            LOGGER.info(derivate.getId().toString() + " updated.");
             LOGGER.info("");
         } else {
-            MCRMetadataManager.create(mycore_obj);
-            LOGGER.info(mycore_obj.getId().toString() + " loaded.");
+            MCRMetadataManager.create(derivate);
+            LOGGER.info(derivate.getId().toString() + " loaded.");
             LOGGER.info("");
         }
 
