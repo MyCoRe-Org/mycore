@@ -134,7 +134,8 @@ public class MCRXMLFunctions {
      * @return QueryServlet-Link
      */
     public static String getQueryServlet(String hostAlias) {
-        return getBaseLink(hostAlias).append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(QUERY_SUFFIX).toString())).toString();
+        return getBaseLink(hostAlias).append(
+                CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(QUERY_SUFFIX).toString())).toString();
     }
 
     /**
@@ -145,15 +146,14 @@ public class MCRXMLFunctions {
      * @return FileNodeServlet-Link
      */
     public static String getIFSServlet(String hostAlias) {
-        return getBaseLink(hostAlias).append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(IFS_SUFFIX).toString())).toString();
+        return getBaseLink(hostAlias).append(
+                CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(IFS_SUFFIX).toString())).toString();
     }
 
     public static StringBuffer getBaseLink(String hostAlias) {
         StringBuffer returns = new StringBuffer();
-        returns
-            .append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PROTOCOLL_SUFFIX).toString(), "http"))
-            .append("://")
-            .append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(HOST_SUFFIX).toString()));
+        returns.append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PROTOCOLL_SUFFIX).toString(), "http"))
+                .append("://").append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(HOST_SUFFIX).toString()));
         String port = CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PORT_SUFFIX).toString(), DEFAULT_PORT);
         if (!port.equals(DEFAULT_PORT)) {
             returns.append(":").append(port);
@@ -168,13 +168,8 @@ public class MCRXMLFunctions {
     public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language) throws ParseException {
         if (LOGGER.isDebugEnabled()) {
             StringBuffer sb = new StringBuffer("isoDate=");
-            sb.append(isoDate)
-                .append(", simpleFormat=")
-                .append(simpleFormat)
-                .append(", isoFormat=")
-                .append(isoFormat)
-                .append(", iso649Language=")
-                .append(iso639Language);
+            sb.append(isoDate).append(", simpleFormat=").append(simpleFormat).append(", isoFormat=").append(isoFormat)
+                    .append(", iso649Language=").append(iso639Language);
             LOGGER.debug(sb.toString());
         }
         Locale locale = new Locale(iso639Language);
@@ -427,7 +422,14 @@ public class MCRXMLFunctions {
     }
 
     public static boolean isDisplayedEnabledDerivate(String derivateId) {
-        MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateId));
+        MCRObjectID derId = MCRObjectID.getInstance(derivateId);
+
+        if (!MCRMetadataManager.exists(derId)) {
+            LOGGER.error("Derivate \"" + derivateId + "\" does not exist");
+            return false;
+        }
+
+        MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(derId);
 
         org.jdom.Element derivateElem = der.getDerivate().createXML();
         String display = derivateElem.getAttributeValue("display");
@@ -481,8 +483,8 @@ public class MCRXMLFunctions {
                 return true;
             }
         }
-        LOGGER
-            .info("URN assignment disabled as the object type " + givenType + " is not in the list of allowed objects. See property \"" + propertyName + "\"");
+        LOGGER.info("URN assignment disabled as the object type " + givenType + " is not in the list of allowed objects. See property \""
+                + propertyName + "\"");
         return false;
     }
 
