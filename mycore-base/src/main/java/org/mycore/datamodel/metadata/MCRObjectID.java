@@ -110,7 +110,7 @@ public final class MCRObjectID {
      */
     public MCRObjectID(String id) throws MCRException {
         if (!setID(id)) {
-            throw new MCRException("The ID is not valid: " + id + " , it should has the form String_String_Integer");
+            throw new MCRException("The ID is not valid: " + id + " , it should match the pattern String_String_Integer");
         }
     }
 
