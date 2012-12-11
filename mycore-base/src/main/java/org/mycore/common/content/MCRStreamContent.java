@@ -52,6 +52,14 @@ public class MCRStreamContent extends MCRContent {
         setSystemId(systemId);
     }
 
+    /**
+     * @param systemId the systemID of this stream
+     */
+    public MCRStreamContent(InputStream in, String systemId, String docType) {
+        this(in, systemId);
+        super.docType = docType;
+    }
+
     @Override
     public InputStream getInputStream() {
         return in;

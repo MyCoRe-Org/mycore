@@ -57,7 +57,7 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
 
             if (statusCode == HttpStatus.SC_OK) {
                 MCRStreamContent solrResponse = new MCRStreamContent(solrResponseStream, solrHttpMethod.getURI()
-                        .toString());
+                        .toString(), "response");
                 MCRLayoutService.instance().doLayout(job.getRequest(), resp, solrResponse);
                 return;
             }
