@@ -29,6 +29,7 @@ import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,6 +60,8 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -1075,6 +1078,47 @@ public class MCRUtils {
             if (child instanceof MCRFile) {
                 fList.add((MCRFile) child);
             }
+        }
+    }
+
+    /**
+     * Extracts files in a tar archive. Currently works only on uncompressed tar files.
+     * 
+     * @param source the uncompressed tar to extract
+     * @param expandToDirectory the directory to extract the tar file to
+     * 
+     * @throws IOException if the source file does not exists
+     * 
+     * @author shermann
+     */
+    public static void untar(File source, File expandToDirectory) throws IOException {
+        TarArchiveInputStream tarOutputStream = new TarArchiveInputStream(new FileInputStream(source));
+        try {
+            ArchiveEntry entry = null;
+            byte[] buffer = new byte[10240];
+
+            while ((entry = tarOutputStream.getNextTarEntry()) != null) {
+                String fileName = entry.getName();
+                File newFile = new File(expandToDirectory.getAbsolutePath() + File.separator + fileName);
+
+                if (entry.isDirectory()) {
+                    new File(newFile.getParent()).mkdirs();
+                } else {
+                    new File(newFile.getParent()).mkdirs();
+                    FileOutputStream fileOutputStream = new FileOutputStream(newFile);
+                    try {
+                        int length = -1;
+                        while ((length = tarOutputStream.read(buffer)) > 0) {
+                            fileOutputStream.write(buffer, 0, length);
+                        }
+                    } catch (Exception ex) {
+                        fileOutputStream.close();
+                        throw new IOException("Could not extract file \"" + newFile.getAbsolutePath() + "\"", ex);
+                    }
+                }
+            }
+        } finally {
+            tarOutputStream.close();
         }
     }
 }
