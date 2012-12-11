@@ -34,7 +34,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.jdom.Document;
-import org.jdom.JDOMException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -49,7 +48,6 @@ import org.mycore.datamodel.ifs2.MCRStoreManager;
 import org.mycore.datamodel.ifs2.MCRStoredMetadata;
 import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.xml.sax.SAXParseException;
 
 /**
  * Manages persistence of MCRObject and MCRDerivate xml metadata.
@@ -210,8 +208,8 @@ public class MCRXMLMetadataManager {
                     try {
                         setupStore(project, type, prefix);
                     } catch (Exception e) {
-                        throw new MCRPersistenceException(MessageFormat.format("Could not instantiate store for project {0} and object type {1}.", project,
-                            type), e);
+                        throw new MCRPersistenceException(MessageFormat.format(
+                                "Could not instantiate store for project {0} and object type {1}.", project, type), e);
                     }
                 }
             }
@@ -219,7 +217,8 @@ public class MCRXMLMetadataManager {
 
         MCRMetadataStore store = MCRStoreManager.getStore(projectType, MCRMetadataStore.class);
         if (store == null) {
-            throw new MCRPersistenceException(MessageFormat.format("Metadata store for project {0} and object type {1} is unconfigured.", project, type));
+            throw new MCRPersistenceException(MessageFormat.format("Metadata store for project {0} and object type {1} is unconfigured.",
+                    project, type));
         }
         return store;
     }
@@ -389,6 +388,22 @@ public class MCRXMLMetadataManager {
             }
             String msg = "Exception while updating XML metadata of mcrobject " + mcrid.toString();
             throw new MCRPersistenceException(msg, ex);
+        }
+    }
+
+    /**
+     * Creates or updates metadata of a MCRObject in the persistent store. 
+     * 
+     * @param mcrid the MCRObjectID
+     * @param xml the xml metadata of the MCRObject 
+     * @param lastModified the date of last modification to set
+     * @return the stored metadata as IFS2 object
+     */
+    public MCRStoredMetadata createOrUpdate(MCRObjectID mcrid, Document xml, Date lastModified) {
+        if (exists(mcrid)) {
+            return update(mcrid, xml, lastModified);
+        } else {
+            return create(mcrid, xml, lastModified);
         }
     }
 
