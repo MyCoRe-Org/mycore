@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.util.Date;
 import java.util.List;
 
@@ -34,12 +35,12 @@ public class MCRMigrationCommands22Test {
     private File svnBase;
     
     @Before
-    public void init(){
+    public void init() throws MalformedURLException{
         baseDir = tmpFolder.newFolder("baseDir");
         svnBase = tmpFolder.newFolder("SVNBase");
         MCRConfiguration.instance().set("MCR.CLI.Classes.Annotated", MCRMigrationCommands22.class.getName());
         MCRConfiguration.instance().set("MCR.Metadata.Store.BaseDir", baseDir.getAbsolutePath());
-        MCRConfiguration.instance().set("MCR.Metadata.Store.SVNBase", svnBase.toURI().toString());
+        MCRConfiguration.instance().set("MCR.Metadata.Store.SVNBase", "file:///"+svnBase.getAbsolutePath().replace('\\', '/'));
         MCRConfiguration.instance().set("MCR.Metadata.Type.cbu", true);
         MCRConfiguration.instance().set("MCR.Metadata.Type.mods", true);
         MCRConfiguration.instance().set("MCR.CommandLineInterface.unitTest", true);
