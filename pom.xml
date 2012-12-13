@@ -28,6 +28,23 @@
     <system>sourceforge</system>
     <url>https://sourceforge.net/tracker/index.php?group_id=92005</url>
   </issueManagement>
+  <distributionManagement>
+    <repository>
+      <id>MyCoRe HQ</id>
+      <name>MyCoRe HQ-releases</name>
+      <url>http://artifactory.mycore.de/libs-releases-local</url>
+    </repository>
+    <snapshotRepository>
+      <id>MyCoRe HQ</id>
+      <name>MyCoRe HQ-snapshots</name>
+      <url>http://artifactory.mycore.de/libs-snapshots-local</url>
+    </snapshotRepository>
+    <site>
+      <id>MyCoRe HQ</id>
+      <name>MyCoRe HQ-sites</name>
+      <url>scp://server.mycore.de/mcr/mycore.de/generated/${project.build.finalName}</url>
+    </site>
+  </distributionManagement>
   <ciManagement>
     <system>hudson</system>
     <url>http://www.mycore.org/hudson/job/MyCoRe/</url>
