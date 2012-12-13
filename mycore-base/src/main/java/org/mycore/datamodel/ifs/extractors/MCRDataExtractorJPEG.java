@@ -56,7 +56,7 @@ public class MCRDataExtractorJPEG extends MCRDataExtractor {
     @Override
     protected void extractData(Element container, InputStream in) throws JpegProcessingException {
         Metadata metadata = JpegMetadataReader.readMetadata(in);
-        Iterator directories = metadata.getDirectoryIterator();
+        Iterator directories = metadata.getDirectories().iterator();
         while (directories.hasNext()) {
             Directory directory = (Directory) directories.next();
             extractDirectoryData(container, directory);
@@ -74,7 +74,7 @@ public class MCRDataExtractorJPEG extends MCRDataExtractor {
             if (dirName != null) {
                 xDirectory.setAttribute("name", dirName);
             }
-            Iterator tags = directory.getTagIterator();
+            Iterator tags = directory.getTags().iterator();
             while (tags.hasNext()) {
                 Tag tag = (Tag) tags.next();
                 extractTagData(xDirectory, tag);
