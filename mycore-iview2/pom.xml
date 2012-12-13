@@ -97,8 +97,9 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
+        <groupId>org.jvnet.jax-ws-commons</groupId>
         <artifactId>jaxws-maven-plugin</artifactId>
+	<version>2.2</version>
         <executions>
           <execution>
             <id>generate-wsdl</id>
@@ -106,7 +107,6 @@
               <goal>wsgen</goal>
             </goals>
             <configuration>
-              <pluginArtifacts />
               <sei>org.mycore.iview2.services.webservice.MCRIView2RemoteFunctions</sei>
               <keep>true</keep>
               <verbose>true</verbose>
