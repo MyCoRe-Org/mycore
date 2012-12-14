@@ -62,9 +62,9 @@
     </notifiers>
   </ciManagement>
   <scm>
-    <connection>scm:svn:http://server.mycore.de/svn/mycore/tags/mycore-2.1.0</connection>
-    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/tags/mycore-2.1.0</developerConnection>
-    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/tags/mycore-2.1.0</url>
+    <connection>scm:svn:http://server.mycore.de/svn/mycore/branches/release_2_1_fixes</connection>
+    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/branches/release_2_1_fixes</developerConnection>
+    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/branches/release_2_1_fixes</url>
   </scm>
   <profiles>
     <profile>
