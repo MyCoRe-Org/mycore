@@ -92,7 +92,7 @@ public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
 
     @Override
     public boolean add(MCRBasketEntry entry) {
-        return (contains(entry) ? false : list.add(entry));
+        return !contains(entry) && list.add(entry);
     }
 
     @Override
