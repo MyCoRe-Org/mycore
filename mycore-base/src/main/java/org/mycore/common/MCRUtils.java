@@ -27,10 +27,12 @@ import static org.mycore.common.MCRConstants.DATE_FORMAT;
 import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -614,6 +616,25 @@ public class MCRUtils {
      */
     public static final void writeElementToFile(Element elm, File xml) {
         writeJDOMToFile(new Document().addContent(elm), xml);
+    }
+
+    /**
+     * Writes plain text to a file.
+     * 
+     * @param textToWrite
+     *            the text to write into the file
+     * @param fileName
+     *            the name of the file to write to, given as absolute path
+     * @return a handle to the written file
+     * @throws IOException
+     */
+    public static File writeTextToFile(String textToWrite, String fileName) throws IOException {
+        File file = new File(fileName);
+        BufferedWriter fOut = new BufferedWriter(new FileWriter(file));
+        fOut.write(textToWrite);
+        fOut.flush();
+        fOut.close();
+        return file;
     }
 
     /**
