@@ -204,7 +204,7 @@ public class MCRResults implements Iterable<MCRHit> {
 
                 for (int i = 0; result == 0 && i < sortByList.size(); i++) {
                     MCRSortBy sortBy = sortByList.get(i);
-                    if (sortBy.getSortOrder() == MCRSortBy.ASCENDING) {
+                    if (sortBy.getSortOrder()) {
                         result = a.compareTo(sortBy.getField(), b);
                     } else {
                         result = b.compareTo(sortBy.getField(), a);

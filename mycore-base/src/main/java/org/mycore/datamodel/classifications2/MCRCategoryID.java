@@ -53,7 +53,7 @@ public class MCRCategoryID implements Serializable {
 
     private String ID;
 
-    MCRCategoryID() {
+    private MCRCategoryID() {
         super();
     }
 

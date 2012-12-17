@@ -186,7 +186,7 @@ public class MCRQuery {
                     MCRSortBy sb = sortBy.get(i);
                     Element ref = new Element("field");
                     ref.setAttribute("name", sb.getField().getName());
-                    ref.setAttribute("order", sb.getSortOrder() == MCRSortBy.ASCENDING ? "ascending" : "descending");
+                    ref.setAttribute("order", sb.getSortOrder() ? "ascending" : "descending");
                     sortByElem.addContent(ref);
                 }
             }

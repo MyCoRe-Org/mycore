@@ -152,7 +152,11 @@ public class MCRParameterCollector {
     private void setFromSession(MCRSession session) {
         for (Map.Entry<Object, Object> entry : session.getMapEntries()) {
             String key = entry.getKey().toString();
-            setXSLParameter(key, entry.getValue().toString());
+            try {
+                setXSLParameter(key, entry.getValue().toString());
+            } catch (NullPointerException e) {
+                LOGGER.warn("NPE " + key + ":" + entry.getValue(), e);
+            }
         }
     }
 

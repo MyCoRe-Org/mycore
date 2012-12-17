@@ -96,7 +96,7 @@ public class MCRLuceneSolrAdapter {
 
     private static SolrQuery applySortOptions(SolrQuery q, List<MCRSortBy> sortBy) {
         for (MCRSortBy option : sortBy) {
-            q.addSortField(option.getField().getName(), option.getSortOrder() == true ? SolrQuery.ORDER.asc : SolrQuery.ORDER.desc);
+            q.addSortField(option.getField().getName(), option.getSortOrder() ? SolrQuery.ORDER.asc : SolrQuery.ORDER.desc);
         }
         return q;
     }

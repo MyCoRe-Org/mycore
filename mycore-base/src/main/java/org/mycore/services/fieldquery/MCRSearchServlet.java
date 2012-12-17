@@ -486,7 +486,7 @@ public class MCRSearchServlet extends MCRServlet {
                 MCRSortBy sortBy = list.get(i);
                 sb.append("&").append(sortBy.getField().getName());
                 sb.append(".sortField.").append(i + 1);
-                sb.append("=").append(sortBy.getSortOrder() == MCRSortBy.ASCENDING ? "ascending" : "descending");
+                sb.append("=").append(sortBy.getSortOrder() ? "ascending" : "descending");
             }
         }
 

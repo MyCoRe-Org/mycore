@@ -322,7 +322,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                 if (isTokenized(sortByElement.getField())) {
                     name += getSortableSuffix();
                 }
-                sortField = new SortField(name, fieldType, sortByElement.getSortOrder() == MCRSortBy.DESCENDING);
+                sortField = new SortField(name, fieldType, !sortByElement.getSortOrder());
             }
             sortList.add(sortField);
         }
