@@ -248,7 +248,7 @@ public class MCRIndexBrowserXmlGenerator {
                                 }
                             }
                         } else {
-                            while (it.hasNext()) {
+                            if (it.hasNext()) {
                                 Element el = (Element) it.next();
                                 if (attribute != el.getAttributeValue("type")) {
                                     if (value.length() > 0) {
@@ -257,7 +257,6 @@ public class MCRIndexBrowserXmlGenerator {
                                     value += el.getText();
                                     attribute = el.getAttributeValue("type");
                                 }
-                                break;
                             }
                         }
                     }
