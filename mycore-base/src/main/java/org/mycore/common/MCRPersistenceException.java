@@ -54,5 +54,5 @@ public class MCRPersistenceException extends MCRException {
      */
     public MCRPersistenceException(String message, Exception exception) {
         super(message, exception);
-    };
+    }
 }

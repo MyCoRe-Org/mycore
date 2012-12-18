@@ -60,4 +60,4 @@ class MCRDateBeforeClause implements MCRCondition<MCRAccessData> {
         cond.setAttribute("value", dateformat.format(date));
         return cond;
     }
-};
+}

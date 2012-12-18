@@ -48,4 +48,4 @@ public class MCRFalseCondition implements MCRCondition<Object> {
         cond.setAttribute("operator", "false");
         return cond;
     }
-};
+}

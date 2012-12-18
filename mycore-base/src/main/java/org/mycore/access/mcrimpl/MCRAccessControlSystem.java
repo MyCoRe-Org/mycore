@@ -469,6 +469,6 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     public static MCRCache getCache() {
         return cache;
-    };
+    }
 
-};
+}

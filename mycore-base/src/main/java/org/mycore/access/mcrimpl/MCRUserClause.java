@@ -58,4 +58,4 @@ class MCRUserClause implements MCRCondition<Object> {
         cond.setAttribute("value", user);
         return cond;
     }
-};
+}

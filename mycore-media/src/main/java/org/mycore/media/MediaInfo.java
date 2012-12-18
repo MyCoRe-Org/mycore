@@ -99,7 +99,7 @@ public class MediaInfo {
         Text,
         Chapters,
         Image,
-        Menu;
+        Menu
     }
 
     //Enums
@@ -145,7 +145,7 @@ public class MediaInfo {
         /**
          * Domain of this piece of information.
          */
-        Domain;
+        Domain
     }
 
     //Constructor/Destructor

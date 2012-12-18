@@ -61,4 +61,4 @@ class MCRDateAfterClause implements MCRCondition<MCRAccessData> {
         return cond;
     }
 
-};
+}

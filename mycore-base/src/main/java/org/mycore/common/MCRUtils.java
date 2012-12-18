@@ -102,7 +102,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class MCRUtils {
     // The file slash
-    private static String SLASH = System.getProperty("file.separator");;
+    private static String SLASH = System.getProperty("file.separator");
 
     public final static char COMMAND_OR = 'O';
 

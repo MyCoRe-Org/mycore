@@ -60,4 +60,4 @@ class MCRGroupClause implements MCRCondition<Object> {
         cond.setAttribute("value", groupname);
         return cond;
     }
-};
+}

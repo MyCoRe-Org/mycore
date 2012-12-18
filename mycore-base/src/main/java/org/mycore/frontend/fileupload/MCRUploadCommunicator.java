@@ -424,7 +424,6 @@ public class MCRUploadCommunicator {
         byte[] buffer = new byte[bufferSize];
 
         while (in.read(buffer, 0, buffer.length) != -1) {
-            ;
         }
 
         in.close();

@@ -72,7 +72,7 @@ public class MCRCommand {
      * use this to overwrite this class.
      */
     protected MCRCommand() {
-    };
+    }
 
     /**
      * Creates a new MCRCommand.

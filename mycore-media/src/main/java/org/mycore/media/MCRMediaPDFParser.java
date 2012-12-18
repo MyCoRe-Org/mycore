@@ -45,7 +45,7 @@ import org.mycore.datamodel.ifs.MCROldFile;
 public class MCRMediaPDFParser extends MCRMediaParser {
     private static final String[] supportedFileExts = { "pdf", "ps" };
 
-    private static MCRMediaPDFParser instance = new MCRMediaPDFParser();;
+    private static MCRMediaPDFParser instance = new MCRMediaPDFParser();
 
     private static final Logger LOGGER = Logger.getLogger(MCRMediaPDFParser.class);
 

@@ -53,7 +53,7 @@ public class MCRRedundancyMapServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger LOGGER = Logger.getLogger(MCRRedundancyMapServlet.class);;
+    private static Logger LOGGER = Logger.getLogger(MCRRedundancyMapServlet.class);
 
     private int nonDoubletCount;
 

@@ -50,4 +50,4 @@ class MCRDummyClause implements MCRCondition<Object> {
     public Element toXML() {
         return null; /* TODO */
     }
-};
+}

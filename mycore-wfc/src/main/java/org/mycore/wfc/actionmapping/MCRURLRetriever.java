@@ -45,7 +45,7 @@ import org.mycore.wfc.MCRConstants;
  */
 public final class MCRURLRetriever {
     private MCRURLRetriever() {
-    };
+    }
 
     private static final Logger LOGGER = Logger.getLogger(MCRURLRetriever.class);
 

@@ -218,5 +218,5 @@ public class MCRMediaAVExtender extends MCRAudioVideoExtender {
     }
 
     public void getPlayerStarterTo(OutputStream out, String startPos, String stopPos) throws MCRPersistenceException {
-    };
+    }
 }

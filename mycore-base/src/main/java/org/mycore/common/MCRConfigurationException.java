@@ -54,5 +54,5 @@ public class MCRConfigurationException extends MCRException {
      */
     public MCRConfigurationException(String message, Exception exception) {
         super(message, exception);
-    };
+    }
 }

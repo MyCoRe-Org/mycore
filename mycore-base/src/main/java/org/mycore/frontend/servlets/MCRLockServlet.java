@@ -46,7 +46,7 @@ public class MCRLockServlet extends MCRServlet {
     private static final String ACTION_KEY = MCRLockServlet.class.getCanonicalName() + ".Action";
 
     enum Action {
-        lock, unlock;
+        lock, unlock
     }
 
     private static final Logger LOGGER = Logger.getLogger(MCRLockServlet.class);

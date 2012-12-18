@@ -161,7 +161,6 @@ public class MCRLuceneSolrAdapter {
                 BooleanClause.Occur occur = BooleanClause.Occur.MUST;
 
                 if (reqfn && !prof) {
-                    ;
                 } else if (!reqfn && !prof) {
                     occur = BooleanClause.Occur.SHOULD;
                 } else if (!reqfn && prof) {

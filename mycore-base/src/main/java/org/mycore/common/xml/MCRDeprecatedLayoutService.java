@@ -29,7 +29,7 @@ public class MCRDeprecatedLayoutService {
     private static final MCRLayoutService SINGLETON = new MCRLayoutService();
 
     MCRDeprecatedLayoutService() {
-    };
+    }
 
     /**
      * Sends a JDOM document as a response. 

@@ -164,4 +164,4 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
         }
         return null;
     }
-};
+}

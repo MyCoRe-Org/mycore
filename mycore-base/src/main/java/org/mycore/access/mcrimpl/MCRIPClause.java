@@ -59,4 +59,4 @@ class MCRIPClause implements MCRCondition<MCRAccessData> {
         cond.setAttribute("value", ip.toString());
         return cond;
     }
-};
+}
