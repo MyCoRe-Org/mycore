@@ -143,11 +143,7 @@ public class MCRLanguageFactory {
         if (code.startsWith("x-") || code.startsWith("i-")) {
             return true;
         }
-        if (!languageByCode.containsKey(code)) {
-            return false;
-        } else {
-            return true;
-        }
+        return languageByCode.containsKey(code);
     }
 
     /**

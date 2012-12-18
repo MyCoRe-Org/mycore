@@ -190,10 +190,7 @@ public class MCRUserManager {
         if (MCRSystemUserInformation.getGuestInstance().getUserID().equals(user.getUserID())) {
             return true;
         }
-        if (MCRSystemUserInformation.getSystemUserInstance().getUserID().equals(user.getUserID())) {
-            return true;
-        }
-        return false;
+        return MCRSystemUserInformation.getSystemUserInstance().getUserID().equals(user.getUserID());
     }
 
     /** 

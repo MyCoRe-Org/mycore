@@ -257,9 +257,7 @@ public class MCRRedundancyCleanUpCommand {
                 return false;
             Element e = (Element) arg0;
             String value = e.getAttributeValue(attrKey, ns);
-            if (value != null && value.equals(attrValue))
-                return true;
-            return false;
+            return value != null && value.equals(attrValue);
         }
     }
 }

@@ -528,10 +528,8 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         xp.addNamespace(MCRConstants.XLINK_NAMESPACE);
 
         Object obj = xp.selectSingleNode(mets);
-        if (obj != null)
-            return true;
+        return obj != null;
 
-        return false;
     }
 
     /**

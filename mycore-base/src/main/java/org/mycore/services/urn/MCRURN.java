@@ -244,11 +244,7 @@ public class MCRURN {
         }
         String toTest = toValidate.substring(0, toValidate.length() - 1);
         try {
-            if (MCRURN.valueOf(toTest).checksum() == chk) {
-                return true;
-            } else {
-                return false;
-            }
+            return MCRURN.valueOf(toTest).checksum() == chk;
         } catch (Exception e) {
             return false;
         }

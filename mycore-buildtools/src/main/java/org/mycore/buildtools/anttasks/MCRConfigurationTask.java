@@ -266,8 +266,7 @@ public class MCRConfigurationTask extends Task {
         if (p1 == -1) return false;
         if (p1 == value.length()) return false;
         int p2 = value.indexOf('%',p1+1);
-        if (p2 == -1) return false;
-        return true;
+        return p2 != -1;
     }
     
     private String propertyReplaceVariables(String value, Properties prop) {

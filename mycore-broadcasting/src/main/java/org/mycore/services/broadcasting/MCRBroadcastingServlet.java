@@ -111,10 +111,8 @@ public class MCRBroadcastingServlet extends MCRServlet {
     public static boolean hasReceived(MCRSession session, boolean sessionSensitive) {
         // if (!cache.isEmpty() && cache.get("bcRecList") != null) {
         String key = getKey(sessionSensitive, session);
-        if ((session.getUserInformation().getUserID().equals("gast") && bcRecList.get(session.getID()) != null)
-                        || (!session.getUserInformation().getUserID().equals("gast") && bcRecList.get(key) != null))
-            return true;
-        return false;
+        return (session.getUserInformation().getUserID().equals("gast") && bcRecList.get(session.getID()) != null)
+                || (!session.getUserInformation().getUserID().equals("gast") && bcRecList.get(key) != null);
     }
 
     private final static String getKey(boolean sessionSensitive, MCRSession session) {

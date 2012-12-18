@@ -331,17 +331,12 @@ public class MCRImportMappingManager {
                 Element e = (Element) obj;
                 if(!e.getName().equals("map"))
                     return false;
-                if (e.getAttributeValue("type") == null ||
-                    !e.getAttributeValue("type").equals("id"))
-                    return false;
-                return true;
+                return !(e.getAttributeValue("type") == null ||
+                        !e.getAttributeValue("type").equals("id"));
             }
         });
         // is there an id mapping element in the mapping file?
-        if(idMapList.size() > 0) {
-            return false;
-        }
-        return true;
+        return idMapList.size() <= 0;
     }
 
     /**

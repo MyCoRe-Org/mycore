@@ -180,10 +180,7 @@ public class MCRCategoryTransformer {
         }
 
         static boolean stringNotEmpty(String test) {
-            if (test != null && test.length() > 0) {
-                return true;
-            }
-            return false;
+            return test != null && test.length() > 0;
         }
     }
 

@@ -1697,11 +1697,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
     }
 
     public void setback() {
-        if (request.getParameter("back") != null && request.getParameter("back").equals("true")) {
-            this.back = true;
-        } else {
-            this.back = false;
-        }
+        this.back = request.getParameter("back") != null && request.getParameter("back").equals("true");
     }
 
     public String getBackAddress() {

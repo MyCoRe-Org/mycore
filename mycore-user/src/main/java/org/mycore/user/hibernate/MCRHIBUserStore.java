@@ -148,10 +148,7 @@ public class MCRHIBUserStore implements MCRUserStore {
         Session session = MCRHIBConnection.instance().getSession();
         List<MCRUSERS> l = session.createQuery("from MCRUSERS where UID = '" + userID + "'").list();
 
-        if (l.isEmpty()) {
-            return false;
-        }
-        return true;
+        return !l.isEmpty();
     }
 
     /**
@@ -169,10 +166,7 @@ public class MCRHIBUserStore implements MCRUserStore {
         Session session = MCRHIBConnection.instance().getSession();
         List<MCRUSERS> l = session.createQuery("from MCRUSERS where NUMID = " + numID + " or UID = '" + userID + "'").list();
 
-        if (l.isEmpty()) {
-            return false;
-        }
-        return true;
+        return !l.isEmpty();
     }
 
     /**

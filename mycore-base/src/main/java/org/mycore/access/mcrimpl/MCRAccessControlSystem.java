@@ -316,10 +316,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         MCRAccessRule rule = getAccessRule(objID, permission);
         LOGGER.debug("getAccess() is done");
         if (rule == null) {
-            if (userID.equals(MCRConstants.SUPER_USER_ID)) {
-                return true;
-            }
-            return false;
+            return userID.equals(MCRConstants.SUPER_USER_ID);
         }
         return rule.checkAccess(userID, date, ip);
     }

@@ -169,11 +169,7 @@ public final class MCRWebsiteWriteProtection {
      * @return true if valid, false if note
      */
     private final static boolean cacheValid() {
-        if (CONFIG_CACHE == null || CONFIG_CACHE_INITTIME < CONFIG_FILE.lastModified()) {
-            return false;
-        } else {
-            return true;
-        }
+        return !(CONFIG_CACHE == null || CONFIG_CACHE_INITTIME < CONFIG_FILE.lastModified());
     }
 
 }

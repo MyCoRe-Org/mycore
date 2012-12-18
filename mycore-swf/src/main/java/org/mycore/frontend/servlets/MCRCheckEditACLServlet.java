@@ -159,10 +159,7 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
         if (MCRAccessManager.checkPermission("create-" + ID.getBase())) {
             return true;
         }
-        if (MCRAccessManager.checkPermission("create-" + ID.getTypeId())) {
-            return true;
-        }
-        return false;
+        return MCRAccessManager.checkPermission("create-" + ID.getTypeId());
     }
 
 }

@@ -471,11 +471,7 @@ public class DepositServlet extends MCRServlet {
 	 * @return if HTTP Basic authentication is in use or not
 	 */
 	protected boolean authenticateWithBasic() {
-		if (authN.equalsIgnoreCase("Basic")) {
-			return true;
-		} else {
-			return false;
-		}
+        return authN.equalsIgnoreCase("Basic");
 	}
 
 	/**

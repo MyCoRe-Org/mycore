@@ -146,11 +146,7 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
 
     private boolean metsExist(MCRDirectory dir) {
         MCRFile mcrfile = (MCRFile) dir.getChild(metsfile);
-        if (mcrfile == null) {
-            return false;
-        } else {
-            return true;
-        }
+        return mcrfile != null;
     }
 
     private void addPicturesToList(MCRDirectory dir, ArrayList<String> list) {

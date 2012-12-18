@@ -196,10 +196,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
 
         Session session = MCRHIBConnection.instance().getSession();
         List<MCRACCESSRULE> l = session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).list();
-        if (l.size() == 1) {
-            return true;
-        }
-        return false;
+        return l.size() == 1;
     }
 
     @Override

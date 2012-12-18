@@ -200,8 +200,6 @@ public abstract class MCRACLHIBAccess {
     public static boolean isRuleInUse(String ruleid) {
         Session session = MCRHIBConnection.instance().getSession();
         Query query = session.createQuery("from MCRACCESS as accdef where accdef.rule.rid = '" + ruleid + "'");
-        if(query.list().isEmpty())
-            return false;
-        return true;
+        return !query.list().isEmpty();
     }
 }

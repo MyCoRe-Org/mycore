@@ -156,10 +156,7 @@ public class MCRLabel implements Cloneable, Serializable {
         } else if (!text.equals(other.text)) {
             return false;
         }
-        if (!getDescription().equals(other.getDescription())) {
-            return false;
-        }
-        return true;
+        return getDescription().equals(other.getDescription());
     }
 
 }

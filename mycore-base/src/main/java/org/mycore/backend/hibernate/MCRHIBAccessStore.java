@@ -111,10 +111,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         Session session = MCRHIBConnection.instance().getSession();
         MCRACCESSPK key = new MCRACCESSPK(pool, objid);
         List<MCRACCESS> l = session.createCriteria(MCRACCESS.class).add(Restrictions.eq("key", key)).list();
-        if (l.size() == 1) {
-            return true;
-        }
-        return false;
+        return l.size() == 1;
     }
 
     @Override
@@ -133,10 +130,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
             criteria.add(Restrictions.eq("key.acpool", pool));
         }
         int count = ((Number) criteria.uniqueResult()).intValue();
-        if (count > 0) {
-            return true;
-        }
-        return false;
+        return count > 0;
     }
 
     /**

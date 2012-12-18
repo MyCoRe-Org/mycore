@@ -636,10 +636,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
          * @return true if the content is valid.
          */
         public boolean isValid() {
-            if (lang.length() == 0 || datetext.length() == 0) {
-                return false;
-            }
-            return true;
+            return !(lang.length() == 0 || datetext.length() == 0);
         }
 
     }

@@ -231,11 +231,7 @@ public class ServiceDocumentServlet extends HttpServlet {
 	 * @return if HTTP Basic authentication is in use or not
 	 */
 	private boolean authenticateWithBasic() {
-		if (authN.equalsIgnoreCase("Basic")) {
-			return true;
-		} else {
-			return false;
-		}
+        return authN.equalsIgnoreCase("Basic");
 	}
 	
 	/**

@@ -200,10 +200,7 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
      * @return true if the access is set
      */
     protected boolean checkAccess(MCRObjectID ID) {
-        if (MCRAccessManager.checkPermission(ID, "writedb")) {
-            return true;
-        }
-        return false;
+        return MCRAccessManager.checkPermission(ID, "writedb");
     }
 
 }

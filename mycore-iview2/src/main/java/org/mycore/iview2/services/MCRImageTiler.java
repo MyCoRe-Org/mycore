@@ -65,11 +65,7 @@ public class MCRImageTiler implements Runnable, Closeable {
      * @return true if image tiler thread is running.
      */
     public static boolean isRunning() {
-        if (instance == null) {
-            return false;
-        } else {
-            return true;
-        }
+        return instance != null;
     }
 
     /**

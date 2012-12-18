@@ -382,18 +382,11 @@ public class MCRStartClassEditorServlet extends MCRServlet {
     }
 
     private boolean needsCreatePrivilege(String todo, String todo2) {
-        if (todo.equals("commit-classification")) {
-            if (todo2.equals("create-classification") || todo2.equals("import-classification"))
-                return true;
-        }
-        return false;
+        return (todo.equals("commit-classification") && (todo2.equals("create-classification") || todo2.equals("import-classification")));
     }
 
     private boolean needsDeleteRight(String todo, String todo2) {
-        if (todo.equals("delete-classification")) {
-            return true;
-        }
-        return false;
+        return todo.equals("delete-classification");
     }
 
     public MCRClassificationEditor getClassificationEditor() {

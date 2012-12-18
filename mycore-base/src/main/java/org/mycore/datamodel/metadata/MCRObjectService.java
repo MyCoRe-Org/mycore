@@ -399,10 +399,7 @@ public class MCRObjectService {
      */
     public final boolean isFlagTypeSet(String type) {
         ArrayList<MCRMetaLangText> internalList = getFlagsAsMCRMetaLangText(type);
-        if (internalList.size() > 0) {
-            return true;
-        }
-        return false;
+        return internalList.size() > 0;
     }
 
     /**

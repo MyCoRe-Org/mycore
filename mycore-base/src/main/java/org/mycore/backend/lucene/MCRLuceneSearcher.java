@@ -488,10 +488,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
     private boolean isTokenized(MCRFieldDef fieldDef) {
         String type = fieldDef.getDataType();
-        if (type.equals("Text") || type.equals("name") || type.equals("text")) {
-            return true;
-        }
-        return false;
+        return type.equals("Text") || type.equals("name") || type.equals("text");
     }
 
     @Override

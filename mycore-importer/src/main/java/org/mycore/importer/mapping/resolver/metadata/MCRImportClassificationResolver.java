@@ -18,9 +18,7 @@ public class MCRImportClassificationResolver extends MCRImportAbstractMetadataRe
         // its possible that the categ id is empty. in this case return null,
         // so that the classification is not added to the xml structure.
         String categid = saveToElement.getAttributeValue("categid");
-        if(categid == null || categid.equals(""))
-            return false;
-        return true;
+        return !(categid == null || categid.equals(""));
     }
 
     @Override

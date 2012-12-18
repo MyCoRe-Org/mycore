@@ -314,10 +314,7 @@ public class MCRSimpleWorkflowManager {
         String DID = linkmeta.getAttributeValue("href", XLINK_NAMESPACE);
         logger.debug("The linked object ID of derivate is " + DID);
 
-        if (!ID.toString().equals(DID)) {
-            return false;
-        }
-        return true;
+        return ID.toString().equals(DID);
     }
 
     /**

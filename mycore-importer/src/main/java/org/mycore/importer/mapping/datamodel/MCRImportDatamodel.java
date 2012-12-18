@@ -8,9 +8,7 @@ public interface MCRImportDatamodel {
         TRUE, FALSE, IGNORE;
 
         public boolean getBoolean() {
-            if(this.equals(Inheritance.TRUE))
-                return true;
-            return false;
+            return this.equals(Inheritance.TRUE);
         }
     }
 

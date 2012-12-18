@@ -271,11 +271,7 @@ public class MCRLayoutUtilities {
      * @return true if valid, false if note
      */
     private static boolean naviCacheValid() {
-        if (CACHE_INITTIME < NAVFILE.lastModified()) {
-            return false;
-        } else {
-            return true;
-        }
+        return CACHE_INITTIME >= NAVFILE.lastModified();
     }
 
     private static String getWebpageACLID(Element item) {

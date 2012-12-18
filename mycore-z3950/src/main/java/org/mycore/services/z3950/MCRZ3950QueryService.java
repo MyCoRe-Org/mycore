@@ -101,10 +101,7 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
             logger.debug("Transformed query: " + condition.toString());
 
         mycoreResults = MCRQueryManager.search(new MCRQuery( condition ));
-        if (mycoreResults.getNumHits() > 0)
-            return true;
-        else
-            return false;
+        return mycoreResults.getNumHits() > 0;
     }
     
     /**

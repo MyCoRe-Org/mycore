@@ -15,10 +15,7 @@ public class MCRImportLinkResolver extends MCRImportAbstractMetadataResolver {
     @Override
     protected boolean isValid() {
         String href = saveToElement.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
-        if(href == null || href.equals("")) {
-            return false;
-        }
-        return true;
+        return !(href == null || href.equals(""));
     }
 
     @Override

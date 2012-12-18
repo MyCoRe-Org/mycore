@@ -23,8 +23,6 @@ public class MCRImportTextResolver extends MCRImportAbstractMetadataResolver {
     }
 
     protected boolean isValid() {
-        if(saveToElement.getText() == null || saveToElement.getText().equals(""))
-            return false;
-        return true;
+        return !(saveToElement.getText() == null || saveToElement.getText().equals(""));
     }
 }

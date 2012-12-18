@@ -530,9 +530,7 @@ public class MCRImportImporter {
                 return false;
             // exists a href attribute and if its not empty
             String href = e.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
-            if(href == null || href.equals(""))
-                return false;
-            return true;
+            return !(href == null || href.equals(""));
         }
     }
 
@@ -550,9 +548,7 @@ public class MCRImportImporter {
             Element e = (Element)arg0;
             Element p = e.getParentElement();
             // check the class attribute of the parent element
-            if(p == null || p.getAttributeValue("class") == null || !p.getAttributeValue("class").equals("MCRMetaClassification"))
-                return false;
-            return true;
+            return !(p == null || p.getAttributeValue("class") == null || !p.getAttributeValue("class").equals("MCRMetaClassification"));
         }
     }
 }

@@ -119,11 +119,8 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
         }
         Collection<String> col = MCRAccessManager.getPermissionsForID(ID.toString());
         if (col == null || col.size() == 0) {
-            if ((!MCRAccessManager.checkPermission("create-" + ID.getBase()))
-                    && (!MCRAccessManager.checkPermission("create-" + ID.getTypeId()))) {
-                return false;
-            }
-            return true;
+            return !((!MCRAccessManager.checkPermission("create-" + ID.getBase()))
+                    && (!MCRAccessManager.checkPermission("create-" + ID.getTypeId())));
         }
         return false;
     }

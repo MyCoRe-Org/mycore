@@ -120,10 +120,7 @@ public class MCRIndexBrowserCache {
         try {
             TYPE_CACHE_TABLE_LOCK.readLock().lock();
             MCRCache mcrCache = TYPE_CACHE_TABLE.get(index);
-            if (mcrCache != null && mcrCache.get(cacheKey) != null) {
-                return true;
-            }
-            return false;
+            return mcrCache != null && mcrCache.get(cacheKey) != null;
         } finally {
             TYPE_CACHE_TABLE_LOCK.readLock().unlock();
         }

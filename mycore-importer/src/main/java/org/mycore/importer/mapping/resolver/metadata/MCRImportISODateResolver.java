@@ -36,15 +36,11 @@ public class MCRImportISODateResolver extends MCRImportAbstractMetadataResolver 
     }
 
     protected boolean isYearValid(String year) {
-        if(areNumbers(year) && year.length() == 4)
-            return true;
-        return false;
+        return areNumbers(year) && year.length() == 4;
     }
 
     protected boolean isMonthOrDayValid(String monthOrDay) {
-        if(areNumbers(monthOrDay) && monthOrDay.length() == 2)
-            return true;
-        return false;
+        return areNumbers(monthOrDay) && monthOrDay.length() == 2;
     }
     
     protected boolean areNumbers(String isNumber) {

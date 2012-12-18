@@ -149,10 +149,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
         try {
             MCRAccessRule rule = getAccessRule(id, permission);
             if (rule == null) {
-                if (MCRConstants.SUPER_USER_ID.equals(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID())) {
-                    return true;
-                }
-                return false;
+                return MCRConstants.SUPER_USER_ID.equals(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
             }
             return rule.validate();
         } finally {

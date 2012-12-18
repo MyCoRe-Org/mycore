@@ -198,10 +198,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
      * @return true if the parameter is a solr parameter
      */
     private boolean isSolrParameter(String parameterName) {
-        if (reservedParameterKeys.contains(parameterName)) {
-            return true;
-        }
-        return false;
+        return reservedParameterKeys.contains(parameterName);
     }
 
     /**
@@ -210,9 +207,6 @@ public class MCRSolrSearchServlet extends MCRServlet {
      * @return true if the parameter is a type parameter
      */
     private boolean isTypeParameter(String parameterName) {
-        if (parameterName.startsWith("solr.type.")) {
-            return true;
-        }
-        return false;
+        return parameterName.startsWith("solr.type.");
     }
 }

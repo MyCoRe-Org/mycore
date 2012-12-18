@@ -407,10 +407,7 @@ public class MCREditorOutValidator {
                 errorlog.add(msg);
             }
         }
-        if (datatag.getChildren().size() == 0) {
-            return false;
-        }
-        return true;
+        return datatag.getChildren().size() != 0;
     }
 
     /**

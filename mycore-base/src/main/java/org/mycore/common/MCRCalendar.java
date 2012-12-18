@@ -323,10 +323,7 @@ public class MCRCalendar {
     public static final boolean testHistoryDate(String datestr, boolean last, String calstr) {
         try {
             Calendar cal = checkHistoryDate(datestr, last, calstr);
-            if (cal == null) {
-                return false;
-            }
-            return true;
+            return cal != null;
         } catch (MCRException ex) {
             return false;
         }

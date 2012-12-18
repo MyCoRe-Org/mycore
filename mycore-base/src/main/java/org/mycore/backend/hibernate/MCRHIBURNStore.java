@@ -267,10 +267,7 @@ public class MCRHIBURNStore implements MCRURNStore {
                 .append("'");
         logger.debug("HQL-Statement: " + querySB.toString());
         List<String> returns = session.createQuery(querySB.toString()).list();
-        if (returns == null || returns.isEmpty()) {
-            return false;
-        }
-        return true;
+        return !(returns == null || returns.isEmpty());
     }
 
     /**

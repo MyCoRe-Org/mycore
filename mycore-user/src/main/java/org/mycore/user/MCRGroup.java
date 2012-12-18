@@ -337,11 +337,8 @@ public class MCRGroup extends MCRUserObject {
      * @return Returns true if the given user is a member of this group.
      */
     public boolean hasUserMember(MCRUser user) {
-        if (admUserIDs.contains(user.getID()) || mbrUserIDs.contains(user.getID())) {
-            return true;
-        }
+        return admUserIDs.contains(user.getID()) || mbrUserIDs.contains(user.getID());
 
-        return false;
     }
 
     /**
@@ -352,11 +349,8 @@ public class MCRGroup extends MCRUserObject {
      * @return Returns true if the given user is a member of this group.
      */
     public boolean hasUserMember(String user) {
-        if (admUserIDs.contains(user) || mbrUserIDs.contains(user)) {
-            return true;
-        }
+        return admUserIDs.contains(user) || mbrUserIDs.contains(user);
 
-        return false;
     }
 
     /**
