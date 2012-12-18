@@ -172,7 +172,7 @@ public class MCROAIObjectManager {
         String objectType = MCRObjectID.getIDParts(mcrId)[1];
         boolean exists = MCRMetadataManager.exists(MCRObjectID.getInstance(mcrId));
         String value = uri.replace("{id}", mcrId).replace("{format}", metadataPrefix).replace("{objectType}", objectType)
-                .replace(":{flag}", exists == false ? ":deletedMcrObject" : "");
+                .replace(":{flag}", !exists ? ":deletedMcrObject" : "");
         return value;
     }
 

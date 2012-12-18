@@ -795,7 +795,7 @@ public class MCRCalendar {
             // set AD/BC
             GregorianCalendar newdate = new GregorianCalendar();
             newdate.set(year, mon, day);
-            if (bc == true) {
+            if (bc) {
                 newdate.set(GregorianCalendar.ERA, GregorianCalendar.BC);
                 TD = -TD - 4; // Calendar correction reversible
             } else {

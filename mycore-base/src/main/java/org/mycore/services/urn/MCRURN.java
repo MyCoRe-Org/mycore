@@ -260,7 +260,7 @@ public class MCRURN {
      * @see MCRURN#valueOf(String)
      */
     public void normalize() {
-        if (this.hasChecksumAttached() == false)
+        if (!this.hasChecksumAttached())
             return;
         namespaceSpecificPart = namespaceSpecificPart.substring(0, namespaceSpecificPart.length() - 1);
     }

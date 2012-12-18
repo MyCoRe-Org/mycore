@@ -6,7 +6,7 @@ public class MCRImportBooleanResolver extends MCRImportAbstractMetadataResolver 
     @Override
     protected boolean isValid() {
         String text = saveToElement.getText();
-        if(Boolean.valueOf(text) == true)
+        if(Boolean.valueOf(text))
             return true;
         return false;
     }

@@ -83,7 +83,7 @@ public class MCRMediaPDFParser extends MCRMediaParser {
             for (String sExt : supportedFileExts) {
                 if (!sExt.equals(ext.toLowerCase()))
                     continue;
-                return isValid() && true;
+                return isValid();
             }
         }
 

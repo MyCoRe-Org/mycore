@@ -96,7 +96,7 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
             for (String sExt : supportedFileExts) {
                 if (!sExt.equals(ext))
                     continue;
-                return isValid() && true;
+                return isValid();
             }
         }
 

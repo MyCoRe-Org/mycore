@@ -723,7 +723,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
                 /* dynamic content binding */
                 /* set */
-                if (dcbActionAdd == true) {
+                if (dcbActionAdd) {
                     Element addedChildElement = findActElem(root, "href", fileName);
                     Element dcb = new Element("dynamicContentBinding");
                     dcb.addContent(new Element("rootTag").setText(dcbValueAdd));
@@ -791,7 +791,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
                 /* dynamic content binding */
                 /* set */
-                if (dcbActionAdd == true) {
+                if (dcbActionAdd) {
                     if (actElem.getChild("dynamicContentBinding") == null) {
                         Element dcb = new Element("dynamicContentBinding");
                         dcb.addContent(new Element("rootTag").setText(dcbValueAdd));
@@ -803,12 +803,12 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
                 /* END OF: set */
                 /* remove */
-                if (dcbActionDelete == true) {
+                if (dcbActionDelete) {
                     List dcbChildren = actElem.getChild("dynamicContentBinding").getChildren();
                     Iterator elementIterator = dcbChildren.iterator();
                     boolean childrenRemoved = false;
 
-                    while (childrenRemoved != true) {
+                    while (!childrenRemoved) {
                         Element child = (Element) elementIterator.next();
 
                         if (child.getValue().equals(dcbValueDelete)) {

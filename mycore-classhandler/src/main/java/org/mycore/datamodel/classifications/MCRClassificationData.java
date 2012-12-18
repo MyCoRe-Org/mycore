@@ -529,7 +529,7 @@ public class MCRClassificationData {
         String writedbPerm = "true";
         String deletedbPerm = "true";
 
-        if (getClassificationPool().isEdited(getClassification().getId()) == false) {
+        if (!getClassificationPool().isEdited(getClassification().getId())) {
             createClassificationPerm = String.valueOf(MCRAccessManager.checkPermission("create-classification"));
             writedbPerm = String.valueOf(MCRAccessManager.checkPermission(rootID, "writedb"));
             deletedbPerm = String.valueOf(MCRAccessManager.checkPermission(rootID, "deletedb"));

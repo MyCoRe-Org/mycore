@@ -410,7 +410,7 @@ public class MCRTextResolver {
                 if (internalTerm != null) {
                     position += internalTerm.getStartEnclosingString().length();
                     internalTerm.resolve(text, position);
-                    if (internalTerm.resolved == false) {
+                    if (!internalTerm.resolved) {
                         resolved = false;
                     }
                     position = internalTerm.position;

@@ -61,7 +61,7 @@ public class MCRImportConfig {
             if(helpString != null && !helpString.equals(""))
                 useDerivates = Boolean.valueOf(resolve(helpString));
 
-            if(useDerivates == true) {
+            if(useDerivates) {
                 helpString = derivatesElement.getChildText("createInImportDir");
                 if(helpString != null && !helpString.equals(""))
                     createInImportDir = Boolean.valueOf(resolve(helpString));

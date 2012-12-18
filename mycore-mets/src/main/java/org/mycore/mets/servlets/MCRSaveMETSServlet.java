@@ -77,7 +77,7 @@ public class MCRSaveMETSServlet extends MCRServlet {
             String notCompleteErrorMsg = "It appears not all files owned by derivate " + derivateId + " are referenced within the mets.xml.";
 
             job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST,
-                "The METS document provided is not valid. See server log for details. " + (isComplete == false ? notCompleteErrorMsg : ""));
+                "The METS document provided is not valid. See server log for details. " + (!isComplete ? notCompleteErrorMsg : ""));
             return;
         }
         LOGGER.info("Validating METS document was successful");
@@ -126,7 +126,7 @@ public class MCRSaveMETSServlet extends MCRServlet {
                     continue;
                 }
 
-                if (fileGroup.contains(node.getPath().substring(derivateId.length() + 1)) == false) {
+                if (!fileGroup.contains(node.getPath().substring(derivateId.length() + 1))) {
                     LOGGER.warn(MessageFormat.format("{0} does not appear in {1}!", node.getPath().substring(derivateId.length() + 1), derivateId));
                     return false;
                 }

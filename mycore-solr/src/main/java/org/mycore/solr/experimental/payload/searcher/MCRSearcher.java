@@ -154,7 +154,7 @@ public class MCRSearcher {
                     tp.nextPosition(); //next occ. of term
                     String payloadData = null;
                     boolean isPayloadAvailable = false;
-                    if ((isPayloadAvailable = tp.isPayloadAvailable()) == true) {
+                    if ((isPayloadAvailable = tp.isPayloadAvailable())) {
                         byte[] buf = new byte[tp.getPayloadLength()];
                         tp.getPayload(buf, 0);
                         payloadData = new String(buf, "UTF-16");
