@@ -43,6 +43,6 @@ public class MCRExternalValidator extends MCRValidatorBase {
 
     private boolean invokeMethod(Method m, Object... input) throws IllegalAccessException, InvocationTargetException {
         Object result = m.invoke(null, input);
-        return result.equals(new Boolean(true));
+        return result.equals(Boolean.TRUE);
     }
 }
