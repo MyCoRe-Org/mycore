@@ -94,7 +94,7 @@ public class MCRContainerLoginServlet extends MCRServlet {
         @Override
         public boolean isUserInRole(String role) {
             HttpServletRequest request = getCurrentRequest();
-            return request == null ? false : request.isUserInRole(role);
+            return request != null && request.isUserInRole(role);
         }
 
         @Override

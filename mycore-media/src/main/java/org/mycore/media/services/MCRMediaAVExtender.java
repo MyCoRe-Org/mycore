@@ -29,9 +29,9 @@ import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.ifs.MCRAudioVideoExtender;
-import org.mycore.datamodel.ifs.MCRFileReader;
-import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
 import org.mycore.datamodel.ifs.MCRFileContentType;
+import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
+import org.mycore.datamodel.ifs.MCRFileReader;
 import org.mycore.media.MCRAudioObject;
 import org.mycore.media.MCRMediaObject;
 import org.mycore.media.MCRMediaParser;
@@ -126,7 +126,7 @@ public class MCRMediaAVExtender extends MCRAudioVideoExtender {
      * @return bool
      */
     public boolean isVideo() {
-        return (media != null ? media.getType() == MCRMediaObject.MediaType.VIDEO : false);
+        return (media != null && media.getType() == MCRMediaObject.MediaType.VIDEO);
     }
 
     /**
@@ -135,7 +135,7 @@ public class MCRMediaAVExtender extends MCRAudioVideoExtender {
      * @return bool
      */
     public boolean isAudio() {
-        return (media != null ? media.getType() == MCRMediaObject.MediaType.AUDIO : false);
+        return (media != null && media.getType() == MCRMediaObject.MediaType.AUDIO);
     }
 
     /**
@@ -159,9 +159,8 @@ public class MCRMediaAVExtender extends MCRAudioVideoExtender {
                     contentTypeID = detectContentTypeIDByFormat(media.getFormat());
                     if (contentTypeID == null) {
                         LOGGER.info("Try to detect file content type with subformat '"
-                                + (isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat()) + "'...");
-                        contentTypeID = detectContentTypeIDByFormat(isVideo() ? getVideoObject().getSubFormat() : getAudioObject()
-                                .getSubFormat());
+                            + (isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat()) + "'...");
+                        contentTypeID = detectContentTypeIDByFormat(isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat());
                         if (contentTypeID == null) {
                             contentTypeID = file.getContentTypeID();
                         }
@@ -178,9 +177,8 @@ public class MCRMediaAVExtender extends MCRAudioVideoExtender {
                 contentTypeID = detectContentTypeIDByFormat(media.getFormat());
                 if (contentTypeID == null) {
                     LOGGER.info("Try to detect file content type with subformat '"
-                            + (isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat()) + "'...");
-                    contentTypeID = detectContentTypeIDByFormat(isVideo() ? getVideoObject().getSubFormat() : getAudioObject()
-                            .getSubFormat());
+                        + (isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat()) + "'...");
+                    contentTypeID = detectContentTypeIDByFormat(isVideo() ? getVideoObject().getSubFormat() : getAudioObject().getSubFormat());
                     if (contentTypeID == null) {
                         contentTypeID = file.getContentTypeID();
                     }

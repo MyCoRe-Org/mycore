@@ -168,7 +168,7 @@ public class TextFilterPluginManager {
      * @return true if content type is supported, else false
      */
     public boolean isSupported(MCRFileContentType ct) {
-        return ct == null ? false : CONTENT_TYPE_PLUGIN_BAG.containsKey(ct);
+        return ct != null && CONTENT_TYPE_PLUGIN_BAG.containsKey(ct);
     }
 
     /**

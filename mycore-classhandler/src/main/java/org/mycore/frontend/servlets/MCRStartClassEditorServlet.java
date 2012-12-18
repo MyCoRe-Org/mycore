@@ -190,7 +190,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
                     String fname = parms.getParameter("/mycoreclass/pathes/path").trim();
                     fname = getClassificationEditor().setTempFile(fname, (FileItem) sub.getFiles().get(0));
                     String sUpdate = parms.getParameter("/mycoreclass/update");
-                    boolean update = sUpdate == null ? true : "true".equals(sUpdate);
+                    boolean update = sUpdate == null || "true".equals(sUpdate);
                     bret = getClassificationEditor().importClassification(update, fname);
                     getClassificationEditor().deleteTempFile();
                     if (!bret) {
@@ -280,7 +280,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             final String sessionObjectID = "classificationEditor";
             Properties params = new Properties();
             StringBuffer sb = new StringBuffer();
-            boolean isEdited = clid.length() > 0 ? getClassificationEditor().isEdited(MCRCategoryID.rootID(clid)) : false;
+            boolean isEdited = clid.length() > 0 && getClassificationEditor().isEdited(MCRCategoryID.rootID(clid));
             MCRCategory classif = null;
             if (isEdited) {
                 classif = getClassificationEditor().getClassification(MCRCategoryID.rootID(clid), false);
