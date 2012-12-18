@@ -56,7 +56,7 @@ public class MCRJAXBContent<T> extends MCRXMLContent {
     public MCRJAXBContent(JAXBContext ctx, T jaxbObject) {
         this.ctx = ctx;
         this.jaxbObject = jaxbObject;
-        Class<? extends Object> clazz = jaxbObject.getClass();
+        Class<?> clazz = jaxbObject.getClass();
         if (!clazz.isAnnotationPresent(XmlRootElement.class)) {
             throw new IllegalArgumentException("Class " + clazz.getName() + " is not a JAXB annotated.");
         }
