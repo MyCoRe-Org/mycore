@@ -735,9 +735,6 @@
     <xsl:variable select="/mycoreobject" name="context" />
     <xsl:for-each select="$unique-ids">
       <xsl:variable select="." name="thisObjectType" />
-      <xsl:variable name="label">
-        <xsl:value-of select="$label" />
-      </xsl:variable>
       <xsl:variable name="children" select="$context/structure/children/child[contains(@xlink:href, concat('_',$thisObjectType,'_'))]" />
       <xsl:variable name="maxElements" select="20" />
       <xsl:variable name="positionMin">
