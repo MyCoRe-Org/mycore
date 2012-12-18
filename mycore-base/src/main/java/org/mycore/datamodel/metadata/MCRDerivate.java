@@ -23,8 +23,6 @@
 
 package org.mycore.datamodel.metadata;
 
-import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
-
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
@@ -118,35 +116,11 @@ final public class MCRDerivate extends MCRBase {
      *                general Exception of MyCoRe
      */
     protected final void setUp() throws MCRException {
-        if (jdom_document == null) {
-            throw new MCRException("The JDOM document is null or empty.");
-        }
-
-        // get object ID from DOM
-        org.jdom.Element jdom_element_root = jdom_document.getRootElement();
-        mcr_id = MCRObjectID.getInstance(jdom_element_root.getAttributeValue("ID"));
-        mcr_label = jdom_element_root.getAttributeValue("label").trim();
-
-        if (mcr_label.length() > MAX_LABEL_LENGTH) {
-            mcr_label = mcr_label.substring(0, MAX_LABEL_LENGTH);
-        }
-
-        mcr_version = jdom_element_root.getAttributeValue("version");
-        if (mcr_version == null || (mcr_version = mcr_version.trim()).length() == 0) {
-            setVersion();
-        }
-
-        mcr_schema = jdom_element_root.getAttribute("noNamespaceSchemaLocation", XSI_NAMESPACE).getValue().trim();
-
-        org.jdom.Element jdom_element;
+        super.setUp();
 
         // get the derivate data of the object
-        jdom_element = jdom_element_root.getChild("derivate");
-        mcr_derivate = new MCRObjectDerivate(mcr_id, jdom_element);
-
-        // get the service data of the object
-        jdom_element = jdom_element_root.getChild("service");
-        mcr_service.setFromDOM(jdom_element);
+        Element derivateElement = jdom_document.getRootElement().getChild("derivate");
+        mcr_derivate = new MCRObjectDerivate(mcr_id, derivateElement);
     }
 
     /**
@@ -261,15 +235,11 @@ final public class MCRDerivate extends MCRBase {
     @Override
     public boolean isValid() {
         if (!super.isValid()) {
-            LOGGER.warn("MCRBase.isValid() == false;");
-            return false;
-        }
-        if (mcr_derivate == null) {
-            LOGGER.warn("No MCRObjectDerivate instance present.");
+            LOGGER.warn("MCRBase is invalid");
             return false;
         }
         if (!getDerivate().isValid()) {
-            LOGGER.warn("MCRObjectDerivate.isValid() == false;");
+            LOGGER.warn("MCRObjectDerivate is invalid");
             return false;
         }
         return true;

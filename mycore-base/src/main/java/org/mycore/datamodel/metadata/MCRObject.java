@@ -23,8 +23,6 @@
 
 package org.mycore.datamodel.metadata;
 
-import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
-
 import java.io.IOException;
 import java.net.URI;
 
@@ -132,64 +130,19 @@ final public class MCRObject extends MCRBase {
      *                general Exception of MyCoRe
      */
     protected final void setUp() throws MCRException {
-        if (jdom_document == null) {
-            throw new MCRException("The JDOM document is null or empty.");
-        }
+        super.setUp();
 
-        setRoot();
-
-        setStructure();
-
-        setMetadata();
-
-        setService();
-    }
-
-    private void setRoot() {
-        // get object ID from DOM
-        org.jdom.Element jdom_element_root = jdom_document.getRootElement();
-        mcr_id = MCRObjectID.getInstance(jdom_element_root.getAttributeValue("ID"));
-        mcr_label = jdom_element_root.getAttributeValue("label");
-
-        if (mcr_label != null && (mcr_label = mcr_label.trim()).length() > MAX_LABEL_LENGTH) {
-            mcr_label = mcr_label.substring(0, MAX_LABEL_LENGTH);
-        }
-
-        mcr_version = jdom_element_root.getAttributeValue("version");
-        if (mcr_version == null || (mcr_version = mcr_version.trim()).length() == 0) {
-            setVersion();
-        }
-
-        mcr_schema = jdom_element_root.getAttribute("noNamespaceSchemaLocation", XSI_NAMESPACE).getValue().trim();
-        LOGGER.debug("MCRObject set schemafile: " + mcr_schema);
-    }
-
-    private void setStructure() {
         // get the structure data of the object
-        org.jdom.Element jdom_element_root = jdom_document.getRootElement();
-        org.jdom.Element jdom_element = jdom_element_root.getChild("structure");
-        if (jdom_element != null) {
-            mcr_struct.setFromDOM(jdom_element);
+        Element structureElement = jdom_document.getRootElement().getChild("structure");
+        if (structureElement != null) {
+            mcr_struct.setFromDOM(structureElement);
         }
-    }
 
-    private void setMetadata() {
         // get the metadata of the object
-        org.jdom.Element jdom_element_root = jdom_document.getRootElement();
-        org.jdom.Element jdom_element = jdom_element_root.getChild("metadata");
+        Element metadataElement = jdom_document.getRootElement().getChild("metadata");
 
-        if (jdom_element != null) {
-            mcr_metadata.setFromDOM(jdom_element);
-        }
-    }
-
-    private void setService() {
-        org.jdom.Element jdom_element;
-        // get the service data of the object
-        org.jdom.Element jdom_element_root = jdom_document.getRootElement();
-        jdom_element = jdom_element_root.getChild("service");
-        if (jdom_element != null) {
-            mcr_service.setFromDOM(jdom_element);
+        if (metadataElement != null) {
+            mcr_metadata.setFromDOM(metadataElement);
         }
     }
 
@@ -231,7 +184,19 @@ final public class MCRObject extends MCRBase {
      */
     @Override
     public boolean isValid() {
-        return super.isValid() && getMetadata().isValid() && getStructure().isValid() && getService().isValid();
+        if (!super.isValid()) {
+            LOGGER.warn("MCRBase is invalid");
+            return false;
+        }
+        if (!getStructure().isValid()) {
+            LOGGER.warn("Structure is invalid");
+            return false;
+        }
+        if (!getMetadata().isValid()) {
+            LOGGER.warn("Metadata is invalid");
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -253,8 +218,7 @@ final public class MCRObject extends MCRBase {
                     if (exists) {
                         continue;
                     }
-                    MCRActiveLinkException activeLink = new MCRActiveLinkException(
-                            "Failure while adding link!. Destination does not exist.");
+                    MCRActiveLinkException activeLink = new MCRActiveLinkException("Failure while adding link!. Destination does not exist.");
                     String destination = classID + "##" + categID;
                     activeLink.addLink(getId().toString(), destination);
                     // throw activeLink;
@@ -265,8 +229,7 @@ final public class MCRObject extends MCRBase {
                     if (!MCRXMLMetadataManager.instance().exists(destination)) {
                         continue;
                     }
-                    MCRActiveLinkException activeLink = new MCRActiveLinkException(
-                            "Failure while adding link!. Destination does not exist.");
+                    MCRActiveLinkException activeLink = new MCRActiveLinkException("Failure while adding link!. Destination does not exist.");
                     activeLink.addLink(getId().toString(), destination.toString());
                     // throw activeLink;
                     // TODO: should trigger undo-Event

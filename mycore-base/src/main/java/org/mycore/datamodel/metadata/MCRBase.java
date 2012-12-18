@@ -121,7 +121,20 @@ public abstract class MCRBase {
         setUp();
     }
 
-    protected abstract void setUp();
+    protected void setUp() {
+        if (jdom_document == null) {
+            throw new MCRException("The JDOM document is null or empty.");
+        }
+
+        org.jdom.Element rootElement = jdom_document.getRootElement();
+        setId(MCRObjectID.getInstance(rootElement.getAttributeValue("ID")));
+        setLabel(rootElement.getAttributeValue("label"));
+        setVersion(rootElement.getAttributeValue("version"));
+        setSchema(rootElement.getAttribute("noNamespaceSchemaLocation", XSI_NAMESPACE).getValue());
+
+        // get the service data of the object
+        mcr_service.setFromDOM(rootElement.getChild("service"));
+    }
 
     /**
      * This methode return the object id. If this is not set, null was returned.
@@ -226,9 +239,10 @@ public abstract class MCRBase {
 
     /**
      * This methode set the MyCoRe version to the string 'Version 1.3'.
+     * @param version
      */
-    public final void setVersion() {
-        mcr_version = MCRConstants.VERSION;
+    public final void setVersion(String version) {
+        mcr_version = version != null ? version : MCRConstants.VERSION;
     }
 
     /**
@@ -294,13 +308,17 @@ public abstract class MCRBase {
      */
     public boolean isValid() {
         if (mcr_id == null) {
+            LOGGER.warn("MCRObjectID is undefined");
             return false;
         }
-
-        if (mcr_schema == null || (mcr_schema = mcr_schema.trim()).length() == 0) {
+        if (getSchema() == null || getSchema().length() == 0) {
+            LOGGER.warn("XML Schema is undefined");
             return false;
         }
-
+        if (!getService().isValid()) {
+            LOGGER.warn("Service is invalid");
+            return false;
+        }
         return true;
     }
 
