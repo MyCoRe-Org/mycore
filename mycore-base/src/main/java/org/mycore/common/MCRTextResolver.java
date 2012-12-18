@@ -337,7 +337,7 @@ public class MCRTextResolver {
      * variables, otherwise false
      */
     public boolean isCompletelyResolved() {
-        return unresolvedVariables.size() == 0 ? true : false;
+        return unresolvedVariables.size() == 0;
     }
 
     /**

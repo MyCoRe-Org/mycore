@@ -81,7 +81,7 @@ public class MCRUserPolicy {
      *            is required
      */
     public boolean isRequiredForUser(String required) {
-        return reqUserAttributes.contains(required) ? true : false;
+        return reqUserAttributes.contains(required);
     }
 
     /**
@@ -93,7 +93,7 @@ public class MCRUserPolicy {
      *            it is required
      */
     public boolean isRequiredForGroup(String required) {
-        return reqGroupAttributes.contains(required) ? true : false;
+        return reqGroupAttributes.contains(required);
     }
 
     /**

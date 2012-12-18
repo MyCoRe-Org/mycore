@@ -204,8 +204,8 @@ public class MCRUser extends MCRUserObject {
             numID = -1;
         }
 
-        idEnabled = elm.getAttributeValue("id_enabled").equals("true") ? true : false;
-        updateAllowed = elm.getAttributeValue("update_allowed").equals("true") ? true : false;
+        idEnabled = elm.getAttributeValue("id_enabled").equals("true");
+        updateAllowed = elm.getAttributeValue("update_allowed").equals("true");
         creator = trim(elm.getChildTextTrim("user.creator"), id_len);
         passwd = trim(elm.getChildTextTrim("user.password"), password_len);
 

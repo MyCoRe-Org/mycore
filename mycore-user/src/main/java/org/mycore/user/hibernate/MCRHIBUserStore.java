@@ -221,8 +221,8 @@ public class MCRHIBUserStore implements MCRUserStore {
             }
 
             // set some boolean values
-            boolean id_enabled = idEnabled.equals("true") ? true : false;
-            boolean update_allowed = updateAllowed.equals("true") ? true : false;
+            boolean id_enabled = idEnabled.equals("true");
+            boolean update_allowed = updateAllowed.equals("true");
 
             // We create the user object
             try {

@@ -203,7 +203,7 @@ final public class MCRObject extends MCRBase {
      * @return true if the MCRObject has got a parent mcrobject, false otherwise 
      */
     public boolean hasParent() {
-        return getStructure().getParentID() == null ? false : true;
+        return getStructure().getParentID() != null;
     }
 
     public void checkLinkTargets() {

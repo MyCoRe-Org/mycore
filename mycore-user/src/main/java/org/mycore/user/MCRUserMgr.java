@@ -916,7 +916,7 @@ public class MCRUserMgr {
 
         String sessionUser = mcrSession.getUserInformation().getUserID();
 
-        return sessionUser.equals(user.getID()) ? true : false;
+        return sessionUser.equals(user.getID());
     }
 
     /**

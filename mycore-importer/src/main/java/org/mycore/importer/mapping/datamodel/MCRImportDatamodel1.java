@@ -69,7 +69,7 @@ public class MCRImportDatamodel1 extends MCRImportAbstractDatamodel {
             return true;
         try {
             int iMinOccurs = Integer.valueOf(minOccurs);
-            return iMinOccurs > 0 ? true : false;
+            return iMinOccurs > 0;
         } catch(NumberFormatException nfe) {
             LOGGER.error("The minOccurs value in the metadata element '" + metadataName + "' in datamodel '" +
                     datamodel.getBaseURI() + "' is invalid (not a number)!");

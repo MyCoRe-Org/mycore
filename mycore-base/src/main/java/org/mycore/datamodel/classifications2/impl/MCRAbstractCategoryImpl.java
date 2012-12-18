@@ -111,7 +111,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         childrenLock.readLock().lock();
         try {
             if (children != null) {
-                return children.size() == 0 ? false : true;
+                return children.size() != 0;
             }
         } finally {
             childrenLock.readLock().unlock();
