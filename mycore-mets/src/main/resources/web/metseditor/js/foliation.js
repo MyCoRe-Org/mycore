@@ -165,15 +165,17 @@ function OrderLabelProvider(startIndex, ty) {
 	this.type = ty;
 	this.postfix = null;
 
-	if(this.type == "leafnumberVerso"){
+	if(this.type == "leafnumberVerso" || this.type == "romanVersoLowercase" || this.type == "romanVersoUppercase"){
 		this.postfix = "v";
-	} else if(this.type == "leafnumberRecto"){
+	} else if(this.type == "leafnumberRecto" || this.type == "romanRectoLowercase" || this.type == "romanRectoUppercase"){
 			this.postfix = "r";
 	} else if(this.type == "leafnumberA"){
 			this.postfix = "a";
 	} else if(this.type == "leafnumberB"){
 			this.postfix = "b";
-	}
+	} else if(this.type == "leafnumberB"){
+            this.postfix = "b";
+    }
 	
 	this.getNext = function(){
 		if(this.type == "romanUppercase"){
@@ -188,6 +190,16 @@ function OrderLabelProvider(startIndex, ty) {
 		if(this.type == "leafnumberVerso" || this.type == "leafnumberRecto"){
 			return this.asLeaf(this.startIndex);
 		}
+		
+		if(this.type == "romanVersoLowercase" || this.type == "romanRectoLowercase"){
+            var temp = this.asLeafRoman(this.startIndex, "lowercase");
+		    return temp;
+        }
+		
+		if(this.type == "romanVersoUppercase" || this.type == "romanRectoUppercase"){
+            var temp = this.asLeafRoman(this.startIndex, "uppercase");
+            return temp;
+        }
 		
 		if(this.type == "leafnumberA" || this.type == "leafnumberB"){
 			return this.asLeafSermon(this.startIndex);
@@ -221,6 +233,25 @@ function OrderLabelProvider(startIndex, ty) {
 		}
 		return toReturn;
 	}
+	
+	this.asLeafRoman = function(anInt, mode){
+        var upOrLow = this.asRoman(this.startIndex);
+        if(mode == "uppercase"){
+            upOrLow = upOrLow.toUpperCase();
+        } else {
+            upOrLow = upOrLow.toLowerCase();    
+        }
+	    
+	    var toReturn = upOrLow + this.postfix;
+        
+        if(this.postfix == "v"){
+            this.postfix = "r";
+            this.startIndex++;
+        } else {
+            this.postfix = "v";
+        }
+        return toReturn;
+    }
 	
 	this.asLeafSermon = function(anInt){
 		var toReturn = anInt + this.postfix;

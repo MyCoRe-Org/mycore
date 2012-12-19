@@ -5,6 +5,10 @@
 	{id:"leafnumberB", name:"Blattnummerierung (mit b beginnend)"},
 	{id:"romanUppercase", name:"römisch (Großbuchstaben)"},
 	{id:"romanLowercase", name:"römisch (Kleinbuchstaben)"},
+	{id:"romanVersoLowercase", name:"römisch (mit verso beginnend, Kleinbuchstaben)"},
+    {id:"romanRectoLowercase", name:"römisch (mit recto beginnend, Kleinbuchstaben)"},
+    {id:"romanVersoUppercase", name:"römisch (mit verso beginnend, Großbuchstaben)"},
+    {id:"romanRectoUppercase", name:"römisch (mit recto beginnend, Großbuchstaben)"},
 	{id:"arabic", name:"arabisch"},
 	{id:"cover", name:"Umschlag"}
 	]
