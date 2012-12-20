@@ -332,7 +332,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                 LOGGER.debug("Sort by: " + name + (sortField.getReverse() ? " descending" : " accending"));
             }
         }
-        return new Sort(sortList.toArray(new SortField[0]));
+        return new Sort(sortList.toArray(new SortField[sortList.size()]));
     }
 
     private int getFieldType(MCRFieldDef fieldDef) {

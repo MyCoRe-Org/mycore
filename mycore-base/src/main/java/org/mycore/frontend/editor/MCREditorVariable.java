@@ -122,7 +122,7 @@ public class MCREditorVariable implements Comparable {
             }
         }
 
-        pathElements = (String[]) elements.toArray(new String[0]);
+        pathElements = (String[]) elements.toArray(new String[elements.size()]);
     }
 
     void setSortNr(String sortNr) {

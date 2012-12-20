@@ -26,11 +26,7 @@ package org.mycore.common;
 import static org.mycore.common.events.MCRSessionEvent.Type.created;
 import static org.mycore.common.events.MCRSessionEvent.Type.destroyed;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.mycore.common.events.MCRSessionListener;
@@ -229,7 +225,8 @@ public class MCRSessionMgr {
 
     public static void close() {
         listenersLock.writeLock().lock();
-        for (MCRSession session : sessions.values().toArray(new MCRSession[0])) {
+        Collection<MCRSession> var = sessions.values();
+        for (MCRSession session : var.toArray(new MCRSession[var.size()])) {
             session.close();
         }
         listenersLock.writeLock().unlock();

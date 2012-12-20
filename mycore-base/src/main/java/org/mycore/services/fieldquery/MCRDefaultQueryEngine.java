@@ -210,9 +210,9 @@ public class MCRDefaultQueryEngine extends MCRBaseClass implements MCRQueryEngin
         }
 
         if (and) {
-            return MCRResults.intersect(results.toArray(new MCRResults[0]));
+            return MCRResults.intersect(results.toArray(new MCRResults[results.size()]));
         } else {
-            return MCRResults.union(results.toArray(new MCRResults[0]));
+            return MCRResults.union(results.toArray(new MCRResults[results.size()]));
         }
     }
 

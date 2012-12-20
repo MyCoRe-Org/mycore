@@ -61,7 +61,7 @@ public abstract class MCRWebCLICommand extends MCRCommand {
         this.messageFormat = new MessageFormat(format);
         
         if (formats.size() > 0){
-            this.messageFormat.setFormats(formats.toArray(new Format[0]));
+            this.messageFormat.setFormats(formats.toArray(new Format[formats.size()]));
         }
     }
 

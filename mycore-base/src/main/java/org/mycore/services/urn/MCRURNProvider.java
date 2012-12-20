@@ -30,6 +30,6 @@ public class MCRURNProvider extends MCRAbstractURNProvider {
             list.add(generateURN());
             amount--;
         }
-        return list.toArray(new MCRURN[0]);
+        return list.toArray(new MCRURN[list.size()]);
     }
 }

@@ -117,7 +117,7 @@ public class MCRShutdownHandler {
         LOGGER.debug("requests: " + requests.toString());
         synchronized (requests) {
             shuttingDown = true;
-            Closeable[] closeables = requests.toArray(new Closeable[0]);
+            Closeable[] closeables = requests.toArray(new Closeable[requests.size()]);
             Arrays.sort(closeables, new MCRCloseableComparator());
             for (Closeable c : closeables) {
                 LOGGER.debug("Prepare Closing: " + c.toString());
