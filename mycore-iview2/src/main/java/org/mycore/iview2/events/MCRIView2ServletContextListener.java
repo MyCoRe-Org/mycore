@@ -38,8 +38,6 @@ import org.mycore.iview2.services.MCRTilingQueue;
 public class MCRIView2ServletContextListener implements ServletContextListener {
     private static Logger LOGGER = Logger.getLogger(MCRIView2ServletContextListener.class);
 
-    private Thread tilingThread;
-
     /**
      * Shuts down {@link MCRImageTiler} and {@link MCRTilingQueue}
      * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
@@ -54,7 +52,7 @@ public class MCRIView2ServletContextListener implements ServletContextListener {
         if (!MCRImageTiler.isRunning()) {
             LOGGER.info("Starting Tiling thread.");
             System.setProperty("java.awt.headless", "true");
-            tilingThread = new Thread(MCRImageTiler.getInstance());
+            Thread tilingThread = new Thread(MCRImageTiler.getInstance());
             tilingThread.start();
         }
     }

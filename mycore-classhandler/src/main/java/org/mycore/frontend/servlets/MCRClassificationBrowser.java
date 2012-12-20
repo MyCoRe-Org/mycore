@@ -52,15 +52,13 @@ public class MCRClassificationBrowser extends MCRServlet {
 
     private static Logger LOGGER = Logger.getLogger(MCRClassificationBrowser.class);
 
-    private static String lang = null;
-
     public void doGetPost(MCRServletJob job) throws ServletException, Exception {
         /*
          * default classification
          */
         LOGGER.debug("Start browsing in classifications");
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        lang = mcrSession.getCurrentLanguage();
+        String lang = mcrSession.getCurrentLanguage();
 
         /*
          * the urn with information about classification-property and category

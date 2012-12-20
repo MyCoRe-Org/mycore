@@ -33,8 +33,6 @@ public class MCRTemplateTask extends Task {
 
     private String choosepath;
 
-    private String directories[];
-
     private static final Namespace XSL = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
 
     /**
@@ -44,7 +42,7 @@ public class MCRTemplateTask extends Task {
      */
     public void execute() throws BuildException {
         File templatedir = new File(templatepath);
-        directories = templatedir.list(new TemplateFilenameFilter());
+        String[] directories = templatedir.list(new TemplateFilenameFilter());
         log("Templates in directory: " + templatedir.getAbsolutePath());
         for (int i = 0; i < directories.length; i++) {
             log(i + ":" + directories[i]);

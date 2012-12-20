@@ -90,18 +90,6 @@ public class MCRLDAPClient {
 
     private static MCRLDAPClient instance = new MCRLDAPClient();
 
-    /** Timeout when connecting to LDAP server */
-    private String readTimeout;
-
-    /** LDAP server */
-    private String providerURL;
-
-    /** Security principal for logging in at LDAP server */
-    private String securityPrincipal;
-
-    /** Security credentials for logging in at LDAP server */
-    private String securityCredentials;
-
     /** Base DN */
     private String baseDN;
 
@@ -127,10 +115,14 @@ public class MCRLDAPClient {
         MCRConfiguration config = MCRConfiguration.instance();
 
         String prefix = "MCR.user2.LDAP.";
-        readTimeout = config.getString(prefix + "ReadTimeout", "10000");
-        providerURL = config.getString(prefix + "ProviderURL");
-        securityPrincipal = config.getString(prefix + "SecurityPrincipal");
-        securityCredentials = config.getString(prefix + "SecurityCredentials");
+        /* Timeout when connecting to LDAP server */
+        String readTimeout = config.getString(prefix + "ReadTimeout", "10000");
+        /* LDAP server */
+        String providerURL = config.getString(prefix + "ProviderURL");
+        /* Security principal for logging in at LDAP server */
+        String securityPrincipal = config.getString(prefix + "SecurityPrincipal");
+        /* Security credentials for logging in at LDAP server */
+        String securityCredentials = config.getString(prefix + "SecurityCredentials");
         baseDN = config.getString(prefix + "BaseDN");
         uidFilter = config.getString(prefix + "UIDFilter");
 

@@ -48,8 +48,6 @@ public class MCRGenericEnumUserType implements UserType, ParameterizedType {
     @SuppressWarnings("rawtypes")
     private Class<? extends Enum> enumClass;
 
-    private Class<?> identifierType;
-
     private Method identifierMethod;
 
     private Method valueOfMethod;
@@ -74,6 +72,7 @@ public class MCRGenericEnumUserType implements UserType, ParameterizedType {
 
         String identifierMethodName = parameters.getProperty("identifierMethod", DEFAULT_IDENTIFIER_METHOD_NAME);
 
+        Class<?> identifierType;
         try {
             identifierMethod = enumClass.getMethod(identifierMethodName, new Class[0]);
             identifierType = identifierMethod.getReturnType();
@@ -91,7 +90,7 @@ public class MCRGenericEnumUserType implements UserType, ParameterizedType {
         String valueOfMethodName = parameters.getProperty("valueOfMethod", DEFAULT_VALUE_OF_METHOD_NAME);
 
         try {
-            valueOfMethod = enumClass.getMethod(valueOfMethodName, new Class[] { identifierType });
+            valueOfMethod = enumClass.getMethod(valueOfMethodName, new Class[] {identifierType});
         } catch (Exception e) {
             throw new HibernateException("Failed to obtain valueOf method", e);
         }

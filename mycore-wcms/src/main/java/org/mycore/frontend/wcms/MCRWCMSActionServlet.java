@@ -100,13 +100,9 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
     private String mode = null;
 
-    private String dir = null;
-
     private String currentLang = null;
 
     private String defaultLang = null;
-
-    private String currentLangLabel = null;
 
     /* Request */
     private String target = null; // Target where to open the current file
@@ -152,8 +148,6 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
     private String masterTemplate = null; // Represents the action of
 
     // templates
-
-    private String selfTemplate = null; // Represents the action of
 
     // templates
 
@@ -1462,6 +1456,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
         contentFileBackup = null;
         naviFileBackup = null;
         hrefFile = null;
+        String dir = null;
         error = href = labelPath = content = label = link = dir = null;
         changeInfo = null;
         masterTemplates = new File(MCRConfiguration.instance().getString("MCR.templatePath") + "master/".replace('/', File.separatorChar)).listFiles();
@@ -1493,7 +1488,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
         }
 
         /* END: code validation by JTidy */
-        currentLangLabel = request.getParameter("label_currentLang");
+        String currentLangLabel = request.getParameter("label_currentLang");
 
         /*
          * if (content != null ) { if ( content.endsWith("\n") ) content = content.substring(0, content.length() - 2); }
@@ -1543,7 +1538,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
         }
 
         masterTemplate = request.getParameter("masterTemplate");
-        selfTemplate = request.getParameter("selfTemplate");
+        String selfTemplate = request.getParameter("selfTemplate");
 
         if (selfTemplate != "") {
             masterTemplate = selfTemplate;

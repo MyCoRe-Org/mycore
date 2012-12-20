@@ -48,7 +48,7 @@ import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
 public class PdfPlugin implements TextFilterPlugin {
     private static HashSet contentTypes = null;
 
-    private static String name = "Yagee's amazing PDF Filter";
+    private static final String name = "Yagee's amazing PDF Filter";
 
     private static final int MAJOR = 0;
 

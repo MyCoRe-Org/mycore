@@ -30,18 +30,12 @@ public class MCRZ3950Servlet extends MCRServlet {
     // Z3950-Anfrage (find), soll im Format "Prefix" sein
     private String query;
 
-    // Dokumententyp
-    private String type;
-
     // Host, auf dem dies Suche angewandt wird
     private String host;
     
     // Index des Suchergebnisses, beginnend bei 1
     private int index;
 
-    // Größe des Resultats (nicht implementiert)
-    private int size;
-    
     // Ist true, wenn das Ergebnis gekürzt werden soll
     private boolean cut;
     
@@ -137,7 +131,7 @@ public class MCRZ3950Servlet extends MCRServlet {
 	    
    private final boolean checkInputParameter(HttpServletRequest request) {
 	   query = request.getParameter("query");
-	   type = request.getParameter("type");
+       String type = request.getParameter("type");
 	   String cutStr = request.getParameter("cut");
 	   cut = false;
 	   if (cutStr != null) {
@@ -145,7 +139,7 @@ public class MCRZ3950Servlet extends MCRServlet {
 	   } 
 	   
 	   String sizeStr = request.getParameter("size");
-	   size = 0;
+       int size = 0;
 	   
 	   if (sizeStr != null) {
 		   size = Integer.parseInt(sizeStr);

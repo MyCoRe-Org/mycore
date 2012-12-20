@@ -24,8 +24,6 @@ class RowCreator_NoLines implements RowCreator {
 
     private MCRClassificationPool classificationPool;
 
-    private MCRConfiguration configuration;
-
     private String emptyLeafs;
 
     private String browserClass;
@@ -44,7 +42,7 @@ class RowCreator_NoLines implements RowCreator {
 
     public RowCreator_NoLines(MCRClassificationPool classificationPool, MCRConfiguration configuration) {
         this.classificationPool = classificationPool;
-        this.configuration = configuration;
+        MCRConfiguration configuration1 = configuration;
         String defaultEmptyLeafs = configuration.getString("MCR.ClassificationBrowser.default.EmptyLeafs");
         emptyLeafs = configuration.getString("MCR.ClassificationBrowser." + getBrowserClass() + ".EmptyLeafs", defaultEmptyLeafs);
     }

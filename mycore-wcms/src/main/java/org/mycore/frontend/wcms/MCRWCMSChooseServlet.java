@@ -67,8 +67,6 @@ public class MCRWCMSChooseServlet extends MCRWCMSServlet {
 
     private String defaultLang = null; //
 
-    private String contentError = null;
-
     private String href = null; // representing the href(dir) attribute of the
 
     // selected element in the navigation.xml
@@ -93,9 +91,6 @@ public class MCRWCMSChooseServlet extends MCRWCMSServlet {
 
     // label(name) of the selected link
     private String target = null; // target of the selected element: {_blank,
-
-    // _self}
-    private String template = null; // choosen Template
 
     private String style = null; // style of the selected element: {bold, normal}
 
@@ -147,13 +142,13 @@ public class MCRWCMSChooseServlet extends MCRWCMSServlet {
 
         File[] contentTemplates = new File(MCRConfiguration.instance().getString("MCR.templatePath") + "content/".replace('/', File.separatorChar)).listFiles();
         File[] masterTemplates = new File(MCRConfiguration.instance().getString("MCR.templatePath") + "master/".replace('/', File.separatorChar)).listFiles();
-        template = request.getParameter("template");
+        String template = request.getParameter("template");
 
         File conTemp = new File(MCRConfiguration.instance().getString("MCR.templatePath") + "content/".replace('/', File.separatorChar));
         Element templates = new Element("templates");
         defaultLangContentOutput = null;
         currentLangContentOutput = null;
-        contentError = null;
+        String contentError = null;
 
         /* get languages */
         if (mcrSession != null) {

@@ -24,7 +24,6 @@ class RowCreator_Lines implements RowCreator {
     private MCRCategLinkService linkService;
     private MCRCategory classif;
     private int maxlevel = 0;
-    private MCRConfiguration configuration;
     private boolean commented = false;
     private String browserClass;
     private String uri;
@@ -34,7 +33,7 @@ class RowCreator_Lines implements RowCreator {
     public RowCreator_Lines(MCRClassificationPool classificationPool, MCRCategLinkService linkService, MCRConfiguration configuration) {
         this.classificationPool = classificationPool;
         this.linkService = linkService;
-        this.configuration = configuration;
+        MCRConfiguration configuration1 = configuration;
         String defaultEmptyLeafs = configuration.getString("MCR.ClassificationBrowser.default.EmptyLeafs");
         emptyLeafs = configuration.getString("MCR.ClassificationBrowser." + getBrowserClass() + ".EmptyLeafs", defaultEmptyLeafs);
     }

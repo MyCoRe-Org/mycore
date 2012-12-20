@@ -22,8 +22,6 @@ import org.jdom.xpath.XPath;
  */
 public class MCRXML2StringWithPayloadProvider {
 
-    private Document xmlSource;
-
     private List<Element> tokenList;
 
     /**
@@ -53,7 +51,7 @@ public class MCRXML2StringWithPayloadProvider {
     private void createDocument(InputStream inputStream) throws IOException {
         try {
             SAXBuilder saxBuilder = new SAXBuilder();
-            xmlSource = saxBuilder.build(inputStream);
+            Document xmlSource = saxBuilder.build(inputStream);
             XPath xp = XPath.newInstance("//Word");
             tokenList = xp.selectNodes(xmlSource);
         } catch (Exception ex) {

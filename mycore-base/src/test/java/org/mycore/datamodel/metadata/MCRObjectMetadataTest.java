@@ -47,8 +47,6 @@ import org.xml.sax.SAXParseException;
 public class MCRObjectMetadataTest extends MCRTestCase {
     private static final String TEST_OBJECT_RESOURCE_NAME = "/mcr_test_01.xml";
 
-    private Document testObjectDocument;
-
     private MCRObjectMetadata testMetadata;
 
     /* (non-Javadoc)
@@ -59,7 +57,7 @@ public class MCRObjectMetadataTest extends MCRTestCase {
     public void setUp() throws Exception {
         super.setUp();
         setProperty("MCR.Metadata.DefaultLang", "de", true);
-        testObjectDocument = loadResourceDocument(TEST_OBJECT_RESOURCE_NAME);
+        Document testObjectDocument = loadResourceDocument(TEST_OBJECT_RESOURCE_NAME);
         testMetadata = new MCRObjectMetadata();
         testMetadata.setFromDOM(testObjectDocument.getRootElement().getChild("metadata"));
     }

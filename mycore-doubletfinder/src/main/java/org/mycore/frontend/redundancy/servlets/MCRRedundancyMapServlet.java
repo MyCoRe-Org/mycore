@@ -59,8 +59,6 @@ public class MCRRedundancyMapServlet extends MCRServlet {
 
     private int doubletCount;
 
-    private int notWorkedCount;
-
     private int errorCount;
 
     public void init() throws ServletException {
@@ -117,13 +115,12 @@ public class MCRRedundancyMapServlet extends MCRServlet {
     private void initCounter(MCRServletJob job, Element redObjectsElement) {
         nonDoubletCount = 0;
         doubletCount = 0;
-        notWorkedCount = 0;
         errorCount = 0;
         Filter elementAndObjectFilter = new ElementFilter("object");
         for (int i = 1; i <= redObjectsElement.getContent(elementAndObjectFilter).size(); i++) {
             String status = job.getRequest().getParameter("selection_" + i);
             if (status == null || status.equals("")) {
-                notWorkedCount++;
+                //did not work
             } else if (status.equals("doublet")) {
                 doubletCount++;
             } else if (status.equals("nonDoublet")) {

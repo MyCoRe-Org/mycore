@@ -56,9 +56,6 @@ public class MCRLinkTableManager {
     // logger
     static Logger logger = Logger.getLogger(MCRLinkTableManager.class.getName());
 
-    // the persitence class
-    private String persistclassname = null;
-
     private MCRLinkTableInterface persistenceclass = null;
 
     /**
@@ -81,7 +78,7 @@ public class MCRLinkTableManager {
         MCRConfiguration config = MCRConfiguration.instance();
 
         // Load the persistence class
-        persistclassname = config.getString("MCR.Persistence.LinkTable.Store.Class");
+        String persistclassname = config.getString("MCR.Persistence.LinkTable.Store.Class");
 
         Object obj = new Object();
         try {

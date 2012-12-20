@@ -33,8 +33,6 @@ public class MCRJSONProvider {
 
     //final private static Logger LOGGER = Logger.getLogger(MCRJSONProvider.class);
 
-    private Document metsDocument;
-
     private Mets mets;
 
     /**
@@ -45,8 +43,8 @@ public class MCRJSONProvider {
      * @throws Exception 
      */
     public MCRJSONProvider(Document mets, String derivate) throws Exception  {
-        this.metsDocument = mets;
-        this.mets = new Mets(this.metsDocument);
+        Document metsDocument = mets;
+        this.mets = new Mets(metsDocument);
     }
 
     public String getJson() {

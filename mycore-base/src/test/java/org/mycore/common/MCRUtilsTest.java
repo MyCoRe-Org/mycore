@@ -38,11 +38,11 @@ import org.junit.Test;
  */
 public class MCRUtilsTest extends MCRTestCase {
 
-    private static String TEST = "Hello World!";
+    private static final String TEST = "Hello World!";
 
-    private static String TEST_SHA1 = "2ef7bde608ce5404e97d5f042f95f89f1c232871";
+    private static final String TEST_SHA1 = "2ef7bde608ce5404e97d5f042f95f89f1c232871";
 
-    private static String TEST_MD5 = "ed076287532e86365e841e92bfc50d8c";
+    private static final String TEST_MD5 = "ed076287532e86365e841e92bfc50d8c";
 
     /**
      * Test method for {@link org.mycore.common.MCRUtils#asSHA1String(java.lang.String)}.

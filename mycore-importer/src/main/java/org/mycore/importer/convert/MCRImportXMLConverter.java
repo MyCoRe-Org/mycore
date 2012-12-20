@@ -22,7 +22,7 @@ import org.mycore.importer.MCRImportRecordConverter;
  */
 public class MCRImportXMLConverter implements MCRImportRecordConverter<Document> {
 
-    private String SEPARATOR = "/";
+    private static final String SEPARATOR = "/";
 
     private String name;
 

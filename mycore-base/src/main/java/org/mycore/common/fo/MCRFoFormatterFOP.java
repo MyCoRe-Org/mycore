@@ -59,8 +59,6 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
 
     private FopFactory fopFactory;
 
-    private Configuration cfg = null;
-
     /**
      * Protected constructor to create the singleton instance
      * @throws IOException 
@@ -71,6 +69,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
         String fo_cfg = MCRConfiguration.instance().getString("MCR.LayoutService.FoFormatter.FOP.config",null);
         if ((fo_cfg != null) && (fo_cfg.length() != 0)) {
             DefaultConfigurationBuilder cfgBuilder = new DefaultConfigurationBuilder();
+            Configuration cfg = null;
             try {
                 cfg = cfgBuilder.build(MCRFoFormatterFOP.class.getResourceAsStream("/" + fo_cfg));
             } catch (ConfigurationException e) {

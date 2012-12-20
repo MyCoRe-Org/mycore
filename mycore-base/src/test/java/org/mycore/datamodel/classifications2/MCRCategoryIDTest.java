@@ -14,15 +14,15 @@ import org.mycore.common.MCRTestCase;
  *
  */
 public class MCRCategoryIDTest extends MCRTestCase {
-    private static String invalidID = "identifier:.sub";
+    private static final String invalidID = "identifier:.sub";
 
-    private static String validRootID = "rootID";
+    private static final String validRootID = "rootID";
 
-    private static String validCategID = "categID";
+    private static final String validCategID = "categID";
 
-    private static String toLongRootID = "012345678901234567890123456789012";
+    private static final String toLongRootID = "012345678901234567890123456789012";
 
-    private String toLongCategID = "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678";
+    private static final String toLongCategID = "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678";
 
     /**
      * Test method for {@link org.mycore.datamodel.classifications2.MCRCategoryID#MCRCategoryID(java.lang.String, java.lang.String)}.

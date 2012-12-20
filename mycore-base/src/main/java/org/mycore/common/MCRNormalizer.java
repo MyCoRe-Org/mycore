@@ -82,10 +82,6 @@ public class MCRNormalizer {
 
     private static boolean normalize;
 
-    private static String addRule;
-
-    private static String setRule;
-
     private static boolean diacriticRule;
 
     private static boolean useRuleFirst;
@@ -97,8 +93,8 @@ public class MCRNormalizer {
     public static void loadConfig() {
         MCRConfiguration config = MCRConfiguration.instance();
         normalize = config.getBoolean("MCR.Metadata.Normalize", true);
-        addRule = config.getString("MCR.Metadata.Normalize.AddRule", "");
-        setRule = config.getString("MCR.Metadata.Normalize.SetRule", "");
+        String addRule = config.getString("MCR.Metadata.Normalize.AddRule", "");
+        String setRule = config.getString("MCR.Metadata.Normalize.SetRule", "");
         diacriticRule = config.getBoolean("MCR.Metadata.Normalize.DiacriticRule", true);
         useRuleFirst = config.getBoolean("MCR.Metadata.Normalize.UseRuleFirst", false);
         

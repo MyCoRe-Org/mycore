@@ -43,11 +43,11 @@ public class MCRCategoryID implements Serializable {
 
     private static final long serialVersionUID = -5672923571406252855L;
 
-    private static Pattern validID = Pattern.compile("[^:$\\{\\}]+");
+    private static final Pattern validID = Pattern.compile("[^:$\\{\\}]+");
 
-    private static int ROOT_ID_LENGTH = 32;
+    private static final int ROOT_ID_LENGTH = 32;
 
-    private static int CATEG_ID_LENGTH = 128;
+    private static final int CATEG_ID_LENGTH = 128;
 
     private String rootID;
 

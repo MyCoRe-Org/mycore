@@ -106,8 +106,6 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
     private Vector<MCRFieldDef> addableFields = new Vector<MCRFieldDef>();
 
-    private boolean storeQueryFields;
-
     private MCRLuceneQueryFieldLogger queryFieldLogger;
 
     private boolean initializeResult;
@@ -180,7 +178,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         } catch (IOException e) {
             throw new MCRException("Cannot initialize IndexReader.", e);
         }
-        storeQueryFields = MCRConfiguration.instance().getBoolean(prefix + "StoreQueryFields", false);
+        boolean storeQueryFields = MCRConfiguration.instance().getBoolean(prefix + "StoreQueryFields", false);
         if (storeQueryFields) {
             File queryFieldProperties = getQueryFieldLoggerProperties();
             Properties props = new Properties();

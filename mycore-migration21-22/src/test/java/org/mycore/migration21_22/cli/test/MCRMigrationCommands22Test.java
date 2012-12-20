@@ -31,16 +31,14 @@ public class MCRMigrationCommands22Test {
 
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
-    private File baseDir;
-    private File svnBase;
-    
+
     @Before
     public void init() throws MalformedURLException{
-        baseDir = tmpFolder.newFolder("baseDir");
-        svnBase = tmpFolder.newFolder("SVNBase");
+        File baseDir = tmpFolder.newFolder("baseDir");
+        File svnBase = tmpFolder.newFolder("SVNBase");
         MCRConfiguration.instance().set("MCR.CLI.Classes.Annotated", MCRMigrationCommands22.class.getName());
         MCRConfiguration.instance().set("MCR.Metadata.Store.BaseDir", baseDir.getAbsolutePath());
-        MCRConfiguration.instance().set("MCR.Metadata.Store.SVNBase", "file:///"+svnBase.getAbsolutePath().replace('\\', '/'));
+        MCRConfiguration.instance().set("MCR.Metadata.Store.SVNBase", "file:///"+ svnBase.getAbsolutePath().replace('\\', '/'));
         MCRConfiguration.instance().set("MCR.Metadata.Type.cbu", true);
         MCRConfiguration.instance().set("MCR.Metadata.Type.mods", true);
         MCRConfiguration.instance().set("MCR.CommandLineInterface.unitTest", true);

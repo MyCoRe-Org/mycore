@@ -58,7 +58,7 @@ abstract class OpenOfficeBasePlugin implements TextFilterPlugin {
 
     private HashSet<MCRFileContentType> contentTypes;
 
-    private static int DEF_BYTE_SZ = 1024 * 63;
+    private static final int DEF_BYTE_SZ = 1024 * 63;
 
     /**
      * 

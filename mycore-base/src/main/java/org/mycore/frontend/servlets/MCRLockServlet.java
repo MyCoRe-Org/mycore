@@ -51,11 +51,11 @@ public class MCRLockServlet extends MCRServlet {
 
     private static final Logger LOGGER = Logger.getLogger(MCRLockServlet.class);
 
-    private static String PARAM_ACTION = "action";
+    private static final String PARAM_ACTION = "action";
 
-    private static String PARAM_OBJECTID = "id";
+    private static final String PARAM_OBJECTID = "id";
 
-    private static String PARAM_REDIRECT = "url";
+    private static final String PARAM_REDIRECT = "url";
 
     @Override
     protected void think(MCRServletJob job) throws Exception {

@@ -25,7 +25,6 @@ package org.mycore.datamodel.ifs;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.StringTokenizer;
 
@@ -53,11 +52,7 @@ public class MCRDirectoryXML {
 
     private static final DateFormat timeFormatter = new SimpleDateFormat(timeFormat);
 
-    private static MCRConfiguration CONFIG = MCRConfiguration.instance();
-
-    private static ArrayList remoteAliasList;
-
-    protected static MCRDirectoryXML SINGLETON;
+    protected static MCRDirectoryXML SINGLETON = new MCRDirectoryXML();
 
     /** 
      * If true, XML output of FileNodeServlet directory listing and 
@@ -70,19 +65,15 @@ public class MCRDirectoryXML {
     static {
         WITH_ADDITIONAL_DATA_DEFAULT = MCRConfiguration.instance().getBoolean("MCR.IFS.IncludeAdditionalDataByDefault", false);
     }
-    
+
     /**
      *  
      */
     private MCRDirectoryXML() {
         super();
-        init();
     }
 
     public static MCRDirectoryXML getInstance() {
-        if (SINGLETON == null) {
-            SINGLETON = new MCRDirectoryXML();
-        }
         return SINGLETON;
     }
 
@@ -92,7 +83,7 @@ public class MCRDirectoryXML {
     protected Document getDirectoryXML(MCRDirectory dir) {
         return getDirectoryXML(dir, WITH_ADDITIONAL_DATA_DEFAULT);
     }
-    
+
     /**
      * Sends the contents of an MCRDirectory as XML data to the client
      */
@@ -238,7 +229,7 @@ public class MCRDirectoryXML {
     public Document getDirectory(String requestPath) {
         return getDirectory(requestPath, WITH_ADDITIONAL_DATA_DEFAULT);
     }
-    
+
     /**
      * Handles the HTTP request
      */
@@ -312,27 +303,6 @@ public class MCRDirectoryXML {
             return getErrorDocument(msg);
         } else {
             return getDirectoryXML((MCRDirectory) node, withAdditionalData);
-        }
-    }
-
-    /**
-     * Initializes the servlet and reads the default language and the remote
-     * host list from the configuration.
-     */
-    public void init() {
-
-        // read host list from configuration
-        String hostconf = CONFIG.getString("MCR.remoteaccess_hostaliases", "local");
-        remoteAliasList = new ArrayList();
-
-        if (hostconf.indexOf("local") < 0) {
-            remoteAliasList.add("local");
-        }
-
-        StringTokenizer st = new StringTokenizer(hostconf, ", ");
-
-        while (st.hasMoreTokens()) {
-            remoteAliasList.add(st.nextToken());
         }
     }
 

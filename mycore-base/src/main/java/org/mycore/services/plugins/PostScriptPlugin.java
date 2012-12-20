@@ -47,7 +47,7 @@ import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
 public class PostScriptPlugin implements TextFilterPlugin {
     private static HashSet contentTypes = null;
 
-    private static String name = "Yagee's amazing PostScript Filter";
+    private static final String name = "Yagee's amazing PostScript Filter";
 
     private static final int MAJOR = 0;
 

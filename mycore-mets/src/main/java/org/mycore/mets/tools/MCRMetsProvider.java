@@ -60,12 +60,6 @@ public class MCRMetsProvider {
 
     private Mets mets;
 
-    private DmdSec dmdSec;
-
-    private AmdSec amdSec;
-
-    private FileSec fileSec;
-
     private FileGrp fileGrpMaster;
 
     private PhysicalStructMap physicalStructMp;
@@ -80,14 +74,14 @@ public class MCRMetsProvider {
     public MCRMetsProvider(String derivate) {
         this.idProvider = new LogicalIdProvider("log", 6);
         mets = new Mets();
-        dmdSec = new DmdSec("dmd_" + derivate);
+        DmdSec dmdSec = new DmdSec("dmd_" + derivate);
 
-        amdSec = new AmdSec("amd_" + derivate);
+        AmdSec amdSec = new AmdSec("amd_" + derivate);
         mets.addDmdSec(dmdSec);
         mets.addAmdSec(amdSec);
 
         // filesec
-        fileSec = new FileSec();
+        FileSec fileSec = new FileSec();
         fileGrpMaster = new FileGrp(FileGrp.USE_MASTER);
         fileSec.addFileGrp(fileGrpMaster);
 
