@@ -133,7 +133,10 @@ public abstract class MCRBase {
         setSchema(rootElement.getAttribute("noNamespaceSchemaLocation", XSI_NAMESPACE).getValue());
 
         // get the service data of the object
-        mcr_service.setFromDOM(rootElement.getChild("service"));
+        Element serviceElement = rootElement.getChild("service");
+        if (serviceElement != null) {
+            mcr_service.setFromDOM(serviceElement);
+        }
     }
 
     /**
