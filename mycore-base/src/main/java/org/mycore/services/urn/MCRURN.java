@@ -68,9 +68,7 @@ public class MCRURN {
         }
         // part[0] is "urn" by default
         String[] namespaceIdentifiersOfTheURNToBe = new String[parts.length - 2];
-        for (int i = 0; i < parts.length - 2; i++) {
-            namespaceIdentifiersOfTheURNToBe[i] = parts[i + 1];
-        }
+        System.arraycopy(parts, 1, namespaceIdentifiersOfTheURNToBe, 0, parts.length - 2);
 
         MCRURN toReturn = new MCRURN(namespaceIdentifiersOfTheURNToBe, parts[parts.length - 1]);
         return toReturn;
