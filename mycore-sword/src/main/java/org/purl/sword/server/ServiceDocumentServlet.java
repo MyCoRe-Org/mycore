@@ -152,8 +152,7 @@ public class ServiceDocumentServlet extends HttpServlet {
 		}
 
 		// Set the x-on-behalf-of header
-		sdr.setOnBehalfOf(request.getHeader(HttpHeaders.X_ON_BEHALF_OF
-				.toString()));
+		sdr.setOnBehalfOf(request.getHeader(HttpHeaders.X_ON_BEHALF_OF));
 
 		// Set the IP address
 		sdr.setIPAddress(request.getRemoteAddr());

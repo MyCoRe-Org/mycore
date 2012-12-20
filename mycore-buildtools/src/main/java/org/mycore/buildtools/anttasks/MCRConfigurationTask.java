@@ -194,7 +194,7 @@ public class MCRConfigurationTask extends Task {
             return;
         }
         fileChanged = true;
-        String prop = propLines.get(lineNumber).toString();
+        String prop = propLines.get(lineNumber);
         String newProp = prop;
         if (prop.charAt(prop.length() - 1) != '=') {
             newProp += ",";
@@ -216,7 +216,7 @@ public class MCRConfigurationTask extends Task {
             return;
         }
         fileChanged = true;
-        String newProp = propLines.get(lineNumber).toString().replaceAll("," + value, "");
+        String newProp = propLines.get(lineNumber).replaceAll("," + value, "");
         propLines.remove(lineNumber);
         propLines.add(lineNumber, newProp);
         handleOutput(new StringBuffer(propertyFile.getName()).append(':').append(lineNumber).append(" removed '")

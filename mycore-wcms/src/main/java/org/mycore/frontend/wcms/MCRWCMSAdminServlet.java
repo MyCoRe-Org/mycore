@@ -94,12 +94,12 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
             generateXML_saveGlobal(request, response);
         else if (todo.equals("view") && (request.getParameter("file") != null && !request.getParameter("file").equals(""))) {
             // live content version requested
-            if (request.getParameter("file").toString().subSequence(0, 4).equals("http")) {
+            if (request.getParameter("file").subSequence(0, 4).equals("http")) {
                 String url = request.getParameter("file");
                 url = url + "?XSL.href=" + request.getParameter("XSL.href");
                 // archived navi version requested
                 if (request.getParameter("XSL.navi") != null && !request.getParameter("XSL.navi").equals("")
-                        && !request.getParameter("XSL.navi").toString().subSequence(0, 4).equals("http")) {
+                        && !request.getParameter("XSL.navi").subSequence(0, 4).equals("http")) {
                     url = url + "&XSL.navi=" + request.getParameter("XSL.navi");
                     response.sendRedirect(response.encodeRedirectURL(url));
                 } else

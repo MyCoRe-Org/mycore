@@ -199,7 +199,7 @@ public class MCRSWORDDepositServlet extends MCRServlet {
                 d.setFile(file);
 
                 // Set the X-On-Behalf-Of header
-                String onBehalfOf = request.getHeader(HttpHeaders.X_ON_BEHALF_OF.toString());
+                String onBehalfOf = request.getHeader(HttpHeaders.X_ON_BEHALF_OF);
                 if ((onBehalfOf != null) && (onBehalfOf.equals("reject"))) {
                     // user name is "reject", so throw a not know error to allow
                     // the client to be tested
@@ -268,13 +268,13 @@ public class MCRSWORDDepositServlet extends MCRServlet {
                 g.setVersion(MCRConfiguration.instance().getString("MCR.SWORD.generator.version", ""));
 
                 // Echo back the user agent
-                if (request.getHeader(HttpHeaders.USER_AGENT.toString()) != null) {
-                    dr.getEntry().setUserAgent(request.getHeader(HttpHeaders.USER_AGENT.toString()));
+                if (request.getHeader(HttpHeaders.USER_AGENT) != null) {
+                    dr.getEntry().setUserAgent(request.getHeader(HttpHeaders.USER_AGENT));
                 }
 
                 // Echo back the packaging format
-                if (request.getHeader(HttpHeaders.X_PACKAGING.toString()) != null) {
-                    dr.getEntry().setPackaging(request.getHeader(HttpHeaders.X_PACKAGING.toString()));
+                if (request.getHeader(HttpHeaders.X_PACKAGING) != null) {
+                    dr.getEntry().setPackaging(request.getHeader(HttpHeaders.X_PACKAGING));
                 }
 
                 // Print out the Deposit Response

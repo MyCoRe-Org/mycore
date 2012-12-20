@@ -550,7 +550,7 @@ public class MCREditorServlet extends MCRServlet {
         }
 
         LOGGER.debug("EditorServlet redirecting to " + url);
-        res.sendRedirect(res.encodeRedirectURL(url.toString()));
+        res.sendRedirect(res.encodeRedirectURL(url));
     }
 
     private void sendToSubSelect(HttpServletResponse res, MCRRequestParameters parms, List variables, String root) throws IOException {

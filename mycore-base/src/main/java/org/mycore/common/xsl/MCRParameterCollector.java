@@ -112,7 +112,7 @@ public class MCRParameterCollector {
      * Sets the parameter only if it starts with "XSL." and is not empty
      */
     private void setXSLParameter(String name, String value) {
-        if (name.startsWith("XSL.") && (value != null) && (!value.toString().isEmpty()))
+        if (name.startsWith("XSL.") && (value != null) && (!value.isEmpty()))
             parameters.put(name.substring(4), value);
     }
 

@@ -327,7 +327,7 @@ public class MCRHIBUserStore implements MCRUserStore {
         for (int i = 0; i < memberUserIDs.size(); i++) {
             MCRGROUPMEMBERS member = new MCRGROUPMEMBERS();
             member.setGid(group);
-            member.setUserid((MCRUSERS) session.get(MCRUSERS.class, memberUserIDs.get(i).toString()));
+            member.setUserid((MCRUSERS) session.get(MCRUSERS.class, memberUserIDs.get(i)));
             session.save(member);
         }
 
@@ -335,7 +335,7 @@ public class MCRHIBUserStore implements MCRUserStore {
         for (int i = 0; i < newGroup.getAdminUserIDs().size(); i++) {
             MCRGROUPADMINS admin = new MCRGROUPADMINS();
             admin.setGid(group);
-            admin.setUserid((MCRUSERS) session.get(MCRUSERS.class, newGroup.getAdminUserIDs().get(i).toString()));
+            admin.setUserid((MCRUSERS) session.get(MCRUSERS.class, newGroup.getAdminUserIDs().get(i)));
             admin.setGroupid(ADMIN_GROUP);
             session.saveOrUpdate(admin);
             session.evict(ADMIN_GROUP);
@@ -344,7 +344,7 @@ public class MCRHIBUserStore implements MCRUserStore {
             MCRGROUPADMINS admin = new MCRGROUPADMINS();
             admin.setGid(group);
             admin.setUserid(ADMIN_USER);
-            final String adminGroupID = newGroup.getAdminGroupIDs().get(i).toString();
+            final String adminGroupID = newGroup.getAdminGroupIDs().get(i);
             admin.setGroupid((MCRGROUPS) session.get(MCRGROUPS.class, adminGroupID));
             if (session.get(MCRGROUPADMINS.class, admin.getKey()) == null) {
                 session.saveOrUpdate(admin);
@@ -536,7 +536,7 @@ public class MCRHIBUserStore implements MCRUserStore {
         // table
         for (int i = 0; i < newUserIDs.size(); i++) {
             if (!oldUserIDs.contains(newUserIDs.get(i))) {
-                MCRUSERS user = (MCRUSERS) session.get(MCRUSERS.class, newUserIDs.get(i).toString());
+                MCRUSERS user = (MCRUSERS) session.get(MCRUSERS.class, newUserIDs.get(i));
                 MCRGROUPMEMBERS grpmembers = new MCRGROUPMEMBERS();
                 grpmembers.setGid(dbgroup);
                 grpmembers.setUserid(user);

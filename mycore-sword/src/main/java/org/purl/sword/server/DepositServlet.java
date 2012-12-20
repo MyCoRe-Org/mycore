@@ -279,7 +279,7 @@ public class DepositServlet extends MCRServlet {
 	            d.setFile(f);
 	            
 	            // Set the X-On-Behalf-Of header
-	            String onBehalfOf = request.getHeader(HttpHeaders.X_ON_BEHALF_OF.toString());
+	            String onBehalfOf = request.getHeader(HttpHeaders.X_ON_BEHALF_OF);
 	            if ((onBehalfOf != null) && (onBehalfOf.equals("reject"))) {
 	                // user name is "reject", so throw a not know error to allow the client to be tested
 	                throw new SWORDErrorException(ErrorCodes.TARGET_OWNER_UKNOWN,"unknown user \"reject\"");
@@ -343,13 +343,13 @@ public class DepositServlet extends MCRServlet {
 	            DepositResponse dr = myRepository.doDeposit(d, job);
 	            
 	            // Echo back the user agent
-	            if (request.getHeader(HttpHeaders.USER_AGENT.toString()) != null) {
-	                dr.getEntry().setUserAgent(request.getHeader(HttpHeaders.USER_AGENT.toString()));
+	            if (request.getHeader(HttpHeaders.USER_AGENT) != null) {
+	                dr.getEntry().setUserAgent(request.getHeader(HttpHeaders.USER_AGENT));
 	            }
 	            
 	            // Echo back the packaging format
-	            if (request.getHeader(HttpHeaders.X_PACKAGING.toString()) != null) {
-	                dr.getEntry().setPackaging(request.getHeader(HttpHeaders.X_PACKAGING.toString()));
+	            if (request.getHeader(HttpHeaders.X_PACKAGING) != null) {
+	                dr.getEntry().setPackaging(request.getHeader(HttpHeaders.X_PACKAGING));
 	            }
 	            
 	            // Print out the Deposit Response
@@ -427,8 +427,8 @@ public class DepositServlet extends MCRServlet {
 		Summary sum = new Summary();
 		sum.setContent(summary);
 		sed.setSummary(sum);
-		if (request.getHeader(HttpHeaders.USER_AGENT.toString()) != null) {
-			sed.setUserAgent(request.getHeader(HttpHeaders.USER_AGENT.toString()));
+		if (request.getHeader(HttpHeaders.USER_AGENT) != null) {
+			sed.setUserAgent(request.getHeader(HttpHeaders.USER_AGENT));
 		}
 		response.setStatus(status);
     	response.setContentType("application/atom+xml; charset=UTF-8");

@@ -701,7 +701,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
 
         MCRContent content = new MCRByteContent(xml);
-        File xmlOutput = new File(dir, nid.toString() + ".xml");
+        File xmlOutput = new File(dir, nid + ".xml");
 
         if (trans != null) {
             FileOutputStream out = new FileOutputStream(xmlOutput);
@@ -711,7 +711,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         } else {
             content.sendTo(xmlOutput);
         }
-        LOGGER.info("Object " + nid.toString() + " saved to " + xmlOutput.getCanonicalPath() + ".");
+        LOGGER.info("Object " + nid + " saved to " + xmlOutput.getCanonicalPath() + ".");
         return true;
     }
 

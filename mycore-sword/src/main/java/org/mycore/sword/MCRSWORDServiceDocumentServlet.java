@@ -108,7 +108,7 @@ public class MCRSWORDServiceDocumentServlet extends MCRServlet {
         }
 
         // Set the x-on-behalf-of header
-        sdr.setOnBehalfOf(request.getHeader(HttpHeaders.X_ON_BEHALF_OF.toString()));
+        sdr.setOnBehalfOf(request.getHeader(HttpHeaders.X_ON_BEHALF_OF));
         LOG.info("on behalf of user: " + sdr.getOnBehalfOf());
 
         // Set the IP address

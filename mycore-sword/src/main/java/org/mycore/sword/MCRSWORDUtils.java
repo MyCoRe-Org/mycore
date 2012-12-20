@@ -239,8 +239,8 @@ public class MCRSWORDUtils {
         Summary sum = new Summary();
         sum.setContent(summary);
         sed.setSummary(sum);
-        if (request.getHeader(HttpHeaders.USER_AGENT.toString()) != null) {
-            sed.setUserAgent(request.getHeader(HttpHeaders.USER_AGENT.toString()));
+        if (request.getHeader(HttpHeaders.USER_AGENT) != null) {
+            sed.setUserAgent(request.getHeader(HttpHeaders.USER_AGENT));
         }
         response.setStatus(status);
         response.setContentType("application/atom+xml; charset=UTF-8");
