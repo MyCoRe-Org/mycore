@@ -63,7 +63,7 @@ public class MCRRoleManager {
     }
 
     private static void loadSystemRoles() {
-        if (lastLoaded == DAO.getLastModified()) {
+        if (lastLoaded == DAO.getLastModified() || !DAO.exist(MCRUser2Constants.ROLE_CLASSID)) {
             return;
         }
         lastLoaded = DAO.getLastModified();
