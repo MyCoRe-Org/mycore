@@ -28,11 +28,7 @@ import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.net.URI;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -305,9 +301,7 @@ public class MCRCategoryTransformer {
             for (Element element : a) {
                 element.detach();
             }
-            for (Element element : a) {
-                list.add(element);
-            }
+            Collections.addAll(list, a);
         }
     }
 }

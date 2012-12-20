@@ -5,16 +5,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -328,8 +319,7 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         String notEditableCreators = properties.getProperty("notEditableCreators");
         List<String> notEditableCreatorList = new ArrayList<String>();
         if(notEditableCreators != null) {
-            for(String notEditableCreator : notEditableCreators.split(":"))
-                notEditableCreatorList.add(notEditableCreator);
+            Collections.addAll(notEditableCreatorList, notEditableCreators.split(":"));
         }
         Element elem = MCRACLXMLProcessing.ruleSet2XML(MCRACLHIBAccess.getRuleList(properties), notEditableCreatorList);
         return elem;

@@ -21,11 +21,7 @@
  */
 package org.mycore.oai;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -100,9 +96,7 @@ public class MCROAIDataProvider extends MCRServlet {
         for (Object o : pMap.entrySet()) {
             Map.Entry entry = (Map.Entry) o;
             List<String> valueList = new ArrayList<String>();
-            for (String value : (String[]) entry.getValue()) {
-                valueList.add(value);
-            }
+            Collections.addAll(valueList, (String[]) entry.getValue());
             rMap.put((String) entry.getKey(), valueList);
         }
         return rMap;
