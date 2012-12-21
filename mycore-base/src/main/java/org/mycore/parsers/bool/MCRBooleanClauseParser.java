@@ -80,8 +80,8 @@ public class MCRBooleanClauseParser {
                 if (name.equals("and")) {
                     MCRAndCondition acond = new MCRAndCondition();
 
-                    for (int i = 0; i < children.size(); i++) {
-                        Element child = (Element) children.get(i);
+                    for (Object aChildren : children) {
+                        Element child = (Element) aChildren;
                         acond.addChild(parse(child));
                     }
 
@@ -89,8 +89,8 @@ public class MCRBooleanClauseParser {
                 } else {
                     MCROrCondition ocond = new MCROrCondition();
 
-                    for (int i = 0; i < children.size(); i++) {
-                        Element child = (Element) children.get(i);
+                    for (Object aChildren : children) {
+                        Element child = (Element) aChildren;
                         ocond.addChild(parse(child));
                     }
 

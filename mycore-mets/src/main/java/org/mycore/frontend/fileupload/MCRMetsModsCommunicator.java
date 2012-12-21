@@ -187,15 +187,15 @@ public class MCRMetsModsCommunicator {
 
                     String[] files = dir.list();
 
-                    for (int j = 0; j < files.length; j++) {
-                        f = new File(dir, files[j]);
+                    for (String file : files) {
+                        f = new File(dir, file);
 
                         if (f.isFile()) {
                             list[0].addElement(f);
-                            list[1].addElement(base + files[j]);
+                            list[1].addElement(base + file);
                         } else {
                             dirStack.push(f);
-                            baseStack.push(base + files[j] + "/");
+                            baseStack.push(base + file + "/");
                         }
                     }
                 }

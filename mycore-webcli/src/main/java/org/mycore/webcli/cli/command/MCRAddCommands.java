@@ -40,8 +40,7 @@ public class MCRAddCommands extends MCRWebCLICommand {
 
         if (file.isDirectory()) {
             File[] jarFiles = MCRJarTools.listJarFiles(file);
-            for (int i = 0; i < jarFiles.length; i++) {
-                File jarFile = jarFiles[i];
+            for (File jarFile : jarFiles) {
                 addCommandFromJar(jarFile);
             }
         } else {

@@ -69,8 +69,8 @@ public class MCRWCMSFileUploadServlet extends MCRWCMSServlet {
             // parse the request
             try {
                 List items = upload.parseRequest(request);
-                for (Iterator it = items.iterator(); it.hasNext();) {
-                    FileItem item = (FileItem) it.next();
+                for (Object item1 : items) {
+                    FileItem item = (FileItem) item1;
                     if (item.isFormField()) {
                         processFormField(item);
                     } else {

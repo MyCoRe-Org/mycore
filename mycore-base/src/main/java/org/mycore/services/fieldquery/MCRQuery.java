@@ -182,8 +182,7 @@ public class MCRQuery {
             if (sortBy != null && sortBy.size() > 0) {
                 Element sortByElem = new Element("sortBy");
                 query.addContent(sortByElem);
-                for (int i = 0; i < sortBy.size(); i++) {
-                    MCRSortBy sb = sortBy.get(i);
+                for (MCRSortBy sb : sortBy) {
                     Element ref = new Element("field");
                     ref.setAttribute("name", sb.getField().getName());
                     ref.setAttribute("order", sb.getSortOrder() ? "ascending" : "descending");
@@ -231,8 +230,8 @@ public class MCRQuery {
             List children = sortByElem.getChildren();
             sortBy = new ArrayList<MCRSortBy>(children.size());
 
-            for (int i = 0; i < children.size(); i++) {
-                Element sortByChild = (org.jdom.Element) children.get(i);
+            for (Object aChildren : children) {
+                Element sortByChild = (Element) aChildren;
                 String name = sortByChild.getAttributeValue("name");
                 String ad = sortByChild.getAttributeValue("order");
 
@@ -254,8 +253,8 @@ public class MCRQuery {
                 hostAliases = MCRQueryClient.ALL_HOSTS;
             } else if ("selected".equals(target)) {
                 List list = hostsElem.getChildren();
-                for (int i = 0; i < list.size(); i++) {
-                    Element host = (Element) list.get(i);
+                for (Object aList : list) {
+                    Element host = (Element) aList;
                     hostAliases.add(host.getTextTrim());
                 }
             }

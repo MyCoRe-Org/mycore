@@ -135,12 +135,10 @@ public class MCRStartZoomifyServlet extends MCRStartEditorServlet{
 			{
 			    Document doc = MCRFile.getFile(getMetsFile(mcrid)).getContentAsJDOM();
 				ArrayList<MCRMetsModsPicture> list = MCRMetsModsUtil.getFileList(doc);
-				for(int j=0;j<list.size();j++)
-				{
-					MCRMetsModsPicture pic = list.get(j);
-					this.directories.add(pic.getPicture());
-					this.orderlabels.add(pic.getOrderlabel());
-				}
+                for (MCRMetsModsPicture pic : list) {
+                    this.directories.add(pic.getPicture());
+                    this.orderlabels.add(pic.getOrderlabel());
+                }
 					
 			}
 			

@@ -254,12 +254,12 @@ public class SearchfieldsXMLMerger implements MergeProcessor {
 					
 					boolean isPresent=false;
 					String[] oldValues = baseAttr.getValue().split("\\|");
-					for(int i=0;i<oldValues.length;i++){
-						if(oldValues[i].trim().equals(value)){
-							isPresent=true;
-							break;
-						}
-					}
+                    for (String oldValue : oldValues) {
+                        if (oldValue.trim().equals(value)) {
+                            isPresent = true;
+                            break;
+                        }
+                    }
 					if(!isPresent){
 						eBaseField.setAttribute(name, baseAttr.getValue()+" | "+value);	
 					}
@@ -273,12 +273,12 @@ public class SearchfieldsXMLMerger implements MergeProcessor {
 					
 					boolean isPresent=false;
 					String[] oldValues = baseAttr.getValue().split("\\s");
-					for(int i=0;i<oldValues.length;i++){
-						if(oldValues[i].trim().equals(value)){
-							isPresent=true;
-							break;
-						}
-					}
+                    for (String oldValue : oldValues) {
+                        if (oldValue.trim().equals(value)) {
+                            isPresent = true;
+                            break;
+                        }
+                    }
 					if(!isPresent){
 						eBaseField.setAttribute(name, baseAttr.getValue()+" "+value);	
 					}

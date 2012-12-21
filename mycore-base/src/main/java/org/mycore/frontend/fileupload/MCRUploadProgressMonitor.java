@@ -521,19 +521,19 @@ public class MCRUploadProgressMonitor extends JDialog {
         int numFiles = files.length;
         long sizeTotal = 0;
 
-        for (int i = 0; i < numFiles; i++) {
-            sizeTotal += files[i].length();
+        for (File file1 : files) {
+            sizeTotal += file1.length();
         }
 
         MCRUploadProgressMonitor upm = new MCRUploadProgressMonitor(numFiles, sizeTotal, null);
 
-        for (int i = 0; i < numFiles; i++) {
+        for (File file : files) {
             if (upm.isCanceled()) {
                 break;
             }
-            upm.startFile(files[i].getName(), files[i].length());
+            upm.startFile(file.getName(), file.length());
 
-            FileInputStream fin = new FileInputStream(files[i]);
+            FileInputStream fin = new FileInputStream(file);
             byte[] buffer = new byte[65536];
             long num = 0;
 

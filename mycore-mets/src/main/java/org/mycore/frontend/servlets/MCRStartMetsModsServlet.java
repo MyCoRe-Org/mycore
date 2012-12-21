@@ -190,9 +190,9 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
         if (allowed.compareTo("") == 0)
             return false;
         MCRFilesystemNode liste[] = dir.getChildren();
-        for (int i = 0; i < liste.length; i++) {
-            if (liste[i] instanceof MCRFile) {
-                if (liste[i].getName().contains(allowed))
+        for (MCRFilesystemNode aListe : liste) {
+            if (aListe instanceof MCRFile) {
+                if (aListe.getName().contains(allowed))
                     return true;
             }
         }

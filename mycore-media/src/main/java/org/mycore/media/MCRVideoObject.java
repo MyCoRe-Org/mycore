@@ -308,9 +308,9 @@ public class MCRVideoObject extends MCRMediaObject {
 
         if ( xml.getChild("audioStreams") != null ) {
             List<Element> audioStreams = xml.getChild("audioStreams").getChildren("audiostream");
-            for ( int c=0; c < audioStreams.size(); c++ ) {
-                Element astream = (Element)audioStreams.get(c);
-                
+            for (Element audioStream : audioStreams) {
+                Element astream = (Element) audioStream;
+
                 MCRAudioObject audio = new MCRAudioObject(video);
                 MCRAudioObject.addStreamFromXML(audio, astream);
 

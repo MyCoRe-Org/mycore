@@ -478,12 +478,8 @@ public class MCREditorOutValidator {
             if (rootbool == null) {
                 continue;
             }
-            for (@SuppressWarnings("unchecked")
-            Iterator<Element> boolIt = rootbool.getChildren("boolean").iterator(); boolIt.hasNext();) {
-                Element orbool = boolIt.next();
-                for (@SuppressWarnings("unchecked")
-                Iterator<Element> condIt = orbool.getChildren("condition").iterator(); condIt.hasNext();) {
-                    Element firstcond = condIt.next();
+            for (Element orbool : (Iterable<Element>) rootbool.getChildren("boolean")) {
+                for (Element firstcond : (Iterable<Element>) orbool.getChildren("condition")) {
                     if (firstcond == null) {
                         continue;
                     }

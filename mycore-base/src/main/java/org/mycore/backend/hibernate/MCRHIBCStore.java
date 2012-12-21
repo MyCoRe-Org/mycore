@@ -88,8 +88,8 @@ public class MCRHIBCStore extends MCRContentStore {
         Session session = MCRHIBConnection.instance().getSession();
         List<MCRCSTORE> l = session.createQuery("from MCRCSTORE where storageid=" + storageID).list();
 
-        for (int t = 0; t < l.size(); t++) {
-            session.delete(l.get(t));
+        for (MCRCSTORE aL : l) {
+            session.delete(aL);
         }
     }
 

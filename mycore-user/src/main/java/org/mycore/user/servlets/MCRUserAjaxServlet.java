@@ -320,8 +320,7 @@ public class MCRUserAjaxServlet extends MCRServlet {
 
         Set<Object> idKeys = Collections.synchronizedSet(new TreeSet<Object>(idMap.keySet()));
 
-        for (Iterator<Object> iterator = idKeys.iterator(); iterator.hasNext();) {
-            Object idKey = (Object) iterator.next();
+        for (Object idKey : idKeys) {
             JsonObject user = (JsonObject) idMap.get(idKey);
 
             users.add(user);

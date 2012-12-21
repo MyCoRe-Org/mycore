@@ -214,11 +214,9 @@ public class CmdClient implements ClientType
                      List<SwordAcceptPackaging> acceptsPackaging = collection.getAcceptPackaging();
 
                      String acceptPackagingList = "";
-                     for(Iterator i = acceptsPackaging.iterator();i.hasNext();)
-                     {
-                        SwordAcceptPackaging accept = (SwordAcceptPackaging) i.next();
-                        acceptPackagingList +=  accept.getContent() + " ("+ accept.getQualityValue() +"), ";
-                     }
+                    for (SwordAcceptPackaging accept : acceptsPackaging) {
+                        acceptPackagingList += accept.getContent() + " (" + accept.getQualityValue() + "), ";
+                    }
                      System.out.println("Accepts Packaging: "+ acceptPackagingList);
 
 				}
