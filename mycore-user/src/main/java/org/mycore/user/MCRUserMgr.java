@@ -239,7 +239,7 @@ public class MCRUserMgr {
      * @param group
      *            The group object to be created
      */
-    private final synchronized void createGroupInternal(MCRGroup group) throws MCRException {
+    private synchronized void createGroupInternal(MCRGroup group) throws MCRException {
         // Check if there really is a non-null group object provided
         if (group == null) {
             throw new MCRException("The given group object is null.");
@@ -329,7 +329,7 @@ public class MCRUserMgr {
      * @param user
      *            The user object which will be created
      */
-    private final synchronized void createUserInternal(MCRUser user) throws MCRException {
+    private synchronized void createUserInternal(MCRUser user) throws MCRException {
         // Check if there really is a non-null object provided
         if (user == null) {
             throw new MCRException("The given user object is null.");
@@ -421,7 +421,7 @@ public class MCRUserMgr {
      * @param groupID
      *            The group ID which will be deleted
      */
-    private final synchronized void deleteGroupInternal(String groupID) throws MCRException {
+    private synchronized void deleteGroupInternal(String groupID) throws MCRException {
         // Check if the group exists at all
         if (!mcrUserStore.existsGroup(groupID)) {
             throw new MCRException("The group '" + groupID + "' is unknown!");
@@ -496,7 +496,7 @@ public class MCRUserMgr {
      * @param userID
      *            The user ID which will be deleted
      */
-    private final synchronized void deleteUserInternal(String userID) throws MCRException {
+    private synchronized void deleteUserInternal(String userID) throws MCRException {
         // Check if the user exists at all
         if (!mcrUserStore.existsUser(userID)) {
             throw new MCRException("User '" + userID + "' is unknown!");
@@ -1224,7 +1224,7 @@ public class MCRUserMgr {
      * @param updGroup
      *            The group object which will be updated
      */
-    private final synchronized void updateGroupInternal(MCRGroup updGroup) throws MCRException {
+    private synchronized void updateGroupInternal(MCRGroup updGroup) throws MCRException {
         // check that the updGroup is valid
         if (updGroup == null) {
             throw new MCRException("The provided group object is null!");
@@ -1392,7 +1392,7 @@ public class MCRUserMgr {
      * @param oldObject
      *            The same user object as it was before the update request.
      */
-    private final void update(MCRUser updUser, MCRUser oldUser) throws MCRException {
+    private void update(MCRUser updUser, MCRUser oldUser) throws MCRException {
         // It is important to first check whether *all* groups where the current
         // object is a new member of
         // exist at all. Furthermore it is very important that the current user
@@ -1444,7 +1444,7 @@ public class MCRUserMgr {
      * @param flag
      *            the enable/disable flag
      */
-    private final void enable(String userID, boolean flag) throws MCRException {
+    private void enable(String userID, boolean flag) throws MCRException {
         if (locked) {
             throw new MCRException("The user component is locked. At the moment write access is denied.");
         }

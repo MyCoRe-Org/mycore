@@ -354,7 +354,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            if true, object will be updated, else object is created
      * @throws MCRActiveLinkException
      */
-    private static final List<String> processFromDirectory(String directory, boolean update)
+    private static List<String> processFromDirectory(String directory, boolean update)
             throws MCRActiveLinkException {
         File dir = new File(directory);
 
@@ -453,7 +453,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    private static final boolean processFromFile(File file, boolean update, boolean importMode)
+    private static boolean processFromFile(File file, boolean update, boolean importMode)
             throws MCRActiveLinkException, MCRException, SAXParseException, IOException {
         if (!file.getName().endsWith(".xml")) {
             LOGGER.warn(file + " ignored, does not end with *.xml");
@@ -631,7 +631,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws TransformerFactoryConfigurationError
      * @throws TransformerConfigurationException
      */
-    private static final Transformer getTransformer(String style) throws TransformerFactoryConfigurationError,
+    private static Transformer getTransformer(String style) throws TransformerFactoryConfigurationError,
             TransformerConfigurationException {
         String xslfile = DEFAULT_TRANSFORMER;
         if (style != null && style.trim().length() != 0) {
@@ -690,7 +690,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    private static final boolean exportMCRObject(File dir, Transformer trans, String nid) throws FileNotFoundException,
+    private static boolean exportMCRObject(File dir, Transformer trans, String nid) throws FileNotFoundException,
             TransformerException, IOException, MCRException, SAXParseException {
         byte[] xml = null;
         try {
@@ -832,14 +832,14 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param value
      *            Value of the field
      */
-    private static final void removeFromIndex(String fieldname, String value) {
+    private static void removeFromIndex(String fieldname, String value) {
         MCRFieldDef fd = MCRFieldDef.getDef(fieldname);
         MCRSearcher searcher = getSearcherForField(fieldname);
         MCRFieldValue fv = new MCRFieldValue(fd, value);
         searcher.clearIndex(fieldname, fv.getValue());
     }
 
-    private static final MCRSearcher getSearcherForField(String fieldname) {
+    private static MCRSearcher getSearcherForField(String fieldname) {
         MCRFieldDef fd = MCRFieldDef.getDef(fieldname);
         String index = fd.getIndex();
         return MCRSearcherFactory.getSearcherForIndex(index);

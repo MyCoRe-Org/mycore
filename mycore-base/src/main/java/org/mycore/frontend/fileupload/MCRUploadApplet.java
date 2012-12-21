@@ -256,7 +256,7 @@ public class MCRUploadApplet extends JApplet {
      * @param label
      * @return translated String
      */
-    private final String translateI18N(String label) {
+    private String translateI18N(String label) {
         String result;
         Locale currentLocale = getLocale();
         try {
@@ -270,7 +270,7 @@ public class MCRUploadApplet extends JApplet {
         return result;
     }
 
-    private final Color getColorParameter(String name) {
+    private Color getColorParameter(String name) {
         String value = getParameter(name);
         if (value == null) {
             System.err.println("Did not find color parameter: " + name);

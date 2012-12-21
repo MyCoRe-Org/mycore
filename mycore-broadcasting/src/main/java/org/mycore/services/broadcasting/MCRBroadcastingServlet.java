@@ -102,7 +102,7 @@ public class MCRBroadcastingServlet extends MCRServlet {
         }
     }
 
-    private final Element getReceiverDetails(MCRSession session) {
+    private Element getReceiverDetails(MCRSession session) {
         Element details = new Element("details").addContent(new Element("login").setText(session.getUserInformation().getUserID())).addContent(
                         new Element("ip").setText(session.getCurrentIP())).addContent(new Element("session-id").setText(session.getID()));
         return details;
@@ -115,7 +115,7 @@ public class MCRBroadcastingServlet extends MCRServlet {
                 || (!session.getUserInformation().getUserID().equals("gast") && bcRecList.get(key) != null);
     }
 
-    private final static String getKey(boolean sessionSensitive, MCRSession session) {
+    private static String getKey(boolean sessionSensitive, MCRSession session) {
         if (sessionSensitive)
             return session.getUserInformation().getUserID().trim() + session.getID().trim();
         else

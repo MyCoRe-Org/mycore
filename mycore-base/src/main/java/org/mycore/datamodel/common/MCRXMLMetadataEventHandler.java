@@ -138,7 +138,7 @@ public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
         handleStoreEvent(evt, der);
     }
 
-    private final void handleStoreEvent(MCREvent evt, MCRBase obj) {
+    private void handleStoreEvent(MCREvent evt, MCRBase obj) {
         MCRBaseContent content = new MCRBaseContent(obj);
         if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
             metaDataManager.update(obj.getId(), content, obj.getService().getDate("modifydate"));

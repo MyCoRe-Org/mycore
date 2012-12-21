@@ -203,7 +203,7 @@ public class MCRNormalizer {
         return temp;
     }
 
-    private static final String doNormalize(String in) {
+    private static String doNormalize(String in) {
         in = in.toLowerCase().trim();
         for (int i = 0; i < patterns.length; i++) {
             in = patterns[i].matcher(in).replaceAll(replace[i]);

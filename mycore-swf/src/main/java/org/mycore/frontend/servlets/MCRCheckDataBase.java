@@ -235,7 +235,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
      * A method to handle valid errors.
      * @throws IOException 
      */
-    private final void errorHandlerValid(MCRServletJob job, List<String> logtext, MCRObjectID ID, String lang) throws IOException {
+    private void errorHandlerValid(MCRServletJob job, List<String> logtext, MCRObjectID ID, String lang) throws IOException {
         // handle HttpSession
         String sessionID = "";
         HttpSession session = job.getRequest().getSession(false);

@@ -284,7 +284,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
      *            the current language
      */
     @SuppressWarnings("unchecked")
-    private final void errorHandlerValid(MCRServletJob job, List<String> logtext, MCRObjectID ID, String lang) throws Exception {
+    private void errorHandlerValid(MCRServletJob job, List<String> logtext, MCRObjectID ID, String lang) throws Exception {
         if (logtext.size() == 0) {
             return;
         }

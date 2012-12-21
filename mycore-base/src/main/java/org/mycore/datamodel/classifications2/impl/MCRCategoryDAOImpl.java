@@ -502,7 +502,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         return Restrictions.naturalId().set("rootID", id.getRootID()).set("categID", id.getID());
     }
 
-    private static final MCRCategoryImpl buildCategoryFromPrefetchedList(List<MCRCategoryImpl> list) {
+    private static MCRCategoryImpl buildCategoryFromPrefetchedList(List<MCRCategoryImpl> list) {
         MCRCategoryImpl baseCat = list.iterator().next();
         int size = list.size();
         for (int i = size - 1; i >= 0; i--) {

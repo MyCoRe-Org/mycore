@@ -88,7 +88,7 @@ public class MCRObjectDerivate {
      * @param derivate
      *            a list of relevant DOM elements for the derivate
      */
-    private final void setFromDOM(org.jdom.Element derivate) {
+    private void setFromDOM(org.jdom.Element derivate) {
         // Link to Metadata part
         org.jdom.Element linkmeta_element = derivate.getChild("linkmetas").getChild("linkmeta");
         MCRMetaLinkID link = new MCRMetaLinkID();

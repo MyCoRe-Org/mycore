@@ -46,7 +46,7 @@ public class MCRXMLHelperTest extends MCRTestCase {
         assertFalse("Elements should be different", MCRXMLHelper.deepEqual(getBigElement(), getSmallElement()));
     }
 
-    private static final Element getSmallElement() {
+    private static Element getSmallElement() {
         Element elm = new Element("test");
         elm.setAttribute("j", "unit");
         elm.setAttribute("junit", "test");
@@ -54,7 +54,7 @@ public class MCRXMLHelperTest extends MCRTestCase {
         return elm;
     }
     
-    private static final Element getBigElement(){
+    private static Element getBigElement(){
         Element elm=getSmallElement();
         elm.addContent(new Element("junit"));
         return elm;

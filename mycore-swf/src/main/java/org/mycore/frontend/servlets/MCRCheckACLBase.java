@@ -247,7 +247,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
      * @param lang
      *            the current language
      */
-    private final void errorHandlerValid(MCRServletJob job, List<String> logtext, MCRObjectID ID, String lang) throws Exception {
+    private void errorHandlerValid(MCRServletJob job, List<String> logtext, MCRObjectID ID, String lang) throws Exception {
         if (logtext.size() == 0) {
             return;
         }

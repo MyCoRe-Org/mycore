@@ -587,7 +587,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the filename of the user data input
      * @return true if the file name is okay
      */
-    private static final boolean checkFilename(String filename) {
+    private static boolean checkFilename(String filename) {
         if (!filename.endsWith(".xml")) {
             LOGGER.warn(filename + " ignored, does not end with *.xml");
 
@@ -719,7 +719,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         }
     }
 
-    private static final MCRUser[] getMCRUsersFromFile(String filename) throws SAXParseException, IOException {
+    private static MCRUser[] getMCRUsersFromFile(String filename) throws SAXParseException, IOException {
         if (!checkFilename(filename)) {
             return new MCRUser[0];
         }
@@ -792,7 +792,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            a FileOutputStream object for the output
      * @throws IOException if output file can not be closed
      */
-    private static final void saveToXMLFile(Document jdomDoc, FileOutputStream outFile) throws MCRException, IOException {
+    private static void saveToXMLFile(Document jdomDoc, FileOutputStream outFile) throws MCRException, IOException {
         String mcr_encoding = CONFIG.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
 
         // Create the output

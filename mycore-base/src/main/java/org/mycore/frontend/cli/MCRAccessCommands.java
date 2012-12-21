@@ -150,7 +150,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      *            the filename of the user data input
      * @return true if the file name is okay
      */
-    private static final boolean checkFilename(String filename) {
+    private static boolean checkFilename(String filename) {
         if (!filename.endsWith(".xml")) {
             LOGGER.warn(filename + " ignored, does not end with *.xml");
 

@@ -276,7 +276,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @throws TransformerFactoryConfigurationError
      * @throws TransformerConfigurationException
      */
-    private static final Transformer getTransformer(String style) throws TransformerFactoryConfigurationError,
+    private static Transformer getTransformer(String style) throws TransformerFactoryConfigurationError,
             TransformerConfigurationException {
         String xslfile = DEFAULT_TRANSFORMER;
         if (style != null && style.trim().length() != 0) {

@@ -126,7 +126,7 @@ public class MCRQueryCommands extends MCRAbstractCommands {
     }
 
     /** Transform the results to an output using stylesheets */
-    private final static void buildOutput(MCRResults results) {
+    private static void buildOutput(MCRResults results) {
         // read stylesheet
         String xslfile = "results-commandlinequery.xsl";
         InputStream in = MCRQueryCommands.class.getResourceAsStream("/" + xslfile);

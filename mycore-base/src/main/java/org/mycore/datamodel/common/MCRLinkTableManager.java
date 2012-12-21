@@ -101,7 +101,7 @@ public class MCRLinkTableManager {
      * @return true if it is a defined type, else return false and send a
      *         warning to the logger.
      */
-    private final boolean checkType(String type) {
+    private boolean checkType(String type) {
         if (type.equals(ENTRY_TYPE_CHILD) || type.equals(ENTRY_TYPE_DERIVATE) || type.equals(ENTRY_TYPE_PARENT)
                 || type.equals(ENTRY_TYPE_REFERENCE)) {
             return true;

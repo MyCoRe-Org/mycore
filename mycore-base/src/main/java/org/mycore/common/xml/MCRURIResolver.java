@@ -161,7 +161,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         SUPPORTED_SCHEMES = Collections.unmodifiableMap(getResolverMapping());
     }
 
-    private static final MCRResolverProvider getExternalResolverProvider() {
+    private static MCRResolverProvider getExternalResolverProvider() {
         String externalClassName = MCRConfiguration.instance().getString(CONFIG_PREFIX + "ExternalResolver.Class", null);
         final MCRResolverProvider emptyResolver = new MCRResolverProvider() {
             public Map<String, MCRResolver> getResolverMapping() {

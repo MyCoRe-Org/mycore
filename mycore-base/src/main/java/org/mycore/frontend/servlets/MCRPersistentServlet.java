@@ -540,7 +540,7 @@ public class MCRPersistentServlet extends MCRServlet {
      * handles validation errors (XML Schema) and present nice pages instead of stack traces.
      * @throws IOException 
      */
-    private final void errorHandlerValid(MCRServletJob job, List<String> logtext) throws IOException {
+    private void errorHandlerValid(MCRServletJob job, List<String> logtext) throws IOException {
         // write to the log file
         for (int i = 0; i < logtext.size(); i++) {
             LOGGER.error(logtext.get(i));

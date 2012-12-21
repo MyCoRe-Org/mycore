@@ -252,7 +252,7 @@ public class MCRMetsModsApplet extends JApplet {
         return sb.toString();
     }
 
-    private final String translateI18N(String label) {
+    private String translateI18N(String label) {
         String result;
         Locale currentLocale = getLocale();
         try {

@@ -580,7 +580,7 @@ public class MCRClassificationData {
 
     // don't use it works not really good
 
-    private final Element sortMyTree(final Element xDocument) {
+    private Element sortMyTree(final Element xDocument) {
         Element xDoc = (Element) xDocument.clone();
         final Element navitree = ((Element) xDoc.getChild("navigationtree"));
         // separate
@@ -618,7 +618,7 @@ public class MCRClassificationData {
         return xDoc;
     }
 
-    private final void sortMyTreePerLevel(int von, int bis, int level, ArrayList<String> itemname, ArrayList<Integer> itemlevel,
+    private void sortMyTreePerLevel(int von, int bis, int level, ArrayList<String> itemname, ArrayList<Integer> itemlevel,
             int[] itemnum) {
         if (von == bis)
             return;

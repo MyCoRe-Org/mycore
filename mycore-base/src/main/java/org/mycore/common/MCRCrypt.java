@@ -212,7 +212,7 @@ public class MCRCrypt {
                     0x08200000, 0x08000020, 0x00208000, 0x00008020, 0x08008020, 0x08200000, 0x00000020, 0x08208000, 0x00208020, 0x00000000,
                     0x08000000, 0x08200020, 0x00008000, 0x00208020 } };
 
-    private static final int byteToUnsigned(byte b) {
+    private static int byteToUnsigned(byte b) {
         int value = b;
 
         return value >= 0 ? value : value + 256;
@@ -223,14 +223,14 @@ public class MCRCrypt {
                 | byteToUnsigned(b[offset]) << 24;
     }
 
-    private static final void intToFourBytes(int iValue, byte[] b, int offset) {
+    private static void intToFourBytes(int iValue, byte[] b, int offset) {
         b[offset++] = (byte) (iValue & 0xff);
         b[offset++] = (byte) (iValue >>> 8 & 0xff);
         b[offset++] = (byte) (iValue >>> 16 & 0xff);
         b[offset] = (byte) (iValue >>> 24 & 0xff);
     }
 
-    private static final void PERM_OP(int a, int b, int n, int m, int[] results) {
+    private static void PERM_OP(int a, int b, int n, int m, int[] results) {
         int t;
 
         t = (a >>> n ^ b) & m;
@@ -241,7 +241,7 @@ public class MCRCrypt {
         results[1] = b;
     }
 
-    private static final int HPERM_OP(int a, int n, int m) {
+    private static int HPERM_OP(int a, int n, int m) {
         int t;
 
         t = (a << 16 - n ^ a) & m;
@@ -312,7 +312,7 @@ public class MCRCrypt {
         return schedule;
     }
 
-    private static final int D_ENCRYPT(int L, int R, int S, int E0, int E1, int[] s) {
+    private static int D_ENCRYPT(int L, int R, int S, int E0, int E1, int[] s) {
         int t;
         int u;
         int v;
@@ -330,7 +330,7 @@ public class MCRCrypt {
         return L;
     }
 
-    private static final int[] body(int[] schedule, int Eswap0, int Eswap1) {
+    private static int[] body(int[] schedule, int Eswap0, int Eswap1) {
         int left = 0;
         int right = 0;
         int t = 0;

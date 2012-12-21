@@ -248,7 +248,7 @@ public class MCRObjectServlet extends MCRServlet {
         }
     }
 
-    private static final String getObjectID(HttpServletRequest request) {
+    private static String getObjectID(HttpServletRequest request) {
         // the urn with information about the MCRObjectID
         String uri = request.getPathInfo();
 
@@ -264,7 +264,7 @@ public class MCRObjectServlet extends MCRServlet {
         return pathInfo.substring(1, j);
     }
 
-    private final String getEditorID(HttpServletRequest request) {
+    private String getEditorID(HttpServletRequest request) {
         String referer = getProperty(request, "referer");
         if (referer != null) {
             return resolveEditorID(referer);

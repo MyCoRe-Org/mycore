@@ -63,7 +63,7 @@ public final class MCRWebsiteWriteProtection {
         }
     }
 
-    private final static Element getConfiguration() {
+    private static Element getConfiguration() {
         // try to get file
         File configFolder = new File(CONFIG_FOLDER_PATH);
         if (!configFolder.exists()) {
@@ -98,7 +98,7 @@ public final class MCRWebsiteWriteProtection {
         }
     }
 
-    private final static void setConfiguration(Element configXML) {
+    private static void setConfiguration(Element configXML) {
         try {
             // save
             XMLOutputter xmlOut = new XMLOutputter();
@@ -168,7 +168,7 @@ public final class MCRWebsiteWriteProtection {
      * 
      * @return true if valid, false if note
      */
-    private final static boolean cacheValid() {
+    private static boolean cacheValid() {
         return !(CONFIG_CACHE == null || CONFIG_CACHE_INITTIME < CONFIG_FILE.lastModified());
     }
 

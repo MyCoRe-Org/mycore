@@ -129,7 +129,7 @@ public class MCRZ3950Servlet extends MCRServlet {
 	   }
    }
 	    
-   private final boolean checkInputParameter(HttpServletRequest request) {
+   private boolean checkInputParameter(HttpServletRequest request) {
 	   query = request.getParameter("query");
        String type = request.getParameter("type");
 	   String cutStr = request.getParameter("cut");

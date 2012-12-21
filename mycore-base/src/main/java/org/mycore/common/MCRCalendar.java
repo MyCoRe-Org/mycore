@@ -340,7 +340,7 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static final String checkCalendarName(String calstr) {
+    private static String checkCalendarName(String calstr) {
         if (calstr == null || calstr.trim().length() == 0) {
             throw new MCRException("The calendar name is null or empty.");
         }
@@ -371,7 +371,7 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static final Calendar checkHistoryDate(String datestr, boolean last, String calstr) throws MCRException {
+    private static Calendar checkHistoryDate(String datestr, boolean last, String calstr) throws MCRException {
         Calendar out = null;
         // check datestr String
         LOGGER.debug("Input checkHistoryDate " + datestr + "  " + calstr + "  " + Boolean.toString(last));
@@ -441,7 +441,7 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static final GregorianCalendar getCalendarFromGregorianDate(String datestr, boolean last) throws MCRException {
+    private static GregorianCalendar getCalendarFromGregorianDate(String datestr, boolean last) throws MCRException {
         try {
             // look for BC
             datestr = datestr.toUpperCase();
@@ -620,7 +620,7 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static final GregorianCalendar getCalendarFromJulianDate(String datestr, boolean last) throws MCRException {
+    private static GregorianCalendar getCalendarFromJulianDate(String datestr, boolean last) throws MCRException {
         try {
             // look for v. Chr.
             datestr = datestr.toUpperCase();
@@ -831,7 +831,7 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static final IslamicCalendar getCalendarFromIslamicDate(String datestr, boolean last) {
+    private static IslamicCalendar getCalendarFromIslamicDate(String datestr, boolean last) {
         try {
             // test before Hidschra
             boolean bh = false;
@@ -989,7 +989,7 @@ public class MCRCalendar {
      *                MCRException if parsing has an error
      */
 
-    private static final HebrewCalendar getCalendarFromHebrewDate(String datestr, boolean last) {
+    private static HebrewCalendar getCalendarFromHebrewDate(String datestr, boolean last) {
         try {
             int start = 0;
             datestr = datestr.trim();
@@ -1088,7 +1088,7 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static final CopticCalendar getCalendarFromCopticDate(String datestr, boolean last) {
+    private static CopticCalendar getCalendarFromCopticDate(String datestr, boolean last) {
         try {
             datestr = datestr.trim();
             // test before Martyrium
@@ -1228,7 +1228,7 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static final JapaneseCalendar getCalendarFromJapaneseDate(String datestr, boolean last) {
+    private static JapaneseCalendar getCalendarFromJapaneseDate(String datestr, boolean last) {
         try {
             datestr = datestr.trim();
 
@@ -1354,7 +1354,7 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static final EthiopicCalendar getCalendarFromEthiopicDate(String datestr, boolean last) {
+    private static EthiopicCalendar getCalendarFromEthiopicDate(String datestr, boolean last) {
         try {
             datestr = datestr.trim();
             // test before Christi
@@ -1484,7 +1484,7 @@ public class MCRCalendar {
      *                MCRException if parsing has an error
      */
 
-    private static final BuddhistCalendar getCalendarFromBuddhistDate(String datestr, boolean last) {
+    private static BuddhistCalendar getCalendarFromBuddhistDate(String datestr, boolean last) {
         try {
             datestr = datestr.trim();
             // test before Buddhas
@@ -1620,7 +1620,7 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static final GregorianCalendar getCalendarFromPersicDate(String datestr, boolean last) {
+    private static GregorianCalendar getCalendarFromPersicDate(String datestr, boolean last) {
         try {
             datestr = datestr.trim();
             // test before
@@ -1796,7 +1796,7 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static final GregorianCalendar getCalendarFromArmenianDate(String datestr, boolean last) {
+    private static GregorianCalendar getCalendarFromArmenianDate(String datestr, boolean last) {
         try {
             datestr = datestr.trim();
             // test before
@@ -1964,7 +1964,7 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static final GregorianCalendar getCalendarFromEgyptianDate(String datestr, boolean last) {
+    private static GregorianCalendar getCalendarFromEgyptianDate(String datestr, boolean last) {
         try {
             datestr = datestr.trim();
             // test before

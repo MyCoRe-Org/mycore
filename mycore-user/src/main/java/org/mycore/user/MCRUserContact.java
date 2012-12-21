@@ -205,7 +205,7 @@ public class MCRUserContact {
     /**
      * This method initializes this object with empty attributes.
      */
-    private final void init() {
+    private void init() {
         salutation = "";
         firstname = "";
         lastname = "";

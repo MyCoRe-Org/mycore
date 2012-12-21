@@ -590,7 +590,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            The XML access condition from the ACL system
      */
     @SuppressWarnings("unchecked")
-    private final org.jdom.Element normalizeACLforSWF(org.jdom.Element ruleelm) {
+    private org.jdom.Element normalizeACLforSWF(org.jdom.Element ruleelm) {
         if (LOGGER.isDebugEnabled()) {
             try {
                 MCRUtils.writeElementToSysout(ruleelm);

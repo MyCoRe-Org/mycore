@@ -679,7 +679,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @param thisnode
      *            a IFS nod (file or directory)
      */
-    private static final void doForChildren(MCRFilesystemNode thisnode) {
+    private static void doForChildren(MCRFilesystemNode thisnode) {
         if (thisnode instanceof MCRDirectory) {
             MCRFilesystemNode[] childnodes = ((MCRDirectory) thisnode).getChildren();
             for (MCRFilesystemNode childnode : childnodes) {

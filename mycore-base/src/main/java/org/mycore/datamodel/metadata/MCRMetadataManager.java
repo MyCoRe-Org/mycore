@@ -691,7 +691,7 @@ public final class MCRMetadataManager {
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
      */
-    private static final void updateInheritedMetadata(final MCRObjectID childId) throws MCRPersistenceException {
+    private static void updateInheritedMetadata(final MCRObjectID childId) throws MCRPersistenceException {
         LOGGER.debug("Update metadata from Child " + childId);
         final MCRObject child = MCRMetadataManager.retrieveMCRObject(childId);
         try {

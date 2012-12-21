@@ -180,7 +180,7 @@ public class MCRObjectService {
         return isoDate.getDate();
     }
 
-    private final MCRMetaISO8601Date getISO8601Date(String type) {
+    private MCRMetaISO8601Date getISO8601Date(String type) {
         if (type == null || type.length() == 0) {
             return null;
         }
@@ -239,7 +239,7 @@ public class MCRObjectService {
      * @param date
      *            set time to this Calendar
      */
-    private final void setDate(MCRMetaISO8601Date date) {
+    private void setDate(MCRMetaISO8601Date date) {
         MCRMetaISO8601Date d = getISO8601Date(date.getType()); //search date in ArrayList
 
         if (d == null) {
