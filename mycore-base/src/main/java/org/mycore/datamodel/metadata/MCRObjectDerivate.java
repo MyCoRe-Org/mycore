@@ -232,29 +232,8 @@ public class MCRObjectDerivate {
         if (file == null) {
             throw new NullPointerException("file may not be null");
         }
-        int fileCount = files.size();
         String path = file.getAbsolutePath();
-        for (int i = 0; i < fileCount; i++) {
-            MCRFileMetadata fileMetadata = files.get(i);
-            int compare = fileMetadata.getName().compareTo(path);
-            if (compare < 0) {
-                continue;
-            } else if (compare == 0) {
-                return fileMetadata;
-            } else {
-                //we need to create entry here
-                MCRFileMetadata newFileMetadata = new MCRFileMetadata(path, null, null);
-                files.add(i, newFileMetadata);
-                return newFileMetadata;
-            }
-        }
-        //add path to end of list;
-        if (files.isEmpty()) {
-            files = new ArrayList<MCRFileMetadata>();
-        }
-        MCRFileMetadata newFileMetadata = new MCRFileMetadata(path, null, null);
-        files.add(newFileMetadata);
-        return newFileMetadata;
+        return getOrCreateFileMetadata(path);
     }
 
     public final MCRFileMetadata getOrCreateFileMetadata(String path) {
@@ -265,11 +244,9 @@ public class MCRObjectDerivate {
         for (int i = 0; i < fileCount; i++) {
             MCRFileMetadata fileMetadata = files.get(i);
             int compare = fileMetadata.getName().compareTo(path);
-            if (compare < 0) {
-                continue;
-            } else if (compare == 0) {
+            if (compare == 0) {
                 return fileMetadata;
-            } else {
+            } else if (compare > 0) {
                 //we need to create entry here
                 MCRFileMetadata newFileMetadata = createFileMetadata(path);
                 files.add(i, newFileMetadata);
@@ -303,11 +280,11 @@ public class MCRObjectDerivate {
      * @param path {@link MCRFile#getAbsolutePath()}
      * @return true if metadata was deleted and false if file has no metadata.
      */
-    public boolean deleteFileMetaData(String path){
-        Iterator<MCRFileMetadata> it=files.iterator();
-        while (it.hasNext()){
-            MCRFileMetadata metadata=it.next();
-            if (metadata.getName().equals(path)){
+    public boolean deleteFileMetaData(String path) {
+        Iterator<MCRFileMetadata> it = files.iterator();
+        while (it.hasNext()) {
+            MCRFileMetadata metadata = it.next();
+            if (metadata.getName().equals(path)) {
                 it.remove();
                 return true;
             }
