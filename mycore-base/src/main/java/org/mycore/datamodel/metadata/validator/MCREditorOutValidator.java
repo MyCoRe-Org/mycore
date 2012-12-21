@@ -467,9 +467,7 @@ public class MCREditorOutValidator {
         if (acls == null) {
             return;
         }
-        for (@SuppressWarnings("unchecked")
-        Iterator<Element> it = acls.getChildren().iterator(); it.hasNext();) {
-            Element acl = it.next();
+        for (Element acl : (Iterable<Element>) acls.getChildren()) {
             Element condition = acl.getChild("condition");
             if (condition == null) {
                 continue;

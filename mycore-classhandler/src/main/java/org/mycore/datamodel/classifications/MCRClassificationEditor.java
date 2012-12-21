@@ -478,7 +478,7 @@ public class MCRClassificationEditor {
 
             if (parent != null) {
                 Map<MCRCategoryID, Boolean> linkMap = getClassificationPool().hasLinks(categToDelete);
-                if (!linkMap.get(categToDelete.getId()).booleanValue()) {
+                if (!linkMap.get(categToDelete.getId())) {
                     parent.getChildren().remove(categToDelete);
                     getClassificationPool().updateClassification(classif);
                     String sessionID = MCRSessionMgr.getCurrentSession().getID();

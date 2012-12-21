@@ -214,8 +214,8 @@ public class MCREditorServlet extends MCRServlet {
     private static Element getTargetParameters(Map parameters) {
         Element tps = new Element("target-parameters");
 
-        for (Iterator parameterNames = parameters.keySet().iterator(); parameterNames.hasNext();) {
-            String parameterName = (String) parameterNames.next();
+        for (Object o : parameters.keySet()) {
+            String parameterName = (String) o;
             String[] parameterValues = (String[]) parameters.get(parameterName);
 
             if (parameterValues == null)

@@ -137,7 +137,7 @@ public class Client implements SWORDClient {
 	public Client() {
 		client = new DefaultHttpClient();
 		client.getParams().setParameter("http.socket.timeout",
-				new Integer(DEFAULT_TIMEOUT));
+                DEFAULT_TIMEOUT);
 		HttpHost proxy = (HttpHost) client.getParams().getParameter(ConnRoutePNames.DEFAULT_PROXY);
 		if (proxy != null) {
 		    
@@ -239,7 +239,7 @@ public class Client implements SWORDClient {
 	 */
 	public void setSocketTimeout(int milliseconds) {
 		client.getParams().setParameter("http.socket.timeout",
-				new Integer(milliseconds));
+                milliseconds);
 	}
 
 	/**
@@ -280,7 +280,7 @@ public class Client implements SWORDClient {
 			// Try relative URL
 			URL baseURL = null;
 			try {
-				baseURL = new URL("http", server, Integer.valueOf(port), "/");
+				baseURL = new URL("http", server, port, "/");
 				serviceDocURL = new URL(baseURL, (url == null) ? "" : url);
 			} catch (MalformedURLException e1) {
 				// No dice, can't even form base URL...

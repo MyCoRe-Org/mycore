@@ -208,12 +208,12 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     @Test
     public void hasLinks() {
         MCRCategoryImpl germany = (MCRCategoryImpl) category.getChildren().get(0).getChildren().get(0);
-        assertFalse("Classification should not be in use", SERVICE.hasLinks(category).get(category.getId()).booleanValue());
-        assertFalse("Category should not be in use", SERVICE.hasLinks(germany).get(germany.getId()).booleanValue());
+        assertFalse("Classification should not be in use", SERVICE.hasLinks(category).get(category.getId()));
+        assertFalse("Category should not be in use", SERVICE.hasLinks(germany).get(germany.getId()));
         addTestLinks();
         startNewTransaction();
-        assertTrue("Classification should be in use", SERVICE.hasLinks(category).get(category.getId()).booleanValue());
-        assertTrue("Category should be in use", SERVICE.hasLinks(germany).get(germany.getId()).booleanValue());
+        assertTrue("Classification should be in use", SERVICE.hasLinks(category).get(category.getId()));
+        assertTrue("Category should be in use", SERVICE.hasLinks(germany).get(germany.getId()));
     }
 
     @Test

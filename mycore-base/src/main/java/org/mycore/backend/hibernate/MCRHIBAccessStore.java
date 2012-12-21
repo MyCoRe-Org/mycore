@@ -201,8 +201,8 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         ArrayList<String> ret = new ArrayList<String>();
 
         List<MCRACCESS> l = session.createQuery("from MCRACCESS where ACPOOL = '" + pool + "'").list();
-        for (int i = 0; i < l.size(); i++) {
-            ret.add((l.get(i)).getKey().getObjid());
+        for (MCRACCESS aL : l) {
+            ret.add(aL.getKey().getObjid());
         }
 
         return ret;
@@ -215,8 +215,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         Session session = MCRHIBConnection.instance().getSession();
         ArrayList<String> ret = new ArrayList<String>();
         List<MCRACCESS> l = session.createQuery("from MCRACCESS where OBJID = '" + objid + "'").list();
-        for (int i = 0; i < l.size(); i++) {
-            MCRACCESS access = l.get(i);
+        for (MCRACCESS access : l) {
             ret.add(access.getKey().getAcpool());
         }
 
@@ -230,9 +229,9 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         ArrayList<String> ret = new ArrayList<String>();
         Session session = MCRHIBConnection.instance().getSession();
         List<MCRACCESS> l = session.createCriteria(MCRACCESS.class).list();
-        for (int i = 0; i < l.size(); i++) {
-            if (!ret.contains((l.get(i)).getKey().getAcpool())) {
-                ret.add((l.get(i)).getKey().getAcpool());
+        for (MCRACCESS aL : l) {
+            if (!ret.contains(aL.getKey().getAcpool())) {
+                ret.add(aL.getKey().getAcpool());
             }
         }
         return ret;

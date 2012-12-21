@@ -108,8 +108,8 @@ public class MCROAIDataProvider extends MCRServlet {
     @SuppressWarnings("rawtypes")
     protected void logRequest(HttpServletRequest req) {
         StringBuilder log = new StringBuilder(this.getServletName());
-        for (Iterator it = req.getParameterMap().keySet().iterator(); it.hasNext();) {
-            String name = (String) it.next();
+        for (Object o : req.getParameterMap().keySet()) {
+            String name = (String) o;
             for (String value : req.getParameterValues(name))
                 log.append(" ").append(name).append("=").append(value);
         }

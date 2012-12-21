@@ -113,8 +113,8 @@ public class MCREditorSubmission {
 
         LinkedHashMap<String, String> table = new LinkedHashMap<String, String>();
 
-        for (int i = 0; i < children.size(); i++) {
-            Element var = (Element) children.get(i);
+        for (Object aChildren : children) {
+            Element var = (Element) aChildren;
             String path = var.getAttributeValue("name");
             String value = var.getAttributeValue("value");
 
@@ -123,8 +123,8 @@ public class MCREditorSubmission {
             }
         }
 
-        for (int i = 0; i < submitted.size(); i++) {
-            MCREditorVariable var = (MCREditorVariable) submitted.get(i);
+        for (Object aSubmitted : submitted) {
+            MCREditorVariable var = (MCREditorVariable) aSubmitted;
             String path = var.getPath();
             String value = var.getValue();
             path = varpath + path.substring(root.length());
@@ -144,8 +144,8 @@ public class MCREditorSubmission {
         Element input = editor.getChild("input");
         List children = input.getChildren();
 
-        for (int i = 0; i < children.size(); i++) {
-            Element var = (Element) children.get(i);
+        for (Object aChildren : children) {
+            Element var = (Element) aChildren;
             String path = var.getAttributeValue("name");
             String value = var.getAttributeValue("value");
             addVariable(path, value);
@@ -178,8 +178,8 @@ public class MCREditorSubmission {
         setVariablesFromXML(prefix, key, element, predecessors);
 
         List attributes = element.getAttributes();
-        for (int i = 0; i < attributes.size(); i++) {
-            Attribute attribute = (Attribute) attributes.get(i);
+        for (Object attribute1 : attributes) {
+            Attribute attribute = (Attribute) attribute1;
             String name = getNamespacePrefix(attribute.getNamespace()) + attribute.getName();
             String value = attribute.getValue().replace(BLANK, BLANK_ESCAPED).replace(SLASH, SLASH_ESCAPED);
             if (value == null || value.length() == 0) {
@@ -195,9 +195,9 @@ public class MCREditorSubmission {
     private void setVariablesFromXML(String prefix, String key, Element element, Hashtable predecessors) {
         int pos = 1;
         if (predecessors.containsKey(key)) {
-            pos = ((Integer) predecessors.get(key)).intValue() + 1;
+            pos = (Integer) predecessors.get(key) + 1;
         }
-        predecessors.put(key, new Integer(pos));
+        predecessors.put(key, pos);
 
         String path = prefix + "/" + key;
         if (pos > 1) {
@@ -209,8 +209,8 @@ public class MCREditorSubmission {
 
         // Add value of all attributes
         List attributes = element.getAttributes();
-        for (int i = 0; i < attributes.size(); i++) {
-            Attribute attribute = (Attribute) attributes.get(i);
+        for (Object attribute1 : attributes) {
+            Attribute attribute = (Attribute) attribute1;
             String value = attribute.getValue();
             if (value != null && value.length() > 0) {
                 addVariable(path + "/@" + getNamespacePrefix(attribute.getNamespace()) + attribute.getName(), value);
@@ -220,8 +220,8 @@ public class MCREditorSubmission {
         // Add values of all children
         predecessors = new Hashtable();
         List children = element.getChildren();
-        for (int i = 0; i < children.size(); i++) {
-            Element child = (Element) children.get(i);
+        for (Object aChildren : children) {
+            Element child = (Element) aChildren;
             setVariablesFromXML(path, child, predecessors);
         }
     }
@@ -390,8 +390,8 @@ public class MCREditorSubmission {
                 values[0] = "";
             }
 
-            for (int i = 0; i < conditions.size(); i++) {
-                Element condition = (Element) conditions.get(i);
+            for (Object condition1 : conditions) {
+                Element condition = (Element) condition1;
 
                 boolean ok = true;
                 for (int j = 0; j < values.length && ok; j++) {
@@ -556,8 +556,8 @@ public class MCREditorSubmission {
     Element buildInputElements() {
         Element input = new Element("input");
 
-        for (int i = 0; i < variables.size(); i++) {
-            MCREditorVariable var = (MCREditorVariable) variables.get(i);
+        for (Object variable : variables) {
+            MCREditorVariable var = (MCREditorVariable) variable;
             input.addContent(var.asInputElement());
         }
 
@@ -567,8 +567,8 @@ public class MCREditorSubmission {
     Element buildRepeatElements() {
         Element eRepeats = new Element("repeats");
 
-        for (int i = 0; i < repeats.size(); i++) {
-            MCREditorVariable var = (MCREditorVariable) repeats.get(i);
+        for (Object repeat : repeats) {
+            MCREditorVariable var = (MCREditorVariable) repeat;
             eRepeats.addContent(var.asRepeatElement());
         }
 
@@ -612,8 +612,8 @@ public class MCREditorSubmission {
             root = buildElement(rootName.replace("/", ""));
         }
 
-        for (int i = 0; i < variables.size(); i++) {
-            MCREditorVariable var = (MCREditorVariable) variables.get(i);
+        for (Object variable : variables) {
+            MCREditorVariable var = (MCREditorVariable) variable;
 
             Element parent = root;
             String[] elements = var.getPathElements();
@@ -763,16 +763,16 @@ public class MCREditorSubmission {
 
         List children = element.getChildren();
 
-        for (int i = 0; i < children.size(); i++) {
-            renameRepeatedElements((Element) children.get(i));
+        for (Object aChildren : children) {
+            renameRepeatedElements((Element) aChildren);
         }
     }
 
     private void setRepeatsFromVariables() {
         Hashtable maxtable = new Hashtable();
 
-        for (int i = 0; i < variables.size(); i++) {
-            MCREditorVariable var = (MCREditorVariable) variables.get(i);
+        for (Object variable : variables) {
+            MCREditorVariable var = (MCREditorVariable) variable;
             String[] path = var.getPathElements();
             String prefix = "/" + path[0];
 
@@ -861,8 +861,8 @@ public class MCREditorSubmission {
         String prefix1 = prefix + (nr > 2 ? "[" + String.valueOf(nr - 1) + "]" : "");
         String prefix2 = prefix + "[" + String.valueOf(nr) + "]";
 
-        for (int i = 0; i < variables.size(); i++) {
-            MCREditorVariable var = (MCREditorVariable) variables.get(i);
+        for (Object variable : variables) {
+            MCREditorVariable var = (MCREditorVariable) variable;
             String path = var.getPath();
 
             if (path.startsWith(prefix1 + "/") || path.equals(prefix1)) {
@@ -874,8 +874,8 @@ public class MCREditorSubmission {
             }
         }
 
-        for (int i = 0; i < repeats.size(); i++) {
-            MCREditorVariable var = (MCREditorVariable) repeats.get(i);
+        for (Object repeat : repeats) {
+            MCREditorVariable var = (MCREditorVariable) repeat;
             String path = var.getPath();
 
             if (path.startsWith(prefix1 + "/")) {
@@ -889,8 +889,8 @@ public class MCREditorSubmission {
     }
 
     void changeRepeatNumber(String prefix, int change) {
-        for (int i = 0; i < repeats.size(); i++) {
-            MCREditorVariable var = (MCREditorVariable) repeats.get(i);
+        for (Object repeat : repeats) {
+            MCREditorVariable var = (MCREditorVariable) repeat;
 
             if (var.getPath().equals(prefix)) {
                 int value = Integer.parseInt(var.getValue()) + change;
@@ -911,8 +911,8 @@ public class MCREditorSubmission {
         list.addAll(variables);
         list.addAll(repeats);
 
-        for (int i = 0; i < list.size(); i++) {
-            MCREditorVariable var = (MCREditorVariable) list.get(i);
+        for (Object aList : list) {
+            MCREditorVariable var = (MCREditorVariable) aList;
             String path = var.getPath();
 
             if (!path.startsWith(prefix + "[")) {

@@ -64,8 +64,7 @@ public class MCRFieldDef {
         @SuppressWarnings("unchecked")
         List<Element> children = def.getChildren("index", MCRConstants.MCR_NAMESPACE);
 
-        for (int i = 0; i < children.size(); i++) {
-            Element index = children.get(i);
+        for (Element index : children) {
             String id = index.getAttributeValue("id");
 
             @SuppressWarnings("unchecked")

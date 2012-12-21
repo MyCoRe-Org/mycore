@@ -90,19 +90,19 @@ public abstract class MCRRedundancyAbstractMapGenerator {
         List<XPath> xpathList = typeData.getXPathCompareList();
         if(xpathList != null && xpathList.size() > 0) {
             Document doc = MCRXMLMetadataManager.instance().retrieveXML(MCRObjectID.getInstance(mcrHit.getID()));
-            for(int i = 0; i < xpathList.size(); i++) {
+            for (XPath aXpathList : xpathList) {
                 try {
-                    Object o = xpathList.get(i).selectSingleNode(doc);
+                    Object o = aXpathList.selectSingleNode(doc);
                     String value = null;
                     if (o instanceof Attribute)
                         value = ((Attribute) o).getValue();
                     else if (o instanceof Text)
                         value = ((Text) o).getText();
-                    else if(o != null)
+                    else if (o != null)
                         value = o.toString();
-                    compareCriteriaValues.put(xpathList.get(i).getXPath(), compareStringFormatter.format(value));
+                    compareCriteriaValues.put(aXpathList.getXPath(), compareStringFormatter.format(value));
                 } catch (JDOMException jdomExc) {
-                    LOGGER.error("Couldnt parse xpath expression " + xpathList.get(i)
+                    LOGGER.error("Couldnt parse xpath expression " + aXpathList
                             + " while creating compare criterias for mcr object " + mcrHit.getID(), jdomExc);
                 }
             }

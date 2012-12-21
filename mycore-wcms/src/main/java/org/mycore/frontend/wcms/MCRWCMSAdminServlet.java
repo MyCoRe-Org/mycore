@@ -225,9 +225,9 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
         Element templates = new Element("templates");
         Element contentTemp = new Element("content");
 
-        for (int i = 0; i < contentTemplates.length; i++) {
-            if (!contentTemplates[i].isDirectory()) {
-                contentTemp.addContent(new Element("template").setText(contentTemplates[i].getName()));
+        for (File contentTemplate : contentTemplates) {
+            if (!contentTemplate.isDirectory()) {
+                contentTemp.addContent(new Element("template").setText(contentTemplate.getName()));
             }
         }
 

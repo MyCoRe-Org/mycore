@@ -258,8 +258,7 @@ public class MCRHit {
             Element eSort = new Element("sortData", MCRConstants.MCR_NAMESPACE);
             eHit.addContent(eSort);
 
-            for (int i = 0; i < sortData.size(); i++) {
-                MCRFieldValue fv = sortData.get(i);
+            for (MCRFieldValue fv : sortData) {
                 eSort.addContent(fv.buildXML());
             }
         }
@@ -309,8 +308,8 @@ public class MCRHit {
         Element eSort = xml.getChild("sortData", MCRConstants.MCR_NAMESPACE);
         if (eSort != null) {
             List children = eSort.getChildren();
-            for (Iterator it = children.iterator(); it.hasNext();) {
-                Element child = (Element) it.next();
+            for (Object aChildren : children) {
+                Element child = (Element) aChildren;
                 hit.addSortData(MCRFieldValue.parseXML(child));
             }
         }
@@ -320,8 +319,8 @@ public class MCRHit {
             Element md = (Element) itm.next();
             List children = md.getChildren();
 
-            for (Iterator it = children.iterator(); it.hasNext();) {
-                Element child = (Element) it.next();
+            for (Object aChildren : children) {
+                Element child = (Element) aChildren;
                 hit.addMetaData(MCRFieldValue.parseXML(child));
             }
             if (itm.hasNext()) {

@@ -89,8 +89,8 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
         try {
             List extensions = xRules.getChildren("extension");
 
-            for (int i = 0; i < extensions.size(); i++) {
-                Element elem = (Element) extensions.get(i);
+            for (Object extension : extensions) {
+                Element elem = (Element) extension;
 
                 double score = elem.getAttribute("score").getDoubleValue();
                 String ext = elem.getTextTrim();
@@ -100,8 +100,8 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
 
             List patterns = xRules.getChildren("pattern");
 
-            for (int i = 0; i < patterns.size(); i++) {
-                Element elem = (Element) patterns.get(i);
+            for (Object pattern1 : patterns) {
+                Element elem = (Element) pattern1;
 
                 double score = elem.getAttribute("score").getDoubleValue();
                 int offset = elem.getAttribute("offset").getIntValue();
@@ -113,8 +113,8 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
 
             List doctypes = xRules.getChildren("doctype");
 
-            for (int i = 0; i < doctypes.size(); i++) {
-                Element elem = (Element) doctypes.get(i);
+            for (Object doctype1 : doctypes) {
+                Element elem = (Element) doctype1;
 
                 double score = elem.getAttribute("score").getDoubleValue();
                 String doctype = elem.getTextTrim();
@@ -124,8 +124,8 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
 
             List strings = xRules.getChildren("string");
 
-            for (int i = 0; i < strings.size(); i++) {
-                Element elem = (Element) strings.get(i);
+            for (Object string1 : strings) {
+                Element elem = (Element) string1;
 
                 double score = elem.getAttribute("score").getDoubleValue();
                 String string = elem.getTextTrim();

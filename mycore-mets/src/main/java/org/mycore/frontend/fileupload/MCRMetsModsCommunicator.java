@@ -49,8 +49,7 @@ public class MCRMetsModsCommunicator {
     protected long countTotalBytes(Vector files) {
         long total = 0;
 
-        for (int i = 0; i < files.size(); i++)
-            total += ((File) files.get(i)).length();
+        for (Object file : files) total += ((File) file).length();
 
         return total;
     }
@@ -160,8 +159,8 @@ public class MCRMetsModsCommunicator {
             return list;
         }
 
-        for (int i = 0; i < selectedFiles.length; i++) {
-            File f = selectedFiles[i];
+        for (File selectedFile : selectedFiles) {
+            File f = selectedFile;
 
             if (!f.exists()) {
                 throw new FileNotFoundException("Datei oder Verzeichnis " + f.getPath() + " nicht gefunden!");
@@ -294,7 +293,7 @@ public class MCRMetsModsCommunicator {
             if (clname.equals(String.class.getName())) {
                 value = dis.readUTF();
             } else if (clname.equals(Integer.class.getName())) {
-                value = new Integer(dis.readInt());
+                value = dis.readInt();
             } else {
                 value = dis.readUTF();
             }
@@ -330,8 +329,8 @@ public class MCRMetsModsCommunicator {
         byte[] bytes = digest.digest();
         StringBuilder sb = new StringBuilder();
 
-        for (int i = 0; i < bytes.length; i++) {
-            String sValue = "0" + Integer.toHexString(bytes[i]);
+        for (byte aByte : bytes) {
+            String sValue = "0" + Integer.toHexString(aByte);
             sb.append(sValue.substring(sValue.length() - 2));
         }
 

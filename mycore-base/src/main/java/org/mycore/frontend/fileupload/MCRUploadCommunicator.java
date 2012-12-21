@@ -115,8 +115,8 @@ public class MCRUploadCommunicator {
     protected long countTotalBytes(Vector files) {
         long total = 0;
 
-        for (int i = 0; i < files.size(); i++) {
-            total += ((File) files.get(i)).length();
+        for (Object file : files) {
+            total += ((File) file).length();
         }
 
         return total;
@@ -395,7 +395,7 @@ public class MCRUploadCommunicator {
             if (clname.equals(String.class.getName())) {
                 value = dis.readUTF();
             } else if (clname.equals(Integer.class.getName())) {
-                value = new Integer(dis.readInt());
+                value = dis.readInt();
             } else {
                 value = dis.readUTF();
             }

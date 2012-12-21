@@ -292,8 +292,8 @@ public class MCRObjectService {
     public final String getFlags() {
         StringBuilder sb = new StringBuilder("");
 
-        for (int i = 0; i < flags.size(); i++) {
-            sb.append(flags.get(i).getText()).append(" ");
+        for (MCRMetaLangText flag : flags) {
+            sb.append(flag.getText()).append(" ");
         }
 
         return sb.toString();
@@ -381,8 +381,8 @@ public class MCRObjectService {
             return false;
         }
 
-        for (int i = 0; i < flags.size(); i++) {
-            if (flags.get(i).getText().equals(value)) {
+        for (MCRMetaLangText flag : flags) {
+            if (flag.getText().equals(value)) {
                 return true;
             }
         }
@@ -585,8 +585,8 @@ public class MCRObjectService {
             org.jdom.Element elmm = new org.jdom.Element("servdates");
             elmm.setAttribute("class", "MCRMetaISO8601Date");
 
-            for (int i = 0; i < dates.size(); i++) {
-                elmm.addContent(dates.get(i).createXML());
+            for (MCRMetaISO8601Date date : dates) {
+                elmm.addContent(date.createXML());
             }
 
             elm.addContent(elmm);
@@ -596,8 +596,8 @@ public class MCRObjectService {
             org.jdom.Element elmm = new org.jdom.Element("servacls");
             elmm.setAttribute("class", "MCRMetaAccessRule");
 
-            for (int i = 0; i < rules.size(); i++) {
-                elmm.addContent(rules.get(i).createXML());
+            for (MCRMetaAccessRule rule : rules) {
+                elmm.addContent(rule.createXML());
             }
 
             elm.addContent(elmm);
@@ -607,8 +607,8 @@ public class MCRObjectService {
             org.jdom.Element elmm = new org.jdom.Element("servflags");
             elmm.setAttribute("class", "MCRMetaLangText");
 
-            for (int i = 0; i < flags.size(); i++) {
-                elmm.addContent(flags.get(i).createXML());
+            for (MCRMetaLangText flag : flags) {
+                elmm.addContent(flag.createXML());
             }
 
             elm.addContent(elmm);

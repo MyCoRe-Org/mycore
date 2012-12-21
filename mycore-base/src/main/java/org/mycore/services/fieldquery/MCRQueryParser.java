@@ -300,8 +300,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
             }
 
             MCRAndCondition<Object> ac = new MCRAndCondition<Object>();
-            for (int i = 0; i < values.size(); i++) {
-                String value = values.get(i);
+            for (String value : values) {
                 if (value.startsWith("'")) {
                     ac.addChild(new MCRQueryCondition(qc.getField(), "phrase", value.substring(1, value.length() - 1)));
                 } else if (value.startsWith("-'")) {

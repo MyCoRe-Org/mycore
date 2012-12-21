@@ -361,10 +361,10 @@ public class MCRUserCommands extends MCRAbstractCommands {
             List<Element> listelm = rootelm.getChildren(); // the <user>
             // elements
 
-            for (int i = 0; i < listelm.size(); i++) {
+            for (Element aListelm : listelm) {
                 // Get the passwords, encrypt and write it back into the
                 // document
-                Element elm = (Element) listelm.get(i);
+                Element elm = (Element) aListelm;
                 String passwd = elm.getChildTextTrim("user.password");
                 String encryptedPasswd = MCRCrypt.crypt(passwd);
                 elm.getChild("user.password").setText(encryptedPasswd);
@@ -534,9 +534,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
         sb.append("       group=").append(group.getID());
         LOGGER.info(sb.toString());
         ArrayList<String> ar = group.getMemberUserIDs();
-        for (int i = 0; i < ar.size(); i++) {
+        for (String anAr : ar) {
             sb = new StringBuffer();
-            sb.append("          user in this group=").append((String) ar.get(i));
+            sb.append("          user in this group=").append((String) anAr);
             LOGGER.info(sb.toString());
         }
         LOGGER.info("");
@@ -646,8 +646,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
             @SuppressWarnings("unchecked")
             List<Element> listelm = rootelm.getChildren();
 
-            for (int i = 0; i < listelm.size(); i++) {
-                MCRGroup g = new MCRGroup((Element) listelm.get(i));
+            for (Element aListelm : listelm) {
+                MCRGroup g = new MCRGroup((Element) aListelm);
                 if (!mcrUserMgr.existGroup(g.getID())) {
                     MCRUserMgr.instance().createGroup(g);
                 } else {

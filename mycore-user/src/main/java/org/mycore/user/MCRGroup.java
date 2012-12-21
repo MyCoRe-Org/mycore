@@ -206,8 +206,7 @@ public class MCRGroup extends MCRUserObject {
             @SuppressWarnings("unchecked")
             List<Element> adminIDList = adminElement.getChildren();
 
-            for (int j = 0; j < adminIDList.size(); j++) {
-                Element newID = adminIDList.get(j);
+            for (Element newID : adminIDList) {
                 String id = trim(newID.getTextTrim(), id_len);
 
                 if (newID.getName().equals("admins.userID")) {
@@ -232,8 +231,7 @@ public class MCRGroup extends MCRUserObject {
             @SuppressWarnings("unchecked")
             List<Element> memberIDList = memberElement.getChildren();
 
-            for (int j = 0; j < memberIDList.size(); j++) {
-                Element newID = memberIDList.get(j);
+            for (Element newID : memberIDList) {
                 String id = trim(newID.getTextTrim(), id_len);
 
                 if (newID.getName().equals("members.userID")) {
@@ -459,20 +457,20 @@ public class MCRGroup extends MCRUserObject {
         Element members = new Element("group.members");
 
         // Loop over all administrator user IDs
-        for (int i = 0; i < admUserIDs.size(); i++) {
-            Element admUserID = new Element("admins.userID").setText(admUserIDs.get(i));
+        for (String admUserID1 : admUserIDs) {
+            Element admUserID = new Element("admins.userID").setText(admUserID1);
             admins.addContent(admUserID);
         }
 
         // Loop over all administrator group IDs
-        for (int i = 0; i < admGroupIDs.size(); i++) {
-            Element admGroupID = new Element("admins.groupID").setText(admGroupIDs.get(i));
+        for (String admGroupID1 : admGroupIDs) {
+            Element admGroupID = new Element("admins.groupID").setText(admGroupID1);
             admins.addContent(admGroupID);
         }
 
         // Loop over all user IDs (members of this group!)
-        for (int i = 0; i < mbrUserIDs.size(); i++) {
-            Element mbrUserID = new Element("members.userID").setText(mbrUserIDs.get(i));
+        for (String mbrUserID1 : mbrUserIDs) {
+            Element mbrUserID = new Element("members.userID").setText(mbrUserID1);
             members.addContent(mbrUserID);
         }
 
@@ -489,16 +487,16 @@ public class MCRGroup extends MCRUserObject {
     public final void debug() {
         debugDefault();
 
-        for (int i = 0; i < admGroupIDs.size(); i++) {
-            logger.debug("admGroupIDs        = " + admGroupIDs.get(i));
+        for (String admGroupID : admGroupIDs) {
+            logger.debug("admGroupIDs        = " + admGroupID);
         }
 
-        for (int i = 0; i < admUserIDs.size(); i++) {
-            logger.debug("admUserIDs         = " + admUserIDs.get(i));
+        for (String admUserID : admUserIDs) {
+            logger.debug("admUserIDs         = " + admUserID);
         }
 
-        for (int i = 0; i < mbrUserIDs.size(); i++) {
-            logger.debug("mbrUserIDs         = " + mbrUserIDs.get(i));
+        for (String mbrUserID : mbrUserIDs) {
+            logger.debug("mbrUserIDs         = " + mbrUserID);
         }
     }
 

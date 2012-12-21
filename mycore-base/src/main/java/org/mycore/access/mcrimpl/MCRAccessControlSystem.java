@@ -333,13 +333,13 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         int nextFreeID;
         String sNextFreeID;
         if (nextFreeRuleID.containsKey(prefix)) {
-            nextFreeID = nextFreeRuleID.get(prefix).intValue();
+            nextFreeID = nextFreeRuleID.get(prefix);
         } else {
             nextFreeID = ruleStore.getNextFreeRuleID(prefix);
         }
         sNextFreeID = lexicographicalPattern + String.valueOf(nextFreeID);
         sNextFreeID = sNextFreeID.substring(sNextFreeID.length() - lexicographicalPattern.length());
-        nextFreeRuleID.put(prefix, Integer.valueOf(nextFreeID + 1));
+        nextFreeRuleID.put(prefix, nextFreeID + 1);
         return prefix + sNextFreeID;
     }
 

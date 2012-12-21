@@ -286,7 +286,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     private void addParentHasValues(HashMap<MCRCategoryID, Boolean> boolMap, MCRCategory parent) {
         boolMap.put(parent.getId(), true);
-        if (parent.isCategory() && !boolMap.get(parent.getParent().getId()).booleanValue()) {
+        if (parent.isCategory() && !boolMap.get(parent.getParent().getId())) {
             addParentHasValues(boolMap, parent.getParent());
         }
     }

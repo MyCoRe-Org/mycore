@@ -600,7 +600,7 @@ public class MCRClassificationData {
             } catch (final Exception ignored) {
             }
             itemname.add(sText);
-            itemlevel.add(new Integer(level));
+            itemlevel.add(level);
             itemelm.add((Element) child.clone());
             navitree.removeContent(child);
             i--;
@@ -612,8 +612,8 @@ public class MCRClassificationData {
         // sort
         sortMyTreePerLevel(0, itemname.size(), 1, itemname, itemlevel, itemnum);
         // write back
-        for (int i = 0; i < itemnum.length; i++) {
-            navitree.addContent(itemelm.get(itemnum[i]));
+        for (int anItemnum : itemnum) {
+            navitree.addContent(itemelm.get(anItemnum));
         }
         return xDoc;
     }
@@ -629,7 +629,7 @@ public class MCRClassificationData {
                 // System.out.println("%%%> inner sort");
                 int start = i;
                 int stop = start;
-                while (stop + 1 < bis && itemlevel.get(itemnum[stop + 1]).intValue() > level) {
+                while (stop + 1 < bis && itemlevel.get(itemnum[stop + 1]) > level) {
                     stop++;
                 }
                 // System.out.println("--------------------");
@@ -641,7 +641,7 @@ public class MCRClassificationData {
             }
             String aktitem = itemname.get(itemnum[i]);
             for (int j = i + 1; j < bis; j++) {
-                if (level != itemlevel.get(itemnum[j]).intValue())
+                if (level != itemlevel.get(itemnum[j]))
                     continue;
                 // System.out.println("%%%>" + i + " " + aktitem + " " + j + " "
                 // + itemname.get(itemnum[j]) + " " + level + " " +

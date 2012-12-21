@@ -67,8 +67,8 @@ public class MCRTemplateTask extends Task {
         Element rootOut = new Element("stylesheet", XSL).setAttribute("version", "1.0");
         Document jdom = new Document(rootOut);
 
-        for (int i = 0; i < directory.length; i++) {
-            temppath = directory[i] + ".xsl";
+        for (String aDirectory1 : directory) {
+            temppath = aDirectory1 + ".xsl";
             rootOut.addContent(new Element("include", XSL).setAttribute("href", temppath));
         }
 
@@ -81,22 +81,22 @@ public class MCRTemplateTask extends Task {
         Element template2 = new Element("template", XSL).setAttribute("name", "get.templates");
         Element templates = new Element("templates");
 
-        for (int i = 0; i < directory.length; i++) {
-            temptest = "$template = '" + directory[i] + "'";
+        for (String aDirectory : directory) {
+            temptest = "$template = '" + aDirectory + "'";
 
             // add elements in the first template
             Element when = new Element("when", XSL).setAttribute("test", temptest);
-            Element call = new Element("call-template", XSL).setAttribute("name", directory[i]);
+            Element call = new Element("call-template", XSL).setAttribute("name", aDirectory);
             when.addContent(call);
             choose.addContent(when);
 
             // add elements in the second template
-            Element innertemplate = new Element("template").setAttribute("category", "master").setText(directory[i]);
+            Element innertemplate = new Element("template").setAttribute("category", "master").setText(aDirectory);
             templates.addContent(innertemplate);
         }
 
-        for (int i = 0; i < contentdir.length; i++) {
-            Element innertemplate = new Element("template").setAttribute("category", "content").setText(contentdir[i]);
+        for (String aContentdir : contentdir) {
+            Element innertemplate = new Element("template").setAttribute("category", "content").setText(aContentdir);
             templates.addContent(innertemplate);
         }
 
@@ -129,8 +129,8 @@ public class MCRTemplateTask extends Task {
             return new String[0];
 
         String[] contentdir = templatedir.list(new TemplateFilenameFilter());
-        for (int i = 0; i < contentdir.length; i++) {
-            String temppath = contentdir[i] + ".xsl";
+        for (String aContentdir : contentdir) {
+            String temppath = aContentdir + ".xsl";
             rootOut.addContent(new Element("include", XSL).setAttribute("href", temppath));
         }
 

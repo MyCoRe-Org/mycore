@@ -288,7 +288,7 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
 
                             media.duration = durationMinutes * 3600000 + durationSeconds * 60000 + durationMilSeconds;
                         } else if ("Avg Bit Rate:".equals(key)) {
-                            media.bitRate = Math.round(1024 * Float.valueOf(value.substring(0, value.indexOf(" "))).floatValue());
+                            media.bitRate = Math.round(1024 * Float.valueOf(value.substring(0, value.indexOf(" "))));
                         } else if (key.equals("Title:") || key.equals("Author:") || key.equals("Copyright:")) {
 
                             if (media.tags == null)
@@ -308,7 +308,7 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
                                 media.mimeType = value;
                         } else if ("Avg Stream Bit Rate:".equals(key)) {
                             ((MCRVideoObject) media).streamBitRate = Math.round(1024 * Float
-                                    .valueOf(value.substring(0, value.indexOf(" "))).floatValue());
+                                    .valueOf(value.substring(0, value.indexOf(" "))));
                         } else if ("Dimensions:".equals(key)) {
                             StringTokenizer st1 = new StringTokenizer(value, "x");
                             ((MCRVideoObject) media).width = Integer.parseInt(st1.nextToken());
@@ -317,7 +317,7 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
                             StringTokenizer st1 = new StringTokenizer(value.substring(0, value.indexOf("fps")), " ,");
 
                             while (st1.hasMoreTokens()) {
-                                float fvalue = Float.valueOf(st1.nextToken()).floatValue();
+                                float fvalue = Float.valueOf(st1.nextToken());
                                 ((MCRVideoObject) media).frameRate = Math.max(((MCRVideoObject) media).frameRate, fvalue);
                             }
                         } else if ("Video Codec:".equals(key)) {
@@ -348,9 +348,9 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
                             } else if (audio.mimeType == null)
                                 audio.mimeType = value;
                         } else if ("Avg Stream Bit Rate:".equals(key)) {
-                            audio.streamBitRate = Math.round(1024 * Float.valueOf(value.substring(0, value.indexOf(" "))).floatValue());
+                            audio.streamBitRate = Math.round(1024 * Float.valueOf(value.substring(0, value.indexOf(" "))));
                         } else if ("Max Stream Bit Rate:".equals(key) && audio.streamBitRate == 0) {
-                            audio.streamBitRate = Math.round(1024 * Float.valueOf(value.substring(0, value.indexOf(" "))).floatValue());
+                            audio.streamBitRate = Math.round(1024 * Float.valueOf(value.substring(0, value.indexOf(" "))));
                         } else if ("Audio Codec:".equals(key)) {
                             if (value.contains("(")) {
                                 audio.subFormatFull = value.substring(value.indexOf("(") + 1, value.indexOf(")"));

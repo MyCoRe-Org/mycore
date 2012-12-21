@@ -22,7 +22,7 @@ public abstract class MCRJerseyResourceTest extends JerseyTest {
         WebAppDescriptor webAppDescriptor = getBuilder().build();
         ClientConfig clientConfig = webAppDescriptor.getClientConfig();
         Map<String, Boolean> features = clientConfig.getFeatures();
-        features.put("com.sun.jersey.config.feature.DisableXmlSecurity", Boolean.valueOf(true));
+        features.put("com.sun.jersey.config.feature.DisableXmlSecurity", true);
         return webAppDescriptor;
     }
 

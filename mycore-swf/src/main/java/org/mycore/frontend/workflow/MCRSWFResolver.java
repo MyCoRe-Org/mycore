@@ -329,14 +329,14 @@ public class MCRSWFResolver implements URIResolver {
                         if (dir.isDirectory()) {
                             ArrayList<String> dirlist = MCRUtils.getAllFileNames(dir);
 
-                            for (int k = 0; k < dirlist.size(); k++) {
+                            for (String aDirlist : dirlist) {
                                 Element file = new Element("file");
-                                file.setText(derpath + SLASH + (String) dirlist.get(k));
+                                file.setText(derpath + SLASH + (String) aDirlist);
 
-                                File thisfile = new File(dir, (String) dirlist.get(k));
+                                File thisfile = new File(dir, (String) aDirlist);
                                 file.setAttribute("size", String.valueOf(thisfile.length()));
 
-                                if (mainfile.equals(dirlist.get(k))) {
+                                if (mainfile.equals(aDirlist)) {
                                     file.setAttribute("main", "true");
                                 } else {
                                     file.setAttribute("main", "false");

@@ -331,8 +331,8 @@ public class MCRObjectDerivate {
             org.jdom.Element extEl = new org.jdom.Element("externals");
             extEl.setAttribute("class", "MCRMetaLink");
             extEl.setAttribute("heritable", "false");
-            for (int i = 0; i < externals.size(); i++) {
-                extEl.addContent(externals.get(i).createXML());
+            for (MCRMetaLink external : externals) {
+                extEl.addContent(external.createXML());
             }
             elm.addContent(extEl);
         }
@@ -349,8 +349,8 @@ public class MCRObjectDerivate {
             org.jdom.Element titEl = new org.jdom.Element("titles");
             titEl.setAttribute("class", "MCRMetaLangText");
             titEl.setAttribute("heritable", "false");
-            for (int i = 0; i < titles.size(); i++) {
-                titEl.addContent(titles.get(i).createXML());
+            for (MCRMetaLangText title : titles) {
+                titEl.addContent(title.createXML());
             }
             elm.addContent(titEl);
         }

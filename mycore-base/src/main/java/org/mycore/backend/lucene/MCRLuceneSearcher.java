@@ -358,8 +358,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
      *            of hit
      */
     private void addSortDataToHit(List<MCRSortBy> sortBy, org.apache.lucene.document.Document doc, MCRHit hit, String score) {
-        for (int j = 0; j < sortBy.size(); j++) {
-            MCRSortBy sb = sortBy.get(j);
+        for (MCRSortBy sb : sortBy) {
             MCRFieldDef fds = sb.getField();
             if (null != fds) {
                 String field = fds.getName();
@@ -444,8 +443,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
     public static Document buildLuceneDocument(List<MCRFieldValue> fields) throws Exception {
         Document doc = new Document();
 
-        for (int i = 0; i < fields.size(); i++) {
-            MCRFieldValue field = fields.get(i);
+        for (MCRFieldValue field : fields) {
             String name = field.getField().getName();
             String type = field.getField().getDataType();
             String content = field.getValue();
