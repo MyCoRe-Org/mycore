@@ -105,7 +105,7 @@ public class MCRImportImporter {
                         " in the import directory exists and all files ends with '.xml'.");
 
         if(!classManager.isCompletelyFilled()) {
-            StringBuffer error = new StringBuffer("The following classification mapping keys are not set:\n");
+            StringBuilder error = new StringBuilder("The following classification mapping keys are not set:\n");
             for(MCRImportClassificationMap map : classManager.getClassificationMapList()) {
                 for(String emptyImportValue : map.getEmptyImportValues())
                     error.append(" " + emptyImportValue + "\n");
@@ -206,7 +206,7 @@ public class MCRImportImporter {
         LOGGER.info("Finished in " + durationInMinutes + " minutes");
         LOGGER.info(objectCount - errorObjectList.size() + " of " + objectCount + " objects successfully generated");
         if(errorObjectList.size() > 0) {
-            StringBuffer errorLog = new StringBuffer("The following objects causes errors\n");
+            StringBuilder errorLog = new StringBuilder("The following objects causes errors\n");
             for(String errorObject : errorObjectList) {
                 errorLog.append(" " + errorObject + "\n");
             }
@@ -227,9 +227,9 @@ public class MCRImportImporter {
         try {
             // print status informations
             currentObject++;
-            StringBuffer importStatus = new StringBuffer(String.valueOf(currentObject));
+            StringBuilder importStatus = new StringBuilder(String.valueOf(currentObject));
             importStatus.append("/").append(String.valueOf(objectCount));
-            StringBuffer statusBuffer = new StringBuffer("(").append(importStatus).append(") ");
+            StringBuilder statusBuffer = new StringBuilder("(").append(importStatus).append(") ");
             LOGGER.info(statusBuffer.toString() + "Try to generate " + importId);
 
             // check if import id exists
@@ -311,7 +311,7 @@ public class MCRImportImporter {
         // remove 'datamodel-' and '.xsd' to get a valid object type (e.g. author)
         String objectType = schemaLocation.substring(schemaLocation.indexOf("-") + 1, schemaLocation.lastIndexOf('.'));
         // create the next id
-        StringBuffer baseBuf = new StringBuffer(config.getProjectName()).append("_").append(objectType);
+        StringBuilder baseBuf = new StringBuilder(config.getProjectName()).append("_").append(objectType);
         MCRObjectID mcrObjId = getNextFreeId(baseBuf.toString());
         // set the new id in the xml document
         doc.getRootElement().setAttribute("ID", mcrObjId.toString());
@@ -337,7 +337,7 @@ public class MCRImportImporter {
         // resolve links
         resolveLinks(doc);
         // create the next id
-        StringBuffer baseBuf = new StringBuffer(config.getProjectName()).append("_derivate");
+        StringBuilder baseBuf = new StringBuilder(config.getProjectName()).append("_derivate");
         MCRObjectID mcrDerivateId = getNextFreeId(baseBuf.toString());
         // set the new id in the xml document
         doc.getRootElement().setAttribute("ID", mcrDerivateId.toString());
@@ -395,7 +395,7 @@ public class MCRImportImporter {
                 return null;
             }
         }
-        StringBuffer fileName = new StringBuffer(mcrId.toString()).append(".xml");
+        StringBuilder fileName = new StringBuilder(mcrId.toString()).append(".xml");
         return new File(subfolder, fileName.toString());
     }
 

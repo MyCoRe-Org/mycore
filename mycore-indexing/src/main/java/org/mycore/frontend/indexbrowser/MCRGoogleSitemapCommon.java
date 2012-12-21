@@ -209,7 +209,7 @@ public final class MCRGoogleSitemapCommon {
         else
             dt = new DateTime();
 
-        StringBuffer sb = new StringBuffer(1024);
+        StringBuilder sb = new StringBuilder(1024);
         sb.append(baseurl).append(objectPath).append(mcrID);
         if ((style != null) && (style.trim().length() > 0)) {
             sb.append("?XSL.Style=").append(style);
@@ -238,7 +238,7 @@ public final class MCRGoogleSitemapCommon {
         for (int i = 0; i < number; i++) {
             Element sitemap = new Element("sitemap", ns);
             index.addContent(sitemap);
-            StringBuffer sb = new StringBuffer(128);
+            StringBuilder sb = new StringBuilder(128);
             sb.append(baseurl).append(getFileName(i + 2, false));
             sitemap.addContent(new Element("loc", ns).addContent(sb.toString()));
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");

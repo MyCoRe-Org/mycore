@@ -20,7 +20,7 @@ public class ClientFactory {
      * @return A list of the options for this program.
      */
     public static String usage() {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         buffer.append("swordclient: version ");
         buffer.append(ClientConstants.CLIENT_VERSION);
         buffer.append("\n");

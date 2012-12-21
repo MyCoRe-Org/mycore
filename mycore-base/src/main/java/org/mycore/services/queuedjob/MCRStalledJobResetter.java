@@ -81,7 +81,7 @@ public class MCRStalledJobResetter implements Runnable {
         Transaction executorTransaction = session.beginTransaction();
         LOGGER.info("MCRJob is Checked for dead Entries");
         
-        StringBuffer sb = new StringBuffer("FROM MCRJob WHERE ");
+        StringBuilder sb = new StringBuilder("FROM MCRJob WHERE ");
         if (action != null)
             sb.append("action='" + action.getName() + "' AND ");
         sb.append(" status='" + MCRJobStatus.PROCESSING + "' ORDER BY id ASC");

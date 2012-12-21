@@ -927,7 +927,7 @@ public class MCREditorSubmission {
             if (num > nr) {
                 num += change;
 
-                StringBuffer newpath = new StringBuffer(prefix);
+                StringBuilder newpath = new StringBuilder(prefix);
 
                 if (num > 1) {
                     newpath.append("[").append(num).append("]");

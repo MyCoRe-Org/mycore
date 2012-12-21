@@ -259,7 +259,7 @@ public class MCRUtils {
             return "";
         }
 
-        StringBuffer sb = new StringBuffer(2048);
+        StringBuilder sb = new StringBuilder(2048);
 
         for (int i = 0; i < in.length(); i++) {
             if (in.charAt(i) == '<') {
@@ -812,7 +812,7 @@ public class MCRUtils {
     }
 
     public static String arrayToString(Object[] objArray, String seperator) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         for (Object element : objArray) {
             buf.append(element).append(seperator);

@@ -138,7 +138,7 @@ public class MCRCommandLineInterface {
     }
 
     private static String readLineFromArguments(String[] args) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (String arg : args) {
             sb.append(arg).append(" ");
         }

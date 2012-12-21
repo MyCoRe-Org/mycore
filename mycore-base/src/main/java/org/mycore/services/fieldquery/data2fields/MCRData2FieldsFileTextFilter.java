@@ -52,7 +52,7 @@ public class MCRData2FieldsFileTextFilter implements MCRData2Fields {
                 BufferedReader in = new BufferedReader(reader);
 
                 String line;
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 while ((line = in.readLine()) != null) {
                     sb.append(line).append(" ");
                 }

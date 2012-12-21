@@ -159,7 +159,7 @@ class MCRStoreBrowserRequest {
      * the given slot directory.
      */
     private String buildMinimumIDContained(String slot) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         for (String token : pathElements)
             sb.append(token);

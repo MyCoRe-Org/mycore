@@ -167,7 +167,7 @@ public class MCRXMLFunctions {
 
     public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language) throws ParseException {
         if (LOGGER.isDebugEnabled()) {
-            StringBuffer sb = new StringBuffer("isoDate=");
+            StringBuilder sb = new StringBuilder("isoDate=");
             sb.append(isoDate).append(", simpleFormat=").append(simpleFormat).append(", isoFormat=").append(isoFormat)
                     .append(", iso649Language=").append(iso639Language);
             LOGGER.debug(sb.toString());

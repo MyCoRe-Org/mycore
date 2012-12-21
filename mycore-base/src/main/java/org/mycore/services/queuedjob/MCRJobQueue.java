@@ -207,7 +207,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             return;
         Session session = MCRHIBConnection.instance().getSession();
 
-        StringBuffer sb = new StringBuffer("DELETE FROM MCRJob");
+        StringBuilder sb = new StringBuilder("DELETE FROM MCRJob");
         if (action != null)
             sb.append(" WHERE action='" + action.getName() + "'");
 
@@ -228,7 +228,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         }
         Session session = MCRHIBConnection.instance().getSession();
 
-        StringBuffer sb = new StringBuffer("FROM MCRJob job JOIN FETCH job.parameters WHERE ");
+        StringBuilder sb = new StringBuilder("FROM MCRJob job JOIN FETCH job.parameters WHERE ");
         if (action != null)
             sb.append("action='" + action.getName() + "' AND ");
         sb.append("status='" + MCRJobStatus.NEW + "' ORDER BY added ASC");
@@ -248,7 +248,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             return 0;
         Session session = MCRHIBConnection.instance().getSession();
 
-        StringBuffer sb = new StringBuffer("SELECT count(*) FROM MCRJob WHERE ");
+        StringBuilder sb = new StringBuilder("SELECT count(*) FROM MCRJob WHERE ");
         if (action != null)
             sb.append("action='" + action.getName() + "' AND ");
         sb.append("status='" + MCRJobStatus.NEW + "'");
@@ -284,7 +284,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
         Session session = MCRHIBConnection.instance().getSession();
 
-        StringBuffer qStr = new StringBuffer("FROM MCRJob job JOIN FETCH job.parameters WHERE action = '" + action.getName() + "' ");
+        StringBuilder qStr = new StringBuilder("FROM MCRJob job JOIN FETCH job.parameters WHERE action = '" + action.getName() + "' ");
         for (String paramKey : params.keySet()) {
             qStr.append(" AND job.parameters['" + paramKey + "'] = '" + params.get(paramKey) + "'");
         }
@@ -324,7 +324,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     private int preFetch(int amount) {
         Session session = MCRHIBConnection.instance().getSession();
 
-        StringBuffer sb = new StringBuffer("FROM MCRJob job JOIN FETCH job.parameters WHERE ");
+        StringBuilder sb = new StringBuilder("FROM MCRJob job JOIN FETCH job.parameters WHERE ");
         if (action != null)
             sb.append("action='" + action.getName() + "' AND ");
         sb.append("status='" + MCRJobStatus.NEW + "' ORDER BY added ASC");
@@ -395,7 +395,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
         Session session = MCRHIBConnection.instance().getSession();
 
-        StringBuffer qStr = new StringBuffer("DELETE FROM MCRJob job WHERE action = '" + action.getName() + "' ");
+        StringBuilder qStr = new StringBuilder("DELETE FROM MCRJob job WHERE action = '" + action.getName() + "' ");
         for (String paramKey : params.keySet()) {
             qStr.append(" AND job.parameters['" + paramKey + "'] = '" + params.get(paramKey) + "'");
         }

@@ -268,7 +268,7 @@ public class MCRImportMappingManager {
 
         // print error list
         if(errorList.size() > 0) {
-            StringBuffer errorMsg = new StringBuffer("The following objects causes erros:");
+            StringBuilder errorMsg = new StringBuilder("The following objects causes erros:");
             for(String id : errorList)
                 errorMsg.append("-").append(id).append("\n");
             LOGGER.info(errorMsg.toString());
@@ -301,7 +301,7 @@ public class MCRImportMappingManager {
             }
             // save it
             saveImportObject(importObject, record.getName());
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             buf.append(record.getName()).append(": ").append(importObject.getId());
             fireRecordMapped(buf.toString());
         }
@@ -423,7 +423,7 @@ public class MCRImportMappingManager {
 
         // create the xml
         Element ioElement = importObject.createXML();
-        StringBuffer savePath = new StringBuffer(config.getSaveToPath());
+        StringBuilder savePath = new StringBuilder(config.getSaveToPath());
         savePath.append(subFolderName).append("/");
 
         FileOutputStream output = null;
@@ -473,7 +473,7 @@ public class MCRImportMappingManager {
             output = new FileOutputStream(folder.getAbsolutePath() + "/" + derivate.getDerivateId() + ".xml");
             outputter.output(new Document(derivateElement), output);
             // inform all listeners that a derivate is saved
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             buf.append("derivate: ").append(derivate.getDerivateId());
             fireDerivateSaved(buf.toString());
         } catch(Exception e) {

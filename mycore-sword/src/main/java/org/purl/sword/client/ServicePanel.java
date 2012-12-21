@@ -680,7 +680,7 @@ implements TreeSelectionListener
 
          // process links 
          Iterator<Link> links = entry.getLinks();
-         StringBuffer linkBuffer = new StringBuffer(); 
+         StringBuilder linkBuffer = new StringBuilder();
          for( ; links.hasNext(); )
          {
             Link link = links.next();
@@ -783,7 +783,7 @@ implements TreeSelectionListener
    private String getAuthorDetails(Iterator<Author> authors)
    {
       // process author
-      StringBuffer authorBuffer = new StringBuffer(); 
+      StringBuilder authorBuffer = new StringBuilder();
       for( ; authors.hasNext(); )
       {
          Author a = authors.next(); 
@@ -808,7 +808,7 @@ implements TreeSelectionListener
    private String getContributorDetails(Iterator<Contributor> contributors)
    {
       // process author
-      StringBuffer authorBuffer = new StringBuffer(); 
+      StringBuilder authorBuffer = new StringBuilder();
       for( ; contributors.hasNext(); )
       {
          Contributor c = contributors.next(); 
@@ -833,7 +833,7 @@ implements TreeSelectionListener
    private String getAuthorDetails(Author author)
    {
       // process author
-      StringBuffer authorBuffer = new StringBuffer();
+      StringBuilder authorBuffer = new StringBuilder();
       authorBuffer.append(author.getName());
       authorBuffer.append(" (email: '");
       authorBuffer.append(author.getEmail());

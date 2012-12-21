@@ -154,7 +154,7 @@ public class MCRURIResolverFilter implements Filter {
 
         @Override
         public String toString() {
-            StringBuffer buf = new StringBuffer("The following includes where resolved by MCRURIResolver:\n\n");
+            StringBuilder buf = new StringBuilder("The following includes where resolved by MCRURIResolver:\n\n");
             for (Iterator<String> it = iterator(); it.hasNext();) {
                 Object obj = it.next();
                 buf.append(obj.toString());

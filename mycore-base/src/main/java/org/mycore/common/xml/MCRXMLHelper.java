@@ -201,7 +201,7 @@ public class MCRXMLHelper {
         }
 
         // It seems we have to filter out invalid XML characters...
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < text.length(); i++) {
             if (Verifier.isXMLCharacter(text.charAt(i))) {
                 sb.append(text.charAt(i));

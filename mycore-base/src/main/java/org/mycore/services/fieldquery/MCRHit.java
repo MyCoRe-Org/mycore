@@ -339,7 +339,7 @@ public class MCRHit {
      */
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("---- MCRHit ----");
         sb.append("\nID       = ").append(id);
         sb.append("\nHost     = ").append(host);

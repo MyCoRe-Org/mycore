@@ -279,7 +279,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             String base = getBaseURL() + myfile;
             final String sessionObjectID = "classificationEditor";
             Properties params = new Properties();
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             boolean isEdited = clid.length() > 0 && getClassificationEditor().isEdited(MCRCategoryID.rootID(clid));
             MCRCategory classif = null;
             if (isEdited) {

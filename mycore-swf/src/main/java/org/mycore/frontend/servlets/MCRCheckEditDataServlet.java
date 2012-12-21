@@ -57,7 +57,7 @@ public class MCRCheckEditDataServlet extends MCRCheckDataBase {
      * @return the next URL as String
      */
     protected String getNextURL(MCRObjectID ID, boolean okay) throws MCRActiveLinkException {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (okay) {
             sb.append(WFM.getWorkflowFile(getServletContext(), pagedir, ID.getBase()));
         } else {
@@ -83,7 +83,7 @@ public class MCRCheckEditDataServlet extends MCRCheckDataBase {
 		String sender = WFM.getMailSender();
 		String appl = MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe");
 		String subject = "Automatically generated message from " + appl;
-		StringBuffer text = new StringBuffer();
+		StringBuilder text = new StringBuilder();
 		text.append("An object with type ").append(ID.getTypeId()).append(" and ID ").append(ID.toString()).append(" was changed in the workflow.");
 		LOGGER.info(text.toString());
 

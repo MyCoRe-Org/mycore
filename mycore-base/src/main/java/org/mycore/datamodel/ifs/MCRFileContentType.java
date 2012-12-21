@@ -109,7 +109,7 @@ public class MCRFileContentType {
 
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("ID    = ").append(getID()).append("\n");
         sb.append("label = ").append(getLabel()).append("\n");
         sb.append("mime  = ").append(getMimeType()).append("\n");

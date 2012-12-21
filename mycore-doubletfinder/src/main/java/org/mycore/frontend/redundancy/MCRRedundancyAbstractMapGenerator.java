@@ -188,7 +188,7 @@ public abstract class MCRRedundancyAbstractMapGenerator {
      * @return a new group element
      */
     protected Element createGroupElement(int id, Map<String, String> compareCriterias) {
-        StringBuffer name = new StringBuffer();
+        StringBuilder name = new StringBuilder();
         int count = 0;
         for(String value : compareCriterias.values()) {
             name.append(value);

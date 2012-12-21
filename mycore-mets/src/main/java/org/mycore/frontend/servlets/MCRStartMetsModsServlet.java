@@ -123,7 +123,7 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
 
         }
 
-        StringBuffer sb = new StringBuffer(getBaseURL()).append("receive/").append(cd.myremcrid.toString());
+        StringBuilder sb = new StringBuilder(getBaseURL()).append("receive/").append(cd.myremcrid.toString());
         MCRSWFUploadHandlerIFS fuh = new MCRSWFUploadHandlerIFS(cd.myremcrid.toString(), cd.mysemcrid.toString(), sb.toString());
         String fuhid = fuh.getID();
 

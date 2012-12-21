@@ -241,7 +241,7 @@ public class MCRMergeSearchfieldsXMLTask extends Task {
             } else {
                 String data = (eBaseField.getAttribute("objects") + " " + eDeltaField.getAttribute("objects"));
                 Set<String> set = new HashSet<String>(Arrays.asList(data.split("\\s+")));
-                StringBuffer result = new StringBuffer();
+                StringBuilder result = new StringBuilder();
                 for (String s : set) {
                     result.append(" ").append(s.trim());
                 }
@@ -255,7 +255,7 @@ public class MCRMergeSearchfieldsXMLTask extends Task {
             } else {
                 String data = (eBaseField.getAttribute("value") + " | " + eDeltaField.getAttribute("value"));
                 Set<String> set = new HashSet<String>(Arrays.asList(data.split("\\s*\\|\\s*")));
-                StringBuffer result = new StringBuffer();
+                StringBuilder result = new StringBuilder();
                 for (String s : set) {
                     result.append(" | ").append(s.trim());
                 }
@@ -269,7 +269,7 @@ public class MCRMergeSearchfieldsXMLTask extends Task {
             } else {
                 String data = (eBaseField.getAttribute("xpath") + " | " + eDeltaField.getAttribute("xpath"));
                 Set<String> set = new HashSet<String>(Arrays.asList(data.split("\\s*\\|\\s*")));
-                StringBuffer result = new StringBuffer();
+                StringBuilder result = new StringBuilder();
                 for (String s : set) {
                     result.append(" | ").append(s.trim());
                 }

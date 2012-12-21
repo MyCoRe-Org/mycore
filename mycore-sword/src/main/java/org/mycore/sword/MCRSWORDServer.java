@@ -487,8 +487,8 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
         String tempDirString = MCRConfiguration.instance().getString("MCR.SWORD.temp.upload.dir", System.getProperty("java.io.tmpdir"));
         File tempDir = new File(tempDirString);
 
-        StringBuffer skippedDirectories = new StringBuffer(LINE_SEPARATOR + "skipped directories: {");
-        StringBuffer decompressedFiles = new StringBuffer(LINE_SEPARATOR + "decompressed files: {");
+        StringBuilder skippedDirectories = new StringBuilder(LINE_SEPARATOR + "skipped directories: {");
+        StringBuilder decompressedFiles = new StringBuilder(LINE_SEPARATOR + "decompressed files: {");
 
         // all files/directories are written to temp directory
         while ((ze = zip.getNextEntry()) != null) {

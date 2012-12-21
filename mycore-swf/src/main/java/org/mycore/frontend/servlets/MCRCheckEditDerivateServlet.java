@@ -116,7 +116,7 @@ public class MCRCheckEditDerivateServlet extends MCRCheckBase {
             }
 
             // update data
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append(WFM.getDirectoryPath(derID.getBase())).append(File.separator).append(derID.toString()).append(".xml");
             MCRUtils.writeJDOMToFile(indoc, new File(sb.toString()));
             okay = true;
@@ -139,7 +139,7 @@ public class MCRCheckEditDerivateServlet extends MCRCheckBase {
      * @return the next URL as String
      */
     public final String getNextURL(MCRObjectID ID, boolean okay) throws MCRActiveLinkException {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (okay) {
             // return all is ready
             sb.append(WFM.getWorkflowFile(getServletContext(), pagedir, ID.getBase()));
@@ -163,7 +163,7 @@ public class MCRCheckEditDerivateServlet extends MCRCheckBase {
         String sender = WFM.getMailSender();
         String appl = MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe");
         String subject = "Automatically generated message from " + appl;
-        StringBuffer text = new StringBuffer();
+        StringBuilder text = new StringBuilder();
         text.append("The title of the derivate with the ID ").append(ID.toString()).append(" was changed in the workflow.");
         LOGGER.info(text.toString());
         try {

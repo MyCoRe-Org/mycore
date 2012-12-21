@@ -65,7 +65,7 @@ public class MCRExternalProcess {
     }
 
     private void debug(String... command) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (String arg : command)
             sb.append(arg).append(" ");
         LOGGER.debug(sb.toString().trim());

@@ -325,7 +325,7 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
         }
 
         if ((fullname = fullname.trim()).length() == 0) {
-            StringBuffer sb = new StringBuffer(128);
+            StringBuilder sb = new StringBuilder(128);
             sb.append(academic).append(' ').append(peerage).append(' ').append(firstname).append(' ').append(prefix).append(' ').append(
                     surname);
             fullname = sb.toString();

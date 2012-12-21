@@ -358,7 +358,7 @@ public class MCRCache<K,V> {
      */
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("Cache capacity:  ").append(capacity).append("\n");
         sb.append("Cache size:      ").append(size).append("\n");
         sb.append("Cache fill rate: ").append(getFillRate()).append("\n");

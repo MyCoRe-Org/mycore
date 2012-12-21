@@ -601,7 +601,7 @@ public class MCRPersistentServlet extends MCRServlet {
      * @return the location string
      */
     private String getSAXErrorMessage(SAXParseException ex) {
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
 
         String systemId = ex.getSystemId();
         if (systemId != null) {

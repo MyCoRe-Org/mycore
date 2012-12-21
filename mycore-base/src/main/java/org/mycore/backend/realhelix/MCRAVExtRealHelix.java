@@ -103,7 +103,7 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
             }
 
             StringTokenizer st3 = new StringTokenizer(sSize, ",");
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
 
             while (st3.hasMoreTokens()) {
                 sb.append(st3.nextToken());
@@ -168,7 +168,7 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
         }
 
         try {
-            StringBuffer cgi = new StringBuffer(basePlayerStarter);
+            StringBuilder cgi = new StringBuilder(basePlayerStarter);
             cgi.append(file.getStorageID());
 
             if (startPos != null || stopPos != null) {

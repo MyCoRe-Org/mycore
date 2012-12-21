@@ -162,7 +162,7 @@ public class PostDestination
     */
    public String toString()
    {
-      StringBuffer buffer = new StringBuffer();
+      StringBuilder buffer = new StringBuilder();
       buffer.append(username);
       if( onBehalfOf != null )
       {

@@ -709,7 +709,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             String path = uri.substring(uri.indexOf(":") + 1);
             LOGGER.debug("Reading xml from request " + path);
 
-            StringBuffer url = new StringBuffer(MCRServlet.getBaseURL());
+            StringBuilder url = new StringBuilder(MCRServlet.getBaseURL());
             url.append(path);
 
             final MCRSession currentSession = MCRSessionMgr.getCurrentSession();
@@ -737,7 +737,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 path = url.substring(0, queryPos);
                 query = url.substring(queryPos);
             }
-            StringBuffer sb = new StringBuffer(path);
+            StringBuilder sb = new StringBuilder(path);
             sb.append(";jsessionid=");
             sb.append(sessionId);
             sb.append(query);
@@ -1019,7 +1019,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             }
 
             String classID = pst.nextToken();
-            StringBuffer categID = new StringBuffer();
+            StringBuilder categID = new StringBuilder();
             if (pst.hasMoreTokens()) {
                 pst.nextToken(); // :
                 while (pst.hasMoreTokens()) {

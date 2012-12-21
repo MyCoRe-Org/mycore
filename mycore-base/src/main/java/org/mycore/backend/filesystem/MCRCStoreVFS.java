@@ -86,7 +86,7 @@ public class MCRCStoreVFS extends MCRContentStore {
 
     @Override
     protected String doStoreContent(MCRFileReader file, MCRContentInputStream source) throws Exception {
-        StringBuffer storageId = new StringBuffer();
+        StringBuilder storageId = new StringBuilder();
 
         String[] slots = buildSlotPath();
         // Recursively create directory name

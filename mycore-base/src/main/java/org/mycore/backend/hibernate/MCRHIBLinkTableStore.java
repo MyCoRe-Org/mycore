@@ -121,7 +121,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         if (from == null || (from = from.trim()).length() == 0) {
             throw new MCRPersistenceException("The from value is null or empty.");
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("from ").append(classname).append(" where MCRFROM = '").append(from).append("'");
         if (to != null && (to = to.trim()).length() > 0) {
             sb.append(" and MCRTO = '").append(to).append("'");
@@ -154,7 +154,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
     public final int countTo(String fromtype, String to, String type, String restriction) {
         Session session = getSession();
         Number returns;
-        StringBuffer qBf = new StringBuffer(1024);
+        StringBuilder qBf = new StringBuilder(1024);
         qBf.append("select count(key.mcrfrom) from ").append(classname).append(" where MCRTO like ").append('\'').append(to).append('\'');
 
         if (type != null && type.length() != 0) {
@@ -214,7 +214,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
     @SuppressWarnings("unchecked")
     public Collection<String> getSourcesOf(String to, String type) {
         Session session = getSession();
-        StringBuffer querySB = new StringBuffer("select key.mcrfrom from ").append(classname).append(" where MCRTO='").append(to).append(
+        StringBuilder querySB = new StringBuilder("select key.mcrfrom from ").append(classname).append(" where MCRTO='").append(to).append(
                 "'");
         if (type != null && type.trim().length() > 0) {
             querySB.append(" and MCRTYPE = '").append(type).append("'");
@@ -238,7 +238,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
     @SuppressWarnings("unchecked")
     public Collection<String> getDestinationsOf(String source, String type) {
         Session session = getSession();
-        StringBuffer querySB = new StringBuffer("select key.mcrto from ").append(classname).append(" where MCRFROM='").append(source)
+        StringBuilder querySB = new StringBuilder("select key.mcrto from ").append(classname).append(" where MCRFROM='").append(source)
                 .append("'");
         if (type != null && type.trim().length() != 0) {
             querySB.append(" and MCRTYPE = '").append(type).append("'");

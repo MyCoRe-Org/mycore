@@ -246,7 +246,7 @@ public class MCRTranslation {
     static String[] getStringArray(String masked) {
         List<String> a = new LinkedList<String>();
         boolean mask = false;
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         if (masked == null) {
             return new String[0];
         }

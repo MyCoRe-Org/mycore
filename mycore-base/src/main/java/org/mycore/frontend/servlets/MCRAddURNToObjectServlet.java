@@ -114,7 +114,7 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
             href = objectId;
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(getBaseURL()).append("receive/").append(href);
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
     }

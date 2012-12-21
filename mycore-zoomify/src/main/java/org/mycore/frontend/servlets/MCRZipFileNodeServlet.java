@@ -108,8 +108,8 @@ public class MCRZipFileNodeServlet extends MCRServlet {
         String ownerID = getOwnerID(request);
         String requestPath = request.getPathInfo();
         // get path for zip file
-        StringBuffer zippath = new StringBuffer(128);
-        StringBuffer filepath = new StringBuffer(128);
+        StringBuilder zippath = new StringBuilder(128);
+        StringBuilder filepath = new StringBuilder(128);
         StringTokenizer st = new StringTokenizer(requestPath, "/");
         zippath.append('/').append(st.nextToken()).append('/');
         filepath.append(st.nextToken());
@@ -137,7 +137,7 @@ public class MCRZipFileNodeServlet extends MCRServlet {
 
         // root node is a directory
         int pos = ownerID.length() + 1;
-        StringBuffer path = new StringBuffer(zippath.toString().substring(pos));
+        StringBuilder path = new StringBuilder(zippath.toString().substring(pos));
         if ((path.charAt(path.length() - 1) == '/') && path.length() > 1) {
             path.deleteCharAt(path.length() - 1);
         }
@@ -174,7 +174,7 @@ public class MCRZipFileNodeServlet extends MCRServlet {
      */
     protected static String getOwnerID(HttpServletRequest request) {
         String pI = request.getPathInfo();
-        StringBuffer ownerID = new StringBuffer(request.getPathInfo().length());
+        StringBuilder ownerID = new StringBuilder(request.getPathInfo().length());
         boolean running = true;
         for (int i = (pI.charAt(0) == '/') ? 1 : 0; (i < pI.length() && running); i++) {
             switch (pI.charAt(i)) {

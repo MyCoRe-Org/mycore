@@ -99,7 +99,7 @@ public class MCRMetsModsCommunicator {
         zos.setLevel(Deflater.NO_COMPRESSION);
 
         ZipEntry ze = new ZipEntry(java.net.URLEncoder.encode(path, "UTF-8"));
-        StringBuffer extra = new StringBuffer();
+        StringBuilder extra = new StringBuilder();
         extra.append(md5).append(" ").append(metsbytes.length).append(" ").append(uid);
         ze.setExtra(extra.toString().getBytes("UTF-8"));
         zos.putNextEntry(ze);
@@ -258,7 +258,7 @@ public class MCRMetsModsCommunicator {
     }
 
     protected String encodeParameters(Hashtable parameters) {
-        StringBuffer data = new StringBuffer();
+        StringBuilder data = new StringBuilder();
         Enumeration e = parameters.keys();
 
         while (e.hasMoreElements()) {
@@ -328,7 +328,7 @@ public class MCRMetsModsCommunicator {
         in.close();
 
         byte[] bytes = digest.digest();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < bytes.length; i++) {
             String sValue = "0" + Integer.toHexString(bytes[i]);

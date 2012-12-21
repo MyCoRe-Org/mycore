@@ -63,7 +63,7 @@ public class MCRImportXMLConverter implements MCRImportRecordConverter<Document>
 
         // add attributes as subfields
         for(Attribute a : (List<Attribute>)e.getAttributes()) {
-            StringBuffer attrId = new StringBuffer("@");
+            StringBuilder attrId = new StringBuilder("@");
             String nsPrefix = a.getNamespacePrefix();
             if(nsPrefix != null && !nsPrefix.equals(""))
                 attrId.append(nsPrefix).append(":");
@@ -96,7 +96,7 @@ public class MCRImportXMLConverter implements MCRImportRecordConverter<Document>
     private void addNamespace(MCRImportField baseField, Namespace ns) {
         if(ns.getURI() == null || ns.getURI().equals(""))
             return;
-        StringBuffer nsId = new StringBuffer("@xmlns");
+        StringBuilder nsId = new StringBuilder("@xmlns");
         if(ns.getPrefix() != null && !ns.getPrefix().equals(""))
             nsId.append(":").append(ns.getPrefix());
         MCRImportField nsField = new MCRImportField(nsId.toString(), ns.getURI());

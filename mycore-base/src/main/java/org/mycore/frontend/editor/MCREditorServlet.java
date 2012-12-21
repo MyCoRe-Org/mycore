@@ -327,7 +327,7 @@ public class MCREditorServlet extends MCRServlet {
             LOGGER.debug("Editor start subselect " + id + " at position " + var);
 
             Element subselect = MCREditorDefReader.findElementByID(id, editor);
-            StringBuffer sb = new StringBuffer(getBaseURL());
+            StringBuilder sb = new StringBuilder(getBaseURL());
 
             String webpage = URLEncoder.encode(parms.getParameter("_webpage"), "UTF-8");
             if ("editor".equals(subselect.getAttributeValue("type"))) {
@@ -398,7 +398,7 @@ public class MCREditorServlet extends MCRServlet {
             editor.addContent(sub.buildRepeatElements());
 
             // Redirect to webpage to reload editor form
-            StringBuffer sb = new StringBuffer(getBaseURL());
+            StringBuilder sb = new StringBuilder(getBaseURL());
             String wp = parms.getParameter("_webpage");
             sb.append(wp);
             if (!wp.contains("XSL.editor.session.id=")) {
@@ -436,7 +436,7 @@ public class MCREditorServlet extends MCRServlet {
             String sessionID = parms.getParameter("_session");
 
             // Redirect to webpage to reload editor form
-            StringBuffer sb = new StringBuffer(getBaseURL());
+            StringBuilder sb = new StringBuilder(getBaseURL());
             String wp = parms.getParameter("_webpage");
             sb.append(wp);
             if (!wp.contains("XSL.editor.session.id=")) {
@@ -519,7 +519,7 @@ public class MCREditorServlet extends MCRServlet {
     }
 
     private void sendToURL(HttpServletRequest req, HttpServletResponse res) throws IOException {
-        StringBuffer url = new StringBuffer(req.getParameter("_target-url"));
+        StringBuilder url = new StringBuilder(req.getParameter("_target-url"));
         url.append('?').append(req.getQueryString());
         res.sendRedirect(res.encodeRedirectURL(url.toString()));
     }
@@ -567,7 +567,7 @@ public class MCREditorServlet extends MCRServlet {
         editor.addContent(subnew.buildRepeatElements());
 
         // Redirect to webpage to reload editor form
-        StringBuffer sb = new StringBuffer(getBaseURL());
+        StringBuilder sb = new StringBuilder(getBaseURL());
         sb.append(webpage);
         if (!webpage.contains("XSL.editor.session.id=")) {
             sb.append("XSL.editor.session.id=");

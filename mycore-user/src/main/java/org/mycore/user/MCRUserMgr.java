@@ -1408,7 +1408,7 @@ public class MCRUserMgr {
             String gid = (String) updUser.getGroupIDs().get(i);
 
             if (!mcrUserStore.existsGroup(gid)) {
-                StringBuffer msg = new StringBuffer("You tried to update ");
+                StringBuilder msg = new StringBuilder("You tried to update ");
                 msg.append(updUser instanceof MCRUser ? "user '" : "group '").append(ID).append("' with the unknown group '").append(gid).append("'.");
                 throw new MCRException(msg.toString());
             }

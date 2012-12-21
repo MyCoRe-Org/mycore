@@ -103,7 +103,7 @@ public class MCRQueryClientWebService extends MCRQueryClientBase {
             alias = "services/MCRWebService";
             LOGGER.warn("The servicepath attribute for the host is null or empty, services/MCRWebService was set.");
         }
-        StringBuffer sb = new StringBuffer(256);
+        StringBuilder sb = new StringBuilder(256);
         sb.append("Host ").append(alias).append(" with access mode ").append(access).append(" uses host url ").append(url).append(
                 servicepath);
         LOGGER.debug(sb.toString());
@@ -191,7 +191,7 @@ public class MCRQueryClientWebService extends MCRQueryClientBase {
      */
     @Override
     public org.w3c.dom.Document doRetrieveClassification(String level, String type, String classID, String categID, String format) {
-        StringBuffer ID = new StringBuffer(256);
+        StringBuilder ID = new StringBuilder(256);
         ID.append("level=").append(level).append(":type=").append(type).append(":classId=").append(classID).append(":categId=").append(
                 categID);
         try {
@@ -232,7 +232,7 @@ public class MCRQueryClientWebService extends MCRQueryClientBase {
      */
     @Override
     public org.w3c.dom.Document doRetrieveLinks(String from, String to, String type) {
-        StringBuffer ID = new StringBuffer(256);
+        StringBuilder ID = new StringBuilder(256);
         ID.append("from=").append(from).append(":to=").append(to).append(":type=").append(type);
         try {
             // Build webservice call

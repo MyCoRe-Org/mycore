@@ -90,7 +90,7 @@ public class MCRImportCommands extends MCRAbstractCommands {
         if(Boolean.valueOf(uploadFiles) && filesElement != null) {
             for(Element fileElement : (List<Element>)filesElement.getChildren("file")) {
                 String path = fileElement.getText();
-                StringBuffer command = new StringBuffer("internal upload file ");
+                StringBuilder command = new StringBuilder("internal upload file ");
                 command.append(path);
                 command.append(" for derivate ");
                 command.append(id);

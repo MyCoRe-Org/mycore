@@ -229,7 +229,7 @@ public class MCRImportClassificationMappingManager {
         MCRImportClassificationMap map = classificationMapTable.get(classId);
         if(map == null)
             return;
-        StringBuffer fileBuf = new StringBuffer(this.classMappingDir.getAbsolutePath());
+        StringBuilder fileBuf = new StringBuilder(this.classMappingDir.getAbsolutePath());
         fileBuf.append("/").append(classId).append(".xml");
         
         Element rootElement = map.createXML();

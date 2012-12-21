@@ -44,7 +44,7 @@ public class MCRImportFieldValueResolver {
 
     private void parseSubFields(MCRImportField parentField, Map<String, String> varTable, String base) {
         for(MCRImportField childField : parentField.getSubFieldList()) {
-            StringBuffer id = new StringBuffer(base);
+            StringBuilder id = new StringBuilder(base);
             id.append(parentField.getSeperator());
             id.append(childField.getId());
             if(childField.getValue() != null)

@@ -875,7 +875,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.info("No Resultset to work with, use command \"select objects with query {0}\" to build one");
             return;
         }
-        StringBuffer out = new StringBuffer();
+        StringBuilder out = new StringBuilder();
         for (String id : getSelectedObjectIDs()) {
             out.append(id).append(" ");
         }
@@ -1048,7 +1048,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRObjectID mcrId = MCRObjectID.getInstance(id);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
-            StringBuffer log = new StringBuffer("Revisions:\n");
+            StringBuilder log = new StringBuilder("Revisions:\n");
             List<MCRMetadataVersion> revisions = MCRUtils.listRevisions(mcrId);
             for (MCRMetadataVersion revision : revisions) {
                 log.append(revision.getRevision()).append(" ");

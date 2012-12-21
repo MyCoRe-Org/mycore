@@ -63,7 +63,7 @@ public class MCRQueryClientBase implements MCRQueryClientInterface {
         alias = xmlhost.getAttributeValue("alias");
         url = xmlhost.getAttributeValue("url");
         access = xmlhost.getAttributeValue("access");
-        StringBuffer sb = new StringBuffer(256);
+        StringBuilder sb = new StringBuilder(256);
         sb.append("Host ").append(alias).append(" with access mode ").append(access).append(" uses host url ").append(url);
         LOGGER.debug(sb.toString());
     }

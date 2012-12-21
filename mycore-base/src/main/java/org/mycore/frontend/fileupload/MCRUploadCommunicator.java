@@ -196,7 +196,7 @@ public class MCRUploadCommunicator {
         zos.setLevel(Deflater.NO_COMPRESSION);
 
         ZipEntry ze = new ZipEntry(java.net.URLEncoder.encode(path, "UTF-8"));
-        StringBuffer extra = new StringBuffer();
+        StringBuilder extra = new StringBuilder();
         extra.append(md5).append(" ").append(file.length()).append(" ").append(uid);
         ze.setExtra(extra.toString().getBytes("UTF-8"));
         zos.putNextEntry(ze);
@@ -359,7 +359,7 @@ public class MCRUploadCommunicator {
     }
 
     protected String encodeParameters(Hashtable parameters) {
-        StringBuffer data = new StringBuffer();
+        StringBuilder data = new StringBuilder();
         Enumeration e = parameters.keys();
 
         while (e.hasMoreElements()) {
@@ -429,7 +429,7 @@ public class MCRUploadCommunicator {
         in.close();
 
         byte[] bytes = digest.digest();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         for (byte b : bytes) {
             String sValue = "0" + Integer.toHexString(b);

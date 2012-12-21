@@ -106,7 +106,7 @@ public class MCRNISSBuilderDateCounter implements MCRNISSBuilder {
         String niss;
 
         do {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
 
             if (fmtDate != null) {
                 Calendar now = new GregorianCalendar();

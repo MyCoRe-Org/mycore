@@ -335,14 +335,14 @@ public class MCRImportObject {
      */
     public boolean isValid() {
         boolean valid = true;
-        StringBuffer errorMsg = new StringBuffer();
+        StringBuilder errorMsg = new StringBuilder();
         errorMsg.append("(").append(id).append(") The following errors occur:\n");
         // is id set?
         if(id == null || id.equals("")) {
             errorMsg.append("Id is missing\n");
             valid = false;
         }
-        StringBuffer requiredMsg = new StringBuffer();
+        StringBuilder requiredMsg = new StringBuilder();
         // checks if all required metadata elements are set
         List<String> metadataNameList = datamodel.getMetadataNames();
         for(String name : metadataNameList) {

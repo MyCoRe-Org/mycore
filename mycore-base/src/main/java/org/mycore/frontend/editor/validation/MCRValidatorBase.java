@@ -42,7 +42,7 @@ public abstract class MCRValidatorBase implements MCRValidator {
     protected abstract boolean isValidOrDie(Object... input) throws Exception;
 
     private String buildLogInfo(boolean isValid, Object... input) {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         buffer.append(getClass().getSimpleName());
         buffer.append(" validation ");

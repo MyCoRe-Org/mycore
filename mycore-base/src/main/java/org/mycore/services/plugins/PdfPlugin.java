@@ -110,7 +110,7 @@ public class PdfPlugin implements TextFilterPlugin {
         int rc;
         final String[] testcommand = { "pdftotext", "-v" };
         String s;
-        StringBuffer infofetch = new StringBuffer();
+        StringBuilder infofetch = new StringBuilder();
 
         try {
             Process p = Runtime.getRuntime().exec(testcommand);

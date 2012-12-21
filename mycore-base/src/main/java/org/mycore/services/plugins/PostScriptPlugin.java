@@ -110,7 +110,7 @@ public class PostScriptPlugin implements TextFilterPlugin {
         int rc;
         final String[] testcommand = { "ps2ascii", "--version" };
         String s;
-        StringBuffer infofetch = new StringBuffer("GhostScript v");
+        StringBuilder infofetch = new StringBuilder("GhostScript v");
 
         try {
             Process p = Runtime.getRuntime().exec(testcommand);

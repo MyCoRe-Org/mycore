@@ -115,7 +115,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
      * @return the next URL as String
      */
     protected String getNextURL(MCRObjectID ID, boolean okay) throws MCRActiveLinkException {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (okay) {
             sb.append("browse?mode=edit");
         } else {

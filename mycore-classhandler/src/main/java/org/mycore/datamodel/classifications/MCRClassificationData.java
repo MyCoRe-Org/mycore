@@ -505,7 +505,7 @@ public class MCRClassificationData {
     }
 
     private String createDoctypeString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (objectTypeArray.length > 1) {
             sb.append("(");
         }

@@ -509,7 +509,7 @@ public class MCREditorOutValidator {
                     int i = value.indexOf("$CurrentIP");
                     if (i != -1) {
                         String thisip = MCRSessionMgr.getCurrentSession().getCurrentIP();
-                        StringBuffer sb = new StringBuffer(64);
+                        StringBuilder sb = new StringBuilder(64);
                         sb.append(value.substring(0, i)).append(thisip).append(value.substring(i + 10, value.length()));
                         firstcond.setAttribute("value", sb.toString());
                     }

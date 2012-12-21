@@ -166,7 +166,7 @@ public class MCRDeprecatedLayoutService {
      * Builds the filename of the stylesheet to use, e. g. "playlist-simple.xsl"
      */
     private static String buildStylesheetName(String docType, String style) {
-        StringBuffer filename = new StringBuffer("xsl/").append(docType);
+        StringBuilder filename = new StringBuilder("xsl/").append(docType);
 
         if (!"default".equals(style)) {
             filename.append("-");

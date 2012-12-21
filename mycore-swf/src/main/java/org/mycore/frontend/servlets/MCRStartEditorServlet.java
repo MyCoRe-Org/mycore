@@ -310,7 +310,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             return;
         }
 
-        StringBuffer sb = new StringBuffer(getBaseURL()).append("receive/").append(cd.myremcrid.toString());
+        StringBuilder sb = new StringBuilder(getBaseURL()).append("receive/").append(cd.myremcrid.toString());
         MCRSWFUploadHandlerIFS fuh = new MCRSWFUploadHandlerIFS(cd.myremcrid.toString(), cd.mysemcrid.toString(), sb.toString());
         String fuhid = fuh.getID();
         cd.myfile = pagedir + "fileupload_commit.xml";
@@ -370,7 +370,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         }
         // back to the metadata view
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(getBaseURL()).append("receive/").append(cd.mysemcrid);
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
     }
@@ -395,7 +395,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         try {
             MCRMetadataManager.deleteMCRDerivate(cd.mysemcrid);
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append("receive/").append(cd.myremcrid.toString());
             cd.myfile = sb.toString();
         } catch (Exception e) {
@@ -411,7 +411,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             String sender = WFM.getMailSender();
             String appl = CONFIG.getString("MCR.NameOfProject", "MyCoRe");
             String subject = "Automatically generated message from " + appl;
-            StringBuffer text = new StringBuffer();
+            StringBuilder text = new StringBuilder();
             text.append("The derivate with ID ").append(cd.mysemcrid).append(" from the object with ID ").append(cd.mysemcrid)
                     .append(" was removed from server.");
             LOGGER.info(text.toString());
@@ -475,7 +475,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             }
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(getBaseURL()).append("servlets/MCRFileNodeServlet/").append(cd.mysemcrid).append("/?hosts=local");
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
     }
@@ -519,7 +519,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             String sender = WFM.getMailSender();
             String appl = CONFIG.getString("MCR.NameOfProject", "MyCoRe");
             String subject = "Automatically generated message from " + appl;
-            StringBuffer text = new StringBuffer();
+            StringBuilder text = new StringBuilder();
             text.append("The object with type ").append(cd.mytype).append(" with ID ").append(cd.mytfmcrid).append(" was removed from server.");
             LOGGER.info(text.toString());
 
@@ -567,7 +567,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             System.out.println(new String(xml));
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(pagedir).append("editor_form_").append(cd.mystep).append("-acl.xml");
         MCRSession session = MCRSessionMgr.getCurrentSession();
         session.put("service", serviceelm);
@@ -737,7 +737,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         copyobj.setId(cd.mytfmcrid);
         copyobj.setLabel(cd.mytfmcrid.toString());
         copyobj.getStructure().clear();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         try {
             MCRMetadataManager.update(copyobj);
             for (String permission:permissions) {
@@ -862,7 +862,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             LOGGER.error("Exception while store to derivate " + cd.mysemcrid);
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(getBaseURL()).append("servlets/MCRFileNodeServlet/").append(cd.mysemcrid).append("/?hosts=local");
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
     }
@@ -932,7 +932,7 @@ public class MCRStartEditorServlet extends MCRServlet {
                     String sender = WFM.getMailSender();
                     String appl = CONFIG.getString("MCR.NameOfProject", "MyCoRe");
                     String subject = "Automatically generated message from " + appl;
-                    StringBuffer text = new StringBuffer();
+                    StringBuilder text = new StringBuilder();
                     text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid)
                             .append(" was commited from workflow to the server.");
                     LOGGER.info(text.toString());
@@ -944,7 +944,7 @@ public class MCRStartEditorServlet extends MCRServlet {
                     }
                 }
 
-                StringBuffer sb = new StringBuffer("receive/").append(cd.mysemcrid);
+                StringBuilder sb = new StringBuilder("receive/").append(cd.mysemcrid);
                 cd.myfile = sb.toString();
             } else {
                 cd.myfile = storeerrorpage;
@@ -995,7 +995,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             String sender = WFM.getMailSender();
             String appl = CONFIG.getString("MCR.NameOfProject", "MyCoRe");
             String subject = "Automatically generated message from " + appl;
-            StringBuffer text = new StringBuffer();
+            StringBuilder text = new StringBuilder();
             text.append("The derivate with ID ").append(cd.mysemcrid).append(" was removed from workflow.");
             LOGGER.info(text.toString());
 
@@ -1096,7 +1096,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             String sender = WFM.getMailSender();
             String appl = CONFIG.getString("MCR.NameOfProject", "MyCoRe");
             String subject = "Automatically generated message from " + appl;
-            StringBuffer text = new StringBuffer();
+            StringBuilder text = new StringBuilder();
             text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid).append(" was removed from the workflow.");
             LOGGER.info(text.toString());
 
@@ -1405,7 +1405,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void wrongtodo(MCRServletJob job, CommonData cd) throws IOException {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(getBaseURL()).append("index.html");
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
     }

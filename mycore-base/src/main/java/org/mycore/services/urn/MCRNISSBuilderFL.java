@@ -51,7 +51,7 @@ public class MCRNISSBuilderFL implements MCRNISSBuilder {
 
         String DDDDD = String.valueOf(yyy * 366 + ddd);
 
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         buffer.append(DDDDD.charAt(4));
         buffer.append(DDDDD.charAt(2));
         buffer.append(DDDDD.charAt(1));

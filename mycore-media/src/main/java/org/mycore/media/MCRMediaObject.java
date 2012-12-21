@@ -160,7 +160,7 @@ public class MCRMediaObject implements Cloneable {
      * @return the duration of this asset, formatted as a String
      */
     public String getDurationFormatted(String hourLabel, String minutesLabel, String secondsLabel) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         if (getDurationHours() > 0) {
             sb.append(getDurationHours());
@@ -188,7 +188,7 @@ public class MCRMediaObject implements Cloneable {
      */
     public String getDurationTimecode() {
         DecimalFormat formatter = new DecimalFormat("00");
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(formatter.format(getDurationHours()));
         sb.append(":");
         sb.append(formatter.format(getDurationMinutes()));

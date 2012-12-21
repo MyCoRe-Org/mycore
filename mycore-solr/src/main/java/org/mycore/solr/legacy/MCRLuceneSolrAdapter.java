@@ -308,7 +308,7 @@ public class MCRLuceneSolrAdapter {
         aQuery = MCRUtils.replaceString(aQuery, "'", "\""); // handle phrase
 
         StringTokenizer _tokenizer = new StringTokenizer(aQuery, " \t\n\r", true);
-        StringBuffer _fixedQuery = new StringBuffer(aQuery.length());
+        StringBuilder _fixedQuery = new StringBuilder(aQuery.length());
         boolean _inString = false;
 
         while (_tokenizer.hasMoreTokens()) {

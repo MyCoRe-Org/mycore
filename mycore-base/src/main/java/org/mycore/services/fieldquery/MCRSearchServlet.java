@@ -465,7 +465,7 @@ public class MCRSearchServlet extends MCRServlet {
     protected void sendRedirect(HttpServletRequest req, HttpServletResponse res, MCRCachedQueryData qd, Document query) throws IOException {
 
         // Redirect browser to first results page   
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("MCRSearchServlet?mode=results&id=").append(qd.getResults().getID());
 
         String numPerPage = query.getRootElement().getAttributeValue("numPerPage", "0");

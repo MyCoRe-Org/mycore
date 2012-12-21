@@ -68,7 +68,7 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
             okay = false;
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (okay) {
             // then delete the data
             wfm.deleteMetadataObject(ID);
@@ -96,7 +96,7 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
         String sender = WFM.getMailSender();
         String appl = MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe");
         String subject = "Automatically generated message from " + appl;
-        StringBuffer text = new StringBuffer();
+        StringBuilder text = new StringBuilder();
         text.append("An Object with type ").append(ID.getTypeId()).append(" and ID ").append(ID.toString()).append(
                 " was stored in the system.");
         LOGGER.info(text.toString());

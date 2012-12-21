@@ -38,7 +38,7 @@ public class MCRStackTraceDialog extends JDialog {
         if (ex == null) {
             throw new IllegalArgumentException("The Exception parameter must not be null");
         }
-        StringBuffer msg = new StringBuffer();
+        StringBuilder msg = new StringBuilder();
         msg.append(getExceptionStackTrace(ex) + "\n");
 
         if (ex instanceof MCRUploadException) {

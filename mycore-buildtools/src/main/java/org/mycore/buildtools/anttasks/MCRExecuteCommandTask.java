@@ -71,7 +71,7 @@ public class MCRExecuteCommandTask extends Task {
 		} catch (IOException e) {
 			// do nothing
 		}
-		StringBuffer sbCommands = new StringBuffer();
+		StringBuilder sbCommands = new StringBuilder();
 		for (String s : list) {
 		    getProject().log(s, LogLevel.INFO.getLevel());
 			sbCommands.append(s).append(";;");

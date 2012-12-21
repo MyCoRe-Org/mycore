@@ -94,7 +94,7 @@ public class MCRCatchException extends Exception {
             return super.toString();
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         sb.append("MyCoRe Exception: ").append(getClass().getName());
         sb.append("\n\n");

@@ -66,7 +66,7 @@ public abstract class MCRSetCondition<T> implements MCRCondition<T> {
 
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < children.size(); i++) {
             sb.append("(").append(children.get(i)).append(")");
             if (i < children.size() - 1) {

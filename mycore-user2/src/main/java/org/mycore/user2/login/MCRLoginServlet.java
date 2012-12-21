@@ -221,7 +221,7 @@ public class MCRLoginServlet extends MCRServlet {
     private String encodePath(String path) throws Exception {
         path = path.replace('\\', '/');
 
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         StringTokenizer st = new StringTokenizer(path, " /?&=", true);
 
         while (st.hasMoreTokens()) {

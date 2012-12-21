@@ -100,7 +100,7 @@ public class ChecksumUtils
 
          byte[] md5Digest = md.digest();
 
-         StringBuffer buffer = new StringBuffer(); 
+         StringBuilder buffer = new StringBuilder();
          for( byte b : md5Digest )
          {
             // 0xFF is used to handle the issue of negative numbers in the bytes
@@ -156,7 +156,7 @@ public class ChecksumUtils
 
          byte[] md5Digest = md.digest();
 
-         StringBuffer buffer = new StringBuffer(); 
+         StringBuilder buffer = new StringBuilder();
          for( byte b : md5Digest )
          {
             // 0xFF is used to handle the issue of negative numbers in the bytes

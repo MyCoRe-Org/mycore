@@ -243,7 +243,7 @@ public class DummyServer implements SWORDServer {
 		}
 		
 		// Get the filenames
-		StringBuffer filenames = new StringBuffer("Deposit file contained: ");
+		StringBuilder filenames = new StringBuilder("Deposit file contained: ");
 		if (deposit.getFilename() != null) {
 			filenames.append("(filename = " + deposit.getFilename() + ") ");
 		}

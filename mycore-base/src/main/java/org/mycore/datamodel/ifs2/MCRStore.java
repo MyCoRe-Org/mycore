@@ -204,7 +204,7 @@ public abstract class MCRStore {
         String id = createIDWithLeadingZeros(ID);
 
         String[] paths = new String[slotLength.length + 1];
-        StringBuffer path = new StringBuffer();
+        StringBuilder path = new StringBuilder();
         int offset = 0;
         for (int i = 0; i < paths.length - 1; i++) {
             path.append(id.substring(offset, offset + slotLength[i]));

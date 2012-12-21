@@ -127,7 +127,7 @@ public class MCREditorVariable implements Comparable {
 
     void setSortNr(String sortNr) {
         StringTokenizer st = new StringTokenizer(sortNr, ".");
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         while (st.hasMoreTokens()) {
             int number = Integer.parseInt(st.nextToken());

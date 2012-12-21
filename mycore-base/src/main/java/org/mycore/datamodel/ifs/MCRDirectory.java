@@ -501,7 +501,7 @@ public class MCRDirectory extends MCRFilesystemNode {
         collectMD5Lines(list);
         Collections.sort(list);
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < list.size(); i++) {
             sb.append(list.get(i)).append('\n');
@@ -518,7 +518,7 @@ public class MCRDirectory extends MCRFilesystemNode {
 
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(super.toString());
         sb.append("NumChildDirectoriesHere  = ").append(numChildDirsHere);
         sb.append("NumChildFilesHere        = ").append(numChildFilesHere);

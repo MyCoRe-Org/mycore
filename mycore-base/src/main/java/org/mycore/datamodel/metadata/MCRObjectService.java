@@ -290,7 +290,7 @@ public class MCRObjectService {
      * @return the flags string
      */
     public final String getFlags() {
-        StringBuffer sb = new StringBuffer("");
+        StringBuilder sb = new StringBuilder("");
 
         for (int i = 0; i < flags.size(); i++) {
             sb.append(flags.get(i).getText()).append(" ");

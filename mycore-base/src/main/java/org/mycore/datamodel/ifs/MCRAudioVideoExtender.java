@@ -226,7 +226,7 @@ public abstract class MCRAudioVideoExtender {
      * @return the duration of this asset, formatted as a String
      */
     public String getDurationFormatted(String hourLabel, String minutesLabel, String secondsLabel) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         if (durationHours > 0) {
             sb.append(durationHours);
@@ -254,7 +254,7 @@ public abstract class MCRAudioVideoExtender {
      */
     public String getDurationTimecode() {
         DecimalFormat formatter = new DecimalFormat("00");
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(formatter.format(durationHours));
         sb.append(":");
         sb.append(formatter.format(durationMinutes));
@@ -333,7 +333,7 @@ public abstract class MCRAudioVideoExtender {
      */
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("Media Type      : ");
         sb.append(isVideo() ? "Video\n" : "Audio\n");
         sb.append("Bitrate         : ").append(getBitRateFormatted()).append("/sec.");

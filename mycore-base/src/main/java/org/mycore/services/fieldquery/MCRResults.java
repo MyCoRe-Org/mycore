@@ -304,7 +304,7 @@ public class MCRResults implements Iterable<MCRHit> {
 
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("---- MCRResults ----");
         sb.append("\nNumHits = ").append(getNumHits());
         for (int i = 0; i < hits.size(); i++) {

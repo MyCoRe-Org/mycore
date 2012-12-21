@@ -115,7 +115,7 @@ public class MCRTemplatesCompiler {
     }
 
     private static String buildErrorMessage(String resource, Exception cause) {
-        StringBuffer msg = new StringBuffer("Error compiling XSL stylesheet ");
+        StringBuilder msg = new StringBuilder("Error compiling XSL stylesheet ");
         msg.append(resource);
 
         if (cause instanceof TransformerException) {

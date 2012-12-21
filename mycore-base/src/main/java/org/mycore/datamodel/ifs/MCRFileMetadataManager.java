@@ -136,7 +136,7 @@ public class MCRFileMetadataManager {
     synchronized String createNodeID() {
         String time = "0000000000" + Long.toString(last_number++, 36);
 
-        StringBuffer sb = new StringBuffer(getIDPrefix());
+        StringBuilder sb = new StringBuilder(getIDPrefix());
         sb.append(time.substring(time.length() - 10));
         sb.reverse();
         return sb.toString();

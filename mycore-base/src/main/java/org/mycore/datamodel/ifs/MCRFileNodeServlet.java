@@ -188,7 +188,7 @@ public class MCRFileNodeServlet extends MCRServlet {
      */
     protected static String getOwnerID(HttpServletRequest request) {
         String pI = request.getPathInfo();
-        StringBuffer ownerID = new StringBuffer(request.getPathInfo().length());
+        StringBuilder ownerID = new StringBuilder(request.getPathInfo().length());
         boolean running = true;
         for (int i = pI.charAt(0) == '/' ? 1 : 0; i < pI.length() && running; i++) {
             switch (pI.charAt(i)) {
@@ -210,7 +210,7 @@ public class MCRFileNodeServlet extends MCRServlet {
     protected static String getPath(HttpServletRequest request) {
         String ownerID = getOwnerID(request);
         int pos = ownerID.length() + 1;
-        StringBuffer path = new StringBuffer(request.getPathInfo().substring(pos));
+        StringBuilder path = new StringBuilder(request.getPathInfo().substring(pos));
         if (path.length() > 1 && path.charAt(path.length() - 1) == '/') {
             path.deleteCharAt(path.length() - 1);
         }

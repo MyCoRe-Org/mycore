@@ -66,7 +66,7 @@ public class MCRXMLParserErrorHandler implements ErrorHandler {
      * @return the location string
      */
     public static String getSAXErrorMessage(SAXParseException ex) {
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
 
         String systemId = ex.getSystemId();
         if (systemId != null) {

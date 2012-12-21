@@ -65,7 +65,7 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
      * @return the next URL as String
      */
     protected String getNextURL(MCRObjectID ID, boolean okay) throws MCRActiveLinkException {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (okay) {
             sb.append(WFM.getWorkflowFile(getServletContext(), pagedir, ID.getBase()));
         } else {
@@ -91,7 +91,7 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
         String sender = WFM.getMailSender();
         String appl = MCRConfiguration.instance().getString("MCR.NameOfProject", "DocPortal");
         String subject = "Automatically generated message from " + appl;
-        StringBuffer text = new StringBuffer();
+        StringBuilder text = new StringBuilder();
         text.append("The ACL data of the MyCoRe object of type ").append(ID.getTypeId()).append(" with the ID ").append(ID.toString())
                 .append(" in the workflow was changes.");
         LOGGER.info(text.toString());

@@ -39,7 +39,7 @@ public class MCRImportField {
         return id;
     }
     public String getBaseId() {
-        StringBuffer baseId = new StringBuffer(this.id);
+        StringBuilder baseId = new StringBuilder(this.id);
         MCRImportField parent = this.parent;
         while(parent != null) {
             baseId.insert(0, parent.getSeperator());

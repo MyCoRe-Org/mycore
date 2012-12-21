@@ -103,7 +103,7 @@ public abstract class MCRContentStore {
             return doStoreContent(file, source);
         } catch (Exception exc) {
             if (!(exc instanceof MCRException)) {
-                StringBuffer msg = new StringBuffer();
+                StringBuilder msg = new StringBuilder();
                 msg.append("Could not store content of file [");
                 msg.append(file.getPath()).append("] in store [");
                 msg.append(storeID).append("]");
@@ -163,7 +163,7 @@ public abstract class MCRContentStore {
             doDeleteContent(storageID);
         } catch (Exception exc) {
             if (!(exc instanceof MCRException)) {
-                StringBuffer msg = new StringBuffer();
+                StringBuilder msg = new StringBuilder();
                 msg.append("Could not delete content of file with storage ID [");
                 msg.append(storageID).append("] in store [");
                 msg.append(storeID).append("]");
@@ -259,7 +259,7 @@ public abstract class MCRContentStore {
             return doRetrieveContent(file);
         } catch (Exception exc) {
             if (!(exc instanceof MCRException)) {
-                StringBuffer msg = new StringBuffer();
+                StringBuilder msg = new StringBuilder();
                 msg.append("Could not retrieve content of file with storage ID [");
                 msg.append(file.getStorageID()).append("] in store [");
                 msg.append(storeID).append("]");
@@ -276,7 +276,7 @@ public abstract class MCRContentStore {
      * Constructs a new unique ID for storing content
      */
     protected static synchronized String buildNextID(MCRFileReader file) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         sb.append(buildNextTimestamp());
         sb.append("-").append(file.getID());

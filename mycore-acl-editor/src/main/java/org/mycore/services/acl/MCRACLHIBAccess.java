@@ -156,7 +156,7 @@ public abstract class MCRACLHIBAccess {
                 String ruleString = rule.getRule();
                 String desc = rule.getDescription();
                 String creator = rule.getCreator();
-                StringBuffer debugMSG = new StringBuffer("Update: ");
+                StringBuilder debugMSG = new StringBuilder("Update: ");
                 debugMSG.append(rid).append(" - ");
                 debugMSG.append(ruleString).append(" - ");
                 debugMSG.append(desc);

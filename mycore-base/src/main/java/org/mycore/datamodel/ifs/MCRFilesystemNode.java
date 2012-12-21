@@ -493,7 +493,7 @@ public abstract class MCRFilesystemNode {
     public String toString() {
         String date = formatter.format(lastModified.getTime());
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("ID          = ").append(ID).append("\n");
         sb.append("Name        = ").append(name).append("\n");
         sb.append("Label       = ").append(label).append("\n");

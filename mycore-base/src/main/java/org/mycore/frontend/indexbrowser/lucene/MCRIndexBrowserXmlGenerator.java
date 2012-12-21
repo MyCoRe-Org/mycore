@@ -328,7 +328,7 @@ public class MCRIndexBrowserXmlGenerator {
             return a;
         }
 
-        StringBuffer pdiff = new StringBuffer();
+        StringBuilder pdiff = new StringBuilder();
 
         for (int i = 0; i < Math.min(a.length(), b.length()); i++) {
             pdiff.append(a.charAt(i));

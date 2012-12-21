@@ -925,10 +925,10 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
                 if (mode.equals("intern")) {
                     if (!hrefFile.exists()) {
                         hrefFile.getParentFile().mkdir();
-                        StringBuffer contentHead = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n").append("<!DOCTYPE MyCoReWebPage>\n")
+                        StringBuilder contentHead = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n").append("<!DOCTYPE MyCoReWebPage>\n")
                                         .append("<MyCoReWebPage>\n").append("\t<section xml:lang=\"" + defaultLang + "\" title=\"" + label + "\">\n");
-                        StringBuffer contentBody = new StringBuffer(content);
-                        StringBuffer contentTail = new StringBuffer("\t</section>\n").append("</MyCoReWebPage>\n");
+                        StringBuilder contentBody = new StringBuilder(content);
+                        StringBuilder contentTail = new StringBuilder("\t</section>\n").append("</MyCoReWebPage>\n");
                         BufferedInputStream bis = new BufferedInputStream(new ByteArrayInputStream(((contentHead).append(contentBody).append(contentTail))
                                         .toString().getBytes("UTF-8")));
                         html2BeStored = getXMLAsJDOM(bis);

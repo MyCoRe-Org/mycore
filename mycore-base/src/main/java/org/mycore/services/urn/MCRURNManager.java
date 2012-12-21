@@ -123,7 +123,7 @@ public class MCRURNManager {
      * @return the checksum for the given urn:nbn:de
      */
     public static String buildChecksum(String urn) {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         for (int i = 0; i < urn.length(); i++) {
             String character = urn.substring(i, i + 1);
@@ -164,7 +164,7 @@ public class MCRURNManager {
         String base = "MCR.URN.SubNamespace." + configID + ".";
         String prefix = MCRConfiguration.instance().getString(base + "Prefix");
 
-        StringBuffer buffer = new StringBuffer(prefix);
+        StringBuilder buffer = new StringBuilder(prefix);
         buffer.append(niss);
         buffer.append(buildChecksum(buffer.toString()));
         return buffer.toString();
