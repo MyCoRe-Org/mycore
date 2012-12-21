@@ -276,7 +276,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * @param filename
      *            the file written to
      */
-    public static final void exportAllPermissionsToFile(String filename) throws Exception {
+    public static void exportAllPermissionsToFile(String filename) throws Exception {
         MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
         Element mcrpermissions = new Element("mcrpermissions");

@@ -279,7 +279,7 @@ public class MCRObjectServlet extends MCRServlet {
         return getEditorIDFromObjectID(request, referer);
     }
 
-    protected static final String getEditorIDFromSearch(String referer) {
+    protected static String getEditorIDFromSearch(String referer) {
         Matcher m = SEARCH_ID_PATTERN.matcher(referer);
         m.find();
         LOGGER.debug("Group count: " + m.groupCount());
@@ -309,7 +309,7 @@ public class MCRObjectServlet extends MCRServlet {
         return resolveEditorID(getObjectID(request));
     }
 
-    protected final static String resolveEditorID(String objectID) {
+    protected static String resolveEditorID(String objectID) {
         @SuppressWarnings("unchecked")
         Hashtable<String, String> h = (Hashtable<String, String>) MCRSessionMgr.getCurrentSession().get(EDITOR_ID_TABLE_KEY);
         if (h == null) {
@@ -319,7 +319,7 @@ public class MCRObjectServlet extends MCRServlet {
         return o == null ? null : o.toString();
     }
 
-    protected final static void storeEditorID(String objectID, String editorID) {
+    protected static void storeEditorID(String objectID, String editorID) {
         @SuppressWarnings("unchecked")
         Hashtable<String, String> h = (Hashtable<String, String>) MCRSessionMgr.getCurrentSession().get(EDITOR_ID_TABLE_KEY);
         if (h == null) {

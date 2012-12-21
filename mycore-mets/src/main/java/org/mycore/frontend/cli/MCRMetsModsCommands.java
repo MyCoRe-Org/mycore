@@ -147,7 +147,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
      * The command build mets.xml files in the derivates if it does not exist
      * and the content are images.
      */
-    public static final void buildMets() throws Exception {
+    public static void buildMets() throws Exception {
         LOGGER.info("Build all METS files start.");
         final long start = System.currentTimeMillis();
         List<String> derlist = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
@@ -163,7 +163,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
      * 
      * @param type the data type of the MCRObjectIDs
      */
-    public static final void buildMetsForType(String type) {
+    public static void buildMetsForType(String type) {
         LOGGER.info("Build METS file for type " + type + " start.");
         final long start = System.currentTimeMillis();
         MCRQueryCondition fromcond = new MCRQueryCondition(MCRFieldDef.getDef("objectType"), "=", type);
@@ -185,7 +185,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
      * 
      * @param MCRID the MCRObjectID to check and build
      */
-    public static final void buildMetsForMCRObjectID(String MCRID) {
+    public static void buildMetsForMCRObjectID(String MCRID) {
         LOGGER.info("Build METS file for ID " + MCRID + " start.");
         final long start = System.currentTimeMillis();
         MCRObject mcrobj = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(MCRID));
@@ -205,7 +205,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
      * 
      * @param MCRID the MCRObjectID
      */
-    public static final void buildMetsForMCRDerivateID(String MCRID) {
+    public static void buildMetsForMCRDerivateID(String MCRID) {
         String baseurl = MCRConfiguration.instance().getString("MCR.baseurl", "http://127.0.0.1:8080");
         LOGGER.debug("Build METS file for ID " + MCRID + "  start.");
         final long start = System.currentTimeMillis();

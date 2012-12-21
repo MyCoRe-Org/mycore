@@ -126,7 +126,7 @@ public class MCRUtils {
      *            with x- or i-, otherwise return false;
      * @deprecated use {@link MCRLanguageFactory.instance()#isSupportedLanguage(String)} instead
      */
-    public static final boolean isSupportedLang(String code) {
+    public static boolean isSupportedLang(String code) {
         return MCRLanguageFactory.instance().isSupportedLanguage(code);
     }
 
@@ -138,7 +138,7 @@ public class MCRUtils {
      *            the date input
      * @return the ISO output or null
      */
-    public static final String convertDateToISO(String indate) {
+    public static String convertDateToISO(String indate) {
         if (indate == null || (indate = indate.trim()).length() == 0) {
             return null;
         }
@@ -180,7 +180,7 @@ public class MCRUtils {
      *            the date input
      * @return the GregorianCalendar or null
      */
-    public static final GregorianCalendar convertDateToGregorianCalendar(String indate) {
+    public static GregorianCalendar convertDateToGregorianCalendar(String indate) {
         if (indate == null || (indate = indate.trim()).length() == 0) {
             return null;
         }
@@ -254,7 +254,7 @@ public class MCRUtils {
      *            a string
      * @return the converted string.
      */
-    public static final String stringToXML(String in) {
+    public static String stringToXML(String in) {
         if (in == null) {
             return "";
         }
@@ -307,7 +307,7 @@ public class MCRUtils {
      *            the JDOM output format    
      * @return a byte array of the JDOM tree
      */
-    public static final byte[] getByteArray(org.jdom.Document jdom, Format format) throws MCRPersistenceException {
+    public static byte[] getByteArray(org.jdom.Document jdom, Format format) throws MCRPersistenceException {
         MCRConfiguration conf = MCRConfiguration.instance();
         String mcr_encoding = conf.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
         ByteArrayOutputStream outb = new ByteArrayOutputStream();
@@ -329,7 +329,7 @@ public class MCRUtils {
      *            the JDOM tree
      * @return a byte array of the JDOM tree
      */
-    public static final byte[] getByteArray(org.jdom.Document jdom) throws MCRPersistenceException {
+    public static byte[] getByteArray(org.jdom.Document jdom) throws MCRPersistenceException {
         return getByteArray(jdom, Format.getRawFormat());
     }
 
@@ -341,7 +341,7 @@ public class MCRUtils {
      *            Array of Objects to be converted
      * @return Array of Strings representing Objects
      */
-    public static final String[] getStringArray(Object[] objects) {
+    public static String[] getStringArray(Object[] objects) {
         String[] returns = new String[objects.length];
 
         for (int i = 0; i < objects.length; i++) {
@@ -361,7 +361,7 @@ public class MCRUtils {
      *            The maximum of items to convert
      * @return Array of Strings representing Objects
      */
-    public static final String[] getStringArray(Object[] objects, int maxitems) {
+    public static String[] getStringArray(Object[] objects, int maxitems) {
         String[] returns = new String[maxitems];
 
         for (int i = 0; i < maxitems; i++) {
@@ -441,7 +441,7 @@ public class MCRUtils {
      *            available COMMAND_XYZ
      * @return merged HashSet
      */
-    public static final <T> HashSet<T> mergeHashSets(HashSet<? extends T> set1, HashSet<? extends T> set2, char operation) {
+    public static <T> HashSet<T> mergeHashSets(HashSet<? extends T> set1, HashSet<? extends T> set2, char operation) {
         HashSet<T> merged = new HashSet<T>();
         T id;
 
@@ -500,7 +500,7 @@ public class MCRUtils {
      *            The maximum number of items
      * @return the cutted ArrayList
      */
-    public static final <T> ArrayList<T> cutArrayList(ArrayList<? extends T> arrayin, int maxitems) {
+    public static <T> ArrayList<T> cutArrayList(ArrayList<? extends T> arrayin, int maxitems) {
         if (arrayin == null) {
             throw new MCRException("Input ArrayList is null.");
         }
@@ -538,7 +538,7 @@ public class MCRUtils {
      * @exception IOException
      *                if an I/O error occurs.
      */
-    public static final int readBlocking(InputStream in, byte[] b, int off, int len) throws IOException {
+    public static int readBlocking(InputStream in, byte[] b, int off, int len) throws IOException {
         int totalBytesRead = 0;
 
         while (totalBytesRead < len) {
@@ -574,7 +574,7 @@ public class MCRUtils {
      * @exception IOException
      *                if an I/O error occurs.
      */
-    public static final int readBlocking(Reader in, char[] c, int off, int len) throws IOException {
+    public static int readBlocking(Reader in, char[] c, int off, int len) throws IOException {
         int totalCharsRead = 0;
 
         while (totalCharsRead < len) {
@@ -614,7 +614,7 @@ public class MCRUtils {
      * @param xml
      *            the File instance
      */
-    public static final void writeElementToFile(Element elm, File xml) {
+    public static void writeElementToFile(Element elm, File xml) {
         writeJDOMToFile(new Document().addContent(elm), xml);
     }
 
@@ -645,7 +645,7 @@ public class MCRUtils {
      * @param xml
      *            the File instance
      */
-    public static final void writeJDOMToFile(Document jdom, File xml) {
+    public static void writeJDOMToFile(Document jdom, File xml) {
         try {
             XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
             BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(xml));
@@ -667,7 +667,7 @@ public class MCRUtils {
      * @param elm
      *            the JDOM Document
      */
-    public static final void writeElementToSysout(Element elm) {
+    public static void writeElementToSysout(Element elm) {
         writeJDOMToSysout(new Document().addContent(elm));
     }
 
@@ -677,7 +677,7 @@ public class MCRUtils {
      * @param jdom
      *            the JDOM Document
      */
-    public static final void writeJDOMToSysout(Document jdom) {
+    public static void writeJDOMToSysout(Document jdom) {
         try {
             XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
             BufferedOutputStream out = new BufferedOutputStream(System.out);

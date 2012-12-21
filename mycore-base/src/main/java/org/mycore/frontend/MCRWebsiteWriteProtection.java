@@ -36,7 +36,7 @@ public final class MCRWebsiteWriteProtection {
      * 
      * @return true if write access is currently active, false if not
      */
-    public final static boolean isActive() {
+    public static boolean isActive() {
         // if superuser is online, return false
         String superUser = MCR_CONFIG.getString("MCR.Users.Superuser.UserName");
         if (MCRSessionMgr.getCurrentSession().getUserInformation().getUserID().equals(superUser)) {
@@ -52,7 +52,7 @@ public final class MCRWebsiteWriteProtection {
         return Boolean.valueOf(protection);
     }
 
-    public final static org.w3c.dom.Document getMessage() throws JDOMException, IOException {
+    public static org.w3c.dom.Document getMessage() throws JDOMException, IOException {
         Element config = getConfiguration();
         if (config == null) {
             return new DOMOutputter().output(new Document());
@@ -128,7 +128,7 @@ public final class MCRWebsiteWriteProtection {
     }
 
     // to be used by cli
-    public final static void activate() {
+    public static void activate() {
         // create file, set param in file to true, add message to file
         Element config = getConfiguration();
         config.getChild("protectionEnabled").setText("true");
@@ -136,7 +136,7 @@ public final class MCRWebsiteWriteProtection {
     }
 
     // to be used by cli
-    public final static void activate(String message) {
+    public static void activate(String message) {
         // create file, set param in file to true, add message to file
         Element config = getConfiguration();
         config.getChild("protectionEnabled").setText("true");
@@ -145,14 +145,14 @@ public final class MCRWebsiteWriteProtection {
     }
 
     // to be used by cli
-    public final static void deactivate() {
+    public static void deactivate() {
         // set param in file to false
         Element config = getConfiguration();
         config.getChild("protectionEnabled").setText("false");
         setConfiguration(config);
     }
 
-    public final static boolean printInfoPageIfNoAccess(HttpServletRequest request, HttpServletResponse response, String baseURL)
+    public static boolean printInfoPageIfNoAccess(HttpServletRequest request, HttpServletResponse response, String baseURL)
             throws IOException {
         if (MCRWebsiteWriteProtection.isActive()) {
             response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);

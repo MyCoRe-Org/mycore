@@ -40,7 +40,7 @@ public class MCRCategoryDAOFactory {
     /**
      * Returns an instance of a MCRCategoryDAO implementator.
      */
-    public static final MCRCategoryDAO getInstance() {
+    public static MCRCategoryDAO getInstance() {
         return instance;
     }
 
@@ -53,7 +53,7 @@ public class MCRCategoryDAOFactory {
      * @throws IllegalAccessException
      * @throws InstantiationException
      */
-    public static synchronized final void set(Class<? extends MCRCategoryDAO> daoClass) throws IllegalAccessException,
+    public static synchronized void set(Class<? extends MCRCategoryDAO> daoClass) throws IllegalAccessException,
             InstantiationException {
         instance = daoClass.newInstance();
     }

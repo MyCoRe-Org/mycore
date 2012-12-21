@@ -113,7 +113,7 @@ public class MCRUserMgr {
      * 
      * @return returns the one and only instance of <CODE>MCRUserMgr</CODE>
      */
-    public final static synchronized MCRUserMgr instance() throws MCRException {
+    public static synchronized MCRUserMgr instance() throws MCRException {
         if (theInstance == null) {
             theInstance = new MCRUserMgr();
         }
@@ -909,7 +909,7 @@ public class MCRUserMgr {
      * 
      * @return returns true if the user is authenticated
      */
-    public final static boolean isAuthenticated(MCRUser user) {
+    public static boolean isAuthenticated(MCRUser user) {
         // Get the MCRSession object for the current thread from the session
         // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();

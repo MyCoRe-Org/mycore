@@ -193,7 +193,7 @@ abstract class MCRUserObject {
      * This helper method replaces null with an empty string and trims
      * whitespace from non-null strings.
      */
-    protected final static String trim(String s) {
+    protected static String trim(String s) {
         return s != null ? s.trim() : "";
     }
 
@@ -201,7 +201,7 @@ abstract class MCRUserObject {
      * This helper method replaces null with an empty string and trims
      * whitespace from non-null strings.
      */
-    protected final static String trim(String s, int len) {
+    protected static String trim(String s, int len) {
         String sn = s != null ? s.trim() : "";
 
         if (sn.length() > len) {

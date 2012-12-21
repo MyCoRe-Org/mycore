@@ -313,7 +313,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @param newFile
      *            the filename of the user data output (encrypted passwords)
      */
-    public static final void encryptPasswordsInXMLFile(String oldFile, String newFile) throws MCRException {
+    public static void encryptPasswordsInXMLFile(String oldFile, String newFile) throws MCRException {
         if (!checkFilename(oldFile)) {
             return;
         }
@@ -430,12 +430,12 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @param roleID
      *            the ID of the role for which the XML-representation is needed
      */
-    public static final void listRole(String roleID) throws MCRException {
+    public static void listRole(String roleID) throws MCRException {
         MCRRole role = MCRRoleManager.getRole(roleID);
         listRole(role);
     }
 
-    public static final void listRole(MCRRole role) {
+    public static void listRole(MCRRole role) {
         StringBuilder sb = new StringBuilder();
         sb.append("       role=").append(role.getName());
         for (MCRLabel label : role.getLabels()) {
@@ -455,7 +455,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @param userID
      *            the ID of the user for which the XML-representation is needed
      */
-    public static final void listUser(String userID) throws MCRException {
+    public static void listUser(String userID) throws MCRException {
         MCRUser user = MCRUserManager.getUser(userID);
         listUser(user);
     }
@@ -508,7 +508,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the filename of the user data input
      * @throws SAXParseException 
      */
-    public static final void createUserFromFile(String filename) throws SAXParseException, IOException {
+    public static void createUserFromFile(String filename) throws SAXParseException, IOException {
         MCRUser user = getMCRUserFromFile(filename);
         MCRUserManager.createUser(user);
     }
@@ -520,7 +520,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the filename of the user data input
      * @throws SAXParseException if file could not be parsed
      */
-    public static final void updateUserFromFile(String filename) throws SAXParseException, IOException {
+    public static void updateUserFromFile(String filename) throws SAXParseException, IOException {
         MCRUser user = getMCRUserFromFile(filename);
         MCRUserManager.updateUser(user);
     }
@@ -545,7 +545,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            be added
      * @throws MCRException
      */
-    public static final void assignUserToRole(String userID, String roleID) throws MCRException {
+    public static void assignUserToRole(String userID, String roleID) throws MCRException {
         try {
             MCRUser user = MCRUserManager.getUser(userID);
             user.assignRole(roleID);
@@ -566,7 +566,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            be removed
      * @throws MCRException
      */
-    public static final void unassignUserFromRole(String userID, String roleID) throws MCRException {
+    public static void unassignUserFromRole(String userID, String roleID) throws MCRException {
         try {
             MCRUser user = MCRUserManager.getUser(userID);
             user.unassignRole(roleID);

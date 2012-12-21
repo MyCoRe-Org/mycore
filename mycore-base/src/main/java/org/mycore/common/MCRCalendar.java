@@ -108,7 +108,7 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    public static final GregorianCalendar getGregorianHistoryDate(String datestr, boolean last) throws MCRException {
+    public static GregorianCalendar getGregorianHistoryDate(String datestr, boolean last) throws MCRException {
         return getGregorianHistoryDate(datestr, last, TAG_GREGORIAN);
     }
 
@@ -132,7 +132,7 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    public static final GregorianCalendar getGregorianHistoryDate(String datestr, boolean last, String calstr) throws MCRException {
+    public static GregorianCalendar getGregorianHistoryDate(String datestr, boolean last, String calstr) throws MCRException {
         // check input
         String calstrtmp = checkCalendarName(calstr);
         Calendar cal = checkHistoryDate(datestr, last, calstrtmp);
@@ -320,7 +320,7 @@ public class MCRCalendar {
      * @return the GregorianCalendar date value or null if an error was
      *         occurred.
      */
-    public static final boolean testHistoryDate(String datestr, boolean last, String calstr) {
+    public static boolean testHistoryDate(String datestr, boolean last, String calstr) {
         try {
             Calendar cal = checkHistoryDate(datestr, last, calstr);
             return cal != null;
@@ -2129,7 +2129,7 @@ public class MCRCalendar {
      *            an instance of a Calendar
      * @return the Julian Day number
      */
-    public static final int getJulianDayNumber(Calendar date) {
+    public static int getJulianDayNumber(Calendar date) {
         return date.get(Calendar.JULIAN_DAY);
     }
 
@@ -2141,7 +2141,7 @@ public class MCRCalendar {
      * 
      * @return the date string
      */
-    public static final String getDateToFormattedString(Calendar date) {
+    public static String getDateToFormattedString(Calendar date) {
         return getDateToFormattedString(date, "dd.MM.yyyy G");
     }
 
@@ -2156,7 +2156,7 @@ public class MCRCalendar {
      * @return the date string in the format. If the format is wrong dd.MM.yyyy
      *         G is set. If the date is wrong an empty string will be returned.
      */
-    public static final String getDateToFormattedString(Calendar date, String format) {
+    public static String getDateToFormattedString(Calendar date, String format) {
         if (date == null || format == null || format.trim().length() == 0) {
             return "";
         }

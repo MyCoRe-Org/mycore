@@ -150,7 +150,7 @@ public final class MCRISO8601FormatChooser {
      * @return an ISO 8601 formatted time String with at max 3 digits for
      *         fractions of a second
      */
-    public final static String cropSecondFractions(String isoString) {
+    public static String cropSecondFractions(String isoString) {
         Matcher matcher = MILLI_CHECK_PATTERN.matcher(isoString);
         boolean result = matcher.find();
         if (result) {

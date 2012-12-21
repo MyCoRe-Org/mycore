@@ -249,7 +249,7 @@ public class MCRSession implements Cloneable {
     /** Get the ip value to the local IP
      * @deprecated without replacement
      */
-    public static final String getLocalIP() {
+    public static String getLocalIP() {
         try {
             return java.net.InetAddress.getLocalHost().getHostAddress();
         } catch (java.net.UnknownHostException ignored) {

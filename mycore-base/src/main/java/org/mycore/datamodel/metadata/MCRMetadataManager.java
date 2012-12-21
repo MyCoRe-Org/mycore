@@ -62,7 +62,7 @@ public final class MCRMetadataManager {
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
      */
-    public static final void create(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
+    public static void create(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
         // exist the derivate?
         if (exists(mcrDerivate.getId())) {
             throw new MCRPersistenceException("The derivate " + mcrDerivate.getId() + " allready exists, nothing done.");
@@ -141,7 +141,7 @@ public final class MCRMetadataManager {
      * @throws MCRActiveLinkException
      *             if current object links to nonexistent
      */
-    public static final void create(final MCRObject mcrObject) throws MCRPersistenceException {
+    public static void create(final MCRObject mcrObject) throws MCRPersistenceException {
         // exist the object?
         if (MCRMetadataManager.exists(mcrObject.getId())) {
             throw new MCRPersistenceException("The object " + mcrObject.getId() + " allready exists, nothing done.");
@@ -197,7 +197,7 @@ public final class MCRMetadataManager {
      * @throws MCRPersistenceException
      *             if persistence problem occurs
      */
-    public static final void delete(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
+    public static void delete(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
         // remove link
         MCRObjectID metaId = null;
         try {
@@ -306,7 +306,7 @@ public final class MCRMetadataManager {
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
      */
-    public static final void deleteMCRDerivate(final MCRObjectID id) throws MCRPersistenceException {
+    public static void deleteMCRDerivate(final MCRObjectID id) throws MCRPersistenceException {
         final MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(id);
         MCRMetadataManager.delete(derivate);
     }
@@ -319,7 +319,7 @@ public final class MCRMetadataManager {
      * @throws MCRActiveLinkException
      *             if object is referenced by other objects
      */
-    public static final void deleteMCRObject(final MCRObjectID id) throws MCRPersistenceException, MCRActiveLinkException {
+    public static void deleteMCRObject(final MCRObjectID id) throws MCRPersistenceException, MCRActiveLinkException {
         final MCRObject object = retrieveMCRObject(id);
         MCRMetadataManager.delete(object);
     }
@@ -332,7 +332,7 @@ public final class MCRMetadataManager {
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
      */
-    public final static boolean exists(final MCRObjectID id) throws MCRPersistenceException {
+    public static boolean exists(final MCRObjectID id) throws MCRPersistenceException {
         return MCRXMLMetadataManager.instance().exists(id);
     }
 
@@ -341,7 +341,7 @@ public final class MCRMetadataManager {
      * 
      * @param mcrDerivate
      */
-    public static final void fireRepairEvent(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
+    public static void fireRepairEvent(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
         // handle events
         fireEvent(mcrDerivate, MCREvent.REPAIR_EVENT);
     }
@@ -351,7 +351,7 @@ public final class MCRMetadataManager {
      * 
      * @param mcrBaseObj
      */
-    public static final void fireRepairEvent(final MCRBase mcrBaseObj) throws MCRPersistenceException {
+    public static void fireRepairEvent(final MCRBase mcrBaseObj) throws MCRPersistenceException {
         if (mcrBaseObj instanceof MCRDerivate) {
             MCRMetadataManager.fireRepairEvent((MCRDerivate) mcrBaseObj);
         } else if (mcrBaseObj instanceof MCRObject) {
@@ -364,7 +364,7 @@ public final class MCRMetadataManager {
      * 
      * @param mcrObject
      */
-    public static final void fireRepairEvent(final MCRObject mcrObject) throws MCRPersistenceException {
+    public static void fireRepairEvent(final MCRObject mcrObject) throws MCRPersistenceException {
         // check derivate link
         for (MCRMetaLinkID derivate : mcrObject.getStructure().getDerivates()) {
             if (!exists(derivate.getXLinkHrefID())) {
@@ -382,7 +382,7 @@ public final class MCRMetadataManager {
      * @param mcrObject
      *            TODO
      */
-    public static final void fireUpdateEvent(final MCRObject mcrObject) throws MCRPersistenceException {
+    public static void fireUpdateEvent(final MCRObject mcrObject) throws MCRPersistenceException {
         if (!mcrObject.isImportMode() || mcrObject.getService().getDate("modifydate") == null) {
             mcrObject.getService().setDate("modifydate");
         }
@@ -404,7 +404,7 @@ public final class MCRMetadataManager {
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
      */
-    public static final MCRDerivate retrieveMCRDerivate(final MCRObjectID id) throws MCRPersistenceException {
+    public static MCRDerivate retrieveMCRDerivate(final MCRObjectID id) throws MCRPersistenceException {
         final MCRDerivate derivate = new MCRDerivate(MCRXMLMetadataManager.instance().retrieveXML(id));
         return derivate;
     }
@@ -418,7 +418,7 @@ public final class MCRMetadataManager {
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
      */
-    public static final MCRObject retrieveMCRObject(final MCRObjectID id) throws MCRPersistenceException {
+    public static MCRObject retrieveMCRObject(final MCRObjectID id) throws MCRPersistenceException {
         return new MCRObject(MCRXMLMetadataManager.instance().retrieveXML(id));
     }
 
@@ -431,7 +431,7 @@ public final class MCRMetadataManager {
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
      */
-    public static final MCRBase retrieve(final MCRObjectID id) throws MCRPersistenceException {
+    public static MCRBase retrieve(final MCRObjectID id) throws MCRPersistenceException {
         if (id.getTypeId().equals("derivate")) {
             return retrieveMCRDerivate(id);
         }
@@ -445,7 +445,7 @@ public final class MCRMetadataManager {
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
      */
-    public static final void update(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
+    public static void update(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
         if (!MCRMetadataManager.exists(mcrDerivate.getId())) {
             MCRMetadataManager.create(mcrDerivate);
             return;
@@ -500,7 +500,7 @@ public final class MCRMetadataManager {
      *             if object is created (no real update), see
      *             {@link #create(MCRObject)}
      */
-    public static final void update(final MCRObject mcrObject) throws MCRPersistenceException, MCRActiveLinkException {
+    public static void update(final MCRObject mcrObject) throws MCRPersistenceException, MCRActiveLinkException {
         if (!MCRMetadataManager.exists(mcrObject.getId())) {
             MCRMetadataManager.create(mcrObject);
             return;
@@ -626,7 +626,7 @@ public final class MCRMetadataManager {
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
      */
-    public static final void updateMCRDerivateXML(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
+    public static void updateMCRDerivateXML(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
         if (!mcrDerivate.isImportMode() || mcrDerivate.getService().getDate("modifydate") == null) {
             mcrDerivate.getService().setDate("modifydate");
         }
@@ -644,7 +644,7 @@ public final class MCRMetadataManager {
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
      */
-    public static final void addDerivateToObject(final MCRObjectID id, final MCRMetaLinkID link) throws MCRPersistenceException {
+    public static void addDerivateToObject(final MCRObjectID id, final MCRMetaLinkID link) throws MCRPersistenceException {
         final MCRObject object = MCRMetadataManager.retrieveMCRObject(id);
         // don't put the same derivates twice in an object!
         if (!object.getStructure().addDerivate(link))
@@ -657,7 +657,7 @@ public final class MCRMetadataManager {
         MCRMetadataManager.fireUpdateEvent(object);
     }
 
-    public static final boolean removeDerivateFromObject(final MCRObjectID objectID, final MCRObjectID derivateID) throws MCRPersistenceException {
+    public static boolean removeDerivateFromObject(final MCRObjectID objectID, final MCRObjectID derivateID) throws MCRPersistenceException {
         final MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
         if (object.getStructure().removeDerivate(derivateID)) {
             object.getService().setDate("modifydate");

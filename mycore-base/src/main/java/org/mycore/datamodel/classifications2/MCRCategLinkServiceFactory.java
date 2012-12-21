@@ -37,7 +37,7 @@ public class MCRCategLinkServiceFactory {
     /**
      * Returns an instance of a MCRCategoryDAO implementator.
      */
-    public static final MCRCategLinkService getInstance() {
+    public static MCRCategLinkService getInstance() {
         return instance;
     }
 

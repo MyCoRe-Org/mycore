@@ -65,7 +65,7 @@ public class MCRUserPolicy {
      * 
      * @return returns the one and only instance of <CODE>MCRUserPolicy</CODE>
      */
-    public final static synchronized MCRUserPolicy instance() {
+    public static synchronized MCRUserPolicy instance() {
         if (theInstance == null) {
             theInstance = new MCRUserPolicy();
         }

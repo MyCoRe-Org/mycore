@@ -61,7 +61,7 @@ public class MCRSWORDUtils {
      *             thrown if no instance of {@link SWORDServer} could be
      *             instantiated
      */
-    public static final SWORDServer createServer() {
+    public static SWORDServer createServer() {
         // Instantiate the correct SWORD Server class
         SWORDServer myRepository = null;
         try {

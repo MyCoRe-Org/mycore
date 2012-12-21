@@ -63,7 +63,7 @@ public final class MCRGoogleSitemapCommands extends MCRAbstractCommands {
     /**
      * The build and store method.
      */
-    public static final void buildSitemap() throws Exception {
+    public static void buildSitemap() throws Exception {
         // check time
         LOGGER.debug("Build Google sitemap start.");
         final long start = System.currentTimeMillis();

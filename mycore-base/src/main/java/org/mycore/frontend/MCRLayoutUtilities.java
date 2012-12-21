@@ -106,7 +106,7 @@ public class MCRLayoutUtilities {
      * @throws JDOMException
      * @throws IOException
      */
-    public static final String getAncestorLabels(Element item) {
+    public static String getAncestorLabels(Element item) {
         String label = "";
         String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage().trim();
         XPath xpath;

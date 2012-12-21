@@ -342,7 +342,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @param newFile
      *            the filename of the user data output (encrypted passwords)
      */
-    public static final void encryptPasswordsInXMLFile(String oldFile, String newFile) throws MCRException {
+    public static void encryptPasswordsInXMLFile(String oldFile, String newFile) throws MCRException {
         if (!checkFilename(oldFile)) {
             return;
         }
@@ -527,7 +527,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @param groupID
      *            the ID of the group for which the XML-representation is needed
      */
-    public static final void listGroup(String groupID) throws MCRException {
+    public static void listGroup(String groupID) throws MCRException {
         MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
         StringBuffer sb = new StringBuffer();
         LOGGER.info("");
@@ -549,7 +549,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @param userID
      *            the ID of the user for which the XML-representation is needed
      */
-    public static final void listUser(String userID) throws MCRException {
+    public static void listUser(String userID) throws MCRException {
         MCRUser user = MCRUserMgr.instance().retrieveUser(userID);
         LOGGER.info("");
         StringBuffer sb = new StringBuffer();
@@ -610,7 +610,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the filename of the user data input
      * @throws SAXParseException 
      */
-    public static final void createUserFromFile(String filename) throws SAXParseException, IOException {
+    public static void createUserFromFile(String filename) throws SAXParseException, IOException {
         MCRUser[] users = getMCRUsersFromFile(filename);
         for (MCRUser user : users) {
             try {
@@ -627,7 +627,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @param filename
      *            the filename of the user data input
      */
-    public static final void createGroupFromFile(String filename) throws MCRException {
+    public static void createGroupFromFile(String filename) throws MCRException {
         MCRUserMgr mcrUserMgr = MCRUserMgr.instance();
         if (!checkFilename(filename)) {
             return;
@@ -668,7 +668,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @param userFileName
      *            the filename of the user data input
      */
-    public static final void importUserSystemFromFiles(String groupFileName, String userFileName) throws MCRException {
+    public static void importUserSystemFromFiles(String groupFileName, String userFileName) throws MCRException {
         // check file names
         if (!checkFilename(groupFileName)) {
             return;
@@ -712,7 +712,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the filename of the user data input
      * @throws SAXParseException if file could not be parsed
      */
-    public static final void updateUserFromFile(String filename) throws SAXParseException, IOException {
+    public static void updateUserFromFile(String filename) throws SAXParseException, IOException {
         MCRUser[] users = getMCRUsersFromFile(filename);
         for (MCRUser user : users) {
             MCRUserMgr.instance().updateUser(user);
@@ -750,7 +750,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            be added
      * @throws MCRException
      */
-    public static final void addMemberUserToGroup(String mbrUserID, String groupID) throws MCRException {
+    public static void addMemberUserToGroup(String mbrUserID, String groupID) throws MCRException {
         try {
             MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
             group.addMemberUserID(mbrUserID);
@@ -771,7 +771,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            be removed
      * @throws MCRException
      */
-    public static final void removeMemberUserFromGroup(String mbrUserID, String groupID) throws MCRException {
+    public static void removeMemberUserFromGroup(String mbrUserID, String groupID) throws MCRException {
         try {
             MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
             group.removeMemberUserID(mbrUserID);

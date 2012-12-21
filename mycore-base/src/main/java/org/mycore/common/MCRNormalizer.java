@@ -136,7 +136,7 @@ public class MCRNormalizer {
      *            the String to be normalized
      * @return the normalized String in lower case.
      */
-    public static final String normalizeString(String in) {
+    public static String normalizeString(String in) {
     	
         if (!normalize) {
             return in;

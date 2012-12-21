@@ -399,7 +399,7 @@ public class MCRCrypt {
      * @return A string consisting of the 2-character salt followed by the
      *         encrypted string.
      */
-    public static final String crypt(String salt, String original) {
+    public static String crypt(String salt, String original) {
         // wwb -- Should do some sanity checks: salt needs to be 2 chars, in
         // alpha.
         while (salt.length() < 2) {
@@ -466,7 +466,7 @@ public class MCRCrypt {
      * @return A string consisting of the 2-character salt followed by the
      *         encrypted string.
      */
-    public static final String crypt(String original) {
+    public static String crypt(String original) {
         java.util.Random randomGenerator = new java.util.Random();
         int numSaltChars = chars.length;
         String salt;

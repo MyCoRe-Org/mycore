@@ -46,7 +46,7 @@ public class MCRNormalizeText {
      * @param doc
      *            a JDOM tree of a MCRObject
      */
-    public static final void normalizeJDOM(org.jdom.Document doc) {
+    public static void normalizeJDOM(org.jdom.Document doc) {
         if (doc == null) {
             return;
         }
@@ -120,7 +120,7 @@ public class MCRNormalizeText {
      * @param obj
      *            an instance of a MCRObject
      */
-    public static final void normalizeMCRObject(MCRBase obj) {
+    public static void normalizeMCRObject(MCRBase obj) {
         if (obj == null) {
             return;
         }
