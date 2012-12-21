@@ -395,21 +395,17 @@ public class SwordValidationInfo {
     {
        if( elementItems != null )
        {
-           Iterator<SwordValidationInfo> items = elementItems.iterator();
 
-           while( items.hasNext() )
-           {
-              addUnmarshallElementInfo(items.next());
+           for (SwordValidationInfo elementItem : elementItems) {
+               addUnmarshallElementInfo(elementItem);
            }
        }
 
        if( attributeItems != null )
        {
-          Iterator<SwordValidationInfo> attributes = attributeItems.iterator();
 
-           while( attributes.hasNext() )
-           {
-              addUnmarshallAttributeInfo(attributes.next());
+           for (SwordValidationInfo attributeItem : attributeItems) {
+               addUnmarshallAttributeInfo(attributeItem);
            }
        }
    }

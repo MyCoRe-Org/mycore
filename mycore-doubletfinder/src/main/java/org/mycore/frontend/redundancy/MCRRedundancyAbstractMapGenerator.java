@@ -133,13 +133,11 @@ public abstract class MCRRedundancyAbstractMapGenerator {
     protected boolean areConditionsEquals(Map<String, String> conditionMap1, Map<String, String> conditionMap2) {
         if(conditionMap1.size() != conditionMap2.size())
             return false;
-        Iterator<Map.Entry<String, String>> i = conditionMap1.entrySet().iterator();
-        while (i.hasNext()) {
-            Map.Entry<String, String> entry = i.next();
+        for (Map.Entry<String, String> entry : conditionMap1.entrySet()) {
             String key = entry.getKey();
             String compareValue1 = conditionMap1.get(key);
             String compareValue2 = conditionMap2.get(key);
-            if(compareValue1 == null || compareValue2 == null || comparator.compare(compareValue1, compareValue2) != 0)
+            if (compareValue1 == null || compareValue2 == null || comparator.compare(compareValue1, compareValue2) != 0)
                 return false;
         }
         return true;

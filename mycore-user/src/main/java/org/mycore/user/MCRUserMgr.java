@@ -649,11 +649,8 @@ public class MCRUserMgr {
      */
     public final Set<MCRGroup> getGroupsContainingUser(MCRUser user, Set<MCRGroup> groups) {
         Set<MCRGroup> set = new HashSet<MCRGroup>();
-        Iterator<MCRGroup> iterator = groups.iterator();
 
-        while (iterator.hasNext()) {
-            Object element = iterator.next();
-
+        for (MCRGroup element : groups) {
             if (element instanceof MCRGroup) {
                 MCRGroup group = (MCRGroup) element;
 
@@ -1025,11 +1022,8 @@ public class MCRUserMgr {
      */
     public final Set<MCRGroup> retrieveGroups(Set<String> groupIDs) throws MCRException {
         Set<MCRGroup> groups = new HashSet<MCRGroup>();
-        Iterator<String> iterator = groupIDs.iterator();
 
-        while (iterator.hasNext()) {
-            Object object = iterator.next();
-
+        for (String object : groupIDs) {
             if (object instanceof String) {
                 String groupid = (String) object;
                 MCRGroup group = retrieveGroup(groupid);
@@ -1117,11 +1111,8 @@ public class MCRUserMgr {
      */
     public final Set<MCRUser> retrieveUsers(Set<String> userIDs) {
         Set<MCRUser> users = new HashSet<MCRUser>();
-        Iterator<String> iterator = userIDs.iterator();
 
-        while (iterator.hasNext()) {
-            Object object = iterator.next();
-
+        for (String object : userIDs) {
             if (object instanceof String) {
                 String userid = (String) object;
                 MCRUser user = retrieveUser(userid, false);

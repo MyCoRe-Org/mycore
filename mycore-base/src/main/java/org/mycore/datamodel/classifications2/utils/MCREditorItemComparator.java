@@ -60,9 +60,7 @@ public class MCREditorItemComparator implements Comparator<Element> {
     @SuppressWarnings("unchecked")
     private static String getCurrentLangLabel(Element item, String language) {
         List<Element> labels = item.getChildren("label");
-        Iterator<Element> it = labels.iterator();
-        while (it.hasNext()) {
-            Element label = it.next();
+        for (Element label : labels) {
             if (label.getAttributeValue("lang", Namespace.XML_NAMESPACE).equals(language)) {
                 return label.getText();
             }

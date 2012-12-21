@@ -192,9 +192,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         String query = "select count(key.mcrfrom), key.mcrto from " + classname + " where MCRTO like '" + mcrtoPrefix
                 + "%' group by key.mcrto";
         LOGGER.debug("HQL-Statement: " + query);
-        Iterator<Object[]> results = session.createQuery(query).list().iterator();
-        while (results.hasNext()) {
-            Object[] row = results.next();
+        for (Object row : session.createQuery(query).list()) {
             map.put((String) row[1], (Number) row[0]);
         }
         return map;

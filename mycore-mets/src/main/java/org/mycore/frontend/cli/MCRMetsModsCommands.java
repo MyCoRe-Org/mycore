@@ -169,9 +169,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         MCRQueryCondition fromcond = new MCRQueryCondition(MCRFieldDef.getDef("objectType"), "=", type);
         MCRQuery fromquery = new MCRQuery(fromcond);
         MCRResults fromresult = MCRQueryManager.search(fromquery);
-        Iterator<MCRHit> fromiter = fromresult.iterator();
-        while (fromiter.hasNext()) {
-            MCRHit fromhit = fromiter.next();
+        for (Object fromhit : fromresult) {
             String fromid = fromhit.getID();
             buildMetsForMCRObjectID(fromid);
 
@@ -279,10 +277,8 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         MCRQueryCondition fromcond = new MCRQueryCondition(MCRFieldDef.getDef("objectType"), "=", type);
         MCRQuery fromquery = new MCRQuery(fromcond);
         MCRResults fromresult = MCRQueryManager.search(fromquery);
-        Iterator<MCRHit> fromiter = fromresult.iterator();
 
-        while (fromiter.hasNext()) {
-            MCRHit fromhit = fromiter.next();
+        for (Object fromhit : fromresult) {
             String fromid = fromhit.getID();
 
             if (exclude == null)
@@ -381,10 +377,8 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         MCRQueryCondition fromcond = new MCRQueryCondition(MCRFieldDef.getDef("objectType"), "=", type);
         MCRQuery fromquery = new MCRQuery(fromcond);
         MCRResults fromresult = MCRQueryManager.search(fromquery);
-        Iterator<MCRHit> fromiter = fromresult.iterator();
 
-        while (fromiter.hasNext()) {
-            MCRHit fromhit = fromiter.next();
+        for (Object fromhit : fromresult) {
             String fromid = fromhit.getID();
 
             MCRObject fromobj = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(fromid));

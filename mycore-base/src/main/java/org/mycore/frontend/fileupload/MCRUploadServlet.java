@@ -480,10 +480,8 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
         dos.writeUTF(mime);
 
-        Iterator it = entries.iterator();
-
-        while (it.hasNext()) {
-            Map.Entry entry = (Map.Entry) it.next();
+        for (Object entry1 : entries) {
+            Map.Entry entry = (Map.Entry) entry1;
 
             // write out key
             dos.writeUTF(entry.getKey().toString());

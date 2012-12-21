@@ -179,9 +179,8 @@ public class MCRIndexBrowserSearcher implements MCRIIndexBrowserSearcher {
                 MCRFieldValue value = new MCRFieldValue(mainSortField, "???undefined???");
                 sortData.add(0, value);
             }
-            Iterator<MCRFieldValue> it = sortData.iterator();
-            while (it.hasNext()) {
-                entry.addSortValue(it.next().getValue());
+            for (MCRFieldValue aSortData : sortData) {
+                entry.addSortValue(aSortData.getValue());
             }
             entry.setObjectId(hit.getID());
             hitList.add(entry);

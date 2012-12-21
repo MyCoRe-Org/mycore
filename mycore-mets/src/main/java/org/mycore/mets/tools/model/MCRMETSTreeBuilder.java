@@ -179,11 +179,9 @@ public class MCRMETSTreeBuilder {
      */
     private void addHiddenNodes(MCRMETSNode root) {
         Set<String> fileIds = this.idFileMap.keySet();
-        Iterator<String> fileIdIterator = fileIds.iterator();
 
-        while (fileIdIterator.hasNext()) {
-            String currentFileId = (String) fileIdIterator.next();
-            if (!idDivMap.containsKey(currentFileId.replace("master_", "phys_")) && !idDivMap.containsKey("phys_" + currentFileId)){
+        for (String currentFileId : fileIds) {
+            if (!idDivMap.containsKey(currentFileId.replace("master_", "phys_")) && !idDivMap.containsKey("phys_" + currentFileId)) {
                 LOGGER.info(MessageFormat.format("{0} is a hidden File!", currentFileId));
                 // file does not appear in structmap -> hidden file
                 File metsFile = this.idFileMap.get(currentFileId);

@@ -82,10 +82,9 @@ public class MCRWCMSGetStaticHTMLServlet extends MCRWCMSServlet {
             Document ed = sax.build(getServletContext().getRealPath("") + fs + href);
             Element begin = ed.getRootElement();
             List contentElements = begin.getChildren("section");
-            Iterator contentElementsIterator = contentElements.iterator();
 
-            while (contentElementsIterator.hasNext()) {
-                Element content = (Element) contentElementsIterator.next();
+            for (Object contentElement : contentElements) {
+                Element content = (Element) contentElement;
 
                 if (content.getAttributeValue("lang", ns) != null) {
                     contentList = content.getContent();

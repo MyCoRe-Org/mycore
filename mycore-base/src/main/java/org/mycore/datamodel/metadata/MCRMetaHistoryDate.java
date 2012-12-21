@@ -446,11 +446,9 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
         String langn = "";
         String textn;
-        Iterator<org.jdom.Element> textchild = element.getChildren("text").iterator();
-        while (textchild.hasNext()) {
-            Element elmt = textchild.next();
+        for (Object elmt : element.getChildren("text")) {
             textn = elmt.getText();
-            langn = elmt.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE);
+            langn = elmt.getAttributeValue("lang", Namespace.XML_NAMESPACE);
             if (langn != null) {
                 setText(textn, langn);
             } else {

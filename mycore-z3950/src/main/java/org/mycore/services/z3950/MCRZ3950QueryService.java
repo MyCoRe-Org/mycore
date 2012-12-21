@@ -114,18 +114,16 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
         Element metadata = result.getChild("metadata");
         // Alle Kinder des Knotens, also alle Metadaten
         List metadataChildren = metadata.getChildren();
-        Iterator itm = metadataChildren.iterator();
         // Iteriere ï¿½ber alle Knoten
-        while (itm.hasNext()) {
+        for (Object aMetadataChildren : metadataChildren) {
             // Prï¿½fe, ob der Knoten eine Klassifikation benutzt
-            Element parent = (Element) itm.next();
+            Element parent = (Element) aMetadataChildren;
             String cl = parent.getAttributeValue("class");
             if (cl.equals("MCRMetaClassification")) {
                 // Iteriere ï¿½ber alle Kinder des Knotens (z.B. Subject)             
                 List children = parent.getChildren();
-                Iterator it = children.iterator();
-                while (it.hasNext()) {
-                    Element e = (Element) it.next();
+                for (Object aChildren : children) {
+                    Element e = (Element) aChildren;
                     String classificationId = e.getAttributeValue("classid");
                     String categoryId = e.getAttributeValue("categid");
                     MCRCategory category = MCRCategoryDAOFactory.getInstance().getCategory(new MCRCategoryID(classificationId, categoryId), -1);

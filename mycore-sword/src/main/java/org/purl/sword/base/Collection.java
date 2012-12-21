@@ -484,12 +484,10 @@ public class Collection extends XmlElement implements SwordElementInterface
       {
           collection.appendChild(item.marshall());
       }
-      
-      Iterator<SwordAcceptPackaging> apIterator = acceptPackaging.iterator();
-      while( apIterator.hasNext() )
-      {
-         collection.appendChild(apIterator.next().marshall());
-      }
+
+       for (SwordAcceptPackaging anAcceptPackaging : acceptPackaging) {
+           collection.appendChild(anAcceptPackaging.marshall());
+       }
 
       if (swordCollectionPolicy != null)
       {
@@ -766,20 +764,16 @@ public class Collection extends XmlElement implements SwordElementInterface
       {
           if( accepts.size() > 0 )
           {
-             Iterator<Accept> acceptIterator = accepts.iterator();
-             while( acceptIterator.hasNext() )
-             {
-                 result.addValidationInfo(acceptIterator.next().validate(validationContext));
-             }
+              for (Accept accept : accepts) {
+                  result.addValidationInfo(accept.validate(validationContext));
+              }
           }
 
           if( acceptPackaging.size() > 0 )
           {
-             Iterator<SwordAcceptPackaging> apIterator = acceptPackaging.iterator();
-             while( apIterator.hasNext() )
-             {
-                 result.addValidationInfo(apIterator.next().validate(validationContext));
-             }
+              for (SwordAcceptPackaging anAcceptPackaging : acceptPackaging) {
+                  result.addValidationInfo(anAcceptPackaging.validate(validationContext));
+              }
           }
 
           if( location != null )

@@ -333,23 +333,21 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         // no derivate link
         if(me == null)
             return null;
-        Iterator<MCRMetaInterface> it = me.iterator();
-        while(it.hasNext()) {
+        for (Object mi : me) {
             // return if its no derivate
-            MCRMetaInterface mi = it.next();
-            if(!(mi instanceof MCRMetaDerivateLink))
+            if (!(mi instanceof MCRMetaDerivateLink))
                 continue;
             // return if the href is null
-            String href = ((MCRMetaDerivateLink)mi).getXLinkHref();
-            if(href == null)
+            String href = ((MCRMetaDerivateLink) mi).getXLinkHref();
+            if (href == null)
                 continue;
             // return if the href doesn't contain the split slash
             int indexOfSlash = href.indexOf("/");
-            if(indexOfSlash == -1)
+            if (indexOfSlash == -1)
                 continue;
             // return if its the wrong derivate
             String derIdAsString = href.substring(0, indexOfSlash);
-            if(!this.mcrDer.getId().equals(MCRObjectID.getInstance(derIdAsString)))
+            if (!this.mcrDer.getId().equals(MCRObjectID.getInstance(derIdAsString)))
                 continue;
             // finally get the linked file
             return href.substring(indexOfSlash + 1);

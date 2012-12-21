@@ -242,10 +242,9 @@ public class MCRWCMSChooseServlet extends MCRWCMSServlet {
 
                 Element begin = ed.getRootElement();
                 List contentElements = begin.getChildren("section");
-                Iterator contentElementsIterator = contentElements.iterator();
 
-                while (contentElementsIterator.hasNext()) {
-                    Element content = (Element) contentElementsIterator.next();
+                for (Object contentElement : contentElements) {
+                    Element content = (Element) contentElement;
 
                     if (content.getAttributeValue("lang", ns) != null) {
                         contentList = content.getContent();
@@ -352,10 +351,8 @@ public class MCRWCMSChooseServlet extends MCRWCMSServlet {
                 rootOut.addContent(new Element("contentError").setAttribute("msg", contentError).setText("yes"));
             }
 
-            Iterator rootNodesIterator = rootNodes.iterator();
-
-            while (rootNodesIterator.hasNext()) {
-                Element rootNode = (Element) rootNodesIterator.next();
+            for (Object rootNode1 : rootNodes) {
+                Element rootNode = (Element) rootNode1;
                 rootOut.addContent(new Element("rootNode").setAttribute("href", rootNode.getAttributeValue("href")).setText(rootNode.getTextTrim()));
             }
 
@@ -522,18 +519,15 @@ public class MCRWCMSChooseServlet extends MCRWCMSServlet {
      */
     public void validate(Element element) {
         List elements = element.getChildren();
-        Iterator elementIterator = elements.iterator();
 
-        while (elementIterator.hasNext()) {
-            Element child = (Element) elementIterator.next();
+        for (Object element1 : elements) {
+            Element child = (Element) element1;
 
             if (child.getAttribute("href") != null) {
                 if (child.getAttributeValue("href").equals(href)) {
                     if (action.equals("delete") && !child.getChildren("item").isEmpty()) {
                         c = '7';
-                    }
-
-                    else if (action.equals("add") && child.getAttributeValue("type").equals("extern") && addAtPosition.equals("child"))
+                    } else if (action.equals("add") && child.getAttributeValue("type").equals("extern") && addAtPosition.equals("child"))
                         c = '6';
 
                     else {

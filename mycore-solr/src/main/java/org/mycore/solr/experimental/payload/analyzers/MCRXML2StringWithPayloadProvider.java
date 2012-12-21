@@ -70,10 +70,7 @@ public class MCRXML2StringWithPayloadProvider {
         Element payloads = new Element("payloads");
         Document payloadDocument = new Document(payloads);
 
-        Iterator<Element> iterator = tokenList.iterator();
-
-        while (iterator.hasNext()) {
-            Element w = iterator.next();
+        for (Element w : tokenList) {
             String tokenWithPayload = this.getTokenWithPayload(w);
             payloads.addContent(new Element("payload").setText(tokenWithPayload));
         }
@@ -89,10 +86,8 @@ public class MCRXML2StringWithPayloadProvider {
      */
     public String getFlatDocument() throws IOException {
         StringBuilder b = new StringBuilder();
-        Iterator<Element> iterator = tokenList.iterator();
 
-        while (iterator.hasNext()) {
-            Element w = iterator.next();
+        for (Element w : tokenList) {
             String tokenWithPayload = this.getTokenWithPayload(w);
             b.append(tokenWithPayload);
         }

@@ -216,9 +216,8 @@ public class MCRXSLTransformation {
      * 
      */
     public static void setParameters(Transformer transformer, Map parameters) {
-        Iterator names = parameters.keySet().iterator();
-        while (names.hasNext()) {
-            String name = names.next().toString();
+        for (Object o : parameters.keySet()) {
+            String name = o.toString();
             String value = parameters.get(name).toString();
             transformer.setParameter(name, value);
         }

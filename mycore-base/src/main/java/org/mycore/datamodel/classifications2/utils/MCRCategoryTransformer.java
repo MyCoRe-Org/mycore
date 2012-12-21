@@ -285,9 +285,7 @@ public class MCRCategoryTransformer {
         @SuppressWarnings("unchecked")
         private void sortItems(List<Element> items) {
             sort(items, MCREditorItemComparator.getCurrentLangComperator());
-            Iterator<Element> it = items.iterator();
-            while (it.hasNext()) {
-                Element item = it.next();
+            for (Element item : items) {
                 List<Element> children = item.getChildren("item");
                 if (children.size() > 0) {
                     sortItems(children);

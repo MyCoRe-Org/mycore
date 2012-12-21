@@ -87,9 +87,8 @@ public class MCRThumbnailServlet extends MCRServlet {
 
     @Override
     public void destroy() {
-        Iterator<ImageWriter> writers = imageWriters.iterator();
-        while (writers.hasNext()) {
-            writers.next().dispose();
+        for (ImageWriter imageWriter : imageWriters) {
+            imageWriter.dispose();
         }
         super.destroy();
     }

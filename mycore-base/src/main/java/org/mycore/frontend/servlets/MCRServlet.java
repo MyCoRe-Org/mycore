@@ -559,9 +559,7 @@ public class MCRServlet extends HttpServlet {
         StringBuilder msgBuf = new StringBuilder(msg);
         msgBuf.append("\nThere are links active preventing the commit of work, see error message for details. The following links where affected:");
         Map<String, Collection<String>> links = activeLinks.getActiveLinks();
-        Iterator<Map.Entry<String, Collection<String>>> entryIt = links.entrySet().iterator();
-        while (entryIt.hasNext()) {
-            Map.Entry<String, Collection<String>> entry = entryIt.next();
+        for (Map.Entry<String, Collection<String>> entry : links.entrySet()) {
             for (String source : entry.getValue()) {
                 msgBuf.append('\n').append(source).append("==>").append(entry.getKey());
             }

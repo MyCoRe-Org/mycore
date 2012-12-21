@@ -265,9 +265,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
             // rootNodes Iterator used in case of action==delete &&
             // realyDel==false
-            Iterator rootNodesIterator = rootNodes.iterator();
-            while (rootNodesIterator.hasNext()) {
-                Element rootNode = (Element) rootNodesIterator.next();
+            for (Object rootNode1 : rootNodes) {
+                Element rootNode = (Element) rootNode1;
                 rootOut.addContent(new Element("rootNode").setAttribute("href", rootNode.getAttributeValue("href")).setText(rootNode.getTextTrim()));
             }
 
@@ -534,10 +533,9 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
     public void validate(Element element) {
         List elements = element.getChildren();
-        Iterator elementIterator = elements.iterator();
 
-        while (elementIterator.hasNext()) {
-            Element child = (Element) elementIterator.next();
+        for (Object element1 : elements) {
+            Element child = (Element) element1;
 
             if (child.getAttribute("href") != null) {
                 if (child.getAttributeValue("href").equals(href)) {
@@ -744,10 +742,9 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
                 actElem = findActElem(root, attribute, avalue);
 
                 List labels = actElem.getChildren("label");
-                Iterator li = labels.iterator();
 
-                while (li.hasNext()) {
-                    Element lie = (Element) li.next();
+                for (Object label1 : labels) {
+                    Element lie = (Element) label1;
 
                     if (lie.getAttributeValue("lang", ns).equals(defaultLang)) {
                         lie.setText(label);

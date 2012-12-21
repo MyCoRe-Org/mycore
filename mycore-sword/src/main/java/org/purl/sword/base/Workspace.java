@@ -327,11 +327,9 @@ public class Workspace extends XmlElement implements SwordElementInterface
 
           if( collections.size() > 0 )
           {
-             Iterator<Collection> iterator = collections.iterator();
-             while( iterator.hasNext() )
-             {
-                 result.addValidationInfo(iterator.next().validate(validationContext));
-             }
+              for (Collection collection : collections) {
+                  result.addValidationInfo(collection.validate(validationContext));
+              }
           }
       }
 

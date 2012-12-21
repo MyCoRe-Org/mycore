@@ -628,11 +628,9 @@ public class Service extends XmlElement implements SwordElementInterface
             result.addValidationInfo(generator.validate(validationContext));
          }
 
-         Iterator<Workspace> iterator = workspaces.iterator();
-         while( iterator.hasNext() )
-         {
-            result.addValidationInfo(iterator.next().validate(validationContext));
-         }
+          for (Workspace workspace : workspaces) {
+              result.addValidationInfo(workspace.validate(validationContext));
+          }
       }
 
       result.addUnmarshallValidationInfo(existing, null);

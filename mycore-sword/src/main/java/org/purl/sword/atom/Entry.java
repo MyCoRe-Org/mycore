@@ -668,11 +668,8 @@ public class Entry extends XmlElement implements SwordElementInterface
        }
        else if( (! contributors.isEmpty()) && validateAll )
        {
-           Iterator<Contributor> iterator = contributors.iterator();
-           while( iterator.hasNext() )
-           {
-              Contributor contributor = iterator.next();
-              result.addValidationInfo(contributor.validate(validationContext));
+           for (Contributor contributor : contributors) {
+               result.addValidationInfo(contributor.validate(validationContext));
            }
        }
 
@@ -691,18 +688,12 @@ public class Entry extends XmlElement implements SwordElementInterface
        if( validateAll )
        {
            // process the remaining items
-           Iterator<Link> linksIterator = links.iterator();
-           while( linksIterator.hasNext() )
-           {
-              Link link = linksIterator.next();
-              result.addValidationInfo(link.validate(validationContext));
+           for (Link link : links) {
+               result.addValidationInfo(link.validate(validationContext));
            }
 
-           Iterator<Author> authorIterator = authors.iterator();
-           while( authorIterator.hasNext() )
-           {
-              Author author = authorIterator.next();
-              result.addValidationInfo(author.validate(validationContext));
+           for (Author author : authors) {
+               result.addValidationInfo(author.validate(validationContext));
            }
 
            if( content != null )
@@ -725,11 +716,8 @@ public class Entry extends XmlElement implements SwordElementInterface
                result.addValidationInfo(summary.validate(validationContext));
            }
 
-           Iterator<Category> categoryIterator = categories.iterator();
-           while( categoryIterator.hasNext() )
-           {
-              Category category = categoryIterator.next();
-              result.addValidationInfo(category.validate(validationContext));
+           for (Category category : categories) {
+               result.addValidationInfo(category.validate(validationContext));
            }
            
        }

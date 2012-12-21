@@ -160,9 +160,7 @@ public class MCREditorSubmission {
         if (ns == null || ns.equals(Namespace.NO_NAMESPACE)) {
             return "";
         }
-        Iterator<String> it = nsMap.keySet().iterator();
-        while (it.hasNext()) {
-            String key = (String) it.next();
+        for (String key : nsMap.keySet()) {
             if (ns.equals(nsMap.get(key))) {
                 return key + ":";
             }

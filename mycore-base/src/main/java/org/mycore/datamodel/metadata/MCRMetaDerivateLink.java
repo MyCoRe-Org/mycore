@@ -40,10 +40,8 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         List<Element> childrenList = element.getChildren(MCRMetaDerivateLink.ANNOTATION);
         if (childrenList == null)
             return;
-        Iterator<Element> annotationsIter = childrenList.iterator();
 
-        while (annotationsIter.hasNext()) {
-            org.jdom.Element anAnnotation = annotationsIter.next();
+        for (Element anAnnotation : childrenList) {
             String key = anAnnotation.getAttributeValue(MCRMetaDerivateLink.ATTRIBUTE, Namespace.XML_NAMESPACE);
             String annotationText = anAnnotation.getText();
             this.map.put(key, annotationText);
@@ -53,10 +51,8 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
     public Element createXML() throws MCRException {
         Element elm = super.createXML();
 
-        Iterator<String> keys = map.keySet().iterator();
-        while (keys.hasNext()) {
-            String key = keys.next();
-            org.jdom.Element annotationElem = new Element(MCRMetaDerivateLink.ANNOTATION);
+        for (String key : map.keySet()) {
+            Element annotationElem = new Element(MCRMetaDerivateLink.ANNOTATION);
             annotationElem.setAttribute(MCRMetaDerivateLink.ATTRIBUTE, key, Namespace.XML_NAMESPACE);
             String content = map.get(key);
             if (content == null || content.length() == 0)

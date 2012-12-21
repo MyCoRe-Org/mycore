@@ -145,9 +145,8 @@ public class MCRWCMSUtilities {
      */
     private static void buildWritableNavi(Element origNavi, Document writableNavi, String userID) throws JDOMException, IOException {
         List childs = xpath.selectNodes(origNavi);
-        Iterator childIter = childs.iterator();
-        while (childIter.hasNext()) {
-            Element child = (Element) childIter.next();
+        for (Object child1 : childs) {
+            Element child = (Element) child1;
             boolean access = false;
             if (userID != null && userID.length() > 0) {
                 access = MCRLayoutUtilities.itemAccess(getWritePermissionWebpage(), child, false, userID);

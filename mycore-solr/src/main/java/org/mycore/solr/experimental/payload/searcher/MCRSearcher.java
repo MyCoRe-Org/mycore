@@ -72,9 +72,7 @@ public class MCRSearcher {
             Document matchedDoc = indexSearcher.doc(scoreDoc.doc);
             System.out.println(matchedDoc.get("x"));
             HashMap<Term, List<byte[]>> payloads = getActualPayload(scoreDoc, query, indexSearcher.getIndexReader());
-            Iterator<Term> iterator = payloads.keySet().iterator();
-            while (iterator.hasNext()) {
-                Term term = iterator.next();
+            for (Term term : payloads.keySet()) {
                 List<byte[]> payload4Term = payloads.get(term);
                 System.out.print(term + " payloads:");
                 for (byte[] payload : payload4Term) {
