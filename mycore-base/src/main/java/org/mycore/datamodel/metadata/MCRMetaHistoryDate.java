@@ -24,7 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
@@ -444,15 +444,13 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         super.setFromDOM(element);
         texts.clear(); // clear
 
-        String langn = "";
-        String textn;
-        for (Object elmt : element.getChildren("text")) {
-            textn = elmt.getText();
-            langn = elmt.getAttributeValue("lang", Namespace.XML_NAMESPACE);
-            if (langn != null) {
-                setText(textn, langn);
+        for (Element textElement : (Collection<Element>) element.getChildren("text")) {
+            String text = textElement.getText();
+            String lang = textElement.getAttributeValue("lang", Namespace.XML_NAMESPACE);
+            if (lang != null) {
+                setText(text, lang);
             } else {
-                setText(textn);
+                setText(text);
             }
         }
         setCalendar(element.getChildTextTrim("calendar"));
