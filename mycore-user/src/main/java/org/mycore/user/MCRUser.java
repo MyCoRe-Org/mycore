@@ -241,9 +241,7 @@ public class MCRUser extends MCRUserObject {
         if (userGroupElement != null) {
             List<Element> groupIDList = userGroupElement.getChildren();
 
-            for (int j = 0; j < groupIDList.size(); j++) {
-                Element groupID = groupIDList.get(j);
-
+            for (Element groupID : groupIDList) {
                 if (!groupID.getTextTrim().equals("")) {
                     groupIDs.add(groupID.getTextTrim());
                 }
@@ -533,8 +531,8 @@ public class MCRUser extends MCRUserObject {
         // Loop over all group IDs
         if (groupIDs.size() != 0) {
             Element Groups = new Element("user.groups");
-            for (int i = 0; i < groupIDs.size(); i++) {
-                Element groupID = new Element("groups.groupID").setText(groupIDs.get(i));
+            for (String groupID1 : groupIDs) {
+                Element groupID = new Element("groups.groupID").setText(groupID1);
                 Groups.addContent(groupID);
             }
             user.addContent(Groups);
@@ -549,8 +547,8 @@ public class MCRUser extends MCRUserObject {
         debugDefault();
         logger.debug("primaryGroupID     = " + primaryGroupID);
         logger.debug("groupIDs #         = " + groupIDs.size());
-        for (int i = 0; i < groupIDs.size(); i++) {
-            logger.debug("groupIDs           = " + groupIDs.get(i));
+        for (String groupID : groupIDs) {
+            logger.debug("groupIDs           = " + groupID);
         }
         userContact.debug();
     }
@@ -579,8 +577,8 @@ public class MCRUser extends MCRUserObject {
             // of one of the admGroups
             ArrayList<String> admGroupIDs = primaryGroup.getAdminGroupIDs();
 
-            for (int i = 0; i < admGroupIDs.size(); i++) {
-                MCRGroup currentGroup = MCRUserMgr.instance().retrieveGroup(admGroupIDs.get(i), false);
+            for (String admGroupID : admGroupIDs) {
+                MCRGroup currentGroup = MCRUserMgr.instance().retrieveGroup(admGroupID, false);
 
                 if (currentGroup.getMemberUserIDs().contains(currentUserID)) {
                     return true;

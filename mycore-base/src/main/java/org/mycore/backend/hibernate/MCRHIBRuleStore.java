@@ -88,8 +88,8 @@ public class MCRHIBRuleStore extends MCRRuleStore {
         Session session = MCRHIBConnection.instance().getSession();
         List<MCRACCESSRULE> l = session.createCriteria(MCRACCESSRULE.class).add(Restrictions.like("rule", ruleExpression)).add(
                 Restrictions.like("description", description)).list();
-        for (int i = 0; i < l.size(); i++) {
-            ret.add(l.get(i).getRid());
+        for (MCRACCESSRULE aL : l) {
+            ret.add(aL.getRid());
         }
         return ret;
     }
@@ -176,8 +176,8 @@ public class MCRHIBRuleStore extends MCRRuleStore {
         Session session = MCRHIBConnection.instance().getSession();
         ArrayList<String> ret = new ArrayList<String>();
         List<MCRACCESSRULE> l = session.createCriteria(MCRACCESSRULE.class).list();
-        for (int i = 0; i < l.size(); i++) {
-            ret.add(l.get(i).getRid());
+        for (MCRACCESSRULE aL : l) {
+            ret.add(aL.getRid());
         }
         return ret;
     }

@@ -69,9 +69,9 @@ public class MCRFileContentTypeFactory {
         Element xml = MCRURIResolver.instance().resolve("resource:" + file);
         List types = xml.getChildren("type");
 
-        for (int i = 0; i < types.size(); i++) {
+        for (Object type1 : types) {
             // Build file content type from XML element
-            Element xType = (Element) types.get(i);
+            Element xType = (Element) type1;
             String ID = xType.getAttributeValue("ID");
             String label = xType.getChildTextTrim("label");
             String url = xType.getChildTextTrim("url");

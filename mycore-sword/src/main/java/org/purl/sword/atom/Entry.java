@@ -772,10 +772,9 @@ public class Entry extends XmlElement implements SwordElementInterface
     */
    public Iterator<String> getCategories() {
       ArrayList<String> items = new ArrayList<String>();
-      for( int i = 0; i < categories.size(); i++ )
-      {
-         items.add(categories.get(i).getContent());
-      }
+       for (Category category : categories) {
+           items.add(category.getContent());
+       }
 
       return items.iterator();
    }

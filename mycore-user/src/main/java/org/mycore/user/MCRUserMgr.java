@@ -186,27 +186,27 @@ public class MCRUserMgr {
             // check the admin users
             ArrayList<String> admUserIDs = currentGroup.getAdminUserIDs();
 
-            for (int j = 0; j < admUserIDs.size(); j++) {
-                if (!mcrUserStore.existsUser((String) admUserIDs.get(j))) {
-                    LOGGER.error("group: '" + currentGroup.getID() + "' error: unknown admin" + " user '" + (String) admUserIDs.get(j) + "'!");
+            for (String admUserID : admUserIDs) {
+                if (!mcrUserStore.existsUser((String) admUserID)) {
+                    LOGGER.error("group: '" + currentGroup.getID() + "' error: unknown admin" + " user '" + (String) admUserID + "'!");
                 }
             }
 
             // check the admin groups
             ArrayList<String> admGroupIDs = currentGroup.getAdminGroupIDs();
 
-            for (int j = 0; j < admGroupIDs.size(); j++) {
-                if (!mcrUserStore.existsGroup((String) admGroupIDs.get(j))) {
-                    LOGGER.error("group: '" + currentGroup.getID() + "' error: unknown admin" + " group '" + (String) admGroupIDs.get(j) + "'!");
+            for (String admGroupID : admGroupIDs) {
+                if (!mcrUserStore.existsGroup((String) admGroupID)) {
+                    LOGGER.error("group: '" + currentGroup.getID() + "' error: unknown admin" + " group '" + (String) admGroupID + "'!");
                 }
             }
 
             // check the users (members)
             ArrayList<String> mbrUserIDs = currentGroup.getMemberUserIDs();
 
-            for (int j = 0; j < mbrUserIDs.size(); j++) {
-                if (!mcrUserStore.existsUser((String) mbrUserIDs.get(j))) {
-                    LOGGER.error("group: '" + currentGroup.getID() + "' error: unknown user '" + (String) mbrUserIDs.get(j) + "'!");
+            for (String mbrUserID : mbrUserIDs) {
+                if (!mcrUserStore.existsUser((String) mbrUserID)) {
+                    LOGGER.error("group: '" + currentGroup.getID() + "' error: unknown user '" + (String) mbrUserID + "'!");
                 }
             }
         }
@@ -261,19 +261,19 @@ public class MCRUserMgr {
         }
         // add other administration user
         ArrayList<String> admUserIDs = group.getAdminUserIDs();
-        for (int j = 0; j < admUserIDs.size(); j++) {
-            if (!mcrUserStore.existsUser((String) admUserIDs.get(j))) {
-                throw new MCRException("Unknown admin userID: " + (String) admUserIDs.get(j));
+        for (String admUserID : admUserIDs) {
+            if (!mcrUserStore.existsUser((String) admUserID)) {
+                throw new MCRException("Unknown admin userID: " + (String) admUserID);
             }
         }
         // add other primary groups
         ArrayList<String> admGroupIDs = group.getAdminGroupIDs();
-        for (int j = 0; j < admGroupIDs.size(); j++) {
-            if (((String) admGroupIDs.get(j)).equals(group.getID())) {
+        for (String admGroupID : admGroupIDs) {
+            if (((String) admGroupID).equals(group.getID())) {
                 continue;
             }
-            if (!mcrUserStore.existsGroup((String) admGroupIDs.get(j))) {
-                throw new MCRException("Unknown admin groupID: " + (String) admGroupIDs.get(j));
+            if (!mcrUserStore.existsGroup((String) admGroupID)) {
+                throw new MCRException("Unknown admin groupID: " + (String) admGroupID);
             }
         }
 
@@ -374,9 +374,9 @@ public class MCRUserMgr {
             mcrUserStore.updateGroup(primGroup);
 
             // now update the other groups
-            for (int i = 0; i < groupIDs.size(); i++) {
-                if (!primGroup.getID().equals(groupIDs.get(i))) {
-                    MCRGroup otherGroup = retrieveGroup((String) groupIDs.get(i), true);
+            for (String groupID : groupIDs) {
+                if (!primGroup.getID().equals(groupID)) {
+                    MCRGroup otherGroup = retrieveGroup((String) groupID, true);
                     otherGroup.addMemberUserID(user.getID());
                     groupCache.remove(otherGroup.getID());
                     mcrUserStore.updateGroup(otherGroup);
@@ -825,11 +825,11 @@ public class MCRUserMgr {
         // clean user system
         List<String> uids = mcrUserStore.getAllUserIDs();
         List<String> gids = mcrUserStore.getAllGroupIDs();
-        for (int i = 0; i < uids.size(); i++) {
-            deleteUserInternal(uids.get(i));
+        for (String uid : uids) {
+            deleteUserInternal(uid);
         }
-        for (int i = 0; i < gids.size(); i++) {
-            deleteGroupInternal(gids.get(i));
+        for (String gid : gids) {
+            deleteGroupInternal(gid);
         }
         LOGGER.info("The user system is clean now.");
         // load elementary group entries
@@ -867,9 +867,9 @@ public class MCRUserMgr {
             }
             // Check if the groups the user will be a member of really exist
             List<String> groupIDs = u.getGroupIDs();
-            for (int j = 0; j < groupIDs.size(); j++) {
-                if (!existGroup((String) groupIDs.get(j))) {
-                    throw new MCRException("The user '" + u.getID() + "' is linked to the unknown group '" + groupIDs.get(j) + "'.");
+            for (String groupID1 : groupIDs) {
+                if (!existGroup((String) groupID1)) {
+                    throw new MCRException("The user '" + u.getID() + "' is linked to the unknown group '" + groupID1 + "'.");
                 }
             }
             // At first create the user. The user must be created before
@@ -881,16 +881,16 @@ public class MCRUserMgr {
             primGroup.addMemberUserID(u.getID());
             updateGroupInternal(primGroup);
             // now update the other groups
-            for (int j = 0; j < groupIDs.size(); j++) {
-                MCRGroup otherGroup = retrieveGroup((String) groupIDs.get(j));
+            for (String groupID : groupIDs) {
+                MCRGroup otherGroup = retrieveGroup((String) groupID);
                 otherGroup.addMemberUserID(u.getID());
                 updateGroupInternal(otherGroup);
             }
             LOGGER.info("All data of user " + u.getID() + " are imported.");
         }
         // complete groups
-        for (int i = 0; i < grouplistelm.size(); i++) {
-            MCRGroup gin = new MCRGroup((org.jdom.Element) grouplistelm.get(i));
+        for (Element aGrouplistelm : grouplistelm) {
+            MCRGroup gin = new MCRGroup((Element) aGrouplistelm);
             MCRGroup g = MCRUserMgr.instance().retrieveGroup(gin.getID());
             // backup up creator and dates
             g.setAdminGroupIDs(gin.getAdminGroupIDs());

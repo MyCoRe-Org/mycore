@@ -410,8 +410,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     @SuppressWarnings("unchecked")
     public Element normalize(Element rule) {
         Element newRule = new Element(rule.getName());
-        for (Iterator<Attribute> it = rule.getAttributes().iterator(); it.hasNext();) {
-            Attribute att = it.next();
+        for (Attribute att : (Iterable<Attribute>) rule.getAttributes()) {
             newRule.setAttribute((Attribute) att.clone());
         }
         List<Element> children = rule.getChildren();
@@ -419,8 +418,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
             return newRule;
         }
         List<Element> newList = new ArrayList<Element>();
-        for (Iterator<Element> it = children.iterator(); it.hasNext();) {
-            Element el = (Element) it.next();
+        for (Element el : children) {
             newList.add((Element) el.clone());
         }
         Collections.sort(newList, accessComp);

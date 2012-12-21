@@ -246,11 +246,10 @@ public class MCRMetsModsUtil {
         Element div = structMap.getChild("div", MCRConstants.METS_NAMESPACE);
         List elements = div.getChildren("div", MCRConstants.METS_NAMESPACE);
 
-        for (int i = 0; i < elements.size(); i++)
-            piclist.add(new MCRMetsModsPicture("dummy", 0, "0"));
+        for (Object element1 : elements) piclist.add(new MCRMetsModsPicture("dummy", 0, "0"));
 
-        for (int i = 0; i < elements.size(); i++) {
-            Element e = (Element) elements.get(i);
+        for (Object element : elements) {
+            Element e = (Element) element;
             String fileid = e.getAttributeValue("ID");
             String order = e.getAttributeValue("ORDER");
             String orderlabel = e.getAttributeValue("ORDERLABEL");
@@ -267,8 +266,8 @@ public class MCRMetsModsUtil {
         Element structMap = root.getChild("structMap", MCRConstants.METS_NAMESPACE);
         Element div = structMap.getChild("div", MCRConstants.METS_NAMESPACE);
         List elements = div.getChildren("div", MCRConstants.METS_NAMESPACE);
-        for (int i = 0; i < elements.size(); i++) {
-            Element e = (Element) elements.get(i);
+        for (Object element : elements) {
+            Element e = (Element) element;
             String fileid = e.getAttributeValue("ID");
 
             for (int j = 0; j < piclist.size(); j++) {

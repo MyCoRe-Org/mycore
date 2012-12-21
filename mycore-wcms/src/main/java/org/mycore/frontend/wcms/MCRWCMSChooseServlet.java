@@ -361,9 +361,9 @@ public class MCRWCMSChooseServlet extends MCRWCMSServlet {
 
             Element contentTemp = new Element("content");
 
-            for (int i = 0; i < contentTemplates.length; i++) {
-                if (!contentTemplates[i].isDirectory()) {
-                    contentTemp.addContent(new Element("template").setText(contentTemplates[i].getName()));
+            for (File contentTemplate : contentTemplates) {
+                if (!contentTemplate.isDirectory()) {
+                    contentTemp.addContent(new Element("template").setText(contentTemplate.getName()));
                 }
             }
 
@@ -457,9 +457,9 @@ public class MCRWCMSChooseServlet extends MCRWCMSServlet {
 
         Element master = new Element("master");
 
-        for (int i = 0; i < masterTemplates.length; i++) {
-            if (masterTemplates[i].isDirectory() && (masterTemplates[i].getName().compareToIgnoreCase("cvs") != 0)) {
-                master.addContent(new Element("template").setText(masterTemplates[i].getName()));
+        for (File masterTemplate : masterTemplates) {
+            if (masterTemplate.isDirectory() && (masterTemplate.getName().compareToIgnoreCase("cvs") != 0)) {
+                master.addContent(new Element("template").setText(masterTemplate.getName()));
             }
         }
 

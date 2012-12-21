@@ -191,8 +191,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         MCRObject mcrobj = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(MCRID));
         MCRObjectStructure structure = mcrobj.getStructure();
         List<MCRMetaLinkID> derivates = structure.getDerivates();
-        for (int i = 0; i < derivates.size(); i++) {
-            MCRMetaLinkID mcrder = derivates.get(i);
+        for (MCRMetaLinkID mcrder : derivates) {
             LOGGER.debug("For ID " + MCRID + " found derivate " + mcrder.getXLinkHref());
             buildMetsForMCRDerivateID(mcrder.getXLinkHrefID().toString());
         }
@@ -218,10 +217,10 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
                 LOGGER.warn("No mets.xml file was found for " + docid.toString() + " in " + MCRID + ".");
                 MCRFilesystemNode[] fsnode = difs.getChildren();
                 boolean checkimage = false;
-                for (int i = 0; i < fsnode.length; i++) {
+                for (MCRFilesystemNode aFsnode : fsnode) {
                     StringTokenizer st = new StringTokenizer(known_image_list, ",");
                     while (st.hasMoreElements()) {
-                        if (fsnode[i].getName().endsWith(st.nextToken())) {
+                        if (aFsnode.getName().endsWith(st.nextToken())) {
                             checkimage = true;
                             break;
                         }
@@ -327,8 +326,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         MCRObject mcrobj = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(MCRID));
         MCRObjectStructure structure = mcrobj.getStructure();
         List<MCRMetaLinkID> derivates = structure.getDerivates();
-        for (int i = 0; i < derivates.size(); i++) {
-            MCRMetaLinkID mcrder = derivates.get(i);
+        for (MCRMetaLinkID mcrder : derivates) {
             LOGGER.debug("found derivate " + mcrder.getXLinkTitle());
             String label = mcrder.getXLinkLabel();
 
@@ -392,8 +390,8 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
             MCRObject fromobj = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(fromid));
             MCRObjectStructure structure = fromobj.getStructure();
             List<MCRMetaLinkID> derivates = structure.getDerivates();
-            for (int i = 0; i < derivates.size(); i++) {
-                MCRObjectID mcrderid = derivates.get(i).getXLinkHrefID();
+            for (MCRMetaLinkID derivate : derivates) {
+                MCRObjectID mcrderid = derivate.getXLinkHrefID();
                 MCRDerivate mcrder = MCRMetadataManager.retrieveMCRDerivate(mcrderid);
                 MCRDirectory derdir = mcrder.receiveDirectoryFromIFS();
                 if (derdir.getChild("mets.xml") != null) {

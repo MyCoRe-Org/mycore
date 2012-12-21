@@ -40,9 +40,8 @@ public abstract class MCRCategoryMapperBase {
 
     public Set<MCRCategoryID> map(Collection<MCRCategoryID> input) {
         SortedSet<MCRCategoryID> output = new TreeSet<MCRCategoryID>();
-    
-        for (Iterator<MCRCategoryID> iterator = input.iterator(); iterator.hasNext();) {
-            MCRCategoryID categoryID = iterator.next();
+
+        for (MCRCategoryID categoryID : input) {
             Set<MCRCategoryID> mapped = collectMappings(categoryID);
             output.addAll(mapped);
         }
@@ -66,9 +65,8 @@ public abstract class MCRCategoryMapperBase {
 
     private boolean alreadyContainsCategoryOfSameClassification(Collection<MCRCategoryID> collection, MCRCategoryID candidate) {
         String classificationID = candidate.getRootID();
-        
-        for (Iterator<MCRCategoryID> iterator = collection.iterator(); iterator.hasNext();) {
-            MCRCategoryID existing = iterator.next();
+
+        for (MCRCategoryID existing : collection) {
             if (existing.getRootID().equals(classificationID))
                 return true;
         }

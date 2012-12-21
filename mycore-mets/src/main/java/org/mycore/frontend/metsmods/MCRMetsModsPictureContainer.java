@@ -66,11 +66,9 @@ public class MCRMetsModsPictureContainer extends JPanel{
 
 	public MCRMetsModsPictureItem searchItemByOrder(int order)
 	{
-		for(int i=0;i<itemlist.size();i++)
-		{
-			MCRMetsModsPictureItem item = itemlist.get(i);
-			if(item.getOrderValue()==order) return item;
-		}
+        for (MCRMetsModsPictureItem item : itemlist) {
+            if (item.getOrderValue() == order) return item;
+        }
 		
 		return null;
 	}
@@ -138,18 +136,16 @@ public class MCRMetsModsPictureContainer extends JPanel{
 		int x = 10;
 		
 		int w = 0;
-		for(int i=0;i<itemlist.size();i++)
-		{
-			MCRMetsModsPictureItem item = itemlist.get(i);
-			item.setContainer(this);
-			
-			if(item.getWidth()>w) w=item.getWidth();
-			
-			item.setLocation(x,y);
-			y += (itemheight+itemspace);
-			
-			this.add(item);
-		}
+        for (MCRMetsModsPictureItem item : itemlist) {
+            item.setContainer(this);
+
+            if (item.getWidth() > w) w = item.getWidth();
+
+            item.setLocation(x, y);
+            y += (itemheight + itemspace);
+
+            this.add(item);
+        }
 		
 		this.setBounds(0,0,w,y);
 		

@@ -80,10 +80,10 @@ public abstract class MCRWebCLICommand extends MCRCommand {
     protected void setMethod() {
         if (this.method == null) {
             Method[] methods = this.getClass().getMethods();
-            for (int i = 0; i < methods.length; i++) {
-                String methodName = methods[i].getName();
+            for (Method method1 : methods) {
+                String methodName = method1.getName();
                 if (methodName.startsWith("cmd")) {
-                    this.method = methods[i];
+                    this.method = method1;
                 }
             }
         }

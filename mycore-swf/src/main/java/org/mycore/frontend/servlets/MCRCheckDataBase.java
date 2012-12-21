@@ -39,6 +39,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -245,8 +246,8 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         }
 
         // write to the log file
-        for (int i = 0; i < logtext.size(); i++) {
-            LOGGER.error(logtext.get(i));
+        for (String aLogtext : logtext) {
+            LOGGER.error(aLogtext);
         }
 
         // prepare editor with error messages
@@ -268,10 +269,8 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
             @SuppressWarnings("unchecked")
             List<Element> sectionlist = root.getChildren("section");
 
-            for (int i = 0; i < sectionlist.size(); i++) {
-                Element section = sectionlist.get(i);
-
-                final String sectLang = section.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE);
+            for (Element section : sectionlist) {
+                final String sectLang = section.getAttributeValue("lang", Namespace.XML_NAMESPACE);
                 if (!sectLang.equals(lang) && !sectLang.equals("all")) {
                     continue;
                 }

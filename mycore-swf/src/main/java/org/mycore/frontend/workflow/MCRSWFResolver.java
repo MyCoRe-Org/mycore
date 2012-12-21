@@ -21,6 +21,7 @@ import javax.xml.transform.sax.TransformerHandler;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.transform.JDOMSource;
 import org.jdom.xpath.XPath;
@@ -166,8 +167,8 @@ public class MCRSWFResolver implements URIResolver {
         String objid;
         String dername;
 
-        for (int i = 0; i < derifiles.size(); i++) {
-            dername = (String) derifiles.get(i);
+        for (String derifile : derifiles) {
+            dername = (String) derifile;
 
             File derivateFile = new File(derivateDirectory, dername);
             mainfile = "";
@@ -186,15 +187,15 @@ public class MCRSWFResolver implements URIResolver {
                 XPath maindocpath = XPath.newInstance("/mycorederivate/derivate/internals/internal");
                 XPath titlepath = XPath.newInstance("/mycorederivate/derivate/titles/title[lang(\'" + lang + "\')]");
                 for (Object node : objidpath.selectNodes(der_in)) {
-                    org.jdom.Element elm = (org.jdom.Element) node;
+                    Element elm = (Element) node;
                     objid = elm.getAttributeValue("href", XLINK_NAMESPACE);
                 }
                 for (Object node : maindocpath.selectNodes(der_in)) {
-                    org.jdom.Element elm = (org.jdom.Element) node;
+                    Element elm = (Element) node;
                     mainfile = elm.getAttributeValue("maindoc");
                 }
                 for (Object node : titlepath.selectNodes(der_in)) {
-                    org.jdom.Element elm = (org.jdom.Element) node;
+                    Element elm = (Element) node;
                     title = elm.getText();
                 }
 
@@ -252,10 +253,10 @@ public class MCRSWFResolver implements URIResolver {
         MCRXSLTransformation.setParameters(handler, parameters);
         MCRAccessInterface ai = MCRAccessManager.getAccessImpl();
         // run the loop over all objects in the workflow
-        for (int i = 0; i < workfiles.size(); i++) {
-            String wfile = (String) workfiles.get(i);
+        for (String workfile : workfiles) {
+            String wfile = (String) workfile;
             File wf = new File(objectDirectory, wfile);
-            org.jdom.Element elm = null;
+            Element elm = null;
 
             try {
                 workflow_in = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(wf));
@@ -314,7 +315,7 @@ public class MCRSWFResolver implements URIResolver {
                         String derpath = (String) derderid.get(j);
                         mainfile = (String) dermain.get(j);
 
-                        org.jdom.Element deriv = new org.jdom.Element("derivate");
+                        Element deriv = new Element("derivate");
                         deriv.setAttribute("ID", (String) derderid.get(j));
                         deriv.setAttribute("label", (String) derlabel.get(j));
                         title = (String) dertitle.get(j);
@@ -329,7 +330,7 @@ public class MCRSWFResolver implements URIResolver {
                             ArrayList<String> dirlist = MCRUtils.getAllFileNames(dir);
 
                             for (int k = 0; k < dirlist.size(); k++) {
-                                org.jdom.Element file = new org.jdom.Element("file");
+                                Element file = new Element("file");
                                 file.setText(derpath + SLASH + (String) dirlist.get(k));
 
                                 File thisfile = new File(dir, (String) dirlist.get(k));
@@ -357,7 +358,7 @@ public class MCRSWFResolver implements URIResolver {
                     }
                 }
             } catch (Exception ex) {
-                LOGGER.error("Error while read derivates for XML workflow file " + (String) workfiles.get(i), ex);
+                LOGGER.error("Error while read derivates for XML workflow file " + (String) workfile, ex);
             }
             root.addContent(elm);
         }

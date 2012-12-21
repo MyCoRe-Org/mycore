@@ -101,9 +101,9 @@ public class TextFilterPluginManager {
                     filter = (TextFilterPlugin) o;
                     LOGGER.info(new StringBuffer(propertyName + "Loading TextFilterPlugin: ").append(filter.getName()).append(" v:")
                             .append(filter.getMajorNumber()).append('.').append(filter.getMinorNumber()).toString());
-                    for (Iterator CtIterator = filter.getSupportedContentTypes().iterator(); CtIterator.hasNext();) {
+                    for (Object o1 : filter.getSupportedContentTypes()) {
                         // Add MIME Type filters to the basket
-                        ct = (MCRFileContentType) CtIterator.next();
+                        ct = (MCRFileContentType) o1;
 
                         if (ct != null) {
                             CONTENT_TYPE_PLUGIN_BAG.put(ct, filter);

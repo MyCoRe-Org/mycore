@@ -32,6 +32,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -157,8 +158,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                 @SuppressWarnings("unchecked")
                 List<Element> servacllist = servacls.getChildren("servacl");
                 if (servacllist.size() != 0) {
-                    for (int i = 0; i < servacllist.size(); i++) {
-                        Element servacl = servacllist.get(i);
+                    for (Element servacl : servacllist) {
                         Element outcond = servacl.getChild("condition");
                         if (outcond != null) {
                             Element outbool = outcond.getChild("boolean");
@@ -167,16 +167,16 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                                 List<Element> inbool = outbool.getChildren("boolean");
                                 String outoper = outbool.getAttributeValue("operator");
                                 if (inbool.size() != 0 && outoper != null && !outoper.equals("true")) {
-                                    for (int j = 0; j < inbool.size(); j++) {
+                                    for (Element anInbool : inbool) {
                                         @SuppressWarnings("unchecked")
-                                        List<Element> incondlist = inbool.get(j).getChildren("condition");
+                                        List<Element> incondlist = anInbool.getChildren("condition");
                                         int k = incondlist.size();
                                         if (k != 0) {
                                             for (int l = 0; l < k; l++) {
                                                 Element incond = incondlist.get(l);
                                                 String condvalue = incond.getAttributeValue("value");
                                                 if (condvalue == null || (condvalue = condvalue.trim()).length() == 0) {
-                                                    ((Element) inbool.get(j)).removeContent(incond);
+                                                    ((Element) anInbool).removeContent(incond);
                                                     k--;
                                                     l--;
                                                     continue;
@@ -184,22 +184,22 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                                                 String condfield = incond.getAttributeValue("field");
                                                 if (condfield.equals("date")) {
                                                     if (MCRUtils.convertDateToISO(condvalue) == null) {
-                                                        inbool.get(j).removeContent(incond);
+                                                        anInbool.removeContent(incond);
                                                         k--;
                                                         l--;
                                                     }
                                                 }
                                             }
                                             if (k == 1) {
-                                                String inbooloper = inbool.get(j).getAttributeValue("operator");
+                                                String inbooloper = anInbool.getAttributeValue("operator");
                                                 if ((inbooloper != null) && inbooloper.toLowerCase().equals("and")) {
                                                     Element newtrue = new Element("boolean");
                                                     newtrue.setAttribute("operator", "true");
-                                                    inbool.get(j).addContent(newtrue);
+                                                    anInbool.addContent(newtrue);
                                                 } else {
                                                     Element newfalse = new Element("boolean");
                                                     newfalse.setAttribute("operator", "false");
-                                                    inbool.get(j).addContent(newfalse);
+                                                    anInbool.addContent(newfalse);
                                                 }
                                             }
                                         } else {
@@ -252,8 +252,8 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
         }
 
         // write to the log file
-        for (int i = 0; i < logtext.size(); i++) {
-            LOGGER.error(logtext.get(i));
+        for (String aLogtext1 : logtext) {
+            LOGGER.error(aLogtext1);
         }
 
         // prepare editor with error messages
@@ -274,10 +274,8 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
             @SuppressWarnings("unchecked")
             List<Element> sectionlist = root.getChildren("section");
 
-            for (int i = 0; i < sectionlist.size(); i++) {
-                Element section = sectionlist.get(i);
-
-                if (!section.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE).equals(lang.toLowerCase())) {
+            for (Element section : sectionlist) {
+                if (!section.getAttributeValue("lang", Namespace.XML_NAMESPACE).equals(lang.toLowerCase())) {
                     continue;
                 }
 
@@ -290,12 +288,12 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                 Element table = new Element("table");
                 table.setAttribute("width", "80%");
 
-                for (int j = 0; j < logtext.size(); j++) {
+                for (String aLogtext : logtext) {
                     Element tr = new Element("tr");
                     Element td = new Element("td");
                     Element el = new Element("font");
                     el.setAttribute("color", "red");
-                    el.addContent(logtext.get(j));
+                    el.addContent(aLogtext);
                     td.addContent(el);
                     tr.addContent(td);
                     table.addContent(tr);

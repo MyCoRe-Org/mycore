@@ -90,9 +90,9 @@ public abstract class MCRWCMSServlet extends MCRServlet {
         File[] masterTemplates = new File(MCRConfiguration.instance().getString("MCR.templatePath") + "master/".replace('/', File.separatorChar)).listFiles();
         Element master = new Element("master");
 
-        for (int i = 0; i < masterTemplates.length; i++) {
-            if (masterTemplates[i].isDirectory() && (masterTemplates[i].getName().compareToIgnoreCase("cvs") != 0)) {
-                master.addContent(new Element("template").setText(masterTemplates[i].getName()));
+        for (File masterTemplate : masterTemplates) {
+            if (masterTemplate.isDirectory() && (masterTemplate.getName().compareToIgnoreCase("cvs") != 0)) {
+                master.addContent(new Element("template").setText(masterTemplate.getName()));
             }
         }
 
@@ -141,9 +141,9 @@ public abstract class MCRWCMSServlet extends MCRServlet {
 
         imageList = new File(imagePath.toString()).listFiles();
 
-        for (int i = 0; i < imageList.length; i++) {
-            if (!imageList[i].isDirectory()) {
-                images.addContent(new Element("image").setText(imageList[i].getName()));
+        for (File anImageList : imageList) {
+            if (!anImageList.isDirectory()) {
+                images.addContent(new Element("image").setText(anImageList.getName()));
             }
         }
 
@@ -161,9 +161,9 @@ public abstract class MCRWCMSServlet extends MCRServlet {
 
         documentList = new File(documentPath.toString()).listFiles();
 
-        for (int i = 0; i < documentList.length; i++) {
-            if (!documentList[i].isDirectory()) {
-                documents.addContent(new Element("document").setText(documentList[i].getName()));
+        for (File aDocumentList : documentList) {
+            if (!aDocumentList.isDirectory()) {
+                documents.addContent(new Element("document").setText(aDocumentList.getName()));
             }
         }
 

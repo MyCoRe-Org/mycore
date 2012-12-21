@@ -91,8 +91,8 @@ public class MCRRequestParameters {
                 throw new MCRException(msg, ex);
             }
 
-            for (int i = 0; i < items.size(); i++) {
-                FileItem item = (FileItem) items.get(i);
+            for (Object item1 : items) {
+                FileItem item = (FileItem) item1;
 
                 String name = item.getFieldName();
                 String value = null;

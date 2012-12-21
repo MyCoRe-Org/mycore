@@ -268,8 +268,8 @@ public class MCRURN {
             return null;
         StringBuilder urn = new StringBuilder();
         urn.append(MCRURN.DEFAULT_SCHEMA);
-        for (int i = 0; i < namespaceIdentifiers.length; i++) {
-            urn.append(":" + namespaceIdentifiers[i]);
+        for (String namespaceIdentifier : namespaceIdentifiers) {
+            urn.append(":" + namespaceIdentifier);
         }
         urn.append(":" + namespaceSpecificPart);
         return urn.toString();

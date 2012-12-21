@@ -28,6 +28,7 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.mycore.common.MCRCalendar;
 import org.mycore.common.MCRException;
 
@@ -182,9 +183,9 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         if (set_lang == null) {
             return null;
         }
-        for (int i = 0; i < texts.size(); i++) {
-            if (texts.get(i).getLang().equals(set_lang)) {
-                return texts.get(i);
+        for (MCRMetaHistoryDateText text : texts) {
+            if (text.getLang().equals(set_lang)) {
+                return text;
             }
         }
         return null;
@@ -472,10 +473,10 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     @Override
     public org.jdom.Element createXML() throws MCRException {
         Element elm = super.createXML();
-        for (int i = 0; i < texts.size(); i++) {
-            org.jdom.Element elmt = new org.jdom.Element("text");
-            elmt.addContent(texts.get(i).getText());
-            elmt.setAttribute("lang", texts.get(i).getLang(), org.jdom.Namespace.XML_NAMESPACE);
+        for (MCRMetaHistoryDateText text : texts) {
+            Element elmt = new Element("text");
+            elmt.addContent(text.getText());
+            elmt.setAttribute("lang", text.getLang(), Namespace.XML_NAMESPACE);
             elm.addContent(elmt);
         }
         elm.addContent(new org.jdom.Element("calendar").addContent(calendar));
@@ -531,8 +532,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     @Override
     public MCRMetaHistoryDate clone() {
         MCRMetaHistoryDate out = new MCRMetaHistoryDate(subtag, lang, type, inherited);
-        for (int i = 0; i < texts.size(); i++) {
-            MCRMetaHistoryDateText h = texts.get(i);
+        for (MCRMetaHistoryDateText h : texts) {
             out.setText(h.getText(), h.getLang());
         }
         out.setVonDate(von);
@@ -547,8 +547,8 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     @Override
     public void debug() {
         super.debugDefault();
-        for (int i = 0; i < texts.size(); i++) {
-            LOGGER.debug("Text / lang         = " + texts.get(i).getText() + " / " + texts.get(i).getLang());
+        for (MCRMetaHistoryDateText text : texts) {
+            LOGGER.debug("Text / lang         = " + text.getText() + " / " + text.getLang());
         }
         LOGGER.debug("Calendar           = " + calendar);
         if (calendar.equals(MCRCalendar.TAG_GREGORIAN)) {

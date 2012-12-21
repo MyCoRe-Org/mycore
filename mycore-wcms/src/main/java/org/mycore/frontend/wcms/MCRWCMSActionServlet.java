@@ -276,9 +276,9 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
                 Element templates = new Element("templates");
                 Element contentTemp = new Element("content");
 
-                for (int i = 0; i < contentTemplates.length; i++) {
-                    if (!contentTemplates[i].isDirectory()) {
-                        contentTemp.addContent(new Element("template").setText(contentTemplates[i].getName()));
+                for (File contentTemplate : contentTemplates) {
+                    if (!contentTemplate.isDirectory()) {
+                        contentTemp.addContent(new Element("template").setText(contentTemplate.getName()));
                     }
                 }
 
@@ -292,24 +292,24 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
                 rootOut.addContent(images);
                 imageList = (new File(MCRConfiguration.instance().getString("MCR.WCMS.imagePath").replace('/', File.separatorChar))).list();
 
-                for (int i = 0; i < imageList.length; i++) {
-                    images.addContent(new Element("image").setText(MCRConfiguration.instance().getString("MCR.WCMS.imagePath") + imageList[i]));
+                for (String anImageList : imageList) {
+                    images.addContent(new Element("image").setText(MCRConfiguration.instance().getString("MCR.WCMS.imagePath") + anImageList));
                 }
 
                 Element documents = new Element("documents");
                 rootOut.addContent(documents);
                 documentList = (new File(MCRConfiguration.instance().getString("MCR.WCMS.documentPath").replace('/', File.separatorChar))).list();
 
-                for (int i = 0; i < documentList.length; i++) {
-                    documents.addContent(new Element("document").setText(MCRConfiguration.instance().getString("MCR.WCMS.imagePath") + documentList[i]));
+                for (String aDocumentList : documentList) {
+                    documents.addContent(new Element("document").setText(MCRConfiguration.instance().getString("MCR.WCMS.imagePath") + aDocumentList));
                 }
 
                 Element templates = new Element("templates");
                 Element master = new Element("master");
 
-                for (int i = 0; i < masterTemplates.length; i++) {
-                    if (masterTemplates[i].isDirectory() && (masterTemplates[i].getName().compareToIgnoreCase("cvs") != 0)) {
-                        master.addContent(new Element("template").setText(masterTemplates[i].getName()));
+                for (File masterTemplate1 : masterTemplates) {
+                    if (masterTemplate1.isDirectory() && (masterTemplate1.getName().compareToIgnoreCase("cvs") != 0)) {
+                        master.addContent(new Element("template").setText(masterTemplate1.getName()));
                     }
                 }
 

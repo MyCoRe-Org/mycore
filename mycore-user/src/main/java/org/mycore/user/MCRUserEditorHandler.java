@@ -38,10 +38,10 @@ public abstract class MCRUserEditorHandler {
         // Loop over all assignable group IDs
         org.jdom.Element root = new org.jdom.Element("items");
 
-        for (int i = 0; i < groupIDs.size(); i++) {
-            org.jdom.Element item = new org.jdom.Element("item")
-                .setAttribute("value", (String) groupIDs.get(i))
-                .setAttribute("label", (String) groupIDs.get(i));
+        for (String groupID : groupIDs) {
+            Element item = new Element("item")
+                    .setAttribute("value", (String) groupID)
+                    .setAttribute("label", (String) groupID);
             root.addContent(item);
         }
         return root;
@@ -71,8 +71,8 @@ public abstract class MCRUserEditorHandler {
         List<String> userIDs = MCRUserMgr.instance().getAllUserIDs();
         // Loop over all assignable group IDs
         Element root = new org.jdom.Element("items");
-        for (int i = 0; i < userIDs.size(); i++) {
-            Element item = new Element("item").setAttribute("value", (String) userIDs.get(i)).setAttribute("label", (String) userIDs.get(i));
+        for (String userID : userIDs) {
+            Element item = new Element("item").setAttribute("value", (String) userID).setAttribute("label", (String) userID);
             root.addContent(item);
         }
         return new Document(root);
@@ -86,10 +86,10 @@ public abstract class MCRUserEditorHandler {
         groupIDs = MCRUserMgr.instance().getAllGroupIDs();
         // Loop over all assignable group IDs
         org.jdom.Element root = new org.jdom.Element("items");
-        for (int i = 0; i < groupIDs.size(); i++) {
-            org.jdom.Element item = new org.jdom.Element("item")
-                .setAttribute("value", (String) groupIDs.get(i))
-                .setAttribute("label", (String) groupIDs.get(i));
+        for (String groupID : groupIDs) {
+            Element item = new Element("item")
+                    .setAttribute("value", (String) groupID)
+                    .setAttribute("label", (String) groupID);
             root.addContent(item);
         }
         return new Document(root);

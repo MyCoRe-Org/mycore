@@ -31,6 +31,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -159,8 +160,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
             if (servacls != null) {
                 List<Element> servacllist = servacls.getChildren("servacl");
                 if (servacllist.size() != 0) {
-                    for (int i = 0; i < servacllist.size(); i++) {
-                        Element servacl = servacllist.get(i);
+                    for (Element servacl : servacllist) {
                         Element outcond = servacl.getChild("condition");
                         if (outcond != null) {
                             Element outbool = outcond.getChild("boolean");
@@ -168,15 +168,15 @@ public class MCRCheckClassACLServlet extends MCRServlet {
                                 List<Element> inbool = outbool.getChildren("boolean");
                                 String outoper = outbool.getAttributeValue("operator");
                                 if (inbool.size() != 0 && outoper != null && !outoper.equals("true")) {
-                                    for (int j = 0; j < inbool.size(); j++) {
-                                        List<Element> incondlist = inbool.get(j).getChildren("condition");
+                                    for (Element anInbool : inbool) {
+                                        List<Element> incondlist = anInbool.getChildren("condition");
                                         int k = incondlist.size();
                                         if (k != 0) {
                                             for (int l = 0; l < k; l++) {
                                                 Element incond = incondlist.get(l);
                                                 String condvalue = incond.getAttributeValue("value");
                                                 if (condvalue == null || (condvalue = condvalue.trim()).length() == 0) {
-                                                    ((Element) inbool.get(j)).removeContent(incond);
+                                                    ((Element) anInbool).removeContent(incond);
                                                     k--;
                                                     l--;
                                                 }
@@ -184,7 +184,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
                                             if (k == 1) {
                                                 Element newtrue = new Element("boolean");
                                                 newtrue.setAttribute("operator", "true");
-                                                ((Element) inbool.get(j)).addContent(newtrue);
+                                                ((Element) anInbool).addContent(newtrue);
                                             }
                                         } else {
                                             logtext.add("Can't find an inner condition element.");
@@ -289,8 +289,8 @@ public class MCRCheckClassACLServlet extends MCRServlet {
         }
 
         // write to the log file
-        for (int i = 0; i < logtext.size(); i++) {
-            LOGGER.error(logtext.get(i));
+        for (String aLogtext1 : logtext) {
+            LOGGER.error(aLogtext1);
         }
 
         // prepare editor with error messages
@@ -310,10 +310,10 @@ public class MCRCheckClassACLServlet extends MCRServlet {
             Element root = jdom.getRootElement();
             List<Element> sectionlist = root.getChildren("section");
 
-            for (int i = 0; i < sectionlist.size(); i++) {
-                Element section = (Element) sectionlist.get(i);
+            for (Element aSectionlist : sectionlist) {
+                Element section = (Element) aSectionlist;
 
-                if (!section.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE).equals(lang.toLowerCase())) {
+                if (!section.getAttributeValue("lang", Namespace.XML_NAMESPACE).equals(lang.toLowerCase())) {
                     continue;
                 }
 
@@ -326,12 +326,12 @@ public class MCRCheckClassACLServlet extends MCRServlet {
                 Element table = new Element("table");
                 table.setAttribute("width", "80%");
 
-                for (int j = 0; j < logtext.size(); j++) {
+                for (String aLogtext : logtext) {
                     Element tr = new Element("tr");
                     Element td = new Element("td");
                     Element el = new Element("font");
                     el.setAttribute("color", "red");
-                    el.addContent((String) logtext.get(j));
+                    el.addContent((String) aLogtext);
                     td.addContent(el);
                     tr.addContent(td);
                     table.addContent(tr);

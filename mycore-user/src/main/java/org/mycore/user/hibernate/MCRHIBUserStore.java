@@ -324,10 +324,10 @@ public class MCRHIBUserStore implements MCRUserStore {
 
         final ArrayList<String> memberUserIDs = newGroup.getMemberUserIDs();
         // now update the member lookup table Groupmembers
-        for (int i = 0; i < memberUserIDs.size(); i++) {
+        for (String memberUserID : memberUserIDs) {
             MCRGROUPMEMBERS member = new MCRGROUPMEMBERS();
             member.setGid(group);
-            member.setUserid((MCRUSERS) session.get(MCRUSERS.class, memberUserIDs.get(i)));
+            member.setUserid((MCRUSERS) session.get(MCRUSERS.class, memberUserID));
             session.save(member);
         }
 
@@ -478,13 +478,13 @@ public class MCRHIBUserStore implements MCRUserStore {
         }
 
         // insert
-        for (int i = 0; i < newAdminUserIDs.size(); i++) {
-            if (!oldAdminUserIDs.contains(newAdminUserIDs.get(i))) {
+        for (String newAdminUserID : newAdminUserIDs) {
+            if (!oldAdminUserIDs.contains(newAdminUserID)) {
                 MCRGROUPADMINSPK pk = new MCRGROUPADMINSPK();
                 pk.setGid(dbgroup);
                 pk.setGroupid(ADMIN_GROUP);
                 MCRUSERS user = new MCRUSERS();
-                user.setUid(newAdminUserIDs.get(i));
+                user.setUid(newAdminUserID);
                 pk.setUserid(user);
                 if (session.get(MCRGROUPADMINS.class, pk) == null) {
                     MCRGROUPADMINS grpadmins = new MCRGROUPADMINS();
@@ -496,12 +496,12 @@ public class MCRHIBUserStore implements MCRUserStore {
             }
         }
 
-        for (int i = 0; i < newAdminGroupIDs.size(); i++) {
-            if (!oldAdminGroupIDs.contains(newAdminGroupIDs.get(i))) {
+        for (String newAdminGroupID : newAdminGroupIDs) {
+            if (!oldAdminGroupIDs.contains(newAdminGroupID)) {
                 MCRGROUPADMINSPK pk = new MCRGROUPADMINSPK();
                 pk.setGid(dbgroup);
                 MCRGROUPS adminGroup = new MCRGROUPS();
-                adminGroup.setGid(newAdminGroupIDs.get(i));
+                adminGroup.setGid(newAdminGroupID);
                 pk.setGroupid(adminGroup);
                 pk.setUserid(ADMIN_USER);
                 if (session.get(MCRGROUPADMINS.class, pk) == null) {
@@ -516,27 +516,27 @@ public class MCRHIBUserStore implements MCRUserStore {
 
         // We search for the recently removed admins and remove them from
         // the table
-        for (int i = 0; i < oldAdminUserIDs.size(); i++) {
-            if (!newAdminUserIDs.contains(oldAdminUserIDs.get(i))) {
+        for (String oldAdminUserID : oldAdminUserIDs) {
+            if (!newAdminUserIDs.contains(oldAdminUserID)) {
                 int deletedEntities = session.createQuery(
-                    "delete MCRGROUPADMINS " + "where GID = '" + group.getID() + "'" + " and USERID = '" + oldAdminUserIDs.get(i) + "'").executeUpdate();
+                        "delete MCRGROUPADMINS " + "where GID = '" + group.getID() + "'" + " and USERID = '" + oldAdminUserID + "'").executeUpdate();
                 logger.info(deletedEntities + " groupadmin-entries deleted");
             }
         }
 
-        for (int i = 0; i < oldAdminGroupIDs.size(); i++) {
-            if (!newAdminGroupIDs.contains(oldAdminGroupIDs.get(i))) {
+        for (String oldAdminGroupID : oldAdminGroupIDs) {
+            if (!newAdminGroupIDs.contains(oldAdminGroupID)) {
                 int deletedEntities = session.createQuery(
-                    "delete MCRGROUPADMINS " + "where GID = '" + group.getID() + "'" + " and GROUPID = '" + oldAdminGroupIDs.get(i) + "'").executeUpdate();
+                        "delete MCRGROUPADMINS " + "where GID = '" + group.getID() + "'" + " and GROUPID = '" + oldAdminGroupID + "'").executeUpdate();
                 logger.info(deletedEntities + " groupadmin-entries deleted");
             }
         }
 
         // We search for the new members and insert them into the lookup
         // table
-        for (int i = 0; i < newUserIDs.size(); i++) {
-            if (!oldUserIDs.contains(newUserIDs.get(i))) {
-                MCRUSERS user = (MCRUSERS) session.get(MCRUSERS.class, newUserIDs.get(i));
+        for (String newUserID : newUserIDs) {
+            if (!oldUserIDs.contains(newUserID)) {
+                MCRUSERS user = (MCRUSERS) session.get(MCRUSERS.class, newUserID);
                 MCRGROUPMEMBERS grpmembers = new MCRGROUPMEMBERS();
                 grpmembers.setGid(dbgroup);
                 grpmembers.setUserid(user);
@@ -546,10 +546,10 @@ public class MCRHIBUserStore implements MCRUserStore {
 
         // We search for the users which have been removed from this group
         // and delete the entries from the member lookup table
-        for (int i = 0; i < oldUserIDs.size(); i++) {
-            if (!newUserIDs.contains(oldUserIDs.get(i))) {
+        for (String oldUserID : oldUserIDs) {
+            if (!newUserIDs.contains(oldUserID)) {
                 List<MCRGROUPMEMBERS> deleteEntities = session.createQuery(
-                    "from MCRGROUPMEMBERS where GID = '" + group.getID() + "' " + "and USERID ='" + oldUserIDs.get(i) + "'").list();
+                        "from MCRGROUPMEMBERS where GID = '" + group.getID() + "' " + "and USERID ='" + oldUserID + "'").list();
                 for (MCRGROUPMEMBERS member : deleteEntities) {
                     session.delete(member);
                 }

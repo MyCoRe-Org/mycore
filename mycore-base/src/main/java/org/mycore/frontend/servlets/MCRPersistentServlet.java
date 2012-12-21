@@ -40,6 +40,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.Namespace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.access.MCRAccessManager;
@@ -542,8 +543,8 @@ public class MCRPersistentServlet extends MCRServlet {
      */
     private void errorHandlerValid(MCRServletJob job, List<String> logtext) throws IOException {
         // write to the log file
-        for (int i = 0; i < logtext.size(); i++) {
-            LOGGER.error(logtext.get(i));
+        for (String aLogtext : logtext) {
+            LOGGER.error(aLogtext);
         }
 
         // prepare editor with error messages
@@ -554,10 +555,8 @@ public class MCRPersistentServlet extends MCRServlet {
         @SuppressWarnings("unchecked")
         List<Element> sectionlist = root.getChildren("section");
 
-        for (int i = 0; i < sectionlist.size(); i++) {
-            Element section = sectionlist.get(i);
-
-            final String sectLang = section.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE);
+        for (Element section : sectionlist) {
+            final String sectLang = section.getAttributeValue("lang", Namespace.XML_NAMESPACE);
             if (!sectLang.equals(MCRSessionMgr.getCurrentSession().getCurrentLanguage()) && !sectLang.equals("all")) {
                 continue;
             }

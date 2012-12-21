@@ -103,8 +103,8 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
         notinherit = set_notinherit;
 
         if (set_list != null) {
-            for (int i = 0; i < set_list.size(); i++) {
-                list.add(set_list.get(i));
+            for (MCRMetaInterface aSet_list : set_list) {
+                list.add(aSet_list);
             }
         }
     }
@@ -321,8 +321,8 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
         List<Element> element_list = element.getChildren();
         int len = element_list.size();
 
-        for (int i = 0; i < len; i++) {
-            org.jdom.Element subtag = (org.jdom.Element) element_list.get(i);
+        for (Element anElement_list : element_list) {
+            Element subtag = (Element) anElement_list;
             MCRMetaInterface obj;
 
             try {
@@ -357,8 +357,8 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
         org.jdom.Element elm = new org.jdom.Element(tag);
         int j = 0;
 
-        for (int i = 0; i < list.size(); i++) {
-            if ((list.get(i)).getInherited() > 0) {
+        for (MCRMetaInterface aList1 : list) {
+            if (aList1.getInherited() > 0) {
             }
 
             j++;
@@ -371,14 +371,14 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
         elm.setAttribute("heritable", String.valueOf(heritable));
         elm.setAttribute("notinherit", String.valueOf(notinherit));
 
-        for (int i = 0; i < list.size(); i++) {
+        for (MCRMetaInterface aList : list) {
             if (!flag) {
-                if ((list.get(i)).getInherited() > 0) {
+                if (aList.getInherited() > 0) {
                     continue;
                 }
             }
 
-            elm.addContent((list.get(i)).createXML());
+            elm.addContent(aList.createXML());
         }
 
         return elm;
@@ -450,8 +450,8 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
         LOGGER.debug("NotInherit         = " + String.valueOf(notinherit));
         LOGGER.debug("Elements           = " + String.valueOf(list.size()));
         LOGGER.debug(" ");
-        for (int i = 0; i < list.size(); i++) {
-            list.get(i).debug();
+        for (MCRMetaInterface aList : list) {
+            aList.debug();
         }
     }
 

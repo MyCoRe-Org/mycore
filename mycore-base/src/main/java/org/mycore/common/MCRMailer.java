@@ -342,13 +342,13 @@ public class MCRMailer extends MCRServlet {
             msg.setReplyTo(adrs);
         }
 
-        for (int i = 0; i < to.size(); i++) {
-            msg.addRecipient(Message.RecipientType.TO, buildAddress(to.get(i)));
+        for (String aTo : to) {
+            msg.addRecipient(Message.RecipientType.TO, buildAddress(aTo));
         }
 
         if (bcc != null) {
-            for (int i = 0; i < bcc.size(); i++) {
-                msg.addRecipient(Message.RecipientType.BCC, buildAddress(bcc.get(i)));
+            for (String aBcc : bcc) {
+                msg.addRecipient(Message.RecipientType.BCC, buildAddress(aBcc));
             }
         }
 
@@ -367,10 +367,10 @@ public class MCRMailer extends MCRServlet {
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(messagePart);
 
-            for (int i = 0; i < parts.size(); i++) {
+            for (String part : parts) {
                 messagePart = new MimeBodyPart();
 
-                URL url = new URL(parts.get(i));
+                URL url = new URL(part);
                 DataSource source = new URLDataSource(url);
                 messagePart.setDataHandler(new DataHandler(source));
 

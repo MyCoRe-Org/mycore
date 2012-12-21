@@ -279,8 +279,8 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // call method named like todo
         Method meth[] = this.getClass().getMethods();
-        for (int i = 0; i < meth.length; i++) {
-            LOGGER.debug("Methods for SWF " + meth[i].getName());
+        for (Method aMeth : meth) {
+            LOGGER.debug("Methods for SWF " + aMeth.getName());
         }
         try {
             Method method = this.getClass().getMethod(mytodo, new Class[] { job.getClass(), cd.getClass() });
@@ -645,8 +645,8 @@ public class MCRStartEditorServlet extends MCRServlet {
                 }
                 String testfield = "";
                 List<org.jdom.Element> innercond = newelm.getChildren();
-                for (int j = 0; j < innercond.size(); j++) {
-                    org.jdom.Element cond = (org.jdom.Element) innercond.get(j);
+                for (Element anInnercond : innercond) {
+                    Element cond = (Element) anInnercond;
                     if (cond.getName().equals("condition")) {
                         testfield = cond.getAttributeValue("field");
                     }

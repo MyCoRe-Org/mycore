@@ -91,9 +91,8 @@ public class MCROAIIdentify extends SimpleIdentify {
     public FriendsDescription getFriendsDescription() {
         FriendsDescription desc = new FriendsDescription();
         Properties friends = this.config.getProperties(this.configPrefix + "Friends.");
-        for (@SuppressWarnings("rawtypes")
-        Iterator it = friends.values().iterator(); it.hasNext();) {
-            String friend = (String) (it.next());
+        for (Object o : friends.values()) {
+            String friend = (String) (o);
             desc.getFriendsList().add(friend);
         }
         return desc;

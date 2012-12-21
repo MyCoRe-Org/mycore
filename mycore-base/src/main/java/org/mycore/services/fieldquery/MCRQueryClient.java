@@ -58,8 +58,8 @@ public class MCRQueryClient {
 
         ALL_HOSTS = new ArrayList<String>();
         List children = hosts.getChildren();
-        for (int i = 0; i < children.size(); i++) {
-            Element host = (Element) children.get(i);
+        for (Object aChildren : children) {
+            Element host = (Element) aChildren;
             String classname = host.getAttributeValue("class");
             if (classname == null || (classname = classname.trim()).length() == 0) {
                 classname = "org.mycore.services.fieldquery.MCRQueryClientWebService";
@@ -110,8 +110,8 @@ public class MCRQueryClient {
             LOGGER.error(msg, ex);
         }
 
-        for (int i = 0; i < hosts.size(); i++) {
-            String alias = (String) hosts.get(i);
+        for (Object host : hosts) {
+            String alias = (String) host;
             MCRQueryClient.search(alias, inDoc, results);
         }
 

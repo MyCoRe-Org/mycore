@@ -69,8 +69,8 @@ public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector {
 
             List types = store.getChildren();
 
-            for (int j = 0; j < types.size(); j++) {
-                Element type = (Element) types.get(j);
+            for (Object type1 : types) {
+                Element type = (Element) type1;
                 String typeID = type.getTextTrim();
 
                 table.put(typeID, storeID);

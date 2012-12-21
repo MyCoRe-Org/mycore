@@ -39,16 +39,16 @@ public class MCRPWCallback implements CallbackHandler {
      */
     public void handle(Callback[] callbacks) throws IOException,
                     UnsupportedCallbackException {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof WSPasswordCallback) {
-                WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
+        for (Callback callback : callbacks) {
+            if (callback instanceof WSPasswordCallback) {
+                WSPasswordCallback pc = (WSPasswordCallback) callback;
                 // set the password given a username
                 System.out.println("org.mycore.services.wsclient.MCRPWCallback USER: " + pc.getIdentifer());
                 if ("wss4j".equals(pc.getIdentifer())) {
                     pc.setPassword("security");
                 }
             } else {
-                throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
+                throw new UnsupportedCallbackException(callback, "Unrecognized Callback");
             }
         }
     }

@@ -454,8 +454,8 @@ public class MCRUtils {
 
         case COMMAND_AND:
 
-            for (Iterator<? extends T> it = set1.iterator(); it.hasNext();) {
-                id = it.next();
+            for (T aSet11 : set1) {
+                id = aSet11;
 
                 if (set2.contains(id)) {
                     merged.add(id);
@@ -466,16 +466,16 @@ public class MCRUtils {
 
         case COMMAND_XOR:
 
-            for (Iterator<? extends T> it = set1.iterator(); it.hasNext();) {
-                id = it.next();
+            for (T aSet1 : set1) {
+                id = aSet1;
 
                 if (!set2.contains(id)) {
                     merged.add(id);
                 }
             }
 
-            for (Iterator<? extends T> it = set2.iterator(); it.hasNext();) {
-                id = it.next();
+            for (T aSet2 : set2) {
+                id = aSet2;
 
                 if (!set1.contains(id) && !merged.contains(id)) {
                     merged.add(id);

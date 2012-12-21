@@ -124,15 +124,15 @@ public class MCRMetsModsApplet extends JApplet {
         scroller.setBounds(10, 10, this.getWidth() - 20, this.getHeight() - 50);
 
         int k = 0;
-        for (int i = 0; i < pictures.size(); i++)
-            if (((MCRMetsModsPicture) pictures.get(i)).getPicture().length() * 10 > k)
-                k = ((MCRMetsModsPicture) pictures.get(i)).getPicture().length() * 10;
+        for (MCRMetsModsPicture picture1 : pictures)
+            if (((MCRMetsModsPicture) picture1).getPicture().length() * 10 > k)
+                k = ((MCRMetsModsPicture) picture1).getPicture().length() * 10;
 
         title_label2.setBounds(k + 10, 2, 100, 20); // adapting text length of filename for position of label
         title_label3.setBounds(k + 130, 2, 100, 20); // adapting text length of filename for position of label
 
-        for (int i = 0; i < pictures.size(); i++) {
-            MCRMetsModsPicture mmpic = (MCRMetsModsPicture) pictures.get(i);
+        for (MCRMetsModsPicture picture : pictures) {
+            MCRMetsModsPicture mmpic = (MCRMetsModsPicture) picture;
             MCRMetsModsPictureItem mmpi = new MCRMetsModsPictureItem(mmpic, k);
             mmpc.addItem(mmpi);
         }

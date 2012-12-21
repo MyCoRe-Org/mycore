@@ -408,11 +408,11 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
             return true;
         boolean valid = false;
         List<Element> childList= (List<Element>)childElement.getContent(new ElementFilter());
-        for(int i = 0; i < childList.size(); i++) {
-           if(isValidChild(childList.get(i)))
-               valid = true;
-           else
-               childElement.removeContent(childList.get(i));
+        for (Element aChildList : childList) {
+            if (isValidChild(aChildList))
+                valid = true;
+            else
+                childElement.removeContent(aChildList);
         }
         return valid;
     }

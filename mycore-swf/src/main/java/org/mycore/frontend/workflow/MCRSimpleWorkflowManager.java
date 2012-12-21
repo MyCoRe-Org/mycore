@@ -225,9 +225,9 @@ public class MCRSimpleWorkflowManager {
         }
 
         if (dirl != null) {
-            for (int i = 0; i < dirl.length; i++) {
-                if ((dirl[i].contains(base)) && (dirl[i].endsWith(".xml"))) {
-                    workfiles.add(dirl[i]);
+            for (String aDirl : dirl) {
+                if ((aDirl.contains(base)) && (aDirl.endsWith(".xml"))) {
+                    workfiles.add(aDirl);
                 }
             }
         }
@@ -255,9 +255,9 @@ public class MCRSimpleWorkflowManager {
         }
 
         if (dirl != null) {
-            for (int i = 0; i < dirl.length; i++) {
-                if ((dirl[i].contains("_derivate_")) && (dirl[i].endsWith(".xml"))) {
-                    workfiles.add(dirl[i]);
+            for (String aDirl : dirl) {
+                if ((aDirl.contains("_derivate_")) && (aDirl.endsWith(".xml"))) {
+                    workfiles.add(aDirl);
                 }
             }
         }
@@ -344,8 +344,7 @@ public class MCRSimpleWorkflowManager {
         // remove derivate
         ArrayList<String> derifiles = getAllDerivateFileNames(ID.getProjectId() + "_derivate");
 
-        for (int i = 0; i < derifiles.size(); i++) {
-            String dername = derifiles.get(i);
+        for (String dername : derifiles) {
             logger.debug("Check the derivate file " + dername);
 
             if (isDerivateOfObject(dername, ID)) {
@@ -390,8 +389,8 @@ public class MCRSimpleWorkflowManager {
                 // delete files
                 ArrayList<String> dellist = MCRUtils.getAllFileNames(fi);
 
-                for (int j = 0; j < dellist.size(); j++) {
-                    String na = (String) dellist.get(j);
+                for (String aDellist : dellist) {
+                    String na = (String) aDellist;
                     File fl = new File(fn + File.separator + na);
 
                     if (fl.delete()) {
@@ -456,8 +455,7 @@ public class MCRSimpleWorkflowManager {
         String derivateBase = ID.getProjectId() + "_derivate";
         ArrayList<String> derifiles = getAllDerivateFileNames(derivateBase);
 
-        for (int i = 0; i < derifiles.size(); i++) {
-            String dername = derifiles.get(i);
+        for (String dername : derifiles) {
             logger.debug("Check the derivate file " + dername);
 
             if (isDerivateOfObject(dername, ID)) {
