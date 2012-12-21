@@ -179,7 +179,6 @@ public class MCRCheckClassACLServlet extends MCRServlet {
                                                     ((Element) inbool.get(j)).removeContent(incond);
                                                     k--;
                                                     l--;
-                                                    continue;
                                                 }
                                             }
                                             if (k == 1) {

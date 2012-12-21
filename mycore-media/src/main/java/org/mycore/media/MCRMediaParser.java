@@ -152,7 +152,6 @@ public class MCRMediaParser {
                         break;
                 } catch (Exception ex) {
                     LOGGER.warn(ex);
-                    continue;
                 }
             }
         }
@@ -179,7 +178,6 @@ public class MCRMediaParser {
                         break;
                 } catch (Exception ex) {
                     LOGGER.warn(ex);
-                    continue;
                 }
             }
         }
@@ -206,7 +204,6 @@ public class MCRMediaParser {
                         break;
                 } catch (Exception ex) {
                     LOGGER.warn(ex);
-                    continue;
                 }
             }
         }
@@ -233,7 +230,6 @@ public class MCRMediaParser {
                         break;
                 } catch (Exception ex) {
                     LOGGER.warn(ex);
-                    continue;
                 }
             }
         }

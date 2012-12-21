@@ -160,7 +160,6 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
             } else {
                 LOGGER.warn("Unknown format '"+ format + "' in condition element. " +
                             "<condition format=\"xml\"> instead.");
-                continue;
             }
         }
     }

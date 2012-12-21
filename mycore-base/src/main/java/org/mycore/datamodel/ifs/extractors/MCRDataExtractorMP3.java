@@ -23,15 +23,12 @@
 
 package org.mycore.datamodel.ifs.extractors;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.util.Enumeration;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
 import org.farng.mp3.MP3File;
 import org.jdom.Element;
 import org.mycore.common.MCRUtils;
@@ -150,7 +147,7 @@ public class MCRDataExtractorMP3 extends MCRDataExtractor {
                 String value = (String) m.invoke(tag, new Object[] {});
                 addDataValue(parent, key, value);
             } catch (Exception ex) {
-                continue;
+                Logger.getLogger(MCRDataExtractorMP3.class).warn("Error while extracting tag data", ex);
             }
         }
 

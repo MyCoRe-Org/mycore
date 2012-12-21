@@ -512,7 +512,6 @@ public class MCREditorOutValidator {
                         StringBuffer sb = new StringBuffer(64);
                         sb.append(value.substring(0, i)).append(thisip).append(value.substring(i + 10, value.length()));
                         firstcond.setAttribute("value", sb.toString());
-                        continue;
                     }
                 }
             }

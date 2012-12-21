@@ -29,11 +29,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.apache.commons.vfs.FileContent;
-import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileType;
-import org.apache.commons.vfs.RandomAccessContent;
-import org.apache.commons.vfs.VFS;
+import org.apache.commons.vfs.*;
 import org.apache.commons.vfs.util.RandomAccessMode;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRVFSContent;
@@ -277,7 +273,8 @@ public abstract class MCRNode {
             String name = st.nextToken();
             if (name.equals(".")) {
                 continue;
-            } else if (name.equals("..")) {
+            }
+            if (name.equals("..")) {
                 current = current.getParent();
             } else {
                 current = current.getChild(name);

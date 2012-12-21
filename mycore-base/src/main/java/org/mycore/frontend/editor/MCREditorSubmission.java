@@ -23,23 +23,11 @@
 
 package org.mycore.frontend.editor;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
-import org.jdom.Attribute;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.Namespace;
-import org.jdom.filter.ElementFilter;
+import org.jdom.*;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
@@ -130,11 +118,7 @@ public class MCREditorSubmission {
             String path = var.getAttributeValue("name");
             String value = var.getAttributeValue("value");
 
-            if (merge) {
-                table.put(path, value);
-            } else if (path.equals(varpath) || path.startsWith(varpath + "/")) {
-                continue;
-            } else {
+            if (merge || !(path.equals(varpath) || path.startsWith(varpath + "/"))) {
                 table.put(path, value);
             }
         }
@@ -280,7 +264,7 @@ public class MCREditorSubmission {
         String value = var.substring(pos2 + 2, pos3 - 1).trim().replace(BLANK, BLANK_ESCAPED).replace(SLASH, SLASH_ESCAPED);
         return ATTR_SEP + attr + ATTR_SEP + value;
     }
-    
+
     private void setVariablesFromSubmission(MCRRequestParameters parms, Element editor) {
         for (Enumeration e = parms.getParameterNames(); e.hasMoreElements();) {
             String name = (String) e.nextElement();
@@ -475,8 +459,8 @@ public class MCREditorSubmission {
                         Element current = null;
                         try {
                             XPath xpath = XPath.newInstance(path);
-                            for( Namespace namespace : getNamespaceMap().values() )
-                              xpath.addNamespace(namespace);
+                            for (Namespace namespace : getNamespaceMap().values())
+                                xpath.addNamespace(namespace);
                             current = (Element) xpath.selectSingleNode(getXML());
                         } catch (JDOMException ex) {
                             LOGGER.debug("Could not validate, because no element found at xpath " + path);

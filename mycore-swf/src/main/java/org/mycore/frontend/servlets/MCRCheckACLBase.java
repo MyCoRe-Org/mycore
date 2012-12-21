@@ -187,7 +187,6 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                                                         inbool.get(j).removeContent(incond);
                                                         k--;
                                                         l--;
-                                                        continue;
                                                     }
                                                 }
                                             }

@@ -282,8 +282,7 @@ public class SearchfieldsXMLMerger implements MergeProcessor {
 					if(!isPresent){
 						eBaseField.setAttribute(name, baseAttr.getValue()+" "+value);	
 					}
-					continue;
-				}	
+                }
 			}
 		}	
 	}

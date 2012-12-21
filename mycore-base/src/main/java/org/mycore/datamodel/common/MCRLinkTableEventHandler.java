@@ -81,7 +81,6 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
                 }
                 if (inf instanceof MCRMetaLinkID) {
                     mcr_linktable.addReferenceLink(mcr_id.toString(), ((MCRMetaLink) inf).getXLinkHref(), MCRLinkTableManager.ENTRY_TYPE_REFERENCE, "");
-                    continue;
                 }
             }
         }

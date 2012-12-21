@@ -241,7 +241,6 @@ public class MCRGroup extends MCRUserObject {
                         addMemberUserID(id);
                     }
 
-                    continue;
                 }
             }
         }

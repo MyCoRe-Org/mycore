@@ -433,7 +433,6 @@ public class MCRImportImporter {
                 linkElement.setAttribute("href", fs.getMycoreId().toString(), MCRConstants.XLINK_NAMESPACE);
             } else {
                 LOGGER.error("Couldnt resolve reference for link " + linkId + " in " + doc.getBaseURI());
-                continue;
             }
         }
     }

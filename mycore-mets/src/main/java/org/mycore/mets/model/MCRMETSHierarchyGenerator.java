@@ -145,7 +145,6 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         MCRFilesystemNode[] children = dir.getChildren(MCRDirectory.SORT_BY_NAME_IGNORECASE);
         for (MCRFilesystemNode node : children) {
             if (ignoreNodes.contains(node)) {
-                continue;
             } else if (node instanceof MCRDirectory) {
                 MCRDirectory subDir = (MCRDirectory) node;
                 addFolder(fgroup, subDir, ignoreNodes);
