@@ -326,7 +326,7 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
         // no text element defined -> every field which is not used
         // will added to the text.
         if(textElement == null) {
-            StringBuffer textBuffer = new StringBuffer();
+            StringBuilder textBuffer = new StringBuilder();
             // go through the not used list
             for(MCRImportField field : fieldResolver.getNotUsedFields()) {
                 // add every field to the text
