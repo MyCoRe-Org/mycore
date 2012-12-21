@@ -202,8 +202,7 @@ public class MCRHIBURNStore implements MCRURNStore {
         }
 
         Session session = getSession();
-        StringBuilder querySB = new StringBuilder("select key.mcrurn from ").append(classname).append(" where key.mcrid='").append(id)
-                .append("'");
+        String querySB = "select key.mcrurn from " + classname + " where key.mcrid='" + id + "'";
         logger.debug("HQL-Statement: " + querySB.toString());
         List<String> returns = session.createQuery(querySB.toString()).list();
         if (returns.size() != 1) {
@@ -239,8 +238,7 @@ public class MCRHIBURNStore implements MCRURNStore {
         }
 
         Session session = getSession();
-        StringBuilder querySB = new StringBuilder("select key.mcrid from ").append(classname).append(" where key.mcrurn='").append(urn)
-                .append("'");
+        String querySB = "select key.mcrid from " + classname + " where key.mcrurn='" + urn + "'";
         logger.debug("HQL-Statement: " + querySB.toString());
         List<String> returns = session.createQuery(querySB.toString()).list();
         if (returns.size() != 1) {
@@ -263,8 +261,7 @@ public class MCRHIBURNStore implements MCRURNStore {
         }
 
         Session session = getSession();
-        StringBuilder querySB = new StringBuilder("select key.mcrurn from ").append(classname).append(" where key.mcrid='").append(id)
-                .append("'");
+        String querySB = "select key.mcrurn from " + classname + " where key.mcrid='" + id + "'";
         logger.debug("HQL-Statement: " + querySB.toString());
         List<String> returns = session.createQuery(querySB.toString()).list();
         return !(returns == null || returns.isEmpty());
@@ -283,8 +280,7 @@ public class MCRHIBURNStore implements MCRURNStore {
         }
 
         Session session = getSession();
-        StringBuilder query = new StringBuilder("select key.mcrid from ").append(classname).append(" where key.mcrurn = '").append(urn)
-                .append("'");
+        String query = "select key.mcrid from " + classname + " where key.mcrurn = '" + urn + "'";
         List<String> l = session.createQuery(query.toString()).list();
         if (!l.isEmpty()) {
             exists = true;

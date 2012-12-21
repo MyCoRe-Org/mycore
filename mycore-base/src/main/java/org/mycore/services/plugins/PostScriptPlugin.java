@@ -74,17 +74,11 @@ public class PostScriptPlugin implements TextFilterPlugin {
         }
 
         if (p2t_info == null && !ps2ascii()) {
-            throw new FilterPluginInstantiationException(new StringBuffer("The execution of \"p2ascii\" failed.").append(
-                    "Maybe it's not installed or in your search path!\n").append("To use this Plugin you have to install GhostScript(")
-                    .append("http://www.cs.wisc.edu/~ghost/) and ensure ").append("the ps2ascii binary is in your search path.\n").append(
-                            "Another reason maybe that you are using a version that").append(" is not compatible with this Plugin:\n")
-                    .append(getName()).append(" v").append(MAJOR).append('.').append(MINOR).toString());
+            throw new FilterPluginInstantiationException("The execution of \"p2ascii\" failed." + "Maybe it's not installed or in your search path!\n" + "To use this Plugin you have to install GhostScript(" + "http://www.cs.wisc.edu/~ghost/) and ensure " + "the ps2ascii binary is in your search path.\n" + "Another reason maybe that you are using a version that" + " is not compatible with this Plugin:\n" + getName() + " v" + MAJOR + '.' + MINOR);
         }
 
         if (info == null) {
-            info = new StringBuffer("This filter uses GhostScript for transformation.").append(
-                    "\nSource code is available on http://www.cs.wisc.edu/~ghost/").append("\nCurrently using: ").append(p2t_info)
-                    .toString();
+            info = "This filter uses GhostScript for transformation." + "\nSource code is available on http://www.cs.wisc.edu/~ghost/" + "\nCurrently using: " + p2t_info;
         }
     }
 
@@ -124,9 +118,7 @@ public class PostScriptPlugin implements TextFilterPlugin {
             p2t_info = infofetch.deleteCharAt(infofetch.length() - 2).toString();
         } catch (IOException e) {
             if (e.getMessage().indexOf("not found") > 0) {
-                throw new FilterPluginInstantiationException(new StringBuffer(testcommand[0]).append(
-                        " is not installed or in search path!\n").append("To use this Plugin you have to install GhostScript(").append(
-                        "http://www.cs.wisc.edu/~ghost/) and ensure ").append("the ps2ascii binary is in your search path.").toString(), e);
+                throw new FilterPluginInstantiationException(testcommand[0] + " is not installed or in search path!\n" + "To use this Plugin you have to install GhostScript(" + "http://www.cs.wisc.edu/~ghost/) and ensure " + "the ps2ascii binary is in your search path.", e);
             }
             throw new FilterPluginInstantiationException("Error while excuting " + testcommand, e);
         } catch (InterruptedException e) {

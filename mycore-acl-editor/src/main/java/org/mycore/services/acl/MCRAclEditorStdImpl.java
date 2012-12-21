@@ -409,7 +409,7 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
                 LOGGER.debug("Param key: " + key);
 
                 currentRid = key.substring(key.lastIndexOf("$") + 1, key.length());
-                creator = parameterMap.get(new StringBuffer(currentRid).append("$CREATOR").toString())[0];
+                creator = parameterMap.get(currentRid + "$CREATOR")[0];
 
                 if (!currentRid.equals(ridOld)) {
                     ruleMapping.setRid(currentRid);

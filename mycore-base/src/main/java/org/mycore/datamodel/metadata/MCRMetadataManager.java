@@ -247,10 +247,7 @@ public final class MCRMetadataManager {
         final Collection<String> sources = MCRLinkTableManager.instance().getSourceOf(mcrObject.mcr_id);
         LOGGER.debug("Sources size:" + sources.size());
         if (sources.size() > 0) {
-            final MCRActiveLinkException activeLinks = new MCRActiveLinkException(new StringBuffer("Error while deleting object ")
-                .append(mcrObject.mcr_id.toString())
-                .append(". This object is still referenced by other objects and can not be removed until all links are released.")
-                .toString());
+            final MCRActiveLinkException activeLinks = new MCRActiveLinkException("Error while deleting object " + mcrObject.mcr_id.toString() + ". This object is still referenced by other objects and can not be removed until all links are released.");
             for (final String curSource : sources) {
                 activeLinks.addLink(curSource, mcrObject.mcr_id.toString());
             }

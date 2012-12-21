@@ -169,7 +169,7 @@ public class MCRIntegrateTask extends Task {
         expandSet.setProject(getProject());
         expandSet.setIncludes("integrate.xml config/** components/** web/**");
         for (String excluded : getExcludedComponents()) {
-            expandSet.setExcludes(new StringBuilder("components/").append(excluded).append("/**").toString());
+            expandSet.setExcludes("components/" + excluded + "/**");
         }
         expandTask.addPatternset(expandSet);
         expandTask.setOverwrite(false);

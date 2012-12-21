@@ -291,8 +291,7 @@ public final class MCRObjectID {
         if (number < 0) {
             throw new IllegalArgumentException("number must be non negative integer");
         }
-        return new StringBuilder(MAX_LENGTH).append(projectID).append('_').append(type.toLowerCase()).append('_')
-                .append(idFormat.numberFormat().format(number)).toString();
+        return projectID + '_' + type.toLowerCase() + '_' + idFormat.numberFormat().format(number);
     }
 
     /**

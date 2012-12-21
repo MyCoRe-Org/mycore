@@ -189,8 +189,7 @@ public class MCRConfigurationTask extends Task {
      */
     private void addInclude() {
         if (valuePresent) {
-            handleOutput(new StringBuffer("Not changing ").append(propertyFile.getName()).append(": '").append(value)
-                    .append("' already included.").toString());
+            handleOutput("Not changing " + propertyFile.getName() + ": '" + value + "' already included.");
             return;
         }
         fileChanged = true;
@@ -202,8 +201,7 @@ public class MCRConfigurationTask extends Task {
         newProp += value;
         propLines.remove(lineNumber);
         propLines.add(lineNumber, newProp);
-        handleOutput(new StringBuffer(propertyFile.getName()).append(':').append(lineNumber).append(" added '").append(
-                value).append("' to ").append(getKey()).toString());
+        handleOutput(propertyFile.getName() + ':' + lineNumber + " added '" + value + "' to " + getKey());
     }
 
     /**
@@ -211,16 +209,14 @@ public class MCRConfigurationTask extends Task {
      */
     private void removeInclude() {
         if (!valuePresent) {
-            handleOutput(new StringBuffer("Not changing ").append(propertyFile.getName()).append(": '").append(value)
-                    .append("' not present.").toString());
+            handleOutput("Not changing " + propertyFile.getName() + ": '" + value + "' not present.");
             return;
         }
         fileChanged = true;
         String newProp = propLines.get(lineNumber).replaceAll("," + value, "");
         propLines.remove(lineNumber);
         propLines.add(lineNumber, newProp);
-        handleOutput(new StringBuffer(propertyFile.getName()).append(':').append(lineNumber).append(" removed '")
-                .append(value).append("' from ").append(getKey()).toString());
+        handleOutput(propertyFile.getName() + ':' + lineNumber + " removed '" + value + "' from " + getKey());
     }
 
     /**
@@ -369,7 +365,7 @@ public class MCRConfigurationTask extends Task {
     /**
      * sets the property file that needs to be changed.
      * 
-     * @param action
+     * @param propertyFile
      *            a 'mycore.properties' file
      */
     public void setPropertyFile(File propertyFile) {
@@ -394,7 +390,7 @@ public class MCRConfigurationTask extends Task {
      * ",mycore.properties.moduleXY" to the property
      * "MCR.Configuration.Include".
      * 
-     * @param action
+     * @param value
      *            a 'mycore.properties' file
      */
     public void setValue(String value) {

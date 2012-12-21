@@ -66,7 +66,7 @@ public class MSWordPlugin implements TextFilterPlugin {
         }
 
         if (info == null) {
-            info = new StringBuffer("This filter extracts the text out of a Word Document").toString();
+            info = "This filter extracts the text out of a Word Document";
         }
     }
 

@@ -918,8 +918,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
         List<String> commandList = new ArrayList<String>();
         for (String mcrId : getSelectedObjectIDs()) {
-            commandList.add(new StringBuffer("xslt ").append(mcrId).append(" with file ").append(xslFilePath)
-                    .toString());
+            commandList.add("xslt " + mcrId + " with file " + xslFilePath);
         }
         return commandList;
     }
@@ -938,8 +937,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
         List<String> cmds = new ArrayList<String>(getSelectedObjectIDs().size());
         for (String id : getSelectedObjectIDs()) {
-            cmds.add(new StringBuilder("export object from ").append(id).append(" to ").append(id)
-                    .append(" to directory ").append(dirname).append(" with ").append(style).toString());
+            cmds.add("export object from " + id + " to " + id + " to directory " + dirname + " with " + style);
         }
         return cmds;
     }
@@ -1072,8 +1070,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param revision
      *            revision to restore
      * @throws MCRActiveLinkException
-     *             if object is created (no real update), see
-     *             {@link #getInstance(MCRObject)}
+     *             if object is created (no real update)
      */
     public static void restoreToRevision(String id, int revision) throws MCRActiveLinkException {
         LOGGER.info("Try to restore object " + id + " with revision " + revision);

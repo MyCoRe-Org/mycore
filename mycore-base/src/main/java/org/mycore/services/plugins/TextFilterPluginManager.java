@@ -99,8 +99,7 @@ public class TextFilterPluginManager {
                 Object o = config.getInstanceOf(propertyName);
                 if (null != o) {
                     filter = (TextFilterPlugin) o;
-                    LOGGER.info(new StringBuffer(propertyName + "Loading TextFilterPlugin: ").append(filter.getName()).append(" v:")
-                            .append(filter.getMajorNumber()).append('.').append(filter.getMinorNumber()).toString());
+                    LOGGER.info(propertyName + "Loading TextFilterPlugin: " + filter.getName() + " v:" + filter.getMajorNumber() + '.' + filter.getMinorNumber());
                     for (Object o1 : filter.getSupportedContentTypes()) {
                         // Add MIME Type filters to the basket
                         ct = (MCRFileContentType) o1;

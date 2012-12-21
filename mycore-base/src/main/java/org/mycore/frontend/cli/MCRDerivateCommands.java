@@ -516,7 +516,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         List<String> cmds = new ArrayList<String>(ids.size());
         for (String id : ids) {
-            cmds.add(new StringBuilder("export derivate ").append(id).append(" to directory ").append(dirname).append(" with ").append(style).toString());
+            cmds.add("export derivate " + id + " to directory " + dirname + " with " + style);
         }
         return cmds;
     }
@@ -544,13 +544,12 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         for (String id : ids) {
             if (!id.startsWith(project))
                 continue;
-            cmds.add(new StringBuilder("export derivate ").append(id).append(" to directory ").append(dirname).append(" with ").append(style).toString());
+            cmds.add("export derivate " + id + " to directory " + dirname + " with " + style);
         }
         return cmds;
     }
 
     /**
-     * @param dirname
      * @param dir
      * @param trans
      * @param nid

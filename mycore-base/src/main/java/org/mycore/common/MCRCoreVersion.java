@@ -39,7 +39,7 @@ public class MCRCoreVersion {
 
     public static final int REVISION = Integer.parseInt(prop.getProperty("revision.number"));
 
-    public static final String COMPLETE = new StringBuilder(VERSION).append(" r").append(REVISION).toString();
+    public static final String COMPLETE = VERSION + " r" + REVISION;
 
     public static String getVersion() {
         return VERSION;

@@ -135,7 +135,7 @@ public class MCRXMLFunctions {
      */
     public static String getQueryServlet(String hostAlias) {
         return getBaseLink(hostAlias).append(
-                CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(QUERY_SUFFIX).toString())).toString();
+                CONFIG.getString(HOST_PREFIX + hostAlias + QUERY_SUFFIX)).toString();
     }
 
     /**
@@ -147,14 +147,14 @@ public class MCRXMLFunctions {
      */
     public static String getIFSServlet(String hostAlias) {
         return getBaseLink(hostAlias).append(
-                CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(IFS_SUFFIX).toString())).toString();
+                CONFIG.getString(HOST_PREFIX + hostAlias + IFS_SUFFIX)).toString();
     }
 
     public static StringBuffer getBaseLink(String hostAlias) {
         StringBuffer returns = new StringBuffer();
-        returns.append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PROTOCOLL_SUFFIX).toString(), "http"))
-                .append("://").append(CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(HOST_SUFFIX).toString()));
-        String port = CONFIG.getString(new StringBuffer(HOST_PREFIX).append(hostAlias).append(PORT_SUFFIX).toString(), DEFAULT_PORT);
+        returns.append(CONFIG.getString(HOST_PREFIX + hostAlias + PROTOCOLL_SUFFIX, "http"))
+                .append("://").append(CONFIG.getString(HOST_PREFIX + hostAlias + HOST_SUFFIX));
+        String port = CONFIG.getString(HOST_PREFIX + hostAlias + PORT_SUFFIX, DEFAULT_PORT);
         if (!port.equals(DEFAULT_PORT)) {
             returns.append(":").append(port);
         }

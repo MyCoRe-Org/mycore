@@ -99,7 +99,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             parent.getChildren().add(category);
         }
         session.save(category);
-        LOGGER.info(new StringBuilder("Category ").append(category.getId()).append(" saved.").toString());
+        LOGGER.info("Category " + category.getId() + " saved.");
         updateTimeStamp();
 
         updateLastModified(category.getRoot().getId().toString());
@@ -669,7 +669,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     /**
-     * @param session
+     * @param connection
      * @param left
      * @param increment
      */

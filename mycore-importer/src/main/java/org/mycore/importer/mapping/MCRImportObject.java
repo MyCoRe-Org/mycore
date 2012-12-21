@@ -294,7 +294,7 @@ public class MCRImportObject {
         int indexOfFS = datamodel.getPath().lastIndexOf("/") + 1;
         int indexOfPoint = datamodel.getPath().lastIndexOf(".");
         String objectType = datamodel.getPath().substring(indexOfFS, indexOfPoint);
-        return new StringBuffer("datamodel-").append(objectType).append(".xsd").toString();
+        return "datamodel-" + objectType + ".xsd";
     }
 
     /**
@@ -330,7 +330,6 @@ public class MCRImportObject {
      * Checks if the import object is valid. Currently it checks only if
      * required metadata elements are missing (minOccurs > 0).
      * 
-     * @param mcrObjectElement
      * @return true if the import object is valid, otherwise false
      */
     public boolean isValid() {

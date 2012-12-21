@@ -28,21 +28,7 @@
  */
 package org.mycore.frontend.wcms;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.SequenceInputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -267,11 +253,13 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             // realyDel==false
             for (Object rootNode1 : rootNodes) {
                 Element rootNode = (Element) rootNode1;
-                rootOut.addContent(new Element("rootNode").setAttribute("href", rootNode.getAttributeValue("href")).setText(rootNode.getTextTrim()));
+                rootOut.addContent(new Element("rootNode").setAttribute("href", rootNode.getAttributeValue("href")).setText(
+                        rootNode.getTextTrim()));
             }
 
             if (action.equals("delete")) {
-                File[] contentTemplates = new File((MCRConfiguration.instance().getString("MCR.templatePath") + "content/").replace('/', File.separatorChar)).listFiles();
+                File[] contentTemplates = new File((MCRConfiguration.instance().getString("MCR.templatePath") + "content/").replace('/',
+                        File.separatorChar)).listFiles();
                 Element templates = new Element("templates");
                 Element contentTemp = new Element("content");
 
@@ -292,15 +280,18 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
                 imageList = (new File(MCRConfiguration.instance().getString("MCR.WCMS.imagePath").replace('/', File.separatorChar))).list();
 
                 for (String anImageList : imageList) {
-                    images.addContent(new Element("image").setText(MCRConfiguration.instance().getString("MCR.WCMS.imagePath") + anImageList));
+                    images.addContent(new Element("image").setText(MCRConfiguration.instance().getString("MCR.WCMS.imagePath")
+                            + anImageList));
                 }
 
                 Element documents = new Element("documents");
                 rootOut.addContent(documents);
-                documentList = (new File(MCRConfiguration.instance().getString("MCR.WCMS.documentPath").replace('/', File.separatorChar))).list();
+                documentList = (new File(MCRConfiguration.instance().getString("MCR.WCMS.documentPath").replace('/', File.separatorChar)))
+                        .list();
 
                 for (String aDocumentList : documentList) {
-                    documents.addContent(new Element("document").setText(MCRConfiguration.instance().getString("MCR.WCMS.imagePath") + aDocumentList));
+                    documents.addContent(new Element("document").setText(MCRConfiguration.instance().getString("MCR.WCMS.imagePath")
+                            + aDocumentList));
                 }
 
                 Element templates = new Element("templates");
@@ -418,7 +409,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
                 footer.getParentFile().mkdirs();
             doc = getXMLAsJDOM(footer);
             Element root = doc.getRootElement();
-            root.setAttribute("date", getDate()).setAttribute("time", getTime()).setAttribute("labelPath", labelPath).setAttribute("lastEditor", userRealName);
+            root.setAttribute("date", getDate()).setAttribute("time", getTime()).setAttribute("labelPath", labelPath)
+                    .setAttribute("lastEditor", userRealName);
             writeJDOMDocumentToFile(doc, footer);
 
             /*
@@ -439,17 +431,17 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
             if (root.getChild("meta") != null) {
                 if (root.getChild("meta").getChild("log") != null) {
-                    root.getChild("meta").getChild("log").setAttribute("date", getDate()).setAttribute("time", getTime()).setAttribute("labelPath", labelPath)
-                                    .setAttribute("lastEditor", userRealName);
+                    root.getChild("meta").getChild("log").setAttribute("date", getDate()).setAttribute("time", getTime())
+                            .setAttribute("labelPath", labelPath).setAttribute("lastEditor", userRealName);
                 } else {
                     root.getChild("meta").addContent(
-                                    new Element("log").setAttribute("date", getDate()).setAttribute("time", getTime()).setAttribute("labelPath", labelPath)
-                                                    .setAttribute("lastEditor", userRealName));
+                            new Element("log").setAttribute("date", getDate()).setAttribute("time", getTime())
+                                    .setAttribute("labelPath", labelPath).setAttribute("lastEditor", userRealName));
                 }
             } else {
                 Element meta = new Element("meta");
-                meta.addContent(new Element("log").setAttribute("date", getDate()).setAttribute("time", getTime()).setAttribute("labelPath", labelPath)
-                                .setAttribute("lastEditor", userRealName));
+                meta.addContent(new Element("log").setAttribute("date", getDate()).setAttribute("time", getTime())
+                        .setAttribute("labelPath", labelPath).setAttribute("lastEditor", userRealName));
                 root.addContent(meta);
             }
 
@@ -486,18 +478,20 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
             if (contentFileBackup == null) {
 
-                contentFileBackup = MCRConfiguration.instance().getString("MCR.WCMS.backupPath").replace('/', File.separatorChar) + fileName.substring(1);
+                contentFileBackup = MCRConfiguration.instance().getString("MCR.WCMS.backupPath").replace('/', File.separatorChar)
+                        + fileName.substring(1);
             }
 
             if (changeInfo == null) {
-                root.addContent(new Element("log").setAttribute("date", getDate()).setAttribute("time", getTime()).setAttribute("userRealName", userRealName)
-                                .setAttribute("labelPath", labelPath).setAttribute("doneAction", action).setAttribute("backupContentFile", contentFileBackup)
-                                .setAttribute("backupNavigationFile", naviFileBackup));
+                root.addContent(new Element("log").setAttribute("date", getDate()).setAttribute("time", getTime())
+                        .setAttribute("userRealName", userRealName).setAttribute("labelPath", labelPath).setAttribute("doneAction", action)
+                        .setAttribute("backupContentFile", contentFileBackup).setAttribute("backupNavigationFile", naviFileBackup));
             } else {
                 Element log = new Element("log");
-                log.setAttribute("date", getDate()).setAttribute("time", getTime()).setAttribute("userRealName", userRealName).setAttribute("labelPath",
-                                labelPath).setAttribute("doneAction", action).setAttribute("backupContentFile", contentFileBackup).setAttribute(
-                                "backupNavigationFile", naviFileBackup).addContent(new Element("note").setText(changeInfo));
+                log.setAttribute("date", getDate()).setAttribute("time", getTime()).setAttribute("userRealName", userRealName)
+                        .setAttribute("labelPath", labelPath).setAttribute("doneAction", action)
+                        .setAttribute("backupContentFile", contentFileBackup).setAttribute("backupNavigationFile", naviFileBackup)
+                        .addContent(new Element("note").setText(changeInfo));
 
                 root.addContent(log);
             }
@@ -614,9 +608,11 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
         File backupFile = null;
 
         if (inputFile.toString().endsWith(fs + "navigation.xml")) {
-            backupFile = new File(MCRConfiguration.instance().getString("MCR.WCMS.backupPath").replace('/', File.separatorChar) + fs + "navi" + fs + "navigation.xml");
+            backupFile = new File(MCRConfiguration.instance().getString("MCR.WCMS.backupPath").replace('/', File.separatorChar) + fs
+                    + "navi" + fs + "navigation.xml");
         } else {
-            backupFile = new File(MCRConfiguration.instance().getString("MCR.WCMS.backupPath").replace('/', File.separatorChar) + href.replace('/', File.separatorChar));
+            backupFile = new File(MCRConfiguration.instance().getString("MCR.WCMS.backupPath").replace('/', File.separatorChar)
+                    + href.replace('/', File.separatorChar));
         }
 
         if (inputFile.exists()) {
@@ -685,29 +681,35 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
                     if ((0 <= position) && (position <= neighbors.size())) {
                         if (!masterTemplate.equals("delete") && !masterTemplate.equals("noAction")) {
-                            neighbors.add(position, new Element("item").setAttribute("href", fileName).setAttribute("type", mode)
-                                            .setAttribute("target", target).setAttribute("style", style).setAttribute("replaceMenu", replaceMenu).setAttribute(
-                                                            "constrainPopUp", constrainPopUp).setAttribute("template", masterTemplate).addContent(
-                                                            new Element("label").setAttribute("lang", defaultLang, ns).setText(label)));
+                            neighbors.add(
+                                    position,
+                                    new Element("item").setAttribute("href", fileName).setAttribute("type", mode)
+                                            .setAttribute("target", target).setAttribute("style", style)
+                                            .setAttribute("replaceMenu", replaceMenu).setAttribute("constrainPopUp", constrainPopUp)
+                                            .setAttribute("template", masterTemplate)
+                                            .addContent(new Element("label").setAttribute("lang", defaultLang, ns).setText(label)));
                         } else {
-                            neighbors.add(position, new Element("item").setAttribute("href", fileName).setAttribute("type", mode)
-                                            .setAttribute("target", target).setAttribute("style", style).setAttribute("replaceMenu", replaceMenu).setAttribute(
-                                                            "constrainPopUp", constrainPopUp).addContent(
-                                                            new Element("label").setAttribute("lang", defaultLang, ns).setText(label)));
+                            neighbors.add(
+                                    position,
+                                    new Element("item").setAttribute("href", fileName).setAttribute("type", mode)
+                                            .setAttribute("target", target).setAttribute("style", style)
+                                            .setAttribute("replaceMenu", replaceMenu).setAttribute("constrainPopUp", constrainPopUp)
+                                            .addContent(new Element("label").setAttribute("lang", defaultLang, ns).setText(label)));
                         }
                     }
                 }
 
                 if (addAtPosition.equals("child")) {
                     if (!masterTemplate.equals("delete") && !masterTemplate.equals("noAction")) {
-                        Element itemElement = new Element("item").setAttribute("href", fileName).setAttribute("type", mode).setAttribute("target", target)
-                                        .setAttribute("style", style).setAttribute("replaceMenu", replaceMenu).setAttribute("constrainPopUp", constrainPopUp)
-                                        .setAttribute("template", masterTemplate);
+                        Element itemElement = new Element("item").setAttribute("href", fileName).setAttribute("type", mode)
+                                .setAttribute("target", target).setAttribute("style", style).setAttribute("replaceMenu", replaceMenu)
+                                .setAttribute("constrainPopUp", constrainPopUp).setAttribute("template", masterTemplate);
                         itemElement.addContent(new Element("label").setAttribute("lang", defaultLang, ns).setText(label));
                         actElem.addContent(itemElement);
                     } else {
-                        Element itemElement = new Element("item").setAttribute("href", fileName).setAttribute("type", mode).setAttribute("target", target)
-                                        .setAttribute("style", style).setAttribute("replaceMenu", replaceMenu).setAttribute("constrainPopUp", constrainPopUp);
+                        Element itemElement = new Element("item").setAttribute("href", fileName).setAttribute("type", mode)
+                                .setAttribute("target", target).setAttribute("style", style).setAttribute("replaceMenu", replaceMenu)
+                                .setAttribute("constrainPopUp", constrainPopUp);
                         itemElement.addContent(new Element("label").setAttribute("lang", defaultLang, ns).setText(label));
                         actElem.addContent(itemElement);
                     }
@@ -922,12 +924,13 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
                 if (mode.equals("intern")) {
                     if (!hrefFile.exists()) {
                         hrefFile.getParentFile().mkdir();
-                        StringBuilder contentHead = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n").append("<!DOCTYPE MyCoReWebPage>\n")
-                                        .append("<MyCoReWebPage>\n").append("\t<section xml:lang=\"" + defaultLang + "\" title=\"" + label + "\">\n");
-                        StringBuilder contentBody = new StringBuilder(content);
-                        StringBuilder contentTail = new StringBuilder("\t</section>\n").append("</MyCoReWebPage>\n");
-                        BufferedInputStream bis = new BufferedInputStream(new ByteArrayInputStream(((contentHead).append(contentBody).append(contentTail))
-                                        .toString().getBytes("UTF-8")));
+                        StringBuilder contentBuilder = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+                                .append("<!DOCTYPE MyCoReWebPage>\n").append("<MyCoReWebPage>\n")
+                                .append("\t<section xml:lang=\"" + defaultLang + "\" title=\"" + label + "\">\n");
+                        contentBuilder.append(content);
+                        contentBuilder.append("\t</section>\n").append("</MyCoReWebPage>\n");
+                        BufferedInputStream bis = new BufferedInputStream(new ByteArrayInputStream(contentBuilder.toString().getBytes(
+                                "UTF-8")));
                         html2BeStored = getXMLAsJDOM(bis);
                         bis.close();
                     } else {
@@ -977,7 +980,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
                     Element contentSection = findActElem(storedHTMLRoot, "lang", currentLang, ns);
 
                     if (contentSection == null) {
-                        storedHTMLRoot.addContent(new Element("section").setAttribute("lang", currentLang, ns).setAttribute("title", label));
+                        storedHTMLRoot
+                                .addContent(new Element("section").setAttribute("lang", currentLang, ns).setAttribute("title", label));
                     }
 
                     contentSection = findActElem(storedHTMLRoot, "lang", currentLang, ns);
@@ -1164,7 +1168,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
                     ByteArrayOutputStream baosc = new ByteArrayOutputStream();
                     tidyXML.parse(baisc, baosc);
                     contentCurrentLangTmp = baosc.toString("UTF-8");
-                    contentCurrentLangTmp = contentCurrentLangTmp.substring(contentCurrentLangTmp.indexOf(">") + 1, contentCurrentLangTmp.lastIndexOf("<"));
+                    contentCurrentLangTmp = contentCurrentLangTmp.substring(contentCurrentLangTmp.indexOf(">") + 1,
+                            contentCurrentLangTmp.lastIndexOf("<"));
                     baisc.close();
                     baosc.flush();
                     baosc.close();
@@ -1456,7 +1461,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
         String dir = null;
         error = href = labelPath = content = label = link = dir = null;
         changeInfo = null;
-        masterTemplates = new File(MCRConfiguration.instance().getString("MCR.templatePath") + "master/".replace('/', File.separatorChar)).listFiles();
+        masterTemplates = new File(MCRConfiguration.instance().getString("MCR.templatePath") + "master/".replace('/', File.separatorChar))
+                .listFiles();
         userID = (String) mcrSession.get("userID");
         userClass = (String) mcrSession.get("userClass");
         userRealName = (String) mcrSession.get("userRealName");
@@ -1492,8 +1498,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
          */
         /* check for dynamic content bindings */
         /* add */
-        if ((request.getParameter("dcbActionAdd") != null) && !request.getParameter("dcbActionAdd").equals("") && (request.getParameter("dcbValueAdd") != null)
-                        && !request.getParameter("dcbValueAdd").equals("")) {
+        if ((request.getParameter("dcbActionAdd") != null) && !request.getParameter("dcbActionAdd").equals("")
+                && (request.getParameter("dcbValueAdd") != null) && !request.getParameter("dcbValueAdd").equals("")) {
             dcbActionAdd = true;
             dcbValueAdd = request.getParameter("dcbValueAdd");
         } else {
@@ -1502,7 +1508,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
         /* remove */
         if ((request.getParameter("dcbActionDelete") != null) && !request.getParameter("dcbActionDelete").equals("")
-                        && (request.getParameter("dcbValueDelete") != null) && !request.getParameter("dcbValueDelete").equals("")) {
+                && (request.getParameter("dcbValueDelete") != null) && !request.getParameter("dcbValueDelete").equals("")) {
             dcbActionDelete = true;
             dcbValueDelete = request.getParameter("dcbValueDelete");
         } else {
@@ -1595,7 +1601,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
         if (action.equals("add") && mode.equals("extern")) {
             fileName = link;
 
-            if (!(link.toLowerCase().startsWith("http") || link.toLowerCase().startsWith("ftp:") || link.toLowerCase().startsWith("mailto:"))) {
+            if (!(link.toLowerCase().startsWith("http") || link.toLowerCase().startsWith("ftp:") || link.toLowerCase()
+                    .startsWith("mailto:"))) {
                 // fileName = "http://" + link;
                 fileName = link;
             }
@@ -1617,7 +1624,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             // implement here (edit, extern)6
             fileName = link;
 
-            if (!(link.toLowerCase().startsWith("http") || link.toLowerCase().startsWith("ftp:") || link.toLowerCase().startsWith("mailto:"))) {
+            if (!(link.toLowerCase().startsWith("http") || link.toLowerCase().startsWith("ftp:") || link.toLowerCase()
+                    .startsWith("mailto:"))) {
                 // fileName = "http://" + link;
                 fileName = link;
             }

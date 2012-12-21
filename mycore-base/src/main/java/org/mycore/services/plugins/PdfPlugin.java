@@ -75,16 +75,11 @@ public class PdfPlugin implements TextFilterPlugin {
         }
 
         if (p2t_info == null && !pdftotext()) {
-            throw new FilterPluginInstantiationException(new StringBuffer("The execution of \"pdftotext\" failed.").append(
-                    "Maybe it's not installed or in your search path!\n").append("To use this Plugin you have to install XPdf").append(
-                    "http://www.foolabs.com/xpdf/) and ensure ").append("the pdftotext binary is in your search path.\n").append(
-                    "Another reason maybe that you are using a version that").append(" is not compatible with this Plugin:\n").append(
-                    getName()).append(" v").append(MAJOR).append('.').append(MINOR).toString());
+            throw new FilterPluginInstantiationException("The execution of \"pdftotext\" failed." + "Maybe it's not installed or in your search path!\n" + "To use this Plugin you have to install XPdf" + "http://www.foolabs.com/xpdf/) and ensure " + "the pdftotext binary is in your search path.\n" + "Another reason maybe that you are using a version that" + " is not compatible with this Plugin:\n" + getName() + " v" + MAJOR + '.' + MINOR);
         }
 
         if (info == null) {
-            info = new StringBuffer("This filter uses XPDF for transformation.").append(
-                    "\nSource code is available on http://www.foolabs.com/xpdf/").append("\nCurrently using: ").append(p2t_info).toString();
+            info = "This filter uses XPDF for transformation." + "\nSource code is available on http://www.foolabs.com/xpdf/" + "\nCurrently using: " + p2t_info;
         }
     }
 
@@ -125,9 +120,7 @@ public class PdfPlugin implements TextFilterPlugin {
         } catch (IOException e) {
             if (e.getMessage().indexOf("not found") > 0) {
                 //NOTE: It is a ugly pain to parse a error message, but at worst we throw the wrong error message
-                throw new FilterPluginInstantiationException(new StringBuffer(testcommand[0]).append(
-                        " is not installed or in search path!\n").append("To use this Plugin you have to install XPdf").append(
-                        "http://www.foolabs.com/xpdf/) and ensure ").append("the pdftotext binary is in your search path.").toString(), e);
+                throw new FilterPluginInstantiationException(testcommand[0] + " is not installed or in search path!\n" + "To use this Plugin you have to install XPdf" + "http://www.foolabs.com/xpdf/) and ensure " + "the pdftotext binary is in your search path.", e);
             }
             throw new FilterPluginInstantiationException("Error while excuting " + testcommand, e);
         } catch (InterruptedException e) {

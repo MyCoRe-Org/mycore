@@ -75,7 +75,7 @@ public class XmlHtmlPlugin implements TextFilterPlugin {
         }
 
         if (info == null) {
-            info = new StringBuffer("This filter converts XML, XTHML and HTML to plain text").toString();
+            info = "This filter converts XML, XTHML and HTML to plain text";
         }
     }
 

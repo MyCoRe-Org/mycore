@@ -229,7 +229,7 @@ public class MCRImportImporter {
             currentObject++;
             StringBuilder importStatus = new StringBuilder(String.valueOf(currentObject));
             importStatus.append("/").append(String.valueOf(objectCount));
-            StringBuilder statusBuffer = new StringBuilder("(").append(importStatus).append(") ");
+            String statusBuffer = "(" + importStatus + ") ";
             LOGGER.info(statusBuffer.toString() + "Try to generate " + importId);
 
             // check if import id exists
@@ -290,7 +290,7 @@ public class MCRImportImporter {
      * Imports a mycore object xml file to mycore by its path. All internal import
      * ids and classification mapping values (if enabled) are resolved.
      * 
-     * @param filePath the path of the xml file which should be imported
+     * @param fs the path of the xml file which should be imported
      * @throws IOException
      * @throws JDOMException
      * @throws MCRActiveLinkException
@@ -311,7 +311,7 @@ public class MCRImportImporter {
         // remove 'datamodel-' and '.xsd' to get a valid object type (e.g. author)
         String objectType = schemaLocation.substring(schemaLocation.indexOf("-") + 1, schemaLocation.lastIndexOf('.'));
         // create the next id
-        StringBuilder baseBuf = new StringBuilder(config.getProjectName()).append("_").append(objectType);
+        String baseBuf = config.getProjectName() + "_" + objectType;
         MCRObjectID mcrObjId = getNextFreeId(baseBuf.toString());
         // set the new id in the xml document
         doc.getRootElement().setAttribute("ID", mcrObjId.toString());
@@ -325,7 +325,7 @@ public class MCRImportImporter {
      * are resolved. If the derivate is successfully imported a status event is
      * fired.
      * 
-     * @param filePath the file to the derivate
+     * @param fs the file to the derivate
      * @return the mcrId of the successfully imported derivate
      * @throws IOException
      * @throws JDOMException
@@ -337,7 +337,7 @@ public class MCRImportImporter {
         // resolve links
         resolveLinks(doc);
         // create the next id
-        StringBuilder baseBuf = new StringBuilder(config.getProjectName()).append("_derivate");
+        String baseBuf = config.getProjectName() + "_derivate";
         MCRObjectID mcrDerivateId = getNextFreeId(baseBuf.toString());
         // set the new id in the xml document
         doc.getRootElement().setAttribute("ID", mcrDerivateId.toString());
@@ -395,7 +395,7 @@ public class MCRImportImporter {
                 return null;
             }
         }
-        StringBuilder fileName = new StringBuilder(mcrId.toString()).append(".xml");
+        String fileName = mcrId.toString() + ".xml";
         return new File(subfolder, fileName.toString());
     }
 
@@ -489,7 +489,7 @@ public class MCRImportImporter {
      * Sends all registerd listeners that a mycore object is
      * successfully generated in temp directory.
      * 
-     * @param record the record which is mapped
+     * @param mcrId the record which is mapped
      */
     private void fireMCRObjectGenerated(String mcrId) {
         for(MCRImportStatusListener l : listenerList) {
@@ -502,7 +502,7 @@ public class MCRImportImporter {
      * Sends all registerd listeners that a mycore object is
      * successfully generated in temp directory.
      * 
-     * @param record the record which is mapped
+     * @param derId the record which is mapped
      */
     private void fireMCRDerivateGenerated(String derId) {
         for(MCRImportStatusListener l : listenerList) {

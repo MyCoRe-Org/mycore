@@ -310,7 +310,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             return;
         }
 
-        StringBuilder sb = new StringBuilder(getBaseURL()).append("receive/").append(cd.myremcrid.toString());
+        String sb = getBaseURL() + "receive/" + cd.myremcrid.toString();
         MCRSWFUploadHandlerIFS fuh = new MCRSWFUploadHandlerIFS(cd.myremcrid.toString(), cd.mysemcrid.toString(), sb.toString());
         String fuhid = fuh.getID();
         cd.myfile = pagedir + "fileupload_commit.xml";
@@ -944,7 +944,7 @@ public class MCRStartEditorServlet extends MCRServlet {
                     }
                 }
 
-                StringBuilder sb = new StringBuilder("receive/").append(cd.mysemcrid);
+                String sb = "receive/" + cd.mysemcrid;
                 cd.myfile = sb.toString();
             } else {
                 cd.myfile = storeerrorpage;

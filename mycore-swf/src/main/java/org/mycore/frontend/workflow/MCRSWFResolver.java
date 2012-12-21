@@ -136,7 +136,7 @@ public class MCRSWFResolver implements URIResolver {
         String derBase = base;
         if (base != null && MCRAccessManager.checkPermission("create-" + base)) {
             workfiles = WFM.getAllObjectFileNames(base);
-            derBase = new StringBuffer(base.substring(0, base.indexOf('_'))).append("_derivate").toString();
+            derBase = base.substring(0, base.indexOf('_')) + "_derivate";
             derifiles = WFM.getAllDerivateFileNames(derBase);
         } else {
             if (MCRAccessManager.checkPermission("create-" + type)) {
@@ -185,7 +185,7 @@ public class MCRSWFResolver implements URIResolver {
 
                 XPath objidpath = XPath.newInstance("/mycorederivate/derivate/linkmetas/linkmeta");
                 XPath maindocpath = XPath.newInstance("/mycorederivate/derivate/internals/internal");
-                XPath titlepath = XPath.newInstance("/mycorederivate/derivate/titles/title[lang(\'" + lang + "\')]");
+                XPath titlepath = XPath.newInstance("/mycorederivate/derivate/titles/title[lang('" + lang + "')]");
                 for (Object node : objidpath.selectNodes(der_in)) {
                     Element elm = (Element) node;
                     objid = elm.getAttributeValue("href", XLINK_NAMESPACE);

@@ -158,8 +158,7 @@ public class MCRLinkTableManager {
             attr = "";
         }
 
-        StringBuilder sb = new StringBuilder().append("Link in table ").append(type).append(" add for ").append(from).append("<-->").append(
-                to).append(" with ").append(type).append(" and ").append(attr);
+        String sb = "Link in table " + type + " add for " + from + "<-->" + to + " with " + type + " and " + attr;
         logger.debug(sb.toString());
 
         try {

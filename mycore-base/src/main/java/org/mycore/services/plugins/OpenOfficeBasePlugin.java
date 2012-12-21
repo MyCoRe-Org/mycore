@@ -75,13 +75,7 @@ abstract class OpenOfficeBasePlugin implements TextFilterPlugin {
         try {
             Class.forName(SAXparser);
         } catch (ClassNotFoundException e) {
-            throw new FilterPluginInstantiationException(new StringBuilder("This Plugin is only tested with Xerces").append(
-                    "(http://xml.apache.org/xerces2-j/index.html) and").append(" though requires it to be installed somewhere in").append(
-                    " CLASSPATH. Please ensure that a jar file ").append(" containing the class ").append(SAXparser).append(
-                    " is listed in a CLASSPATH before running your").append(" brandnew MyCoRe(tm)-Application.\n").append(
-                    " I as a developer of cause know that Xerces is").append(" bundled with every MyCoRe(tm) release and thus").append(
-                    " you will never read this message.\n").append(" But just in case, I thought it is a good idea to").append(
-                    " implement this message here.").toString());
+            throw new FilterPluginInstantiationException("This Plugin is only tested with Xerces" + "(http://xml.apache.org/xerces2-j/index.html) and" + " though requires it to be installed somewhere in" + " CLASSPATH. Please ensure that a jar file " + " containing the class " + SAXparser + " is listed in a CLASSPATH before running your" + " brandnew MyCoRe(tm)-Application.\n" + " I as a developer of cause know that Xerces is" + " bundled with every MyCoRe(tm) release and thus" + " you will never read this message.\n" + " But just in case, I thought it is a good idea to" + " implement this message here.");
         }
     }
 

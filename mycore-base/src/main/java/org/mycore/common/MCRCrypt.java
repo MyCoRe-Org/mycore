@@ -471,8 +471,7 @@ public class MCRCrypt {
         int numSaltChars = chars.length;
         String salt;
 
-        salt = new StringBuffer().append(chars[Math.abs(randomGenerator.nextInt()) % numSaltChars]).append(
-                chars[Math.abs(randomGenerator.nextInt()) % numSaltChars]).toString();
+        salt = String.valueOf(chars[Math.abs(randomGenerator.nextInt()) % numSaltChars]) + chars[Math.abs(randomGenerator.nextInt()) % numSaltChars];
 
         return crypt(salt, original);
     }

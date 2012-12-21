@@ -352,8 +352,8 @@ public class MCRImportMappingManager {
         // set the new id by map
         Element idGenMapElement = new Element("map");
         idGenMapElement.setAttribute("type", "id");
-        idGenMapElement.setAttribute("value", new StringBuffer(rN).append("_").toString());
-        idGenMapElement.setAttribute("resolver", new StringBuffer("idGen:").append(rN).toString());
+        idGenMapElement.setAttribute("value", rN + "_");
+        idGenMapElement.setAttribute("resolver", "idGen:" + rN);
         mapIt(importObject, record, idGenMapElement);
     }
 
@@ -380,7 +380,7 @@ public class MCRImportMappingManager {
      * Sends all registerd listeners that a record is
      * successfully mapped and saved to the file system.
      * 
-     * @param record the record which is mapped
+     * @param mappedString the record which is mapped
      */
     private void fireRecordMapped(String mappedString) {
         for(MCRImportStatusListener l : listenerList) {
