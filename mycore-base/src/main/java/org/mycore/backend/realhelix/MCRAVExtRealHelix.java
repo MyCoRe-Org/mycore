@@ -78,12 +78,12 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
             String sDuration = getBetween("Duration:</strong>", "<br>", data, "0:0.0");
             String sType = getBetween("Stream:</strong>", "<br>", data, "");
 
-            bitRate = Math.round(1024 * Float.valueOf(sBitRate).floatValue());
+            bitRate = Math.round(1024 * Float.valueOf(sBitRate));
 
             StringTokenizer st1 = new StringTokenizer(sFrameRate, " ,");
 
             while (st1.hasMoreTokens()) {
-                double value = Double.valueOf(st1.nextToken()).doubleValue();
+                double value = Double.valueOf(st1.nextToken());
                 frameRate = Math.max(frameRate, value);
             }
 

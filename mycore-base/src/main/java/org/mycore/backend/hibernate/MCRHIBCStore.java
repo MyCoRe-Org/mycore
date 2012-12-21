@@ -84,7 +84,7 @@ public class MCRHIBCStore extends MCRContentStore {
     @Override
     @SuppressWarnings("unchecked")
     protected synchronized void doDeleteContent(String ID) throws Exception {
-        int storageID = Integer.valueOf(ID).intValue();
+        int storageID = Integer.valueOf(ID);
         Session session = MCRHIBConnection.instance().getSession();
         List<MCRCSTORE> l = session.createQuery("from MCRCSTORE where storageid=" + storageID).list();
 
@@ -96,7 +96,7 @@ public class MCRHIBCStore extends MCRContentStore {
     @Override
     @SuppressWarnings("unchecked")
     protected void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception {
-        int storageID = Integer.valueOf(file.getStorageID()).intValue();
+        int storageID = Integer.valueOf(file.getStorageID());
         Session session = MCRHIBConnection.instance().getSession();
         List<MCRCSTORE> l = session.createQuery("from MCRCSTORE where storageid=" + storageID).list();
 
@@ -111,7 +111,7 @@ public class MCRHIBCStore extends MCRContentStore {
 
     @Override
     protected InputStream doRetrieveContent(MCRFileReader file) throws IOException {
-        int storageID = Integer.valueOf(file.getStorageID()).intValue();
+        int storageID = Integer.valueOf(file.getStorageID());
         Session session = MCRHIBConnection.instance().getSession();
         MCRCSTORE st = (MCRCSTORE) session.createQuery("from MCRCSTORE where storageid=" + storageID).uniqueResult();
         try {
@@ -123,7 +123,7 @@ public class MCRHIBCStore extends MCRContentStore {
 
     @Override
     protected boolean exists(MCRFileReader file) {
-        int storageID = Integer.valueOf(file.getStorageID()).intValue();
+        int storageID = Integer.valueOf(file.getStorageID());
         Session session = MCRHIBConnection.instance().getSession();
         @SuppressWarnings("unchecked")
         List<MCRCSTORE> l = session.createQuery("from MCRCSTORE where storageid=" + storageID).list();

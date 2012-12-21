@@ -240,7 +240,7 @@ public class MCRCategoryTransformer {
         }
 
         void addChildren(Element parent, MCRCategory category) {
-            if (!emptyLeaves && !linkedMap.get(category.getId()).booleanValue()) {
+            if (!emptyLeaves && !linkedMap.get(category.getId())) {
                 return;
             }
 

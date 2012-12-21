@@ -125,7 +125,7 @@ public class MCRSessionMgr {
      *  @return true if a session is bound to the current thread
      */
     public static boolean hasCurrentSession(){
-        return isSessionAttached.get().booleanValue();
+        return isSessionAttached.get();
     }
 
     /**
