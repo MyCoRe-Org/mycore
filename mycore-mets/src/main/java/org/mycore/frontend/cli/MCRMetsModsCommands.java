@@ -169,10 +169,9 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         MCRQueryCondition fromcond = new MCRQueryCondition(MCRFieldDef.getDef("objectType"), "=", type);
         MCRQuery fromquery = new MCRQuery(fromcond);
         MCRResults fromresult = MCRQueryManager.search(fromquery);
-        for (Object fromhit : fromresult) {
+        for (MCRHit fromhit : fromresult) {
             String fromid = fromhit.getID();
             buildMetsForMCRObjectID(fromid);
-
         }
         LOGGER.info("Build METS file for type " + type + " took " + (System.currentTimeMillis() - start) + "ms.");
     }
@@ -278,7 +277,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         MCRQuery fromquery = new MCRQuery(fromcond);
         MCRResults fromresult = MCRQueryManager.search(fromquery);
 
-        for (Object fromhit : fromresult) {
+        for (MCRHit fromhit : fromresult) {
             String fromid = fromhit.getID();
 
             if (exclude == null)
@@ -378,7 +377,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         MCRQuery fromquery = new MCRQuery(fromcond);
         MCRResults fromresult = MCRQueryManager.search(fromquery);
 
-        for (Object fromhit : fromresult) {
+        for (MCRHit fromhit : fromresult) {
             String fromid = fromhit.getID();
 
             MCRObject fromobj = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(fromid));
