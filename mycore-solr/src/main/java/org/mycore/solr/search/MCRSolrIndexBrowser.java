@@ -91,7 +91,7 @@ public class MCRSolrIndexBrowser implements MCRIIndexBrowserSearcher {
      */
     private String buildSorlQuery() {
         String q = new String();
-        if (indexConfig.getIndex().indexOf(",") != -1) {
+        if (indexConfig.getIndex().contains(",")) {
             StringTokenizer st = new StringTokenizer(indexConfig.getIndex(), ",");
             while (st.hasMoreTokens()) {
                 String next = st.nextToken();

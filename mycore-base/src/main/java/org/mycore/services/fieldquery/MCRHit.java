@@ -153,7 +153,7 @@ public class MCRHit {
         if (!sortValues.containsKey(field)) {
             sortData.add(fieldValue);
             sortValues.put(field, value);
-        } else if ("text name identifier".indexOf(field.getDataType()) >= 0) {
+        } else if ("text name identifier".contains(field.getDataType())) {
             String oldValue = sortValues.get(field);
             String newValue = oldValue.concat(" ").concat(value);
             sortData.add(fieldValue);

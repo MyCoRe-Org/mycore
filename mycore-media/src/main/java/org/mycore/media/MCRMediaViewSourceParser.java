@@ -195,14 +195,14 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
                 String line = st.nextToken().trim();
 
                 String key = null;
-                if (line.indexOf(startKTag) != -1 && line.indexOf(endKTag) != -1) {
+                if (line.contains(startKTag) && line.contains(endKTag)) {
                     key = line.substring(line.indexOf(startKTag) + startKTag.length(), line.indexOf(endKTag)).trim();
                 }
 
                 if (key != null) {
                     String value = line.substring(line.indexOf(endKTag) + endKTag.length());
                     for (String endVTag : endVTags) {
-                        if (value.indexOf(endVTag) != -1) {
+                        if (value.contains(endVTag)) {
                             value = value.substring(0, value.indexOf(endVTag)).trim();
                             break;
                         }
@@ -273,8 +273,8 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
                                 }
                             }
                         } else if (key.equals("Stream:")) {
-                            media.formatFull = (value.indexOf(" -") != -1 ? value.substring(0, value.indexOf(" -")) : value);
-                            if (media.formatFull.indexOf(" Stream") != -1)
+                            media.formatFull = (value.contains(" -") ? value.substring(0, value.indexOf(" -")) : value);
+                            if (media.formatFull.contains(" Stream"))
                                 media.formatFull = media.format = media.formatFull.substring(0, media.formatFull.indexOf(" Stream"));
                         } else if ("File Name:".equals(key))
                             media.fileName = value;
@@ -321,9 +321,9 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
                                 ((MCRVideoObject) media).frameRate = Math.max(((MCRVideoObject) media).frameRate, fvalue);
                             }
                         } else if ("Video Codec:".equals(key)) {
-                            if (value.indexOf("(") != -1) {
+                            if (value.contains("(")) {
                                 ((MCRVideoObject) media).subFormatFull = value.substring(value.indexOf("(") + 1, value.indexOf(")"));
-                                if (((MCRVideoObject) media).subFormatFull.indexOf(" ") != -1) {
+                                if (((MCRVideoObject) media).subFormatFull.contains(" ")) {
                                     StringTokenizer st1 = new StringTokenizer(((MCRVideoObject) media).subFormatFull, " ");
                                     ((MCRVideoObject) media).subFormat = st1.nextToken();
                                     ((MCRVideoObject) media).subFormatVersion = st1.nextToken();
@@ -352,15 +352,15 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
                         } else if ("Max Stream Bit Rate:".equals(key) && audio.streamBitRate == 0) {
                             audio.streamBitRate = Math.round(1024 * Float.valueOf(value.substring(0, value.indexOf(" "))).floatValue());
                         } else if ("Audio Codec:".equals(key)) {
-                            if (value.indexOf("(") != -1) {
+                            if (value.contains("(")) {
                                 audio.subFormatFull = value.substring(value.indexOf("(") + 1, value.indexOf(")"));
-                                if (audio.subFormatFull.indexOf(" ") != -1) {
+                                if (audio.subFormatFull.contains(" ")) {
                                     StringTokenizer st1 = new StringTokenizer(audio.subFormatFull, " ");
                                     audio.subFormat = st1.nextToken();
                                     audio.subFormatVersion = st1.nextToken();
                                 }
 
-                                if (value.indexOf("Khz") != -1) {
+                                if (value.contains("Khz")) {
                                     audio.samplingRate = Integer.parseInt(value.substring(value.indexOf(")") + 1, value.indexOf("Khz"))
                                             .trim());
                                 }

@@ -87,7 +87,7 @@ public class MCRIndexBrowserSearcher implements MCRIIndexBrowserSearcher {
         MCRAndCondition cAnd = new MCRAndCondition();
         MCRFieldDef fieldproject;
         MCRFieldDef fieldtype;
-        if (indexConfig.getIndex().indexOf(",") != -1) {
+        if (indexConfig.getIndex().contains(",")) {
             MCROrCondition cOr = new MCROrCondition();
             StringTokenizer st = new StringTokenizer(indexConfig.getIndex(), ",");
             while (st.hasMoreTokens()) {

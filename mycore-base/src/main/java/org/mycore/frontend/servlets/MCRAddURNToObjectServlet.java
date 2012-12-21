@@ -61,7 +61,7 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
         } else {
             if (!MCRURNManager.hasURNAssigned(object)) {
                 /* assign urn to derivate */
-                if (object.indexOf("_derivate_") != -1) {
+                if (object.contains("_derivate_")) {
                     try {
                         LOGGER.info("Adding URN to all files in derivate " + object);
                         if (!urnAdder.addURNToDerivates(object)) {
@@ -105,7 +105,7 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
         String href = null;
 
         /* object is a derivate */
-        if (objectId.indexOf("_derivate_") != -1) {
+        if (objectId.contains("_derivate_")) {
             MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(objectId));
             href = derivate.getDerivate().getMetaLink().getXLinkHref();
         }

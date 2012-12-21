@@ -114,23 +114,23 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
             durationHours = durationMinutes / 60;
             durationMinutes = durationMinutes - durationHours * 60;
 
-            if (sType.indexOf("MPEG Layer 3") >= 0) {
+            if (sType.contains("MPEG Layer 3")) {
                 contentTypeID = "mp3";
                 mediaType = AUDIO;
-            } else if (sType.indexOf("3GPP") >= 0) {
+            } else if (sType.contains("3GPP")) {
                 contentTypeID = "3gp";
                 mediaType = VIDEO;
-            } else if (sType.indexOf("MPEG4") >= 0) {
+            } else if (sType.contains("MPEG4")) {
                 contentTypeID = "mpeg4";
                 mediaType = VIDEO;
-            } else if (sType.indexOf("MPEG") >= 0) {
+            } else if (sType.contains("MPEG")) {
                 contentTypeID = "mpegvid";
                 mediaType = VIDEO;
-            } else if (sType.indexOf("RealVideo") >= 0) {
+            } else if (sType.contains("RealVideo")) {
                 contentTypeID = "realvid";
-            } else if (sType.indexOf("RealAudio") >= 0) {
+            } else if (sType.contains("RealAudio")) {
                 contentTypeID = "realaud";
-            } else if (sType.indexOf("Wave File") >= 0) {
+            } else if (sType.contains("Wave File")) {
                 contentTypeID = "wav";
                 mediaType = AUDIO;
             } else // should be one of "wma" "wmv" "asf"
@@ -144,7 +144,7 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
                 }
             }
 
-            if (" wma wmv asf asx ".indexOf(" " + contentTypeID + " ") != -1) {
+            if (" wma wmv asf asx ".contains(" " + contentTypeID + " ")) {
                 basePlayerStarter = config.getString(prefix + "AsxGenBaseURL");
                 playerDownloadURL = config.getString(prefix + "MediaPlayerURL");
             } else {

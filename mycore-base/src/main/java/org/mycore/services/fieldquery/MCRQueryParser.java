@@ -308,7 +308,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
                     ac
                             .addChild(new MCRNotCondition<Object>(new MCRQueryCondition(qc.getField(), "phrase", value.substring(2,
                                     value.length() - 1))));
-                } else if (value.indexOf("*") >= 0 || value.indexOf("?") >= 0) {
+                } else if (value.contains("*") || value.contains("?")) {
                     ac.addChild(new MCRQueryCondition(qc.getField(), "like", value));
                 } else if (value.startsWith("-")) // -word means "NOT word"
                 {

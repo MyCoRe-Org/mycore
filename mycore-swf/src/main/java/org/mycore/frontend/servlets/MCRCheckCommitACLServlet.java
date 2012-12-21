@@ -131,7 +131,7 @@ public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
         while (0 < rulesize) {
             org.jdom.Element conditions = service.getRule(0).getCondition();
             String permission = service.getRule(0).getPermission();
-            if (storedrules.indexOf(permission) != -1) {
+            if (storedrules.contains(permission)) {
                 MCRAccessManager.updateRule(ID, permission, conditions, "");
             }
             service.removeRule(0);

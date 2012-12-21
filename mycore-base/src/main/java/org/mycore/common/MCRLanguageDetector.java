@@ -83,7 +83,7 @@ public class MCRLanguageDetector {
         while (st.hasMoreTokens()) {
             String ending = st.nextToken();
 
-            if (text.indexOf(ending + " ") >= 0) {
+            if (text.contains(ending + " ")) {
                 score += 1;
             }
             int pos = 0;

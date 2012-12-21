@@ -296,7 +296,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 addDebugInfo(href, null);
             }
         }
-        if (href.indexOf(":") == -1) {
+        if (!href.contains(":")) {
             return tryResolveXSL(href);
         }
 

@@ -341,7 +341,7 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
         @Override
         double getScore(String filename, byte[] header) {
             String head = new String(header);
-            if (-1 != head.indexOf(string)) {
+            if (head.contains(string)) {
                 return score;
             }
             return 0;

@@ -252,7 +252,7 @@ public class MCRURNAdder {
             String namespace = null;
 
             /* examine attribute name */
-            if (anAttribute.indexOf(":") != -1) {
+            if (anAttribute.contains(":")) {
                 // we have a namespace here -> namespace:attName=value
                 attributeName = anAttribute.substring(1, anAttribute.indexOf("=")).substring(anAttribute.indexOf(":"));
                 namespace = anAttribute.substring(1, anAttribute.indexOf(":"));

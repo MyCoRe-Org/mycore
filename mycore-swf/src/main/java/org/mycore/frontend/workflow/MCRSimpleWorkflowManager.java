@@ -226,7 +226,7 @@ public class MCRSimpleWorkflowManager {
 
         if (dirl != null) {
             for (int i = 0; i < dirl.length; i++) {
-                if ((dirl[i].indexOf(base) != -1) && (dirl[i].endsWith(".xml"))) {
+                if ((dirl[i].contains(base)) && (dirl[i].endsWith(".xml"))) {
                     workfiles.add(dirl[i]);
                 }
             }
@@ -256,7 +256,7 @@ public class MCRSimpleWorkflowManager {
 
         if (dirl != null) {
             for (int i = 0; i < dirl.length; i++) {
-                if ((dirl[i].indexOf("_derivate_") != -1) && (dirl[i].endsWith(".xml"))) {
+                if ((dirl[i].contains("_derivate_")) && (dirl[i].endsWith(".xml"))) {
                     workfiles.add(dirl[i]);
                 }
             }

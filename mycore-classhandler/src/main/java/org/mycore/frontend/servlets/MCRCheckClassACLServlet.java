@@ -255,7 +255,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
         while (0 < rulesize) {
             Element conditions = serv.getRule(0).getCondition();
             String permission = serv.getRule(0).getPermission();
-            if (storedrules.indexOf(permission) != -1) {
+            if (storedrules.contains(permission)) {
                 if (li.contains(permission)) {
                     MCRAccessManager.updateRule(ID.toString(), permission, conditions, "");
                 } else {

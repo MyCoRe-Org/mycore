@@ -24,7 +24,7 @@ public class MCRTemplateTask extends Task {
     private static class TemplateFilenameFilter implements FilenameFilter {
 
         public boolean accept(File f, String s) {
-            return (s.indexOf("template") != -1);
+            return (s.contains("template"));
         }
     }
 

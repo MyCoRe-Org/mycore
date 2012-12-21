@@ -143,7 +143,7 @@ public class MCRIView2Tools {
      * @return if {@link MCRFile#getContentTypeID()} is in property <code>MCR.Module-iview2.SupportedContentTypes</code>
      */
     public static boolean isFileSupported(MCRFile file) {
-        return SUPPORTED_CONTENT_TYPE.indexOf(file.getContentTypeID()) > -1;
+        return SUPPORTED_CONTENT_TYPE.contains(file.getContentTypeID());
     }
 
     /**
@@ -152,7 +152,7 @@ public class MCRIView2Tools {
      * @see @link{MCRIView2Tools#isFileSupported(MCRFile)}
      */
     public static boolean isFileSupported(String filename) {
-        return SUPPORTED_CONTENT_TYPE.indexOf(filename.substring(filename.lastIndexOf(".") + 1)) > -1;
+        return SUPPORTED_CONTENT_TYPE.contains(filename.substring(filename.lastIndexOf(".") + 1));
     }
 
     /**

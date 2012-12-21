@@ -266,7 +266,7 @@ public class MCRFieldDef {
 
         String a = " " + objects + " ";
         String b = " " + objectType + " ";
-        return a.indexOf(b) >= 0;
+        return a.contains(b);
     }
 
     public boolean isUsedFor(MCRFieldsSelector selector) {

@@ -1126,7 +1126,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             pw.flush();
             pw.close();
 
-            if (sw.toString().indexOf("Warning: discarding unexpected") != -1) {
+            if (sw.toString().contains("Warning: discarding unexpected")) {
                 logger.debug("Jumping to XML code validation because content contains at least one non-valid XHTML Element.");
 
                 Tidy tidyXML = new Tidy();
@@ -1388,7 +1388,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             pw.close();
             System.out.println(pw);
 
-            if ((sw.toString().indexOf("is not recognized!") != -1) && (sw.toString().indexOf("Warning: discarding unexpected") != -1)) {
+            if ((sw.toString().contains("is not recognized!")) && (sw.toString().contains("Warning: discarding unexpected"))) {
                 System.out.println("Parsing Document as XML");
                 tidy = new Tidy();
                 tidy = getTidyConfig(tidy, "xml");

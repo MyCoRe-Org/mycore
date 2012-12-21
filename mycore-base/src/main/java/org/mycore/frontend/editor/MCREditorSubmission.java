@@ -242,7 +242,7 @@ public class MCREditorSubmission {
         int beginOfPredicate = var.indexOf("[@");
         while (beginOfPredicate != -1) {
             String name = var.substring(0, beginOfPredicate).trim();
-            if (name.indexOf("/") >= 0) {
+            if (name.contains("/")) {
                 name = name.substring(name.lastIndexOf("/") + 1).trim();
             }
             if (name.contains("["))

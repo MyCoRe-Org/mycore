@@ -85,7 +85,7 @@ public abstract class MCRDataExtractor extends MCREventHandlerBase {
     @Override
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
         String supported = " " + getSupportedContentTypeIDs() + " ";
-        if (supported.indexOf(" " + file.getContentTypeID() + " ") == -1) {
+        if (!supported.contains(" " + file.getContentTypeID() + " ")) {
             return;
         }
 

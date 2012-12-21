@@ -1084,7 +1084,7 @@ public class MCRUserMgr {
                 throw new MCRException("userID (input) too long");
             }
             // Check for invalid characters
-            if (userID.indexOf("'") !=-1  || userID.trim().indexOf(" ") != -1) {
+            if (userID.contains("'") || userID.trim().contains(" ")) {
                 throw new MCRException("userID contains invalid characters");
             }
             
@@ -1496,7 +1496,7 @@ public class MCRUserMgr {
      * @return true if the user exists, else return false
      */
     public final boolean existUser(String user) {
-        if (user == null || user.length() > MCRUser.id_len || user.indexOf("'") !=-1  || user.trim().indexOf(" ") != -1) {
+        if (user == null || user.length() > MCRUser.id_len || user.contains("'") || user.trim().contains(" ")) {
             return false;
         }
         

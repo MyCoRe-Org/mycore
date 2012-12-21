@@ -32,7 +32,7 @@ public class MCRDisplayHideDerivateServlet extends MCRServlet {
             return;
         }
         
-        if (derivate == null || (derivate.indexOf("_derivate_") == -1)) {
+        if (derivate == null || (!derivate.contains("_derivate_"))) {
             LOGGER.error("Cannot toogle display attribute. No derivate id provided.");
             job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "You must provide a proper derivate id");
             return;

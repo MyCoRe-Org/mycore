@@ -60,7 +60,7 @@ public class MCRDerivateWithURNSearcher extends MCRSearcher {
 
         MCRResults toReturn = new MCRResults();
         for (MCRHit aHit : results) {
-            if (aHit.getID().indexOf("_derivate_") == -1) {
+            if (!aHit.getID().contains("_derivate_")) {
                 toReturn.addHit(aHit);
             } else {
                 MCRFieldValue derivateOwner = aHit.getMetaData("derivateOwner");

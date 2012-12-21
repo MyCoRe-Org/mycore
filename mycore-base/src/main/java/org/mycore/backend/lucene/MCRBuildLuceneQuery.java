@@ -182,7 +182,7 @@ public class MCRBuildLuceneQuery {
 
             String help = value.endsWith("*") ? value.substring(0, value.length() - 1) : value;
 
-            if (-1 != help.indexOf("*") || -1 != help.indexOf("?")) {
+            if (help.contains("*") || help.contains("?")) {
                 LOGGER.debug("WILDCARD");
 
                 te = new Term(field, value);

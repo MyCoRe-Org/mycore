@@ -213,7 +213,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     }
 
     private MCRFile getNewFile(String path) {
-        if (path.indexOf("/") == -1) {
+        if (!path.contains("/")) {
             return new MCRFile(path, rootDir);
         }
         StringTokenizer tok = new StringTokenizer(path, "/");

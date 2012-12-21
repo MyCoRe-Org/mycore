@@ -206,7 +206,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         while (0 < rulesize) {
             org.jdom.Element conditions = base.getService().getRule(0).getCondition();
             String permission = base.getService().getRule(0).getPermission();
-            if (storedrules.indexOf(permission) != -1) {
+            if (storedrules.contains(permission)) {
                 MCRAccessManager.addRule(base.getId(), permission, conditions, "");
             }
             base.getService().removeRule(0);
@@ -238,7 +238,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
             while (0 < rulesize) {
                 org.jdom.Element conditions = base.getService().getRule(0).getCondition();
                 String permission = base.getService().getRule(0).getPermission();
-                if (storedrules.indexOf(permission) != -1) {
+                if (storedrules.contains(permission)) {
                     MCRAccessManager.updateRule(base.getId(), permission, conditions, "");
                 }
                 base.getService().removeRule(0);
@@ -277,7 +277,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         Collection<String> savedPermissions = MCRAccessManager.getPermissionsForID(id);
         Collection<String> configuredPermissions = AI.getAccessPermissionsFromConfiguration();
         for (String permission : configuredPermissions) {
-            if (storedrules.indexOf(permission) != -1) {
+            if (storedrules.contains(permission)) {
                 if (savedPermissions != null && savedPermissions.contains(permission)) {
                     if (overwrite) {
                         MCRAccessManager.removeRule(id, permission);

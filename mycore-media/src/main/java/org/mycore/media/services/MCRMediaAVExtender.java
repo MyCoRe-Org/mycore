@@ -198,17 +198,17 @@ public class MCRMediaAVExtender extends MCRAudioVideoExtender {
     private String detectContentTypeIDByFormat(String format) {
         String cType = null;
 
-        if (format.indexOf("MPEG Layer 3") >= 0) {
+        if (format.contains("MPEG Layer 3")) {
             cType = "mp3";
-        } else if (format.indexOf("MPEG") >= 0) {
+        } else if (format.contains("MPEG")) {
             cType = "mpegvid";
-        } else if (format.indexOf("RealVideo") >= 0) {
+        } else if (format.contains("RealVideo")) {
             cType = "realvid";
-        } else if (format.indexOf("RealAudio") >= 0) {
+        } else if (format.contains("RealAudio")) {
             cType = "realaud";
-        } else if (format.indexOf("Flash Video") >= 0) {
+        } else if (format.contains("Flash Video")) {
             cType = "flv";
-        } else if (format.indexOf("Wave File") >= 0) {
+        } else if (format.contains("Wave File")) {
             cType = "wav";
         }
 
