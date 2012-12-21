@@ -495,12 +495,12 @@ public class MCRURNAdder {
     private void getPathFilenamePairs(MCRFilesystemNode[] m, List<MCRPair<String, MCRFile>> pairs) {
         if (pairs == null)
             return;
-        for (int i = 0; i < m.length; i++) {
-            if (m[i] instanceof MCRDirectory) {
-                getPathFilenamePairs(((MCRDirectory) m[i]).getChildren(), pairs);
+        for (MCRFilesystemNode aM : m) {
+            if (aM instanceof MCRDirectory) {
+                getPathFilenamePairs(((MCRDirectory) aM).getChildren(), pairs);
             }
-            if (m[i] instanceof MCRFile) {
-                pairs.add(new MCRPair<String, MCRFile>(getPath((MCRFile) m[i]), (MCRFile) m[i]));
+            if (aM instanceof MCRFile) {
+                pairs.add(new MCRPair<String, MCRFile>(getPath((MCRFile) aM), (MCRFile) aM));
             }
         }
     }

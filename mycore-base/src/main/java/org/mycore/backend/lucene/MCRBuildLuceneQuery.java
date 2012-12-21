@@ -73,8 +73,7 @@ public class MCRBuildLuceneQuery {
      * 
      */
     public static Query buildLuceneQuery(BooleanQuery r, boolean reqf, List<Element> f, Analyzer analyzer, Set<String> usedFields) throws Exception {
-        for (int i = 0; i < f.size(); i++) {
-            org.jdom.Element xEle = f.get(i);
+        for (Element xEle : f) {
             String name = xEle.getName();
             if ("boolean".equals(name)) {
                 name = xEle.getAttributeValue("operator").toLowerCase();
