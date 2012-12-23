@@ -196,7 +196,7 @@ public class MCRDirectoryXML {
     }
 
     private void addExtenderData(Element parent, MCRAudioVideoExtender ext) {
-        parent.setAttribute("type", ext.isVideo() ? "video" : "audio");
+        parent.setAttribute("type", ext.hasVideoStream() ? "video" : "audio");
 
         int hh = ext.getDurationHours();
         int mm = ext.getDurationMinutes();
@@ -205,7 +205,7 @@ public class MCRDirectoryXML {
 
         addString(parent, "bitRate", String.valueOf(ext.getBitRate()));
 
-        if (ext.isVideo()) {
+        if (ext.hasVideoStream()) {
             addString(parent, "frameRate", String.valueOf(ext.getFrameRate()));
         }
 

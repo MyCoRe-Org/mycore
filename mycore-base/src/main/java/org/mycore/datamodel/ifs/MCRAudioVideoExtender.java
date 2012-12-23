@@ -47,11 +47,6 @@ import org.mycore.common.MCRUtils;
  * @version $Revision$ $Date$
  */
 public abstract class MCRAudioVideoExtender {
-    /** Constant for media type = video */
-    public final static boolean VIDEO = true;
-
-    /** Constant for media type = audio */
-    public final static boolean AUDIO = false;
 
     /** The bitrate of the asset in number of bits per second */
     protected int bitRate = 0;
@@ -59,8 +54,8 @@ public abstract class MCRAudioVideoExtender {
     /** The framerate of the asset in number of frames per second */
     protected double frameRate = 0;
 
-    /** The media type of the asset, either AUDIO or VIDEO */
-    protected boolean mediaType = VIDEO;
+    /** The media has video stream or is audio only */
+    protected boolean hasVideo = true;
 
     /** The hours part of the duration of the asset */
     protected int durationHours = 0;
@@ -157,21 +152,12 @@ public abstract class MCRAudioVideoExtender {
     }
 
     /**
-     * Returns the media type, either AUDIO od VIDEO for this asset
-     * 
-     * @return the media type, compare to the boolean constants in this class
-     */
-    public boolean getMediaType() {
-        return mediaType;
-    }
-
-    /**
      * Returns true, if this asset is an audio asset.
      * 
      * @return true, if this asset is an audio asset.
      */
-    public boolean isAudio() {
-        return mediaType == AUDIO;
+    public boolean isAudioOnly() {
+        return !hasVideo;
     }
 
     /**
@@ -179,8 +165,8 @@ public abstract class MCRAudioVideoExtender {
      * 
      * @return true, if this asset is a video asset.
      */
-    public boolean isVideo() {
-        return mediaType == VIDEO;
+    public boolean hasVideoStream() {
+        return hasVideo;
     }
 
     /**
@@ -335,11 +321,11 @@ public abstract class MCRAudioVideoExtender {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Media Type      : ");
-        sb.append(isVideo() ? "Video\n" : "Audio\n");
+        sb.append(hasVideoStream() ? "Video\n" : "Audio\n");
         sb.append("Bitrate         : ").append(getBitRateFormatted()).append("/sec.");
         sb.append(" (").append(getBitRate()).append(")\n");
 
-        if (isVideo()) {
+        if (hasVideoStream()) {
             sb.append("Framerate       : ").append(getFrameRateFormatted()).append(" fps");
             sb.append(" (").append(getFrameRate()).append(")\n");
         }

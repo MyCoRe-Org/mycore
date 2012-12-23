@@ -581,7 +581,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
             root.setAttribute("bitRate", String.valueOf(ext.getBitRate()));
             root.setAttribute("frameRate", String.valueOf(ext.getFrameRate()));
             root.setAttribute("duration", ext.getDurationTimecode());
-            root.setAttribute("mediaType", (ext.getMediaType() == MCRAudioVideoExtender.AUDIO ? "audio" : "video"));
+            root.setAttribute("mediaType", (ext.hasVideoStream() ? "video" : "audio"));
         }
 
         return new Document(root);

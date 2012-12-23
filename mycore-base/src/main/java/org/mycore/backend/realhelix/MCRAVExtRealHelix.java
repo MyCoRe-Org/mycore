@@ -87,7 +87,7 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
                 frameRate = Math.max(frameRate, value);
             }
 
-            mediaType = frameRate > 0;
+            hasVideo = frameRate > 0;
 
             StringTokenizer st2 = new StringTokenizer(sDuration, ":.");
             durationMinutes = Integer.parseInt(st2.nextToken());
@@ -116,31 +116,31 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
 
             if (sType.contains("MPEG Layer 3")) {
                 contentTypeID = "mp3";
-                mediaType = AUDIO;
+                hasVideo = false;
             } else if (sType.contains("3GPP")) {
                 contentTypeID = "3gp";
-                mediaType = VIDEO;
+                hasVideo = true;
             } else if (sType.contains("MPEG4")) {
                 contentTypeID = "mpeg4";
-                mediaType = VIDEO;
+                hasVideo = true;
             } else if (sType.contains("MPEG")) {
                 contentTypeID = "mpegvid";
-                mediaType = VIDEO;
+                hasVideo = true;
             } else if (sType.contains("RealVideo")) {
                 contentTypeID = "realvid";
             } else if (sType.contains("RealAudio")) {
                 contentTypeID = "realaud";
             } else if (sType.contains("Wave File")) {
                 contentTypeID = "wav";
-                mediaType = AUDIO;
+                hasVideo = false;
             } else // should be one of "wma" "wmv" "asf"
             {
                 contentTypeID = file.getContentTypeID();
 
                 if (contentTypeID.equals("wma")) {
-                    mediaType = AUDIO;
+                    hasVideo = false;
                 } else {
-                    mediaType = VIDEO;
+                    hasVideo = true;
                 }
             }
 
