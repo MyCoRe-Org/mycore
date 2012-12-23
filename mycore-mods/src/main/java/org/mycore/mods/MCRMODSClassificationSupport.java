@@ -241,8 +241,9 @@ public final class MCRMODSClassificationSupport {
             MCRCategory category = DAO.getCategory(categoryID, 0);
             MCRCategory classification = category.getRoot();
 
-            if (classification.equals(MCRTypeOfResource.TYPE_OF_RESOURCE))
+            if (classification.getId().getRootID().equals(MCRTypeOfResource.TYPE_OF_RESOURCE)){
                 return new MCRTypeOfResource(categoryID.getID());
+            }
 
             String authority = MCRAuthorityAndCode.getAuthority(classification);
             if (authority != null) {
@@ -514,7 +515,7 @@ public final class MCRMODSClassificationSupport {
         @Override
         protected MCRCategoryID lookupCategoryID() {
             for (MCRCategory category : getCategoryByURI(valueURI)) {
-                if (authorityURI.equals(category.getRoot().getLabel(LABEL_LANG_URI))) {
+                if (authorityURI.equals(category.getRoot().getLabel(LABEL_LANG_URI).getText())) {
                     return category.getId();
                 }
             }

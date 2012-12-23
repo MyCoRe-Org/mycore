@@ -59,7 +59,7 @@ public class MCRRealmResolver implements URIResolver {
         } else if ("local".equals(realmID)) {
             realmID = MCRRealmFactory.getLocalRealm().getID();
         }
-        return new JDOMSource(getElement(MCRRealmFactory.getLocalRealm().getID()));
+        return new JDOMSource(getElement(MCRRealmFactory.getRealm(realmID).getID()));
     }
 
     private Element getElement(final String id) {
@@ -67,7 +67,7 @@ public class MCRRealmResolver implements URIResolver {
         @SuppressWarnings("unchecked")
         List<Element> realms = realmsDocument.getRootElement().getChildren("realm");
         for (Element realm : realms) {
-            if (id.equals(realm.getAttribute("id"))) {
+            if (id.equals(realm.getAttributeValue("id"))) {
                 return realm;
             }
         }

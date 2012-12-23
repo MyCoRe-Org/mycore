@@ -1242,8 +1242,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRObject sourceMCRObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(sourceId));
         // old parent
         MCRObjectID oldParentId = sourceMCRObject.getStructure().getParentID();
+        MCRObjectID newParentObjectID=MCRObjectID.getInstance(newParentId);
 
-        if (newParentId.equals(oldParentId)) {
+        if (newParentObjectID.equals(oldParentId)) {
             LOGGER.info("Object " + sourceId + " is already child of " + newParentId);
             return;
         }
@@ -1255,9 +1256,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
 
         // change href to new parent
-        LOGGER.info("Setting link in \"" + sourceId + "\" to parent \"" + newParentId + "\"");
+        LOGGER.info("Setting link in \"" + sourceId + "\" to parent \"" + newParentObjectID + "\"");
         MCRMetaLinkID parentLinkId = new MCRMetaLinkID("parent", 0);
-        parentLinkId.setReference(newParentId, null, null);
+        parentLinkId.setReference(newParentObjectID, null, null);
         sourceMCRObject.getStructure().setParent(parentLinkId);
 
         if (oldParentMCRObject != null) {

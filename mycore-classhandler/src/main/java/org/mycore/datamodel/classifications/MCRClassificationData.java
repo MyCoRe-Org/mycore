@@ -270,7 +270,7 @@ public class MCRClassificationData {
 
     private void clearPath(final String[] uriParts) throws Exception {
         final String[] cati = new String[uriParts.length];
-        String path = "";
+        String path;
         if (uriParts.length == 1) {
             path = "/" + uriParts[0];
         } else {
@@ -483,7 +483,7 @@ public class MCRClassificationData {
 
         docRoot.addContent(xNavtree);
 
-        if ("true".equals(sort)) {
+        if (sort) {
             docRoot = sortMyTree(docRoot);
         }
         //MCRUtils.writeJDOMToSysout(doc);
