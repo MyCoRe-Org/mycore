@@ -304,11 +304,8 @@ public class MCRMailer extends MCRServlet {
                 public void run() {
                     for (int i = numTries - 1; i > 0; i--) {
                         LOGGER.info("Retrying in 5 minutes...");
-                        Object obj = new Object();
                         try {
-                            synchronized (obj) {
-                                obj.wait(300000);
-                            }
+                            Thread.sleep(300000);
                         } // wait 5 minutes
                         catch (InterruptedException ignored) {
                         }

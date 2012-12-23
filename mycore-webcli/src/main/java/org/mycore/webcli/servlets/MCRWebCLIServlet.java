@@ -131,6 +131,7 @@ public class MCRWebCLIServlet extends MCRServlet {
     private static MCRWebCLIContainer getCurrentSessionContainer(boolean create, HttpSession hsession) {
         MCRSession session = MCRSessionMgr.getCurrentSession();
         Object sessionValue;
+        //noinspection SynchronizationOnLocalVariableOrMethodParameter
         synchronized (session) {
             sessionValue = session.get(SESSION_KEY);
             if (sessionValue == null) {
