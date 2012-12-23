@@ -84,7 +84,7 @@ public abstract class MCRHibTestCase extends MCRTestCase {
         super.setUp();
         boolean setProperty = false;
         setProperty = setProperty("log4j.logger.org.hibernate", "WARN", false) || setProperty;
-        setProperty = setProperty("log4j.logger.org.hsqldb", "WARN", false) ? true : setProperty;
+        setProperty = setProperty("log4j.logger.org.hsqldb", "WARN", false) || setProperty;
         if (setProperty) {
             CONFIG.configureLogging();
         }

@@ -64,7 +64,7 @@ public class MCRTestCase {
     
     protected boolean setProperty(String key, String value, boolean overwrite) {
         String propValue = CONFIG.getProperties().getProperty(key);
-        if (propValue == null || overwrite == true) {
+        if (propValue == null || overwrite) {
             CONFIG.getProperties().setProperty(key, value);
             return true;
         }

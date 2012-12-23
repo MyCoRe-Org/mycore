@@ -137,11 +137,7 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
             {
                 contentTypeID = file.getContentTypeID();
 
-                if (contentTypeID.equals("wma")) {
-                    hasVideo = false;
-                } else {
-                    hasVideo = true;
-                }
+                hasVideo = !contentTypeID.equals("wma");
             }
 
             if (" wma wmv asf asx ".contains(" " + contentTypeID + " ")) {
