@@ -60,7 +60,7 @@ public class MCRJobMaster implements Runnable, Closeable {
 
     private static Logger LOGGER = Logger.getLogger(MCRJobMaster.class);
 
-    private MCRJobQueue JOB_QUEUE;
+    private final MCRJobQueue JOB_QUEUE;
 
     private Class<? extends MCRJobAction> action;
 

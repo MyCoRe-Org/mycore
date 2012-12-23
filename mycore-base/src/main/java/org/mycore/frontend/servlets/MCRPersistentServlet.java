@@ -236,6 +236,7 @@ public class MCRPersistentServlet extends MCRServlet {
         MCRObject mcrObject = getMCRObject(doc);
         MCRObjectID objectId = mcrObject.getId();
         if (MCRAccessManager.checkPermission("create-" + objectId.getBase()) || MCRAccessManager.checkPermission("create-" + objectId.getTypeId())) {
+            //noinspection SynchronizeOnNonFinalField
             synchronized (operation) {
                 if (objectId.getNumberAsInteger() == 0) {
                     String objId = mcrObject.getId().toString();

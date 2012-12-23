@@ -34,7 +34,7 @@ public class MCRClassificationPool {
     /**
      * stores all edited classifications
      */
-    private HashMap<MCRCategoryID, MCRCategory> classifications = new HashMap<MCRCategoryID, MCRCategory>();
+    private final HashMap<MCRCategoryID, MCRCategory> classifications = new HashMap<MCRCategoryID, MCRCategory>();
 
     private HashSet<MCRCategoryID> movedCategories = new HashSet<MCRCategoryID>();
 
@@ -187,7 +187,7 @@ public class MCRClassificationPool {
 
     /**
      * Delete a classfication from the pool
-     * @param cl
+     * @param mcrClassificationID
      */
     public void deleteClassification(MCRCategoryID mcrClassificationID) {
         //only delete with DAO if Classification really exists.

@@ -37,7 +37,7 @@ public class MCRImageTiler implements Runnable, Closeable {
 
     private static Logger LOGGER = Logger.getLogger(MCRImageTiler.class);
 
-    private static MCRTilingQueue tq = MCRTilingQueue.getInstance();
+    private static final MCRTilingQueue tq = MCRTilingQueue.getInstance();
 
     private ThreadPoolExecutor tilingServe;
 

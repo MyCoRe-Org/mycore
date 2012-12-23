@@ -90,7 +90,7 @@ public class MCROAISetManager {
 
     protected boolean filterEmptySets;
 
-    protected OAIDataList<Set> cachedSetList;
+    protected final OAIDataList<Set> cachedSetList;
 
     public MCROAISetManager() {
         this.setURIs = new ArrayList<String>();
@@ -135,7 +135,9 @@ public class MCROAISetManager {
                 try {
                     LOGGER.info("update oai set list");
                     synchronized (cachedSetList) {
-                        cachedSetList = createSetList();
+                        OAIDataList<Set> setList = createSetList();
+                        cachedSetList.clear();
+                        cachedSetList.addAll(setList);
                     }
                 } finally {
                     try {
@@ -181,7 +183,9 @@ public class MCROAISetManager {
         if (lastModified != this.classLastModified) {
             this.classLastModified = lastModified;
             synchronized (this.cachedSetList) {
-                this.cachedSetList = createSetList();
+                OAIDataList<Set> setList = createSetList();
+                cachedSetList.clear();
+                cachedSetList.addAll(setList);
             }
         }
         // create a shallow copy of the set list
