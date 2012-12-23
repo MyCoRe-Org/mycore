@@ -16,8 +16,6 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 
 class RowCreator_NoLines implements RowCreator {
-    int maxlevel = 0;
-
     private boolean commented = false;
 
     private MCRCategory classif;
@@ -42,7 +40,6 @@ class RowCreator_NoLines implements RowCreator {
 
     public RowCreator_NoLines(MCRClassificationPool classificationPool, MCRConfiguration configuration) {
         this.classificationPool = classificationPool;
-        MCRConfiguration configuration1 = configuration;
         String defaultEmptyLeafs = configuration.getString("MCR.ClassificationBrowser.default.EmptyLeafs");
         emptyLeafs = configuration.getString("MCR.ClassificationBrowser." + getBrowserClass() + ".EmptyLeafs", defaultEmptyLeafs);
     }
@@ -114,7 +111,7 @@ class RowCreator_NoLines implements RowCreator {
         }
 
         String folder1_Sign = "folder_plain";
-        if ("T".equals(status) || status == null) {
+        if ("T".equals(status)) {
             folder1_Sign = "folder_plus";
         } else if ("F".equals(status)) {
             folder1_Sign = "folder_minus";
@@ -163,8 +160,6 @@ class RowCreator_NoLines implements RowCreator {
 
     public void setClassification(MCRCategoryID classifID) {
         classif = classificationPool.getClassificationAsPojo(classifID, true);
-        if (classif == null)
-            return;
     }
 
     public void update(final String categID) throws Exception {

@@ -43,8 +43,7 @@ public class MCRJSONProvider {
      * @throws Exception 
      */
     public MCRJSONProvider(Document mets, String derivate) throws Exception  {
-        Document metsDocument = mets;
-        this.mets = new Mets(metsDocument);
+        this.mets = new Mets(mets);
     }
 
     public String getJson() {

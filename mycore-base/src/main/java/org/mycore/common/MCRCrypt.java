@@ -213,9 +213,7 @@ public class MCRCrypt {
                     0x08000000, 0x08200020, 0x00008000, 0x00208020 } };
 
     private static int byteToUnsigned(byte b) {
-        int value = b;
-
-        return value >= 0 ? value : value + 256;
+        return b >= 0 ? (int) b : (int) b + 256;
     }
 
     private static int fourBytesToInt(byte[] b, int offset) {
@@ -333,7 +331,7 @@ public class MCRCrypt {
     private static int[] body(int[] schedule, int Eswap0, int Eswap1) {
         int left = 0;
         int right = 0;
-        int t = 0;
+        int t;
 
         for (int j = 0; j < 25; j++) {
             for (int i = 0; i < ITERATIONS * 2; i += 4) {

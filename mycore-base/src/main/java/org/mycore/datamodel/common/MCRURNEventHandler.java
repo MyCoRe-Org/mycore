@@ -77,7 +77,6 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
                 return;
             }
             LOGGER.warn("Can't find method for " + MCREvent.DERIVATE_TYPE + " for event type " + evt.getEventType());
-            return;
         }
     }
 
@@ -157,10 +156,9 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
 
                 for (Element fileResult : files) {
                     // add the urn of each file
-                    Element file = fileResult;
                     String fileName, fileUrn, fileDirectory;
 
-                    if ((fileName = file.getAttributeValue("name")) != null && (fileUrn = file.getChildText("urn")) != null) {
+                    if ((fileName = fileResult.getAttributeValue("name")) != null && (fileUrn = fileResult.getChildText("urn")) != null) {
 
                         File derivateFile = new File(fileName);
 

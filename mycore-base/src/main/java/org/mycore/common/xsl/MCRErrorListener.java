@@ -71,15 +71,14 @@ public class MCRErrorListener implements ErrorListener {
     }
 
     private TransformerException unwrapException(TransformerException exception) {
-        TransformerException e = exception;
-        Throwable cause = e.getCause();
+        Throwable cause = exception.getCause();
         while (cause != null) {
             if (cause instanceof TransformerException) {
                 return unwrapException((TransformerException) cause);
             }
             cause = cause.getCause();
         }
-        return e;
+        return exception;
     }
 
 }

@@ -71,13 +71,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
         Document indoc = sub.getXML();
 
         // read the parameter
-        MCRRequestParameters parms;
-
-        if (sub == null) {
-            parms = new MCRRequestParameters(job.getRequest());
-        } else {
-            parms = sub.getParameters();
-        }
+        MCRRequestParameters parms = sub.getParameters();
 
         String oldmcrid = parms.getParameter("mcrid");
         String oldtype = parms.getParameter("type");
@@ -93,12 +87,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
         LOGGER.info("LANG = " + lang);
 
         // prepare the MCRObjectID's for the Metadata
-        String mmcrid = oldmcrid;
-        MCRObjectID ID = MCRObjectID.getInstance(mmcrid);
-
-        if (!ID.getTypeId().equals(oldtype)) {
-            ID = MCRObjectID.getInstance(oldmcrid);
-        }
+        MCRObjectID ID = MCRObjectID.getInstance(oldmcrid);
 
         // check access
         if (!checkAccess(ID)) {
@@ -149,7 +138,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
      *            the current language
      */
     protected Element prepareService(Document jdom_in, MCRObjectID ID, MCRServletJob job, String lang) throws Exception {
-        Element elm_out = null;
+        Element elm_out;
         ArrayList<String> logtext = new ArrayList<String>();
         Element root = jdom_in.getRootElement();
         if (root != null) {
@@ -176,7 +165,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                                                 Element incond = incondlist.get(l);
                                                 String condvalue = incond.getAttributeValue("value");
                                                 if (condvalue == null || (condvalue = condvalue.trim()).length() == 0) {
-                                                    ((Element) anInbool).removeContent(incond);
+                                                    anInbool.removeContent(incond);
                                                     k--;
                                                     l--;
                                                     continue;
@@ -259,7 +248,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
         // prepare editor with error messages
         String pagedir = MCRConfiguration.instance().getString("MCR.SWF.PageDir", "");
         String myfile = pagedir + MCRConfiguration.instance().getString("MCR.SWF.PageErrorFormular", "editor_error_formular.xml");
-        Document jdom = null;
+        Document jdom;
 
         try {
             InputStream in = (new URL(getBaseURL() + myfile + "?XSL.Style=xml")).openStream();

@@ -24,23 +24,14 @@
 package org.mycore.datamodel.classifications2.impl;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.CriteriaSpecification;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.criterion.Subqueries;
+import org.hibernate.criterion.*;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -139,10 +130,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         criteria.setProjection(Projections.rowCount()).add(getCategoryCriterion(id));
         criteria.setCacheable(true);
         Number result = (Number) criteria.uniqueResult();
-        if (result == null) {
-            return false;
-        }
-        return result.intValue() > 0;
+        return result != null && result.intValue() > 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -172,7 +160,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     public MCRCategory getCategory(MCRCategoryID id, int childLevel) {
         Session session = getHibConnection().getSession();
         final boolean fetchAllChildren = childLevel < 0;
-        Query q = null;
+        Query q;
         if (id.isRootID()) {
             q = getHibConnection().getNamedQuery(
                     CATEGRORY_CLASS.getName() + (fetchAllChildren ? ".prefetchClassQuery" : ".prefetchClassLevelQuery"));
@@ -293,7 +281,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             List<MCRCategory> parents = getParents(baseID);
             List<MCRCategoryImpl> parentsCopy = new ArrayList<MCRCategoryImpl>(parents.size());
             for (int i = parents.size() - 1; i >= 0; i--) {
-                parentsCopy.add(copyDeep((MCRCategoryImpl) parents.get(i), 0));
+                parentsCopy.add(copyDeep(parents.get(i), 0));
             }
             MCRCategoryImpl root = parentsCopy.get(0);
             for (int i = 1; i < parentsCopy.size(); i++) {
@@ -421,10 +409,9 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         int increment = diffNodes * 2;
         if (increment != 0 && oldCategory.isCategory()) {
             final int left = oldCategory.getRightSiblingOrOfAncestor().getLeft();
-            final int maxLeft = ((MCRCategoryImpl) oldCategory.getRoot()).getRight();
+            final int maxLeftRight = ((MCRCategoryImpl) oldCategory.getRoot()).getRight();
             final int right = oldCategory.getRightSiblingOrParent().getRight();
-            final int maxRight = maxLeft;
-            updateLeftRightValueMax(connection, newCategory.getId().getRootID(), left, maxLeft, right, maxRight, increment);
+            updateLeftRightValueMax(connection, newCategory.getId().getRootID(), left, maxLeftRight, right, maxLeftRight, increment);
         }
         newCategoryImpl.calculateLeftRightAndLevel(oldCategory.getLevel(), oldCategory.getLeft());
         if (oldCategory.isCategory()) {
@@ -668,11 +655,6 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         }
     }
 
-    /**
-     * @param connection
-     * @param left
-     * @param increment
-     */
     private static void updateLeftRightValue(MCRHIBConnection connection, String classID, int left, final int increment) {
         LOGGER.debug("LEFT AND RIGHT values need updates. Left=" + left + ", increment by: " + increment);
         Query leftQuery = getHibConnection().getNamedQuery(CATEGRORY_CLASS.getName() + ".updateLeft");
@@ -717,7 +699,6 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     /**
      * Method updates the last modified timestamp, for the given root id.
      * 
-     * @param root  
      */
     synchronized private void updateLastModified(String root) {
         LAST_MODIFIED_MAP.put(root, System.currentTimeMillis());
@@ -725,8 +706,6 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     /**
      * Gets the timestamp for the given root id. If there is not timestamp at the moment -1 is returned.
-     * 
-     * @param root
      * 
      * @return the last modified timestamp (if any) or -1
      */

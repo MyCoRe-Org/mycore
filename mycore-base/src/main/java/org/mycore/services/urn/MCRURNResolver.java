@@ -68,9 +68,8 @@ public class MCRURNResolver extends MCRServlet {
         HttpServletResponse res = job.getResponse();
 
         String path = req.getPathInfo();
-        String param = req.getQueryString();
 
-        String urn = param;
+        String urn = req.getQueryString();
 
         if (urn == null && path != null) {
             urn = path.substring(1).trim();

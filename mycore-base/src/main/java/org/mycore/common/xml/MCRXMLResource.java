@@ -135,8 +135,7 @@ public class MCRXMLResource {
             entry = new CacheEntry();
             resourceCache.put(name, entry);
             entry.resourceURL = con.getURL();
-            MCRContent content = getDocument(entry.resourceURL);
-            entry.content = content;
+            entry.content = getDocument(entry.resourceURL);
             return entry.content;
         } finally {
             closeURLConnection(con);

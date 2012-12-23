@@ -132,8 +132,9 @@ public class MCRUser extends MCRUserObject {
      * @param userContact
      *            contact information
      */
-    public MCRUser(int numID, String ID, String creator, Timestamp creationDate, Timestamp modifiedDate, boolean idEnabled, boolean updateAllowed,
-        String description, String passwd, String primaryGroupID, List<String> groupIDs, MCRUserContact userContact) {
+    public MCRUser(int numID, String ID, String creator, Timestamp creationDate, Timestamp modifiedDate, boolean idEnabled,
+            boolean updateAllowed, String description, String passwd, String primaryGroupID, List<String> groupIDs,
+            MCRUserContact userContact) {
         // The following data will never be changed by update
         this(ID);
         this.numID = numID;
@@ -155,8 +156,8 @@ public class MCRUser extends MCRUserObject {
     }
 
     public MCRUser(String userid, String passwd) {
-        this(MCRUserMgr.instance().getMaxUserNumID() + 1, userid, MCRSessionMgr.getCurrentSession().getUserInformation().getUserID(), null, null, true,
-            true, null, null, MCRGroup.getDefaultGroupID(), null, null);
+        this(MCRUserMgr.instance().getMaxUserNumID() + 1, userid, MCRSessionMgr.getCurrentSession().getUserInformation().getUserID(), null,
+                null, true, true, null, null, MCRGroup.getDefaultGroupID(), null, null);
     }
 
     /**
@@ -174,8 +175,7 @@ public class MCRUser extends MCRUserObject {
         this(elm);
 
         if (useEncryption) {
-            String cryptPwd = MCRCrypt.crypt(passwd);
-            passwd = cryptPwd;
+            passwd = MCRCrypt.crypt(passwd);
         }
     }
 
@@ -214,7 +214,7 @@ public class MCRUser extends MCRUserObject {
         if (tmp != null) {
             try {
                 super.creationDate = Timestamp.valueOf(tmp);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
 
@@ -223,7 +223,7 @@ public class MCRUser extends MCRUserObject {
         if (tmp != null) {
             try {
                 super.modifiedDate = Timestamp.valueOf(tmp);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
 
@@ -368,7 +368,7 @@ public class MCRUser extends MCRUserObject {
     /**
      * This method checks if the user is member of a given group.
      * 
-     * @param group
+     * @param groupID
      *            Is the user a member of this group?
      * @return Returns true if the user is a member of the given group.
      */
@@ -396,7 +396,7 @@ public class MCRUser extends MCRUserObject {
         boolean test = true;
 
         if (requiredUserAttributes.contains("userID")) {
-            test = test && super.ID.length() > 0;
+            test = super.ID.length() > 0;
         }
 
         if (requiredUserAttributes.contains("numID")) {
@@ -507,11 +507,8 @@ public class MCRUser extends MCRUserObject {
      */
     @Override
     public Element toJDOMElement() throws MCRException {
-        Element user = new Element("user")
-            .setAttribute("numID", Integer.toString(numID))
-            .setAttribute("ID", ID)
-            .setAttribute("id_enabled", idEnabled ? "true" : "false")
-            .setAttribute("update_allowed", updateAllowed ? "true" : "false");
+        Element user = new Element("user").setAttribute("numID", Integer.toString(numID)).setAttribute("ID", ID)
+                .setAttribute("id_enabled", idEnabled ? "true" : "false").setAttribute("update_allowed", updateAllowed ? "true" : "false");
         Element Creator = new Element("user.creator").setText(super.creator);
         Element CreationDate = new Element("user.creation_date").setText(super.creationDate.toString());
         Element ModifiedDate = new Element("user.last_modified").setText(super.modifiedDate.toString());
@@ -520,13 +517,8 @@ public class MCRUser extends MCRUserObject {
         Element Primarygroup = new Element("user.primary_group").setText(primaryGroupID);
 
         // Aggregate user element
-        user.addContent(Creator)
-            .addContent(CreationDate)
-            .addContent(ModifiedDate)
-            .addContent(Passwd)
-            .addContent(Description)
-            .addContent(Primarygroup)
-            .addContent(userContact.toJDOMElement());
+        user.addContent(Creator).addContent(CreationDate).addContent(ModifiedDate).addContent(Passwd).addContent(Description)
+                .addContent(Primarygroup).addContent(userContact.toJDOMElement());
 
         // Loop over all group IDs
         if (groupIDs.size() != 0) {
@@ -622,15 +614,12 @@ public class MCRUser extends MCRUserObject {
         if (this == u) {
             return true;
         }
-        if (hashCode() != hashCode()) {
-            // acording to the hashCode() contract
-            return false;
-        }
-        return fastEquals(u);
+        // acording to the hashCode() contract
+        return hashCode() == u.hashCode() && fastEquals(u);
     }
 
     private boolean fastEquals(MCRUser u) {
-        return (getID() == u.getID() || getID().equals(u.getID())) && (getUserContact() == u.getUserContact() || getUserContact().equals(u.getUserContact()));
+        return getID().equals(u.getID()) && getUserContact().equals(u.getUserContact());
     }
 
     @Override

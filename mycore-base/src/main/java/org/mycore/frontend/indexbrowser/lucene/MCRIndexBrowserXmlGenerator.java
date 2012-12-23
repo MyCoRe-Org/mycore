@@ -103,7 +103,7 @@ public class MCRIndexBrowserXmlGenerator {
                 String objectID = resultList.get(index).getObjectId();
                 delims.add(new MyRangeDelim(index, firstEntry.getSortValue(0), objectID));
                 index += stepSize;
-                String secondValue = "";
+                String secondValue;
                 if (index >= to) {
                     index = to - 1;
                 }
@@ -125,11 +125,10 @@ public class MCRIndexBrowserXmlGenerator {
      */
     private int calculateStepSize(int numSelectedRows, int maxPerPage) {
         for (int i = 1;; i++) {
-            double dNum = numSelectedRows;
             double dI = 1.0 / i;
-            double root = Math.pow(dNum, dI);
+            double root = Math.pow((double) numSelectedRows, dI);
             if (root <= maxPerPage) {
-                return (int) Math.floor(dNum / root);
+                return (int) Math.floor((double) numSelectedRows / root);
             }
         }
     }
@@ -215,7 +214,7 @@ public class MCRIndexBrowserXmlGenerator {
                         Element el = (Element) it.next();
                         String lang = el.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE);
                         if (lang != null && lang.equals(currentlang)) {
-                            if (attribute != el.getAttributeValue("type")) {
+                            if (!attribute.equals(el.getAttributeValue("type"))) {
                                 if (value.length() > 0) {
                                     value += " - ";
                                 }
@@ -237,12 +236,11 @@ public class MCRIndexBrowserXmlGenerator {
                                 Element el = (Element) it.next();
                                 String lang = el.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE);
                                 if (lang != null && lang.equals(defaultlang)) {
-                                    if (attribute != el.getAttributeValue("type")) {
+                                    if (!attribute.equals(el.getAttributeValue("type"))) {
                                         if (value.length() > 0) {
                                             value += " - ";
                                         }
                                         value += el.getText();
-                                        attribute = el.getAttributeValue("type");
                                     }
                                     break;
                                 }
@@ -250,12 +248,11 @@ public class MCRIndexBrowserXmlGenerator {
                         } else {
                             if (it.hasNext()) {
                                 Element el = (Element) it.next();
-                                if (attribute != el.getAttributeValue("type")) {
+                                if (!attribute.equals(el.getAttributeValue("type"))) {
                                     if (value.length() > 0) {
                                         value += " - ";
                                     }
                                     value += el.getText();
-                                    attribute = el.getAttributeValue("type");
                                 }
                             }
                         }
