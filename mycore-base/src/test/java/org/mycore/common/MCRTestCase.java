@@ -29,13 +29,13 @@ public class MCRTestCase {
     	CONFIG = MCRConfiguration.instance();
         boolean setProperty = false;
         if (isDebugEnabled()) {
-            setProperty = setProperty("log4j.rootLogger", "DEBUG, stdout", false) ? true : setProperty;
+            setProperty = setProperty("log4j.rootLogger", "DEBUG, stdout", false) || setProperty;
         } else {
-            setProperty = setProperty("log4j.rootLogger", "INFO, stdout", false) ? true : setProperty;
+            setProperty = setProperty("log4j.rootLogger", "INFO, stdout", false) || setProperty;
         }
-        setProperty = setProperty("log4j.appender.stdout", "org.apache.log4j.ConsoleAppender", false) ? true : setProperty;
-        setProperty = setProperty("log4j.appender.stdout.layout", "org.apache.log4j.PatternLayout", false) ? true : setProperty;
-        setProperty = setProperty("log4j.appender.stdout.layout.ConversionPattern", "%-5p %m%n", false) ? true : setProperty;
+        setProperty = setProperty("log4j.appender.stdout", "org.apache.log4j.ConsoleAppender", false) || setProperty;
+        setProperty = setProperty("log4j.appender.stdout.layout", "org.apache.log4j.PatternLayout", false) || setProperty;
+        setProperty = setProperty("log4j.appender.stdout.layout.ConversionPattern", "%-5p %m%n", false) || setProperty;
         if (setProperty) {
             CONFIG.configureLogging();
         }
