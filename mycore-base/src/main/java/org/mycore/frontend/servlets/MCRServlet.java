@@ -88,7 +88,7 @@ public class MCRServlet extends HttpServlet {
     private static Logger LOGGER = Logger.getLogger(MCRServlet.class);
 
     private static String BASE_URL;
-    
+
     private static String BASE_HOST_IP;
 
     private static String SERVLET_URL;
@@ -160,7 +160,7 @@ public class MCRServlet extends HttpServlet {
             InetAddress BASE_HOST = InetAddress.getByName(url.getHost());
             BASE_HOST_IP = BASE_HOST.getHostAddress();
         } catch (MalformedURLException e) {
-            LOGGER.error("Can't create URL fro String " + BASE_URL);
+            LOGGER.error("Can't create URL from String " + BASE_URL);
         } catch (UnknownHostException e) {
             LOGGER.error("Can't find host IP for URL " + BASE_URL);
         }
@@ -546,8 +546,8 @@ public class MCRServlet extends HttpServlet {
                 value = URLEncoder.encode(parameters.getProperty(name), "UTF-8");
             } catch (UnsupportedEncodingException ex) {
                 value = parameters.getProperty(name);
-            } 
-            
+            }
+
             redirectURL.append(name).append("=").append(value);
         }
         LOGGER.debug("Sending redirect to " + redirectURL.toString());
@@ -785,20 +785,16 @@ public class MCRServlet extends HttpServlet {
      *            the source URL
      */
     public static String encodeURL(String url) throws URISyntaxException {
-        url = url.replace("%", "%25");
-        url = url.replace(" ", "%20");
-
-        URI uri = new URI(url);
-
-        String scheme = uri.getScheme();
-        String userInfo = uri.getUserInfo();
-        String host = uri.getHost();
-        int port = uri.getPort();
-        String path = uri.getPath();
-        String query = uri.getQuery();
-        String fragment = uri.getFragment();
-
-        uri = new URI(scheme, userInfo, host, port, path, query, fragment);
-        return uri.toASCIIString();
+        try {
+            URI testURI = new URI(url);
+            return testURI.toASCIIString();
+        } catch (URISyntaxException e) {
+            try {
+                URI absoluteURI = new URI(null, null, url, null);
+                return absoluteURI.getRawPath();
+            } catch (URISyntaxException e2) {
+                throw e2;
+            }
+        }
     }
 }
