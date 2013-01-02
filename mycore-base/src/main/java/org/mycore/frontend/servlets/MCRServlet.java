@@ -62,6 +62,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.services.i18n.MCRTranslation;
 
@@ -783,6 +784,7 @@ public class MCRServlet extends HttpServlet {
      * 
      * @param url
      *            the source URL
+     * @deprecated use {@link MCRXMLFunctions#encodeURIPath(String)} or {@link URI} directly   
      */
     public static String encodeURL(String url) throws URISyntaxException {
         try {
@@ -790,8 +792,7 @@ public class MCRServlet extends HttpServlet {
             return testURI.toASCIIString();
         } catch (URISyntaxException e) {
             try {
-                URI absoluteURI = new URI(null, null, url, null);
-                return absoluteURI.getRawPath();
+                return MCRXMLFunctions.encodeURIPath(url);
             } catch (URISyntaxException e2) {
                 throw e2;
             }

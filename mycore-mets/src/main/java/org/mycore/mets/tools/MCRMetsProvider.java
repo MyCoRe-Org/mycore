@@ -24,7 +24,7 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.jdom.JDOMException;
-import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.mets.misc.LogicalIdProvider;
 import org.mycore.mets.model.Mets;
 import org.mycore.mets.model.files.FLocat;
@@ -90,8 +90,7 @@ public class MCRMetsProvider {
         /* init the two structure maps */
         /* init logical structure map */
         logicalStructMp = new LogicalStructMap();
-        LogicalDiv logDivContainer = new LogicalDiv("log_" + derivate, "monograph", "Label for " + derivate, 1, amdSec.getId(),
-                dmdSec.getId());
+        LogicalDiv logDivContainer = new LogicalDiv("log_" + derivate, "monograph", "Label for " + derivate, 1, amdSec.getId(), dmdSec.getId());
         logicalStructMp.setDivContainer(logDivContainer);
 
         /* init physical structure map */
@@ -197,8 +196,7 @@ public class MCRMetsProvider {
      */
     private PhysicalSubDiv createPhysicalDiv(String id, int physicalOrder, String orderLabel) {
         String idStripped = MCRJSONTools.stripBracketsAndQuotes(id);
-        PhysicalSubDiv physDiv = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + idStripped, PhysicalSubDiv.TYPE_PAGE, physicalOrder,
-                orderLabel);
+        PhysicalSubDiv physDiv = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + idStripped, PhysicalSubDiv.TYPE_PAGE, physicalOrder, orderLabel);
         physDiv.add(new Fptr(id));
         return physDiv;
     }
@@ -231,10 +229,10 @@ public class MCRMetsProvider {
             return null;
         }
         try {
-            source = MCRServlet.encodeURL(source);
+            return MCRXMLFunctions.encodeURIPath(source);
         } catch (URISyntaxException ex) {
             LOGGER.error("Error occured while decoding source string \"" + source + "\"", ex);
+            return null;
         }
-        return source;
     }
 }
