@@ -300,7 +300,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
      *            this.getLevel() will return this value
      * @return this.right
      */
-    int calculateLeftRightAndLevel(int leftStart, int levelStart) {
+    public int calculateLeftRightAndLevel(int leftStart, int levelStart) {
         int curValue = leftStart;
         final int nextLevel = levelStart + 1;
         setLeft(leftStart);

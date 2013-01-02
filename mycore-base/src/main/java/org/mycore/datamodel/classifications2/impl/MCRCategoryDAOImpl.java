@@ -531,7 +531,15 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         return newCateg;
     }
 
-    static MCRCategoryImpl getByNaturalID(Session session, MCRCategoryID id) {
+    /**
+     * returns database backed MCRCategoryImpl
+     * 
+     * every change to the returned MCRCategory is refelected in the database.
+     * 
+     * @param session
+     * @param id
+     */
+    public static MCRCategoryImpl getByNaturalID(Session session, MCRCategoryID id) {
         final Criteria criteria = session.createCriteria(CATEGRORY_CLASS);
         return (MCRCategoryImpl) criteria.setCacheable(true).add(getCategoryCriterion(id)).uniqueResult();
     }
