@@ -91,7 +91,7 @@ public class MCRTemplatesSource {
             return MCRXMLResource.instance().getLastModified(resource, MCRXSLTransformerFactory.class.getClassLoader());
         } catch (IOException e) {
             LOGGER.warn("Could not determine last modified date of resource " + resource);
-            return 0;
+            return -1;
         }
     }
 }

@@ -1270,12 +1270,14 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             }
 
             try {
-                Hashtable<String, String> params = null;
+                Map<String, String> params;
                 StringTokenizer tok = new StringTokenizer(stylesheets, "?");
                 stylesheets = tok.nextToken();
 
                 if (tok.hasMoreTokens()) {
                     params = getParameterMap(tok.nextToken());
+                } else {
+                    params = Collections.emptyMap();
                 }
                 Source resolved = MCRURIResolver.instance().resolve(target, base);
 
@@ -1304,7 +1306,11 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 return transformer;
             }
             transformer = new MCRXSLTransformer();
-            transformer.setStylesheets("xsl/" + stylesheet + ".xsl");
+            String[] stylesheets = new String[stylesheet.length];
+            for (int i = 0; i < stylesheets.length; i++) {
+                stylesheets[i] = "xsl/" + stylesheet[i] + ".xsl";
+            }
+            transformer.setStylesheets(stylesheets);
             cache.put(key, transformer);
             return transformer;
         }

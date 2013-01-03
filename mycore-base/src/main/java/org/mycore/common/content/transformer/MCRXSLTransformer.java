@@ -122,7 +122,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     private void checkTemplateUptodate() throws TransformerConfigurationException, SAXException {
         for (int i = 0; i < templateSources.length; i++) {
             long lastModified = templateSources[i].getLastModified();
-            if (modified[i] < lastModified) {
+            if (templates[i] == null || modified[i] < lastModified) {
                 SAXSource source = templateSources[i].getSource();
                 templates[i] = tFactory.newTemplates(source);
                 if (templates[i] == null) {
