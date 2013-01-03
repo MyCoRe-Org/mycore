@@ -208,8 +208,8 @@ public class MCRXMLMetadataManager {
                     try {
                         setupStore(project, type, prefix);
                     } catch (Exception e) {
-                        throw new MCRPersistenceException(MessageFormat.format(
-                                "Could not instantiate store for project {0} and object type {1}.", project, type), e);
+                        throw new MCRPersistenceException(MessageFormat.format("Could not instantiate store for project {0} and object type {1}.", project,
+                            type), e);
                     }
                 }
             }
@@ -217,8 +217,7 @@ public class MCRXMLMetadataManager {
 
         MCRMetadataStore store = MCRStoreManager.getStore(projectType, MCRMetadataStore.class);
         if (store == null) {
-            throw new MCRPersistenceException(MessageFormat.format("Metadata store for project {0} and object type {1} is unconfigured.",
-                    project, type));
+            throw new MCRPersistenceException(MessageFormat.format("Metadata store for project {0} and object type {1} is unconfigured.", project, type));
         }
         return store;
     }
@@ -637,5 +636,20 @@ public class MCRXMLMetadataManager {
      */
     public long getLastModified() {
         return MCRConfiguration.instance().getSystemLastModified();
+    }
+
+    /**
+     * Returns the time when the xml data of a MCRObject was last modified.
+     * @param id
+     * @return output of {@link MCRStoredMetadata#getLastModified()}
+     * @throws IOException thrown by {@link MCRMetadataStore#retrieve(int)}
+     */
+    public long getLastModified(MCRObjectID id) throws IOException {
+        MCRMetadataStore store = getStore(id);
+        MCRStoredMetadata metadata = store.retrieve(id.getNumberAsInteger());
+        if (metadata != null) {
+            return metadata.getLastModified().getTime();
+        }
+        return -1;
     }
 }
