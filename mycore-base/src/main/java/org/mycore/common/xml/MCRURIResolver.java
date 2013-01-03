@@ -35,6 +35,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -77,6 +78,9 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRSourceContent;
+import org.mycore.common.content.transformer.MCRXSLTransformer;
+import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -956,8 +960,8 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
         private static final String SORT_CONFIG_PREFIX = CONFIG_PREFIX + "Classification.Sort.";
 
-        private static MCRCache<String, Element> categoryCache = new MCRCache<String, Element>(MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Classification.CacheSize", 1000),
-            "URIResolver categories");
+        private static MCRCache<String, Element> categoryCache = new MCRCache<String, Element>(MCRConfiguration.instance().getInt(
+            CONFIG_PREFIX + "Classification.CacheSize", 1000), "URIResolver categories");
 
         private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
@@ -1247,15 +1251,17 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
     /**
      * Transform result of other resolver with stylesheet. Usage:
-     * xslStyle:<stylesheet><?param1=value1<&param2=value2>>:<anyMyCoReURI> To
+     * xslStyle:<stylesheet><,stylesheet><?param1=value1<&param2=value2>>:<anyMyCoReURI> To
      * <stylesheet> is extension .xsl added. File is searched in classpath.
      */
     private static class MCRXslStyleResolver implements URIResolver {
 
+        MCRCache<String, MCRXSLTransformer> cache = new MCRCache<String, MCRXSLTransformer>(20, "MCRXSLStyleResolver transformers");
+
         @Override
         public Source resolve(String href, String base) throws TransformerException {
             String help = href.substring(href.indexOf(":") + 1);
-            String stylesheet = new StringTokenizer(help, ":").nextToken();
+            String stylesheets = new StringTokenizer(help, ":").nextToken();
             String target = help.substring(help.indexOf(":") + 1);
 
             String subUri = target.substring(target.indexOf(":") + 1);
@@ -1265,26 +1271,21 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
             try {
                 Hashtable<String, String> params = null;
-                StringTokenizer tok = new StringTokenizer(stylesheet, "?");
-                stylesheet = tok.nextToken();
+                StringTokenizer tok = new StringTokenizer(stylesheets, "?");
+                stylesheets = tok.nextToken();
 
                 if (tok.hasMoreTokens()) {
                     params = getParameterMap(tok.nextToken());
                 }
+                Source resolved = MCRURIResolver.instance().resolve(target, base);
 
-                Element result = MCRURIResolver.instance().resolve(target);
-                if (result != null) {
-                    Document doc = result.getDocument();
-                    if (doc == null) {
-                        doc = new Document(result);
-                    }
-                    Source xx = MCRLayoutService.instance().doLayout(doc, "xsl/" + stylesheet + ".xsl", params);
-                    if (xx == null) {
-                        LOGGER.info("MCRXslStyleResolver no root element after transformation ");
-                        return new JDOMSource(new Element("null"));
-                    }
-                    LOGGER.debug("MCRXslStyleResolver root element after transformation is " + xx.getSystemId());
-                    return xx;
+                if (resolved != null) {
+                    MCRSourceContent content = new MCRSourceContent(resolved);
+                    MCRXSLTransformer transformer = getTransformer(stylesheets.split(","));
+                    MCRParameterCollector paramcollector = new MCRParameterCollector();
+                    paramcollector.setParameters(params);
+                    MCRContent result = transformer.transform(content, paramcollector);
+                    return result.getSource();
                 } else {
                     LOGGER.debug("MCRXslStyleResolver returning empty xml");
                     return new JDOMSource(new Element("null"));
@@ -1294,6 +1295,18 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 LOGGER.debug("MCRXslStyleResolver returning empty xml");
                 return new JDOMSource(new Element("null"));
             }
+        }
+
+        private MCRXSLTransformer getTransformer(String... stylesheet) {
+            String key = Arrays.toString(stylesheet);
+            MCRXSLTransformer transformer = cache.get(key);
+            if (transformer != null) {
+                return transformer;
+            }
+            transformer = new MCRXSLTransformer();
+            transformer.setStylesheets("xsl/" + stylesheet + ".xsl");
+            cache.put(key, transformer);
+            return transformer;
         }
     }
 

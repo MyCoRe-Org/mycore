@@ -107,6 +107,14 @@ public class MCRParameterCollector {
     public void setParameter(String name, String value) {
         parameters.put(name, value);
     }
+    
+    /**
+     * Sets all parameters from the given map
+     * @param param
+     */
+    public void setParameters(Map<String, String> param){
+        parameters.putAll(param);
+    }
 
     /**
      * Sets the parameter only if it starts with "XSL." and is not empty
