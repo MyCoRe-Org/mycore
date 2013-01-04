@@ -35,6 +35,7 @@ import java.io.UnsupportedEncodingException;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs.FileObject;
 import org.jdom.Document;
 import org.jdom.JDOMException;
@@ -114,8 +115,11 @@ public abstract class MCRContent {
      */
     public void sendTo(OutputStream out) throws IOException {
         InputStream in = getInputStream();
-        MCRUtils.copyStream(in, out);
-        in.close();
+        try {
+            IOUtils.copy(in, out);
+        } finally {
+            in.close();
+        }
     }
 
     /**
@@ -128,8 +132,9 @@ public abstract class MCRContent {
      */
     public void sendTo(OutputStream out, boolean close) throws IOException {
         sendTo(out);
-        if (close)
+        if (close) {
             out.close();
+        }
     }
 
     /**
