@@ -35,7 +35,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -337,7 +336,8 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     @Override
     public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId) throws SAXException, IOException {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(MessageFormat.format("Resolving: \nname: {0}\npublicId: {1}\nbaseURI: {2}\nsystemId: {3}", name, publicId, baseURI, systemId));
+            LOGGER.debug(MessageFormat.format("Resolving: \nname: {0}\npublicId: {1}\nbaseURI: {2}\nsystemId: {3}", name, publicId,
+                    baseURI, systemId));
         }
         if (systemId == null) {
             return null; // Use default resolver
@@ -918,7 +918,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         private static final String SORT_CONFIG_PREFIX = CONFIG_PREFIX + "Classification.Sort.";
 
         private static MCRCache<String, Element> categoryCache = new MCRCache<String, Element>(MCRConfiguration.instance().getInt(
-            CONFIG_PREFIX + "Classification.CacheSize", 1000), "URIResolver categories");
+                CONFIG_PREFIX + "Classification.CacheSize", 1000), "URIResolver categories");
 
         private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
@@ -1005,7 +1005,8 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             } else if (axis.equals("parents")) {
                 if (categ.length() == 0) {
                     LOGGER.error("Cannot resolve parent axis without a CategID. URI: " + uri);
-                    throw new IllegalArgumentException("Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: " + uri);
+                    throw new IllegalArgumentException(
+                            "Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: " + uri);
                 }
                 cl = DAO.getRootCategory(new MCRCategoryID(classID, categ), levels);
             }
@@ -1213,8 +1214,6 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
      */
     private static class MCRXslStyleResolver implements URIResolver {
 
-        MCRCache<String, MCRXSLTransformer> cache = new MCRCache<String, MCRXSLTransformer>(20, "MCRXSLStyleResolver transformers");
-
         @Override
         public Source resolve(String href, String base) throws TransformerException {
             String help = href.substring(href.indexOf(":") + 1);
@@ -1262,19 +1261,11 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         }
 
         private MCRXSLTransformer getTransformer(String... stylesheet) {
-            String key = Arrays.toString(stylesheet);
-            MCRXSLTransformer transformer = cache.get(key);
-            if (transformer != null) {
-                return transformer;
-            }
-            transformer = new MCRXSLTransformer();
             String[] stylesheets = new String[stylesheet.length];
             for (int i = 0; i < stylesheets.length; i++) {
                 stylesheets[i] = "xsl/" + stylesheet[i] + ".xsl";
             }
-            transformer.setStylesheets(stylesheets);
-            cache.put(key, transformer);
-            return transformer;
+            return MCRXSLTransformer.getInstance(stylesheets);
         }
     }
 

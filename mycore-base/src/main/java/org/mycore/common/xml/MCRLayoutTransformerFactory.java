@@ -76,7 +76,7 @@ public class MCRLayoutTransformerFactory {
             LOGGER.info("Using noop transformer for " + idStripped);
             return NOOP_TRANSFORMER;
         }
-        MCRContentTransformer transformer = new MCRXSLTransformer(stylesheet);
+        MCRContentTransformer transformer = MCRXSLTransformer.getInstance(stylesheet);
         if ("application/pdf".equals(transformer.getMimeType())) {
             transformer = new MCRTransformerPipe(transformer, fopper);
             LOGGER.info("Using styleshet '" + stylesheet + "' for " + idStripped + " and MCRFopper for PDF output.");
