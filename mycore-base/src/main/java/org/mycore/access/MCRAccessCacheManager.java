@@ -38,7 +38,21 @@ class MCRAccessCacheManager implements MCRSessionListener {
 
     private static String key = MCRAccessCacheManager.class.getCanonicalName();
 
-    ThreadLocal<MCRCache<MCRPermissionHandle, Boolean>> accessCache = new ThreadLocal<MCRCache<MCRPermissionHandle, Boolean>>();
+    ThreadLocal<MCRCache<MCRPermissionHandle, Boolean>> accessCache = new ThreadLocal<MCRCache<MCRPermissionHandle, Boolean>>() {
+
+        @Override
+        protected MCRCache<MCRPermissionHandle, Boolean> initialValue() {
+            //this is only called for every session that was created before this class could attach to session events
+            MCRSession session = MCRSessionMgr.getCurrentSession();
+            @SuppressWarnings("unchecked")
+            MCRCache<MCRPermissionHandle, Boolean> cache = (MCRCache<MCRPermissionHandle, Boolean>) session.get(key);
+            if (cache == null) {
+                cache = createCache(session);
+                session.put(key, cache);
+            }
+            return cache;
+        }
+    };
 
     @Override
     @SuppressWarnings("unchecked")
@@ -52,10 +66,6 @@ class MCRAccessCacheManager implements MCRSessionListener {
             break;
         case activated:
             cache = (MCRCache<MCRPermissionHandle, Boolean>) session.get(key);
-            if (cache == null) {
-                cache = createCache(session);
-                session.put(key, cache);
-            }
             accessCache.set(cache);
             break;
         case passivated:
@@ -78,11 +88,6 @@ class MCRAccessCacheManager implements MCRSessionListener {
     }
 
     public MCRAccessCacheManager() {
-        //store cache of first user into his session: we missed his session create event
-        MCRSession session = MCRSessionMgr.getCurrentSession();
-        MCRCache<MCRPermissionHandle, Boolean> cache = createCache(session);
-        session.put(key, cache);
-        accessCache.set(cache);
         //init for current user done
         MCRSessionMgr.addSessionListener(this);
     }
