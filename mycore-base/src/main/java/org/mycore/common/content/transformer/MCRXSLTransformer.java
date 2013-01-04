@@ -202,6 +202,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         for (Templates template : templates) {
             TransformerHandler handler = tFactory.newTransformerHandler(template);
             parameterCollector.setParametersTo(handler.getTransformer());
+            handler.getTransformer().setErrorListener(MCRErrorListener.getInstance());
             if (TRACE_LISTENER_ENABLED) {
                 TransformerImpl transformer = (TransformerImpl) handler.getTransformer();
                 TraceManager traceManager = transformer.getTraceManager();

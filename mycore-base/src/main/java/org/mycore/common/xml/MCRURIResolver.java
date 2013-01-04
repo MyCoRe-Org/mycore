@@ -48,16 +48,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
-import javax.xml.bind.util.JAXBSource;
 import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.URIResolver;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -66,7 +63,6 @@ import org.jdom.Namespace;
 import org.jdom.input.DOMBuilder;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
-import org.jdom.transform.JDOMResult;
 import org.jdom.transform.JDOMSource;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
@@ -106,7 +102,6 @@ import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearchInputResolver;
 import org.mycore.services.fieldquery.data2fields.MCRXSLBuilder;
 import org.mycore.tools.MCRObjectFactory;
-import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -142,18 +137,6 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     final static String SESSION_OBJECT_NAME = "URI_RESOLVER_DEBUG";
 
     private MCRCache<String, byte[]> bytesCache;
-
-    private ThreadLocal<TransformerFactory> transformerFactories = new ThreadLocal<TransformerFactory>() {
-
-        /* (non-Javadoc)
-         * @see java.lang.ThreadLocal#initialValue()
-         */
-        @Override
-        protected TransformerFactory initialValue() {
-            return TransformerFactory.newInstance();
-        }
-
-    };
 
     /**
      * Creates a new MCRURIResolver
@@ -399,10 +382,12 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 LOGGER.debug(classResource + " not found");
                 return null;
             }
-
-            MCRUtils.copyStream(in, baos);
-            baos.close();
-            in.close();
+            try {
+                IOUtils.copy(in, baos);
+            } finally {
+                baos.close();
+                in.close();
+            }
             bytes = baos.toByteArray();
             bytesCache.put(classResource, bytes);
         }
@@ -427,51 +412,23 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
          * declare throw in method signature
          */
 
-        Source source = null;
+        Source source;
         try {
             source = resolve(uri, null);
+            if (source == null) {
+                throw new MCRException("Could not get JDOM Element from URI " + uri);
+            }
         } catch (TransformerException ex) {
             throw new MCRException("Error while resolving " + uri, ex);
         }
 
-        if (source == null)
-            throw new MCRException("Could not get JDOM Element from URI " + uri);
-
-        else
-            try {
-                if (source instanceof JDOMSource) {
-                    JDOMSource jdomSource = (JDOMSource) source;
-
-                    Document xml = jdomSource.getDocument();
-                    if (xml != null)
-                        return xml.getRootElement();
-
-                    for (Object node : jdomSource.getNodes()) {
-                        if (node instanceof Element)
-                            return (Element) node;
-                        else if (node instanceof Document)
-                            return ((Document) node).getRootElement();
-                    }
-                } else if (source instanceof DOMSource) {
-                    Node node = ((DOMSource) source).getNode();
-                    Document xml = new DOMBuilder().build((org.w3c.dom.Document) node);
-                    return xml.getRootElement();
-                } else if (source instanceof JAXBSource) {
-                    //JAXBSource is a SAXSource but XERCES does not handle JAXBSource and our URIs well
-                    JDOMResult result = new JDOMResult();
-                    Transformer transformer = transformerFactories.get().newTransformer();
-                    transformer.transform(source, result);
-                    return result.getDocument().getRootElement();
-                } else {
-                    InputSource iSrc = SAXSource.sourceToInputSource(source);
-                    Document xml = new SAXBuilder().build(iSrc);
-                    return xml.getRootElement();
-                }
-
-            } catch (Exception e) {
-                throw new MCRException("Error while resolving " + uri, e);
-            }
-        throw new MCRException("Nothing found resolving " + uri);
+        try {
+            MCRSourceContent content = new MCRSourceContent(source);
+            LOGGER.info("Wrapped " + content.getBaseContent().getClass().getCanonicalName() + ": " + content.getBaseContent().getSystemId());
+            return content.asXML().getRootElement();
+        } catch (Exception e) {
+            throw new MCRException("Error while resolving " + uri, e);
+        }
     }
 
     /**
@@ -1269,18 +1226,18 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 return new JDOMSource(new Element("null"));
             }
 
+            Map<String, String> params;
+            StringTokenizer tok = new StringTokenizer(stylesheets, "?");
+            stylesheets = tok.nextToken();
+
+            if (tok.hasMoreTokens()) {
+                params = getParameterMap(tok.nextToken());
+            } else {
+                params = Collections.emptyMap();
+            }
+            Source resolved = MCRURIResolver.instance().resolve(target, base);
+
             try {
-                Map<String, String> params;
-                StringTokenizer tok = new StringTokenizer(stylesheets, "?");
-                stylesheets = tok.nextToken();
-
-                if (tok.hasMoreTokens()) {
-                    params = getParameterMap(tok.nextToken());
-                } else {
-                    params = Collections.emptyMap();
-                }
-                Source resolved = MCRURIResolver.instance().resolve(target, base);
-
                 if (resolved != null) {
                     MCRSourceContent content = new MCRSourceContent(resolved);
                     MCRXSLTransformer transformer = getTransformer(stylesheets.split(","));
@@ -1292,10 +1249,15 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                     LOGGER.debug("MCRXslStyleResolver returning empty xml");
                     return new JDOMSource(new Element("null"));
                 }
-            } catch (Exception ex) {
-                LOGGER.info("MCRXslStyleResolver caught exception: " + ex.getLocalizedMessage(), ex);
-                LOGGER.debug("MCRXslStyleResolver returning empty xml");
-                return new JDOMSource(new Element("null"));
+            } catch (IOException e) {
+                Throwable cause = e.getCause();
+                while (cause != null) {
+                    if (cause instanceof TransformerException) {
+                        throw (TransformerException) cause;
+                    }
+                    cause = cause.getCause();
+                }
+                throw new TransformerException(e);
             }
         }
 

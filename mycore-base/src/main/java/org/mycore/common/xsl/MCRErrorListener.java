@@ -27,6 +27,7 @@ import javax.xml.transform.ErrorListener;
 import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
+import org.apache.xml.utils.WrappedRuntimeException;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -76,9 +77,12 @@ public class MCRErrorListener implements ErrorListener {
             if (cause instanceof TransformerException) {
                 return unwrapException((TransformerException) cause);
             }
-            cause = cause.getCause();
+            if (cause instanceof WrappedRuntimeException) {
+                cause = ((WrappedRuntimeException) cause).getException();
+            } else {
+                cause = cause.getCause();
+            }
         }
         return exception;
     }
-
 }

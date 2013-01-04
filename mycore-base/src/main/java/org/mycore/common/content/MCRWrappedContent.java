@@ -46,7 +46,7 @@ public abstract class MCRWrappedContent extends MCRContent {
 
     private MCRContent baseContent;
 
-    protected MCRContent getBaseContent() {
+    public MCRContent getBaseContent() {
         return baseContent;
     }
 
