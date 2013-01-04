@@ -1241,7 +1241,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 if (resolved != null) {
                     MCRSourceContent content = new MCRSourceContent(resolved);
                     MCRXSLTransformer transformer = getTransformer(stylesheets.split(","));
-                    MCRParameterCollector paramcollector = new MCRParameterCollector();
+                    MCRParameterCollector paramcollector = MCRParameterCollector.getInstanceFromUserSession();
                     paramcollector.setParameters(params);
                     MCRContent result = transformer.transform(content, paramcollector);
                     return result.getSource();

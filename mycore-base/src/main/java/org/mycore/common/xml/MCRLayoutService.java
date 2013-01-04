@@ -24,35 +24,22 @@ package org.mycore.common.xml;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.Hashtable;
-import java.util.Map;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.transform.JDOMResult;
-import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
-import org.mycore.common.xsl.MCRTemplatesSource;
-import org.mycore.common.xsl.MCRXSLTransformerFactory;
-import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * Does the layout for other MyCoRe servlets by transforming XML input to
@@ -165,43 +152,5 @@ public class MCRLayoutService extends MCRDeprecatedLayoutService {
         } finally {
             LOGGER.debug("MCRContent transformation took " + (System.currentTimeMillis() - start) + " ms.");
         }
-    }
-
-    public DOMSource doLayout(Document doc, String stylesheetName, Hashtable<String, String> params) throws Exception {
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        MCRServletJob job = (MCRServletJob) mcrSession.get("MCRServletJob");
-        Transformer transformer = MCRXSLTransformerFactory.getTransformer(new MCRTemplatesSource(stylesheetName));
-        MCRParameterCollector parameters = job == null ? new MCRParameterCollector() : new MCRParameterCollector(job.getRequest());
-        if (params != null)
-            for (Map.Entry<String, String> entry : params.entrySet()) {
-                parameters.setParameter(entry.getKey(), entry.getValue());
-            }
-
-        parameters.setParametersTo(transformer);
-        DOMResult out = new DOMResult();
-        //temporarily workaround as JDOMResult does not work with xsl:output
-        transformer.transform(new JDOMSource(doc), out);
-        return new DOMSource(out.getNode());
-    }
-
-    /**
-     * @param xml the document source to transform
-     * @param resourceName the name of the stylesheet to invoke (fullqualified name)
-     * 
-     * @return {@link JDOMResult} or null if either xml or resourceName parameter is null
-     * 
-     * @throws IOException
-     */
-    public JDOMResult doLayout(Source xml, String resourceName) throws IOException {
-        if (xml == null || resourceName == null) {
-            return null;
-        }
-        JDOMResult result = new JDOMResult();
-        try {
-            MCRXSLTransformerFactory.getTransformer(new MCRTemplatesSource(resourceName)).transform(xml, result);
-        } catch (TransformerException ex) {
-            LOGGER.error("Error while transforming XML using XSL stylesheet: " + ex.getMessageAndLocation(), ex);
-        }
-        return result;
     }
 }

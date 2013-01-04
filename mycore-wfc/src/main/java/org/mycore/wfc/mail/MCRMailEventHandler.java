@@ -23,8 +23,8 @@
 
 package org.mycore.wfc.mail;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRMailer;
@@ -50,11 +50,9 @@ public class MCRMailEventHandler extends MCREventHandlerBase {
 
     private static final Logger LOGGER = Logger.getLogger(MCRMailEventHandler.class);
 
-    private static final String CONFIG_PREFIX = "MCR.MCRMailEventHandler.";
-
     private void sendNotificationMail(MCREvent evt, MCRContent doc) throws Exception {
         LOGGER.info("Preparing mail for: " + doc.getSystemId());
-        Properties parameters = new Properties();
+        HashMap<String, String> parameters = new HashMap<String, String>();
         for (Map.Entry<String, Object> entry : evt.entrySet()) {
             parameters.put(entry.getKey(), entry.getValue().toString());
         }

@@ -36,6 +36,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * Collects parameters used in XSL transformations, by copying them from
@@ -273,5 +274,14 @@ public class MCRParameterCollector {
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
             transformer.setParameter(entry.getKey(), entry.getValue());
         }
+    }
+
+    /**
+     * @return
+     */
+    public static MCRParameterCollector getInstanceFromUserSession() {
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        MCRServletJob job = (MCRServletJob) mcrSession.get("MCRServletJob");
+        return job == null ? new MCRParameterCollector() : new MCRParameterCollector(job.getRequest());
     }
 }

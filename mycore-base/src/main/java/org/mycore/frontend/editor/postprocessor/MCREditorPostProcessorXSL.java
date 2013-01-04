@@ -23,14 +23,12 @@
 
 package org.mycore.frontend.editor.postprocessor;
 
-import java.util.Hashtable;
-
-import javax.xml.transform.dom.DOMSource;
-
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.input.DOMBuilder;
-import org.mycore.common.xml.MCRLayoutService;
+import org.mycore.common.MCRCache;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -39,13 +37,24 @@ public class MCREditorPostProcessorXSL implements MCREditorPostProcessor {
 
     private String stylesheet;
 
+    private MCRXSL2XMLTransformer transformer;
+
+    private static MCRCache<String, MCRXSL2XMLTransformer> TRANSFORMER_CACHE = new MCRCache<String, MCRXSL2XMLTransformer>(100,
+        "MCREditorPostProcessorXSL transformer cache");
+
     public void init(Element configuration) {
         this.stylesheet = configuration.getAttributeValue("stylesheet");
+        transformer = TRANSFORMER_CACHE.get(stylesheet);
+        if (transformer == null) {
+            transformer = new MCRXSL2XMLTransformer();
+            transformer.setStylesheets("xsl/" + stylesheet);
+            TRANSFORMER_CACHE.put(stylesheet, transformer);
+        }
     }
 
     public Document process(Document input) throws Exception {
-        Hashtable<String, String> parameters = new Hashtable<String, String>();
-        DOMSource src = MCRLayoutService.instance().doLayout(input, "xsl/" + stylesheet, parameters);
-        return new DOMBuilder().build((org.w3c.dom.Document) (src.getNode()));
+        MCRJDOMContent source = new MCRJDOMContent(input);
+        MCRContent result = transformer.transform(source);
+        return result.asXML();
     }
 }
