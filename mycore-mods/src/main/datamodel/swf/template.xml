@@ -8,9 +8,9 @@
     <div class="borderbox">
       <editor id="author-file">
         <source uri="xslStyle:mods2editor:{sourceURI}" />
-        <source uri="xslStyle:mods2editor:xslStyle:asParent:mcrobject:{parentId}" />
-        <source uri="xslStyle:mods2editor:xslStyle:mycoreobject-editor:mcrobject:{id}" />
-        <source uri="xslStyle:mods2editor:xslStyle:mycoreobject-editor:xslStyle:RDF-mods-journal:http://ld.zdb-services.de/data/{zdbid}.rdf" />
+        <source uri="xslStyle:asParent,mods2editor:mcrobject:{parentId}" />
+        <source uri="xslStyle:mycoreobject-editor,mods2editor:mcrobject:{id}" />
+        <source uri="xslStyle:RDF-mods-journal,mycoreobject-editor,mods2editor:http://ld.zdb-services.de/data/{zdbid}.rdf" />
         <cancel url="servlets/MCRLockServlet?action=unlock&amp;id={id}&amp;url=/receive/{id}" />
         <cancel url="{cancelUrl}" />
         <postprocessor class="org.mycore.frontend.editor.postprocessor.MCREditorPostProcessorXSL" stylesheet="editor2mods.xsl" />
