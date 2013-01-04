@@ -67,9 +67,6 @@ import org.mycore.frontend.servlets.MCRServletJob;
  */
 public class MCRMailer extends MCRServlet {
 
-    private static MCRCache<String, MCRXSL2XMLTransformer> TRANSFORMER_CACHE = new MCRCache<String, MCRXSL2XMLTransformer>(100,
-        "MCREditorPostProcessorXSL transformer cache");
-
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
         String goTo = job.getRequest().getParameter("goto");
@@ -286,8 +283,8 @@ public class MCRMailer extends MCRServlet {
      *            a List of URL strings which should be added as parts, may be
      *            null
      */
-    public static void send(final String from, final List<String> replyTo, final List<String> to, final List<String> bcc, final String subject,
-        final String body, final List<String> parts) {
+    public static void send(final String from, final List<String> replyTo, final List<String> to, final List<String> bcc,
+            final String subject, final String body, final List<String> parts) {
         if (to == null || to.size() == 0) {
             StringBuilder sb = new StringBuilder("No receiver defined for mail\n");
             sb.append("Subject: ").append(subject).append('\n');
@@ -329,8 +326,8 @@ public class MCRMailer extends MCRServlet {
         }
     }
 
-    private static void trySending(String from, List<String> replyTo, List<String> to, List<String> bcc, String subject, String body, List<String> parts)
-        throws Exception {
+    private static void trySending(String from, List<String> replyTo, List<String> to, List<String> bcc, String subject, String body,
+            List<String> parts) throws Exception {
         MimeMessage msg = new MimeMessage(mailSession);
         msg.setFrom(buildAddress(from));
 
@@ -456,7 +453,7 @@ public class MCRMailer extends MCRServlet {
      * @see org.mycore.common.MCRMailer
      */
     public static Element sendMail(Document input, String stylesheet) throws Exception {
-        return sendMail(input, stylesheet, Collections.<String, String>emptyMap());
+        return sendMail(input, stylesheet, Collections.<String, String> emptyMap());
     }
 
     /** 
@@ -469,12 +466,7 @@ public class MCRMailer extends MCRServlet {
      */
     private static Document transform(Document input, String stylesheet, Map<String, String> parameters) throws Exception {
         MCRJDOMContent source = new MCRJDOMContent(input);
-        MCRXSL2XMLTransformer transformer = TRANSFORMER_CACHE.get(stylesheet);
-        if (transformer != null) {
-            transformer = new MCRXSL2XMLTransformer();
-            transformer.setStylesheets("xsl/" + stylesheet + ".xsl");
-            TRANSFORMER_CACHE.put(stylesheet, transformer);
-        }
+        MCRXSL2XMLTransformer transformer = MCRXSL2XMLTransformer.getInstance("xsl/" + stylesheet + ".xsl");
         MCRParameterCollector parameterCollector = MCRParameterCollector.getInstanceFromUserSession();
         MCRContent result = transformer.transform(source, parameterCollector);
         return result.asXML();

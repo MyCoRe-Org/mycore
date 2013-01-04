@@ -36,6 +36,7 @@ import org.jdom.Document;
 import org.jdom.JDOMFactory;
 import org.jdom.Text;
 import org.jdom.transform.JDOMResult;
+import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -56,8 +57,26 @@ import org.xml.sax.XMLReader;
  */
 public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
 
+    private static MCRCache<String, MCRXSL2XMLTransformer> INSTANCE_CACHE = new MCRCache<String, MCRXSL2XMLTransformer>(100,
+            "MCRXSLTransformer instance cache");
+
+    public MCRXSL2XMLTransformer(String... stylesheets) {
+        super(stylesheets);
+    }
+
+    public static MCRXSL2XMLTransformer getInstance(String... stylesheets) {
+        String key = stylesheets.length == 1 ? stylesheets[0] : Arrays.toString(stylesheets);
+        MCRXSL2XMLTransformer instance = INSTANCE_CACHE.get(key);
+        if (instance == null) {
+            instance = new MCRXSL2XMLTransformer(stylesheets);
+            INSTANCE_CACHE.put(key, instance);
+        }
+        return instance;
+    }
+
     @Override
-    protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler) throws IOException, SAXException {
+    protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler) throws IOException,
+            SAXException {
         JDOMResult result = new JDOMResult();
         transformerHandler.setResult(result);
         // Parse the source XML, and send the parse events to the
@@ -65,8 +84,8 @@ public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
         reader.parse(source.getInputSource());
         Document resultDoc = getDocument(result);
         if (resultDoc == null) {
-            throw new MCRConfigurationException("Stylesheets " + Arrays.asList(templateSources).toString() + " does not return any content for "
-                + source.getSystemId());
+            throw new MCRConfigurationException("Stylesheets " + Arrays.asList(templateSources).toString()
+                    + " does not return any content for " + source.getSystemId());
         }
         return new MCRJDOMContent(resultDoc);
     }

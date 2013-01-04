@@ -26,6 +26,7 @@ package org.mycore.common.content.transformer;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Properties;
 import java.util.TooManyListenersException;
@@ -43,6 +44,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.log4j.Logger;
 import org.apache.xalan.trace.TraceManager;
 import org.apache.xalan.transformer.TransformerImpl;
+import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -75,6 +77,9 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     private static boolean TRACE_LISTENER_ENABLED = Logger.getLogger(MCRTraceListener.class).isDebugEnabled();
 
+    private static MCRCache<String, MCRXSLTransformer> INSTANCE_CACHE = new MCRCache<String, MCRXSLTransformer>(100,
+            "MCRXSLTransformer instance cache");
+
     /** The compiled XSL stylesheet */
     protected MCRTemplatesSource[] templateSources;
 
@@ -98,8 +103,19 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         if (transformerFactory.getFeature(SAXSource.FEATURE) && transformerFactory.getFeature(SAXResult.FEATURE)) {
             this.tFactory = (SAXTransformerFactory) transformerFactory;
         } else {
-            throw new MCRConfigurationException("Transformer Factory " + transformerFactory.getClass().getName() + " does not implement SAXTransformerFactory");
+            throw new MCRConfigurationException("Transformer Factory " + transformerFactory.getClass().getName()
+                    + " does not implement SAXTransformerFactory");
         }
+    }
+
+    public static MCRXSLTransformer getInstance(String... stylesheets) {
+        String key = stylesheets.length == 1 ? stylesheets[0] : Arrays.toString(stylesheets);
+        MCRXSLTransformer instance = INSTANCE_CACHE.get(key);
+        if (instance == null) {
+            instance = new MCRXSLTransformer(stylesheets);
+            INSTANCE_CACHE.put(key, instance);
+        }
+        return instance;
     }
 
     @Override
@@ -185,7 +201,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         }
     }
 
-    protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler) throws IOException, SAXException {
+    protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler) throws IOException,
+            SAXException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         StreamResult serializer = new StreamResult(baos);
         transformerHandler.setResult(serializer);
@@ -195,8 +212,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         return new MCRByteContent(baos.toByteArray());
     }
 
-    private LinkedList<TransformerHandler> getTransformHandlerList(MCRParameterCollector parameterCollector) throws TransformerConfigurationException,
-        SAXException {
+    private LinkedList<TransformerHandler> getTransformHandlerList(MCRParameterCollector parameterCollector)
+            throws TransformerConfigurationException, SAXException {
         checkTemplateUptodate();
         LinkedList<TransformerHandler> xslSteps = new LinkedList<TransformerHandler>();
         for (Templates template : templates) {

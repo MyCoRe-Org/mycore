@@ -25,7 +25,6 @@ package org.mycore.frontend.editor.postprocessor;
 
 import org.jdom.Document;
 import org.jdom.Element;
-import org.mycore.common.MCRCache;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
@@ -39,17 +38,9 @@ public class MCREditorPostProcessorXSL implements MCREditorPostProcessor {
 
     private MCRXSL2XMLTransformer transformer;
 
-    private static MCRCache<String, MCRXSL2XMLTransformer> TRANSFORMER_CACHE = new MCRCache<String, MCRXSL2XMLTransformer>(100,
-        "MCREditorPostProcessorXSL transformer cache");
-
     public void init(Element configuration) {
         this.stylesheet = configuration.getAttributeValue("stylesheet");
-        transformer = TRANSFORMER_CACHE.get(stylesheet);
-        if (transformer == null) {
-            transformer = new MCRXSL2XMLTransformer();
-            transformer.setStylesheets("xsl/" + stylesheet);
-            TRANSFORMER_CACHE.put(stylesheet, transformer);
-        }
+        transformer = MCRXSL2XMLTransformer.getInstance("xsl/" + stylesheet);
     }
 
     public Document process(Document input) throws Exception {
