@@ -24,6 +24,7 @@
 package org.mycore.common.xsl;
 
 import javax.xml.transform.ErrorListener;
+import javax.xml.transform.SourceLocator;
 import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
@@ -48,7 +49,13 @@ public class MCRErrorListener implements ErrorListener {
     @Override
     public void warning(TransformerException exception) throws TransformerException {
         exception = unwrapException(exception);
-        LOGGER.warn("Exception while XSL transformation.", exception);
+        StackTraceElement[] stackTrace = exception.getStackTrace();
+        if (stackTrace.length > 0 && stackTrace[0].getMethodName().equals("message")) {
+            //org.apache.xalan.transformer.MsgMgr.message to print a message
+            LOGGER.info(getMyMessageAndLocation(exception));
+        } else {
+            LOGGER.warn("Exception while XSL transformation.", exception);
+        }
     }
 
     /* (non-Javadoc)
@@ -84,5 +91,32 @@ public class MCRErrorListener implements ErrorListener {
             }
         }
         return exception;
+    }
+
+    private String getMyMessageAndLocation(TransformerException exception) {
+        SourceLocator locator = exception.getLocator();
+        StringBuilder msg = new StringBuilder();
+        if (locator != null) {
+            String systemID = locator.getSystemId();
+            int line = locator.getLineNumber();
+            int col = locator.getColumnNumber();
+            if (systemID != null) {
+                msg.append("SystemID: ");
+                msg.append(systemID);
+            }
+            if (line != 0) {
+                msg.append(" [");
+                msg.append(line);
+                if (col != 0) {
+                    msg.append(',');
+                    msg.append(col);
+                }
+                msg.append("]");
+            }
+        }
+        msg.append(": ");
+        msg.append(exception.getMessage());
+        String message=msg.toString();
+        return message;
     }
 }
