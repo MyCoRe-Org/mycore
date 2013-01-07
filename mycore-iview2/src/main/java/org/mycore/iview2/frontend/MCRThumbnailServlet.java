@@ -106,7 +106,7 @@ public class MCRThumbnailServlet extends MCRServlet {
             LOGGER.info("IView2 file: " + iviewFile.getAbsolutePath());
             if (!iviewFile.exists()) {
                 job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND,
-                    MessageFormat.format("Could not find iview2 file for {0}/{1}", derivate, imagePath));
+                    MessageFormat.format("Could not find iview2 file for {0}{1}", derivate, imagePath));
                 return;
             }
             BufferedImage thumbnail = getThumbnail(iviewFile);
