@@ -4,12 +4,16 @@
 <hibernate-mapping package="org.mycore.datamodel.classifications2.impl">
   <class name="MCRCategoryImpl" table="MCRCategory">
     <cache usage="nonstrict-read-write" />
-    <id name="internalID" access="field">
-      <generator class="native" />
+
+    <id name="internalID" type="integer" access="field">
+      <generator class="sequence">
+        <param name="sequence">category</param>
+      </generator>
     </id>
+
     <natural-id>
-        <property name="rootID" type="string" column="ClassID" length="32" />
-        <property name="categID" type="string" column="CategID" length="128" not-null="false" />
+      <property name="rootID" type="string" column="ClassID" length="32" />
+      <property name="categID" type="string" column="CategID" length="128" not-null="false" />
     </natural-id>
     <property name="URI" length="254" not-null="false" type="org.mycore.datamodel.classifications2.impl.MCRURIType" />
     <set name="labels" cascade="all" table="MCRCategoryLabels" fetch="join" lazy="false">
