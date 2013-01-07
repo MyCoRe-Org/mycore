@@ -416,7 +416,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         try {
             source = resolve(uri, null);
             if (source == null) {
-                throw new MCRException("Could not get JDOM Element from URI " + uri);
+                return null;
             }
         } catch (TransformerException ex) {
             throw new MCRException("Error while resolving " + uri, ex);
