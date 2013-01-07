@@ -245,6 +245,15 @@ public abstract class MCRContent {
     }
 
     /**
+     * Overwrites DocType detection.
+     * @see MCRContent#getDocType();
+     * @param docType
+     */
+    public void setDocType(String docType) {
+        this.docType = docType;
+    }
+
+    /**
      * If true, content can be read more than once by calling getInputStream() and
      * similar methods. If false, content may be consumed when it is read more than once.
      * Most subclasses provide reusable content.  

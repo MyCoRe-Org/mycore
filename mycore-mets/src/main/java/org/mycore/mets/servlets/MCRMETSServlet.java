@@ -37,7 +37,6 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
@@ -82,7 +81,8 @@ public class MCRMETSServlet extends MCRServlet {
 
         writeCacheHeaders(response, CACHE_TIME, lastModified, useExpire);
         long start = System.currentTimeMillis();
-        MCRLayoutService.instance().doLayout(request, response, MCRMETSServlet.getMetsSource(job, useExistingMets(request), derivate));
+        MCRContent metsContent = getMetsSource(job, useExistingMets(request), derivate);
+        MCRLayoutService.instance().doLayout(request, response, metsContent);
         LOGGER.info("Generation of code by " + this.getClass().getSimpleName() + " took " + (System.currentTimeMillis() - start) + " ms");
     }
 
@@ -107,7 +107,9 @@ public class MCRMETSServlet extends MCRServlet {
         }
 
         if (metsFile != null && useExistingMets) {
-            return new MCRStreamContent(((MCRFile) metsFile).getContentAsInputStream());
+            MCRContent content = ((MCRFile) metsFile).getContent();
+            content.setDocType("mets");
+            return content;
         } else {
             HashSet<MCRFilesystemNode> ignoreNodes = new HashSet<MCRFilesystemNode>();
             if (metsFile != null)
