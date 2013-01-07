@@ -4,14 +4,17 @@
 <hibernate-mapping package="org.mycore.datamodel.classifications2.impl">
   <class name="MCRCategoryLink">
     <cache usage="nonstrict-read-write" />
+
     <id name="id" access="field">
-      <generator class="native" />
+      <generator class="sequence">
+        <param name="sequence">categorylink</param>
+      </generator>
     </id>
+
     <natural-id mutable="true">
-      <many-to-one name="category" class="MCRCategoryImpl"
-        cascade="none" />
+      <many-to-one name="category" class="MCRCategoryImpl" cascade="none" />
       <component name="objectReference" class="org.mycore.datamodel.classifications2.MCRCategLinkReference" access="field">
-        <property name="objectID"/>
+        <property name="objectID" />
         <property name="type" column="objectType" length="70" />
       </component>
     </natural-id>
