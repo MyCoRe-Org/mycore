@@ -33,10 +33,12 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -44,6 +46,7 @@ import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRFileContent;
+import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.xml.sax.SAXParseException;
@@ -166,20 +169,14 @@ public class MCRRealmFactory {
         MCRRealmFactory.realmsList = realmsList;
     }
 
-    private static Document getRealms() throws SAXParseException, IOException {
+    private static Document getRealms() throws JDOMException, TransformerException, SAXParseException, IOException {
         if (realmsFile == null) {
-            return MCRURIResolver.instance().resolve(realmsURI.toString()).getDocument();
+            return MCRSourceContent.getInstance(realmsURI.toASCIIString()).asXML();
         }
         if (!realmsFile.exists()) {
             LOGGER.info("Creating " + realmsFile.getAbsolutePath() + "...");
-            Element root = MCRURIResolver.instance().resolve(RESOURCE_REALMS_URI);
-            FileOutputStream fout = new FileOutputStream(realmsFile);
-            try {
-                XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-                xout.output(root.getDocument(), fout);
-            } finally {
-                fout.close();
-            }
+            MCRSourceContent realmsContent = MCRSourceContent.getInstance(RESOURCE_REALMS_URI);
+            realmsContent.sendTo(realmsFile);
         }
         updateLastModified();
         return MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(realmsFile));

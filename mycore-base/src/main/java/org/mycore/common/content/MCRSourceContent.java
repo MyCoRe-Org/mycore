@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
@@ -34,6 +35,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.transform.JDOMSource;
+import org.mycore.common.xml.MCRURIResolver;
 import org.w3c.dom.Node;
 
 /**
@@ -41,6 +43,7 @@ import org.w3c.dom.Node;
  *
  */
 public class MCRSourceContent extends MCRWrappedContent {
+    private static final MCRURIResolver URI_RESOLVER = MCRURIResolver.instance();
     private Source source;
 
     public MCRSourceContent(Source source) {
@@ -86,6 +89,16 @@ public class MCRSourceContent extends MCRWrappedContent {
             baseContent.setSystemId(getSystemId());
         }
         this.setBaseContent(baseContent);
+    }
+    
+    /**
+     * Build instance of MCRSourceContent by resolving via {@link MCRURIResolver}
+     * @param uri
+     * @throws TransformerException thrown by {@link MCRURIResolver#resolve(String, String)}
+     */
+    public static MCRSourceContent getInstance(String uri) throws TransformerException{
+        Source source = URI_RESOLVER.resolve(uri, null);
+        return new MCRSourceContent(source);
     }
 
     @Override
