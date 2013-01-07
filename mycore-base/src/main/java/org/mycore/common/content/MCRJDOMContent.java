@@ -78,6 +78,6 @@ public class MCRJDOMContent extends MCRXMLContent {
 
     @Override
     public Document asXML() {
-        return (Document) (jdom.clone());
+        return jdom;
     }
 }

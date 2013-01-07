@@ -49,6 +49,7 @@ import java.util.regex.Pattern;
 import javax.servlet.ServletContext;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
@@ -120,7 +121,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @author Frank L\u00FCtzenkirchen
  * @author Thomas Scheffler (yagee)
  */
-public final class MCRURIResolver implements javax.xml.transform.URIResolver, EntityResolver2 {
+public final class MCRURIResolver implements URIResolver, EntityResolver2 {
     private static final Logger LOGGER = Logger.getLogger(MCRURIResolver.class);
 
     private static Map<String, URIResolver> SUPPORTED_SCHEMES;
@@ -293,6 +294,10 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             return uriResolver.resolve(href, base);
         } else { // try to handle as URL, use default resolver for file:// and
             // http://
+            if (href.endsWith("/") && href.startsWith("file:")) {
+                //cannot stream directories
+                return null;
+            }
             StreamSource streamSource = new StreamSource();
             streamSource.setSystemId(href);
             return streamSource;
@@ -336,8 +341,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     @Override
     public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId) throws SAXException, IOException {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(MessageFormat.format("Resolving: \nname: {0}\npublicId: {1}\nbaseURI: {2}\nsystemId: {3}", name, publicId,
-                    baseURI, systemId));
+            LOGGER.debug(MessageFormat.format("Resolving: \nname: {0}\npublicId: {1}\nbaseURI: {2}\nsystemId: {3}", name, publicId, baseURI, systemId));
         }
         if (systemId == null) {
             return null; // Use default resolver
@@ -425,7 +429,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         try {
             MCRSourceContent content = new MCRSourceContent(source);
             LOGGER.info("Wrapped " + content.getBaseContent().getClass().getCanonicalName() + ": " + content.getBaseContent().getSystemId());
-            return content.asXML().getRootElement();
+            return (Element) content.asXML().getRootElement().detach();
         } catch (Exception e) {
             throw new MCRException("Error while resolving " + uri, e);
         }
@@ -749,10 +753,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                     InputSource input = new InputSource(resource.toString());
                     return new SAXSource(reader, input);
                 }
-                StreamSource streamSource = new StreamSource();
-                // setting systemID here is crucial for good XSL error messages
-                streamSource.setSystemId(resource.toString());
-                return streamSource;
+                return MCRURIResolver.instance().resolve(resource.toString(), base);
             }
             return null;
         }
@@ -918,7 +919,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         private static final String SORT_CONFIG_PREFIX = CONFIG_PREFIX + "Classification.Sort.";
 
         private static MCRCache<String, Element> categoryCache = new MCRCache<String, Element>(MCRConfiguration.instance().getInt(
-                CONFIG_PREFIX + "Classification.CacheSize", 1000), "URIResolver categories");
+            CONFIG_PREFIX + "Classification.CacheSize", 1000), "URIResolver categories");
 
         private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
@@ -1005,8 +1006,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             } else if (axis.equals("parents")) {
                 if (categ.length() == 0) {
                     LOGGER.error("Cannot resolve parent axis without a CategID. URI: " + uri);
-                    throw new IllegalArgumentException(
-                            "Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: " + uri);
+                    throw new IllegalArgumentException("Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: " + uri);
                 }
                 cl = DAO.getRootCategory(new MCRCategoryID(classID, categ), levels);
             }

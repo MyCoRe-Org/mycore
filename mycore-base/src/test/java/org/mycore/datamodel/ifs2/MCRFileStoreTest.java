@@ -215,16 +215,16 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
     @Test
     public void repairMetadata() throws Exception {
         MCRFileCollection col = getStore().create();
-        Document xml1 = new MCRJDOMContent(col.getMetadata()).asXML();
+        Document xml1 = (Document) col.getMetadata().clone();
         col.repairMetadata();
-        Document xml2 = new MCRJDOMContent(col.getMetadata()).asXML();
+        Document xml2 = (Document) col.getMetadata().clone();
         assertTrue(equals(xml1, xml2));
 
         MCRDirectory dir = col.createDir("foo");
-        xml1 = new MCRJDOMContent(col.getMetadata()).asXML();
+        xml1 = (Document) col.getMetadata().clone();
         assertFalse(equals(xml1, xml2));
         dir.delete();
-        xml1 = new MCRJDOMContent(col.getMetadata()).asXML();
+        xml1 = (Document) col.getMetadata().clone();
         assertTrue(equals(xml1, xml2));
 
         MCRDirectory dir2 = col.createDir("dir");
@@ -235,18 +235,18 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         MCRFile file3 = col.createFile("test2.txt");
         file3.setContent(new MCRStringContent("Test 2"));
         file3.setLabel("de", "Die Testdatei");
-        xml2 = new MCRJDOMContent(col.getMetadata()).asXML();
+        xml2 = (Document) col.getMetadata().clone();
 
         col.repairMetadata();
-        xml1 = new MCRJDOMContent(col.getMetadata()).asXML();
+        xml1 = (Document) col.getMetadata().clone();
         assertTrue(equals(xml1, xml2));
 
         file3.clearLabels();
-        xml2 = new MCRJDOMContent(col.getMetadata()).asXML();
+        xml2 = (Document) col.getMetadata().clone();
 
         col.fo.getChild("mcrdata.xml").delete();
         col = getStore().retrieve(col.getID());
-        xml1 = new MCRJDOMContent(col.getMetadata()).asXML();
+        xml1 = (Document) col.getMetadata().clone();
         assertTrue(equals(xml1, xml2));
 
         col.fo.getChild("test1.txt").delete();
