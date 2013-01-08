@@ -5,11 +5,12 @@
   <typedef name="MCRJobStatus" class="org.mycore.backend.hibernate.MCRGenericEnumUserType">
     <param name="enumClass">org.mycore.services.queuedjob.MCRJobStatus</param>
   </typedef>
-  
+
   <class name="MCRJob">
     <id name="id">
-      <generator class="native" />
+      <generator class="identity" />
     </id>
+
     <property name="action" type="MCRJobAction" />
     <property name="status" type="MCRJobStatus" />
     <property name="added" type="java.util.Date" />
@@ -22,3 +23,4 @@
     </map>
   </class>
 </hibernate-mapping>
+
