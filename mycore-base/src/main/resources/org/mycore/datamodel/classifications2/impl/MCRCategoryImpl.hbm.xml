@@ -6,9 +6,7 @@
     <cache usage="nonstrict-read-write" />
 
     <id name="internalID" type="integer" access="field">
-      <generator class="sequence">
-        <param name="sequence">category</param>
-      </generator>
+      <generator class="identity" />
     </id>
 
     <natural-id>

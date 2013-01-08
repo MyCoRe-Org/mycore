@@ -3,10 +3,8 @@
 <hibernate-mapping package="org.mycore.iview2.services">
   <class name="MCRTileJob">
 
-    <id name="id" type="long" unsaved-value="null">
-      <generator class="sequence">
-        <param name="sequence">tilejob</param>
-      </generator>
+    <id name="id" type="long">
+      <generator class="identity" />
     </id>
 
     <natural-id>

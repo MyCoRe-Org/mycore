@@ -6,9 +6,7 @@
     <cache usage="nonstrict-read-write" />
 
     <id name="id" access="field">
-      <generator class="sequence">
-        <param name="sequence">categorylink</param>
-      </generator>
+      <generator class="identity" />
     </id>
 
     <natural-id mutable="true">
