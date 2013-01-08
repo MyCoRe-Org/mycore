@@ -29,10 +29,15 @@ import org.mycore.solr.utils.MCRSolrUtils;
 public class MCRSolrSelectProxyServlet extends MCRServlet {
 
     private static final Logger LOGGER = Logger.getLogger(MCRSolrSelectProxyServlet.class);
+
     private static final long serialVersionUID = 1L;
+
     private static final String SOLR_QUERY_VERSION = MCRSolrUtils.getSolrPropertyValue("SelectProxy.Version", "3.6");
+
     private static final String SOLR_SELECT_PATH = "select/";
+
     private HttpClient httpClient;
+
     private MultiThreadedHttpConnectionManager connectionManager;
 
     @Override
@@ -56,8 +61,7 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
             }
 
             if (statusCode == HttpStatus.SC_OK) {
-                MCRStreamContent solrResponse = new MCRStreamContent(solrResponseStream, solrHttpMethod.getURI()
-                        .toString(), "response");
+                MCRStreamContent solrResponse = new MCRStreamContent(solrResponseStream, solrHttpMethod.getURI().toString(), "response");
                 MCRLayoutService.instance().doLayout(job.getRequest(), resp, solrResponse);
                 return;
             }
@@ -101,16 +105,17 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
     public static HttpMethod getSolrHttpMethod(Map<String, String[]> parameterMap) {
         String solrServerUrl = MCRSolrUtils.getSolrPropertyValue("ServerURL");
         if (solrServerUrl == null) {
-            throw new MCRException(MessageFormat.format("Property \"{0}ServerURL\" is undefined.",
-                    MCRSolrUtils.CONFIG_PREFIX));
+            throw new MCRException(MessageFormat.format("Property \"{0}ServerURL\" is undefined.", MCRSolrUtils.CONFIG_PREFIX));
+        }
+        if (!solrServerUrl.endsWith("/")) {
+            solrServerUrl += '/';
         }
 
         String queryString = getQueryString(parameterMap);
         if (!parameterMap.containsKey("version")) {
             queryString += "&version=" + SOLR_QUERY_VERSION;
         }
-        GetMethod getMethod = new GetMethod(MessageFormat.format("{0}{1}?{2}", solrServerUrl, SOLR_SELECT_PATH,
-                queryString));
+        GetMethod getMethod = new GetMethod(MessageFormat.format("{0}{1}?{2}", solrServerUrl, SOLR_SELECT_PATH, queryString));
 
         return getMethod;
     }
