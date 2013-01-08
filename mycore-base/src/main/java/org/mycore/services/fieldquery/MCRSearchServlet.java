@@ -77,7 +77,7 @@ public class MCRSearchServlet extends MCRServlet {
 
     /** Default search field */
     private String defaultSearchField;
-    
+
     /** Maximum number of hits to display per page (numPerPage) */
     private int maxPerPage;
 
@@ -166,7 +166,7 @@ public class MCRSearchServlet extends MCRServlet {
                 }
             }
         }
-        
+
         if (condition.getChildren().isEmpty()) {
             throw new MCRUsageException("Missing query condition");
         }
@@ -338,6 +338,10 @@ public class MCRSearchServlet extends MCRServlet {
             return;
         }
 
+        showResults(request, response, qd);
+    }
+
+    private void showResults(HttpServletRequest request, HttpServletResponse response, MCRCachedQueryData qd) throws IOException {
         MCRResults results = qd.getResults();
 
         // Number of hits per page
@@ -417,7 +421,7 @@ public class MCRSearchServlet extends MCRServlet {
 
         return npp;
     }
-    
+
     /**
      * Executes a query that comes from editor search mask, and redirects the
      * browser to the first results page
@@ -427,6 +431,7 @@ public class MCRSearchServlet extends MCRServlet {
         MCREditorSubmission sub = (MCREditorSubmission) request.getAttribute("MCREditorSubmission");
         String searchString = getReqParameter(request, "search", null);
         String queryString = getReqParameter(request, "query", null);
+        boolean doNotRedirect = "false".equals(getReqParameter(request, "redirect", null));
 
         Document input;
         MCRQuery query;
@@ -451,9 +456,12 @@ public class MCRSearchServlet extends MCRServlet {
             XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
             LOGGER.debug(out.outputString(input));
         }
-
         MCRCachedQueryData qd = MCRCachedQueryData.cache(query, input);
-        sendRedirect(request, response, qd, input);
+        if (doNotRedirect) {
+            showResults(request, response, qd);
+        } else {
+            sendRedirect(request, response, qd, input);
+        }
     }
 
     /**      
