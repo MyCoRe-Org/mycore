@@ -131,7 +131,7 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
         } catch (UnsupportedEncodingException e) {
             throw new MCRException(e);
         }
-        if (sb.length() >= 0) {
+        if (sb.length() != 0) {
             sb.deleteCharAt(0);// removes first "&"
         }
         return sb.toString();
