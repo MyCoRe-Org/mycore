@@ -590,7 +590,7 @@ public class MCRPersistentServlet extends MCRServlet {
         }
 
         // restart editor
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(root.getDocument()));
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(root));
     }
 
     /**
