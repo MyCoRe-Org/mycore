@@ -40,8 +40,7 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
  * 
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date: 2010-12-29 09:18:22 +0100 (Wed, 29 Dec
- *          2010) $
+ * @version $Revision$ $Date$
  */
 public final class MCRObjectID {
     /**
@@ -53,16 +52,12 @@ public final class MCRObjectID {
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     // counter for the next IDs per project base ID
-    private static HashMap<String, Integer> lastnumber = new HashMap<String, Integer>();
+    private static HashMap<String, Integer> lastNumber = new HashMap<String, Integer>();
 
     // data of the ID
-    private String mcr_project_id = null;
+    private String projectId, objectType, combinedId;
 
-    private String mcr_type_id = null;
-
-    private String mcr_id = null;
-
-    private int mcr_number = -1;
+    private int numberPart;
 
     private static final MCRObjectIDFormat idFormat = new MCRObjectIDDefaultFormat();
 
@@ -106,9 +101,8 @@ public final class MCRObjectID {
      * 
      * @exception MCRException
      *                if the given string is not valid.
-     * @deprecated use {@link #getInstance(String)} instead
      */
-    public MCRObjectID(String id) throws MCRException {
+    MCRObjectID(String id) throws MCRException {
         if (!setID(id)) {
             throw new MCRException("The ID is not valid: " + id + " , it should match the pattern String_String_Integer");
         }
@@ -171,7 +165,7 @@ public final class MCRObjectID {
         if (rest != 0)
             next += numberDistance - rest;
 
-        lastnumber.put(base_id, next);
+        lastNumber.put(base_id, next);
         String[] idParts = getIDParts(base_id);
         return getInstance(formatID(idParts[0], idParts[1], next));
     }
@@ -182,7 +176,7 @@ public final class MCRObjectID {
      * store.
      */
     private static int getLastIDNumber(String base_id) {
-        int lastIDKnown = lastnumber.containsKey(base_id) ? lastnumber.get(base_id) : 0;
+        int lastIDKnown = lastNumber.containsKey(base_id) ? lastNumber.get(base_id) : 0;
 
         String[] idParts = getIDParts(base_id);
         int highestStoredID = MCRXMLMetadataManager.instance().getHighestStoredID(idParts[0], idParts[1]);
@@ -217,10 +211,6 @@ public final class MCRObjectID {
         return MCRObjectIDPool.getMCRObjectID(id);
     }
 
-    public static void main(String[] a) {
-        MCRObjectID.getInstance("Bluadash");
-    }
-
     /**
      * This method get the string with <em>project_id</em>. If the ID is not
      * valid, an empty string was returned.
@@ -228,7 +218,7 @@ public final class MCRObjectID {
      * @return the string of the project id
      */
     public final String getProjectId() {
-        return mcr_project_id;
+        return projectId;
     }
 
     /**
@@ -238,7 +228,7 @@ public final class MCRObjectID {
      * @return the string of the type id
      */
     public final String getTypeId() {
-        return mcr_type_id;
+        return objectType;
     }
 
     /**
@@ -248,7 +238,7 @@ public final class MCRObjectID {
      * @return the string of the number
      */
     public final String getNumberAsString() {
-        return idFormat.numberFormat().format(mcr_number);
+        return idFormat.numberFormat().format(numberPart);
     }
 
     /**
@@ -258,7 +248,7 @@ public final class MCRObjectID {
      * @return the number as integer
      */
     public final int getNumberAsInteger() {
-        return mcr_number;
+        return numberPart;
     }
 
     /**
@@ -269,7 +259,7 @@ public final class MCRObjectID {
      * @return the string of the schema name
      */
     public String getBase() {
-        return mcr_project_id + "_" + mcr_type_id;
+        return projectId + "_" + objectType;
     }
 
     /**
@@ -343,7 +333,7 @@ public final class MCRObjectID {
         }
 
         String mcr_id = id.trim();
-        if (mcr_id.length() > MAX_LENGTH || mcr_id.length() == 0) {
+        if (mcr_id.length() > MAX_LENGTH) {
             return false;
         }
 
@@ -353,73 +343,26 @@ public final class MCRObjectID {
             return false;
         }
 
-        mcr_project_id = idParts[0].intern();
+        projectId = idParts[0].intern();
 
-        mcr_type_id = idParts[1].toLowerCase().intern();
+        objectType = idParts[1].toLowerCase().intern();
 
-        if (!CONFIG.getBoolean("MCR.Metadata.Type." + mcr_type_id, false)) {
-            LOGGER.warn("Property MCR.Metadata.Type." + mcr_type_id + " is not set. Thus " + id + " cannot be a valid id");
-            return false;
-        }
-
-        mcr_number = -1;
-
-        try {
-            mcr_number = Integer.parseInt(idParts[2]);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-
-        if (mcr_number < 0) {
-            return false;
-        }
-        this.mcr_id = formatID(mcr_project_id, mcr_type_id, mcr_number);
-
-        return true;
-    }
-
-    /**
-     * This method check the given identifier of following rules:<br/>
-     * <ul>
-     * <li>the <em>id</em> is not NULL</li>
-     * <li>0 &gt; <em>length(id)</em> &lt; 64</li>
-     * <li>the <em>id</em> has not three parts</li>
-     * <li>the <em>id</em> has not a defined type via  MCR.Metadata.Type.<em>type</em> property</li>
-     * <li>The number part of the <em>id</em> is lower 0 or not a number</li>
-     * </ul>
-     * 
-     * @param id the given identifier
-     * @return true if all rules are complied
-     */
-    public static boolean isValid(String id) {
-        if (id == null) {
-            return false;
-        }
-
-        String mcrId = id.trim();
-        if (mcrId.length() > MAX_LENGTH || mcrId.length() == 0) {
-            return false;
-        }
-
-        String[] idParts = getIDParts(mcrId);
-
-        if (idParts.length != 3) {
-            return false;
-        }
-
-        String type = idParts[1].toLowerCase().intern();
-
-        if (!CONFIG.getBoolean("MCR.Metadata.Type." + type, false)) {
+        if (!CONFIG.getBoolean("MCR.Metadata.Type." + objectType, false)) {
+            LOGGER.warn("Property MCR.Metadata.Type." + objectType + " is not set. Thus " + id + " cannot be a valid id");
             return false;
         }
 
         try {
-            if (Integer.parseInt(idParts[2]) < 0) {
-                return false;
-            }
+            numberPart = Integer.parseInt(idParts[2]);
         } catch (NumberFormatException e) {
             return false;
         }
+
+        if (numberPart < 0) {
+            return false;
+        }
+        this.combinedId = formatID(projectId, objectType, numberPart);
+
         return true;
     }
 
@@ -432,7 +375,7 @@ public final class MCRObjectID {
      * @return true if all parts are equal, else return false
      */
     public boolean equals(MCRObjectID in) {
-        return in == null ? false : toString().equals(in.toString());
+        return this == in || in == null ? false : toString().equals(in.toString());
     }
 
     /**
@@ -446,10 +389,10 @@ public final class MCRObjectID {
      */
     @Override
     public boolean equals(Object in) {
-        if (!(in instanceof MCRObjectID)) {
-            return false;
+        if (in instanceof MCRObjectID) {
+            return equals((MCRObjectID) in);
         }
-        return equals((MCRObjectID) in);
+        return false;
     }
 
     /**
@@ -460,7 +403,7 @@ public final class MCRObjectID {
      */
     @Override
     public String toString() {
-        return mcr_id;
+        return combinedId;
     }
 
     /**
