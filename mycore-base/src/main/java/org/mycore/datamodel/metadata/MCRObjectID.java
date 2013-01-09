@@ -429,10 +429,10 @@ public final class MCRObjectID {
      * 
      * @param in
      *            the MCRObjectID to check
-     * @return true if all parts are equal, else return false.
+     * @return true if all parts are equal, else return false
      */
     public boolean equals(MCRObjectID in) {
-        return toString().equals(in.toString());
+        return in == null ? false : toString().equals(in.toString());
     }
 
     /**
