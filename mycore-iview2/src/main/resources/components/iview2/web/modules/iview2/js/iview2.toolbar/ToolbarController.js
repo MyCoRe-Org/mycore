@@ -120,7 +120,7 @@ ToolbarController.prototype.addView = function(view) {
       if (args.elementName == "pageBox") {
         // TODO: maybe do this in the toolbar view?
         args.view.addClass("iview2-button-icon-dropdown");
-        args.view.menu({
+        args.view.fgmenu({
           // content list to navigate
           content : that.getViewer().context.container.find('#pages').html(),
           /* width: 100, */

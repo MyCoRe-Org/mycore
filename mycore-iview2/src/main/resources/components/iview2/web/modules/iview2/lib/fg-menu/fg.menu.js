@@ -1,10 +1,11 @@
+// TODO: should be replaced with jquery ui menu.
 /*-------------------------------------------------------------------- 
 Scripts for creating and manipulating custom menus based on standard <ul> markup
 Version: 3.0, 03.31.2009
 
 By: Maggie Costello Wachs (maggie@filamentgroup.com) and Scott Jehl (scott@filamentgroup.com)
 	http://www.filamentgroup.com
-	* reference articles: http://www.filamentgroup.com/lab/jquery_ipod_style_drilldown_menu/
+	* reference articles: http://www.filamentgroup.com/lab/jQuery_ipod_style_drilldown_menu/
 		
 Copyright (c) 2009 Filament Group
 Dual licensed under the MIT (filamentgroup.com/examples/mit-license.txt) and GPL (filamentgroup.com/examples/gpl-license.txt) licenses.
@@ -13,13 +14,13 @@ Dual licensed under the MIT (filamentgroup.com/examples/mit-license.txt) and GPL
 
 var allUIMenus = [];
 
-$.fn.menu = function(options){
+jQuery.fn.fgmenu = function(options){
 	var caller = this;
 	var options = options;
 	var m = new Menu(caller, options);	
 	allUIMenus.push(m);
 	
-	$(this)
+	jQuery(this)
 	.mousedown(function(){
 		if (!m.menuOpen) { m.showLoading(); };
 	})	
@@ -32,8 +33,8 @@ $.fn.menu = function(options){
 
 function Menu(caller, options){
 	var menu = this;
-	var caller = $(caller);
-	var container = $('<div class="fg-menu-container ui-widget ui-widget-content ui-corner-all">'+options.content+'</div>');
+	var caller = jQuery(caller);
+	var container = jQuery('<div class="fg-menu-container ui-widget ui-widget-content ui-corner-all">'+options.content+'</div>');
 	
 	this.menuOpen = false;
 	this.menuExists = false;
@@ -70,7 +71,7 @@ function Menu(caller, options){
 		nextCrumbLink: 'ui-icon-carat-1-e',
 		//addition
 		onChoose: function(value){
-			$('#menuSelection').text($(item).text());	
+			jQuery('#menuSelection').text(jQuery(item).text());	
 		}
 	}, options);
 	this.options=options;
@@ -78,7 +79,7 @@ function Menu(caller, options){
 	options.caller=caller;
 	
 	var killAllMenus = function(){
-		$.each(allUIMenus, function(i){
+		jQuery.each(allUIMenus, function(i){
 			if (allUIMenus[i].menuOpen) { allUIMenus[i].kill(); };	
 		});
 	};
@@ -95,8 +96,8 @@ function Menu(caller, options){
 		if (container.is('.fg-menu-flyout')) { menu.resetFlyoutMenu(); };	
 		container.parent().hide();	
 		menu.menuOpen = false;
-		$(document).unbind('click', killAllMenus);
-		$(document).unbind('keydown');
+		jQuery(document).unbind('click', killAllMenus);
+		jQuery(document).unbind('keydown');
 	};
 	
 	this.showLoading = function(){
@@ -117,40 +118,40 @@ function Menu(caller, options){
 		container.hide().slideDown(options.showSpeed).find('.fg-menu:eq(0)');
 		menu.menuOpen = true;
 		caller.removeClass(options.loadingState);
-		$(document).click(killAllMenus);
+		jQuery(document).click(killAllMenus);
 		
 		// assign key events
-		$(document).keydown(function(event){
+		jQuery(document).keydown(function(event){
 			var e;
 			if (event.which !="") { e = event.which; }
 			else if (event.charCode != "") { e = event.charCode; }
 			else if (event.keyCode != "") { e = event.keyCode; }
 			
-			var menuType = ($(event.target).parents('div').is('.fg-menu-flyout')) ? 'flyout' : 'ipod' ;
+			var menuType = (jQuery(event.target).parents('div').is('.fg-menu-flyout')) ? 'flyout' : 'ipod' ;
 			
 			switch(e) {
 				case 37: // left arrow 
 					if (menuType == 'flyout') {
-						$(event.target).trigger('mouseout');
-						if ($('.'+options.flyOutOnState).size() > 0) { $('.'+options.flyOutOnState).trigger('mouseover'); };
+						jQuery(event.target).trigger('mouseout');
+						if (jQuery('.'+options.flyOutOnState).size() > 0) { jQuery('.'+options.flyOutOnState).trigger('mouseover'); };
 					};
 					
 					if (menuType == 'ipod') {
-						$(event.target).trigger('mouseout');
-						if ($('.fg-menu-footer').find('a').size() > 0) { $('.fg-menu-footer').find('a').trigger('click'); };
-						if ($('.fg-menu-header').find('a').size() > 0) { $('.fg-menu-current-crumb').prev().find('a').trigger('click'); };
-						if ($('.fg-menu-current').prev().is('.fg-menu-indicator')) {
-							$('.fg-menu-current').prev().trigger('mouseover');							
+						jQuery(event.target).trigger('mouseout');
+						if (jQuery('.fg-menu-footer').find('a').size() > 0) { jQuery('.fg-menu-footer').find('a').trigger('click'); };
+						if (jQuery('.fg-menu-header').find('a').size() > 0) { jQuery('.fg-menu-current-crumb').prev().find('a').trigger('click'); };
+						if (jQuery('.fg-menu-current').prev().is('.fg-menu-indicator')) {
+							jQuery('.fg-menu-current').prev().trigger('mouseover');							
 						};						
 					};
 					return false;
 					break;
 					
 				case 38: // up arrow 
-					if ($(event.target).is('.' + options.linkHover)) {	
-						var prevLink = $(event.target).parent().prev().find('a:eq(0)');						
+					if (jQuery(event.target).is('.' + options.linkHover)) {	
+						var prevLink = jQuery(event.target).parent().prev().find('a:eq(0)');						
 						if (prevLink.size() > 0) {
-							$(event.target).trigger('mouseout');
+							jQuery(event.target).trigger('mouseout');
 							prevLink.trigger('mouseover');
 						};						
 					}
@@ -159,14 +160,14 @@ function Menu(caller, options){
 					break;
 					
 				case 39: // right arrow 
-					if ($(event.target).is('.fg-menu-indicator')) {						
+					if (jQuery(event.target).is('.fg-menu-indicator')) {						
 						if (menuType == 'flyout') {
-							$(event.target).next().find('a:eq(0)').trigger('mouseover');
+							jQuery(event.target).next().find('a:eq(0)').trigger('mouseover');
 						}
 						else if (menuType == 'ipod') {
-							$(event.target).trigger('click');						
+							jQuery(event.target).trigger('click');						
 							setTimeout(function(){
-								$(event.target).next().find('a:eq(0)').trigger('mouseover');
+								jQuery(event.target).next().find('a:eq(0)').trigger('mouseover');
 							}, options.crossSpeed);
 						};				
 					}; 
@@ -174,10 +175,10 @@ function Menu(caller, options){
 					break;
 					
 				case 40: // down arrow 
-					if ($(event.target).is('.' + options.linkHover)) {
-						var nextLink = $(event.target).parent().next().find('a:eq(0)');						
+					if (jQuery(event.target).is('.' + options.linkHover)) {
+						var nextLink = jQuery(event.target).parent().next().find('a:eq(0)');						
 						if (nextLink.size() > 0) {							
-							$(event.target).trigger('mouseout');
+							jQuery(event.target).trigger('mouseout');
 							nextLink.trigger('mouseover');
 						};				
 					}
@@ -190,10 +191,10 @@ function Menu(caller, options){
 					break;
 					
 				case 13: // enter
-					if ($(event.target).is('.fg-menu-indicator') && menuType == 'ipod') {							
-						$(event.target).trigger('click');						
+					if (jQuery(event.target).is('.fg-menu-indicator') && menuType == 'ipod') {							
+						jQuery(event.target).trigger('click');						
 						setTimeout(function(){
-							$(event.target).next().find('a:eq(0)').trigger('mouseover');
+							jQuery(event.target).next().find('a:eq(0)').trigger('mouseover');
 						}, options.crossSpeed);					
 					}; 
 					break;
@@ -228,12 +229,12 @@ function Menu(caller, options){
 			var allLinks = container.find('.fg-menu li a');
 			allLinks.hover(
 				function(){
-					var menuitem = $(this);
-					$('.'+options.linkHover).removeClass(options.linkHover).blur().parent().removeAttr('id');
-					$(this).addClass(options.linkHover).focus().parent().attr('id','active-menuitem');
+					var menuitem = jQuery(this);
+					jQuery('.'+options.linkHover).removeClass(options.linkHover).blur().parent().removeAttr('id');
+					jQuery(this).addClass(options.linkHover).focus().parent().attr('id','active-menuitem');
 				},
 				function(){
-					$(this).removeClass(options.linkHover).blur().parent().removeAttr('id');
+					jQuery(this).removeClass(options.linkHover).blur().parent().removeAttr('id');
 				}
 			);
 		};
@@ -241,11 +242,11 @@ function Menu(caller, options){
 		if (options.linkHoverSecondary) {
 			container.find('.fg-menu li').hover(
 				function(){
-					$(this).siblings('li').removeClass(options.linkHoverSecondary);
-					if (options.flyOutOnState) { $(this).siblings('li').find('a').removeClass(options.flyOutOnState); }
-					$(this).addClass(options.linkHoverSecondary);
+					jQuery(this).siblings('li').removeClass(options.linkHoverSecondary);
+					if (options.flyOutOnState) { jQuery(this).siblings('li').find('a').removeClass(options.flyOutOnState); }
+					jQuery(this).addClass(options.linkHoverSecondary);
 				},
-				function(){ $(this).removeClass(options.linkHoverSecondary); }
+				function(){ jQuery(this).removeClass(options.linkHoverSecondary); }
 			);
 		};	
 		
@@ -257,7 +258,7 @@ function Menu(caller, options){
 		menu.kill();
 		// edit this for your own custom function/callback:
 		options.onChoose(item);
-		// location.href = $(item).attr('href');
+		// location.href = jQuery(item).attr('href');
 	};
 };
 
@@ -272,34 +273,34 @@ Menu.prototype.flyout = function(container, options) {
 	container.addClass('fg-menu-flyout').find('li:has(ul)').each(function(){
 		var linkWidth = container.width();
 		var showTimer, hideTimer;
-		var allSubLists = $(this).find('ul');		
+		var allSubLists = jQuery(this).find('ul');		
 		
 		allSubLists.css({ left: linkWidth, width: linkWidth }).hide();
 			
-		$(this).find('a:eq(0)').addClass('fg-menu-indicator').html('<span>' + $(this).find('a:eq(0)').text() + '</span><span class="ui-icon '+options.nextMenuLink+'"></span>').hover(
+		jQuery(this).find('a:eq(0)').addClass('fg-menu-indicator').html('<span>' + jQuery(this).find('a:eq(0)').text() + '</span><span class="ui-icon '+options.nextMenuLink+'"></span>').hover(
 			function(){
 				clearTimeout(hideTimer);
-				var subList = $(this).next();
-				if (!fitVertical(subList, $(this).offset().top)) { subList.css({ top: 'auto', bottom: 0 }); };
-				if (!fitHorizontal(subList, $(this).offset().left + 100)) { subList.css({ left: 'auto', right: linkWidth, 'z-index': 999 }); };
+				var subList = jQuery(this).next();
+				if (!fitVertical(subList, jQuery(this).offset().top)) { subList.css({ top: 'auto', bottom: 0 }); };
+				if (!fitHorizontal(subList, jQuery(this).offset().left + 100)) { subList.css({ left: 'auto', right: linkWidth, 'z-index': 999 }); };
 				showTimer = setTimeout(function(){
 					subList.addClass('ui-widget-content').show(options.showSpeed).attr('aria-expanded', 'true');	
 				}, 300);	
 			},
 			function(){
 				clearTimeout(showTimer);
-				var subList = $(this).next();
+				var subList = jQuery(this).next();
 				hideTimer = setTimeout(function(){
 					subList.removeClass('ui-widget-content').hide(options.showSpeed).attr('aria-expanded', 'false');
 				}, 400);	
 			}
 		);
 
-		$(this).find('ul a').hover(
+		jQuery(this).find('ul a').hover(
 			function(){
 				clearTimeout(hideTimer);
-				if ($(this).parents('ul').prev().is('a.fg-menu-indicator')) {
-					$(this).parents('ul').prev().addClass(options.flyOutOnState);
+				if (jQuery(this).parents('ul').prev().is('a.fg-menu-indicator')) {
+					jQuery(this).parents('ul').prev().addClass(options.flyOutOnState);
 				}
 			},
 			function(){
@@ -321,13 +322,13 @@ Menu.prototype.flyout = function(container, options) {
 Menu.prototype.drilldown = function(container, options) {
 	var menu = this;	
 	var topList = container.find('.fg-menu');	
-	var breadcrumb = $('<ul class="fg-menu-breadcrumb ui-widget-header ui-corner-all ui-helper-clearfix"></ul>');
-	var crumbDefaultHeader = $('<li class="fg-menu-breadcrumb-text">'+options.crumbDefaultText+'</li>');
+	var breadcrumb = jQuery('<ul class="fg-menu-breadcrumb ui-widget-header ui-corner-all ui-helper-clearfix"></ul>');
+	var crumbDefaultHeader = jQuery('<li class="fg-menu-breadcrumb-text">'+options.crumbDefaultText+'</li>');
 	var firstCrumbText = (options.backLink) ? options.backLinkText : options.topLinkText;
 	var firstCrumbClass = (options.backLink) ? 'fg-menu-prev-list' : 'fg-menu-all-lists';
 	var firstCrumbLinkClass = (options.backLink) ? 'ui-state-default ui-corner-all' : '';
 	var firstCrumbIcon = (options.backLink) ? '<span class="ui-icon ui-icon-triangle-1-w"></span>' : '';
-	var firstCrumb = $('<li class="'+firstCrumbClass+'"><a href="#" class="'+firstCrumbLinkClass+'">'+firstCrumbIcon+firstCrumbText+'</a></li>');
+	var firstCrumb = jQuery('<li class="'+firstCrumbClass+'"><a href="#" class="'+firstCrumbLinkClass+'">'+firstCrumbIcon+firstCrumbText+'</a></li>');
 	
 	container.addClass('fg-menu-ipod');
 	
@@ -343,17 +344,17 @@ Menu.prototype.drilldown = function(container, options) {
 	var resetChildMenu = function(el){ el.removeClass('fg-menu-scroll').removeClass('fg-menu-current').height('auto'); };
 	
 	this.resetDrilldownMenu = function(){
-		$('.fg-menu-current').removeClass('fg-menu-current');
+		jQuery('.fg-menu-current').removeClass('fg-menu-current');
 		topList.animate({ left: 0 }, options.crossSpeed, function(){
-			$(this).find('ul').each(function(){
-				$(this).hide();
-				resetChildMenu($(this));				
+			jQuery(this).find('ul').each(function(){
+				jQuery(this).hide();
+				resetChildMenu(jQuery(this));				
 			});
 			topList.addClass('fg-menu-current');			
 		});		
-		$('.fg-menu-all-lists').find('span').remove();	
+		jQuery('.fg-menu-all-lists').find('span').remove();	
 		breadcrumb.empty().append(crumbDefaultHeader);		
-		$('.fg-menu-footer').empty().hide();	
+		jQuery('.fg-menu-footer').empty().hide();	
 		checkMenuHeight(topList);		
 	};
 	
@@ -368,16 +369,16 @@ Menu.prototype.drilldown = function(container, options) {
 	
 	topList.find('a').each(function(){
 		// if the link opens a child menu:
-		if ($(this).next().is('ul')) {
-			$(this)
+		if (jQuery(this).next().is('ul')) {
+			jQuery(this)
 				.addClass('fg-menu-indicator')
-				.each(function(){ $(this).html('<span>' + $(this).text() + '</span><span class="ui-icon '+options.nextMenuLink+'"></span>'); })
+				.each(function(){ jQuery(this).html('<span>' + jQuery(this).text() + '</span><span class="ui-icon '+options.nextMenuLink+'"></span>'); })
 				.click(function(){ // ----- show the next menu			
-					var nextList = $(this).next();
-		    		var parentUl = $(this).parents('ul:eq(0)');   		
+					var nextList = jQuery(this).next();
+		    		var parentUl = jQuery(this).parents('ul:eq(0)');   		
 		    		var parentLeft = (parentUl.is('.fg-menu-content')) ? 0 : parseFloat(topList.css('left'));    		
 		    		var nextLeftVal = Math.round(parentLeft - parseFloat(container.width()));
-		    		var footer = $('.fg-menu-footer');
+		    		var footer = jQuery('.fg-menu-footer');
 		    		
 		    		// show next menu   		
 		    		resetChildMenu(parentUl);
@@ -387,7 +388,7 @@ Menu.prototype.drilldown = function(container, options) {
 		    		
 		    		var setPrevMenu = function(backlink){
 		    			var b = backlink;
-		    			var c = $('.fg-menu-current');
+		    			var c = jQuery('.fg-menu-current');
 			    		var prevList = c.parents('ul:eq(0)');
 			    		c.hide().attr('aria-expanded', 'false');
 		    			resetChildMenu(c);
@@ -400,10 +401,10 @@ Menu.prototype.drilldown = function(container, options) {
 					if (options.backLink) {
 						if (footer.find('a').size() == 0) {
 							footer.show();
-							$('<a href="#"><span class="ui-icon ui-icon-triangle-1-w"></span> <span>Back</span></a>')
+							jQuery('<a href="#"><span class="ui-icon ui-icon-triangle-1-w"></span> <span>Back</span></a>')
 								.appendTo(footer)
 								.click(function(){ // ----- show the previous menu
-									var b = $(this);
+									var b = jQuery(this);
 						    		var prevLeftVal = parseFloat(topList.css('left')) + container.width();		    						    		
 						    		topList.animate({ left: prevLeftVal },  options.crossSpeed, function(){
 						    			setPrevMenu(b);
@@ -421,24 +422,24 @@ Menu.prototype.drilldown = function(container, options) {
 								return false;
 							});
 						}
-						$('.fg-menu-current-crumb').removeClass('fg-menu-current-crumb');
-						var crumbText = $(this).find('span:eq(0)').text();
-						var newCrumb = $('<li class="fg-menu-current-crumb"><a href="javascript://" class="fg-menu-crumb">'+crumbText+'</a></li>');	
+						jQuery('.fg-menu-current-crumb').removeClass('fg-menu-current-crumb');
+						var crumbText = jQuery(this).find('span:eq(0)').text();
+						var newCrumb = jQuery('<li class="fg-menu-current-crumb"><a href="javascript://" class="fg-menu-crumb">'+crumbText+'</a></li>');	
 						newCrumb
 							.appendTo(breadcrumb)
 							.find('a').click(function(){
-								if ($(this).parent().is('.fg-menu-current-crumb')){
+								if (jQuery(this).parent().is('.fg-menu-current-crumb')){
 									menu.chooseItem(this);
 								}
 								else {
-									var newLeftVal = - ($('.fg-menu-current').parents('ul').size() - 1) * 180;
+									var newLeftVal = - (jQuery('.fg-menu-current').parents('ul').size() - 1) * 180;
 									topList.animate({ left: newLeftVal }, options.crossSpeed, function(){
 										setPrevMenu();
 									});
 								
 									// make this the current crumb, delete all breadcrumbs after this one, and navigate to the relevant menu
-									$(this).parent().addClass('fg-menu-current-crumb').find('span').remove();
-									$(this).parent().nextAll().remove();									
+									jQuery(this).parent().addClass('fg-menu-current-crumb').find('span').remove();
+									jQuery(this).parent().nextAll().remove();									
 								};
 								return false;
 							});
@@ -449,7 +450,7 @@ Menu.prototype.drilldown = function(container, options) {
 		}
 		// if the link is a leaf node (doesn't open a child menu)
 		else {
-			$(this).click(function(){
+			jQuery(this).click(function(){
 				menu.chooseItem(this);
 				return false;
 			});
@@ -483,7 +484,7 @@ Menu.prototype.setPosition = function(widget, caller, options) {
 	var options = options;
 	var xVal, yVal;
 	
-	var helper = $('<div class="positionHelper"></div>');
+	var helper = jQuery('<div class="positionHelper"></div>');
 	/* mcrkoch: must not use css width declaration in case of dynamic content based width */
 	helper.css({ position: 'absolute', left: dims.refX, top: dims.refY/*, width: dims.refW*/, height: dims.refH });
 	el.wrap(helper);
@@ -560,11 +561,11 @@ Menu.prototype.setPosition = function(widget, caller, options) {
 function sortBigToSmall(a, b) { return b - a; };
 
 jQuery.fn.getTotalWidth = function(){
-	return $(this).width() + parseInt($(this).css('paddingRight')) + parseInt($(this).css('paddingLeft')) + parseInt($(this).css('borderRightWidth')) + parseInt($(this).css('borderLeftWidth'));
+	return jQuery(this).width() + parseInt(jQuery(this).css('paddingRight')) + parseInt(jQuery(this).css('paddingLeft')) + parseInt(jQuery(this).css('borderRightWidth')) + parseInt(jQuery(this).css('borderLeftWidth'));
 };
 
 jQuery.fn.getTotalHeight = function(){
-	return $(this).height() + parseInt($(this).css('paddingTop')) + parseInt($(this).css('paddingBottom')) + parseInt($(this).css('borderTopWidth')) + parseInt($(this).css('borderBottomWidth'));
+	return jQuery(this).height() + parseInt(jQuery(this).css('paddingTop')) + parseInt(jQuery(this).css('paddingBottom')) + parseInt(jQuery(this).css('borderTopWidth')) + parseInt(jQuery(this).css('borderBottomWidth'));
 };
 
 function getScrollTop(){
@@ -591,13 +592,13 @@ function getWindowWidth(){
 	leftOffset / topOffset = optional parameter if the offset cannot be calculated (i.e., if the object is in the DOM but is set to display: 'none') */
 	
 function fitHorizontal(el, leftOffset){
-	var leftVal = parseInt(leftOffset) || $(el).offset().left;
-	return (leftVal + $(el).width() <= getWindowWidth() + getScrollLeft() && leftVal - getScrollLeft() >= 0);
+	var leftVal = parseInt(leftOffset) || jQuery(el).offset().left;
+	return (leftVal + jQuery(el).width() <= getWindowWidth() + getScrollLeft() && leftVal - getScrollLeft() >= 0);
 };
 
 function fitVertical(el, topOffset){
-	var topVal = parseInt(topOffset) || $(el).offset().top;
-	return (topVal + $(el).height() <= getWindowHeight() + getScrollTop() && topVal - getScrollTop() >= 0);
+	var topVal = parseInt(topOffset) || jQuery(el).offset().top;
+	return (topVal + jQuery(el).height() <= getWindowHeight() + getScrollTop() && topVal - getScrollTop() >= 0);
 };
 
 /*-------------------------------------------------------------------- 
@@ -645,9 +646,9 @@ Number.prototype.pxToEm = String.prototype.pxToEm = function(settings){
 		When this happens, we calculate the correct body font-size (%) and multiply it by 16 (the standard browser font size) 
 		to get an accurate em value. */
 				
-	if (settings.scope == 'body' && $.browser.msie && (parseFloat($('body').css('font-size')) / getWindowWidth()).toFixed(1) > 0.0) {
+	if (settings.scope == 'body' && jQuery.browser.msie && (parseFloat(jQuery('body').css('font-size')) / getWindowWidth()).toFixed(1) > 0.0) {
 		var calcFontSize = function(){		
-			return (parseFloat($('body').css('font-size'))/getWindowWidth()).toFixed(3) * 16;
+			return (parseFloat(jQuery('body').css('font-size'))/getWindowWidth()).toFixed(3) * 16;
 		};
 		scopeVal = calcFontSize();
 	}

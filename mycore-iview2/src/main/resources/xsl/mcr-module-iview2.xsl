@@ -11,7 +11,7 @@
 
   <xsl:variable name="initCalls" select="mcrxslext:Counter.new()" />
 
-  <xsl:variable name="jqueryUI.version" select="'1.8.17'" />
+  <xsl:variable name="jqueryUI.version" select="'1.9.2'" />
   <xsl:variable name="loadJQueryUI" select="$MCR.Module-iview2.LoadJQueryUI" />
 
   <xsl:template name="iview2.getViewer" mode="iview2">
