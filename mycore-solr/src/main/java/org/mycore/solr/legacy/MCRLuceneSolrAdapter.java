@@ -72,18 +72,9 @@ public class MCRLuceneSolrAdapter {
         }
 
         try {
-            List<Element> f = new ArrayList<Element>();
-            f.add(condition.toXML());
+            SolrQuery q = getSolrQuery(condition, sortBy, maxResults);
 
-            Query luceneQuery = MCRLuceneSolrAdapter.buildLuceneQuery(null, true, f, new HashSet<String>());
-
-            LOGGER.info("Legacy Query transformed by \"" + MCRLuceneSolrAdapter.class.getCanonicalName() + "\" to \"" + luceneQuery.toString()
-                    + "\"");
             HttpSolrServer solrServer = MCRSolrServerFactory.getSolrServer();
-            SolrQuery q = MCRLuceneSolrAdapter.applySortOptions(new SolrQuery(luceneQuery.toString()), sortBy);
-            q.setIncludeScore(true);
-            q.setRows(maxResults == 0 ? Integer.MAX_VALUE : maxResults);
-
             SolrDocumentList solrDocumentList = solrServer.query(q).getResults();
             solrResults = new MCRSolrResults(solrDocumentList);
 
@@ -92,6 +83,20 @@ public class MCRLuceneSolrAdapter {
             LOGGER.error("Exception in while processing legacy lucene query:", e);
         }
         return solrResults != null ? solrResults : new MCRResults();
+    }
+
+    public static SolrQuery getSolrQuery(MCRCondition condition, List<MCRSortBy> sortBy, int maxResults) throws Exception {
+        List<Element> f = new ArrayList<Element>();
+        f.add(condition.toXML());
+
+        Query luceneQuery = MCRLuceneSolrAdapter.buildLuceneQuery(null, true, f, new HashSet<String>());
+
+        LOGGER.info("Legacy Query transformed by \"" + MCRLuceneSolrAdapter.class.getCanonicalName() + "\" to \"" + luceneQuery.toString()
+                + "\"");
+        SolrQuery q = MCRLuceneSolrAdapter.applySortOptions(new SolrQuery(luceneQuery.toString()), sortBy);
+        q.setIncludeScore(true);
+        q.setRows(maxResults == 0 ? Integer.MAX_VALUE : maxResults);
+        return q;
     }
 
     private static SolrQuery applySortOptions(SolrQuery q, List<MCRSortBy> sortBy) {
