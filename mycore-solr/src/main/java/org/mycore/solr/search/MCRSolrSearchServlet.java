@@ -10,7 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequestWrapper;
 
 import org.apache.log4j.Logger;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -35,8 +37,8 @@ public class MCRSolrSearchServlet extends MCRServlet {
      * @return the list.
      */
     private static List<String> solrParameterKeys() {
-        String[] params = new String[] { "q", "sort", "start", "rows", "pageDoc", "pageScore", "fq", "cache", "fl", "glob", "debug",
-                "explainOther", "defType", "timeAllowed", "omitHeader", "sortOrder", "sortBy" };
+        String[] params = new String[] { "q", "sort", "start", "rows", "pageDoc", "pageScore", "fq", "cache", "fl", "glob", "debug", "explainOther", "defType",
+                "timeAllowed", "omitHeader", "sortOrder", "sortBy" };
         return Collections.unmodifiableList(Arrays.asList(params));
     }
 
@@ -134,14 +136,20 @@ public class MCRSolrSearchServlet extends MCRServlet {
         LOGGER.info("SolrParameter Parameter Query is : " + otherParameters);
 
         String url = MCRServlet.getServletBaseURL() + "SolrSelectProxy?" + otherParameters + q;
-
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(url));
-
+        HttpServletRequestWrapper request = new HttpServletRequestWrapper(job.getRequest()) {
+            @Override
+            public Map<String, String[]> getParameterMap() {
+                //TODO: use generated parameter map
+                return getRequest().getParameterMap();
+            }
+        };
+        
+        RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher("/servlets/SolrSelectProxy");
+        requestDispatcher.forward(request, job.getResponse());
     }
 
-
-    protected void extractParameterList(Map<String, String[]> requestParameter, Map<String, String[]> queryParameter,
-            Map<String, String[]> solrParameter, Map<String, String[]> typeParameter) {
+    protected void extractParameterList(Map<String, String[]> requestParameter, Map<String, String[]> queryParameter, Map<String, String[]> solrParameter,
+        Map<String, String[]> typeParameter) {
         for (Entry<String, String[]> currentEntry : requestParameter.entrySet()) {
             String parameterName = currentEntry.getKey();
             SolrParameterGroup parameterGroup = getParameterType(parameterName);
