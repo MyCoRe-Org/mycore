@@ -3,8 +3,12 @@
  */
 package org.mycore.solr.commands;
 
+import java.util.List;
+
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
+import org.mycore.frontend.cli.MCRObjectCommands;
+import org.mycore.solr.index.cs.MCRSolrIndexer;
 
 /**
  * Class provides useful solr related commands.
@@ -35,6 +39,11 @@ public class MCRSolrCommands extends MCRAbstractCommands {
                 "rebuilds solr's metadata index for the given type in {0}");
         addCommand(com);
 
+        com = new MCRCommand("restricted rebuild solr metadata index for selected",
+                "org.mycore.solr.commands.MCRSolrCommands.rebuildMetadataIndexForSelected",
+                "rebuilds solr's metadata index for selected objects");
+        addCommand(com);
+
         com = new MCRCommand("optimize solr index", "org.mycore.solr.index.cs.MCRSolrIndexer.optimize",
                 "An optimize is like a hard commit except that it forces all of the index segments to be merged into a single segment first. "
                         + "Depending on the use cases, this operation should be performed infrequently (like nightly), "
@@ -44,4 +53,10 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         com = new MCRCommand("drop solr index", "org.mycore.solr.index.cs.MCRSolrIndexer.dropIndex", "Deletes an existing index from solr");
         addCommand(com);
     }
+
+    public static void rebuildMetadataIndexForSelected() {
+        List<String> selectedObjects = MCRObjectCommands.getSelectedObjectIDs();
+        MCRSolrIndexer.rebuildMetadataIndex(selectedObjects);
+    }
+
 }
