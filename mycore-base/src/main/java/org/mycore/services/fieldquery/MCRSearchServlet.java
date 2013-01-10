@@ -191,6 +191,7 @@ public class MCRSearchServlet extends MCRServlet {
             String operator = element.getAttributeValue("operator", defaultOperator);
             element.setAttribute("operator", operator);
 
+            @SuppressWarnings("unchecked")
             List<Element> values = element.getChildren("value");
             if (values != null && values.size() > 0) {
                 element.removeAttribute("field");
@@ -226,8 +227,9 @@ public class MCRSearchServlet extends MCRServlet {
 
             // Remove conditions without values
             List<Element> empty = new ArrayList<Element>();
-            for (Iterator it = conditions.getDescendants(new ElementFilter("condition")); it.hasNext();) {
-                Element cond = (Element) it.next();
+            for (@SuppressWarnings("unchecked")
+            Iterator<Element> it = conditions.getDescendants(new ElementFilter("condition")); it.hasNext();) {
+                Element cond = it.next();
                 if (cond.getAttribute("value") == null) {
                     empty.add(cond);
                 }
@@ -236,7 +238,9 @@ public class MCRSearchServlet extends MCRServlet {
             // Remove empty sort conditions
             Element sortBy = root.getChild("sortBy");
             if (sortBy != null) {
-                for (Element field : (List<Element>) sortBy.getChildren("field")) {
+                for (@SuppressWarnings("unchecked")
+                Iterator<Element> iterator = sortBy.getChildren("field").iterator(); iterator.hasNext();) {
+                    Element field = iterator.next();
                     if (field.getAttributeValue("name", "").length() == 0) {
                         empty.add(field);
                     }
@@ -269,7 +273,8 @@ public class MCRSearchServlet extends MCRServlet {
         query.setMaxResults(Integer.parseInt(maxResults));
 
         List<String> sortFields = new ArrayList<String>();
-        for (Enumeration names = req.getParameterNames(); names.hasMoreElements();) {
+        for (@SuppressWarnings("unchecked")
+        Enumeration<String> names = req.getParameterNames(); names.hasMoreElements();) {
             String name = (String) names.nextElement();
             if (name.contains(".sortField")) {
                 sortFields.add(name);
@@ -277,12 +282,10 @@ public class MCRSearchServlet extends MCRServlet {
         }
 
         if (sortFields.size() > 0) {
-            Collections.sort(sortFields, new Comparator() {
-                public int compare(Object arg0, Object arg1) {
-                    String s0 = (String) arg0;
-                    s0 = s0.substring(s0.indexOf(".sortField"));
-                    String s1 = (String) arg1;
-                    s1 = s1.substring(s1.indexOf(".sortField"));
+            Collections.sort(sortFields, new Comparator<String>() {
+                public int compare(String arg0, String arg1) {
+                    String s0 = arg0.substring(arg0.indexOf(".sortField"));
+                    String s1 = arg1.substring(arg1.indexOf(".sortField"));
                     return s0.compareTo(s1);
                 }
             });
@@ -344,7 +347,7 @@ public class MCRSearchServlet extends MCRServlet {
         showResults(request, response, qd);
     }
 
-    private void showResults(HttpServletRequest request, HttpServletResponse response, MCRCachedQueryData qd) throws IOException {
+    protected void showResults(HttpServletRequest request, HttpServletResponse response, MCRCachedQueryData qd) throws IOException {
         MCRResults results = qd.getResults();
 
         // Number of hits per page
