@@ -5,9 +5,11 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.Header;
@@ -19,6 +21,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.xml.MCRLayoutService;
@@ -36,15 +39,30 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
 
     private static final String SOLR_SELECT_PATH = "select/";
 
+    /**
+     * Attribute key to store Query parameters as <code>Map&lt;String, String[]&gt;</code> for SOLR.
+     * 
+     * This takes precedence over any {@link HttpServletRequest} parameter.
+     */
+    public static final String MAP_KEY = MCRSolrSelectProxyServlet.class.getName() + ".map";
+
+    /**
+     * Attribute key to store a {@link SolrQuery}.
+     * 
+     * This takes precedence over {@link #MAP_KEY} or any {@link HttpServletRequest} parameter.
+     */
+    public static final String QUERY_KEY = MCRSolrSelectProxyServlet.class.getName() + ".query";
+
     private HttpClient httpClient;
 
     private MultiThreadedHttpConnectionManager connectionManager;
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
-        @SuppressWarnings("unchecked")
-        Map<String, String[]> parameterMap = job.getRequest().getParameterMap();
-        HttpMethod solrHttpMethod = MCRSolrSelectProxyServlet.getSolrHttpMethod(parameterMap);
+        HttpServletRequest request = job.getRequest();
+        Map<String, String[]> solrParameter = getSolrQueryParameter(request);
+
+        HttpMethod solrHttpMethod = MCRSolrSelectProxyServlet.getSolrHttpMethod(solrParameter);
         try {
             LOGGER.info("Sending Request: " + solrHttpMethod.getURI());
             int statusCode = httpClient.executeMethod(solrHttpMethod);
@@ -62,7 +80,7 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
 
             if (statusCode == HttpStatus.SC_OK) {
                 MCRStreamContent solrResponse = new MCRStreamContent(solrResponseStream, solrHttpMethod.getURI().toString(), "response");
-                MCRLayoutService.instance().doLayout(job.getRequest(), resp, solrResponse);
+                MCRLayoutService.instance().doLayout(request, resp, solrResponse);
                 return;
             }
 
@@ -72,6 +90,30 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
         } finally {
             solrHttpMethod.releaseConnection();
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, String[]> getSolrQueryParameter(HttpServletRequest request) {
+        SolrQuery query = (SolrQuery) request.getAttribute(QUERY_KEY);
+        Map<String, String[]> solrParameter;
+        if (query == null) {
+            solrParameter = (Map<String, String[]>) request.getAttribute(MAP_KEY);
+            if (solrParameter == null) {
+                //good old way
+                solrParameter = request.getParameterMap();
+            }
+        } else {
+            solrParameter = getMap(query);
+        }
+        return solrParameter;
+    }
+
+    private Map<String, String[]> getMap(SolrQuery query) {
+        Map<String, String[]> parameter = new HashMap<String, String[]>();
+        for (String name : query.getParameterNames()) {
+            parameter.put(name, query.getParams(name));
+        }
+        return parameter;
     }
 
     @Override
