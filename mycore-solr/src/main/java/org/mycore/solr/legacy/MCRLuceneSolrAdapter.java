@@ -3,6 +3,7 @@
  */
 package org.mycore.solr.legacy;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -47,7 +48,6 @@ import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSortBy;
 import org.mycore.solr.MCRSolrServerFactory;
 
-
 /**
  * @author shermann
  *
@@ -85,11 +85,16 @@ public class MCRLuceneSolrAdapter {
         return solrResults != null ? solrResults : new MCRResults();
     }
 
-    public static SolrQuery getSolrQuery(MCRCondition condition, List<MCRSortBy> sortBy, int maxResults) throws Exception {
+    public static SolrQuery getSolrQuery(MCRCondition condition, List<MCRSortBy> sortBy, int maxResults) {
         List<Element> f = new ArrayList<Element>();
         f.add(condition.toXML());
 
-        Query luceneQuery = MCRLuceneSolrAdapter.buildLuceneQuery(null, true, f, new HashSet<String>());
+        Query luceneQuery;
+        try {
+            luceneQuery = MCRLuceneSolrAdapter.buildLuceneQuery(null, true, f, new HashSet<String>());
+        } catch (Exception e) {
+            throw new MCRException("Error while building SOLR query.", e);
+        }
 
         LOGGER.info("Legacy Query transformed by \"" + MCRLuceneSolrAdapter.class.getCanonicalName() + "\" to \"" + luceneQuery.toString()
                 + "\"");
@@ -110,9 +115,13 @@ public class MCRLuceneSolrAdapter {
      * Build Lucene Query from XML
      * 
      * @return Lucene Query
+     * @throws ParseException 
+     * @throws org.apache.lucene.queryParser.ParseException 
+     * @throws IOException 
      * 
      */
-    private static Query buildLuceneQuery(BooleanQuery r, boolean reqf, List<Element> f, Set<String> usedFields) throws Exception {
+    private static Query buildLuceneQuery(BooleanQuery r, boolean reqf, List<Element> f, Set<String> usedFields) throws IOException,
+            org.apache.lucene.queryParser.ParseException, ParseException {
         for (Element xEle : f) {
             String name = xEle.getName();
             if ("boolean".equals(name)) {
@@ -179,7 +188,7 @@ public class MCRLuceneSolrAdapter {
     }
 
     private static Query handleCondition(String field, String operator, String value, String fieldtype, boolean reqf, Analyzer analyzer)
-            throws Exception {
+            throws IOException, org.apache.lucene.queryParser.ParseException, ParseException {
         if ("text".equals(fieldtype) && "contains".equals(operator)) {
             BooleanQuery bq = null;
 
@@ -268,7 +277,7 @@ public class MCRLuceneSolrAdapter {
 
             return new TermRangeQuery(field, lower, upper, true, true);
         } else if ("date".equals(fieldtype) || "time".equals(fieldtype) || "timestamp".equals(fieldtype)) {
-            return DateQuery2(field, operator, value);
+            return generateDateQuery(field, operator, value);
         } else if ("identifier".equals(fieldtype) && "=".equals(operator)) {
             Term te = new Term(field, "\"" + value + "\"");
 
@@ -428,11 +437,7 @@ public class MCRLuceneSolrAdapter {
         return null;
     }
 
-    /***************************************************************************
-     * DateQuery2 ()
-     * @throws ParseException 
-     **************************************************************************/
-    private static Query DateQuery2(String fieldname, String Op, String value) throws ParseException {
+    private static Query generateDateQuery(String fieldname, String Op, String value) throws ParseException {
         long numberValue = getLongValue(value);
         return NumberQuery(fieldname, "integer", Op, numberValue);
     }
@@ -441,21 +446,21 @@ public class MCRLuceneSolrAdapter {
 
     private static final int YYYY_MM_DD_HH_MM_SS = 19;
 
-    private static long getLongValue(String value) throws ParseException {
-        switch (value.length()) {
+    private static long getLongValue(String isoDate) throws ParseException {
+        switch (isoDate.length()) {
         case YYYY_MM_DD_HH_MM_SS:
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
             df.setTimeZone(TimeZone.getTimeZone("UTC"));
-            return df.parse(value).getTime();
+            return df.parse(isoDate).getTime();
         case HH_MM_SS:
-            short hour = Short.parseShort(value.substring(0, 2));
-            short minute = Short.parseShort(value.substring(3, 5));
-            short second = Short.parseShort(value.substring(6));
+            short hour = Short.parseShort(isoDate.substring(0, 2));
+            short minute = Short.parseShort(isoDate.substring(3, 5));
+            short second = Short.parseShort(isoDate.substring(6));
             return (hour * 60 + minute) * 60 + second;
         default:
-            MCRISO8601Date date = new MCRISO8601Date(value);
+            MCRISO8601Date date = new MCRISO8601Date(isoDate);
             if (date.getDate() == null) {
-                throw new MCRException("Could not parse to long value: " + value);
+                throw new MCRException("Could not parse to long value: " + isoDate);
             }
             return date.getDate().getTime();
         }
