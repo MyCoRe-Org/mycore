@@ -306,7 +306,7 @@ public class MCRSearchServlet extends MCRServlet {
     }
 
     @Override
-    public void doGetPost(MCRServletJob job) throws IOException {
+    public void doGetPost(MCRServletJob job) throws IOException, ServletException {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
 
@@ -334,7 +334,7 @@ public class MCRSearchServlet extends MCRServlet {
      * Shows a results page. Usage:
      * MCRSearchServlet?mode=results&numPerPage=10&page=1
      */
-    protected void showResults(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void showResults(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         // Get cached results
         String id = request.getParameter("id");
         MCRCachedQueryData qd = MCRCachedQueryData.getData(id);
@@ -347,7 +347,7 @@ public class MCRSearchServlet extends MCRServlet {
         showResults(request, response, qd);
     }
 
-    protected void showResults(HttpServletRequest request, HttpServletResponse response, MCRCachedQueryData qd) throws IOException {
+    protected void showResults(HttpServletRequest request, HttpServletResponse response, MCRCachedQueryData qd) throws IOException, ServletException {
         MCRResults results = qd.getResults();
 
         // Number of hits per page
@@ -432,7 +432,7 @@ public class MCRSearchServlet extends MCRServlet {
      * Executes a query that comes from editor search mask, and redirects the
      * browser to the first results page
      */
-    protected void doQuery(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doQuery(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
         MCREditorSubmission sub = (MCREditorSubmission) request.getAttribute("MCREditorSubmission");
         String searchString = getReqParameter(request, "search", null);
