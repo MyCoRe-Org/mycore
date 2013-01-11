@@ -23,11 +23,14 @@
 
 package org.mycore.datamodel.ifs2;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.StringTokenizer;
 
+import org.apache.log4j.Logger;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.content.MCRContent;
@@ -39,34 +42,87 @@ import org.mycore.datamodel.ifs.MCRFileReader;
 /**
  * Implements the MCRContentStore interface to store the content of
  * IFS1 MCRFile objects in a structure of the new, but currently incomplete
- * IFS2 store.
+ * IFS2 store. Example configuration:
  * 
  * <code>
+ * MCR.IFS.ContentStore.FS.Class=org.mycore.datamodel.ifs2.MCRCStoreIFS2
+ * MCR.IFS.ContentStore.FS.BaseDir=/foo/bar
+ * MCR.IFS.ContentStore.FS.SlotLayout=4-2-2
  * </code>
  * 
- * @author Frank Lützenkirchen
+ * @author Frank L\u00FCtzenkirchen
  **/
 public class MCRCStoreIFS2 extends MCRContentStore {
 
-    private MCRFileStore store;
+    private String slotLayout;
+
+    private String baseDir;
+
+    private final static Logger LOGGER = Logger.getLogger(MCRCStoreIFS2.class);
 
     @Override
     public void init(String storeID) {
         super.init(storeID);
 
-        store = MCRStoreManager.getStore(storeID, MCRFileStore.class);
+        MCRConfiguration config = MCRConfiguration.instance();
+        baseDir = config.getString(prefix + "BaseDir");
+        LOGGER.info("Base directory for store " + storeID + " is " + baseDir);
+
+        String pattern = config.getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000");
+        slotLayout = pattern.length() - 4 + "-2-2";
+        slotLayout = config.getString(prefix + "SlotLayout", slotLayout);
+        LOGGER.info("Default slot layout for store " + storeID + " is " + slotLayout);
+    }
+
+    private void configureStore(String base) {
+        String storeConfigPrefix = "MCR.IFS2.Store." + base + ".";
+        String storeBaseDir = baseDir + File.separatorChar + base.replace("_", File.separator);
+
+        configureIfNotSet(storeConfigPrefix + "Class", MCRFileStore.class.getName());
+        configureIfNotSet(storeConfigPrefix + "BaseDir", storeBaseDir);
+        configureIfNotSet(storeConfigPrefix + "SlotLayout", slotLayout);
+    }
+
+    private void configureIfNotSet(String property, String value) {
+        value = MCRConfiguration.instance().getString(property, value);
+        MCRConfiguration.instance().set(property, value);
+        LOGGER.info("Configured " + property + "=" + value);
+    }
+
+    private MCRFileStore getStore(String base) {
+        MCRFileStore store = MCRStoreManager.getStore(base, MCRFileStore.class);
         if (store == null)
-            try {
-                store = MCRStoreManager.createStore(storeID, MCRFileStore.class);
-            } catch (Exception ex) {
-                String msg = "Could not create IFS2 file store with ID " + storeID;
-                throw new MCRConfigurationException(msg, ex);
-            }
+            store = createStore(base);
+        return store;
+    }
+
+    private synchronized MCRFileStore createStore(String base) {
+        try {
+            configureStore(base);
+            return MCRStoreManager.createStore(base, MCRFileStore.class);
+        } catch (Exception ex) {
+            String msg = "Could not create IFS2 file store with ID " + base;
+            throw new MCRConfigurationException(msg, ex);
+        }
+    }
+
+    private int getSlotID(MCRFileReader fr) {
+        String ownerID = fr.getOwnerID();
+        int pos = ownerID.lastIndexOf("_") + 1;
+        return Integer.parseInt(ownerID.substring(pos));
+    }
+
+    private String getBase(MCRFileReader fr) {
+        String ownerID = fr.getOwnerID();
+        int pos = ownerID.lastIndexOf("_");
+        return ownerID.substring(0, pos);
     }
 
     @Override
     protected boolean exists(MCRFileReader fr) {
         int slotID = getSlotID(fr);
+        String base = getBase(fr);
+        MCRFileStore store = getStore(base);
 
         try {
             MCRFileCollection slot = store.retrieve(slotID);
@@ -84,11 +140,13 @@ public class MCRCStoreIFS2 extends MCRContentStore {
 
     @Override
     protected String doStoreContent(MCRFileReader fr, MCRContentInputStream source) throws Exception {
+        int slotID = getSlotID(fr);
+        String base = getBase(fr);
+        MCRFileStore store = getStore(base);
 
-        int id = getSlotID(fr);
-        MCRFileCollection slot = store.retrieve(id);
+        MCRFileCollection slot = store.retrieve(slotID);
         if (slot == null)
-            slot = store.create(id);
+            slot = store.create(slotID);
 
         String path = fr.getPath();
         MCRDirectory dir = slot;
@@ -107,7 +165,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
             }
         }
 
-        return id + "/" + path;
+        return fr.getOwnerID() + "/" + path;
     }
 
     @Override
@@ -143,15 +201,13 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         return file.getContent();
     }
 
-    private int getSlotID(MCRFileReader fr) {
-        String ownerID = fr.getOwnerID();
-        int pos = ownerID.lastIndexOf("_") + 1;
-        return Integer.parseInt(ownerID.substring(pos));
-    }
-
     private MCRFileCollection getSlot(String storageID) throws IOException {
-        int slotID = Integer.parseInt(storageID.split("/")[0]);
-        return store.retrieve(slotID);
+        int pos = storageID.indexOf("/");
+        String first = storageID.substring(0, pos);
+        pos = first.lastIndexOf("_");
+        String base = first.substring(0, pos);
+        int slotID = Integer.parseInt(first.substring(pos + 1));
+        return getStore(base).retrieve(slotID);
     }
 
     private MCRFile getFile(String storageID) throws IOException {
