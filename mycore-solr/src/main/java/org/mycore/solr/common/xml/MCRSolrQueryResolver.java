@@ -7,7 +7,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.content.MCRStreamContent;
+import org.mycore.common.content.MCRURLContent;
 import org.mycore.solr.MCRSolrServerFactory;
 import org.mycore.solr.search.MCRSolrURL;
 
@@ -24,7 +24,7 @@ public class MCRSolrQueryResolver implements URIResolver {
         String urlQuery = href.substring(href.indexOf(":") + 1);
         MCRSolrURL solrURL = new MCRSolrURL(MCRSolrServerFactory.getSolrServer(), urlQuery);
         try {
-            MCRStreamContent result = new MCRStreamContent(solrURL.openStream(), solrURL.getUrl().toString());
+            MCRURLContent result = new MCRURLContent(solrURL.getUrl());
             return result.getSource();
         } catch (IOException e) {
             LOGGER.error("Unable to get input stream from solr", e);
