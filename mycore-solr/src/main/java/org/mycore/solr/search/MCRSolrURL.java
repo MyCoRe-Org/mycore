@@ -23,7 +23,7 @@ import org.mycore.solr.utils.MCRSolrUtils;
 public class MCRSolrURL {
     private static final Logger LOGGER = Logger.getLogger(MCRSolrURL.class);
 
-    public static final String SOLR_VERSION = MCRSolrUtils.getSolrPropertyValue("solr.client.Version", "3.6");
+    public static final String SOLR_VERSION = MCRSolrUtils.getSolrPropertyValue("XMLProtocolVersion", "4.0");
 
     private static final String SOLR_SELECT_PATH = MCRSolrUtils.getSolrPropertyValue("SelectPath", "select/");
 
