@@ -8,10 +8,12 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.MessageFormat;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.mycore.solr.utils.MCRSolrUtils;
 
 /**
  * Convenience class for holding the parameters for the solr search url.
@@ -21,11 +23,16 @@ import org.apache.solr.client.solrj.impl.HttpSolrServer;
 public class MCRSolrURL {
     private static final Logger LOGGER = Logger.getLogger(MCRSolrURL.class);
 
-    public static final String VERSION_2_2 = "2.2";
+    public static final String SOLR_VERSION = MCRSolrUtils.getSolrPropertyValue("solr.client.Version", "3.6");
+
+    private static final String SOLR_SELECT_PATH = MCRSolrUtils.getSolrPropertyValue("SelectPath", "select/");
+
+    public static final String FIXED_URL_PART = MessageFormat.format("{0}{1}?version={2}", SOLR_SELECT_PATH.startsWith("/") ? "" : "/",
+            SOLR_SELECT_PATH, SOLR_VERSION);
 
     private HttpSolrServer solrServer;
 
-    private String urlQuery, q, fixedURLPart, sortOptions, wt;
+    private String urlQuery, q, sortOptions, wt;
 
     private int start, rows;
 
@@ -40,7 +47,6 @@ public class MCRSolrURL {
         rows = 10;
         q = null;
         wt = null;
-        fixedURLPart = "/select/?version=2.2";
         sortOptions = new String();
         returnScore = false;
     }
@@ -55,7 +61,6 @@ public class MCRSolrURL {
      */
     public MCRSolrURL(HttpSolrServer solrServer, String urlQuery) {
         this.solrServer = solrServer;
-        this.fixedURLPart = "/select/?version=2.2";
         this.urlQuery = urlQuery;
     }
 
@@ -73,11 +78,12 @@ public class MCRSolrURL {
      */
     public URL getUrl() {
         try {
-            if(this.urlQuery == null) {
-                return new URL(solrServer.getBaseURL() + fixedURLPart + "&q=" + URLEncoder.encode(q, "UTF-8") + "&start=" + start + "&rows="
-                        + rows + "&sort=" + URLEncoder.encode(sortOptions, "UTF-8") + (returnScore ? "&fl=*,score" : "") + (wt != null ? "&wt=" + wt : ""));
+            if (this.urlQuery == null) {
+                return new URL(solrServer.getBaseURL() + FIXED_URL_PART + "&q=" + URLEncoder.encode(q, "UTF-8") + "&start=" + start
+                        + "&rows=" + rows + "&sort=" + URLEncoder.encode(sortOptions, "UTF-8") + (returnScore ? "&fl=*,score" : "")
+                        + (wt != null ? "&wt=" + wt : ""));
             } else {
-                return new URL(solrServer.getBaseURL() + fixedURLPart + "&" + urlQuery);
+                return new URL(solrServer.getBaseURL() + FIXED_URL_PART + "&" + urlQuery);
             }
         } catch (Exception urlException) {
             LOGGER.error("Error building solr url", urlException);
@@ -131,7 +137,7 @@ public class MCRSolrURL {
      * @param sort the sort option e.g. 'maintitle desc'
      */
     public void addSortOption(String sort) {
-        if(sort == null || sort.equals("")) {
+        if (sort == null || sort.equals("")) {
             return;
         }
         if (sortOptions.length() > 0) {

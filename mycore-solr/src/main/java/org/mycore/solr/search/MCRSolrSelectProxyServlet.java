@@ -35,9 +35,9 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String SOLR_QUERY_VERSION = MCRSolrUtils.getSolrPropertyValue("SelectProxy.Version", "3.6");
+    private static final String SOLR_QUERY_VERSION = MCRSolrUtils.getSolrPropertyValue("solr.client.Version", "3.6");
 
-    private static final String SOLR_SELECT_PATH = "select/";
+    private static final String SOLR_SELECT_PATH = MCRSolrUtils.getSolrPropertyValue("SelectPath", "select/");
 
     /**
      * Attribute key to store Query parameters as <code>Map&lt;String, String[]&gt;</code> for SOLR.
