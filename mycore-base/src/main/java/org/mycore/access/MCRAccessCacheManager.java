@@ -61,15 +61,10 @@ class MCRAccessCacheManager implements MCRSessionListener {
         MCRSession session = event.getSession();
         switch (event.getType()) {
         case created:
-            cache = createCache(session);
-            session.put(key, cache);
-            break;
         case activated:
-            cache = (MCRCache<MCRPermissionHandle, Boolean>) session.get(key);
-            accessCache.set(cache);
             break;
         case passivated:
-            accessCache.set(null);
+            accessCache.remove();
             break;
 
         case destroyed:
