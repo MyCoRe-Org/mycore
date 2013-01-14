@@ -94,7 +94,9 @@ class MCRAccessCacheManager implements MCRSessionListener {
 
     public Boolean isPermitted(String id, String permission) {
         MCRPermissionHandle handle = new MCRPermissionHandle(id, permission);
-        return accessCache.get().getIfUpToDate(handle, MCRSessionMgr.getCurrentSession().getLoginTime());
+        MCRCache<MCRPermissionHandle, Boolean> permissionCache = accessCache.get();
+        MCRSession currentSession = MCRSessionMgr.getCurrentSession();
+        return permissionCache.getIfUpToDate(handle, currentSession.getLoginTime());
     }
 
     public void cachePermission(String id, String permission, boolean permitted) {
