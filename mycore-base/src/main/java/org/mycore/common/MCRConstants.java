@@ -89,10 +89,6 @@ public final class MCRConstants {
 
     public final static Namespace MODS_NAMESPACE = Namespace.getNamespace("mods", MODS_URL);
 
-    /** epicur namespace*/
-    public static final Namespace XEPICUR_NAMESPACE = Namespace.getNamespace("urn:nbn:de:1111-2004033116",
-            "http://www.persistent-identifier.de/xepicur/version1.0/xepicur.xsd");
-
     /** The URL of the MCR */
     private final static String MCR_URL = "http://www.mycore.org/";
 
