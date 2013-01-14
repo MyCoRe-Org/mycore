@@ -57,10 +57,10 @@ public final class MCRConstants {
     private final static String XLINK_URL = "http://www.w3.org/1999/xlink";
 
     public final static Namespace XLINK_NAMESPACE = Namespace.getNamespace("xlink", XLINK_URL);
-    
+
     /** the MARC 21 namespace */
     public final static Namespace MARC21_NAMESPACE = Namespace.getNamespace("marc21", "http://www.loc.gov/MARC21/slim");
-    
+
     /** MARC 21 namespace schema location */
     public final static String MARC21_SCHEMA_LOCATION = "http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd";
 
@@ -88,6 +88,10 @@ public final class MCRConstants {
     private final static String MODS_URL = "http://www.loc.gov/mods/v3";
 
     public final static Namespace MODS_NAMESPACE = Namespace.getNamespace("mods", MODS_URL);
+
+    /** epicur namespace*/
+    public static final Namespace XEPICUR_NAMESPACE = Namespace.getNamespace("urn:nbn:de:1111-2004033116",
+            "http://www.persistent-identifier.de/xepicur/version1.0/xepicur.xsd");
 
     /** The URL of the MCR */
     private final static String MCR_URL = "http://www.mycore.org/";
