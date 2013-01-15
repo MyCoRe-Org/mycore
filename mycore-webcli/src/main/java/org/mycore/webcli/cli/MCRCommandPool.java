@@ -1,8 +1,6 @@
 package org.mycore.webcli.cli;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 
 import org.mycore.frontend.cli.MCRCommand;
@@ -53,15 +51,7 @@ public class MCRCommandPool {
     }
     
     public ArrayList<MCRCommand> getPossibleCommands() {
-        ArrayList<MCRCommand> commandList = new ArrayList<MCRCommand>(cmdMap.values());
-        Collections.sort(commandList, new Comparator<MCRCommand>() {
-            @Override
-            public int compare(MCRCommand cmd1, MCRCommand cmd2) {
-                return cmd1.getSyntax().compareTo(cmd2.getSyntax());
-            }
-        });
-        
-        return commandList;
+        return new ArrayList<MCRCommand>(cmdMap.values());
     }
 
     public long getLastModified() {

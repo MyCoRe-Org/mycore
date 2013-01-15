@@ -24,8 +24,6 @@
 package org.mycore.frontend.cli;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 import org.mycore.common.MCRConfiguration;
 
@@ -74,13 +72,6 @@ abstract public class MCRAbstractCommands implements MCRExternalCommandInterface
      * @return a ascending sorted command pair ArrayList
      */
     public ArrayList<MCRCommand> getPossibleCommands() {
-        Collections.sort(this.command, new Comparator<MCRCommand>() {
-            @Override
-            public int compare(MCRCommand cmd1, MCRCommand cmd2) {
-                return cmd1.getSyntax().compareTo(cmd2.getSyntax());
-            }
-        });
-
         return this.command;
     }
 
