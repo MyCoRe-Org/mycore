@@ -6,6 +6,7 @@ import java.text.MessageFormat;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -20,6 +21,8 @@ import org.mycore.solr.MCRSolrServerFactory;
  *
  */
 public class MCRFileContentStream extends MCRAbstractSolrContentStream<MCRFile> {
+
+    private static final String EXTRACT_PATH = MCRConfiguration.instance().getString("MCR.Module-solr.ExtractPath", "/update/extract");
 
     /**
      * @param file
@@ -74,20 +77,20 @@ public class MCRFileContentStream extends MCRAbstractSolrContentStream<MCRFile> 
         }
         LOGGER.trace("Solr: indexing file \"" + file.getAbsolutePath() + " (" + solrID + ")\"");
         /* create the update request object */
-        ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest("/update/extract");
+        ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest(EXTRACT_PATH);
         updateRequest.addContentStream(this);
 
         /* set the additional parameters */
         updateRequest.setParam("literal.id", solrID);
-        updateRequest.setParam("literal.owner", file.getOwnerID());
+        updateRequest.setParam("literal.DerivateID", file.getOwnerID());
         if (idOfMCRObjectForDerivate != null) {
-            updateRequest.setParam("literal.derivate_owner", idOfMCRObjectForDerivate);
+            updateRequest.setParam("literal.returnId", idOfMCRObjectForDerivate);
         }
-        updateRequest.setParam("literal.path", file.getAbsolutePath());
-        updateRequest.setParam("literal.object_type", "data_file");
-        updateRequest.setParam("literal.file_name", file.getName());
-        updateRequest.setParam("literal.object_project", MCRObjectID.getInstance(file.getOwnerID()).getProjectId());
-        updateRequest.setParam("literal.modifydate", MCRAbstractSolrContentStream.DATE_FORMATTER.format(file.getLastModified().getTime()));
+        updateRequest.setParam("literal.filePath", file.getAbsolutePath());
+        updateRequest.setParam("literal.objectType", "data_file");
+        updateRequest.setParam("literal.fileName", file.getName());
+        updateRequest.setParam("literal.objectProject", MCRObjectID.getInstance(file.getOwnerID()).getProjectId());
+        updateRequest.setParam("literal.fileDateModified", MCRAbstractSolrContentStream.DATE_FORMATTER.format(file.getLastModified().getTime()));
 
         LOGGER.trace("Solr: sending binary data (" + file.getAbsolutePath() + " (" + solrID + "), size is " + file.getSizeFormatted()
                 + ") to solr server.");
