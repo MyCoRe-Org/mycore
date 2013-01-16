@@ -909,10 +909,10 @@
     <!-- Hamburg -->
     <developer>
       <id>mcrkrebs</id>
-      <name>Kathleen Krebs</name>
-      <organization>Universität Hamburg, Informatik, Verteilte Systeme und Informationssysteme</organization>
-      <email>kkrebs (at) informatik.uni-hamburg.de</email>
-      <organizationUrl>http://www.informatik.uni-hamburg.de/</organizationUrl>
+      <name>Kathleen Neumann</name>
+      <organization>Verbundzentrale des GBV (VZG), Document Management System</organization>
+      <email>Kathleen.Neumann (at) gbv.de</email>
+      <organizationUrl>http://www.gbv.de</organizationUrl>
       <timezone>+1</timezone>
       <roles>
         <role>coordination</role>
