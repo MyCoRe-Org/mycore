@@ -1,5 +1,7 @@
 package org.mycore.solr;
 
+import java.text.MessageFormat;
+
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.impl.BinaryRequestWriter;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
@@ -15,6 +17,7 @@ public class MCRSolrServerFactory {
     private static final Logger LOGGER = Logger.getLogger(MCRSolrServerFactory.class);
 
     private static HttpSolrServer _solrServer;
+
     private static ConcurrentUpdateSolrServer _concurrentSolrServer;
 
     static {
@@ -22,7 +25,7 @@ public class MCRSolrServerFactory {
             String solrServerUrl = MCRSolrUtils.getSolrPropertyValue("ServerURL");
             _solrServer = new HttpSolrServer(solrServerUrl);
             _solrServer.setRequestWriter(new BinaryRequestWriter());
-            
+
             String queueSize = MCRConfiguration.instance().getString("MCR.Solr.Server.queueSize", "10");
             String threadSize = MCRConfiguration.instance().getString("MCR.Solr.Server.threadSize", "10");
             _concurrentSolrServer = new ConcurrentUpdateSolrServer(solrServerUrl, Integer.parseInt(queueSize), Integer.parseInt(threadSize));
@@ -32,7 +35,8 @@ public class MCRSolrServerFactory {
         } catch (Error error) {
             LOGGER.error("Error creating solr server object", error);
         } finally {
-            LOGGER.info("Solr: using server at address \"" + _solrServer != null ? _solrServer.getBaseURL() : "n/a" + "\"");
+            LOGGER.info(MessageFormat.format("Solr: using server at address \"{0}\"", _solrServer != null ? _solrServer.getBaseURL()
+                    : "n/a"));
         }
     }
 
@@ -51,7 +55,7 @@ public class MCRSolrServerFactory {
     public static HttpSolrServer getSolrServer() {
         return MCRSolrServerFactory._solrServer;
     }
-    
+
     public static ConcurrentUpdateSolrServer getConcurrentSolrServer() {
         return MCRSolrServerFactory._concurrentSolrServer;
     }
