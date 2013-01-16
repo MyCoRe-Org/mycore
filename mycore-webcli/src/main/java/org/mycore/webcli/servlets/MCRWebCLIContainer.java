@@ -21,6 +21,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -151,9 +152,17 @@ class MCRWebCLIContainer {
         JsonArray jsonArray = new JsonArray();
         commandsJSON.add("commands", jsonArray);
         for (Map.Entry<String, List<MCRCommand>> entry : knownCommands.entrySet()) {
+            //sort commands
+            List<MCRCommand> commandList = entry.getValue();
+            String[] syntaxes = new String[commandList.size()];
+            for (int i = 0; i < syntaxes.length; i++) {
+                syntaxes[i] = commandList.get(i).getSyntax();
+            }
+            Arrays.sort(syntaxes);
+            //commands sorted
             JsonArray commands = new JsonArray();
-            for (final MCRCommand cmd : entry.getValue()) {
-                commands.add(new JsonPrimitive(cmd.getSyntax()));
+            for (String cmd : syntaxes) {
+                commands.add(new JsonPrimitive(cmd));
             }
             JsonObject item = new JsonObject();
             item.addProperty("name", entry.getKey());
