@@ -22,11 +22,11 @@ import org.mycore.frontend.servlets.MCRServletJob;
  */
 public class MCRSolrSearchServlet extends MCRServlet {
 
-    private static final String JOIN_FROM_RETURN_ID_TO_ID = "{!join from=returnId to=id}";
-
     private enum SolrParameterGroup {
-        SolrParameter, QueryParameter, TypeParameter
+        QueryParameter, SolrParameter, TypeParameter
     }
+
+    private static final String JOIN_PATTERN = "{!join from=returnId to=id}";
 
     private static final long serialVersionUID = 1L;
 
@@ -42,70 +42,23 @@ public class MCRSolrSearchServlet extends MCRServlet {
 
     private List<String> reservedParameterKeys;
 
-    protected Map<String, String[]> buildQueryParameterMap(Map<String, String[]> queryParameters, Map<String, String[]> typeParameters) {
-        HashMap<String, String[]> queryParameterMap = new HashMap<String, String[]>();
-
-        // this Map contains all solr fields that are a solr.type.* as key
-        // and the sor.type as value
-        HashMap<String, String> memberTypeMap = new HashMap<String, String>();
-
-        // fill the member type map
-        for (Entry<String, String[]> currentType : typeParameters.entrySet()) {
-            for (String typeMember : currentType.getValue()) {
-                memberTypeMap.put(typeMember, currentType.getKey());
-            }
-        }
-
-        HashMap<String, StringBuilder> filterQueryMap = new HashMap<String, StringBuilder>();
-        StringBuilder query = new StringBuilder();
-        for (Entry<String, String[]> queryParameter : queryParameters.entrySet()) {
-            String fieldName = queryParameter.getKey();
-
-            // Build the q parameter without solr.type.fields
-            if (!memberTypeMap.containsKey(fieldName)) {
-                for (String fieldValue : queryParameter.getValue()) {
-                    try {
-                        if (fieldValue.length() == 0) {
-                            continue;
-                        }
-                        query.append(buildQueryPart(fieldName, fieldValue));
-                    } catch (UnsupportedEncodingException e) {
-                    }// impossible(UTF-8)
+    /**
+     * Adds a field  with all values to a {@link StringBuilder}
+     * A empty field value will be skipped.
+     * @param query represents a solr query
+     * @param fieldValues containing all the values for the field
+     * @param fieldName the name of the field
+     */
+    private void addFieldToQuery(StringBuilder query, String[] fieldValues, String fieldName) {
+        for (String fieldValue : fieldValues) {
+            try {
+                if (fieldValue.length() == 0) {
+                    continue;
                 }
-            } else {
-                // a stringbuilder for each solr.type
-                String fieldType = memberTypeMap.get(fieldName);
-                if (!filterQueryMap.containsKey(fieldType)) {
-                    filterQueryMap.put(fieldType, new StringBuilder(JOIN_FROM_RETURN_ID_TO_ID));
-                }
-
-                StringBuilder filterQueryBuilder = filterQueryMap.get(fieldType);
-                for (String fieldValue : queryParameter.getValue()) {
-                    try {
-                        if (fieldValue.length() == 0){
-                            continue;
-                        }
-                        filterQueryBuilder.append(buildQueryPart(fieldName, fieldValue));
-                    } catch (UnsupportedEncodingException e) {
-                    }// impossible(UTF-8)
-                }
-            }
+                query.append(buildQueryPart(fieldName, fieldValue));
+            } catch (UnsupportedEncodingException e) {
+            }// impossible(UTF-8)
         }
-
-        // put query and all filterquery´s to the map
-        String[] queryAsArray = { query.toString() };
-        queryParameterMap.put("q", queryAsArray);
-
-        for (StringBuilder filterQueryBuilder : filterQueryMap.values()) {
-            if (filterQueryBuilder.length() <= JOIN_FROM_RETURN_ID_TO_ID.length()) {
-                continue;
-            }
-
-            String[] filterQueryAsArray = { filterQueryBuilder.toString() };
-            queryParameterMap.put("fq", filterQueryAsArray);
-        }
-
-        return queryParameterMap;
     }
 
     private String buildQueryPart(String fieldName, String value) throws UnsupportedEncodingException {
@@ -116,6 +69,56 @@ public class MCRSolrSearchServlet extends MCRServlet {
         sb.append(value);
         sb.append(" ");
         return sb.toString();
+    }
+
+    /**
+     * @param queryParameters all parameter where <code>getParameterGroup.equals(QueryParameter)</code> 
+     * @param typeParameters all parameter where <code>getParameterGroup.equals(TypeParameter)</code>
+     * @return a map wich can be forwarded to {@link MCRSolrSelectProxyServlet}
+     */
+    protected Map<String, String[]> buildSelectParameterMap(Map<String, String[]> queryParameters, Map<String, String[]> typeParameters) {
+        HashMap<String, String[]> queryParameterMap = new HashMap<String, String[]>();
+
+        // and the sor.type as value
+        HashMap<String, String> fieldTypeMap = createFieldTypeMap(typeParameters);
+
+        HashMap<String, StringBuilder> filterQueryMap = new HashMap<String, StringBuilder>();
+        StringBuilder query = new StringBuilder();
+        for (Entry<String, String[]> queryParameter : queryParameters.entrySet()) {
+            String fieldName = queryParameter.getKey();
+            String[] fieldValues = queryParameter.getValue();
+            // Build the q parameter without solr.type.fields
+            if (!fieldTypeMap.containsKey(fieldName)) {
+                addFieldToQuery(query, fieldValues, fieldName);
+            } else {
+                String fieldType = fieldTypeMap.get(fieldName);
+                StringBuilder filterQueryBuilder = getFilterQueryBuilder(filterQueryMap, fieldType);
+                addFieldToQuery(filterQueryBuilder, fieldValues, fieldName);
+            }
+        }
+
+        // put query and all filterquery´s to the map
+        queryParameterMap.put("q", new String[] { query.toString() });
+
+        for (StringBuilder filterQueryBuilder : filterQueryMap.values()) {
+            // skip the whole query if no field has been added
+            if (filterQueryBuilder.length() > JOIN_PATTERN.length()) {
+                queryParameterMap.put("fq", new String[] { filterQueryBuilder.toString() });
+            }
+        }
+
+        return queryParameterMap;
+    }
+
+    private HashMap<String, String> createFieldTypeMap(Map<String, String[]> typeParameters) {
+        HashMap<String, String> fieldTypeMap = new HashMap<String, String>();
+
+        for (Entry<String, String[]> currentType : typeParameters.entrySet()) {
+            for (String typeMember : currentType.getValue()) {
+                fieldTypeMap.put(typeMember, currentType.getKey());
+            }
+        }
+        return fieldTypeMap;
     }
 
     @SuppressWarnings("unchecked")
@@ -129,14 +132,21 @@ public class MCRSolrSearchServlet extends MCRServlet {
         HttpServletResponse response = job.getResponse();
 
         extractParameterList(request.getParameterMap(), queryParameters, solrParameters, typeParameters);
-        Map<String, String[]> buildedSolrParameters = buildQueryParameterMap(queryParameters, typeParameters);
+        Map<String, String[]> buildedSolrParameters = buildSelectParameterMap(queryParameters, typeParameters);
         buildedSolrParameters.putAll(solrParameters);
-        
+
         request.setAttribute(MCRSolrSelectProxyServlet.MAP_KEY, buildedSolrParameters);
         RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher("/servlets/SolrSelectProxy");
         requestDispatcher.forward(request, response);
     }
 
+    /**
+     * Splits the parameters into three groups.
+     * @param requestParameter the map of parameters to split.
+     * @param queryParameter all querys will be stored here.
+     * @param solrParameter all solr-parameters will be stored here.
+     * @param typeParameter all type-parameters will be stored here.
+     */
     protected void extractParameterList(Map<String, String[]> requestParameter, Map<String, String[]> queryParameter,
             Map<String, String[]> solrParameter, Map<String, String[]> typeParameter) {
         for (Entry<String, String[]> currentEntry : requestParameter.entrySet()) {
@@ -156,6 +166,19 @@ public class MCRSolrSearchServlet extends MCRServlet {
             }
         }
 
+    }
+
+    /**
+     * @param filterQueryMap a map wich contains all {@link StringBuilder}
+     * @param fieldType 
+     * @return a {@link StringBuilder} for the specific fieldType
+     */
+    private StringBuilder getFilterQueryBuilder(HashMap<String, StringBuilder> filterQueryMap, String fieldType) {
+        if (!filterQueryMap.containsKey(fieldType)) {
+            filterQueryMap.put(fieldType, new StringBuilder(JOIN_PATTERN));
+        }
+        StringBuilder filterQueryBuilder = filterQueryMap.get(fieldType);
+        return filterQueryBuilder;
     }
 
     /**
