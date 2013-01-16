@@ -23,6 +23,9 @@ import org.mycore.solr.MCRSolrServerFactory;
  * @author shermann
  * */
 abstract public class MCRAbstractSolrContentStream<T> extends ContentStreamBase implements Runnable {
+
+    private static final String UPDATE_PATH = MCRConfiguration.instance().getString("MCR.Module-solr.UpdatePath", "/update");
+
     public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
 
     final static Logger LOGGER = Logger.getLogger(MCRAbstractSolrContentStream.class);
@@ -99,7 +102,7 @@ abstract public class MCRAbstractSolrContentStream<T> extends ContentStreamBase 
         try {
             LOGGER.trace("Solr: indexing data of\"" + getName() + "\"");
             long tStart = System.currentTimeMillis();
-            ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest("/update/xslt");
+            ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest(UPDATE_PATH);
             updateRequest.addContentStream(this);
             updateRequest.setParam("tr", STYLESHEET);
             MCRSolrServerFactory.getSolrServer().request(updateRequest);
