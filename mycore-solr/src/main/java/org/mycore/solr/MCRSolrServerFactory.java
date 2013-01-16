@@ -7,6 +7,7 @@ import org.apache.solr.client.solrj.impl.BinaryRequestWriter;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.solr.logging.MCRSolrLogLevels;
 import org.mycore.solr.utils.MCRSolrUtils;
 
 /**
@@ -35,8 +36,8 @@ public class MCRSolrServerFactory {
         } catch (Error error) {
             LOGGER.error("Error creating solr server object", error);
         } finally {
-            LOGGER.info(MessageFormat.format("Solr: using server at address \"{0}\"", _solrServer != null ? _solrServer.getBaseURL()
-                    : "n/a"));
+            LOGGER.log(MCRSolrLogLevels.SOLR_INFO,
+                    MessageFormat.format("Using server at address \"{0}\"", _solrServer != null ? _solrServer.getBaseURL() : "n/a"));
         }
     }
 

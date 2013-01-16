@@ -6,6 +6,7 @@ import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.common.util.ContentStreamBase;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.logging.MCRSolrLogLevels;
 
 /**
  * This class is recommended for batch updates. It uses a {@link ConcurrentUpdateSolrServer} for better performance.
@@ -18,7 +19,7 @@ public class MCRXMLSolrIndexer {
 
     static String TRANSFORM = MCRConfiguration.instance().getString("MCR.Module-solr.transform", "object2fields.xsl");
     static {
-        LOGGER.info(MCRXMLSolrIndexer.class.getName() + " will use " + TRANSFORM);
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, MCRXMLSolrIndexer.class.getName() + " will use " + TRANSFORM);
     }
 
     public void index(ContentStreamBase stream) {

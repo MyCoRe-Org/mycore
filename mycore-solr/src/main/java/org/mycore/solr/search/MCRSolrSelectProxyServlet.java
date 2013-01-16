@@ -27,6 +27,7 @@ import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.solr.logging.MCRSolrLogLevels;
 import org.mycore.solr.utils.MCRSolrUtils;
 
 public class MCRSolrSelectProxyServlet extends MCRServlet {
@@ -64,7 +65,7 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
 
         HttpMethod solrHttpMethod = MCRSolrSelectProxyServlet.getSolrHttpMethod(solrParameter);
         try {
-            LOGGER.info("Sending Request: " + solrHttpMethod.getURI());
+            LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Sending Request: " + solrHttpMethod.getURI());
             int statusCode = httpClient.executeMethod(solrHttpMethod);
             InputStream solrResponseStream = solrHttpMethod.getResponseBodyAsStream();
 

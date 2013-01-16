@@ -29,6 +29,7 @@ import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRSortBy;
 import org.mycore.solr.MCRSolrServerFactory;
 import org.mycore.solr.legacy.MCRLuceneSolrAdapter;
+import org.mycore.solr.logging.MCRSolrLogLevels;
 
 /**
  * @author shermann
@@ -105,7 +106,7 @@ public class MCRSolrIndexer extends MCRSearcher {
             LOGGER.trace("Solr: submitting data of\"" + objectOrDerivate.getId().toString() + "\" for indexing done in "
                     + (System.currentTimeMillis() - tStart) + "ms ");
         } catch (Exception ex) {
-            LOGGER.error("Error creating transfer thread", ex);
+            LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Error creating transfer thread", ex);
         }
     }
 
@@ -118,7 +119,7 @@ public class MCRSolrIndexer extends MCRSearcher {
             contentStream = new MCRFileContentStream(file);
             executorService.submit(contentStream);
         } catch (Exception ex) {
-            LOGGER.error("Error creating transfer thread", ex);
+            LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Error creating transfer thread", ex);
         }
     }
 
@@ -139,11 +140,11 @@ public class MCRSolrIndexer extends MCRSearcher {
     protected UpdateResponse deleteByIdFromSolr(String solrID) {
         UpdateResponse updateResponse = null;
         try {
-            LOGGER.info("Solr: deleting \"" + solrID + "\" from solr");
+            LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Deleting \"" + solrID + "\" from solr");
             updateResponse = solrServer.deleteById(solrID);
             solrServer.commit();
         } catch (Exception e) {
-            LOGGER.error("Error deleting document from solr", e);
+            LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Error deleting document from solr", e);
         }
         return updateResponse;
     }
@@ -170,9 +171,9 @@ public class MCRSolrIndexer extends MCRSearcher {
      * @param list list of identifiers of the objects to index
      */
     public static void rebuildMetadataIndex(List<String> list) {
-        LOGGER.info("=======================");
-        LOGGER.info("Building Metadata Index");
-        LOGGER.info("=======================");
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "=======================");
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Building Metadata Index");
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "=======================");
 
         if (list.size() == 0) {
             LOGGER.info("Sorry, no documents to index");
@@ -180,7 +181,7 @@ public class MCRSolrIndexer extends MCRSearcher {
         }
 
         long tStart = System.currentTimeMillis();
-        LOGGER.info("Solr: sending " + list.size() + " objects to solr for reindexing");
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Sending " + list.size() + " objects to solr for reindexing");
 
         Element objCollector = new Element("mcrObjs");
         MCRXMLMetadataManager metadataMgr = MCRXMLMetadataManager.instance();
@@ -188,7 +189,7 @@ public class MCRSolrIndexer extends MCRSearcher {
 
         for (String id : list) {
             try {
-                LOGGER.info("Solr: submitting data of\"" + id + "\" for indexing");
+                LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Submitting data of\"" + id + "\" for indexing");
                 Document mcrObjXML = metadataMgr.retrieveXML(MCRObjectID.getInstance(id));
                 objCollector.addContent(mcrObjXML.getRootElement().detach());
 
@@ -197,7 +198,7 @@ public class MCRSolrIndexer extends MCRSearcher {
                     objCollector = new Element("mcrObjs");
                 }
             } catch (Exception ex) {
-                LOGGER.error("Error creating transfer thread", ex);
+                LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Error creating transfer thread", ex);
             }
         }
         /* index remaining docs*/
@@ -208,31 +209,31 @@ public class MCRSolrIndexer extends MCRSearcher {
         }
         long tStop = System.currentTimeMillis();
         int durationInSeconds = (int) (tStop - tStart) / 1000;
-        LOGGER.info("Solr: submitted data of " + list.size() + " objects for indexing done in " + durationInSeconds + " seconds ("
-                + Math.ceil((tStop - tStart) / list.size()) + " ms/object)");
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Submitted data of " + list.size() + " objects for indexing done in " + durationInSeconds
+                + " seconds (" + Math.ceil((tStop - tStart) / list.size()) + " ms/object)");
     }
 
     /**
      * Rebuilds solr's content index.
      */
     public static void rebuildContentIndex() {
-        LOGGER.info("======================");
-        LOGGER.info("Building Content Index");
-        LOGGER.info("======================");
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "======================");
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Building Content Index");
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "======================");
 
         List<String> list = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         if (list.size() == 0) {
-            LOGGER.info("No derivates to index");
+            LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "No derivates to index");
             return;
         }
 
         long tStart = System.currentTimeMillis();
 
-        LOGGER.info("Solr: sending content of files of " + list.size() + " derivates to solr for reindexing");
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Sending content of files of " + list.size() + " derivates to solr for reindexing");
         for (String derivate : list) {
 
             List<MCRFile> files = MCRUtils.getFiles(derivate);
-            LOGGER.info("Sending files (" + files.size() + ") for derivate \"" + derivate + "\"");
+            LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Sending files (" + files.size() + ") for derivate \"" + derivate + "\"");
             MCRFileContentStream contentStream = null;
             for (MCRFile file : files) {
                 try {
@@ -240,14 +241,14 @@ public class MCRSolrIndexer extends MCRSearcher {
                     contentStream = new MCRFileContentStream(file);
                     executorService.submit(contentStream);
                 } catch (Exception ex) {
-                    LOGGER.error("Error creating transfer thread", ex);
+                    LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Error creating transfer thread", ex);
                 }
             }
         }
 
         long tStop = System.currentTimeMillis();
-        LOGGER.info("Solr: submitted data of " + list.size() + " derivates for indexing done in " + (tStop - tStart) + "ms ("
-                + ((float) (tStop - tStart) / list.size()) + " ms/derivate)");
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Submitted data of " + list.size() + " derivates for indexing done in " + (tStop - tStart)
+                + "ms (" + ((float) (tStop - tStart) / list.size()) + " ms/derivate)");
     }
 
     /**
@@ -263,9 +264,9 @@ public class MCRSolrIndexer extends MCRSearcher {
      * Drops the current solr index.
      */
     public static void dropIndex() throws Exception {
-        LOGGER.info("Dropping solr index...");
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Dropping solr index...");
         MCRSolrServerFactory.getSolrServer().deleteByQuery("*:*");
-        LOGGER.info("Dropping solr index...done");
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Dropping solr index...done");
     }
 
     /**
@@ -273,10 +274,10 @@ public class MCRSolrIndexer extends MCRSearcher {
      */
     public static void optimize() {
         try {
-            LOGGER.info("Sending optimize request to solr");
+            LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Sending optimize request to solr");
             MCRSolrServerFactory.getSolrServer().optimize();
         } catch (Exception ex) {
-            LOGGER.error("Could not optimize solr index", ex);
+            LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Could not optimize solr index", ex);
         }
     }
 
@@ -285,7 +286,7 @@ public class MCRSolrIndexer extends MCRSearcher {
      * */
     @SuppressWarnings("rawtypes")
     public MCRResults search(MCRCondition condition, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) {
-        LOGGER.warn("Processing legacy query \"" + condition.toString() + "\"");
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Processing legacy query \"" + condition.toString() + "\"");
         MCRResults result = MCRLuceneSolrAdapter.search(condition, maxResults, sortBy, addSortData);
         return result;
     }

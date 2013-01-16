@@ -47,6 +47,7 @@ import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSortBy;
 import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.logging.MCRSolrLogLevels;
 
 /**
  * @author shermann
@@ -85,6 +86,7 @@ public class MCRLuceneSolrAdapter {
         return solrResults != null ? solrResults : new MCRResults();
     }
 
+    @SuppressWarnings("rawtypes")
     public static SolrQuery getSolrQuery(MCRCondition condition, List<MCRSortBy> sortBy, int maxResults) {
         List<Element> f = new ArrayList<Element>();
         f.add(condition.toXML());
@@ -96,8 +98,8 @@ public class MCRLuceneSolrAdapter {
             throw new MCRException("Error while building SOLR query.", e);
         }
 
-        LOGGER.info("Legacy Query transformed by \"" + MCRLuceneSolrAdapter.class.getCanonicalName() + "\" to \"" + luceneQuery.toString()
-                + "\"");
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Legacy Query transformed by \"" + MCRLuceneSolrAdapter.class.getCanonicalName() + "\" to \""
+                + luceneQuery.toString() + "\"");
         SolrQuery q = MCRLuceneSolrAdapter.applySortOptions(new SolrQuery(luceneQuery.toString()), sortBy);
         q.setIncludeScore(true);
         q.setRows(maxResults == 0 ? Integer.MAX_VALUE : maxResults);
