@@ -5,7 +5,53 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2.2">
+    <release version="2.1.80">
+      <action dev="mcrfluet" type="add">
+        Added MCRContent and MCRContentTransformer classes
+      </action>
+      <action dev="mcrjkupf" type="remove">
+        removed old OAI implementation
+      </action>
+      <action dev="mcrsherm" type="update">
+        mycore-mets: many improvements to mets editor
+      </action>
+      <action dev="mcrheinz" type="update">
+        mycore-iview2: many improvements
+      </action>
+      <action dev="mcrtchef" type="update">
+        update to maven 3
+      </action>
+      <action dev="mcrtchef" type="fix">
+        MyCoRe is fully xlink 1.1 conform
+      </action>
+      <action dev="mcrkrebs" type="add">
+        added many editor forms for different mods document types
+      </action>
+      <action dev="mcrtchef" type="add">
+        added MCRPersistentServlet to circumvent mycore-swf
+      </action>
+      <action dev="mcrtchef" type="update">
+        MCRURIResolver now implements EntityResolver2
+      </action>
+      <action dev="mcrsherm" type="add">
+        all deleted items are stored in table MCRDELETEDITEMS
+      </action>
+      <action dev="mcrfluet" type="add">
+        added MCRExternalProcess to launch command line processes.
+      </action>
+      <action dev="mcrtchef" type="add">
+        added support to generate PDF documents in image viewer.
+        see: http://www.mycore.de/svn/maven/mets-printer/
+      </action>
+      <action dev="mcrmeich" type="update">
+        new OAI implementation
+      </action>
+      <action dev="mcrjkupf" type="update">
+        added support to switch XSL-FO implementation
+      </action>
+      <action dev="mcrtchef" type="remove">
+        removed mycore-imaging, mycore-iview and mycore-migration20-21 component
+      </action>
       <action dev="mcrfluet" type="add">
         Added templates for share/subscribe buttons. See share.xsl and document metadata details view in DocPortal for an example.
       </action>
@@ -13,6 +59,9 @@
         Added basket functionality to web front end. A basket collects objects in the user's session. 
         Objects can be added, removed, their order can be changed and the basket can be cleared completely.
         There can be different baskets for different purposes within the same session. 
+      </action>
+      <action dev="mcrtchef" type="add">
+        added MODS datamodel support through mycore-mods
       </action>
     </release>
     <release version="2.1.0" date="2011-05-18" description="LTS">
