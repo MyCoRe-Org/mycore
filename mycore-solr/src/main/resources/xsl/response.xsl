@@ -17,7 +17,7 @@
     <xsl:variable name="linkTo">
       <xsl:choose>
         <xsl:when test="str[@name='objectType'] = 'data_file'">
-          <xsl:value-of select="concat($WebApplicationBaseURL, 'receive/', str[@name='derivate_owner'])" />
+          <xsl:value-of select="concat($WebApplicationBaseURL, 'receive/', str[@name='returnId'])" />
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="concat($WebApplicationBaseURL, 'receive/',$identifier)" />
@@ -42,9 +42,9 @@
         <xsl:choose>
           <xsl:when test="str[@name='objectType'] = 'data_file'">
             <xsl:call-template name="iViewLinkPrev">
-              <xsl:with-param name="derivates" select="./str[@name='file_owner']" />
-              <xsl:with-param name="mcrid" select="./str[@name='derivate_owner']" />
-              <xsl:with-param name="fileName" select="./str[@name='file_path']" />
+              <xsl:with-param name="derivates" select="./str[@name='DerivateID']" />
+              <xsl:with-param name="mcrid" select="./str[@name='returnId']" />
+              <xsl:with-param name="fileName" select="./str[@name='filePath']" />
             </xsl:call-template>
           </xsl:when>
           <xsl:otherwise>
