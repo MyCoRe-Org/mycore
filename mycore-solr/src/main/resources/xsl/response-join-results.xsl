@@ -51,7 +51,7 @@
 			select="lst[@name='responseHeader']/lst[@name='params']/str[@name='fq' and starts-with(.,$JoinPattern)]" />
 		<xsl:copy>
 			<xsl:copy-of select="@*|node()" />
-			<xsl:if test="$fq">
+			<xsl:if test="$fq and result/doc">
 				<xsl:variable name="orChain">
 					<xsl:apply-templates mode="query" select="result/doc/@id" />
 				</xsl:variable>
