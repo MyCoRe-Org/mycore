@@ -55,7 +55,9 @@ import org.mycore.frontend.servlets.MCRServletJob;
  */
 public class MCRStoreBrowserServlet extends MCRServlet {
 
-    @Override
+	private static final long serialVersionUID = 1L;
+
+	@Override
     protected void doGetPost(MCRServletJob job) throws Exception {
         String pathInfo = job.getRequest().getPathInfo();
 
@@ -89,7 +91,7 @@ class MCRStoreBrowserRequest {
         if (storeID.contains("_"))
             store = MCRXMLMetadataManager.instance().getStore(storeID);
         if (store == null) {
-            store = MCRStoreCenter.instance().getStore(storeID, MCRMetadataStore.class);
+            store = MCRStoreManager.getStore(storeID, MCRMetadataStore.class);
             if (store == null)
                 store = MCRStoreManager.createStore(storeID, MCRMetadataStore.class);
         }
