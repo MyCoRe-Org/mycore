@@ -1,13 +1,17 @@
 package org.mycore.solr.index.cs;
 
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.common.util.ContentStreamBase;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.solr.MCRSolrServerFactory;
 
+/**
+ * This class is recommended for batch updates. It uses a {@link ConcurrentUpdateSolrServer} for better performance.
+ */
 public class MCRXMLSolrIndexer {
-    
+
     private static final String UPDATE_PATH = MCRConfiguration.instance().getString("MCR.Module-solr.UpdatePath", "/update");
 
     final static Logger LOGGER = Logger.getLogger(MCRXMLSolrIndexer.class);
