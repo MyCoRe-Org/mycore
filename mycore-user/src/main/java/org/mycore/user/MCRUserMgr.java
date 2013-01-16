@@ -28,7 +28,6 @@ import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -75,10 +74,10 @@ public class MCRUserMgr {
     private boolean useEncryption = false;
 
     /** the user cache */
-    private MCRCache userCache;
+    private MCRCache<String, MCRUser> userCache;
 
     /** the group cache */
-    private MCRCache groupCache;
+    private MCRCache<String, MCRGroup> groupCache;
 
     /** the class responsible for persistent datastore (configurable ) */
     private MCRUserStore mcrUserStore;
@@ -101,9 +100,9 @@ public class MCRUserMgr {
             throw new MCRException("MCRUserStore error", e);
         }
 
-        userCache = new MCRCache(20, "UserMgr users"); // resonable values?
+        userCache = new MCRCache<String, MCRUser>(20, "UserMgr users"); // resonable values?
         // This might also be
-        groupCache = new MCRCache(10, "UserMgr groups"); // read from
+        groupCache = new MCRCache<String, MCRGroup>(10, "UserMgr groups"); // read from
         // mycore.properties....
     }
 
@@ -935,7 +934,7 @@ public class MCRUserMgr {
      * @return true if the password matches the password stored, false otherwise
      */
     public boolean login(String userID, String passwd) throws MCRException {
-        MCRUser loginUser = retrieveUser(userID, false);
+        MCRUser loginUser = retrieveUser(userID, true);
 
         if (loginUser == null) {
             throw new MCRException("Login denied. User does not exist: " + userID);
@@ -990,7 +989,7 @@ public class MCRUserMgr {
         // In order to compare a modified group object with the persistent one
         // we must
         // be able to force this method to get the group from the store
-        MCRGroup reqGroup = bFromDataStore ? null : (MCRGroup) groupCache.get(groupID);
+        MCRGroup reqGroup = bFromDataStore ? null : groupCache.get(groupID);
 
         if (reqGroup == null) { // We do not have this group in the cache.
             try {
@@ -1069,7 +1068,7 @@ public class MCRUserMgr {
         // In order to compare a modified user object with the persistent one we
         // must
         // be able to force this method to get the user from the store
-        MCRUser reqUser = bFromDataStore ? null : (MCRUser) userCache.get(userID);
+        MCRUser reqUser = bFromDataStore ? null : userCache.get(userID);
 
         if (reqUser == null) { // We do not have this user in the cache
 
