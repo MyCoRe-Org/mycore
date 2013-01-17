@@ -5,9 +5,60 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2.1.80">
+    <release version="2.1.80" date="2013-01-XX" description="Beta 1">
+      <action dev="mcrtchef" type="add">
+        ?XSL.Style=versions on "/receive/*" URLs displays version information
+      </action>
+      <action dev="mcrsherm" type="add">
+        added mycore-solr to add Apache SOLR support
+      </action>
+      <action dev="mcrtchef" type="add">
+        added MCRIFSCommands to operate on IFS from CLI
+      </action>
+      <action dev="mcrtchef" type="add">
+        added MCRLockServlet to lock metadata update forms
+      </action>
+      <action dev="mcrmeich" type="add">
+        added mycore-classeditor - a new classeditor that uses RESTful web services
+      </action>
+      <action dev="mcrmeich" type="add">
+        added JAX-RS support via Apache Jersey
+      </action>
+      <action dev="mcrtchef" type="add">
+        added mycore-migration21-22 component
+      </action>
+      <action dev="mcrtchef" type="update">
+        MCRLayoutService uses MCRContent and MCRXSLTransformer to pipe XML through a set of XSL templates. 
+      </action>
+      <action dev="mcrtchef" type="add">
+        added mycore-wfc (workflow component)
+      </action>
       <action dev="mcrfluet" type="add">
         Added MCRContent and MCRContentTransformer classes
+      </action>
+      <action dev="mcrtchef" type="add">
+        added mycore-user2 component
+      </action>
+      <action dev="mcrtchef" type="fix">
+        instances of MCRSession are bound to the first IP address
+      </action>
+      <action dev="mcrfluet" type="add">
+        added org.mycore.datamodel.language.* for code-independent representation for languages used in datamodels
+      </action>
+      <action dev="mcradler" type="update">
+        mycore-media: many improvements
+      </action>
+      <action dev="mcrtchef" type="remove">
+        removed MCRFSMapperServlet
+      </action>
+      <action dev="mcrsherm" type="add">
+        added MCRLoggingCommands to change log levels through webcli
+      </action>
+      <action dev="mcrsherm" type="add">
+        added MCRTarServlet to generate tar files
+      </action>
+      <action dev="mcrmeich" type="update">
+        new OAI implementation
       </action>
       <action dev="mcrjkupf" type="remove">
         removed old OAI implementation
@@ -42,9 +93,6 @@
       <action dev="mcrtchef" type="add">
         added support to generate PDF documents in image viewer.
         see: http://www.mycore.de/svn/maven/mets-printer/
-      </action>
-      <action dev="mcrmeich" type="update">
-        new OAI implementation
       </action>
       <action dev="mcrjkupf" type="update">
         added support to switch XSL-FO implementation
