@@ -3,11 +3,14 @@
  */
 package org.mycore.solr.index.cs;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.jdom.Document;
@@ -180,12 +183,12 @@ public class MCRSolrIndexer extends MCRSearcher {
             return;
         }
 
-        long tStart = System.currentTimeMillis();
+        StopWatch swatch = new StopWatch();
+        swatch.start();
         LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Sending " + list.size() + " objects to solr for reindexing");
 
         Element objCollector = new Element("mcrObjs");
         MCRXMLMetadataManager metadataMgr = MCRXMLMetadataManager.instance();
-        MCRXMLSolrIndexer xmlSolrIndexer = new MCRXMLSolrIndexer();
 
         for (String id : list) {
             try {
@@ -194,7 +197,7 @@ public class MCRSolrIndexer extends MCRSearcher {
                 objCollector.addContent(mcrObjXML.getRootElement().detach());
 
                 if (objCollector.getChildren().size() % BULK_SIZE == 0) {
-                    xmlSolrIndexer.index(new MCRXMLContentCollectorStream(objCollector));
+                    executorService.submit(new MCRXMLSolrIndexer(new MCRXMLContentCollectorStream(objCollector)));
                     objCollector = new Element("mcrObjs");
                 }
             } catch (Exception ex) {
@@ -205,12 +208,23 @@ public class MCRSolrIndexer extends MCRSearcher {
         int remaining = objCollector.getChildren().size();
         LOGGER.trace("Indexing almost done. Only " + remaining + " object(s) remaining");
         if (remaining > 0) {
-            xmlSolrIndexer.index(new MCRXMLContentCollectorStream(objCollector));
+            executorService.submit(new MCRXMLSolrIndexer(new MCRXMLContentCollectorStream(objCollector)));
         }
-        long tStop = System.currentTimeMillis();
-        int durationInSeconds = (int) (tStop - tStart) / 1000;
-        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Submitted data of " + list.size() + " objects for indexing done in " + durationInSeconds
-                + " seconds (" + Math.ceil((tStop - tStart) / list.size()) + " ms/object)");
+
+        long durationInMilliSeconds = swatch.getTime();
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO,
+                "Submitted data of " + list.size() + " objects for indexing done in " + Math.ceil(durationInMilliSeconds / 1000)
+                        + " seconds (" + durationInMilliSeconds / list.size() + " ms/object)");
+        try {
+            // we wait until all index threads are finished 
+            MCRSolrServerFactory.getConcurrentSolrServer().blockUntilFinished();
+            // one last commit before we are done
+            MCRSolrServerFactory.getConcurrentSolrServer().commit();
+        } catch (SolrServerException e) {
+            LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Could not commit changes to index", e);
+        } catch (IOException e) {
+            LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "An " + e.getClass() + " occured", e);
+        }
     }
 
     /**
