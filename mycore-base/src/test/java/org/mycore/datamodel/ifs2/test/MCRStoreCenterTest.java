@@ -22,7 +22,7 @@ public class MCRStoreCenterTest {
         MCRStoreCenter storeHeap = MCRStoreCenter.instance();
 
         FakeStoreConfig config = new FakeStoreConfig();
-        storeHeap.addStore(new FakeStore(config));
+        storeHeap.addStore(config.getID(), new FakeStore(config));
         String storeID = config.getID();
         FakeStore fakeStore = storeHeap.getStore(storeID, FakeStore.class);
 
@@ -36,10 +36,10 @@ public class MCRStoreCenterTest {
     @Test(expected = MCRStoreAlreadyExistsException.class)
     public void addStoreTwice() throws Exception {
         MCRStoreCenter storeHeap = MCRStoreCenter.instance();
-
-        FakeStore fakeStore = new FakeStore(new FakeStoreConfig());
-        storeHeap.addStore(fakeStore);
-        storeHeap.addStore(fakeStore);
+        FakeStoreConfig config = new FakeStoreConfig();
+        FakeStore fakeStore = new FakeStore(config);
+        storeHeap.addStore(config.getID(), fakeStore);
+        storeHeap.addStore(config.getID(), fakeStore);
     }
     
     class FakeStoreConfig implements MCRStoreConfig{
