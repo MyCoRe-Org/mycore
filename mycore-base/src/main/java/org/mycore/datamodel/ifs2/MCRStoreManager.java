@@ -1,14 +1,10 @@
 package org.mycore.datamodel.ifs2;
 
-import java.util.HashMap;
-
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs2.MCRStore.MCRStoreConfig;
 
 public class MCRStoreManager {
     
-    protected static HashMap<String, MCRStore> stores = new HashMap<String, MCRStore>();
-
     public static <T extends MCRStore> T createStore(String ID, Class<T> storeClass) throws InstantiationException, IllegalAccessException {
         return createStore(new MCRStoreDefaultConfig(ID), storeClass);
     }
@@ -17,7 +13,7 @@ public class MCRStoreManager {
         T store = storeClass.newInstance();
         store.init(config);
         try {
-            MCRStoreCenter.instance().addStore(store);
+            MCRStoreCenter.instance().addStore(store.getID(), store);
         } catch (Exception e) {
             throw new MCRException("Could not create store with ID " + config.getID() + ", store allready exists");
         }

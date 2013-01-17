@@ -115,7 +115,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
     private String getBase(MCRFileReader fr) {
         String ownerID = fr.getOwnerID();
         int pos = ownerID.lastIndexOf("_");
-        return ownerID.substring(0, pos);
+        return getID()+"/"+ownerID.substring(0, pos);
     }
 
     @Override
@@ -207,7 +207,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         pos = first.lastIndexOf("_");
         String base = first.substring(0, pos);
         int slotID = Integer.parseInt(first.substring(pos + 1));
-        return getStore(base).retrieve(slotID);
+        return getStore(getID()+"/"+base).retrieve(slotID);
     }
 
     private MCRFile getFile(String storageID) throws IOException {
