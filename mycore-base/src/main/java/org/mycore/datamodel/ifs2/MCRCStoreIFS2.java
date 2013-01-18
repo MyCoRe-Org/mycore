@@ -74,36 +74,38 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         LOGGER.info("Default slot layout for store " + storeID + " is " + slotLayout);
     }
 
-    private void configureStore(String base) {
-        String storeConfigPrefix = "MCR.IFS2.Store." + base + ".";
+    private MCRFileStore getStore(String base) {
+        String sid = getID() + "_" + base;
+        MCRFileStore store = MCRStoreManager.getStore(sid, MCRFileStore.class);
+        if (store == null)
+            store = createStore(sid, base);
+        return store;
+    }
+
+    private synchronized MCRFileStore createStore(String sid, String base) {
+        try {
+            configureStore(sid, base);
+            return MCRStoreManager.createStore(sid, MCRFileStore.class);
+        } catch (Exception ex) {
+            String msg = "Could not create IFS2 file store with ID " + sid;
+            throw new MCRConfigurationException(msg, ex);
+        }
+    }
+
+    private void configureStore(String sid, String base) {
+        String storeConfigPrefix = "MCR.IFS2.Store." + sid + ".";
         String storeBaseDir = baseDir + File.separatorChar + base.replace("_", File.separator);
 
         configureIfNotSet(storeConfigPrefix + "Class", MCRFileStore.class.getName());
         configureIfNotSet(storeConfigPrefix + "BaseDir", storeBaseDir);
         configureIfNotSet(storeConfigPrefix + "SlotLayout", slotLayout);
+        configureIfNotSet(storeConfigPrefix + "Prefix", "");
     }
 
     private void configureIfNotSet(String property, String value) {
         value = MCRConfiguration.instance().getString(property, value);
         MCRConfiguration.instance().set(property, value);
         LOGGER.info("Configured " + property + "=" + value);
-    }
-
-    private MCRFileStore getStore(String base) {
-        MCRFileStore store = MCRStoreManager.getStore(base, MCRFileStore.class);
-        if (store == null)
-            store = createStore(base);
-        return store;
-    }
-
-    private synchronized MCRFileStore createStore(String base) {
-        try {
-            configureStore(base);
-            return MCRStoreManager.createStore(base, MCRFileStore.class);
-        } catch (Exception ex) {
-            String msg = "Could not create IFS2 file store with ID " + base;
-            throw new MCRConfigurationException(msg, ex);
-        }
     }
 
     private int getSlotID(MCRFileReader fr) {
@@ -115,7 +117,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
     private String getBase(MCRFileReader fr) {
         String ownerID = fr.getOwnerID();
         int pos = ownerID.lastIndexOf("_");
-        return getID()+"/"+ownerID.substring(0, pos);
+        return ownerID.substring(0, pos);
     }
 
     @Override
@@ -207,7 +209,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         pos = first.lastIndexOf("_");
         String base = first.substring(0, pos);
         int slotID = Integer.parseInt(first.substring(pos + 1));
-        return getStore(getID()+"/"+base).retrieve(slotID);
+        return getStore(base).retrieve(slotID);
     }
 
     private MCRFile getFile(String storageID) throws IOException {
