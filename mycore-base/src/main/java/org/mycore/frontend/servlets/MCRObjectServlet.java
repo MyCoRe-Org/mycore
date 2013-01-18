@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRContent;
@@ -73,7 +74,7 @@ public class MCRObjectServlet extends MCRServlet {
     private static final String EDITOR_ID_TABLE_KEY = "MCRObjectServlet.editorIds";
 
     private static final int REV_CURRENT = 0;
-    
+
     private static final String I18N_ERROR_PREFIX = "component.base.error";
 
     /**
@@ -166,17 +167,17 @@ public class MCRObjectServlet extends MCRServlet {
         }
 
         if (!MCRAccessManager.checkPermission(mcrid, "read")) { // check read permission for ID
+            MCRSession currentSession = MCRSessionMgr.getCurrentSession();
             job.getResponse().sendError(
                 HttpServletResponse.SC_UNAUTHORIZED,
-                getErrorI18N("accessDenied", mcrid.toString(), MCRSessionMgr.getCurrentSession().getUserInformation().getUserID(), MCRSessionMgr
-                    .getCurrentSession()
-                    .getCurrentIP()));
+                getErrorI18N(I18N_ERROR_PREFIX, "accessDenied", mcrid.toString(), currentSession.getUserInformation().getUserID(),
+                    currentSession.getCurrentIP()));
             return null;
         }
         return mcrid;
     }
 
-    private MCRContent requestVersionedObject(MCRServletJob job, long rev) throws IOException  {
+    private MCRContent requestVersionedObject(MCRServletJob job, long rev) throws IOException {
         final MCRObjectID mcrid = getMCRObjectID(job);
         if (mcrid == null) {
             return null;
@@ -184,7 +185,7 @@ public class MCRObjectServlet extends MCRServlet {
         MCRMetadataStore metadataStore = MCRXMLMetadataManager.instance().getStore(mcrid);
         if (metadataStore instanceof MCRVersioningMetadataStore) {
             MCRContent content = MCRUtils.requestVersionedObjectAsContent(mcrid, rev);
-            if(content != null) {
+            if (content != null) {
                 return content;
             }
             job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, getErrorI18N(I18N_ERROR_PREFIX, "revisionNotFound", rev, mcrid));
