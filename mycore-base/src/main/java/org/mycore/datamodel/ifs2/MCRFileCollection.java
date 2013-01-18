@@ -26,6 +26,7 @@ package org.mycore.datamodel.ifs2;
 import java.io.IOException;
 
 import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.VFS;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -105,6 +106,14 @@ public class MCRFileCollection extends MCRDirectory {
     protected void saveAdditionalData() throws IOException {
         FileObject target = VFS.getManager().resolveFile(fo, dataFile);
         new MCRJDOMContent(data.getDocument()).sendTo(target);
+    }
+
+    /**
+     * Deletes this file collection with all its data and children
+     */
+    public void delete() throws IOException {
+        data.removeContent();
+        fo.delete(Selectors.SELECT_ALL);
     }
 
     /**

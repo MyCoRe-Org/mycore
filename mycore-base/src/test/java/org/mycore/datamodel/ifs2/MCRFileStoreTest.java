@@ -77,10 +77,16 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
     public void delete() throws Exception {
         MCRFileCollection col = getStore().create();
         assertTrue(getStore().exists(col.getID()));
+        
         getStore().delete(col.getID());
         assertFalse(getStore().exists(col.getID()));
+        
         MCRFileCollection col2 = getStore().retrieve(col.getID());
         assertNull(col2);
+        
+        MCRFileCollection col3 = getStore().create();
+        col3.delete();
+        assertFalse(getStore().exists(col3.getID()));
     }
 
     @Test
@@ -211,7 +217,7 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         col.clearLabels();
         assertTrue(col.getLabels().isEmpty());
     }
-
+    
     @Test
     public void repairMetadata() throws Exception {
         MCRFileCollection col = getStore().create();
