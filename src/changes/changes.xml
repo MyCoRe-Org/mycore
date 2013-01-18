@@ -5,7 +5,7 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2.1.80" date="2013-01-XX" description="Beta 1">
+    <release version="2.1.80" date="2013-01-18" description="Beta 1">
       <action dev="mcrtchef" type="add">
         ?XSL.Style=versions on "/receive/*" URLs displays version information
       </action>
