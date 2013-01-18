@@ -22,7 +22,7 @@
     <hibernate.version>3.6.10.Final</hibernate.version>
     <lucene.version>3.6.1</lucene.version>
     <xalan.version>2.7.1</xalan.version>
-    <changelog.since>2011-05-18</changelog.since>
+    <changelog.since>2013-01-18</changelog.since>
   </properties>
   <issueManagement>
     <system>sourceforge</system>
