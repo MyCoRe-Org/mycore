@@ -5,7 +5,7 @@
   <parent>
     <artifactId>mycore-parent</artifactId>
     <groupId>org.mycore</groupId>
-    <version>13-SNAPSHOT</version>
+    <version>13</version>
   </parent>
   <artifactId>mycore</artifactId>
   <packaging>pom</packaging>
@@ -450,12 +450,12 @@
       <dependency>
         <groupId>org.mycore.iview2</groupId>
         <artifactId>image-tiler</artifactId>
-        <version>1.7-SNAPSHOT</version>
+        <version>1.7</version>
       </dependency>
       <dependency>
         <groupId>org.mycore.mets</groupId>
         <artifactId>mets-model</artifactId>
-        <version>0.2-SNAPSHOT</version>
+        <version>0.2</version>
       </dependency>
       <dependency>
         <groupId>junit</groupId>
