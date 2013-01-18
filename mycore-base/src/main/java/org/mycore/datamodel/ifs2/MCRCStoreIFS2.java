@@ -99,7 +99,6 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         configureIfNotSet(storeConfigPrefix + "Class", MCRFileStore.class.getName());
         configureIfNotSet(storeConfigPrefix + "BaseDir", storeBaseDir);
         configureIfNotSet(storeConfigPrefix + "SlotLayout", slotLayout);
-        configureIfNotSet(storeConfigPrefix + "Prefix", "");
     }
 
     private void configureIfNotSet(String property, String value) {
