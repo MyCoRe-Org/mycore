@@ -169,7 +169,7 @@ public class MCRLDAPClient {
                     String attributeID = attributeIDs.next();
                     Attribute attribute = attributes.get(attributeID);
 
-                    for (NamingEnumeration values = attribute.getAll(); values.hasMore();) {
+                    for (NamingEnumeration<?> values = attribute.getAll(); values.hasMore();) {
                         String attributeValue = values.next().toString();
                         LOGGER.debug(attributeID + "=" + attributeValue);
 

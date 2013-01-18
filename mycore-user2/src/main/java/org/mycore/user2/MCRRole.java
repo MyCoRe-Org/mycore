@@ -103,11 +103,13 @@ public class MCRRole {
         return isSystemRole;
     }
 
+    @SuppressWarnings("unused")
     @XmlElement(name = "label")
     private MCRLabel[] getLabelsArray() {
         return labels.values().toArray(new MCRLabel[labels.size()]);
     }
 
+    @SuppressWarnings("unused")
     private void setLabelsArray(MCRLabel[] labels) {
         for (MCRLabel label : labels) {
             this.labels.put(label.getLang(), label);
