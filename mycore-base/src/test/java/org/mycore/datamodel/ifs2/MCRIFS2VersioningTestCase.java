@@ -2,8 +2,8 @@ package org.mycore.datamodel.ifs2;
 
 import java.io.File;
 
-import org.apache.commons.vfs.Selectors;
-import org.apache.commons.vfs.VFS;
+import org.apache.commons.vfs2.Selectors;
+import org.apache.commons.vfs2.VFS;
 import org.junit.After;
 
 public class MCRIFS2VersioningTestCase extends MCRIFS2TestCase {

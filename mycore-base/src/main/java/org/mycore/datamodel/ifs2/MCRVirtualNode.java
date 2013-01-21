@@ -25,7 +25,7 @@ package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
 
-import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs2.FileObject;
 
 /**
  * A virtual node in a file collection, which may be a child node of a container

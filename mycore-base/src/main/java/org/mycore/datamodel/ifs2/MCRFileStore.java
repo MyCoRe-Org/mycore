@@ -26,7 +26,7 @@ package org.mycore.datamodel.ifs2;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs2.FileObject;
 import org.mycore.common.MCRException;
 
 /**

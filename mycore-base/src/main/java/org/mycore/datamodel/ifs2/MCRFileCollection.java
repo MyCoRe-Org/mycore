@@ -25,9 +25,9 @@ package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
 
-import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.Selectors;
-import org.apache.commons.vfs.VFS;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.Selectors;
+import org.apache.commons.vfs2.VFS;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;

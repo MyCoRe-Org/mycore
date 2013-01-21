@@ -11,8 +11,8 @@ import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.Date;
 
-import org.apache.commons.vfs.Selectors;
-import org.apache.commons.vfs.VFS;
+import org.apache.commons.vfs2.Selectors;
+import org.apache.commons.vfs2.VFS;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;

@@ -26,8 +26,8 @@ package org.mycore.datamodel.ifs2;
 import java.io.IOException;
 import java.util.Date;
 
-import org.apache.commons.vfs.FileContent;
-import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs2.FileContent;
+import org.apache.commons.vfs2.FileObject;
 import org.jdom.JDOMException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRContent;

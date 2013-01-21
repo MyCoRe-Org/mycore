@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>mycore-parent</artifactId>
@@ -20,8 +21,9 @@
     <java.target.version>1.6</java.target.version>
     <uniqueVersion>false</uniqueVersion>
     <hibernate.version>3.6.10.Final</hibernate.version>
-    <lucene.version>3.6.1</lucene.version>
+    <lucene.version>3.6.2</lucene.version>
     <xalan.version>2.7.1</xalan.version>
+    <jersey.version>1.17</jersey.version>
     <changelog.since>2013-01-18</changelog.since>
   </properties>
   <issueManagement>
@@ -459,7 +461,7 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.8.2</version>
+        <version>4.11</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -502,7 +504,7 @@
       <dependency>
         <groupId>jaxen</groupId>
         <artifactId>jaxen</artifactId>
-        <version>1.1.1</version>
+        <version>1.1.4</version>
         <scope>runtime</scope>
         <exclusions>
           <exclusion>
@@ -522,33 +524,33 @@
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-compress</artifactId>
-        <version>1.3</version>
+        <version>1.4.1</version>
       </dependency>
       <dependency>
-        <groupId>commons-vfs</groupId>
-        <artifactId>commons-vfs</artifactId>
-        <version>1.0</version>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-vfs2</artifactId>
+        <version>2.0</version>
       </dependency>
       <dependency>
-	     <groupId>commons-httpclient</groupId>
-	     <artifactId>commons-httpclient</artifactId>
-	     <version>3.1</version>
-      </dependency>    
+        <groupId>commons-httpclient</groupId>
+        <artifactId>commons-httpclient</artifactId>
+        <version>3.1</version>
+      </dependency>
       <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
-        <version>1.6</version>
+        <version>1.7</version>
       </dependency>
       <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
-        <version>1.7.1</version>
+        <version>2.2.2</version>
       </dependency>
       <dependency>
         <!-- required for commons-vfs -->
         <groupId>com.jcraft</groupId>
         <artifactId>jsch</artifactId>
-        <version>0.1.44-1</version>
+        <version>0.1.49</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -559,7 +561,7 @@
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>2.0.1</version>
+        <version>2.4</version>
       </dependency>
       <dependency>
         <groupId>org.apache.axis</groupId>
@@ -569,7 +571,7 @@
       <dependency>
         <groupId>log4j</groupId>
         <artifactId>log4j</artifactId>
-        <version>1.2.16</version>
+        <version>1.2.17</version>
         <exclusions>
           <exclusion>
             <groupId>com.sun.jdmk</groupId>
@@ -624,7 +626,7 @@
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpmime</artifactId>
-        <version>4.2.2</version>
+        <version>4.2.3</version>
       </dependency>
       <dependency>
         <groupId>xerces</groupId>
@@ -639,7 +641,7 @@
       <dependency>
         <groupId>javax.mail</groupId>
         <artifactId>mail</artifactId>
-        <version>1.4.3</version>
+        <version>1.4.5</version>
       </dependency>
       <dependency>
         <groupId>javax.activation</groupId>
@@ -675,7 +677,7 @@
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId>
-        <version>4.1</version>
+        <version>4.2.3</version>
       </dependency>
       <dependency>
         <groupId>com.drewnoakes</groupId>
@@ -690,24 +692,24 @@
       <dependency>
         <groupId>org.apache.pdfbox</groupId>
         <artifactId>pdfbox</artifactId>
-        <version>1.5.0</version>
+        <version>1.7.1</version>
       </dependency>
       <dependency>
         <groupId>org.tmatesoft.svnkit</groupId>
         <artifactId>svnkit</artifactId>
-        <version>1.3.5</version>
+        <version>1.7.8</version>
       </dependency>
       <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
-        <version>3.2.7</version>
+        <version>3.5.1</version>
         <optional>true</optional>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>1.6.2</version>
+        <version>2.1</version>
       </dependency>
       <dependency>
         <groupId>org.apache.axis</groupId>
@@ -717,7 +719,7 @@
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
         <artifactId>fop</artifactId>
-        <version>1.0</version>
+        <version>1.1</version>
         <exclusions>
           <exclusion>
             <groupId>xml-apis</groupId>
@@ -726,6 +728,14 @@
           <exclusion>
             <groupId>xml-apis</groupId>
             <artifactId>xml-apis</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.avalon.framework</groupId>
+            <artifactId>avalon-framework-impl</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.avalon.framework</groupId>
+            <artifactId>avalon-framework-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -737,7 +747,7 @@
       <dependency>
         <groupId>org.apache.ws.security</groupId>
         <artifactId>wss4j</artifactId>
-        <version>1.5.7</version>
+        <version>1.6.9</version>
       </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>
@@ -751,6 +761,11 @@
         <version>4.3.1</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.avalon.framework</groupId>
+        <artifactId>avalon-framework-api</artifactId>
+        <version>4.3.1</version>
+      </dependency>
+      <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-core</artifactId>
         <version>${hibernate.version}</version>
@@ -758,7 +773,7 @@
       <dependency>
         <groupId>org.apache.ant</groupId>
         <artifactId>ant</artifactId>
-        <version>1.8.2</version>
+        <version>1.8.4</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -770,7 +785,7 @@
       <dependency>
         <groupId>net.sf.ehcache</groupId>
         <artifactId>ehcache-core</artifactId>
-        <version>2.4.7</version>
+        <version>2.6.3</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -781,7 +796,7 @@
       <dependency>
         <groupId>org.javassist</groupId>
         <artifactId>javassist</artifactId>
-        <version>3.14.0-GA</version>
+        <version>3.17.1-GA</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -822,19 +837,29 @@
       </dependency>
       <dependency>
         <groupId>com.sun.jersey</groupId>
-        <artifactId>jersey-server</artifactId>
-        <version>1.1.5.1</version>
+        <artifactId>jersey-client</artifactId>
+        <version>${jersey.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.jersey.contribs</groupId>
+        <artifactId>jersey-multipart</artifactId>
+        <version>${jersey.version}</version>
       </dependency>
       <dependency>
         <groupId>com.sun.jersey</groupId>
-        <artifactId>jersey-test-framework</artifactId>
-        <version>1.1.5.1</version>
+        <artifactId>jersey-server</artifactId>
+        <version>${jersey.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.jersey.jersey-test-framework</groupId>
+        <artifactId>jersey-test-framework-grizzly</artifactId>
+        <version>1.16</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>com.sun.jersey.contribs</groupId>
         <artifactId>jersey-apache-client</artifactId>
-        <version>1.1.5.1</version>
+        <version>${jersey.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>

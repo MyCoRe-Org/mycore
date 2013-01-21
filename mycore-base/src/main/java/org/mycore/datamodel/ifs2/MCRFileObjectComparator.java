@@ -2,7 +2,7 @@ package org.mycore.datamodel.ifs2;
 
 import java.util.Comparator;
 
-import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs2.FileObject;
 
 class MCRFileObjectComparator implements Comparator<FileObject>{
 

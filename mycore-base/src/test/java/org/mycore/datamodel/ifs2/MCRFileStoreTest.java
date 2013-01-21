@@ -37,7 +37,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs2.FileObject;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.junit.Test;

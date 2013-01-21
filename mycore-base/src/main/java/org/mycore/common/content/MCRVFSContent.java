@@ -29,9 +29,9 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 
-import org.apache.commons.vfs.FileContent;
-import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.VFS;
+import org.apache.commons.vfs2.FileContent;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.VFS;
 import org.apache.log4j.Logger;
 
 /**

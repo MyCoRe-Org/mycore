@@ -29,8 +29,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.apache.commons.vfs.*;
-import org.apache.commons.vfs.util.RandomAccessMode;
+import org.apache.commons.vfs2.*;
+import org.apache.commons.vfs2.util.RandomAccessMode;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRVFSContent;
 

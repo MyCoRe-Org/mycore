@@ -34,7 +34,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Date;
 
-import org.apache.commons.vfs.RandomAccessContent;
+import org.apache.commons.vfs2.RandomAccessContent;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.junit.Test;

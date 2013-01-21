@@ -36,7 +36,7 @@ public class MCRPWCallback implements CallbackHandler {
             if (callback instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callback;
                 // set the password given a username
-                if ("wss4j".equals(pc.getIdentifer())) {
+                if ("wss4j".equals(pc.getIdentifier())) {
                     pc.setPassword("security");
                 }
             } else {

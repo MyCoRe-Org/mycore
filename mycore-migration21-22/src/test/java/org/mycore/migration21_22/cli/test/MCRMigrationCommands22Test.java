@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.util.Date;
 import java.util.List;
 
@@ -33,7 +32,7 @@ public class MCRMigrationCommands22Test {
     public TemporaryFolder tmpFolder = new TemporaryFolder();
 
     @Before
-    public void init() throws MalformedURLException{
+    public void init() throws IOException{
         File baseDir = tmpFolder.newFolder("baseDir");
         File svnBase = tmpFolder.newFolder("SVNBase");
         MCRConfiguration.instance().set("MCR.CLI.Classes.Annotated", MCRMigrationCommands22.class.getName());

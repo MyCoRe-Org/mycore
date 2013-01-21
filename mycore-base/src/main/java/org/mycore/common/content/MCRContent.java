@@ -36,7 +36,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs2.FileObject;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.mycore.common.MCRUtils;

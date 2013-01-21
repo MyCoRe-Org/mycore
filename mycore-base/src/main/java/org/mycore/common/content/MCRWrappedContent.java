@@ -31,7 +31,7 @@ import java.io.UnsupportedEncodingException;
 
 import javax.xml.transform.Source;
 
-import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs2.FileObject;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.mycore.datamodel.ifs2.MCRContentInputStream;

@@ -26,8 +26,8 @@ package org.mycore.datamodel.ifs2;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.provider.local.LocalFile;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.provider.local.LocalFile;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRDevNull;
