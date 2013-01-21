@@ -73,7 +73,7 @@ public class MCRMetsResolver implements URIResolver {
             if (metsFile != null) {
                 //TODO: generate new METS Output
                 //ignoreNodes.add(metsFile);
-                return new StreamSource(((MCRFile) metsFile).getContentAsInputStream());
+                return ((MCRFile) metsFile).getContent().getSource();
             }
             Document mets = MCRMETSGenerator.getGenerator().getMETS(dir, ignoreNodes).asDocument();
             return new JDOMSource(mets);
