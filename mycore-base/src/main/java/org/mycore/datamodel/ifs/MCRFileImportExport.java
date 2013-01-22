@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRDevNull;
 import org.mycore.common.MCRException;
+import org.mycore.common.content.streams.MCRMD5InputStream;
 
 /**
  * Imports or exports complete directory trees with all contained files and subdirectories between the local host's filesystem and the internal MCRDirectory
@@ -142,7 +143,7 @@ public class MCRFileImportExport {
                 } catch (FileNotFoundException willNotBeThrown) {
                 }
 
-                MCRContentInputStream cis = new MCRContentInputStream(fin);
+                MCRMD5InputStream cis = new MCRMD5InputStream(fin);
 
                 IOUtils.copy(cis, new MCRDevNull());
 
