@@ -32,6 +32,7 @@ import java.security.NoSuchAlgorithmException;
 
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
+import org.mycore.common.content.streams.MCRBlockingInputStream;
 
 /**
  * This input stream is used by the MyCoRe filesystem classes to read the

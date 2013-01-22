@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.datamodel.ifs;
+package org.mycore.common.content.streams;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
