@@ -135,13 +135,11 @@ public class MCRFileViewWorkflowServlet extends MCRServlet {
                 String mime = MCRFileContentTypeFactory.detectType(in.getName(), header).getMimeType();
                 LOGGER.debug("MimeType = " + mime);
                 job.getResponse().setContentType(mime);
-                fin = new FileInputStream(in);
                 job.getResponse().setContentLength((int) (in.length()));
 
-                MCRUtils.copyStream(fin, out);
+                MCRUtils.copyStream(cis, out);
             } finally {
                 out.close();
-                fin.close();
                 cis.close();
             }
         } else {
