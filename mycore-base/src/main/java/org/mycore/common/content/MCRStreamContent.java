@@ -26,7 +26,7 @@ package org.mycore.common.content;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.mycore.datamodel.ifs2.MCRContentInputStream;
+import org.mycore.datamodel.ifs.MCRContentInputStream;;
 
 /**
  * Reads MCRContent from an input stream. Typically, this content is not reusable, so that

@@ -34,7 +34,7 @@ import javax.xml.transform.Source;
 import org.apache.commons.vfs2.FileObject;
 import org.jdom.Document;
 import org.jdom.JDOMException;
-import org.mycore.datamodel.ifs2.MCRContentInputStream;
+import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 

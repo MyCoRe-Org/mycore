@@ -34,6 +34,7 @@ import org.mycore.common.MCRDevNull;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
+import org.mycore.datamodel.ifs.MCRContentInputStream;
 
 /**
  * Represents a file stored in a file collection. This is a file that is

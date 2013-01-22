@@ -41,7 +41,7 @@ import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLParserFactory;
-import org.mycore.datamodel.ifs2.MCRContentInputStream;
+import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 
