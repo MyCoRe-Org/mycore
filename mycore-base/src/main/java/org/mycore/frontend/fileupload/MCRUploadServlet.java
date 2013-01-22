@@ -33,10 +33,8 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +55,7 @@ import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.content.streams.MCRNotClosingInputStream;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
@@ -382,7 +381,6 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
      * @return a new {@link LinkedHashMap} with all extracted filenames and file
      *         items
      */
-    @SuppressWarnings("unchecked")
     private LinkedHashMap<String, FileItem> getFileItems(MCRRequestParameters params) {
         LinkedHashMap<String, FileItem> result = new LinkedHashMap<String, FileItem>();
         Enumeration parameterNames = params.getParameterNames();
@@ -399,7 +397,8 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
     private void uploadZipFile(MCRUploadHandler handler, InputStream in) throws IOException, Exception {
         ZipInputStream zis = new ZipInputStream(in);
-        ZipEntry entry = null;
+        MCRNotClosingInputStream nis = new MCRNotClosingInputStream(zis);
+        ZipEntry entry = null; 
         while ((entry = zis.getNextEntry()) != null) {
             String path = entry.getName();
 
@@ -414,12 +413,13 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
             if (entry.isDirectory()) {
                 LOGGER.debug("UploadServlet skipping ZIP entry " + path + ", is a directory");
-                continue;
+            } else {
+                checkPathName(path);
+                LOGGER.info("UploadServlet unpacking ZIP entry " + path);
+                handler.receiveFile(path, nis, 0, null);
             }
-            checkPathName(path);
-            LOGGER.info("UploadServlet unpacking ZIP entry " + path);
-            handler.receiveFile(path, zis, 0, null);
         }
+        nis.reallyClose();
     }
 
     /**
