@@ -30,10 +30,10 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.provider.local.LocalFile;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-import org.mycore.common.MCRDevNull;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
+import org.mycore.common.content.streams.MCRDevNull;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 
 /**

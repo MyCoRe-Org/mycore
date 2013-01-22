@@ -17,8 +17,8 @@ import java.io.IOException;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRArgumentChecker;
-import org.mycore.common.MCRDevNull;
 import org.mycore.common.MCRException;
+import org.mycore.common.content.streams.MCRDevNull;
 import org.mycore.common.content.streams.MCRMD5InputStream;
 
 /**

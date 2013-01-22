@@ -20,7 +20,7 @@
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
-package org.mycore.common;
+package org.mycore.common.content.streams;
 
 import java.io.IOException;
 import java.io.OutputStream;
