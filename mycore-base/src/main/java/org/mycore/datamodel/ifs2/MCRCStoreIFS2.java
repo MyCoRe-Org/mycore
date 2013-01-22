@@ -139,11 +139,11 @@ public class MCRCStoreIFS2 extends MCRContentStore {
             if (slot == null)
                 return false;
 
-            String path = fr.getPath();
+            String path = fr.getAbsolutePath();
             MCRNode node = slot.getNodeByPath(path);
             return (node != null);
         } catch (IOException ex) {
-            String msg = "Exception checking existence of file " + fr.getPath();
+            String msg = "Exception checking existence of file " + fr.getAbsolutePath();
             throw new MCRPersistenceException(msg, ex);
         }
     }
@@ -158,7 +158,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         if (slot == null)
             slot = store.create(slotID);
 
-        String path = fr.getPath();
+        String path = fr.getAbsolutePath();
         MCRDirectory dir = slot;
         StringTokenizer steps = new StringTokenizer(path, "/");
         while (steps.hasMoreTokens()) {
@@ -175,7 +175,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
             }
         }
 
-        return fr.getOwnerID() + "/" + path;
+        return fr.getOwnerID() + path;
     }
 
     @Override
