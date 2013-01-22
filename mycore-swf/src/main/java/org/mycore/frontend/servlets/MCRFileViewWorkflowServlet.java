@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRUtils;
-import org.mycore.datamodel.ifs.MCRContentInputStream;
+import org.mycore.common.content.streams.MCRHeaderInputStream;
 import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 
@@ -128,19 +128,19 @@ public class MCRFileViewWorkflowServlet extends MCRServlet {
 
         if (in.isFile()) {
             FileInputStream fin = new FileInputStream(in);
-            MCRContentInputStream cis = new MCRContentInputStream(fin);
+            MCRHeaderInputStream his = new MCRHeaderInputStream(fin);
             OutputStream out = new BufferedOutputStream(job.getResponse().getOutputStream());
             try {
-                byte[] header = cis.getHeader();
+                byte[] header = his.getHeader();
                 String mime = MCRFileContentTypeFactory.detectType(in.getName(), header).getMimeType();
                 LOGGER.debug("MimeType = " + mime);
                 job.getResponse().setContentType(mime);
                 job.getResponse().setContentLength((int) (in.length()));
 
-                MCRUtils.copyStream(cis, out);
+                MCRUtils.copyStream(his, out);
             } finally {
                 out.close();
-                cis.close();
+                his.close();
             }
         } else {
             LOGGER.warn("File " + in.getName() + " not found.");

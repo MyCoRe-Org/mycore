@@ -72,11 +72,11 @@ import org.jdom.JDOMException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.streams.MCRMD5InputStream;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
-import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
@@ -1056,14 +1056,14 @@ public class MCRUtils {
      * @throws NoSuchAlgorithmException 
      */
     public static String getMD5Sum(InputStream inputStream) throws IOException, NoSuchAlgorithmException {
-        MCRContentInputStream contentInputStream = null;
+        MCRMD5InputStream md5InputStream = null;
         try {
-            contentInputStream = new MCRContentInputStream(inputStream);
-            contentInputStream.consume();
-            return contentInputStream.getMD5String();
+            md5InputStream = new MCRMD5InputStream(inputStream);
+            IOUtils.copy(md5InputStream, new MCRDevNull());
+            return md5InputStream.getMD5String();
         } finally {
-            if (contentInputStream != null) {
-                contentInputStream.close();
+            if (md5InputStream != null) {
+                md5InputStream.close();
             }
         }
     }
