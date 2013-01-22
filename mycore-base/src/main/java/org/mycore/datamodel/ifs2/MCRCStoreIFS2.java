@@ -58,6 +58,8 @@ public class MCRCStoreIFS2 extends MCRContentStore {
 
     private String baseDir;
 
+    private boolean ignoreOwnerBase;
+
     private final static Logger LOGGER = Logger.getLogger(MCRCStoreIFS2.class);
 
     @Override
@@ -72,19 +74,28 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         slotLayout = pattern.length() - 4 + "-2-2";
         slotLayout = config.getString(prefix + "SlotLayout", slotLayout);
         LOGGER.info("Default slot layout for store " + storeID + " is " + slotLayout);
+
+        ignoreOwnerBase = config.getBoolean(prefix + "IgnoreOwnerBase", false);
     }
 
     private MCRFileStore getStore(String base) {
-        String sid = getID() + "_" + base;
+        String sid = getID();
+        String storeBaseDir = baseDir;
+
+        if (!ignoreOwnerBase) {
+            sid += "_" + base;
+            storeBaseDir += File.separatorChar + base.replace("_", File.separator);
+        }
+
         MCRFileStore store = MCRStoreManager.getStore(sid, MCRFileStore.class);
         if (store == null)
-            store = createStore(sid, base);
+            store = createStore(sid, storeBaseDir);
         return store;
     }
 
-    private synchronized MCRFileStore createStore(String sid, String base) {
+    private synchronized MCRFileStore createStore(String sid, String storeBaseDir) {
         try {
-            configureStore(sid, base);
+            configureStore(sid, storeBaseDir);
             return MCRStoreManager.createStore(sid, MCRFileStore.class);
         } catch (Exception ex) {
             String msg = "Could not create IFS2 file store with ID " + sid;
@@ -92,10 +103,8 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         }
     }
 
-    private void configureStore(String sid, String base) {
+    private void configureStore(String sid, String storeBaseDir) {
         String storeConfigPrefix = "MCR.IFS2.Store." + sid + ".";
-        String storeBaseDir = baseDir + File.separatorChar + base.replace("_", File.separator);
-
         configureIfNotSet(storeConfigPrefix + "Class", MCRFileStore.class.getName());
         configureIfNotSet(storeConfigPrefix + "BaseDir", storeBaseDir);
         configureIfNotSet(storeConfigPrefix + "SlotLayout", slotLayout);
