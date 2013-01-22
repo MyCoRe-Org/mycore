@@ -41,6 +41,11 @@ public interface MCRFileReader {
     public String getID();
 
     /**
+     * Returns the absolute path of this file
+     */
+    public String getAbsolutePath();
+
+    /**
      * Returns the relative path of this file
      */
     public String getPath();

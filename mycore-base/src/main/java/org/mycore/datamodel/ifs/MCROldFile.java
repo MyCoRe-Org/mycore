@@ -133,6 +133,13 @@ public class MCROldFile implements MCRFileReader {
     }
 
     /**
+     * Returns the absolute path of this file
+     */
+    public String getAbsolutePath() {
+        return "/" + path;
+    }
+    
+    /**
      * Returns the filename of this file
      */
     public String getFileName() {
