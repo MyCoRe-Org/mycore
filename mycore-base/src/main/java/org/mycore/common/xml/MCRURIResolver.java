@@ -427,7 +427,7 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
 
         try {
             MCRSourceContent content = new MCRSourceContent(source);
-            LOGGER.info("Wrapped " + content.getBaseContent().getClass().getCanonicalName() + ": " + content.getBaseContent().getSystemId());
+            LOGGER.debug("Wrapped " + content.getBaseContent().getClass().getCanonicalName() + ": " + content.getBaseContent().getSystemId());
             return (Element) content.asXML().getRootElement().detach();
         } catch (Exception e) {
             throw new MCRException("Error while resolving " + uri, e);
