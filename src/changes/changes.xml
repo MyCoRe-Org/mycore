@@ -7,6 +7,9 @@
   <body>
     <release version="2.1.81" date="2013-0X-XX" description="Beta 2">
       <action dev="mcrtchef" type="update">
+        update to Java 7
+      </action>
+      <action dev="mcrtchef" type="update">
         update to JDOM 2
       </action>
       <action dev="mcrfluet" type="update">

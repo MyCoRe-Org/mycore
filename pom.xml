@@ -18,7 +18,7 @@
     required for such applications, for example metadata management, querying, OAI harvesting interface, or an image viewer
     module.</description>
   <properties>
-    <java.target.version>1.6</java.target.version>
+    <java.target.version>1.7</java.target.version>
     <uniqueVersion>false</uniqueVersion>
     <hibernate.version>3.6.10.Final</hibernate.version>
     <lucene.version>3.6.2</lucene.version>
