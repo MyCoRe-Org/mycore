@@ -32,6 +32,9 @@
             <xsl:when test="./arr[@name='search_result_link_text']">
               <xsl:value-of select="./arr[@name='search_result_link_text']/str[position() = 1]" />
             </xsl:when>
+            <xsl:when test="./str[@name='fileName']">
+              <xsl:value-of select="./str[@name='fileName']" />
+            </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="$identifier" />
             </xsl:otherwise>
