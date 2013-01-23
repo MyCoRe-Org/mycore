@@ -29,7 +29,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
 /**

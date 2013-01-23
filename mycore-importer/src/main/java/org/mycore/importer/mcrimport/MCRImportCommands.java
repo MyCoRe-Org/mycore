@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
+import org.jdom2.Element;
+import org.jdom2.input.SAXBuilder;
 import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;

@@ -26,10 +26,11 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.xpath.XPath;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
@@ -52,18 +53,10 @@ import org.mycore.datamodel.metadata.MCRObject;
  * @version $Revision$ $Date$
  */
 public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
-    private static XPath xpathClassifications;
 
     private static final MCRCategoryDAO DAO = new MCRCategoryDAOImpl();
 
     private static Logger LOGGER = Logger.getLogger(MCRClassificationMappingEventHandler.class);
-    static {
-        try {
-            xpathClassifications = XPath.newInstance("//*[@categid]");
-        } catch (JDOMException je) {
-            LOGGER.error("Error creating XPath expression", je);
-        }
-    }
 
     private MCRMetaElement oldMappings = null;
 
@@ -97,7 +90,6 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
         undo(obj);
     }
 
-    @SuppressWarnings("unchecked")
     private void createMapping(MCRObject obj) {
         MCRMetaElement mappings = obj.getMetadata().getMetadataElement("mappings");
         if (mappings != null) {
@@ -107,9 +99,9 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
 
         Element currentClassElement = null;
         try {
-            List<Element> classList = xpathClassifications.selectNodes(obj.getMetadata().createXML());
             Document doc = new Document((Element) obj.getMetadata().createXML().detach());
-            classList = xpathClassifications.selectNodes(doc);
+            XPathExpression<Element> classElementPath = XPathFactory.instance().compile("//*[@categid]", Filters.element());
+            List<Element> classList = classElementPath.evaluate(doc);
             if (classList.size() > 0 && mappings == null) {
                 mappings = new MCRMetaElement();
                 mappings.setTag("mappings");
@@ -120,8 +112,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             }
             for (Element classElement : classList) {
                 currentClassElement = classElement;
-                MCRCategory categ = DAO.getCategory(
-                        new MCRCategoryID(classElement.getAttributeValue("classid"), classElement.getAttributeValue("categid")), 0);
+                MCRCategory categ = DAO.getCategory(new MCRCategoryID(classElement.getAttributeValue("classid"), classElement.getAttributeValue("categid")), 0);
                 addMappings(mappings, categ);
             }
         } catch (Exception je) {

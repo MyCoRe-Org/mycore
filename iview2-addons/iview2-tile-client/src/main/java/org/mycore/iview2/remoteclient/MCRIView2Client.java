@@ -36,7 +36,7 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 
 import org.apache.log4j.Logger;
-import org.jdom.JDOMException;
+import org.jdom2.JDOMException;
 import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
 import org.mycore.iview2.services.remoteclient.MCRIView2RemoteFunctions;

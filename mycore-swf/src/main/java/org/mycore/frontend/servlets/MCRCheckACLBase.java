@@ -30,9 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Namespace;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -257,7 +257,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                 throw new MCRConfigurationException("Can't read editor file " + myfile);
             }
 
-            jdom = new org.jdom.input.SAXBuilder().build(in);
+            jdom = new org.jdom2.input.SAXBuilder().build(in);
 
             Element root = jdom.getRootElement();
             @SuppressWarnings("unchecked")
@@ -315,7 +315,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                 input3.setAttribute("value", ID.getTypeId());
                 form.addContent(input3);
             }
-        } catch (org.jdom.JDOMException e) {
+        } catch (org.jdom2.JDOMException e) {
             throw new MCRException("Can't read editor file " + myfile + " or it has a parse error.", e);
         }
 

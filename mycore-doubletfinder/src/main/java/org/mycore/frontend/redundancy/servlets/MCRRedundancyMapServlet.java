@@ -30,14 +30,15 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.filter.ElementFilter;
-import org.jdom.filter.Filter;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.filter.ElementFilter;
+import org.jdom2.filter.Filter;
+import org.jdom2.filter.Filters;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -81,7 +82,7 @@ public class MCRRedundancyMapServlet extends MCRServlet {
         String redunObject = job.getRequest().getParameter("redunObject").trim();
 
         String xPathExpr = "//redundancyObjects[@id=" + redunObject + "]";
-        org.jdom.xpath.XPath xp = org.jdom.xpath.XPath.newInstance(xPathExpr);
+        org.jdom2.xpath.XPath xp = org.jdom2.xpath.XPath.newInstance(xPathExpr);
         Element redundancyObjectsElement = (Element) xp.selectSingleNode(redunMap);
 
         initCounter(job, redundancyObjectsElement);
@@ -104,7 +105,7 @@ public class MCRRedundancyMapServlet extends MCRServlet {
         fos.close();
         LOGGER.debug("saved changed  dublicate list to file=" + redMapPath);
 
-        int maxObjects = redunMap.getRootElement().getContent(new ElementFilter()).size();
+        int maxObjects = redunMap.getRootElement().getContent(Filters.element()).size();
         // send to client
         forwardToClient(job, maxObjects);
     }

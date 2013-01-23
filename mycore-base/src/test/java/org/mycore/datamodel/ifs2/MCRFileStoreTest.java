@@ -38,8 +38,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.vfs2.FileObject;
-import org.jdom.Document;
-import org.jdom.Element;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.junit.Test;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRByteContent;

@@ -28,8 +28,8 @@ import java.text.MessageFormat;
 
 import org.apache.log4j.Logger;
 import org.apache.xerces.parsers.SAXParser;
-import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
+import org.jdom2.Document;
+import org.jdom2.input.SAXBuilder;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
 import org.xml.sax.InputSource;

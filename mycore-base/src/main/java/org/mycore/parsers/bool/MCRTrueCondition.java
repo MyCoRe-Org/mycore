@@ -23,7 +23,7 @@
 
 package org.mycore.parsers.bool;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 
 /**
  * Implementation of the boolean "true" primitive

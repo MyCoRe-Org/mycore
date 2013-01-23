@@ -26,7 +26,7 @@ package org.mycore.access.mcrimpl;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.parsers.bool.MCRBooleanClauseParser;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRFalseCondition;

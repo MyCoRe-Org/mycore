@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileType;
-import org.jdom.Element;
+import org.jdom2.Element;
 
 /**
  * Represents a directory stored in a file collection, which may contain other

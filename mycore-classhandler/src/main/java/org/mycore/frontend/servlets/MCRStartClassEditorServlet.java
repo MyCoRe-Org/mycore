@@ -24,15 +24,15 @@
 
 package org.mycore.frontend.servlets;
 
-import static org.jdom.Namespace.XML_NAMESPACE;
+import static org.jdom2.Namespace.XML_NAMESPACE;
 
 import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Element;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
@@ -149,7 +149,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
 
         // nach Editoraufruf von new/modify auf commit
         if ("commit-classification".equals(todo)) {
-            org.jdom.Document indoc = sub.getXML();
+            org.jdom2.Document indoc = sub.getXML();
             boolean bret = false;
 
             // for debug

@@ -23,16 +23,16 @@
 
 package org.mycore.frontend.servlets;
 
-import static org.jdom.Namespace.XML_NAMESPACE;
+import static org.jdom2.Namespace.XML_NAMESPACE;
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.xpath.XPath;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.xpath.XPath;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRMailer;

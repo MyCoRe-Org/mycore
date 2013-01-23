@@ -34,7 +34,7 @@ public interface MCRQueryClientInterface {
     /*
      * Initalize the class for using.
      */
-    abstract void init(org.jdom.Element xmlhost);
+    abstract void init(org.jdom2.Element xmlhost);
 
     /*
      * The method return the alias of the host definition. @return the host

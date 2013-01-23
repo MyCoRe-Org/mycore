@@ -27,7 +27,7 @@ import java.io.IOException;
 
 import javax.servlet.ServletException;
 
-import org.jdom.Document;
+import org.jdom2.Document;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRJDOMContent;

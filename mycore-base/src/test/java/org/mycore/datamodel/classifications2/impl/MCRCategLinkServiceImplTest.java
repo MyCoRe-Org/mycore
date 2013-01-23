@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
+import org.jdom2.Document;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRException;

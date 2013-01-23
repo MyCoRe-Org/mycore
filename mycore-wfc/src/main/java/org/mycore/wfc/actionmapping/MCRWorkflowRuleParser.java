@@ -23,7 +23,7 @@
 
 package org.mycore.wfc.actionmapping;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.access.mcrimpl.MCRRuleParser;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.parsers.bool.MCRCondition;
@@ -51,7 +51,7 @@ public class MCRWorkflowRuleParser extends MCRRuleParser {
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.access.mcrimpl.MCRRuleParser#parseElement(org.jdom.Element)
+     * @see org.mycore.access.mcrimpl.MCRRuleParser#parseElement(org.jdom2.Element)
      */
     @Override
     protected MCRCondition<?> parseElement(Element e) {

@@ -119,7 +119,7 @@ public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
      * @param ID
      *            the MCRObjectID
      */
-    public final boolean storeService(org.jdom.Element outelm, MCRServletJob job, MCRObjectID ID) {
+    public final boolean storeService(org.jdom2.Element outelm, MCRServletJob job, MCRObjectID ID) {
 
         MCRObjectService service = new MCRObjectService();
         service.setFromDOM(outelm);
@@ -129,7 +129,7 @@ public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
             return false;
         }
         while (0 < rulesize) {
-            org.jdom.Element conditions = service.getRule(0).getCondition();
+            org.jdom2.Element conditions = service.getRule(0).getCondition();
             String permission = service.getRule(0).getPermission();
             if (storedrules.contains(permission)) {
                 MCRAccessManager.updateRule(ID, permission, conditions, "");

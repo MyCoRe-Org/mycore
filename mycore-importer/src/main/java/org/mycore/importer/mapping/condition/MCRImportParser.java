@@ -3,7 +3,7 @@ package org.mycore.importer.mapping.condition;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.parsers.bool.MCRBooleanClauseParser;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRFalseCondition;

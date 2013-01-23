@@ -3,7 +3,7 @@ package org.mycore.frontend.editor;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.junit.Test;
 import org.junit.Before;
 

@@ -195,7 +195,7 @@ final public class MCRMetaLinkID extends MCRMetaLink {
      *                and to are not a MCRObjectID
      */
     @Override
-    public final void setFromDOM(org.jdom.Element element) {
+    public final void setFromDOM(org.jdom2.Element element) {
         super.setFromDOM(element);
 
         if (linktype.equals("locator")) {

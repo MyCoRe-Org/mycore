@@ -100,7 +100,7 @@ class MCRLuceneResults extends MCRResults {
     }
 
     @Override
-    protected int merge(org.jdom.Document doc, String hostAlias) {
+    protected int merge(org.jdom2.Document doc, String hostAlias) {
         throw new UnsupportedOperationException("MCRResults are read only");
     }
 

@@ -12,12 +12,17 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.transform.JDOMResult;
-import org.jdom.transform.JDOMSource;
-import org.jdom.xpath.XPath;
+import org.jdom2.Attribute;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.filter.Filters;
+import org.jdom2.transform.JDOMResult;
+import org.jdom2.transform.JDOMSource;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.xml.MCRXSLTransformation;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -25,7 +30,7 @@ import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 
-@MCRCommandGroup(name="Migrate from 2.1 to 2.2")
+@MCRCommandGroup(name = "Migrate from 2.1 to 2.2")
 public class MCRMigrationCommands22 extends MCRAbstractCommands {
     private static Logger LOGGER = Logger.getLogger(MCRMigrationCommands22.class);
 
@@ -36,16 +41,17 @@ public class MCRMigrationCommands22 extends MCRAbstractCommands {
     public static void xlinkLabelMigration() throws TransformerException, JDOMException, IOException {
         MCRXMLMetadataManager xmlMetaManager = MCRXMLMetadataManager.instance();
         List<String> listIDs = xmlMetaManager.listIDs();
-        
+
         InputStream resourceAsStream = MCRMigrationCommands22.class.getResourceAsStream("/xsl/xlinkLabelMigration.xsl");
         Source stylesheet = new StreamSource(resourceAsStream);
         Transformer xsltTransformer = MCRXSLTransformation.getInstance().getStylesheet(stylesheet).newTransformer();
 
-        XPath xlinkLabel = XPath.newInstance("/mycoreobject/*/*[starts-with(@class,'MCRMetaLink')]/*/@xlink:label");
+        XPathExpression<Attribute> xlinkLabel = XPathFactory.instance().compile("/mycoreobject/*/*[starts-with(@class,'MCRMetaLink')]/*/@xlink:label",
+            Filters.attribute(), null, MCRConstants.XLINK_NAMESPACE);
         for (String ID : listIDs) {
             MCRObjectID mcrid = MCRObjectID.getInstance(ID);
             Document mcrObjXML = xmlMetaManager.retrieveXML(mcrid);
-            if (!xlinkLabel.selectNodes(mcrObjXML).isEmpty()) {
+            if (xlinkLabel.evaluateFirst(mcrObjXML) != null) {
                 Source xmlSource = new JDOMSource(mcrObjXML);
                 JDOMResult jdomResult = new JDOMResult();
                 xsltTransformer.transform(xmlSource, jdomResult);
@@ -58,24 +64,25 @@ public class MCRMigrationCommands22 extends MCRAbstractCommands {
             }
         }
     }
-    
-    @MCRCommand(help="Replace ':' in categID with '_'", syntax="fix colone in categID")
-    public static void fixCategID() throws JDOMException, TransformerException{
+
+    @MCRCommand(help = "Replace ':' in categID with '_'", syntax = "fix colone in categID")
+    public static void fixCategID() throws JDOMException, TransformerException {
         Session dbSession = MCRHIBConnection.instance().getSession();
         dbSession.createSQLQuery("update MCRCATEGORY set CATEGID=replace(categid,':','-') where CATEGID like '%:%'").executeUpdate();
-        
+
         MCRXMLMetadataManager xmlMetaManager = MCRXMLMetadataManager.instance();
         List<String> listIDs = xmlMetaManager.listIDs();
-        
+
         InputStream resourceAsStream = MCRMigrationCommands22.class.getResourceAsStream("/xsl/replaceColoneInCategID.xsl");
         Source stylesheet = new StreamSource(resourceAsStream);
         Transformer xsltTransformer = MCRXSLTransformation.getInstance().getStylesheet(stylesheet).newTransformer();
 
-        XPath xlinkLabel = XPath.newInstance("/mycoreobject/metadata/*[@class='MCRMetaClassification']/*[contains(@categid,':')]");
+        XPathExpression<Element> xlinkLabel = XPathFactory.instance().compile(
+            "/mycoreobject/metadata/*[@class='MCRMetaClassification']/*[contains(@categid,':')]", Filters.element());
         for (String ID : listIDs) {
             MCRObjectID mcrid = MCRObjectID.getInstance(ID);
             Document mcrObjXML = xmlMetaManager.retrieveXML(mcrid);
-            if (!xlinkLabel.selectNodes(mcrObjXML).isEmpty()) {
+            if (xlinkLabel.evaluateFirst(mcrObjXML) != null) {
                 Source xmlSource = new JDOMSource(mcrObjXML);
                 JDOMResult jdomResult = new JDOMResult();
                 xsltTransformer.transform(xmlSource, jdomResult);

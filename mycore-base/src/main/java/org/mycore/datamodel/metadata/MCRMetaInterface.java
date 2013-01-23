@@ -115,7 +115,7 @@ public interface MCRMetaInterface extends Cloneable {
      * @param element
      *            a relevant JDOM element for the metadata
      */
-    public void setFromDOM(org.jdom.Element element);
+    public void setFromDOM(org.jdom2.Element element);
 
     /**
      * This methode create a XML stream for a metadata part.
@@ -124,7 +124,7 @@ public interface MCRMetaInterface extends Cloneable {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML data of the metadata part
      */
-    public org.jdom.Element createXML() throws MCRException;
+    public org.jdom2.Element createXML() throws MCRException;
 
     /**
      * This methode check the validation of the content of this class.

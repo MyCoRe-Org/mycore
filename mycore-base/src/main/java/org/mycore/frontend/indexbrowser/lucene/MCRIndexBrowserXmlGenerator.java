@@ -5,14 +5,14 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.jdom.Attribute;
-import org.jdom.Content;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.filter.ElementFilter;
-import org.jdom.output.XMLOutputter;
-import org.jdom.xpath.XPath;
+import org.jdom2.Attribute;
+import org.jdom2.Content;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.filter.ElementFilter;
+import org.jdom2.output.XMLOutputter;
+import org.jdom2.xpath.XPath;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSession;
@@ -139,7 +139,7 @@ public class MCRIndexBrowserXmlGenerator {
      */
     public Document getXMLContent() {
         if (LOGGER.isDebugEnabled()) {
-            XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
+            XMLOutputter out = new XMLOutputter(org.jdom2.output.Format.getPrettyFormat());
             LOGGER.debug("Results: \n" + out.outputString(page));
         }
         return new Document(page);
@@ -212,7 +212,7 @@ public class MCRIndexBrowserXmlGenerator {
                     boolean hasdefault = false;
                     while (it.hasNext()) {
                         Element el = (Element) it.next();
-                        String lang = el.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE);
+                        String lang = el.getAttributeValue("lang", org.jdom2.Namespace.XML_NAMESPACE);
                         if (lang != null && lang.equals(currentlang)) {
                             if (!attribute.equals(el.getAttributeValue("type"))) {
                                 if (value.length() > 0) {
@@ -234,7 +234,7 @@ public class MCRIndexBrowserXmlGenerator {
                         if (hasdefault) {
                             while (it.hasNext()) {
                                 Element el = (Element) it.next();
-                                String lang = el.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE);
+                                String lang = el.getAttributeValue("lang", org.jdom2.Namespace.XML_NAMESPACE);
                                 if (lang != null && lang.equals(defaultlang)) {
                                     if (!attribute.equals(el.getAttributeValue("type"))) {
                                         if (value.length() > 0) {

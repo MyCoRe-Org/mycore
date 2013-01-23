@@ -24,7 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
 /**
@@ -219,7 +219,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      *            a relevant JDOM element for the metadata
      */
     @Override
-    public final void setFromDOM(org.jdom.Element element) {
+    public final void setFromDOM(org.jdom2.Element element) {
         super.setFromDOM(element);
         measurement = element.getAttributeValue("measurement");
         dimension = element.getAttributeValue("dimension");
@@ -235,7 +235,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRNumber part
      */
     @Override
-    public final org.jdom.Element createXML() throws MCRException {
+    public final org.jdom2.Element createXML() throws MCRException {
         Element elm = super.createXML();
         if (dimension != null && dimension.length() != 0) {
             elm.setAttribute("dimension", dimension);

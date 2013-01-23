@@ -30,8 +30,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
-import org.jdom.Namespace;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -75,7 +75,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
     public void doGetPost(MCRServletJob job) throws Exception {
         // read the XML data
         MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
-        org.jdom.Document indoc = sub.getXML();
+        org.jdom2.Document indoc = sub.getXML();
 
         // read the parameter
         MCRRequestParameters parms;
@@ -93,7 +93,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
         LOGGER.info("LANG = " + lang);
 
         // create a service object and prepare it
-        Element outelm = prepareService((org.jdom.Document) indoc.clone(), ID, job, lang);
+        Element outelm = prepareService((org.jdom2.Document) indoc.clone(), ID, job, lang);
 
         // Save the prepared metadata object
         boolean okay = storeService(outelm, job, ID);
@@ -151,7 +151,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
      *            the current language
      */
     @SuppressWarnings("unchecked")
-    protected Element prepareService(org.jdom.Document jdom_in, MCRObjectID ID, MCRServletJob job, String lang) throws Exception {
+    protected Element prepareService(org.jdom2.Document jdom_in, MCRObjectID ID, MCRServletJob job, String lang) throws Exception {
         Element elm_out = null;
         ArrayList<String> logtext = new ArrayList<String>();
         Element root = jdom_in.getRootElement();
@@ -296,7 +296,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
         // prepare editor with error messages
         String pagedir = MCRConfiguration.instance().getString("MCR.editor_page_dir", "");
         String myfile = pagedir + MCRConfiguration.instance().getString("MCR.editor_page_error_formular", "editor_error_formular.xml");
-        org.jdom.Document jdom = null;
+        org.jdom2.Document jdom = null;
 
         try {
             InputStream in = (new URL(getBaseURL() + myfile + "?XSL.Style=xml")).openStream();
@@ -305,7 +305,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
                 throw new MCRConfigurationException("Can't read editor file " + myfile);
             }
 
-            jdom = new org.jdom.input.SAXBuilder().build(in);
+            jdom = new org.jdom2.input.SAXBuilder().build(in);
 
             Element root = jdom.getRootElement();
             List<Element> sectionlist = root.getChildren("section");
@@ -364,7 +364,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
                 input3.setAttribute("value", ID.getTypeId());
                 form.addContent(input3);
             }
-        } catch (org.jdom.JDOMException e) {
+        } catch (org.jdom2.JDOMException e) {
             throw new MCRException("Can't read editor file " + myfile + " or it has a parse error.", e);
         }
 

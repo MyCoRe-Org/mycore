@@ -1,8 +1,8 @@
 package org.mycore.importer.convert;
 
 import static org.junit.Assert.assertEquals;
-import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
+import org.jdom2.Document;
+import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.importer.MCRImportRecord;

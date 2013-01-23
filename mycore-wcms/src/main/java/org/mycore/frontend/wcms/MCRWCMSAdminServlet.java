@@ -32,13 +32,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-import org.jdom.xpath.XPath;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+import org.jdom2.xpath.XPath;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
@@ -157,7 +157,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
     }
 
     /**
-     * Returns an org.jdom.element containing all MCRUsers that have access to
+     * Returns an org.jdom2.element containing all MCRUsers that have access to
      * wcms write management
      * 
      * @return all wcms write admin users OR null if no user has access

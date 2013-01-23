@@ -2,8 +2,8 @@ package org.mycore.user;
 
 import java.util.List;
 
-import org.jdom.Document;
-import org.jdom.Element;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
@@ -36,7 +36,7 @@ public abstract class MCRUserEditorHandler {
         }
 
         // Loop over all assignable group IDs
-        org.jdom.Element root = new org.jdom.Element("items");
+        org.jdom2.Element root = new org.jdom2.Element("items");
 
         for (String groupID : groupIDs) {
             Element item = new Element("item")
@@ -70,7 +70,7 @@ public abstract class MCRUserEditorHandler {
         }
         List<String> userIDs = MCRUserMgr.instance().getAllUserIDs();
         // Loop over all assignable group IDs
-        Element root = new org.jdom.Element("items");
+        Element root = new org.jdom2.Element("items");
         for (String userID : userIDs) {
             Element item = new Element("item").setAttribute("value", (String) userID).setAttribute("label", (String) userID);
             root.addContent(item);
@@ -85,7 +85,7 @@ public abstract class MCRUserEditorHandler {
         }
         groupIDs = MCRUserMgr.instance().getAllGroupIDs();
         // Loop over all assignable group IDs
-        org.jdom.Element root = new org.jdom.Element("items");
+        org.jdom2.Element root = new org.jdom2.Element("items");
         for (String groupID : groupIDs) {
             Element item = new Element("item")
                     .setAttribute("value", (String) groupID)

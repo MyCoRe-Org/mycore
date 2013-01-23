@@ -29,8 +29,8 @@ import java.util.GregorianCalendar;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
 
@@ -91,7 +91,7 @@ public class MCRDirectoryXML {
         LOGGER.info("MCRDirectoryXML: start listing of directory " + dir.getName());
 
         Element root = new Element("mcr_directory");
-        Document doc = new org.jdom.Document(root);
+        Document doc = new org.jdom2.Document(root);
 
         root.setAttribute("ID", dir.getID());
 

@@ -5,8 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
-import org.jdom.Namespace;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -34,7 +34,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         super.href = owner + path;
     }
 
-    public void setFromDOM(org.jdom.Element element) throws MCRException {
+    public void setFromDOM(org.jdom2.Element element) throws MCRException {
         super.setFromDOM(element);
         @SuppressWarnings("unchecked")
         List<Element> childrenList = element.getChildren(MCRMetaDerivateLink.ANNOTATION);

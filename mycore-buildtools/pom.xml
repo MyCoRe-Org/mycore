@@ -36,7 +36,7 @@
       <exclusions>
         <exclusion>
           <groupId>jdom</groupId>
-          <artifactId>jdom</artifactId>
+          <artifactId>jdom2</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

@@ -31,8 +31,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
-import org.jdom.transform.JDOMSource;
+import org.jdom2.Element;
+import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
@@ -86,10 +86,10 @@ public class MCRRoleResolver implements URIResolver {
         }
 
         // Loop over all assignable groups
-        org.jdom.Element root = new org.jdom.Element("items");
+        org.jdom2.Element root = new org.jdom2.Element("items");
 
         for (MCRRole group : groupIDs) {
-            org.jdom.Element item = new org.jdom.Element("item").setAttribute("value", group.getName()).setAttribute("label", group.getLabel().getText());
+            org.jdom2.Element item = new org.jdom2.Element("item").setAttribute("value", group.getName()).setAttribute("label", group.getLabel().getText());
             root.addContent(item);
         }
         return root;

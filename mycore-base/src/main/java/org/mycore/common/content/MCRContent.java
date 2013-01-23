@@ -37,8 +37,8 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.FileObject;
-import org.jdom.Document;
-import org.jdom.JDOMException;
+import org.jdom2.Document;
+import org.jdom2.JDOMException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.ifs.MCRContentInputStream;

@@ -43,11 +43,11 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.output.SAXOutputter;
-import org.jdom.transform.JDOMResult;
-import org.jdom.transform.JDOMSource;
+import org.jdom2.Document;
+import org.jdom2.JDOMException;
+import org.jdom2.output.SAXOutputter;
+import org.jdom2.transform.JDOMResult;
+import org.jdom2.transform.JDOMSource;
 
 /**
  * This class implements XSLTransformation functions to be used in all other
@@ -230,7 +230,7 @@ public class MCRXSLTransformation {
      * @param handler
      * @param out
      */
-    public void transform(org.jdom.Document in, TransformerHandler handler, OutputStream out) {
+    public void transform(org.jdom2.Document in, TransformerHandler handler, OutputStream out) {
         handler.setResult(new StreamResult(out));
 
         try {
@@ -251,7 +251,7 @@ public class MCRXSLTransformation {
      *            the stylesheet.
      * @return Document The new document or null, if an exception was thrown.
      */
-    public static org.jdom.Document transform(org.jdom.Document in, String stylesheet) {
+    public static org.jdom2.Document transform(org.jdom2.Document in, String stylesheet) {
         return transform(in, stylesheet, emptyParameters);
     }
 
@@ -268,7 +268,7 @@ public class MCRXSLTransformation {
      *            parameters used by the stylesheet for transformation
      * @return Document The new document or null, if an exception was thrown.
      */
-    public static org.jdom.Document transform(org.jdom.Document in, String stylesheet, Map parameters) {
+    public static org.jdom2.Document transform(org.jdom2.Document in, String stylesheet, Map parameters) {
         return transform(in, new StreamSource(new File(stylesheet)), parameters);
     }
 
@@ -285,7 +285,7 @@ public class MCRXSLTransformation {
      *            parameters used by the stylesheet for transformation
      * @return Document The new document or null, if an exception was thrown.
      */
-    public static org.jdom.Document transform(org.jdom.Document in, Source stylesheet, Map parameters) {
+    public static org.jdom2.Document transform(org.jdom2.Document in, Source stylesheet, Map parameters) {
         try {
             Transformer transformer = factory.newTransformer(stylesheet);
             setParameters(transformer, parameters);

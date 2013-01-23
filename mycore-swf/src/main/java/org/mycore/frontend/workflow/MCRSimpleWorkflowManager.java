@@ -40,14 +40,15 @@ import java.util.StringTokenizer;
 import javax.servlet.ServletContext;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.xpath.XPath;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRFileContent;
-import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -280,7 +281,7 @@ public class MCRSimpleWorkflowManager {
     public final boolean isDerivateOfObject(String filename, MCRObjectID ID) {
         File dir = getDirectoryPath(ID.getProjectId() + "_derivate");
         File fname = new File(dir, filename);
-        org.jdom.Document workflow_in = null;
+        org.jdom2.Document workflow_in = null;
 
         try {
             workflow_in = MCRXMLParserFactory.getParser().parseXML(new MCRFileContent(fname));
@@ -292,20 +293,20 @@ public class MCRSimpleWorkflowManager {
             return false;
         }
 
-        org.jdom.Element root = workflow_in.getRootElement();
-        org.jdom.Element derivate = root.getChild("derivate");
+        org.jdom2.Element root = workflow_in.getRootElement();
+        org.jdom2.Element derivate = root.getChild("derivate");
 
         if (derivate == null) {
             return false;
         }
 
-        org.jdom.Element linkmetas = derivate.getChild("linkmetas");
+        org.jdom2.Element linkmetas = derivate.getChild("linkmetas");
 
         if (linkmetas == null) {
             return false;
         }
 
-        org.jdom.Element linkmeta = linkmetas.getChild("linkmeta");
+        org.jdom2.Element linkmeta = linkmetas.getChild("linkmeta");
 
         if (linkmeta == null) {
             return false;
@@ -451,7 +452,7 @@ public class MCRSimpleWorkflowManager {
         if (!MCRMetadataManager.exists(ID)) {
             return false;
         }
-        
+
         String derivateBase = ID.getProjectId() + "_derivate";
         ArrayList<String> derifiles = getAllDerivateFileNames(derivateBase);
 
@@ -578,7 +579,7 @@ public class MCRSimpleWorkflowManager {
         internal.setMainDoc("");
         der.getDerivate().setInternals(internal);
 
-        org.jdom.Element elm = der.getService().createXML();
+        org.jdom2.Element elm = der.getService().createXML();
         MCREditorOutValidator.setDefaultDerivateACLs(elm);
         der.getService().setFromDOM(elm);
 
@@ -595,16 +596,16 @@ public class MCRSimpleWorkflowManager {
      *            the permission for the ACL system
      * @return the XML tree of the condition or null if the permission is not defined
      */
-    public final org.jdom.Element getRuleFromFile(MCRObjectID mcrid, String permission) {
+    public final org.jdom2.Element getRuleFromFile(MCRObjectID mcrid, String permission) {
         // read data
         String fn = getDirectoryPath(mcrid.getBase()) + File.separator + mcrid.toString() + ".xml";
         try {
             File fi = new File(fn);
             if (fi.isFile() && fi.canRead()) {
                 Document wfDoc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(fi));
-                XPath path = XPath.newInstance("/*/service/servacls/servacl[@permission='" + permission + "']/condition");
-                @SuppressWarnings("unchecked")
-                List<Element> results = path.selectNodes(wfDoc);
+                XPathExpression<Element> path = XPathFactory.instance().compile("/*/service/servacls/servacl[@permission='" + permission + "']/condition",
+                    Filters.element());
+                List<Element> results = path.evaluate(wfDoc);
                 if (results.size() > 0) {
                     return (Element) ((Element) results.get(0)).detach();
                 }

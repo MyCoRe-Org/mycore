@@ -36,7 +36,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.metsmods.MCRMetsModsPicture;
 import org.mycore.frontend.metsmods.MCRMetsModsUtil;
-import org.jdom.*;
+import org.jdom2.*;
 
 /**
  * This servlet implements the zoomify viewer.

@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 

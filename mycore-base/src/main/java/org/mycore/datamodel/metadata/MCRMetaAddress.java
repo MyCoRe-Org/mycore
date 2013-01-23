@@ -24,7 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
 /**
@@ -111,7 +111,7 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRMetaAddress part
      */
     @Override
-    public final org.jdom.Element createXML() throws MCRException {
+    public final org.jdom2.Element createXML() throws MCRException {
         final Element elm = super.createXML();
         if (getCountry() != null) {
             elm.addContent(new Element("country").addContent(getCountry()));
@@ -239,7 +239,7 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      *            a relevant JDOM element for the metadata
      */
     @Override
-    public final void setFromDOM(final org.jdom.Element element) {
+    public final void setFromDOM(final org.jdom2.Element element) {
         super.setFromDOM(element);
         country = element.getChildTextTrim("country");
         state = element.getChildTextTrim("state");

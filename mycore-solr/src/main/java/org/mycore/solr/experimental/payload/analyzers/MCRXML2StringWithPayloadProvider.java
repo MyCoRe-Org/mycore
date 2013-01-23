@@ -8,13 +8,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.List;
 
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
-import org.jdom.xpath.XPath;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.filter.Filters;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 
 /**
  * @author shermann
@@ -22,6 +23,7 @@ import org.jdom.xpath.XPath;
  */
 public class MCRXML2StringWithPayloadProvider {
 
+    private static final XPathFactory XPATH_FACTORY = XPathFactory.instance();
     private List<Element> tokenList;
 
     /**
@@ -47,13 +49,12 @@ public class MCRXML2StringWithPayloadProvider {
      * @param inputStream the InputStream to build the document from, stream is closed after method call 
      * @throws IOException
      */
-    @SuppressWarnings("unchecked")
     private void createDocument(InputStream inputStream) throws IOException {
         try {
             SAXBuilder saxBuilder = new SAXBuilder();
             Document xmlSource = saxBuilder.build(inputStream);
-            XPath xp = XPath.newInstance("//Word");
-            tokenList = xp.selectNodes(xmlSource);
+            XPathExpression<Element> xp = XPATH_FACTORY.compile("//Word", Filters.element());
+            tokenList = xp.evaluate(xmlSource);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
@@ -96,8 +97,15 @@ public class MCRXML2StringWithPayloadProvider {
     }
 
     private String getTokenWithPayload(Element w) {
-        String text = w.getText().replaceAll("\"", "").replaceAll("'", "").replaceAll("\\(", "").replaceAll("\\)", "").replaceAll(",", "")
-                .replaceAll("[0-9]*", "").replaceAll("\\.", "");
+        String text = w
+            .getText()
+            .replaceAll("\"", "")
+            .replaceAll("'", "")
+            .replaceAll("\\(", "")
+            .replaceAll("\\)", "")
+            .replaceAll(",", "")
+            .replaceAll("[0-9]*", "")
+            .replaceAll("\\.", "");
 
         if (text.trim().length() == 0) {
             return "";

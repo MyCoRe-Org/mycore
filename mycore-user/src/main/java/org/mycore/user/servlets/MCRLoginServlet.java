@@ -28,7 +28,7 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
+import org.jdom2.Document;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRJDOMContent;
@@ -74,8 +74,8 @@ public class MCRLoginServlet extends MCRServlet {
             return;
         }
 
-        org.jdom.Element root = new org.jdom.Element("mcr_user");
-        org.jdom.Document jdomDoc = new org.jdom.Document(root);
+        org.jdom2.Element root = new org.jdom2.Element("mcr_user");
+        org.jdom2.Document jdomDoc = new org.jdom2.Document(root);
 
         if (uid != null) {
             if (!MCRUserMgr.instance().existUser(uid)) {
@@ -92,7 +92,7 @@ public class MCRLoginServlet extends MCRServlet {
                 root.setAttribute("userOrPasswordInvalid", "true");
             }
         }
-        root.addContent(new org.jdom.Element("backto_url").addContent(backto_url));
+        root.addContent(new org.jdom2.Element("backto_url").addContent(backto_url));
         doLayout(job, "Login", jdomDoc); // use the stylesheet
     }
 

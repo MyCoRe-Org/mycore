@@ -39,9 +39,9 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Document;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.xml.MCRURIResolver;
@@ -256,7 +256,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         FileOutputStream out = new FileOutputStream(xmlOutput);
         if (trans != null) {
             StreamResult sr = new StreamResult(out);
-            trans.transform(new org.jdom.transform.JDOMSource(classDoc), sr);
+            trans.transform(new org.jdom2.transform.JDOMSource(classDoc), sr);
         } else {
             XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
             xout.output(classDoc, out);

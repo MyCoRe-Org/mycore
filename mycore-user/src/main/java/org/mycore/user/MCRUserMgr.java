@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
@@ -571,10 +571,10 @@ public class MCRUserMgr {
      * 
      * @return JDOM document presentation of all groups of the system
      */
-    public final org.jdom.Document getAllGroups() throws MCRException {
+    public final org.jdom2.Document getAllGroups() throws MCRException {
         // Build the DOM
         MCRGroup currentGroup = null;
-        org.jdom.Element root = new org.jdom.Element("mycoregroup");
+        org.jdom2.Element root = new org.jdom2.Element("mycoregroup");
         root.addNamespaceDeclaration(XSI_NAMESPACE);
         root.addNamespaceDeclaration(XLINK_NAMESPACE);
         root.setAttribute("noNamespaceSchemaLocation", "MCRGroup.xsd", XSI_NAMESPACE);
@@ -586,7 +586,7 @@ public class MCRUserMgr {
             root.addContent(currentGroup.toJDOMElement());
         }
 
-        org.jdom.Document jdomDoc = new org.jdom.Document(root);
+        org.jdom2.Document jdomDoc = new org.jdom2.Document(root);
 
         return jdomDoc;
     }
@@ -606,10 +606,10 @@ public class MCRUserMgr {
      * 
      * @return JDOM document presentation of all users of the system
      */
-    public final org.jdom.Document getAllUsers() throws MCRException {
+    public final org.jdom2.Document getAllUsers() throws MCRException {
         // Build the DOM
         MCRUser currentUser;
-        org.jdom.Element root = new org.jdom.Element("mycoreuser");
+        org.jdom2.Element root = new org.jdom2.Element("mycoreuser");
         root.addNamespaceDeclaration(XSI_NAMESPACE);
         root.addNamespaceDeclaration(XLINK_NAMESPACE);
         root.setAttribute("noNamespaceSchemaLocation", "MCRUser.xsd", XSI_NAMESPACE);
@@ -621,7 +621,7 @@ public class MCRUserMgr {
             root.addContent(currentUser.toJDOMElement());
         }
 
-        org.jdom.Document jdomDoc = new org.jdom.Document(root);
+        org.jdom2.Document jdomDoc = new org.jdom2.Document(root);
 
         return jdomDoc;
     }
@@ -802,7 +802,7 @@ public class MCRUserMgr {
      *            the JDOM tree of the MCRUsers data input
      */
     @SuppressWarnings("unchecked")
-    public final void importUserSystemFromFiles(org.jdom.Element groups, org.jdom.Element users) throws MCRException {
+    public final void importUserSystemFromFiles(org.jdom2.Element groups, org.jdom2.Element users) throws MCRException {
         // check authorization
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         String sessionUser = mcrSession.getUserInformation().getUserID();

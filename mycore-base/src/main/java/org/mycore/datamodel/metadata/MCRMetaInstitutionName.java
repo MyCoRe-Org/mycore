@@ -24,7 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
 /**
@@ -141,7 +141,7 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
      *            a relevant DOM element for the metadata
      */
     @Override
-    public final void setFromDOM(org.jdom.Element element) {
+    public final void setFromDOM(org.jdom2.Element element) {
         super.setFromDOM(element);
         fullname = element.getChildTextTrim("fullname");
 
@@ -171,16 +171,16 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRMetaInstitutionName part
      */
     @Override
-    public final org.jdom.Element createXML() throws MCRException {
+    public final org.jdom2.Element createXML() throws MCRException {
         Element elm = super.createXML();
-        elm.addContent(new org.jdom.Element("fullname").addContent(fullname));
+        elm.addContent(new org.jdom2.Element("fullname").addContent(fullname));
 
         if ((nickname = nickname.trim()).length() != 0) {
-            elm.addContent(new org.jdom.Element("nickname").addContent(nickname));
+            elm.addContent(new org.jdom2.Element("nickname").addContent(nickname));
         }
 
         if ((property = property.trim()).length() != 0) {
-            elm.addContent(new org.jdom.Element("property").addContent(property));
+            elm.addContent(new org.jdom2.Element("property").addContent(property));
         }
 
         return elm;

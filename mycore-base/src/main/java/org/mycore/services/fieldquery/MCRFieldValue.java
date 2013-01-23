@@ -23,7 +23,7 @@
 
 package org.mycore.services.fieldquery;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRNormalizer;

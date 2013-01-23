@@ -31,7 +31,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
-import org.jdom.Document;
+import org.jdom2.Document;
 import org.junit.Test;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRTestCase;

@@ -28,7 +28,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
 import org.apache.log4j.Logger;
-import org.jdom.transform.JDOMSource;
+import org.jdom2.transform.JDOMSource;
 
 /**
  * Implements the searchInput:[ID] resolver that returns the

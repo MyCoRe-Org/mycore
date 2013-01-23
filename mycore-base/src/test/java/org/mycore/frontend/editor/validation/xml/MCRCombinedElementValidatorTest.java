@@ -2,7 +2,7 @@ package org.mycore.frontend.editor.validation.xml;
 
 import static org.junit.Assert.*;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;

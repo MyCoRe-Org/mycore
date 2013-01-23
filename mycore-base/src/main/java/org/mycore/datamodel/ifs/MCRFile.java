@@ -23,9 +23,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUsageException;
@@ -477,8 +477,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         return new String(getContentAsByteArray(), encoding);
     }
 
-    public org.jdom.Document getContentAsJDOM() throws MCRPersistenceException, IOException, org.jdom.JDOMException {
-        return new org.jdom.input.SAXBuilder().build(getContentAsInputStream());
+    public org.jdom2.Document getContentAsJDOM() throws MCRPersistenceException, IOException, org.jdom2.JDOMException {
+        return new org.jdom2.input.SAXBuilder().build(getContentAsInputStream());
     }
 
     /**

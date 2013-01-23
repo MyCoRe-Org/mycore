@@ -7,11 +7,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Attribute;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.filter.ElementFilter;
-import org.jdom.input.SAXBuilder;
+import org.jdom2.Attribute;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.filter.Filters;
+import org.jdom2.input.SAXBuilder;
 import org.mycore.common.MCRTextResolver;
 import org.mycore.common.xml.MCRURIResolver.MCRResolver;
 
@@ -144,9 +144,8 @@ public abstract class MCRDynamicURIResolver implements MCRResolver {
      * @param startElement where to start to resolve the variables
      * @param variablesMap a map of all variables
      */
-    @SuppressWarnings("unchecked")
     protected void resolveVariablesFromElement(Element startElement, Hashtable<String, String> variablesMap) {
-        Iterator<Element> it = startElement.getDescendants(new ElementFilter());
+        Iterator<Element> it = startElement.getDescendants(Filters.element());
         MCRTextResolver varResolver = new MCRTextResolver(variablesMap);
         while (it.hasNext()) {
             Element element = it.next();

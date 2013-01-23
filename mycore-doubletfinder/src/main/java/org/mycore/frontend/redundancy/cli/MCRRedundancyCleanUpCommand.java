@@ -8,15 +8,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.filter.ElementFilter;
-import org.jdom.filter.Filter;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.filter.ElementFilter;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.xml.MCRAttributeValueFilter;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -61,14 +61,13 @@ public class MCRRedundancyCleanUpCommand {
         SAXBuilder builder = new SAXBuilder();
         document = builder.build(file);
         Element rootElement = document.getRootElement();
-        Filter redunObjectFilter = new ElementFilter("redundancyObjects");
+        ElementFilter redunObjectFilter = new ElementFilter("redundancyObjects");
 
         LOGGER.info("Start to replaces links and delete duplicate objects.");
 
         // pass through the redundancyObjects elements
-        List list = rootElement.getContent(redunObjectFilter);
-        for (Object o : list) {
-            Element redunElement = (Element) o;
+        List<Element> list = rootElement.getContent(redunObjectFilter);
+        for (Element redunElement : list) {
             String status = redunElement.getAttributeValue("status");
             if (status != null && status.equals("closed")) {
                 // add the redundancy object to commands list
@@ -95,9 +94,8 @@ public class MCRRedundancyCleanUpCommand {
         Element originalElement = null;
         ArrayList<Element> duplicateElements = new ArrayList<Element>();
 
-        Filter objectFilter = new ElementFilter("object");
-        for (Object o : redunElement.getContent(objectFilter)) {
-            Element objectElement = (Element) o;
+        ElementFilter objectFilter = new ElementFilter("object");
+        for (Element objectElement : redunElement.getContent(objectFilter)) {
             String status = objectElement.getAttributeValue("status");
             if (status == null)
                 continue;
@@ -150,10 +148,9 @@ public class MCRRedundancyCleanUpCommand {
      * @return The element or null. 
      */
     protected static Element getRedunElementOfId(String id) {
-        Filter filter = new ElementFilter("redundancyObjects");
-        List list = document.getRootElement().getContent(filter);
-        for (Object o : list) {
-            Element e = (Element) o;
+        ElementFilter filter = new ElementFilter("redundancyObjects");
+        List<Element> list = document.getRootElement().getContent(filter);
+        for (Element e : list) {
             if (e.getAttributeValue("id") != null && e.getAttributeValue("id").equals(id)) {
                 return e;
             }
@@ -179,11 +176,11 @@ public class MCRRedundancyCleanUpCommand {
         ArrayList<Element> equalElements = new ArrayList<Element>();
 
         Namespace ns = Namespace.getNamespace("xlink", "http://www.w3.org/1999/xlink");
-        Filter oldLinkFilter = new AttributeValueFilter("href", ns, oldLink);
+        MCRAttributeValueFilter oldLinkFilter = new MCRAttributeValueFilter("href", ns, oldLink);
         Document doc = sourceMCRObject.createXML();
-        Iterator i = doc.getDescendants(oldLinkFilter);
+        Iterator<Element> i = doc.getDescendants(oldLinkFilter);
         while (i.hasNext()) {
-            Element e = (Element) i.next();
+            Element e = i.next();
             e.setAttribute("href", newLink, ns);
             /*	It is possible, that an updated element is equal with an existing element.
             	In that case it is necessary to delete the new element. */
@@ -208,9 +205,8 @@ public class MCRRedundancyCleanUpCommand {
      */
     protected static boolean isElementAlreadyExists(Element element) {
         Element parent = element.getParentElement();
-        Filter filter = new ElementFilter(element.getName());
-        for (Object o : parent.getContent(filter)) {
-            Element child = (Element) o;
+        ElementFilter filter = new ElementFilter(element.getName());
+        for (Element child : parent.getContent(filter)) {
             // only different instances
             if (element == child)
                 continue;
@@ -233,31 +229,5 @@ public class MCRRedundancyCleanUpCommand {
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
         FileOutputStream output = new FileOutputStream(fileName);
         outputter.output(document, output);
-    }
-
-    /**
-     * A jdom-filter which compares attribute values.
-     */
-    protected static class AttributeValueFilter implements Filter {
-        protected String attrKey;
-
-        protected String attrValue;
-
-        protected Namespace ns;
-
-        public AttributeValueFilter(String attrKey, Namespace ns, String attrValue) {
-            this.attrKey = attrKey;
-            this.attrValue = attrValue;
-            this.ns = ns;
-
-        }
-
-        public boolean matches(Object arg0) {
-            if (!(arg0 instanceof Element))
-                return false;
-            Element e = (Element) arg0;
-            String value = e.getAttributeValue(attrKey, ns);
-            return value != null && value.equals(attrValue);
-        }
     }
 }

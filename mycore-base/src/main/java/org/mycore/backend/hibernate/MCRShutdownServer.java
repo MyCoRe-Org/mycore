@@ -33,10 +33,10 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Properties;
 
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 
 /**
  * replacement for <code>org.hsqldb.util.ShutdownServer</code> which is missing in hsqldb 2.0

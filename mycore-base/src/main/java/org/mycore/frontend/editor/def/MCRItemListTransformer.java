@@ -2,7 +2,7 @@ package org.mycore.frontend.editor.def;
 
 import java.util.List;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 
 public class MCRItemListTransformer extends MCRTransformerBase {
 

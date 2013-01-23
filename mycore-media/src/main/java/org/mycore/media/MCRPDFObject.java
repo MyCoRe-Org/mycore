@@ -11,7 +11,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.jdom.Element;
+import org.jdom2.Element;
 
 public class MCRPDFObject extends MCRMediaObject {
     protected int numPages;

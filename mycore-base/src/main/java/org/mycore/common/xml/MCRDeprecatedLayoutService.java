@@ -36,7 +36,7 @@ public class MCRDeprecatedLayoutService {
      * @deprecated use {@link #sendXML(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
      */
     @Deprecated
-    public void sendXML(HttpServletRequest req, HttpServletResponse res, org.jdom.Document jdom) throws IOException {
+    public void sendXML(HttpServletRequest req, HttpServletResponse res, org.jdom2.Document jdom) throws IOException {
         SINGLETON.sendXML(req, res, new MCRJDOMContent(jdom));
     }
 
@@ -72,7 +72,7 @@ public class MCRDeprecatedLayoutService {
      * @deprecated use {@link #doLayout(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
      */
     @Deprecated
-    public void doLayout(HttpServletRequest req, HttpServletResponse res, org.jdom.Document jdom) throws IOException {
+    public void doLayout(HttpServletRequest req, HttpServletResponse res, org.jdom2.Document jdom) throws IOException {
         SINGLETON.doLayout(req, res, new MCRJDOMContent(jdom));
     }
 
@@ -82,18 +82,18 @@ public class MCRDeprecatedLayoutService {
      * @deprecated will be removed without replacement
      */
     @Deprecated
-    public void doLayout(HttpServletRequest req, HttpServletResponse res, Writer out, org.jdom.Document jdom) throws IOException {
+    public void doLayout(HttpServletRequest req, HttpServletResponse res, Writer out, org.jdom2.Document jdom) throws IOException {
         MCRContent content = new MCRJDOMContent(jdom);
         String docType = content.getDocType();
         MCRParameterCollector parameters = new MCRParameterCollector(req);
         String resourceName = getResourceName(req, parameters, docType);
         if (resourceName == null) {
-            new org.jdom.output.XMLOutputter().output(jdom, out);
+            new org.jdom2.output.XMLOutputter().output(jdom, out);
         } else {
             Transformer transformer = MCRXSLTransformerFactory.getTransformer(new MCRTemplatesSource(resourceName));
             parameters.setParametersTo(transformer);
             try {
-                transformer.transform(new org.jdom.transform.JDOMSource(jdom), new StreamResult(out));
+                transformer.transform(new org.jdom2.transform.JDOMSource(jdom), new StreamResult(out));
             } catch (TransformerException ex) {
                 String msg = "Error while transforming XML using XSL stylesheet: " + ex.getMessageAndLocation();
                 throw new MCRException(msg, ex);

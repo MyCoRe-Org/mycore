@@ -25,9 +25,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.*;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.*;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.metadata.MCRObjectID;

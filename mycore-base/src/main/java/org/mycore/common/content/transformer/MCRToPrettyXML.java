@@ -25,8 +25,8 @@ package org.mycore.common.content.transformer;
 
 import java.io.IOException;
 
-import org.jdom.JDOMException;
-import org.jdom.output.Format;
+import org.jdom2.JDOMException;
+import org.jdom2.output.Format;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRXMLContent;

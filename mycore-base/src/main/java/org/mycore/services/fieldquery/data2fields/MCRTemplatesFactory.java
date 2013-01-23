@@ -28,7 +28,7 @@ import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.jdom.transform.JDOMSource;
+import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.services.fieldquery.MCRFieldDef;

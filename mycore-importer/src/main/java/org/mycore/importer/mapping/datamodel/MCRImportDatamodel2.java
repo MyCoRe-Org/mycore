@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.filter.ElementFilter;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.filter.ElementFilter;
 import org.mycore.importer.mapping.MCRImportMetadataResolverManager;
 
 public class MCRImportDatamodel2 extends MCRImportAbstractDatamodel {

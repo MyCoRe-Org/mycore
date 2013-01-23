@@ -33,7 +33,7 @@ import java.util.Map;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.log4j.Logger;
-import org.jdom.JDOMException;
+import org.jdom2.JDOMException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;

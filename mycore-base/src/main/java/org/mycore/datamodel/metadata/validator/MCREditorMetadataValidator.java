@@ -22,7 +22,7 @@
 
 package org.mycore.datamodel.metadata.validator;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 
 /**
  * Validates the output of the Editor framework.

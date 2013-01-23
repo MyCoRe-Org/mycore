@@ -33,7 +33,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.jdom.Document;
+import org.jdom2.Document;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;

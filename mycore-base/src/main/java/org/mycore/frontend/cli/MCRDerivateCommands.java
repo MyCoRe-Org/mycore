@@ -34,8 +34,8 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
@@ -589,9 +589,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         if (trans != null) {
             trans.setParameter("dirname", dir.getPath());
             StreamResult sr = new StreamResult(out);
-            trans.transform(new org.jdom.transform.JDOMSource(xml), sr);
+            trans.transform(new org.jdom2.transform.JDOMSource(xml), sr);
         } else {
-            new org.jdom.output.XMLOutputter().output(xml, out);
+            new org.jdom2.output.XMLOutputter().output(xml, out);
             out.flush();
             out.close();
         }

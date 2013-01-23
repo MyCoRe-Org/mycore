@@ -44,7 +44,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
-import org.jdom.Document;
+import org.jdom2.Document;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRException;

@@ -46,7 +46,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.util.Version;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRNormalizer;
 import org.mycore.common.MCRUtils;
 import org.mycore.services.fieldquery.MCRFieldDef;

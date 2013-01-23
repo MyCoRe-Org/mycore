@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 
 public class MCRValidationResults {
 

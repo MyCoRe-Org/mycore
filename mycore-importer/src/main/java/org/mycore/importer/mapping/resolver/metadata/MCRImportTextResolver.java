@@ -1,6 +1,6 @@
 package org.mycore.importer.mapping.resolver.metadata;
 
-import org.jdom.Namespace;
+import org.jdom2.Namespace;
 
 
 public class MCRImportTextResolver extends MCRImportAbstractMetadataResolver {

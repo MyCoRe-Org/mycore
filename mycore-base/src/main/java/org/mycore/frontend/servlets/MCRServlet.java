@@ -52,9 +52,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.jdom.DocType;
-import org.jdom.Document;
-import org.jdom.Element;
+import org.jdom2.DocType;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;

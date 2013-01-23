@@ -29,10 +29,10 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.joda.time.format.DateTimeFormat;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRISO8601Date;
@@ -106,10 +106,10 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
     /*
      * (non-Javadoc)
      * 
-     * @see org.mycore.datamodel.metadata.MCRMetaDefault#setFromDOM(org.jdom.Element)
+     * @see org.mycore.datamodel.metadata.MCRMetaDefault#setFromDOM(org.jdom2.Element)
      */
     @Override
-    public void setFromDOM(org.jdom.Element element) {
+    public void setFromDOM(org.jdom2.Element element) {
         super.setFromDOM(element);
         setFormat(element.getAttributeValue("format"));
         setDate(element.getTextTrim());

@@ -33,12 +33,12 @@ import java.util.List;
 
 import org.codehaus.cargo.module.merge.MergeException;
 import org.codehaus.cargo.module.merge.MergeProcessor;
-import org.jdom.Attribute;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Attribute;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
 /**
  * This class implements a merger for MyCoRe's searchfields.xml.
@@ -70,7 +70,7 @@ public class SearchfieldsXMLMerger implements MergeProcessor {
 	}
 
 	/**
-	 * adds another searchfield.xml as org.jdom.Document
+	 * adds another searchfield.xml as org.jdom2.Document
 	 */
 	public void addMergeItem(Object o) throws MergeException {
 		if(o instanceof ByteArrayInputStream){
@@ -108,7 +108,7 @@ public class SearchfieldsXMLMerger implements MergeProcessor {
 	 *     <li>type source i18n classification: merging their values makes no sense, they will be replaced</li>
 	 * </ul>
 	 * 
-	 * @return org.jdom.Document the new (merged) searchfields
+	 * @return org.jdom2.Document the new (merged) searchfields
 	 */
 	
 	public Object performMerge() throws MergeException {

@@ -27,10 +27,10 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.transform.JDOMResult;
-import org.jdom.transform.JDOMSource;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.transform.JDOMResult;
+import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRException;
 import org.mycore.user2.MCRUser;
 

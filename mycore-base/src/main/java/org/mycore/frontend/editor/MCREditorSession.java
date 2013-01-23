@@ -1,6 +1,6 @@
 package org.mycore.frontend.editor;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.frontend.servlets.MCRServlet;
 
 public class MCREditorSession {

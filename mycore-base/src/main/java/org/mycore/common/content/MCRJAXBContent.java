@@ -34,9 +34,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.util.JAXBSource;
 import javax.xml.transform.Source;
 
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.transform.JDOMResult;
+import org.jdom2.Document;
+import org.jdom2.JDOMException;
+import org.jdom2.transform.JDOMResult;
 import org.xml.sax.SAXParseException;
 
 /**

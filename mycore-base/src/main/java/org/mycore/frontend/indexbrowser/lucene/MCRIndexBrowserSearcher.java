@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCROrCondition;
@@ -73,7 +73,7 @@ public class MCRIndexBrowserSearcher implements MCRIIndexBrowserSearcher {
         List<MCRSortBy> sortCriteria = buildSortCriteria();
         MCRQuery query = new MCRQuery(cond, sortCriteria, 0);
         if (LOGGER.isDebugEnabled()) {
-            XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
+            XMLOutputter out = new XMLOutputter(org.jdom2.output.Format.getPrettyFormat());
             LOGGER.debug("Query: \n" + out.outputString(query.buildXML()));
         }
         return query;

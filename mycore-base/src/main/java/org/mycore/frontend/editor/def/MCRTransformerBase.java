@@ -1,6 +1,6 @@
 package org.mycore.frontend.editor.def;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 
 public abstract class MCRTransformerBase implements MCRTransformer {
 

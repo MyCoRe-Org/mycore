@@ -24,7 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
 /**
@@ -211,7 +211,7 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
      *            a relevant JDOM element for the metadata
      */
     @Override
-    public final void setFromDOM(org.jdom.Element element) {
+    public final void setFromDOM(org.jdom2.Element element) {
         super.setFromDOM(element);
         firstname = element.getChildTextTrim("firstname");
 
@@ -265,34 +265,34 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRMetaPersonName part
      */
     @Override
-    public final org.jdom.Element createXML() throws MCRException {
+    public final org.jdom2.Element createXML() throws MCRException {
         Element elm = super.createXML();
         if ((firstname = firstname.trim()).length() != 0) {
-            elm.addContent(new org.jdom.Element("firstname").addContent(firstname));
+            elm.addContent(new org.jdom2.Element("firstname").addContent(firstname));
         }
 
         if ((callname = callname.trim()).length() != 0) {
-            elm.addContent(new org.jdom.Element("callname").addContent(callname));
+            elm.addContent(new org.jdom2.Element("callname").addContent(callname));
         }
 
         if ((fullname = fullname.trim()).length() != 0) {
-            elm.addContent(new org.jdom.Element("fullname").addContent(fullname));
+            elm.addContent(new org.jdom2.Element("fullname").addContent(fullname));
         }
 
         if ((surname = surname.trim()).length() != 0) {
-            elm.addContent(new org.jdom.Element("surname").addContent(surname));
+            elm.addContent(new org.jdom2.Element("surname").addContent(surname));
         }
 
         if ((academic = academic.trim()).length() != 0) {
-            elm.addContent(new org.jdom.Element("academic").addContent(academic));
+            elm.addContent(new org.jdom2.Element("academic").addContent(academic));
         }
 
         if ((peerage = peerage.trim()).length() != 0) {
-            elm.addContent(new org.jdom.Element("peerage").addContent(peerage));
+            elm.addContent(new org.jdom2.Element("peerage").addContent(peerage));
         }
 
         if ((prefix = prefix.trim()).length() != 0) {
-            elm.addContent(new org.jdom.Element("prefix").addContent(prefix));
+            elm.addContent(new org.jdom2.Element("prefix").addContent(prefix));
         }
 
         return elm;

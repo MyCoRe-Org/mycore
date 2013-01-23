@@ -34,10 +34,10 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.transform.JDOMSource;
+import org.jdom2.Document;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
@@ -140,7 +140,7 @@ public class MCRQueryCommands extends MCRAbstractCommands {
             TransformerFactory transfakt = TransformerFactory.newInstance();
             Transformer trans = transfakt.newTransformer(source);
             StreamResult sr = new StreamResult(System.out);
-            trans.transform(new JDOMSource(new org.jdom.Document(results.buildXML())), sr);
+            trans.transform(new JDOMSource(new org.jdom2.Document(results.buildXML())), sr);
         } catch (Exception ex) {
             Logger LOGGER = Logger.getLogger(MCRQueryCommands.class);
             LOGGER.error("Error while tranforming query result XML using XSLT");

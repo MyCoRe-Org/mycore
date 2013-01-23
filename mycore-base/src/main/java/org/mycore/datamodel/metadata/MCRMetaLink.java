@@ -27,7 +27,7 @@ import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 
 import org.apache.log4j.Logger;
 import org.apache.xerces.util.XMLChar;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
 /**
@@ -245,7 +245,7 @@ public class MCRMetaLink extends MCRMetaDefault {
      *                if the xlink:type is not locator or arc or if href or from and to are null or empty
      */
     @Override
-    public void setFromDOM(org.jdom.Element element) throws MCRException {
+    public void setFromDOM(org.jdom2.Element element) throws MCRException {
         super.setFromDOM(element);
 
         String temp = element.getAttributeValue("type", XLINK_NAMESPACE);
@@ -277,7 +277,7 @@ public class MCRMetaLink extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRMetaLink part
      */
     @Override
-    public org.jdom.Element createXML() throws MCRException {
+    public org.jdom2.Element createXML() throws MCRException {
         Element elm = super.createXML();
         elm.setAttribute("type", linktype, XLINK_NAMESPACE);
         

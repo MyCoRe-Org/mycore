@@ -28,7 +28,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.xml.MCRURIResolver;
 

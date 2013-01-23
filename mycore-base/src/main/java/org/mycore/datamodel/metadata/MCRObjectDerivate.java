@@ -29,7 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -88,15 +88,15 @@ public class MCRObjectDerivate {
      * @param derivate
      *            a list of relevant DOM elements for the derivate
      */
-    private void setFromDOM(org.jdom.Element derivate) {
+    private void setFromDOM(org.jdom2.Element derivate) {
         // Link to Metadata part
-        org.jdom.Element linkmeta_element = derivate.getChild("linkmetas").getChild("linkmeta");
+        org.jdom2.Element linkmeta_element = derivate.getChild("linkmetas").getChild("linkmeta");
         MCRMetaLinkID link = new MCRMetaLinkID();
         link.setFromDOM(linkmeta_element);
         linkmeta = link;
 
         // External part
-        org.jdom.Element externalsElement = derivate.getChild("externals");
+        org.jdom2.Element externalsElement = derivate.getChild("externals");
         externals.clear();
         if (externalsElement != null) {
             @SuppressWarnings("unchecked")
@@ -109,9 +109,9 @@ public class MCRObjectDerivate {
         }
 
         // Internal part
-        org.jdom.Element internals_element = derivate.getChild("internals");
+        org.jdom2.Element internals_element = derivate.getChild("internals");
         if (internals_element != null) {
-            org.jdom.Element internal_element = internals_element.getChild("internal");
+            org.jdom2.Element internal_element = internals_element.getChild("internal");
             if (internal_element != null) {
                 internals = new MCRMetaIFS();
                 internals.setFromDOM(internal_element);
@@ -119,7 +119,7 @@ public class MCRObjectDerivate {
         }
 
         // Title part
-        org.jdom.Element titlesElement = derivate.getChild("titles");
+        org.jdom2.Element titlesElement = derivate.getChild("titles");
         titles.clear();
         if (titlesElement != null) {
             @SuppressWarnings("unchecked")
@@ -313,22 +313,22 @@ public class MCRObjectDerivate {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML data of the structure data part
      */
-    public final org.jdom.Element createXML() throws MCRException {
+    public final org.jdom2.Element createXML() throws MCRException {
         if (!isValid()) {
             throw new MCRException("The content is not valid.");
         }
 
-        org.jdom.Element elm = new org.jdom.Element("derivate");
+        org.jdom2.Element elm = new org.jdom2.Element("derivate");
         elm.setAttribute("display", String.valueOf(display));
 
-        org.jdom.Element linkmetas = new org.jdom.Element("linkmetas");
+        org.jdom2.Element linkmetas = new org.jdom2.Element("linkmetas");
         linkmetas.setAttribute("class", "MCRMetaLinkID");
         linkmetas.setAttribute("heritable", "false");
         linkmetas.addContent(linkmeta.createXML());
         elm.addContent(linkmetas);
 
         if (externals.size() != 0) {
-            org.jdom.Element extEl = new org.jdom.Element("externals");
+            org.jdom2.Element extEl = new org.jdom2.Element("externals");
             extEl.setAttribute("class", "MCRMetaLink");
             extEl.setAttribute("heritable", "false");
             for (MCRMetaLink external : externals) {
@@ -338,7 +338,7 @@ public class MCRObjectDerivate {
         }
 
         if (internals != null) {
-            org.jdom.Element intEl = new org.jdom.Element("internals");
+            org.jdom2.Element intEl = new org.jdom2.Element("internals");
             intEl.setAttribute("class", "MCRMetaIFS");
             intEl.setAttribute("heritable", "false");
             intEl.addContent(internals.createXML());
@@ -346,7 +346,7 @@ public class MCRObjectDerivate {
         }
 
         if (titles.size() != 0) {
-            org.jdom.Element titEl = new org.jdom.Element("titles");
+            org.jdom2.Element titEl = new org.jdom2.Element("titles");
             titEl.setAttribute("class", "MCRMetaLangText");
             titEl.setAttribute("heritable", "false");
             for (MCRMetaLangText title : titles) {

@@ -30,8 +30,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
@@ -153,7 +153,7 @@ public class MCRLoginServlet extends MCRServlet {
             }
         }
         addCurrentUserInfo(root);
-        root.addContent(new org.jdom.Element("returnURL").addContent(getReturnURL(req)));
+        root.addContent(new org.jdom2.Element("returnURL").addContent(getReturnURL(req)));
         getLayoutService().doLayout(req, res, new MCRJDOMContent(root));
     }
 

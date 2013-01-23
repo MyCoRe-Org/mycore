@@ -22,9 +22,9 @@
  */
 package org.mycore.datamodel.classifications2.utils;
 
-import static org.jdom.Namespace.XML_NAMESPACE;
+import static org.jdom2.Namespace.XML_NAMESPACE;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer.MetaDataElementFactory;
 

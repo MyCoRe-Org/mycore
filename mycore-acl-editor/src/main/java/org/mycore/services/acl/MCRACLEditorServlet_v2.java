@@ -6,9 +6,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.jdom.DocType;
-import org.jdom.Document;
-import org.jdom.Element;
+import org.jdom2.DocType;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRJDOMContent;

@@ -27,10 +27,10 @@ import java.util.*;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
-import org.jdom.*;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-import org.jdom.xpath.XPath;
+import org.jdom2.*;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+import org.jdom2.xpath.XPath;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
 import org.mycore.frontend.editor.validation.MCRValidator;

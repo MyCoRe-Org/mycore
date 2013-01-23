@@ -26,7 +26,7 @@ package org.mycore.media;
 import java.text.DecimalFormat;
 import java.util.StringTokenizer;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 
 /**
  * This Class is the Superclass of all other classes. Is holds some 

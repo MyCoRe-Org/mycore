@@ -29,7 +29,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
+import org.jdom2.Document;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
@@ -129,7 +129,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      */
     @Deprecated
     private void getAssignableGroupsForUser(MCRServletJob job) throws IOException {
-        org.jdom.Element root;
+        org.jdom2.Element root;
         try {
             root = MCRUserEditorHandler.getAssignableGroupsForUser();
         } catch (MCRAccessException ex) {
@@ -137,7 +137,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
             showNoPrivsPage(job);
             return;
         }
-        org.jdom.Document jdomDoc = new org.jdom.Document(root);
+        org.jdom2.Document jdomDoc = new org.jdom2.Document(root);
         getLayoutService().sendXML(job.getRequest(), job.getResponse(), new MCRJDOMContent(jdomDoc));
     }
 
@@ -207,7 +207,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
             return;
         }
         try {
-            org.jdom.Document userlist = MCRUserMgr.instance().getAllUsers();
+            org.jdom2.Document userlist = MCRUserMgr.instance().getAllUsers();
             doLayout(job, "ListAllUser", userlist, false);
         } catch (MCRException ex) {
             // TODO: Es gibt Probleme mit den Fehlermeldungen, siehe oben.
@@ -274,7 +274,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
 
         // Read the XML data sent by the editor
         MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
-        org.jdom.Document jdomDoc = sub.getXML();
+        org.jdom2.Document jdomDoc = sub.getXML();
 
         // Read the request parameters
         MCRRequestParameters parms;
@@ -297,7 +297,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
                 jdomDoc.getRootElement().getChild("user").setAttribute("update_allowed", "false");
             }
 
-            org.jdom.Element userElement = jdomDoc.getRootElement().getChild("user");
+            org.jdom2.Element userElement = jdomDoc.getRootElement().getChild("user");
 
             if (useCase.equals("create-user")) {
                 MCRUser newUser = new MCRUser(userElement, true);

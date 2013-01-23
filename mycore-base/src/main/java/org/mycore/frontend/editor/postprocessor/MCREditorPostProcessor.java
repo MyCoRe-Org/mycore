@@ -23,8 +23,8 @@
 
 package org.mycore.frontend.editor.postprocessor;
 
-import org.jdom.Document;
-import org.jdom.Element;
+import org.jdom2.Document;
+import org.jdom2.Element;
 
 /**
  * @author Frank L\u00FCtzenkirchen

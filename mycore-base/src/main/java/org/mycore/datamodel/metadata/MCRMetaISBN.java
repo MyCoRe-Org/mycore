@@ -24,7 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
 /**
@@ -109,7 +109,7 @@ public class MCRMetaISBN extends MCRMetaDefault {
      *            a relevant JDOM element for the metadata
      */
     @Override
-    public void setFromDOM(org.jdom.Element element) {
+    public void setFromDOM(org.jdom2.Element element) {
         super.setFromDOM(element);
         setISBN(element.getText());
     }
@@ -123,7 +123,7 @@ public class MCRMetaISBN extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRMetaLangText part
      */
     @Override
-    public org.jdom.Element createXML() throws MCRException {
+    public org.jdom2.Element createXML() throws MCRException {
         Element elm = super.createXML();
         elm.addContent(isbn);
 

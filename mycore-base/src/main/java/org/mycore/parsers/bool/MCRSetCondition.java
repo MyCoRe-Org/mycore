@@ -27,7 +27,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 
 /**
  * @author Frank Lützenkirchen

@@ -59,7 +59,7 @@ public class MCRQueryClientBase implements MCRQueryClientInterface {
      * 
      * @param xmlhost an entry of a remote host from hosts.xml
      */
-    public void init(org.jdom.Element xmlhost) {
+    public void init(org.jdom2.Element xmlhost) {
         alias = xmlhost.getAttributeValue("alias");
         url = xmlhost.getAttributeValue("url");
         access = xmlhost.getAttributeValue("access");

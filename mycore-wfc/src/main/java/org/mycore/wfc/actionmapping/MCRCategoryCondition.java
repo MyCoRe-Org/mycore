@@ -23,7 +23,7 @@
 
 package org.mycore.wfc.actionmapping;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;

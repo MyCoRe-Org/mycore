@@ -24,8 +24,8 @@
 package org.mycore.datamodel.metadata;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
-import org.jdom.Namespace;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
@@ -226,7 +226,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      * @exception MCRException
      *                if the set_subtag value is null or empty
      */
-    public void setFromDOM(org.jdom.Element element) throws MCRException {
+    public void setFromDOM(org.jdom2.Element element) throws MCRException {
         if (element == null) {
             return;
         }
@@ -239,7 +239,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
 
         subtag = temp_subtag;
 
-        String temp_lang = element.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE);
+        String temp_lang = element.getAttributeValue("lang", org.jdom2.Namespace.XML_NAMESPACE);
 
         if (temp_lang != null && (temp_lang = temp_lang.trim()).length() != 0) {
             lang = temp_lang;

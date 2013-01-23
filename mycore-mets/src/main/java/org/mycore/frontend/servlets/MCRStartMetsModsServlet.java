@@ -40,9 +40,9 @@ import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.frontend.fileupload.MCRSWFUploadHandlerIFS;
 import org.mycore.frontend.metsmods.MCRMetsModsUtil;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.jdom.Element;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Element;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
 /**
  * 

@@ -28,7 +28,7 @@ import static org.junit.Assert.assertNull;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 

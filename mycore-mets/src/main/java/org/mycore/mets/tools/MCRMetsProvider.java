@@ -23,7 +23,7 @@ import java.net.URISyntaxException;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.jdom.JDOMException;
+import org.jdom2.JDOMException;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.mets.misc.LogicalIdProvider;
 import org.mycore.mets.model.Mets;

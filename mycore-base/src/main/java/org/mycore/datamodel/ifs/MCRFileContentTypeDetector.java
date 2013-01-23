@@ -23,7 +23,7 @@
 
 package org.mycore.datamodel.ifs;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 
 /**
  * Detects the file content type from filename and file header. The rules to do

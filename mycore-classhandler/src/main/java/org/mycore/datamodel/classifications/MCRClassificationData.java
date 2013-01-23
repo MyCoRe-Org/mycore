@@ -28,9 +28,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Namespace;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
@@ -251,7 +251,7 @@ public class MCRClassificationData {
     }
 
     @SuppressWarnings("unchecked")
-    public org.jdom.Document loadTreeIntoSite(final org.jdom.Document cover, final org.jdom.Document browser) {
+    public org.jdom2.Document loadTreeIntoSite(final org.jdom2.Document cover, final org.jdom2.Document browser) {
         final Element placeholder = cover.getRootElement().getChild("classificationBrowser");
         LOGGER.info(" Found Entry at " + placeholder);
         if (placeholder != null) {

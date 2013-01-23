@@ -27,7 +27,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.HashSet;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;

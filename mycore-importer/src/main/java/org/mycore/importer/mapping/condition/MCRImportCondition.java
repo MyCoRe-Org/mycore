@@ -1,6 +1,6 @@
 package org.mycore.importer.mapping.condition;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.importer.mapping.resolver.MCRImportFieldValueResolver;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRParseException;

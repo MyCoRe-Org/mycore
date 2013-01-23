@@ -30,10 +30,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.xpath.XPath;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -131,7 +132,7 @@ final public class MCRDerivate extends MCRBase {
      * @return a JDOM Document with the XML data of the object as byte array
      */
     @Override
-    public final org.jdom.Document createXML() throws MCRException {
+    public final org.jdom2.Document createXML() throws MCRException {
         Document doc = super.createXML();
         Element elm = doc.getRootElement();
         elm.addContent(mcr_derivate.createXML());
@@ -152,29 +153,25 @@ final public class MCRDerivate extends MCRBase {
     public Map<String, String> getUrnMap() {
         Map<String, String> fileUrnMap = new HashMap<String, String>();
 
-        try {
-            XPath filesetPath = XPath.newInstance("./mycorederivate/derivate/fileset");
-            Object obj = filesetPath.selectSingleNode(this.createXML());
-            if (obj == null) {
-                return fileUrnMap;
+        XPathExpression<Element> filesetPath = XPathFactory.instance().compile("./mycorederivate/derivate/fileset", Filters.element());
+
+        Element result = filesetPath.evaluateFirst(this.createXML());
+        if (result == null) {
+            return fileUrnMap;
+        }
+        String urn = result.getAttributeValue("urn");
+
+        if (urn != null) {
+            XPathExpression<Element> filePath = XPathFactory
+                .instance()
+                .compile("./mycorederivate/derivate/fileset[@urn='" + urn + "']/file", Filters.element());
+            List<Element> files = filePath.evaluate(this.createXML());
+
+            for (Element currentFileElement : files) {
+                String currentUrn = currentFileElement.getChildText("urn");
+                String currentFile = currentFileElement.getAttributeValue("name");
+                fileUrnMap.put(currentFile, currentUrn);
             }
-
-            Element result = (Element) obj;
-            String urn = result.getAttributeValue("urn");
-
-            if (urn != null) {
-                XPath filePath = XPath.newInstance("./mycorederivate/derivate/fileset[@urn='" + urn + "']/file");
-                @SuppressWarnings("unchecked")
-                List<Element> files = filePath.selectNodes(this.createXML());
-
-                for (Element currentFileElement : files) {
-                    String currentUrn = currentFileElement.getChildText("urn");
-                    String currentFile = currentFileElement.getAttributeValue("name");
-                    fileUrnMap.put(currentFile, currentUrn);
-                }
-            }
-        } catch (JDOMException ex) {
-            LOGGER.error("Read derivate XML cause error", ex);
         }
         return fileUrnMap;
     }

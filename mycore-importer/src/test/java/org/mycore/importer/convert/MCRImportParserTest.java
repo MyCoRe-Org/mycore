@@ -2,7 +2,7 @@ package org.mycore.importer.convert;
 
 import static org.junit.Assert.*;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.importer.mapping.condition.MCRImportCondition;

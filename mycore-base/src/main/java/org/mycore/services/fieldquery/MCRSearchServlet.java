@@ -37,10 +37,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.filter.ElementFilter;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.filter.ElementFilter;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUsageException;
@@ -459,7 +459,7 @@ public class MCRSearchServlet extends MCRServlet {
 
         // Show incoming query document
         if (LOGGER.isDebugEnabled()) {
-            XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
+            XMLOutputter out = new XMLOutputter(org.jdom2.output.Format.getPrettyFormat());
             LOGGER.debug(out.outputString(input));
         }
         MCRCachedQueryData qd = MCRCachedQueryData.cache(query, input);

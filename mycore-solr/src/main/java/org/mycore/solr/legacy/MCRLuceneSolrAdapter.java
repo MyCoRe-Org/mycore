@@ -36,7 +36,7 @@ import org.apache.lucene.util.Version;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrDocumentList;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.backend.lucene.MCRBuildLuceneQuery;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRNormalizer;

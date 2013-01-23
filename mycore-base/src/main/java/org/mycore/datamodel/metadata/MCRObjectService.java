@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
 /**
@@ -103,7 +103,7 @@ public class MCRObjectService {
      */
     public final void setFromDOM(Element service) {
         // Date part
-        org.jdom.Element dates_element = service.getChild("servdates");
+        org.jdom2.Element dates_element = service.getChild("servdates");
         dates.clear();
 
         if (dates_element != null) {
@@ -140,7 +140,7 @@ public class MCRObjectService {
         }
 
         // Flag part
-        org.jdom.Element flagsElement = service.getChild("servflags");
+        org.jdom2.Element flagsElement = service.getChild("servflags");
         if (flagsElement != null) {
             @SuppressWarnings("unchecked")
             List<Element> flagList = flagsElement.getChildren();
@@ -482,7 +482,7 @@ public class MCRObjectService {
      * @param condition -
      *            the new rule as JDOM tree Element
      */
-    public final void addRule(String permission, org.jdom.Element condition) {
+    public final void addRule(String permission, org.jdom2.Element condition) {
         if (condition == null) {
             return;
         }
@@ -574,15 +574,15 @@ public class MCRObjectService {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML data of the structure data part
      */
-    public final org.jdom.Element createXML() throws MCRException {
+    public final org.jdom2.Element createXML() throws MCRException {
         if (!isValid()) {
             throw new MCRException("The content is not valid.");
         }
 
-        org.jdom.Element elm = new org.jdom.Element("service");
+        org.jdom2.Element elm = new org.jdom2.Element("service");
 
         if (dates.size() != 0) {
-            org.jdom.Element elmm = new org.jdom.Element("servdates");
+            org.jdom2.Element elmm = new org.jdom2.Element("servdates");
             elmm.setAttribute("class", "MCRMetaISO8601Date");
 
             for (MCRMetaISO8601Date date : dates) {
@@ -593,7 +593,7 @@ public class MCRObjectService {
         }
 
         if (rules.size() != 0) {
-            org.jdom.Element elmm = new org.jdom.Element("servacls");
+            org.jdom2.Element elmm = new org.jdom2.Element("servacls");
             elmm.setAttribute("class", "MCRMetaAccessRule");
 
             for (MCRMetaAccessRule rule : rules) {
@@ -604,7 +604,7 @@ public class MCRObjectService {
         }
 
         if (flags.size() != 0) {
-            org.jdom.Element elmm = new org.jdom.Element("servflags");
+            org.jdom2.Element elmm = new org.jdom2.Element("servflags");
             elmm.setAttribute("class", "MCRMetaLangText");
 
             for (MCRMetaLangText flag : flags) {

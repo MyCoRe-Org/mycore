@@ -28,7 +28,7 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
+import org.jdom2.Document;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
@@ -142,8 +142,8 @@ public class MCRUserServlet extends MCRServlet {
         String pwd_2 = getProperty(job.getRequest(), "pwd_2").trim();
         String oldpwd = getProperty(job.getRequest(), "oldpwd").trim();
 
-        org.jdom.Document jdomDoc = createJdomDocBase(job);
-        org.jdom.Element root = jdomDoc.getRootElement();
+        org.jdom2.Document jdomDoc = createJdomDocBase(job);
+        org.jdom2.Element root = jdomDoc.getRootElement();
 
         if (!pwd_1.equals(pwd_2)) {
             root.setAttribute("new_pwd_mismatch", "true");
@@ -158,7 +158,7 @@ public class MCRUserServlet extends MCRServlet {
                 // mcr_user-SelectTask.xsl
                 return;
             } catch (MCRException e) {
-                root.addContent(new org.jdom.Element("error").addContent(e.getMessage()));
+                root.addContent(new org.jdom2.Element("error").addContent(e.getMessage()));
             }
         }
 
@@ -179,7 +179,7 @@ public class MCRUserServlet extends MCRServlet {
      *             for errors from the servlet engine.
      */
     protected void createPwdDialog(MCRServletJob job) throws IOException {
-        org.jdom.Document jdomDoc = createJdomDocBase(job);
+        org.jdom2.Document jdomDoc = createJdomDocBase(job);
         doLayout(job, "ChangePwd", jdomDoc); // use the stylesheet
 
         // mcr_user-ChangePwd.xsl
@@ -205,7 +205,7 @@ public class MCRUserServlet extends MCRServlet {
         // checked here and in case he or she has additional privileges this
         // will be
         // forwarded to the presentation layer (i.e. XSL stylesheets).
-        org.jdom.Document jdomDoc = createJdomDocBase(job);
+        org.jdom2.Document jdomDoc = createJdomDocBase(job);
         doLayout(job, "SelectTask", jdomDoc); // use the stylesheet
 
         // mcr_user-SelectTask.xsl
@@ -229,8 +229,8 @@ public class MCRUserServlet extends MCRServlet {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         String currentUser = mcrSession.getUserInformation().getUserID();
 
-        org.jdom.Document jdomDoc = createJdomDocBase(job);
-        org.jdom.Element root = jdomDoc.getRootElement();
+        org.jdom2.Document jdomDoc = createJdomDocBase(job);
+        org.jdom2.Element root = jdomDoc.getRootElement();
 
         MCRUser user = MCRUserMgr.instance().retrieveUser(currentUser);
         if (user != null)
@@ -249,7 +249,7 @@ public class MCRUserServlet extends MCRServlet {
      *            The MCRServletJob instance
      * @return jdom document
      */
-    protected org.jdom.Document createJdomDocBase(MCRServletJob job) {
+    protected org.jdom2.Document createJdomDocBase(MCRServletJob job) {
         // Get the MCRSession object for the current thread from the session
         // manager.
         String backto_url = null;
@@ -258,12 +258,12 @@ public class MCRUserServlet extends MCRServlet {
             backto_url = url.trim();
         }
 
-        org.jdom.Element root = new org.jdom.Element("mcr_user");
-        org.jdom.Document jdomDoc = new org.jdom.Document(root);
+        org.jdom2.Element root = new org.jdom2.Element("mcr_user");
+        org.jdom2.Document jdomDoc = new org.jdom2.Document(root);
 
-        root.addContent(new org.jdom.Element("guest_id").addContent(GUEST_ID));
-        root.addContent(new org.jdom.Element("guest_pwd").addContent(GUEST_PWD));
-        root.addContent(new org.jdom.Element("backto_url").addContent(backto_url));
+        root.addContent(new org.jdom2.Element("guest_id").addContent(GUEST_ID));
+        root.addContent(new org.jdom2.Element("guest_pwd").addContent(GUEST_PWD));
+        root.addContent(new org.jdom2.Element("backto_url").addContent(backto_url));
 
         return jdomDoc;
     }

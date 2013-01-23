@@ -5,9 +5,9 @@ import java.util.Enumeration;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.xpath.XPath;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.xpath.XPath;
 import org.mycore.frontend.editor.MCREditorDefReader;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;

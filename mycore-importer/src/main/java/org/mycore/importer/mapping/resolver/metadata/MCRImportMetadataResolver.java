@@ -2,7 +2,7 @@ package org.mycore.importer.mapping.resolver.metadata;
 
 import java.util.List;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.importer.MCRImportField;
 
 /**

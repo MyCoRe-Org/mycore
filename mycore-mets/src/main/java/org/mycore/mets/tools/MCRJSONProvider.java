@@ -19,7 +19,7 @@
 package org.mycore.mets.tools;
 
 //import org.apache.log4j.Logger;
-import org.jdom.Document;
+import org.jdom2.Document;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.mets.model.Mets;
 import org.mycore.mets.tools.model.MCRMETSTreeBuilder;

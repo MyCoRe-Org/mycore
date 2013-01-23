@@ -23,8 +23,8 @@
 
 package org.mycore.frontend.basket;
 
-import org.jdom.Document;
-import org.jdom.Element;
+import org.jdom2.Document;
+import org.jdom2.Element;
 
 /**
  * Builds xml representations of a basket and its entries.

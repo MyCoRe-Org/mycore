@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.importer.MCRImportField;
 import org.mycore.importer.MCRImportRecord;
 import org.mycore.importer.mapping.MCRImportMetadata;

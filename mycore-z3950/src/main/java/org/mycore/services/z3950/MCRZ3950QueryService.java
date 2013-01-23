@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -71,20 +71,20 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
                 MCRHit hit = mycoreResults.getHit(index);
                 String id = hit.getID();
                 // check the ID and retrieve the data
-                org.jdom.Document d = TM.retrieveXML(MCRObjectID.getInstance(id));
+                org.jdom2.Document d = TM.retrieveXML(MCRObjectID.getInstance(id));
                 fillClassificationsWithLabels(d.getRootElement());
                 
                 // build old MCRXMLContainer so that stylesheets in jzkit package must not be changed
                 // cleaning action in Hamburg 2006/11/21 has caused this 
-                org.jdom.Element root = new org.jdom.Element( "mcr_results");
-                org.jdom.Element ele = new org.jdom.Element( "mcr_result");
+                org.jdom2.Element root = new org.jdom2.Element( "mcr_results");
+                org.jdom2.Element ele = new org.jdom2.Element( "mcr_result");
                 root.addContent(ele);
                 ele.setAttribute("id", id);
                 ele.addContent(d.cloneContent());
 
-                org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
+                org.jdom2.output.XMLOutputter outputter = new org.jdom2.output.XMLOutputter();
                 logger.debug(outputter.outputString(root));
-                result = MCRUtils.getByteArray(new org.jdom.Document( root));
+                result = MCRUtils.getByteArray(new org.jdom2.Document( root));
             }
         return result;  
     }
@@ -110,7 +110,7 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
      * Metadaten nur ein Verweis auf Klasse und Kategorie ist, wird dieser
      * ergï¿½nzt durch sein Label.
      */
-    private void fillClassificationsWithLabels(org.jdom.Element result) {
+    private void fillClassificationsWithLabels(org.jdom2.Element result) {
         Element metadata = result.getChild("metadata");
         // Alle Kinder des Knotens, also alle Metadaten
         List metadataChildren = metadata.getChildren();

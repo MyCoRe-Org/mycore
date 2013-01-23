@@ -39,7 +39,7 @@ import java.util.Properties;
 import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
@@ -555,13 +555,13 @@ public class MCRStartEditorServlet extends MCRServlet {
         MCRObjectService service = new MCRObjectService();
         Collection<String> permlist = MCRAccessManager.getPermissionsForID(cd.mysemcrid.toString());
         for (String permission : permlist) {
-            org.jdom.Element ruleelm = AI.getRule(cd.mysemcrid.toString(), permission);
+            org.jdom2.Element ruleelm = AI.getRule(cd.mysemcrid.toString(), permission);
             ruleelm = normalizeACLforSWF(ruleelm);
             service.addRule(permission, ruleelm);
         }
-        org.jdom.Element serviceelm = service.createXML();
+        org.jdom2.Element serviceelm = service.createXML();
         if (LOGGER.isDebugEnabled()) {
-            org.jdom.Document dof = new org.jdom.Document();
+            org.jdom2.Document dof = new org.jdom2.Document();
             dof.addContent(serviceelm);
             byte[] xml = MCRUtils.getByteArray(dof);
             System.out.println(new String(xml));
@@ -590,7 +590,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            The XML access condition from the ACL system
      */
     @SuppressWarnings("unchecked")
-    private org.jdom.Element normalizeACLforSWF(org.jdom.Element ruleelm) {
+    private org.jdom2.Element normalizeACLforSWF(org.jdom2.Element ruleelm) {
         if (LOGGER.isDebugEnabled()) {
             try {
                 MCRUtils.writeElementToSysout(ruleelm);
@@ -599,14 +599,14 @@ public class MCRStartEditorServlet extends MCRServlet {
             }
         }
         // build new condition element
-        org.jdom.Element newcondition = new org.jdom.Element("condition");
+        org.jdom2.Element newcondition = new org.jdom2.Element("condition");
         newcondition.setAttribute("format", "xml");
         // build new boolean AND element
-        org.jdom.Element newwrapperand = new org.jdom.Element("boolean");
+        org.jdom2.Element newwrapperand = new org.jdom2.Element("boolean");
         newwrapperand.setAttribute("operator", "and");
         newcondition.addContent(newwrapperand);
         // build new boolean TRUE element
-        org.jdom.Element newtrue = new org.jdom.Element("boolean");
+        org.jdom2.Element newtrue = new org.jdom2.Element("boolean");
         newtrue.setAttribute("operator", "true");
         // check rule
         if (ruleelm == null) {
@@ -615,28 +615,28 @@ public class MCRStartEditorServlet extends MCRServlet {
         }
         try {
             // check of boolean AND element
-            org.jdom.Element oldwrapperand = ruleelm.getChild("boolean");
+            org.jdom2.Element oldwrapperand = ruleelm.getChild("boolean");
             if (oldwrapperand == null) {
                 return newcondition;
             }
 
-            org.jdom.Element newuser = (org.jdom.Element) newtrue.clone();
+            org.jdom2.Element newuser = (org.jdom2.Element) newtrue.clone();
             newuser.detach();
-            org.jdom.Element newdate = (org.jdom.Element) newtrue.clone();
+            org.jdom2.Element newdate = (org.jdom2.Element) newtrue.clone();
             newdate.detach();
-            org.jdom.Element newip = (org.jdom.Element) newtrue.clone();
+            org.jdom2.Element newip = (org.jdom2.Element) newtrue.clone();
             newip.detach();
-            org.jdom.Element newelm = null;
+            org.jdom2.Element newelm = null;
 
-            List<org.jdom.Element> parts = oldwrapperand.getChildren();
+            List<org.jdom2.Element> parts = oldwrapperand.getChildren();
             for (int i = 0; i < parts.size(); i++) {
                 if (i > 2)
                     break;
-                org.jdom.Element oldelm = (org.jdom.Element) parts.get(i).detach();
+                org.jdom2.Element oldelm = (org.jdom2.Element) parts.get(i).detach();
                 // if (oldelm.getChildren().size() == 0)
                 // continue;
                 if (oldelm.getName().equals("condition")) {
-                    org.jdom.Element newwrapper = new org.jdom.Element("boolean");
+                    org.jdom2.Element newwrapper = new org.jdom2.Element("boolean");
                     newwrapper.setAttribute("operator", "or");
                     newwrapper.addContent(oldelm);
                     newelm = newwrapper;
@@ -644,7 +644,7 @@ public class MCRStartEditorServlet extends MCRServlet {
                     newelm = oldelm;
                 }
                 String testfield = "";
-                List<org.jdom.Element> innercond = newelm.getChildren();
+                List<org.jdom2.Element> innercond = newelm.getChildren();
                 for (Element anInnercond : innercond) {
                     Element cond = (Element) anInnercond;
                     if (cond.getName().equals("condition")) {
@@ -877,7 +877,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void waddfile(MCRServletJob job, CommonData cd) throws IOException {
-        org.jdom.Element rule = WFM.getRuleFromFile(cd.myremcrid, "writewf");
+        org.jdom2.Element rule = WFM.getRuleFromFile(cd.myremcrid, "writewf");
         if (rule != null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
@@ -909,7 +909,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      * @throws SAXParseException 
      */
     public void wcommit(MCRServletJob job, CommonData cd) throws IOException, SAXParseException {
-        org.jdom.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "writedb");
+        org.jdom2.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "writedb");
         if (rule != null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
@@ -973,7 +973,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void wdelder(MCRServletJob job, CommonData cd) throws IOException {
-        org.jdom.Element rule = WFM.getRuleFromFile(cd.myremcrid, "deletewf");
+        org.jdom2.Element rule = WFM.getRuleFromFile(cd.myremcrid, "deletewf");
         if (rule != null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
@@ -1017,7 +1017,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void wdelfile(MCRServletJob job, CommonData cd) throws IOException {
-        org.jdom.Element rule = WFM.getRuleFromFile(cd.myremcrid, "deletewf");
+        org.jdom2.Element rule = WFM.getRuleFromFile(cd.myremcrid, "deletewf");
         if (rule != null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
@@ -1073,7 +1073,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void wdelobj(MCRServletJob job, CommonData cd) throws IOException {
-        org.jdom.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "deletewf");
+        org.jdom2.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "deletewf");
         if (rule != null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
@@ -1149,7 +1149,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void weditacl(MCRServletJob job, CommonData cd) throws IOException {
-        org.jdom.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "writewf");
+        org.jdom2.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "writewf");
         if (rule != null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
@@ -1162,7 +1162,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         // read file
         File path = WFM.getDirectoryPath(cd.mysemcrid.getBase());
         File fi = new File(path, cd.mysemcrid + ".xml");
-        org.jdom.Element service = null;
+        org.jdom2.Element service = null;
         try {
             if (fi.isFile() && fi.canRead()) {
                 MCRObject obj = new MCRObject(fi.toURI());
@@ -1198,7 +1198,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void weditder(MCRServletJob job, CommonData cd) throws IOException {
-        org.jdom.Element rule = WFM.getRuleFromFile(cd.myremcrid, "writewf");
+        org.jdom2.Element rule = WFM.getRuleFromFile(cd.myremcrid, "writewf");
         if (rule != null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
@@ -1233,7 +1233,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      * @throws MCRException 
      */
     public void wcopyobj(MCRServletJob job, CommonData cd) throws IOException, MCRException, SAXParseException {
-        org.jdom.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "writewf");
+        org.jdom2.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "writewf");
         if (rule != null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
@@ -1266,7 +1266,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void weditobj(MCRServletJob job, CommonData cd) throws IOException {
-        org.jdom.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "writewf");
+        org.jdom2.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "writewf");
         if (rule != null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
@@ -1297,7 +1297,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void wnewder(MCRServletJob job, CommonData cd) throws IOException {
-        org.jdom.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "writewf");
+        org.jdom2.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "writewf");
         MCRUtils.writeElementToSysout(rule);
         if (rule != null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
@@ -1368,7 +1368,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      * @throws SAXParseException 
      */
     public void wsetfile(MCRServletJob job, CommonData cd) throws IOException, SAXParseException {
-        org.jdom.Element rule = WFM.getRuleFromFile(cd.myremcrid, "writewf");
+        org.jdom2.Element rule = WFM.getRuleFromFile(cd.myremcrid, "writewf");
         if (rule != null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;

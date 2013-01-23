@@ -23,7 +23,7 @@
 
 package org.mycore.media;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 
 /**
  * This Object holds various media tags from parsed media files.

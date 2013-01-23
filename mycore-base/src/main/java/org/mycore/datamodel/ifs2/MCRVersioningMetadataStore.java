@@ -29,7 +29,7 @@ import java.util.Iterator;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.log4j.Logger;
-import org.jdom.JDOMException;
+import org.jdom2.JDOMException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRSessionMgr;

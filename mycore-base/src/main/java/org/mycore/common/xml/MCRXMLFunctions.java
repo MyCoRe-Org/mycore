@@ -49,8 +49,8 @@ import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-import org.jdom.JDOMException;
-import org.jdom.output.DOMOutputter;
+import org.jdom2.JDOMException;
+import org.jdom2.output.DOMOutputter;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRConfiguration;
@@ -258,10 +258,10 @@ public class MCRXMLFunctions {
 
     public static Element getResults(String query) {
         MCRResults result = getQueryResult(query);
-        org.jdom.Element xml = result.buildXML();
+        org.jdom2.Element xml = result.buildXML();
         DOMOutputter out = new DOMOutputter();
         try {
-            Document w3cDoc = out.output(new org.jdom.Document(xml));
+            Document w3cDoc = out.output(new org.jdom2.Document(xml));
             return w3cDoc.getDocumentElement();
         } catch (JDOMException exc) {
             LOGGER.error("Error while converting jdom- to w3c-element", exc);
@@ -449,7 +449,7 @@ public class MCRXMLFunctions {
 
         MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(derId);
 
-        org.jdom.Element derivateElem = der.getDerivate().createXML();
+        org.jdom2.Element derivateElem = der.getDerivate().createXML();
         String display = derivateElem.getAttributeValue("display");
         if (display == null) {
             display = "true";
@@ -688,9 +688,9 @@ public class MCRXMLFunctions {
      * @throws JDOMException
      */
     public static NodeList resolve(String uri) throws JDOMException {
-        org.jdom.Element element = MCRURIResolver.instance().resolve(uri);
+        org.jdom2.Element element = MCRURIResolver.instance().resolve(uri);
         element.detach();
-        org.jdom.Document document = new org.jdom.Document(element);
+        org.jdom2.Document document = new org.jdom2.Document(element);
         return new DOMOutputter().output(document).getDocumentElement().getChildNodes();
     }
 }

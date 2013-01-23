@@ -55,14 +55,14 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.Namespace;
-import org.jdom.input.DOMBuilder;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
-import org.jdom.transform.JDOMSource;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.Namespace;
+import org.jdom2.input.DOMBuilder;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.XMLOutputter;
+import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
@@ -1155,7 +1155,7 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
             queryElement.addContent(conditions);
             conditions.setAttribute("format", "text");
             conditions.addContent(query);
-            org.jdom.Element root = input.getRootElement();
+            org.jdom2.Element root = input.getRootElement();
             if (sortby != null) {
                 final Element fieldElement = new Element("field").setAttribute("name", sortby);
                 if (order != null) {
@@ -1164,7 +1164,7 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
                 root.addContent(new Element("sortBy").addContent(fieldElement));
             }
             if (LOGGER.isDebugEnabled()) {
-                XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
+                XMLOutputter out = new XMLOutputter(org.jdom2.output.Format.getPrettyFormat());
                 LOGGER.debug(out.outputString(input));
             }
             return input;

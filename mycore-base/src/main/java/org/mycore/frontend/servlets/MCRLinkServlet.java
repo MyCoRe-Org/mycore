@@ -32,8 +32,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.common.MCRLinkTableManager;

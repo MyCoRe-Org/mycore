@@ -31,7 +31,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRCalendar;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.parsers.bool.MCRAndCondition;

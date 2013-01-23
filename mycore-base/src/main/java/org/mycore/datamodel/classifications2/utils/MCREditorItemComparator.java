@@ -31,8 +31,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import org.jdom.Element;
-import org.jdom.Namespace;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
 import org.mycore.common.MCRSessionMgr;
 
 public class MCREditorItemComparator implements Comparator<Element> {

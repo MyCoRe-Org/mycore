@@ -31,8 +31,8 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
@@ -61,7 +61,7 @@ public abstract class MCRBase {
     protected static final String mcr_encoding;
 
     // the DOM document
-    protected org.jdom.Document jdom_document = null;
+    protected org.jdom2.Document jdom_document = null;
 
     // the object content
     protected MCRObjectID mcr_id = null;
@@ -126,7 +126,7 @@ public abstract class MCRBase {
             throw new MCRException("The JDOM document is null or empty.");
         }
 
-        org.jdom.Element rootElement = jdom_document.getRootElement();
+        org.jdom2.Element rootElement = jdom_document.getRootElement();
         setId(MCRObjectID.getInstance(rootElement.getAttributeValue("ID")));
         setLabel(rootElement.getAttributeValue("label"));
         setVersion(rootElement.getAttributeValue("version"));

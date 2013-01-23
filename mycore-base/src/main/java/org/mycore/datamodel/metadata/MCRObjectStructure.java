@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
 /**
@@ -386,7 +386,7 @@ public class MCRObjectStructure {
      * 
      * @exception MCRException
      *                if the content of this class is not valid
-     * @return org.jdom.Element the structure XML string
+     * @return org.jdom2.Element the structure XML string
      */
     public final Element createXML() throws MCRException {
         if (!isValid()) {

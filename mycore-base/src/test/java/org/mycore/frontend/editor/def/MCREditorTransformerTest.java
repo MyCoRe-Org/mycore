@@ -2,8 +2,8 @@ package org.mycore.frontend.editor.def;
 
 import java.util.List;
 
-import org.jdom.Element;
-import org.jdom.xpath.XPath;
+import org.jdom2.Element;
+import org.jdom2.xpath.XPath;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

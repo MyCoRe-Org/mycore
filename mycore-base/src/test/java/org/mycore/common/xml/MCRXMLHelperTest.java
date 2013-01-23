@@ -25,7 +25,7 @@ package org.mycore.common.xml;
 
 import static org.junit.Assert.*;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
@@ -36,7 +36,7 @@ import org.mycore.common.MCRTestCase;
 public class MCRXMLHelperTest extends MCRTestCase {
 
     /**
-     * Test method for {@link org.mycore.common.xml.MCRXMLHelper#deepEqual(org.jdom.Element, org.jdom.Element)}.
+     * Test method for {@link org.mycore.common.xml.MCRXMLHelper#deepEqual(org.jdom2.Element, org.jdom2.Element)}.
      */
     @Test
     public void testDeepEqualElementElement() {

@@ -24,7 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
 /**
@@ -176,7 +176,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      *            a relevant JDOM element for the metadata
      */
     @Override
-    public void setFromDOM(org.jdom.Element element) {
+    public void setFromDOM(org.jdom2.Element element) {
         super.setFromDOM(element);
         setValue(element.getTextTrim());
     }

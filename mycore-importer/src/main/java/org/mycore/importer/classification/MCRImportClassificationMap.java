@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 
 /**
  * This class is an abstraction of a xml classification mapping file.

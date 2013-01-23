@@ -30,10 +30,10 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.xpath.XPath;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.xpath.XPath;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRConstants;
@@ -58,7 +58,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
     }
 
     /**
-     * Test method for {@link org.mycore.mods.MCRMODSWrapper#wrapMODSDocument(org.jdom.Element, java.lang.String)}.
+     * Test method for {@link org.mycore.mods.MCRMODSWrapper#wrapMODSDocument(org.jdom2.Element, java.lang.String)}.
      * @throws URISyntaxException 
      * @throws SAXParseException 
      * @throws JDOMException 

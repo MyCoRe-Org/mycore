@@ -24,7 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
@@ -152,7 +152,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
      *                empty, too long or not a MCRObjectID
      */
     @Override
-    public void setFromDOM(org.jdom.Element element) throws MCRException {
+    public void setFromDOM(org.jdom2.Element element) throws MCRException {
         super.setFromDOM(element);
 
         String set_classid = element.getAttributeValue("classid");

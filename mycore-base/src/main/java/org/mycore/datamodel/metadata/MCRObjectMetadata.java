@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -236,7 +236,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      * @exception MCRException
      *                if a problem is occured
      */
-    public final void setFromDOM(org.jdom.Element element) throws MCRException {
+    public final void setFromDOM(org.jdom2.Element element) throws MCRException {
         @SuppressWarnings("unchecked")
         List<Element> elements_list = element.getChildren();
         meta_list.clear();
@@ -254,7 +254,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML data of the metadata part
      */
-    public final org.jdom.Element createXML() throws MCRException {
+    public final org.jdom2.Element createXML() throws MCRException {
         if (!isValid()) {
             throw new MCRException("MCRObjectMetadata : The content is not valid.");
         }

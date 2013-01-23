@@ -20,11 +20,11 @@ import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.TransformerHandler;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.transform.JDOMSource;
-import org.jdom.xpath.XPath;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.transform.JDOMSource;
+import org.jdom2.xpath.XPath;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
@@ -86,7 +86,7 @@ public class MCRSWFResolver implements URIResolver {
         }
     }
 
-    private static org.jdom.Document getWorkFlow(String base, String type, String step, String with_derivate) throws IOException,
+    private static org.jdom2.Document getWorkFlow(String base, String type, String step, String with_derivate) throws IOException,
             JDOMException {
         if (base != null) {
             base = base.trim();
@@ -158,8 +158,8 @@ public class MCRSWFResolver implements URIResolver {
         ArrayList<String> dermain = new ArrayList<String>();
         ArrayList<String> derlabel = new ArrayList<String>();
         ArrayList<String> dertitle = new ArrayList<String>();
-        org.jdom.Document der_in;
-        org.jdom.Element der;
+        org.jdom2.Document der_in;
+        org.jdom2.Element der;
         String mainfile;
         String label;
         String title;
@@ -226,7 +226,7 @@ public class MCRSWFResolver implements URIResolver {
         }
 
         // build the frame of mcr_workflow
-        org.jdom.Element root = new org.jdom.Element("mcr_workflow");
+        org.jdom2.Element root = new org.jdom2.Element("mcr_workflow");
         root.addNamespaceDeclaration(XSI_NAMESPACE);
         if (base != null) {
             root.setAttribute("base", base);
@@ -237,10 +237,10 @@ public class MCRSWFResolver implements URIResolver {
         root.setAttribute("step", step);
         root.setAttribute("with_derivate", with_derivate);
 
-        org.jdom.Document workflow_in = null;
-        org.jdom.Element writewf = null;
-        org.jdom.Element deletewf = null;
-        org.jdom.Element writedb = null;
+        org.jdom2.Document workflow_in = null;
+        org.jdom2.Element writewf = null;
+        org.jdom2.Element deletewf = null;
+        org.jdom2.Element writedb = null;
         boolean bdeletewf = false;
         boolean bwritedb = false;
 
@@ -363,7 +363,7 @@ public class MCRSWFResolver implements URIResolver {
             root.addContent(elm);
         }
 
-        org.jdom.Document workflow_doc = new org.jdom.Document(root);
+        org.jdom2.Document workflow_doc = new org.jdom2.Document(root);
         return workflow_doc;
     }
 

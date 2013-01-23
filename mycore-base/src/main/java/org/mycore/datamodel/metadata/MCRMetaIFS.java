@@ -24,7 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
 /**
@@ -155,7 +155,7 @@ final public class MCRMetaIFS extends MCRMetaDefault {
      *                if the set_sourcepath value is null or empty
      */
     @Override
-    public final void setFromDOM(org.jdom.Element element) throws MCRException {
+    public final void setFromDOM(org.jdom2.Element element) throws MCRException {
         super.setFromDOM(element);
         setSourcePath(element.getAttributeValue("sourcepath"));
         setMainDoc(element.getAttributeValue("maindoc"));

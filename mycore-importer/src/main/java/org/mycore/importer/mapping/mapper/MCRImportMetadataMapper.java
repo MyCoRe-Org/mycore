@@ -2,7 +2,7 @@ package org.mycore.importer.mapping.mapper;
 
 import java.util.Hashtable;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.importer.MCRImportRecord;
 import org.mycore.importer.mapping.MCRImportMetadata;
 import org.mycore.importer.mapping.MCRImportObject;

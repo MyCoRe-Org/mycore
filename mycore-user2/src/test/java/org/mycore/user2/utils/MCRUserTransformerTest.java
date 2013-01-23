@@ -45,10 +45,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlValue;
 import javax.xml.transform.stream.StreamSource;
 
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -89,7 +89,7 @@ public class MCRUserTransformerTest extends MCRHibTestCase {
     }
 
     /**
-     * Test method for {@link org.mycore.user2.utils.MCRUserTransformer#buildMCRUser(org.jdom.Element)}.
+     * Test method for {@link org.mycore.user2.utils.MCRUserTransformer#buildMCRUser(org.jdom2.Element)}.
      * @throws IOException 
      * @throws JAXBException 
      */

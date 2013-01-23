@@ -33,10 +33,10 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
@@ -183,8 +183,8 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         }
         LOGGER.info("Reading file " + filename + " ...");
 
-        org.jdom.Document doc = MCRXMLParserFactory.getValidatingParser().parseXML(new MCRFileContent(filename));
-        org.jdom.Element rootelm = doc.getRootElement();
+        org.jdom2.Document doc = MCRXMLParserFactory.getValidatingParser().parseXML(new MCRFileContent(filename));
+        org.jdom2.Element rootelm = doc.getRootElement();
 
         if (!rootelm.getName().equals("mcrpermissions")) {
             throw new MCRException("The data are not for mcrpermissions.");
@@ -256,11 +256,11 @@ public class MCRAccessCommands extends MCRAbstractCommands {
             if (description.equals("")) {
                 description = "No description";
             }
-            org.jdom.Element rule = AI.getRule(permission);
+            org.jdom2.Element rule = AI.getRule(permission);
             LOGGER.info("       " + permission);
             LOGGER.info("           " + description);
             if (rule != null) {
-                org.jdom.output.XMLOutputter o = new org.jdom.output.XMLOutputter();
+                org.jdom2.output.XMLOutputter o = new org.jdom2.output.XMLOutputter();
                 LOGGER.info("           " + o.outputString(rule));
             }
         }

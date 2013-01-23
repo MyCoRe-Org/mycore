@@ -33,8 +33,8 @@ import org.apache.axis.constants.Style;
 import org.apache.axis.constants.Use;
 import org.apache.axis.description.OperationDesc;
 import org.apache.axis.description.ParameterDesc;
-import org.jdom.Document;
-import org.jdom.input.DOMBuilder;
+import org.jdom2.Document;
+import org.jdom2.input.DOMBuilder;
 
 /*
  * This class is the implementation for remote access via Webservices
@@ -82,7 +82,7 @@ public class MCRQueryClientWebService extends MCRQueryClientBase {
      * @param xmlhost an entry of a remote host from hosts.xml
      */
     @Override
-    public void init(org.jdom.Element xmlhost) {
+    public void init(org.jdom2.Element xmlhost) {
         alias = xmlhost.getAttributeValue("alias");
         if (alias == null || (alias = alias.trim()).length() == 0) {
             alias = "remote";

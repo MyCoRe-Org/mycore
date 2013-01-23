@@ -11,13 +11,13 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.filter.Filter;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.filter.ElementFilter;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
@@ -39,9 +39,9 @@ import org.mycore.importer.event.MCRImportStatusListener;
 public class MCRImportImporter {
 
     private static final Logger LOGGER = Logger.getLogger(MCRImportImporter.class);
-    
+
     private static final String LOAD_OBJECT_COMMAND = "load object from file ";
-    
+
     private static final String LOAD_DERIVATE_COMMAND = "internal import derivate ";
 
     private MCRImportConfig config;
@@ -49,7 +49,7 @@ public class MCRImportImporter {
     private SAXBuilder builder;
 
     private File tempDirectory;
-    
+
     private Hashtable<String, MCRImportFileStatus> idTable = new Hashtable<String, MCRImportFileStatus>();
 
     protected ArrayList<MCRImportStatusListener> listenerList;
@@ -63,7 +63,9 @@ public class MCRImportImporter {
 
     // import status variables  
     protected long objectCount;
+
     protected long currentObject;
+
     protected ArrayList<String> errorObjectList;
 
     public LinkedList<String> getCommandList() {
@@ -80,38 +82,37 @@ public class MCRImportImporter {
      * @throws JDOMException
      */
     public MCRImportImporter(File mappingFile) throws IOException, JDOMException {
-        if(!mappingFile.exists())
+        if (!mappingFile.exists())
             throw new FileNotFoundException(mappingFile.getAbsolutePath());
         this.builder = new SAXBuilder();
         Element rootElement = getRootElement(mappingFile);
         // get the config from the import xml file
         this.config = new MCRImportConfig(rootElement);
         File mainDirectory = new File(config.getSaveToPath());
-        if(!mainDirectory.exists())
+        if (!mainDirectory.exists())
             throw new FileNotFoundException(mainDirectory.getAbsolutePath());
 
         // delete the temp directory from previous imports and create it again
         tempDirectory = new File(config.getSaveToPath(), "_temp");
         LOGGER.info("delete '_temp' directory");
-        if(MCRUtils.deleteDirectory(tempDirectory))
+        if (MCRUtils.deleteDirectory(tempDirectory))
             LOGGER.warn("Unable to delete temp directory " + tempDirectory.getAbsolutePath());
-        if(tempDirectory.mkdirs())
+        if (tempDirectory.mkdirs())
             LOGGER.warn("Unable to create temp directory " + tempDirectory.getAbsolutePath());
 
         // create the classification manager
         this.classManager = new MCRImportClassificationMappingManager(new File(config.getSaveToPath() + "classification/"));
-        if(this.classManager.getClassificationMapList().isEmpty())
-            LOGGER.warn("No classification mapping documents found! Check if the folder 'classification'" +
-                        " in the import directory exists and all files ends with '.xml'.");
+        if (this.classManager.getClassificationMapList().isEmpty())
+            LOGGER.warn("No classification mapping documents found! Check if the folder 'classification'"
+                + " in the import directory exists and all files ends with '.xml'.");
 
-        if(!classManager.isCompletelyFilled()) {
+        if (!classManager.isCompletelyFilled()) {
             StringBuilder error = new StringBuilder("The following classification mapping keys are not set:\n");
-            for(MCRImportClassificationMap map : classManager.getClassificationMapList()) {
-                for(String emptyImportValue : map.getEmptyImportValues())
+            for (MCRImportClassificationMap map : classManager.getClassificationMapList()) {
+                for (String emptyImportValue : map.getEmptyImportValues())
                     error.append(" " + emptyImportValue + "\n");
             }
-            error.append("Before the import can start, all mycore values have to be set or" +
-            		     " the classifcation mapping needs to be disabled!");
+            error.append("Before the import can start, all mycore values have to be set or" + " the classifcation mapping needs to be disabled!");
             throw new MCRException(error.toString());
         }
 
@@ -146,29 +147,29 @@ public class MCRImportImporter {
      */
     protected void buildIdTable(File dir) {
         LOGGER.info("Import preprocessing... This could take some time!");
-        for(File file : dir.listFiles()) {
-            if(file.isDirectory())
+        for (File file : dir.listFiles()) {
+            if (file.isDirectory())
                 // call this method recursive if its a directory
                 buildIdTable(file);
-            else if(file.getName().endsWith(".xml")) {
+            else if (file.getName().endsWith(".xml")) {
                 // if is a valid import file
                 Document doc = null;
                 try {
                     doc = builder.build(file);
-                } catch(Exception exc) {
+                } catch (Exception exc) {
                     continue;
                 }
                 Element rE = doc.getRootElement();
                 // mycore objects
-                if(rE.getName().equals("mycoreobject")) {
+                if (rE.getName().equals("mycoreobject")) {
                     String importId = rE.getAttributeValue("ID");
-                    if(importId == null || importId.equals(""))
+                    if (importId == null || importId.equals(""))
                         continue;
                     idTable.put(importId, new MCRImportFileStatus(importId, file.getAbsolutePath(), MCRImportFileType.MCROBJECT));
-                } else if(config.isUseDerivates() && config.isImportToMycore() && rE.getName().equals("mcrImportDerivate")) {
+                } else if (config.isUseDerivates() && config.isImportToMycore() && rE.getName().equals("mcrImportDerivate")) {
                     // derivate objects
                     String importId = rE.getAttributeValue("importId");
-                    if(importId == null || importId.equals(""))
+                    if (importId == null || importId.equals(""))
                         continue;
                     idTable.put(importId, new MCRImportFileStatus(importId, file.getAbsolutePath(), MCRImportFileType.MCRDERIVATE));
                 }
@@ -192,11 +193,11 @@ public class MCRImportImporter {
         LOGGER.info(objectCount + " objects to import");
 
         long startTime = System.currentTimeMillis();
-        for(MCRImportFileStatus fs : idTable.values()) {
+        for (MCRImportFileStatus fs : idTable.values()) {
             // object is saved on disk with resolved links etc.
-            if(fs.isSavedInTempDirectory())
+            if (fs.isSavedInTempDirectory())
                 continue;
-            generateMyCoReXmlFileById(fs.getImportId());                
+            generateMyCoReXmlFileById(fs.getImportId());
         }
 
         // print end informations
@@ -205,9 +206,9 @@ public class MCRImportImporter {
         LOGGER.info("MyCoRe files successfully generated");
         LOGGER.info("Finished in " + durationInMinutes + " minutes");
         LOGGER.info(objectCount - errorObjectList.size() + " of " + objectCount + " objects successfully generated");
-        if(errorObjectList.size() > 0) {
+        if (errorObjectList.size() > 0) {
             StringBuilder errorLog = new StringBuilder("The following objects causes errors\n");
-            for(String errorObject : errorObjectList) {
+            for (String errorObject : errorObjectList) {
                 errorLog.append(" " + errorObject + "\n");
             }
             LOGGER.info(errorLog.toString());
@@ -234,7 +235,7 @@ public class MCRImportImporter {
 
             // check if import id exists
             MCRImportFileStatus fs = idTable.get(importId);
-            if(fs == null) {
+            if (fs == null) {
                 LOGGER.error("there is no object with the id '" + importId + "' defined!");
                 return;
             }
@@ -243,10 +244,10 @@ public class MCRImportImporter {
             Document mcrDocument = null;
             StringBuffer loadCommand = null;
             // create the xml files
-            if(type.equals(MCRImportFileType.MCROBJECT)) {
+            if (type.equals(MCRImportFileType.MCROBJECT)) {
                 mcrDocument = createMCRObjectXml(fs);
                 loadCommand = new StringBuffer(LOAD_OBJECT_COMMAND);
-            } else if(type.equals(MCRImportFileType.MCRDERIVATE)) {
+            } else if (type.equals(MCRImportFileType.MCRDERIVATE)) {
                 mcrDocument = createMCRDerivateXml(fs);
                 loadCommand = new StringBuffer(LOAD_DERIVATE_COMMAND);
             } else {
@@ -256,7 +257,7 @@ public class MCRImportImporter {
 
             // save xml file to temp dir
             File mcrFile = saveDocumentToTemp(fs, mcrDocument);
-            if(mcrFile == null) {
+            if (mcrFile == null) {
                 LOGGER.warn("Cannot create import file. Cancel import id " + importId);
                 return;
             }
@@ -266,21 +267,21 @@ public class MCRImportImporter {
 
             // add load command to the command list
             loadCommand.append(mcrFile.getAbsolutePath());
-            if(type.equals(MCRImportFileType.MCRDERIVATE)) {
+            if (type.equals(MCRImportFileType.MCRDERIVATE)) {
                 loadCommand.append(" and upload files ");
                 loadCommand.append(config.isImportFilesToMycore());
             }
             commandList.add(loadCommand.toString());
 
             // fire events
-            if(type.equals(MCRImportFileType.MCROBJECT))
+            if (type.equals(MCRImportFileType.MCROBJECT))
                 fireMCRObjectGenerated(mcrId);
-            else if(type.equals(MCRImportFileType.MCRDERIVATE))
+            else if (type.equals(MCRImportFileType.MCRDERIVATE))
                 fireMCRDerivateGenerated(mcrId);
 
             // print successfully imported status infos
             LOGGER.info(statusBuffer.toString() + "Object successfully generated " + importId + " - " + mcrId);
-        } catch(Exception e) {
+        } catch (Exception e) {
             errorObjectList.add(importId);
             LOGGER.error("Error while generating object with import id '" + importId + "'!", e);
         }
@@ -304,7 +305,7 @@ public class MCRImportImporter {
 
         // use the xsi:noNamespaceSchemaLocation to get the type
         String schemaLocation = doc.getRootElement().getAttributeValue("noNamespaceSchemaLocation", MCRConstants.XSI_NAMESPACE);
-        if(schemaLocation == null) {
+        if (schemaLocation == null) {
             LOGGER.error("Couldnt get object type because there is no xsi:noNamespaceSchemaLocation defined for object " + doc.getBaseURI());
             return null;
         }
@@ -366,20 +367,20 @@ public class MCRImportImporter {
      */
     protected File saveDocumentToTemp(MCRImportFileStatus fs, Document documentToSave) throws FileNotFoundException {
         File saveToFile = getMCRXmlFile(fs.getMycoreId());
-        if(saveToFile == null)
+        if (saveToFile == null)
             return null;
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
         FileOutputStream output = null;
         try {
             output = new FileOutputStream(saveToFile);
             outputter.output(documentToSave, output);
-        } catch(IOException ioExc) {
+        } catch (IOException ioExc) {
             LOGGER.error("while saving document to temp directory " + saveToFile.getAbsolutePath());
             return null;
         } finally {
             try {
                 output.close();
-            } catch(IOException ioExc) {
+            } catch (IOException ioExc) {
                 LOGGER.error("while saving document to temp directory " + saveToFile.getAbsolutePath(), ioExc);
                 return null;
             }
@@ -389,8 +390,8 @@ public class MCRImportImporter {
 
     public File getMCRXmlFile(MCRObjectID mcrId) {
         File subfolder = new File(this.tempDirectory, mcrId.getTypeId());
-        if(!subfolder.exists()) {
-            if(!subfolder.mkdirs()) {
+        if (!subfolder.exists()) {
+            if (!subfolder.mkdirs()) {
                 LOGGER.warn("Unable to create folder " + subfolder.getAbsolutePath());
                 return null;
             }
@@ -409,27 +410,26 @@ public class MCRImportImporter {
      * @throws JDOMException
      * @throws MCRActiveLinkException
      */
-    @SuppressWarnings("unchecked")
-    protected void resolveLinks(Document doc) { 
+    protected void resolveLinks(Document doc) {
         Iterator<Element> it = doc.getRootElement().getDescendants(new LinkIdFilter());
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             Element linkElement = it.next();
             String linkId = linkElement.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
             // try to get the mycore id from the hashtable
             MCRImportFileStatus fs = idTable.get(linkId);
-            if(fs == null) {
+            if (fs == null) {
                 // print error only if its not a internal mycore id
-                if(!MCRMetadataManager.exists(MCRObjectID.getInstance(linkId)))
-                    LOGGER.error(   "Invalid id " + linkId + " found in file " + doc.getBaseURI() + 
-                                    " at element " + linkElement.getName() + linkElement.getAttributes());
+                if (!MCRMetadataManager.exists(MCRObjectID.getInstance(linkId)))
+                    LOGGER.error("Invalid id " + linkId + " found in file " + doc.getBaseURI() + " at element " + linkElement.getName()
+                        + linkElement.getAttributes());
                 continue;
             }
             // if null -> the linked object is currently not imported -> do it
-            if(fs.getMycoreId() == null)
+            if (fs.getMycoreId() == null)
                 generateMyCoReXmlFileById(linkId);
 
             // set the new mycoreId
-            if(fs.getMycoreId() != null) {
+            if (fs.getMycoreId() != null) {
                 linkElement.setAttribute("href", fs.getMycoreId().toString(), MCRConstants.XLINK_NAMESPACE);
             } else {
                 LOGGER.error("Couldnt resolve reference for link " + linkId + " in " + doc.getBaseURI());
@@ -443,22 +443,21 @@ public class MCRImportImporter {
      * 
      * @param doc the document where the classifications have to be mapped
      */
-    @SuppressWarnings("unchecked")
     protected void mapClassificationValues(Document doc) throws IOException, JDOMException, MCRActiveLinkException {
         Iterator<Element> it = doc.getRootElement().getDescendants(new ClassificationFilter());
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             Element classElement = it.next();
             // classid & categid
             String classId = classElement.getAttributeValue("classid");
             String categId = classElement.getAttributeValue("categid");
 
-            if(classId == null || categId == null || classId.equals("") || categId.equals(""))
+            if (classId == null || categId == null || classId.equals("") || categId.equals(""))
                 continue;
 
             // get the mycore value from the classifcation mapping file
             String mcrValue = classManager.getMyCoReValue(classId, categId);
 
-            if(mcrValue == null || mcrValue.equals("") || mcrValue.equals(categId))
+            if (mcrValue == null || mcrValue.equals("") || mcrValue.equals(categId))
                 continue;
 
             // set the new mycore value
@@ -492,7 +491,7 @@ public class MCRImportImporter {
      * @param mcrId the record which is mapped
      */
     private void fireMCRObjectGenerated(String mcrId) {
-        for(MCRImportStatusListener l : listenerList) {
+        for (MCRImportStatusListener l : listenerList) {
             MCRImportStatusEvent e = new MCRImportStatusEvent(this, mcrId);
             l.objectGenerated(e);
         }
@@ -505,7 +504,7 @@ public class MCRImportImporter {
      * @param derId the record which is mapped
      */
     private void fireMCRDerivateGenerated(String derId) {
-        for(MCRImportStatusListener l : listenerList) {
+        for (MCRImportStatusListener l : listenerList) {
             MCRImportStatusEvent e = new MCRImportStatusEvent(this, derId);
             l.derivateGenerated(e);
         }
@@ -515,21 +514,23 @@ public class MCRImportImporter {
      * Internal filter class which returns only true
      * if the element is a xlink. 
      */
-    private static class LinkIdFilter implements Filter {
+    private static class LinkIdFilter extends ElementFilter {
         private static final long serialVersionUID = 1L;
 
-        public boolean matches(Object arg0) {
-            // only elements
-            if(!(arg0 instanceof Element))
-                return false;
-            Element e = (Element)arg0;
-            Element p = e.getParentElement();
-            // check the class attribute of the parent element
-            if(p == null || p.getAttributeValue("class") == null || !p.getAttributeValue("class").equals("MCRMetaLinkID"))
-                return false;
-            // exists a href attribute and if its not empty
-            String href = e.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
-            return !(href == null || href.equals(""));
+        public Element filter(Object arg0) {
+            Element e = super.filter(arg0);
+            if (e != null) {
+                Element p = e.getParentElement();
+                // check the class attribute of the parent element
+                if (p != null && "MCRMetaLinkID".equals(p.getAttributeValue("class"))) {
+                    // exists a href attribute and if its not empty
+                    String href = e.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
+                    if (!(href == null || href.equals(""))) {
+                        return e;
+                    }
+                }
+            }
+            return null;
         }
     }
 
@@ -537,17 +538,17 @@ public class MCRImportImporter {
      * Internal filter calls which returns only true
      * if the element is a classification.
      */
-    private static class ClassificationFilter implements Filter {
+    private static class ClassificationFilter extends ElementFilter {
         private static final long serialVersionUID = 1L;
 
-        public boolean matches(Object arg0) {
-            // only elements
-            if(!(arg0 instanceof Element))
-                return false;
-            Element e = (Element)arg0;
-            Element p = e.getParentElement();
-            // check the class attribute of the parent element
-            return !(p == null || p.getAttributeValue("class") == null || !p.getAttributeValue("class").equals("MCRMetaClassification"));
+        public Element filter(Object arg0) {
+            Element e = super.filter(arg0);
+            if (e != null) {
+                Element p = e.getParentElement();
+                // check the class attribute of the parent element
+                return (p != null && "MCRMetaClassification".equals(p.getAttributeValue("class"))) ? e : null;
+            }
+            return null;
         }
     }
 }

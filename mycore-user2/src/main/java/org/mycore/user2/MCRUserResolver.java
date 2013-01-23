@@ -35,9 +35,9 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.transform.JDOMSource;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.user2.utils.MCRUserTransformer;
@@ -110,7 +110,7 @@ public class MCRUserResolver implements URIResolver {
         }
         List<MCRUser> users = MCRUserManager.listUsers(null, null, null);
         // Loop over all assignable group IDs
-        Element root = new org.jdom.Element("items");
+        Element root = new org.jdom2.Element("items");
         for (MCRUser user : users) {
             Element item = new Element("item");
             StringBuilder label = new StringBuilder(user.getUserID());

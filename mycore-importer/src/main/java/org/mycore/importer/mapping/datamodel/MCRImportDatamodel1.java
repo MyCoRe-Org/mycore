@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.filter.ElementFilter;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.filter.ElementFilter;
+import org.jdom2.filter.Filters;
 import org.mycore.importer.mapping.MCRImportMetadataResolverManager;
 
 public class MCRImportDatamodel1 extends MCRImportAbstractDatamodel {
@@ -77,7 +78,6 @@ public class MCRImportDatamodel1 extends MCRImportAbstractDatamodel {
         return false;
     }
 
-    @SuppressWarnings("unchecked")
     protected Element findMetadataChild(String metadataName) {
         Element cachedElement = getCachedMetadataTable().get(metadataName);
         if(cachedElement != null)
@@ -89,7 +89,7 @@ public class MCRImportDatamodel1 extends MCRImportAbstractDatamodel {
         // go through all elements
         for (Element element : metadataElements) {
             // the metadataName is defined in the child of a metadataElement
-            Element metadataChildElement = (Element) element.getContent(new ElementFilter()).get(0);
+            Element metadataChildElement = (Element) element.getContent(Filters.element()).get(0);
             if (metadataName.equals(metadataChildElement.getAttributeValue("name"))) {
                 // right child found -> cache & return it
                 addCachedMetadataElement(metadataName, metadataChildElement);
@@ -101,14 +101,13 @@ public class MCRImportDatamodel1 extends MCRImportAbstractDatamodel {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     public List<String> getMetadataNames() {
         List<String> nameList = new ArrayList<String>();
         Element rootElement = datamodel.getRootElement();
         Element metadata = rootElement.getChild("metadata");
         for(Element e : (List<Element>)metadata.getContent(new ElementFilter("element"))) {
             // the metadataName is defined in the child of a metadataElement
-            Element metadataChildElement = (Element) e.getContent(new ElementFilter()).get(0);
+            Element metadataChildElement = (Element) e.getContent(Filters.element()).get(0);
             nameList.add(metadataChildElement.getAttributeValue("name"));
         }
         return nameList;

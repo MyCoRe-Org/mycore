@@ -26,7 +26,7 @@ package org.mycore.datamodel.ifs;
 import java.util.Hashtable;
 import java.util.List;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;

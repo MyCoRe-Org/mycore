@@ -11,7 +11,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import org.jdom.Document;
+import org.jdom2.Document;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;

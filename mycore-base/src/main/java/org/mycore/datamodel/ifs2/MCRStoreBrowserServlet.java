@@ -31,8 +31,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.jdom.Document;
-import org.jdom.Element;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.frontend.servlets.MCRServlet;

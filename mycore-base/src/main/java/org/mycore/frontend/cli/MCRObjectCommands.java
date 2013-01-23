@@ -33,9 +33,9 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.transform.JDOMResult;
-import org.jdom.transform.JDOMSource;
+import org.jdom2.Document;
+import org.jdom2.transform.JDOMResult;
+import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
@@ -707,7 +707,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             FileOutputStream out = new FileOutputStream(xmlOutput);
             StreamResult sr = new StreamResult(out);
             Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(content);
-            trans.transform(new org.jdom.transform.JDOMSource(doc), sr);
+            trans.transform(new org.jdom2.transform.JDOMSource(doc), sr);
         } else {
             content.sendTo(xmlOutput);
         }

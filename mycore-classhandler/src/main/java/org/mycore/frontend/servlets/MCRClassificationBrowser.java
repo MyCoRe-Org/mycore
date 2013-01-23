@@ -28,8 +28,8 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.apache.log4j.Logger;
 import org.mycore.common.*;
 import org.mycore.common.content.MCRJDOMContent;
-import org.jdom.*;
-import org.jdom.input.SAXBuilder;
+import org.jdom2.*;
+import org.jdom2.input.SAXBuilder;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
@@ -111,7 +111,7 @@ public class MCRClassificationBrowser extends MCRServlet {
         doLayout(job, bData.getXslStyle(), jdom); // use the stylesheet-postfix from properties
     }
 
-    private org.jdom.Document getEmbeddingPage(String coverPage) throws Exception {
+    private org.jdom2.Document getEmbeddingPage(String coverPage) throws Exception {
         String path = getServletContext().getRealPath(coverPage);
         File file = new File(path);
         if (!file.exists()) {

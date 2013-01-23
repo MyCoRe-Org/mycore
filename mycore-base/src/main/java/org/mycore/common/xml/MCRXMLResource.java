@@ -31,7 +31,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.apache.log4j.Logger;
-import org.jdom.JDOMException;
+import org.jdom2.JDOMException;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUtils;

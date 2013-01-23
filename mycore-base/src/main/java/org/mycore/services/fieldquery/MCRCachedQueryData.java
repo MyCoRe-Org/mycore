@@ -23,7 +23,7 @@
 
 package org.mycore.services.fieldquery;
 
-import org.jdom.Document;
+import org.jdom2.Document;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;

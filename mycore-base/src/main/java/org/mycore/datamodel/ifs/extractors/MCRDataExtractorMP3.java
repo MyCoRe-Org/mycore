@@ -30,7 +30,7 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.farng.mp3.MP3File;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRUtils;
 
 /**

@@ -4,11 +4,11 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Attribute;
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.Text;
-import org.jdom.filter.ElementFilter;
+import org.jdom2.Attribute;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.Text;
+import org.jdom2.filter.Filters;
 import org.mycore.common.MCRConstants;
 import org.mycore.importer.MCRImportField;
 import org.mycore.importer.mapping.MCRImportMappingManager;
@@ -43,7 +43,7 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
 
     /*
      * (non-Javadoc)
-     * @see org.mycore.importer.mapping.resolver.metadata.MCRImportMetadataResolver#resolve(org.jdom.Element, java.util.List)
+     * @see org.mycore.importer.mapping.resolver.metadata.MCRImportMetadataResolver#resolve(org.jdom2.Element, java.util.List)
      */
     public boolean resolve(Element map, List<MCRImportField> fieldList, Element saveToElement) {
         this.map = map;
@@ -407,7 +407,7 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
         if(childElement.getText() != null && !childElement.getText().equals(""))
             return true;
         boolean valid = false;
-        List<Element> childList= (List<Element>)childElement.getContent(new ElementFilter());
+        List<Element> childList= (List<Element>)childElement.getContent(Filters.element());
         for (Element aChildList : childList) {
             if (isValidChild(aChildList))
                 valid = true;

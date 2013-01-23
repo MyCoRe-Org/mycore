@@ -4,14 +4,16 @@
 package org.mycore.datamodel.common;
 
 import java.io.File;
-import java.util.Formatter;
+import java.text.MessageFormat;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.xpath.XPath;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.filter.Filter;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -25,6 +27,8 @@ import org.mycore.services.urn.MCRURNManager;
  * @author shermann
  */
 public class MCRURNEventHandler extends MCREventHandlerBase {
+    private static final Filter<Element> ELEMENT_FILTER = Filters.element();
+    private static final XPathFactory XPATH_FACTORY = XPathFactory.instance();
     private static final Logger LOGGER = Logger.getLogger(MCRURNEventHandler.class);
 
     /**
@@ -129,49 +133,42 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
      * @param der
      *            the MCRDerivate that caused the event
      */
-    @SuppressWarnings("unchecked")
     @Override
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
-        try {
-            Document derivateXml = MCRXMLMetadataManager.instance().retrieveXML(der.getId());
+        Document derivateXml = MCRXMLMetadataManager.instance().retrieveXML(der.getId());
 
-            // get all filesets from Derivate
-            XPath filesetPath = XPath.newInstance("./mycorederivate/derivate/fileset");
+        // get all filesets from Derivate
+        XPathExpression<Element> filesetPath = XPATH_FACTORY.compile("./mycorederivate/derivate/fileset", ELEMENT_FILTER);
 
-            Object obj = filesetPath.selectSingleNode(derivateXml);
-            if (!(obj instanceof Element)) {
-                return;
-            }
+        // add the urn of the fileset
+        Element result = filesetPath.evaluateFirst(derivateXml);
+        if (result == null) {
+            return;
+        }
+        String urn = result.getAttributeValue("urn");
 
-            // add the urn of the fileset
-            Element result = (Element) obj;
-            String urn = result.getAttributeValue("urn");
+        if (urn != null && MCRURNManager.isValid(urn)) {
+            MCRURNManager.assignURN(urn, der.getId().toString());
+            LOGGER.info("Loading fileset urn: " + urn + ", " + der.getId().toString());
+            // get all files in the fileset
+            XPathExpression<Element> filePath = XPATH_FACTORY.compile("./mycorederivate/derivate/fileset[@urn='" + urn + "']/file",
+                ELEMENT_FILTER);
+            List<Element> files = filePath.evaluate(derivateXml);
 
-            if (urn != null && MCRURNManager.isValid(urn)) {
-                MCRURNManager.assignURN(urn, der.getId().toString());
-                LOGGER.info("Loading fileset urn: " + urn + ", " + der.getId().toString());
-                // get all files in the fileset
-                XPath filePath = XPath.newInstance("./mycorederivate/derivate/fileset[@urn='" + urn + "']/file");
-                List<Element> files = filePath.selectNodes(derivateXml);
+            for (Element fileResult : files) {
+                // add the urn of each file
+                String fileName, fileUrn, fileDirectory;
 
-                for (Element fileResult : files) {
-                    // add the urn of each file
-                    String fileName, fileUrn, fileDirectory;
+                if ((fileName = fileResult.getAttributeValue("name")) != null && (fileUrn = fileResult.getChildText("urn")) != null) {
 
-                    if ((fileName = fileResult.getAttributeValue("name")) != null && (fileUrn = fileResult.getChildText("urn")) != null) {
+                    File derivateFile = new File(fileName);
 
-                        File derivateFile = new File(fileName);
-
-                        fileName = derivateFile.getName();
-                        fileDirectory = derivateFile.getParent();
-                        LOGGER.info(new Formatter().format("load file urn : %s, %s, %s, %s ", fileUrn, der.getId().toString(),
-                                fileDirectory, fileName).toString());
-                        MCRURNManager.assignURN(fileUrn, der.getId().toString(), fileDirectory, fileName);
-                    }
+                    fileName = derivateFile.getName();
+                    fileDirectory = derivateFile.getParent();
+                    LOGGER.info(MessageFormat.format("load file urn : %s, %s, %s, %s ", fileUrn, der.getId().toString(), fileDirectory, fileName).toString());
+                    MCRURNManager.assignURN(fileUrn, der.getId().toString(), fileDirectory, fileName);
                 }
             }
-        } catch (JDOMException je) {
-            LOGGER.error("error while reading filesets or files from derivate " + der.getId().toString(), je);
         }
     }
 

@@ -27,7 +27,7 @@ import java.text.MessageFormat;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;

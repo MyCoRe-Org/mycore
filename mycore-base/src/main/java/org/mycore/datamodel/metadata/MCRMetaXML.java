@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Content;
-import org.jdom.Element;
+import org.jdom2.Content;
+import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
 /**
@@ -67,7 +67,7 @@ public class MCRMetaXML extends MCRMetaDefault {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public void setFromDOM(org.jdom.Element element) {
+    public void setFromDOM(org.jdom2.Element element) {
         super.setFromDOM(element);
 
         content = element.cloneContent();
@@ -94,7 +94,7 @@ public class MCRMetaXML extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRMetaLangText part
      */
     @Override
-    public org.jdom.Element createXML() throws MCRException {
+    public org.jdom2.Element createXML() throws MCRException {
         Element elm = super.createXML();
         List<Content> addedContent = new ArrayList<Content>(content.size());
         cloneListContent(addedContent, content);

@@ -35,8 +35,8 @@ import java.io.InputStream;
 import java.util.Date;
 
 import org.apache.commons.vfs2.RandomAccessContent;
-import org.jdom.Document;
-import org.jdom.Element;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.junit.Test;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;

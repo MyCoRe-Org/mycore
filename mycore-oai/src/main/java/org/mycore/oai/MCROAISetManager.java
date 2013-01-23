@@ -33,7 +33,7 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Transaction;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;

@@ -22,7 +22,7 @@
 
 package org.mycore.datamodel.metadata.validator;
 
-import static org.jdom.Namespace.XML_NAMESPACE;
+import static org.jdom2.Namespace.XML_NAMESPACE;
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
@@ -39,13 +39,13 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-import org.jdom.xpath.XPath;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+import org.jdom2.xpath.XPath;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
@@ -86,7 +86,7 @@ public class MCREditorOutValidator {
 
     private static final String CONFIG_PREFIX = "MCR.EditorOutValidator.";
 
-    private static final SAXBuilder SAX_BUILDER = new org.jdom.input.SAXBuilder();
+    private static final SAXBuilder SAX_BUILDER = new org.jdom2.input.SAXBuilder();
 
     private Document input;
 
@@ -347,7 +347,7 @@ public class MCREditorOutValidator {
      */
     private void checkObject() throws JDOMException, IOException {
         // add the namespaces (this is a workaround)
-        org.jdom.Element root = input.getRootElement();
+        org.jdom2.Element root = input.getRootElement();
         root.addNamespaceDeclaration(XLINK_NAMESPACE);
         root.addNamespaceDeclaration(XSI_NAMESPACE);
         // set the schema
@@ -359,11 +359,11 @@ public class MCREditorOutValidator {
             root.setAttribute("label", id.toString());
         }
         // remove the path elements from the incoming
-        org.jdom.Element pathes = root.getChild("pathes");
+        org.jdom2.Element pathes = root.getChild("pathes");
         if (pathes != null) {
             root.removeChildren("pathes");
         }
-        org.jdom.Element structure = root.getChild("structure");
+        org.jdom2.Element structure = root.getChild("structure");
         if (structure == null) {
             root.addContent(new Element("structure"));
         } else {
@@ -371,7 +371,7 @@ public class MCREditorOutValidator {
         }
         Element metadata = root.getChild("metadata");
         checkObjectMetadata(metadata);
-        org.jdom.Element service = root.getChild("service");
+        org.jdom2.Element service = root.getChild("service");
         checkObjectService(root, service);
     }
 
@@ -418,7 +418,7 @@ public class MCREditorOutValidator {
     @SuppressWarnings("unchecked")
     private void checkObjectService(Element root, Element service) throws JDOMException, IOException {
         if (service == null) {
-            service = new org.jdom.Element("service");
+            service = new org.jdom2.Element("service");
             root.addContent(service);
         }
         List<Element> servicelist = service.getChildren();
@@ -442,7 +442,7 @@ public class MCREditorOutValidator {
      * @throws IOException 
      * @throws JDOMException 
      */
-    private void setDefaultObjectACLs(org.jdom.Element service) throws JDOMException, IOException {
+    private void setDefaultObjectACLs(org.jdom2.Element service) throws JDOMException, IOException {
         if (!MCRConfiguration.instance().getBoolean("MCR.Access.AddObjectDefaultRule", true)) {
             LOGGER.info("Adding object default acl rule is disabled.");
             return;
@@ -557,7 +557,7 @@ public class MCREditorOutValidator {
      * 
      * @param service
      */
-    public static void setDefaultDerivateACLs(org.jdom.Element service) {
+    public static void setDefaultDerivateACLs(org.jdom2.Element service) {
         // Read stylesheet and add user
         InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream("/editor_default_acls_derivate.xml");
         if (aclxml == null) {
@@ -565,8 +565,8 @@ public class MCREditorOutValidator {
             return;
         }
         try {
-            org.jdom.Document xml = SAX_BUILDER.build(aclxml);
-            org.jdom.Element acls = xml.getRootElement().getChild("servacls");
+            org.jdom2.Document xml = SAX_BUILDER.build(aclxml);
+            org.jdom2.Element acls = xml.getRootElement().getChild("servacls");
             if (acls != null) {
                 service.addContent(acls.detach());
             }

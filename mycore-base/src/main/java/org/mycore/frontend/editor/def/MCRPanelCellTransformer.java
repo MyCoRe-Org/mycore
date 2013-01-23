@@ -3,8 +3,8 @@ package org.mycore.frontend.editor.def;
 import java.text.MessageFormat;
 import java.util.List;
 
-import org.jdom.DataConversionException;
-import org.jdom.Element;
+import org.jdom2.DataConversionException;
+import org.jdom2.Element;
 import org.mycore.common.MCRConfigurationException;
 
 public class MCRPanelCellTransformer extends MCRTransformerBase {

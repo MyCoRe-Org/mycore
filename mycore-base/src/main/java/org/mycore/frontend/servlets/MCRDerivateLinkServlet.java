@@ -3,8 +3,8 @@ package org.mycore.frontend.servlets;
 import java.util.Collection;
 import java.util.Map;
 
-import org.jdom.Document;
-import org.jdom.Element;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;

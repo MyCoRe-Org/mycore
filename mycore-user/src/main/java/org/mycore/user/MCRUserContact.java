@@ -168,7 +168,7 @@ public class MCRUserContact {
      * @param elm
      *            the JDOM Element
      */
-    public MCRUserContact(org.jdom.Element elm) {
+    public MCRUserContact(org.jdom2.Element elm) {
         init();
         setFromJDOMElement(elm);
     }
@@ -179,7 +179,7 @@ public class MCRUserContact {
      * @param elm
      *            the JDOM Element
      */
-    public final void setFromJDOMElement(org.jdom.Element elm) {
+    public final void setFromJDOMElement(org.jdom2.Element elm) {
         if (elm == null) {
             return;
         }
@@ -362,24 +362,24 @@ public class MCRUserContact {
      * 
      * @return JDOM Element including data fields of this class
      */
-    public final org.jdom.Element toJDOMElement() {
-        org.jdom.Element address = new org.jdom.Element("user.contact");
-        org.jdom.Element Salutation = new org.jdom.Element("contact.salutation").setText(salutation);
-        org.jdom.Element Firstname = new org.jdom.Element("contact.firstname").setText(firstname);
-        org.jdom.Element Lastname = new org.jdom.Element("contact.lastname").setText(lastname);
-        org.jdom.Element Street = new org.jdom.Element("contact.street").setText(street);
-        org.jdom.Element City = new org.jdom.Element("contact.city").setText(city);
-        org.jdom.Element Postalcode = new org.jdom.Element("contact.postalcode").setText(postalcode);
-        org.jdom.Element Country = new org.jdom.Element("contact.country").setText(country);
-        org.jdom.Element State = new org.jdom.Element("contact.state").setText(state);
-        org.jdom.Element Institution = new org.jdom.Element("contact.institution").setText(institution);
-        org.jdom.Element Faculty = new org.jdom.Element("contact.faculty").setText(faculty);
-        org.jdom.Element Department = new org.jdom.Element("contact.department").setText(department);
-        org.jdom.Element Institute = new org.jdom.Element("contact.institute").setText(institute);
-        org.jdom.Element Telephone = new org.jdom.Element("contact.telephone").setText(telephone);
-        org.jdom.Element Fax = new org.jdom.Element("contact.fax").setText(fax);
-        org.jdom.Element Email = new org.jdom.Element("contact.email").setText(email);
-        org.jdom.Element Cellphone = new org.jdom.Element("contact.cellphone").setText(cellphone);
+    public final org.jdom2.Element toJDOMElement() {
+        org.jdom2.Element address = new org.jdom2.Element("user.contact");
+        org.jdom2.Element Salutation = new org.jdom2.Element("contact.salutation").setText(salutation);
+        org.jdom2.Element Firstname = new org.jdom2.Element("contact.firstname").setText(firstname);
+        org.jdom2.Element Lastname = new org.jdom2.Element("contact.lastname").setText(lastname);
+        org.jdom2.Element Street = new org.jdom2.Element("contact.street").setText(street);
+        org.jdom2.Element City = new org.jdom2.Element("contact.city").setText(city);
+        org.jdom2.Element Postalcode = new org.jdom2.Element("contact.postalcode").setText(postalcode);
+        org.jdom2.Element Country = new org.jdom2.Element("contact.country").setText(country);
+        org.jdom2.Element State = new org.jdom2.Element("contact.state").setText(state);
+        org.jdom2.Element Institution = new org.jdom2.Element("contact.institution").setText(institution);
+        org.jdom2.Element Faculty = new org.jdom2.Element("contact.faculty").setText(faculty);
+        org.jdom2.Element Department = new org.jdom2.Element("contact.department").setText(department);
+        org.jdom2.Element Institute = new org.jdom2.Element("contact.institute").setText(institute);
+        org.jdom2.Element Telephone = new org.jdom2.Element("contact.telephone").setText(telephone);
+        org.jdom2.Element Fax = new org.jdom2.Element("contact.fax").setText(fax);
+        org.jdom2.Element Email = new org.jdom2.Element("contact.email").setText(email);
+        org.jdom2.Element Cellphone = new org.jdom2.Element("contact.cellphone").setText(cellphone);
 
         // Aggregate address element
         address.addContent(Salutation).addContent(Firstname).addContent(Lastname).addContent(Street).addContent(City)

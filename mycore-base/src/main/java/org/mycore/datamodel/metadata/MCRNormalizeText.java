@@ -25,7 +25,7 @@ package org.mycore.datamodel.metadata;
 
 import java.util.List;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRNormalizer;
 
 /**
@@ -46,7 +46,7 @@ public class MCRNormalizeText {
      * @param doc
      *            a JDOM tree of a MCRObject
      */
-    public static void normalizeJDOM(org.jdom.Document doc) {
+    public static void normalizeJDOM(org.jdom2.Document doc) {
         if (doc == null) {
             return;
         }

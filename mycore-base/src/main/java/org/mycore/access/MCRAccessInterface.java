@@ -24,7 +24,7 @@ package org.mycore.access;
 
 import java.util.Collection;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
 /**
@@ -83,7 +83,7 @@ public interface MCRAccessInterface {
      * @throws MCRException
      *             if an error occured
      */
-    public void addRule(String id, String permission, org.jdom.Element rule, String description) throws MCRException;
+    public void addRule(String id, String permission, org.jdom2.Element rule, String description) throws MCRException;
 
     /**
      * adds an access rule for an "a priori-permission" like "create-document"
@@ -97,7 +97,7 @@ public interface MCRAccessInterface {
      * @throws MCRException
      *             if an error occured
      */
-    public void addRule(String permission, org.jdom.Element rule, String description) throws MCRException;
+    public void addRule(String permission, org.jdom2.Element rule, String description) throws MCRException;
 
     /**
      * removes a rule. The parameter <code>id</code> serves as an identifier
@@ -278,7 +278,7 @@ public interface MCRAccessInterface {
      * @see org.mycore.common.MCRSessionMgr#getCurrentSession()
      * @see org.mycore.common.MCRSession
      */
-    public boolean checkPermission(org.jdom.Element rule);
+    public boolean checkPermission(org.jdom2.Element rule);
 
     /**
      * exports a access rule as JDOM element.

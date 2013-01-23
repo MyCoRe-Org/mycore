@@ -171,13 +171,13 @@ abstract class MCRUserObject {
      * This method must be implemented by a subclass and then returns the user
      * or group object as a JDOM document.
      */
-    abstract public org.jdom.Document toJDOMDocument() throws MCRException;
+    abstract public org.jdom2.Document toJDOMDocument() throws MCRException;
 
     /**
      * This method must be implemented by a subclass and then returns the user
      * or group object as a JDOM element.
      */
-    abstract public org.jdom.Element toJDOMElement() throws MCRException;
+    abstract public org.jdom2.Element toJDOMElement() throws MCRException;
 
     /**
      * This method must be implemented by a subclass and returns the the ID of

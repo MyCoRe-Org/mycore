@@ -27,10 +27,12 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.jdom.Content;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.xpath.XPath;
+import org.jdom2.Content;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRMetaElement;
@@ -124,16 +126,13 @@ public class MCRMODSWrapper {
         modsContainer.addContent(mods);
     }
 
-    private XPath buildXPath(String xPath) throws JDOMException {
-        XPath path = XPath.newInstance(xPath);
-        path.addNamespace(MCRConstants.MODS_NAMESPACE);
-        path.addNamespace(MCRConstants.XLINK_NAMESPACE);
-        return path;
+    private XPathExpression<Element> buildXPath(String xPath) throws JDOMException {
+        return XPathFactory.instance().compile(xPath, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
     }
 
     public Element getElement(String xPath) {
         try {
-            return (Element) (buildXPath(xPath).selectSingleNode(getMODS()));
+            return buildXPath(xPath).evaluateFirst(getMODS());
         } catch (JDOMException ex) {
             String msg = "Could not get MODS element from " + xPath;
             throw new MCRException(msg, ex);
@@ -142,7 +141,7 @@ public class MCRMODSWrapper {
 
     public List<Element> getElements(String xPath) {
         try {
-            return (List<Element>) (buildXPath(xPath).selectNodes(getMODS()));
+            return buildXPath(xPath).evaluate(getMODS());
         } catch (JDOMException ex) {
             String msg = "Could not get elements at " + xPath;
             throw new MCRException(msg, ex);
@@ -178,7 +177,7 @@ public class MCRMODSWrapper {
     public void addElement(Element element) {
         if (!element.getNamespace().equals(MCRConstants.MODS_NAMESPACE))
             throw new IllegalArgumentException("given element is no mods element");
-            
+
         insertTopLevelElement(element);
     }
 
@@ -197,7 +196,7 @@ public class MCRMODSWrapper {
     public void removeElements(String xPath) {
         Iterator<Element> selected;
         try {
-            selected = buildXPath(xPath).selectNodes(getMODS()).iterator();
+            selected = buildXPath(xPath).evaluate(getMODS()).iterator();
         } catch (JDOMException ex) {
             String msg = "Could not remove elements at " + xPath;
             throw new MCRException(msg, ex);

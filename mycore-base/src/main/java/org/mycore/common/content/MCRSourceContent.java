@@ -32,9 +32,9 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.transform.JDOMSource;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.transform.JDOMSource;
 import org.mycore.common.xml.MCRURIResolver;
 import org.w3c.dom.Node;
 

@@ -30,7 +30,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
 
-import org.jdom.Document;
+import org.jdom2.Document;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;

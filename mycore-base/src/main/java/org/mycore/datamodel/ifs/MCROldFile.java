@@ -445,8 +445,8 @@ public class MCROldFile implements MCRFileReader {
         return getContentStore().retrieveContent(this);
     }
 
-    public org.jdom.Document getContentAsJDOM() throws MCRPersistenceException, IOException, org.jdom.JDOMException {
-        return new org.jdom.input.SAXBuilder().build(getContentAsInputStream());
+    public org.jdom2.Document getContentAsJDOM() throws MCRPersistenceException, IOException, org.jdom2.JDOMException {
+        return new org.jdom2.input.SAXBuilder().build(getContentAsInputStream());
     }
 
     public void repairSearch() {

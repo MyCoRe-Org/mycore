@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
@@ -297,7 +297,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      *                if the class can't loaded
      */
     @SuppressWarnings("unchecked")
-    public final void setFromDOM(org.jdom.Element element) throws MCRException {
+    public final void setFromDOM(org.jdom2.Element element) throws MCRException {
 
         String fullname;
         Class<? extends MCRMetaInterface> forName;
@@ -348,13 +348,13 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML Element part
      */
-    public final org.jdom.Element createXML(boolean flag) throws MCRException {
+    public final org.jdom2.Element createXML(boolean flag) throws MCRException {
         if (!isValid()) {
             debug();
             throw new MCRException("MCRMetaElement : The content is not valid: Tag=" + this.tag);
         }
 
-        org.jdom.Element elm = new org.jdom.Element(tag);
+        org.jdom2.Element elm = new org.jdom2.Element(tag);
         int j = 0;
 
         for (MCRMetaInterface aList1 : list) {

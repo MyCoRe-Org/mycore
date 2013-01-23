@@ -27,7 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
-import org.jdom.JDOMException;
+import org.jdom2.JDOMException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;

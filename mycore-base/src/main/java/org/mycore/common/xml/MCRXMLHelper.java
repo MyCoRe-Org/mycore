@@ -38,20 +38,20 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.apache.log4j.Logger;
-import org.jdom.Attribute;
-import org.jdom.Comment;
-import org.jdom.Content;
-import org.jdom.DocType;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.Parent;
-import org.jdom.ProcessingInstruction;
-import org.jdom.Text;
-import org.jdom.Verifier;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-import org.jdom.transform.JDOMSource;
+import org.jdom2.Attribute;
+import org.jdom2.Comment;
+import org.jdom2.Content;
+import org.jdom2.DocType;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.Parent;
+import org.jdom2.ProcessingInstruction;
+import org.jdom2.Text;
+import org.jdom2.Verifier;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRStringContent;
@@ -196,7 +196,7 @@ public class MCRXMLHelper {
         if (text == null || text.trim().length() == 0) {
             return text;
         }
-        if (org.jdom.Verifier.checkCharacterData(text) == null) {
+        if (org.jdom2.Verifier.checkCharacterData(text) == null) {
             return text;
         }
 

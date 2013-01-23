@@ -24,7 +24,7 @@
 
 package org.mycore.datamodel.classifications;
 
-import static org.jdom.Namespace.XML_NAMESPACE;
+import static org.jdom2.Namespace.XML_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.io.File;
@@ -36,8 +36,8 @@ import java.util.Set;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
@@ -84,7 +84,7 @@ public class MCRClassificationEditor {
      *            the category ID to add after it
      * @return
      */
-    public boolean createCategoryInClassification(org.jdom.Document indoc, MCRCategoryID id) {
+    public boolean createCategoryInClassification(org.jdom2.Document indoc, MCRCategoryID id) {
 
         try {
             Element clroot = indoc.getRootElement();
@@ -158,7 +158,7 @@ public class MCRClassificationEditor {
      *            the category ID
      * @return true if all it's okay, else return false
      */
-    public final boolean modifyCategoryInClassification(org.jdom.Document indoc, MCRCategoryID id) {
+    public final boolean modifyCategoryInClassification(org.jdom2.Document indoc, MCRCategoryID id) {
         try {
             LOGGER.debug("Start modify category in classification " + id.getRootID() + " with categid " + id.getID());
             Element clroot = indoc.getRootElement();
@@ -249,7 +249,7 @@ public class MCRClassificationEditor {
      *            the output from the editor dialogue
      * @return true if all it's okay, else return false
      */
-    public final boolean createNewClassification(org.jdom.Document indoc) {
+    public final boolean createNewClassification(org.jdom2.Document indoc) {
         try {
             LOGGER.debug("Start create a  new classification.");
             Element clroot = indoc.getRootElement();
@@ -313,7 +313,7 @@ public class MCRClassificationEditor {
      *            the classification ID
      * @return true if all it's okay, else return false
      */
-    public final boolean modifyClassificationDescription(org.jdom.Document indoc, String clid) {
+    public final boolean modifyClassificationDescription(org.jdom2.Document indoc, String clid) {
         try {
             LOGGER.debug("Start modify classification description for " + clid);
             Element clroot = indoc.getRootElement();

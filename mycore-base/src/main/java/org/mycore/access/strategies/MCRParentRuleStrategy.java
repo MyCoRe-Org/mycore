@@ -26,8 +26,8 @@ package org.mycore.access.strategies;
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;

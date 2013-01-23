@@ -29,10 +29,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.jdom.Attribute;
-import org.jdom.Content;
-import org.jdom.Element;
-import org.jdom.Namespace;
+import org.jdom2.Attribute;
+import org.jdom2.Content;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;

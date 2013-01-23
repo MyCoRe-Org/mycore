@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import org.apache.commons.fileupload.FileItem;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.xml.MCRXMLHelper;
 
 /**

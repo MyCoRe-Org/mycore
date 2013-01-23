@@ -9,13 +9,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.filter.ElementFilter;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.filter.ElementFilter;
+import org.jdom2.filter.Filters;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.importer.MCRImportConfig;
 import org.mycore.importer.MCRImportRecord;
 import org.mycore.importer.classification.MCRImportClassificationMappingManager;
@@ -81,12 +82,17 @@ public class MCRImportMappingManager {
     private MCRImportConfig config;
 
     private MCRImportMapperManager mapperManager;
+
     private MCRImportMetadataResolverManager metadataResolverManager;
+
     private MCRImportURIResolverManager uriResolverManager;
+
     private MCRImportDatamodelManager datamodelManager;
+
     private MCRImportClassificationMappingManager classificationManager;
 
-    private MCRImportMappingManager()  {}
+    private MCRImportMappingManager() {
+    }
 
     /**
      * Initialize the singleton instance with the xml import
@@ -97,7 +103,6 @@ public class MCRImportMappingManager {
      * @throws IOException
      * @throws JDOMException
      */
-    @SuppressWarnings("unchecked")
     public boolean init(File file) throws IOException, JDOMException {
         this.outputter = new XMLOutputter(Format.getPrettyFormat());
         this.listenerList = new ArrayList<MCRImportStatusListener>();
@@ -107,14 +112,14 @@ public class MCRImportMappingManager {
         config = new MCRImportConfig(rootElement);
 
         Element mappingElement = rootElement.getChild("mapping");
-        if(mappingElement == null) {
+        if (mappingElement == null) {
             LOGGER.error("No mapping element found in " + rootElement.getDocument().getBaseURI());
             return false;
         }
 
         // get the mcrobject list
         Element mcrobjectsElement = mappingElement.getChild("mcrobjects");
-        if(mcrobjectsElement == null) {
+        if (mcrobjectsElement == null) {
             LOGGER.error("No mcrobjects element defined in mapping element at " + mappingElement.getDocument().getBaseURI());
             return false;
         }
@@ -133,7 +138,7 @@ public class MCRImportMappingManager {
         // create datamodel manager
         datamodelManager = new MCRImportDatamodelManager(config.getDatamodelPath(), metadataResolverManager);
         // create the classification manager
-        if(config.isCreateClassificationMapping())
+        if (config.isCreateClassificationMapping())
             classificationManager = new MCRImportClassificationMappingManager(new File(config.getSaveToPath() + "classification/"));
         // preload all uri resolvers from the mapping element
         preloadUriResolvers(mappingElement);
@@ -165,24 +170,23 @@ public class MCRImportMappingManager {
      * @return instance of this class
      */
     public static MCRImportMappingManager getInstance() {
-        if(INSTANCE == null)
+        if (INSTANCE == null)
             INSTANCE = new MCRImportMappingManager();
         return INSTANCE;
     }
 
-    @SuppressWarnings("unchecked")
     private void preloadUriResolvers(Element mappingElement) {
         uriResolverManager = new MCRImportURIResolverManager();
 
         // load resolver
         Element resolversElement = mappingElement.getChild("resolvers");
-        if(resolversElement == null) {
+        if (resolversElement == null) {
             LOGGER.info("No resolvers element defined.");
             return;
         }
-        List<Element> resolverList = resolversElement.getContent(new ElementFilter());
+        List<Element> resolverList = resolversElement.getContent(Filters.element());
 
-        for(Element resolver : resolverList) {
+        for (Element resolver : resolverList) {
             String prefix = resolver.getAttributeValue("prefix");
             String className = resolver.getAttributeValue("class");
 
@@ -190,13 +194,13 @@ public class MCRImportMappingManager {
                 // try to create a instance of the class
                 Class<?> c = Class.forName(className);
                 Object o = c.newInstance();
-                if(o instanceof MCRImportURIResolver) {
+                if (o instanceof MCRImportURIResolver) {
                     // add it to the uri resolver manager
-                    uriResolverManager.addURIResolver(prefix, (MCRImportURIResolver)o);
+                    uriResolverManager.addURIResolver(prefix, (MCRImportURIResolver) o);
                 } else {
                     LOGGER.error("Class " + className + " doesnt extends MCRImportURIResolver!");
                 }
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 LOGGER.error(exc);
             }
         }
@@ -209,13 +213,13 @@ public class MCRImportMappingManager {
      * @throws JDOMException
      */
     private void preloadDatamodel() throws IOException, JDOMException {
-        for(Element mcrObjectElement : mcrObjectList) {
+        for (Element mcrObjectElement : mcrObjectList) {
             String dmPath = mcrObjectElement.getAttributeValue("datamodel");
             try {
                 getDatamodelManager().addDatamodel(config.getDatamodelPath() + dmPath);
-            } catch(JDOMException e) {
+            } catch (JDOMException e) {
                 throw new JDOMException("Could not load datamodel " + dmPath, e);
-            } catch(IOException e) {
+            } catch (IOException e) {
                 LOGGER.error(e);
                 throw new IOException("Could not load datamodel " + dmPath);
             }
@@ -253,23 +257,23 @@ public class MCRImportMappingManager {
      */
     public void startMapping(List<MCRImportRecord> recordList) {
         // records
-        for(MCRImportRecord record : recordList) {
+        for (MCRImportRecord record : recordList) {
             mapAndSaveRecord(record);
         }
 
         // classification
-        if(config.isCreateClassificationMapping())
+        if (config.isCreateClassificationMapping())
             classificationManager.saveAllClassificationMaps();
 
         // derivates
-        if(derivateList != null && config.isUseDerivates() && config.isCreateInImportDir())
-            for(MCRImportDerivate derivate : derivateList)
+        if (derivateList != null && config.isUseDerivates() && config.isCreateInImportDir())
+            for (MCRImportDerivate derivate : derivateList)
                 saveDerivate(derivate);
 
         // print error list
-        if(errorList.size() > 0) {
+        if (errorList.size() > 0) {
             StringBuilder errorMsg = new StringBuilder("The following objects causes erros:");
-            for(String id : errorList)
+            for (String id : errorList)
                 errorMsg.append("-").append(id).append("\n");
             LOGGER.info(errorMsg.toString());
         }
@@ -284,17 +288,17 @@ public class MCRImportMappingManager {
         // do the mapping
         MCRImportObject importObject = createMCRObject(record);
         // save the new import object
-        if(importObject != null) {
+        if (importObject != null) {
             // test if the mcrobject has an id
             boolean idGeneration = isIdGenerationActivated(record.getName());
-            if(idGeneration) {
+            if (idGeneration) {
                 createDynamicIdForImportObject(importObject, record);
             }
             if (importObject.getId() == null || importObject.getId().equals("")) {
                 StringBuffer errorString = new StringBuffer();
                 errorString.append("No id defined for import object created by record ");
                 errorString.append(record).append("!");
-                if(idGeneration)
+                if (idGeneration)
                     errorString.append(" For unknown reasons, the MCRImportMappingManager could'nt generate an Id.");
                 LOGGER.error(errorString);
                 return null;
@@ -307,7 +311,7 @@ public class MCRImportMappingManager {
         }
         return importObject;
     }
-    
+
     /**
      * This method checks if the id for a record is created by the
      * importer or from the mapping file. If the mcrobject element
@@ -318,21 +322,18 @@ public class MCRImportMappingManager {
      * @return true if the id is generated automatic by the importer,
      * otherwise false
      */
-    @SuppressWarnings("unchecked")
     private boolean isIdGenerationActivated(String recordName) {
         Element mappingElement = getMappingElement(recordName);
-        List<Element> idMapList = mappingElement.getContent(new ElementFilter() {
+        List<Element> idMapList = mappingElement.getContent(new ElementFilter("map") {
             private static final long serialVersionUID = 1L;
+
             @Override
-            public boolean matches(Object obj) {
-                boolean isElement = super.matches(obj);
-                if (!isElement)
-                    return false;
-                Element e = (Element) obj;
-                if(!e.getName().equals("map"))
-                    return false;
-                return !(e.getAttributeValue("type") == null ||
-                        !e.getAttributeValue("type").equals("id"));
+            public Element filter(Object obj) {
+                Element e = super.filter(obj);
+                if (e != null && "id".equals(e.getAttributeValue("type"))) {
+                    return e;
+                }
+                return null;
             }
         });
         // is there an id mapping element in the mapping file?
@@ -383,7 +384,7 @@ public class MCRImportMappingManager {
      * @param mappedString the record which is mapped
      */
     private void fireRecordMapped(String mappedString) {
-        for(MCRImportStatusListener l : listenerList) {
+        for (MCRImportStatusListener l : listenerList) {
             MCRImportStatusEvent e = new MCRImportStatusEvent(this, mappedString);
             l.recordMapped(e);
         }
@@ -396,10 +397,10 @@ public class MCRImportMappingManager {
      * @param infoString a string to describe the event
      */
     private void fireDerivateSaved(String infoString) {
-        for(MCRImportStatusListener l : listenerList) {
+        for (MCRImportStatusListener l : listenerList) {
             MCRImportStatusEvent e = new MCRImportStatusEvent(this, infoString);
             l.derivateSaved(e);
-        }        
+        }
     }
 
     /**
@@ -412,13 +413,13 @@ public class MCRImportMappingManager {
      */
     public void saveImportObject(MCRImportObject importObject, String subFolderName) {
         String id = importObject.getId();
-        if(id == null || id.equals("")) {
+        if (id == null || id.equals("")) {
             LOGGER.error("No id defined for an object of datamodel '" + importObject.getDatamodel().getPath() + "'!");
             return;
         }
         // check if the object is valid. this prints only errors
         // and does not interrupt the creation.
-        if(!importObject.isValid())
+        if (!importObject.isValid())
             errorList.add(importObject.getId());
 
         // create the xml
@@ -430,21 +431,20 @@ public class MCRImportMappingManager {
         // save the new mapped object
         try {
             File folder = new File(savePath.toString());
-            if(!folder.exists())
-                if(!folder.mkdirs()) {
-                    LOGGER.warn("Unable to create folder " + folder.getAbsolutePath() +
-                                ". Cannot save MyCoRe import object.");
+            if (!folder.exists())
+                if (!folder.mkdirs()) {
+                    LOGGER.warn("Unable to create folder " + folder.getAbsolutePath() + ". Cannot save MyCoRe import object.");
                     return;
                 }
             output = new FileOutputStream(folder.getAbsolutePath() + "/" + id + ".xml");
             outputter.output(new Document(ioElement), output);
-        } catch(Exception e) {
-            LOGGER.error("Error while saving import object.",e);
+        } catch (Exception e) {
+            LOGGER.error("Error while saving import object.", e);
         } finally {
-            if(output != null) {
+            if (output != null) {
                 try {
                     output.close();
-                } catch(IOException ioExc) {
+                } catch (IOException ioExc) {
                     LOGGER.error("Error while closing output stream.", ioExc);
                 }
             }
@@ -460,10 +460,9 @@ public class MCRImportMappingManager {
     public void saveDerivate(MCRImportDerivate derivate) {
         Element derivateElement = derivate.createXML();
         File folder = new File(config.getSaveToPath() + "derivates/");
-        if(!folder.exists()) {
-            if(!folder.mkdirs()) {
-                LOGGER.warn("Unable to create folder " + folder.getAbsolutePath() +
-                            ". Cannot save derivate " + derivate.getDerivateId());
+        if (!folder.exists()) {
+            if (!folder.mkdirs()) {
+                LOGGER.warn("Unable to create folder " + folder.getAbsolutePath() + ". Cannot save derivate " + derivate.getDerivateId());
                 return;
             }
         }
@@ -476,13 +475,13 @@ public class MCRImportMappingManager {
             StringBuilder buf = new StringBuilder();
             buf.append("derivate: ").append(derivate.getDerivateId());
             fireDerivateSaved(buf.toString());
-        } catch(Exception e) {
+        } catch (Exception e) {
             LOGGER.error(e);
         } finally {
-            if(output != null) {
+            if (output != null) {
                 try {
                     output.close();
-                } catch(IOException ioExc) {
+                } catch (IOException ioExc) {
                     LOGGER.error("Error while closing output stream.", ioExc);
                 }
             }
@@ -501,7 +500,7 @@ public class MCRImportMappingManager {
         // get the right jdom mcrobject element from the mapping file
         Element mappedObject = getMappingElement(record.getName());
 
-        if(mappedObject == null) {
+        if (mappedObject == null) {
             LOGGER.warn("Couldnt find match for mapping of mcrobject '" + record.getName() + "'!");
             return null;
         }
@@ -515,21 +514,20 @@ public class MCRImportMappingManager {
         // get the mapping processor
         MCRImportMappingProcessor mappingProcessor = null;
         String processorClassName = mappedObject.getAttributeValue("processor");
-        if(processorClassName != null)
+        if (processorClassName != null)
             mappingProcessor = getMappingProcessor(processorClassName);
 
         // preprocessing
-        if(mappingProcessor != null)
+        if (mappingProcessor != null)
             mappingProcessor.preProcessing(mcrObject, record);
 
         // go through every map element and map the containing fields
-        @SuppressWarnings("unchecked")
         List<Element> fieldMappings = mappedObject.getContent(new ElementFilter("map"));
-        for(Element map : fieldMappings)
+        for (Element map : fieldMappings)
             mapIt(mcrObject, record, map);
 
         // postprocessing
-        if(mappingProcessor != null)
+        if (mappingProcessor != null)
             mappingProcessor.postProcessing(mcrObject, record);
 
         return mcrObject;
@@ -545,7 +543,7 @@ public class MCRImportMappingManager {
      */
     private MCRImportMappingProcessor getMappingProcessor(String className) {
         MCRImportMappingProcessor processor = processorMap.get(className);
-        if(processor == null) {
+        if (processor == null) {
             processor = MCRImportMappingProcessorBuilder.createProcessorInstance(className);
             processorMap.put(className, processor);
         }
@@ -560,8 +558,8 @@ public class MCRImportMappingManager {
      * @return a mcrobject element
      */
     protected Element getMappingElement(String objectName) {
-        for(Element mcrObjectElement : mcrObjectList) {
-            if(objectName.equals(mcrObjectElement.getAttributeValue("name")))
+        for (Element mcrObjectElement : mcrObjectList) {
+            if (objectName.equals(mcrObjectElement.getAttributeValue("name")))
                 return mcrObjectElement;
         }
         return null;
@@ -580,15 +578,15 @@ public class MCRImportMappingManager {
         // get the type
         String type = map.getAttributeValue("type");
         // if the type is empty -> use the metadata mapper
-        if(type == null || type.equals("")) {
+        if (type == null || type.equals("")) {
             type = "metadata";
 
             // special case for classification
             String metadataName = map.getAttributeValue("to");
-            if(config.isCreateClassificationMapping() && metadataName != null && !metadataName.equals("")) {
+            if (config.isCreateClassificationMapping() && metadataName != null && !metadataName.equals("")) {
                 MCRImportDatamodel dm = mcrObject.getDatamodel();
                 String className = dm.getClassname(metadataName);
-                if(className.equals("MCRMetaClassification"))
+                if (className.equals("MCRMetaClassification"))
                     type = "classification";
             }
         }
@@ -596,19 +594,19 @@ public class MCRImportMappingManager {
         try {
             // try to get a mapper instance depending on the type
             MCRImportMapper mapper = mapperManager.createMapperInstance(type);
-            if(mapper == null) {
+            if (mapper == null) {
                 LOGGER.error("Couldnt resolve mapper " + type);
                 return;
             }
             // do the mapping
             mapper.map(mcrObject, record, map);
-        } catch(InstantiationException ie) {
+        } catch (InstantiationException ie) {
             LOGGER.error(ie);
-        } catch(IllegalAccessException iae) {
+        } catch (IllegalAccessException iae) {
             LOGGER.error(iae);
         }
     }
- 
+
     /**
      * Returns the mapper manager.
      * 
@@ -626,7 +624,7 @@ public class MCRImportMappingManager {
     public MCRImportMetadataResolverManager getMetadataResolverManager() {
         return metadataResolverManager;
     }
-    
+
     /**
      * Returns the uri resolver manager.
      * 

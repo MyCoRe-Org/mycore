@@ -31,10 +31,10 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.jdom.Content;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.filter.ElementFilter;
+import org.jdom2.Content;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.filter.Filters;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.content.MCRJDOMContent;
@@ -84,7 +84,7 @@ public class MCREditorDefReader {
 
     private void checkDuplicateIDs(Element editor) {
         Set<String> ids = new HashSet<String>();
-        Iterator<Element> elements = editor.getDescendants(new ElementFilter());
+        Iterator<Element> elements = editor.getDescendants(Filters.element());
         while (elements.hasNext()) {
             String id = elements.next().getAttributeValue("id");
             if (id == null || id.trim().length() == 0) {
@@ -230,8 +230,8 @@ public class MCREditorDefReader {
      * replaces them with the referenced component.
      */
     private void resolveReferences() {
-        for (Iterator it = referencing2ref.keySet().iterator(); it.hasNext();) {
-            Element referencing = (Element) it.next();
+        for (Iterator<Element> it = referencing2ref.keySet().iterator(); it.hasNext();) {
+            Element referencing = it.next();
             String id = referencing2ref.get(referencing);
             LOGGER.debug("Resolving reference to " + id);
 

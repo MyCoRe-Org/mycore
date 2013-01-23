@@ -6,8 +6,8 @@ package org.mycore.tools;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.jdom.Document;
-import org.jdom.Element;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;

@@ -4,8 +4,8 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
-import org.jdom.Element;
-import org.jdom.transform.JDOMSource;
+import org.jdom2.Element;
+import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.user.MCRUserMgr;
 

@@ -23,7 +23,7 @@
 
 package org.mycore.frontend.basket;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.xml.MCRURIResolver;
 
 /**

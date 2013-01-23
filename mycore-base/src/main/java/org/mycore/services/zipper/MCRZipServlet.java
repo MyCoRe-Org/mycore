@@ -42,10 +42,10 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.transform.JDOMSource;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -208,7 +208,7 @@ public class MCRZipServlet extends MCRServlet {
      * XSL-Transformation with the Metadata
      * 
      * @param jdom
-     *            MycoreObject-ResultContainer as org.jdom.Document
+     *            MycoreObject-ResultContainer as org.jdom2.Document
      * @param parameters
      *            Parameters, that can be needed in the transforming
      *            XSL-Stylesheet

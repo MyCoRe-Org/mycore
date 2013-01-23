@@ -26,8 +26,8 @@ package org.mycore.services.fieldquery;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jdom.Document;
-import org.jdom.Element;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.mycore.parsers.bool.MCRCondition;
 
 /** Represents a query with its condition and optional parameters */

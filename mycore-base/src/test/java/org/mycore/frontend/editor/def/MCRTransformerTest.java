@@ -2,7 +2,7 @@ package org.mycore.frontend.editor.def;
 
 import java.util.StringTokenizer;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 
 public abstract class MCRTransformerTest {
 

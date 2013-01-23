@@ -3,7 +3,7 @@ package org.mycore.services.acl;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.backend.hibernate.tables.MCRACCESSPK;
 import org.mycore.backend.hibernate.tables.MCRACCESSRULE;

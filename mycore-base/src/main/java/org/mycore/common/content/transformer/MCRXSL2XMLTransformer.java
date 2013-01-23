@@ -30,12 +30,12 @@ import java.util.List;
 
 import javax.xml.transform.sax.TransformerHandler;
 
-import org.jdom.Content;
-import org.jdom.DefaultJDOMFactory;
-import org.jdom.Document;
-import org.jdom.JDOMFactory;
-import org.jdom.Text;
-import org.jdom.transform.JDOMResult;
+import org.jdom2.Content;
+import org.jdom2.DefaultJDOMFactory;
+import org.jdom2.Document;
+import org.jdom2.JDOMFactory;
+import org.jdom2.Text;
+import org.jdom2.transform.JDOMResult;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;

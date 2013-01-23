@@ -32,9 +32,9 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXTransformerFactory;
 
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.transform.JDOMResult;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.transform.JDOMResult;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;

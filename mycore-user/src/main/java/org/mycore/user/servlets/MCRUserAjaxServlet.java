@@ -33,7 +33,7 @@ import java.util.TreeSet;
 import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
+import org.jdom2.Document;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRJSONUtils;
 import org.mycore.common.content.MCRJDOMContent;
@@ -352,9 +352,9 @@ public class MCRUserAjaxServlet extends MCRServlet {
     }
 
     private void buidPage(MCRServletJob job) throws IOException {
-        org.jdom.Element root = new org.jdom.Element("mcr_user");
+        org.jdom2.Element root = new org.jdom2.Element("mcr_user");
 
-        org.jdom.Document document = new Document(root);
+        org.jdom2.Document document = new Document(root);
         doLayout(job, "UserAjax", document);
     }
 

@@ -69,7 +69,7 @@ public class MCRMediaAVExtender extends MCRAudioVideoExtender {
             tok.nextToken();
             String derivateID = tok.nextToken();
 
-            org.jdom.Document mediaXML = null;
+            org.jdom2.Document mediaXML = null;
             LOGGER.info("Get metadata for file " + file.getStoreID() + "@" + file.getStorageID() + "...");
             try {
                 mediaXML = MCRMediaIFSTools.getMetadataFromStore(derivateID, file.getPath());

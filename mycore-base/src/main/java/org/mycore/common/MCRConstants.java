@@ -33,7 +33,8 @@ import java.util.Locale;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.jdom.Namespace;
+import org.jdom2.Namespace;
+import org.jdom2.xpath.XPathFactory;
 
 /**
  * This class replaces the deprecated MCRDefaults interface and provides some
@@ -47,22 +48,24 @@ import org.jdom.Namespace;
  *          2011) $
  */
 public final class MCRConstants {
-    /** MyCoRe version */
+    /** MyCoRe version
+     *  This sticks to "2.0"
+     * @deprecated use {@link MCRCoreVersion#getVersion()} to get mycore version 
+     */
     public final static String VERSION = "2.0";
 
     /** MCR.Metadata.DefaultLang */
     public static final String DEFAULT_LANG = "de";
 
-    /** The URL of the XLink */
-    private final static String XLINK_URL = "http://www.w3.org/1999/xlink";
-
-    public final static Namespace XLINK_NAMESPACE = Namespace.getNamespace("xlink", XLINK_URL);
+    public final static Namespace XLINK_NAMESPACE = Namespace.getNamespace("xlink", "http://www.w3.org/1999/xlink");
 
     /** the MARC 21 namespace */
     public final static Namespace MARC21_NAMESPACE = Namespace.getNamespace("marc21", "http://www.loc.gov/MARC21/slim");
 
     /** MARC 21 namespace schema location */
     public final static String MARC21_SCHEMA_LOCATION = "http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd";
+
+    public final static XPathFactory XPATH_FACTORY = XPathFactory.instance();
 
     /** The URL of the XSI */
     private final static String XSI_URL = "http://www.w3.org/2001/XMLSchema-instance";

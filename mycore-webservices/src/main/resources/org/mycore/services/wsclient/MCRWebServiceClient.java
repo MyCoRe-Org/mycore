@@ -128,9 +128,9 @@ public class MCRWebServiceClient {
                 if (null != mcrid) {
                     org.w3c.dom.Document result = stub.MCRDoRetrieveObject(mcrid);
 
-                    org.jdom.input.DOMBuilder d = new org.jdom.input.DOMBuilder();
-                    org.jdom.Document doc = d.build(result);
-                    org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
+                    org.jdom2.input.DOMBuilder d = new org.jdom2.input.DOMBuilder();
+                    org.jdom2.Document doc = d.build(result);
+                    org.jdom2.output.XMLOutputter outputter = new org.jdom2.output.XMLOutputter();
                     logger.info(outputter.outputString(doc));
                 } else
                     System.out.println("parameter -mcrid missing");
@@ -140,27 +140,27 @@ public class MCRWebServiceClient {
                 if (null != fileName) {
                     File file=new File(fileName);
                     System.out.println(file.toURI());
-                    org.jdom.Element queryXML = MCRURIResolver.instance().resolve(file.toURI().toString());
-                    org.jdom.Document root = new org.jdom.Document(queryXML);
-                    org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
+                    org.jdom2.Element queryXML = MCRURIResolver.instance().resolve(file.toURI().toString());
+                    org.jdom2.Document root = new org.jdom2.Document(queryXML);
+                    org.jdom2.output.DOMOutputter doo = new org.jdom2.output.DOMOutputter();
 
                     org.w3c.dom.Document result = stub.MCRDoQuery(doo.output(root));
 
-                    org.jdom.input.DOMBuilder d = new org.jdom.input.DOMBuilder();
-                    org.jdom.Document doc = d.build(result);
-                    org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
+                    org.jdom2.input.DOMBuilder d = new org.jdom2.input.DOMBuilder();
+                    org.jdom2.Document doc = d.build(result);
+                    org.jdom2.output.XMLOutputter outputter = new org.jdom2.output.XMLOutputter();
                     logger.info(outputter.outputString(doc));
                 } else if (query!=null){
                     System.out.println("query:"+query);
                     MCRCondition queryCond=new MCRQueryParser().parse(query);
-                    org.jdom.Document root = new MCRQuery(queryCond).buildXML();
-                    org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
+                    org.jdom2.Document root = new MCRQuery(queryCond).buildXML();
+                    org.jdom2.output.DOMOutputter doo = new org.jdom2.output.DOMOutputter();
 
                     org.w3c.dom.Document result = stub.MCRDoQuery(doo.output(root));
 
-                    org.jdom.input.DOMBuilder d = new org.jdom.input.DOMBuilder();
-                    org.jdom.Document doc = d.build(result);
-                    org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
+                    org.jdom2.input.DOMBuilder d = new org.jdom2.input.DOMBuilder();
+                    org.jdom2.Document doc = d.build(result);
+                    org.jdom2.output.XMLOutputter outputter = new org.jdom2.output.XMLOutputter();
                     logger.info(outputter.outputString(doc));
                 } else
                     System.out.println("xml file with query missing");
@@ -171,9 +171,9 @@ public class MCRWebServiceClient {
                 if (null != classID && null != level) {
                     org.w3c.dom.Document result = stub.MCRDoRetrieveClassification(level, "children", classID, catID, null);
 
-                    org.jdom.input.DOMBuilder d = new org.jdom.input.DOMBuilder();
-                    org.jdom.Document doc = d.build(result);
-                    org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
+                    org.jdom2.input.DOMBuilder d = new org.jdom2.input.DOMBuilder();
+                    org.jdom2.Document doc = d.build(result);
+                    org.jdom2.output.XMLOutputter outputter = new org.jdom2.output.XMLOutputter();
                     logger.info(outputter.outputString(doc));
                 } else
                     System.out.println("parameter(s) for retrieve classification missing");
@@ -221,9 +221,9 @@ public class MCRWebServiceClient {
                     // Call webservice
                     org.w3c.dom.Document outDoc = (org.w3c.dom.Document) (call.invoke(new Object[] { level, type, classID, categID, format }));
 
-                    org.jdom.input.DOMBuilder d = new org.jdom.input.DOMBuilder();
-                    org.jdom.Document doc = d.build(outDoc);
-                    org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
+                    org.jdom2.input.DOMBuilder d = new org.jdom2.input.DOMBuilder();
+                    org.jdom2.Document doc = d.build(outDoc);
+                    org.jdom2.output.XMLOutputter outputter = new org.jdom2.output.XMLOutputter();
                     logger.info(outputter.outputString(doc));
                 } else
                     System.out.println("parameter(s) for retrieve classification missing");
@@ -233,9 +233,9 @@ public class MCRWebServiceClient {
                 String type = params.getProperty("type", "");
                 if ((from.length() != 0) || (to.length() != 0)) {
                     org.w3c.dom.Document result = stub.MCRDoRetrieveLinks(from, to, type);
-                    org.jdom.input.DOMBuilder d = new org.jdom.input.DOMBuilder();
-                    org.jdom.Document doc = d.build(result);
-                    org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
+                    org.jdom2.input.DOMBuilder d = new org.jdom2.input.DOMBuilder();
+                    org.jdom2.Document doc = d.build(result);
+                    org.jdom2.output.XMLOutputter outputter = new org.jdom2.output.XMLOutputter();
                     logger.info(outputter.outputString(doc));
                 } else
                     System.out.println("parameter -from or -to missing");

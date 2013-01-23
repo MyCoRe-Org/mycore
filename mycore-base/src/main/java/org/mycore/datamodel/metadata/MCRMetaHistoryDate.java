@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
-import org.jdom.Namespace;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
 import org.mycore.common.MCRCalendar;
 import org.mycore.common.MCRException;
 
@@ -440,7 +440,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public void setFromDOM(org.jdom.Element element) {
+    public void setFromDOM(org.jdom2.Element element) {
         super.setFromDOM(element);
         texts.clear(); // clear
 
@@ -467,7 +467,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRMetaHistoryDate part
      */
     @Override
-    public org.jdom.Element createXML() throws MCRException {
+    public org.jdom2.Element createXML() throws MCRException {
         Element elm = super.createXML();
         for (MCRMetaHistoryDateText text : texts) {
             Element elmt = new Element("text");
@@ -475,13 +475,13 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             elmt.setAttribute("lang", text.getLang(), Namespace.XML_NAMESPACE);
             elm.addContent(elmt);
         }
-        elm.addContent(new org.jdom.Element("calendar").addContent(calendar));
+        elm.addContent(new org.jdom2.Element("calendar").addContent(calendar));
 
-        elm.addContent(new org.jdom.Element("ivon").addContent(Integer.toString(ivon)));
-        elm.addContent(new org.jdom.Element("von").addContent(getVonToGregorianString()));
+        elm.addContent(new org.jdom2.Element("ivon").addContent(Integer.toString(ivon)));
+        elm.addContent(new org.jdom2.Element("von").addContent(getVonToGregorianString()));
 
-        elm.addContent(new org.jdom.Element("ibis").addContent(Integer.toString(ibis)));
-        elm.addContent(new org.jdom.Element("bis").addContent(getBisToGregorianString()));
+        elm.addContent(new org.jdom2.Element("ibis").addContent(Integer.toString(ibis)));
+        elm.addContent(new org.jdom2.Element("bis").addContent(getBisToGregorianString()));
         return elm;
     }
 

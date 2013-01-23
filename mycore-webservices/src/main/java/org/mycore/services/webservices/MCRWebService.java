@@ -27,7 +27,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
+import org.jdom2.Document;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -57,12 +57,12 @@ public class MCRWebService implements MCRWS {
      */
     public org.w3c.dom.Document MCRDoRetrieveObject(String ID) throws Exception {
         // check the ID and retrieve the data
-        org.jdom.Document d = TM.retrieveXML(MCRObjectID.getInstance(ID));
+        org.jdom2.Document d = TM.retrieveXML(MCRObjectID.getInstance(ID));
 
-        org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
+        org.jdom2.output.DOMOutputter doo = new org.jdom2.output.DOMOutputter();
 
         if (logger.isDebugEnabled()) {
-            org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
+            org.jdom2.output.XMLOutputter outputter = new org.jdom2.output.XMLOutputter();
             logger.debug(outputter.outputString(d));
         }
 
@@ -81,15 +81,15 @@ public class MCRWebService implements MCRWS {
             format = "metadata";
 
         String uri = "classification:" + format + ":" + level + ":" + type + ":" + classID + ":" + categID;
-        org.jdom.Element cl = MCRURIResolver.instance().resolve(uri);
+        org.jdom2.Element cl = MCRURIResolver.instance().resolve(uri);
 
         if (logger.isDebugEnabled()) {
-            org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
+            org.jdom2.output.XMLOutputter outputter = new org.jdom2.output.XMLOutputter();
             logger.debug(outputter.outputString(cl));
         }
 
-        org.jdom.Document d = new org.jdom.Document((org.jdom.Element) (cl.clone()));
-        return new org.jdom.output.DOMOutputter().output(d);
+        org.jdom2.Document d = new org.jdom2.Document((org.jdom2.Element) (cl.clone()));
+        return new org.jdom2.output.DOMOutputter().output(d);
     }
 
     /*
@@ -100,11 +100,11 @@ public class MCRWebService implements MCRWS {
     public org.w3c.dom.Document MCRDoQuery(org.w3c.dom.Document query) throws Exception {
         Document doc = null;
         try {
-            org.jdom.input.DOMBuilder d = new org.jdom.input.DOMBuilder();
+            org.jdom2.input.DOMBuilder d = new org.jdom2.input.DOMBuilder();
             doc = d.build(query);
 
             if (logger.isDebugEnabled()) {
-                org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
+                org.jdom2.output.XMLOutputter outputter = new org.jdom2.output.XMLOutputter();
                 logger.debug(outputter.outputString(doc));
             }
 
@@ -112,10 +112,10 @@ public class MCRWebService implements MCRWS {
             MCRResults res = MCRQueryManager.search(MCRQuery.parseXML(doc), true);
             Document result = new Document(res.buildXML());
 
-            org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
+            org.jdom2.output.DOMOutputter doo = new org.jdom2.output.DOMOutputter();
             return doo.output(result);
         } catch (Exception e) {
-            org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
+            org.jdom2.output.XMLOutputter outputter = new org.jdom2.output.XMLOutputter();
             logger.error("Error while excuting query:\n" + outputter.outputString(doc), e);
             throw e;
         }
@@ -159,7 +159,7 @@ public class MCRWebService implements MCRWS {
         }
         // write output
         Document result = new Document(results.buildXML());
-        org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
+        org.jdom2.output.DOMOutputter doo = new org.jdom2.output.DOMOutputter();
         return doo.output(result);
     }
 

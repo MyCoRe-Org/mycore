@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.solr.common.util.ContentStreamBase;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 

@@ -35,8 +35,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 
-import org.jdom.Document;
-import org.jdom.Element;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.junit.Test;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;

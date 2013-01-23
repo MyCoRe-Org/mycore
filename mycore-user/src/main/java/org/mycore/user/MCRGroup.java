@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 
@@ -429,14 +429,14 @@ public class MCRGroup extends MCRUserObject {
      * @return This method returns the user or group object as a JDOM document.
      */
     @Override
-    public org.jdom.Document toJDOMDocument() throws MCRException {
+    public org.jdom2.Document toJDOMDocument() throws MCRException {
         Element root = new Element("mycoregroup");
         root.addNamespaceDeclaration(XSI_NAMESPACE);
         root.addNamespaceDeclaration(XLINK_NAMESPACE);
         root.setAttribute("noNamespaceSchemaLocation", "MCRGroup.xsd", XSI_NAMESPACE);
         root.addContent(toJDOMElement());
 
-        org.jdom.Document jdomDoc = new org.jdom.Document(root);
+        org.jdom2.Document jdomDoc = new org.jdom2.Document(root);
 
         return jdomDoc;
     }

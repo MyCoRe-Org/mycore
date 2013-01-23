@@ -32,8 +32,8 @@ import java.io.UnsupportedEncodingException;
 import javax.xml.transform.Source;
 
 import org.apache.commons.vfs2.FileObject;
-import org.jdom.Document;
-import org.jdom.JDOMException;
+import org.jdom2.Document;
+import org.jdom2.JDOMException;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;

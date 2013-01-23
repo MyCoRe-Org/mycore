@@ -29,9 +29,9 @@ import java.io.OutputStream;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 
-import org.jdom.JDOMException;
-import org.jdom.input.DOMBuilder;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.JDOMException;
+import org.jdom2.input.DOMBuilder;
+import org.jdom2.output.XMLOutputter;
 import org.w3c.dom.Document;
 
 /**
@@ -60,7 +60,7 @@ public class MCRDOMContent extends MCRXMLContent {
 
     @Override
     public void sendTo(OutputStream out) throws IOException {
-        org.jdom.Document jdom;
+        org.jdom2.Document jdom;
         try {
             jdom = asXML();
         } catch (JDOMException ex) {
@@ -70,7 +70,7 @@ public class MCRDOMContent extends MCRXMLContent {
     }
 
     @Override
-    public org.jdom.Document asXML() throws JDOMException {
+    public org.jdom2.Document asXML() throws JDOMException {
         return new DOMBuilder().build(dom);
     }
 }

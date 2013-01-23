@@ -37,9 +37,9 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Namespace;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -73,7 +73,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
     public void doGetPost(MCRServletJob job) throws Exception {
         // read the XML data
         MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
-        org.jdom.Document indoc = sub.getXML();
+        org.jdom2.Document indoc = sub.getXML();
 
         // read the parameter
         MCRRequestParameters parms;
@@ -137,7 +137,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         storeMetadata(outxml, job, ID, fullname.getAbsolutePath());
 
         // create a metadata object and prepare it
-        org.jdom.Document outdoc = prepareMetadata((org.jdom.Document) indoc.clone(), ID, job, lang);
+        org.jdom2.Document outdoc = prepareMetadata((org.jdom2.Document) indoc.clone(), ID, job, lang);
         if (outdoc == null)
             return;
         outxml = MCRUtils.getByteArray(outdoc);
@@ -209,7 +209,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
      *            the current language
      * @throws IOException 
      */
-    protected org.jdom.Document prepareMetadata(org.jdom.Document jdom_in, MCRObjectID ID, MCRServletJob job, String lang)
+    protected org.jdom2.Document prepareMetadata(org.jdom2.Document jdom_in, MCRObjectID ID, MCRServletJob job, String lang)
             throws IOException {
         MCREditorOutValidator ev = null;
         try {
@@ -253,7 +253,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         // prepare editor with error messages
         String pagedir = MCRConfiguration.instance().getString("MCR.SWF.PageDir", "");
         String myfile = pagedir + MCRConfiguration.instance().getString("MCR.SWF.PageErrorFormular", "editor_error_formular.xml");
-        org.jdom.Document jdom = null;
+        org.jdom2.Document jdom = null;
 
         try {
             //TODO: Access File directly
@@ -263,7 +263,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
                 throw new MCRConfigurationException("Can't read editor file " + myfile);
             }
 
-            jdom = new org.jdom.input.SAXBuilder().build(in);
+            jdom = new org.jdom2.input.SAXBuilder().build(in);
 
             Element root = jdom.getRootElement();
             @SuppressWarnings("unchecked")
@@ -301,7 +301,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
                 section.addContent(2, p);
                 break;
             }
-        } catch (org.jdom.JDOMException e) {
+        } catch (org.jdom2.JDOMException e) {
             throw new MCRException("Can't read editor file " + myfile + " or it has a parse error.", e);
         }
 

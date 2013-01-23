@@ -66,11 +66,11 @@ import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.streams.MCRDevNull;
 import org.mycore.common.content.streams.MCRMD5InputStream;
@@ -308,7 +308,7 @@ public class MCRUtils {
      *            the JDOM output format    
      * @return a byte array of the JDOM tree
      */
-    public static byte[] getByteArray(org.jdom.Document jdom, Format format) throws MCRPersistenceException {
+    public static byte[] getByteArray(org.jdom2.Document jdom, Format format) throws MCRPersistenceException {
         MCRConfiguration conf = MCRConfiguration.instance();
         String mcr_encoding = conf.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
         ByteArrayOutputStream outb = new ByteArrayOutputStream();
@@ -330,7 +330,7 @@ public class MCRUtils {
      *            the JDOM tree
      * @return a byte array of the JDOM tree
      */
-    public static byte[] getByteArray(org.jdom.Document jdom) throws MCRPersistenceException {
+    public static byte[] getByteArray(org.jdom2.Document jdom) throws MCRPersistenceException {
         return getByteArray(jdom, Format.getRawFormat());
     }
 
@@ -607,7 +607,7 @@ public class MCRUtils {
     }
 
     /**
-     * The method wrap the org.jdom.Element in a org.jdom.Document and write it
+     * The method wrap the org.jdom2.Element in a org.jdom2.Document and write it
      * to a file.
      * 
      * @param elm
@@ -656,13 +656,13 @@ public class MCRUtils {
             if (LOGGER.isDebugEnabled()) {
                 ioe.printStackTrace();
             } else {
-                LOGGER.error("Can't write org.jdom.Document to file " + xml.getName() + ".");
+                LOGGER.error("Can't write org.jdom2.Document to file " + xml.getName() + ".");
             }
         }
     }
 
     /**
-     * The method wrap the org.jdom.Element in a org.jdom.Document and write it
+     * The method wrap the org.jdom2.Element in a org.jdom2.Document and write it
      * to Sysout.
      * 
      * @param elm
@@ -688,7 +688,7 @@ public class MCRUtils {
             if (LOGGER.isDebugEnabled()) {
                 ioe.printStackTrace();
             } else {
-                LOGGER.error("Can't write org.jdom.Document to Sysout.");
+                LOGGER.error("Can't write org.jdom2.Document to Sysout.");
             }
         }
     }

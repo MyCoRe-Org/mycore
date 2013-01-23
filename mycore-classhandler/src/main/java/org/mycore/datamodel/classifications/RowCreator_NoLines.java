@@ -9,7 +9,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -49,7 +49,7 @@ class RowCreator_NoLines implements RowCreator {
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.datamodel.classifications.RowCreator#createRows(java.lang.String, org.jdom.Element)
+     * @see org.mycore.datamodel.classifications.RowCreator#createRows(java.lang.String, org.jdom2.Element)
      */
     public void createRows(String lang, Element xNavtree) {
         StopWatch stopWatch = new StopWatch();

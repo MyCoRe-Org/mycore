@@ -27,7 +27,7 @@ package org.mycore.access;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
+import org.jdom2.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.events.MCREvent;
@@ -204,7 +204,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
             LOGGER.warn("The ACL conditions for this object are empty!");
         }
         while (0 < rulesize) {
-            org.jdom.Element conditions = base.getService().getRule(0).getCondition();
+            org.jdom2.Element conditions = base.getService().getRule(0).getCondition();
             String permission = base.getService().getRule(0).getPermission();
             if (storedrules.contains(permission)) {
                 MCRAccessManager.addRule(base.getId(), permission, conditions, "");
@@ -236,7 +236,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         }
         if (aclsize == 0) {
             while (0 < rulesize) {
-                org.jdom.Element conditions = base.getService().getRule(0).getCondition();
+                org.jdom2.Element conditions = base.getService().getRule(0).getCondition();
                 String permission = base.getService().getRule(0).getPermission();
                 if (storedrules.contains(permission)) {
                     MCRAccessManager.updateRule(base.getId(), permission, conditions, "");

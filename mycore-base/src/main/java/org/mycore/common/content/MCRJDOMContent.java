@@ -28,10 +28,10 @@ import java.io.OutputStream;
 
 import javax.xml.transform.Source;
 
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
-import org.jdom.transform.JDOMSource;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.output.XMLOutputter;
+import org.jdom2.transform.JDOMSource;
 
 /**
  * Reads MCRContent from a JDOM XML document.

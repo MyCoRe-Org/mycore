@@ -5,11 +5,11 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.xpath.XPath;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.xpath.XPath;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.access.mcrimpl.MCRAccessStore;
@@ -287,10 +287,10 @@ public class MCRLayoutUtilities {
     }
 
     /**
-     * Returns the navigation.xml as org.jdom.document, using a cache the
+     * Returns the navigation.xml as org.jdom2.document, using a cache the
      * enhance loading time.
      * 
-     * @return navigation.xml as org.jdom.document
+     * @return navigation.xml as org.jdom2.document
      */
     public static Document getNavi() {
         if (!naviCacheValid()) {
