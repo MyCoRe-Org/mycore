@@ -5,6 +5,20 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
+    <release version="2.1.81" date="2013-0X-XX" description="Beta 2">
+      <action dev="mcrtchef" type="update">
+        update to JDOM 2
+      </action>
+      <action dev="mcrfluet" type="update">
+        moved many stream related classes to new package org.mycore.common.content.stream
+      </action>
+      <action dev="mcrtchef" type="update">
+        updated dependencies
+      </action>
+      <action dev="mcrtchef" type="remove">
+        removed componente mycore-classhandler (old classification browser and editor)
+      </action>
+    </release>
     <release version="2.1.80" date="2013-01-18" description="Beta 1">
       <action dev="mcrtchef" type="add">
         ?XSL.Style=versions on "/receive/*" URLs displays version information
