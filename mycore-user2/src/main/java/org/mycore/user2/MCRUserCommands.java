@@ -265,13 +265,11 @@ public class MCRUserCommands extends MCRAbstractCommands {
         if (roles == null) {
             return;
         }
-        @SuppressWarnings("unchecked")
         List<Element> roleList = roles.getChildren("role");
         for (Element role : roleList) {
             String name = role.getAttributeValue("name");
             MCRRole mcrRole = MCRRoleManager.getRole(name);
             if (mcrRole == null) {
-                @SuppressWarnings("unchecked")
                 List<Element> labelList = role.getChildren("label");
                 mcrRole = new MCRRole(name, MCRXMLTransformer.getLabels(labelList));
                 MCRRoleManager.addRole(mcrRole);

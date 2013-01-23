@@ -566,7 +566,6 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         public String realm;
     }
 
-    @SuppressWarnings("unused")
     @XmlElementWrapper(name = "roles")
     @XmlElement(name = "role")
     private MCRRole[] getRoles() {
@@ -590,7 +589,6 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         }
     }
 
-    @SuppressWarnings("unused")
     @XmlElementWrapper(name = "attributes")
     @XmlElement(name = "attribute")
     private MapEntry[] getAttributesMap() {
@@ -614,7 +612,6 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         }
     }
 
-    @SuppressWarnings("unused")
     @XmlElement(name = "owner")
     private UserIdentifier getOwnerId() {
         if (owner == null) {

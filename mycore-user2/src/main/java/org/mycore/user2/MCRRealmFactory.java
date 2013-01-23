@@ -131,13 +131,11 @@ public class MCRRealmFactory {
         /** List of defined realms */
         List<MCRRealm> realmsList = new ArrayList<MCRRealm>();
 
-        @SuppressWarnings("unchecked")
         List<Element> realms = (List<Element>) (root.getChildren("realm"));
         for (Element child : realms) {
             String id = child.getAttributeValue("id");
             MCRRealm realm = new MCRRealm(id);
 
-            @SuppressWarnings("unchecked")
             List<Element> labels = (List<Element>) (child.getChildren("label"));
             for (Element label : labels) {
                 String text = label.getTextTrim();

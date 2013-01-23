@@ -64,7 +64,6 @@ public class MCRRealmResolver implements URIResolver {
 
     private Element getElement(final String id) {
         Document realmsDocument = MCRRealmFactory.getRealmsDocument();
-        @SuppressWarnings("unchecked")
         List<Element> realms = realmsDocument.getRootElement().getChildren("realm");
         for (Element realm : realms) {
             if (id.equals(realm.getAttributeValue("id"))) {

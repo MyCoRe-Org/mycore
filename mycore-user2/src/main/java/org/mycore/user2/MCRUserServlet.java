@@ -268,7 +268,6 @@ public class MCRUserServlet extends MCRServlet {
         if (gs != null) {
             user.getSystemRoleIDs().clear();
             user.getExternalRoleIDs().clear();
-            @SuppressWarnings("unchecked")
             List<Element> groupList = (List<Element>) gs.getChildren("role");
             for (Element group : groupList) {
                 String groupName = group.getAttributeValue("name");
@@ -304,7 +303,6 @@ public class MCRUserServlet extends MCRServlet {
 
         Element attributes = u.getChild("attributes");
         if (attributes != null) {
-            @SuppressWarnings("unchecked")
             List<Element> attributeList = attributes.getChildren("attribute");
             user.getAttributes().clear();
             for (Element attribute : attributeList) {

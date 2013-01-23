@@ -162,7 +162,6 @@ public class MCRLoginServlet extends MCRServlet {
         Document realmsDoc = MCRRealmFactory.getRealmsDocument();
         Element realms = realmsDoc.getRootElement();
         addCurrentUserInfo(realms);
-        @SuppressWarnings("unchecked")
         List<Element> realmList = realms.getChildren("realm");
         for (Element realm : realmList) {
             String realmID = realm.getAttributeValue("id");
