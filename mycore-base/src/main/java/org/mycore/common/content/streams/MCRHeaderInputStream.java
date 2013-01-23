@@ -32,22 +32,23 @@ import org.mycore.common.content.streams.MCRBlockingInputStream;
 /**
  * Provides the header of the stream that is read. 
  * This may be useful for content type detection purposes.
+ * Immediately after stream construction, getHeader() can be called.
  * 
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRHeaderInputStream extends MCRBlockingInputStream {
 
     /** The number of bytes that will be read for content type detection */
-    protected final static int headerSize = 65536;
+    public final static int MAX_HEADER_SIZE = 65536;
 
     /** The header of the stream read */
     protected byte[] header;
 
     public MCRHeaderInputStream(InputStream in) throws IOException, MCRException {
-        super(in, headerSize);
-        super.mark(headerSize);
+        super(in, MAX_HEADER_SIZE);
+        super.mark(MAX_HEADER_SIZE);
 
-        byte[] buffer = new byte[headerSize];
+        byte[] buffer = new byte[MAX_HEADER_SIZE];
 
         try {
             int num = read(buffer, 0, buffer.length);
@@ -64,9 +65,8 @@ public class MCRHeaderInputStream extends MCRBlockingInputStream {
     }
 
     /**
-     * Returns the first 64 k of the underlying input stream.
-     * 
-     * @return the first 64 k of the input stream
+     * Returns the header of the underlying input stream, at maximum
+     * MAX_HEADER_SIZE bytes.
      */
     public byte[] getHeader() {
         return header;
