@@ -100,28 +100,15 @@ public class MCRErrorServlet extends HttpServlet {
                 String[] parsed = acceptValue.split(";");
                 String mediaRange = parsed[0].trim();
                 if (mediaRange.startsWith("text/html") || mediaRange.startsWith("text/*") || mediaRange.startsWith("*/")) {
-                    int quality = 1000; //default 'q=1.0'
+                    float quality = 1f; //default 'q=1.0'
                     for (int i = 1; i < parsed.length; i++) {
                         if (parsed[i].trim().startsWith("q=")) {
-                            String qualityValue = parsed[i].trim().substring(2).trim().replaceFirst("\\.", "");
-                            switch (qualityValue.length()) {
-                            case 1:
-                                qualityValue += "000";
-                                break;
-                            case 2:
-                                qualityValue += "00";
-                                break;
-                            case 3:
-                                qualityValue += "0";
-                                break;
-                            default:
-                                break;
-                            }
-                            quality = Integer.parseInt(qualityValue);
+                            String qualityValue = parsed[i].trim().substring(2).trim();
+                            quality=Float.parseFloat(qualityValue);
                         }
                     }
-                    if (quality >= 500) {
-                        //q=0.5 or greater
+                    if (quality > 0.5) {
+                        //firefox 18 accepts every media type when requesting images with 0.5 but closes stream immediately when detecting text/html
                         return true;
                     }
                 }
