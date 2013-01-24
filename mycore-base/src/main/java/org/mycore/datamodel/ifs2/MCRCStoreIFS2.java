@@ -81,15 +81,18 @@ public class MCRCStoreIFS2 extends MCRContentStore {
     private MCRFileStore getStore(String base) {
         String sid = getID();
         String storeBaseDir = baseDir;
+        String prefix = "";
 
         if (!ignoreOwnerBase) {
             sid += "_" + base;
             storeBaseDir += File.separatorChar + base.replace("_", File.separator);
+            prefix = base+"_";
         }
 
         MCRFileStore store = MCRStoreManager.getStore(sid, MCRFileStore.class);
         if (store == null)
             store = createStore(sid, storeBaseDir);
+        	store.prefix = prefix;
         return store;
     }
 
