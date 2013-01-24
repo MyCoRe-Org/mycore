@@ -3,7 +3,7 @@
 The ${developmentTeam} is pleased to announce the ${finalName} (${release.getDescription()}) release!
 
 ${introduction}
-#set($issueTracker="http://sourceforge.net/support/tracker.php?aid=")
+#set($issueTracker="https://sourceforge.net/p/mycore/bugs/")
 
 #if ($release.getActions().size() == 0)
 No changes defined in this version.
