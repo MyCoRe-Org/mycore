@@ -57,7 +57,7 @@ return declare("mycore.classification.ExportDialog", [Dialog, _Templated, _Setti
 	},
 
 	openInNewWindow: function() {
-		window.open(this.settings.webAppBaseURL + "servlets/MCRClassExportServlet?id=" + this.classificationId);
+		window.open(this.settings.webAppBaseURL + "rsc/classifications/export/" + this.classificationId);
 	}
 
 });
