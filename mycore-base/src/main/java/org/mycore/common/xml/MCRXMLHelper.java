@@ -300,7 +300,6 @@ public class MCRXMLHelper {
         private JDOMEquivalent() {
         }
 
-        @SuppressWarnings("unchecked")
         public static boolean equivalent(Element e1, Element e2) {
             return equivalentName(e1, e2) && equivalentAttributes(e1, e2) && equivalentContent(e1.getContent(), e2.getContent());
         }
@@ -347,9 +346,7 @@ public class MCRXMLHelper {
         }
 
         public static boolean equivalentAttributes(Element e1, Element e2) {
-            @SuppressWarnings("unchecked")
             List<Attribute> aList1 = e1.getAttributes();
-            @SuppressWarnings("unchecked")
             List<Attribute> aList2 = e2.getAttributes();
             if (aList1.size() != aList2.size()) {
                 LOGGER.info("Number of attributes differ \"" + aList1 + "\"!=\"" + aList2 + "\" for element " + e1.getName());
