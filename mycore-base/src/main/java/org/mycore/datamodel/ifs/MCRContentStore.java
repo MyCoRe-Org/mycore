@@ -54,7 +54,7 @@ public abstract class MCRContentStore {
     protected String storeID;
 
     /** The prefix of all properties in mycore.properties for this store */
-    protected String prefix;
+    protected String storeConfigPrefix;
 
     /** The depth of slot subdirectories to build */
     protected int slotDirDepth;
@@ -74,8 +74,8 @@ public abstract class MCRContentStore {
      */
     public void init(String storeID) {
         this.storeID = storeID;
-        prefix = "MCR.IFS.ContentStore." + storeID + ".";
-        slotDirDepth = MCRConfiguration.instance().getInt(prefix + "SlotDirDepth", 2);
+        storeConfigPrefix = "MCR.IFS.ContentStore." + storeID + ".";
+        slotDirDepth = MCRConfiguration.instance().getInt(storeConfigPrefix + "SlotDirDepth", 2);
     }
 
     /**

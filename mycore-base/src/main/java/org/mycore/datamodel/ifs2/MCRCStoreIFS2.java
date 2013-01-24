@@ -67,15 +67,15 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         super.init(storeID);
 
         MCRConfiguration config = MCRConfiguration.instance();
-        baseDir = config.getString(prefix + "BaseDir");
+        baseDir = config.getString(storeConfigPrefix + "BaseDir");
         LOGGER.info("Base directory for store " + storeID + " is " + baseDir);
 
         String pattern = config.getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000");
         slotLayout = pattern.length() - 4 + "-2-2";
-        slotLayout = config.getString(prefix + "SlotLayout", slotLayout);
+        slotLayout = config.getString(storeConfigPrefix + "SlotLayout", slotLayout);
         LOGGER.info("Default slot layout for store " + storeID + " is " + slotLayout);
 
-        ignoreOwnerBase = config.getBoolean(prefix + "IgnoreOwnerBase", false);
+        ignoreOwnerBase = config.getBoolean(storeConfigPrefix + "IgnoreOwnerBase", false);
     }
 
     private MCRFileStore getStore(String base) {

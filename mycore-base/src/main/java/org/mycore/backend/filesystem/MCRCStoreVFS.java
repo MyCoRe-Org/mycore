@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.FileContent;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -41,7 +42,6 @@ import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
@@ -100,7 +100,7 @@ public class MCRCStoreVFS extends MCRContentStore {
         FileObject targetObject = fsManager.resolveFile(getBase(), storageId.toString());
         FileContent targetContent = targetObject.getContent();
         OutputStream out = targetContent.getOutputStream();
-        MCRUtils.copyStream(source, out);
+        IOUtils.copy(source, out);
         out.close();
 
         return storageId.toString();
@@ -158,8 +158,8 @@ public class MCRCStoreVFS extends MCRContentStore {
     public void init(String storeId) {
         super.init(storeId);
 
-        uri = MCRConfiguration.instance().getString(prefix + "URI");
-        String check = MCRConfiguration.instance().getString(prefix + "StrictHostKeyChecking", "no");
+        uri = MCRConfiguration.instance().getString(storeConfigPrefix + "URI");
+        String check = MCRConfiguration.instance().getString(storeConfigPrefix + "StrictHostKeyChecking", "no");
 
         try {
             fsManager = VFS.getManager();
