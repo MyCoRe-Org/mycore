@@ -204,7 +204,6 @@ public class MCRMODSWrapper {
 
         while (selected.hasNext()) {
             Element element = selected.next();
-            selected.remove();
             element.detach();
         }
     }
