@@ -25,6 +25,7 @@ package org.mycore.frontend.servlets;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -74,7 +75,59 @@ public class MCRErrorServlet extends HttpServlet {
             LOGGER.debug(msg, exception);
             LOGGER.debug("Has current session: " + MCRSessionMgr.hasCurrentSession());
         }
-        generateErrorPage(req, resp, message, exception, statusCode, exceptionType, requestURI, servletName);
+        if (acceptWebPage(req)) {
+            generateErrorPage(req, resp, message, exception, statusCode, exceptionType, requestURI, servletName);
+        } else {
+            LOGGER.info("Client does not accept HTML pages: " + req.getHeader("Accept"));
+            resp.sendError(statusCode, message);
+        }
+    }
+
+    /**
+     * Returns true if Accept header allows sending html pages
+     * @param req
+     * @return
+     */
+    private boolean acceptWebPage(HttpServletRequest req) {
+        @SuppressWarnings("unchecked")
+        Enumeration<String> acceptHeader = req.getHeaders("Accept");
+        if (!acceptHeader.hasMoreElements()) {
+            return true;
+        }
+        while (acceptHeader.hasMoreElements()) {
+            String[] acceptValues = acceptHeader.nextElement().split(",");
+            for (String acceptValue : acceptValues) {
+                String[] parsed = acceptValue.split(";");
+                String mediaRange = parsed[0].trim();
+                if (mediaRange.startsWith("text/html") || mediaRange.startsWith("text/*") || mediaRange.startsWith("*/")) {
+                    int quality = 1000; //default 'q=1.0'
+                    for (int i = 1; i < parsed.length; i++) {
+                        if (parsed[i].trim().startsWith("q=")) {
+                            String qualityValue = parsed[i].trim().substring(2).trim().replaceFirst("\\.", "");
+                            switch (qualityValue.length()) {
+                            case 1:
+                                qualityValue += "000";
+                                break;
+                            case 2:
+                                qualityValue += "00";
+                                break;
+                            case 3:
+                                qualityValue += "0";
+                                break;
+                            default:
+                                break;
+                            }
+                            quality = Integer.parseInt(qualityValue);
+                        }
+                    }
+                    if (quality >= 500) {
+                        //q=0.5 or greater
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private boolean setCurrentSession(HttpServletRequest req) {
@@ -99,11 +152,11 @@ public class MCRErrorServlet extends HttpServlet {
         }
     }
 
-    protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, String msg, Throwable ex,
-            Integer statusCode, Class<? extends Throwable> exceptionType, String requestURI, String servletName) throws IOException {
+    protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, String msg, Throwable ex, Integer statusCode,
+        Class<? extends Throwable> exceptionType, String requestURI, String servletName) throws IOException {
         boolean exceptionThrown = ex != null;
         LOGGER.log(exceptionThrown ? Level.ERROR : Level.WARN,
-                MessageFormat.format("{0}: Error {1} occured. The following message was given: {2}", requestURI, statusCode, msg), ex);
+            MessageFormat.format("{0}: Error {1} occured. The following message was given: {2}", requestURI, statusCode, msg), ex);
 
         String rootname = "mcr_error";
         String style = MCRServlet.getProperty(request, "XSL.Style");
@@ -168,7 +221,7 @@ public class MCRErrorServlet extends HttpServlet {
                     session.commitTransaction();
                 return;
             } finally {
-                if (exceptionThrown||!currentSessionActive) {
+                if (exceptionThrown || !currentSessionActive) {
                     MCRSessionMgr.releaseCurrentSession();
                 }
                 if (!sessionFromRequest) {
@@ -178,8 +231,7 @@ public class MCRErrorServlet extends HttpServlet {
             }
         } else {
             if (request.getAttribute(requestAttr) != null) {
-                LOGGER.warn("Could not send error page. Generating error page failed. The original message:\n"
-                        + request.getAttribute(requestAttr));
+                LOGGER.warn("Could not send error page. Generating error page failed. The original message:\n" + request.getAttribute(requestAttr));
             } else {
                 LOGGER.warn("Could not send error page. Response allready commited. The following message was given:\n" + msg);
             }
