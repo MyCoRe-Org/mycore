@@ -27,9 +27,9 @@ import java.io.IOException;
 import java.text.MessageFormat;
 
 import org.apache.log4j.Logger;
-import org.apache.xerces.parsers.SAXParser;
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
+import org.jdom2.input.sax.XMLReaderJDOMFactory;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
 import org.xml.sax.InputSource;
@@ -38,13 +38,12 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.ext.EntityResolver2;
 
 /**
- * Parses XML content using the default Xerces parser. 
+ * Parses XML content using specified {@link XMLReaderJDOMFactory}. 
  *  
  * @author Frank L\u00FCtzenkirchen
+ * @author Thomas Scheffler (yagee)
  */
-public class MCRXMLParserXerces implements MCRXMLParser {
-
-    private final static String PARSER_CLASS_NAME = SAXParser.class.getCanonicalName();
+public class MCRXMLParserImpl implements MCRXMLParser {
 
     private final static String FEATURE_NAMESPACES = "http://xml.org/sax/features/namespaces";
 
@@ -54,20 +53,22 @@ public class MCRXMLParserXerces implements MCRXMLParser {
 
     private final static String msg = "Error while parsing XML document: ";
 
+    private boolean validate;
+
     private SAXBuilder builder;
 
-    public void setValidating(boolean validate) {
-        builder = new SAXBuilder(PARSER_CLASS_NAME, validate);
+    public MCRXMLParserImpl(XMLReaderJDOMFactory factory) {
+        this.validate = factory.isValidating();
+        builder = new SAXBuilder(factory);
         builder.setFeature(FEATURE_NAMESPACES, true);
         builder.setFeature(FEATURE_SCHEMA_SUPPORT, validate);
         builder.setFeature(FEATURE_FULL_SCHEMA_SUPPORT, false);
-        builder.setReuseParser(false);
         builder.setErrorHandler(new MCRXMLParserErrorHandler());
         builder.setEntityResolver(new XercesBugFixResolver(MCRURIResolver.instance()));
     }
 
     public boolean isValidating() {
-        return builder.getValidation();
+        return validate;
     }
 
     public Document parseXML(MCRContent content) throws SAXParseException {
@@ -95,7 +96,7 @@ public class MCRXMLParserXerces implements MCRXMLParser {
     private static class XercesBugFixResolver implements EntityResolver2 {
         private EntityResolver2 fallback;
 
-        private static Logger LOGGER = Logger.getLogger(MCRXMLParserXerces.class);
+        private static Logger LOGGER = Logger.getLogger(MCRXMLParserImpl.class);
 
         public XercesBugFixResolver(EntityResolver2 fallback) {
             this.fallback = fallback;

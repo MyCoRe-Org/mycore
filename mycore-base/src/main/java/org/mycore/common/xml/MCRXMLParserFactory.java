@@ -23,50 +23,48 @@
 
 package org.mycore.common.xml;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.apache.xerces.parsers.SAXParser;
+import org.jdom2.input.sax.XMLReaderJDOMFactory;
+import org.jdom2.input.sax.XMLReaderSAX2Factory;
 import org.mycore.common.MCRConfiguration;
 
 /**
  * Returns validating or non-validating XML parsers.
  * 
  * @author Frank L\u00FCtzenkirchen
+ * @author Thomas Scheffler (yagee)
  */
 public class MCRXMLParserFactory {
+    private static boolean VALIDATE_BY_DEFAULT = MCRConfiguration.instance().getBoolean("MCR.XMLParser.ValidateSchema", true);
 
-    private final static String PROPERTY_PARSER_CLASS = "MCR.XMLParser.Class";
+    private final static String PARSER_CLASS_NAME = SAXParser.class.getCanonicalName();
 
-    private final static String PROPERTY_VALIDATE_BY_DEFAULT = "MCR.XMLParser.ValidateSchema";
+    private static XMLReaderJDOMFactory nonValidatingFactory = new XMLReaderSAX2Factory(false, PARSER_CLASS_NAME);
 
-    private final static String DEFAULT_PARSER_CLASS = "org.mycore.common.xml.MCRXMLParserXerces";
+    private static ThreadLocal<MCRXMLParserImpl> nonValidating = new ThreadLocal<MCRXMLParserImpl>() {
+        @Override
+        protected MCRXMLParserImpl initialValue() {
+            return new MCRXMLParserImpl(nonValidatingFactory);
+        }
+    };
 
-    private static Map<Boolean, MCRXMLParser> parsers;
+    private static XMLReaderJDOMFactory validatingFactory = new XMLReaderSAX2Factory(true, PARSER_CLASS_NAME);
 
-    private static boolean validateByDefault = false;
-
-    static {
-        validateByDefault = MCRConfiguration.instance().getBoolean(PROPERTY_VALIDATE_BY_DEFAULT, true);
-        parsers = new HashMap<Boolean, MCRXMLParser>();
-        parsers.put(false, buildParser(false));
-        parsers.put(true, buildParser(true));
-    }
-
-    private static MCRXMLParser buildParser(boolean validate) {
-        Object o = MCRConfiguration.instance().getInstanceOf(PROPERTY_PARSER_CLASS, DEFAULT_PARSER_CLASS);
-        MCRXMLParser parser = (MCRXMLParser) o;
-        parser.setValidating(validate);
-        return parser;
-    }
+    private static ThreadLocal<MCRXMLParserImpl> validating = new ThreadLocal<MCRXMLParserImpl>() {
+        @Override
+        protected MCRXMLParserImpl initialValue() {
+            return new MCRXMLParserImpl(validatingFactory);
+        }
+    };
 
     /** Returns a validating parser */
     public static MCRXMLParser getValidatingParser() {
-        return parsers.get(true);
+        return validating.get();
     }
 
     /** Returns a non-validating parser */
     public static MCRXMLParser getNonValidatingParser() {
-        return parsers.get(false);
+        return nonValidating.get();
     }
 
     /**
@@ -75,7 +73,7 @@ public class MCRXMLParserFactory {
      * determine if the parser will validate or not. 
      */
     public static MCRXMLParser getParser() {
-        return parsers.get(validateByDefault);
+        return VALIDATE_BY_DEFAULT ? validating.get() : nonValidating.get();
     }
 
     /** 
@@ -84,6 +82,6 @@ public class MCRXMLParserFactory {
      * @param validate if true, the parser will validate the XML against the schema.
      */
     public static MCRXMLParser getParser(boolean validate) {
-        return parsers.get(validate);
+        return validate ? validating.get() : nonValidating.get();
     }
 }

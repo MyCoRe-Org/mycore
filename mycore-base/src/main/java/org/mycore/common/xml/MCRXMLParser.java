@@ -29,13 +29,14 @@ import org.mycore.common.content.MCRContent;
 import org.xml.sax.SAXParseException;
 
 /**
- * Parses XML content and returns it as JDOM document. 
+ * Parses XML content and returns it as JDOM document.
+ * 
+ * Implementations of this interface are not thread safe.
  * 
  * @author Frank L\u00FCtzenkirchen
+ * @author Thomas Scheffler (yagee)
  */
 public interface MCRXMLParser {
-
-    public void setValidating(boolean validate);
 
     public boolean isValidating();
 
