@@ -316,6 +316,9 @@ public class MCRUserManager {
      * Wildcards containing * and ? for single character may be used for searching
      * by login user name or real name.
      * 
+     * Pay attention that no role information is attached to user data. If you need
+     * this information call {@link MCRUserManager#getUser(String, String)}.
+     * 
      * @param userPattern a wildcard pattern for the login user name, may be null
      * @param namePattern a wildcard pattern for the person's real name, may be null
      * @param realm the realm the user belongs to, may be null
