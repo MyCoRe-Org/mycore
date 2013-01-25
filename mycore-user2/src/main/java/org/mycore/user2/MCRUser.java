@@ -58,6 +58,10 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     /** The unique user ID */
     int internalID;
+    
+    @XmlAttribute(name = "locked")
+    /** if locked, user may not change this instance */
+    private boolean locked;
 
     @XmlAttribute(name = "name")
     /** The login user name */
@@ -130,6 +134,14 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      */
     public MCRUser(String userName) {
         this(userName, MCRRealmFactory.getLocalRealm().getID());
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
     }
 
     /**
@@ -664,6 +676,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      */
     public MCRUser getBasicCopy() {
         MCRUser copy = new MCRUser(userName, realmID);
+        copy.locked = locked;
         copy.owner = this.equals(this.owner) ? copy : this.owner;
         copy.setAttributes(null);
         copy.password = null;

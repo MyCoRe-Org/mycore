@@ -100,6 +100,9 @@ public class MCRUserServlet extends MCRServlet {
         if (!checkUserIsNotNull(res, currentUser, null)) {
             return;
         }
+        if (checkUserIsLocked(res, currentUser)) {
+            return;
+        }
         String url = currentUser.getRealm().getPasswordChangeURL();
         if (url == null) {
             String msg = MCRTranslation.translate("component.user2.UserServlet.missingRealPasswortChangeURL", currentUser.getRealmID());
@@ -117,6 +120,16 @@ public class MCRUserServlet extends MCRServlet {
             return false;
         }
         return true;
+    }
+
+    private static boolean checkUserIsLocked(HttpServletResponse res, MCRUser currentUser) throws IOException {
+        if (currentUser.isLocked()) {
+            String userName = currentUser.getUserID();
+            String msg = MCRTranslation.translate("component.user2.UserServlet.isLocked", userName);
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
+            return true;
+        }
+        return false;
     }
 
     private static boolean forbidIfGuest(HttpServletResponse res) throws IOException {
@@ -172,6 +185,9 @@ public class MCRUserServlet extends MCRServlet {
     private void saveCurrentUser(HttpServletRequest req, HttpServletResponse res) throws IOException {
         MCRUser currentUser = MCRUserManager.getCurrentUser();
         if (!checkUserIsNotNull(res, currentUser, null)) {
+            return;
+        }
+        if (checkUserIsLocked(res, currentUser)) {
             return;
         }
         if (!currentUser.hasNoOwner()) {
