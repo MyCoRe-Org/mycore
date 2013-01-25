@@ -4,6 +4,6 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:noNamespaceSchemaLocation="MCRCondition.xsd">
   <boolean operator="or">
-    <condition value="broadcastinggroup" operator="=" field="group" />
+    <condition value="broadcast" operator="=" field="group" />
   </boolean>
 </condition>

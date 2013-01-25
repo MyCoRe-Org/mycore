@@ -7,10 +7,7 @@
   <target name="create.users">
     <property name="commands.file" value="${basedir}/commands.txt" />
     <echo file="${commands.file}" append="false">
-change to user ${MCR.Users.Superuser.UserName} with ${MCR.Users.Superuser.UserPasswd}
-create group data from file broadcastinggroup.xml
-add user ${MCR.Users.Superuser.UserName} as member to group broadcastinggroup    	
-check user data consistency
+		assign user ${MCR.Users.Superuser.UserName} to role broadcast    	
 	</echo>
     <antcall target="invoke.cli">
       <param name="cli.directory" value="${basedir}/config/access" />

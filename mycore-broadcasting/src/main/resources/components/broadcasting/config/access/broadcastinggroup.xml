@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="ISO_8859-1"?>
-<mycoregroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:noNamespaceSchemaLocation="MCRGroup.xsd">
-  <group ID="broadcastinggroup">
-    <group.description>The administration group for module broadcasting</group.description>
-  </group>
-</mycoregroup>
-
