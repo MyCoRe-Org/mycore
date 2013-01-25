@@ -6,6 +6,10 @@
   </properties>
   <body>
     <release version="2.1.81" date="2013-0X-XX" description="Beta 2">
+      <action dev="mcrtchef" type="remove">
+        removed mycore-user component.
+        Use "migrate users" from mycore-migration21-22 to transfer your old users.
+      </action>
       <action dev="mcrtchef" type="fix" due-to="Silvio Hermann">
         fixed multi thread access to SAXBuilder
         <fixes issue="598" />
