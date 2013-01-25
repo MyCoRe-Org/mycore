@@ -121,8 +121,8 @@ public class MCRRealmFactory {
         Element root;
         try {
             root = getRealms().getRootElement();
-        } catch (Exception e) {
-            throw new MCRException("Could not load realms from URI: " + realmsURI, e);
+        } catch (SAXParseException | JDOMException | TransformerException | IOException e) {
+            throw new MCRException("Could not load realms from URI: " + realmsURI);
         }
         String localRealmID = root.getAttributeValue("local");
         /** Map of defined realms, key is the ID of the realm */
@@ -167,7 +167,7 @@ public class MCRRealmFactory {
         if (realmsFile == null) {
             return MCRSourceContent.getInstance(realmsURI.toASCIIString()).asXML();
         }
-        if (!realmsFile.exists()) {
+        if (!realmsFile.exists() || realmsFile.length()==0) {
             LOGGER.info("Creating " + realmsFile.getAbsolutePath() + "...");
             MCRSourceContent realmsContent = MCRSourceContent.getInstance(RESOURCE_REALMS_URI);
             realmsContent.sendTo(realmsFile);

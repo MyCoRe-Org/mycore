@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
@@ -45,6 +46,8 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRRoleManager {
+
+    private static Logger LOGGER = Logger.getLogger(MCRRoleManager.class);
 
     /** Map of defined roles, key is the unique role name */
     private static HashMap<String, MCRRole> rolesByName = new HashMap<String, MCRRole>();
@@ -103,8 +106,13 @@ public class MCRRoleManager {
      */
     public static MCRRole getExternalRole(String name) {
         MCRCategoryID categoryID = MCRCategoryID.fromString(name);
+        if (categoryID.isRootID()) {
+            LOGGER.debug("External role may not be a rootCategory: " + categoryID);
+            return null;
+        }
         MCRCategory category = DAO.getCategory(categoryID, 0);
         if (category == null) {
+            LOGGER.debug("Category does not exist: " + categoryID);
             return null;
         }
         MCRRole role = new MCRRole(name, category.getLabels());
@@ -181,8 +189,8 @@ public class MCRRoleManager {
     static Collection<MCRCategoryID> getRoleIDs(MCRUser user) {
         return CATEG_LINK_SERVICE.getLinksFromReference(getLinkID(user));
     }
-    
-    static boolean isAssignedToRole(MCRUser user, String roleID){
+
+    static boolean isAssignedToRole(MCRUser user, String roleID) {
         MCRCategoryID categoryID = MCRCategoryID.fromString(roleID);
         MCRCategLinkReference linkReference = getLinkID(user);
         return CATEG_LINK_SERVICE.isInCategory(linkReference, categoryID);
