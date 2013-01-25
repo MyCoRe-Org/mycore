@@ -61,7 +61,7 @@ public class MCRRole {
      * @param id the unique role ID
      * @param name the unique role name
      */
-    MCRRole(String name, Set<MCRLabel> labels) {
+    public MCRRole(String name, Set<MCRLabel> labels) {
         this();
         for (MCRLabel label : labels) {
             this.labels.put(label.getLang(), label);
