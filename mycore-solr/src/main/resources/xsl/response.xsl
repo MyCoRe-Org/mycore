@@ -6,11 +6,11 @@
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:xalan="http://xml.apache.org/xalan" exclude-result-prefixes="xalan i18n encoder">
   &html-output;
   <xsl:include href="MyCoReLayout.xsl" />
-  <xsl:include href="xslInclude:solrResponse"/>
+  <xsl:include href="xslInclude:solrResponse" />
 
   <xsl:param name="WebApplicationBaseURL" />
   <xsl:variable name="PageTitle" select="'Suchergebnisse'" />
-  
+
   <xsl:template match="doc">
     <xsl:variable name="identifier" select="str[@name='id']" />
 
@@ -181,6 +181,19 @@
       <xsl:apply-templates select="result/doc" />
     </table>
 
+    <!-- retain the original query parameters -->
+    <xsl:variable name="params">
+      <xsl:for-each select="lst[@name='responseHeader']/lst[@name='params']/str">
+        <xsl:if test="not(@name='start' or @name='rows') ">
+          <!-- parameterName=parameterValue -->
+          <xsl:value-of select="concat(@name,'=', .)" />
+          <xsl:if test="not (position() = last())">
+            <xsl:value-of select="'&amp;'" />
+          </xsl:if>
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:variable>
+
     <!-- table footer -->
     <div id="pageSelection">
       <tr>
@@ -190,7 +203,7 @@
           </xsl:variable>
           <td>
             <a title="{i18n:translate('searchResults.prevPage')}"
-              href="{concat($WebApplicationBaseURL,'servlets/SolrSelectProxy?q=', $query, '&amp;start=', $startRecordPrevPage, '&amp;rows=', $rows)}">&lt;</a>
+              href="{concat($WebApplicationBaseURL,'servlets/SolrSelectProxy?', $params, '&amp;start=', $startRecordPrevPage, '&amp;rows=', $rows)}">&lt;</a>
           </td>
         </xsl:if>
 
@@ -199,7 +212,8 @@
         </xsl:variable>
         <xsl:if test="$startRecordNextPage &lt; $hits">
           <td>
-            <a title="{i18n:translate('searchResults.nextPage')}" href="{concat($WebApplicationBaseURL,'servlets/SolrSelectProxy?q=', $query, '&amp;start=', $start + $rows, '&amp;rows=', $rows)}">&gt;</a>
+            <a title="{i18n:translate('searchResults.nextPage')}"
+              href="{concat($WebApplicationBaseURL,'servlets/SolrSelectProxy?', $params, '&amp;start=', $start + $rows, '&amp;rows=', $rows)}">&gt;</a>
           </td>
         </xsl:if>
       </tr>
