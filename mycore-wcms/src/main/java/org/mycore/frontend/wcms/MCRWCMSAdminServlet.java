@@ -26,6 +26,7 @@ package org.mycore.frontend.wcms;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,8 +47,8 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.user.MCRUser;
-import org.mycore.user.MCRUserMgr;
+import org.mycore.user2.MCRUser;
+import org.mycore.user2.MCRUserManager;
 
 public class MCRWCMSAdminServlet extends MCRWCMSServlet {
 
@@ -99,7 +100,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
                 url = url + "?XSL.href=" + request.getParameter("XSL.href");
                 // archived navi version requested
                 if (request.getParameter("XSL.navi") != null && !request.getParameter("XSL.navi").equals("")
-                        && !request.getParameter("XSL.navi").subSequence(0, 4).equals("http")) {
+                    && !request.getParameter("XSL.navi").subSequence(0, 4).equals("http")) {
                     url = url + "&XSL.navi=" + request.getParameter("XSL.navi");
                     response.sendRedirect(response.encodeRedirectURL(url));
                 } else
@@ -119,7 +120,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
         } else
             getLayoutService().doLayout(request, response, new MCRJDOMContent(jdom));
     }
-    
+
     public static Element getRoot(String session, String userId, String userClass) {
         Element root = new Element("cms");
         root.addContent(new Element("session").setText(session));
@@ -132,7 +133,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
         Element answer = new Element("cms");
         answer.addContent(new Element("rightsManagement").setAttribute("mode", MCRWCMSUtilities.getPermRightsManagementWCMSAccess()));
         // add all users to xml
-        answer.getChild("rightsManagement").addContent(MCRUserMgr.instance().getAllUsers().getRootElement().detach());
+        answer.getChild("rightsManagement").addContent(getAllUsers());
         // add admin users to xml
         Element adminUsers = getWCMSAdminUsers(MCRWCMSUtilities.getPermRightsManagementWCMSAccess());
         if (adminUsers != null)
@@ -144,11 +145,23 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
         getLayoutService().doLayout(request, response, new MCRJDOMContent(answer));
     }
 
+    private Element getAllUsers() {
+        List<MCRUser> users = MCRUserManager.listUsers(null, null, null);
+        Element root = new Element("mycoreuser");
+        for (MCRUser user : users) {
+            Element userEl = new Element("user");
+            userEl.setAttribute("ID", user.getUserID());
+            userEl.setAttribute("realName", user.getRealName());
+            root.addContent(userEl);
+        }
+        return root;
+    }
+
     private void manageReadAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Element answer = new Element("cms");
         answer.addContent(new Element("rightsManagement").setAttribute("mode", MCRWCMSUtilities.getPermRightsManagementReadAccess()));
         // add all users to xml
-        answer.getChild("rightsManagement").addContent(MCRUserMgr.instance().getAllUsers().getRootElement().detach());
+        answer.getChild("rightsManagement").addContent(getAllUsers());
         // add admin users to xml
         Element adminUsers = getWCMSAdminUsers(MCRWCMSUtilities.getPermRightsManagementReadAccess());
         if (adminUsers != null)
@@ -163,22 +176,22 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
      * @return all wcms write admin users OR null if no user has access
      */
     private Element getWCMSAdminUsers(String permission) {
-        MCRUserMgr um = MCRUserMgr.instance();
+        Element adminUsers = getAllUsers();
+        adminUsers.setName("users").setAttribute("filter", "administrators");
         MCRAccessInterface am = MCRAccessManager.getAccessImpl();
-        List<String> userIDs = um.getAllUserIDs();
-        Element adminUsers = (new Element("users")).setAttribute("filter", "administrators");
+        List<Element> users = adminUsers.getChildren("user");
+        Iterator<Element> userIterator = users.iterator();
         boolean adminsFound = false;
-        for (String userID : userIDs) {
-            MCRUser mcrUser = um.retrieveUser(userID);
+        while (userIterator.hasNext()) {
+            Element currentUser = userIterator.next();
+            String userID = currentUser.getAttributeValue("ID");
             if (am.checkPermissionForUser(permission, userID)) {
-                adminUsers.addContent(mcrUser.toJDOMElement());
                 adminsFound = true;
+            } else {
+                currentUser.detach();
             }
         }
-        if (adminsFound)
-            return adminUsers;
-        else
-            return null;
+        return adminsFound ? adminUsers : null;
     }
 
     private void exitWCMS(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -212,14 +225,13 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
     public void generateXML_managPage(MCRSession mcrSession, Element root) {
         List<Element> rootNodes = (List<Element>) mcrSession.get("rootNodes");
         File[] contentTemplates = new File((MCRConfiguration.instance().getString("MCR.templatePath") + "content/").replace('/', File.separatorChar))
-                .listFiles();
+            .listFiles();
         root.addContent(new Element("userRealName").setText(mcrSession.get("userRealName").toString()));
         root.addContent(new Element("userClass").setText(mcrSession.get("userClass").toString()));
         root.addContent(new Element("error").setText(""));
 
         for (Element rootNode : rootNodes) {
-            root.addContent(new Element("rootNode").setAttribute("href", rootNode.getAttributeValue("href"))
-                    .setText(rootNode.getTextTrim()));
+            root.addContent(new Element("rootNode").setAttribute("href", rootNode.getAttributeValue("href")).setText(rootNode.getTextTrim()));
         }
 
         Element templates = new Element("templates");
@@ -238,7 +250,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
     public static void generateXML_logs(String sort, String sortOrder, Element rootOut) {
         try {
             File logFile = new File(MCRConfiguration.instance().getString("MCR.WCMS.logFile").replace('/', File.separatorChar));
-            if(logFile.exists()) {
+            if (logFile.exists()) {
                 Element root = new SAXBuilder().build(logFile).getRootElement();
                 Element test = (Element) root.clone();
                 rootOut.addContent(test);

@@ -1231,7 +1231,6 @@
     <module>mycore-session-listing</module>
     <module>mycore-swf</module>
     <module>mycore-sword</module>
-    <module>mycore-user</module>
     <module>mycore-user2</module>
     <module>mycore-wcms</module>
     <module>mycore-webcli</module>

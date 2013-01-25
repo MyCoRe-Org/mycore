@@ -118,12 +118,12 @@
                     <xsl:choose>
                         <xsl:when test="$filteredUser=@ID">
                             <option value="{@ID}" selected="selected">
-                                <xsl:value-of select="concat(user.contact/contact.firstname/text(),user.contact/contact.lastname/text(),' (',@ID,')')" />
+                                <xsl:value-of select="concat(@realName,' (',@ID,')')" />
                             </option>
                         </xsl:when>
                         <xsl:otherwise>
                             <option value="{@ID}">
-                                <xsl:value-of select="concat(user.contact/contact.firstname/text(),user.contact/contact.lastname/text(),' (',@ID,')')" />
+                                <xsl:value-of select="concat(@realName,' (',@ID,')')" />
                             </option>
                         </xsl:otherwise>
                     </xsl:choose>

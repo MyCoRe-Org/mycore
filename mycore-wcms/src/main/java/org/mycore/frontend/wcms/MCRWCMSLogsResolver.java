@@ -7,7 +7,6 @@ import javax.xml.transform.URIResolver;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.user.MCRUserMgr;
 
 public class MCRWCMSLogsResolver implements URIResolver {
 
@@ -16,7 +15,7 @@ public class MCRWCMSLogsResolver implements URIResolver {
         String target = href.substring(href.indexOf(":") + 1);
         String[] parameter = target.split(":");
 
-        String userId = MCRUserMgr.instance().getCurrentUser().getID();
+        String userId = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
         String userClass = MCRSessionMgr.getCurrentSession().get("userClass").toString();
 
         Element root = MCRWCMSAdminServlet.getRoot("logs", userId, userClass);

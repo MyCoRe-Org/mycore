@@ -9,5 +9,9 @@
                 propertyfile="${build.config}/mycore.properties"
                 key="MCR.CLI.Classes.Annotated"
                 value="org.mycore.migration21_22.cli.MCRMigrationCommands22" />
+    <AddHibernateMapping class="org.mycore.migration21_22.user.hibernate.MCRGROUPADMINS" />
+    <AddHibernateMapping class="org.mycore.migration21_22.user.hibernate.MCRGROUPMEMBERS" />
+    <AddHibernateMapping class="org.mycore.migration21_22.user.hibernate.MCRGROUPS" />
+    <AddHibernateMapping class="org.mycore.migration21_22.user.hibernate.MCRUSERS" />
   </target>
 </project>

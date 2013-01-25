@@ -3,7 +3,10 @@ package org.mycore.migration21_22.cli;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -24,11 +27,23 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.xml.MCRXSLTransformation;
+import org.mycore.datamodel.classifications2.MCRLabel;
+import org.mycore.datamodel.common.MCRISO8601Date;
+import org.mycore.datamodel.common.MCRISO8601Format;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
+import org.mycore.migration21_22.user.MCRGroup;
+import org.mycore.migration21_22.user.MCRUser;
+import org.mycore.migration21_22.user.MCRUserContact;
+import org.mycore.migration21_22.user.hibernate.MCRHIBUserStore;
+import org.mycore.user2.MCRPasswordHashType;
+import org.mycore.user2.MCRRole;
+import org.mycore.user2.MCRRoleManager;
+import org.mycore.user2.MCRUserCommands;
+import org.mycore.user2.MCRUserManager;
 
 @MCRCommandGroup(name = "Migrate from 2.1 to 2.2")
 public class MCRMigrationCommands22 extends MCRAbstractCommands {
@@ -93,6 +108,123 @@ public class MCRMigrationCommands22 extends MCRAbstractCommands {
             } else {
                 LOGGER.info("Nothing to replace for " + mcrid);
             }
+        }
+    }
+
+    @MCRCommand(syntax = "migrate users", help = "Migrate user from MyCoRe < 2.2")
+    public static void migrateUsers() {
+        //initialize new user system
+        MCRUserCommands.initSuperuser();
+        final String suser = CONFIG.getString("MCR.Users.Superuser.UserName", "administrator");
+        org.mycore.user2.MCRUser superUser = MCRUserManager.getUser(suser);
+        MCRHIBUserStore userStore = new MCRHIBUserStore();
+        //convert groups
+        List<String> groupIDs = userStore.getAllGroupIDs();
+
+        for (String groupID : groupIDs) {
+            MCRRole role = MCRRoleManager.getRole(groupID);
+            if (role != null) {
+                LOGGER.warn("Role does already exist: " + role.getName());
+                continue;
+            }
+            LOGGER.info("Adding group: " + groupID);
+            MCRGroup group = userStore.retrieveGroup(groupID);
+            createRole(group);
+        }
+        List<String> userIDs = userStore.getAllUserIDs();
+
+        for (String userID : userIDs) {
+            if (MCRUserManager.exists(userID)) {
+                LOGGER.warn("User does already exist: " + userID);
+                continue;
+            }
+            LOGGER.info("Adding user: " + userID);
+            MCRUser user = userStore.retrieveUser(userID);
+            createUser(user, superUser);
+        }
+    }
+
+    private static void createRole(MCRGroup group) {
+        HashSet<MCRLabel> labels = new HashSet<>();
+        labels.add(new MCRLabel(MCRConstants.DEFAULT_LANG, group.getID(), group.getDescription()));
+        MCRRole role = new MCRRole(group.getID(), labels);
+        MCRRoleManager.addRole(role);
+    }
+
+    private static void createUser(MCRUser user, org.mycore.user2.MCRUser superUser) {
+        org.mycore.user2.MCRUser newUser = new org.mycore.user2.MCRUser(user.getID());
+        newUser.setEMail(user.getUserContact().getEmail());
+        newUser.setHashType(MCRPasswordHashType.crypt);
+        newUser.setPassword(user.getPassword());
+        newUser.setRealName(getRealName(user));
+        if (!user.isEnabled()) {
+            newUser.setValidUntil(new Date());
+        }
+        newUser.setLocked(!user.isUpdateAllowed());
+        if (newUser.isLocked()) {
+            newUser.setOwner(superUser);
+        }
+        newUser.assignRole(user.getPrimaryGroupID());
+        for (String group : user.getGroupIDs()) {
+            newUser.assignRole(group);
+        }
+        newUser.setAttributes(getUserAttributes(user));
+        MCRUserManager.createUser(newUser);
+    }
+
+    private static String getRealName(MCRUser user) {
+        String firstName = user.getUserContact().getFirstName();
+        String lastName = user.getUserContact().getLastName();
+        StringBuilder realName = new StringBuilder();
+        if (firstName != null && firstName.length() > 0) {
+            realName.append(firstName);
+        }
+        if (lastName != null && lastName.length() > 0) {
+            if (realName.length() > 0) {
+                realName.append(' ');
+            }
+            realName.append(lastName);
+        }
+        return realName.toString();
+    }
+
+    private static Map<String, String> getUserAttributes(MCRUser user) {
+        Map<String, String> att = new TreeMap<String, String>();
+        MCRUserContact contact = user.getUserContact();
+        setAttribute(att, "user.creator", user.getCreator());
+        if (user.getCreationDate() != null) {
+            MCRISO8601Date date = new MCRISO8601Date();
+            date.setDate(user.getCreationDate());
+            date.setFormat(MCRISO8601Format.COMPLETE_HH_MM_SS);
+            att.put("user.creation_date", date.getISOString());
+        }
+        if (user.getModifiedDate() != null) {
+            MCRISO8601Date date = new MCRISO8601Date();
+            date.setDate(user.getModifiedDate());
+            date.setFormat(MCRISO8601Format.COMPLETE_HH_MM_SS);
+            att.put("user.last_modified", date.getISOString());
+        }
+        setAttribute(att, "user.description", user.getDescription());
+        att.put("user.primary_group", user.getPrimaryGroupID());
+        setAttribute(att, "contact.salutation", contact.getSalutation());
+        setAttribute(att, "contact.street", contact.getStreet());
+        setAttribute(att, "contact.city", contact.getCity());
+        setAttribute(att, "contact.postalcode", contact.getPostalCode());
+        setAttribute(att, "contact.country", contact.getCountry());
+        setAttribute(att, "contact.state", contact.getState());
+        setAttribute(att, "contact.institution", contact.getInstitution());
+        setAttribute(att, "contact.faculty", contact.getFaculty());
+        setAttribute(att, "contact.department", contact.getDepartment());
+        setAttribute(att, "contact.institute", contact.getInstitute());
+        setAttribute(att, "contact.telephone", contact.getTelephone());
+        setAttribute(att, "contact.fax", contact.getFax());
+        setAttribute(att, "contact.cellphone", contact.getCellphone());
+        return att;
+    }
+
+    private static void setAttribute(Map<String, String> att, String attrName, String value) {
+        if (value != null && value.length() > 0) {
+            att.put(attrName, value);
         }
     }
 }
