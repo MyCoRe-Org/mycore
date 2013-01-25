@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -37,6 +38,7 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 
 /**
@@ -220,6 +222,10 @@ public class MCRRoleManager {
         if (!DAO.exist(rootID)) {
             MCRCategoryImpl category = new MCRCategoryImpl();
             category.setId(rootID);
+            HashSet<MCRLabel> labels = new HashSet<MCRLabel>();
+            labels.add(new MCRLabel("de", "Systemrollen", null));
+            labels.add(new MCRLabel("en", "system roles", null));
+            category.setLabels(labels);
             DAO.addCategory(null, category);
         }
         MCRCategoryImpl category = new MCRCategoryImpl();
