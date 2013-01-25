@@ -103,7 +103,7 @@ public abstract class MCRContent {
      * @return content as Source
      */
     public Source getSource() throws IOException {
-        return new StreamSource(getInputStream(), systemId);
+        return new StreamSource(getInputStream(), getSystemId());
     }
 
     /**
@@ -148,7 +148,7 @@ public abstract class MCRContent {
      */
     public InputSource getInputSource() throws IOException {
         InputSource source = new InputSource(getInputStream());
-        source.setSystemId(systemId);
+        source.setSystemId(getSystemId());
         return source;
     }
 
@@ -274,7 +274,7 @@ public abstract class MCRContent {
             return this;
         } else {
             MCRContent copy = new MCRByteContent(asByteArray());
-            copy.setSystemId(systemId);
+            copy.setSystemId(getSystemId());
             return copy;
         }
     }

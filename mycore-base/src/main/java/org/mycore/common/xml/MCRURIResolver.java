@@ -103,6 +103,7 @@ import org.mycore.services.fieldquery.data2fields.MCRXSLBuilder;
 import org.mycore.tools.MCRObjectFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.ext.EntityResolver2;
 import org.xml.sax.helpers.XMLReaderFactory;
@@ -410,26 +411,15 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
             addDebugInfo(uri, "JAVA method invocation");
         }
 
-        /**
-         * rethrow Exception as RuntimException TODO: need to refactor this and
-         * declare throw in method signature
-         */
-
-        Source source;
+        MCRSourceContent content;
         try {
-            source = resolve(uri, null);
-            if (source == null) {
-                return null;
-            }
-        } catch (TransformerException ex) {
-            throw new MCRException("Error while resolving " + uri, ex);
-        }
-
-        try {
-            MCRSourceContent content = new MCRSourceContent(source);
-            LOGGER.debug("Wrapped " + content.getBaseContent().getClass().getCanonicalName() + ": " + content.getBaseContent().getSystemId());
-            return (Element) content.asXML().getRootElement().detach();
-        } catch (Exception e) {
+            content = MCRSourceContent.getInstance(uri);
+            return content.asXML().getRootElement().detach();
+        } catch (SAXParseException | TransformerException | JDOMException | IOException e) {
+            /**
+             * rethrow Exception as RuntimException TODO: need to refactor this and
+             * declare throw in method signature
+             */
             throw new MCRException("Error while resolving " + uri, e);
         }
     }

@@ -32,6 +32,7 @@ import java.io.UnsupportedEncodingException;
 import javax.xml.transform.Source;
 
 import org.apache.commons.vfs2.FileObject;
+import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
@@ -44,6 +45,8 @@ import org.xml.sax.SAXParseException;
  */
 public abstract class MCRWrappedContent extends MCRContent {
 
+    private static final Logger LOGGER = Logger.getLogger(MCRWrappedContent.class);
+
     private MCRContent baseContent;
 
     public MCRContent getBaseContent() {
@@ -51,6 +54,7 @@ public abstract class MCRWrappedContent extends MCRContent {
     }
 
     protected void setBaseContent(MCRContent baseContent) {
+        LOGGER.debug("Wrapped " + baseContent.getClass().getCanonicalName() + ": " + baseContent.getSystemId());
         this.baseContent = baseContent;
     }
 

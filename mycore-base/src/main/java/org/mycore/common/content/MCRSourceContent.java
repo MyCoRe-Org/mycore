@@ -25,6 +25,8 @@ package org.mycore.common.content;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -35,6 +37,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
+import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
 import org.w3c.dom.Node;
 
@@ -44,6 +47,7 @@ import org.w3c.dom.Node;
  */
 public class MCRSourceContent extends MCRWrappedContent {
     private static final MCRURIResolver URI_RESOLVER = MCRURIResolver.instance();
+
     private Source source;
 
     public MCRSourceContent(Source source) {
@@ -83,20 +87,29 @@ public class MCRSourceContent extends MCRWrappedContent {
             baseContent = new MCRDOMContent(node.getOwnerDocument());
         } else if (source instanceof StreamSource) {
             InputStream inputStream = ((StreamSource) source).getInputStream();
-            baseContent = new MCRStreamContent(inputStream);
+            if (inputStream != null) {
+                baseContent = new MCRStreamContent(inputStream);
+            } else {
+                try {
+                    URL url = new URL(source.getSystemId());
+                    baseContent = new MCRURLContent(url);
+                } catch (MalformedURLException e) {
+                    throw new MCRException("Could not create instance of MCRURLContent for SYSTEMID: " + source.getSystemId(), e);
+                }
+            }
         }
         if (baseContent != null) {
             baseContent.setSystemId(getSystemId());
         }
         this.setBaseContent(baseContent);
     }
-    
+
     /**
      * Build instance of MCRSourceContent by resolving via {@link MCRURIResolver}
      * @param uri
      * @throws TransformerException thrown by {@link MCRURIResolver#resolve(String, String)}
      */
-    public static MCRSourceContent getInstance(String uri) throws TransformerException{
+    public static MCRSourceContent getInstance(String uri) throws TransformerException {
         Source source = URI_RESOLVER.resolve(uri, null);
         return new MCRSourceContent(source);
     }
