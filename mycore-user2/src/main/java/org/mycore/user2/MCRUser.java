@@ -58,7 +58,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     /** The unique user ID */
     int internalID;
-    
+
     @XmlAttribute(name = "locked")
     /** if locked, user may not change this instance */
     private boolean locked;
@@ -140,8 +140,14 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         return locked;
     }
 
-    public void setLocked(boolean locked) {
-        this.locked = locked;
+    public void setLocked(Boolean locked) {
+        this.locked = locked == null ? false : locked;
+    }
+
+    /* Getter for hibernate */
+    @SuppressWarnings("unused")
+    private Boolean getLocked() {
+        return this.locked;
     }
 
     /**
@@ -430,7 +436,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     @Override
     public boolean isUserInRole(final String role) {
         boolean directMember = getSystemRoleIDs().contains(role) || getExternalRoleIDs().contains(role);
-        if (directMember){
+        if (directMember) {
             return true;
         }
         return MCRRoleManager.isAssignedToRole(this, role);
