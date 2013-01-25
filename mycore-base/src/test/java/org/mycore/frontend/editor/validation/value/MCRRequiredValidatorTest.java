@@ -31,7 +31,7 @@ public class MCRRequiredValidatorTest extends MCRValidatorTest {
         validator.setProperty("required", "true");
         assertFalse(validator.isValid(""));
         assertFalse(validator.isValid(" "));
-        assertFalse(validator.isValid(null));
+        assertFalse(validator.isValid((Object[])null));
     }
 
     @Test

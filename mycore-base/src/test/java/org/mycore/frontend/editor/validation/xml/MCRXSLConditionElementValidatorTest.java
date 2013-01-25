@@ -38,7 +38,7 @@ public class MCRXSLConditionElementValidatorTest extends MCRValidatorTest {
     @Test
     public void testNull() {
         validator.setProperty("xsl", "label[lang('de')]");
-        assertTrue(validator.isValid(null));
+        assertTrue(validator.isValid((Object[])null));
     }
     private Element buildTestElement(String lang) {
         Element input = new Element("foo");
