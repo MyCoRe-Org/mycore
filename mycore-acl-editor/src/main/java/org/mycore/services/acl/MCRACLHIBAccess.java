@@ -144,7 +144,7 @@ public abstract class MCRACLHIBAccess {
      */
     public static void saveRuleChanges(Map<MCRAclAction, List<MCRACCESSRULE>> diffMap) {
         MCRRuleStore ruleStore = MCRRuleStore.getInstance();
-        MCRCache cache = MCRAccessControlSystem.getCache();
+        MCRCache<String, MCRAccessRule> cache = MCRAccessControlSystem.getCache();
 
         List<MCRACCESSRULE> updateList = diffMap.get(MCRAclAction.update);
         List<MCRACCESSRULE> saveList = diffMap.get(MCRAclAction.save);

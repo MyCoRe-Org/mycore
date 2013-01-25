@@ -23,7 +23,6 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Vector;
 
-import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUsageException;
 
@@ -227,14 +226,13 @@ public class MCRDirectory extends MCRFilesystemNode {
      *            the Comparator to be used to sort the children
      * @return a possibly empty array of MCRFilesystemNode objects
      */
-    public MCRFilesystemNode[] getChildren(Comparator sortOrder) {
+    public MCRFilesystemNode[] getChildren(Comparator<MCRFilesystemNode> sortOrder) {
         ensureNotDeleted();
 
-        MCRArgumentChecker.ensureNotNull(sortOrder, "sort order");
-
         MCRFilesystemNode[] array = getChildren();
-        Arrays.sort(array, sortOrder);
-
+        if (sortOrder != null) {
+            Arrays.sort(array, sortOrder);
+        }
         return array;
     }
 
@@ -437,30 +435,30 @@ public class MCRDirectory extends MCRFilesystemNode {
     }
 
     /** Sorts children by filename, case insensitive * */
-    public final static Comparator SORT_BY_NAME_IGNORECASE = new Comparator() {
-        public int compare(Object a, Object b) {
-            return ((MCRFilesystemNode) a).getName().compareToIgnoreCase(((MCRFilesystemNode) b).getName());
+    public final static Comparator<MCRFilesystemNode> SORT_BY_NAME_IGNORECASE = new Comparator<MCRFilesystemNode>() {
+        public int compare(MCRFilesystemNode a, MCRFilesystemNode b) {
+            return a.getName().compareToIgnoreCase(b.getName());
         }
     };
 
     /** Sorts children by filename, case sensitive * */
-    public final static Comparator SORT_BY_NAME = new Comparator() {
-        public int compare(Object a, Object b) {
-            return ((MCRFilesystemNode) a).getName().compareTo(((MCRFilesystemNode) b).getName());
+    public final static Comparator<MCRFilesystemNode> SORT_BY_NAME = new Comparator<MCRFilesystemNode>() {
+        public int compare(MCRFilesystemNode a, MCRFilesystemNode b) {
+            return a.getName().compareTo(b.getName());
         }
     };
 
     /** Sorts children by file size or total directory size * */
-    public final static Comparator SORT_BY_SIZE = new Comparator() {
-        public int compare(Object a, Object b) {
-            return (int) (((MCRFilesystemNode) a).getSize() - ((MCRFilesystemNode) b).getSize());
+    public final static Comparator<MCRFilesystemNode> SORT_BY_SIZE = new Comparator<MCRFilesystemNode>() {
+        public int compare(MCRFilesystemNode a, MCRFilesystemNode b) {
+            return (int) (a.getSize() - b.getSize());
         }
     };
 
     /** Sorts children by date of last modification * */
-    public final static Comparator SORT_BY_DATE = new Comparator() {
-        public int compare(Object a, Object b) {
-            return ((MCRFilesystemNode) a).getLastModified().getTime().compareTo(((MCRFilesystemNode) b).getLastModified().getTime());
+    public final static Comparator<MCRFilesystemNode> SORT_BY_DATE = new Comparator<MCRFilesystemNode>() {
+        public int compare(MCRFilesystemNode a, MCRFilesystemNode b) {
+            return a.getLastModified().getTime().compareTo(b.getLastModified().getTime());
         }
     };
 
@@ -469,7 +467,7 @@ public class MCRDirectory extends MCRFilesystemNode {
      * indirect children of this directory and adds them to the given list
      * object.
      */
-    protected void collectMD5Lines(List list) {
+    protected void collectMD5Lines(List<String> list) {
         MCRFilesystemNode[] nodes = getChildren();
 
         for (MCRFilesystemNode node : nodes) {
@@ -497,7 +495,7 @@ public class MCRDirectory extends MCRFilesystemNode {
     public byte[] buildFingerprint() {
         ensureNotDeleted();
 
-        List list = new Vector();
+        List<String> list = new Vector<String>();
         collectMD5Lines(list);
         Collections.sort(list);
 

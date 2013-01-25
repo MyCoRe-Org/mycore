@@ -42,8 +42,8 @@ public class MCRWCMSLoginServlet extends MCRWCMSServlet {
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// init 
 		MCRSession session = MCRSessionMgr.getCurrentSession();
-		String userID = session.getCurrentUserID();
-        String userRealName = session.getCurrentUserID();
+		String userID = session.getUserInformation().getUserID();
+        String userRealName = session.getUserInformation().getUserID();
         String userClass = "admin";
         // fill session
         session.put("status", "loggedIn");

@@ -63,8 +63,8 @@ public abstract class MCRWCMSServlet extends MCRServlet {
             // set some global required params
             MCRSession session = MCRSessionMgr.getCurrentSession();
             session.put("status", "loggedIn");
-            session.put("userID", session.getCurrentUserID());
-            session.put("userRealName", session.getCurrentUserID());
+            session.put("userID", session.getUserInformation().getUserID());
+            session.put("userRealName", session.getUserInformation().getUserID());
             session.put("userClass", "admin");
             session.put("rootNodes", new ArrayList());
             // forward

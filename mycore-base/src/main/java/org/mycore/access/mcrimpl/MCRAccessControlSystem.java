@@ -31,7 +31,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -62,7 +61,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     public static final String lexicographicalPattern = "0000000000";
 
-    static MCRCache cache;
+    static MCRCache<String, MCRAccessRule> cache;
 
     MCRAccessStore accessStore;
 
@@ -85,7 +84,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
             disabled = true;
         }
 
-        cache = new MCRCache(size, "Access Rules");
+        cache = new MCRCache<String, MCRAccessRule>(size, "Access Rules");
         accessStore = MCRAccessStore.getInstance();
         ruleStore = MCRRuleStore.getInstance();
         accessComp = new MCRAccessConditionsComparator();
@@ -285,7 +284,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         if (ruleID == null) {
             return null;
         }
-        MCRAccessRule a = (MCRAccessRule) cache.get(ruleID);
+        MCRAccessRule a = cache.get(ruleID);
         if (a == null) {
             LOGGER.debug("ruleStore.getRule()");
             a = ruleStore.getRule(ruleID);
@@ -407,7 +406,6 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
      *            condition-JDOM of an access-rule
      * @return the normalized JDOM-Rule
      */
-    @SuppressWarnings("unchecked")
     public Element normalize(Element rule) {
         Element newRule = new Element(rule.getName());
         for (Attribute att : (Iterable<Attribute>) rule.getAttributes()) {
@@ -462,7 +460,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         }
     }
 
-    public static MCRCache getCache() {
+    public static MCRCache<String, MCRAccessRule> getCache() {
         return cache;
     }
 

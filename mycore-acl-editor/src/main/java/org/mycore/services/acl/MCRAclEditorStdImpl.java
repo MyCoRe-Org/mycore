@@ -1,11 +1,19 @@
 package org.mycore.services.acl;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -13,17 +21,19 @@ import org.jdom2.Content;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
 import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.content.MCRStringContent;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.services.acl.filter.MCRAclObjIdFilter;
 import org.mycore.services.acl.filter.MCRAclPermissionFilter;
+import org.xml.sax.SAXException;
 
 import com.ibm.icu.util.StringTokenizer;
 
@@ -70,7 +80,7 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         Element elem = null;
 
         Properties requestProperties = getRequestProperties(request);
-        
+
         if (action.equals("setFilter"))
             elem = setFilter(request);
         else if (action.equals("getPermEditor"))
@@ -81,9 +91,13 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
             elem = getACLEditor(request);
         else if (action.equals("createNewPerm"))
             elem = createNewPerm(request);
-        else if (action.equals("createNewRule"))
-            elem = createNewRule(request);
-        else if (action.equals("getRuleAsItems"))
+        else if (action.equals("createNewRule")) {
+            try {
+                elem = createNewRule(request);
+            } catch (JDOMException | IOException | SAXException e) {
+                throw new MCRException(e);
+            }
+        } else if (action.equals("getRuleAsItems"))
             elem = getRuleAsItems(requestProperties);
         else if (action.equals("submitPerm"))
             elem = processPermSubmission(request);
@@ -99,13 +113,15 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
 
     protected Properties getRequestProperties(HttpServletRequest request) {
         Properties p = new Properties();
+        @SuppressWarnings("unchecked")
         Enumeration<String> en = request.getAttributeNames();
-        while(en.hasMoreElements()) {
+        while (en.hasMoreElements()) {
             String attrKey = en.nextElement();
             p.put(attrKey, request.getAttribute(attrKey));
         }
+        @SuppressWarnings("unchecked")
         Enumeration<String> en2 = request.getParameterNames();
-        while(en2.hasMoreElements()) {
+        while (en2.hasMoreElements()) {
             String attrKey = en2.nextElement();
             p.put(attrKey, request.getParameter(attrKey));
         }
@@ -157,10 +173,10 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         return elem;
     }
 
-    private Element createNewPerm(HttpServletRequest request){
+    private Element createNewPerm(HttpServletRequest request) {
         String objId = "";
         try {
-            objId = URLDecoder.decode(request.getParameter("newPermOBJID"),"UTF-8");
+            objId = URLDecoder.decode(request.getParameter("newPermOBJID"), "UTF-8");
         } catch (UnsupportedEncodingException e) {
             LOGGER.error(e);
         }
@@ -190,6 +206,7 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
     private Element processPermSubmission(HttpServletRequest request) {
         LOGGER.debug("Processing Mapping submission.");
 
+        @SuppressWarnings("unchecked")
         Map<String, String[]> parameterMap = request.getParameterMap();
         Iterator<String> iter = parameterMap.keySet().iterator();
 
@@ -281,8 +298,8 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
 
     public MCRRuleMapping createRuleMapping(String acpool, String objid, String rid, String creator) {
         MCRRuleMapping ruleMapping = new MCRRuleMapping();
-        if(creator == null || creator.equals(""))
-            creator = MCRSessionMgr.getCurrentSession().getCurrentUserID();
+        if (creator == null || creator.equals(""))
+            creator = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
         ruleMapping.setCreator(creator);
         ruleMapping.setCreationdate(new Date());
         ruleMapping.setPool(acpool);
@@ -318,21 +335,21 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
     public static Element getRuleEditor(Properties properties) {
         String notEditableCreators = properties.getProperty("notEditableCreators");
         List<String> notEditableCreatorList = new ArrayList<String>();
-        if(notEditableCreators != null) {
+        if (notEditableCreators != null) {
             Collections.addAll(notEditableCreatorList, notEditableCreators.split(":"));
         }
         Element elem = MCRACLXMLProcessing.ruleSet2XML(MCRACLHIBAccess.getRuleList(properties), notEditableCreatorList);
         return elem;
     }
 
-    private Element createNewRule(HttpServletRequest request) {
+    private Element createNewRule(HttpServletRequest request) throws JDOMException, IOException, SAXException {
         MCRACCESSRULE accessRule = new MCRACCESSRULE();
         MCRAccessInterface AI = MCRAccessControlSystem.instance();
         String rule = MCRServlet.getProperty(request, "newRule").trim();
         String desc = MCRServlet.getProperty(request, "newRuleDesc");
         String creator = MCRServlet.getProperty(request, "creator");
-        if(creator == null)
-            creator = MCRSessionMgr.getCurrentSession().getCurrentUserID();
+        if (creator == null)
+            creator = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
 
         if (rule.startsWith("<"))
             rule = ruleFromXML(rule);
@@ -356,25 +373,14 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
             editor = redirect(redirectURL);
         else
             editor = ACLEditor().addContent(editorType("ruleEditor"));
-        
+
         return editor;
     }
 
-    private String ruleFromXML(String rule) {
-        SAXBuilder saxBuilder = new SAXBuilder("org.apache.xerces.parsers.SAXParser");
-        Reader stringReader = new StringReader(rule);
-        Document jdomDocument = null;
-
-        try {
-            jdomDocument = saxBuilder.build(stringReader);
-        } catch (JDOMException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+    private String ruleFromXML(String rule) throws JDOMException, IOException, SAXException {
+        MCRStringContent content = new MCRStringContent(rule);
+        Document jdomDocument = content.asXML();
         MCRAccessInterface AI = MCRAccessControlSystem.instance();
-
         return AI.getNormalizedRuleString(jdomDocument.getRootElement());
     }
 
@@ -385,8 +391,8 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
 
     private Element processRuleSubmission(HttpServletRequest request) {
         LOGGER.debug("Processing Rule submission.");
-        
-        String uid = MCRServlet.getProperty(request, "uid");
+
+        @SuppressWarnings("unchecked")
         Map<String, String[]> parameterMap = request.getParameterMap();
         Set<String> keySet = parameterMap.keySet();
         Iterator<String> iter = keySet.iterator();
@@ -445,7 +451,7 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
 
     private Element deleteAllRules(HttpServletRequest request, Properties filterProperties) {
         LOGGER.debug("Delete all rules.");
-        HashMap<MCRAclAction, List<MCRACCESSRULE>> diffMap = new HashMap<MCRAclAction, List<MCRACCESSRULE>>(); 
+        HashMap<MCRAclAction, List<MCRACCESSRULE>> diffMap = new HashMap<MCRAclAction, List<MCRACCESSRULE>>();
 
         List<MCRACCESSRULE> ruleList = MCRACLHIBAccess.getRuleList(filterProperties);
         diffMap.put(MCRAclAction.delete, ruleList);

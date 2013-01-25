@@ -145,7 +145,7 @@ public class MCRMigrationCommands22 extends MCRAbstractCommands {
     }
 
     private static void createRole(MCRGroup group) {
-        HashSet<MCRLabel> labels = new HashSet<>();
+        HashSet<MCRLabel> labels = new HashSet<MCRLabel>();
         labels.add(new MCRLabel(MCRConstants.DEFAULT_LANG, group.getID(), group.getDescription()));
         MCRRole role = new MCRRole(group.getID(), labels);
         MCRRoleManager.addRole(role);
