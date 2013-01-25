@@ -29,7 +29,11 @@ import java.io.InputStream;
 import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
 
+import org.jdom2.Document;
+import org.jdom2.JDOMException;
+import org.jdom2.input.sax.SAXHandler;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 /**
@@ -59,6 +63,19 @@ public class MCRSAXContent extends MCRXMLContent {
     @Override
     public Source getSource() throws IOException {
         return new SAXSource(this.xmlReader, this.inputSource);
+    }
+
+    @Override
+    public MCRContent ensureXML() {
+        return this;
+    }
+
+    @Override
+    public Document asXML() throws JDOMException, IOException, SAXException {
+        SAXHandler jdomContentHandler = new SAXHandler();
+        xmlReader.setContentHandler(jdomContentHandler);
+        xmlReader.parse(inputSource);
+        return jdomContentHandler.getDocument();
     }
 
 }

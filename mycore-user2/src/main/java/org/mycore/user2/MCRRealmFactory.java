@@ -45,7 +45,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
-import org.xml.sax.SAXParseException;
+import org.xml.sax.SAXException;
 
 /**
  * Handles {@link MCRRealm} instantiation.
@@ -121,7 +121,7 @@ public class MCRRealmFactory {
         Element root;
         try {
             root = getRealms().getRootElement();
-        } catch (SAXParseException | JDOMException | TransformerException | IOException e) {
+        } catch (SAXException | JDOMException | TransformerException | IOException e) {
             throw new MCRException("Could not load realms from URI: " + realmsURI);
         }
         String localRealmID = root.getAttributeValue("local");
@@ -163,11 +163,11 @@ public class MCRRealmFactory {
         MCRRealmFactory.realmsList = realmsList;
     }
 
-    private static Document getRealms() throws JDOMException, TransformerException, SAXParseException, IOException {
+    private static Document getRealms() throws JDOMException, TransformerException, SAXException, IOException {
         if (realmsFile == null) {
             return MCRSourceContent.getInstance(realmsURI.toASCIIString()).asXML();
         }
-        if (!realmsFile.exists() || realmsFile.length()==0) {
+        if (!realmsFile.exists() || realmsFile.length() == 0) {
             LOGGER.info("Creating " + realmsFile.getAbsolutePath() + "...");
             MCRSourceContent realmsContent = MCRSourceContent.getInstance(RESOURCE_REALMS_URI);
             realmsContent.sendTo(realmsFile);

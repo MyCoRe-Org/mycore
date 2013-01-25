@@ -34,7 +34,7 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRVFSContent;
-import org.xml.sax.SAXParseException;
+import org.xml.sax.SAXException;
 
 /**
  * Represents a set of files and directories belonging together, that are stored
@@ -96,9 +96,7 @@ public class MCRFileCollection extends MCRDirectory {
         }
         try {
             data = new MCRVFSContent(src).asXML().getRootElement();
-        } catch(JDOMException jdomExc) {
-            throw new IOException(jdomExc);
-        } catch (SAXParseException e) {
+        } catch (JDOMException | SAXException e) {
             throw new IOException(e);
         }
     }

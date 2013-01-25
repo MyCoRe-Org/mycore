@@ -24,7 +24,6 @@
 package org.mycore.frontend.servlets;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -39,13 +38,11 @@ import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.frontend.editor.MCREditorServlet;
-import org.xml.sax.SAXParseException;
+import org.xml.sax.SAXException;
 
 /**
  * This servlet displays static *.xml files stored in the web application by
@@ -59,13 +56,12 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
 
     protected final static Logger LOGGER = Logger.getLogger(MCRStaticXMLFileServlet.class);
 
-    protected final static String docTypesIncludingEditors = MCRConfiguration.instance().getString("MCR.EditorFramework.DocTypes",
-            "MyCoReWebPage");
+    protected final static String docTypesIncludingEditors = MCRConfiguration.instance().getString("MCR.EditorFramework.DocTypes", "MyCoReWebPage");
 
     protected final static HashMap<String, String> docTypesMap = new HashMap<String, String>();
 
     @Override
-    public void doGetPost(MCRServletJob job) throws java.io.IOException, MCRException, SAXParseException, JDOMException {
+    public void doGetPost(MCRServletJob job) throws java.io.IOException, MCRException, SAXException, JDOMException {
         final HttpServletRequest request = job.getRequest();
         final HttpServletResponse response = job.getResponse();
         String requestedPath = request.getServletPath();
@@ -83,8 +79,8 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
         processFile(request, response, file);
     }
 
-    static void processFile(final HttpServletRequest request, final HttpServletResponse response, File file) throws FileNotFoundException,
-            IOException, MalformedURLException, MCRException, SAXParseException, JDOMException {
+    static void processFile(final HttpServletRequest request, final HttpServletResponse response, File file) throws FileNotFoundException, IOException,
+        MalformedURLException, MCRException, SAXException, JDOMException {
         request.setAttribute("XSL.StaticFilePath", request.getServletPath().substring(1));
         request.setAttribute("XSL.DocumentBaseURL", file.getParent() + File.separator);
         request.setAttribute("XSL.FileName", file.getName());

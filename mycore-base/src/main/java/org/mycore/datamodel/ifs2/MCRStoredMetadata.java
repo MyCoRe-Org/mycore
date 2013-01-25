@@ -32,7 +32,7 @@ import org.jdom2.JDOMException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRVFSContent;
-import org.xml.sax.SAXParseException;
+import org.xml.sax.SAXException;
 
 /**
  * Represents an XML metadata document that is stored in MCRMetadataStore.
@@ -82,7 +82,7 @@ public class MCRStoredMetadata {
         if (store.shouldForceXML()) {
             try {
                 xml = xml.ensureXML();
-            } catch (SAXParseException e) {
+            } catch (SAXException e) {
                 throw new IOException(e);
             }
         }
@@ -105,7 +105,7 @@ public class MCRStoredMetadata {
         if (store.shouldForceXML()) {
             try {
                 xml = xml.ensureXML();
-            } catch (SAXParseException e) {
+            } catch (SAXException e) {
                 throw new IOException(e);
             }
         }

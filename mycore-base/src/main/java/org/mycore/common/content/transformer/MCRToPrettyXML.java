@@ -30,6 +30,7 @@ import org.jdom2.output.Format;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRXMLContent;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -44,9 +45,7 @@ public class MCRToPrettyXML extends MCRContentTransformer {
         MCRXMLContent content;
         try {
             content = (source instanceof MCRXMLContent ? (MCRXMLContent) source : new MCRJDOMContent(source.asXML()));
-        } catch (SAXParseException e) {
-            throw new IOException(e);
-        } catch (JDOMException e) {
+        } catch (JDOMException | SAXException e) {
             throw new IOException(e);
         }
         content.setFormat(Format.getPrettyFormat().setEncoding(getEncoding()));
@@ -57,7 +56,7 @@ public class MCRToPrettyXML extends MCRContentTransformer {
     public String getEncoding() {
         return MCRXMLContent.ENCODING;
     }
-    
+
     @Override
     protected String getDefaultExtension() {
         return "xml";

@@ -52,7 +52,7 @@ import org.mycore.services.fieldquery.data2fields.MCRData2FieldsFile;
 import org.mycore.services.fieldquery.data2fields.MCRIndexEntry;
 import org.mycore.services.fieldquery.data2fields.MCRIndexEntryBuilder;
 import org.mycore.services.fieldquery.data2fields.MCRXSLBuilder;
-import org.xml.sax.SAXParseException;
+import org.xml.sax.SAXException;
 
 /**
  * provides static methods to manipulate MCRSearcher indexes.
@@ -90,12 +90,7 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
                 List<MCRSearcher> searcherList = clearAndInitSearchers();
                 createNewIndexFor(searcherList);
                 closeSearchers(searcherList);
-
-            } catch (SAXParseException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JDOMException e) {
+            } catch (IOException | JDOMException | SAXException e) {
                 e.printStackTrace();
             }
         }
@@ -107,7 +102,7 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             }
         }
 
-        private List<MCRSearcher> clearAndInitSearchers() throws IOException, JDOMException, SAXParseException {
+        private List<MCRSearcher> clearAndInitSearchers() throws IOException, JDOMException, SAXException {
             List<MCRSearcher> searcherList = new ArrayList<MCRSearcher>();
             for (String index : getIndexes()) {
                 if (isIndexType(index, mechanism.getIndexType())) {
@@ -138,7 +133,7 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             return luceneIndexes;
         }
 
-        private boolean isIndexType(String index, String type) throws IOException, JDOMException, SAXParseException {
+        private boolean isIndexType(String index, String type) throws IOException, JDOMException, SAXException {
             MCRContent searchFieldsContent = MCRXMLResource.instance().getResource("searchfields.xml");
             Document searchFields = searchFieldsContent.asXML();
             final String indexKey = MCRConfiguration.instance().getString(SEARCHER_PROPERTY_START + index + SEARCHER_INDEX_SUFFIX);

@@ -103,7 +103,6 @@ import org.mycore.services.fieldquery.data2fields.MCRXSLBuilder;
 import org.mycore.tools.MCRObjectFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.ext.EntityResolver2;
 import org.xml.sax.helpers.XMLReaderFactory;
@@ -415,7 +414,7 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
         try {
             content = MCRSourceContent.getInstance(uri);
             return content.asXML().getRootElement().detach();
-        } catch (SAXParseException | TransformerException | JDOMException | IOException e) {
+        } catch (SAXException | TransformerException | JDOMException | IOException e) {
             /**
              * rethrow Exception as RuntimException TODO: need to refactor this and
              * declare throw in method signature

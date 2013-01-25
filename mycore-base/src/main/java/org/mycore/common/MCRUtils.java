@@ -88,6 +88,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -914,7 +915,7 @@ public class MCRUtils {
      * @throws JDOMException 
      * @throws SAXParseException 
      */
-    public static Document requestVersionedObject(MCRObjectID objId, long revision) throws IOException, JDOMException, SAXParseException {
+    public static Document requestVersionedObject(MCRObjectID objId, long revision) throws IOException, JDOMException, SAXException {
         MCRContent content = requestVersionedObjectAsContent(objId, revision);
         if (content == null) {
             return null;

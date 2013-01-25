@@ -43,6 +43,7 @@ import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -211,7 +212,7 @@ public abstract class MCRContent {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    public Document asXML() throws JDOMException, IOException, SAXParseException {
+    public Document asXML() throws JDOMException, IOException, SAXException {
         return MCRXMLParserFactory.getNonValidatingParser().parseXML(this);
     }
 
@@ -222,7 +223,7 @@ public abstract class MCRContent {
      * 
      * @throws SAXParseException 
      */
-    public MCRContent ensureXML() throws IOException, JDOMException, SAXParseException {
+    public MCRContent ensureXML() throws IOException, JDOMException, SAXException {
         return new MCRJDOMContent(asXML());
     }
 
