@@ -23,8 +23,6 @@
 
 package org.mycore.user2;
 
-import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -43,6 +41,7 @@ import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -133,15 +132,18 @@ public class MCRUserCommands extends MCRAbstractCommands {
             "The command exports the data of user {0} to the file {1}.");
         addCommand(com);
 
+        com = new MCRCommand("export all users to directory {0}", "org.mycore.user2.MCRUserCommands.exportAllUserToDirectory String",
+            "The command exports the data of all users to the directory {0}.");
+        addCommand(com);
+
         com = new MCRCommand("import user from file {0}", "org.mycore.user2.MCRUserCommands.importUserFromFile String",
             "The command imports a user from file {0}.");
         addCommand(com);
-        
+
         com = new MCRCommand("update user from file {0}", "org.mycore.user2.MCRUserCommands.updateUserFromFile String",
-                "The command updates a user from file {0}.");
+            "The command updates a user from file {0}.");
         addCommand(com);
     }
-    
 
     /**
      * This command changes the user of the session context to a new user.
@@ -331,7 +333,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
             FileOutputStream outFile = new FileOutputStream(newFile);
             saveToXMLFile(mcrUser, outFile);
         } catch (Exception e) {
-            throw new MCRException("Error while encrypting cleartext passwords in user xml file: "+e.getMessage());
+            throw new MCRException("Error while encrypting cleartext passwords in user xml file: " + e.getMessage());
         }
     }
 
@@ -380,15 +382,28 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @param filename
      *            Name of the file to store the exported user
      */
-    public static void exportUserToFile(String userID, String filename) throws MCRException {
-        try {
-            MCRUser user = MCRUserManager.getUser(userID);
-            FileOutputStream outFile = new FileOutputStream(filename);
-            LOGGER.info("Writing to file " + filename + " ...");
-            saveToXMLFile(user, outFile);
-        } catch (Exception e) {
-            throw new MCRException("Error while command saveUserToFile()", e);
+    public static void exportUserToFile(String userID, String filename) throws IOException {
+        MCRUser user = MCRUserManager.getUser(userID);
+        if (user.getSystemRoleIDs().isEmpty()) {
+            LOGGER.warn("User " + user.getUserID() + " has not any system roles.");
         }
+        FileOutputStream outFile = new FileOutputStream(filename);
+        LOGGER.info("Writing to file " + filename + " ...");
+        saveToXMLFile(user, outFile);
+    }
+
+    public static List<String> exportAllUserToDirectory(String directory) throws IOException {
+        File dir = new File(directory);
+        if (!dir.exists() || !dir.isDirectory()) {
+            throw new MCRException("Directory does not exist: " + dir.getAbsolutePath());
+        }
+        List<MCRUser> users = MCRUserManager.listUsers(null, null, null);
+        ArrayList<String> commands = new ArrayList<>(users.size());
+        for (MCRUser user : users) {
+            File userFile = new File(dir, user.getUserID() + ".xml");
+            commands.add("export user " + user.getUserID() + " to file " + userFile.getAbsolutePath());
+        }
+        return commands;
     }
 
     /**
@@ -586,15 +601,13 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @throws IOException if output file can not be closed
      */
     private static void saveToXMLFile(MCRUser mcrUser, FileOutputStream outFile) throws MCRException, IOException {
-        String mcr_encoding = CONFIG.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
-
         // Create the output
-        XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat().setEncoding(mcr_encoding));
+        XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat().setEncoding(MCRConstants.DEFAULT_ENCODING));
 
         try {
             outputter.output(MCRUserTransformer.buildExportableXML(mcrUser), outFile);
         } catch (Exception e) {
-            throw new MCRException("Error while save XML to file: "+e.getMessage());
+            throw new MCRException("Error while save XML to file: " + e.getMessage());
         } finally {
             outFile.close();
         }
