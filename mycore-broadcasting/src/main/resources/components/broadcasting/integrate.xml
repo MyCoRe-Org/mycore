@@ -7,6 +7,7 @@
   <target name="create.users">
     <property name="commands.file" value="${basedir}/commands.txt" />
     <echo file="${commands.file}" append="false">
+		import role from file broadcast-role.xml 
 		assign user ${MCR.Users.Superuser.UserName} to role broadcast    	
 	</echo>
     <antcall target="invoke.cli">
