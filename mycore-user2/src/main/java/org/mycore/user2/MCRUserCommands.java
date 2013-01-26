@@ -49,9 +49,9 @@ import org.mycore.common.MCRUserInformation;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRLabel;
-import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
+import org.mycore.user2.utils.MCRRoleTransformer;
 import org.mycore.user2.utils.MCRUserTransformer;
 import org.xml.sax.SAXParseException;
 
@@ -76,44 +76,51 @@ public class MCRUserCommands extends MCRAbstractCommands {
         MCRCommand com = null;
 
         addCommand(new MCRCommand("change to user {0} with {1}", "org.mycore.user2.MCRUserCommands.changeToUser String String",
-            "Change the user {0} with the given password in {1}."));
+                "Change the user {0} with the given password in {1}."));
         addCommand(new MCRCommand("login {0}", "org.mycore.user2.MCRUserCommands.login String", "Start the login dialog for the user {0}."));
 
         com = new MCRCommand("init superuser", "org.mycore.user2.MCRUserCommands.initSuperuser",
-            "Initialized the user system. This command runs only if the user database does not exist.");
+                "Initialized the user system. This command runs only if the user database does not exist.");
         addCommand(com);
 
-        com = new MCRCommand("encrypt passwords in user xml file {0} to file {1}", "org.mycore.user2.MCRUserCommands.encryptPasswordsInXMLFile String String",
-            "This is a migration tool to change old plain text password entries to encrpted entries.");
+        com = new MCRCommand("encrypt passwords in user xml file {0} to file {1}",
+                "org.mycore.user2.MCRUserCommands.encryptPasswordsInXMLFile String String",
+                "This is a migration tool to change old plain text password entries to encrpted entries.");
         addCommand(com);
 
         com = new MCRCommand("set password for user {0} to {1}", "org.mycore.user2.MCRUserCommands.setPassword String String",
-            "This command sets a new password for the user. You must be this user or you must have administrator access.");
+                "This command sets a new password for the user. You must be this user or you must have administrator access.");
         addCommand(com);
 
-        com = new MCRCommand("enable user {0}", "org.mycore.user2.MCRUserCommands.enableUser String", "The command enables the user for the access.");
+        com = new MCRCommand("enable user {0}", "org.mycore.user2.MCRUserCommands.enableUser String",
+                "The command enables the user for the access.");
         addCommand(com);
 
-        com = new MCRCommand("disable user {0}", "org.mycore.user2.MCRUserCommands.disableUser String", "The command disables the user from the access.");
+        com = new MCRCommand("disable user {0}", "org.mycore.user2.MCRUserCommands.disableUser String",
+                "The command disables the user from the access.");
         addCommand(com);
 
         com = new MCRCommand("delete role {0}", "org.mycore.user2.MCRUserCommands.deleteRole String",
-            "The command delete the role {0} from the user system, but only if it has no user assigned.");
+                "The command delete the role {0} from the user system, but only if it has no user assigned.");
+        addCommand(com);
+
+        com = new MCRCommand("import role from file {0}", "org.mycore.user2.MCRUserCommands.addRole String",
+                "The command imports a role from file, if that role does not exist");
         addCommand(com);
 
         com = new MCRCommand("add roles from user file {0}", "org.mycore.user2.MCRUserCommands.addRoles String",
-            "The command adds roles found in user file {0} that do not exist");
+                "The command adds roles found in user file {0} that do not exist");
         addCommand(com);
 
         com = new MCRCommand("delete user {0}", "org.mycore.user2.MCRUserCommands.deleteUser String", "The command delete the user {0}.");
         addCommand(com);
 
         com = new MCRCommand("assign user {0} to role {1}", "org.mycore.user2.MCRUserCommands.assignUserToRole String String",
-            "The command add a user {0} as secondary member in the role {1}.");
+                "The command add a user {0} as secondary member in the role {1}.");
         addCommand(com);
 
         com = new MCRCommand("unassign user {0} from role {1}", "org.mycore.user2.MCRUserCommands.unassignUserFromRole String String",
-            "The command remove the user {0} as secondary member from the role {1}.");
+                "The command remove the user {0} as secondary member from the role {1}.");
         addCommand(com);
 
         com = new MCRCommand("list all roles", "org.mycore.user2.MCRUserCommands.listAllRoles", "The command list all roles.");
@@ -129,19 +136,19 @@ public class MCRUserCommands extends MCRAbstractCommands {
         addCommand(com);
 
         com = new MCRCommand("export user {0} to file {1}", "org.mycore.user2.MCRUserCommands.exportUserToFile String String",
-            "The command exports the data of user {0} to the file {1}.");
+                "The command exports the data of user {0} to the file {1}.");
         addCommand(com);
 
         com = new MCRCommand("export all users to directory {0}", "org.mycore.user2.MCRUserCommands.exportAllUserToDirectory String",
-            "The command exports the data of all users to the directory {0}.");
+                "The command exports the data of all users to the directory {0}.");
         addCommand(com);
 
         com = new MCRCommand("import user from file {0}", "org.mycore.user2.MCRUserCommands.importUserFromFile String",
-            "The command imports a user from file {0}.");
+                "The command imports a user from file {0}.");
         addCommand(com);
 
         com = new MCRCommand("update user from file {0}", "org.mycore.user2.MCRUserCommands.updateUserFromFile String",
-            "The command updates a user from file {0}.");
+                "The command updates a user from file {0}.");
         addCommand(com);
     }
 
@@ -272,10 +279,28 @@ public class MCRUserCommands extends MCRAbstractCommands {
             String name = role.getAttributeValue("name");
             MCRRole mcrRole = MCRRoleManager.getRole(name);
             if (mcrRole == null) {
-                List<Element> labelList = role.getChildren("label");
-                mcrRole = new MCRRole(name, MCRXMLTransformer.getLabels(labelList));
+                mcrRole = MCRRoleTransformer.buildMCRRole(role);
                 MCRRoleManager.addRole(mcrRole);
             }
+        }
+    }
+
+    /**
+     * Loads XML from a user and looks for roles currently not present in the system and creates them.
+     * 
+     * @param fileName
+     *            a valid user XML file
+     * @throws IOException 
+     * @throws SAXParseException 
+     */
+    public static void addRole(String fileName) throws SAXParseException, IOException {
+        LOGGER.info("Reading file " + fileName + " ...");
+        Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(fileName));
+        MCRRole role = MCRRoleTransformer.buildMCRRole(doc.getRootElement());
+        if (MCRRoleManager.getRole(role.getName()) == null) {
+            MCRRoleManager.addRole(role);
+        } else {
+            LOGGER.info("Role " + role.getName() + " does already exist.");
         }
     }
 
@@ -475,14 +500,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
     public static void listUser(MCRUser user) {
         StringBuilder sb = new StringBuilder("\n");
-        sb.append("       user=")
-            .append(user.getUserName())
-            .append("   real name=")
-            .append(user.getRealName())
-            .append('\n')
-            .append("   loginAllowed=")
-            .append(user.loginAllowed())
-            .append('\n');
+        sb.append("       user=").append(user.getUserName()).append("   real name=").append(user.getRealName()).append('\n')
+                .append("   loginAllowed=").append(user.loginAllowed()).append('\n');
         List<String> roles = new ArrayList<String>(user.getSystemRoleIDs());
         roles.addAll(user.getExternalRoleIDs());
         for (String rid : roles) {
