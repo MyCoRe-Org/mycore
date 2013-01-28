@@ -590,12 +590,16 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         if (getSystemRoleIDs().isEmpty() && getExternalRoleIDs().isEmpty()) {
             return null;
         }
-        Collection<MCRRole> roles = new ArrayList<MCRRole>();
-        for (String roleName : getSystemRoleIDs()) {
-            roles.add(MCRRoleManager.getRole(roleName));
-        }
-        for (String roleName : getExternalRoleIDs()) {
-            roles.add(MCRRoleManager.getRole(roleName));
+        ArrayList<String> roleIds = new ArrayList<String>(getSystemRoleIDs().size() + getExternalRoleIDs().size());
+        Collection<MCRRole> roles = new ArrayList<MCRRole>(roleIds.size());
+        roleIds.addAll(getSystemRoleIDs());
+        roleIds.addAll(getExternalRoleIDs());
+        for (String roleName : roleIds) {
+            MCRRole role = MCRRoleManager.getRole(roleName);
+            if (role == null) {
+                throw new MCRException("Could not load role: " + roleName);
+            }
+            roles.add(role);
         }
         return roles.toArray(new MCRRole[roles.size()]);
     }
@@ -603,6 +607,12 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     @SuppressWarnings("unused")
     private void setRoles(MCRRole[] roles) {
         for (MCRRole role : roles) {
+            //check if role does exist, so we wont lose it on export
+            String roleName = role.getName();
+            role = MCRRoleManager.getRole(roleName);
+            if (role == null) {
+                throw new MCRException("Could not load role: " + roleName);
+            }
             assignRole(role);
         }
     }
