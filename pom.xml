@@ -28,7 +28,7 @@
   </properties>
   <issueManagement>
     <system>sourceforge</system>
-    <url>https://sourceforge.net/tracker/index.php?group_id=92005</url>
+    <url>http://sourceforge.net/p/mycore/bugs/</url>
   </issueManagement>
   <ciManagement>
     <system>jenkins</system>
@@ -74,7 +74,6 @@
               <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
               <smtpPort implementation="java.lang.Integer">25</smtpPort>
               <toAddresses>
-                <toAddress implementation="java.lang.String">mycore-developer@lists.sourceforge.net</toAddress>
                 <toAddress implementation="java.lang.String">mycore-user@lists.sourceforge.net</toAddress>
               </toAddresses>
               <mailSender>
@@ -135,8 +134,8 @@
           <plugin>
             <artifactId>maven-changelog-plugin</artifactId>
             <configuration>
-              <issueIDRegexPattern>\d{6,}</issueIDRegexPattern>
-              <issueLinkUrl>http://sourceforge.net/support/tracker.php?aid=%ISSUE%</issueLinkUrl>
+              <issueIDRegexPattern>\d{3,}</issueIDRegexPattern>
+              <issueLinkUrl>http://sourceforge.net/p/mycore/bugs/%ISSUE%</issueLinkUrl>
               <type>date</type>
               <dates>
                 <date implementation="java.lang.String">${changelog.since}</date>
@@ -248,12 +247,12 @@
                 </tag>
               </tags>
               <links>
-                <link>http://java.sun.com/javase/6/docs/api/</link>
+                <link>http://docs.oracle.com/javase/7/docs/api/</link>
                 <link>http://tomcat.apache.org/tomcat-5.5-doc/servletapi/</link>
-                <link>http://www.jdom.org/docs/apidocs</link>
-                <link>http://logging.apache.org/log4j/docs/api/</link>
-                <link>http://docs.jboss.org/hibernate/stable/core/api/</link>
-                <link>http://lucene.apache.org/java/3_0_2/api/all/</link>
+                <link>http://www.jdom.org/docs/apidocs/</link>
+                <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
+                <link>http://docs.jboss.org/hibernate/core/3.6/javadocs/</link>
+                <link>http://lucene.apache.org/core/3_6_2/api/all/</link>
               </links>
             </configuration>
             <reportSets>
@@ -399,13 +398,12 @@
               </tag>
             </tags>
             <links>
-              <link>http://java.sun.com/javase/6/docs/api/</link>
+              <link>http://docs.oracle.com/javase/7/docs/api/</link>
               <link>http://tomcat.apache.org/tomcat-5.5-doc/servletapi/</link>
-              <link>http://java.sun.com/xml/jaxp/dist/1.1/docs/api/</link>
-              <link>http://www.jdom.org/docs/apidocs</link>
-              <link>http://logging.apache.org/log4j/docs/api/</link>
-              <link>http://www.hibernate.org/hib_docs/v3/api/</link>
-              <link>http://lucene.apache.org/java/3_0_0/api/all/</link>
+              <link>http://www.jdom.org/docs/apidocs/</link>
+              <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
+              <link>http://docs.jboss.org/hibernate/core/3.6/javadocs/</link>
+              <link>http://lucene.apache.org/core/3_6_2/api/all/</link>
             </links>
           </configuration>
         </plugin>
