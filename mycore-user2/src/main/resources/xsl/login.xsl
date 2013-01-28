@@ -34,7 +34,6 @@
   <xsl:include href="MyCoReLayout.xsl" />
   <xsl:param name="MCR.Users.Guestuser.UserName" />
 
-  <xsl:variable name="MainTitle" select="i18n:translate('component.user2.login.form.title')" />
   <xsl:variable name="PageTitle" select="i18n:translate('component.user2.login.form.title')" />
 
   <xsl:template match="/login">
