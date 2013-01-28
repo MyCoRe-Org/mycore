@@ -103,9 +103,16 @@
     </cell>
 
     <cell row="9" col="1" anchor="EAST">
+      <text i18n="component.user2.admin.user.locked" />
+    </cell>
+    <cell row="9" col="2" colspan="2" anchor="WEST" var="@locked">
+      <checkbox value="true" checked="false" />
+    </cell>
+    
+    <cell row="10" col="1" anchor="EAST">
       <text i18n="component.user2.admin.user.validUntil" />
     </cell>
-    <cell row="9" col="2" colspan="2" anchor="WEST" var="validUntil">
+    <cell row="10" col="2" colspan="2" anchor="WEST" var="validUntil">
       <textfield width="20" maxlength="20" id="tf.valid">
         <condition id="cond.valid" type="datetime" format="yyyy-MM-dd;yyyy-MM-dd'T'HH:mm:ss'Z'">
           <label xml:lang="de">Bitte geben Sie das Datum im Format YYYY-MM-TT ein!</label>
@@ -114,10 +121,10 @@
       </textfield>
     </cell>
     
-    <cell row="10" col="1" anchor="EAST">
+    <cell row="11" col="1" anchor="EAST">
       <text i18n="component.user2.admin.owner" />
     </cell>
-    <cell row="10" col="2" colspan="2" anchor="WEST" var="owner">
+    <cell row="11" col="2" colspan="2" anchor="WEST" var="owner">
       <repeater min="1" max="1" lines="off">
         <panel lines="off">
           <hidden descendants="true" />
@@ -134,10 +141,10 @@
       </repeater>
     </cell>
 
-    <cell row="11" col="1" anchor="NORTHEAST">
+    <cell row="12" col="1" anchor="NORTHEAST">
       <text i18n="component.user2.admin.roles" />
     </cell>
-    <cell row="11" col="2" colspan="2" anchor="NORTHWEST" var="roles/role">
+    <cell row="12" col="2" colspan="2" anchor="NORTHWEST" var="roles/role">
       <repeater min="0" max="20" lines="off">
         <panel lines="off">
           <hidden descendants="true" var="label" />
@@ -158,7 +165,7 @@
   </include>
 
   <include id="buttons">
-    <cell row="12" col="1" colspan="3" anchor="SOUTHEAST">
+    <cell row="20" col="1" colspan="3" anchor="SOUTHEAST">
       <cancelButton i18n="component.user2.button.cancel" style="width: 100px;" />
       <text label=" " />
       <submitButton i18n="component.user2.button.save" style="width: 100px;" />

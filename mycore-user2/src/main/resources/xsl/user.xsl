@@ -2,9 +2,9 @@
 
 <!-- XSL to display data of a login user -->
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions"
-  xmlns:acl="xalan://org.mycore.access.MCRAccessManager" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:const="xalan://org.mycore.user2.MCRUser2Constants"
-  exclude-result-prefixes="xsl xalan i18n acl const mcrxsl">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
+  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:acl="xalan://org.mycore.access.MCRAccessManager" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
+  xmlns:const="xalan://org.mycore.user2.MCRUser2Constants" exclude-result-prefixes="xsl xalan i18n acl const mcrxsl">
 
   <xsl:include href="MyCoReLayout.xsl" />
 
@@ -40,21 +40,21 @@
             <input type="submit" class="action" value="{i18n:translate('component.user2.admin.changedata')}" />
           </form>
         </xsl:when>
-        <xsl:when test="$CurrentUser = $uid">
+        <xsl:when test="$CurrentUser = $uid and not(/user/@locked = 'true')">
           <form action="{$WebApplicationBaseURL}authorization/change-current-user.xml" method="get">
             <input type="hidden" name="action" value="saveCurrentUser" />
             <input type="submit" class="action" value="{i18n:translate('component.user2.admin.changedata')}" />
           </form>
         </xsl:when>
       </xsl:choose>
-      <xsl:if test="/user/@realm = 'local'">
+      <xsl:if test="/user/@realm = 'local' and ($CurrentUser != $uid or not(/user/@locked = 'true'))">
         <form action="{$WebApplicationBaseURL}authorization/change-password.xml" method="get">
           <input type="hidden" name="action" value="password" />
           <input type="hidden" name="id" value="{$uid}" />
           <input type="submit" class="action" value="{i18n:translate('component.user2.admin.changepw')}" />
         </form>
       </xsl:if>
-      <xsl:if test="mcrxsl:isCurrentUserInRole('admin') or ($CurrentUser != $uid)">
+      <xsl:if test="mcrxsl:isCurrentUserInRole('admin') and ($CurrentUser != $uid)">
         <form action="MCRUserServlet" method="get">
           <input type="hidden" name="action" value="show" />
           <input type="hidden" name="id" value="{$uid}" />
@@ -173,6 +173,21 @@
             </td>
           </tr>
         </xsl:if>
+        <tr>
+          <th scope="row">
+            <xsl:value-of select="i18n:translate('component.user2.admin.user.locked')" />
+          </th>
+          <td>
+            <xsl:choose>
+              <xsl:when test="@locked='true'">
+                <xsl:value-of select="i18n:translate('component.user2.admin.user.locked.true')" />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="i18n:translate('component.user2.admin.user.locked.false')" />
+              </xsl:otherwise>
+            </xsl:choose>
+          </td>
+        </tr>
         <xsl:if test="attributes">
           <tr>
             <th scope="row">
