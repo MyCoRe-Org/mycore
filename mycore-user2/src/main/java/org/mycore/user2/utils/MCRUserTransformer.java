@@ -22,17 +22,20 @@
  */
 package org.mycore.user2.utils;
 
+import java.io.IOException;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.transform.JDOMResult;
+import org.jdom2.JDOMException;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRException;
+import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.user2.MCRUser;
+import org.xml.sax.SAXParseException;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -56,12 +59,10 @@ public abstract class MCRUserTransformer {
     }
 
     private static Document getDocument(MCRUser user) {
+        MCRJAXBContent<MCRUser> content = new MCRJAXBContent<MCRUser>(JAXB_CONTEXT, user);
         try {
-            Marshaller marshaller = JAXB_CONTEXT.createMarshaller();
-            JDOMResult result = new JDOMResult();
-            marshaller.marshal(user, result);
-            return result.getDocument();
-        } catch (JAXBException e) {
+            return content.asXML();
+        } catch (SAXParseException | JDOMException | IOException e) {
             throw new MCRException("Exception while transforming MCRUser " + user.getUserID() + " to JDOM document.", e);
         }
     }
