@@ -257,6 +257,8 @@ public class MCRUserServlet extends MCRServlet {
         updateBasicUserInfo(u, user);
 
         if (hasAdminPermission) {
+            boolean locked = "true".equals(u.getAttributeValue("locked"));
+            user.setLocked(locked);
             Element o = u.getChild("owner");
             if (o != null && !o.getAttributes().isEmpty()) {
                 String ownerName = o.getAttributeValue("name");
