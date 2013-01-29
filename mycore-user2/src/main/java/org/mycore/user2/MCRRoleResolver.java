@@ -35,7 +35,7 @@ import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRException;
+import org.mycore.datamodel.classifications2.MCRLabel;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -45,54 +45,55 @@ public class MCRRoleResolver implements URIResolver {
 
     private static final Logger LOGGER = Logger.getLogger(MCRRoleResolver.class);
 
-    /* (non-Javadoc)
-     * @see javax.xml.transform.URIResolver#resolve(java.lang.String, java.lang.String)
-     */
-    @Override
-    public Source resolve(String href, String base) throws TransformerException {
-        String target = href.substring(href.indexOf(":") + 1);
-        String[] part = target.split(":");
-        String method = part[0];
-        try {
-            if ("getAssignableGroupsForUser".equals(method)) {
-                return new JDOMSource(getAssignableGroupsForUser());
-            }
-        } catch (MCRAccessException exc) {
-            throw new TransformerException(exc);
-        }
-        throw new TransformerException(new IllegalArgumentException("Unknown method " + method + " in uri " + href));
-    }
-
     public static Element getAssignableGroupsForUser() throws MCRAccessException {
-        LOGGER.warn("Please fix https://sourceforge.net/tracker/?func=detail&aid=3497583&group_id=92005&atid=599192");
+        LOGGER.warn("Please fix http://sourceforge.net/p/mycore/bugs/568/");
         List<MCRRole> groupIDs = null;
 
         // The list of assignable groups depends on the privileges of the
         // current user.
-        try {
-            if (MCRAccessManager.checkPermission("administrate-user")) {
-                groupIDs = MCRRoleManager.listSystemRoles();
-            } else if (MCRAccessManager.checkPermission("create-user")) {
-                MCRUser currentUser = MCRUserManager.getCurrentUser();
-                groupIDs = new ArrayList<MCRRole>(currentUser.getSystemRoleIDs().size());
-                for (String id : currentUser.getSystemRoleIDs()) {
-                    groupIDs.add(MCRRoleManager.getRole(id));
-                }
-            } else {
-                throw new MCRAccessException("Not enough permissions! " + "Someone might have tried to call the new user form directly.");
+        if (MCRAccessManager.checkPermission("administrate-user")) {
+            groupIDs = MCRRoleManager.listSystemRoles();
+        } else if (MCRAccessManager.checkPermission("create-user")) {
+            final MCRUser currentUser = MCRUserManager.getCurrentUser();
+            groupIDs = new ArrayList<MCRRole>(currentUser.getSystemRoleIDs().size());
+            for (final String id : currentUser.getSystemRoleIDs()) {
+                groupIDs.add(MCRRoleManager.getRole(id));
             }
-        } catch (MCRException exc) {
-            throw new MCRAccessException("Not enough permissions", exc);
+        } else {
+            throw new MCRAccessException("Not enough permissions! " + "Someone might have tried to call the new user form directly.");
         }
 
         // Loop over all assignable groups
-        org.jdom2.Element root = new org.jdom2.Element("items");
+        final Element root = new Element("items");
 
-        for (MCRRole group : groupIDs) {
-            org.jdom2.Element item = new org.jdom2.Element("item").setAttribute("value", group.getName()).setAttribute("label", group.getLabel().getText());
+        for (final MCRRole group : groupIDs) {
+            String label = group.getName();
+            MCRLabel groupLabel = group.getLabel();
+            if (groupLabel != null && groupLabel.getText() != null) {
+                label = groupLabel.getText();
+            }
+            final Element item = new Element("item").setAttribute("value", group.getName()).setAttribute("label", label);
             root.addContent(item);
         }
         return root;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.xml.transform.URIResolver#resolve(java.lang.String, java.lang.String)
+     */
+    @Override
+    public Source resolve(final String href, final String base) throws TransformerException {
+        final String target = href.substring(href.indexOf(":") + 1);
+        final String[] part = target.split(":");
+        final String method = part[0];
+        try {
+            if ("getAssignableGroupsForUser".equals(method)) {
+                return new JDOMSource(getAssignableGroupsForUser());
+            }
+        } catch (final MCRAccessException exc) {
+            throw new TransformerException(exc);
+        }
+        throw new TransformerException(new IllegalArgumentException("Unknown method " + method + " in uri " + href));
     }
 
 }
