@@ -76,8 +76,9 @@ public class MCRUserServlet extends MCRServlet {
         if ((uid == null) || (uid.trim().length() == 0)) {
             user = MCRUserManager.getCurrentUser();
             uid = user != null ? String.valueOf(user.getUserID()) : null;
-        } else
-            user = MCRUserManager.getUser(uid);
+        }
+        //even reload current user, so that owner is correctly initialized
+        user = MCRUserManager.getUser(uid);
 
         if ("show".equals(action))
             showUser(req, res, user, uid);
