@@ -129,7 +129,7 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
         }
 
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateId));
-        derivate.getDerivate().getOrCreateFileMetadata(file);
+        derivate.getDerivate().getOrCreateFileMetadata(file, urn);
         MCRMetadataManager.update(derivate);
     }
 }
