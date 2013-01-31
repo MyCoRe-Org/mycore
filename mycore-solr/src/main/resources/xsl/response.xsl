@@ -9,7 +9,38 @@
   <xsl:include href="xslInclude:solrResponse" />
 
   <xsl:param name="WebApplicationBaseURL" />
-  <xsl:variable name="PageTitle" select="'Suchergebnisse'" />
+
+  <xsl:variable name="PageTitle" select="i18n:translate('component.solr.searchresult.resultList')" />
+
+  <xsl:variable name="hits" select="./response/result/@numFound" />
+  <xsl:variable name="start" select="./response/lst[@name='responseHeader']/lst[@name='params']/str[@name='start']" />
+  <xsl:variable name="rows" select="./response/lst[@name='responseHeader']/lst[@name='params']/str[@name='rows']" />
+  <xsl:variable name="currentPage" select="ceiling((($start + 1) - $rows) div $rows)+1" />
+  <xsl:variable name="query" select="encoder:encode(./response/lst[@name='responseHeader']/lst[@name='params']/str[@name='q'])" />
+
+  <xsl:variable name="pageTotal">
+    <xsl:choose>
+      <xsl:when test="ceiling($hits div $rows) = 0">
+        <xsl:value-of select="1" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="ceiling($hits div $rows )" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <!-- retain the original query parameters, for attaching them to a url -->
+  <xsl:variable name="params">
+    <xsl:for-each select="./response/lst[@name='responseHeader']/lst[@name='params']/str">
+      <xsl:if test="not(@name='start' or @name='rows') ">
+        <!-- parameterName=parameterValue -->
+        <xsl:value-of select="concat(@name,'=', .)" />
+        <xsl:if test="not (position() = last())">
+          <xsl:value-of select="'&amp;'" />
+        </xsl:if>
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:variable>
 
   <xsl:template match="doc">
     <xsl:variable name="identifier" select="str[@name='id']" />
@@ -143,30 +174,12 @@
 
   </xsl:template>
 
-
   <xsl:template match="/response">
-    <xsl:variable name="hits" select="result/@numFound" />
-    <xsl:variable name="start" select="lst[@name='responseHeader']/lst[@name='params']/str[@name='start']" />
-    <xsl:variable name="rows" select="lst[@name='responseHeader']/lst[@name='params']/str[@name='rows']" />
-    <xsl:variable name="query" select="encoder:encode(lst[@name='responseHeader']/lst[@name='params']/str[@name='q'])" />
-
-    <xsl:variable name="pageTotal">
-      <xsl:choose>
-        <xsl:when test="ceiling($hits div $rows) = 0">
-          <xsl:value-of select="1" />
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="ceiling($hits div $rows )" />
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
-
     <!-- table header -->
     <table class="resultHeader" cellspacing="0" cellpadding="0">
       <tr>
         <td class="resultPages">
-          <xsl:value-of
-            select="concat(i18n:translate('searchResults.resultPage'), ': ', ceiling((($start + 1) - $rows) div $rows)+1 ,'/', $pageTotal )" />
+          <xsl:value-of select="concat(i18n:translate('searchResults.resultPage'), ': ', $currentPage ,'/', $pageTotal )" />
         </td>
         <td class="resultCount">
           <strong>
@@ -181,42 +194,99 @@
       <xsl:apply-templates select="result/doc" />
     </table>
 
-    <!-- retain the original query parameters -->
-    <xsl:variable name="params">
-      <xsl:for-each select="lst[@name='responseHeader']/lst[@name='params']/str">
-        <xsl:if test="not(@name='start' or @name='rows') ">
-          <!-- parameterName=parameterValue -->
-          <xsl:value-of select="concat(@name,'=', .)" />
-          <xsl:if test="not (position() = last())">
-            <xsl:value-of select="'&amp;'" />
-          </xsl:if>
-        </xsl:if>
-      </xsl:for-each>
-    </xsl:variable>
+
 
     <!-- table footer -->
     <div id="pageSelection">
-      <tr>
-        <xsl:if test="($start - $rows) &gt;= 0">
-          <xsl:variable name="startRecordPrevPage">
-            <xsl:value-of select="$start - $rows" />
-          </xsl:variable>
-          <td>
-            <a title="{i18n:translate('searchResults.prevPage')}"
-              href="{concat($WebApplicationBaseURL,'servlets/SolrSelectProxy?', $params, '&amp;start=', $startRecordPrevPage, '&amp;rows=', $rows)}">&lt;</a>
-          </td>
-        </xsl:if>
+      <table id="">
+        <tr>
+          <xsl:if test="($start - $rows) &gt;= 0">
+            <xsl:variable name="startRecordPrevPage">
+              <xsl:value-of select="$start - $rows" />
+            </xsl:variable>
+            <td>
+              <a title="{i18n:translate('searchResults.prevPage')}"
+                href="{concat($WebApplicationBaseURL,'servlets/SolrSelectProxy?', $params, '&amp;start=', $startRecordPrevPage, '&amp;rows=', $rows)}">
+                <xsl:value-of select="i18n:translate('component.solr.searchresult.prev')" />
+              </a>
+            </td>
+          </xsl:if>
 
-        <xsl:variable name="startRecordNextPage">
-          <xsl:value-of select="$start + $rows" />
-        </xsl:variable>
-        <xsl:if test="$startRecordNextPage &lt; $hits">
+          <xsl:variable name="lookAhead" select="5" />
+          <xsl:variable name="lastPageNumberToDisplay">
+            <xsl:choose>
+              <xsl:when test="$currentPage + $lookAhead &gt; $pageTotal">
+                <xsl:value-of select="$pageTotal" />
+              </xsl:when>
+              <xsl:when test="$currentPage + $lookAhead &lt; 10 ">
+                <xsl:value-of select="10" />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$currentPage + $lookAhead" />
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+
+          <xsl:variable name="startPage">
+            <xsl:choose>
+              <xsl:when test="$currentPage - $lookAhead &lt; 0">
+                <xsl:value-of select="0" />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$currentPage - $lookAhead" />
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+
           <td>
-            <a title="{i18n:translate('searchResults.nextPage')}"
-              href="{concat($WebApplicationBaseURL,'servlets/SolrSelectProxy?', $params, '&amp;start=', $start + $rows, '&amp;rows=', $rows)}">&gt;</a>
+            <xsl:call-template name="displayPageNavigation">
+              <xsl:with-param name="i" select="$startPage" />
+              <xsl:with-param name="lastPageNumberToDisplay" select="$lastPageNumberToDisplay" />
+            </xsl:call-template>
           </td>
-        </xsl:if>
-      </tr>
+
+          <xsl:variable name="startRecordNextPage">
+            <xsl:value-of select="$start + $rows" />
+          </xsl:variable>
+          <xsl:if test="$startRecordNextPage &lt; $hits">
+            <td>
+              <a title="{i18n:translate('searchResults.nextPage')}"
+                href="{concat($WebApplicationBaseURL,'servlets/SolrSelectProxy?', $params, '&amp;start=', $start + $rows, '&amp;rows=', $rows)}">
+                <xsl:value-of select="i18n:translate('component.solr.searchresult.next')" />
+              </a>
+            </td>
+          </xsl:if>
+        </tr>
+      </table>
     </div>
+
   </xsl:template>
+
+  <xsl:template name="displayPageNavigation">
+    <xsl:param name="i" />
+    <xsl:param name="lastPageNumberToDisplay" />
+
+    <xsl:if test="$i &lt; $lastPageNumberToDisplay">
+      <xsl:variable name="s" select="$i * $rows" />
+
+      <a title="{$i + 1}" href="{concat($WebApplicationBaseURL,'servlets/SolrSelectProxy?', $params, '&amp;start=', $s, '&amp;rows=', $rows)}">
+        <xsl:choose>
+          <!-- the page currently displayed -->
+          <xsl:when test="$s = $start">
+            <xsl:value-of select="concat(' ', $i + 1, ' ')" />
+          </xsl:when>
+          <!-- any other page -->
+          <xsl:otherwise>
+            <xsl:value-of select="$i + 1" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </a>
+
+      <xsl:call-template name="displayPageNavigation">
+        <xsl:with-param name="i" select="$i + 1" />
+        <xsl:with-param name="lastPageNumberToDisplay" select="$lastPageNumberToDisplay" />
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+
 </xsl:stylesheet>
