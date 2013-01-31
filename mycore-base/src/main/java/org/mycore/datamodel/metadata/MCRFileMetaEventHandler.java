@@ -117,23 +117,19 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
     @Override
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
         if (file.getParent().getParent() != null) {
+            LOGGER.warn("Sorry, directories are currently not supported.");
             return;
         }
 
-        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(file.getOwnerID()));
-        MCRDirectory rootNode = derivate.receiveDirectoryFromIFS();
-        Map<String, String> urnMap = derivate.getUrnMap();
+        String derivateId = file.getOwnerID();
+        String urn = MCRURNManager.getURNForFile(derivateId, file.getName());
 
-        for (MCRFilesystemNode node : rootNode.getChildren()) {
-            String key = "/" + node.getName();
-            if (!urnMap.containsKey(key)) {
-                String urn = MCRURNManager.getURNForFile(derivate.getId().toString(), node.getName());
-                if (urn == null) {
-                    return;
-                }
-                derivate.getDerivate().getOrCreateFileMetadata((MCRFile) node, urn);
-            }
+        if (urn == null) {
+            return;
         }
+
+        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateId));
+        derivate.getDerivate().getOrCreateFileMetadata(file);
         MCRMetadataManager.update(derivate);
     }
 }
