@@ -1,6 +1,6 @@
 /*
- * 
- * $Revision$ $Date$
+ * $Revision$ 
+ * $Date$
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -25,20 +25,15 @@ package org.mycore.services.fieldquery;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
-import org.jdom2.transform.JDOMSource;
-import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.parsers.bool.MCRCondition;
@@ -127,20 +122,13 @@ public class MCRQueryCommands extends MCRAbstractCommands {
 
     /** Transform the results to an output using stylesheets */
     private static void buildOutput(MCRResults results) {
-        // read stylesheet
-        String xslfile = "results-commandlinequery.xsl";
-        InputStream in = MCRQueryCommands.class.getResourceAsStream("/" + xslfile);
-        if (in == null) {
-            throw new MCRConfigurationException("Can't read stylesheet file " + xslfile);
-        }
+        String xslFile = "xsl/results-commandlinequery.xsl";
+        MCRXSLTransformer transformer = new MCRXSLTransformer(xslFile);
+        MCRContent input = new MCRJDOMContent(new Document(results.buildXML()));
 
-        // transform data
         try {
-            StreamSource source = new StreamSource(in);
-            TransformerFactory transfakt = TransformerFactory.newInstance();
-            Transformer trans = transfakt.newTransformer(source);
-            StreamResult sr = new StreamResult(System.out);
-            trans.transform(new JDOMSource(new org.jdom2.Document(results.buildXML())), sr);
+            MCRContent output = transformer.transform(input);
+            output.sendTo(System.out);
         } catch (Exception ex) {
             Logger LOGGER = Logger.getLogger(MCRQueryCommands.class);
             LOGGER.error("Error while tranforming query result XML using XSLT");
