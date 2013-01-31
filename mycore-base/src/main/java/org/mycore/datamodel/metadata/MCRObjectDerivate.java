@@ -99,7 +99,6 @@ public class MCRObjectDerivate {
         org.jdom2.Element externalsElement = derivate.getChild("externals");
         externals.clear();
         if (externalsElement != null) {
-            @SuppressWarnings("unchecked")
             List<Element> externalList = externalsElement.getChildren();
             for (Element externalElement : externalList) {
                 MCRMetaLink eLink = new MCRMetaLink();
@@ -122,7 +121,6 @@ public class MCRObjectDerivate {
         org.jdom2.Element titlesElement = derivate.getChild("titles");
         titles.clear();
         if (titlesElement != null) {
-            @SuppressWarnings("unchecked")
             List<Element> titleList = titlesElement.getChildren();
             for (Element titleElement : titleList) {
                 MCRMetaLangText text = new MCRMetaLangText();
@@ -140,7 +138,6 @@ public class MCRObjectDerivate {
             if (mainURN != null) {
                 this.derivateURN = mainURN;
             }
-            @SuppressWarnings("unchecked")
             List<Element> filesInList = filesetElements.getChildren();
             if (!filesInList.isEmpty()) {
                 files = new ArrayList<MCRFileMetadata>(filesInList.size());
@@ -228,15 +225,39 @@ public class MCRObjectDerivate {
         return internals;
     }
 
-    public final MCRFileMetadata getOrCreateFileMetadata(MCRFile file) {
+    /**
+     * @param file the file to add
+     * @param urn the urn of the file, if already known, if not provide null
+     * @return
+     * 
+     * @throws @{@link NullPointerException} if first argument is null
+     */
+    public MCRFileMetadata getOrCreateFileMetadata(MCRFile file, String urn) {
         if (file == null) {
-            throw new NullPointerException("file may not be null");
+            throw new NullPointerException("File may not be null");
         }
         String path = file.getAbsolutePath();
-        return getOrCreateFileMetadata(path);
+        return getOrCreateFileMetadata(path, urn);
     }
 
-    public final MCRFileMetadata getOrCreateFileMetadata(String path) {
+    /**
+     * TODO
+     * @param file
+     * @return
+     * 
+     * @see {@link MCRObjectDerivate#getOrCreateFileMetadata(MCRFile, String)}
+     */
+    public final MCRFileMetadata getOrCreateFileMetadata(MCRFile file) {
+        return getOrCreateFileMetadata(file, null);
+    }
+
+    /**
+     * TODO
+     * @param path
+     * @param urn
+     * @return
+     */
+    private MCRFileMetadata getOrCreateFileMetadata(String path, String urn) {
         if (path == null) {
             throw new NullPointerException("path may not be null");
         }
@@ -248,7 +269,7 @@ public class MCRObjectDerivate {
                 return fileMetadata;
             } else if (compare > 0) {
                 //we need to create entry here
-                MCRFileMetadata newFileMetadata = createFileMetadata(path);
+                MCRFileMetadata newFileMetadata = createFileMetadata(path, urn);
                 files.add(i, newFileMetadata);
                 return newFileMetadata;
             }
@@ -257,20 +278,37 @@ public class MCRObjectDerivate {
         if (files.isEmpty()) {
             files = new ArrayList<MCRFileMetadata>();
         }
-        MCRFileMetadata newFileMetadata = createFileMetadata(path);
+        MCRFileMetadata newFileMetadata = createFileMetadata(path, urn);
         files.add(newFileMetadata);
         return newFileMetadata;
     }
 
-    private MCRFileMetadata createFileMetadata(String path) {
+    /**
+     * TODO 
+     * @param path
+     * @return
+     */
+    public final MCRFileMetadata getOrCreateFileMetadata(String path) {
+        return getOrCreateFileMetadata(path, null);
+    }
+
+    /**
+     * @param path
+     * @param urn
+     * @return
+     */
+    private MCRFileMetadata createFileMetadata(String path, String urn) {
         MCRFile mcrFile = MCRFile.getMCRFile(derivateID, path);
         if (mcrFile == null) {
             throw new MCRPersistenceException("File does not exist: " + derivateID + path);
         }
-        MCRFileMetadata newFileMetadata = new MCRFileMetadata(path, null, null);
+        MCRFileMetadata newFileMetadata = new MCRFileMetadata(path, urn, null);
         return newFileMetadata;
     }
 
+    /**
+     * @return
+     */
     public List<MCRFileMetadata> getFileMetadata() {
         return Collections.unmodifiableList(files);
     }
