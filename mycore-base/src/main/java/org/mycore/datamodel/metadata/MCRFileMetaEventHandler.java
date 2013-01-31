@@ -26,6 +26,7 @@ package org.mycore.datamodel.metadata;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.events.MCREvent;
@@ -35,7 +36,10 @@ import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.ifs.MCRFilesystemNode;
+import org.mycore.services.urn.MCRURNManager;
 
 /**
  * Handles category links to files
@@ -101,4 +105,35 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
         }
     }
 
+    /**
+     * When overriding an existing file with urn, this method ensures the urn remaining in the derivate xml.
+     * @param evt
+     * @param file
+     *
+     * TODO handle directory structures 
+     * 
+     * @author shermann
+     * */
+    @Override
+    protected void handleFileCreated(MCREvent evt, MCRFile file) {
+        if (file.getParent().getParent() != null) {
+            return;
+        }
+
+        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(file.getOwnerID()));
+        MCRDirectory rootNode = derivate.receiveDirectoryFromIFS();
+        Map<String, String> urnMap = derivate.getUrnMap();
+
+        for (MCRFilesystemNode node : rootNode.getChildren()) {
+            String key = "/" + node.getName();
+            if (!urnMap.containsKey(key)) {
+                String urn = MCRURNManager.getURNForFile(derivate.getId().toString(), node.getName());
+                if (urn == null) {
+                    return;
+                }
+                derivate.getDerivate().getOrCreateFileMetadata((MCRFile) node, urn);
+            }
+        }
+        MCRMetadataManager.update(derivate);
+    }
 }
