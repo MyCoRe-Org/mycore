@@ -14,6 +14,8 @@ import org.mycore.parsers.bool.MCRCondition;
 
 /**
  * @author shermann
+ * 
+ * @deprecated Define proper search fields in solr to get a good performance solution.
  */
 public class MCRDerivateWithURNSearcher extends MCRSearcher {
 
