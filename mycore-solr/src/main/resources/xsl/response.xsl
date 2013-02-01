@@ -194,20 +194,18 @@
       <xsl:apply-templates select="result/doc" />
     </table>
 
-
-
     <!-- table footer -->
     <div id="pageSelection">
-      <table id="">
+      <table>
         <tr>
           <xsl:if test="($start - $rows) &gt;= 0">
             <xsl:variable name="startRecordPrevPage">
               <xsl:value-of select="$start - $rows" />
             </xsl:variable>
             <td>
-              <a title="{i18n:translate('searchResults.prevPage')}"
+              <a id="linkToPreviousPage" title="{i18n:translate('searchResults.prevPage')}"
                 href="{concat($WebApplicationBaseURL,'servlets/SolrSelectProxy?', $params, '&amp;start=', $startRecordPrevPage, '&amp;rows=', $rows)}">
-                <xsl:value-of select="i18n:translate('component.solr.searchresult.prev')" />
+                <xsl:value-of select="'↩'" />
               </a>
             </td>
           </xsl:if>
@@ -250,16 +248,15 @@
           </xsl:variable>
           <xsl:if test="$startRecordNextPage &lt; $hits">
             <td>
-              <a title="{i18n:translate('searchResults.nextPage')}"
+              <a id="linkToNextPage" title="{i18n:translate('searchResults.nextPage')}"
                 href="{concat($WebApplicationBaseURL,'servlets/SolrSelectProxy?', $params, '&amp;start=', $start + $rows, '&amp;rows=', $rows)}">
-                <xsl:value-of select="i18n:translate('component.solr.searchresult.next')" />
+                <xsl:value-of select="'↪'" />
               </a>
             </td>
           </xsl:if>
         </tr>
       </table>
     </div>
-
   </xsl:template>
 
   <xsl:template name="displayPageNavigation">
@@ -269,19 +266,30 @@
     <xsl:if test="$i &lt; $lastPageNumberToDisplay">
       <xsl:variable name="s" select="$i * $rows" />
 
-      <a title="{$i + 1}" href="{concat($WebApplicationBaseURL,'servlets/SolrSelectProxy?', $params, '&amp;start=', $s, '&amp;rows=', $rows)}">
-        <xsl:choose>
-          <!-- the page currently displayed -->
-          <xsl:when test="$s = $start">
-            <xsl:value-of select="concat(' ', $i + 1, ' ')" />
-          </xsl:when>
-          <!-- any other page -->
-          <xsl:otherwise>
-            <xsl:value-of select="$i + 1" />
-          </xsl:otherwise>
-        </xsl:choose>
-      </a>
+      <xsl:element name="a">
+        <xsl:variable name="idValue">
+          <xsl:choose>
+            <xsl:when test="$s = $start">
+              <xsl:value-of select="'selectedResultPage'" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="'unselectedResultPage'" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
 
+        <xsl:attribute name="id">
+          <xsl:value-of select="$idValue" />
+        </xsl:attribute>
+
+        <xsl:attribute name="href">
+          <xsl:value-of select="concat($WebApplicationBaseURL,'servlets/SolrSelectProxy?', $params, '&amp;start=', $s, '&amp;rows=', $rows)" />
+        </xsl:attribute>
+
+        <xsl:value-of select="$i + 1" />
+      </xsl:element>
+
+      <!-- display next page -->
       <xsl:call-template name="displayPageNavigation">
         <xsl:with-param name="i" select="$i + 1" />
         <xsl:with-param name="lastPageNumberToDisplay" select="$lastPageNumberToDisplay" />
