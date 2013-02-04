@@ -22,13 +22,12 @@ function trackSelection(selectedItem, source, event) {
 		tracker.clearSelectedItems();
 	}
 		
-	if (event.ctrlKey == true && selectedItem.type == "item") {
-		tracker.setTo(selectedItem);
+	if ((event.ctrlKey == true || event.metaKey) == true && selectedItem.type == "item") {
+	    tracker.setTo(selectedItem);
 		tracker.setSelectedStructure(null);
 		tracker.addSelectedItems(selectedItem);
 		
-	} else if(!event.ctrlKey && selectedItem.type == "item") {
-		
+	} else if(( !(event.ctrlKey || event.metaKey)) && selectedItem.type == "item") {
 			tracker.setFrom(selectedItem);
 			tracker.setSelectedStructure(null);
 			tracker.clearSelectedStuff;
