@@ -2,8 +2,8 @@ package org.mycore.mets.tools.model;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 /**
  * Contains all fields that are necessary for the serialization of the Tree
