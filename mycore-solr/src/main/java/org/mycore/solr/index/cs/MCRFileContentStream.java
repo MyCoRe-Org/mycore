@@ -57,10 +57,8 @@ public class MCRFileContentStream extends MCRAbstractSolrContentStream<MCRFile> 
                 return;
             }
             indexRawFile((MCRFile) source);
-        } catch (SolrServerException solrEx) {
-            LOGGER.error(MessageFormat.format("Error sending file content to solr: \n{0}", (MCRFile) source), solrEx);
-        } catch (IOException ioEx) {
-            LOGGER.error(MessageFormat.format("Error sending file content to solr: \n{0}", (MCRFile) source), ioEx);
+        } catch (IOException | SolrServerException ex) {
+            LOGGER.error(MessageFormat.format("Error sending file content to solr: \n{0}", (MCRFile) source), ex);
         }
     }
 
@@ -90,12 +88,17 @@ public class MCRFileContentStream extends MCRAbstractSolrContentStream<MCRFile> 
         updateRequest.setParam("literal.objectType", "data_file");
         updateRequest.setParam("literal.fileName", file.getName());
         updateRequest.setParam("literal.objectProject", MCRObjectID.getInstance(file.getOwnerID()).getProjectId());
-        updateRequest.setParam("literal.fileDateModified", MCRAbstractSolrContentStream.DATE_FORMATTER.format(file.getLastModified().getTime()));
+        updateRequest.setParam("literal.fileDateModified",
+                MCRAbstractSolrContentStream.DATE_FORMATTER.format(file.getLastModified().getTime()));
+
+        String urn = null;
+        if ((urn = derivate.getUrnMap().get(file.getAbsolutePath())) != null) {
+            updateRequest.setParam("literal.urn", urn);
+        }
 
         LOGGER.trace("Solr: sending binary data (" + file.getAbsolutePath() + " (" + solrID + "), size is " + file.getSizeFormatted()
                 + ") to solr server.");
         long t = System.currentTimeMillis();
-
         /* actually send the request */
         MCRSolrServerFactory.getSolrServer().request(updateRequest);
         LOGGER.trace("Solr: sending binary data \"" + file.getAbsolutePath() + " (" + solrID + ")\"" + " done in "
