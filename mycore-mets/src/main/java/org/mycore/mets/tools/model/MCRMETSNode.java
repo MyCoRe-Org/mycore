@@ -140,4 +140,18 @@ public class MCRMETSNode implements Comparable<MCRMETSNode> {
         getChildren().add(node);
     }
 
+    /**
+     * @return the orderLabel
+     */
+    public String getOrderLabel() {
+        return orderLabel;
+    }
+
+    /**
+     * @param orderLabel the orderLabel to set
+     */
+    public void setOrderLabel(String orderLabel) {
+        this.orderLabel = orderLabel;
+    }
+
 }

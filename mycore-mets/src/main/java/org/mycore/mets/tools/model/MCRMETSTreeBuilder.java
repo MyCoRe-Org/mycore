@@ -3,7 +3,6 @@ package org.mycore.mets.tools.model;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -140,6 +139,7 @@ public class MCRMETSTreeBuilder {
         destinationNode.setType("item");
         destinationNode.setContentIds(fileDiv.getContentids());
         destinationNode.setOrder(fileDiv.getOrder());
+        destinationNode.setOrderLabel(fileDiv.getOrderLabel());
 
         if (sourceNode == null) {
             LOGGER.error("Can´t link with " + from);
@@ -163,6 +163,7 @@ public class MCRMETSTreeBuilder {
             metsStructureFolder.setType("category");
             metsStructureFolder.setStructureType(metsFolder.getType());
             metsStructureFolder.setOrder(metsFolder.getOrder());
+            
             idFolderMap.put(metsFolder.getId(), metsStructureFolder);
             root.addChild(metsStructureFolder);
 
