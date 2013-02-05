@@ -135,6 +135,7 @@ public class MCRMigrationCommands22 extends MCRAbstractCommands {
             LOGGER.info("Adding super user: " + suser);
             MCRUser user = userStore.retrieveUser(suser);
             createUser(user, null);
+            superUser = MCRUserManager.getUser(suser);
         }
 
         for (String userID : userIDs) {
