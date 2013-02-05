@@ -192,25 +192,6 @@ public class MCRUserCommands extends MCRAbstractCommands {
         final String spasswd = CONFIG.getString("MCR.Users.Superuser.UserPasswd", "alleswirdgut");
         final String srole = CONFIG.getString("MCR.Users.Superuser.GroupName", "admin");
 
-        //set to super user
-        MCRSessionMgr.getCurrentSession().setUserInformation(new MCRUserInformation() {
-
-            @Override
-            public boolean isUserInRole(String role) {
-                return true;
-            }
-
-            @Override
-            public String getUserID() {
-                return suser;
-            }
-
-            @Override
-            public String getUserAttribute(String attribute) {
-                return null;
-            }
-        });
-
         if (MCRUserManager.exists(suser)) {
             LOGGER.error("The superuser already exists!");
             return null;
