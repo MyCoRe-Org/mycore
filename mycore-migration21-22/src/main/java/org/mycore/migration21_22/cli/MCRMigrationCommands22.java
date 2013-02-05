@@ -42,7 +42,6 @@ import org.mycore.migration21_22.user.hibernate.MCRHIBUserStore;
 import org.mycore.user2.MCRPasswordHashType;
 import org.mycore.user2.MCRRole;
 import org.mycore.user2.MCRRoleManager;
-import org.mycore.user2.MCRUserCommands;
 import org.mycore.user2.MCRUserManager;
 
 @MCRCommandGroup(name = "Migrate from 2.1 to 2.2")
@@ -113,11 +112,8 @@ public class MCRMigrationCommands22 extends MCRAbstractCommands {
 
     @MCRCommand(syntax = "migrate users", help = "Migrate user from MyCoRe < 2.2")
     public static void migrateUsers() {
-        //initialize new user system
-        MCRUserCommands.initSuperuser();
-        final String suser = CONFIG.getString("MCR.Users.Superuser.UserName", "administrator");
-        org.mycore.user2.MCRUser superUser = MCRUserManager.getUser(suser);
         MCRHIBUserStore userStore = new MCRHIBUserStore();
+        final String suser = CONFIG.getString("MCR.Users.Superuser.UserName", "administrator");
         //convert groups
         List<String> groupIDs = userStore.getAllGroupIDs();
 
@@ -131,10 +127,18 @@ public class MCRMigrationCommands22 extends MCRAbstractCommands {
             MCRGroup group = userStore.retrieveGroup(groupID);
             createRole(group);
         }
+
         List<String> userIDs = userStore.getAllUserIDs();
+        org.mycore.user2.MCRUser superUser = MCRUserManager.getUser(suser);
+        if (superUser == null) {
+            //initialize new user system
+            LOGGER.info("Adding super user: " + suser);
+            MCRUser user = userStore.retrieveUser(suser);
+            createUser(user, null);
+        }
 
         for (String userID : userIDs) {
-            if (MCRUserManager.exists(userID)) {
+            if (userID.equals(superUser.getUserID()) || MCRUserManager.exists(userID)) {
                 LOGGER.warn("User does already exist: " + userID);
                 continue;
             }
@@ -161,7 +165,7 @@ public class MCRMigrationCommands22 extends MCRAbstractCommands {
             newUser.setValidUntil(new Date());
         }
         newUser.setLocked(!user.isUpdateAllowed());
-        if (newUser.isLocked()) {
+        if (newUser.isLocked() && superUser != null) {
             newUser.setOwner(superUser);
         }
         newUser.assignRole(user.getPrimaryGroupID());
