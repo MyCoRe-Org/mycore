@@ -1,8 +1,5 @@
 <project name="iview2" xmlns:mcr="antlib:org.mycore.buildtools">
   <import file="../../integrate.xml" />
-  <condition property="jai.available">
-    <available classname="javax.media.jai.JAI" classpathref="integration.classpath" />
-  </condition>
   <!-- - - - - - - - - - - - - - - - - - 
 	          target: config                      
 	         - - - - - - - - - - - - - - - - - -->
@@ -17,18 +14,4 @@
                 value="mcr-module-startIview2.xsl" />
     <AddHibernateMapping class="org.mycore.iview2.services.MCRTileJob" />
   </target>
-  <!-- - - - - - - - - - - - - - - - - - 
-          target: checkJAI                      
-         - - - - - - - - - - - - - - - - - -->
-  <target name="checkJAI" unless="jai.available">
-    <delete dir="." failonerror="false">
-      <include name="config/**" />
-      <include name="web/**" />
-    </delete>
-  </target>
-
-  <target name="pre.config" depends="checkJAI" />
-  <target name="pre.i18n" depends="checkJAI" />
-  <target name="pre.webapp" depends="checkJAI" />
-  <target name="pre.scripts" depends="checkJAI" />
 </project>
