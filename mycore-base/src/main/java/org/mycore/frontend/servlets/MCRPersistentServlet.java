@@ -51,6 +51,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xml.MCRXMLParserErrorHandler;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -344,7 +345,7 @@ public class MCRPersistentServlet extends MCRServlet {
         if (ex != null) {
             if (ex instanceof SAXParseException) {
                 ArrayList<String> errorLog = new ArrayList<String>();
-                errorLog.add(getSAXErrorMessage((SAXParseException) ex));
+                errorLog.add(MCRXMLParserErrorHandler.getSAXErrorMessage((SAXParseException) ex));
                 errorHandlerValid(job, errorLog);
                 return;
             }
@@ -553,7 +554,6 @@ public class MCRPersistentServlet extends MCRServlet {
         String myfile = pagedir + MCRConfiguration.instance().getString("MCR.SWF.PageErrorFormular", "editor_error_formular.xml");
         //TODO: Access File directly
         Element root = MCRURIResolver.instance().resolve("webapp:" + myfile);
-        @SuppressWarnings("unchecked")
         List<Element> sectionlist = root.getChildren("section");
 
         for (Element section : sectionlist) {
@@ -591,35 +591,6 @@ public class MCRPersistentServlet extends MCRServlet {
 
         // restart editor
         getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(root));
-    }
-
-    /**
-     * Returns a text indicating at which line and column the error occurred.
-     * 
-     * @param ex
-     *            the SAXParseException exception
-     * @return the location string
-     */
-    private String getSAXErrorMessage(SAXParseException ex) {
-        StringBuilder str = new StringBuilder();
-
-        String systemId = ex.getSystemId();
-        if (systemId != null) {
-            int index = systemId.lastIndexOf('/');
-
-            if (index != -1) {
-                systemId = systemId.substring(index + 1);
-            }
-
-            str.append(systemId).append(": ");
-        }
-
-        str.append("line ").append(ex.getLineNumber());
-        str.append(", column ").append(ex.getColumnNumber());
-        str.append(", ");
-        str.append(ex.getLocalizedMessage());
-
-        return str.toString();
     }
 
     private String getCancelUrl(MCRServletJob job) {
