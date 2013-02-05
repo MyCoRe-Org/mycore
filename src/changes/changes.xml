@@ -5,7 +5,21 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2.1.81" date="2013-0X-XX" description="Beta 2">
+    <release version="2.1.81" date="2013-02-XX" description="Beta 2">
+      <action dev="mcrsherm" type="fix">
+        Mets-Editor: order label is not displayed in the mets-editor
+        <fixes issue="601" />
+      </action>
+      <action dev="mcrsherm" type="fix">
+        foliation in METS editor does not work on Mac OS 
+        <fixes issue="595" />
+      </action>
+      <action dev="mcrfluet" type="update">
+        moved results-commandlinequery.xsl to MyCoRe - it is independent of any application
+      </action>
+      <action dev="mcrsherm" type="fix">
+        do not remove URN information if file content is updated
+      </action>
       <action dev="mcrtchef" type="remove">
         removed mycore-user component.
         Use "migrate users" from mycore-migration21-22 to transfer your old users.
