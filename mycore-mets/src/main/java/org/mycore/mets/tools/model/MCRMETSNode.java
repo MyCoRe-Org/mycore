@@ -14,7 +14,7 @@ public class MCRMETSNode implements Comparable<MCRMETSNode> {
     protected int order;
 
     protected boolean hide;
-    
+
     protected List<MCRMETSNode> children;
 
     public MCRMETSNode() {
@@ -144,14 +144,17 @@ public class MCRMETSNode implements Comparable<MCRMETSNode> {
      * @return the orderLabel
      */
     public String getOrderLabel() {
-        return orderLabel;
+        return "undefined".equals(orderLabel) ? "" : orderLabel;
     }
 
     /**
      * @param orderLabel the orderLabel to set
      */
     public void setOrderLabel(String orderLabel) {
+        if ("undefined".equals(orderLabel)) {
+            this.orderLabel = "";
+            return;
+        }
         this.orderLabel = orderLabel;
     }
-
 }

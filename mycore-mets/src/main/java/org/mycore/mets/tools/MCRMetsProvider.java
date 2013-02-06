@@ -90,7 +90,8 @@ public class MCRMetsProvider {
         /* init the two structure maps */
         /* init logical structure map */
         logicalStructMp = new LogicalStructMap();
-        LogicalDiv logDivContainer = new LogicalDiv("log_" + derivate, "monograph", "Label for " + derivate, 1, amdSec.getId(), dmdSec.getId());
+        LogicalDiv logDivContainer = new LogicalDiv("log_" + derivate, "monograph", "Label for " + derivate, 1, amdSec.getId(),
+                dmdSec.getId());
         logicalStructMp.setDivContainer(logDivContainer);
 
         /* init physical structure map */
@@ -167,6 +168,7 @@ public class MCRMetsProvider {
                 if (!hide) {
                     int physicalOrder = json.get("physicalOrder").getAsInt();
                     String orderLabel = MCRJSONTools.stripBracketsAndQuotes(json.get("orderLabel").getAsString());
+                    orderLabel = orderLabel.equals("undefined") ? "" : orderLabel;
                     path = encode(path);
 
                     /* create the physical div and add it to the physical struct map */
@@ -196,7 +198,8 @@ public class MCRMetsProvider {
      */
     private PhysicalSubDiv createPhysicalDiv(String id, int physicalOrder, String orderLabel) {
         String idStripped = MCRJSONTools.stripBracketsAndQuotes(id);
-        PhysicalSubDiv physDiv = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + idStripped, PhysicalSubDiv.TYPE_PAGE, physicalOrder, orderLabel);
+        PhysicalSubDiv physDiv = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + idStripped, PhysicalSubDiv.TYPE_PAGE, physicalOrder,
+                orderLabel);
         physDiv.add(new Fptr(id));
         return physDiv;
     }
