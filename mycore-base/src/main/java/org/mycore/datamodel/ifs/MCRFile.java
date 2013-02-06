@@ -563,7 +563,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         root.setAttribute("contentTypeID", getContentTypeID());
         root.setAttribute("contentType", getContentType().getLabel());
         root.setAttribute("returnId", getMCRObjectID().toString());
-        String urn = MCRURNManager.getURNForFile(getOwnerID(), absolutePath);
+        String urn = MCRURNManager.getURNForFile(getOwnerID(), name);
         if (urn != null) {
             root.setAttribute("urn", urn);
         }
