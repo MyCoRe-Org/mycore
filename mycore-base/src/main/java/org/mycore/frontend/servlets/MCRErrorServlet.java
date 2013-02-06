@@ -75,12 +75,7 @@ public class MCRErrorServlet extends HttpServlet {
             LOGGER.debug(msg, exception);
             LOGGER.debug("Has current session: " + MCRSessionMgr.hasCurrentSession());
         }
-        if (acceptWebPage(req)) {
-            generateErrorPage(req, resp, message, exception, statusCode, exceptionType, requestURI, servletName);
-        } else {
-            LOGGER.info("Client does not accept HTML pages: " + req.getHeader("Accept"));
-            resp.sendError(statusCode, message);
-        }
+        generateErrorPage(req, resp, message, exception, statusCode, exceptionType, requestURI, servletName);
     }
 
     /**
@@ -104,7 +99,7 @@ public class MCRErrorServlet extends HttpServlet {
                     for (int i = 1; i < parsed.length; i++) {
                         if (parsed[i].trim().startsWith("q=")) {
                             String qualityValue = parsed[i].trim().substring(2).trim();
-                            quality=Float.parseFloat(qualityValue);
+                            quality = Float.parseFloat(qualityValue);
                         }
                     }
                     if (quality > 0.5) {
@@ -139,11 +134,11 @@ public class MCRErrorServlet extends HttpServlet {
         }
     }
 
-    protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, String msg, Throwable ex, Integer statusCode,
-        Class<? extends Throwable> exceptionType, String requestURI, String servletName) throws IOException {
+    protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, String msg, Throwable ex,
+            Integer statusCode, Class<? extends Throwable> exceptionType, String requestURI, String servletName) throws IOException {
         boolean exceptionThrown = ex != null;
         LOGGER.log(exceptionThrown ? Level.ERROR : Level.WARN,
-            MessageFormat.format("{0}: Error {1} occured. The following message was given: {2}", requestURI, statusCode, msg), ex);
+                MessageFormat.format("{0}: Error {1} occured. The following message was given: {2}", requestURI, statusCode, msg), ex);
 
         String rootname = "mcr_error";
         String style = MCRServlet.getProperty(request, "XSL.Style");
@@ -218,7 +213,8 @@ public class MCRErrorServlet extends HttpServlet {
             }
         } else {
             if (request.getAttribute(requestAttr) != null) {
-                LOGGER.warn("Could not send error page. Generating error page failed. The original message:\n" + request.getAttribute(requestAttr));
+                LOGGER.warn("Could not send error page. Generating error page failed. The original message:\n"
+                        + request.getAttribute(requestAttr));
             } else {
                 LOGGER.warn("Could not send error page. Response allready commited. The following message was given:\n" + msg);
             }
