@@ -14,18 +14,18 @@
 
   <xsl:template match="/">
     <solr-document-container>
-      <xsl:apply-templates mode="mcr2Source" select="//mycoreobject|//mycorederivate|//file"/>
+      <xsl:apply-templates mode="mcr2Source" select="//mycoreobject|//mycorederivate|//file[not(parent::fileset)]" />
     </solr-document-container>
   </xsl:template>
 
   <xsl:template mode="mcr2Source" match="mycoreobject|mycorederivate|file">
-      <source>
-        <xsl:copy-of select="." />
-        <user>
-          <xsl:apply-templates />
-          <xsl:apply-templates mode="user-application" />
-        </user>
-      </source>
+    <source>
+      <xsl:copy-of select="." />
+      <user>
+        <xsl:apply-templates />
+        <xsl:apply-templates mode="user-application" />
+      </user>
+    </source>
   </xsl:template>
 
   <!-- overwrite this in your application -->
