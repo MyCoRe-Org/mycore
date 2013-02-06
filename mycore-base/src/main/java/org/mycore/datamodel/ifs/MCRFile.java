@@ -36,6 +36,8 @@ import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRISO8601Date;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.urn.MCRURNManager;
 
@@ -116,8 +118,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     /*
      * Internal constructor, do not use on your own.
      */
-    MCRFile(String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, String storeID, String storageID,
-        String fctID, String md5) {
+    MCRFile(String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, String storeID,
+            String storageID, String fctID, String md5) {
         super(ID, parentID, ownerID, name, label, size, date);
 
         this.storageID = storageID;
@@ -560,12 +562,13 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         root.setAttribute("extension", getExtension());
         root.setAttribute("contentTypeID", getContentTypeID());
         root.setAttribute("contentType", getContentType().getLabel());
+        root.setAttribute("returnId", getMCRObjectID().toString());
         String urn = MCRURNManager.getURNForFile(getOwnerID(), absolutePath);
         if (urn != null) {
             root.setAttribute("urn", urn);
         }
         Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.getInstance().getLinksFromReference(
-            getCategLinkReference(MCRObjectID.getInstance(getOwnerID()), absolutePath));
+                getCategLinkReference(MCRObjectID.getInstance(getOwnerID()), absolutePath));
         for (MCRCategoryID category : linksFromReference) {
             Element catEl = new Element("category");
             catEl.setAttribute("id", category.toString());
@@ -585,6 +588,14 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         }
 
         return new Document(root);
+    }
+
+    /**
+     * @return
+     */
+    public MCRObjectID getMCRObjectID() {
+        MCRDerivate d = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(getOwnerID()));
+        return d.getOwnerID();
     }
 
     /**

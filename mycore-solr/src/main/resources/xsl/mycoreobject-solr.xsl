@@ -14,11 +14,11 @@
 
   <xsl:template match="/">
     <solr-document-container>
-      <xsl:apply-templates mode="mcr2Source" select="//mycoreobject|//mycorederivate"/>
+      <xsl:apply-templates mode="mcr2Source" select="//mycoreobject|//mycorederivate|//file"/>
     </solr-document-container>
   </xsl:template>
 
-  <xsl:template mode="mcr2Source" match="mycoreobject|mycorederivate">
+  <xsl:template mode="mcr2Source" match="mycoreobject|mycorederivate|file">
       <source>
         <xsl:copy-of select="." />
         <user>

@@ -43,8 +43,10 @@ public class MCRBaseContentStream extends MCRAbstractSolrContentStream<MCRConten
         inputStream = new ByteArrayInputStream(byteArray);
     }
 
+    /**
+     * @return
+     */
     public MCRContentTransformer getTransformer() {
         return MCRSolrAppender.getTransformer();
     }
-
 }
