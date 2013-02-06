@@ -328,4 +328,35 @@ public class MCRHIBURNStore implements MCRURNStore {
 
         return urn;
     }
+
+    /**
+     * @param derivateId 
+     * @param path
+     * @param fileName
+     * @return
+     */
+    public String getURNForFile(String derivateId, String path, String fileName) {
+        if (derivateId == null || fileName == null) {
+            return null;
+        }
+
+        Session session = getSession();
+        StringBuilder querySB = new StringBuilder();
+        querySB.append("select key.mcrurn from ");
+        querySB.append(classname).append(" where key.mcrid='");
+        querySB.append(derivateId).append("'");
+        querySB.append(" and filename='").append(fileName).append("'");
+        querySB.append(" and path='").append(path).append("'");
+        logger.debug("HQL-Statement: " + querySB.toString());
+        List<String> returns = session.createQuery(querySB.toString()).list();
+        if (returns.isEmpty()) {
+            return null;
+        }
+        if (returns.size() != 1) {
+            logger.warn("There are more than just one urn for file \"" + fileName + "\" in derivate \"" + derivateId + "\"");
+        }
+        String urn = returns.get(0);
+
+        return urn;
+    }
 }

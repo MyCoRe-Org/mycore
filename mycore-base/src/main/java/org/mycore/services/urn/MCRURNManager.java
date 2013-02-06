@@ -246,14 +246,26 @@ public class MCRURNManager {
     public static String getURNforDocument(String documentID) {
         return store.getURNforDocument(documentID);
     }
-    
+
     /**
      * @param derivateId
      * @param fileName
      * @return the URN for the given file if any
+     * 
+     * @deprecated use {@link MCRURNManager#getURNForFile(String, String, String)}
      */
     public static String getURNForFile(String derivateId, String fileName) {
         return store.getURNForFile(derivateId, fileName);
+    }
+
+    /**
+     * @param derivateId
+     * @param path
+     * @param fileName
+     * @return
+     */
+    public static String getURNForFile(String derivateId, String path, String fileName) {
+        return store.getURNForFile(derivateId, path, fileName);
     }
 
     /**
