@@ -23,7 +23,6 @@
 
 package org.mycore.iview2.frontend;
 
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
@@ -31,7 +30,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.imageio.IIOImage;
@@ -50,8 +48,6 @@ import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
 import org.mycore.iview2.services.MCRIView2Tools;
-
-import com.sun.jersey.api.core.HttpResponseContext;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -94,7 +90,7 @@ public class MCRThumbnailServlet extends MCRServlet {
     }
 
     @Override
-    protected void render(MCRServletJob job, Exception ex) throws Exception {
+    protected void render(MCRServletJob job, Exception ex) throws IOException, JDOMException {
         try {
             String pathInfo = job.getRequest().getPathInfo();
             if (pathInfo.startsWith("/"))
@@ -106,39 +102,32 @@ public class MCRThumbnailServlet extends MCRServlet {
             LOGGER.info("IView2 file: " + iviewFile.getAbsolutePath());
             if (!iviewFile.exists()) {
                 job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND,
-                    MessageFormat.format("Could not find iview2 file for {0}{1}", derivate, imagePath));
+                        MessageFormat.format("Could not find iview2 file for {0}{1}", derivate, imagePath));
                 return;
             }
-            BufferedImage thumbnail = getThumbnail(iviewFile);
-
             String centerThumb = job.getRequest().getParameter("centerThumb");
-            if (thumbnail != null) {
-                if (!"no".equals(centerThumb)) {
-                    thumbnail = centerThumbnail(thumbnail);
-                }
+            //defaults to "yes"
+            boolean centered = !"no".equals(centerThumb);
+            BufferedImage thumbnail = getThumbnail(iviewFile, centered);
 
+            if (thumbnail != null) {
                 job.getResponse().setHeader("Cache-Control", "max-age=" + MCRTileServlet.MAX_AGE);
                 job.getResponse().setContentType("image/png");
                 job.getResponse().setDateHeader("Last-Modified", iviewFile.lastModified());
                 Date expires = new Date(System.currentTimeMillis() + MCRTileServlet.MAX_AGE * 1000);
                 LOGGER.debug("Last-Modified: " + new Date(iviewFile.lastModified()) + ", expire on: " + expires);
                 job.getResponse().setDateHeader("Expires", expires.getTime());
-                ServletOutputStream sout = job.getResponse().getOutputStream();
-                try {
-                    ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout);
-                    ImageWriter imageWriter = getImageWriter();
-                    try {
-                        imageWriter.setOutput(imageOutputStream);
-                        //tile = addWatermark(scaleBufferedImage(tile));        
-                        IIOImage iioImage = new IIOImage(thumbnail, null, null);
-                        imageWriter.write(null, iioImage, imageWriteParam);
-                    } finally {
-                        imageWriter.reset();
-                        imageWriters.add(imageWriter);
-                        imageOutputStream.close();
-                    }
+
+                ImageWriter imageWriter = getImageWriter();
+                try (ServletOutputStream sout = job.getResponse().getOutputStream();
+                        ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout)) {
+                    imageWriter.setOutput(imageOutputStream);
+                    //tile = addWatermark(scaleBufferedImage(tile));        
+                    IIOImage iioImage = new IIOImage(thumbnail, null, null);
+                    imageWriter.write(null, iioImage, imageWriteParam);
                 } finally {
-                    sout.close();
+                    imageWriter.reset();
+                    imageWriters.add(imageWriter);
                 }
             } else {
                 job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -149,7 +138,7 @@ public class MCRThumbnailServlet extends MCRServlet {
         }
     }
 
-    private BufferedImage getThumbnail(File iviewFile) throws IOException, JDOMException {
+    private BufferedImage getThumbnail(File iviewFile, boolean centered) throws IOException, JDOMException {
         MCRTiledPictureProps props = MCRTiledPictureProps.getInstance(iviewFile);
         if (props.getZoomlevel() == 0)
             return MCRIView2Tools.getZoomLevel(iviewFile, 0);
@@ -159,7 +148,7 @@ public class MCRThumbnailServlet extends MCRServlet {
         final double height = level1Image.getHeight();
         final int newWidth = width < height ? (int) Math.ceil(thumbnailSize * width / height) : thumbnailSize;
         final int newHeight = width < height ? thumbnailSize : (int) Math.ceil(thumbnailSize * height / width);
-        int imageType = level1Image.getType();
+        int imageType = centered ? BufferedImage.TYPE_INT_ARGB : level1Image.getType();
         if (imageType == BufferedImage.TYPE_CUSTOM) {
             imageType = BufferedImage.TYPE_INT_RGB;
         }
@@ -167,7 +156,9 @@ public class MCRThumbnailServlet extends MCRServlet {
         final Graphics2D bg = bicubic.createGraphics();
         bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         bg.scale(newWidth / width, newHeight / height);
-        bg.drawImage(level1Image, 0, 0, null);
+        int x = centered ? (thumbnailSize - newWidth) / 2 : 0;
+        int y = centered ? (thumbnailSize - newHeight) / 2 : 0;
+        bg.drawImage(level1Image, x, y, null);
         bg.dispose();
         return bicubic;
     }
@@ -178,15 +169,6 @@ public class MCRThumbnailServlet extends MCRServlet {
             imageWriter = ImageIO.getImageWritersBySuffix("png").next();
         }
         return imageWriter;
-    }
-
-    private BufferedImage centerThumbnail(BufferedImage thumbnail) {
-        BufferedImage centered = new BufferedImage(thumbnailSize, thumbnailSize, BufferedImage.TYPE_INT_ARGB);
-        Graphics graphics = centered.getGraphics();
-        int x = (thumbnailSize - thumbnail.getWidth()) / 2;
-        int y = (thumbnailSize - thumbnail.getHeight()) / 2;
-        graphics.drawImage(thumbnail, x, y, null);
-        return centered;
     }
 
 }

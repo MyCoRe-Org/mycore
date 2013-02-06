@@ -45,8 +45,9 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRUtils;
+import org.jdom2.JDOMException;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.imagetiler.MCRImage;
@@ -59,7 +60,18 @@ import org.mycore.iview2.services.MCRIView2Tools;
  *
  */
 public class MCRTileCombineServlet extends MCRServlet {
+
+    /** key of request attribute for {@link BufferedImage}. */
+    protected static final String IMAGE_KEY = MCRTileCombineServlet.class.getName() + ".image";
+
+    /** key of request attribute for iview2-{@link File}. */
+    protected static final String THUMBNAIL_KEY = MCRTileCombineServlet.class.getName() + ".thumb";
+
     private static final long serialVersionUID = 7924934677622546958L;
+
+    private static final float QUALITY = 0.75f;
+
+    private static final Logger LOGGER = Logger.getLogger(MCRTileCombineServlet.class);
 
     private ThreadLocal<ImageWriter> imageWriter = new ThreadLocal<ImageWriter>() {
 
@@ -72,13 +84,7 @@ public class MCRTileCombineServlet extends MCRServlet {
 
     private JPEGImageWriteParam imageWriteParam;
 
-    private static Logger LOGGER = Logger.getLogger(MCRTileCombineServlet.class);
-
     private MCRFooterInterface footerImpl = null;
-
-    protected static final String IMAGE_KEY = MCRTileCombineServlet.class.getName() + ".image";
-
-    protected static final String THUMBNAIL_KEY = MCRTileCombineServlet.class.getName() + ".thumb";
 
     /**
      * Initializes this instance.
@@ -95,7 +101,7 @@ public class MCRTileCombineServlet extends MCRServlet {
             LOGGER.warn("Your JPEG encoder does not support progressive JPEGs.");
         }
         imageWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-        imageWriteParam.setCompressionQuality(0.75f);
+        imageWriteParam.setCompressionQuality(QUALITY);
         String footerClassName = getInitParameter(MCRFooterInterface.class.getName());
         if (footerClassName != null) {
             try {
@@ -120,10 +126,12 @@ public class MCRTileCombineServlet extends MCRServlet {
      * </table>
      * 
      * See {@link #init()} how to attach a footer to every generated image.
+     * @throws JDOMException 
+     * @throws IOException 
      */
     @Override
-    protected void think(MCRServletJob job) throws Exception {
-        HttpServletRequest request = job.getRequest();
+    protected void think(final MCRServletJob job) throws IOException, JDOMException {
+        final HttpServletRequest request = job.getRequest();
         try {
             String pathInfo = request.getPathInfo();
             if (pathInfo.startsWith("/")) {
@@ -132,22 +140,24 @@ public class MCRTileCombineServlet extends MCRServlet {
             String zoomAlias = pathInfo.substring(0, pathInfo.indexOf('/'));
             pathInfo = pathInfo.substring(zoomAlias.length() + 1);
             final String derivate = pathInfo.substring(0, pathInfo.indexOf('/'));
-            String imagePath = pathInfo.substring(derivate.length());
+            final String imagePath = pathInfo.substring(derivate.length());
             LOGGER.info("Zoom-Level: " + zoomAlias + ", derivate: " + derivate + ", image: " + imagePath);
-            File iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, imagePath);
-            MCRTiledPictureProps pictureProps = MCRTiledPictureProps.getInstance(iviewFile);
-            int maxZoomLevel = pictureProps.getZoomlevel();
+            final File iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, imagePath);
+            final MCRTiledPictureProps pictureProps = MCRTiledPictureProps.getInstance(iviewFile);
+            final int maxZoomLevel = pictureProps.getZoomlevel();
             request.setAttribute(THUMBNAIL_KEY, iviewFile);
             LOGGER.info("IView2 file: " + iviewFile.getAbsolutePath());
             int zoomLevel = 0;
-            if (zoomAlias.equals("MIN")) {
+            switch (zoomAlias) {
+            case "MIN":
                 zoomLevel = 1;
-            }
-            if (zoomAlias.equals("MID")) {
+                break;
+            case "MID":
                 zoomLevel = 2;
-            }
-            if (zoomAlias.equals("MAX")) {
+                break;
+            case "MAX":
                 zoomLevel = 3;
+                break;
             }
             HttpServletResponse response = job.getResponse();
             if (zoomLevel > maxZoomLevel) {
@@ -162,8 +172,8 @@ public class MCRTileCombineServlet extends MCRServlet {
                     zoomAlias = "THUMB";
                     break;
                 }
-                String redirectURL = response.encodeRedirectURL(MessageFormat.format("{0}{1}/{2}/{3}/{4}", request.getContextPath(), request.getServletPath(),
-                    zoomAlias, derivate, imagePath));
+                String redirectURL = response.encodeRedirectURL(MessageFormat.format("{0}{1}/{2}/{3}/{4}", request.getContextPath(),
+                        request.getServletPath(), zoomAlias, derivate, imagePath));
                 response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
                 response.setHeader("Location", redirectURL);
                 response.flushBuffer();
@@ -172,19 +182,19 @@ public class MCRTileCombineServlet extends MCRServlet {
             if (zoomLevel == 0 && footerImpl == null) {
                 //we're done, sendThumbnail is called in render phase
                 return;
-            } else {
-                BufferedImage combinedImage = MCRIView2Tools.getZoomLevel(iviewFile, zoomLevel);
-                if (combinedImage != null) {
-                    if (footerImpl != null) {
-                        BufferedImage footer = footerImpl.getFooter(combinedImage.getWidth(), derivate, imagePath);
-                        combinedImage = attachFooter(combinedImage, footer);
-                    }
-                    request.setAttribute(IMAGE_KEY, combinedImage);
-                } else {
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                    return;
-                }
             }
+            BufferedImage combinedImage = MCRIView2Tools.getZoomLevel(iviewFile, zoomLevel);
+            if (combinedImage != null) {
+                if (footerImpl != null) {
+                    BufferedImage footer = footerImpl.getFooter(combinedImage.getWidth(), derivate, imagePath);
+                    combinedImage = attachFooter(combinedImage, footer);
+                }
+                request.setAttribute(IMAGE_KEY, combinedImage);
+            } else {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+
         } finally {
             LOGGER.info("Finished sending " + request.getPathInfo());
         }
@@ -196,11 +206,12 @@ public class MCRTileCombineServlet extends MCRServlet {
      * <table>
      * <tr><th>keyName</th><th>type</th><th>description</th></tr>
      * <tr><td>{@link #THUMBNAIL_KEY}</td><td>{@link File}</td><td>.iview2 File with all tiles in it</td></tr>
-     * <tr><td>{@link #IMAGE_KEY}</td><td>{@link BufferedImage}</td><td>generated image if <code>zoomLevel != 0<code> and no implementation of {@link MCRFooterInterface} defined</td></tr>
+     * <tr><td>{@link #IMAGE_KEY}</td><td>{@link BufferedImage}</td>
+     * <td>generated image if <code>zoomLevel != 0</code> and no implementation of {@link MCRFooterInterface} defined</td></tr>
      * </table>
      */
     @Override
-    protected void render(MCRServletJob job, Exception ex) throws Exception {
+    protected void render(final MCRServletJob job, final Exception ex) throws Exception {
         if (job.getResponse().isCommitted()) {
             return;
         }
@@ -208,8 +219,8 @@ public class MCRTileCombineServlet extends MCRServlet {
             throw ex;
         }
         //check for thumnail
-        File iviewFile = (File) job.getRequest().getAttribute(THUMBNAIL_KEY);
-        BufferedImage combinedImage = (BufferedImage) job.getRequest().getAttribute(IMAGE_KEY);
+        final File iviewFile = (File) job.getRequest().getAttribute(THUMBNAIL_KEY);
+        final BufferedImage combinedImage = (BufferedImage) job.getRequest().getAttribute(IMAGE_KEY);
         if (iviewFile != null && combinedImage == null) {
             sendThumbnail(iviewFile, job.getResponse());
             return;
@@ -218,34 +229,31 @@ public class MCRTileCombineServlet extends MCRServlet {
         job.getResponse().setHeader("Cache-Control", "max-age=" + MCRTileServlet.MAX_AGE);
         job.getResponse().setContentType("image/jpeg");
         job.getResponse().setDateHeader("Last-Modified", iviewFile.lastModified());
-        Date expires = new Date(System.currentTimeMillis() + MCRTileServlet.MAX_AGE * 1000);
+        final Date expires = new Date(System.currentTimeMillis() + MCRTileServlet.MAX_AGE * 1000);
         LOGGER.info("Last-Modified: " + new Date(iviewFile.lastModified()) + ", expire on: " + expires);
         job.getResponse().setDateHeader("Expires", expires.getTime());
-        ServletOutputStream sout = job.getResponse().getOutputStream();
-        try {
-            ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout);
-            try {
-                imageWriter.get().setOutput(imageOutputStream);
-                IIOImage iioImage = new IIOImage(combinedImage, null, null);
-                imageWriter.get().write(null, iioImage, imageWriteParam);
-            } finally {
-                imageWriter.get().reset();
-                imageOutputStream.close();
-            }
+
+        final ImageWriter curImgWriter = imageWriter.get();
+        try (ServletOutputStream sout = job.getResponse().getOutputStream();
+                ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout);) {
+            curImgWriter.setOutput(imageOutputStream);
+            final IIOImage iioImage = new IIOImage(combinedImage, null, null);
+            curImgWriter.write(null, iioImage, imageWriteParam);
         } finally {
-            sout.close();
+            curImgWriter.reset();
         }
     }
 
     /**
-     * attaches <code>footer</code> to <code>combinedImage</code>
+     * attaches <code>footer</code> to <code>combinedImage</code>.
      * @param combinedImage image to attach footer to
      * @param footer image of same with as <code>combinedImage</code>
      * @return a {@link BufferedImage} with <code>footer</code> attached to <code>combinedImage</code>
      */
-    protected static BufferedImage attachFooter(BufferedImage combinedImage, BufferedImage footer) {
-        BufferedImage resultImage = new BufferedImage(combinedImage.getWidth(), combinedImage.getHeight() + footer.getHeight(), combinedImage.getType());
-        Graphics2D graphics = resultImage.createGraphics();
+    protected static BufferedImage attachFooter(final BufferedImage combinedImage, final BufferedImage footer) {
+        final BufferedImage resultImage = new BufferedImage(combinedImage.getWidth(), combinedImage.getHeight() + footer.getHeight(),
+                combinedImage.getType());
+        final Graphics2D graphics = resultImage.createGraphics();
         try {
             graphics.drawImage(combinedImage, 0, 0, null);
             graphics.drawImage(footer, 0, combinedImage.getHeight(), null);
@@ -255,28 +263,20 @@ public class MCRTileCombineServlet extends MCRServlet {
         }
     }
 
-    private void sendThumbnail(File iviewFile, HttpServletResponse response) throws IOException {
-        ZipFile zipFile = new ZipFile(iviewFile);
-        try {
-            ZipEntry ze = zipFile.getEntry("0/0/0.jpg");
+    private void sendThumbnail(final File iviewFile, final HttpServletResponse response) throws IOException {
+        try (ZipFile zipFile = new ZipFile(iviewFile);) {
+            final ZipEntry ze = zipFile.getEntry("0/0/0.jpg");
             if (ze != null) {
                 response.setHeader("Cache-Control", "max-age=" + MCRTileServlet.MAX_AGE);
                 response.setContentType("image/jpeg");
                 response.setContentLength((int) ze.getSize());
-                ServletOutputStream out = response.getOutputStream();
-                InputStream zin = zipFile.getInputStream(ze);
-                try {
-                    MCRUtils.copyStream(zin, out);
-                } finally {
-                    zin.close();
-                    out.close();
+                try (ServletOutputStream out = response.getOutputStream(); InputStream zin = zipFile.getInputStream(ze);) {
+                    IOUtils.copy(zin, out);
                 }
             } else {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
-        } finally {
-            zipFile.close();
         }
     }
 
