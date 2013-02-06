@@ -19,10 +19,8 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.events.MCREvent;
-import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRBase;
@@ -146,14 +144,14 @@ public class MCRSolrIndexer extends MCRSearcher {
 
     @Override
     protected void handleFileDeleted(MCREvent evt, MCRFile file) {
-        this.deleteByIdFromSolr(file.getID());
+        MCRSolrIndexer.deleteByIdFromSolr(file.getID());
     }
 
     /**
      * @param solrID
      * @return
      */
-    protected UpdateResponse deleteByIdFromSolr(String solrID) {
+    synchronized public static UpdateResponse deleteByIdFromSolr(String solrID) {
         UpdateResponse updateResponse = null;
         try {
             LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Deleting \"" + solrID + "\" from solr");
@@ -264,11 +262,14 @@ public class MCRSolrIndexer extends MCRSearcher {
             for (MCRFile file : files) {
                 try {
                     LOGGER.trace("Solr: submitting file \"" + file.getAbsolutePath() + " (" + file.getID() + ")\" for indexing");
-
-                    MCREvent evt = new MCREvent(MCREvent.FILE_TYPE, MCREvent.UPDATE_EVENT);
-                    evt.put("file", file);
-
-                    MCREventManager.instance().handleEvent(evt);
+                    if (file.getSize() > MCRSolrIndexer.OVER_THE_WIRE_THRESHOLD) {
+                        MCRBaseContentStream contentStream = new MCRBaseContentStream(file.getID(), new MCRJDOMContent(file.createXML()));
+                        executorService.submit(contentStream);
+                    } else {
+                        /* extract metadata with tika */
+                        MCRAbstractSolrContentStream<MCRFile> contentStream = new MCRFileContentStream(file);
+                        executorService.submit(contentStream);
+                    }
                 } catch (Exception ex) {
                     LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Error creating transfer thread", ex);
                 }

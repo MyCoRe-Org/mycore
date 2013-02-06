@@ -52,6 +52,10 @@ public class MCRSolrCommands extends MCRAbstractCommands {
 
         com = new MCRCommand("drop solr index", "org.mycore.solr.index.cs.MCRSolrIndexer.dropIndex", "Deletes an existing index from solr");
         addCommand(com);
+
+        com = new MCRCommand("delete from solr index by id {0}", "org.mycore.solr.index.cs.MCRSolrIndexer.deleteByIdFromSolr String",
+                "Deletes an document from the index by id");
+        addCommand(com);
     }
 
     public static void rebuildMetadataIndexForSelected() {
