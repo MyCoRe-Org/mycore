@@ -51,9 +51,9 @@ public class MCRSolrIndexer extends MCRSearcher {
     /** Specify how many documents will be submitted to solr at a time when rebuilding the metadata index. Default is 100. */
     final static int BULK_SIZE = MCRConfiguration.instance().getInt("MCR.Module-solr.bulk.size", 100);
 
-    /** default is 10 MB */
-    public final static long OVER_THE_WIRE_THRESHOLD = MCRConfiguration.instance().getLong("MCR.Module-solr.OverTheWireThresholdInBytes",
-            1024 * 1024 * 10);
+    /** the Threshold in bytes */
+    public final static long OVER_THE_WIRE_THRESHOLD = MCRConfiguration.instance().getLong(
+            "MCR.Module-solr.OverTheWireThresholdInMegaBytes", 32) * 1024 * 1024;
 
     @Override
     public boolean isIndexer() {
