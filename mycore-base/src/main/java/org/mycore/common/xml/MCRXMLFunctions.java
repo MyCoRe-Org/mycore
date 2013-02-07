@@ -679,7 +679,13 @@ public class MCRXMLFunctions {
      *         given id
      */
     public static String getMCRObjectID(String derivateID) {
-        return MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateID)).getOwnerID().toString();
+        return getMCRObjectID(derivateID, 5000);
+    }
+    /**
+     * Same as {@link MCRMetadataManager#getObjectId(MCRObjectID, long)} with String representation.
+     */
+    public static String getMCRObjectID(final String derivateID, final long expire){
+        return MCRMetadataManager.getObjectId(MCRObjectID.getInstance(derivateID), expire).toString();
     }
 
     /**
@@ -693,4 +699,5 @@ public class MCRXMLFunctions {
         org.jdom2.Document document = new org.jdom2.Document(element);
         return new DOMOutputter().output(document).getDocumentElement().getChildNodes();
     }
+
 }

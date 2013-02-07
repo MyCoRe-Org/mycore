@@ -36,7 +36,6 @@ import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRISO8601Date;
-import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.urn.MCRURNManager;
@@ -595,8 +594,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
      * @return
      */
     public MCRObjectID getMCRObjectID() {
-        MCRDerivate d = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(getOwnerID()));
-        return d.getOwnerID();
+        return MCRMetadataManager.getObjectId(MCRObjectID.getInstance(getOwnerID()), 10000);
     }
 
     /**
