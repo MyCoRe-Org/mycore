@@ -112,7 +112,7 @@ function save(){
    dojo.xhrPost({
        url: webApplicationBaseURL + "servlets/SaveMetsServlet",
        handleAs: "text",
-       postData: "jsontree=" + data + "&derivate=" + derivateId,
+       postData: "jsontree=" + encodeURIComponent(data) + "&derivate=" + derivateId,
        load: function(response) {
             log('Mets successfully saved');
         },
