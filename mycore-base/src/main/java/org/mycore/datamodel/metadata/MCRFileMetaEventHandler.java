@@ -95,6 +95,10 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
     @Override
     protected void handleFileDeleted(MCREvent evt, MCRFile file) {
         MCRObjectID derivateID = MCRObjectID.getInstance(file.getOwnerID());
+        if (!MCRMetadataManager.exists(derivateID)) {
+            LOGGER.warn("Derivate " + derivateID + " from file '" + file + "' does not exist.");
+            return;
+        }
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
         MCRObjectDerivate objectDerivate = derivate.getDerivate();
         if (objectDerivate.deleteFileMetaData(file.getAbsolutePath())) {
@@ -119,7 +123,9 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
         }
 
         String derivateId = file.getOwnerID();
-        String urn = MCRURNManager.getURNForFile(derivateId, file.getName());
+        String absolutePath = file.getAbsolutePath();
+        String path = absolutePath.substring(0, absolutePath.lastIndexOf("/") + 1);
+        String urn = MCRURNManager.getURNForFile(derivateId, path, file.getName());
 
         if (urn == null) {
             return;
