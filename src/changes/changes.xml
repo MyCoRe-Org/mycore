@@ -6,6 +6,15 @@
   </properties>
   <body>
     <release version="2.1.81" date="2013-02-XX" description="Beta 2">
+      <action dev="mcrtchef" type="add">
+      added o.m.d.m.MCRMetadataManager.getObjectId(MCRObjectID, long) to retrieve objectID of metadata object for derivate id
+      </action>
+      <action dev="mcrtchef" type="update">
+       improved speed of MCRCache
+      </action>
+      <action dev="mcrtchef" type="add">
+        MCRCache added getIfUpToDate() with lazy determination of last modified timestamp of cache value
+      </action>
       <action dev="mcrsherm" type="fix">
         Mets-Editor: order label is not displayed in the mets-editor
         <fixes issue="601" />
