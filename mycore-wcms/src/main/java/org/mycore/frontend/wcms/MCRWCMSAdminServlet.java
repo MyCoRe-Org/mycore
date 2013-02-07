@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -180,7 +181,8 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
         adminUsers.setName("users").setAttribute("filter", "administrators");
         MCRAccessInterface am = MCRAccessManager.getAccessImpl();
         List<Element> users = adminUsers.getChildren("user");
-        Iterator<Element> userIterator = users.iterator();
+        LinkedList<Element> modifiableList = new LinkedList<Element>(users);
+        Iterator<Element> userIterator = modifiableList.iterator();
         boolean adminsFound = false;
         while (userIterator.hasNext()) {
             Element currentUser = userIterator.next();
