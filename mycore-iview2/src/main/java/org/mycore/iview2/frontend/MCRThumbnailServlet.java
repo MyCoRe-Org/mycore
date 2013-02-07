@@ -157,13 +157,12 @@ public class MCRThumbnailServlet extends MCRServlet {
         final BufferedImage bicubic = new BufferedImage(centered ? thumbnailSize : newWidth, centered ? thumbnailSize : newHeight, imageType);
         final Graphics2D bg = bicubic.createGraphics();
         bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        bg.scale(newWidth / width, newHeight / height);
         int x = centered ? (thumbnailSize - newWidth) / 2 : 0;
         int y = centered ? (thumbnailSize - newHeight) / 2 : 0;
         if (x != 0 && y != 0) {
             LOGGER.warn("Writing at position " + x + "," + y);
         }
-        bg.drawImage(level1Image, x, y, null);
+        bg.drawImage(level1Image, x, y, x + newWidth, y + newHeight, 0, 0, (int) Math.ceil(width), (int) Math.ceil(height), null);
         bg.dispose();
         return bicubic;
     }
