@@ -102,7 +102,7 @@ public class MCRThumbnailServlet extends MCRServlet {
             LOGGER.info("IView2 file: " + iviewFile.getAbsolutePath());
             if (!iviewFile.exists()) {
                 job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND,
-                        MessageFormat.format("Could not find iview2 file for {0}{1}", derivate, imagePath));
+                    MessageFormat.format("Could not find iview2 file for {0}{1}", derivate, imagePath));
                 return;
             }
             String centerThumb = job.getRequest().getParameter("centerThumb");
@@ -120,7 +120,7 @@ public class MCRThumbnailServlet extends MCRServlet {
 
                 ImageWriter imageWriter = getImageWriter();
                 try (ServletOutputStream sout = job.getResponse().getOutputStream();
-                        ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout)) {
+                    ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout)) {
                     imageWriter.setOutput(imageOutputStream);
                     //tile = addWatermark(scaleBufferedImage(tile));        
                     IIOImage iioImage = new IIOImage(thumbnail, null, null);
@@ -148,16 +148,21 @@ public class MCRThumbnailServlet extends MCRServlet {
         final double height = level1Image.getHeight();
         final int newWidth = width < height ? (int) Math.ceil(thumbnailSize * width / height) : thumbnailSize;
         final int newHeight = width < height ? thumbnailSize : (int) Math.ceil(thumbnailSize * height / width);
+        //if centered make transparent image
         int imageType = centered ? BufferedImage.TYPE_INT_ARGB : level1Image.getType();
         if (imageType == BufferedImage.TYPE_CUSTOM) {
             imageType = BufferedImage.TYPE_INT_RGB;
         }
-        final BufferedImage bicubic = new BufferedImage(newWidth, newHeight, imageType);
+        //if centered make thumbnailSize x thumbnailSize image
+        final BufferedImage bicubic = new BufferedImage(centered ? thumbnailSize : newWidth, centered ? thumbnailSize : newHeight, imageType);
         final Graphics2D bg = bicubic.createGraphics();
         bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         bg.scale(newWidth / width, newHeight / height);
         int x = centered ? (thumbnailSize - newWidth) / 2 : 0;
         int y = centered ? (thumbnailSize - newHeight) / 2 : 0;
+        if (x != 0 && y != 0) {
+            LOGGER.warn("Writing at position " + x + "," + y);
+        }
         bg.drawImage(level1Image, x, y, null);
         bg.dispose();
         return bicubic;
