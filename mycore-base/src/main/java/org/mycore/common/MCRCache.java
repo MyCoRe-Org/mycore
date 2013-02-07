@@ -45,18 +45,37 @@ import org.mycore.services.mbeans.MCRJMXBridge;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
-public class MCRCache<K,V> {
+public class MCRCache<K, V> {
+    /**
+         * @author Thomas Scheffler (yagee)
+         *
+         */
+    public interface ModifiedHandle {
+
+        /**
+         * check distance in ms.
+         * After this period of time use {@link #getLastModified()} to check if object is still up-to-date.
+         */
+        long getCheckPeriod();
+
+        /**
+         * returns timestamp when the cache value was last modified.
+         */
+        long getLastModified();
+
+    }
+
     /**
      * For each object in the cache, there is one MCRCacheEntry object
      * encapsulating it. The cache uses a double-linked list of MCRCacheEntries
      * and holds references to the most and least recently used entry.
      */
-    static class MCRCacheEntry<K,V> {
+    static class MCRCacheEntry<K, V> {
         /** The entry before this one, more often used than this entry */
-        MCRCacheEntry<K,V> before;
+        MCRCacheEntry<K, V> before;
 
         /** The entry after this one, less often used than this entry */
-        MCRCacheEntry<K,V> after;
+        MCRCacheEntry<K, V> after;
 
         /** The key for this object, to be used for removing the object */
         K key;
@@ -64,18 +83,23 @@ public class MCRCache<K,V> {
         /** The timestamp when this object was placed in the cache */
         long time;
 
+        /**
+         * The timestamp when this object was last checked for actuality
+         */
+        long lookUpTime;
+
         /** The stored object encapsulated by this entry */
         V value;
     }
 
     /** The most recently used object * */
-    protected MCRCacheEntry<K,V> mru;
+    protected MCRCacheEntry<K, V> mru;
 
     /** The least recently used object * */
-    protected MCRCacheEntry<K,V> lru;
+    protected MCRCacheEntry<K, V> lru;
 
     /** A hashtable for looking up a cached object by a given key */
-    protected Hashtable<K, MCRCacheEntry<K,V>> index = new Hashtable<K, MCRCacheEntry<K,V>>();
+    protected Hashtable<K, MCRCacheEntry<K, V>> index = new Hashtable<K, MCRCacheEntry<K, V>>();
 
     /** The number of requests to get an object from this cache */
     protected long gets = 0;
@@ -137,7 +161,7 @@ public class MCRCache<K,V> {
             remove(lru.key);
         }
 
-        MCRCacheEntry<K,V> added = new MCRCacheEntry<K,V>();
+        MCRCacheEntry<K, V> added = new MCRCacheEntry<K, V>();
         added.value = value;
         added.key = key;
         added.time = System.currentTimeMillis();
@@ -169,7 +193,7 @@ public class MCRCache<K,V> {
             return;
         }
 
-        MCRCacheEntry<K,V> removed = index.get(key);
+        MCRCacheEntry<K, V> removed = index.get(key);
 
         if (removed == lru) {
             lru = removed.after;
@@ -213,7 +237,7 @@ public class MCRCache<K,V> {
 
         hits++;
 
-        MCRCacheEntry<K,V> found = index.get(key);
+        MCRCacheEntry<K, V> found = index.get(key);
 
         if (found != mru) {
             found.after.before = found.before;
@@ -253,15 +277,47 @@ public class MCRCache<K,V> {
             return null;
         }
 
-        MCRCacheEntry<K,V> found = index.get(key);
+        MCRCacheEntry<K, V> found = index.get(key);
 
         if (found.time >= time) {
+            found.lookUpTime = System.currentTimeMillis();
             return value;
         }
 
         remove(key);
 
         return null;
+    }
+
+    /**
+     * Returns an object from the cache for the given key, but only if the cache
+     * entry is not older than the given timestamp of the {@link ModifiedHandle}.
+     * In contrast to {@link #getIfUpToDate(Object, long)} you can submit your own
+     * handle that returns the last modified timestamp after a certain period is over.
+     * Use this method if determining lastModified date is rather expensive and cache access is often.
+     * 
+     * @param key
+     *            the key for the object you want to get from this cache
+     * @param handle
+     *            the timestamp to check that the cache entry is up to date
+     * @return the cached object, or null
+     * @since 2.1.81
+     */
+    public synchronized V getIfUpToDate(K key, ModifiedHandle handle) {
+        MCRCacheEntry<K, V> found = index.get(key);
+        if (found == null) {
+            return null;
+        }
+        if (System.currentTimeMillis() - found.lookUpTime > handle.getCheckPeriod()) {
+            if (found.time >= handle.getLastModified()) {
+                found.lookUpTime = System.currentTimeMillis();
+                return found.value;
+            }
+            remove(key);
+            return null;
+        } else {
+            return found.value;
+        }
     }
 
     /**
@@ -347,7 +403,7 @@ public class MCRCache<K,V> {
      * Clears the cache by removing all entries from the cache
      */
     public synchronized void clear() {
-        index = new Hashtable<K, MCRCacheEntry<K,V>>();
+        index = new Hashtable<K, MCRCacheEntry<K, V>>();
         size = 0;
         mru = lru = null;
     }
@@ -371,7 +427,7 @@ public class MCRCache<K,V> {
      * A small sample program for testing this class.
      */
     public static void main(String[] args) {
-        MCRCache<String,String> cache = new MCRCache<String,String>(4, "Small Sample Program");
+        MCRCache<String, String> cache = new MCRCache<String, String>(4, "Small Sample Program");
         System.out.println(cache);
         cache.put("a", "Anton");
         cache.put("b", "Bohnen");
