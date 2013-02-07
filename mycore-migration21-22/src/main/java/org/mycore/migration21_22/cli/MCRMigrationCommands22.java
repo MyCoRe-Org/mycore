@@ -26,6 +26,7 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.xml.MCRXSLTransformation;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.common.MCRISO8601Date;
@@ -139,6 +140,10 @@ public class MCRMigrationCommands22 extends MCRAbstractCommands {
         }
 
         for (String userID : userIDs) {
+            if (userID.equals(MCRSystemUserInformation.getGuestInstance().getUserID())) {
+                LOGGER.warn("Guest user will not be migrated: " + userID);
+                continue;
+            }
             if (userID.equals(superUser.getUserID()) || MCRUserManager.exists(userID)) {
                 LOGGER.warn("User does already exist: " + userID);
                 continue;
