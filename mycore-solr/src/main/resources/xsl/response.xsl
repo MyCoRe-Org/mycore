@@ -31,13 +31,11 @@
 
   <!-- retain the original query parameters, for attaching them to a url -->
   <xsl:variable name="params">
-    <xsl:for-each select="./response/lst[@name='responseHeader']/lst[@name='params']/str">
-      <xsl:if test="not(@name='start' or @name='rows') ">
-        <!-- parameterName=parameterValue -->
-        <xsl:value-of select="concat(@name,'=', .)" />
-        <xsl:if test="not (position() = last())">
-          <xsl:value-of select="'&amp;'" />
-        </xsl:if>
+    <xsl:for-each select="./response/lst[@name='responseHeader']/lst[@name='params']/str[not(@name='start' or @name='rows')]">
+      <!-- parameterName=parameterValue -->
+      <xsl:value-of select="concat(@name,'=', encoder:encode(., 'UTF-8'))" />
+      <xsl:if test="not (position() = last())">
+        <xsl:value-of select="'&amp;'" />
       </xsl:if>
     </xsl:for-each>
   </xsl:variable>
