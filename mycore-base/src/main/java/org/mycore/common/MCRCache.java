@@ -24,7 +24,7 @@
 package org.mycore.common;
 
 import java.util.Collections;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 
 import org.mycore.services.mbeans.MCRJMXBridge;
@@ -99,7 +99,7 @@ public class MCRCache<K, V> {
     protected MCRCacheEntry<K, V> lru;
 
     /** A hashtable for looking up a cached object by a given key */
-    protected Hashtable<K, MCRCacheEntry<K, V>> index = new Hashtable<K, MCRCacheEntry<K, V>>();
+    protected HashMap<K, MCRCacheEntry<K, V>> index = new HashMap<K, MCRCacheEntry<K, V>>();
 
     /** The number of requests to get an object from this cache */
     protected long gets = 0;
@@ -153,9 +153,7 @@ public class MCRCache<K, V> {
             return;
         }
 
-        if (index.containsKey(key)) {
-            remove(key);
-        }
+        remove(key);
 
         if (isFull()) {
             remove(lru.key);
@@ -189,11 +187,10 @@ public class MCRCache<K, V> {
             throw new MCRUsageException("The value of the argument key is null.");
         }
 
-        if (!index.containsKey(key)) {
+        MCRCacheEntry<K, V> removed = index.get(key);
+        if (removed == null) {
             return;
         }
-
-        MCRCacheEntry<K, V> removed = index.get(key);
 
         if (removed == lru) {
             lru = removed.after;
@@ -225,36 +222,36 @@ public class MCRCache<K, V> {
      * @return the cached object, or null
      */
     public synchronized V get(K key) {
+        return getEntry(key).value;
+    }
+
+    private MCRCacheEntry<K, V> getEntry(K key) {
         if (key == null) {
             throw new MCRUsageException("The value of the argument key is null.");
         }
 
         gets++;
 
-        if (!index.containsKey(key)) {
+        MCRCacheEntry<K, V> found = index.get(key);
+        if (found == null) {
             return null;
         }
 
         hits++;
 
-        MCRCacheEntry<K, V> found = index.get(key);
-
         if (found != mru) {
             found.after.before = found.before;
-
             if (found == lru) {
                 lru = found.after;
             } else {
                 found.before.after = found.after;
             }
-
             found.after = null;
             found.before = mru;
             mru.after = found;
             mru = found;
         }
-
-        return found.value;
+        return found;
     }
 
     /**
@@ -271,21 +268,17 @@ public class MCRCache<K, V> {
      * @return the cached object, or null
      */
     public synchronized V getIfUpToDate(K key, long time) {
-        V value = get(key);
+        MCRCacheEntry<K, V> found = getEntry(key);
 
-        if (value == null) {
+        if (found == null) {
             return null;
         }
 
-        MCRCacheEntry<K, V> found = index.get(key);
-
         if (found.time >= time) {
             found.lookUpTime = System.currentTimeMillis();
-            return value;
+            return found.value;
         }
-
         remove(key);
-
         return null;
     }
 
@@ -304,7 +297,7 @@ public class MCRCache<K, V> {
      * @since 2.1.81
      */
     public synchronized V getIfUpToDate(K key, ModifiedHandle handle) {
-        MCRCacheEntry<K, V> found = index.get(key);
+        MCRCacheEntry<K, V> found = getEntry(key);
         if (found == null) {
             return null;
         }
@@ -403,7 +396,7 @@ public class MCRCache<K, V> {
      * Clears the cache by removing all entries from the cache
      */
     public synchronized void clear() {
-        index = new Hashtable<K, MCRCacheEntry<K, V>>();
+        index.clear();
         size = 0;
         mru = lru = null;
     }
@@ -451,6 +444,6 @@ public class MCRCache<K, V> {
      * Returns an iterable list of keys to the cached objects. 
      */
     public List<K> keys() {
-        return Collections.list(index.keys());
+        return Collections.list(Collections.enumeration(index.keySet()));
     }
 }
