@@ -226,8 +226,12 @@ public final class MCRXSLInfoServlet extends MCRServlet {
             List<Element> list = xsl.getChildren("template", MCRConstants.XSL_NAMESPACE);
             IteratorIterable<Element> callTemplateElements = xsl.getDescendants(Filters.element("call-template", MCRConstants.XSL_NAMESPACE));
             LinkedList<Element> templates = new LinkedList<Element>(list);
+            HashSet<String> callNames = new HashSet<String>();
             for (Element callTemplate : callTemplateElements) {
-                templates.add(callTemplate);
+                String name = callTemplate.getAttributeValue("name");
+                if (callNames.add(name)) {
+                    templates.add(callTemplate);
+                }
             }
             for (Element template : templates) {
                 Element copy = template.clone();
