@@ -102,7 +102,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             Document doc = new Document((Element) obj.getMetadata().createXML().detach());
             XPathExpression<Element> classElementPath = XPathFactory.instance().compile("//*[@categid]", Filters.element());
             List<Element> classList = classElementPath.evaluate(doc);
-            if (classList.size() > 0 && mappings == null) {
+            if (classList.size() > 0) {
                 mappings = new MCRMetaElement();
                 mappings.setTag("mappings");
                 mappings.setClass(MCRMetaClassification.class);
