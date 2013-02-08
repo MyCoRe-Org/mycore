@@ -91,27 +91,23 @@ public class MCRTemplatesCompiler {
         }
     }
 
-    /** Returns a new transformer for the compiled XSL templates */
-    public static Transformer getTransformer(Templates templates) {
-        try {
-            Transformer tf = factory.newTransformerHandler(templates).getTransformer();
+    /** Returns a new transformer for the compiled XSL templates 
+     * @throws TransformerConfigurationException */
+    public static Transformer getTransformer(Templates templates) throws TransformerConfigurationException {
+        Transformer tf = factory.newTransformerHandler(templates).getTransformer();
 
-            // In debug mode, add a TraceListener to log stylesheet execution
-            if (LOGGER.isDebugEnabled()) {
-                try {
-                    TraceManager tm = ((org.apache.xalan.transformer.TransformerImpl) tf).getTraceManager();
-                    tm.addTraceListener(new MCRTraceListener());
+        // In debug mode, add a TraceListener to log stylesheet execution
+        if (LOGGER.isDebugEnabled()) {
+            try {
+                TraceManager tm = ((org.apache.xalan.transformer.TransformerImpl) tf).getTraceManager();
+                tm.addTraceListener(new MCRTraceListener());
 
-                } catch (Exception ex) {
-                    LOGGER.warn(ex);
-                }
+            } catch (Exception ex) {
+                LOGGER.warn(ex);
             }
-
-            return tf;
-        } catch (TransformerConfigurationException exc) {
-            String msg = "Error while building XSL transformer: " + exc.getMessageAndLocation();
-            throw new MCRConfigurationException(msg, exc);
         }
+
+        return tf;
     }
 
     private static String buildErrorMessage(String resource, Exception cause) {

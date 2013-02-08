@@ -33,7 +33,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
@@ -103,20 +102,13 @@ public class MCRXMLMetadataManager {
         }
 
         @Override
-        public long getLastModified() {
-            try {
-                return MCRXMLMetadataManager.instance().getLastModified(id);
-            } catch (IOException e) {
-                LOGGER.warn("Cannot determine last modified date", e);
-                return -1;
-            }
+        public long getLastModified() throws IOException {
+            return MCRXMLMetadataManager.instance().getLastModified(id);
         }
     }
 
     /** The singleton */
     private static MCRXMLMetadataManager SINGLETON;
-
-    private static final Logger LOGGER = Logger.getLogger(MCRXMLMetadataManager.class);
 
     /** Returns the singleton */
     public static synchronized MCRXMLMetadataManager instance() {
@@ -238,8 +230,8 @@ public class MCRXMLMetadataManager {
                     try {
                         setupStore(project, type, prefix);
                     } catch (Exception e) {
-                        throw new MCRPersistenceException(MessageFormat.format(
-                                "Could not instantiate store for project {0} and object type {1}.", project, type), e);
+                        throw new MCRPersistenceException(MessageFormat.format("Could not instantiate store for project {0} and object type {1}.", project,
+                            type), e);
                     }
                 }
             }
@@ -247,8 +239,7 @@ public class MCRXMLMetadataManager {
 
         MCRMetadataStore store = MCRStoreManager.getStore(projectType, MCRMetadataStore.class);
         if (store == null) {
-            throw new MCRPersistenceException(MessageFormat.format("Metadata store for project {0} and object type {1} is unconfigured.",
-                    project, type));
+            throw new MCRPersistenceException(MessageFormat.format("Metadata store for project {0} and object type {1} is unconfigured.", project, type));
         }
         return store;
     }

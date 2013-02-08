@@ -23,6 +23,7 @@
 
 package org.mycore.common;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +62,7 @@ public class MCRCache<K, V> {
         /**
          * returns timestamp when the cache value was last modified.
          */
-        long getLastModified();
+        long getLastModified() throws IOException;
 
     }
 
@@ -295,9 +296,10 @@ public class MCRCache<K, V> {
      * @param handle
      *            the timestamp to check that the cache entry is up to date
      * @return the cached object, or null
+     * @throws IOException thrown by {@link ModifiedHandle#getLastModified()}
      * @since 2.1.81
      */
-    public synchronized V getIfUpToDate(K key, ModifiedHandle handle) {
+    public synchronized V getIfUpToDate(K key, ModifiedHandle handle) throws IOException {
         MCRCacheEntry<K, V> found = getEntry(key);
         if (found == null) {
             return null;

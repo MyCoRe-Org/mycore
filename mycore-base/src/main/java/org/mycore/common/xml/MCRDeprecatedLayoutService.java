@@ -90,9 +90,9 @@ public class MCRDeprecatedLayoutService {
         if (resourceName == null) {
             new org.jdom2.output.XMLOutputter().output(jdom, out);
         } else {
-            Transformer transformer = MCRXSLTransformerFactory.getTransformer(new MCRTemplatesSource(resourceName));
-            parameters.setParametersTo(transformer);
             try {
+                Transformer transformer = MCRXSLTransformerFactory.getTransformer(new MCRTemplatesSource(resourceName));
+                parameters.setParametersTo(transformer);
                 transformer.transform(new org.jdom2.transform.JDOMSource(jdom), new StreamResult(out));
             } catch (TransformerException ex) {
                 String msg = "Error while transforming XML using XSL stylesheet: " + ex.getMessageAndLocation();

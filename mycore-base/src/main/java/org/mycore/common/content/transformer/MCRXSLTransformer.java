@@ -77,8 +77,9 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     private static boolean TRACE_LISTENER_ENABLED = Logger.getLogger(MCRTraceListener.class).isDebugEnabled();
 
-    private static MCRCache<String, MCRXSLTransformer> INSTANCE_CACHE = new MCRCache<String, MCRXSLTransformer>(100,
-            "MCRXSLTransformer instance cache");
+    private static MCRCache<String, MCRXSLTransformer> INSTANCE_CACHE = new MCRCache<String, MCRXSLTransformer>(100, "MCRXSLTransformer instance cache");
+
+    private static long CHECK_PERIOD = MCRConfiguration.instance().getLong("MCR.LayoutService.LastModifiedCheckPeriod", 10000);
 
     /** The compiled XSL stylesheet */
     protected MCRTemplatesSource[] templateSources;
@@ -86,6 +87,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     protected Templates[] templates;
 
     protected long[] modified;
+
+    protected long[] modifiedChecked;
 
     protected SAXTransformerFactory tFactory;
 
@@ -103,8 +106,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         if (transformerFactory.getFeature(SAXSource.FEATURE) && transformerFactory.getFeature(SAXResult.FEATURE)) {
             this.tFactory = (SAXTransformerFactory) transformerFactory;
         } else {
-            throw new MCRConfigurationException("Transformer Factory " + transformerFactory.getClass().getName()
-                    + " does not implement SAXTransformerFactory");
+            throw new MCRConfigurationException("Transformer Factory " + transformerFactory.getClass().getName() + " does not implement SAXTransformerFactory");
         }
     }
 
@@ -132,12 +134,19 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             this.templateSources[i] = new MCRTemplatesSource(stylesheets[i].trim());
         }
         this.modified = new long[templateSources.length];
+        this.modifiedChecked = new long[templateSources.length];
         this.templates = new Templates[templateSources.length];
     }
 
     private void checkTemplateUptodate() throws TransformerConfigurationException, SAXException {
         for (int i = 0; i < templateSources.length; i++) {
-            long lastModified = templateSources[i].getLastModified();
+            long lastModifiedChecked = modifiedChecked[i];
+            boolean check = System.currentTimeMillis() - lastModifiedChecked > CHECK_PERIOD;
+            long lastModified = modified[i];
+            if (check) {
+                lastModified = templateSources[i].getLastModified();
+                modifiedChecked[i] = System.currentTimeMillis();
+            }
             if (templates[i] == null || modified[i] < lastModified) {
                 SAXSource source = templateSources[i].getSource();
                 templates[i] = tFactory.newTemplates(source);
@@ -201,8 +210,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         }
     }
 
-    protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler) throws IOException,
-            SAXException {
+    protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler) throws IOException, SAXException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         StreamResult serializer = new StreamResult(baos);
         transformerHandler.setResult(serializer);
@@ -212,8 +220,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         return new MCRByteContent(baos.toByteArray());
     }
 
-    private LinkedList<TransformerHandler> getTransformHandlerList(MCRParameterCollector parameterCollector)
-            throws TransformerConfigurationException, SAXException {
+    private LinkedList<TransformerHandler> getTransformHandlerList(MCRParameterCollector parameterCollector) throws TransformerConfigurationException,
+        SAXException {
         checkTemplateUptodate();
         LinkedList<TransformerHandler> xslSteps = new LinkedList<TransformerHandler>();
         for (Templates template : templates) {

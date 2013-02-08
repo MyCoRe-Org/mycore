@@ -30,11 +30,11 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRURLContent;
 
@@ -121,25 +121,23 @@ public class MCRXMLResource {
      *             if resource cannot be parsed
      */
     public MCRContent getResource(String name, ClassLoader classLoader) throws IOException {
-        URLConnection con = getResourceURLConnection(name, classLoader);
-        if (con == null) {
-            return null;
-        }
-        try {
-            LOGGER.debug(name + " last modified: " + con.getLastModified());
-            CacheEntry entry = resourceCache.getIfUpToDate(name, con.getLastModified());
-            if (entry != null && entry.resourceURL.equals(con.getURL())) {
-                LOGGER.debug("Using cached resource " + name);
-                return entry.content;
-            }
-            entry = new CacheEntry();
-            resourceCache.put(name, entry);
-            entry.resourceURL = con.getURL();
-            entry.content = getDocument(entry.resourceURL);
+        ResourceModifiedHandle modifiedHandle = getModifiedHandle(name, classLoader, 10000);
+        CacheEntry entry = resourceCache.getIfUpToDate(name, modifiedHandle);
+        URL resolvedURL = modifiedHandle.getURL();
+        if (entry != null && (resolvedURL == null || entry.resourceURL.equals(resolvedURL))) {
+            LOGGER.debug("Using cached resource " + name);
             return entry.content;
-        } finally {
-            closeURLConnection(con);
         }
+        entry = new CacheEntry();
+        resourceCache.put(name, entry);
+        entry.resourceURL = resolvedURL;
+        entry.content = getDocument(entry.resourceURL);
+        return entry.content;
+    }
+
+    public ResourceModifiedHandle getModifiedHandle(String name, ClassLoader classLoader, long checkPeriod) {
+        ResourceModifiedHandle modifiedHandle = new ResourceModifiedHandle(name, classLoader, checkPeriod);
+        return modifiedHandle;
     }
 
     /**
@@ -155,23 +153,19 @@ public class MCRXMLResource {
      *             if resource cannot be loaded
      */
     public byte[] getRawResource(String name, ClassLoader classLoader) throws IOException {
-        ByteArrayOutputStream baos;
         URLConnection con = getResourceURLConnection(name, classLoader);
         if (con == null) {
             return null;
         }
-        baos = new ByteArrayOutputStream();
-        InputStream in = new BufferedInputStream(con.getInputStream());
-        try {
-            MCRUtils.copyStream(in, baos);
-            baos.close();
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream(64 * 1024); InputStream in = new BufferedInputStream(con.getInputStream())) {
+            IOUtils.copy(in, baos);
             return baos.toByteArray();
         } finally {
             closeURLConnection(con);
         }
     }
 
-    private URLConnection getResourceURLConnection(String name, ClassLoader classLoader) throws IOException {
+    private static URLConnection getResourceURLConnection(String name, ClassLoader classLoader) throws IOException {
         LOGGER.debug("Reading xml from classpath resource " + name);
         URL url = classLoader.getResource(name);
         LOGGER.debug("Resource URL:" + url);
@@ -182,7 +176,7 @@ public class MCRXMLResource {
         return con;
     }
 
-    private MCRContent getDocument(URL url) {
+    private static MCRContent getDocument(URL url) {
         MCRContent content = new MCRURLContent(url);
         return content;
     }
@@ -211,7 +205,49 @@ public class MCRXMLResource {
         MCRContent content;
     }
 
-    private void closeURLConnection(URLConnection con) throws IOException {
+    public static class ResourceModifiedHandle implements MCRCache.ModifiedHandle {
+        private long checkPeriod;
+
+        private String name;
+
+        private ClassLoader classLoader;
+
+        private URL resolvedURL;
+
+        public ResourceModifiedHandle(String name, ClassLoader classLoader, long checkPeriod) {
+            this.name = name;
+            this.classLoader = classLoader;
+            this.checkPeriod = checkPeriod;
+        }
+
+        public URL getURL() {
+            return this.resolvedURL;
+        }
+
+        @Override
+        public long getCheckPeriod() {
+            return checkPeriod;
+        }
+
+        @Override
+        public long getLastModified() throws IOException {
+            URLConnection con = getResourceURLConnection(name, classLoader);
+            if (con == null) {
+                return -1;
+            }
+            try {
+                long lastModified = con.getLastModified();
+                resolvedURL = con.getURL();
+                LOGGER.debug(name + " last modified: " + lastModified);
+                return lastModified;
+            } finally {
+                closeURLConnection(con);
+            }
+        }
+
+    }
+
+    private static void closeURLConnection(URLConnection con) throws IOException {
         if (con == null) {
             return;
         }

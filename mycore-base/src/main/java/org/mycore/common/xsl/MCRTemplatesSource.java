@@ -28,6 +28,7 @@ import java.net.URL;
 import javax.xml.transform.sax.SAXSource;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.MCRCache;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLResource;
 import org.xml.sax.InputSource;
@@ -93,5 +94,9 @@ public class MCRTemplatesSource {
             LOGGER.warn("Could not determine last modified date of resource " + resource);
             return -1;
         }
+    }
+
+    public MCRCache.ModifiedHandle getModifiedHandle(long checkPeriod) {
+        return MCRXMLResource.instance().getModifiedHandle(resource, MCRXSLTransformerFactory.class.getClassLoader(), checkPeriod);
     }
 }

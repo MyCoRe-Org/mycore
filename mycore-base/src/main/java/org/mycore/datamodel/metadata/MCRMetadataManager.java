@@ -23,6 +23,7 @@
 package org.mycore.datamodel.metadata;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Collection;
 
@@ -52,15 +53,14 @@ public final class MCRMetadataManager {
 
     private static final Logger LOGGER = Logger.getLogger(MCRMetadataManager.class);
 
-    private static final MCRCache<MCRObjectID, MCRObjectID> derivateObjectMap = new MCRCache<MCRObjectID, MCRObjectID>(10000,
-            "derivate objectid cache");
+    private static final MCRCache<MCRObjectID, MCRObjectID> derivateObjectMap = new MCRCache<MCRObjectID, MCRObjectID>(10000, "derivate objectid cache");
 
     private static MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.instance();
 
     private MCRMetadataManager() {
 
     }
-    
+
     /**
      * Returns the MCRObjectID of the object containing derivate with the given ID.
      * @param derivateID derivateID
@@ -69,7 +69,12 @@ public final class MCRMetadataManager {
      */
     public static MCRObjectID getObjectId(final MCRObjectID derivateID, final long expire) {
         ModifiedHandle modifiedHandle = XML_MANAGER.getLastModifiedHandle(derivateID, expire);
-        MCRObjectID mcrObjectID = derivateObjectMap.getIfUpToDate(derivateID, modifiedHandle);
+        MCRObjectID mcrObjectID = null;
+        try {
+            mcrObjectID = derivateObjectMap.getIfUpToDate(derivateID, modifiedHandle);
+        } catch (IOException e) {
+            LOGGER.warn("Could not determine last modified timestamp of derivate " + derivateID);
+        }
         if (mcrObjectID != null) {
             return mcrObjectID;
         }
@@ -110,8 +115,7 @@ public final class MCRMetadataManager {
         }
         final MCRObjectID objid = mcrDerivate.getDerivate().getMetaLink().getXLinkHrefID();
         if (!MCRXMLMetadataManager.instance().exists(objid)) {
-            throw new MCRPersistenceException("The derivate " + mcrDerivate.getId() + " can't find metadata object " + objid
-                    + ", nothing done.");
+            throw new MCRPersistenceException("The derivate " + mcrDerivate.getId() + " can't find metadata object " + objid + ", nothing done.");
         }
 
         // prepare the derivate metadata and store under the XML table
@@ -218,8 +222,7 @@ public final class MCRMetadataManager {
         if (parent_id != null) {
             try {
                 parent.getStructure().addChild(
-                        new MCRMetaLinkID("child", mcrObject.getId(), mcrObject.getStructure().getParent().getXLinkLabel(), mcrObject
-                                .getLabel()));
+                    new MCRMetaLinkID("child", mcrObject.getId(), mcrObject.getStructure().getParent().getXLinkLabel(), mcrObject.getLabel()));
                 MCRMetadataManager.fireUpdateEvent(parent);
             } catch (final Exception e) {
                 LOGGER.error("Error while store child ID in parent object.", e);
@@ -244,8 +247,7 @@ public final class MCRMetadataManager {
             if (MCRMetadataManager.removeDerivateFromObject(metaId, mcrDerivate.getId())) {
                 LOGGER.info(MessageFormat.format("Link in MCRObject {0} to MCRDerivate {1} is deleted.", metaId, mcrDerivate.getId()));
             } else {
-                LOGGER.warn(MessageFormat.format("Link in MCRObject {0} to MCRDerivate {1} could not be deleted.", metaId,
-                        mcrDerivate.getId()));
+                LOGGER.warn(MessageFormat.format("Link in MCRObject {0} to MCRDerivate {1} could not be deleted.", metaId, mcrDerivate.getId()));
             }
         } catch (final Exception e) {
             LOGGER.warn("Can't delete link for MCRDerivate " + mcrDerivate.getId() + " from MCRObject " + metaId + ". Error ignored.");
@@ -262,7 +264,7 @@ public final class MCRMetadataManager {
                     e.printStackTrace();
                 }
                 LOGGER.warn("Error while delete for ID " + mcrDerivate.getId().toString() + " from IFS with ID "
-                        + mcrDerivate.getDerivate().getInternals().getIFSID());
+                    + mcrDerivate.getDerivate().getInternals().getIFSID());
             }
         }
 
@@ -287,9 +289,8 @@ public final class MCRMetadataManager {
         final Collection<String> sources = MCRLinkTableManager.instance().getSourceOf(mcrObject.mcr_id);
         LOGGER.debug("Sources size:" + sources.size());
         if (sources.size() > 0) {
-            final MCRActiveLinkException activeLinks = new MCRActiveLinkException("Error while deleting object "
-                    + mcrObject.mcr_id.toString()
-                    + ". This object is still referenced by other objects and can not be removed until all links are released.");
+            final MCRActiveLinkException activeLinks = new MCRActiveLinkException("Error while deleting object " + mcrObject.mcr_id.toString()
+                + ". This object is still referenced by other objects and can not be removed until all links are released.");
             for (final String curSource : sources) {
                 activeLinks.addLink(curSource, mcrObject.mcr_id.toString());
             }

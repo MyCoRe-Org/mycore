@@ -22,8 +22,11 @@
 
 package org.mycore.common.xsl;
 
+import java.io.IOException;
+
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
@@ -40,16 +43,19 @@ public class MCRXSLTransformerFactory {
     /** A cache of already compiled stylesheets */
     private static MCRCache<String, Templates> cache;
 
+    private static long checkPeriod;
+
     static {
         int cacheSize = MCRConfiguration.instance().getInt("MCR.LayoutService.XSLCacheSize", 200);
+        checkPeriod = MCRConfiguration.instance().getLong("MCR.LayoutService.LastModifiedCheckPeriod", 10000);
         cache = new MCRCache<String, Templates>(cacheSize, MCRXSLTransformerFactory.class.getName());
     }
 
-    /** Returns the compiled XSL templates cached for the given source, if it is up-to-date. */
-    private static Templates getCachedTemplates(MCRTemplatesSource source) {
-        long lastModified = source.getLastModified();
+    /** Returns the compiled XSL templates cached for the given source, if it is up-to-date. 
+     * @throws IOException */
+    private static Templates getCachedTemplates(MCRTemplatesSource source) throws IOException {
         String key = source.getKey();
-        return (cache.getIfUpToDate(key, lastModified));
+        return cache.getIfUpToDate(key, source.getModifiedHandle(checkPeriod));
     }
 
     /** Compiles the given XSL source, and caches the result */
@@ -59,8 +65,10 @@ public class MCRXSLTransformerFactory {
         return templates;
     }
 
-    /** Returns a transformer for the given XSL source */
-    public static Transformer getTransformer(MCRTemplatesSource source) {
+    /** Returns a transformer for the given XSL source 
+     * @throws IOException 
+     * @throws TransformerConfigurationException */
+    public static Transformer getTransformer(MCRTemplatesSource source) throws IOException, TransformerConfigurationException {
         Templates templates = getCachedTemplates(source);
         if (templates == null) {
             templates = compileTemplates(source);
