@@ -664,3 +664,7 @@ div.thumbnail>img {
 .viewerContainer.min>thumbnailOverview {
 	overflow: hidden;
 }
+
+#pages.hidden {
+	display: none;
+}
