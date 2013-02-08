@@ -222,7 +222,8 @@ public class MCRCache<K, V> {
      * @return the cached object, or null
      */
     public synchronized V get(K key) {
-        return getEntry(key).value;
+        MCRCacheEntry<K, V> found = getEntry(key);
+        return found == null ? null : found.value;
     }
 
     private MCRCacheEntry<K, V> getEntry(K key) {
