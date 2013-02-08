@@ -413,7 +413,7 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
         MCRSourceContent content;
         try {
             content = MCRSourceContent.getInstance(uri);
-            return content.asXML().getRootElement().detach();
+            return content == null ? null : content.asXML().getRootElement().detach();
         } catch (SAXException | TransformerException | JDOMException | IOException e) {
             /**
              * rethrow Exception as RuntimException TODO: need to refactor this and

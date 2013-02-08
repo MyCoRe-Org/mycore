@@ -115,6 +115,9 @@ public class MCRSourceContent extends MCRWrappedContent {
      */
     public static MCRSourceContent getInstance(String uri) throws TransformerException {
         Source source = URI_RESOLVER.resolve(uri, null);
+        if (source == null) {
+            return null;
+        }
         return new MCRSourceContent(source);
     }
 
