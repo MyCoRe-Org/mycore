@@ -65,7 +65,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     private static Class<MCRCategoryLink> LINK_CLASS = MCRCategoryLink.class;
 
-    private static MCRCache categCache = new MCRCache(MCRConfiguration.instance().getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size", 1000),
+    private static MCRCache<MCRCategoryID, MCRCategoryImpl> categCache = new MCRCache<MCRCategoryID, MCRCategoryImpl>(MCRConfiguration.instance().getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size", 1000),
         "MCRCategLinkService category cache");
 
     private static MCRCategoryDAOImpl DAO = new MCRCategoryDAOImpl();
@@ -210,7 +210,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     private static MCRCategoryImpl getMCRCategory(Session session, MCRCategoryID categID) {
-        MCRCategoryImpl categ = (MCRCategoryImpl) categCache.getIfUpToDate(categID, DAO.getLastModified());
+        MCRCategoryImpl categ = categCache.getIfUpToDate(categID, DAO.getLastModified());
         if (categ != null) {
             return categ;
         }
