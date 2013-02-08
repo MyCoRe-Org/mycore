@@ -72,10 +72,8 @@ public class MCROAIIdentify extends SimpleIdentify {
         String sDelRecPol = this.config.getString(configPrefix + "DeletedRecord", "transient");
         this.setDeletedRecordPolicy(DeletedRecordPolicy.get(sDelRecPol));
         this.setGranularity(Granularity.YYYY_MM_DD);
-        String adminMail = this.config.getString(configPrefix + "AdminEmail", config.getString("MCR.Mail.Address"));
-        if (adminMail == null || adminMail.equals("")) {
-            adminMail = "no_mail_defined@oai_provider.com";
-        }
+        String adminMail = this.config.getString(configPrefix + "AdminEmail", config.getString("MCR.Mail.Address", "no_mail_defined@oai_provider.com"));
+
         this.setEarliestDatestamp(calculateEarliestTimestamp());
         this.getAdminEmailList().add(adminMail);
         this.getDescriptionList().add(getIdentifierDescription());
