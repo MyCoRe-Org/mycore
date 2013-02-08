@@ -28,15 +28,18 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
+import org.jdom2.filter.Filters;
+import org.jdom2.util.IteratorIterable;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRURIResolver;
@@ -221,6 +224,11 @@ public final class MCRXSLInfoServlet extends MCRServlet {
 
         private void listTemplates() {
             List<Element> list = xsl.getChildren("template", MCRConstants.XSL_NAMESPACE);
+            IteratorIterable<Element> callTemplateElements = xsl.getDescendants(Filters.element("call-template", MCRConstants.XSL_NAMESPACE));
+            LinkedList<Element> templates = new LinkedList<Element>(list);
+            for (Element callTemplate : callTemplateElements) {
+                templates.add(callTemplate);
+            }
             for (Element template : list) {
                 Element copy = (Element) (template.clone());
                 copy.removeContent();
