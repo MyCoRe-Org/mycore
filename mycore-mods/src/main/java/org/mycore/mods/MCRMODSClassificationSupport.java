@@ -213,7 +213,7 @@ public final class MCRMODSClassificationSupport {
         }
 
         /** A cache that maps category ID to authority information */
-        public final static MCRCache authorityInfoByCategoryID = new MCRCache(1000, "Authority info by category ID");
+        public final static MCRCache<String, MCRAuthorityInfo> authorityInfoByCategoryID = new MCRCache<String, MCRAuthorityInfo>(1000, "Authority info by category ID");
 
         /**
          * Returns the authority information that represents the category with the given ID.
@@ -222,7 +222,7 @@ public final class MCRMODSClassificationSupport {
             String key = categoryID.toString();
             LOGGER.debug("get authority info for " + key);
 
-            MCRAuthorityInfo authorityInfo = (MCRAuthorityInfo) (authorityInfoByCategoryID.getIfUpToDate(key, DAO.getLastModified()));
+            MCRAuthorityInfo authorityInfo = authorityInfoByCategoryID.getIfUpToDate(key, DAO.getLastModified());
 
             if (authorityInfo == null) {
                 authorityInfo = buildAuthorityInfo(categoryID);
@@ -267,7 +267,7 @@ public final class MCRMODSClassificationSupport {
         /**
          * A cache that maps authority information to the category ID that is represented by that info.
          */
-        private final static MCRCache categoryIDbyAuthorityInfo = new MCRCache(1000, "Category ID by authority info");
+        private final static MCRCache<String, Object> categoryIDbyAuthorityInfo = new MCRCache<String, Object>(1000, "Category ID by authority info");
 
         /**
          * Used in the cache to indicate the case when no category ID maps to the given authority info 
