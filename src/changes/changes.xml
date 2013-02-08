@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2.1.81" date="2013-02-XX" description="Beta 2">
+      <action dev="mcrtchef" type="add">
+        MCRXSLInfoServlet generates graphs that display call-template calls: XSL.mode=uses
+      </action>
       <action dev="mcrtchef" type="update">
         Speed up XSL Transformations: XSL files are checked for changes after "MCR.LayoutService.LastModifiedCheckPeriod" ms (default 10000).
       </action>
