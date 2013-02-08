@@ -19,6 +19,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.de.GermanAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.TermAttribute;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.QueryParser;
@@ -34,6 +35,7 @@ import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.util.Version;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrDocumentList;
 import org.jdom2.Element;
@@ -59,7 +61,7 @@ public class MCRLuceneSolrAdapter {
     private static final Logger LOGGER = Logger.getLogger(MCRBuildLuceneQuery.class);
 
     /* the analyzer used in legacy queries */
-    private static Analyzer analyzer = new PerFieldAnalyzerWrapper(new GermanAnalyzer(Version.LUCENE_30));
+    private static Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_36);
 
     static {
         BooleanQuery.setMaxClauseCount(10000);
@@ -75,17 +77,22 @@ public class MCRLuceneSolrAdapter {
         try {
             SolrQuery q = getSolrQuery(condition, sortBy, maxResults);
 
-            HttpSolrServer solrServer = MCRSolrServerFactory.getSolrServer();
-            SolrDocumentList solrDocumentList = solrServer.query(q).getResults();
-            solrResults = new MCRSolrResults(solrDocumentList);
+            solrResults = getResults(q);
 
-            LOGGER.debug(solrDocumentList.getNumFound() + " document(s) found (" + solrDocumentList.size() + " included)");
+            LOGGER.debug(solrResults.getNumHits()+ " document(s) found");
         } catch (Exception e) {
             LOGGER.error("Exception in while processing legacy lucene query:", e);
         }
         return solrResults != null ? solrResults : new MCRResults();
     }
 
+
+    public static MCRSolrResults getResults(SolrQuery q) throws SolrServerException{
+        HttpSolrServer solrServer = MCRSolrServerFactory.getSolrServer();
+        SolrDocumentList solrDocumentList = solrServer.query(q).getResults();
+        return new MCRSolrResults(solrDocumentList);
+    }
+    
     @SuppressWarnings("rawtypes")
     public static SolrQuery getSolrQuery(MCRCondition condition, List<MCRSortBy> sortBy, int maxResults) {
         List<Element> f = new ArrayList<Element>();

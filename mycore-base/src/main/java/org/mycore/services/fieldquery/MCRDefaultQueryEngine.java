@@ -136,13 +136,13 @@ public class MCRDefaultQueryEngine extends MCRBaseClass implements MCRQueryEngin
      * If a condition references fields from multiple indexes, this constant is
      * returned
      */
-    private final String mixed = "--mixed--";
+    protected static final String mixed = "--mixed--";
 
     /**
      * Returns the ID of the index of all fields referenced in this condition.
      * If the fields come from multiple indexes, the constant mixed is returned.
      */
-    protected String getIndex(MCRCondition cond) {
+    protected static String getIndex(MCRCondition cond) {
         if (cond instanceof MCRQueryCondition) {
             return ((MCRQueryCondition) cond).getField().getIndex();
         } else if (cond instanceof MCRNotCondition) {
@@ -162,11 +162,8 @@ public class MCRDefaultQueryEngine extends MCRBaseClass implements MCRQueryEngin
     }
 
     /** Executes query, if necessary splits into subqueries for each index */
-    private MCRResults buildResults(MCRCondition cond, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) {
-        if (cond instanceof MCRTrueCondition || cond instanceof MCRFalseCondition) {
-            String msg = "Your query makes no sense. What do you mean when you search for '" + cond.toString() + "'?";
-            throw new MCRUsageException(msg);
-        }
+    protected MCRResults buildResults(MCRCondition cond, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) {
+        checkCondition(cond);
         String index = getIndex(cond);
         if (index != mixed) {
             // All fields are from same index, just one searcher
@@ -180,15 +177,28 @@ public class MCRDefaultQueryEngine extends MCRBaseClass implements MCRQueryEngin
             }
             return searcher.search(cond, maxResults, sortByCopy, addSortData);
         } else if (cond instanceof MCRSetCondition) {
-            return buildCombinedResults((MCRSetCondition) cond, sortBy, false);
+            return buildCombinedResults((MCRSetCondition) cond, sortBy, false, maxResults);
         } else { // Move not down: not(a and/or b)=(not a) and/or (not b)
             MCRCondition child = ((MCRNotCondition) cond).getChild();
-            return buildCombinedResults((MCRSetCondition) child, sortBy, true);
+            return buildCombinedResults((MCRSetCondition) child, sortBy, true, maxResults);
         }
     }
 
-    /** Split query into subqueries for each index, recombine results */
-    private MCRResults buildCombinedResults(MCRSetCondition cond, List<MCRSortBy> sortBy, boolean not) {
+    /**
+     * Checks a condition makes sense. 
+     * @param cond the condition to check.
+     * @throws MCRUsageException if the condition makes no sense
+     */
+    protected void checkCondition(MCRCondition cond) throws MCRUsageException {
+        if (cond instanceof MCRTrueCondition || cond instanceof MCRFalseCondition) {
+            String msg = "Your query makes no sense. What do you mean when you search for '" + cond.toString() + "'?";
+            throw new MCRUsageException(msg);
+        }
+    }
+
+    /** Split query into subqueries for each index, recombine results 
+     * @param maxResults TODO*/
+    protected MCRResults buildCombinedResults(MCRSetCondition cond, List<MCRSortBy> sortBy, boolean not, int maxResults) {
         boolean and = cond instanceof MCRAndCondition;
         HashMap<String, List<MCRCondition>> table = groupConditionsByIndex(cond);
         List<MCRResults> results = new LinkedList<MCRResults>();
@@ -220,7 +230,7 @@ public class MCRDefaultQueryEngine extends MCRBaseClass implements MCRQueryEngin
      * Build a table from index ID to a List of conditions referencing this
      * index
      */
-    private HashMap<String, List<MCRCondition>> groupConditionsByIndex(MCRSetCondition cond) {
+    public static HashMap<String, List<MCRCondition>> groupConditionsByIndex(MCRSetCondition cond) {
         HashMap<String, List<MCRCondition>> table = new HashMap<String, List<MCRCondition>>();
         List<MCRCondition> children = cond.getChildren();
 
@@ -237,7 +247,7 @@ public class MCRDefaultQueryEngine extends MCRBaseClass implements MCRQueryEngin
     }
 
     /** Builds a new condition for all fields from one single index */
-    private MCRCondition buildSubCondition(List<MCRCondition> conditions, boolean and, boolean not) {
+    protected static MCRCondition buildSubCondition(List<MCRCondition> conditions, boolean and, boolean not) {
         MCRCondition subCond;
         if (conditions.size() == 1) {
             subCond = conditions.get(0);

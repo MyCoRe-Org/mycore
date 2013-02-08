@@ -163,7 +163,7 @@
   <servlet id="StoreBrowser">
     <servlet-name>MCRStoreBrowserServlet</servlet-name>
     <servlet-class>org.mycore.datamodel.ifs2.MCRStoreBrowserServlet</servlet-class>
-  </servlet>
+  </servlet>!--
   <servlet id="MCRObject">
     <servlet-name>MCRObjectServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRObjectServlet</servlet-class>
@@ -171,7 +171,12 @@
   <servlet id="MCRSearch">
     <servlet-name>MCRSearchServlet</servlet-name>
     <servlet-class>org.mycore.services.fieldquery.MCRSearchServlet</servlet-class>
-  </servlet>
+  </servlet> 
+  <!-- to use old search forms with new result pages
+  <servlet id="MCRSearch">
+    <servlet-name>MCRSearchServlet</servlet-name>
+    <servlet-class>org.mycore.solr.search.MCRSolrLegacySearchServlet</servlet-class>
+  </servlet>  --> 
   <servlet id="MCRLink">
     <servlet-name>MCRLinkServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRLinkServlet</servlet-class>

@@ -93,7 +93,7 @@ public class MCRSearchServlet extends MCRServlet {
     /**
      * Search in default search field specified by MCR.SearchServlet.DefaultSearchField
      */
-    private MCRQuery buildDefaultQuery(String search) {
+    protected MCRQuery buildDefaultQuery(String search) {
         String[] fields = defaultSearchField.split(" *, *");
         MCROrCondition queryCondition = new MCROrCondition();
 
@@ -110,14 +110,14 @@ public class MCRSearchServlet extends MCRServlet {
     /**
      * Search using complex query expression given as text string
      */
-    private MCRQuery buildComplexQuery(String query) {
+    protected MCRQuery buildComplexQuery(String query) {
         return new MCRQuery(new MCRQueryParser().parse(query));
     }
 
     /**
      * Search using name=value pairs from HTTP request
      */
-    private MCRQuery buildNameValueQuery(HttpServletRequest req) {
+    protected MCRQuery buildNameValueQuery(HttpServletRequest req) {
         MCRAndCondition condition = new MCRAndCondition();
 
         for (Enumeration names = req.getParameterNames(); names.hasMoreElements();) {
@@ -218,7 +218,7 @@ public class MCRSearchServlet extends MCRServlet {
     /**
      * Build MCRQuery from editor XML input
      */
-    private MCRQuery buildFormQuery(Element root) {
+    protected MCRQuery buildFormQuery(Element root) {
         Element conditions = root.getChild("conditions");
 
         if (conditions.getAttributeValue("format", "xml").equals("xml")) {
@@ -259,7 +259,7 @@ public class MCRSearchServlet extends MCRServlet {
         return MCRQuery.parseXML(root.getDocument());
     }
 
-    private String getReqParameter(HttpServletRequest req, String name, String defaultValue) {
+    protected String getReqParameter(HttpServletRequest req, String name, String defaultValue) {
         String value = req.getParameter(name);
         if (value == null || value.trim().length() == 0) {
             return defaultValue;
@@ -268,7 +268,7 @@ public class MCRSearchServlet extends MCRServlet {
         }
     }
 
-    private Document setQueryOptions(MCRQuery query, HttpServletRequest req) {
+    protected Document setQueryOptions(MCRQuery query, HttpServletRequest req) {
         String maxResults = getReqParameter(req, "maxResults", "0");
         query.setMaxResults(Integer.parseInt(maxResults));
 
@@ -347,7 +347,13 @@ public class MCRSearchServlet extends MCRServlet {
         showResults(request, response, qd);
     }
 
-    protected void showResults(HttpServletRequest request, HttpServletResponse response, MCRCachedQueryData qd) throws IOException, ServletException {
+    protected void showResults(HttpServletRequest request, HttpServletResponse response, MCRQuery query, Document input)
+            throws IOException, ServletException {
+        MCRCachedQueryData qd = MCRCachedQueryData.cache(query, input);
+        showResults(request, response, qd);
+    }
+
+    private void showResults(HttpServletRequest request, HttpServletResponse response, MCRCachedQueryData qd) throws IOException {
         MCRResults results = qd.getResults();
 
         // Number of hits per page
@@ -433,11 +439,9 @@ public class MCRSearchServlet extends MCRServlet {
      * browser to the first results page
      */
     protected void doQuery(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
         MCREditorSubmission sub = (MCREditorSubmission) request.getAttribute("MCREditorSubmission");
         String searchString = getReqParameter(request, "search", null);
         String queryString = getReqParameter(request, "query", null);
-        boolean doNotRedirect = "false".equals(getReqParameter(request, "redirect", null));
 
         Document input;
         MCRQuery query;
@@ -462,11 +466,13 @@ public class MCRSearchServlet extends MCRServlet {
             XMLOutputter out = new XMLOutputter(org.jdom2.output.Format.getPrettyFormat());
             LOGGER.debug(out.outputString(input));
         }
-        MCRCachedQueryData qd = MCRCachedQueryData.cache(query, input);
+
+        boolean doNotRedirect = "false".equals(getReqParameter(request, "redirect", null));
+
         if (doNotRedirect) {
-            showResults(request, response, qd);
+            showResults(request, response, query, input);
         } else {
-            sendRedirect(request, response, qd, input);
+            sendRedirect(request, response, query, input);
         }
     }
 
@@ -476,16 +482,17 @@ public class MCRSearchServlet extends MCRServlet {
      *   
      * see its overwritten in jspdocportal     
      */
-    protected void sendRedirect(HttpServletRequest req, HttpServletResponse res, MCRCachedQueryData qd, Document query) throws IOException {
+    protected void sendRedirect(HttpServletRequest req, HttpServletResponse res, MCRQuery query, Document input) throws IOException {
 
+        MCRCachedQueryData qd = MCRCachedQueryData.cache(query, input);
         // Redirect browser to first results page   
         StringBuilder sb = new StringBuilder();
         sb.append("MCRSearchServlet?mode=results&id=").append(qd.getResults().getID());
 
-        String numPerPage = query.getRootElement().getAttributeValue("numPerPage", "0");
+        String numPerPage = input.getRootElement().getAttributeValue("numPerPage", "0");
         sb.append("&numPerPage=").append(numPerPage);
 
-        String mask = query.getRootElement().getAttributeValue("mask", "-");
+        String mask = input.getRootElement().getAttributeValue("mask", "-");
         sb.append("&mask=").append(mask);
 
         String queryString = qd.getQuery().getCondition().toString();
