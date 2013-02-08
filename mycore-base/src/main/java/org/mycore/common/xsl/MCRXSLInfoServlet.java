@@ -230,7 +230,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
                 templates.add(callTemplate);
             }
             for (Element template : list) {
-                Element copy = (Element) (template.clone());
+                Element copy = template.clone();
                 copy.removeContent();
                 templates.add(copy);
             }
@@ -244,7 +244,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
             addValues(elem, "imports", imports);
 
             for (Element template : templates)
-                elem.addContent((Element) (template.clone()));
+                elem.addContent(template.clone());
 
             return elem;
         }
