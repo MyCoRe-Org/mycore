@@ -51,6 +51,9 @@ public class MCRSourceContent extends MCRWrappedContent {
     private Source source;
 
     public MCRSourceContent(Source source) {
+        if (source == null) {
+            throw new NullPointerException("Source cannot be null");
+        }
         this.source = source;
         MCRContent baseContent = null;
         if (source instanceof JDOMSource) {
@@ -98,9 +101,10 @@ public class MCRSourceContent extends MCRWrappedContent {
                 }
             }
         }
-        if (baseContent != null) {
-            baseContent.setSystemId(getSystemId());
+        if (baseContent == null) {
+            throw new MCRException("Could not get MCRContent from " + source.getClass().getCanonicalName());
         }
+        baseContent.setSystemId(getSystemId());
         this.setBaseContent(baseContent);
     }
 
