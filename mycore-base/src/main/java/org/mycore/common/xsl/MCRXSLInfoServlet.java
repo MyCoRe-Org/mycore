@@ -229,10 +229,10 @@ public final class MCRXSLInfoServlet extends MCRServlet {
             for (Element callTemplate : callTemplateElements) {
                 templates.add(callTemplate);
             }
-            for (Element template : list) {
+            for (Element template : templates) {
                 Element copy = template.clone();
                 copy.removeContent();
-                templates.add(copy);
+                this.templates.add(copy);
             }
         }
 
