@@ -38,18 +38,18 @@ import org.mycore.common.MCRConfiguration;
 public class MCRXSLTransformerFactory {
 
     /** A cache of already compiled stylesheets */
-    private static MCRCache cache;
+    private static MCRCache<String, Templates> cache;
 
     static {
         int cacheSize = MCRConfiguration.instance().getInt("MCR.LayoutService.XSLCacheSize", 200);
-        cache = new MCRCache(cacheSize, MCRXSLTransformerFactory.class.getName());
+        cache = new MCRCache<String, Templates>(cacheSize, MCRXSLTransformerFactory.class.getName());
     }
 
     /** Returns the compiled XSL templates cached for the given source, if it is up-to-date. */
     private static Templates getCachedTemplates(MCRTemplatesSource source) {
         long lastModified = source.getLastModified();
         String key = source.getKey();
-        return (Templates) (cache.getIfUpToDate(key, lastModified));
+        return (cache.getIfUpToDate(key, lastModified));
     }
 
     /** Compiles the given XSL source, and caches the result */
