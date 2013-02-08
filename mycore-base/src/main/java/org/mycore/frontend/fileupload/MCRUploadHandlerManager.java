@@ -39,7 +39,7 @@ import org.mycore.common.MCRUsageException;
 public class MCRUploadHandlerManager {
 
     /** Cache of currently active upload handler sessions */
-    protected static MCRCache handlers = new MCRCache(100, "UploadHandlerManager UploadHandlers");
+    protected static MCRCache<String, MCRUploadHandlerCacheEntry> handlers = new MCRCache<String, MCRUploadHandlerCacheEntry>(100, "UploadHandlerManager UploadHandlers");
 
     private static Logger logger = Logger.getLogger(MCRUploadHandlerManager.class);
 
@@ -52,7 +52,7 @@ public class MCRUploadHandlerManager {
     public static MCRUploadHandler getHandler(String uploadID) {
 
         long yesterday = System.currentTimeMillis() - 86400000;
-        MCRUploadHandlerCacheEntry entry = (MCRUploadHandlerCacheEntry) handlers.getIfUpToDate(uploadID, yesterday);
+        MCRUploadHandlerCacheEntry entry = handlers.getIfUpToDate(uploadID, yesterday);
 
         if (entry == null)
             throw new MCRUsageException("Upload session " + uploadID + " timed out");
