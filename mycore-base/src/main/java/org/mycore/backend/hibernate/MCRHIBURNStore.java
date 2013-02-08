@@ -23,10 +23,15 @@
 
 package org.mycore.backend.hibernate;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.services.urn.MCRURNStore;
@@ -341,14 +346,18 @@ public class MCRHIBURNStore implements MCRURNStore {
         }
 
         Session session = getSession();
-        StringBuilder querySB = new StringBuilder();
-        querySB.append("select key.mcrurn from ");
-        querySB.append(classname).append(" where key.mcrid='");
-        querySB.append(derivateId).append("'");
-        querySB.append(" and filename='").append(fileName).append("'");
-        querySB.append(" and path='").append(path).append("'");
-        logger.debug("HQL-Statement: " + querySB.toString());
-        List<String> returns = session.createQuery(querySB.toString()).list();
+        Criteria criteria = session.createCriteria(MCRURN.class);
+        criteria.setProjection(Projections.property("key.mcrurn"));
+        Map<String, String> propertyNameValues = new HashMap<String, String>();
+        propertyNameValues.put("key.mcrid", derivateId);
+        propertyNameValues.put("path", path);
+        propertyNameValues.put("filename", fileName);
+        criteria.add(Restrictions.allEq(propertyNameValues));
+        if (logger.isDebugEnabled()) {
+            logger.debug("HQL-Statement: " + criteria.toString());
+        }
+        @SuppressWarnings("unchecked")
+        List<String> returns = criteria.list();
         if (returns.isEmpty()) {
             return null;
         }
