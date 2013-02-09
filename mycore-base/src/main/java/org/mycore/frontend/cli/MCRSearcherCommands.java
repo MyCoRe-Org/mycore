@@ -29,6 +29,7 @@ import org.hibernate.Criteria;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -72,10 +73,13 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
 
     public MCRSearcherCommands() {
         super();
-        addCommand(new MCRCommand("rebuild metadata index", "org.mycore.frontend.cli.MCRSearcherCommands.repairMetaIndex", "Repairs metadata index"));
-        addCommand(new MCRCommand("rebuild content index", "org.mycore.frontend.cli.MCRSearcherCommands.repairContentIndex", "Repairs metadata index"));
-        addCommand(new MCRCommand("save searchfields of index {0} to stylesheet file {1}", "org.mycore.frontend.cli.MCRSearcherCommands.saveXSL String String",
-            "Generates XSL file {0} that is used to index metadata."));
+        addCommand(new MCRCommand("rebuild metadata index", "org.mycore.frontend.cli.MCRSearcherCommands.repairMetaIndex",
+                "Repairs metadata index"));
+        addCommand(new MCRCommand("rebuild content index", "org.mycore.frontend.cli.MCRSearcherCommands.repairContentIndex",
+                "Repairs metadata index"));
+        addCommand(new MCRCommand("save searchfields of index {0} to stylesheet file {1}",
+                "org.mycore.frontend.cli.MCRSearcherCommands.saveXSL String String",
+                "Generates XSL file {0} that is used to index metadata."));
     }
 
     static class RepairIndex {
@@ -190,16 +194,22 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             Session session = MCRHIBConnection.instance().getSession();
             Criteria fileCriteria = session.createCriteria(MCRFSNODES.class);
             fileCriteria.add(Restrictions.eq("type", "F"));
+            fileCriteria.addOrder(Order.asc("owner"));
             fileCriteria.setCacheMode(CacheMode.IGNORE);
             ScrollableResults results = fileCriteria.scroll(ScrollMode.FORWARD_ONLY);
+            String owner = null;
             try {
                 while (results.next()) {
                     MCRFSNODES node = (MCRFSNODES) results.get(0);
+                    if (!node.getOwner().equals(owner)) {
+                        owner = node.getOwner();
+                        LOGGER.info("Indexing files of derivate: " + owner);
+                    }
                     GregorianCalendar greg = new GregorianCalendar();
                     greg.setTime(node.getDate());
-                    MCRFile file = (MCRFile) MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(), node.getOwner(),
-                        node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(), node.getFctid(), node.getMd5(),
-                        node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
+                    MCRFile file = (MCRFile) MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(),
+                            node.getOwner(), node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(),
+                            node.getFctid(), node.getMd5(), node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
                     addFileToIndex(file, false, searcherList);
                     session.evict(node);
                 }
@@ -219,7 +229,8 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
                     searcher.addToIndex(entry);
                 } catch (IOException e) {
                     LOGGER.error(
-                        MessageFormat.format("Could not index file {0}{1} with searcher: {2}", file.getOwnerID(), file.getAbsolutePath(), searcher.getID()), e);
+                            MessageFormat.format("Could not index file {0}{1} with searcher: {2}", file.getOwnerID(),
+                                    file.getAbsolutePath(), searcher.getID()), e);
                 }
             }
         }
