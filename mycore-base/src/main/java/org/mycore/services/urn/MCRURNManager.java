@@ -149,7 +149,7 @@ public class MCRURNManager {
     }
 
     /** A map from configID to MCRNissBuilder objects */
-    private static Hashtable builders = new Hashtable();
+    private static Hashtable<String, MCRNISSBuilder> builders = new Hashtable<String, MCRNISSBuilder>();
 
     /**
      * Builds a URN with a custom, given NISS.
@@ -180,7 +180,7 @@ public class MCRURNManager {
     public static synchronized String buildURN(String configID) {
         String base = "MCR.URN.SubNamespace." + configID + ".";
 
-        MCRNISSBuilder builder = (MCRNISSBuilder) builders.get(configID);
+        MCRNISSBuilder builder = builders.get(configID);
         if (builder == null) {
             Object obj = MCRConfiguration.instance().getSingleInstanceOf(base + "NISSBuilder");
             builder = (MCRNISSBuilder) obj;
@@ -249,13 +249,15 @@ public class MCRURNManager {
 
     /**
      * @param derivateId
-     * @param fileName
+     * @param path complete path to file
      * @return the URN for the given file if any
-     * 
-     * @deprecated use {@link MCRURNManager#getURNForFile(String, String, String)}
      */
-    public static String getURNForFile(String derivateId, String fileName) {
-        return store.getURNForFile(derivateId, fileName);
+    public static String getURNForFile(String derivateId, String filePath) {
+        String path = filePath.charAt(0) == '/' ? filePath : "/" + filePath;
+        int i = path.lastIndexOf("/") + 1;
+        String file = path.substring(i);
+        String pathDb = path.substring(0, i);
+        return store.getURNForFile(derivateId, pathDb, file);
     }
 
     /**
