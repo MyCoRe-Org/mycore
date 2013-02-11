@@ -294,7 +294,7 @@ public class MCRURN {
      *         <code>false</code> otherwise
      * @see MCRURN#hasChecksumAttached()
      */
-    public boolean attachChecksum() throws Exception {
+    public boolean attachChecksum() {
         if (this.hasChecksumAttached()) {
             return false;
         }
