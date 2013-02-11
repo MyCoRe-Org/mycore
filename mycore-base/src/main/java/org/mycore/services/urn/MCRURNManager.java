@@ -238,6 +238,20 @@ public class MCRURNManager {
         store.assignURN(urn, derivateID, path, filename);
     }
 
+    /** 
+     * Assigns the given urn to the given derivate ID 
+     * @param urn 
+     *      the urn to assign
+     * @param derivateID 
+     *      the id of the derivate
+     * @param path 
+     *      the path of the derivate in the internal filesystem including file name
+     */
+    public static void assignURN(String urn, String derivateID, String path) {
+        String[] pathParts = splitFilePath(path);
+        store.assignURN(urn, derivateID, pathParts[0], pathParts[1]);
+    }
+
     /**
      * Retrieves the URN that is assigned to the given document ID
      * 
@@ -253,11 +267,17 @@ public class MCRURNManager {
      * @return the URN for the given file if any
      */
     public static String getURNForFile(String derivateId, String filePath) {
+        String[] pathParts = splitFilePath(filePath);
+        return store.getURNForFile(derivateId, pathParts[0], pathParts[1]);
+    }
+
+    private static String[] splitFilePath(String filePath) {
         String path = filePath.charAt(0) == '/' ? filePath : "/" + filePath;
         int i = path.lastIndexOf("/") + 1;
         String file = path.substring(i);
         String pathDb = path.substring(0, i);
-        return store.getURNForFile(derivateId, pathDb, file);
+        String[] pathParts = new String[] { pathDb, file };
+        return pathParts;
     }
 
     /**
