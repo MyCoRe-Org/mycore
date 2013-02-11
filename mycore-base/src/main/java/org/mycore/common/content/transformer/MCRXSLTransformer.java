@@ -282,7 +282,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     @Override
     public String getFileExtension() {
         String fileExtension = super.getFileExtension();
-        if (fileExtension != null) {
+        if (fileExtension != null && !getDefaultExtension().equals(fileExtension)) {
             return fileExtension;
         }
         //until we have a better solution
@@ -292,7 +292,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         if ("text/xml".equals(getMimeType())) {
             return "xml";
         }
-        return null;
+        return getDefaultExtension();
     }
 
 }
