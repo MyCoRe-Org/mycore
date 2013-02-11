@@ -102,7 +102,7 @@ public class MCRURN {
 
      *      persistent-identifier.de/?link=316</a>
      */
-    public int checksum() throws Exception {
+    public int checksum() {
         if (this.checksum != -1) {
             return this.checksum;
         }
