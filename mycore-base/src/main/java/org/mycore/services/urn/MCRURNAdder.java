@@ -1,5 +1,6 @@
 package org.mycore.services.urn;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -10,11 +11,15 @@ import org.apache.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
-import org.jdom2.xpath.XPath;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -29,6 +34,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.xml.sax.SAXException;
 
 /**
  * This class provides methods for adding URN to mycore objects and derivates.
@@ -126,17 +132,17 @@ public class MCRURNAdder {
         }
 
         MCRObject mcrobj = MCRMetadataManager.retrieveMCRObject(id);
-        XPath xp = XPath.newInstance("./mycoreobject/metadata");
+        XPathExpression<Element> xp = XPathFactory.instance().compile("./mycoreobject/metadata", Filters.element());
         Document xml = mcrobj.createXML();
-        Object obj = xp.selectSingleNode(xml);
+        Element metaData = xp.evaluateFirst(xml);
 
-        if (!(obj instanceof Element)) {
+        if (metaData == null) {
             LOGGER.error("Could not resolve metadata element");
             return false;
         }
         String urn = generateURN();
         Element urnHoldingElement = createElementByXPath(xpath, urn);
-        ((Element) obj).addContent(urnHoldingElement);
+        metaData.addContent(urnHoldingElement);
 
         try {
             LOGGER.info("Updating metadata of object " + objectId + " with URN " + urn + " [" + xpath + "]");
@@ -294,8 +300,11 @@ public class MCRURNAdder {
      * 
      * @param derivateId
      *            the derivate id
+     * @throws SAXException 
+     * @throws JDOMException 
+     * @throws IOException 
      */
-    public boolean addURNToDerivates(String derivateId) throws Exception {
+    public boolean addURNToDerivates(String derivateId) throws IOException, JDOMException, SAXException {
         // checking access right
         if (!MCRAccessManager.checkPermission(derivateId, "writedb")) {
             LOGGER.warn("Permission denied");
@@ -310,7 +319,12 @@ public class MCRURNAdder {
         }
         /* Generating base urn for the derivate */
         LOGGER.info("Generating base urn for derivate " + derivate.getId().toString());
-        MCRIURNProvider urnProvider = this.getURNProvider();
+        MCRIURNProvider urnProvider;
+        try {
+            urnProvider = this.getURNProvider();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            throw new MCRException("Could not get URN Provider.", e);
+        }
         MCRURN parentURN = urnProvider.generateURN();
         parentURN.attachChecksum();
 
@@ -404,11 +418,7 @@ public class MCRURNAdder {
         urn.attachChecksum();
 
         LOGGER.info("Assigning urn " + urn + " to " + path);
-        int i = path.lastIndexOf("/");
-        String file = path.substring(i + 1);
-        String pathDb = path.substring(0, i + 1);
-
-        MCRURNManager.assignURN(urn.toString(), derivateId, pathDb, file);
+        MCRURNManager.assignURN(urn.toString(), derivateId, path);
         objectDerivate.getOrCreateFileMetadata(path).setUrn(urn.toString());
         MCRMetadataManager.updateMCRDerivateXML(derivate);
         return true;
@@ -418,15 +428,12 @@ public class MCRURNAdder {
      * @return the number of files with urn referenced by the derivate
      */
     private int getFilesWithURNCount(MCRDerivate derivate) throws Exception {
-        Document xml = derivate.createXML();
-        XPath xp = XPath.newInstance("./mycorederivate/derivate/fileset");
-        Object obj = xp.selectSingleNode(xml);
-        if (obj == null) {
-            throw new Exception("No 'fileset' element within derivate '" + derivate.getId() + "' found. Single file urn assignment not possible");
+        int size = 0;
+        for (MCRFileMetadata fileMetadata : derivate.getDerivate().getFileMetadata()) {
+            if (fileMetadata.getUrn() != null) {
+                size++;
+            }
         }
-        Element fileset = (Element) obj;
-        int size = fileset.getChildren("file").size();
-
         return size;
     }
 
@@ -436,7 +443,7 @@ public class MCRURNAdder {
      * @return <code>true</code> if it allowed to add urn to the owner of the
      *         derivate,<code>false</code> otherwise
      */
-    private boolean parentIsAllowedObject(MCRDerivate derivate) {
+    private boolean parentIsAllowedObject(MCRDerivate derivate) throws IOException, JDOMException, SAXException {
         MCRMetaLinkID linkToParent = derivate.getDerivate().getMetaLink();
         MCRObjectID parentID = linkToParent.getXLinkHrefID();
         MCRObject obj = MCRMetadataManager.retrieveMCRObject(parentID);
@@ -474,10 +481,13 @@ public class MCRURNAdder {
 
     /**
      * @return
+     * @throws ClassNotFoundException 
+     * @throws IllegalAccessException 
+     * @throws InstantiationException 
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
-    private MCRIURNProvider getURNProvider() throws Exception {
+    private MCRIURNProvider getURNProvider() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         String className = MCRConfiguration.instance().getString("MCR.URN.Provider.Class");
         LOGGER.info("Loading class " + className + " as IURNProvider");
         Class<MCRIURNProvider> c = (Class<MCRIURNProvider>) Class.forName(className);
