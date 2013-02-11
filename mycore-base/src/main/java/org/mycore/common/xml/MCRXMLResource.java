@@ -55,8 +55,7 @@ public class MCRXMLResource {
     private static Logger LOGGER = Logger.getLogger(MCRXMLResource.class);
 
     private MCRXMLResource() {
-        resourceCache = new MCRCache<String, CacheEntry>(MCRConfiguration.instance().getInt("MCR.MCRXMLResource.Cache.Size", 100),
-                "XML resources");
+        resourceCache = new MCRCache<String, CacheEntry>(MCRConfiguration.instance().getInt("MCR.MCRXMLResource.Cache.Size", 100), "XML resources");
     }
 
     /**
@@ -129,6 +128,10 @@ public class MCRXMLResource {
             LOGGER.debug("Using cached resource " + name);
             return entry.content;
         }
+        if (resolvedURL == null) {
+            LOGGER.warn("Could not resolve resource: " + name);
+            return null;
+        }
         entry = new CacheEntry();
         resourceCache.put(name, entry);
         entry.resourceURL = resolvedURL;
@@ -158,8 +161,7 @@ public class MCRXMLResource {
         if (con == null) {
             return null;
         }
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream(64 * 1024);
-                InputStream in = new BufferedInputStream(con.getInputStream())) {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream(64 * 1024); InputStream in = new BufferedInputStream(con.getInputStream())) {
             IOUtils.copy(in, baos);
             return baos.toByteArray();
         } finally {
