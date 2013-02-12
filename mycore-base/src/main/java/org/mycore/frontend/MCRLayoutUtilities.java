@@ -1,5 +1,6 @@
 package org.mycore.frontend;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -24,8 +25,6 @@ import org.mycore.common.MCRSessionMgr;
 public class MCRLayoutUtilities {
     final static String OBJIDPREFIX_WEBPAGE = "webpage:";
 
-    final static String READ_PERMISSION_WEBPAGE = "read";
-
     // strategies for access verification
     public final static int ALLTRUE = 1;
 
@@ -42,10 +41,9 @@ public class MCRLayoutUtilities {
     private static Document NAVI;
 
     private static final String NAV_LOC_DEFAULT = MCRConfiguration.instance().getString("MCR.basedir")
-            + "build/webapps/config/navigation.xml".replace('/', File.separatorChar);
+        + "build/webapps/config/navigation.xml".replace('/', File.separatorChar);
 
-    private static final File NAVFILE = new File(MCRConfiguration.instance().getString("MCR.navigationFile", NAV_LOC_DEFAULT).replace('/',
-            File.separatorChar));
+    private static final File NAVFILE = new File(MCRConfiguration.instance().getString("MCR.navigationFile", NAV_LOC_DEFAULT).replace('/', File.separatorChar));
 
     private static final boolean ACCESS_CONTROLL_ON = MCRConfiguration.instance().getBoolean("MCR.Website.ReadAccessVerification", true);
 
@@ -66,9 +64,9 @@ public class MCRLayoutUtilities {
     public static boolean readAccess(String webpageID, String blockerWebpageID) {
         if (ACCESS_CONTROLL_ON) {
             long startTime = System.currentTimeMillis();
-            boolean access = getAccess(webpageID, "read", ALL2BLOCKER_TRUE, blockerWebpageID);
-            LOGGER.debug("checked read access for webpageID= " + webpageID + " (with blockerWebpageID =" + blockerWebpageID + ") => "
-                    + access + ": took " + getDuration(startTime) + " msec.");
+            boolean access = getAccess(webpageID, PERMISSION_READ, ALL2BLOCKER_TRUE, blockerWebpageID);
+            LOGGER.debug("checked read access for webpageID= " + webpageID + " (with blockerWebpageID =" + blockerWebpageID + ") => " + access + ": took "
+                + getDuration(startTime) + " msec.");
             return access;
         } else {
             return true;
@@ -87,9 +85,8 @@ public class MCRLayoutUtilities {
     public static boolean readAccess(String webpageID) {
         if (ACCESS_CONTROLL_ON) {
             long startTime = System.currentTimeMillis();
-            boolean access = getAccess(webpageID, "read", ALLTRUE);
-            LOGGER.debug("checked read access for webpageID= " + webpageID + " => " + access + ": took " + getDuration(startTime)
-                    + " msec.");
+            boolean access = getAccess(webpageID, PERMISSION_READ, ALLTRUE);
+            LOGGER.debug("checked read access for webpageID= " + webpageID + " => " + access + ": took " + getDuration(startTime) + " msec.");
             return access;
         } else {
             return true;
@@ -154,12 +151,12 @@ public class MCRLayoutUtilities {
     public static boolean getAccess(String webpageID, String permission, int strategy) {
         Element item = getItem(webpageID);
         // check permission according to $strategy
-        
+
         boolean access = false;
-        if (item == null){
+        if (item == null) {
             return false;
         }
-        
+
         if (strategy == ALLTRUE) {
             access = true;
             do {
@@ -340,7 +337,7 @@ public class MCRLayoutUtilities {
     }
 
     public static String getPermission2ReadWebpage() {
-        return READ_PERMISSION_WEBPAGE;
+        return PERMISSION_READ;
     }
 
     public static String getLastValidPageID() {

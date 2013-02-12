@@ -1,5 +1,5 @@
 package org.mycore.frontend.redundancy.cli;
-
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -165,7 +165,7 @@ public class MCRRedundancyCleanUpCommand {
      * @param newLink The new link.
      */
     public static void replaceLinks(String sourceId, String oldLink, String newLink) throws Exception {
-        if (!MCRAccessManager.checkPermission(sourceId, "writedb")) {
+        if (!MCRAccessManager.checkPermission(sourceId, PERMISSION_WRITE)) {
             LOGGER.error("The current user has not the permission to modify " + sourceId);
             return;
         }

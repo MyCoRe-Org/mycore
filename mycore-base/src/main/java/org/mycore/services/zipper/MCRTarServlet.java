@@ -1,5 +1,5 @@
 package org.mycore.services.zipper;
-
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.util.Date;
@@ -42,7 +42,7 @@ public class MCRTarServlet extends MCRServlet {
         }
 
         LOGGER.info("Creating tar archive for derivate " + derivateId);
-        if (!MCRAccessManager.checkPermission(derivateId, "writedb")) {
+        if (!MCRAccessManager.checkPermission(derivateId, PERMISSION_WRITE)) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN, "Access forbidden to " + derivateId);
             return;
         }

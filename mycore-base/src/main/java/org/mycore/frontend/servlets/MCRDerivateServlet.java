@@ -3,6 +3,9 @@
  */
 package org.mycore.frontend.servlets;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 import java.io.IOException;
 import java.text.MessageFormat;
 
@@ -66,13 +69,14 @@ public class MCRDerivateServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     private void setMainFile(String derivateId, String file, HttpServletResponse response) throws IOException {
-        if (MCRAccessManager.checkPermission(derivateId, "writedb")) {
+        if (MCRAccessManager.checkPermission(derivateId, PERMISSION_WRITE)) {
             MCRObjectID mcrid = MCRObjectID.getInstance(derivateId);
             MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(mcrid);
             der.getDerivate().getInternals().setMainDoc(file);
             MCRMetadataManager.updateMCRDerivateXML(der);
         } else {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, MessageFormat.format("User has not the \"writedb\" permission on object {0}.", derivateId));
+            response.sendError(HttpServletResponse.SC_FORBIDDEN,
+                MessageFormat.format("User has not the \"" + PERMISSION_WRITE + "\" permission on object {0}.", derivateId));
         }
     }
 
@@ -84,12 +88,13 @@ public class MCRDerivateServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     private void deleteFile(String derivateId, String file, HttpServletResponse response) throws IOException {
-        if (MCRAccessManager.checkPermission(derivateId, "deletedb")) {
+        if (MCRAccessManager.checkPermission(derivateId, PERMISSION_DELETE)) {
             MCRDirectory rootdir = MCRDirectory.getRootDirectory(derivateId);
             MCRFilesystemNode filesystemNode = rootdir.getChildByPath(file);
             filesystemNode.delete();
         } else {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, MessageFormat.format("User has not the \"deletedb\" permission on object {0}.", derivateId));
+            response.sendError(HttpServletResponse.SC_FORBIDDEN,
+                MessageFormat.format("User has not the \"" + PERMISSION_DELETE + "\" permission on object {0}.", derivateId));
         }
     }
 }

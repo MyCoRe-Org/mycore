@@ -23,6 +23,8 @@
 package org.mycore.services.zipper;
 
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -107,7 +109,7 @@ public class MCRZipServlet extends MCRServlet {
         // get Parameter
         String paramid = getProperty(req, "id");
 
-        if (!MCRAccessManager.checkPermission(MCRObjectID.getInstance(paramid), "writedb")) {
+        if (!MCRAccessManager.checkPermission(MCRObjectID.getInstance(paramid), PERMISSION_WRITE)) {
             String ip = MCRSessionMgr.getCurrentSession().getCurrentIP();
             String userId = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
             String msg = "Unsufficient privileges to read content of object \"" + paramid + "\"";
@@ -152,7 +154,7 @@ public class MCRZipServlet extends MCRServlet {
                 out.close();
             } else {
                 Document jdom = xmlMetaMgr.retrieveXML(mcrid);
-                if (!MCRAccessManager.checkPermission(id, "read")) {
+                if (!MCRAccessManager.checkPermission(id, PERMISSION_READ)) {
                     LOGGER.info("MCRFileNodeServlet: AccessForbidden to " + id);
                     res.sendRedirect(res.encodeRedirectURL(getBaseURL() + accessErrorPage));
                     return;
@@ -300,7 +302,6 @@ public class MCRZipServlet extends MCRServlet {
      * @throws JDOMException
      * @throws TransformerException 
      */
-    @SuppressWarnings("unchecked")
     protected void sendObject(Document jdom, HttpServletRequest req, ZipOutputStream out) throws IOException, JDOMException,
             TransformerException {
         // zip the object's Metadata
@@ -316,7 +317,7 @@ public class MCRZipServlet extends MCRServlet {
             if (el.getAttributeValue("inherited").equals("0")) {
                 String ownerID = el.getAttributeValue("href", XLINK_NAMESPACE);
                 // here the access check is tested only against the derivate
-                if (MCRAccessManager.checkPermission(ownerID, "read")) {
+                if (MCRAccessManager.checkPermission(ownerID, PERMISSION_READ)) {
                     String dir = null;
                     sendDerivate(ownerID, dir, out);
                 }

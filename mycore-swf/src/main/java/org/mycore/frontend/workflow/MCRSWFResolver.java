@@ -3,6 +3,7 @@
  */
 package org.mycore.frontend.workflow;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
@@ -86,8 +87,7 @@ public class MCRSWFResolver implements URIResolver {
         }
     }
 
-    private static org.jdom2.Document getWorkFlow(String base, String type, String step, String with_derivate) throws IOException,
-            JDOMException {
+    private static org.jdom2.Document getWorkFlow(String base, String type, String step, String with_derivate) throws IOException, JDOMException {
         if (base != null) {
             base = base.trim();
             LOGGER.debug("Property from request : base = " + base);
@@ -276,12 +276,12 @@ public class MCRSWFResolver implements URIResolver {
                 } else {
                     bdeletewf = true;
                 }
-                j = service.getRuleIndex("writedb");
+                j = service.getRuleIndex(PERMISSION_WRITE);
                 if (j != -1) {
                     writedb = service.getRule(j).getCondition();
                     bwritedb = ai.checkPermission(writedb);
                 } else {
-                    bwritedb = MCRAccessManager.checkPermission(obj.getId().toString(), "writedb");
+                    bwritedb = MCRAccessManager.checkPermission(obj.getId().toString(), PERMISSION_WRITE);
                 }
             } catch (Exception ex) {
                 if (LOGGER.isDebugEnabled()) {
@@ -303,7 +303,7 @@ public class MCRSWFResolver implements URIResolver {
 
             String ID = elm.getAttributeValue("ID");
             elm.setAttribute("deletewf", String.valueOf(bdeletewf));
-            elm.setAttribute("writedb", String.valueOf(bwritedb));
+            elm.setAttribute(PERMISSION_WRITE, String.valueOf(bwritedb));
 
             // LOGGER.debug("The data ID is "+ID);
             try {

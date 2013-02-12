@@ -17,6 +17,7 @@
  * Mets-Editor. If not, see http://www.gnu.org/licenses/.
  */
 package org.mycore.mets.servlets;
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.text.MessageFormat;
 
@@ -57,7 +58,7 @@ public class MCRSaveMETSServlet extends MCRServlet {
         MCRObjectID derivateId = MCRObjectID.getInstance(job.getRequest().getParameter("derivate"));
 
         // checking access right
-        if (!MCRAccessManager.checkPermission(derivateId, "writedb")) {
+        if (!MCRAccessManager.checkPermission(derivateId, PERMISSION_WRITE)) {
             LOGGER.warn("Creating Mets object for derivate with id " + derivateId + " failed. Unsufficient privileges.");
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
             return;

@@ -22,6 +22,7 @@
  */
 
 package org.mycore.frontend.servlets;
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.util.List;
 
@@ -148,7 +149,7 @@ public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
      * @return true if the access is set
      */
     protected boolean checkAccess(MCRObjectID ID) {
-        return MCRAccessManager.checkPermission(ID, "writedb");
+        return MCRAccessManager.checkPermission(ID, PERMISSION_WRITE);
     }
 
 }

@@ -24,6 +24,7 @@
 package org.mycore.frontend.servlets;
 
 import static org.jdom2.Namespace.XML_NAMESPACE;
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
@@ -57,6 +58,7 @@ import org.mycore.frontend.editor.MCREditorSubmission;
 public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
 
     private static final long serialVersionUID = 1L;
+
     private static Logger LOGGER = Logger.getLogger(MCRCheckCommitDerivateServlet.class);
 
     /**
@@ -165,7 +167,7 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
             sb.append("receive/").append(ID.toString());
         } else {
             sb.append(MCRConfiguration.instance().getString("MCR.SWF.PageDir", "")).append(
-                    MCRConfiguration.instance().getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
+                MCRConfiguration.instance().getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
         }
         return sb.toString();
     }
@@ -200,7 +202,7 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
      * @return true if the access is set
      */
     protected boolean checkAccess(MCRObjectID ID) {
-        return MCRAccessManager.checkPermission(ID, "writedb");
+        return MCRAccessManager.checkPermission(ID, PERMISSION_WRITE);
     }
 
 }

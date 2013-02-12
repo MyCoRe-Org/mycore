@@ -23,6 +23,8 @@
 
 package org.mycore.frontend.servlets;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -97,8 +99,7 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
         String appl = MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe");
         String subject = "Automatically generated message from " + appl;
         StringBuilder text = new StringBuilder();
-        text.append("An Object with type ").append(ID.getTypeId()).append(" and ID ").append(ID.toString()).append(
-                " was stored in the system.");
+        text.append("An Object with type ").append(ID.getTypeId()).append(" and ID ").append(ID.toString()).append(" was stored in the system.");
         LOGGER.info(text.toString());
 
         try {
@@ -114,13 +115,12 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
      * @return true if the access is set
      */
     protected boolean checkAccess(MCRObjectID ID) {
-        if (MCRAccessManager.checkPermission(ID, "writedb")) {
+        if (MCRAccessManager.checkPermission(ID, PERMISSION_WRITE)) {
             return true;
         }
         Collection<String> col = MCRAccessManager.getPermissionsForID(ID.toString());
         if (col == null || col.size() == 0) {
-            return !((!MCRAccessManager.checkPermission("create-" + ID.getBase()))
-                    && (!MCRAccessManager.checkPermission("create-" + ID.getTypeId())));
+            return !((!MCRAccessManager.checkPermission("create-" + ID.getBase())) && (!MCRAccessManager.checkPermission("create-" + ID.getTypeId())));
         }
         return false;
     }

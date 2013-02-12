@@ -23,6 +23,8 @@
 
 package org.mycore.frontend.servlets;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
@@ -272,11 +274,11 @@ public class MCRPersistentServlet extends MCRServlet {
         MCRObject mcrObject = getMCRObject(doc);
         LOGGER.info("ID: " + mcrObject.getId());
         try {
-            if (MCRAccessManager.checkPermission(mcrObject.getId(), "writedb")) {
+            if (MCRAccessManager.checkPermission(mcrObject.getId(), PERMISSION_WRITE)) {
                 MCRMetadataManager.update(mcrObject);
                 return mcrObject.getId();
             } else {
-                throw new MCRPersistenceException("You do not have \"write\" permission on " + mcrObject.getId() + ".");
+                throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on " + mcrObject.getId() + ".");
             }
         } finally {
             MCRObjectIDLockTable.unlock(mcrObject.getId());
@@ -300,8 +302,8 @@ public class MCRPersistentServlet extends MCRServlet {
         byte[] xml = MCRUtils.getByteArray(editorSubmission);
         MCRDerivate der = new MCRDerivate(xml, true);
         String derivateID = der.getId().toString();
-        if (!MCRAccessManager.checkPermission(derivateID, "writedb")) {
-            throw new MCRPersistenceException("You do not have \"write\" permission on " + derivateID + ".");
+        if (!MCRAccessManager.checkPermission(derivateID, PERMISSION_WRITE)) {
+            throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on " + derivateID + ".");
         }
         MCRMetadataManager.updateMCRDerivateXML(der);
         objectID = der.getDerivate().getMetaLink().getXLinkHrefID();
@@ -316,10 +318,10 @@ public class MCRPersistentServlet extends MCRServlet {
      *  If links from other objects will fail.
      */
     private void deleteObject(String id) throws MCRActiveLinkException {
-        if (MCRAccessManager.checkPermission(id, "deletedb"))
+        if (MCRAccessManager.checkPermission(id, PERMISSION_DELETE))
             MCRObjectCommands.delete(id);
         else
-            throw new MCRPersistenceException("You do not have \"delete\" permission on " + id + ".");
+            throw new MCRPersistenceException("You do not have \"" + PERMISSION_DELETE + "\" permission on " + id + ".");
     }
 
     /**
@@ -330,10 +332,10 @@ public class MCRPersistentServlet extends MCRServlet {
      * @throws MCRPersistenceException 
      */
     private void deleteDerivate(String id) throws MCRPersistenceException, MCRActiveLinkException {
-        if (MCRAccessManager.checkPermission(id, "deletedb")) {
+        if (MCRAccessManager.checkPermission(id, PERMISSION_DELETE)) {
             MCRDerivateCommands.delete(id);
         } else
-            throw new MCRPersistenceException("You do not have \"delete\" permission on " + id + ".");
+            throw new MCRPersistenceException("You do not have \"" + PERMISSION_DELETE + "\" permission on " + id + ".");
     }
 
     @Override
@@ -469,8 +471,8 @@ public class MCRPersistentServlet extends MCRServlet {
      */
     private void redirectToCreateDerivate(MCRServletJob job) throws IOException {
         String parentObjectID = getProperty(job.getRequest(), "id");
-        if (!MCRAccessManager.checkPermission(parentObjectID, "writedb")) {
-            throw new MCRPersistenceException("You do not have \"write\" permission on " + parentObjectID + ".");
+        if (!MCRAccessManager.checkPermission(parentObjectID, PERMISSION_WRITE)) {
+            throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on " + parentObjectID + ".");
         }
         redirectToUploadPage(job, parentObjectID, null);
     }
@@ -495,11 +497,11 @@ public class MCRPersistentServlet extends MCRServlet {
         String derivateID = getProperty(job.getRequest(), "id");
         if (parentObjectID != null) {
             //Load additional files
-            if (!MCRAccessManager.checkPermission(parentObjectID, "writedb")) {
-                throw new MCRPersistenceException("You do not have \"write\" permission on " + parentObjectID + ".");
+            if (!MCRAccessManager.checkPermission(parentObjectID, PERMISSION_WRITE)) {
+                throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on " + parentObjectID + ".");
             }
-            if (!MCRAccessManager.checkPermission(derivateID, "writedb")) {
-                throw new MCRPersistenceException("You do not have \"write\" permission on " + derivateID + ".");
+            if (!MCRAccessManager.checkPermission(derivateID, PERMISSION_WRITE)) {
+                throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on " + derivateID + ".");
             }
             redirectToUploadPage(job, parentObjectID, derivateID);
         } else {

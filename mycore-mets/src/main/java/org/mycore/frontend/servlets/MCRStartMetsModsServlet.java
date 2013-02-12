@@ -23,6 +23,8 @@
 
 package org.mycore.frontend.servlets;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,6 +32,9 @@ import java.util.Collections;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import org.jdom2.Element;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -39,10 +44,6 @@ import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.frontend.fileupload.MCRSWFUploadHandlerIFS;
 import org.mycore.frontend.metsmods.MCRMetsModsUtil;
-import org.mycore.frontend.servlets.MCRServletJob;
-import org.jdom2.Element;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 
 /**
  * 
@@ -64,7 +65,7 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
 
     public void seditmets(MCRServletJob job, CommonData cd) throws IOException {
 
-        if (!MCRAccessManager.checkPermission(cd.myremcrid.toString(), "writedb")) {
+        if (!MCRAccessManager.checkPermission(cd.myremcrid.toString(), PERMISSION_WRITE)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }

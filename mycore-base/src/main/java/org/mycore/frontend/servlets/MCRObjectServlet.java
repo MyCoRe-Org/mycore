@@ -23,6 +23,7 @@
 
 package org.mycore.frontend.servlets;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Hashtable;
@@ -166,7 +167,7 @@ public class MCRObjectServlet extends MCRServlet {
             return null; // sorry, no object to return
         }
 
-        if (!MCRAccessManager.checkPermission(mcrid, "read")) { // check read permission for ID
+        if (!MCRAccessManager.checkPermission(mcrid, PERMISSION_READ)) { // check read permission for ID
             MCRSession currentSession = MCRSessionMgr.getCurrentSession();
             job.getResponse().sendError(
                 HttpServletResponse.SC_UNAUTHORIZED,
@@ -220,13 +221,13 @@ public class MCRObjectServlet extends MCRServlet {
                     // hit allocated
                     // search for next and previous object readable by user
                     for (int j = i - 1; j >= 0; j--) {
-                        if (results.getHit(j).getHost() != MCRHit.LOCAL || MCRAccessManager.checkPermission(results.getHit(j).getID(), "read")) {
+                        if (results.getHit(j).getHost() != MCRHit.LOCAL || MCRAccessManager.checkPermission(results.getHit(j).getID(), PERMISSION_READ)) {
                             previousObject = results.getHit(j);
                             break;
                         }
                     }
                     for (int j = i + 1; j < numHits; j++) {
-                        if (results.getHit(j).getHost() != MCRHit.LOCAL || MCRAccessManager.checkPermission(results.getHit(j).getID(), "read")) {
+                        if (results.getHit(j).getHost() != MCRHit.LOCAL || MCRAccessManager.checkPermission(results.getHit(j).getID(), PERMISSION_READ)) {
                             nextObject = results.getHit(j);
                             break;
                         }

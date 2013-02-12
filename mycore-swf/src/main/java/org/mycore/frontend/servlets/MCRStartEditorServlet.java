@@ -23,6 +23,9 @@
 
 package org.mycore.frontend.servlets;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -305,7 +308,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void saddfile(MCRServletJob job, CommonData cd) throws IOException {
-        if (!MCRAccessManager.checkPermission(cd.myremcrid.toString(), "writedb")) {
+        if (!MCRAccessManager.checkPermission(cd.myremcrid.toString(), PERMISSION_WRITE)) {
             job.getResponse().sendRedirect(getBaseURL() + usererrorpage);
             return;
         }
@@ -337,7 +340,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      */
     public void saddnbn(MCRServletJob job, CommonData cd) throws Exception {
         // access right
-        if (!MCRAccessManager.checkPermission(cd.mysemcrid, "writedb")) {
+        if (!MCRAccessManager.checkPermission(cd.mysemcrid, PERMISSION_WRITE)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
@@ -384,7 +387,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void sdelder(MCRServletJob job, CommonData cd) throws IOException {
-        if (!MCRAccessManager.checkPermission(cd.myremcrid.toString(), "deletedb")) {
+        if (!MCRAccessManager.checkPermission(cd.myremcrid.toString(), PERMISSION_DELETE)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
@@ -412,8 +415,11 @@ public class MCRStartEditorServlet extends MCRServlet {
             String appl = CONFIG.getString("MCR.NameOfProject", "MyCoRe");
             String subject = "Automatically generated message from " + appl;
             StringBuilder text = new StringBuilder();
-            text.append("The derivate with ID ").append(cd.mysemcrid).append(" from the object with ID ").append(cd.mysemcrid)
-                    .append(" was removed from server.");
+            text.append("The derivate with ID ")
+                .append(cd.mysemcrid)
+                .append(" from the object with ID ")
+                .append(cd.mysemcrid)
+                .append(" was removed from server.");
             LOGGER.info(text.toString());
 
             try {
@@ -434,7 +440,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void sdelfile(MCRServletJob job, CommonData cd) throws IOException {
-        if (!MCRAccessManager.checkPermission(cd.myremcrid.toString(), "deletedb")) {
+        if (!MCRAccessManager.checkPermission(cd.myremcrid.toString(), PERMISSION_DELETE)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
@@ -489,7 +495,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void sdelobj(MCRServletJob job, CommonData cd) throws IOException {
-        if (!MCRAccessManager.checkPermission(cd.mytfmcrid, "deletedb")) {
+        if (!MCRAccessManager.checkPermission(cd.mytfmcrid, PERMISSION_DELETE)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
@@ -542,7 +548,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void seditacl(MCRServletJob job, CommonData cd) throws IOException {
-        if (!MCRAccessManager.checkPermission(cd.mysemcrid, "writedb")) {
+        if (!MCRAccessManager.checkPermission(cd.mysemcrid, PERMISSION_WRITE)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
@@ -686,7 +692,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void seditder(MCRServletJob job, CommonData cd) throws IOException {
-        if (!MCRAccessManager.checkPermission(cd.myremcrid.toString(), "writedb")) {
+        if (!MCRAccessManager.checkPermission(cd.myremcrid.toString(), PERMISSION_WRITE)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
@@ -721,7 +727,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void scopyobj(MCRServletJob job, CommonData cd) throws IOException {
-        if (!MCRAccessManager.checkPermission(cd.mysemcrid.toString(), "writedb")) {
+        if (!MCRAccessManager.checkPermission(cd.mysemcrid.toString(), PERMISSION_WRITE)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
@@ -740,7 +746,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         StringBuilder sb = new StringBuilder();
         try {
             MCRMetadataManager.update(copyobj);
-            for (String permission:permissions) {
+            for (String permission : permissions) {
                 Element rule_copy = AI.getRule(cd.mysemcrid.toString(), permission);
                 String rule_description = AI.getRuleDescription(cd.mysemcrid.toString(), permission);
                 AI.updateRule(cd.mytfmcrid.toString(), permission, rule_copy, rule_description);
@@ -765,13 +771,13 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the common data block
      */
     public void seditobj(MCRServletJob job, CommonData cd) throws IOException {
-        if (!MCRAccessManager.checkPermission(cd.mytfmcrid, "writedb")) {
+        if (!MCRAccessManager.checkPermission(cd.mytfmcrid, PERMISSION_WRITE)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
-        sobj(job,cd);
+        sobj(job, cd);
     }
-    
+
     /**
      * The method start the editor to add a metadata object that is stored in
      * the server. The method use the input parameter: <b>type</b>,<b>step</b>
@@ -787,7 +793,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
-        sobj(job,cd);
+        sobj(job, cd);
     }
 
     private void sobj(MCRServletJob job, CommonData cd) throws IOException {
@@ -826,7 +832,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void snewder(MCRServletJob job, CommonData cd) throws IOException {
-        if (!MCRAccessManager.checkPermission(cd.myremcrid.toString(), "writedb")) {
+        if (!MCRAccessManager.checkPermission(cd.myremcrid.toString(), PERMISSION_WRITE)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
@@ -844,7 +850,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void ssetfile(MCRServletJob job, CommonData cd) throws IOException {
-        if (!MCRAccessManager.checkPermission(cd.myremcrid.toString(), "writedb")) {
+        if (!MCRAccessManager.checkPermission(cd.myremcrid.toString(), PERMISSION_WRITE)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
@@ -909,7 +915,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      * @throws SAXParseException 
      */
     public void wcommit(MCRServletJob job, CommonData cd) throws IOException, SAXParseException {
-        org.jdom2.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "writedb");
+        org.jdom2.Element rule = WFM.getRuleFromFile(cd.mysemcrid, PERMISSION_WRITE);
         if (rule != null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
@@ -933,8 +939,11 @@ public class MCRStartEditorServlet extends MCRServlet {
                     String appl = CONFIG.getString("MCR.NameOfProject", "MyCoRe");
                     String subject = "Automatically generated message from " + appl;
                     StringBuilder text = new StringBuilder();
-                    text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid)
-                            .append(" was commited from workflow to the server.");
+                    text.append("The object of type ")
+                        .append(cd.mytype)
+                        .append(" with ID ")
+                        .append(cd.mysemcrid)
+                        .append(" was commited from workflow to the server.");
                     LOGGER.info(text.toString());
 
                     try {

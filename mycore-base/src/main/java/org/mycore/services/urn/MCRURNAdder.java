@@ -1,5 +1,5 @@
 package org.mycore.services.urn;
-
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,7 +54,7 @@ public class MCRURNAdder {
      */
     public boolean addURN(String objectId) throws Exception {
         // checking access right
-        if (!MCRAccessManager.checkPermission(objectId, "writedb")) {
+        if (!MCRAccessManager.checkPermission(objectId, PERMISSION_WRITE)) {
             LOGGER.warn("Permission denied");
             return false;
         }
@@ -126,7 +126,7 @@ public class MCRURNAdder {
     public boolean addURN(String objectId, String xpath) throws Exception {
         MCRObjectID id = MCRObjectID.getInstance(objectId);
         // checking access right
-        if (!(MCRAccessManager.checkPermission(objectId, "writedb") || isAllowedObject(id.getTypeId()))) {
+        if (!(MCRAccessManager.checkPermission(objectId, PERMISSION_WRITE) || isAllowedObject(id.getTypeId()))) {
             LOGGER.warn("Permission denied");
             return false;
         }
@@ -306,7 +306,7 @@ public class MCRURNAdder {
      */
     public boolean addURNToDerivates(String derivateId) throws IOException, JDOMException, SAXException {
         // checking access right
-        if (!MCRAccessManager.checkPermission(derivateId, "writedb")) {
+        if (!MCRAccessManager.checkPermission(derivateId, PERMISSION_WRITE)) {
             LOGGER.warn("Permission denied");
             return false;
         }
