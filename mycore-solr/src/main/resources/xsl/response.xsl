@@ -208,6 +208,7 @@
             </td>
           </xsl:if>
 
+          <xsl:variable name="maxNumClickablePages" select="10" />
           <xsl:variable name="lookAhead" select="5" />
           <xsl:variable name="lastPageNumberToDisplay">
             <xsl:choose>
@@ -215,12 +216,12 @@
                 <xsl:value-of select="$pageTotal" />
               </xsl:when>
 
-              <xsl:when test="$currentPage + $lookAhead &lt; 10">
+              <xsl:when test="$currentPage + $lookAhead &lt; $maxNumClickablePages">
                 <xsl:choose>
-                  <xsl:when test="$pageTotal &gt;= 10">
-                    <xsl:value-of select="10" />
+                  <xsl:when test="$pageTotal &gt;= $maxNumClickablePages">
+                    <xsl:value-of select="$maxNumClickablePages" />
                   </xsl:when>
-                  <xsl:when test="$pageTotal &lt; 10">
+                  <xsl:when test="$pageTotal &lt; $maxNumClickablePages">
                     <xsl:value-of select="$pageTotal" />
                   </xsl:when>
                 </xsl:choose>
