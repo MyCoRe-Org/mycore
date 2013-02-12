@@ -7,10 +7,12 @@ import java.util.Date;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mycore.common.MCRStoreTestCase;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 
+@Ignore
 public class MCRObjectIDTest extends MCRStoreTestCase {
 
     private static final String BASE_ID = "MyCoRe_test";

@@ -3,13 +3,14 @@ package org.mycore.common;
 import java.util.List;
 import static org.junit.Assert.*;
 
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
+@Ignore
 public class MCRObjectUtilsTest extends MCRStoreTestCase {
 
     private MCRObject root;
