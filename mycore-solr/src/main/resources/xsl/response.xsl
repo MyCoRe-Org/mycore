@@ -211,10 +211,10 @@
           <xsl:variable name="lookAhead" select="5" />
           <xsl:variable name="lastPageNumberToDisplay">
             <xsl:choose>
-              <xsl:when test="($currentPage + $lookAhead &gt; $pageTotal) or ($currentPage + $lookAhead &lt; $pageTotal)">
+              <xsl:when test="$currentPage + $lookAhead &gt; $pageTotal">
                 <xsl:value-of select="$pageTotal" />
               </xsl:when>
-              <xsl:when test="$currentPage + $lookAhead &lt; 10 and $pageTotal &gt;= 10">
+              <xsl:when test="$currentPage + $lookAhead &lt; 10 ">
                 <xsl:value-of select="10" />
               </xsl:when>
               <xsl:otherwise>
