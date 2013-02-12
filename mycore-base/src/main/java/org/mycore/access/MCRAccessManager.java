@@ -51,6 +51,12 @@ public class MCRAccessManager {
 
     public static final Logger LOGGER = Logger.getLogger(MCRAccessManager.class);
 
+    public static final String PERMISSION_READ = "read";
+
+    public static final String PERMISSION_WRITE = "writedb";
+
+    public static final String PERMISSION_DELETE = "deletedb";
+
     public static MCRAccessInterface getAccessImpl() {
         return ACCESS_IMPL;
     }
