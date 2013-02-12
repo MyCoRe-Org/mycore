@@ -22,6 +22,8 @@
 
 package org.mycore.datamodel.metadata;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -29,6 +31,7 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
 import org.mycore.common.MCRException;
@@ -240,6 +243,9 @@ public final class MCRMetadataManager {
      *             if persistence problem occurs
      */
     public static void delete(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
+        if (!MCRAccessManager.checkPermission(mcrDerivate.getId(), PERMISSION_DELETE)) {
+            throw new MCRPersistenceException("You do not have the permission to delete: " + mcrDerivate.getId());
+        }
         // remove link
         MCRObjectID metaId = null;
         try {
@@ -283,6 +289,9 @@ public final class MCRMetadataManager {
     public static void delete(final MCRObject mcrObject) throws MCRPersistenceException, MCRActiveLinkException {
         if (mcrObject.getId() == null) {
             throw new MCRPersistenceException("The MCRObjectID is null.");
+        }
+        if (!MCRAccessManager.checkPermission(mcrObject.getId(), PERMISSION_DELETE)) {
+            throw new MCRPersistenceException("You do not have the permission to delete: " + mcrObject.getId());
         }
 
         // check for active links
@@ -490,6 +499,9 @@ public final class MCRMetadataManager {
             MCRMetadataManager.create(mcrDerivate);
             return;
         }
+        if (!MCRAccessManager.checkPermission(mcrDerivate.getId(), PERMISSION_WRITE)) {
+            throw new MCRPersistenceException("You do not have the permission to update: " + mcrDerivate.getId());
+        }
         File fileSourceDirectory = null;
         if (mcrDerivate.getDerivate().getInternals() != null && mcrDerivate.getDerivate().getInternals().getSourcePath() != null) {
             fileSourceDirectory = new File(mcrDerivate.getDerivate().getInternals().getSourcePath());
@@ -544,6 +556,9 @@ public final class MCRMetadataManager {
         if (!MCRMetadataManager.exists(mcrObject.getId())) {
             MCRMetadataManager.create(mcrObject);
             return;
+        }
+        if (!MCRAccessManager.checkPermission(mcrObject.getId(), PERMISSION_WRITE)) {
+            throw new MCRPersistenceException("You do not have the permission to update: " + mcrObject.getId());
         }
         MCRObject old = MCRMetadataManager.retrieveMCRObject(mcrObject.getId());
 
