@@ -214,9 +214,18 @@
               <xsl:when test="$currentPage + $lookAhead &gt; $pageTotal">
                 <xsl:value-of select="$pageTotal" />
               </xsl:when>
-              <xsl:when test="$currentPage + $lookAhead &lt; 10 ">
-                <xsl:value-of select="10" />
+
+              <xsl:when test="$currentPage + $lookAhead &lt; 10">
+                <xsl:choose>
+                  <xsl:when test="$pageTotal &gt;= 10">
+                    <xsl:value-of select="10" />
+                  </xsl:when>
+                  <xsl:when test="$pageTotal &lt; 10">
+                    <xsl:value-of select="$pageTotal" />
+                  </xsl:when>
+                </xsl:choose>
               </xsl:when>
+
               <xsl:otherwise>
                 <xsl:value-of select="$currentPage + $lookAhead" />
               </xsl:otherwise>
