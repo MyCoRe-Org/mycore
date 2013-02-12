@@ -17,11 +17,9 @@ public abstract class MCRStoreTestCase extends MCRHibTestCase {
     public void setUp() throws Exception {
         super.setUp();
         storeBaseDir = Files.createTempDirectory(getClass().getSimpleName());
-        String url = "file:///" + storeBaseDir.toAbsolutePath().toString().replace('\\', '/');
-        setProperty("MCR.Metadata.Store.BaseDir", url, true);
+        setProperty("MCR.Metadata.Store.BaseDir", storeBaseDir.toString(), true);
         svnBaseDir = Files.createTempDirectory(getClass().getSimpleName() + "_svn");
-        url = "file:///" + svnBaseDir.toAbsolutePath().toString().replace('\\', '/');
-        setProperty("MCR.Metadata.Store.SVNBase", url, true);
+        setProperty("MCR.Metadata.Store.SVNBase", svnBaseDir.toString(), true);
     }
 
     @Override
