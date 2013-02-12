@@ -6,6 +6,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.transform.URIResolver;
+
 import org.apache.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -13,7 +15,6 @@ import org.jdom2.Element;
 import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.mycore.common.MCRTextResolver;
-import org.mycore.common.xml.MCRURIResolver.MCRResolver;
 
 /**
  * <p>
@@ -46,7 +47,7 @@ import org.mycore.common.xml.MCRURIResolver.MCRResolver;
  * @see MCRTextResolver
  * @author Matthias Eichner
  */
-public abstract class MCRDynamicURIResolver implements MCRResolver {
+public abstract class MCRDynamicURIResolver implements URIResolver {
 
     private static final Logger LOGGER = Logger.getLogger(MCRDynamicURIResolver.class);
 
