@@ -11,7 +11,7 @@ import org.junit.Test;
 public class MCRTestCase {
     File properties = null;
 
-    static MCRConfiguration CONFIG;
+    static MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     /**
      * initializes MCRConfiguration with an empty property file.
@@ -61,8 +61,8 @@ public class MCRTestCase {
             System.getProperties().setProperty("MCR.Configuration.File", properties.getAbsolutePath());
         }//if
     }//InitProperties
-    
-    protected boolean setProperty(String key, String value, boolean overwrite) {
+
+    protected static boolean setProperty(String key, String value, boolean overwrite) {
         String propValue = CONFIG.getProperties().getProperty(key);
         if (propValue == null || overwrite) {
             CONFIG.getProperties().setProperty(key, value);

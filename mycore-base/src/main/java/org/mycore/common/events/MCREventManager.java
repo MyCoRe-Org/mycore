@@ -152,8 +152,7 @@ public class MCREventManager {
                     String msg = "Error: Class does not implement MCREventHandler: " + propertyKey;
                     throw new MCRConfigurationException(msg);
                 }
-
-                getOrCreateEventHandlerListOfType(type).add((MCREventHandler) handler);
+                addEventHandler(type, (MCREventHandler)handler);
             }
         }
     }
@@ -246,4 +245,61 @@ public class MCREventManager {
     public void handleEvent(MCREvent evt) throws MCRException {
         handleEvent(evt, MCREventManager.FORWARD);
     }
+
+    /**
+     * Appends the event handler to the end of the list.
+     * 
+     * @param type type of event e.g. MCRObject
+     * @param handler
+     */
+    public MCREventManager addEventHandler(String type, MCREventHandler handler) {
+        getOrCreateEventHandlerListOfType(type).add(handler);
+        return this;
+    }
+
+    /**
+     * Inserts the event handler at the specified position.
+     * 
+     * @param type type of event e.g. MCRObject
+     * @param handler
+     * @param index index at which the specified element is to be inserted
+     */
+    public MCREventManager addEventHandler(String type, MCREventHandler handler, int index) {
+        getOrCreateEventHandlerListOfType(type).add(index, handler);
+        return this;
+    }
+
+    /**
+     * Removes the specified event handler.
+     * 
+     * @param type type of event handler
+     * @param handler the event handler to remove
+     */
+    public MCREventManager removeEventHandler(String type, MCREventHandler handler) {
+        List<MCREventHandler> handlerList = this.handlers.get(type);
+        handlerList.remove(handler);
+        if(handlerList.isEmpty()) {
+            this.handlers.remove(type);
+        }
+        return this;
+    }
+
+    /**
+     * Removes all event handler of the specified type.
+     * 
+     * @param type type to removed
+     */
+    public MCREventManager removeEventHandler(String type) {
+        this.handlers.remove(type);
+        return this;
+    }
+
+    /**
+     * Clears the <code>MCREventManager</code> so that it contains no <code>MCREventHandler</code>.
+     */
+    public MCREventManager clear() {
+       this.handlers.clear();
+       return this;
+    }
+
 }

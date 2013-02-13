@@ -4,28 +4,28 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 
 public abstract class MCRStoreTestCase extends MCRHibTestCase {
 
+    private static MCRXMLMetadataManager store;
     private static Path storeBaseDir;
     private static Path svnBaseDir;
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        storeBaseDir = Files.createTempDirectory(getClass().getSimpleName());
+    @BeforeClass
+    public static void init() throws Exception {
+        storeBaseDir = Files.createTempDirectory(MCRStoreTestCase.class.getSimpleName());
         setProperty("MCR.Metadata.Store.BaseDir", storeBaseDir.toString(), true);
-        svnBaseDir = Files.createTempDirectory(getClass().getSimpleName() + "_svn");
-        setProperty("MCR.Metadata.Store.SVNBase", svnBaseDir.toString(), true);
+        svnBaseDir = Files.createTempDirectory(MCRStoreTestCase.class.getSimpleName() + "_svn");
+        setProperty("MCR.Metadata.Store.SVNBase", "file://" + svnBaseDir.toString(), true);
+        store = MCRXMLMetadataManager.instance();
+        store.reload();
     }
 
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
+    @AfterClass
+    public static void destroy() throws Exception {
         if(storeBaseDir != null) {
             FileUtils.deleteDirectory(storeBaseDir.toFile());
         }
@@ -40,6 +40,10 @@ public abstract class MCRStoreTestCase extends MCRHibTestCase {
 
     public static Path getSvnBaseDir() {
         return svnBaseDir;
+    }
+
+    public static MCRXMLMetadataManager getStore() {
+        return store;
     }
 
 }

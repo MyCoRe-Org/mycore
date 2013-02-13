@@ -1,16 +1,17 @@
 package org.mycore.common;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
-import static org.junit.Assert.*;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.mycore.common.events.MCREventManager;
+import org.mycore.datamodel.common.MCRXMLMetadataEventHandler;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
-@Ignore
 public class MCRObjectUtilsTest extends MCRStoreTestCase {
 
     private MCRObject root;
@@ -25,9 +26,8 @@ public class MCRObjectUtilsTest extends MCRStoreTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        MCRConfiguration.instance().set("MCR.Metadata.Store.DefaultClass", "org.mycore.datamodel.ifs2.MCRMetadataStore");
         MCRConfiguration.instance().set("MCR.Persistence.LinkTable.Store.Class", "org.mycore.backend.hibernate.MCRHIBLinkTableStore");
-        MCRConfiguration.instance().set("MCR.EventHandler.MCRObject.1.Class", "org.mycore.datamodel.common.MCRXMLMetadataEventHandler");
+        MCREventManager.instance().clear().addEventHandler("MCRObject", new MCRXMLMetadataEventHandler());
         MCRConfiguration.instance().set("MCR.Metadata.Type.document", true);
         root = new MCRObject();
         root.setId(MCRObjectID.getInstance("test_document_00000001"));
@@ -63,7 +63,6 @@ public class MCRObjectUtilsTest extends MCRStoreTestCase {
         MCRMetadataManager.create(l21);
         MCRMetadataManager.create(l22);
         MCRMetadataManager.create(l31);
-        
     }
 
     @Test

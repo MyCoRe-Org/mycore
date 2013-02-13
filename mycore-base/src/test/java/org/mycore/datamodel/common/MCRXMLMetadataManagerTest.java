@@ -21,9 +21,8 @@ import org.jdom2.output.XMLOutputter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.content.MCRByteContent;
-import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 
@@ -31,17 +30,11 @@ import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
  * @author Thomas Scheffler (yagee)
  * @author Frank Lützenkirchen
  */
-public class MCRXMLMetadataManagerTest extends MCRTestCase {
-
-    private static MCRXMLMetadataManager store;
-
-    private static File baseDirectory;
-
-    private static File svnDirectory;
+public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
 
     private XMLInfo MyCoRe_document_00000001, MyCoRe_document_00000001_new, MCR_document_00000001;
 
-    private static final SAXBuilder SAX_BUILDER = new SAXBuilder(false);
+    private static final SAXBuilder SAX_BUILDER = new SAXBuilder();
 
     @Override
     @Before
@@ -55,38 +48,24 @@ public class MCRXMLMetadataManagerTest extends MCRTestCase {
         MyCoRe_document_00000001_new = new XMLInfo("MyCoRe_document_00000001", "<object id=\"MyCoRe_document_00000001\" update=\"true\"/>".getBytes("UTF-8"),
                 new Date());
         MCR_document_00000001 = new XMLInfo("MCR_document_00000001", "<object id=\"MCR_document_00000001\"/>".getBytes("UTF-8"), new Date());
-
-        if (store == null) {
-            baseDirectory = File.createTempFile("base", "");
-            baseDirectory.delete();
-            setProperty("MCR.Metadata.Store.BaseDir", baseDirectory.getAbsolutePath(), true);
-
-            svnDirectory = File.createTempFile("svn", "");
-            svnDirectory.delete();
-            String uri = "file:///" + svnDirectory.getAbsolutePath().replace('\\', '/');
-            setProperty("MCR.Metadata.Store.SVNBase", uri, true);
-
-            store = MCRXMLMetadataManager.instance();
-        }
     }
 
     @Override
     @After
     public void tearDown() throws Exception {
-        for (File projectDir : baseDirectory.listFiles()) {
+        for (File projectDir : getStoreBaseDir().toFile().listFiles()) {
             for (File typeDir : projectDir.listFiles()) {
                 VFS.getManager().resolveFile(typeDir.getAbsolutePath()).delete(Selectors.SELECT_ALL);
                 typeDir.mkdir();
             }
         }
-        for (File projectDir : svnDirectory.listFiles()) {
+        for (File projectDir : getSvnBaseDir().toFile().listFiles()) {
             for (File typeDir : projectDir.listFiles()) {
                 VFS.getManager().resolveFile(typeDir.getAbsolutePath()).delete(Selectors.SELECT_ALL);
                 typeDir.mkdir();
                 SVNRepositoryFactory.createLocalRepository(typeDir, true, false);
             }
         }
-
         super.tearDown();
     }
 
@@ -101,23 +80,23 @@ public class MCRXMLMetadataManagerTest extends MCRTestCase {
 
     @Test
     public void create() {
-        store.create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob, MyCoRe_document_00000001.lastModified);
-        store.create(MCR_document_00000001.id, MCR_document_00000001.blob, MCR_document_00000001.lastModified);
+        getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob, MyCoRe_document_00000001.lastModified);
+        getStore().create(MCR_document_00000001.id, MCR_document_00000001.blob, MCR_document_00000001.lastModified);
     }
 
     @Test
     public void delete() {
-        store.create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob, MyCoRe_document_00000001.lastModified);
-        store.delete(MCR_document_00000001.id);
-        assertTrue(MyCoRe_document_00000001.id + " should not have been deleted", store.exists(MyCoRe_document_00000001.id));
+        getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob, MyCoRe_document_00000001.lastModified);
+        getStore().delete(MCR_document_00000001.id);
+        assertTrue(MyCoRe_document_00000001.id + " should not have been deleted", getStore().exists(MyCoRe_document_00000001.id));
     }
 
     @Test
     public void update() {
-        store.create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob, MyCoRe_document_00000001.lastModified);
-        store.update(MyCoRe_document_00000001_new.id, MyCoRe_document_00000001_new.blob, MyCoRe_document_00000001_new.lastModified);
+        getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob, MyCoRe_document_00000001.lastModified);
+        getStore().update(MyCoRe_document_00000001_new.id, MyCoRe_document_00000001_new.blob, MyCoRe_document_00000001_new.lastModified);
         try {
-            store.update(MCR_document_00000001.id, MCR_document_00000001.blob, MCR_document_00000001.lastModified);
+            getStore().update(MCR_document_00000001.id, MCR_document_00000001.blob, MCR_document_00000001.lastModified);
             fail("Update for non existent " + MCR_document_00000001.id + " succeeded.");
         } catch (RuntimeException e) {
             //this exception is expected here
@@ -126,11 +105,11 @@ public class MCRXMLMetadataManagerTest extends MCRTestCase {
 
     @Test
     public void retrieve() throws JDOMException, IOException {
-        store.create(MyCoRe_document_00000001.id, new MCRByteContent(MyCoRe_document_00000001.blob), MyCoRe_document_00000001.lastModified);
-        Document doc = store.retrieveXML(MyCoRe_document_00000001.id);
+        getStore().create(MyCoRe_document_00000001.id, new MCRByteContent(MyCoRe_document_00000001.blob), MyCoRe_document_00000001.lastModified);
+        Document doc = getStore().retrieveXML(MyCoRe_document_00000001.id);
         assertEquals("Stored document ID do not match:", MyCoRe_document_00000001.id.toString(), doc.getRootElement().getAttributeValue("id"));
         try {
-            doc = store.retrieveXML(MCR_document_00000001.id);
+            doc = getStore().retrieveXML(MCR_document_00000001.id);
             if (doc != null) {
                 fail("Requested " + MCR_document_00000001.id + ", retrieved wrong document:\n" + new XMLOutputter(Format.getPrettyFormat()).outputString(doc));
             }
@@ -141,7 +120,7 @@ public class MCRXMLMetadataManagerTest extends MCRTestCase {
 
     @Test
     public void getHighestStoredID() {
-        Method[] methods = store.getClass().getMethods();
+        Method[] methods = getStore().getClass().getMethods();
         for (Method method : methods) {
             if (method.getName().equals("getHighestStoredID") && method.getParameterTypes().length == 0) {
                 fail("org.mycore.datamodel.ifs2.MCRObjectMetadataStoreIFS2.getHighestStoredID() does not respect ProjectID");
@@ -151,16 +130,16 @@ public class MCRXMLMetadataManagerTest extends MCRTestCase {
 
     @Test
     public void exists() {
-        assertFalse("Object " + MyCoRe_document_00000001.id + " should not exist.", store.exists(MyCoRe_document_00000001.id));
-        store.create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob, MyCoRe_document_00000001.lastModified);
-        assertTrue("Object " + MyCoRe_document_00000001.id + " should exist.", store.exists(MyCoRe_document_00000001.id));
+        assertFalse("Object " + MyCoRe_document_00000001.id + " should not exist.", getStore().exists(MyCoRe_document_00000001.id));
+        getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob, MyCoRe_document_00000001.lastModified);
+        assertTrue("Object " + MyCoRe_document_00000001.id + " should exist.", getStore().exists(MyCoRe_document_00000001.id));
     }
 
     @Test
     public void retrieveAllIDs() {
-        assertEquals("Store should not contain any objects.", 0, store.listIDs().size());
-        store.create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob, MyCoRe_document_00000001.lastModified);
-        assertTrue("Store does not contain object " + MyCoRe_document_00000001.id, store.listIDs().contains(MyCoRe_document_00000001.id.toString()));
+        assertEquals("Store should not contain any objects.", 0, getStore().listIDs().size());
+        getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob, MyCoRe_document_00000001.lastModified);
+        assertTrue("Store does not contain object " + MyCoRe_document_00000001.id, getStore().listIDs().contains(MyCoRe_document_00000001.id.toString()));
     }
 
     private static class XMLInfo {

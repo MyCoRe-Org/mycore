@@ -118,10 +118,14 @@ public class MCRXMLMetadataManager {
         return SINGLETON;
     }
 
+    protected MCRXMLMetadataManager() {
+        reload();
+    }
+
     /**
      * Reads configuration properties, checks and creates base directories and builds the singleton
      */
-    protected MCRXMLMetadataManager() {
+    public void reload() {
         MCRConfiguration config = MCRConfiguration.instance();
 
         String pattern = config.getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000");
