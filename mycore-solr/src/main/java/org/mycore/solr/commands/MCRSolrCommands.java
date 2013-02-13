@@ -3,8 +3,13 @@
  */
 package org.mycore.solr.commands;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.mycore.common.MCRObjectUtils;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.frontend.cli.MCRObjectCommands;
@@ -44,6 +49,11 @@ public class MCRSolrCommands extends MCRAbstractCommands {
                 "rebuilds solr's metadata index for selected objects");
         addCommand(com);
 
+        com = new MCRCommand("restricted rebuild solr metadata index for object",
+                "org.mycore.solr.commands.MCRSolrCommands.rebuildMetadataIndexForObject",
+                "rebuilds solr's metadata index for object and all its children");
+        addCommand(com);
+
         com = new MCRCommand("optimize solr index", "org.mycore.solr.index.cs.MCRSolrIndexer.optimize",
                 "An optimize is like a hard commit except that it forces all of the index segments to be merged into a single segment first. "
                         + "Depending on the use cases, this operation should be performed infrequently (like nightly), "
@@ -61,6 +71,16 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     public static void rebuildMetadataIndexForSelected() {
         List<String> selectedObjects = MCRObjectCommands.getSelectedObjectIDs();
         MCRSolrIndexer.rebuildMetadataIndex(selectedObjects);
+    }
+
+    public static void rebuildMetadataIndexForObject(String id) {
+        MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(id));
+        List<MCRObject> objectList = MCRObjectUtils.getDescendantsAndSelf(mcrObject);
+        List<String> idList = new ArrayList<>();
+        for(MCRObject obj : objectList) {
+            idList.add(obj.getId().toString());
+        }
+        MCRSolrIndexer.rebuildMetadataIndex(idList);
     }
 
 }
