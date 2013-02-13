@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:g="http://graphml.graphdrawing.org/xmlns"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:y="http://www.yworks.com/xml/graphml"
-  xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://www.yworks.com/xml/schema/graphml/1.1/ygraphml.xsd" exclude-result-prefixes="g">
+  xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://www.yworks.com/xml/schema/graphml/1.1/ygraphml.xsd"
+  exclude-result-prefixes="g">
   <xsl:include href="copynodes.xsl" />
   <xsl:template match="g:graphml">
     <graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:y="http://www.yworks.com/xml/graphml"
@@ -33,6 +34,7 @@
           <y:EdgeLabel>
             <xsl:value-of select="normalize-space(g:data[@key='label'])" />
           </y:EdgeLabel>
+          <y:Arrows source="none" target="standard" />
         </y:PolyLineEdge>
       </g:data>
     </xsl:copy>
