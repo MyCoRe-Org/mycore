@@ -21,8 +21,6 @@ import org.jdom2.JDOMException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRContent;
 
-
-
 /**
  * Represents a stored file or directory node with its metadata and content.
  * 
@@ -32,6 +30,7 @@ import org.mycore.common.content.MCRContent;
  */
 public abstract class MCRFilesystemNode {
     private static final Logger LOGGER = Logger.getLogger(MCRFilesystemNode.class);
+
     protected static MCRFileMetadataManager manager = MCRFileMetadataManager.instance();
 
     public static MCRFilesystemNode getNode(String ID) {
@@ -148,7 +147,6 @@ public abstract class MCRFilesystemNode {
         manager.storeNode(this);
         manager.clearMetadataCache();
     }
-    
 
     /**
      * Changed method because of problems with update of files.
@@ -181,9 +179,9 @@ public abstract class MCRFilesystemNode {
     }
 
     /**
-     * Returns the ID of the owner of this node
+     * Returns the ID of the owner (the derivate id) of this node.
      * 
-     * @return the ID of the owner of this node
+     * @return the ID of the owner of this node (derivate id)
      */
     public String getOwnerID() {
         ensureNotDeleted();
