@@ -56,6 +56,6 @@ public class MCRStoreCenter {
      * Remove all store from the store center
      */
     public void clear() {
-        instance = null;
+        storeHeap.clear();
     }
 }
