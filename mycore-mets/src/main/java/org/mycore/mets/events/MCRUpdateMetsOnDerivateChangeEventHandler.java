@@ -27,13 +27,13 @@ public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBa
      */
     @Override
     protected void handleFileDeleted(MCREvent evt, MCRFile file) {
-        String mets = MCRConfiguration.instance().getString(" MCR.Mets.Filename", "mets.xml");
+        String mets = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
         // do nothing if mets.xml itself is deleted
         if (file.getName().equals(mets)) {
             return;
         }
 
-        MCRDirectory rootDir = MCRDirectory.getRootDirectory(file.getOwnerID());
+        MCRDirectory rootDir = file.getRootDirectory();
         if (rootDir == null || !rootDir.hasChild(mets)) {
             return;
         }
