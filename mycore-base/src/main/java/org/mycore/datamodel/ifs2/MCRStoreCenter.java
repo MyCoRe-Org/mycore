@@ -6,26 +6,14 @@ import java.util.Map;
 public class MCRStoreCenter {
     private Map<String, MCRStore> storeHeap;
 
-    private static MCRStoreCenter instance;
+    private static MCRStoreCenter instance = new MCRStoreCenter();
 
     private MCRStoreCenter() {
+        this.storeHeap=new HashMap<String, MCRStore>();
     }
 
     public static MCRStoreCenter instance() {
-        if (instance == null) {
-            instance = new MCRStoreCenter();
-            instance.setStoreHeap(new HashMap<String, MCRStore>());
-        }
-
         return instance;
-    }
-
-    private void setStoreHeap(Map<String, MCRStore> storeHeap) {
-        this.storeHeap = storeHeap;
-    }
-
-    private Map<String, MCRStore> getStoreHeap() {
-        return storeHeap;
     }
 
     /**
@@ -35,11 +23,11 @@ public class MCRStoreCenter {
      * @throws MCRStoreAlreadyExistsException If with the same id already exists in the store center
      */
     public void addStore(String id, MCRStore store) throws MCRStoreAlreadyExistsException  {
-        if (getStoreHeap().containsKey(id)) {
+        if (storeHeap.containsKey(id)) {
             throw new MCRStoreAlreadyExistsException("Could not add store with ID " + id + ", store allready exists");
         }
 
-        getStoreHeap().put(id, store);
+        storeHeap.put(id, store);
     }
 
     /**
@@ -49,9 +37,9 @@ public class MCRStoreCenter {
      * @param storeClass - The class type of the retrieved store
      * @return The retrieved store or null if not exists
      */
-    @SuppressWarnings("unchecked")
-	public <T extends MCRStore> T getStore(String id, Class<T> storeClass) {
-        return (T) getStoreHeap().get(id);
+	@SuppressWarnings("unchecked")
+    public <T extends MCRStore> T getStore(String id, Class<T> storeClass) {
+        return (T) storeHeap.get(id);
     }
 
     /**
@@ -61,7 +49,7 @@ public class MCRStoreCenter {
      * @return true if successfully removed or false
      */
     public boolean removeStore(String id) {
-        return getStoreHeap().remove(id) != null;
+        return storeHeap.remove(id) != null;
     }
 
     /**
