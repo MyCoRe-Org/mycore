@@ -64,7 +64,7 @@ public class MCRErrorListener implements ErrorListener {
     @Override
     public void error(TransformerException exception) throws TransformerException {
         exception = unwrapException(exception);
-        LOGGER.error("Exception while XSL transformation.", exception);
+        LOGGER.error("Exception while XSL transformation:" + exception.getMessageAndLocation());
         throw exception;
     }
 
@@ -116,7 +116,7 @@ public class MCRErrorListener implements ErrorListener {
         }
         msg.append(": ");
         msg.append(exception.getMessage());
-        String message=msg.toString();
+        String message = msg.toString();
         return message;
     }
 }
