@@ -42,7 +42,6 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 
 public class MCRXMLTransformer {
 
-    @SuppressWarnings("unchecked")
     public static MCRCategory getCategory(Document xml) throws URISyntaxException {
         MCRCategoryImpl category = new MCRCategoryImpl();
         category.setRoot(category);
@@ -57,7 +56,6 @@ public class MCRXMLTransformer {
         return category;
     }
 
-    @SuppressWarnings("unchecked")
     public static MCRCategory buildCategory(String classID, Element e, MCRCategory parent) throws URISyntaxException {
         MCRCategoryImpl category = new MCRCategoryImpl();
         //setId must be called before setParent (info important)
