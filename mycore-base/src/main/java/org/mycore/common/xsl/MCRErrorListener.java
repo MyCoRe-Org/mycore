@@ -54,7 +54,7 @@ public class MCRErrorListener implements ErrorListener {
             //org.apache.xalan.transformer.MsgMgr.message to print a message
             LOGGER.info(getMyMessageAndLocation(exception));
         } else {
-            LOGGER.warn("Exception while XSL transformation.", exception);
+            LOGGER.warn("Exception while XSL transformation:" + exception.getMessageAndLocation());
         }
     }
 
