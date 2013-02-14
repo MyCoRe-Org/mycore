@@ -61,6 +61,7 @@ import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.input.DOMBuilder;
 import org.jdom2.input.SAXBuilder;
+import org.jdom2.input.sax.XMLReaders;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessManager;
@@ -452,8 +453,7 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
      * @throws JDOMException
      */
     protected Element parseStream(InputStream in) throws JDOMException, IOException {
-        SAXBuilder builder = new SAXBuilder();
-        builder.setValidation(false);
+        SAXBuilder builder = new SAXBuilder(XMLReaders.NONVALIDATING);
         builder.setEntityResolver(this);
 
         return builder.build(in).getRootElement();
@@ -556,10 +556,12 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
             LOGGER.debug("Reading MCRObject with ID " + id);
 
             MCRObjectID mcrid = MCRObjectID.getInstance(id);
-            MCRContent content = MCRXMLMetadataManager.instance().retrieveContent(mcrid);
-
-            LOGGER.debug("end resolving " + href);
             try {
+                MCRContent content = MCRXMLMetadataManager.instance().retrieveContent(mcrid);
+                if (content == null) {
+                    return null;
+                }
+                LOGGER.debug("end resolving " + href);
                 return content.getSource();
             } catch (IOException e) {
                 throw new TransformerException(e);
