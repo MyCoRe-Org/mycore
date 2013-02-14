@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +18,7 @@ import org.jdom2.Text;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPath;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.parsers.bool.MCRCondition;
@@ -26,6 +26,7 @@ import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRQueryCondition;
+import org.xml.sax.SAXException;
 
 /**
  * Abstract class for creating a redundancy map.
@@ -36,8 +37,11 @@ public abstract class MCRRedundancyAbstractMapGenerator {
     private static final Logger LOGGER = Logger.getLogger(MCRRedundancyAbstractMapGenerator.class);
 
     protected MCRRedundancyTypeData typeData;
+
     protected Element redundancyMap;
+
     protected Comparator<String> comparator;
+
     protected MCRRedundancyFormattable<String> compareStringFormatter;
 
     public MCRRedundancyAbstractMapGenerator() {
@@ -54,7 +58,7 @@ public abstract class MCRRedundancyAbstractMapGenerator {
     protected String getFileName() {
         File directory = new File(MCRRedundancyUtil.DIR);
         if (!directory.exists())
-            directory.mkdir();        
+            directory.mkdir();
         return MCRRedundancyUtil.DIR + "redundancy-" + typeData.getType() + ".xml";
     }
 
@@ -76,9 +80,9 @@ public abstract class MCRRedundancyAbstractMapGenerator {
      */
     protected Map<String, String> getCompareCriteria(MCRHit mcrHit) {
         Map<String, String> compareCriteriaValues = new Hashtable<String, String>();
-        for(MCRFieldDef def : typeData.getFieldsToCompare()) {
-            for(MCRFieldValue fieldValue : mcrHit.getMetaData()) {
-                if(fieldValue.getField().equals(def)) {
+        for (MCRFieldDef def : typeData.getFieldsToCompare()) {
+            for (MCRFieldValue fieldValue : mcrHit.getMetaData()) {
+                if (fieldValue.getField().equals(def)) {
                     String key = def.getName();
                     String value = compareStringFormatter.format(fieldValue.getValue());
                     compareCriteriaValues.put(key, value);
@@ -88,8 +92,13 @@ public abstract class MCRRedundancyAbstractMapGenerator {
         }
         // use the xpath values as compare string
         List<XPath> xpathList = typeData.getXPathCompareList();
-        if(xpathList != null && xpathList.size() > 0) {
-            Document doc = MCRXMLMetadataManager.instance().retrieveXML(MCRObjectID.getInstance(mcrHit.getID()));
+        if (xpathList != null && xpathList.size() > 0) {
+            Document doc;
+            try {
+                doc = MCRXMLMetadataManager.instance().retrieveXML(MCRObjectID.getInstance(mcrHit.getID()));
+            } catch (IOException | JDOMException | SAXException e) {
+                throw new MCRPersistenceException("Could not get xml of object: " + mcrHit.getID(), e);
+            }
             for (XPath aXpathList : xpathList) {
                 try {
                     Object o = aXpathList.selectSingleNode(doc);
@@ -102,8 +111,8 @@ public abstract class MCRRedundancyAbstractMapGenerator {
                         value = o.toString();
                     compareCriteriaValues.put(aXpathList.getXPath(), compareStringFormatter.format(value));
                 } catch (JDOMException jdomExc) {
-                    LOGGER.error("Couldnt parse xpath expression " + aXpathList
-                            + " while creating compare criterias for mcr object " + mcrHit.getID(), jdomExc);
+                    LOGGER
+                        .error("Couldnt parse xpath expression " + aXpathList + " while creating compare criterias for mcr object " + mcrHit.getID(), jdomExc);
                 }
             }
         }
@@ -117,10 +126,10 @@ public abstract class MCRRedundancyAbstractMapGenerator {
      * @return if they are equal
      */
     protected boolean areRedundancyObjectsEqual(MCRRedundancyObject obj1, MCRRedundancyObject obj2) {
-        if(obj1 == null || obj2 == null)
+        if (obj1 == null || obj2 == null)
             return false;
-        if(obj1.getCompareCriteria() == null || obj2.getCompareCriteria() == null)
-            return false; 
+        if (obj1.getCompareCriteria() == null || obj2.getCompareCriteria() == null)
+            return false;
         return areConditionsEquals(obj1.getCompareCriteria(), obj2.getCompareCriteria());
     }
 
@@ -131,7 +140,7 @@ public abstract class MCRRedundancyAbstractMapGenerator {
      * @return If the condition maps are equal.
      */
     protected boolean areConditionsEquals(Map<String, String> conditionMap1, Map<String, String> conditionMap2) {
-        if(conditionMap1.size() != conditionMap2.size())
+        if (conditionMap1.size() != conditionMap2.size())
             return false;
         for (Map.Entry<String, String> entry : conditionMap1.entrySet()) {
             String key = entry.getKey();
@@ -144,14 +153,17 @@ public abstract class MCRRedundancyAbstractMapGenerator {
     }
 
     public void setComparator(Comparator<String> comparator) {
-        this.comparator = comparator; 
+        this.comparator = comparator;
     }
+
     public Comparator<String> getComparator() {
         return comparator;
     }
+
     public void setStringFormatter(MCRRedundancyFormattable<String> stringFormatter) {
         this.compareStringFormatter = stringFormatter;
     }
+
     public MCRRedundancyFormattable<String> getStringFormatter() {
         return compareStringFormatter;
     }
@@ -167,7 +179,7 @@ public abstract class MCRRedundancyAbstractMapGenerator {
      * @throws IOException
      */
     public void saveToFile() throws FileNotFoundException, IOException {
-        if(redundancyMap == null) {
+        if (redundancyMap == null) {
             LOGGER.error("Redundancy map element is null. Execute createRedundancyMap before saving.");
             return;
         }
@@ -188,9 +200,9 @@ public abstract class MCRRedundancyAbstractMapGenerator {
     protected Element createGroupElement(int id, Map<String, String> compareCriterias) {
         StringBuilder name = new StringBuilder();
         int count = 0;
-        for(String value : compareCriterias.values()) {
+        for (String value : compareCriterias.values()) {
             name.append(value);
-            if(count++ < compareCriterias.size() - 1)
+            if (count++ < compareCriterias.size() - 1)
                 name.append(",");
         }
         Element groupElement = new Element("redundancyObjects");
@@ -198,6 +210,7 @@ public abstract class MCRRedundancyAbstractMapGenerator {
         groupElement.setAttribute("name", name.toString());
         return groupElement;
     }
+
     /**
      * Creates a single redundancy object element.
      * @param id the id of the mcr object
@@ -212,11 +225,12 @@ public abstract class MCRRedundancyAbstractMapGenerator {
     protected class DefaultStringComparator implements Comparator<String> {
         public int compare(String o1, String o2) {
             // do a faster equal compare!
-            if(o1.equals(o2))
+            if (o1.equals(o2))
                 return 0;
             return -1;
         }
     }
+
     protected class DefaultCompareStringFormatter implements MCRRedundancyFormattable<String> {
         public String format(String stringToFormat) {
             // do no formatting

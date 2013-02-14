@@ -25,12 +25,16 @@ package org.mycore.access.strategies;
 
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.xml.sax.SAXException;
 
 /**
  * Use this class if you want to have a fallback to ancestor access rules.
@@ -63,7 +67,13 @@ public class MCRParentRuleStrategy implements MCRAccessCheckStrategy {
     }
 
     private static String getParentID(String objectID) {
-        Document parentDoc = MCRXMLMetadataManager.instance().retrieveXML(MCRObjectID.getInstance(objectID));
+        Document parentDoc;
+        try {
+            parentDoc = MCRXMLMetadataManager.instance().retrieveXML(MCRObjectID.getInstance(objectID));
+        } catch (IOException | JDOMException | SAXException e) {
+            LOGGER.error("Could not read object: " + objectID, e);
+            return null;
+        }
         final Element parentElement = parentDoc.getRootElement().getChild("structure").getChild("parents");
         if (parentElement != null) {
             return parentElement.getChild("parent").getAttributeValue("href", XLINK_NAMESPACE);

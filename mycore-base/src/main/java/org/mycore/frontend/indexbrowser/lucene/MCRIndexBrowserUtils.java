@@ -23,6 +23,7 @@
 
 package org.mycore.frontend.indexbrowser.lucene;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.List;
 
@@ -31,7 +32,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.mycore.common.MCRConfiguration;
+import org.xml.sax.SAXException;
 
 /**
  * contains  utility functions for indexbrowser
@@ -51,7 +54,7 @@ public class MCRIndexBrowserUtils {
     /**
      * Creates a xml document with the results of the index browser.
      */
-    public static Document createResultListDocument(MCRIndexBrowserIncomingData incomingBrowserData, MCRIndexBrowserConfig config) {
+    public static Document createResultListDocument(MCRIndexBrowserIncomingData incomingBrowserData, MCRIndexBrowserConfig config) throws IOException, JDOMException, SAXException {
         List<MCRIndexBrowserEntry> resultList = null;
         String index = config.getIndex();
 

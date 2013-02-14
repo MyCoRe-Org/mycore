@@ -44,6 +44,7 @@ import org.mycore.user2.MCRPasswordHashType;
 import org.mycore.user2.MCRRole;
 import org.mycore.user2.MCRRoleManager;
 import org.mycore.user2.MCRUserManager;
+import org.xml.sax.SAXException;
 
 @MCRCommandGroup(name = "Migrate from 2.1 to 2.2")
 public class MCRMigrationCommands22 extends MCRAbstractCommands {
@@ -53,7 +54,7 @@ public class MCRMigrationCommands22 extends MCRAbstractCommands {
     }
 
     @MCRCommand(help = "Move xlink label which is not NCName to xlink:title.", syntax = "migrate xlink label")
-    public static void xlinkLabelMigration() throws TransformerException, JDOMException, IOException {
+    public static void xlinkLabelMigration() throws TransformerException, JDOMException, IOException, SAXException {
         MCRXMLMetadataManager xmlMetaManager = MCRXMLMetadataManager.instance();
         List<String> listIDs = xmlMetaManager.listIDs();
 
@@ -81,7 +82,7 @@ public class MCRMigrationCommands22 extends MCRAbstractCommands {
     }
 
     @MCRCommand(help = "Replace ':' in categID with '_'", syntax = "fix colone in categID")
-    public static void fixCategID() throws JDOMException, TransformerException {
+    public static void fixCategID() throws JDOMException, TransformerException, IOException, SAXException {
         Session dbSession = MCRHIBConnection.instance().getSession();
         dbSession.createSQLQuery("update MCRCATEGORY set CATEGID=replace(categid,':','-') where CATEGID like '%:%'").executeUpdate();
 

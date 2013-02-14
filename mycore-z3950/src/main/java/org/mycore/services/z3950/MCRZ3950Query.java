@@ -1,5 +1,10 @@
 package org.mycore.services.z3950;
 
+import java.io.IOException;
+
+import org.jdom2.JDOMException;
+import org.xml.sax.SAXException;
+
 /**
  * Dieses Java-Interface beschreibt die Syntax der grundlegenen Funktionen
  * für den Z39.50-Suchservice. 
@@ -20,7 +25,7 @@ public interface MCRZ3950Query {
 	 * Gibt alle Ergebnisse als Bytestrom zurück.
 	 * @return Das Ergebnisdokument als Byte-Array, null falls es keine Ergebnisse gab.
 	 */
-	public byte[] getDocumentAsByteArray();
+	public byte[] getDocumentAsByteArray() throws IOException, JDOMException, SAXException;
 	
 	/**
 	 * Führt eine Suchanfrage in MyCoRe aus.

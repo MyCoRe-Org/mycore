@@ -23,15 +23,18 @@
 
 package org.mycore.frontend.indexbrowser.lucene;
 
+import java.io.IOException;
 import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
+import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.xml.sax.SAXException;
 
 /**
  * Servlet to create an xml document which is parsed by xsl
@@ -81,7 +84,7 @@ public class MCRIndexBrowserServlet extends MCRServlet {
      * Creates a xml document with the results of the index browser.
      * @return a new xml document with the result list
      */
-    protected Document createResultListDocument() {
+    protected Document createResultListDocument() throws IOException, JDOMException, SAXException {
         return MCRIndexBrowserUtils.createResultListDocument(incomingBrowserData, config);
     }
 

@@ -25,6 +25,7 @@ import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
+import org.xml.sax.SAXException;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -104,7 +105,7 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
     }
 
     @Test
-    public void retrieve() throws JDOMException, IOException {
+    public void retrieve() throws JDOMException, IOException, SAXException {
         getStore().create(MyCoRe_document_00000001.id, new MCRByteContent(MyCoRe_document_00000001.blob), MyCoRe_document_00000001.lastModified);
         Document doc = getStore().retrieveXML(MyCoRe_document_00000001.id);
         assertEquals("Stored document ID do not match:", MyCoRe_document_00000001.id.toString(), doc.getRootElement().getAttributeValue("id"));

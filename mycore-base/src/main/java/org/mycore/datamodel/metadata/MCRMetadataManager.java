@@ -31,6 +31,7 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
@@ -44,6 +45,7 @@ import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
+import org.xml.sax.SAXException;
 
 /**
  * Delivers persistence operations for {@link MCRObject} and {@link MCRDerivate}
@@ -117,7 +119,10 @@ public final class MCRMetadataManager {
             throw new MCRPersistenceException("The derivate " + mcrDerivate.getId() + " is not valid.");
         }
         final MCRObjectID objid = mcrDerivate.getDerivate().getMetaLink().getXLinkHrefID();
-        if (!MCRXMLMetadataManager.instance().exists(objid)) {
+        byte[] objectBackup;
+        try {
+            objectBackup = MCRXMLMetadataManager.instance().retrieveBLOB(objid);
+        } catch (IOException e) {
             throw new MCRPersistenceException("The derivate " + mcrDerivate.getId() + " can't find metadata object " + objid + ", nothing done.");
         }
 
@@ -133,19 +138,17 @@ public final class MCRMetadataManager {
         fireEvent(mcrDerivate, MCREvent.CREATE_EVENT);
 
         // add the link to metadata
-        final MCRMetaLinkID meta = mcrDerivate.getDerivate().getMetaLink();
         final MCRMetaLinkID der = new MCRMetaLinkID();
         der.setReference(mcrDerivate.getId().toString(), null, mcrDerivate.getLabel());
         der.setSubTag("derobject");
-        final byte[] backup = MCRXMLMetadataManager.instance().retrieveBLOB(meta.getXLinkHrefID());
 
         try {
             LOGGER.debug("adding Derivate in data store");
-            MCRMetadataManager.addDerivateToObject(meta.getXLinkHrefID(), der);
+            MCRMetadataManager.addDerivateToObject(objid, der);
         } catch (final Exception e) {
-            MCRMetadataManager.restore(mcrDerivate, backup);
+            MCRMetadataManager.restore(mcrDerivate, objectBackup);
             // throw final exception
-            throw new MCRPersistenceException("Error while creatlink to MCRObject " + meta.getXLinkHref() + ".", e);
+            throw new MCRPersistenceException("Error while creatlink to MCRObject " + objid + ".", e);
         }
 
         // create data in IFS
@@ -166,7 +169,7 @@ public final class MCRMetadataManager {
                         if (difs != null) {
                             difs.delete();
                         }
-                        MCRMetadataManager.restore(mcrDerivate, backup);
+                        MCRMetadataManager.restore(mcrDerivate, objectBackup);
                         throw new MCRPersistenceException("Can't add derivate to the IFS", e);
                     }
                 } else {
@@ -454,8 +457,11 @@ public final class MCRMetadataManager {
      *                if a persistence problem is occurred
      */
     public static MCRDerivate retrieveMCRDerivate(final MCRObjectID id) throws MCRPersistenceException {
-        final MCRDerivate derivate = new MCRDerivate(MCRXMLMetadataManager.instance().retrieveXML(id));
-        return derivate;
+        try {
+            return new MCRDerivate(MCRXMLMetadataManager.instance().retrieveXML(id));
+        } catch (IOException | JDOMException | SAXException e) {
+            throw new MCRPersistenceException("Could not retrieve xml of derivate: " + id, e);
+        }
     }
 
     /**
@@ -468,7 +474,11 @@ public final class MCRMetadataManager {
      *                if a persistence problem is occurred
      */
     public static MCRObject retrieveMCRObject(final MCRObjectID id) throws MCRPersistenceException {
-        return new MCRObject(MCRXMLMetadataManager.instance().retrieveXML(id));
+        try {
+            return new MCRObject(MCRXMLMetadataManager.instance().retrieveXML(id));
+        } catch (IOException | JDOMException | SAXException e) {
+            throw new MCRPersistenceException("Could not retrieve xml of object: " + id, e);
+        }
     }
 
     /**

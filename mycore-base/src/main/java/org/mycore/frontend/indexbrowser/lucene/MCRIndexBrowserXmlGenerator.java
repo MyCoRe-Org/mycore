@@ -1,5 +1,6 @@
 package org.mycore.frontend.indexbrowser.lucene;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -19,6 +20,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.xml.sax.SAXException;
 
 /**
  * Xml generator class for the index browser.
@@ -43,7 +45,7 @@ public class MCRIndexBrowserXmlGenerator {
     protected List<MCRIndexBrowserEntry> resultList;
 
     public MCRIndexBrowserXmlGenerator(List<MCRIndexBrowserEntry> resultList, MCRIndexBrowserIncomingData browseData,
-            MCRIndexBrowserConfig indexConfig) {
+            MCRIndexBrowserConfig indexConfig) throws IOException, JDOMException, SAXException {
         this.browseData = browseData;
         this.indexConfig = indexConfig;
         this.resultList = resultList;
@@ -150,8 +152,11 @@ public class MCRIndexBrowserXmlGenerator {
      * output values.
      * @param from start from that element
      * @param to end at this element
+     * @throws SAXException 
+     * @throws JDOMException 
+     * @throws IOException 
      */
-    private void fillHitListWithMetadata(int from, int to) {
+    private void fillHitListWithMetadata(int from, int to) throws IOException, JDOMException, SAXException {
         // now we take only the objects from metadata for the dataobjects that
         // we will shown in detail
         // this occurres if we have only a small count of results, or we show

@@ -1,11 +1,13 @@
 package org.mycore.services.z3950;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -18,6 +20,7 @@ import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRResults;
+import org.xml.sax.SAXException;
 /**
  * Diese Klasse ist eine Implementierung eines Suchservice fï¿½r die Z39.50-
  * Schnittstelle. Dabei werden nur Z39.50-Anfragen im Prefixformat
@@ -64,7 +67,7 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
      * Gibt alle Ergebnisse als Bytestrom zurï¿½ck.
      * @return Das Ergebnisdokument als Byte-Array, null falls es keine Ergebnisse gab.
      */
-    public byte[] getDocumentAsByteArray() {
+    public byte[] getDocumentAsByteArray() throws IOException, JDOMException, SAXException {
         byte[] result = null;
         if (mycoreResults.getNumHits() > 0)
             {

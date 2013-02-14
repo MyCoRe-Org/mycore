@@ -28,6 +28,7 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.MCRCommandLineInterface;
 import org.mycore.migration21_22.cli.MCRMigrationCommands22;
+import org.xml.sax.SAXException;
 
 public class MCRMigrationCommands22Test {
     private static Logger LOGGER = Logger.getLogger(MCRMigrationCommands22Test.class);
@@ -54,7 +55,7 @@ public class MCRMigrationCommands22Test {
     }
 
     @Test
-    public void test() throws JDOMException, IOException {
+    public void test() throws JDOMException, IOException, SAXException {
         MCRCommandLineInterface.main(new String[] { "migrate xlink label" });
 
         MCRXMLMetadataManager xmlMetaManager = MCRXMLMetadataManager.instance();
