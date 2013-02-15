@@ -60,6 +60,10 @@ public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
     private static MCRCache<String, MCRXSL2XMLTransformer> INSTANCE_CACHE = new MCRCache<String, MCRXSL2XMLTransformer>(100,
             "MCRXSLTransformer instance cache");
 
+    public MCRXSL2XMLTransformer() {
+        super();
+    }
+
     public MCRXSL2XMLTransformer(String... stylesheets) {
         super(stylesheets);
     }
@@ -96,7 +100,6 @@ public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
             //Sometimes a transformation produces whitespace strings
             //JDOM would produce a empty document if it detects those
             //So we remove them, if they exists.
-            @SuppressWarnings("unchecked")
             List<Content> transformResult = result.getResult();
             int origSize = transformResult.size();
             Iterator<Content> iterator = transformResult.iterator();
