@@ -13,49 +13,51 @@
   <xsl:variable name="PageID" select="'login'" />
 
   <xsl:template match="realms">
-    <div class="section">
-      <p>
-        <xsl:variable name="currentAccount">
-          <xsl:value-of select="'&lt;strong&gt;'" />
-          <xsl:choose>
-            <xsl:when test="@guest='true'">
-              <xsl:value-of select="i18n:translate('component.user2.login.guest')" />
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="concat(@user,' [',@realm,']')" />
-            </xsl:otherwise>
-          </xsl:choose>
-          <xsl:value-of select="'&lt;/strong&gt;'" />
-        </xsl:variable>
-        <xsl:value-of select="i18n:translate('component.user2.login.currentAccount', $currentAccount)" disable-output-escaping="yes" />
-      </p>
-    </div>
-    <div class="section" id="sectionlast">
-      <p>
-        <strong>
-          <xsl:value-of select="i18n:translate('component.user2.login.select')" />
-        </strong>
-        <br />
-        <xsl:if test="@guest != 'true'">
-          <li>
-            <a href="{$ServletsBaseURL}logout">
-              <xsl:value-of select="i18n:translate('component.user2.login.logout')" />
-            </a>
-            <div>
-              <xsl:value-of select="i18n:translate('component.user2.login.openAccess')" />
-            </div>
-          </li>
-        </xsl:if>
-        <dl class="realms">
-          <xsl:apply-templates select="realm" />
-        </dl>
-      </p>
-      <p>
-        <form method="get" action="{$ServletsBaseURL}MCRLoginServlet" class="action">
-          <input value="cancel" name="action" type="hidden" />
-          <input value="{i18n:translate('component.user2.button.cancel')}" class="action" type="submit" />
-        </form>
-      </p>
+    <div class="user-realms">
+      <div class="section">
+        <p>
+          <xsl:variable name="currentAccount">
+            <xsl:value-of select="'&lt;strong&gt;'" />
+            <xsl:choose>
+              <xsl:when test="@guest='true'">
+                <xsl:value-of select="i18n:translate('component.user2.login.guest')" />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="concat(@user,' [',@realm,']')" />
+              </xsl:otherwise>
+            </xsl:choose>
+            <xsl:value-of select="'&lt;/strong&gt;'" />
+          </xsl:variable>
+          <xsl:value-of select="i18n:translate('component.user2.login.currentAccount', $currentAccount)" disable-output-escaping="yes" />
+        </p>
+      </div>
+      <div class="section" id="sectionlast">
+        <p>
+          <strong>
+            <xsl:value-of select="i18n:translate('component.user2.login.select')" />
+          </strong>
+          <br />
+          <xsl:if test="@guest != 'true'">
+            <li>
+              <a href="{$ServletsBaseURL}logout">
+                <xsl:value-of select="i18n:translate('component.user2.login.logout')" />
+              </a>
+              <div>
+                <xsl:value-of select="i18n:translate('component.user2.login.openAccess')" />
+              </div>
+            </li>
+          </xsl:if>
+          <dl class="realms">
+            <xsl:apply-templates select="realm" />
+          </dl>
+        </p>
+        <p>
+          <form method="get" action="{$ServletsBaseURL}MCRLoginServlet" class="action">
+            <input value="cancel" name="action" type="hidden" />
+            <input value="{i18n:translate('component.user2.button.cancel')}" class="action" type="submit" />
+          </form>
+        </p>
+      </div>
     </div>
   </xsl:template>
 

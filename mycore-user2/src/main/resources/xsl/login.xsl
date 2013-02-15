@@ -37,7 +37,7 @@
   <xsl:variable name="PageTitle" select="i18n:translate('component.user2.login.form.title')" />
 
   <xsl:template match="/login">
-    <div id="userlogin">
+    <div id="userlogin" class="user-login">
         <!-- At first we display the current user in a head line. -->
       <p class="header">
         <xsl:variable name="currentAccount">

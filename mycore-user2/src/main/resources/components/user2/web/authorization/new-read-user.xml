@@ -2,8 +2,10 @@
 <!DOCTYPE MyCoReWebPage>
 <MyCoReWebPage>
   <section i18n="component.user2.admin.createUnpriv.title" xml:lang="all">
-    <editor id="new-read-user-form">
-      <include uri="webapp:authorization/user-editor.xml" ref="editor4newReadUser" />
-    </editor>
+    <div class="user-editor">
+      <editor id="new-read-user-form">
+        <include uri="webapp:authorization/user-editor.xml" ref="editor4newReadUser" />
+      </editor>
+    </div>
   </section>
 </MyCoReWebPage>
