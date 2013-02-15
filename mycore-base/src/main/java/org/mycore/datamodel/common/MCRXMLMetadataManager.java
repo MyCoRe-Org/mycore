@@ -486,14 +486,12 @@ public class MCRXMLMetadataManager {
     /**
      * Retrieves stored metadata xml as JDOM document
      * 
-     * @param mcrid the MCRObjectID 
-     * @throws IOException 
-     * @throws SAXException 
-     * @throws JDOMException 
+     * @param mcrid the MCRObjectID
+     * @returns null if metadata is not present 
      */
     public Document retrieveXML(MCRObjectID mcrid) throws IOException, JDOMException, SAXException {
         MCRContent metadata = retrieveContent(mcrid);
-        return metadata.asXML();
+        return metadata == null ? null : metadata.asXML();
     }
 
     /**
