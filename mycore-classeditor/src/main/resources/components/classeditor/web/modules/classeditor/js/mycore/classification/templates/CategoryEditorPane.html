@@ -21,7 +21,7 @@
 		<tr data-dojo-attach-point="categIdRow">
 			<td class="categoryEditorDescription">Category Id</td>
 			<td class="categoryEditorValue">
-				<input data-dojo-type="dijit.form.ValidationTextBox" data-dojo-attach-point="categIdEditor" data-dojo-props="regExp: '[a-zA-Z_\\-0-9]*', required: true, intermediateChanges: true, disabled: true" />
+				<input data-dojo-type="dijit.form.ValidationTextBox" data-dojo-attach-point="categIdEditor" data-dojo-props="regExp: '[^:$\\{\\}\\s]+', required: true, intermediateChanges: true, disabled: true" />
 			</td>
 		</tr>
 	</table>
