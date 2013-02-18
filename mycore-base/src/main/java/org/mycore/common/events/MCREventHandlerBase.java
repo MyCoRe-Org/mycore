@@ -108,7 +108,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 }
                 return;
             }
-            logger.warn("Can't find method for " + MCREvent.OBJECT_TYPE + " for event type " + evt.getEventType());
+            logger.warn("Can't find method for " + MCREvent.FILE_TYPE + " for event type " + evt.getEventType());
             return;
         }
 
