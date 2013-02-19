@@ -2,7 +2,6 @@ package org.mycore.frontend.classeditor.resources;
 
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -24,7 +23,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.log4j.Logger;
@@ -260,18 +258,6 @@ public class MCRClassificationEditorResource {
         return MCRCategoryID.rootID(uuid);
     }
 
-    private URI buildGetURI(MCRCategoryID categoryID) {
-        UriBuilder uriBuilder = UriBuilder.fromUri(uriInfo.getBaseUri());
-        uriBuilder.path(this.getClass());
-        uriBuilder.path(categoryID.getRootID());
-        String categID = categoryID.getID();
-        if (categID != null && !"".equals(categID)) {
-            uriBuilder.path(categID);
-        }
-
-        return uriBuilder.build();
-    }
-
     private MCRCategoryID newRandomUUID(String rootID) {
         if (rootID == null) {
             rootID = UUID.randomUUID().toString();
@@ -331,12 +317,11 @@ public class MCRClassificationEditorResource {
         return category;
     }
 
-    protected Response updateCateg(MCRJSONCategory categ) {
+    protected void updateCateg(MCRJSONCategory categ) {
         MCRCategoryID newParentID = categ.getParentID();
         if (newParentID != null && !getCategoryDAO().exist(newParentID)) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
-        Response response = null;
         if (getCategoryDAO().exist(categ.getId())) {
             Set<MCRLabel> labels = categ.getLabels();
             for (MCRLabel mcrLabel : labels) {
@@ -346,13 +331,9 @@ public class MCRClassificationEditorResource {
             if (newParentID != null) {
                 getCategoryDAO().moveCategory(categ.getId(), newParentID, categ.getPositionInParent());
             }
-            response = Response.status(Status.OK).build();
         } else {
             getCategoryDAO().addCategory(newParentID, categ.asMCRImpl());
-            URI uri = buildGetURI(categ.getId());
-            response = Response.created(uri).build();
         }
-        return response;
     }
 
     private static class SaveElement {
