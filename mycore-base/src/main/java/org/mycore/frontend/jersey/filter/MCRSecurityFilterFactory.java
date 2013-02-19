@@ -26,7 +26,7 @@ public class MCRSecurityFilterFactory implements ResourceFilterFactory {
     @Context
     HttpServletRequest httpRequest;
 
-    public interface AccesManagerConnector {
+    public interface AccessManagerConnector {
         boolean checkPermission(String resourceName, String resourceOperation, MCRSession session);
     }
     
