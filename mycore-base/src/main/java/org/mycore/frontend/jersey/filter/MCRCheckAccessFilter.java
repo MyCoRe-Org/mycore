@@ -26,7 +26,6 @@ import com.sun.jersey.spi.container.ResourceFilter;
 class MCRCheckAccessFilter implements ResourceFilter, ContainerRequestFilter, ContainerResponseFilter {
     private static final Logger LOGGER = Logger.getLogger(MCRCheckAccessFilter.class);
 
-
     private String resourceName;
 
     private String resourceOperation;
