@@ -7,6 +7,9 @@
   <body>
     <release version="2.1.81" date="2013-02-XX" description="Beta 2">
       <action dev="mcrtchef" type="add">
+        added MCRXMLFunctions.normalizeAbsoluteURL(String) to ensure that a absolute URL is RFC 2396 compliant.
+      </action>
+      <action dev="mcrtchef" type="add">
         added MCRURNManager.assignURN(String urn, String derivateID, String path)
       </action>
       <action dev="mcrtchef" type="add">

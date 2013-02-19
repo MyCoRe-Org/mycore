@@ -2,6 +2,8 @@ package org.mycore.common.xml;
 
 import static org.junit.Assert.assertEquals;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 
 import org.junit.Test;
@@ -24,8 +26,20 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
     @Test
     public void getISODate() throws ParseException {
         assertEquals("1964-02-24", MCRXMLFunctions.getISODate("24.02.1964", "dd.MM.yyyy", "YYYY-MM-DD"));
-        assertEquals("Timezone was not correctly detected", "1964-02-23T22:00:00Z", MCRXMLFunctions.getISODate("24.02.1964 00:00:00 +0200",
-                "dd.MM.yyyy HH:mm:ss Z", "YYYY-MM-DDThh:mm:ssTZD"));
+        assertEquals("Timezone was not correctly detected", "1964-02-23T22:00:00Z",
+            MCRXMLFunctions.getISODate("24.02.1964 00:00:00 +0200", "dd.MM.yyyy HH:mm:ss Z", "YYYY-MM-DDThh:mm:ssTZD"));
+    }
+
+    @Test
+    public void normalizeAbsoluteURL() throws MalformedURLException, URISyntaxException {
+        String source = "http://www.mycore.de/Space Character.test";
+        String result = "http://www.mycore.de/Space%20Character.test";
+        assertEquals("Result URL is not correct", result, MCRXMLFunctions.normalizeAbsoluteURL(source));
+        assertEquals("URL differs,  but was already RFC 2396 conform.", result, MCRXMLFunctions.normalizeAbsoluteURL(result));
+        source= "http://www.mycore.de/Hühnerstall.pdf";
+        result= "http://www.mycore.de/H%C3%BChnerstall.pdf";
+        assertEquals("Result URL is not correct", result, MCRXMLFunctions.normalizeAbsoluteURL(source));
+        assertEquals("URL differs,  but was already RFC 2396 conform.", result, MCRXMLFunctions.normalizeAbsoluteURL(result));
     }
 
 }

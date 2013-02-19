@@ -24,6 +24,7 @@
 package org.mycore.common.xml;
 
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -429,6 +430,24 @@ public class MCRXMLFunctions {
     }
 
     /**
+     * Encodes the given URL so, that it is a valid RFC 2396 URL.
+     * @param url
+     * @return
+     * @throws MalformedURLException 
+     * @throws URISyntaxException 
+     */
+    public static String normalizeAbsoluteURL(String url) throws MalformedURLException, URISyntaxException {
+        try {
+            return new URI(url).toASCIIString();
+        } catch (Exception e) {
+            URL testURL = new URL(url);
+            URI uri = new URI(testURL.getProtocol(), testURL.getUserInfo(), testURL.getHost(), testURL.getPort(), testURL.getPath(), testURL.getQuery(),
+                testURL.getRef());
+            return uri.toASCIIString();
+        }
+    }
+
+    /**
      * Encodes the path so that it can be safely used in an URI.
      * @param path
      * @return encoded path as described in RFC 2396
@@ -681,10 +700,11 @@ public class MCRXMLFunctions {
     public static String getMCRObjectID(String derivateID) {
         return getMCRObjectID(derivateID, 5000);
     }
+
     /**
      * Same as {@link MCRMetadataManager#getObjectId(MCRObjectID, long)} with String representation.
      */
-    public static String getMCRObjectID(final String derivateID, final long expire){
+    public static String getMCRObjectID(final String derivateID, final long expire) {
         return MCRMetadataManager.getObjectId(MCRObjectID.getInstance(derivateID), expire).toString();
     }
 
