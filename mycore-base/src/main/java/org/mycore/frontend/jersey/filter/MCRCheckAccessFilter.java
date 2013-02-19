@@ -22,6 +22,7 @@ import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
 
+@Deprecated
 class MCRCheckAccessFilter implements ResourceFilter, ContainerRequestFilter, ContainerResponseFilter {
     private static final Logger LOGGER = Logger.getLogger(MCRCheckAccessFilter.class);
 
