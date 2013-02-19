@@ -99,6 +99,13 @@ public class MCRServlet extends HttpServlet {
 
     public static final String BASE_URL_ATTRIBUTE = "org.mycore.base.url";
 
+    /** The IP addresses of trusted web proxies */
+    protected static Set<String> TRUSTED_PROXIES = getTrustedProxies();
+
+    static {
+        prepareBaseURLs(""); // getBaseURL() etc. may be called before any HTTP Request    
+    }
+
     public static MCRLayoutService getLayoutService() {
         return LAYOUT_SERVICE;
     }
@@ -109,7 +116,6 @@ public class MCRServlet extends HttpServlet {
         if (LAYOUT_SERVICE == null) {
             LAYOUT_SERVICE = MCRLayoutService.instance();
         }
-        initTrustedProxies();
     }
 
     /** returns the base URL of the mycore system */
@@ -164,10 +170,6 @@ public class MCRServlet extends HttpServlet {
         } catch (UnknownHostException e) {
             LOGGER.error("Can't find host IP for URL " + BASE_URL);
         }
-    }
-
-    static {
-        prepareBaseURLs(""); // getBaseURL() etc. may be called before any HTTP Request    
     }
 
     // The methods doGet() and doPost() simply call the private method
@@ -594,18 +596,13 @@ public class MCRServlet extends HttpServlet {
         return value;
     }
 
-    /** The IP addresses of trusted web proxies */
-    protected static Set<String> trustedProxies;
-
     /**
      * Builds a list of trusted proxy IPs from MCR.Request.TrustedProxies. The
      * IP address of the local host is automatically added to this list.
+     * @return 
      */
-    protected static synchronized void initTrustedProxies() {
-        if (trustedProxies != null)
-            return;
-
-        trustedProxies = new HashSet<String>();
+    private static HashSet<String> getTrustedProxies() {
+        HashSet<String> trustedProxies = new HashSet<String>();
 
         String sTrustedProxies = MCRConfiguration.instance().getString("MCR.Request.TrustedProxies", "");
         StringTokenizer st = new StringTokenizer(sTrustedProxies, " ,;");
@@ -616,16 +613,20 @@ public class MCRServlet extends HttpServlet {
         // Always trust the local host
         trustedProxies.add("127.0.0.1");
 
-        try {
-            String host = new java.net.URL(getBaseURL()).getHost();
-            trustedProxies.add(InetAddress.getByName(host).getHostAddress());
-        } catch (Exception ex) {
-            LOGGER.warn("Could not determine IP of local host", ex);
+        //junit test cannot configure baseurl properly
+        if (getBaseURL() != null) {
+            try {
+                String host = new java.net.URL(getBaseURL()).getHost();
+                trustedProxies.add(InetAddress.getByName(host).getHostAddress());
+            } catch (Exception ex) {
+                LOGGER.warn("Could not determine IP of local host serving:" + getBaseURL(), ex);
+            }
         }
 
         for (String proxy : trustedProxies) {
             LOGGER.debug("Trusted proxy: " + proxy);
         }
+        return trustedProxies;
     }
 
     /**
@@ -639,7 +640,7 @@ public class MCRServlet extends HttpServlet {
      */
     public static String getRemoteAddr(HttpServletRequest req) {
         String remoteAddress = req.getRemoteAddr();
-        if (trustedProxies.contains(remoteAddress)) {
+        if (TRUSTED_PROXIES.contains(remoteAddress)) {
             String xff = getXForwardedFor(req);
             if (xff != null)
                 remoteAddress = xff;
