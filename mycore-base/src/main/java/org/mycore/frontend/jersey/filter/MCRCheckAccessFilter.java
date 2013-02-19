@@ -8,6 +8,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -23,23 +24,19 @@ import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
 
 class MCRCheckAccessFilter implements ResourceFilter, ContainerRequestFilter, ContainerResponseFilter {
+    private static final Logger LOGGER = Logger.getLogger(MCRCheckAccessFilter.class);
 
-    /**
-     * 
-     */
-    private final MCRSecurityFilterFactory myCoReSecurityFilterFactory;
 
     private String resourceName;
 
     private String resourceOperation;
 
-    public MCRCheckAccessFilter(MCRSecurityFilterFactory myCoReSecurityFilterFactory, AbstractMethod am) {
-        this.myCoReSecurityFilterFactory = myCoReSecurityFilterFactory;
+    public MCRCheckAccessFilter(AbstractMethod am) {
         this.resourceName = am.getResource().getResourceClass().getName();
         this.resourceOperation = getPath(am) + "_" + getHttpMethod(am);
         MCRResourceSercurityConf.instance().registerResource(resourceName, resourceOperation);
     }
-    
+
     private AccessManagerConnector getAccessManagerConnector() {
         MCRConfiguration instance = MCRConfiguration.instance();
         String defaultConnector = MCRAccessManagerConnector.class.getName();
@@ -49,14 +46,15 @@ class MCRCheckAccessFilter implements ResourceFilter, ContainerRequestFilter, Co
     @Override
     public ContainerRequest filter(ContainerRequest request) {
         MCRSession session = MCRSessionMgr.getCurrentSession();
-        
-        boolean hasPermission = getAccessManagerConnector().checkPermission(resourceName, resourceOperation, session );
 
-        this.myCoReSecurityFilterFactory.logger.debug("current user ID: " + session.getUserInformation().getUserID());
-        this.myCoReSecurityFilterFactory.logger.debug("resource name: " + resourceName);
-        this.myCoReSecurityFilterFactory.logger.debug("resource operation: " + resourceOperation);
-        this.myCoReSecurityFilterFactory.logger.debug("has permission: " + hasPermission);
+        boolean hasPermission = getAccessManagerConnector().checkPermission(resourceName, resourceOperation, session);
 
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("current user ID: " + session.getUserInformation().getUserID());
+            LOGGER.debug("resource name: " + resourceName);
+            LOGGER.debug("resource operation: " + resourceOperation);
+            LOGGER.debug("has permission: " + hasPermission);
+        }
         if (!hasPermission) {
             throw new WebApplicationException(Response.Status.UNAUTHORIZED);
         }
@@ -77,7 +75,7 @@ class MCRCheckAccessFilter implements ResourceFilter, ContainerRequestFilter, Co
     public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
         return response;
     }
-    
+
     private String getPath(AbstractMethod am) {
         PathValue resourcePath = am.getResource().getPath();
         if (resourcePath == null) {
@@ -92,7 +90,7 @@ class MCRCheckAccessFilter implements ResourceFilter, ContainerRequestFilter, Co
 
         return path;
     }
-    
+
     private String getHttpMethod(AbstractMethod am) {
         Class[] httpMethods = { POST.class, GET.class, PUT.class, DELETE.class };
         for (Class httpMethod : httpMethods) {

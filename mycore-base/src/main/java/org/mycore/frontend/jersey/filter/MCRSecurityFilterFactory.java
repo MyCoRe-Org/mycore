@@ -7,7 +7,6 @@ import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
 
-import org.apache.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
@@ -19,9 +18,7 @@ import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
 import com.sun.jersey.spi.container.ResourceFilterFactory;
 
-
 public class MCRSecurityFilterFactory implements ResourceFilterFactory {
-    Logger logger;
 
     @Context
     HttpServletRequest httpRequest;
@@ -29,11 +26,7 @@ public class MCRSecurityFilterFactory implements ResourceFilterFactory {
     public interface AccessManagerConnector {
         boolean checkPermission(String resourceName, String resourceOperation, MCRSession session);
     }
-    
-    public MCRSecurityFilterFactory() {
-        logger = Logger.getLogger(this.getClass());
-    }
-    
+
     class MCRDBTransactionFilter implements ResourceFilter, ContainerRequestFilter, ContainerResponseFilter {
 
         @Override
@@ -57,7 +50,7 @@ public class MCRSecurityFilterFactory implements ResourceFilterFactory {
         public ContainerResponseFilter getResponseFilter() {
             return this;
         }
-        
+
     }
 
     @Override
@@ -67,7 +60,7 @@ public class MCRSecurityFilterFactory implements ResourceFilterFactory {
         filters.add(new MCRDBTransactionFilter());
         RolesAllowed ra = am.getAnnotation(RolesAllowed.class);
         if (ra != null) {
-            filters.add(new MCRCheckAccessFilter(this, am));
+            filters.add(new MCRCheckAccessFilter(am));
         }
         return filters;
     }
