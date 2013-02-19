@@ -17,7 +17,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.frontend.jersey.MCRJerseyResourceTest;
 import org.mycore.frontend.jersey.config.MCRResourceSercurityConf;
 import org.mycore.frontend.jersey.filter.MCRSecurityFilterFactory;
-import org.mycore.frontend.jersey.filter.MCRSecurityFilterFactory.AccesManagerConnector;
+import org.mycore.frontend.jersey.filter.MCRSecurityFilterFactory.AccessManagerConnector;
 import org.mycore.frontend.jersey.resources.MCRTestResource;
 
 import com.sun.jersey.api.client.ClientResponse;
@@ -25,7 +25,7 @@ import com.sun.jersey.spi.container.ResourceFilter;
 
 
 public class MCRResourceSecurityTest extends MCRJerseyResourceTest {
-    public static class MyAccessManagerConnector implements AccesManagerConnector{
+    public static class MyAccessManagerConnector implements AccessManagerConnector{
         private HashMap<String, Boolean> permissions = new HashMap<String, Boolean>();
 
         public MyAccessManagerConnector() {
