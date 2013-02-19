@@ -47,6 +47,7 @@ import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.frontend.classeditor.json.MCRJSONCategory;
 import org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName;
 import org.mycore.frontend.classeditor.wrapper.MCRCategoryListWrapper;
+import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -132,6 +133,7 @@ public class MCRClassificationEditorResource {
 
     @GET
     @Path("newID")
+    @MCRRestrictedAccess(impl = MCRNewClassificationPermission.class)
     @Produces(MediaType.APPLICATION_JSON)
     public String newRootIDJson() {
         Gson gson = MCRJSONManager.instance().createGson();
