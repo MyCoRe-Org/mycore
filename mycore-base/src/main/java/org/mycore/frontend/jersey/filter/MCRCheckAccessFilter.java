@@ -13,7 +13,6 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.jersey.config.MCRResourceSercurityConf;
-import org.mycore.frontend.jersey.filter.MCRSecurityFilterFactory.AccessManagerConnector;
 
 import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.PathValue;
@@ -36,10 +35,10 @@ class MCRCheckAccessFilter implements ResourceFilter, ContainerRequestFilter, Co
         MCRResourceSercurityConf.instance().registerResource(resourceName, resourceOperation);
     }
 
-    private AccessManagerConnector getAccessManagerConnector() {
+    private MCRAccessManagerConnector getAccessManagerConnector() {
         MCRConfiguration instance = MCRConfiguration.instance();
         String defaultConnector = MCRAccessManagerConnector.class.getName();
-        return (AccessManagerConnector) instance.getInstanceOf("McrSessionSecurityFilter.MCRAccessManager.Connector", defaultConnector);
+        return (MCRAccessManagerConnector) instance.getInstanceOf("McrSessionSecurityFilter.MCRAccessManager.Connector", defaultConnector);
     }
 
     @Override
