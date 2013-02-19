@@ -11,6 +11,7 @@ import java.util.Properties;
 import javax.ws.rs.core.Response.Status;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
@@ -48,8 +49,8 @@ public class MCRResourceSecurityTest extends MCRJerseyResourceTest {
         }
     }
 
-    @Before
-    public void init() {
+    @BeforeClass
+    public static void init() {
         Properties mcrProperties = MCRConfiguration.instance().getProperties();
         mcrProperties.setProperty("McrSessionSecurityFilter.MCRAccessManager.Connector", MyAccessManagerConnector.class.getName());
         mcrProperties.setProperty("MCR.Persistence.Database.Enable", "false");
