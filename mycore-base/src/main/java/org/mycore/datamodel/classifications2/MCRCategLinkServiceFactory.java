@@ -23,6 +23,7 @@
  **/
 package org.mycore.datamodel.classifications2;
 
+import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl;
 
 /**
@@ -32,7 +33,10 @@ import org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl;
  * @since 2.0
  */
 public class MCRCategLinkServiceFactory {
-    private static MCRCategLinkService instance = new MCRCategLinkServiceImpl();
+    private static final String STANDARD_IMPL = MCRCategLinkServiceImpl.class.getCanonicalName();
+
+    private static MCRCategLinkService instance = MCRConfiguration.instance().getInstanceOf("MCR.Category.LinkService", STANDARD_IMPL,
+        MCRCategLinkService.class);
 
     /**
      * Returns an instance of a MCRCategoryDAO implementator.

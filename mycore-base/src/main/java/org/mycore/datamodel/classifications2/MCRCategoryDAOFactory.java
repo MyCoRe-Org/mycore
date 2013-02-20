@@ -24,6 +24,7 @@
 package org.mycore.datamodel.classifications2;
 
 import org.mycore.common.MCRConfiguration;
+import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -33,9 +34,10 @@ import org.mycore.common.MCRConfiguration;
  */
 public class MCRCategoryDAOFactory {
 
-    private static final String STANDARD_DAO = "org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl";
+    private static final String STANDARD_DAO = MCRCategoryDAOImpl.class.getCanonicalName();
 
-    private static MCRCategoryDAO instance = (MCRCategoryDAO) MCRConfiguration.instance().getInstanceOf("MCR.Category.DAO", STANDARD_DAO);
+    private static MCRCategoryDAO instance = MCRConfiguration.instance().getInstanceOf("MCR.Category.DAO", STANDARD_DAO,
+        MCRCategoryDAO.class);
 
     /**
      * Returns an instance of a MCRCategoryDAO implementator.
@@ -53,8 +55,7 @@ public class MCRCategoryDAOFactory {
      * @throws IllegalAccessException
      * @throws InstantiationException
      */
-    public static synchronized void set(Class<? extends MCRCategoryDAO> daoClass) throws IllegalAccessException,
-            InstantiationException {
+    public static synchronized void set(Class<? extends MCRCategoryDAO> daoClass) throws IllegalAccessException, InstantiationException {
         instance = daoClass.newInstance();
     }
 
