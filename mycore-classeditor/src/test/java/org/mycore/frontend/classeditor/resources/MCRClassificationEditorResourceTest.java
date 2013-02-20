@@ -21,6 +21,7 @@ import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRJSONManager;
@@ -50,8 +51,8 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyResourceTest {
 
     static Logger LOGGER = Logger.getLogger(MCRClassificationEditorResourceTest.class);
     
-    @Before
-    public void init() {
+    @BeforeClass
+    public static void setup(){
         System.setProperty("MCR.Configuration.File", "config/test.properties");
         Properties mcrProperties = MCRConfiguration.instance().getProperties();
         mcrProperties.setProperty("MCR.Metadata.Type.jpclassi", "true");
@@ -65,8 +66,11 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyResourceTest {
         mcrProperties.setProperty("MCR.Persistence.LinkTable.Store.Class", LinkTableStoreMock.class.getName());
         mcrProperties.setProperty("MCR.Category.DAO", CategoryDAOMock.class.getName());
         mcrProperties.setProperty("ClassificationResouce.useSession", "false");
-        mcrProperties.setProperty("Category.Link.Service", CategoryLinkServiceMock.class.getName());
-
+        mcrProperties.setProperty("MCR.Category.LinkService", CategoryLinkServiceMock.class.getName());
+    }
+    
+    @Before
+    public void init() {
         MCRJSONManager mg = MCRJSONManager.instance();
         mg.registerAdapter(new MCRCategoryTypeAdapter());
         mg.registerAdapter(new MCRCategoryIDTypeAdapter());
@@ -96,7 +100,6 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyResourceTest {
     @After
     public void cleanUp(){
         MCRStoreManager.removeStore("jportal_jpclassi");
-        MCRConfiguration.instance().set("MCR.Category.DAO", null);
     }
     
     @Test

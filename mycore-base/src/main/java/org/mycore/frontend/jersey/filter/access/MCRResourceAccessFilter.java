@@ -23,8 +23,15 @@
 
 package org.mycore.frontend.jersey.filter.access;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+
+import org.apache.commons.io.IOUtils;
 
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
@@ -48,11 +55,23 @@ public class MCRResourceAccessFilter implements ContainerRequestFilter, Resource
      */
     @Override
     public ContainerRequest filter(ContainerRequest request) {
-        boolean hasPermission = accessChecker.isPermitted(request);
-        if (!hasPermission) {
-            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+        //due to ContainerRequest.getEntity() resumes InputStream, we need to keep a copy of it in memory
+        try (InputStream in = request.getEntityInputStream()) {
+            ByteArrayOutputStream out = new ByteArrayOutputStream(64 * 1024);
+            IOUtils.copy(in, out);
+            byte[] entity = out.toByteArray();
+            //restore input
+            request.setEntityInputStream(new ByteArrayInputStream(entity));
+            boolean hasPermission = accessChecker.isPermitted(request);
+            if (!hasPermission) {
+                throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+            }
+            //restore input
+            request.setEntityInputStream(new ByteArrayInputStream(entity));
+            return request;
+        } catch (IOException e) {
+            throw new WebApplicationException(e);
         }
-        return request;
     }
 
     @Override

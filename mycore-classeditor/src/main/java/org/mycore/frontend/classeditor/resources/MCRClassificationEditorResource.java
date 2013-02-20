@@ -1,16 +1,21 @@
 package org.mycore.frontend.classeditor.resources;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -29,8 +34,7 @@ import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRJSONManager;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.content.MCRStreamContent;
@@ -44,10 +48,13 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
+import org.mycore.frontend.classeditor.access.MCRClassificationWritePermission;
+import org.mycore.frontend.classeditor.access.MCRNewClassificationPermission;
 import org.mycore.frontend.classeditor.json.MCRJSONCategory;
 import org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName;
 import org.mycore.frontend.classeditor.wrapper.MCRCategoryListWrapper;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
+import org.xml.sax.SAXParseException;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -79,14 +86,14 @@ import com.sun.jersey.multipart.FormDataParam;
  */
 @Path("classifications")
 public class MCRClassificationEditorResource {
-    static Logger LOGGER = Logger.getLogger(MCRClassificationEditorResource.class);
+    private static final Logger LOGGER = Logger.getLogger(MCRClassificationEditorResource.class);
 
-    private MCRCategoryDAO categoryDAO = null;
+    private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
+
+    private static final MCRCategLinkService CATEG_LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
 
     @Context
     UriInfo uriInfo;
-
-    private MCRCategLinkService linkService;
 
     /**
      * @param rootidStr
@@ -149,7 +156,7 @@ public class MCRClassificationEditorResource {
         }
         MCRCategoryID classId = MCRCategoryID.rootID(rootidStr);
         MCRCategory classification = MCRCategoryDAOFactory.getInstance().getRootCategory(classId, -1);
-        if(classification == null) {
+        if (classification == null) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
         try {
@@ -158,7 +165,7 @@ public class MCRClassificationEditorResource {
             StringWriter wr = new StringWriter();
             out.output(jdom, wr);
             return wr.toString();
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             LOGGER.error("while export classification " + rootidStr, exc);
             throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
         }
@@ -166,23 +173,35 @@ public class MCRClassificationEditorResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public String getClassification() {
+    public Response getClassification() {
         Gson gson = MCRJSONManager.instance().createGson();
-        List<MCRCategory> rootCategories = getCategoryDAO().getRootCategories();
-        Map<MCRCategoryID, Boolean> linkMap = getLinkService().hasLinks(null);
+        List<MCRCategory> rootCategories = new LinkedList<>(CATEGORY_DAO.getRootCategories());
+        for (Iterator<MCRCategory> it = rootCategories.iterator(); it.hasNext();) {
+            MCRCategory category = it.next();
+            if (!MCRAccessManager.checkPermission(category.getId().getRootID(), PERMISSION_WRITE)) {
+                it.remove();
+            }
+        }
+        if (rootCategories.isEmpty() && !MCRAccessManager.checkPermission(MCRNewClassificationPermission.PERMISSION)) {
+            return Response.status(Status.UNAUTHORIZED).build();
+        }
+        Map<MCRCategoryID, Boolean> linkMap = CATEG_LINK_SERVICE.hasLinks(null);
         String json = gson.toJson(new MCRCategoryListWrapper(rootCategories, linkMap));
-        return json;
+        return Response.ok(json).build();
     }
 
     @DELETE
-    @RolesAllowed("")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteCateg(String json) {
         MCRJSONCategory category = parseJson(json);
 
         try {
-            if (getCategoryDAO().exist(category.getId())) {
-                getCategoryDAO().deleteCategory(category.getId());
+            MCRCategoryID categoryID = category.getId();
+            if (CATEGORY_DAO.exist(categoryID)) {
+                if (categoryID.isRootID() && !MCRAccessManager.checkPermission(categoryID.getRootID(), PERMISSION_DELETE)) {
+                    throw new WebApplicationException(Status.UNAUTHORIZED);
+                }
+                CATEGORY_DAO.deleteCategory(categoryID);
                 return Response.status(Status.GONE).build();
             } else {
                 return Response.notModified().build();
@@ -195,9 +214,9 @@ public class MCRClassificationEditorResource {
 
     @POST
     @Path("save")
-    @RolesAllowed("")
+    @MCRRestrictedAccess(MCRClassificationWritePermission.class)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response save(String json) {      
+    public Response save(String json) {
         JsonStreamParser jsonStreamParser = new JsonStreamParser(json);
         if (jsonStreamParser.hasNext()) {
             JsonArray saveObjArray = jsonStreamParser.next().getAsJsonArray();
@@ -206,7 +225,7 @@ public class MCRClassificationEditorResource {
                 saveList.add(jsonElement.getAsJsonObject());
             }
             Collections.sort(saveList, new IndexComperator());
-            for(JsonObject jsonObject : saveList) {
+            for (JsonObject jsonObject : saveList) {
                 String status = getStatus(jsonObject);
                 SaveElement categ = getCateg(jsonObject);
                 MCRJSONCategory parsedCateg = parseJson(categ.getJson());
@@ -218,7 +237,7 @@ public class MCRClassificationEditorResource {
                     return Response.status(Status.BAD_REQUEST).build();
                 }
             }
-//            Status.CONFLICT
+            //            Status.CONFLICT
             return Response.status(Status.OK).build();
         } else {
             return Response.status(Status.BAD_REQUEST).build();
@@ -227,34 +246,35 @@ public class MCRClassificationEditorResource {
 
     @POST
     @Path("import")
-    @RolesAllowed("")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_HTML)
-    public String importClassification(
-            @FormDataParam("classificationFile") InputStream uploadedInputStream,
-            @FormDataParam("classificationFile") FormDataContentDisposition fileDetail) {
+    public Response importClassification(@FormDataParam("classificationFile") InputStream uploadedInputStream,
+        @FormDataParam("classificationFile") FormDataContentDisposition fileDetail) {
+        MCRCategory classification;
         try {
             Document jdom = MCRXMLParserFactory.getParser().parseXML(new MCRStreamContent(uploadedInputStream));
-            MCRCategory classification = MCRXMLTransformer.getCategory(jdom);
-            MCRCategoryDAOFactory.getInstance().addCategory(null, classification);
-        } catch(Exception exc) {
-            LOGGER.error("while import classification", exc);
-            return "<html><body><textarea>error</textarea></body></html>";
+            classification = MCRXMLTransformer.getCategory(jdom);
+        } catch (SAXParseException | URISyntaxException e) {
+            throw new WebApplicationException(e);
+        }
+        if (CATEGORY_DAO.exist(classification.getId())) {
+            if (!MCRAccessManager.checkPermission(classification.getId().getRootID(), PERMISSION_WRITE)) {
+                return Response.status(Status.UNAUTHORIZED).build();
+            }
+            CATEGORY_DAO.replaceCategory(classification);
+        } else {
+            if (!MCRAccessManager.checkPermission(MCRNewClassificationPermission.PERMISSION)){
+                return Response.status(Status.UNAUTHORIZED).build();
+            }
+            CATEGORY_DAO.addCategory(null, classification);
         }
         // This is a hack to support iframe loading via ajax.
         // The benefit is to load file input form data without reloading the page.
         // Maybe its better to create a separate method importClassificationIFrame.
         // @see http://livedocs.dojotoolkit.org/dojo/io/iframe - Additional Information
-        return "<html><body><textarea>200</textarea></body></html>";
+        return Response.ok("<html><body><textarea>200</textarea></body></html>").build();
     }
 
-    protected MCRCategoryDAO getCategoryDAO() {
-        if (categoryDAO == null) {
-            categoryDAO = MCRCategoryDAOFactory.getInstance();
-        }
-        return categoryDAO;
-    }
-    
     protected MCRCategoryID newRootID() {
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         return MCRCategoryID.rootID(uuid);
@@ -268,11 +288,11 @@ public class MCRClassificationEditorResource {
     }
 
     private String getCategory(MCRCategoryID id) {
-        if (!getCategoryDAO().exist(id)) {
+        if (!CATEGORY_DAO.exist(id)) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        MCRCategory category = getCategoryDAO().getCategory(id, 1);
+        MCRCategory category = CATEGORY_DAO.getCategory(id, 1);
         if (!(category instanceof MCRJSONCategory)) {
             category = new MCRJSONCategory(category);
         }
@@ -280,17 +300,6 @@ public class MCRClassificationEditorResource {
 
         String json = gson.toJson(category);
         return json;
-    }
-    
-    protected MCRCategLinkService getLinkService() {
-        if (linkService == null) {
-            try {
-                linkService = (MCRCategLinkService) MCRConfiguration.instance().getInstanceOf("Category.Link.Service");
-            } catch (MCRConfigurationException e) {
-                linkService = MCRCategLinkServiceFactory.getInstance();
-            }
-        }
-        return linkService;
     }
 
     private SaveElement getCateg(JsonElement jsonElement) {
@@ -321,20 +330,20 @@ public class MCRClassificationEditorResource {
 
     protected void updateCateg(MCRJSONCategory categ) {
         MCRCategoryID newParentID = categ.getParentID();
-        if (newParentID != null && !getCategoryDAO().exist(newParentID)) {
+        if (newParentID != null && !CATEGORY_DAO.exist(newParentID)) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
-        if (getCategoryDAO().exist(categ.getId())) {
+        if (CATEGORY_DAO.exist(categ.getId())) {
             Set<MCRLabel> labels = categ.getLabels();
             for (MCRLabel mcrLabel : labels) {
-                getCategoryDAO().setLabel(categ.getId(), mcrLabel);
+                CATEGORY_DAO.setLabel(categ.getId(), mcrLabel);
             }
-            getCategoryDAO().setURI(categ.getId(), categ.getURI());
+            CATEGORY_DAO.setURI(categ.getId(), categ.getURI());
             if (newParentID != null) {
-                getCategoryDAO().moveCategory(categ.getId(), newParentID, categ.getPositionInParent());
+                CATEGORY_DAO.moveCategory(categ.getId(), newParentID, categ.getPositionInParent());
             }
         } else {
-            getCategoryDAO().addCategory(newParentID, categ.asMCRImpl());
+            CATEGORY_DAO.addCategory(newParentID, categ.asMCRImpl());
         }
     }
 
@@ -368,31 +377,31 @@ public class MCRClassificationEditorResource {
     private static class IndexComperator implements Comparator<JsonElement> {
         @Override
         public int compare(JsonElement jsonElement1, JsonElement jsonElement2) {
-            if(!jsonElement1.isJsonObject()) {
+            if (!jsonElement1.isJsonObject()) {
                 return 1;
             }
-            if(!jsonElement2.isJsonObject()) {
+            if (!jsonElement2.isJsonObject()) {
                 return -1;
             }
             // compare level first
             JsonPrimitive depthLevel1 = jsonElement1.getAsJsonObject().getAsJsonPrimitive("depthLevel");
             JsonPrimitive depthLevel2 = jsonElement2.getAsJsonObject().getAsJsonPrimitive("depthLevel");
-            if(depthLevel1 == null) {
+            if (depthLevel1 == null) {
                 return 1;
             }
-            if(depthLevel2 == null) {
+            if (depthLevel2 == null) {
                 return -1;
             }
-            if(depthLevel1.getAsInt() != depthLevel2.getAsInt()) {
+            if (depthLevel1.getAsInt() != depthLevel2.getAsInt()) {
                 return new Integer(depthLevel1.getAsInt()).compareTo(depthLevel2.getAsInt());
             }
             // compare index            
             JsonPrimitive index1 = jsonElement1.getAsJsonObject().getAsJsonPrimitive("index");
             JsonPrimitive index2 = jsonElement2.getAsJsonObject().getAsJsonPrimitive("index");
-            if(index1 == null) {
+            if (index1 == null) {
                 return 1;
             }
-            if(index2 == null) {
+            if (index2 == null) {
                 return -1;
             }
             return new Integer(index1.getAsInt()).compareTo(index2.getAsInt());

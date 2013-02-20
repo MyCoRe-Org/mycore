@@ -1,6 +1,6 @@
 /*
  * $Id$
- * $Revision: 5697 $ $Date: Feb 19, 2013 $
+ * $Revision: 5697 $ $Date: Feb 20, 2013 $
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -21,12 +21,16 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.frontend.classeditor.resources;
+package org.mycore.frontend.classeditor.access;
 
-import java.text.MessageFormat;
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.frontend.classeditor.utils.MCRCategUtils;
 import org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker;
 
 import com.sun.jersey.spi.container.ContainerRequest;
@@ -35,18 +39,27 @@ import com.sun.jersey.spi.container.ContainerRequest;
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRNewClassificationPermission implements MCRResourceAccessChecker {
-    private static final String PERMISSION = "create-class";
+public class MCRClassificationWritePermission implements MCRResourceAccessChecker {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRNewClassificationPermission.class);
+    private static Logger LOGGER = Logger.getLogger(MCRClassificationWritePermission.class);
 
     /* (non-Javadoc)
      * @see org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker#isPermitted(com.sun.jersey.spi.container.ContainerRequest)
      */
     @Override
     public boolean isPermitted(ContainerRequest request) {
-        LOGGER.info(MessageFormat.format("{0} has permission {1}?", request.getPath(), PERMISSION));
-        return MCRAccessManager.checkPermission(PERMISSION);
+        String value = request.getEntity(String.class);
+        Set<MCRCategoryID> categories = MCRCategUtils.getRootCategoryIDs(value);
+        if (categories == null) {
+            LOGGER.error("Could not parse: " + value);
+            return false;
+        }
+        for (MCRCategoryID category : categories) {
+            if (!MCRAccessManager.checkPermission(category.getRootID(), PERMISSION_WRITE)) {
+                LOGGER.info("Permission denied on classification: " + category);
+                return false;
+            }
+        }
+        return true;
     }
-
 }

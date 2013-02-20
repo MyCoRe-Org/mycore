@@ -6,6 +6,10 @@
   </properties>
   <body>
     <release version="2.1.81" date="2013-02-XX" description="Beta 2">
+      <action dev="mcrtchef" type="fix" due-to="Marcus Müller">
+        ClassificationEditor does not work for non super users.
+        <fixes issue="609" />
+      </action>
       <action dev="mcrtchef" type="add" due-to="Frank Lützenkirchen">
         added MCRXMLFunctions.encodeURIPath(String path, boolean asciiOnly) to ensure that encoded path contains only ASCII characters.
         <fixes issue="610" />
