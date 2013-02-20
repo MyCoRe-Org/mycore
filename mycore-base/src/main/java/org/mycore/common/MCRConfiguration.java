@@ -24,8 +24,6 @@
 package org.mycore.common;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +31,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
@@ -40,7 +39,9 @@ import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.mycore.services.plugins.FilterPluginInstantiationException;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRFileContent;
+import org.mycore.common.content.MCRURLContent;
 
 /**
  * Provides methods to manage and read all configuration properties from the
@@ -372,36 +373,33 @@ public class MCRConfiguration {
      */
     private void loadFromFile(String filename) {
         File mycoreProperties = new File(filename);
-        InputStream in;
-        if (mycoreProperties.canRead()) {
-            try {
-                in = new FileInputStream(mycoreProperties);
-            } catch (FileNotFoundException e) {
-                // should never happend, because we verified it allready with canRead() above
-                String msg = "Could not find configuration file " + filename;
-                throw new MCRConfigurationException(msg, e);
-            }
-        } else {
-            in = this.getClass().getResourceAsStream("/" + filename);
-        }
-        if (in == null) {
-            String msg = "Could not find configuration file " + filename + " in CLASSPATH";
-            throw new MCRConfigurationException(msg);
-        }
-
+        MCRContent input=null;
         try {
-            properties.load(in);
-            in.close();
-        } catch (Exception exc) {
-            throw new MCRConfigurationException("Could not load configuration file " + filename, exc);
+            if (mycoreProperties.canRead()) {
+                input = new MCRFileContent(mycoreProperties);
+            } else {
+                URL url = this.getClass().getResource("/" + filename);
+                if (url == null) {
+                    throw new MCRConfigurationException("Could not found file or resource:" + filename);
+                }
+                input = new MCRURLContent(url);
+            }
+            loadFromContent(input);
+        } catch (IOException e) {
+            String name = input == null ? filename : input.getSystemId();
+            throw new MCRConfigurationException("Could not load configuration from: " + name, e);
         }
+    }
 
+    private void loadFromContent(MCRContent input) throws IOException {
+        try (InputStream in = input.getInputStream()) {
+            properties.load(in);
+        }
         String include = getString("MCR.Configuration.Include", null);
 
         if (include != null) {
             StringTokenizer st = new StringTokenizer(include, ", ");
             set("MCR.Configuration.Include", null);
-
             while (st.hasMoreTokens()) {
                 loadFromFile(st.nextToken());
             }
@@ -487,12 +485,15 @@ public class MCRConfiguration {
      *            the non-null and non-empty qualified name of the configuration property
      * @param defaultname
      *            the qualified class name
+     * @param type
+     *            return type of this method
      * @return the value of the configuration property as a String, or null
      * @throws MCRConfigurationException
      *             if the property is not set or the class can not be loaded or
      *             instantiated
      */
-    public Object getInstanceOf(String name, String defaultname) throws MCRConfigurationException {
+    @SuppressWarnings("unchecked")
+    public <T> T getInstanceOf(String name, String defaultname, Class<T> type) {
         String classname = getString(name, defaultname);
         if (classname == null) {
             throw new MCRConfigurationException("Configuration property missing: " + name);
@@ -500,30 +501,25 @@ public class MCRConfiguration {
 
         Logger.getLogger(this.getClass()).debug("Loading Class: " + classname);
 
-        Class<?> cl;
+        T o = null;
+        Class<? extends T> cl;
         try {
-            cl = Class.forName(classname);
-        } catch (Exception ex) {
+            cl = (Class<? extends T>) Class.forName(classname);
+        } catch (ClassNotFoundException ex) {
             throw new MCRConfigurationException("Could not load class " + classname, ex);
         }
-
-        Object o = null;
 
         try {
             try {
                 o = cl.newInstance();
-            } catch (Exception e) {
-                if (e instanceof FilterPluginInstantiationException) {
-                    Logger.getLogger(this.getClass()).info(e.toString());
-                }
+            } catch (IllegalAccessException | InstantiationException e) {
                 // check for singleton
                 Method[] querymethods = cl.getMethods();
 
                 for (Method querymethod : querymethods) {
                     if (querymethod.getName().toLowerCase().equals("instance") || querymethod.getName().toLowerCase().equals("getinstance")) {
                         Object[] ob = new Object[0];
-                        o = querymethod.invoke(cl, ob);
-
+                        o = (T) querymethod.invoke(cl, ob);
                         break;
                     }
                 }
@@ -533,26 +529,31 @@ public class MCRConfiguration {
             }
         } catch (Throwable t) {
             String msg = "Could not instantiate class " + classname;
-
             if (t instanceof ExceptionInInitializerError) {
                 Throwable t2 = ((ExceptionInInitializerError) t).getException();
-
-                if (t2 instanceof Exception) {
-                    throw new MCRConfigurationException(msg, (Exception) t2);
-                }
-
-                throw new MCRConfigurationException(msg + ": " + t2.getClass().getName() + " - " + t2.getMessage());
-            } else if (t instanceof Exception) {
-                t.printStackTrace();
-                throw new MCRConfigurationException(msg, (Exception) t);
+                throw new MCRConfigurationException(msg, t2);
             } else {
-                msg += " because of: " + t.getMessage();
-                msg += "\n" + MCRException.getStackTraceAsString(t);
-                throw new MCRConfigurationException(msg);
+                throw new MCRConfigurationException(msg, t);
             }
         }
-
         return o;
+    }
+
+    /**
+     * Returns a new instance of the class specified in the configuration
+     * property with the given name.
+     * 
+     * @param name
+     *            the non-null and non-empty qualified name of the configuration property
+     * @param defaultname
+     *            the qualified class name
+     * @return the value of the configuration property as a String, or null
+     * @throws MCRConfigurationException
+     *             if the property is not set or the class can not be loaded or
+     *             instantiated
+     */
+    public Object getInstanceOf(String name, String defaultname) throws MCRConfigurationException {
+        return getInstanceOf(name, defaultname, Object.class);
     }
 
     /**
@@ -572,25 +573,46 @@ public class MCRConfiguration {
 
     /**
      * Returns a instance of the class specified in the configuration property
-     * with the given name. If the class was prevously instantiated by this
+     * with the given name. If the class was previously instantiated by this
      * method this instance is returned.
      * 
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return the instance of the class named by the value of the configuration
-     *         propertyl
+     *         property
      * @throws MCRConfigurationException
      *             if the property is not set or the class can not be loaded or
      *             instantiated
      */
     public Object getSingleInstanceOf(String name, String defaultname) throws MCRConfigurationException {
-        Object inst = instanceHolder.get(name);
+        return getSingleInstanceOf(name, defaultname, Object.class);
+    }
+
+    /**
+     * Returns a instance of the class specified in the configuration property
+     * with the given name. If the class was previously instantiated by this
+     * method this instance is returned.
+     * 
+     * @param name
+     *            the non-null and non-empty name of the configuration property
+     * @param defaultName
+     *            qualified class name as default value for property - maybe null
+     * @param type
+     *            return type of this method
+     * @return the instance of the class named by the value of the configuration
+     *         property
+     * @throws MCRConfigurationException
+     *             if the property is not set or the class can not be loaded or
+     *             instantiated
+     */
+    public <T> T getSingleInstanceOf(String name, String defaultname, Class<T> type) throws MCRConfigurationException {
+        @SuppressWarnings("unchecked")
+        T inst = (T) instanceHolder.get(name);
         if (inst != null) {
             return inst;
         }
-        inst = getInstanceOf(name, defaultname); // we need a new instance, get it
+        inst = getInstanceOf(name, defaultname, type); // we need a new instance, get it
         instanceHolder.put(name, inst); // save the instance in the hashtable
-
         return inst;
     }
 
