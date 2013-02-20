@@ -7,6 +7,10 @@
   <body>
     <release version="2.1.81" date="2013-02-XX" description="Beta 2">
       <action dev="mcrtchef" type="add" due-to="Frank Lützenkirchen">
+        added MCRXMLFunctions.encodeURIPath(String path, boolean asciiOnly) to ensure that encoded path contains only ASCII characters.
+        <fixes issue="610" />
+      </action>
+      <action dev="mcrtchef" type="add" due-to="Frank Lützenkirchen">
         added MCRXMLFunctions.normalizeAbsoluteURL(String) to ensure that a absolute URL is RFC 2396 compliant.
         <fixes issue="607" />
       </action>

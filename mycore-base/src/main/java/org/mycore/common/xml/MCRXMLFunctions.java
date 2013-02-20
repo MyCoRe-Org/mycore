@@ -441,21 +441,34 @@ public class MCRXMLFunctions {
             return new URI(url).toASCIIString();
         } catch (Exception e) {
             URL testURL = new URL(url);
-            URI uri = new URI(testURL.getProtocol(), testURL.getUserInfo(), testURL.getHost(), testURL.getPort(), testURL.getPath(), testURL.getQuery(),
-                testURL.getRef());
+            URI uri = new URI(testURL.getProtocol(), testURL.getUserInfo(), testURL.getHost(), testURL.getPort(), testURL.getPath(),
+                testURL.getQuery(), testURL.getRef());
             return uri.toASCIIString();
         }
     }
 
     /**
      * Encodes the path so that it can be safely used in an URI.
+     * Same as calling {@link #encodeURIPath(String, boolean)} with boolean parameter set to false.
      * @param path
      * @return encoded path as described in RFC 2396
      * @throws URISyntaxException
      */
     public static String encodeURIPath(String path) throws URISyntaxException {
+        return encodeURIPath(path, false);
+    }
+
+    /**
+     * Encodes the path so that it can be safely used in an URI.
+     * @param path
+     * @param asciiOnly
+     *          if true, return only ASCII characters (e.g. encode umlauts)
+     * @return encoded path as described in RFC 2396
+     * @throws URISyntaxException
+     */
+    public static String encodeURIPath(String path, boolean asciiOnly) throws URISyntaxException {
         URI relativeURI = new URI(null, null, path, null, null);
-        return relativeURI.getRawPath();
+        return asciiOnly ? relativeURI.toASCIIString() : relativeURI.getRawPath();
     }
 
     public static boolean isDisplayedEnabledDerivate(String derivateId) {
@@ -520,8 +533,8 @@ public class MCRXMLFunctions {
                 return true;
             }
         }
-        LOGGER
-            .info("URN assignment disabled as the object type " + givenType + " is not in the list of allowed objects. See property \"" + propertyName + "\"");
+        LOGGER.info("URN assignment disabled as the object type " + givenType + " is not in the list of allowed objects. See property \""
+            + propertyName + "\"");
         return false;
     }
 
