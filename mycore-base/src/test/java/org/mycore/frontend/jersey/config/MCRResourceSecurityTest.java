@@ -10,23 +10,20 @@ import java.util.Properties;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.frontend.jersey.MCRJerseyResourceTest;
-import org.mycore.frontend.jersey.config.MCRResourceSercurityConf;
+import org.mycore.frontend.jersey.filter.MCRAccessManagerConnector;
 import org.mycore.frontend.jersey.filter.MCRSecurityFilterFactory;
-import org.mycore.frontend.jersey.filter.MCRSecurityFilterFactory.AccessManagerConnector;
 import org.mycore.frontend.jersey.resources.MCRTestResource;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.spi.container.ResourceFilter;
 
-
 public class MCRResourceSecurityTest extends MCRJerseyResourceTest {
-    public static class MyAccessManagerConnector implements AccessManagerConnector{
+    public static class MyAccessManagerConnector extends MCRAccessManagerConnector {
         private HashMap<String, Boolean> permissions = new HashMap<String, Boolean>();
 
         public MyAccessManagerConnector() {
@@ -34,17 +31,17 @@ public class MCRResourceSecurityTest extends MCRJerseyResourceTest {
             permissions.put(decodeRule(MCRTestResource.class.getName(), "/auth/logout/{id}_GET"), false);
         }
 
-        private String decodeRule(String id, String permission){
+        private String decodeRule(String id, String permission) {
             return id + "::" + permission;
         }
 
         @Override
         public boolean checkPermission(String id, String permission, MCRSession session) {
             Boolean perm = permissions.get(decodeRule(id, permission));
-            if(perm == null){
-                throw new RuntimeException("could not find permisson for: " + id + " # " +permission);
+            if (perm == null) {
+                throw new RuntimeException("could not find permisson for: " + id + " # " + permission);
             }
-            
+
             return perm;
         }
     }
@@ -59,26 +56,26 @@ public class MCRResourceSecurityTest extends MCRJerseyResourceTest {
     @Test
     public void testResourceSecurity() throws Exception {
         ClientResponse response = resource().path("/auth").get(ClientResponse.class);
-        
+
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         response = resource().path("/auth/logout/foo").get(ClientResponse.class);
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         Map<String, List<String>> resourceRegister = MCRResourceSercurityConf.instance().getResourceRegister();
-//        assertEquals(1, resourceRegister.size());
+        //        assertEquals(1, resourceRegister.size());
         List<String> testResourceEntry = MCRResourceSercurityConf.instance().getResourceRegister().get(MCRTestResource.class.getName());
         assertNotNull(MCRTestResource.class.getName() + " should has been registered", testResourceEntry);
-//        assertEquals(2, testResourceEntry.size());
+        //        assertEquals(2, testResourceEntry.size());
     }
 
     @Override
     protected String[] getPackageName() {
-        return new String[]{MCRTestResource.class.getPackage().getName()};
+        return new String[] { MCRTestResource.class.getPackage().getName() };
     }
 
     @Override
     protected Map<String, String> getInitParams() {
         Map<String, String> initParams = new HashMap<String, String>();
-        initParams.put(ResourceFilter.class.getName() + "s",MCRSecurityFilterFactory.class.getName());
+        initParams.put(ResourceFilter.class.getName() + "s", MCRSecurityFilterFactory.class.getName());
         return initParams;
     }
 
