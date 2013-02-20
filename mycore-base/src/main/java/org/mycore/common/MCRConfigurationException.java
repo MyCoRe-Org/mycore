@@ -33,6 +33,8 @@ package org.mycore.common;
  * @version $Revision$ $Date$
  */
 public class MCRConfigurationException extends MCRException {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Creates a new MCRConfigurationException with an error message
      * 
@@ -52,7 +54,7 @@ public class MCRConfigurationException extends MCRException {
      * @param exception
      *            the exception that was thrown by an underlying system
      */
-    public MCRConfigurationException(String message, Exception exception) {
-        super(message, exception);
+    public MCRConfigurationException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
