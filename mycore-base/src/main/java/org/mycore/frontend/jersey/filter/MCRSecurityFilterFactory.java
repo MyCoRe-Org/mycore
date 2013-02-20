@@ -31,10 +31,8 @@ public class MCRSecurityFilterFactory implements ResourceFilterFactory {
     @Override
     public List<ResourceFilter> create(AbstractMethod am) {
         List<ResourceFilter> filters = new ArrayList<ResourceFilter>();
-        LOGGER.info("Adding hook filter");
         filters.add(new MCRSessionHookFilter(httpRequest));
         filters.add(TRANSACTION_FILTER);
-
         MCRRestrictedAccess restrictedAccess = am.getAnnotation(MCRRestrictedAccess.class);
         if (restrictedAccess != null) {
             LOGGER.info("Access to " + am.getMethod().toString() + " is restricted by " + restrictedAccess.value().getCanonicalName());
