@@ -133,7 +133,7 @@ public class MCRClassificationEditorResource {
 
     @GET
     @Path("newID")
-    @MCRRestrictedAccess(impl = MCRNewClassificationPermission.class)
+    @MCRRestrictedAccess(MCRNewClassificationPermission.class)
     @Produces(MediaType.APPLICATION_JSON)
     public String newRootIDJson() {
         Gson gson = MCRJSONManager.instance().createGson();

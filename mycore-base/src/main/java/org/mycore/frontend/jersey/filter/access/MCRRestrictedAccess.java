@@ -23,11 +23,20 @@
 
 package org.mycore.frontend.jersey.filter.access;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
  * @author Thomas Scheffler (yagee)
  *
  */
+@Inherited
+@Target(value=ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface MCRRestrictedAccess {
 
-    public Class<? extends MCRResourceAccessChecker> impl();
+    public Class<? extends MCRResourceAccessChecker> value();
 }
