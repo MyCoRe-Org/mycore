@@ -63,9 +63,9 @@ function deleteStructure() {
 		log(selectedItem);
 		var pages = new Array();
 		var sections = new Array();
+		var store = tree.model.store;
 		
 		if (getPagesForStructure(selectedItem.children, pages, sections)) {
-			var store = tree.model.store;
 			/* delete pages */
 			for ( var i = 0; i < pages.length; i++) {
 				store.deleteItem(pages[i]);

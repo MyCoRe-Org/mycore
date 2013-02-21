@@ -68,16 +68,17 @@ function loadPreviewImage(selectedItem, source, event){
 		var divWithManyImg = document.createElement('div');
 		divWithManyImg.id = manyImagesContainerKey;
 		container.appendChild(divWithManyImg);
-		
-		for(var i = 0; i < selectedItem.children.length; i++){
-			var currentItem = selectedItem.children[i];
-			
-			if(currentItem.type == "item"){
-				var newImg = document.createElement('img');
-				newImg.src = previewBaseURL + escape(currentItem.path);
-				newImg.height = '512';
-				log("Adding <img> element to document "+ newImg.src);
-				divWithManyImg.appendChild(newImg);
+		if(typeof selectedItem.children != "undefined"){
+			for(var i = 0; i < selectedItem.children.length; i++){
+				var currentItem = selectedItem.children[i];
+				
+				if(currentItem.type == "item"){
+					var newImg = document.createElement('img');
+					newImg.src = previewBaseURL + escape(currentItem.path);
+					newImg.height = '512';
+					log("Adding <img> element to document "+ newImg.src);
+					divWithManyImg.appendChild(newImg);
+				}
 			}
 		}
 	} 
