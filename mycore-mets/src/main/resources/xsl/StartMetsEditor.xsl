@@ -133,8 +133,8 @@
               width: 16px;
               height: 16px;
               }
-                          
-              </style>
+
+            </style>
             <script type="text/javascript" src="js/includes/includes.js"></script>
             <script type="text/javascript" src="js/saveMets.js"></script>
             <script type="text/javascript" src="js/model/StructureModel.js"></script>
@@ -181,10 +181,16 @@
               dijit.byId('toolbar1.deleteStructure').setDisabled(true);
               }
               );
+
+              window.onbeforeunload = onEditorClose;
+              function onEditorClose() {
+                <xsl:value-of select="concat('var msg = &quot;', i18n:translate('component.mets.editor.close'), '&quot;;')" />
+                return confirm(msg);
+              }
+
             </script>
           </head>
           <body class="tundra">
-
             <span dojoType="dijit.Declaration" widgetClass="ToolbarSectionStart" defaults="{{ label: 'Label'}}">
               <span dojoType="dijit.ToolbarSeparator"></span>
               <i>${label}:</i>
