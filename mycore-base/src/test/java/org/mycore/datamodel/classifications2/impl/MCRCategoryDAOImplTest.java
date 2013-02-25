@@ -102,7 +102,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
     }
 
     /**
-     * 
+     * Test case for https://sourceforge.net/p/mycore/bugs/612/
      */
     @Test
     public void addCategorySingleSteps() {
