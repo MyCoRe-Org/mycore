@@ -124,7 +124,6 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         DAO.addCategory(rootID, c);
         DAO.addCategory(aId, b);
         startNewTransaction();
-        printCategoryTable();
         assertTrue("Category c should not contain child categories.", DAO.getChildren(cId).isEmpty());
         assertFalse("Category a should contain child categories.", DAO.getChildren(aId).isEmpty());
         root = DAO.getCategory(rootID, -1);
