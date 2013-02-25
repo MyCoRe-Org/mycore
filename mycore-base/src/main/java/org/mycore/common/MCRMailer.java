@@ -284,7 +284,7 @@ public class MCRMailer extends MCRServlet {
      *            null
      */
     public static void send(final String from, final List<String> replyTo, final List<String> to, final List<String> bcc,
-            final String subject, final String body, final List<String> parts) {
+        final String subject, final String body, final List<String> parts) {
         if (to == null || to.size() == 0) {
             StringBuilder sb = new StringBuilder("No receiver defined for mail\n");
             sb.append("Subject: ").append(subject).append('\n');
@@ -327,7 +327,7 @@ public class MCRMailer extends MCRServlet {
     }
 
     private static void trySending(String from, List<String> replyTo, List<String> to, List<String> bcc, String subject, String body,
-            List<String> parts) throws Exception {
+        List<String> parts) throws Exception {
         MimeMessage msg = new MimeMessage(mailSession);
         msg.setFrom(buildAddress(from));
 
@@ -468,6 +468,7 @@ public class MCRMailer extends MCRServlet {
         MCRJDOMContent source = new MCRJDOMContent(input);
         MCRXSL2XMLTransformer transformer = MCRXSL2XMLTransformer.getInstance("xsl/" + stylesheet + ".xsl");
         MCRParameterCollector parameterCollector = MCRParameterCollector.getInstanceFromUserSession();
+        parameterCollector.setParameters(parameters);
         MCRContent result = transformer.transform(source, parameterCollector);
         return result.asXML();
     }
