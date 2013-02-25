@@ -16,7 +16,7 @@
   <xsl:variable name="start" select="./response/lst[@name='responseHeader']/lst[@name='params']/str[@name='start']" />
   <xsl:variable name="rows" select="./response/lst[@name='responseHeader']/lst[@name='params']/str[@name='rows']" />
   <xsl:variable name="currentPage" select="ceiling((($start + 1) - $rows) div $rows)+1" />
-  <xsl:variable name="query" select="encoder:encode(./response/lst[@name='responseHeader']/lst[@name='params']/str[@name='q'])" />
+  <xsl:variable name="query" select="./response/lst[@name='responseHeader']/lst[@name='params']/str[@name='q']" />
 
   <xsl:variable name="pageTotal">
     <xsl:choose>
@@ -173,6 +173,19 @@
   </xsl:template>
 
   <xsl:template match="/response">
+    <div id="solrSearchInputSlotFormContainer">
+      <form action="{concat($WebApplicationBaseURL,'servlets/SolrSelectProxy')}" method="get">
+        <xsl:for-each select="lst[@name='responseHeader']/lst[@name='params']/str[not(@name='start' or @name='rows' or @name='q')]">
+          <input type="hidden" name="{@name}" value="{.}" />
+        </xsl:for-each>
+
+        <input type="hidden" name="start" value="0" />
+        <input type="hidden" name="rows" value="5" />
+        <input id="solrSearchInputSlot" type="text" name="q" value="{$query}" />
+        <input id="solrSearchInputSubmit" type="submit" value="" />
+      </form>
+    </div>
+
     <!-- table header -->
     <table class="resultHeader" cellspacing="0" cellpadding="0">
       <tr>
