@@ -6,6 +6,10 @@
   </properties>
   <body>
     <release version="2.1.81" date="2013-02-XX" description="Beta 2">
+      <action dev="mcrtchef" type="fix" due-to="Matthias Eichner">
+        Categories have wrong left-/right- values when using new classification editor
+        <fixes issue="612"/>
+      </action>
       <action dev="mcrtchef" type="fix" due-to="Marcus Müller">
         ClassificationEditor does not work for non super users.
         <fixes issue="609" />
