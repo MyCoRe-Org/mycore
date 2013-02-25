@@ -26,6 +26,7 @@ package org.mycore.backend.lucene;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -54,7 +55,6 @@ import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.parsers.bool.MCRParseException;
 import org.mycore.services.fieldquery.MCRFieldDef;
 
-import com.ibm.icu.util.GregorianCalendar;
 
 /**
  * This class builds a Lucene Query from XML query (specified by Frank Lützenkirchen)
@@ -402,7 +402,6 @@ public class MCRBuildLuceneQuery {
         return null;
     }
 
-    
     /***************************************************************************
      * DateQuery2 ()
      * @throws ParseException 
@@ -410,14 +409,6 @@ public class MCRBuildLuceneQuery {
     private static Query DateQuery2(String fieldname, String Op, String value) throws ParseException {
         long numberValue = MCRLuceneTools.getLongValue(value);
         return NumberQuery(fieldname, "integer", Op, numberValue);
-    }
-
-    private static String getToday() {
-        GregorianCalendar cal = new GregorianCalendar();
-        int year = cal.get(Calendar.YEAR);
-        int month = cal.get(Calendar.MONTH) + 1;
-        int day = cal.get(Calendar.DAY_OF_MONTH);
-        return String.valueOf(day) + "." + String.valueOf(month) + "." + String.valueOf(year);
     }
 
 }
