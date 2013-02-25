@@ -10,7 +10,8 @@
 
   <xsl:param name="WebApplicationBaseURL" />
 
-  <xsl:variable name="PageTitle" select="i18n:translate('component.solr.searchresult.resultList')" />
+  <!-- unfortunately every generated page must conain this variable, we do not want a page title for now -->
+  <xsl:variable name="PageTitle" select="''" />
 
   <xsl:variable name="hits" select="./response/result/@numFound" />
   <xsl:variable name="start" select="./response/lst[@name='responseHeader']/lst[@name='params']/str[@name='start']" />
@@ -185,6 +186,10 @@
         <input id="solrSearchInputSubmit" type="submit" value="" />
       </form>
     </div>
+
+    <h1 id="resultListHeading">
+      <xsl:value-of select="i18n:translate('component.solr.searchresult.resultList')" />
+    </h1>
 
     <!-- table header -->
     <table class="resultHeader" cellspacing="0" cellpadding="0">
