@@ -523,7 +523,7 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
                 try {
                     String scheme = entry.getKey().toString();
                     scheme = scheme.substring(scheme.lastIndexOf('.') + 1);
-                    LOGGER.info("Adding Resolver " + entry.getValue().toString() + " for URI scheme " + scheme);
+                    LOGGER.debug("Adding Resolver " + entry.getValue().toString() + " for URI scheme " + scheme);
                     Object newInstance = MCRConfiguration.instance().getInstanceOf(entry.getKey().toString());
                     if (newInstance instanceof URIResolver) {
                         map.put(scheme, (URIResolver) newInstance);
