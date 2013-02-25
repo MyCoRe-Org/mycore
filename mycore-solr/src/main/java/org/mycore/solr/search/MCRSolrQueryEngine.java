@@ -17,12 +17,15 @@ import org.mycore.services.fieldquery.MCRDefaultQueryEngine;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSortBy;
 import org.mycore.solr.legacy.MCRLuceneSolrAdapter;
+import org.mycore.solr.legacy.MCRSolrAdapter;
 
 public class MCRSolrQueryEngine extends MCRDefaultQueryEngine {
 
     private static final Logger LOGGER = Logger.getLogger(MCRSolrQueryEngine.class);
     
     private static final String JOIN_PATTERN = "{!join from=returnId to=id}";
+    
+    private static MCRSolrAdapter ADAPTER = new MCRLuceneSolrAdapter();
     
     public MCRSolrQueryEngine() {
         super();
@@ -40,7 +43,7 @@ public class MCRSolrQueryEngine extends MCRDefaultQueryEngine {
         SolrQuery solrRequestQuery = buildMergedSolrQuery(sortBy, not, and, table, maxHits);
 
         try {
-            results.add(MCRLuceneSolrAdapter.getResults(solrRequestQuery));
+            results.add(ADAPTER.getResults(solrRequestQuery));
         } catch (SolrServerException e) {
             throw new MCRException("Could not get the results!", e);
         }
@@ -57,17 +60,17 @@ public class MCRSolrQueryEngine extends MCRDefaultQueryEngine {
     public static SolrQuery buildMergedSolrQuery(List<MCRSortBy> sortBy, boolean not, boolean and, HashMap<String, List<MCRCondition>> table, int maxHits) {
         List<MCRCondition> queryConditions = table.get("metadata");
         MCRCondition combined = buildSubCondition(queryConditions, and, not);
-        SolrQuery solrRequestQuery = MCRLuceneSolrAdapter.getSolrQuery(combined, sortBy, maxHits); 
+        SolrQuery solrRequestQuery = ADAPTER.getSolrQuery(combined, sortBy, maxHits); 
         
         
         for (Map.Entry<String, List<MCRCondition>> mapEntry : table.entrySet()) {
             if(!mapEntry.getKey().equals("metadata")){
                 MCRCondition combinedFilterQuery = buildSubCondition(mapEntry.getValue(), and, not);
-                SolrQuery filterQuery = MCRLuceneSolrAdapter.getSolrQuery(combinedFilterQuery, sortBy, maxHits); 
+                SolrQuery filterQuery = ADAPTER.getSolrQuery(combinedFilterQuery, sortBy, maxHits); 
                 solrRequestQuery.addFilterQuery(JOIN_PATTERN + filterQuery.getQuery());
             }
         }
         return solrRequestQuery;
     }
- 
+
 }

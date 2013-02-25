@@ -131,19 +131,14 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
      * @return
      */
     private MCRQueryCondition buildCondition(String field, String oper, String value, boolean vonbis) {
-        MCRFieldDef def = MCRFieldDef.getDef(field);
-        if (def == null) {
-            throw new MCRParseException("Field not defined: <" + field + ">");
-        }
-        String datatype = def.getDataType();
-        if (!"date".equals(datatype) && vonbis) {
+        if (vonbis) {
             value = normalizeHistoryDate(oper, value);
         }
         LOGGER.debug(value);
-        if ("date".equals(datatype) && "TODAY".equals(value)) {
+        if ("TODAY".equals(value)) {
             value = getToday();
         }
-        return new MCRQueryCondition(def, oper, value);
+        return new MCRQueryCondition(field, oper, value);
     }
 
     private String getToday() {
@@ -243,19 +238,6 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
         } else if (cond instanceof MCRQueryCondition) {
             MCRQueryCondition qc = (MCRQueryCondition) cond;
 
-            // Normalize values in date conditions
-            if (qc.getField().getDataType().equals("date")) {
-                try {
-                    MCRISO8601Date iDate = new MCRISO8601Date();
-                    iDate.setDate(qc.getValue());
-                    String sDate = iDate.getISOString().substring(0, 10);
-                    return new MCRQueryCondition(qc.getField(), qc.getOperator(), sDate);
-                } catch (Exception ex) {
-                    LOGGER.debug(ex);
-                    return qc;
-                }
-            }
-
             if (!qc.getOperator().equals("contains")) {
                 return qc;
             }
@@ -302,19 +284,18 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
             MCRAndCondition<Object> ac = new MCRAndCondition<Object>();
             for (String value : values) {
                 if (value.startsWith("'")) {
-                    ac.addChild(new MCRQueryCondition(qc.getField(), "phrase", value.substring(1, value.length() - 1)));
+                    ac.addChild(new MCRQueryCondition(qc.getFieldName(), "phrase", value.substring(1, value.length() - 1)));
                 } else if (value.startsWith("-'")) {
-                    ac
-                            .addChild(new MCRNotCondition<Object>(new MCRQueryCondition(qc.getField(), "phrase", value.substring(2,
+                    ac.addChild(new MCRNotCondition<Object>(new MCRQueryCondition(qc.getFieldName(), "phrase", value.substring(2,
                                     value.length() - 1))));
                 } else if (value.contains("*") || value.contains("?")) {
-                    ac.addChild(new MCRQueryCondition(qc.getField(), "like", value));
+                    ac.addChild(new MCRQueryCondition(qc.getFieldName(), "like", value));
                 } else if (value.startsWith("-")) // -word means "NOT word"
                 {
-                    MCRCondition<Object> subCond = new MCRQueryCondition(qc.getField(), "contains", value.substring(1));
+                    MCRCondition<Object> subCond = new MCRQueryCondition(qc.getFieldName(), "contains", value.substring(1));
                     ac.addChild(new MCRNotCondition<Object>(subCond));
                 } else {
-                    ac.addChild(new MCRQueryCondition(qc.getField(), "contains", value));
+                    ac.addChild(new MCRQueryCondition(qc.getFieldName(), "contains", value));
                 }
             }
 

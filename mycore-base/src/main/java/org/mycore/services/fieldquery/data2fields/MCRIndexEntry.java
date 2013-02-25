@@ -44,7 +44,7 @@ public class MCRIndexEntry {
     }
 
     public void addValue(MCRFieldValue value) {
-        LOGGER.debug("MCRData2Fields " + value.getField().getName() + " := " + value.getValue());
+        LOGGER.debug("MCRData2Fields " + value.getFieldName() + " := " + value.getValue());
         values.add(value);
     }
 

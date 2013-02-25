@@ -39,29 +39,33 @@ public class MCRQueryCondition extends MCRFieldValue implements MCRCondition<Obj
     private String operator;
 
     /** Creates a new simple query condition */
+    @Deprecated
     public MCRQueryCondition(MCRFieldDef field, String operator, String value) {
         super(field, value);
-
         if (!MCRFieldType.isValidOperatorForType(field.getDataType(), operator)) {
             throw new MCRParseException("Search operator <" + operator + "> not allowed for field <" + field.getName() + ">");
         }
+        this.operator = operator;
+    }
 
+    public MCRQueryCondition(String fieldName, String operator, String value) {
+        super(fieldName, value);
         this.operator = operator;
     }
 
     /** Returns the comparison operator used in this condition */
     public String getOperator() {
-        return operator;
+        return this.operator;
     }
 
     @Override
     public String toString() {
-        return getField().getName() + " " + operator + " \"" + getValue() + "\"";
+        return getFieldName() + " " + getOperator() + " \"" + getValue() + "\"";
     }
 
     public Element toXML() {
         Element condition = new Element("condition");
-        condition.setAttribute("field", getField().getName());
+        condition.setAttribute("field", getFieldName());
         condition.setAttribute("operator", operator);
         condition.setAttribute("value", getValue());
 

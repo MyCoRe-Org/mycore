@@ -25,6 +25,7 @@ package org.mycore.backend.lucene;
 
 import java.io.StringReader;
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -49,7 +50,11 @@ import org.apache.lucene.util.Version;
 import org.jdom2.Element;
 import org.mycore.common.MCRNormalizer;
 import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.common.MCRISO8601Date;
+import org.mycore.parsers.bool.MCRParseException;
 import org.mycore.services.fieldquery.MCRFieldDef;
+
+import com.ibm.icu.util.GregorianCalendar;
 
 /**
  * This class builds a Lucene Query from XML query (specified by Frank Lützenkirchen)
@@ -98,16 +103,25 @@ public class MCRBuildLuceneQuery {
                 String field = xEle.getAttributeValue("field", "").intern();
                 String operator = xEle.getAttributeValue("operator", "").intern();
                 String value = xEle.getAttributeValue("value", "");
-
-                LOGGER.debug("field: " + field + " operator: " + operator + " value: " + value);
-
-                String fieldtype = MCRFieldDef.getDef(field).getDataType();
-
+                MCRFieldDef fieldDefinition = MCRFieldDef.getDef(field);
+                if (fieldDefinition == null) {
+                    throw new MCRParseException("Field not defined: <" + field + ">");
+                }
+                String fieldtype = fieldDefinition.getDataType();
+                // Normalize values in date conditions
+                if (fieldtype.equals("date")) {
+                    MCRISO8601Date iDate = new MCRISO8601Date();
+                    iDate.setDate(value);
+                    value = iDate.getISOString().substring(0, 10);
+                }
                 if ("name".equals(fieldtype)) {
                     fieldtype = "text";
                 }
-
-                if ("index".equals(fieldtype)) {
+                if (fieldtype.equals("text")) {
+                    value = MCRNormalizer.normalizeString(value);
+                } else if (fieldtype.equals("decimal")) {
+                    value = value.replace(',', '.');
+                } else if ("index".equals(fieldtype)) {
                     fieldtype = "identifier";
                     value = MCRNormalizer.normalizeString(value);
                 }
@@ -397,4 +411,13 @@ public class MCRBuildLuceneQuery {
         long numberValue = MCRLuceneTools.getLongValue(value);
         return NumberQuery(fieldname, "integer", Op, numberValue);
     }
+
+    private static String getToday() {
+        GregorianCalendar cal = new GregorianCalendar();
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH) + 1;
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+        return String.valueOf(day) + "." + String.valueOf(month) + "." + String.valueOf(year);
+    }
+
 }

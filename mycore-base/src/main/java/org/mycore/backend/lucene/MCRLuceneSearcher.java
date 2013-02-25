@@ -311,13 +311,14 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         ArrayList<SortField> sortList = new ArrayList<SortField>(sortBy.size());
         for (MCRSortBy sortByElement : sortBy) {
             SortField sortField;
-            if (sortByElement.getField().getName().equals("score")) {
+            String name = sortByElement.getFieldName();
+            if (name.equals("score")) {
                 sortField = SortField.FIELD_SCORE;
             } else {
-                String name = sortByElement.getField().getName();
+                MCRFieldDef sortByDefinition = MCRFieldDef.getDef(name);
                 //TODO: use dataType to get FieldType (how to handle dates here?)
-                int fieldType = getFieldType(sortByElement.getField());
-                if (isTokenized(sortByElement.getField())) {
+                int fieldType = getFieldType(sortByDefinition);
+                if (isTokenized(sortByDefinition)) {
                     name += getSortableSuffix();
                 }
                 sortField = new SortField(name, fieldType, !sortByElement.getSortOrder());
@@ -359,22 +360,21 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
      */
     private void addSortDataToHit(List<MCRSortBy> sortBy, org.apache.lucene.document.Document doc, MCRHit hit, String score) {
         for (MCRSortBy sb : sortBy) {
-            MCRFieldDef fds = sb.getField();
-            if (null != fds) {
-                String field = fds.getName();
+            String field = sb.getFieldName();
+            if (null != field) {
                 if ("score".equals(field)) {
                     if (null != score) {
-                        MCRFieldDef fd = MCRFieldDef.getDef(field);
-                        MCRFieldValue fv = new MCRFieldValue(fd, score);
+                        MCRFieldValue fv = new MCRFieldValue(field, score);
                         hit.addSortData(fv);
                     }
                 } else {
+                    MCRFieldDef fds = MCRFieldDef.getDef(field);
                     if (isTokenized(fds)) {
                         field += getSortableSuffix();
                     }
                     String values[] = doc.getValues(field);
                     for (String value : values) {
-                        MCRFieldValue fv = new MCRFieldValue(fds, value);
+                        MCRFieldValue fv = new MCRFieldValue(field, value);
                         hit.addSortData(fv);
                     }
                 }
@@ -444,12 +444,13 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         Document doc = new Document();
 
         for (MCRFieldValue field : fields) {
-            String name = field.getField().getName();
-            String type = field.getField().getDataType();
+            String name = field.getFieldName();
+            MCRFieldDef fieldDefinition = MCRFieldDef.getDef(name);
+            String type = fieldDefinition.getDataType();
             String content = field.getValue();
 
             Field.Store store = Field.Store.NO;
-            if (field.getField().isSortable()) {
+            if (fieldDefinition.isSortable()) {
                 store = Field.Store.YES;
             }
             if ("date".equals(type) || "time".equals(type) || "timestamp".equals(type)) {
@@ -469,9 +470,9 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             if (type.equals("index")) {
                 doc.add(new Field(name, MCRNormalizer.normalizeString(content), Field.Store.YES, Field.Index.NOT_ANALYZED));
             }
-            if (type.equals("Text") || type.equals("name") || type.equals("text") && field.getField().isSortable()) {
+            if (type.equals("Text") || type.equals("name") || type.equals("text") && MCRFieldDef.getDef(field.getFieldName()).isSortable()) {
                 doc.add(new Field(name, content, Field.Store.YES, Field.Index.ANALYZED));
-                if (field.getField().isSortable()) {
+                if (fieldDefinition.isSortable()) {
                     doc.add(new Field(name + getSortableSuffix(), content, Field.Store.YES, Field.Index.NOT_ANALYZED));
                 }
             } else if (type.equals("text")) {

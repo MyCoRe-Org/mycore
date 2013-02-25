@@ -282,8 +282,7 @@ public class MCROAISearchManager {
         mcrDate.setDate(date);
         MCROrCondition orCond = new MCROrCondition();
         for (String fDef : fields) {
-            MCRFieldDef d = MCRFieldDef.getDef(fDef);
-            orCond.addChild(new MCRQueryCondition(d, compareSign, mcrDate.getISOString()));
+            orCond.addChild(new MCRQueryCondition(fDef, compareSign, mcrDate.getISOString()));
         }
         return orCond;
     }

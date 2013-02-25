@@ -184,7 +184,7 @@ public class MCRQuery {
                 query.addContent(sortByElem);
                 for (MCRSortBy sb : sortBy) {
                     Element ref = new Element("field");
-                    ref.setAttribute("name", sb.getField().getName());
+                    ref.setAttribute("name", sb.getFieldName());
                     ref.setAttribute("order", sb.getSortOrder() ? "ascending" : "descending");
                     sortByElem.addContent(ref);
                 }

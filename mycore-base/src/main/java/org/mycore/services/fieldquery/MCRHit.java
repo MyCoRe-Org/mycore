@@ -144,7 +144,7 @@ public class MCRHit {
      */
     public void addSortData(MCRFieldValue fieldValue) {
         String value = fieldValue.getValue();
-        MCRFieldDef field = fieldValue.getField();
+        MCRFieldDef field = MCRFieldDef.getDef(fieldValue.getFieldName());
 
         // If field is repeated (multiple values for same field):
         // for text fields, combine all values for sorting
@@ -181,7 +181,7 @@ public class MCRHit {
      */
     public MCRFieldValue getMetaData(String field) {
         for (MCRFieldValue v : metaData) {
-            if (v.getField().getName().equals(field)) {
+            if (v.getFieldName().equals(field)) {
                 return v;
             }
         }

@@ -144,7 +144,8 @@ public class MCRDefaultQueryEngine extends MCRBaseClass implements MCRQueryEngin
      */
     protected static String getIndex(MCRCondition cond) {
         if (cond instanceof MCRQueryCondition) {
-            return ((MCRQueryCondition) cond).getField().getIndex();
+            MCRQueryCondition queryCondition = ((MCRQueryCondition) cond);
+            return MCRFieldDef.getDef(queryCondition.getFieldName()).getIndex();
         } else if (cond instanceof MCRNotCondition) {
             return getIndex(((MCRNotCondition) cond).getChild());
         }

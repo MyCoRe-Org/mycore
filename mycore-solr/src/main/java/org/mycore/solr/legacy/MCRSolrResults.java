@@ -39,26 +39,18 @@ public class MCRSolrResults extends MCRResults {
         if (i >= sdl.size() || i < 0) {
             return null;
         }
-
         SolrDocument solrDocument = sdl.get(i);
         MCRHit hit = new MCRHit(solrDocument.get("id").toString());
-        hit.addMetaData(new MCRFieldValue(MCRFieldDef.getDef("score"), solrDocument.get("score").toString()));
+        hit.addMetaData(new MCRFieldValue("score", solrDocument.get("score").toString()));
         Collection<String> fieldNames = solrDocument.getFieldNames();
 
         for (String fieldName : fieldNames) {
             try {
-                MCRFieldDef def = MCRFieldDef.getDef(fieldName);
-                if (def == null) {
-                    LOGGER.debug("Could not add hit metadata. Solr field \"" + fieldName + "\" is not defined in legacy searchfields.xml");
-                    continue;
-                }
-                hit.addMetaData(new MCRFieldValue(def, solrDocument.getFieldValue(fieldName).toString()));
-
+                hit.addMetaData(new MCRFieldValue(fieldName, solrDocument.getFieldValue(fieldName).toString()));
             } catch (Exception ex) {
                 LOGGER.debug(ex + " Could not add hit metadata. Solr field is not defined in legacy searchfields.xml");
             }
         }
-
         return hit;
     }
 

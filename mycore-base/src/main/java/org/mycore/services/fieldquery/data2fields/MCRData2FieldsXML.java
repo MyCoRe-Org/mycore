@@ -115,9 +115,7 @@ public class MCRData2FieldsXML implements MCRData2Fields {
         String value = element.getTextTrim();
         if ((value == null) || value.isEmpty())
             return;
-
         String name = element.getName();
-        MCRFieldDef field = MCRFieldDef.getDef(name);
-        entry.addValue(new MCRFieldValue(field, value));
+        entry.addValue(new MCRFieldValue(name, value));
     }
 }

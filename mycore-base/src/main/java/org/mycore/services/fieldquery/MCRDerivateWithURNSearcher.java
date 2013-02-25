@@ -34,7 +34,7 @@ public class MCRDerivateWithURNSearcher extends MCRSearcher {
             return new MCRResults();
         }
 
-        String fieldName = ((MCRQueryCondition) condition).getField().getName();
+        String fieldName = ((MCRQueryCondition) condition).getFieldName();
 
         if (fieldName.equals("objectURN")) {
             return getObjectsForURN(condition);
@@ -94,7 +94,7 @@ public class MCRDerivateWithURNSearcher extends MCRSearcher {
             MCRResults result = new MCRResults();
             for (String derivateId : idList) {
                 if (!MCRXMLFunctions.hasURNDefined(derivateId)) {
-                    MCRFieldValue derivateOwner = new MCRFieldValue(MCRFieldDef.getDef("derivateOwner"), getDerivateOwner(derivateId));
+                    MCRFieldValue derivateOwner = new MCRFieldValue("derivateOwner", getDerivateOwner(derivateId));
                     MCRHit newHit = new MCRHit(derivateId);
                     newHit.addMetaData(derivateOwner);
                     result.addHit(newHit);

@@ -66,6 +66,6 @@ public class MCRData2FieldsFileTextFilter implements MCRData2Fields {
     public void addFieldValues(MCRIndexEntry entry) {
         MCRRelevantFields fields = MCRRelevantFields.getFieldsFor(selector);
         for (MCRFieldDef field : fields.getFields())
-            entry.addValue(new MCRFieldValue(field, text));
+            entry.addValue(new MCRFieldValue(field.getName(), text));
     }
 }

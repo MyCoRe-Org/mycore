@@ -166,7 +166,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
     public static void buildMetsForType(String type) {
         LOGGER.info("Build METS file for type " + type + " start.");
         final long start = System.currentTimeMillis();
-        MCRQueryCondition fromcond = new MCRQueryCondition(MCRFieldDef.getDef("objectType"), "=", type);
+        MCRQueryCondition fromcond = new MCRQueryCondition("objectType", "=", type);
         MCRQuery fromquery = new MCRQuery(fromcond);
         MCRResults fromresult = MCRQueryManager.search(fromquery);
         for (MCRHit fromhit : fromresult) {
@@ -273,7 +273,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         LOGGER.info("Check METS file for type " + type + " start.");
         final long start = System.currentTimeMillis();
 
-        MCRQueryCondition fromcond = new MCRQueryCondition(MCRFieldDef.getDef("objectType"), "=", type);
+        MCRQueryCondition fromcond = new MCRQueryCondition("objectType", "=", type);
         MCRQuery fromquery = new MCRQuery(fromcond);
         MCRResults fromresult = MCRQueryManager.search(fromquery);
 
@@ -373,7 +373,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         LOGGER.debug("Remove METS file for " + type + " start.");
         final long start = System.currentTimeMillis();
 
-        MCRQueryCondition fromcond = new MCRQueryCondition(MCRFieldDef.getDef("objectType"), "=", type);
+        MCRQueryCondition fromcond = new MCRQueryCondition("objectType", "=", type);
         MCRQuery fromquery = new MCRQuery(fromcond);
         MCRResults fromresult = MCRQueryManager.search(fromquery);
 

@@ -56,7 +56,7 @@ public abstract class MCROAIUtils {
             String classID = setSpec.substring(0, setSpec.indexOf(':')).trim();
             classID = MCRClassificationAndSetMapper.mapSetToClassification(configPrefix, classID);
             String id = classID + ":" + categID;
-            return new MCRQueryCondition(MCRFieldDef.getDef("category"), "=", id);
+            return new MCRQueryCondition("category", "=", id);
         } else {
             String id = setSpec;
             String query = MCRConfiguration.instance().getString(configPrefix + "MapSetToQuery." + id, "");
@@ -64,7 +64,7 @@ public abstract class MCROAIUtils {
                 return new MCRQueryParser().parse(query);
             } else {
                 id = MCRClassificationAndSetMapper.mapSetToClassification(configPrefix, id);
-                return new MCRQueryCondition(MCRFieldDef.getDef("category"), "like", id + "*");
+                return new MCRQueryCondition("category", "like", id + "*");
             }
         }
     }

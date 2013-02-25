@@ -833,10 +833,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            Value of the field
      */
     private static void removeFromIndex(String fieldname, String value) {
-        MCRFieldDef fd = MCRFieldDef.getDef(fieldname);
         MCRSearcher searcher = getSearcherForField(fieldname);
-        MCRFieldValue fv = new MCRFieldValue(fd, value);
-        searcher.clearIndex(fieldname, fv.getValue());
+        searcher.clearIndex(fieldname, value);
     }
 
     private static MCRSearcher getSearcherForField(String fieldname) {

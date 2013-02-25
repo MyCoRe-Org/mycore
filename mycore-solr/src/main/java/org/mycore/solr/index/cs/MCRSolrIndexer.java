@@ -21,25 +21,21 @@ import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.events.MCREvent;
+import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.services.fieldquery.MCRResults;
-import org.mycore.services.fieldquery.MCRSearcher;
-import org.mycore.services.fieldquery.MCRSortBy;
 import org.mycore.solr.MCRSolrServerFactory;
-import org.mycore.solr.legacy.MCRLuceneSolrAdapter;
 import org.mycore.solr.logging.MCRSolrLogLevels;
 
 /**
  * @author shermann
  *
  */
-public class MCRSolrIndexer extends MCRSearcher {
+public class MCRSolrIndexer extends MCREventHandlerBase {
     private static final Logger LOGGER = Logger.getLogger(MCRSolrIndexer.class);
 
     /** The Server used for indexing. */
@@ -54,11 +50,6 @@ public class MCRSolrIndexer extends MCRSearcher {
     /** the Threshold in bytes */
     public final static long OVER_THE_WIRE_THRESHOLD = MCRConfiguration.instance().getLong(
             "MCR.Module-solr.OverTheWireThresholdInMegaBytes", 32) * 1024 * 1024;
-
-    @Override
-    public boolean isIndexer() {
-        return true;
-    }
 
     @Override
     synchronized protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
@@ -311,13 +302,4 @@ public class MCRSolrIndexer extends MCRSearcher {
         }
     }
 
-    /**
-     * Handles legacy lucene searches.
-     * */
-    @SuppressWarnings("rawtypes")
-    public MCRResults search(MCRCondition condition, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) {
-        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Processing legacy query \"" + condition.toString() + "\"");
-        MCRResults result = MCRLuceneSolrAdapter.search(condition, maxResults, sortBy, addSortData);
-        return result;
-    }
 }

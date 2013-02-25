@@ -24,6 +24,7 @@
 package org.mycore.services.fieldquery;
 
 import org.jdom2.Element;
+import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRNormalizer;
@@ -40,7 +41,13 @@ public class MCRFieldValue {
     /**
      * The field this value belongs to
      */
+    @Deprecated
     private MCRFieldDef field;
+
+    /**
+     * The field this value belongs to
+     */
+    private String fieldName;
 
     /**
      * The fields's value, as a String
@@ -55,34 +62,56 @@ public class MCRFieldValue {
      * @param value
      *            the value of the field, as a String
      */
+    @Deprecated
     public MCRFieldValue(MCRFieldDef field, String value) {
         if (field == null) {
             throw new NullPointerException("MCRFieldDef cannot be null.");
         }
         this.field = field;
         setValue(value);
+        this.fieldName = field.getName();
+    }
+
+    /**
+     * Creates a new field value
+     * 
+     * @param field
+     *            the field this value belongs to
+     * @param value
+     *            the value of the field, as a String
+     */
+    public MCRFieldValue(String fieldName, String value) {
+        if (fieldName == null) {
+            throw new NullPointerException("field name cannot be null.");
+        }
+        this.fieldName = fieldName;
+        this.value = value;
+        try {
+            this.field = MCRFieldDef.getDef(fieldName);
+        } catch(MCRConfigurationException ce) {}
     }
 
     /**
      * Returns the field this value belongs to
      */
+    @Deprecated
     public MCRFieldDef getField() {
         return field;
     }
 
     /**
+     * Returns the field this value belongs to
+     */
+    public String getFieldName() {
+        return fieldName;
+    }
+
+    /**
      * Sets or updates the field value
-     * @param value the value, whicht will be normalized
+     * 
+     * @param value the value
      */
     public void setValue(String value) {
-        if (field.getDataType().equals("text") || field.getDataType().equals("name")) {
-            this.value = MCRNormalizer.normalizeString(value);
-            return;
-        }
-        if (field.getDataType().equals("decimal")) {
-            this.value = value.replace(',', '.');
-            return;
-        }
         this.value = value;
     }
 
@@ -103,7 +132,11 @@ public class MCRFieldValue {
      */
     public Element buildXML() {
         Element eField = new Element("field", MCRConstants.MCR_NAMESPACE);
-        eField.setAttribute("name", field.getName());
+        if(field != null) {
+            eField.setAttribute("name", field.getName());
+        } else {
+            eField.setAttribute("name", getFieldName());
+        }
         eField.addContent(value);
         return eField;
     }
@@ -125,12 +158,12 @@ public class MCRFieldValue {
         if (value.length() == 0) {
             throw new MCRException("Field value is empty");
         }
-
-        return new MCRFieldValue(MCRFieldDef.getDef(name), value);
+        return new MCRFieldValue(name, value);
     }
 
     @Override
     public String toString() {
-        return field.getName() + " = " + value;
+        return getFieldName() + " = " + value;
     }
+
 }

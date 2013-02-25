@@ -100,7 +100,7 @@ public class MCRSearchServlet extends MCRServlet {
         for (String fDef : fields) {
             MCRFieldDef field = MCRFieldDef.getDef(fDef);
             String operator = MCRFieldType.getDefaultOperator(field.getDataType());
-            MCRCondition condition = new MCRQueryCondition(field, operator, search);
+            MCRCondition condition = new MCRQueryCondition(fDef, operator, search);
             queryCondition.addChild(condition);
         }
 
@@ -160,12 +160,11 @@ public class MCRSearchServlet extends MCRServlet {
             }
 
             for (String fieldName : name.split(",")) {
-                MCRFieldDef field = MCRFieldDef.getDef(fieldName);
-                String defaultOperator = MCRFieldType.getDefaultOperator(field.getDataType());
+                MCRFieldDef fieldDefinition = MCRFieldDef.getDef(fieldName);
+                String defaultOperator = MCRFieldType.getDefaultOperator(fieldDefinition.getDataType());
                 String operator = getReqParameter(req, fieldName + ".operator", defaultOperator);
-
                 for (String value : values) {
-                    parent.addChild(new MCRQueryCondition(field, operator, value));
+                    parent.addChild(new MCRQueryCondition(fieldName, operator, value));
                 }
             }
         }
@@ -505,7 +504,7 @@ public class MCRSearchServlet extends MCRServlet {
         if (list != null) {
             for (int i = 0; i < list.size(); i++) {
                 MCRSortBy sortBy = list.get(i);
-                sb.append("&").append(sortBy.getField().getName());
+                sb.append("&").append(sortBy.getFieldName());
                 sb.append(".sortField.").append(i + 1);
                 sb.append("=").append(sortBy.getSortOrder() ? "ascending" : "descending");
             }

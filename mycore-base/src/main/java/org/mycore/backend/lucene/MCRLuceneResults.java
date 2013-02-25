@@ -204,7 +204,7 @@ class MCRLuceneResults extends MCRResults {
         for (MCRFieldDef fd : addableFields) {
             String[] values = doc.getValues(fd.getName());
             for (String value : values) {
-                MCRFieldValue fv = new MCRFieldValue(fd, value);
+                MCRFieldValue fv = new MCRFieldValue(fd.getName(), value);
                 hit.addMetaData(fv);
             }
         }
@@ -218,7 +218,7 @@ class MCRLuceneResults extends MCRResults {
         for (SortField sortField : sortFields) {
             if (SortField.FIELD_SCORE == sortField || sortField.getField() == null) {
                 if (score != null) {
-                    hit.addSortData(new MCRFieldValue(MCRFieldDef.getDef("score"), score));
+                    hit.addSortData(new MCRFieldValue("score", score));
                 }
             } else {
                 String fieldName = sortField.getField();
@@ -228,7 +228,7 @@ class MCRLuceneResults extends MCRResults {
 
                 String values[] = doc.getValues(fieldName);
                 for (String value : values) {
-                    MCRFieldValue fv = new MCRFieldValue(MCRFieldDef.getDef(fieldName), value);
+                    MCRFieldValue fv = new MCRFieldValue(fieldName, value);
                     hit.addSortData(fv);
                 }
             }

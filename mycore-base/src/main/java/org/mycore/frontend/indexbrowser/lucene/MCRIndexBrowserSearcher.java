@@ -85,8 +85,8 @@ public class MCRIndexBrowserSearcher implements MCRIIndexBrowserSearcher {
      */
     protected MCRCondition buildCondition() {
         MCRAndCondition cAnd = new MCRAndCondition();
-        MCRFieldDef fieldproject;
-        MCRFieldDef fieldtype;
+        String objectProject = "objectProject";
+        String objectType = "objectType";
         if (indexConfig.getIndex().contains(",")) {
             MCROrCondition cOr = new MCROrCondition();
             StringTokenizer st = new StringTokenizer(indexConfig.getIndex(), ",");
@@ -94,14 +94,11 @@ public class MCRIndexBrowserSearcher implements MCRIIndexBrowserSearcher {
                 String next = st.nextToken();
                 int ilen = next.indexOf("_");
                 if (ilen == -1) {
-                    fieldtype = MCRFieldDef.getDef("objectType");
-                    cOr.addChild(new MCRQueryCondition(fieldtype, "=", next));
+                    cOr.addChild(new MCRQueryCondition(objectType, "=", next));
                 } else {
                     MCRAndCondition iAnd = new MCRAndCondition();
-                    fieldtype = MCRFieldDef.getDef("objectType");
-                    iAnd.addChild(new MCRQueryCondition(fieldtype, "=", next.substring(ilen + 1, next.length())));
-                    fieldproject = MCRFieldDef.getDef("objectProject");
-                    iAnd.addChild(new MCRQueryCondition(fieldproject, "=", next.substring(0, ilen)));
+                    iAnd.addChild(new MCRQueryCondition(objectType, "=", next.substring(ilen + 1, next.length())));
+                    iAnd.addChild(new MCRQueryCondition(objectProject, "=", next.substring(0, ilen)));
                     cOr.addChild(iAnd);
                 }
             }
@@ -109,18 +106,14 @@ public class MCRIndexBrowserSearcher implements MCRIIndexBrowserSearcher {
         } else {
             int ilen = indexConfig.getIndex().indexOf("_");
             if (ilen == -1) {
-                fieldtype = MCRFieldDef.getDef("objectType");
-                cAnd.addChild(new MCRQueryCondition(fieldtype, "=", indexConfig.getIndex()));
+                cAnd.addChild(new MCRQueryCondition(objectType, "=", indexConfig.getIndex()));
             } else {
-                fieldtype = MCRFieldDef.getDef("objectType");
-                cAnd.addChild(new MCRQueryCondition(fieldtype, "=", indexConfig.getIndex().substring(ilen + 1,
+                cAnd.addChild(new MCRQueryCondition(objectType, "=", indexConfig.getIndex().substring(ilen + 1,
                         indexConfig.getIndex().length())));
-                fieldproject = MCRFieldDef.getDef("objectProject");
-                cAnd.addChild(new MCRQueryCondition(fieldproject, "=", indexConfig.getIndex().substring(0, ilen)));
+                cAnd.addChild(new MCRQueryCondition(objectProject, "=", indexConfig.getIndex().substring(0, ilen)));
             }
         }
         if (browseData.getSearch() != null && !browseData.getSearch().isEmpty()) {
-            MCRFieldDef field = MCRFieldDef.getDef(indexConfig.getBrowseField());
             String value = browseData.getSearch();
             String operator = getOperator();
             if ("prefix".equals(browseData.getMode()))
@@ -133,7 +126,7 @@ public class MCRIndexBrowserSearcher implements MCRIIndexBrowserSearcher {
                     value = value + "*";
                 }
             }
-            cAnd.addChild(new MCRQueryCondition(field, operator, value));
+            cAnd.addChild(new MCRQueryCondition(indexConfig.getBrowseField(), operator, value));
         }
         return cAnd;
     }
@@ -167,16 +160,19 @@ public class MCRIndexBrowserSearcher implements MCRIIndexBrowserSearcher {
         // at first we must create the full list with all results
         List<MCRIndexBrowserEntry> hitList = new LinkedList<MCRIndexBrowserEntry>();
 
+        String mainFieldName = query.getSortBy().get(0).getFieldName();
+        MCRFieldDef mainSortFieldDefinintion = MCRFieldDef.getDef(mainFieldName);
+
         for (MCRHit hit : results) {
             MCRIndexBrowserEntry entry = new MCRIndexBrowserEntry();
-
             List<MCRFieldValue> sortData = hit.getSortData();
+            String fieldName = sortData.get(0).getFieldName();
+            MCRFieldDef sortDataDefinition = MCRFieldDef.getDef(fieldName);
             // only necessary if the sort entry list is empty 
-            // or the first sort entry differs from the query sort entry 
-            MCRFieldDef mainSortField = query.getSortBy().get(0).getField();
-            if (sortData.size() == 0 || !sortData.get(0).getField().equals(mainSortField)) {
+            // or the first sort entry differs from the query sort entry
+            if (sortData.size() == 0 || !sortDataDefinition.equals(mainSortFieldDefinintion)) {
                 //main sortfield has no value for this hit
-                MCRFieldValue value = new MCRFieldValue(mainSortField, "???undefined???");
+                MCRFieldValue value = new MCRFieldValue(mainFieldName, "???undefined???");
                 sortData.add(0, value);
             }
             for (MCRFieldValue aSortData : sortData) {
