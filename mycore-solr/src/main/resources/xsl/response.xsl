@@ -9,9 +9,19 @@
   <xsl:include href="xslInclude:solrResponse" />
 
   <xsl:param name="WebApplicationBaseURL" />
+  <xsl:param name="DisplaySearchForm" select="'false'" />
 
-  <!-- unfortunately every generated page must conain this variable, we do not want a page title for now -->
-  <xsl:variable name="PageTitle" select="''" />
+  <xsl:variable name="PageTitle">
+    <xsl:choose>
+      <xsl:when test="$DisplaySearchForm = 'true'">
+        <xsl:value-of select="''" />
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- unfortunately every generated page must conain this variable, we do not want a page title for now -->
+        <xsl:value-of select="i18n:translate('component.solr.searchresult.resultList')" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
 
   <xsl:variable name="hits" select="./response/result/@numFound" />
   <xsl:variable name="start" select="./response/lst[@name='responseHeader']/lst[@name='params']/str[@name='start']" />
@@ -174,22 +184,23 @@
   </xsl:template>
 
   <xsl:template match="/response">
-    <div id="solrSearchInputSlotFormContainer">
-      <form action="{concat($WebApplicationBaseURL,'servlets/SolrSelectProxy')}" method="get">
-        <xsl:for-each select="lst[@name='responseHeader']/lst[@name='params']/str[not(@name='start' or @name='rows' or @name='q')]">
-          <input type="hidden" name="{@name}" value="{.}" />
-        </xsl:for-each>
+    <xsl:if test="$DisplaySearchForm = 'true'">
+      <div id="solrSearchInputSlotFormContainer">
+        <form action="{concat($WebApplicationBaseURL,'servlets/SolrSelectProxy')}" method="get">
+          <xsl:for-each select="lst[@name='responseHeader']/lst[@name='params']/str[not(@name='start' or @name='rows' or @name='q')]">
+            <input type="hidden" name="{@name}" value="{.}" />
+          </xsl:for-each>
 
-        <input type="hidden" name="start" value="0" />
-        <input type="hidden" name="rows" value="5" />
-        <input id="solrSearchInputSlot" type="text" name="q" value="{$query}" />
-        <input id="solrSearchInputSubmit" type="submit" value="" />
-      </form>
-    </div>
-
-    <h1 id="resultListHeading">
-      <xsl:value-of select="i18n:translate('component.solr.searchresult.resultList')" />
-    </h1>
+          <input type="hidden" name="start" value="0" />
+          <input type="hidden" name="rows" value="5" />
+          <input id="solrSearchInputSlot" type="text" name="q" value="{$query}" />
+          <input id="solrSearchInputSubmit" type="submit" value="" />
+        </form>
+      </div>
+      <h1 id="resultListHeading">
+        <xsl:value-of select="i18n:translate('component.solr.searchresult.resultList')" />
+      </h1>
+    </xsl:if>
 
     <!-- table header -->
     <table class="resultHeader" cellspacing="0" cellpadding="0">
