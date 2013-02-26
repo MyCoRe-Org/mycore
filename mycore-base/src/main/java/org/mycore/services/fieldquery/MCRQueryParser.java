@@ -130,7 +130,12 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
      * @return
      */
     private MCRQueryCondition buildCondition(String field, String oper, String value, boolean vonbis) {
-        if (vonbis) {
+        MCRFieldDef def = MCRFieldDef.getDef(field);
+        if (def == null) {
+            throw new MCRParseException("Field not defined: <" + field + ">");
+        }
+        String datatype = def.getDataType();
+        if (!"date".equals(datatype) && vonbis) {
             value = normalizeHistoryDate(oper, value);
         }
         LOGGER.debug(value);
