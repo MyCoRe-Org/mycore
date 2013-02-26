@@ -69,7 +69,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
 
     @Override
     synchronized protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
-        this.deleteByIdFromSolr(obj.getId().toString());
+        MCRSolrIndexer.deleteByIdFromSolr(obj.getId().toString());
     }
 
     @Override
@@ -89,7 +89,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateDeleted(MCREvent evt, MCRDerivate derivate) {
-        this.deleteByIdFromSolr(derivate.getId().toString());
+        MCRSolrIndexer.deleteByIdFromSolr(derivate.getId().toString());
     }
 
     synchronized protected void handleMCRBaseCreated(MCREvent evt, MCRBase objectOrDerivate) {
@@ -141,6 +141,8 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
     /**
      * @param solrID
      * @return
+     * 
+     * @see {@link HttpSolrServer#deleteById(String)}
      */
     synchronized public static UpdateResponse deleteByIdFromSolr(String solrID) {
         UpdateResponse updateResponse = null;
