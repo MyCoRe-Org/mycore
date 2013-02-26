@@ -33,6 +33,8 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRCalendar;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRBooleanClauseParser;
 import org.mycore.parsers.bool.MCRCondition;
@@ -130,15 +132,16 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
      * @return
      */
     private MCRQueryCondition buildCondition(String field, String oper, String value, boolean vonbis) {
-        MCRFieldDef def = MCRFieldDef.getDef(field);
-        if (def == null) {
-            throw new MCRParseException("Field not defined: <" + field + ">");
+        try {
+            MCRFieldDef def = MCRFieldDef.getDef(field);
+            String datatype = def.getDataType();
+            if (!"date".equals(datatype) && vonbis) {
+                value = normalizeHistoryDate(oper, value);
+            }
+        } catch(MCRConfigurationException mcrExc) {
+            // ignore exception if field not exist:
+            // this is ugly, but MCRFieldDef shouldn't appear here to hack MCRMetaHistoryDates
         }
-        String datatype = def.getDataType();
-        if (!"date".equals(datatype) && vonbis) {
-            value = normalizeHistoryDate(oper, value);
-        }
-        LOGGER.debug(value);
         if ("TODAY".equals(value)) {
             value = getToday();
         }
