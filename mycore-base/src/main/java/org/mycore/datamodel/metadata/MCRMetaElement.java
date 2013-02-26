@@ -303,11 +303,15 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
         Class<? extends MCRMetaInterface> forName;
         try {
             String classname = element.getAttributeValue("class");
+            if(classname == null) {
+                throw new MCRException("Missing required class attribute in element " + element.getName() + " of object "
+                        + element.getDocument().getRootElement().getAttributeValue("ID"));
+            }
             fullname = META_PACKAGE_NAME + classname;
             forName = (Class<? extends MCRMetaInterface>) Class.forName(fullname);
             setClass(forName);
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new MCRException(e);
         }
         tag = element.getName();
         String heritable = element.getAttributeValue("heritable");
@@ -319,8 +323,6 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
             setNotInherit(Boolean.valueOf(notInherit));
 
         List<Element> element_list = element.getChildren();
-        int len = element_list.size();
-
         for (Element anElement_list : element_list) {
             Element subtag = (Element) anElement_list;
             MCRMetaInterface obj;
