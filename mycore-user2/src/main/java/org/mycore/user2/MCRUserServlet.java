@@ -31,7 +31,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.jdom2.Attribute;
 import org.jdom2.Element;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
@@ -249,7 +253,9 @@ public class MCRUserServlet extends MCRServlet {
             }
         }
 
-        String hint = u.getChildText("hint");
+        XPathExpression<Attribute> hintPath = XPathFactory.instance().compile("password/@hint", Filters.attribute());
+        Attribute hintAttr = hintPath.evaluateFirst(u);
+        String hint = hintAttr == null ? null : hintAttr.getValue();
         if ((hint != null) && (hint.trim().length() == 0)) {
             hint = null;
         }

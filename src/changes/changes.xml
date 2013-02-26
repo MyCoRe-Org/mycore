@@ -6,6 +6,10 @@
   </properties>
   <body>
     <release version="2.1.81" date="2013-02-XX" description="Beta 2">
+      <action dev="mcrtchef" type="fix" due-to="Matthias Eichner">
+        Password hint is not displayed
+        <fixes issue="613"/>
+      </action>
       <action dev="mcrtchef" type="fix" due-to="Kathleen Neumann">
          Workflow looses action and type
         <fixes issue="611"/>

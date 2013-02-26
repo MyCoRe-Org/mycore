@@ -252,7 +252,7 @@
     <cell row="5" col="1" anchor="EAST" style="width: 160px;">
       <text i18n="component.user2.admin.passwordHint" />
     </cell>
-    <cell row="5" col="2" colspan="2" anchor="WEST" var="hint">
+    <cell row="5" col="2" colspan="2" anchor="WEST" var="password/@hint">
       <textfield width="60" maxlength="128" />
     </cell>
 

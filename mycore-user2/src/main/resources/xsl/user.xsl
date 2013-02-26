@@ -133,7 +133,7 @@
               <xsl:value-of select="i18n:translate('component.user2.admin.passwordHint')" />
             </th>
             <td>
-              <xsl:value-of select="hint" />
+              <xsl:value-of select="password/@hint" />
             </td>
           </tr>
           <tr>
