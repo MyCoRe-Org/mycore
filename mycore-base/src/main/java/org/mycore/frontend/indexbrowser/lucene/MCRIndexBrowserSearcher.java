@@ -159,18 +159,14 @@ public class MCRIndexBrowserSearcher implements MCRIIndexBrowserSearcher {
     protected List<MCRIndexBrowserEntry> createLinkedListfromSearch() {
         // at first we must create the full list with all results
         List<MCRIndexBrowserEntry> hitList = new LinkedList<MCRIndexBrowserEntry>();
-
-        String mainFieldName = query.getSortBy().get(0).getFieldName();
-        MCRFieldDef mainSortFieldDefinintion = MCRFieldDef.getDef(mainFieldName);
+        String mainFieldName = this.query.getSortBy().get(0).getFieldName();
 
         for (MCRHit hit : results) {
             MCRIndexBrowserEntry entry = new MCRIndexBrowserEntry();
             List<MCRFieldValue> sortData = hit.getSortData();
-            String fieldName = sortData.get(0).getFieldName();
-            MCRFieldDef sortDataDefinition = MCRFieldDef.getDef(fieldName);
             // only necessary if the sort entry list is empty 
             // or the first sort entry differs from the query sort entry
-            if (sortData.size() == 0 || !sortDataDefinition.equals(mainSortFieldDefinintion)) {
+            if (sortData.size() == 0 || !sortData.get(0).getFieldName().equals(mainFieldName)) {
                 //main sortfield has no value for this hit
                 MCRFieldValue value = new MCRFieldValue(mainFieldName, "???undefined???");
                 sortData.add(0, value);
