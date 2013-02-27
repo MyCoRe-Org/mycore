@@ -1074,21 +1074,24 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         LOGGER.info("Try to restore object " + id + " with revision " + revision);
         MCRObjectID mcrId = MCRObjectID.getInstance(id);
         // get xml of revision
-        Document xml = null;
         try {
-            xml = MCRUtils.requestVersionedObject(mcrId, revision);
+            Document xml = MCRUtils.requestVersionedObject(mcrId, revision);
             if (xml == null) {
                 LOGGER.warn("No such object " + id + " with revision " + revision);
                 return;
             }
+            // store it
+            MCRObject mcrObj = new MCRObject(xml);
+            try {
+                MCRMetadataManager.update(mcrObj);
+            } catch(MCRPersistenceException pe) {
+                // maybe the old object no more exists
+                MCRXMLMetadataManager.instance().update(mcrId, xml, new Date(System.currentTimeMillis()));
+            }
+            LOGGER.info("Object " + id + " successfully restored!");
         } catch (Exception e) {
             LOGGER.error("While retrieving object " + id + " with revision " + revision, e);
-            return;
         }
-        // store it
-        MCRObject mcrObj = new MCRObject(xml);
-        MCRMetadataManager.update(mcrObj);
-        LOGGER.info("Object " + id + " successfully restored!");
     }
 
     public static void deleteByQuery(String source) throws Exception {
