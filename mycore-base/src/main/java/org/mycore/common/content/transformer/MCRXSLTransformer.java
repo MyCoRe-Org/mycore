@@ -69,6 +69,8 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
+    private static final int INITIAL_BUFFER_SIZE = 32 * 1024;
+
     private static final MCRURIResolver URI_RESOLVER = MCRURIResolver.instance();
 
     private static Logger LOGGER = Logger.getLogger(MCRXSLTransformer.class);
@@ -77,7 +79,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     private static boolean TRACE_LISTENER_ENABLED = Logger.getLogger(MCRTraceListener.class).isDebugEnabled();
 
-    private static MCRCache<String, MCRXSLTransformer> INSTANCE_CACHE = new MCRCache<String, MCRXSLTransformer>(100, "MCRXSLTransformer instance cache");
+    private static MCRCache<String, MCRXSLTransformer> INSTANCE_CACHE = new MCRCache<String, MCRXSLTransformer>(100,
+        "MCRXSLTransformer instance cache");
 
     private static long CHECK_PERIOD = MCRConfiguration.instance().getLong("MCR.LayoutService.LastModifiedCheckPeriod", 10000);
 
@@ -106,7 +109,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         if (transformerFactory.getFeature(SAXSource.FEATURE) && transformerFactory.getFeature(SAXResult.FEATURE)) {
             this.tFactory = (SAXTransformerFactory) transformerFactory;
         } else {
-            throw new MCRConfigurationException("Transformer Factory " + transformerFactory.getClass().getName() + " does not implement SAXTransformerFactory");
+            throw new MCRConfigurationException("Transformer Factory " + transformerFactory.getClass().getName()
+                + " does not implement SAXTransformerFactory");
         }
     }
 
@@ -210,8 +214,9 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         }
     }
 
-    protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler) throws IOException, SAXException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler) throws IOException,
+        SAXException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(INITIAL_BUFFER_SIZE);
         StreamResult serializer = new StreamResult(baos);
         transformerHandler.setResult(serializer);
         // Parse the source XML, and send the parse events to the
@@ -220,8 +225,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         return new MCRByteContent(baos.toByteArray());
     }
 
-    private LinkedList<TransformerHandler> getTransformHandlerList(MCRParameterCollector parameterCollector) throws TransformerConfigurationException,
-        SAXException {
+    private LinkedList<TransformerHandler> getTransformHandlerList(MCRParameterCollector parameterCollector)
+        throws TransformerConfigurationException, SAXException {
         checkTemplateUptodate();
         LinkedList<TransformerHandler> xslSteps = new LinkedList<TransformerHandler>();
         for (Templates template : templates) {
