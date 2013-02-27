@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2.1.81" date="2013-02-XX" description="Beta 2">
+      <action dev="mcrtchef" type="update">
+        MCRLayoutService: buffer output gives about 30% faster downloads and big improvements in browser render speed on fast connections.
+      </action>
       <action dev="mcrtchef" type="fix" due-to="Matthias Eichner">
         Password hint is not displayed
         <fixes issue="613"/>

@@ -124,8 +124,8 @@ public class MCRLayoutService extends MCRDeprecatedLayoutService {
         return filename;
     }
 
-    private void transform(HttpServletResponse response, MCRContentTransformer transformer, MCRContent source, MCRParameterCollector parameter, String filename)
-        throws IOException {
+    private void transform(HttpServletResponse response, MCRContentTransformer transformer, MCRContent source,
+        MCRParameterCollector parameter, String filename) throws IOException {
         String fileExtension = transformer.getFileExtension();
         if (fileExtension != null && fileExtension.length() > 0) {
             filename += "." + fileExtension;
@@ -143,12 +143,16 @@ public class MCRLayoutService extends MCRDeprecatedLayoutService {
         ServletOutputStream servletOutputStream = response.getOutputStream();
         long start = System.currentTimeMillis();
         try {
+            MCRContent result;
             if (transformer instanceof MCRParameterizedTransformer) {
                 MCRParameterizedTransformer paramTransformer = (MCRParameterizedTransformer) transformer;
-                paramTransformer.transform(source, servletOutputStream, parameter);
+                result = paramTransformer.transform(source, parameter);
             } else {
-                transformer.transform(source, servletOutputStream);
+                result = transformer.transform(source);
             }
+            byte[] bytes = result.asByteArray();
+            response.setContentLength(bytes.length);
+            servletOutputStream.write(bytes);
         } finally {
             LOGGER.debug("MCRContent transformation took " + (System.currentTimeMillis() - start) + " ms.");
         }
