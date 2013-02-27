@@ -171,7 +171,7 @@ public class MCRParameterCollector {
      * Sets those request attributes as XSL parameters that start with "XSL.",
      * others will be ignored. The "XSL." prefix is cut off from the name.
      */
-    private void setFromRequestAttributes(HttpServletRequest request) {
+    private void setFromRequestParameters(HttpServletRequest request) {
         for (@SuppressWarnings("unchecked")
         Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
             String name = e.nextElement();
@@ -184,7 +184,7 @@ public class MCRParameterCollector {
      * Sets those request parameters as XSL parameters that start with "XSL.",
      * others will be ignored. The "XSL." prefix is cut off from the name.
      */
-    private void setFromRequestParameters(HttpServletRequest request) {
+    private void setFromRequestAttributes(HttpServletRequest request) {
         for (@SuppressWarnings("unchecked")
         Enumeration<String> e = request.getAttributeNames(); e.hasMoreElements();) {
             String name = e.nextElement();
