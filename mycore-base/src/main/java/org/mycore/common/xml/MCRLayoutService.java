@@ -22,6 +22,7 @@
 
 package org.mycore.common.xml;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
 
@@ -49,6 +50,8 @@ import org.mycore.common.xsl.MCRParameterCollector;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRLayoutService extends MCRDeprecatedLayoutService {
+
+    private static final int INITIAL_BUFFER_SIZE = 32 * 1024;
 
     final static Logger LOGGER = Logger.getLogger(MCRLayoutService.class);
 
@@ -143,18 +146,18 @@ public class MCRLayoutService extends MCRDeprecatedLayoutService {
         ServletOutputStream servletOutputStream = response.getOutputStream();
         long start = System.currentTimeMillis();
         try {
-            MCRContent result;
+            ByteArrayOutputStream bout = new ByteArrayOutputStream(INITIAL_BUFFER_SIZE);
             if (transformer instanceof MCRParameterizedTransformer) {
                 MCRParameterizedTransformer paramTransformer = (MCRParameterizedTransformer) transformer;
-                result = paramTransformer.transform(source, parameter);
+                paramTransformer.transform(source, bout, parameter);
             } else {
-                result = transformer.transform(source);
+                transformer.transform(source, bout);
             }
-            byte[] bytes = result.asByteArray();
-            response.setContentLength(bytes.length);
-            servletOutputStream.write(bytes);
+            response.setContentLength(bout.size());
+            bout.writeTo(servletOutputStream);
         } finally {
             LOGGER.debug("MCRContent transformation took " + (System.currentTimeMillis() - start) + " ms.");
         }
     }
+
 }
