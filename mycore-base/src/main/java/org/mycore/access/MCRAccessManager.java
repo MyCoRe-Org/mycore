@@ -223,9 +223,9 @@ public class MCRAccessManager {
      * @return true if the permission exist
      */
     public static boolean checkPermission(String permission) {
-        Boolean value = getAccessImpl().checkPermission(permission);
+        Boolean value = ACCESS_CACHE.isPermitted(null, permission);
         if (value == null) {
-            value = ACCESS_STRATEGY.checkPermission(null, permission);
+            value = getAccessImpl().checkPermission(permission);
             ACCESS_CACHE.cachePermission(null, permission, value);
         }
         return value;
