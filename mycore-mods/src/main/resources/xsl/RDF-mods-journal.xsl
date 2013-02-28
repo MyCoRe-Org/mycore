@@ -9,14 +9,13 @@
       <metadata>
         <def.modsContainer class="MCRMetaXML" heritable="false" notinherit="true">
           <modsContainer inherited="0">
-            <xsl:apply-templates select="bibo:Periodical" />
-            <xsl:apply-templates select="bibo:Series" />
+            <xsl:apply-templates select="rdf:Description" />
           </modsContainer>
         </def.modsContainer>
       </metadata>
     </mycoreobject>
   </xsl:template>
-  <xsl:template match="bibo:Periodical|bibo:Series">
+  <xsl:template match="rdf:Description">
     <mods:mods>
       <!-- process input in deterministic order as editor forms depend on it -->
       <xsl:apply-templates select="dcterms:title" />
