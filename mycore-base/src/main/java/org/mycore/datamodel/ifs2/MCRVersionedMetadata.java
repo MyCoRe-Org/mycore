@@ -29,7 +29,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.log4j.Logger;
@@ -60,10 +59,12 @@ import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
  */
 public class MCRVersionedMetadata extends MCRStoredMetadata {
 
+    private static final class LastRevisionFoundException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+    }
+
     private static final class LastRevisionLogHandler implements ISVNLogEntryHandler {
         private final String path;
-
-        boolean entryFound = false;
 
         long lastRevision = -1;
 
@@ -73,15 +74,13 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
 
         @Override
         public void handleLogEntry(SVNLogEntry logEntry) throws SVNException {
-            if (entryFound) {
-                return;
-            }
             SVNLogEntryPath svnLogEntryPath = logEntry.getChangedPaths().get(path);
             if (svnLogEntryPath != null) {
                 char type = svnLogEntryPath.getType();
                 if (type != SVNLogEntryPath.TYPE_DELETED) {
-                    entryFound = true;
                     lastRevision = logEntry.getRevision();
+                    //no other way to stop svnkit from logging
+                    throw new LastRevisionFoundException();
                 }
             }
         }
@@ -234,7 +233,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
             SVNRepository repository = getStore().getRepository();
             ISVNEditor editor = repository.getCommitEditor(commitMsg, null);
             editor.openRoot(-1);
-            editor.deleteEntry(store.getSlotPath(id), -1);
+            editor.deleteEntry(getFilePath(), -1);
             editor.closeDir();
 
             info = editor.closeEdit();
@@ -254,7 +253,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
     public void update() throws Exception {
         SVNRepository repository = getStore().getRepository();
         MCRByteArrayOutputStream baos = new MCRByteArrayOutputStream();
-        revision = repository.getFile(store.getSlotPath(id), -1, null, baos);
+        revision = repository.getFile(getFilePath(), -1, null, baos);
         baos.close();
         new MCRByteContent(baos.getBuffer(), 0, baos.size()).sendTo(fo);
     }
@@ -269,17 +268,15 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         try {
             List<MCRMetadataVersion> versions = new ArrayList<MCRMetadataVersion>();
             SVNRepository repository = getStore().getRepository();
-            String path = store.getSlotPath(id);
-
-            String dir = getDirectory(path);
+            String path = getFilePath();
+            String dir = getDirectory();
             @SuppressWarnings("unchecked")
             Collection<SVNLogEntry> entries = repository.log(new String[] { dir }, null, 0, repository.getLatestRevision(), true, true);
 
-            path = "/" + path;
             for (SVNLogEntry entry : entries) {
-                Map<String, SVNLogEntryPath> paths = entry.getChangedPaths();
-                if (paths.containsKey(path)) {
-                    char type = paths.get(path).getType();
+                SVNLogEntryPath svnLogEntryPath = entry.getChangedPaths().get(path);
+                if (svnLogEntryPath != null) {
+                    char type = svnLogEntryPath.getType();
                     versions.add(new MCRMetadataVersion(this, entry, type));
                 }
             }
@@ -289,9 +286,13 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         }
     }
 
-    private String getDirectory(String path) {
-        String dir = path.contains("/") ? path.substring(0, path.lastIndexOf('/')) : "";
-        return dir;
+    private String getFilePath() {
+        return "/" + store.getSlotPath(id);
+    }
+
+    private String getDirectory() {
+        String path = getFilePath();
+        return path.substring(0, path.lastIndexOf('/'));
     }
 
     public MCRMetadataVersion getRevision(long revision) throws IOException {
@@ -305,8 +306,8 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
                 }
             }
             SVNRepository repository = getStore().getRepository();
-            String path = store.getSlotPath(id);
-            String dir = getDirectory(path);
+            String path = getFilePath();
+            String dir = getDirectory();
             @SuppressWarnings("unchecked")
             Collection<SVNLogEntry> log = repository.log(new String[] { dir }, null, revision, revision, true, true);
             for (SVNLogEntry logEntry : log) {
@@ -326,11 +327,14 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
 
     public long getLastPresentRevision() throws SVNException {
         SVNRepository repository = getStore().getRepository();
-        final String path = store.getSlotPath(id);
-        String dir = getDirectory(path);
+        final String path = getFilePath();
+        String dir = getDirectory();
         LastRevisionLogHandler lastRevisionLogHandler = new LastRevisionLogHandler(path);
-        int limit = 2; //if last revision is a deletion
-        repository.log(new String[] { dir }, repository.getLatestRevision(), 0, true, true, limit, false, null, lastRevisionLogHandler);
+        int limit = 0; //we stop through LastRevisionFoundException
+        try {
+            repository.log(new String[] { dir }, repository.getLatestRevision(), 0, true, true, limit, false, null, lastRevisionLogHandler);
+        } catch (LastRevisionFoundException e) {
+        }
         return lastRevisionLogHandler.getLastRevision();
     }
 
@@ -354,7 +358,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         SVNDirEntry entry;
         try {
             SVNRepository repository = getStore().getRepository();
-            entry = repository.info(store.getSlotPath(id), -1);
+            entry = repository.info(getFilePath(), -1);
         } catch (SVNException e) {
             throw new IOException(e);
         }
