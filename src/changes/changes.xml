@@ -5,7 +5,11 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2.1.81" date="2013-02-XX" description="Beta 2">
+    <release version="2.1.81" date="2013-03-XX" description="Beta 2">
+      <action dev="mcrtchef" type="fix" due-to="Frank Lützenkirchen">
+        Editing user data produces erroneous links in "Search and manage users"
+        <fixes issue="606"/>
+      </action>
       <action dev="mcrtchef" type="update">
         MCRLayoutService: buffer output gives about 30% faster downloads and big improvements in browser render speed on fast connections.
       </action>
