@@ -28,23 +28,31 @@
     </source>
   </xsl:template>
 
-  <!-- overwrite this in your application -->
-  <xsl:template match="node()" mode="user-application">
-  </xsl:template>
-
   <xsl:template match="*[@class='MCRMetaClassification']/*">
-    <xsl:apply-templates mode="classi2fields"
-      select="document(concat('classification:metadata:0:parents:', @classid, ':', @categid))/mycoreclass/categories//category" />
+    <xsl:variable name="classTree" select="document(concat('classification:metadata:0:parents:', @classid, ':', @categid))/mycoreclass/categories//category" />
+
+    <xsl:apply-templates mode="classi2fields" select="$classTree" />
+
+    <!-- if mycore object is not a child -->
     <xsl:if test="@inherited = '0'">
-      <xsl:apply-templates mode="classi2fieldsTop"
-        select="document(concat('classification:metadata:0:parents:', @classid, ':', @categid))/mycoreclass/categories//category" />
+      <xsl:apply-templates mode="classi2fieldsTop" select="$classTree" />
     </xsl:if>
+
   </xsl:template>
 
   <xsl:template mode="classi2fields" match="category">
-    <field name="{ancestor-or-self::node()[last()]/mycoreclass/@ID}">
+    <xsl:variable name="classid" select="ancestor-or-self::node()[last()]/mycoreclass/@ID" />
+
+    <!-- classid as fieldname -->
+    <field name="{$classid}">
+      <!-- categid as value -->
       <xsl:value-of select="@ID" />
     </field>
+
+    <field name="category">
+      <xsl:value-of select="concat($classid, ':', @ID)" />
+    </field>
+
     <xsl:apply-templates mode="labels" select="label" />
   </xsl:template>
 
@@ -59,4 +67,8 @@
       <xsl:value-of select="@text" />
     </field>
   </xsl:template>
+
+  <!-- overwrite this in your application -->
+  <xsl:template match="node()" mode="user-application" />
+
 </xsl:stylesheet>
