@@ -22,7 +22,6 @@
 
 package org.mycore.common.content.transformer;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,6 +30,7 @@ import javax.xml.transform.TransformerException;
 
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.streams.MCRByteArrayOutputStream;
 import org.mycore.common.fo.MCRFoFactory;
 
 /**
@@ -44,7 +44,7 @@ public class MCRFopper extends MCRContentTransformer {
 
     @Override
     public MCRContent transform(MCRContent source) throws IOException {
-        ByteArrayOutputStream pdf = new ByteArrayOutputStream();
+        MCRByteArrayOutputStream pdf = new MCRByteArrayOutputStream(32 * 1024);
         InputStream in = source.getInputStream();
         try {
             MCRFoFactory.getFoFormatter().transform(in, pdf);
@@ -52,8 +52,7 @@ public class MCRFopper extends MCRContentTransformer {
             throw new IOException(e);
         }
         in.close();
-        pdf.close();
-        return new MCRByteContent(pdf.toByteArray());
+        return new MCRByteContent(pdf.getBuffer(), 0, pdf.size());
     }
 
     @Override

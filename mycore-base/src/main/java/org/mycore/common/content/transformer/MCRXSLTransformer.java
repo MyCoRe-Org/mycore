@@ -23,7 +23,6 @@
 
 package org.mycore.common.content.transformer;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
@@ -50,6 +49,7 @@ import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.streams.MCRByteArrayOutputStream;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xsl.MCRErrorListener;
 import org.mycore.common.xsl.MCRParameterCollector;
@@ -216,13 +216,13 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler) throws IOException,
         SAXException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(INITIAL_BUFFER_SIZE);
+        MCRByteArrayOutputStream baos = new MCRByteArrayOutputStream(INITIAL_BUFFER_SIZE);
         StreamResult serializer = new StreamResult(baos);
         transformerHandler.setResult(serializer);
         // Parse the source XML, and send the parse events to the
         // TransformerHandler.
         reader.parse(source.getInputSource());
-        return new MCRByteContent(baos.toByteArray());
+        return new MCRByteContent(baos.getBuffer(), 0, baos.size());
     }
 
     private LinkedList<TransformerHandler> getTransformHandlerList(MCRParameterCollector parameterCollector)

@@ -23,7 +23,6 @@
 
 package org.mycore.datamodel.ifs2;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -37,6 +36,7 @@ import org.jdom2.JDOMException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.streams.MCRByteArrayOutputStream;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
@@ -220,10 +220,10 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      */
     public void update() throws Exception {
         SVNRepository repository = getStore().getRepository();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        MCRByteArrayOutputStream baos = new MCRByteArrayOutputStream();
         revision = repository.getFile(store.getSlotPath(id), -1, null, baos);
         baos.close();
-        new MCRByteContent(baos.toByteArray()).sendTo(fo);
+        new MCRByteContent(baos.getBuffer(), 0, baos.size()).sendTo(fo);
     }
 
     /**
@@ -251,7 +251,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
                 }
             }
             return versions;
-        } catch(SVNException svnExc) {
+        } catch (SVNException svnExc) {
             throw new IOException(svnExc);
         }
     }

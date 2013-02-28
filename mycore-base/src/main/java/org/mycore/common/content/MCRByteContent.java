@@ -26,7 +26,7 @@ package org.mycore.common.content;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
+import java.util.Arrays;
 
 /**
  * Reads MCRContent from a byte[] arrray.
@@ -37,17 +37,38 @@ public class MCRByteContent extends MCRContent {
 
     private byte[] bytes;
 
+    private int offset;
+
+    private int length;
+
     public MCRByteContent(byte[] bytes) {
+        this(bytes, 0, bytes.length);
+    }
+
+    public MCRByteContent(byte[] bytes, int offset, int length) {
         this.bytes = bytes;
+        this.offset = offset;
+        this.length = length;
     }
 
     @Override
     public InputStream getInputStream() throws IOException {
-        return new ByteArrayInputStream(bytes);
+        return new ByteArrayInputStream(bytes, offset, length);
     }
 
     @Override
     public byte[] asByteArray() throws IOException {
+        if (offset == 0 && length == 0) {
+            return bytes;
+        }
+        synchronized (this) {
+            if (offset == 0 && length == bytes.length) {
+                return bytes;
+            }
+            bytes = Arrays.copyOfRange(bytes, offset, offset + length);
+            offset = 0;
+            length = bytes.length;
+        }
         return bytes;
     }
 }

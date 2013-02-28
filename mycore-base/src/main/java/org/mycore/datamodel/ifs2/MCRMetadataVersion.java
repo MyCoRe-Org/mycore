@@ -23,7 +23,6 @@
 
 package org.mycore.datamodel.ifs2;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
@@ -31,6 +30,7 @@ import org.jdom2.JDOMException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.streams.MCRByteArrayOutputStream;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.io.SVNRepository;
@@ -161,10 +161,10 @@ public class MCRMetadataVersion {
         }
         try {
             SVNRepository repository = vm.getStore().getRepository();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            MCRByteArrayOutputStream baos = new MCRByteArrayOutputStream();
             repository.getFile(vm.getStore().getSlotPath(vm.getID()), revision, null, baos);
             baos.close();
-            return new MCRByteContent(baos.toByteArray());
+            return new MCRByteContent(baos.getBuffer(), 0, baos.size());
         } catch (SVNException e) {
             throw new IOException(e);
         }

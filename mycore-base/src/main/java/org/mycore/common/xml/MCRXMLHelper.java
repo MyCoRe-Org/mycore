@@ -23,7 +23,6 @@
 
 package org.mycore.common.xml;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -56,6 +55,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.content.MCRVFSContent;
+import org.mycore.common.content.streams.MCRByteArrayOutputStream;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -285,13 +285,13 @@ public class MCRXMLHelper {
 
     private static Element canonicalElement(Parent e) throws IOException, SAXParseException {
         XMLOutputter xout = new XMLOutputter(Format.getCompactFormat());
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        MCRByteArrayOutputStream bout = new MCRByteArrayOutputStream();
         if (e instanceof Element) {
             xout.output((Element) e, bout);
         } else {
             xout.output((Document) e, bout);
         }
-        Document xml = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRByteContent(bout.toByteArray()));
+        Document xml = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRByteContent(bout.getBuffer(), 0, bout.size()));
         return xml.getRootElement();
     }
 
@@ -316,7 +316,7 @@ public class MCRXMLHelper {
 
         public static boolean equivalent(DocType d1, DocType d2) {
             boolean equals = (d1.getPublicID() == d2.getPublicID() || d1.getPublicID().equals(d2.getPublicID()))
-                    && (d1.getSystemID() == d2.getSystemID() || d1.getSystemID().equals(d2.getSystemID()));
+                && (d1.getSystemID() == d2.getSystemID() || d1.getSystemID().equals(d2.getSystemID()));
             if (!equals) {
                 LOGGER.info("DocType differs \"" + d1 + "\"!=\"" + d2 + "\"");
             }
