@@ -39,7 +39,6 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRDOMContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -183,9 +182,10 @@ public class MCRObjectServlet extends MCRServlet {
         if (mcrid == null) {
             return null;
         }
-        MCRMetadataStore metadataStore = MCRXMLMetadataManager.instance().getStore(mcrid);
+        MCRXMLMetadataManager xmlMetadataManager = MCRXMLMetadataManager.instance();
+        MCRMetadataStore metadataStore = xmlMetadataManager.getStore(mcrid);
         if (metadataStore instanceof MCRVersioningMetadataStore) {
-            MCRContent content = MCRUtils.requestVersionedObjectAsContent(mcrid, rev);
+            MCRContent content = xmlMetadataManager.retrieveContent(mcrid, rev);
             if (content != null) {
                 return content;
             }
@@ -221,13 +221,15 @@ public class MCRObjectServlet extends MCRServlet {
                     // hit allocated
                     // search for next and previous object readable by user
                     for (int j = i - 1; j >= 0; j--) {
-                        if (results.getHit(j).getHost() != MCRHit.LOCAL || MCRAccessManager.checkPermission(results.getHit(j).getID(), PERMISSION_READ)) {
+                        if (results.getHit(j).getHost() != MCRHit.LOCAL
+                            || MCRAccessManager.checkPermission(results.getHit(j).getID(), PERMISSION_READ)) {
                             previousObject = results.getHit(j);
                             break;
                         }
                     }
                     for (int j = i + 1; j < numHits; j++) {
-                        if (results.getHit(j).getHost() != MCRHit.LOCAL || MCRAccessManager.checkPermission(results.getHit(j).getID(), PERMISSION_READ)) {
+                        if (results.getHit(j).getHost() != MCRHit.LOCAL
+                            || MCRAccessManager.checkPermission(results.getHit(j).getID(), PERMISSION_READ)) {
                             nextObject = results.getHit(j);
                             break;
                         }

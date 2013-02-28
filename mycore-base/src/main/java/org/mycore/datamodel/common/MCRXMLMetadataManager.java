@@ -33,6 +33,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRCache;
@@ -44,11 +45,14 @@ import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
+import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRObjectIDFileSystemDate;
 import org.mycore.datamodel.ifs2.MCRStore;
 import org.mycore.datamodel.ifs2.MCRStoreManager;
 import org.mycore.datamodel.ifs2.MCRStoredMetadata;
+import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.SAXException;
 
@@ -217,6 +221,10 @@ public class MCRXMLMetadataManager {
      */
     private String svnBase;
 
+    public static final int REV_LATEST = -1;
+
+    private static final Logger LOGGER = Logger.getLogger(MCRXMLMetadataManager.class);
+
     /**
      * Returns IFS2 MCRMetadataStore for the given project and object type
      * 
@@ -236,8 +244,8 @@ public class MCRXMLMetadataManager {
                     try {
                         setupStore(project, type, prefix);
                     } catch (Exception e) {
-                        throw new MCRPersistenceException(MessageFormat.format("Could not instantiate store for project {0} and object type {1}.", project,
-                            type), e);
+                        throw new MCRPersistenceException(MessageFormat.format(
+                            "Could not instantiate store for project {0} and object type {1}.", project, type), e);
                     }
                 }
             }
@@ -245,7 +253,8 @@ public class MCRXMLMetadataManager {
 
         MCRMetadataStore store = MCRStoreManager.getStore(projectType, MCRMetadataStore.class);
         if (store == null) {
-            throw new MCRPersistenceException(MessageFormat.format("Metadata store for project {0} and object type {1} is unconfigured.", project, type));
+            throw new MCRPersistenceException(MessageFormat.format("Metadata store for project {0} and object type {1} is unconfigured.",
+                project, type));
         }
         return store;
     }
@@ -513,6 +522,84 @@ public class MCRXMLMetadataManager {
         }
         metadata = storedMetadata.getMetadata();
         return metadata;
+    }
+
+    /**
+     * @param mcrid
+     *            the id of the object to be retrieved
+     * @param revision
+     *            the revision to be returned, specify -1 if you want to
+     *            retrieve the latest revision (includes deleted objects also)
+     * @return a {@link MCRContent} representing the {@link MCRObject} of the
+     *         given revision or <code>null</code> if there is no such object
+     *         with the given revision
+     * @throws IOException 
+     */
+    public MCRContent retrieveContent(MCRObjectID mcrid, long revision) throws IOException {
+        LOGGER.info("Getting object " + mcrid + " in revision " + revision);
+        MCRMetadataVersion version = getMetadataVersion(mcrid, revision);
+        if (version != null) {
+            return version.retrieve();
+        }
+        return null;
+    }
+
+    /**
+     * Returns the {@link MCRMetadataVersion} of the given id and revision.
+     * 
+     * @param mcrId
+     *            the id of the object to be retrieved
+     * @param rev
+     *            the revision to be returned, specify -1 if you want to
+     *            retrieve the latest revision (includes deleted objects also)
+     * @return a {@link MCRMetadataVersion} representing the {@link MCRObject} of the
+     *         given revision or <code>null</code> if there is no such object
+     *         with the given revision
+     * @throws IOException
+     */
+    private MCRMetadataVersion getMetadataVersion(MCRObjectID mcrId, long rev) throws IOException {
+        MCRVersionedMetadata versionedMetaData = getVersionedMetaData(mcrId);
+        if (versionedMetaData == null) {
+            return null;
+        }
+        return versionedMetaData.getRevision(rev);
+    }
+
+    /**
+     * Lists all versions of this metadata object available in the
+     * subversion repository.
+     * 
+     * @param id
+     *            the id of the object to be retrieved
+     * @return {@link List} with all {@link MCRMetadataVersion} of
+     *         the given object or null if the id is null or the metadata
+     *         store doesn't support versioning
+     * @throws IOException
+     */
+    public List<MCRMetadataVersion> listRevisions(MCRObjectID id) throws IOException {
+        MCRVersionedMetadata vm = getVersionedMetaData(id);
+        if (vm == null) {
+            return null;
+        }
+        return vm.listVersions();
+    }
+
+    /**
+     * @param id
+     * @return
+     * @throws IOException
+     */
+    public MCRVersionedMetadata getVersionedMetaData(MCRObjectID id) throws IOException {
+        if (id == null) {
+            return null;
+        }
+        MCRMetadataStore metadataStore = getStore(id);
+        if (!(metadataStore instanceof MCRVersioningMetadataStore)) {
+            return null;
+        }
+        MCRVersioningMetadataStore verStore = (MCRVersioningMetadataStore) metadataStore;
+        MCRVersionedMetadata vm = verStore.retrieve(id.getNumberAsInteger());
+        return vm;
     }
 
     /**

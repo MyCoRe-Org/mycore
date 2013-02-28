@@ -25,6 +25,7 @@ package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.streams.MCRByteArrayOutputStream;
+import org.tmatesoft.svn.core.ISVNLogEntryHandler;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
@@ -57,6 +59,37 @@ import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
  * @author Frank Lützenkirchen
  */
 public class MCRVersionedMetadata extends MCRStoredMetadata {
+
+    private static final class LastRevisionLogHandler implements ISVNLogEntryHandler {
+        private final String path;
+
+        boolean entryFound = false;
+
+        long lastRevision = -1;
+
+        private LastRevisionLogHandler(String path) {
+            this.path = path;
+        }
+
+        @Override
+        public void handleLogEntry(SVNLogEntry logEntry) throws SVNException {
+            if (entryFound) {
+                return;
+            }
+            SVNLogEntryPath svnLogEntryPath = logEntry.getChangedPaths().get(path);
+            if (svnLogEntryPath != null) {
+                char type = svnLogEntryPath.getType();
+                if (type != SVNLogEntryPath.TYPE_DELETED) {
+                    entryFound = true;
+                    lastRevision = logEntry.getRevision();
+                }
+            }
+        }
+
+        public long getLastRevision() {
+            return lastRevision;
+        }
+    }
 
     /**
      * The logger
@@ -238,9 +271,9 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
             SVNRepository repository = getStore().getRepository();
             String path = store.getSlotPath(id);
 
-            String dir = path.contains("/") ? path.substring(0, path.lastIndexOf('/')) : "";
+            String dir = getDirectory(path);
             @SuppressWarnings("unchecked")
-            Collection<SVNLogEntry> entries = repository.log(new String[] { dir }, null, 0, -1, true, true);
+            Collection<SVNLogEntry> entries = repository.log(new String[] { dir }, null, 0, repository.getLatestRevision(), true, true);
 
             path = "/" + path;
             for (SVNLogEntry entry : entries) {
@@ -254,6 +287,51 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         } catch (SVNException svnExc) {
             throw new IOException(svnExc);
         }
+    }
+
+    private String getDirectory(String path) {
+        String dir = path.contains("/") ? path.substring(0, path.lastIndexOf('/')) : "";
+        return dir;
+    }
+
+    public MCRMetadataVersion getRevision(long revision) throws IOException {
+        try {
+            if (revision < 0) {
+                revision = getLastPresentRevision();
+                if (revision < 0) {
+                    LOGGER
+                        .warn(MessageFormat.format("Metadata object {0} in store {1} has no last revision!", getID(), getStore().getID()));
+                    return null;
+                }
+            }
+            SVNRepository repository = getStore().getRepository();
+            String path = store.getSlotPath(id);
+            String dir = getDirectory(path);
+            @SuppressWarnings("unchecked")
+            Collection<SVNLogEntry> log = repository.log(new String[] { dir }, null, revision, revision, true, true);
+            for (SVNLogEntry logEntry : log) {
+                SVNLogEntryPath svnLogEntryPath = logEntry.getChangedPaths().get(path);
+                if (svnLogEntryPath != null) {
+                    char type = svnLogEntryPath.getType();
+                    return new MCRMetadataVersion(this, logEntry, type);
+                }
+            }
+            LOGGER.warn(MessageFormat.format("Metadata object {0} in store {1} has no revision ''{2}''!", getID(), getStore().getID(),
+                revision));
+            return null;
+        } catch (SVNException svnExc) {
+            throw new IOException(svnExc);
+        }
+    }
+
+    public long getLastPresentRevision() throws SVNException {
+        SVNRepository repository = getStore().getRepository();
+        final String path = store.getSlotPath(id);
+        String dir = getDirectory(path);
+        LastRevisionLogHandler lastRevisionLogHandler = new LastRevisionLogHandler(path);
+        int limit = 2; //if last revision is a deletion
+        repository.log(new String[] { dir }, repository.getLatestRevision(), 0, true, true, limit, false, null, lastRevisionLogHandler);
+        return lastRevisionLogHandler.getLastRevision();
     }
 
     /**

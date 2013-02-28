@@ -68,28 +68,18 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.streams.MCRDevNull;
 import org.mycore.common.content.streams.MCRMD5InputStream;
-import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
-import org.mycore.datamodel.ifs2.MCRMetadataStore;
-import org.mycore.datamodel.ifs2.MCRMetadataVersion;
-import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
-import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.language.MCRLanguageFactory;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
@@ -111,8 +101,6 @@ public class MCRUtils {
     public final static char COMMAND_AND = 'A';
 
     public final static char COMMAND_XOR = 'X';
-
-    private static final int REV_LATEST = -1;
 
     // public constant data
     private static final Logger LOGGER = Logger.getLogger(MCRUtils.class);
@@ -900,106 +888,6 @@ public class MCRUtils {
         StringWriter sw = new StringWriter();
         op.output(elm, sw);
         return sw.toString();
-    }
-
-    /**
-     * @param objId
-     *            the id of the object to be retrieved
-     * @param revision
-     *            the revision to be returned, specify -1 if you want to
-     *            retrieve the latest revision (includes deleted objects also)
-     * @return a {@link Document} representing the {@link MCRObject} of the
-     *         given revision or <code>null</code> if there is no such object
-     *         with the given revision
-     * @throws IOException 
-     * @throws JDOMException 
-     * @throws SAXParseException 
-     */
-    public static Document requestVersionedObject(MCRObjectID objId, long revision) throws IOException, JDOMException, SAXException {
-        MCRContent content = requestVersionedObjectAsContent(objId, revision);
-        if (content == null) {
-            return null;
-        }
-        return content.asXML();
-    }
-
-    /**
-     * @param objId
-     *            the id of the object to be retrieved
-     * @param revision
-     *            the revision to be returned, specify -1 if you want to
-     *            retrieve the latest revision (includes deleted objects also)
-     * @return a {@link MCRContent} representing the {@link MCRObject} of the
-     *         given revision or <code>null</code> if there is no such object
-     *         with the given revision
-     * @throws IOException 
-     */
-    public static MCRContent requestVersionedObjectAsContent(MCRObjectID objId, long revision) throws IOException {
-        LOGGER.info("Getting object " + objId + " in revision " + revision);
-        MCRMetadataVersion version = getMetadataVersion(objId, revision);
-        if (version != null) {
-            return version.retrieve();
-        }
-        return null;
-    }
-
-    /**
-     * Lists all versions of this metadata object available in the
-     * subversion repository.
-     * 
-     * @param id
-     *            the id of the object to be retrieved
-     * @return {@link List} with all {@link MCRMetadataVersion} of
-     *         the given object or null if the id is null or the metadata
-     *         store doesn't support versioning
-     * @throws IOException
-     */
-    public static List<MCRMetadataVersion> listRevisions(MCRObjectID id) throws IOException {
-        if (id == null) {
-            return null;
-        }
-        MCRMetadataStore metadataStore = MCRXMLMetadataManager.instance().getStore(id);
-        if (!(metadataStore instanceof MCRVersioningMetadataStore)) {
-            return null;
-        }
-        MCRVersioningMetadataStore verStore = (MCRVersioningMetadataStore) metadataStore;
-        MCRVersionedMetadata vm = verStore.retrieve(id.getNumberAsInteger());
-        return vm.listVersions();
-    }
-
-    /**
-     * Returns the {@link MCRMetadataVersion} of the given id and revision.
-     * 
-     * @param mcrId
-     *            the id of the object to be retrieved
-     * @param rev
-     *            the revision to be returned, specify -1 if you want to
-     *            retrieve the latest revision (includes deleted objects also)
-     * @return a {@link MCRMetadataVersion} representing the {@link MCRObject} of the
-     *         given revision or <code>null</code> if there is no such object
-     *         with the given revision
-     * @throws IOException
-     */
-    public static MCRMetadataVersion getMetadataVersion(MCRObjectID mcrId, long rev) throws IOException {
-        List<MCRMetadataVersion> versions = listRevisions(mcrId);
-        if (versions == null) {
-            return null;
-        }
-        if (rev == REV_LATEST && versions.size() > 0) {
-            //request latest available revision
-            MCRMetadataVersion lastVersion = versions.get(versions.size() - 1);
-            if (lastVersion.getType() == MCRMetadataVersion.DELETED) {
-                lastVersion = versions.get(versions.size() - 2);
-            }
-            return lastVersion;
-        }
-        for (MCRMetadataVersion version : versions) {
-            //request specific revision
-            if (version.getRevision() == rev) {
-                return version;
-            }
-        }
-        return null;
     }
 
     public static String asSHA1String(int iterations, byte[] salt, String text) throws NoSuchAlgorithmException {

@@ -72,7 +72,6 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
@@ -341,7 +340,8 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
     @Override
     public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId) throws SAXException, IOException {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(MessageFormat.format("Resolving: \nname: {0}\npublicId: {1}\nbaseURI: {2}\nsystemId: {3}", name, publicId, baseURI, systemId));
+            LOGGER.debug(MessageFormat.format("Resolving: \nname: {0}\npublicId: {1}\nbaseURI: {2}\nsystemId: {3}", name, publicId,
+                baseURI, systemId));
         }
         if (systemId == null) {
             return null; // Use default resolver
@@ -996,7 +996,8 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
             } else if (axis.equals("parents")) {
                 if (categ.length() == 0) {
                     LOGGER.error("Cannot resolve parent axis without a CategID. URI: " + uri);
-                    throw new IllegalArgumentException("Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: " + uri);
+                    throw new IllegalArgumentException(
+                        "Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: " + uri);
                 }
                 cl = DAO.getRootCategory(new MCRCategoryID(classID, categ), levels);
             }
@@ -1401,12 +1402,13 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
             String id = href.substring(href.indexOf(":") + 1);
             LOGGER.debug("Reading version info of MCRObject with ID " + id);
             MCRObjectID mcrId = MCRObjectID.getInstance(id);
+            MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.instance();
             try {
-                List<MCRMetadataVersion> versions = MCRUtils.listRevisions(mcrId);
+                List<MCRMetadataVersion> versions = metadataManager.listRevisions(mcrId);
                 if (versions != null && !versions.isEmpty()) {
                     return getSource(versions);
                 } else {
-                    MCRMetadataStore metadataStore = MCRXMLMetadataManager.instance().getStore(id);
+                    MCRMetadataStore metadataStore = metadataManager.getStore(id);
                     return getSource(metadataStore.retrieve(mcrId.getNumberAsInteger()));
                 }
             } catch (Exception e) {
@@ -1451,19 +1453,18 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
         @Override
         public Source resolve(String href, String base) throws TransformerException {
             String[] parts = href.split(":");
-            String mcrId = parts[parts.length - 1];
+            MCRObjectID mcrId = MCRObjectID.getInstance(parts[parts.length - 1]);
             LOGGER.info("Resolving deleted object " + mcrId);
-            Document xml = null;
             try {
-                xml = MCRUtils.requestVersionedObject(MCRObjectID.getInstance(mcrId), -1);
-            } catch (Exception exc) {
-                LOGGER.error("while retrieving current version of object " + mcrId, exc);
+                MCRContent lastPresentVersion = MCRXMLMetadataManager.instance().retrieveContent(mcrId, -1);
+                if (lastPresentVersion == null) {
+                    LOGGER.warn("Could not resolve deleted object " + mcrId);
+                    return new JDOMSource(MCRObjectFactory.getSampleObject(mcrId));
+                }
+                return lastPresentVersion.getSource();
+            } catch (IOException e) {
+                throw new TransformerException(e);
             }
-            if (xml == null) {
-                LOGGER.warn("Could not resolve deleted object " + mcrId);
-                return new JDOMSource(MCRObjectFactory.getSampleObject(MCRObjectID.getInstance(mcrId)));
-            }
-            return new JDOMSource(xml);
         }
     }
 
