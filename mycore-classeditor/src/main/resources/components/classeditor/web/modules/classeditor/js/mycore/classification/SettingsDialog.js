@@ -69,7 +69,7 @@ return declare("mycore.classification.SettingsDialog", [Dialog, _Templated, _Set
 		on(this.noSaveAndImportButton, "click", lang.hitch(this, this.onNoSaveAndImport));
 		on(this.cancelImportButton, "click", lang.hitch(this, this.onCancelImport));
     },
-    
+
     show: function(/*boolean*/ dirty) {
 		this.dirty = dirty;
 		this.classificationImported = false;

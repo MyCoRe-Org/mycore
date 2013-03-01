@@ -23,6 +23,8 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 	
 	store: null,
 
+	disabled: false,
+
     constructor: function(/*Object*/ args) {
     	this.gutters = false;
     	this.splitter = false;
@@ -193,9 +195,9 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 			return "icon22 classification";
 		} else {
 			if(classUtil.hasChildren(treeItem)) {
-				return "icon22 category"
+				return "icon22 internalNode"
 			} else {
-				return "icon22 category2";
+				return "icon22 leafNode";
 			}
 		}
 	},
@@ -350,7 +352,7 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 	 * Get all items selected in tree.
 	 */
 	getSelectedItems: function() {
-		return this.tree.selectedItems;
+		return this.tree != null ? this.tree.selectedItems : null;
 	},
 
 	showId: function() {
@@ -367,6 +369,13 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 		this.enableDnD = enableDnD;
 		if(this.tree) {
 			this.tree.dndController.setEnabled(this.enableDnD);
+		}
+	},
+
+	_setDisabledAttr: function(/*boolean*/ disabled) {
+		this.disabled = disabled;
+		if(this.tree != null) {
+			this.tree.set("disabled", disabled);
 		}
 	}
 

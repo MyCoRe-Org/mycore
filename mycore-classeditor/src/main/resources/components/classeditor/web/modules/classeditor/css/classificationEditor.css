@@ -154,12 +154,6 @@
 /*******************************************************
 * Icons
 ********************************************************/
-.classeditor .icon12 {
-	background-repeat: no-repeat;
-	background-position: center center;
-	width: 12px;
-	height: 12px;
-}
 .classeditor .icon16 {
 	background-repeat: no-repeat;
 	background-position: center center;
@@ -172,28 +166,22 @@
 	width: 22px;
 	height: 22px;
 }
-.classeditor .addIcon12 {
-	background-image: url(../img/add_12.png);
-}
-.classeditor .removeIcon12 {
-	background-image: url(../img/remove_12.png);
-}
-.classeditor .addIcon16 {
+.classeditor .addIcon {
 	background-image: url(../img/add_16.png);
 }
-.classeditor .addDisabledIcon16 {
+.classeditor .addDisabledIcon {
 	background-image: url(../img/addDisabled_16.png);
 }
-.classeditor .removeIcon16 {
+.classeditor .removeIcon {
 	background-image: url(../img/remove_16.png);
 }
-.classeditor .removeDisabledIcon16 {
+.classeditor .removeDisabledIcon {
 	background-image: url(../img/removeDisabled_16.png);
 }
-.classeditor .exportClassIcon16 {
+.classeditor .exportClassIcon {
 	background-image: url(../img/classification_16.png);
 }
-.classeditor .exportClassDisabledIcon16 {
+.classeditor .exportClassDisabledIcon {
 	background-image: url(../img/classificationDisabled_16.png);
 }
 .classeditor .root {
@@ -202,11 +190,11 @@
 .classeditor .classification {
 	background-image: url(../img/classification_22.png);
 }
-.classeditor .category {
-	background-image: url(../img/category_22.png);
+.classeditor .internalNode {
+	background-image: url(../img/internalNode_22.png);
 }
-.classeditor .category2 {
-	background-image: url(../img/category2_22.png);
+.classeditor .leafNode {
+	background-image: url(../img/leafNode_22.png);
 }
 .classeditor .saveIcon {
 	background-image: url(../img/save_16.png);
@@ -217,17 +205,29 @@
 .classeditor .settingsIcon {
 	background-image: url(../img/settings_16.png);
 }
+.classeditor .settingsDisabledIcon {
+	background-image: url(../img/settingsDisabled_16.png);
+}
 .classeditor .fullscreenIcon {
 	background-image: url(../img/fullscreen_16.png);
 }
+.classeditor .fullscreenDisabledIcon {
+	background-image: url(../img/fullscreenDisabled_16.png);
+}
 .classeditor .minimizeIcon {
 	background-image: url(../img/minimize_16.png);
+}
+.classeditor .minimizeDisabledIcon {
+	background-image: url(../img/minimizeDisabled_16.png);
 }
 .classeditor .folder {
 	background-image: url(../img/folder_16.png);
 }
 .classeditor .refreshIcon {
 	background-image: url(../img/refresh_16.png);
+}
+.classeditor .refreshDisabledIcon {
+	background-image: url(../img/refreshDisabled_16.png);
 }
 .classeditor .loading {
 	backgroundImage: url(../img/loading.gif);

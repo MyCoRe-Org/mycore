@@ -26,6 +26,8 @@ return declare("mycore.classification.TreePane", [ContentPane, _Templated, _Sett
 
 	exportDialog: null,
 
+	disabled: false,
+
     constructor: function(/*Object*/ args) {
     	declare.safeMixin(this, args);
     },
@@ -46,7 +48,7 @@ return declare("mycore.classification.TreePane", [ContentPane, _Templated, _Sett
 		var disabled = this.get("disabled") == true;
 		// remove button
 		var selectedItems = this.tree.getSelectedItems();
-		var removeVisable = selectedItems && selectedItems.length > 0 && !disabled;
+		var removeVisable = selectedItems != null && selectedItems.length > 0 && !disabled;
 		if(selectedItems) {
 			for(var i = 0; i < selectedItems.length; i++) {
 				if(selectedItems[i]._RI || (selectedItems[i].haslink && selectedItems[i].haslink[0] == true)) {
@@ -56,36 +58,24 @@ return declare("mycore.classification.TreePane", [ContentPane, _Templated, _Sett
 			}
 		}
 		this.removeTreeItemButton.set("disabled", !removeVisable);
-		if(removeVisable) {
-			this.removeTreeItemButton.set("iconClass", "icon16 removeIcon16");
-		} else {
-			this.removeTreeItemButton.set("iconClass", "icon16 removeDisabledIcon16");
-		}
+		this.removeTreeItemButton.set("iconClass", "icon16 " + (removeVisable ? "removeIcon" : "removeDisabledIcon"));
 
 		// add button
 		this.addTreeItemButton.set("disabled", disabled);
-		if(disabled) {
-			this.addTreeItemButton.set("iconClass", "icon16 addDisabledIcon16");0
-		} else {
-			this.addTreeItemButton.set("iconClass", "icon16 addIcon16");
-		}
+		this.addTreeItemButton.set("iconClass", "icon16 " + (disabled ? "addDisabledIcon" : "addIcon"));
 
 		// export button
-		var exportVisable = selectedItems && selectedItems.length > 0 && classUtil.isClassification(selectedItems[0]);
+		var exportVisable = selectedItems != null  && selectedItems.length > 0 && classUtil.isClassification(selectedItems[0]);
 		this.exportClassificationButton.set("disabled", !exportVisable);
-		if(exportVisable) {
-			this.exportClassificationButton.set("iconClass", "icon16 exportClassIcon16");
-		} else {
-			this.exportClassificationButton.set("iconClass", "icon16 exportClassDisabledIcon16");			
-		}
+		this.exportClassificationButton.set("iconClass", "icon16 " + (exportVisable ? "exportClassIcon" : "exportClassDisabledIcon"));
 	},
 
 	add: function() {
 		this.addTreeItemButton.set("disabled", true);
-		this.addTreeItemButton.set("iconClass", "icon16 addDisabledIcon16");
+		this.addTreeItemButton.set("iconClass", "icon16 addDisabledIcon");
 		this.tree.addToSelected();
 		this.addTreeItemButton.set("disabled", false);
-		this.addTreeItemButton.set("iconClass", "icon16 addIcon16");	
+		this.addTreeItemButton.set("iconClass", "icon16 addIcon");	
 	},
 
 	remove: function() {
@@ -104,6 +94,12 @@ return declare("mycore.classification.TreePane", [ContentPane, _Templated, _Sett
 
 	hideId: function() {
 		this.tree.hideId();
+	},
+
+	_setDisabledAttr: function(/*boolean*/ disabled) {
+		this.disabled = disabled;
+		this.updateToolbar();
+		this.tree.set("disabled", disabled);
 	}
 
 });

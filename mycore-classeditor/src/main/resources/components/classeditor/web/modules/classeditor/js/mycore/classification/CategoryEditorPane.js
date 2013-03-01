@@ -26,6 +26,8 @@ return declare("mycore.classification.CategoryEditorPane", [_Widget, Evented, _T
 	labelEditor: null,
 
 	currentItem: null,
+	
+	disabled: false,
 
     constructor: function(/*Object*/ args) {
     	declare.safeMixin(this, args);
@@ -99,7 +101,7 @@ return declare("mycore.classification.CategoryEditorPane", [_Widget, Evented, _T
     },
 
     _setDisabledAttr: function(/*boolean*/ disabled) {
-    	this.inherited(arguments);
+    	this.disabled = disabled;
 		this.labelEditor.set("disabled", disabled);
 		this.urlEditor.set("disabled", disabled);
 		this.classIdEditor.set("disabled", disabled);

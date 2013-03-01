@@ -46,6 +46,8 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 
 	settingsDialog: null,
 
+	disabled: false,
+
 	constructor: function(/*Object*/ args) {
 		declare.safeMixin(this, args);
 	},
@@ -87,6 +89,7 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 		on(this.settingsDialog, "saveBeforeImport", lang.hitch(this, this.onSaveBeforeImport));
 		// store events
 		on(this.store, "saved", lang.hitch(this, this.onStoreSaved));
+		on(this.store, "saveEvent", lang.hitch(this, this.onStoreSaveEvent));
 		on(this.store, "saveError", lang.hitch(this, this.onStoreSaveError));
 	},
 
@@ -190,14 +193,18 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 		alert(i18n.getFromCache("component.classeditor.save.successfull"));
 	},
 
-	onStoreSaveError: function(evt) {
-	    if(evt.error.status === 401) {
-	        alert(i18n.getFromCache("component.classeditor.error.nopermissions"));
+	onStoreSaveError: function(error) {
+		console.log(error);
+	},
+
+	onStoreSaveEvent: function(event) {
+		if(event.xhr.status == 401) {
+	        alert(i18n.getFromCache("component.classeditor.save.nopermission"));
 	    } else{
 	        alert(i18n.getFromCache("component.classeditor.save.generalerror") + " - " + evt.error);
+			console.log("error while saving");
+			console.log(evt.error);
 	    }
-		console.log("error while saving");
-		console.log(evt.error);
 	},
 
 	/**
@@ -220,29 +227,35 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 				this.treePane.updateToolbar();
 				this.updateToolbar();
 			}),
-			lang.hitch(this, function(error) {
-				alert(error);
-				this.treePane.updateToolbar();
-				this.updateToolbar();
+			lang.hitch(this, function(event) {
+				if(event.xhr.status == 401) {
+					alert(i18n.getFromCache("component.classeditor.error.noReadPermission"));
+				} else {
+					alert(event.xhr.statusText);
+					console.log(event);
+				}
+				this.set("disabled", true);
 			})
 		);
 		this.categoryEditorPane.set("disabled", true);
 	},
 
 	updateToolbar: function() {
-		if(this.store.isDirty()) {
-			this.saveButton.set("disabled", false);
-			this.saveButton.set("iconClass", "icon16 saveIcon");
-		} else {
-			this.saveButton.set("disabled", true);
-			this.saveButton.set("iconClass", "icon16 saveDisabledIcon");
-		}
+		var disabled = this.get("disabled") == true;
+		var dirty = this.store.isDirty();
+		var disabledSave = disabled || !dirty;
+		this.saveButton.set("disabled", disabledSave);
+		this.saveButton.set("iconClass", "icon16 " + (disabledSave ? "saveDisabledIcon" : "saveIcon"));
+		this.refreshButton.set("disabled", disabled);
+		this.refreshButton.set("iconClass", "icon16 " + (disabled ? "refreshDisabledIcon" : "refreshIcon"));
+		this.settingsButton.set("disabled", disabled);
+		this.settingsButton.set("iconClass", "icon16 " + (disabled ? "settingsDisabledIcon" : "settingsIcon"));
+		this.fullscreenButton.set("disabled", disabled);
 		if(this.isFullscreen()) {
-			this.fullscreenButton.set("iconClass", "icon16 minimizeIcon");
+			this.fullscreenButton.set("iconClass", "icon16 " + (disabled ? "minimizeDisabledIcon" : "minimizeIcon"));
 		} else {
-			this.fullscreenButton.set("iconClass", "icon16 fullscreenIcon");
+			this.fullscreenButton.set("iconClass", "icon16 " + (disabled ? "fullscreenDisabledIcon" : "fullscreenIcon"));
 		}
-
 	},
 
 	openSettingsDialog: function() {
@@ -283,6 +296,13 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 
 	isFullscreen: function() {
 		return document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
+	},
+
+	_setDisabledAttr: function(/*boolean*/ disabled) {
+		this.disabled = disabled;
+		this.updateToolbar();
+		this.treePane.set("disabled", disabled);
+		this.categoryEditorPane.set("disabled", disabled);
 	}
 
 });

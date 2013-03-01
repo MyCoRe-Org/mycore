@@ -30,7 +30,7 @@ return declare("mycore.classification.Store", [Evented, _SettingsMixin], {
     	declare.safeMixin(this, args);
     },
 
-    load: function(/*function*/ onSuccess, /*function*/ onError) {
+    load: function(/*function*/ onSuccess, /*function*/ onEvent) {
 		var url = this.settings.resourceURL + this.classificationId;
 		if(this.classificationId != null && this.classificationId != "" &&
 				this.categoryId != null && this.categoryId != "") {
@@ -59,8 +59,9 @@ return declare("mycore.classification.Store", [Evented, _SettingsMixin], {
 			}
 		}), function(error) {
 			console.log("error while retrieving classification items from url " + url + "! " + error);
-			if(onError) {
-				onError(error);
+		}, function(evt) {
+			if(onEvent) {
+				onEvent(evt);
 			}
 		});
     },
@@ -131,7 +132,9 @@ return declare("mycore.classification.Store", [Evented, _SettingsMixin], {
 			this.saveArray = [];
 			on.emit(this, "saved");
 		}), lang.hitch(this, function(error) {
-			on.emit(this, "saveError", {error: error});
+			on.emit(this, "saveError", error);
+		}), lang.hitch(this, function(event) {
+			on.emit(this, "saveEvent", event);
 		}));
 	},
 
