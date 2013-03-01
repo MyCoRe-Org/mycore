@@ -187,6 +187,10 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             q.setInteger("right", category.getRight());
         }
         List<MCRCategoryImpl> result = q.list();
+        if (result.isEmpty()) {
+            LOGGER.warn("Could not load category: " + id);
+            return null;
+        }
         MCRCategoryImpl categoryImpl = buildCategoryFromPrefetchedList(result);
         if (!fetchAllChildren) {
             categoryImpl = copyDeep(categoryImpl, childLevel);
