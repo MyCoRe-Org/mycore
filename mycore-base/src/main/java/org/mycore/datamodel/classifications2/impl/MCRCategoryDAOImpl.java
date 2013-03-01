@@ -484,6 +484,13 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         updateLastModified(category.getRootID());
     }
 
+    public void repairLeftRightValue(String classID) {
+        final Session session = MCRHIBConnection.instance().getSession();
+        final MCRCategoryID rootID = MCRCategoryID.rootID(classID);
+        MCRCategoryImpl classification = MCRCategoryDAOImpl.getByNaturalID(session, rootID);
+        classification.calculateLeftRightAndLevel(0, 0);
+    }
+
     public long getLastModified() {
         return LAST_MODIFIED;
     }
