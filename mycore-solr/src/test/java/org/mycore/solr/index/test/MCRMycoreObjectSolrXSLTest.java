@@ -1,12 +1,10 @@
 package org.mycore.solr.index.test;
 
-import static org.junit.Assert.*;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.MessageFormat;
 import java.util.List;
 
 import javax.xml.transform.Source;
@@ -47,7 +45,7 @@ public class MCRMycoreObjectSolrXSLTest {
         assertEquals(1, mycoreojectTags.size());
 
         List userFieldTags = XPath.selectNodes(resultXML, "/solr-document-container/source/user/field");
-        assertEquals(12, userFieldTags.size());
+        assertEquals(16, userFieldTags.size());
 
         List userTopFieldTags = XPath.selectNodes(resultXML, "/solr-document-container/source/user/field[contains(@name, '.top')]");
         assertEquals(4, userTopFieldTags.size());
@@ -69,7 +67,7 @@ public class MCRMycoreObjectSolrXSLTest {
         assertEquals(3, mycoreojectTags.size());
 
         List userFieldTags = XPath.selectNodes(resultXML, "/solr-document-container/source/user/field");
-        assertEquals(36, userFieldTags.size());
+        assertEquals(48, userFieldTags.size());
 
         List userTopFieldTags = XPath.selectNodes(resultXML, "/solr-document-container/source/user/field[contains(@name, '.top')]");
         assertEquals(12, userTopFieldTags.size());
