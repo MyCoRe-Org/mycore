@@ -459,6 +459,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                 content = "true".equals(content) ? "1" : "0";
                 type = "identifier";
             } else if ("decimal".equals(type)) {
+                content = content.replace(',', '.');
                 doc.add(new NumericField(name, store, true).setFloatValue(Float.parseFloat(content)));
             } else if ("integer".equals(type)) {
                 doc.add(new NumericField(name, store, true).setLongValue(Long.parseLong(content)));
@@ -469,6 +470,9 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             }
             if (type.equals("index")) {
                 doc.add(new Field(name, MCRNormalizer.normalizeString(content), Field.Store.YES, Field.Index.NOT_ANALYZED));
+            }
+            if (type.equals("text") || type.equals("name")) {
+                content = MCRNormalizer.normalizeString(content);
             }
             if (type.equals("Text") || type.equals("name") || type.equals("text") && MCRFieldDef.getDef(field.getFieldName()).isSortable()) {
                 doc.add(new Field(name, content, Field.Store.YES, Field.Index.ANALYZED));
