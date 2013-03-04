@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Iterator;
 
+import javax.activation.MimetypesFileTypeMap;
+
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.xml.MCRXMLFunctions;
@@ -216,7 +218,8 @@ public class MCRMetsProvider {
     private File createFile(String id, String path) {
         String idStripped = MCRJSONTools.stripBracketsAndQuotes(id);
         File file = null;
-        file = new File(idStripped, File.MIME_TYPE_TIFF);
+
+        file = new File(idStripped, MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(path));
         file.setFLocat(new FLocat(LOCTYPE.URL, path));
 
         return file;
