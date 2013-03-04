@@ -122,6 +122,8 @@ public class MCRURNAdder {
      *            will be accepted.
      * @return <code>true</code> if successful, <code>false</code> otherwise
      * @throws Exception
+     * 
+     * @deprecated will be deleted without replacement
      */
     public boolean addURN(String objectId, String xpath) throws Exception {
         MCRObjectID id = MCRObjectID.getInstance(objectId);
