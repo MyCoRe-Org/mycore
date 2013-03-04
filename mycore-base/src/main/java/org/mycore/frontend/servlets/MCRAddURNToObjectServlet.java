@@ -5,11 +5,10 @@ package org.mycore.frontend.servlets;
 
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.urn.MCRURNAdder;
 import org.mycore.services.urn.MCRURNManager;
 
@@ -97,26 +96,11 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
                 }
             }
         }
-        returnToMetadataView(job, object);
-    }
-
-    /** Returns to the metadata view this servlet was called from */
-    private void returnToMetadataView(MCRServletJob job, String objectId) throws IOException {
-        String href = null;
-
-        /* object is a derivate */
-        if (objectId.contains("_derivate_")) {
-            MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(objectId));
-            href = derivate.getDerivate().getMetaLink().getXLinkHref();
+        String referrer = job.getRequest().getHeader("referer"); // yes, with misspelling.
+        if (referrer != null && referrer.length() > 0) {
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(referrer));
+        } else {
+            job.getResponse().sendError(HttpServletResponse.SC_EXPECTATION_FAILED, "Could not get referrer from request");
         }
-        /* object is ordinary mcr object */
-        else {
-            href = objectId;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(getBaseURL()).append("receive/").append(href);
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
     }
-
 }
