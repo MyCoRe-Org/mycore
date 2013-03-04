@@ -35,13 +35,11 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
     protected void doGetPost(MCRServletJob job) throws IOException {
         String object = job.getRequest().getParameter("object");
         String target = job.getRequest().getParameter("target");
-        String xpath = job.getRequest().getParameter("xpath");
 
         if (object == null) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + MCRIDERRORPAGE));
             return;
         }
-
         MCRURNAdder urnAdder = new MCRURNAdder();
 
         if (target != null && target.equals("file")) {
@@ -73,22 +71,12 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
                 } else {
                     /* assign urn to a mycore object */
                     boolean assignmentSuccessful = false;
-                    if (xpath != null && xpath.length() > 0) {
-                        try {
-                            LOGGER.info("Assigning urn with xpath '" + xpath + "' to object '" + object + "'");
-                            assignmentSuccessful = urnAdder.addURN(object, xpath);
-                        } catch (Exception e) {
-                            LOGGER.error("Error while Assigning urn with xpath '" + xpath + "' to object '" + object + "'", e);
-                        }
-                    } else {
-                        try {
-                            LOGGER.info("Assigning urn to object '" + object + "'");
-                            assignmentSuccessful = urnAdder.addURN(object);
-                        } catch (Exception e) {
-                            LOGGER.info("Error while assigning urn to object '" + object + "'");
-                        }
+                    try {
+                        LOGGER.info("Assigning urn to object '" + object + "'");
+                        assignmentSuccessful = urnAdder.addURN(object);
+                    } catch (Exception e) {
+                        LOGGER.info("Error while assigning urn to object '" + object + "'");
                     }
-
                     if (!assignmentSuccessful) {
                         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + USERERRORPAGE));
                         return;
@@ -96,6 +84,7 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
                 }
             }
         }
+
         String referrer = job.getRequest().getHeader("referer"); // yes, with misspelling.
         if (referrer != null && referrer.length() > 0) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(referrer));
