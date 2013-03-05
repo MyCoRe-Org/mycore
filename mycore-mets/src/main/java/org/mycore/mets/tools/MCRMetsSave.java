@@ -18,11 +18,14 @@ import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.jdom2.xpath.XPath;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
@@ -120,6 +123,7 @@ public class MCRMetsSave {
         mets = MCRMetsSave.updateOnFileAdd(mets, file);
         if (mets != null)
             MCRMetsSave.saveMets(mets, derivateID);
+   
     }
 
     /**
@@ -157,34 +161,42 @@ public class MCRMetsSave {
             String fileId = org.mycore.mets.model.files.File.PREFIX_MASTER + uuid;
 
             /* add to file section "use=master" */
-            org.mycore.mets.model.files.File f = new org.mycore.mets.model.files.File(fileId, MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(
-                new File(file.getName())));
+            String contentType = MimetypesFileTypeMap.getDefaultFileTypeMap()
+                    .getContentType(new File(file.getName()));
+            LOGGER.info(MessageFormat.format("Content Type is : {0}", contentType) );
+            org.mycore.mets.model.files.File f = new org.mycore.mets.model.files.File(fileId, contentType);
             FLocat fLocat = new FLocat(LOCTYPE.URL, file.getName());
             f.setFLocat(fLocat);
 
             // alter the mets document
-            XPath xp = XPath.newInstance("mets:mets/mets:fileSec/mets:fileGrp");
-            Element fileSec = (Element) xp.selectSingleNode(mets);
+            XPathExpression<Element> xpath = XPathFactory.instance().compile("mets:mets/mets:fileSec/mets:fileGrp", Filters.element(),
+                    null, MCRConstants.METS_NAMESPACE);
+            Element fileSec = xpath.evaluateFirst(mets);
             fileSec.addContent(f.asElement());
 
             /* add to structMap physical */
-            xp = XPath.newInstance("mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[last()]/@ORDER");
-            Attribute orderAttribute = (Attribute) xp.selectSingleNode(mets);
-            PhysicalSubDiv div = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE, orderAttribute.getIntValue() + 1);
+            XPathExpression<Attribute> attributeXpath = XPathFactory.instance().compile(
+                    "mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[last()]/@ORDER",
+                    Filters.attribute(), null, MCRConstants.METS_NAMESPACE);
+            Attribute orderAttribute = attributeXpath.evaluateFirst(mets);
+            PhysicalSubDiv div = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE,
+                    orderAttribute.getIntValue() + 1);
             div.add(new Fptr(fileId));
 
             // actually alter the mets document
-            xp = XPath.newInstance("mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']");
-            Element structMapPhys = (Element) xp.selectSingleNode(mets);
+            xpath = XPathFactory.instance().compile("mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']",
+                    Filters.element(), null, MCRConstants.METS_NAMESPACE);
+            Element structMapPhys = xpath.evaluateFirst(mets);
             structMapPhys.addContent(div.asElement());
 
             /* add to structLink */
-            xp = XPath.newInstance("mets:mets/mets:structMap[@TYPE='LOGICAL']/mets:div/@ID");
-            Attribute idAttribute = (Attribute) xp.selectSingleNode(mets);
+            attributeXpath = XPathFactory.instance().compile("mets:mets/mets:structMap[@TYPE='LOGICAL']/mets:div/@ID", Filters.attribute(),
+                    null, MCRConstants.METS_NAMESPACE);
+            Attribute idAttribute = attributeXpath.evaluateFirst(mets);
             String rootID = idAttribute.getValue();
 
-            xp = XPath.newInstance("mets:mets/mets:structLink");
-            Element structLink = (Element) xp.selectSingleNode(mets);
+            xpath = XPathFactory.instance().compile("mets:mets/mets:structLink", Filters.element(), null, MCRConstants.METS_NAMESPACE);
+            Element structLink = xpath.evaluateFirst(mets);
 
             structLink.addContent((new SmLink(rootID, div.getId()).asElement()));
 
@@ -368,82 +380,5 @@ public class MCRMetsSave {
         }
     }
 
-    /**
-     * Updates the mets.xml belonging to the given derivate. Adds the file to
-     * the mets document (updates file sections and stuff within the mets.xml)
-     * 
-     * @param derivate
-     *            the derivate owning the mets.xml and the given file
-     * @param filename
-     *            file to add to the mets.xml
-     * @throws Exception
-     * @deprecated use
-     *             {@link MCRMetsSave#updateMetsOnFileAdd(MCRDerivate, MCRFile)}
-     */
-    @Deprecated
-    public static void updateMetsOnFileAdd(MCRDerivate derivate, String filename) throws Exception {
-        Document mets = getCurrentMets(derivate.getId().toString());
-        if (mets == null) {
-            LOGGER.info("Derivate with id \"" + derivate.getId().toString() + "\" has no mets file. Nothing to do");
-            return;
-        }
-        mets = MCRMetsSave.updateOnFileAdd(mets, filename);
-        if (mets != null)
-            MCRMetsSave.saveMets(mets, derivate.getId());
-    }
 
-    /**
-     * Alters the mets file
-     * 
-     * @param mets
-     *            the unmodified source
-     * @param filename
-     *            the file to add
-     * @return the modified mets or null if an exception occures
-     */
-    @Deprecated
-    private static Document updateOnFileAdd(Document mets, String filename) {
-        try {
-            UUID uuid = UUID.randomUUID();
-            String fileId = org.mycore.mets.model.files.File.PREFIX_MASTER + uuid;
-
-            /* add to file section "use=master" */
-            org.mycore.mets.model.files.File f = new org.mycore.mets.model.files.File(fileId, MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(
-                new File(filename)));
-            FLocat fLocat = new FLocat(FLocat.LOCTYPE_URL, filename);
-            f.setFLocat(fLocat);
-
-            // alter the mets document
-            XPath xp = XPath.newInstance("mets:mets/mets:fileSec/mets:fileGrp");
-            Element fileSec = (Element) xp.selectSingleNode(mets);
-            fileSec.addContent(f.asElement());
-
-            /* add to structMap physical */
-            xp = XPath.newInstance("mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[last()]/@ORDER");
-            Attribute orderAttribute = (Attribute) xp.selectSingleNode(mets);
-            PhysicalSubDiv div = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE, orderAttribute.getIntValue() + 1);
-            div.add(new Fptr(fileId));
-
-            // actually alter the mets document
-            xp = XPath.newInstance("mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']");
-            Element structMapPhys = (Element) xp.selectSingleNode(mets);
-            structMapPhys.addContent(div.asElement());
-
-            /* add to structLink */
-            xp = XPath.newInstance("mets:mets/mets:structMap[@TYPE='LOGICAL']/mets:div/@ID");
-            Attribute idAttribute = (Attribute) xp.selectSingleNode(mets);
-            String rootID = idAttribute.getValue();
-
-            xp = XPath.newInstance("mets:mets/mets:structLink");
-            Element structLink = (Element) xp.selectSingleNode(mets);
-
-            structLink.addContent((new SmLink(rootID, div.getId()).asElement()));
-
-        } catch (Exception ex) {
-            LOGGER.error("Error occured while adding file " + filename + " to the existing mets file", ex);
-            return null;
-        }
-
-        return mets;
-    }
 }
