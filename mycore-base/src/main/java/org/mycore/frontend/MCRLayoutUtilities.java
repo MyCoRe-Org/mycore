@@ -43,7 +43,10 @@ public class MCRLayoutUtilities {
     private static final String NAV_LOC_DEFAULT = MCRConfiguration.instance().getString("MCR.basedir")
         + "build/webapps/config/navigation.xml".replace('/', File.separatorChar);
 
-    private static final File NAVFILE = new File(MCRConfiguration.instance().getString("MCR.navigationFile", NAV_LOC_DEFAULT).replace('/', File.separatorChar));
+    private static final File NAVFILE = new File(MCRConfiguration
+        .instance()
+        .getString("MCR.navigationFile", NAV_LOC_DEFAULT)
+        .replace('/', File.separatorChar));
 
     private static final boolean ACCESS_CONTROLL_ON = MCRConfiguration.instance().getBoolean("MCR.Website.ReadAccessVerification", true);
 
@@ -65,8 +68,8 @@ public class MCRLayoutUtilities {
         if (ACCESS_CONTROLL_ON) {
             long startTime = System.currentTimeMillis();
             boolean access = getAccess(webpageID, PERMISSION_READ, ALL2BLOCKER_TRUE, blockerWebpageID);
-            LOGGER.debug("checked read access for webpageID= " + webpageID + " (with blockerWebpageID =" + blockerWebpageID + ") => " + access + ": took "
-                + getDuration(startTime) + " msec.");
+            LOGGER.debug("checked read access for webpageID= " + webpageID + " (with blockerWebpageID =" + blockerWebpageID + ") => "
+                + access + ": took " + getDuration(startTime) + " msec.");
             return access;
         } else {
             return true;
@@ -86,7 +89,8 @@ public class MCRLayoutUtilities {
         if (ACCESS_CONTROLL_ON) {
             long startTime = System.currentTimeMillis();
             boolean access = getAccess(webpageID, PERMISSION_READ, ALLTRUE);
-            LOGGER.debug("checked read access for webpageID= " + webpageID + " => " + access + ": took " + getDuration(startTime) + " msec.");
+            LOGGER.debug("checked read access for webpageID= " + webpageID + " => " + access + ": took " + getDuration(startTime)
+                + " msec.");
             return access;
         } else {
             return true;
@@ -151,24 +155,17 @@ public class MCRLayoutUtilities {
     public static boolean getAccess(String webpageID, String permission, int strategy) {
         Element item = getItem(webpageID);
         // check permission according to $strategy
-
-        boolean access = false;
-        if (item == null) {
-            return false;
-        }
-
+        boolean access = strategy == ALLTRUE;
         if (strategy == ALLTRUE) {
-            access = true;
-            do {
+            while (item != null && access) {
                 access = itemAccess(permission, item, access);
                 item = item.getParentElement();
-            } while (item != null && access);
+            }
         } else if (strategy == ONETRUE_ALLTRUE) {
-            access = false;
-            do {
+            while (item != null && !access) {
                 access = itemAccess(permission, item, access);
                 item = item.getParentElement();
-            } while (item != null && !access);
+            }
         }
         return access;
     }
