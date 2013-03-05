@@ -535,30 +535,14 @@
                 </xsl:for-each>
             </xsl:if>
         </xsl:variable>
-        <!-- 3. case -->
-        <!-- nothing look for $lastPage -->
-        <xsl:variable name="browserAddress_lastPage">
-            <xsl:if test=" ($browserAddress_href = '') and ($browserAddress_dynamicContentBinding = '') ">
-                <!-- get from session -->
-                <xsl:variable name="lastPageID" select="layoutUtils:getLastValidPageID()" />
-                <xsl:value-of xmlns:decoder="xalan://java.net.URLDecoder" select="decoder:decode($lastPageID,'UTF-8')" />
-            </xsl:if>
-        </xsl:variable>
 
         <!-- assign right browser address -->
         <xsl:choose>
             <xsl:when test=" $browserAddress_href != '' ">
                 <xsl:value-of select="$browserAddress_href" />
-                <!-- store in session -->
-                <xsl:variable name="dummy" select="layoutUtils:setLastValidPageID($browserAddress_href)" />
             </xsl:when>
             <xsl:when test=" $browserAddress_dynamicContentBinding != '' ">
                 <xsl:value-of select="$browserAddress_dynamicContentBinding" />
-                <!-- store in session -->
-                <xsl:variable name="dummy" select="layoutUtils:setLastValidPageID($browserAddress_dynamicContentBinding)" />
-            </xsl:when>
-            <xsl:when test=" $browserAddress_lastPage != '' ">
-                <xsl:value-of select="$browserAddress_lastPage" />
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="$loaded_navigation_xml/@hrefStartingPage" />

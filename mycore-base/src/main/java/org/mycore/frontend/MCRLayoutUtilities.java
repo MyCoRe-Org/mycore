@@ -1,6 +1,7 @@
 package org.mycore.frontend;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -335,15 +336,5 @@ public class MCRLayoutUtilities {
 
     public static String getPermission2ReadWebpage() {
         return PERMISSION_READ;
-    }
-
-    public static String getLastValidPageID() {
-        String page = (String) MCRSessionMgr.getCurrentSession().get("lastPageID");
-        return page == null ? "" : page;
-    }
-
-    public static String setLastValidPageID(String pageID) {
-        MCRSessionMgr.getCurrentSession().put("lastPageID", pageID);
-        return "";
     }
 }
