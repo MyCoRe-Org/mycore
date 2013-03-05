@@ -403,15 +403,15 @@
 }
 
 .iview2-icon-zoomOut {
-	cursor: -webkit-zoom-out;
+	/* cursor: -webkit-zoom-out; */
 }
 
 .iview2-icon-zoomIn {
-	cursor: -webkit-zoom-in;
+	/* cursor: -webkit-zoom-in; */
 }
 
 .iview2-icon-fitToWidth {
-	cursor: col-resize;
+	/* cursor: col-resize; */
 }
 
 .viewerContainer.min .thumb,.viewerContainer.min .damp {
