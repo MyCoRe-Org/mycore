@@ -41,6 +41,7 @@ import org.jdom2.xpath.XPath;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.content.MCRFileContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -490,7 +491,8 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         }
 
         try {
-            MCRMetsSave.updateMetsOnFileAdd(MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivate)), filename);
+
+            MCRMetsSave.updateMetsOnFileAdd(MCRFile.getMCRFile(MCRObjectID.getInstance(derivate), filename));
         } catch (Exception ex) {
             LOGGER.error("Error while updating mets file", ex);
         }
