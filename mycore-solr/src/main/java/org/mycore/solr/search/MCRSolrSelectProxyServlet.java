@@ -76,7 +76,9 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
 
             // set all header
             for (Header header : solrHttpMethod.getResponseHeaders()) {
-                resp.setHeader(header.getName(), header.getValue());
+                if (!("Transfer-Encoding".equals(header.getName()) && statusCode == HttpStatus.SC_OK)) {
+                    resp.setHeader(header.getName(), header.getValue());
+                }
             }
 
             if (statusCode == HttpStatus.SC_OK) {
