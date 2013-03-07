@@ -23,8 +23,8 @@ import org.apache.log4j.Logger;
  * <b>{}:</b> Use curly brackets for variables or properties. For example "{var1}"
  * or "{MCR.basedir}" 
  * </p><p>
- * <b>[]:</b> Use squared brackets to define a condition. All data which
- * is set in squared brackets is only used if the internal variables are
+ * <b>[]:</b> Use squared brackets to define a condition. All data within
+ * squared brackets is only used if the internal variables are
  * not null and not empty. For example "[hello {lastName}]" is only resolved
  * if the value of "lastName" is not null and not empty. Otherwise the whole
  * content in the squared brackets are ignored.
@@ -116,6 +116,15 @@ public class MCRTextResolver {
     protected ResolveDepth resolveDepth;
 
     /**
+     * Retains the text if a variable couldn't be resolved.
+     * Example if {Variable} could not be resolved:
+     * true: "Hello {Variable}" -> "Hello {Variable}"
+     * false: "Hello "
+     * <p>By default retainText is true</p>
+     */
+    protected boolean retainText;
+
+    /**
      * Creates a new text resolver. To add variables call
      * <code>addVariable</code>, otherwise only MyCoRe property
      * resolving is possible.
@@ -139,10 +148,30 @@ public class MCRTextResolver {
      * @param depth how deep the text is resolved
      */
     public MCRTextResolver(Map<String, String> variablesTable, ResolveDepth depth) {
+        this(variablesTable, depth, true);
+    }
+
+    /**
+     * Creates a new text resolver with a map of variables.
+     * 
+     * @param variablesTable a hash table of variables
+     * @param depth how deep the text is resolved
+     * @param retainText if the original text is retaind if a variable coulnd't be resolved
+     */
+    public MCRTextResolver(Map<String, String> variablesTable, ResolveDepth depth, boolean retainText) {
         this.variablesTable = variablesTable;
         this.resolvedVariables = new Hashtable<String, String>();
         this.unresolvedVariables = new ArrayList<String>();
-        this.resolveDepth = depth;
+        this.retainText = true;
+        this.retainText = retainText;
+    }
+    
+    public void setRetainText(boolean retainText) {
+        this.retainText = retainText;
+    }
+
+    public boolean isRetainText() {
+        return retainText;
     }
 
     /**
@@ -503,6 +532,10 @@ public class MCRTextResolver {
                     if (value == null) {
                         unresolvedVariables.add(termBuffer.toString());
                         resolved = false;
+                        if(isRetainText()) {
+                            this.valueBuffer.append(START_ENCLOSING_STRING).append(termBuffer.toString())
+                                    .append(END_ENCLOSING_STRING);
+                        }
                         return true;
                     }
                 }

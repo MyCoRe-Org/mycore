@@ -108,10 +108,19 @@ public class MCRTextResolverTest extends MCRTestCase {
     public void terms() throws Exception {
         MCRTextResolver.registerTerm(UppercaseTerm.class);
         MCRTextResolver resolver = new MCRTextResolver();
+        resolver.setRetainText(false);
         resolver.addVariable("var1", "test");
         assertEquals("Das ist ein TEST.", resolver.resolveNext("Das ist ein${ {var1}}$."));
         MCRTextResolver.unregisterTerm(UppercaseTerm.class);
         assertEquals("Das ist ein$$.", resolver.resolveNext("Das ist ein${ {var1}}$."));
+    }
+
+    @Test
+    public void retainText() {
+        MCRTextResolver resolver = new MCRTextResolver();
+        assertEquals("Hello {variable}", resolver.resolve("Hello {variable}"));
+        resolver.setRetainText(false);
+        assertEquals("Hello ", resolver.resolve("Hello {variable}"));
     }
 
     private static class UppercaseTerm extends Term {

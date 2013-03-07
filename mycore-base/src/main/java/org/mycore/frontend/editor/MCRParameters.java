@@ -64,4 +64,13 @@ public class MCRParameters {
         else
             return defaultValue;
     }
+
+    public Map<String, String> collapse() {
+        Map<String, String> collapsedMap = new HashMap<>();
+        for(Map.Entry<String, List<String>> entry : parameters.entrySet()) {
+            collapsedMap.put(entry.getKey(), entry.getValue().get(0));
+        }
+        return collapsedMap;
+    }
+
 }
