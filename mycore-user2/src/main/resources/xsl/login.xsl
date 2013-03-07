@@ -37,93 +37,89 @@
   <xsl:variable name="PageTitle" select="i18n:translate('component.user2.login.form.title')" />
 
   <xsl:template match="/login">
-    <div id="userlogin" class="user-login">
-        <!-- At first we display the current user in a head line. -->
-      <p class="header">
-        <xsl:variable name="currentAccount">
-          <xsl:value-of select="'&lt;strong&gt;'" />
-          <xsl:choose>
-            <xsl:when test="@guest='true'">
-              <xsl:value-of select="i18n:translate('component.user2.login.guest')" />
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="concat(@user,' [',@realm,']')" />
-            </xsl:otherwise>
-          </xsl:choose>
-          <xsl:value-of select="'&lt;/strong&gt;'" />
-        </xsl:variable>
-        <xsl:value-of select="i18n:translate('component.user2.login.currentAccount', $currentAccount)" disable-output-escaping="yes" />
-      </p>
-        
-        <!-- +
-        | There are three possible error-conditions: wrong password, unknown user and disabled
-        | user. If one of these conditions occured, the corresponding information will be
-        | presented at the top of the page.
-        + -->
-      <xsl:apply-templates select="." mode="userStatus" />
-      <xsl:apply-templates select="." mode="userAction" />
-    </div>
+    <!-- +
+    | There are three possible error-conditions: wrong password, unknown user and disabled
+    | user. If one of these conditions occured, the corresponding information will be
+    | presented at the top of the page.
+    + -->
+    <xsl:apply-templates select="." mode="userStatus" />
+    <xsl:apply-templates select="." mode="userAction" />
   </xsl:template>
 
   <xsl:template match="login" mode="userAction">
-    <form action="{$ServletsBaseURL}MCRLoginServlet{$HttpSession}" method="post" class="yform"  id="login_form">
+    <form action="{$ServletsBaseURL}MCRLoginServlet{$HttpSession}" method="post" class="form-login">
+      <h2 class="form-login-heading">
+        <xsl:value-of select="i18n:translate('component.user2.login.heading')" />
+      </h2>
       <input type="hidden" name="action" value="login" />
       <input type="hidden" name="url" value="{returnURL}" />
+      <xsl:variable name="userNameText" select="i18n:translate('component.user2.login.form.userName')"/>
+      <xsl:variable name="passwordText" select="i18n:translate('component.user2.login.form.password')"/>
       <fieldset>
         <!-- Here come the input fields... -->
-        <xsl:choose>
-          <xsl:when test="$direction = 'rtl' ">
-            <div class="type-text">
-              <input type="text" name="uid" id="user" size="20"/>
-              <label for="user"><xsl:value-of select="concat(i18n:translate('component.user2.login.form.userName'),' ')" /></label>
-            </div>
-            <div class="type-text">
-              <input type="password" name="pwd" id="password" size="20"/>
-              <label for="password"><xsl:value-of select="concat(i18n:translate('component.user2.login.form.password'),' ')" /></label>
-            </div>
-          </xsl:when>
-          <xsl:otherwise>
-            <div class="type-text">
-              <label for="user"><xsl:value-of select="concat(i18n:translate('component.user2.login.form.userName'),' :')" /></label>
-              <input type="text" name="uid" id="user" size="20"/>
-            </div>
-            <div class="type-text">
-              <label for="password"><xsl:value-of select="concat(i18n:translate('component.user2.login.form.password'),' :')" /></label>
-              <input type="password" name="pwd" id="password" size="20"/>
-            </div>
-          </xsl:otherwise>
-        </xsl:choose>
-        <xsl:choose>
-          <xsl:when test="$direction = 'rtl' ">
-            <div class="type-button">
-              <input id="cancel" onClick="self.location.href='{$ServletsBaseURL}MCRLoginServlet{$HttpSession}?action=cancel'" type="button"
-                tabindex="999" value="{i18n:translate('component.user2.button.cancel')}" />
-              <xsl:value-of select="' '" />
-              <input id="submit" type="submit" value="{i18n:translate('component.user2.button.login')}" name="LoginSubmit" />
-            </div>
-          </xsl:when>
-          <xsl:otherwise>
-            <div class="type-button">
-              <input id="submit" type="submit" value="{i18n:translate('component.user2.button.login')}" name="LoginSubmit" />
-              <xsl:value-of select="' '" />
-              <input id="cancel" onClick="self.location.href='{returnURL}'" type="button"
-                tabindex="999" value="{i18n:translate('component.user2.button.cancel')}" />
-            </div>
-          </xsl:otherwise>
-        </xsl:choose>
+        <div>
+          <xsl:apply-templates select="." mode="controlGroupClass" />
+          <label class="control-label" for="user">
+            <xsl:value-of select="concat($userNameText,' :')" />
+          </label>
+          <div class="controls">
+            <input type="text" name="uid" class="controls input-large" placeholder="{$userNameText}" title="{$userNameText}" />
+          </div>
+        </div>
+        <div>
+          <xsl:apply-templates select="." mode="controlGroupClass" />
+          <label class="control-label" for="password">
+            <xsl:value-of select="concat($passwordText,' :')" />
+          </label>
+          <div class="controls">
+            <input type="password" name="pwd" class="controls input-large" placeholder="{$passwordText}" title="{$passwordText}" />
+          </div>
+        </div>
       </fieldset>
+      <div class="form-actions">
+        <xsl:choose>
+          <xsl:when test="$direction = 'rtl' ">
+            <button class="btn" onClick="self.location.href='{$ServletsBaseURL}MCRLoginServlet{$HttpSession}?action=cancel'"
+              tabindex="999">
+              <xsl:value-of select="i18n:translate('component.user2.button.cancel')" />
+            </button>
+            <xsl:value-of select="' '" />
+            <button class="btn btn-primary" type="submit" name="LoginSubmit">
+              <xsl:value-of select="i18n:translate('component.user2.button.login')" />
+            </button>
+          </xsl:when>
+          <xsl:otherwise>
+            <button class="btn btn-primary" type="submit" name="LoginSubmit">
+              <xsl:value-of select="i18n:translate('component.user2.button.login')" />
+            </button>
+            <xsl:value-of select="' '" />
+            <button class="btn" onClick="self.location.href='{$ServletsBaseURL}MCRLoginServlet{$HttpSession}?action=cancel'"
+              tabindex="999">
+              <xsl:value-of select="i18n:translate('component.user2.button.cancel')" />
+            </button>
+          </xsl:otherwise>
+        </xsl:choose>
+      </div>
     </form>
   </xsl:template>
 
   <xsl:template match="login" mode="userStatus">
     <xsl:if test="@loginFailed='true'">
-      <p class="status">
-        <xsl:value-of select="i18n:translate('component.user2.login.failed')" />
-      </p>
-      <p class="status">
-        <xsl:value-of select="i18n:translate('component.user2.login.invalidUserPwd')" />
+      <p class="alert alert-error">
+        <strong>
+          <xsl:value-of select="i18n:translate('component.user2.login.failed')" />
+        </strong>
+        <xsl:value-of select="concat(' ',i18n:translate('component.user2.login.invalidUserPwd'))" />
       </p>
     </xsl:if>
+  </xsl:template>
+  <xsl:template match="login" mode="controlGroupClass">
+    <xsl:attribute name="class">
+      <xsl:value-of select="'control-group'" />
+      <xsl:if test="@loginFailed='true'">
+        <xsl:value-of select="' error'" />
+      </xsl:if>
+    </xsl:attribute>
   </xsl:template>
 
 </xsl:stylesheet>
