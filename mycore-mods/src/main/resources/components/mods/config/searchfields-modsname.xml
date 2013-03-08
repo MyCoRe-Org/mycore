@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<searchfields 
+  xmlns="http://www.mycore.org/" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://www.mycore.org/ searchfields.xsd" 
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:mcr="http://www.mycore.org/"
+>
+
+  <index id="modsname">
+    <field objects="mods" source="xml" name="idxNameOwner" type="identifier" />
+    <field objects="mods" source="xml" name="idxNameSearch" type="name" />
+    <field objects="mods" source="xml" name="idxNameDisplay" type="identifier" sortable="true" />
+    <field objects="mods" source="xml" name="idxNameGND" type="identifier" addable="true" />
+  </index>
+  
+</searchfields>
