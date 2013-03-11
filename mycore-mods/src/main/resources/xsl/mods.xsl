@@ -233,18 +233,16 @@
       </h3>
       <xsl:choose>
         <xsl:when test="$mods-type='series'">
-          <xsl:call-template name="mods.editobject_without_table">
-            <xsl:with-param select="./@ID" name="id" />
+          <xsl:apply-templates select="." mode="objectActions">
             <xsl:with-param select="'journal'" name="layout" />
             <xsl:with-param select="$mods-type" name="mods-type" />
-          </xsl:call-template>
+          </xsl:apply-templates>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:call-template name="mods.editobject_without_table">
-            <xsl:with-param select="./@ID" name="id" />
+          <xsl:apply-templates select="." mode="objectActions">
             <xsl:with-param select="$mods-type" name="layout" />
             <xsl:with-param select="$mods-type" name="mods-type" />
-          </xsl:call-template>
+          </xsl:apply-templates>
         </xsl:otherwise>
       </xsl:choose>
 
@@ -556,10 +554,10 @@
       </tr>
     </xsl:if>
   </xsl:template>
-  <xsl:template name="mods.editobject_without_table">
+  <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="objectActions">
     <xsl:param name="accessedit" />
     <xsl:param name="accessdelete" />
-    <xsl:param name="id" />
+    <xsl:param name="id" select="./@ID"/>
     <xsl:param name="hasURN" select="'false'" />
     <xsl:param name="displayAddDerivate" select="'true'" />
     <xsl:param name="layout" select="'$'" />
