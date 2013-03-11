@@ -160,12 +160,12 @@ public class MCRTextResolver {
      */
     public MCRTextResolver(Map<String, String> variablesTable, ResolveDepth depth, boolean retainText) {
         this.variablesTable = variablesTable;
+        this.resolveDepth = depth;
+        this.retainText = retainText;
         this.resolvedVariables = new Hashtable<String, String>();
         this.unresolvedVariables = new ArrayList<String>();
-        this.retainText = true;
-        this.retainText = retainText;
     }
-    
+
     public void setRetainText(boolean retainText) {
         this.retainText = retainText;
     }
