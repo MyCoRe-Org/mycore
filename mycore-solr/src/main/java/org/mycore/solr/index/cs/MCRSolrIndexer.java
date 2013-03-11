@@ -48,8 +48,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
     final static int BULK_SIZE = MCRConfiguration.instance().getInt("MCR.Module-solr.bulk.size", 100);
 
     /** the Threshold in bytes */
-    public final static long OVER_THE_WIRE_THRESHOLD = MCRConfiguration.instance().getLong(
-            "MCR.Module-solr.OverTheWireThresholdInMegaBytes", 32) * 1024 * 1024;
+    public final static long OVER_THE_WIRE_THRESHOLD = MCRConfiguration.instance().getLong("MCR.Module-solr.OverTheWireThresholdInMegaBytes", 32) * 1024 * 1024;
 
     @Override
     synchronized protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
@@ -105,7 +104,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
             LOGGER.trace("Solr: submitting data of\"" + objectOrDerivate.getId().toString() + "\" for indexing done in "
                     + (System.currentTimeMillis() - tStart) + "ms ");
         } catch (Exception ex) {
-            LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Error creating transfer thread", ex);
+            LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Error creating transfer thread for object " + objectOrDerivate, ex);
         }
     }
 
@@ -124,7 +123,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
             }
 
         } catch (Exception ex) {
-            LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Error creating transfer thread", ex);
+            LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Error creating transfer thread for file " + file.toString(), ex);
         }
     }
 
@@ -216,9 +215,8 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         }
 
         long durationInMilliSeconds = swatch.getTime();
-        LOGGER.log(MCRSolrLogLevels.SOLR_INFO,
-                "Submitted data of " + list.size() + " objects for indexing done in " + Math.ceil(durationInMilliSeconds / 1000)
-                        + " seconds (" + durationInMilliSeconds / list.size() + " ms/object)");
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Submitted data of " + list.size() + " objects for indexing done in " + Math.ceil(durationInMilliSeconds / 1000)
+                + " seconds (" + durationInMilliSeconds / list.size() + " ms/object)");
         try {
             // we wait until all index threads are finished 
             MCRSolrServerFactory.getConcurrentSolrServer().blockUntilFinished();
@@ -270,8 +268,8 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         }
 
         long tStop = System.currentTimeMillis();
-        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Submitted data of " + list.size() + " derivates for indexing done in " + (tStop - tStart)
-                + "ms (" + ((float) (tStop - tStart) / list.size()) + " ms/derivate)");
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Submitted data of " + list.size() + " derivates for indexing done in " + (tStop - tStart) + "ms ("
+                + ((float) (tStop - tStart) / list.size()) + " ms/derivate)");
     }
 
     /**
