@@ -39,7 +39,7 @@ public class MCRImportFieldValueResolver {
                 varTable.put(baseId, field.getValue());
             parseSubFields(field, varTable, baseId);
         }
-        textResolver = new MCRTextResolver(varTable, ResolveDepth.NoVariables);
+        this.textResolver = new MCRTextResolver(varTable, ResolveDepth.NoVariables, false);
     }
 
     private void parseSubFields(MCRImportField parentField, Map<String, String> varTable, String base) {
