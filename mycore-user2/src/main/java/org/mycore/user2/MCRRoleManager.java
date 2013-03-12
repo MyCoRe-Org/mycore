@@ -185,7 +185,7 @@ public class MCRRoleManager {
             MCRCategoryID categID = MCRCategoryID.fromString(roleID);
             categories.add(categID);
         }
-        LOGGER.info("Asigning " + user.getUserID() + " to these roles: " + categories);
+        LOGGER.info("Assigning " + user.getUserID() + " to these roles: " + categories);
         CATEG_LINK_SERVICE.setLinks(ref, categories);
     }
 
