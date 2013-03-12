@@ -51,7 +51,7 @@ import org.mycore.services.fieldquery.data2fields.MCRIndexEntry;
  * 
  * @author Frank L\u00FCtzenkirchen
  */
-public class NameIndexer extends MCREventHandlerBase {
+public class MCRMODSNameIndexer extends MCREventHandlerBase {
 
     /** Search field storing the GND ID */
     private MCRFieldDef SEARCHFIELD_GND;
