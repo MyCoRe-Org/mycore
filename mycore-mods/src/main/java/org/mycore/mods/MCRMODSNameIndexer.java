@@ -107,7 +107,7 @@ public class MCRMODSNameIndexer extends MCREventHandlerBase {
 
     private MCRSearcher indexer;
 
-    public NameIndexer() {
+    public MCRMODSNameIndexer() {
         super();
         indexer = MCRSearcherFactory.getSearcherForIndex(INDEX_NAME);
         SEARCHFIELD_GND = MCRFieldDef.getDef("idxNameGND");
