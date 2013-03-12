@@ -7,6 +7,9 @@
   <body>
     <release version="2.1.81" date="2013-03-XX" description="Beta 2">
       <action dev="mcrtchef" type="add">
+        MCRObjectTypeStrategy allows "default_class" rules for classifications
+      </action>
+      <action dev="mcrtchef" type="add">
         Added commands to check consistency of classifications and fix any errors found
         <fixes issue="606"/>
       </action>

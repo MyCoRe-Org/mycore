@@ -28,6 +28,9 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 /**
  * Use this class if you want to have a fallback to some default access rules.
@@ -45,6 +48,8 @@ public class MCRObjectTypeStrategy implements MCRAccessCheckStrategy {
     private static final Pattern TYPE_PATTERN = Pattern.compile("[^_]*_([^_]*)_*");
 
     private static final Logger LOGGER = Logger.getLogger(MCRObjectIDStrategy.class);
+
+    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
     /*
      * (non-Javadoc)
@@ -70,6 +75,15 @@ public class MCRObjectTypeStrategy implements MCRAccessCheckStrategy {
         Matcher m = TYPE_PATTERN.matcher(id);
         if (m.find() && m.groupCount() == 1) {
             return m.group(1);
+        } else {
+            try {
+                MCRCategoryID rootID = MCRCategoryID.rootID(id);
+                if (DAO.exist(rootID)) {
+                    return "class";
+                }
+            } catch (Exception e) {
+                LOGGER.warn("Could not check if '" + id + "' is name of a classification.", e);
+            }
         }
         return "";
     }
