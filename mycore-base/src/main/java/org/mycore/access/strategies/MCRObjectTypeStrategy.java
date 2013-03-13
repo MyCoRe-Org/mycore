@@ -58,12 +58,12 @@ public class MCRObjectTypeStrategy implements MCRAccessCheckStrategy {
      *      java.lang.String)
      */
     public boolean checkPermission(String id, String permission) {
-        String objectType = getObjectType(id);
-
         if (MCRAccessManager.getAccessImpl().hasRule(id, permission)) {
             LOGGER.debug("using access rule defined for object.");
             return MCRAccessManager.getAccessImpl().checkPermission(id, permission);
-        } else if (MCRAccessManager.getAccessImpl().hasRule("default_" + objectType, permission)) {
+        }
+        String objectType = getObjectType(id);
+        if (objectType != null && MCRAccessManager.getAccessImpl().hasRule("default_" + objectType, permission)) {
             LOGGER.debug("using access rule defined for object type.");
             return MCRAccessManager.getAccessImpl().checkPermission("default_" + objectType, permission);
         }
@@ -76,16 +76,18 @@ public class MCRObjectTypeStrategy implements MCRAccessCheckStrategy {
         if (m.find() && m.groupCount() == 1) {
             return m.group(1);
         } else {
+            MCRCategoryID rootID;
             try {
-                MCRCategoryID rootID = MCRCategoryID.rootID(id);
-                if (DAO.exist(rootID)) {
-                    return "class";
-                }
+                rootID = MCRCategoryID.rootID(id);
             } catch (Exception e) {
-                LOGGER.warn("Could not check if '" + id + "' is name of a classification.", e);
+                LOGGER.debug("ID '" + id + "' is not a valid category id.");
+                return null;
+            }
+            if (DAO.exist(rootID)) {
+                return "class";
             }
         }
-        return "";
+        return null;
     }
 
 }
