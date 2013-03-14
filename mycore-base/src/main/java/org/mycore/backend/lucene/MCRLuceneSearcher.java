@@ -303,7 +303,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             if (field == SortField.FIELD_SCORE)
                 results.setSorted(false);
         }
-        LOGGER.info("Number of Objects found: " + results.getNumHits() + " Time for Search: " + (System.currentTimeMillis() - start));
+        LOGGER.debug("Number of Objects found: " + results.getNumHits() + " Time for Search: " + (System.currentTimeMillis() - start));
         return results;
     }
 
