@@ -101,7 +101,7 @@ public class MCRMODSNameIndexer extends MCREventHandlerBase {
         indexNames(obj);
     }
 
-    private boolean isOfTypeMODS(MCRObject obj) {
+    protected boolean isOfTypeMODS(MCRObject obj) {
         return "mods".equals(obj.getId().getTypeId());
     }
 
