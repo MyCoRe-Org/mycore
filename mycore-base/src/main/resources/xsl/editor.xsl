@@ -685,7 +685,7 @@
   <xsl:choose>
     <!-- ======== copy all elements, attributes and child elements with current xpath to hidden field ======== -->  
     <xsl:when test="@descendants='true'">
-      <xsl:for-each select="ancestor::editor/input/var[ (@name = $var.new) or ( starts-with(@name,$var.new) and ( starts-with(substring-after(@name,$var.new),'/') or starts-with(substring-after(@name,$var.new),'[') ) ) ]">
+      <xsl:for-each select="ancestor::editor/input/var[ (@name = $var.new) or ( starts-with(@name,$var.new) and ( starts-with(substring-after(@name,$var.new),'/') or starts-with(substring-after(@name,$var.new),'[') ) and ( not( contains(substring-after(@name,$var.new),'__') ) ) ) ]">
         <input type="hidden" name="{@name}" value="{@value}" />
         <input type="hidden" name="_sortnr-{@name}" value="{$pos.new}.{position()}" />
       </xsl:for-each>
