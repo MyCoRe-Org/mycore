@@ -25,9 +25,11 @@ package org.mycore.services.fieldquery;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -81,6 +83,9 @@ public class MCRSearchServlet extends MCRServlet {
     /** Maximum number of hits to display per page (numPerPage) */
     private int maxPerPage;
 
+    private static HashSet<String> SEARCH_PARAMETER = new HashSet<>(Arrays.asList(new String[] { "search", "query", "maxResults",
+            "numPerPage", "page", "mask", "mode", "redirect" }));;
+
     @Override
     public void init() throws ServletException {
         super.init();
@@ -128,22 +133,7 @@ public class MCRSearchServlet extends MCRServlet {
             if (name.contains(".sortField")) {
                 continue;
             }
-            if (name.equals("search")) {
-                continue;
-            }
-            if (name.equals("query")) {
-                continue;
-            }
-            if (name.equals("maxResults")) {
-                continue;
-            }
-            if (name.equals("numPerPage")) {
-                continue;
-            }
-            if (name.equals("mask")) {
-                continue;
-            }
-            if (name.equals("redirect")) {
+            if (SEARCH_PARAMETER.contains(name)){
                 continue;
             }
             if (name.startsWith("XSL.")) {
@@ -347,7 +337,7 @@ public class MCRSearchServlet extends MCRServlet {
     }
 
     protected void showResults(HttpServletRequest request, HttpServletResponse response, MCRQuery query, Document input)
-            throws IOException, ServletException {
+        throws IOException, ServletException {
         MCRCachedQueryData qd = MCRCachedQueryData.cache(query, input);
         showResults(request, response, qd);
     }
@@ -515,7 +505,7 @@ public class MCRSearchServlet extends MCRServlet {
 
         res.sendRedirect(res.encodeRedirectURL(sb.toString()));
     }
-    
+
     private String passXSLParameter(String name, HttpServletRequest req) {
         String value = req.getParameter(name);
         return (value != null) && !value.trim().isEmpty() ? "&" + name + "=" + value : "";
