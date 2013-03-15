@@ -510,12 +510,15 @@ public class MCRSearchServlet extends MCRServlet {
             }
         }
 
-        String style = req.getParameter("XSL.Style");
-        if (style != null && style.trim().length() != 0) {
-            sb.append("&XSL.Style=").append(style);
-        }
+        sb.append(passXSLParameter("XSL.Style", req));
+        sb.append(passXSLParameter("XSL.Transformer", req));
 
         res.sendRedirect(res.encodeRedirectURL(sb.toString()));
+    }
+    
+    private String passXSLParameter(String name, HttpServletRequest req) {
+        String value = req.getParameter(name);
+        return (value != null) && !value.trim().isEmpty() ? "&" + name + "=" + value : "";
     }
 
     /**
