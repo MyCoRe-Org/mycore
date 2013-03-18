@@ -12,7 +12,9 @@ package org.mycore.datamodel.ifs;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
@@ -529,4 +531,30 @@ public abstract class MCRFilesystemNode {
         }
     }
 
+    /**
+     * Returns a list of {@link MCRFile}s in the hierarchy (both up and down) of this node.
+     * 
+     * @return list of {@link MCRFile}
+     */
+    public MCRFile[] getFiles() {
+        MCRFilesystemNode rootNode = MCRFilesystemNode.getRootNode(this.getOwnerID());
+        List<MCRFile> fList = new ArrayList<MCRFile>();
+        if (rootNode instanceof MCRDirectory) {
+            processNode(rootNode, fList);
+        }
+        return fList.toArray(new MCRFile[0]);
+    }
+
+    private void processNode(MCRFilesystemNode node, List<MCRFile> fList) {
+        MCRDirectory dir = (MCRDirectory) node;
+        MCRFilesystemNode[] children = dir.getChildren();
+        for (MCRFilesystemNode child : children) {
+            if (child instanceof MCRDirectory) {
+                processNode(child, fList);
+            }
+            if (child instanceof MCRFile) {
+                fList.add((MCRFile) child);
+            }
+        }
+    }
 }
