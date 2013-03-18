@@ -472,7 +472,7 @@ public class MCRServlet extends HttpServlet {
      */
     @Deprecated()
     protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, int error, String msg, Exception ex, boolean xmlstyle)
-        throws IOException {
+            throws IOException {
         LOGGER.error(getClass().getName() + ": Error " + error + " occured. The following message was given: " + msg, ex);
 
         String rootname = "mcr_error";
@@ -555,7 +555,7 @@ public class MCRServlet extends HttpServlet {
     }
 
     protected void generateActiveLinkErrorpage(HttpServletRequest request, HttpServletResponse response, String msg, MCRActiveLinkException activeLinks)
-        throws IOException {
+            throws IOException {
         StringBuilder msgBuf = new StringBuilder(msg);
         msgBuf.append("\nThere are links active preventing the commit of work, see error message for details. The following links where affected:");
         Map<String, Collection<String>> links = activeLinks.getActiveLinks();
@@ -577,8 +577,7 @@ public class MCRServlet extends HttpServlet {
         if (ENABLE_BROWSER_CACHE) {
             // we can cache every (local) request
             long lastModified = MCRSessionMgr.getCurrentSession().getLoginTime() > MCRConfiguration.instance().getSystemLastModified() ? MCRSessionMgr
-                .getCurrentSession()
-                .getLoginTime() : MCRConfiguration.instance().getSystemLastModified();
+                    .getCurrentSession().getLoginTime() : MCRConfiguration.instance().getSystemLastModified();
             LOGGER.info("LastModified: " + lastModified);
             return lastModified;
         }
@@ -685,7 +684,7 @@ public class MCRServlet extends HttpServlet {
                 if (!request.getParameter(name).trim().equals("")) {
                     mcrSession.put(key, request.getParameter(name));
                     LOGGER.debug("Found HTTP-Req.-Parameter " + name + "=" + request.getParameter(name) + " that should be saved in session, safed " + key
-                        + "=" + request.getParameter(name));
+                            + "=" + request.getParameter(name));
                 }
                 // paramter is empty -> do not store and if contained in
                 // session, remove from it
@@ -704,7 +703,7 @@ public class MCRServlet extends HttpServlet {
                 if (!request.getAttribute(name).toString().trim().equals("")) {
                     mcrSession.put(key, request.getAttribute(name));
                     LOGGER.debug("Found HTTP-Req.-Attribute " + name + "=" + request.getParameter(name) + " that should be saved in session, safed " + key
-                        + "=" + request.getParameter(name));
+                            + "=" + request.getParameter(name));
                 }
                 // attribute is empty -> do not store and if contained in
                 // session, remove from it
@@ -794,6 +793,24 @@ public class MCRServlet extends HttpServlet {
             } catch (URISyntaxException e2) {
                 throw e2;
             }
+        }
+    }
+
+    /**
+     * If a referrer is available this method redirects to the url given by the referrer 
+     * otherwise method redirects to the application base url.
+     * 
+     * @param request
+     * @param response
+     * @throws IOException
+     */
+    protected void toReferrer(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String referrer = getReferer(request);
+        if (referrer != null && referrer.length() > 0) {
+            response.sendRedirect(response.encodeRedirectURL(referrer));
+        } else {
+            LOGGER.warn("Could not get referrer, returning to the application's base url");
+            response.sendRedirect(response.encodeRedirectURL(MCRServlet.getBaseURL()));
         }
     }
 }
