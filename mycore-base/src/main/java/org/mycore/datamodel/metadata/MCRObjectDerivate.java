@@ -237,27 +237,24 @@ public class MCRObjectDerivate {
             throw new NullPointerException("File may not be null");
         }
         String path = file.getAbsolutePath();
-        return getOrCreateFileMetadata(path, urn);
+        return getOrCreateFileMetadata(path, urn, null);
+    }
+
+    public MCRFileMetadata getOrCreateFileMetadata(MCRFile file, String urn, String handle) {
+        if (file == null) {
+            throw new NullPointerException("File may not be null");
+        }
+        String path = file.getAbsolutePath();
+        return getOrCreateFileMetadata(path, urn, handle);
     }
 
     /**
-     * TODO
-     * @param file
-     * @return
-     * 
-     * @see {@link MCRObjectDerivate#getOrCreateFileMetadata(MCRFile, String)}
-     */
-    public final MCRFileMetadata getOrCreateFileMetadata(MCRFile file) {
-        return getOrCreateFileMetadata(file, null);
-    }
-
-    /**
-     * TODO
      * @param path
      * @param urn
+     * @param handle
      * @return
      */
-    private MCRFileMetadata getOrCreateFileMetadata(String path, String urn) {
+    private MCRFileMetadata getOrCreateFileMetadata(String path, String urn, String handle) {
         if (path == null) {
             throw new NullPointerException("path may not be null");
         }
@@ -269,7 +266,7 @@ public class MCRObjectDerivate {
                 return fileMetadata;
             } else if (compare > 0) {
                 //we need to create entry here
-                MCRFileMetadata newFileMetadata = createFileMetadata(path, urn);
+                MCRFileMetadata newFileMetadata = createFileMetadata(path, urn, handle);
                 files.add(i, newFileMetadata);
                 return newFileMetadata;
             }
@@ -278,7 +275,7 @@ public class MCRObjectDerivate {
         if (files.isEmpty()) {
             files = new ArrayList<MCRFileMetadata>();
         }
-        MCRFileMetadata newFileMetadata = createFileMetadata(path, urn);
+        MCRFileMetadata newFileMetadata = createFileMetadata(path, urn, handle);
         files.add(newFileMetadata);
         return newFileMetadata;
     }
@@ -289,20 +286,29 @@ public class MCRObjectDerivate {
      * @return
      */
     public final MCRFileMetadata getOrCreateFileMetadata(String path) {
-        return getOrCreateFileMetadata(path, null);
+        return getOrCreateFileMetadata(path, null, null);
+    }
+
+    /**
+     * @param file
+     * @return
+     */
+    public MCRFileMetadata getOrCreateFileMetadata(MCRFile file) {
+        return getOrCreateFileMetadata(file, null, null);
     }
 
     /**
      * @param path
      * @param urn
+     * @param handle
      * @return
      */
-    private MCRFileMetadata createFileMetadata(String path, String urn) {
+    private MCRFileMetadata createFileMetadata(String path, String urn, String handle) {
         MCRFile mcrFile = MCRFile.getMCRFile(derivateID, path);
         if (mcrFile == null) {
             throw new MCRPersistenceException("File does not exist: " + derivateID + path);
         }
-        MCRFileMetadata newFileMetadata = new MCRFileMetadata(path, urn, null);
+        MCRFileMetadata newFileMetadata = new MCRFileMetadata(path, urn, handle, null);
         return newFileMetadata;
     }
 
