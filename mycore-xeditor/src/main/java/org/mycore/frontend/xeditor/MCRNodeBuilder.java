@@ -44,7 +44,7 @@ public class MCRNodeBuilder {
     }
 
     public static Object build(MCRXPath xPath, String value, Element parent) throws ParseException, JDOMException {
-        LOGGER.info("build xPath " + xPath + " relative to " + MCRXPathBuilder.buildXPath(parent));
+        LOGGER.debug("build xPath " + xPath + " relative to " + MCRXPathBuilder.buildXPath(parent));
 
         List<MCRLocationStep> steps = xPath.getLocationSteps();
         int i, indexOfLastStep = steps.size() - 1;
@@ -52,27 +52,27 @@ public class MCRNodeBuilder {
 
         for (i = indexOfLastStep; i >= 0; i--) {
             String path = xPath.buildXPathExpression(i);
-            LOGGER.info("testing existence of subpath " + path);
+            LOGGER.debug("testing existence of subpath " + path);
             existingNode = XPathFactory.instance().compile(path).evaluateFirst(parent);
             MCRLocationStep currentStep = xPath.getLocationSteps().get(i);
 
             if (existingNode instanceof Element) {
-                LOGGER.info("element already existing.");
+                LOGGER.debug("element already existing.");
                 parent = (Element) existingNode;
                 break;
             } else if (existingNode instanceof Attribute) {
-                LOGGER.info("attribute already existing.");
+                LOGGER.debug("attribute already existing.");
                 break;
             } else if ((existingNode instanceof Boolean) && ((Boolean) existingNode).booleanValue() && (currentStep.getValue() != null)) {
-                LOGGER.info("subpath already existing, but is boolean true: " + path);
+                LOGGER.debug("subpath already existing, but is boolean true: " + path);
                 transformValueToAdditionalPredicate(currentStep);
                 path = xPath.buildXPathExpression(i);
-                LOGGER.info("subpath with value transformed to predicate: " + path);
+                LOGGER.debug("subpath with value transformed to predicate: " + path);
                 existingNode = XPathFactory.instance().compile(path).evaluateFirst(parent);
                 break;
 
             } else
-                LOGGER.info("subpath does not exist or is not a node, ignoring: " + path);
+                LOGGER.debug("subpath does not exist or is not a node, ignoring: " + path);
         }
 
         if (i == indexOfLastStep)
@@ -94,7 +94,7 @@ public class MCRNodeBuilder {
         Object node = null;
         for (MCRLocationStep step : locationSteps) {
             if (!canBeBuilt(step)) {
-                LOGGER.info("location step can not be built, breaking build: " + step);
+                LOGGER.debug("location step can not be built, breaking build: " + step);
                 break;
             }
 
@@ -117,7 +117,7 @@ public class MCRNodeBuilder {
     }
 
     private static Object build(MCRLocationStep locationStep, String value, Element parent) throws ParseException, JDOMException {
-        LOGGER.info("build location step " + locationStep + " relative to " + MCRXPathBuilder.buildXPath(parent));
+        LOGGER.debug("build location step " + locationStep + " relative to " + MCRXPathBuilder.buildXPath(parent));
 
         String name = locationStep.getName();
         if (locationStep.getValue() != null)

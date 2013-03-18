@@ -85,7 +85,7 @@ public class MCRXEditorServlet extends MCRServlet {
 
         private String getPath() {
             String servletPath = req.getServletPath();
-            LOGGER.info(servletPath);
+            LOGGER.debug(servletPath);
             return getServletContext().getRealPath(servletPath);
         }
     }

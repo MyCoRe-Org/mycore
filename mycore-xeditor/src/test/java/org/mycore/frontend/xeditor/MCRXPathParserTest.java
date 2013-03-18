@@ -30,7 +30,7 @@ import java.text.ParseException;
 import org.junit.Test;
 import org.mycore.frontend.xeditor.MCRXPathParser.MCRXPath;
 
-public class MCRTestXPathParser {
+public class MCRXPathParserTest {
 
     @Test
     public void test() throws ParseException {

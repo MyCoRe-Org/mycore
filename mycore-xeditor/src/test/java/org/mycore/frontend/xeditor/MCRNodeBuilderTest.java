@@ -32,7 +32,7 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 
-public class MCRTestNodeBuilder {
+public class MCRNodeBuilderTest {
 
     @Test
     public void testBuildingElements() throws ParseException, JDOMException {

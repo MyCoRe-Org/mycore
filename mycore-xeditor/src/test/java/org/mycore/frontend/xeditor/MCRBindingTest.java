@@ -35,7 +35,7 @@ import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.frontend.xeditor.MCRBinding;
 
-public class MCRTestBinding extends MCRTestCase {
+public class MCRBindingTest extends MCRTestCase {
 
     private MCRBinding binding;
 
