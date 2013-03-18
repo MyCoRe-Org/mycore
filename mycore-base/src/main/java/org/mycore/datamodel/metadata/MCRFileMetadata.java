@@ -33,21 +33,24 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 /**
  * This holds information about file metadata that is stored in derivate xml
+ * 
  * @author Thomas Scheffler (yagee)
+ * @author shermann
  * @see MCRObjectDerivate;
  */
 public class MCRFileMetadata implements Comparable<MCRFileMetadata> {
 
     private Collection<MCRCategoryID> categories;
 
-    private String urn;
+    private String urn, handle;
 
     private String name;
 
     public MCRFileMetadata(Element file) {
         this.name = file.getAttributeValue("name");
         this.urn = file.getChildText("urn");
-        @SuppressWarnings("unchecked")
+        this.handle = file.getChildText("handle");
+
         List<Element> categoryElements = file.getChildren("category");
         this.categories = Collections.emptySet();
         if (!categoryElements.isEmpty()) {
@@ -64,6 +67,7 @@ public class MCRFileMetadata implements Comparable<MCRFileMetadata> {
     }
 
     /**
+     * @param name
      * @param urn
      * @param categories
      */
@@ -71,7 +75,19 @@ public class MCRFileMetadata implements Comparable<MCRFileMetadata> {
         super();
         setName(name);
         setUrn(urn);
+        setHandle(null);
         setCategories(categories);
+    }
+
+    /**
+     * @param name
+     * @param urn
+     * @param handle
+     * @param categories
+     */
+    public MCRFileMetadata(String name, String urn, String handle, Collection<MCRCategoryID> categories) {
+        this(name, urn, categories);
+        setHandle(handle);
     }
 
     public Element createXML() {
@@ -81,6 +97,11 @@ public class MCRFileMetadata implements Comparable<MCRFileMetadata> {
             Element urn = new Element("urn");
             urn.setText(this.urn);
             file.addContent(urn);
+        }
+        if (handle != null) {
+            Element handle = new Element("handle");
+            handle.setText(this.handle);
+            file.addContent(handle);
         }
         for (MCRCategoryID categid : categories) {
             Element category = new Element("category");
@@ -110,6 +131,20 @@ public class MCRFileMetadata implements Comparable<MCRFileMetadata> {
         this.urn = urn;
     }
 
+    /**
+     * @return the handle
+     */
+    public String getHandle() {
+        return handle;
+    }
+
+    /**
+     * @param handle the handle to set
+     */
+    public void setHandle(String handle) {
+        this.handle = handle;
+    }
+
     public String getName() {
         return name;
     }
@@ -122,5 +157,4 @@ public class MCRFileMetadata implements Comparable<MCRFileMetadata> {
     public int compareTo(MCRFileMetadata o) {
         return this.name.compareTo(o.name);
     }
-
 }
