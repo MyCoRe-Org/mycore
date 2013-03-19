@@ -11,30 +11,31 @@
   <xsl:strip-space elements="xed:*" />
 
   <xsl:param name="XEditorSessionID" />
+  <xsl:param name="ServletsBaseURL" />
   
   <xsl:variable name="session" select="store:getFromSession($XEditorSessionID)" />
 
   <xsl:template match="xed:xeditor">
-    <xsl:apply-templates select="*" mode="xeditor" />
+    <xsl:apply-templates select="*" />
   </xsl:template>
 
-  <xsl:template match="xed:source[@uri]" mode="xeditor">
+  <xsl:template match="xed:source[@uri]">
     <xsl:value-of select="session:readSourceXML($session,@uri)" />
   </xsl:template>
 
-  <xsl:template match="xed:source[@root]" mode="xeditor">
-    <xsl:value-of select="session:setRootElementName($session,@root)" />
+  <xsl:template match="xed:source[@root]">
+    <xsl:value-of select="session:setRootElement($session,@root)" />
   </xsl:template>
 
   <!-- implements <xed:include uri="..." /> -->
-  <xsl:template match="xed:include" mode="xeditor">
-    <xsl:apply-templates select="document(@uri)/*/*" mode="xeditor" />
+  <xsl:template match="xed:include">
+    <xsl:apply-templates select="document(@uri)/*/*" />
   </xsl:template>
 
   <!-- implements <xed:bind xpath="..." /> -->
-  <xsl:template match="xed:bind" mode="xeditor">
+  <xsl:template match="xed:bind">
     <xsl:value-of select="session:bind($session,@xpath,@name)" />
-    <xsl:apply-templates select="*" mode="xeditor" />
+    <xsl:apply-templates select="*" />
     <xsl:value-of select="session:unbind($session)" />
   </xsl:template>
 
@@ -83,21 +84,21 @@
     <xsl:value-of select="session:getValue($session)" />
   </xsl:template>
 
-  <xsl:template match="form" mode="xeditor">
+  <xsl:template match="form">
     <xsl:copy>
-      <xsl:apply-templates select="@*" mode="xeditor" />
+      <xsl:apply-templates select="@*" />
       <xsl:attribute name="action">
         <xsl:value-of select="concat($ServletsBaseURL,'XEditor')" />
       </xsl:attribute>
-      <input type="hidden" name="XSL.XEditorSessionID" value="{$XEditorSessionID}" />
-      <xsl:apply-templates select="node()" mode="xeditor" />
+      <input type="hidden" name="XEditorSessionID" value="{$XEditorSessionID}" />
+      <xsl:apply-templates select="node()" />
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="@*|node()" mode="xeditor">
+  <xsl:template match="@*|node()">
     <xsl:copy>
       <xsl:apply-templates select="." mode="xeditor-attribute" />
-      <xsl:apply-templates select="@*|node()" mode="xeditor" />
+      <xsl:apply-templates select="@*|node()" />
       <xsl:apply-templates select="." mode="xeditor-after" />
     </xsl:copy>
   </xsl:template>

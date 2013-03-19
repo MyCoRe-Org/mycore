@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<html>
+  <body>
+    <xed:xeditor xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:source uri="resource:{input}" />
+      <xed:source root="document" />
+      <form>
+        <xed:bind xpath="/document">
+          <xed:bind xpath="title">
+            <input type="text" />
+          </xed:bind>
+          <xed:bind xpath="author">
+            <xed:bind xpath="firstName">
+              <input type="text" id="firstName" />
+            </xed:bind>
+            <xed:bind xpath="lastName">
+              <input type="text" id="lastName" />
+            </xed:bind>
+          </xed:bind>
+          <xed:bind xpath="abstract">
+            <textarea />
+          </xed:bind>
+          <xed:bind xpath="type">
+            <select id="type">
+              <optgroup label="Publikation">
+                <option value="journal">Zeitschrift</option>
+                <option value="article">Artikel</option>
+              </optgroup>
+              <optgroup label="Sonstiges">
+                <option value="video">Video</option>
+              </optgroup>
+            </select>
+          </xed:bind>
+          <xed:bind xpath="service">
+            <input id="oai" value="oai" type="checkbox" />
+            <input id="urn" value="urn" type="checkbox" />
+          </xed:bind>
+          <xed:bind xpath="relatedItem[@type='host']">
+            <xed:bind xpath="titleInfo[nonSort='The'][title='international journal of repository software']" />
+            <xed:bind xpath="part[detail[@type='volume']/number='24'][detail[@type='issue']/number='2']" />
+          </xed:bind>
+        </xed:bind>
+      </form>
+    </xed:xeditor>
+  </body>
+</html>

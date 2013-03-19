@@ -25,8 +25,8 @@ package org.mycore.frontend.xeditor;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
@@ -41,52 +41,22 @@ public class MCRXEditorServlet extends MCRServlet {
 
     @Override
     public void doGetPost(MCRServletJob job) throws IOException {
-        new MCRXEditorServletRequest(job).handleRequest();
-    }
+        String servletPath = job.getRequest().getServletPath();
+        LOGGER.debug(servletPath);
+        String path = getServletContext().getRealPath(servletPath);
 
-    class MCRXEditorServletRequest {
-
-        private HttpServletRequest req;
-
-        private HttpServletResponse res;
-
-        private MCREditorSession editorSession;
-
-        public MCRXEditorServletRequest(MCRServletJob job) {
-            this.req = job.getRequest();
-            this.res = job.getResponse();
+        File file = new File(path);
+        if (!file.exists()) {
+            String msg = "Could not find file " + path;
+            job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, msg);
+            return;
         }
 
-        public void handleRequest() throws IOException {
-            getOrBuildEditorSession();
+        MCRContent xEditor = new MCRFileContent(file);
+        Map<String, String[]> requestParameters = job.getRequest().getParameterMap();
+        String xEditorSessionID = job.getRequest().getParameter("XEditorSessionID");
+        MCRContent transformedEditor = MCRXEditorTransformation.transform(xEditor, xEditorSessionID, requestParameters);
 
-            String path = getPath();
-            File file = new File(path);
-            if (!file.exists()) {
-                String msg = "Could not find file " + path;
-                res.sendError(HttpServletResponse.SC_NOT_FOUND, msg);
-                return;
-            }
-            
-            MCRContent content = new MCRFileContent(file);
-            getLayoutService().doLayout(req, res, content);
-        }
-
-        private void getOrBuildEditorSession() {
-            String editorID = req.getParameter("XSL.XEditorSessionID");
-            if (editorID == null) {
-                editorSession = new MCREditorSession(req.getParameterMap());
-                MCREditorSessionStore.storeInSession(editorSession);
-                req.setAttribute("XSL.XEditorSessionID", editorSession.getID());
-            } else {
-                editorSession = MCREditorSessionStore.getFromSession(editorID);
-            }
-        }
-
-        private String getPath() {
-            String servletPath = req.getServletPath();
-            LOGGER.debug(servletPath);
-            return getServletContext().getRealPath(servletPath);
-        }
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), transformedEditor);
     }
 }

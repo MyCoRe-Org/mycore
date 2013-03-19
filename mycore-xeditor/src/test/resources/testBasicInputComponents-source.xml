@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <title>Der neue XEditor - Utopie oder Wahnsinn?</title>
+  <author>
+    <firstName>Frank</firstName>
+    <lastName>Lützenkirchen</lastName>
+  </author>
+  <abstract>
+    Der XEditor ermöglicht es, HTML-Formulare zur 
+    Bearbeitung von XML-Dokumenten zu verwenden.
+  </abstract>
+  <type>article</type>
+  <service>oai</service>
+  <service>urn</service>
+</document>
