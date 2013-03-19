@@ -1,0 +1,14 @@
+
+<!-- **************************************************************** -->
+<!-- MyCoRe XEditor -->
+<!-- **************************************************************** -->
+
+<servlet id="MCRXEditorServlet">
+  <servlet-name>MCRXEditorServlet</servlet-name>
+  <servlet-class>org.mycore.frontend.servlets.MCRXEditorServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+  <servlet-name>MCRXEditorServlet</servlet-name>
+  <url-pattern>/servlets/XEditor</url-pattern>
+</servlet-mapping>
