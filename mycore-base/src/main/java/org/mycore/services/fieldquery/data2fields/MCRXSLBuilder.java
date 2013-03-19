@@ -132,17 +132,22 @@ public class MCRXSLBuilder {
      *            the date string in a locale-dependent format
      */
     public static String normalizeDate(String sDate) {
-        MCRISO8601Date iDate = new MCRISO8601Date();
-        iDate.setDate(sDate.trim());
-        String isoDateString = iDate.getISOString();
-        if (isoDateString == null) {
+        try {
+            MCRISO8601Date iDate = new MCRISO8601Date();
+            iDate.setDate(sDate.trim());
+            String isoDateString = iDate.getISOString();
+            if(isoDateString == null){
+                return "";
+            }
+            
+            if (isoDateString.length() < 10) {
+                return isoDateString;
+            }
+            
+            return isoDateString.substring(0, 10);
+        } catch (Exception ex) {
+            LOGGER.debug(ex);
             return "";
         }
-
-        if (isoDateString.length() < 10) {
-            return isoDateString;
-        }
-
-        return isoDateString.substring(0, 10);
     }
 }
