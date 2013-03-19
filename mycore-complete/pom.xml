@@ -256,5 +256,10 @@
       <artifactId>mycore-solr</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-xeditor</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>
