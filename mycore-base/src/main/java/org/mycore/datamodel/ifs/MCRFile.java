@@ -317,6 +317,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         String old_md5 = md5;
         long old_size = size;
         String old_storageID = storageID;
+        String old_storeID = storeID;
         MCRContentStore old_store = getContentStore();
 
         initContentFields();
@@ -337,7 +338,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         size = cis.getLength();
         md5 = cis.getMD5String();
 
-        if (old_storageID.length() != 0) {
+        if ((old_storageID.length() != 0) && (!(old_storageID.equals(storageID) && (old_storeID.equals(storeID))))) {
             old_store.deleteContent(old_storageID);
         }
 
