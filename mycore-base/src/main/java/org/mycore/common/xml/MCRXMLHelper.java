@@ -356,7 +356,7 @@ public class MCRXMLHelper {
             for (Attribute attr : aList1) {
                 orig.add(attr.toString());
             }
-            for (Attribute attr : aList1) {
+            for (Attribute attr : aList2) {
                 orig.remove(attr.toString());
             }
             if (!orig.isEmpty()) {

@@ -43,6 +43,7 @@ public class MCRXMLHelperTest extends MCRTestCase {
         assertTrue("Elements should be equal", MCRXMLHelper.deepEqual(getSmallElement(), getSmallElement()));
         assertTrue("Elements should be equal", MCRXMLHelper.deepEqual(getBigElement(), getBigElement()));
         assertFalse("Elements should be different", MCRXMLHelper.deepEqual(getSmallElement(), getBigElement()));
+        assertFalse("Elements should be different", MCRXMLHelper.deepEqual(getSmallElement().setAttribute("j", "junit"), getSmallElement()));
         assertFalse("Elements should be different", MCRXMLHelper.deepEqual(getBigElement(), getSmallElement()));
     }
 
