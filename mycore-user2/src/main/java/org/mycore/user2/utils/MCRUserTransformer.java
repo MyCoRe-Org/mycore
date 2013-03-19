@@ -23,6 +23,7 @@
 package org.mycore.user2.utils;
 
 import java.io.IOException;
+import java.util.Comparator;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -61,10 +62,25 @@ public abstract class MCRUserTransformer {
     private static Document getDocument(MCRUser user) {
         MCRJAXBContent<MCRUser> content = new MCRJAXBContent<MCRUser>(JAXB_CONTEXT, user);
         try {
-            return content.asXML();
+            Document userXML = content.asXML();
+            sortAttributes(userXML);
+            return userXML;
         } catch (SAXParseException | JDOMException | IOException e) {
             throw new MCRException("Exception while transforming MCRUser " + user.getUserID() + " to JDOM document.", e);
         }
+    }
+
+    private static void sortAttributes(Document userXML) {
+        Element attributes = userXML.getRootElement().getChild("attributes");
+        if (attributes == null) {
+            return;
+        }
+        attributes.sortChildren(new Comparator<Element>() {
+            @Override
+            public int compare(Element o1, Element o2) {
+                return o1.getAttributeValue("name").compareTo(o2.getAttributeValue("name"));
+            }
+        });
     }
 
     /**
