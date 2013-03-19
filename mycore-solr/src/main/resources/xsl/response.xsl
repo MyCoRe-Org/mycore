@@ -103,7 +103,7 @@
     <tr>
       <td class="description" colspan="2">
         <xsl:if test="./str[@name='shelfmark.type.actual']">
-          <xsl:value-of select="./str[@name='shelfmark.type.actual'" />
+          <xsl:value-of select="./str[@name='shelfmark.type.actual']" />
           <br />
         </xsl:if>
         <xsl:if test="./arr[@name='placeOfActivity']">
