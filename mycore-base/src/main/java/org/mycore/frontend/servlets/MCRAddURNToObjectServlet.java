@@ -3,11 +3,14 @@
  */
 package org.mycore.frontend.servlets;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.services.urn.MCRURNAdder;
 import org.mycore.services.urn.MCRURNManager;
@@ -25,11 +28,7 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
 
     private static final String PAGEDIR = MCRConfiguration.instance().getString("MCR.SWF.PageDir", "");
 
-    private static final String MCRIDERRORPAGE = PAGEDIR
-            + MCRConfiguration.instance().getString("MCR.SWF.PageErrorMcrid", "editor_error_mcrid.xml");
-
-    private static final String USERERRORPAGE = PAGEDIR
-            + MCRConfiguration.instance().getString("MCR.SWF.PageErrorUser", "editor_error_user.xml");
+    private static final String USERERRORPAGE = PAGEDIR + MCRConfiguration.instance().getString("MCR.SWF.PageErrorUser", "editor_error_user.xml");
 
     @Override
     protected void doGetPost(MCRServletJob job) throws IOException {
@@ -37,9 +36,15 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
         String target = job.getRequest().getParameter("target");
 
         if (object == null) {
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + MCRIDERRORPAGE));
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
+
+        // checking access right
+        if (!MCRAccessManager.checkPermission(object, PERMISSION_WRITE)) {
+            job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
+        }
+
         MCRURNAdder urnAdder = new MCRURNAdder();
 
         if (target != null && target.equals("file")) {

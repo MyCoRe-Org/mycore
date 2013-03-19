@@ -307,11 +307,6 @@ public class MCRURNAdder {
      * @throws IOException 
      */
     public boolean addURNToDerivates(String derivateId) throws IOException, JDOMException, SAXException {
-        // checking access right
-        if (!MCRAccessManager.checkPermission(derivateId, PERMISSION_WRITE)) {
-            LOGGER.warn("Permission denied");
-            return false;
-        }
         MCRObjectID id = MCRObjectID.getInstance(derivateId);
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(id);
 
