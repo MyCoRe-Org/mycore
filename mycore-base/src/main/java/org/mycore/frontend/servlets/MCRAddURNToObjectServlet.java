@@ -43,6 +43,7 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
         // checking access right
         if (!MCRAccessManager.checkPermission(object, PERMISSION_WRITE)) {
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
         }
 
         MCRURNAdder urnAdder = new MCRURNAdder();
