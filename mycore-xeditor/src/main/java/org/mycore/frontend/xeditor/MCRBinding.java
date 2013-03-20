@@ -31,7 +31,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Attribute;
-import org.jdom2.Content;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -40,11 +39,14 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 
+/**
+ * @author Frank L\u00FCtzenkirchen
+ */
 public class MCRBinding {
 
     private final static Logger LOGGER = Logger.getLogger(MCRBinding.class);
 
-    private XPathExpression<Content> xPath;
+    private XPathExpression<Object> xPath;
 
     private List<Object> boundNodes = new ArrayList<Object>();
 
@@ -55,7 +57,7 @@ public class MCRBinding {
     private MCRBinding parent;
 
     public MCRBinding(Document document) throws JDOMException {
-        this.xPath = XPathFactory.instance().compile("/", Filters.content());
+        this.xPath = XPathFactory.instance().compile("/", Filters.fpassthrough());
         this.boundNodes.add(document);
     }
 
@@ -70,7 +72,8 @@ public class MCRBinding {
         parent.children.add(this);
         Map<String, Object> variables = buildXPathVariables();
 
-        this.xPath = XPathFactory.instance().compile(xPathExpression, Filters.content(), variables, MCRConstants.getStandardNamespaces());
+        this.xPath = XPathFactory.instance().compile(xPathExpression, Filters.fpassthrough(), variables,
+                MCRConstants.getStandardNamespaces());
 
         boundNodes.addAll(xPath.evaluate(parent.getBoundNodes()));
 
@@ -89,6 +92,29 @@ public class MCRBinding {
 
     public Object getBoundNode() {
         return boundNodes.get(0);
+    }
+
+    public Element cloneLastBoundElement() {
+        Element lastBoundElement = (Element) (boundNodes.get(boundNodes.size() - 1));
+        Element newElement = lastBoundElement.clone();
+        Element parent = lastBoundElement.getParentElement();
+        int indexInParent = parent.indexOf(lastBoundElement) + 1;
+        parent.addContent(indexInParent, newElement);
+        boundNodes.add(newElement);
+        return newElement;
+    }
+
+    public void detachBoundNodes() {
+        while (!boundNodes.isEmpty())
+            detachBoundNode(getBoundNode());
+    }
+
+    private void detachBoundNode(Object node) {
+        if (node instanceof Attribute)
+            ((Attribute) node).detach();
+        else
+            ((Element) node).detach();
+        boundNodes.remove(node);
     }
 
     public MCRBinding getParent() {
@@ -122,6 +148,21 @@ public class MCRBinding {
                 return true;
 
         return false;
+    }
+
+    public void setValue(String value) {
+        setValue(getBoundNode(), value);
+    }
+
+    public void setValue(int index, String value) {
+        setValue(getBoundNodes().get(index), value);
+    }
+
+    private void setValue(Object node, String value) {
+        if (node instanceof Element)
+            ((Element) node).setText(value);
+        else if (node instanceof Attribute)
+            ((Attribute) node).setValue(value);
     }
 
     public String getName() {

@@ -26,16 +26,19 @@ package org.mycore.frontend.xeditor;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.servlets.MCRStaticXMLFileServlet;
 import org.xml.sax.SAXException;
 
+/**
+ * @author Frank L\u00FCtzenkirchen
+ */
 public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
 
     protected final static Logger LOGGER = Logger.getLogger(MCRStaticXEditorFileServlet.class);
@@ -45,9 +48,18 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
             MalformedURLException {
         MCRContent content = super.expandEditorElements(request, file);
         if (mayContainEditorForm(content)) {
-            Map<String, String[]> requestParameters = request.getParameterMap();
-            String xEditorSessionID = request.getParameter("XEditorSessionID");
-            content = MCRXEditorTransformation.transform(content, xEditorSessionID, requestParameters);
+            String editorSessionID = request.getParameter("XEditorSessionID");
+            MCREditorSession editorSession;
+            if (editorSessionID != null)
+                editorSession = MCREditorSessionStoreFactory.getSessionStore().getSession(editorSessionID);
+            else {
+                editorSession = new MCREditorSession();
+                editorSessionID = MCREditorSessionStoreFactory.getSessionStore().storeSession(editorSession);
+                editorSession.setID(editorSessionID);
+            }
+
+            MCRParameterCollector requestParameters = new MCRParameterCollector(request);
+            content = new MCRXEditorTransformer(requestParameters, editorSession).transform(content);
         }
         return content;
     }

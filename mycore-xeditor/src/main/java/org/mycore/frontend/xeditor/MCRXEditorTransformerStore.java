@@ -23,32 +23,25 @@
 
 package org.mycore.frontend.xeditor;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.mycore.common.MCRCache;
+import org.mycore.common.MCRSessionMgr;
 
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCREditorSessionStore {
+public class MCRXEditorTransformerStore {
 
-    private static final int maxEditorsInSession = 50;
+    private static MCRCache<String, MCRXEditorTransformer> cache = new MCRCache<String, MCRXEditorTransformer>(100, "XEditorTransformers");
 
-    private MCRCache<String, MCREditorSession> cachedSessions;
-
-    private AtomicInteger idGenerator = new AtomicInteger(0);
-
-    MCREditorSessionStore() {
-        cachedSessions = new MCRCache<String, MCREditorSession>(maxEditorsInSession, "Stored XEditor Sessions");
+    public static String storeTransformer(MCRXEditorTransformer transformer) {
+        String key = MCRSessionMgr.getCurrentSession().getID() + "-" + String.valueOf(System.nanoTime());
+        cache.put(key, transformer);
+        return key;
     }
 
-    public String storeSession(MCREditorSession session) {
-        String id = String.valueOf(idGenerator.incrementAndGet());
-        cachedSessions.put(id, session);
-        return id;
-    }
-
-    public MCREditorSession getSession(String id) {
-        return cachedSessions.get(id);
+    public static MCRXEditorTransformer getAndRemoveTransformer(String key) {
+        MCRXEditorTransformer transformer = cache.get(key);
+        cache.remove(key);
+        return transformer;
     }
 }

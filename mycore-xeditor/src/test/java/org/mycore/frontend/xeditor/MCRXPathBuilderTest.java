@@ -31,6 +31,9 @@ import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.junit.Test;
 
+/**
+ * @author Frank L\u00FCtzenkirchen
+ */
 public class MCRXPathBuilderTest {
 
     @Test

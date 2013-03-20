@@ -29,6 +29,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+/**
+ * @author Frank L\u00FCtzenkirchen
+ */
 public class MCRXPathParser {
 
     private final static Logger LOGGER = Logger.getLogger(MCRXPathParser.class);

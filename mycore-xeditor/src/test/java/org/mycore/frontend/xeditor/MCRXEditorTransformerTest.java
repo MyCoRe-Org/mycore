@@ -26,8 +26,6 @@ package org.mycore.frontend.xeditor;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
@@ -37,18 +35,24 @@ import static org.junit.Assert.*;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.xsl.MCRParameterCollector;
 import org.xml.sax.SAXException;
 
-public class MCRXEditorTransformationTest {
+/**
+ * @author Frank L\u00FCtzenkirchen
+ */
+public class MCRXEditorTransformerTest {
 
     private void testTransformation(String inputFile, String editedXMLFile, String expectedOutputFile, boolean write)
             throws TransformerException, IOException, JDOMException, SAXException {
-        Map<String, String[]> parameters = new HashMap<String, String[]>();
+        MCRParameterCollector parameters = new MCRParameterCollector();
         if (editedXMLFile != null)
-            parameters.put("input", new String[] { editedXMLFile });
+            parameters.setParameter("input", editedXMLFile);
 
+        MCREditorSession editorSession = new MCREditorSession();
+        editorSession.setID("1");
         MCRContent input = MCRSourceContent.getInstance("resource:" + inputFile);
-        MCRContent transformed = MCRXEditorTransformation.transform(input, null, parameters);
+        MCRContent transformed = new MCRXEditorTransformer(parameters, editorSession).transform(input);
 
         if (write) {
             File targetFile = File.createTempFile(expectedOutputFile.split("\\.")[0], expectedOutputFile.split("\\.")[1]);

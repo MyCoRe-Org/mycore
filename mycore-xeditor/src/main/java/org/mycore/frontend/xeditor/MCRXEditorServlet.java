@@ -25,6 +25,7 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
@@ -33,6 +34,9 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
+/**
+ * @author Frank L\u00FCtzenkirchen
+ */
 public class MCRXEditorServlet extends MCRServlet {
 
     protected final static Logger LOGGER = Logger.getLogger(MCRXEditorServlet.class);
@@ -40,9 +44,17 @@ public class MCRXEditorServlet extends MCRServlet {
     @Override
     public void doGetPost(MCRServletJob job) throws IOException, JDOMException, ParseException {
         String xEditorSessionID = job.getRequest().getParameter("XEditorSessionID");
-        MCREditorSession session = MCREditorSessionStore.getFromSession(xEditorSessionID);
-        session.setSubmittedValues(job.getRequest().getParameterMap());
-        MCRContent editedContent = new MCRJDOMContent(session.getEditedXML());
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), editedContent);
+        MCREditorSession session = MCREditorSessionStoreFactory.getSessionStore().getSession(xEditorSessionID);
+
+        for (String xPath : (Set<String>) (job.getRequest().getParameterMap().keySet())) {
+            if (xPath.startsWith("/")) {
+                String[] values = job.getRequest().getParameterValues(xPath);
+                session.setSubmittedValues(xPath, values);
+            }
+        }
+        session.removeDeletedNodes();
+
+        MCRContent editedXML = new MCRJDOMContent(session.getEditedXML());
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), editedXML);
     }
 }

@@ -32,6 +32,9 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 
+/**
+ * @author Frank L\u00FCtzenkirchen
+ */
 public class MCRNodeBuilderTest {
 
     @Test

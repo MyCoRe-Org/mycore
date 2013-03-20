@@ -28,6 +28,9 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Parent;
 
+/**
+ * @author Frank L\u00FCtzenkirchen
+ */
 public class MCRXPathBuilder {
 
     public static String buildXPath(Object object) {

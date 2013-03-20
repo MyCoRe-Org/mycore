@@ -34,6 +34,9 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.frontend.xeditor.MCRXPathParser.MCRLocationStep;
 import org.mycore.frontend.xeditor.MCRXPathParser.MCRXPath;
 
+/**
+ * @author Frank L\u00FCtzenkirchen
+ */
 public class MCRNodeBuilder {
 
     private final static Logger LOGGER = Logger.getLogger(MCRNodeBuilder.class);

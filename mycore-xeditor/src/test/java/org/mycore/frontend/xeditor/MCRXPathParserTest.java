@@ -30,6 +30,9 @@ import java.text.ParseException;
 import org.junit.Test;
 import org.mycore.frontend.xeditor.MCRXPathParser.MCRXPath;
 
+/**
+ * @author Frank L\u00FCtzenkirchen
+ */
 public class MCRXPathParserTest {
 
     @Test

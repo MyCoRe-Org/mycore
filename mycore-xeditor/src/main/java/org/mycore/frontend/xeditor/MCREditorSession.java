@@ -23,170 +23,79 @@
 
 package org.mycore.frontend.xeditor;
 
-import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
-import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.mycore.common.content.MCRSourceContent;
-import org.xml.sax.SAXException;
 
+/**
+ * @author Frank L\u00FCtzenkirchen
+ */
 public class MCREditorSession {
 
     private final static Logger LOGGER = Logger.getLogger(MCREditorSession.class);
-
-    private static AtomicInteger idGenerator = new AtomicInteger(0);
 
     private String id;
 
     private Document editedXML;
 
-    private MCRBinding currentBinding;
+    private Set<String> xPathsOfDisplayedFields = new HashSet<String>();
 
-    private Map<String, String[]> parameters;
-
-    private Set<String> xPathsActuallyUsedInEditor = new HashSet<String>();
-
-    public MCREditorSession(Map<String, String[]> parameters) {
-        this.id = String.valueOf(idGenerator.incrementAndGet());
-        this.parameters = parameters;
+    public void setID(String id) {
+        this.id = id;
     }
 
     public String getID() {
         return id;
     }
 
-    public void readSourceXML(String uri) throws JDOMException, IOException, SAXException, TransformerException {
-        uri = replaceParameters(uri);
-        if ((!uri.contains("{")) && (editedXML == null)) {
-            LOGGER.info(id + " reading edited XML from " + uri);
-            setEditedXML(MCRSourceContent.getInstance(uri).asXML());
-        }
-    }
-
-    public void setRootElement(String rootElementName) throws JDOMException {
-        if (editedXML == null) {
-            LOGGER.info(id + " starting with empty edited XML of type <" + rootElementName + ">");
-            setEditedXML(new Document(new Element(rootElementName)));
-        }
-    }
-
-    private void setEditedXML(Document xml) throws JDOMException {
+    public void setEditedXML(Document xml) throws JDOMException {
         editedXML = xml;
-        currentBinding = new MCRBinding(editedXML);
     }
 
     public Document getEditedXML() {
         return editedXML;
     }
 
-    public String replaceParameters(String uri) {
-        for (String name : parameters.keySet()) {
-            String token = "{" + name + "}";
-            String value = parameters.get(name)[0];
-            uri = uri.replace(token, value);
-        }
-        return uri;
-    }
-
-    public void bind(String xPath, String name) throws JDOMException, ParseException {
-        currentBinding = new MCRBinding(xPath, name, currentBinding);
-    }
-
-    public void unbind() {
-        currentBinding = currentBinding.getParent();
-    }
-
-    public String getAbsoluteXPath() {
-        return currentBinding.getAbsoluteXPath();
-    }
-
-    public String getValue() {
-        rememberActuallyUsedNodes(currentBinding.getBoundNodes().toArray());
-        return currentBinding.getValue();
-    }
-
-    public boolean hasValue(String value) {
-        rememberActuallyUsedNodes(currentBinding.getBoundNodes().toArray());
-        return currentBinding.hasValue(value);
-    }
-
-    private void rememberActuallyUsedNodes(Object... nodes) {
-        for (Object node : nodes) {
-            String xPath = MCRXPathBuilder.buildXPath(node);
-            if (!xPathsActuallyUsedInEditor.contains(xPath)) {
-                LOGGER.debug(id + " uses " + xPath);
-                xPathsActuallyUsedInEditor.add(xPath);
-            }
-        }
-    }
-
-    public void setSubmittedValues(Map<String, String[]> submittedValues) throws JDOMException, ParseException {
-        Set<String> submittedXPaths = submittedValues.keySet();
-        MCRBinding root = new MCRBinding(editedXML);
-
-        for (String xPath : submittedXPaths) {
-            if (xPath.startsWith("/")) {
-                String[] values = submittedValues.get(xPath);
-
-                MCRBinding binding = new MCRBinding(xPath, root);
-                List<Object> boundNodes = binding.getBoundNodes();
-                while (boundNodes.size() < values.length)
-                    addNewBoundNode(boundNodes);
-
-                for (int i = 0; i < boundNodes.size(); i++) {
-                    if ((values.length < i) && (values[i] != null) && (!values[i].trim().isEmpty()))
-                        setValue(boundNodes.get(i), values[i].trim());
-                }
-            }
-        }
-
-        removeDeletedNodes();
-    }
-
-    private void removeDeletedNodes() throws JDOMException, ParseException {
-        MCRBinding root = new MCRBinding(editedXML);
-        List<Element> elementsToRemove = new ArrayList<Element>();
-
-        for (String xPath : xPathsActuallyUsedInEditor) {
-            for (Object boundNode : new MCRBinding(xPath, root).getBoundNodes())
-                if (boundNode instanceof Attribute)
-                    ((Attribute) boundNode).detach();
-                else
-                    elementsToRemove.add((Element) boundNode);
-        }
-        for (Element elementToRemove : elementsToRemove)
-            elementToRemove.detach();
-    }
-
-    private void addNewBoundNode(List<Object> boundNodes) {
-        Element lastBoundElement = (Element) (boundNodes.get(boundNodes.size() - 1));
-        Element newElement = lastBoundElement.clone();
-        Element parent = lastBoundElement.getParentElement();
-        int indexInParent = parent.indexOf(lastBoundElement) + 1;
-        parent.addContent(indexInParent + 1, newElement);
-        boundNodes.add(newElement);
-        rememberActuallyUsedNodes(newElement);
-    }
-
-    private void setValue(Object node, String value) {
-        if (node instanceof Element)
-            ((Element) node).setText(value);
-        else if (node instanceof Attribute)
-            ((Attribute) node).setValue(value);
-
+    public void markAsTransformedToInputField(Object node) {
         String xPath = MCRXPathBuilder.buildXPath(node);
-        xPathsActuallyUsedInEditor.remove(xPath);
+        LOGGER.debug(id + " uses " + xPath);
+        xPathsOfDisplayedFields.add(xPath);
+    }
+
+    public void markAsResubmittedFromInputField(Object node) {
+        String xPath = MCRXPathBuilder.buildXPath(node);
+        LOGGER.debug(id + " set value of " + xPath);
+        xPathsOfDisplayedFields.remove(xPath);
+    }
+
+    public void setSubmittedValues(String xPath, String[] values ) throws JDOMException, ParseException {
+        MCRBinding rootBinding = new MCRBinding(editedXML);
+        MCRBinding binding = new MCRBinding(xPath, rootBinding);
+        List<Object> boundNodes = binding.getBoundNodes();
+
+        while (boundNodes.size() < values.length) {
+            Element newElement = binding.cloneLastBoundElement();
+            markAsTransformedToInputField(newElement);
+        }
+
+        for (int i = 0; i < values.length; i++) {
+            if ((values[i] != null) && (!values[i].trim().isEmpty())) {
+                binding.setValue(i, values[i].trim());
+                markAsResubmittedFromInputField(boundNodes.get(i));
+            }
+        }
+    }
+    
+    public void removeDeletedNodes() throws JDOMException, ParseException {
+        MCRBinding root = new MCRBinding(editedXML);
+        for (String xPath : xPathsOfDisplayedFields)
+            new MCRBinding(xPath, root).detachBoundNodes();
+        xPathsOfDisplayedFields.clear();
     }
 }
