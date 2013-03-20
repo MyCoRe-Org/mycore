@@ -24,12 +24,12 @@
 package org.mycore.frontend.servlets;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.HashMap;
-import java.util.StringTokenizer;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -52,59 +52,69 @@ import org.xml.sax.SAXException;
  * @version $Revision$ $Date$
  */
 public class MCRStaticXMLFileServlet extends MCRServlet {
+
     private static final long serialVersionUID = -9213353868244605750L;
 
     protected final static Logger LOGGER = Logger.getLogger(MCRStaticXMLFileServlet.class);
 
-    protected final static String docTypesIncludingEditors = MCRConfiguration.instance().getString("MCR.EditorFramework.DocTypes", "MyCoReWebPage");
+    /** XML document types that may contain editor forms */
+    protected Set<String> docTypesIncludingEditors = new HashSet<String>();
 
-    protected final static HashMap<String, String> docTypesMap = new HashMap<String, String>();
+    @Override
+    public void init() throws ServletException {
+        super.init();
+
+        String docTypes = MCRConfiguration.instance().getString("MCR.EditorFramework.DocTypes", "MyCoReWebPage");
+        for (String docType : docTypes.split(","))
+            docTypesIncludingEditors.add(docType);
+    }
 
     @Override
     public void doGetPost(MCRServletJob job) throws java.io.IOException, MCRException, SAXException, JDOMException {
-        final HttpServletRequest request = job.getRequest();
-        final HttpServletResponse response = job.getResponse();
-        String requestedPath = request.getServletPath();
-        LOGGER.info("MCRStaticXMLFileServlet " + requestedPath);
-
-        String path = getServletContext().getRealPath(requestedPath);
-        File file = new File(path);
-        if (!file.exists()) {
-            String msg = "Could not find file " + requestedPath;
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, msg);
-
-            return;
+        File file = resolveFile(job);
+        if (file != null) {
+            HttpServletRequest request = job.getRequest();
+            HttpServletResponse response = job.getResponse();
+            setXSLParameters(file, request);
+            MCRContent content = expandEditorElements(request, file);
+            getLayoutService().doLayout(request, response, content);
         }
-
-        processFile(request, response, file);
     }
 
-    static void processFile(final HttpServletRequest request, final HttpServletResponse response, File file) throws FileNotFoundException, IOException,
-        MalformedURLException, MCRException, SAXException, JDOMException {
+    private void setXSLParameters(File file, HttpServletRequest request) {
         request.setAttribute("XSL.StaticFilePath", request.getServletPath().substring(1));
         request.setAttribute("XSL.DocumentBaseURL", file.getParent() + File.separator);
         request.setAttribute("XSL.FileName", file.getName());
         request.setAttribute("XSL.FilePath", file.getPath());
+    }
 
-        // Find out XML document type: Is this a static webpage or some other XML?
+    private File resolveFile(MCRServletJob job) throws IOException {
+        String requestedPath = job.getRequest().getServletPath();
+        LOGGER.info("MCRStaticXMLFileServlet " + requestedPath);
+
+        String path = getServletContext().getRealPath(requestedPath);
+        File file = new File(path);
+        if (file.exists())
+            return file;
+
+        String msg = "Could not find file " + requestedPath;
+        job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, msg);
+        return null;
+    }
+
+    /** For defined document types like static webpages, replace editor elements with complete editor definition */
+    private MCRContent expandEditorElements(HttpServletRequest request, File file) throws IOException, JDOMException, SAXException,
+            MalformedURLException {
         MCRContent content = new MCRFileContent(file);
-        String docType = content.getDocType();
-
-        // Parse list of document types that may contain editor elements
-        if (docTypesMap.isEmpty()) {
-            StringTokenizer st = new StringTokenizer(docTypesIncludingEditors, ", ");
-            while (st.hasMoreTokens()) {
-                docTypesMap.put(st.nextToken(), null);
-            }
-        }
-
-        // For defined document types like static webpages, replace editor elements with complete editor definition
-        if (docTypesMap.containsKey(docType)) {
+        if (mayContainEditorForm(content)) {
             Document xml = content.asXML();
             MCREditorServlet.replaceEditorElements(request, file.toURI().toURL().toString(), xml);
-            getLayoutService().doLayout(request, response, new MCRJDOMContent(xml));
-        } else {
-            getLayoutService().doLayout(request, response, content);
+            content = new MCRJDOMContent(xml);
         }
+        return content;
+    }
+
+    private boolean mayContainEditorForm(MCRContent content) throws IOException {
+        return docTypesIncludingEditors.contains(content.getDocType());
     }
 }
