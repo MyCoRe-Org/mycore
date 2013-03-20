@@ -120,7 +120,9 @@
             <xsl:with-param select="i18n:translate('metaData.date')" name="format" />
           </xsl:call-template>
         </xsl:variable>
-        <xsl:value-of select="i18n:translate('results.lastChanged',$date)" />
+        <span class="lastChangeDate">
+          <xsl:value-of select="i18n:translate('results.lastChanged', $date)" />
+        </span>
         <br />
       </td>
     </tr>
