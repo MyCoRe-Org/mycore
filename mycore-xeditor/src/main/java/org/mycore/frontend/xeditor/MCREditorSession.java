@@ -25,11 +25,16 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.xml.transform.TransformerException;
 
+import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -47,6 +52,8 @@ public class MCREditorSession {
     private MCRBinding currentBinding;
 
     private Map<String, String[]> parameters;
+
+    private Set<String> displayedBindings = new HashSet<String>();
 
     public MCREditorSession(Map<String, String[]> parameters) {
         this.id = String.valueOf(idGenerator.incrementAndGet());
@@ -73,6 +80,10 @@ public class MCREditorSession {
         currentBinding = new MCRBinding(editedXML);
     }
 
+    public Document getEditedXML() {
+        return editedXML;
+    }
+
     private String replaceParameters(String uri) {
         for (String name : parameters.keySet()) {
             String token = "{" + name + "}";
@@ -95,10 +106,75 @@ public class MCREditorSession {
     }
 
     public String getValue() {
+        rememberDisplayedValues();
         return currentBinding.getValue();
     }
 
     public boolean hasValue(String value) {
+        rememberDisplayedValues();
         return currentBinding.hasValue(value);
+    }
+
+    private void rememberDisplayedValues() {
+        for (Object boundNode : currentBinding.getBoundNodes())
+            displayedBindings.add(MCRXPathBuilder.buildXPath(boundNode));
+    }
+
+    public void setSubmittedValues(Map<String, String[]> submittedValues) throws JDOMException, ParseException {
+        Set<String> submittedXPaths = submittedValues.keySet();
+        MCRBinding root = new MCRBinding(editedXML);
+
+        for (String xPath : submittedXPaths) {
+            if (xPath.startsWith("/")) {
+                String[] values = submittedValues.get(xPath);
+
+                MCRBinding binding = new MCRBinding(xPath, root);
+                List<Object> boundNodes = binding.getBoundNodes();
+                while (boundNodes.size() < values.length)
+                    addNewBoundNode(boundNodes);
+
+                for (int i = 0; i < boundNodes.size(); i++) {
+                    if ((values.length < i) && (values[i] != null) && (!values[i].trim().isEmpty()))
+                        setValue(boundNodes.get(i), values[i].trim());
+                }
+            }
+        }
+
+        removeDeletedNodes();
+    }
+
+    private void removeDeletedNodes() throws JDOMException, ParseException {
+        MCRBinding root = new MCRBinding(editedXML);
+        List<Element> elementsToRemove = new ArrayList<Element>();
+
+        for (String xPath : displayedBindings) {
+            for (Object boundNode : new MCRBinding(xPath, root).getBoundNodes())
+                if (boundNode instanceof Attribute)
+                    ((Attribute) boundNode).detach();
+                else
+                    elementsToRemove.add((Element) boundNode);
+        }
+        for (Element elementToRemove : elementsToRemove)
+            elementToRemove.detach();
+    }
+
+    private void addNewBoundNode(List<Object> boundNodes) {
+        Element lastBoundElement = (Element) (boundNodes.get(boundNodes.size() - 1));
+        Element newElement = lastBoundElement.clone();
+        Element parent = lastBoundElement.getParentElement();
+        int indexInParent = parent.indexOf(lastBoundElement) + 1;
+        parent.addContent(indexInParent + 1, newElement);
+        boundNodes.add(newElement);
+        displayedBindings.add(MCRXPathBuilder.buildXPath(newElement));
+    }
+
+    private void setValue(Object node, String value) {
+        if (node instanceof Element)
+            ((Element) node).setText(value);
+        else if (node instanceof Attribute)
+            ((Attribute) node).setValue(value);
+
+        String xPath = MCRXPathBuilder.buildXPath(node);
+        displayedBindings.remove(xPath);
     }
 }

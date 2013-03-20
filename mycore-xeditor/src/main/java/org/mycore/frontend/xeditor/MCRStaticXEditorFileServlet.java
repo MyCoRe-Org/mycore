@@ -23,26 +23,32 @@
 
 package org.mycore.frontend.xeditor;
 
+import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
+import java.net.MalformedURLException;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.frontend.servlets.MCRServlet;
-import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.frontend.servlets.MCRStaticXMLFileServlet;
+import org.xml.sax.SAXException;
 
-public class MCRXEditorServlet extends MCRServlet {
+public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
 
-    protected final static Logger LOGGER = Logger.getLogger(MCRXEditorServlet.class);
+    protected final static Logger LOGGER = Logger.getLogger(MCRStaticXEditorFileServlet.class);
 
     @Override
-    public void doGetPost(MCRServletJob job) throws IOException, JDOMException, ParseException {
-        String xEditorSessionID = job.getRequest().getParameter("XEditorSessionID");
-        MCREditorSession session = MCREditorSessionStore.getFromSession(xEditorSessionID);
-        session.setSubmittedValues(job.getRequest().getParameterMap());
-        MCRContent editedContent = new MCRJDOMContent(session.getEditedXML());
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), editedContent);
+    protected MCRContent expandEditorElements(HttpServletRequest request, File file) throws IOException, JDOMException, SAXException,
+            MalformedURLException {
+        MCRContent content = super.expandEditorElements(request, file);
+        if (mayContainEditorForm(content)) {
+            Map<String, String[]> requestParameters = request.getParameterMap();
+            String xEditorSessionID = request.getParameter("XEditorSessionID");
+            content = MCRXEditorTransformation.transform(content, xEditorSessionID, requestParameters);
+        }
+        return content;
     }
 }
