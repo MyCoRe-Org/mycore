@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.xml.transform.TransformerException;
 
+import org.apache.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -42,6 +43,8 @@ import org.mycore.common.content.MCRSourceContent;
 import org.xml.sax.SAXException;
 
 public class MCREditorSession {
+
+    private final static Logger LOGGER = Logger.getLogger(MCREditorSession.class);
 
     private static AtomicInteger idGenerator = new AtomicInteger(0);
 
@@ -53,7 +56,7 @@ public class MCREditorSession {
 
     private Map<String, String[]> parameters;
 
-    private Set<String> displayedBindings = new HashSet<String>();
+    private Set<String> xPathsActuallyUsedInEditor = new HashSet<String>();
 
     public MCREditorSession(Map<String, String[]> parameters) {
         this.id = String.valueOf(idGenerator.incrementAndGet());
@@ -66,13 +69,17 @@ public class MCREditorSession {
 
     public void readSourceXML(String uri) throws JDOMException, IOException, SAXException, TransformerException {
         uri = replaceParameters(uri);
-        if ((!uri.contains("{")) && (editedXML == null))
+        if ((!uri.contains("{")) && (editedXML == null)) {
+            LOGGER.info(id + " reading edited XML from " + uri);
             setEditedXML(MCRSourceContent.getInstance(uri).asXML());
+        }
     }
 
     public void setRootElement(String rootElementName) throws JDOMException {
-        if (editedXML == null)
+        if (editedXML == null) {
+            LOGGER.info(id + " starting with empty edited XML of type <" + rootElementName + ">");
             setEditedXML(new Document(new Element(rootElementName)));
+        }
     }
 
     private void setEditedXML(Document xml) throws JDOMException {
@@ -84,7 +91,7 @@ public class MCREditorSession {
         return editedXML;
     }
 
-    private String replaceParameters(String uri) {
+    public String replaceParameters(String uri) {
         for (String name : parameters.keySet()) {
             String token = "{" + name + "}";
             String value = parameters.get(name)[0];
@@ -106,18 +113,23 @@ public class MCREditorSession {
     }
 
     public String getValue() {
-        rememberDisplayedValues();
+        rememberActuallyUsedNodes(currentBinding.getBoundNodes().toArray());
         return currentBinding.getValue();
     }
 
     public boolean hasValue(String value) {
-        rememberDisplayedValues();
+        rememberActuallyUsedNodes(currentBinding.getBoundNodes().toArray());
         return currentBinding.hasValue(value);
     }
 
-    private void rememberDisplayedValues() {
-        for (Object boundNode : currentBinding.getBoundNodes())
-            displayedBindings.add(MCRXPathBuilder.buildXPath(boundNode));
+    private void rememberActuallyUsedNodes(Object... nodes) {
+        for (Object node : nodes) {
+            String xPath = MCRXPathBuilder.buildXPath(node);
+            if (!xPathsActuallyUsedInEditor.contains(xPath)) {
+                LOGGER.debug(id + " uses " + xPath);
+                xPathsActuallyUsedInEditor.add(xPath);
+            }
+        }
     }
 
     public void setSubmittedValues(Map<String, String[]> submittedValues) throws JDOMException, ParseException {
@@ -147,7 +159,7 @@ public class MCREditorSession {
         MCRBinding root = new MCRBinding(editedXML);
         List<Element> elementsToRemove = new ArrayList<Element>();
 
-        for (String xPath : displayedBindings) {
+        for (String xPath : xPathsActuallyUsedInEditor) {
             for (Object boundNode : new MCRBinding(xPath, root).getBoundNodes())
                 if (boundNode instanceof Attribute)
                     ((Attribute) boundNode).detach();
@@ -165,7 +177,7 @@ public class MCREditorSession {
         int indexInParent = parent.indexOf(lastBoundElement) + 1;
         parent.addContent(indexInParent + 1, newElement);
         boundNodes.add(newElement);
-        displayedBindings.add(MCRXPathBuilder.buildXPath(newElement));
+        rememberActuallyUsedNodes(newElement);
     }
 
     private void setValue(Object node, String value) {
@@ -175,6 +187,6 @@ public class MCREditorSession {
             ((Attribute) node).setValue(value);
 
         String xPath = MCRXPathBuilder.buildXPath(node);
-        displayedBindings.remove(xPath);
+        xPathsActuallyUsedInEditor.remove(xPath);
     }
 }

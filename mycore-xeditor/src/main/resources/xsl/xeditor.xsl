@@ -29,7 +29,7 @@
 
   <!-- implements <xed:include uri="..." /> -->
   <xsl:template match="xed:include">
-    <xsl:apply-templates select="document(@uri)/*/*" />
+    <xsl:apply-templates select="document(session:replaceParameters($session,@uri))/*/*" />
   </xsl:template>
 
   <!-- implements <xed:bind xpath="..." /> -->
