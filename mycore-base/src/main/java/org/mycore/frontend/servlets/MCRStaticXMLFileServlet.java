@@ -1,6 +1,6 @@
 /*
- * 
- * $Revision$ $Date$
+ * $Revision$ 
+ * $Date$
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -103,7 +103,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
     }
 
     /** For defined document types like static webpages, replace editor elements with complete editor definition */
-    private MCRContent expandEditorElements(HttpServletRequest request, File file) throws IOException, JDOMException, SAXException,
+    protected MCRContent expandEditorElements(HttpServletRequest request, File file) throws IOException, JDOMException, SAXException,
             MalformedURLException {
         MCRContent content = new MCRFileContent(file);
         if (mayContainEditorForm(content)) {
@@ -114,7 +114,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
         return content;
     }
 
-    private boolean mayContainEditorForm(MCRContent content) throws IOException {
+    protected boolean mayContainEditorForm(MCRContent content) throws IOException {
         return docTypesIncludingEditors.contains(content.getDocType());
     }
 }
