@@ -5,7 +5,7 @@
 
 <servlet id="MCRXEditorServlet">
   <servlet-name>MCRXEditorServlet</servlet-name>
-  <servlet-class>org.mycore.frontend.servlets.MCRXEditorServlet</servlet-class>
+  <servlet-class>org.mycore.frontend.xeditor.MCRXEditorServlet</servlet-class>
 </servlet>
 
 <servlet-mapping>
