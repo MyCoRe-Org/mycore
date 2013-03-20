@@ -33,11 +33,11 @@ import org.mycore.common.xsl.MCRParameterCollector;
  * @author Thomas Scheffler (yagee)
  *
  */
-public abstract class MCRParameterizedTransformer extends MCRContentTransformer{
+public abstract class MCRParameterizedTransformer extends MCRContentTransformer {
     /** Transforms MCRContent. Subclasses implement different transformation methods */
     public abstract MCRContent transform(MCRContent source, MCRParameterCollector parameter) throws IOException;
 
-    public void transform(MCRContent source,OutputStream out, MCRParameterCollector parameter) throws IOException {
+    public void transform(MCRContent source, OutputStream out, MCRParameterCollector parameter) throws IOException {
         transform(source, parameter).sendTo(out);
     }
 }
