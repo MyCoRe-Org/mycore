@@ -79,12 +79,11 @@ public class MCRXEditorTransformer {
             LOGGER.info(editorSession.getID() + " reading edited XML from " + uri);
             Document xml = MCRSourceContent.getInstance(uri).asXML();
             editorSession.setEditedXML(xml);
-            currentBinding = new MCRBinding(xml);
         }
     }
 
     public void bind(String xPath, String name) throws JDOMException, ParseException {
-        currentBinding = new MCRBinding(xPath, name, currentBinding);
+        currentBinding = new MCRBinding(xPath, name, currentBinding != null ? currentBinding : new MCRBinding(editorSession.getEditedXML()));
     }
 
     public void unbind() {
