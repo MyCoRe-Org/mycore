@@ -111,7 +111,15 @@ public class MCRXEditorTransformer {
         }
     }
 
-    public String repeat(int minRepeats) throws JDOMException {
+    public String bindingName() {
+        return currentBinding.getName();
+    }
+
+    public String bindingXPath() {
+        return currentBinding.getRelativeXPath();
+    }
+
+    public String numRepeats(int minRepeats) throws JDOMException {
         int numBoundNodes = currentBinding.getBoundNodes().size();
         int numRepeats = Math.max(numBoundNodes, Math.max(minRepeats, 1));
         return StringUtils.repeat("a ", numRepeats);

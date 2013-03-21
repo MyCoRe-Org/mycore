@@ -130,20 +130,25 @@
   <!-- ========== <xed:repeat /> ========== -->
   
   <xsl:template match="xed:repeat">
-    <xsl:value-of select="transformer:bind($transformer,@xpath,@name)" />
-    <xsl:variable name="repeats" select="xalan:tokenize(transformer:repeat($transformer,@min))" />
-    <xsl:value-of select="transformer:unbind($transformer)" />
-    
-    <xsl:variable name="currentName" select="@name" />
-    <xsl:variable name="currentXPath" select="@xpath" />
-    <xsl:variable name="currentNodeSet" select="*" />
+    <xsl:variable name="currentName" select="transformer:bindingName($transformer)" />
+    <xsl:variable name="currentXPath" select="transformer:bindingXPath($transformer)" />
 
+    <!-- Number of repeats to make -->
+    <xsl:variable name="repeats" select="xalan:tokenize(transformer:numRepeats($transformer,@min))" />
+
+    <!-- Unbind current binding to bind each node separately -->
+    <xsl:value-of select="transformer:unbind($transformer)" />
+
+    <xsl:variable name="currentNodeSet" select="*" />
     <xsl:for-each select="$repeats">
       <xsl:variable name="xPath" select="concat($currentXPath,'[',position(),']')" />
-      <xsl:value-of select="transformer:bind($transformer,$xPath,$currentName)" />
+      <xsl:value-of select="transformer:bind($transformer,$xPath,'')" />
       <xsl:apply-templates select="$currentNodeSet" />
       <xsl:value-of select="transformer:unbind($transformer)" />
     </xsl:for-each>
+
+    <!-- Restore original binding -->
+    <xsl:value-of select="transformer:bind($transformer,$currentXPath,$currentName)" />
   </xsl:template>
   
 </xsl:stylesheet>
