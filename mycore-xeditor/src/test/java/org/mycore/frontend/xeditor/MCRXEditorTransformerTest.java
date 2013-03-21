@@ -76,4 +76,9 @@ public class MCRXEditorTransformerTest {
     public void testIncludes() throws IOException, URISyntaxException, TransformerException, JDOMException, SAXException {
         testTransformation("testIncludes-editor.xml", null, "testIncludes-transformed.xml", false);
     }
+
+    @Test
+    public void testRepeats() throws IOException, URISyntaxException, TransformerException, JDOMException, SAXException {
+        testTransformation("testRepeats-editor.xml", "testBasicInputComponents-source.xml", "testRepeats-transformed.xml", false);
+    }
 }

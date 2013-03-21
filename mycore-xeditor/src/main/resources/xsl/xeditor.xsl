@@ -80,7 +80,7 @@
 
   <xsl:template match="node()" mode="add-content" />
 
-  <!-- ========== input components ========== -->
+  <!-- ========== <input /> ========== -->
 
   <xsl:template
     match="input[contains('text,password,hidden,file,color,date,datetime,datetime-local,email,month,number,range,search,tel,time,url,week',@type)]"
@@ -127,4 +127,23 @@
     <xsl:value-of select="transformer:getValue($transformer)" />
   </xsl:template>
 
+  <!-- ========== <xed:repeat /> ========== -->
+  
+  <xsl:template match="xed:repeat">
+    <xsl:value-of select="transformer:bind($transformer,@xpath,@name)" />
+    <xsl:variable name="repeats" select="xalan:tokenize(transformer:repeat($transformer,@min))" />
+    <xsl:value-of select="transformer:unbind($transformer)" />
+    
+    <xsl:variable name="currentName" select="@name" />
+    <xsl:variable name="currentXPath" select="@xpath" />
+    <xsl:variable name="currentNodeSet" select="*" />
+
+    <xsl:for-each select="$repeats">
+      <xsl:variable name="xPath" select="concat($currentXPath,'[',position(),']')" />
+      <xsl:value-of select="transformer:bind($transformer,$xPath,$currentName)" />
+      <xsl:apply-templates select="$currentNodeSet" />
+      <xsl:value-of select="transformer:unbind($transformer)" />
+    </xsl:for-each>
+  </xsl:template>
+  
 </xsl:stylesheet>

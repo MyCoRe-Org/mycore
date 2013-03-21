@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
+import org.codehaus.plexus.util.StringUtils;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRContent;
@@ -108,6 +109,12 @@ public class MCRXEditorTransformer {
         for (Object node : currentBinding.getBoundNodes()) {
             editorSession.markAsTransformedToInputField(node);
         }
+    }
+
+    public String repeat(int minRepeats) throws JDOMException {
+        int numBoundNodes = currentBinding.getBoundNodes().size();
+        int numRepeats = Math.max(numBoundNodes, Math.max(minRepeats, 1));
+        return StringUtils.repeat("a ", numRepeats);
     }
 
     public String replaceParameters(String uri) {

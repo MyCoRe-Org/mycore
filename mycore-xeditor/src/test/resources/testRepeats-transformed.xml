@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<div>
+  <form action="/servlets/XEditor">
+    <input value="1" name="XEditorSessionID" type="hidden" />
+    <div>
+      <input name="/document/service" value="oai" type="text" />
+    </div>
+    <div>
+      <input name="/document/service[2]" value="urn" type="text" />
+    </div>
+    <div>
+      <input name="/document/name" value="" type="text" />
+    </div>
+    <div>
+      <input name="/document/name[2]" value="" type="text" />
+    </div>
+    <div>
+      <input name="/document/name[3]" value="" type="text" />
+    </div>
+  </form>
+</div>
