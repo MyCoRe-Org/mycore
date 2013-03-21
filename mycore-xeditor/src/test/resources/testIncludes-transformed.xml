@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<div>
+  <span id="a">
+    <a />
+  </span>
+  <form action="/servlets/XEditor">
+    <input value="1" name="XEditorSessionID" type="hidden" />
+    <i1>
+      <a />
+    </i1>
+    <i2>
+      <span id="b">
+        <b />
+      </span>
+    </i2>
+    <i3>
+      <b />
+    </i3>
+  </form>
+</div>

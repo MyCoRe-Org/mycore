@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<included xmlns:xed="http://www.mycore.de/xeditor">
+  <span id="b">
+    <b />
+    <xed:include ref="a" />
+  </span>
+</included>

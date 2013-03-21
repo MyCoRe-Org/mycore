@@ -2,7 +2,7 @@
 
 <html>
   <body>
-    <form xmlns:xed="http://www.mycore.de/xeditor" action="/servlets/XEditor">
+    <form action="/servlets/XEditor">
       <input value="1" name="XEditorSessionID" type="hidden" />
       <input name="/document/title" value="Der neue XEditor - Utopie oder Wahnsinn?" type="text" />
       <input name="/document/author/firstName" value="Frank" type="text" id="firstName" />
