@@ -24,7 +24,7 @@
       <xsl:attribute name="action">
         <xsl:value-of select="concat($ServletsBaseURL,'XEditor')" />
       </xsl:attribute>
-      <input type="hidden" name="XEditorSessionID" value="{transformer:getEditorSessionID($transformer)}" />
+      <input type="hidden" name="_xed_session" value="{transformer:getEditorSessionID($transformer)}" />
       <xsl:apply-templates select="node()" mode="xeditor" />
     </form>
   </xsl:template>
@@ -69,6 +69,8 @@
     <xsl:value-of select="transformer:unbind($transformer)" />
   </xsl:template>
 
+  <xsl:template match="@xed:*|xed:*" mode="xeditor" />
+
   <xsl:template match="@*" mode="xeditor">
     <xsl:copy />
   </xsl:template>
@@ -86,6 +88,13 @@
   <xsl:template match="node()" mode="add-content" />
 
   <!-- ========== <input /> ========== -->
+
+  <xsl:template match="input[contains('submit image',@type)]" mode="add-attributes">
+    <xsl:attribute name="name">
+      <xsl:text>_xed_submit_</xsl:text>
+      <xsl:value-of select="@xed:target" />
+    </xsl:attribute>
+  </xsl:template>
 
   <xsl:template
     match="input[contains('text,password,hidden,file,color,date,datetime,datetime-local,email,month,number,range,search,tel,time,url,week',@type)]"

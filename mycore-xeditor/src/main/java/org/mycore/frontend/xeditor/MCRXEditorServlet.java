@@ -23,16 +23,17 @@
 
 package org.mycore.frontend.xeditor;
 
-import java.io.IOException;
 import java.text.ParseException;
+import java.util.Enumeration;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
-import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.frontend.xeditor.target.MCRDebugTarget;
+import org.mycore.frontend.xeditor.target.MCREditorTarget;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -41,11 +42,17 @@ public class MCRXEditorServlet extends MCRServlet {
 
     protected final static Logger LOGGER = Logger.getLogger(MCRXEditorServlet.class);
 
+    public final static String XEDITOR_SESSION_PARAM = "_xed_session";
+    
     @Override
-    public void doGetPost(MCRServletJob job) throws IOException, JDOMException, ParseException {
-        String xEditorSessionID = job.getRequest().getParameter("XEditorSessionID");
+    public void doGetPost(MCRServletJob job) throws Exception {
+        String xEditorSessionID = job.getRequest().getParameter(XEDITOR_SESSION_PARAM);
         MCREditorSession session = MCREditorSessionStoreFactory.getSessionStore().getSession(xEditorSessionID);
+        setSubmittedValues(job, session);
+        sendToTarget(job, session);
+    }
 
+    private void setSubmittedValues(MCRServletJob job, MCREditorSession session) throws JDOMException, ParseException {
         for (String xPath : (Set<String>) (job.getRequest().getParameterMap().keySet())) {
             if (xPath.startsWith("/")) {
                 String[] values = job.getRequest().getParameterValues(xPath);
@@ -53,8 +60,27 @@ public class MCRXEditorServlet extends MCRServlet {
             }
         }
         session.removeDeletedNodes();
+    }
 
-        MCRContent editedXML = new MCRJDOMContent(session.getEditedXML());
-        getLayoutService().doLayout(job.getRequest(), job.getResponse(), editedXML);
+    private final static String TARGET_PATTERN = "_xed_submit_";
+
+    private void sendToTarget(MCRServletJob job, MCREditorSession session) throws Exception {
+        for (Enumeration<String> parameters = job.getRequest().getParameterNames(); parameters.hasMoreElements();) {
+            String name = parameters.nextElement();
+            if (name.startsWith(TARGET_PATTERN)) {
+                String targetID = name.split("_")[2].toUpperCase();
+                String parameter = name.substring(TARGET_PATTERN.length() + targetID.length() + 1);
+                LOGGER.info("sending submission to target " + targetID + " " + parameter);
+                getTarget(targetID).handleSubmission(getServletContext(), job, session, parameter);
+                return;
+            }
+        }
+        LOGGER.error("No target ID found in submitted request parameters, " + TARGET_PATTERN + "ID missing");
+        new MCRDebugTarget().handleSubmission(getServletContext(), job, session, null);
+    }
+
+    private MCREditorTarget getTarget(String targetID) {
+        String property = "MCR.XEditor.Target." + targetID + ".Class";
+        return (MCREditorTarget) (MCRConfiguration.instance().getInstanceOf(property));
     }
 }

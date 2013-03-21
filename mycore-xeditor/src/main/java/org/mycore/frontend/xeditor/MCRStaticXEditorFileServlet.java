@@ -48,7 +48,7 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
             MalformedURLException {
         MCRContent content = super.expandEditorElements(request, file);
         if (mayContainEditorForm(content)) {
-            String editorSessionID = request.getParameter("XEditorSessionID");
+            String editorSessionID = request.getParameter(MCRXEditorServlet.XEDITOR_SESSION_PARAM);
             MCREditorSession editorSession;
             if (editorSessionID != null)
                 editorSession = MCREditorSessionStoreFactory.getSessionStore().getSession(editorSessionID);
