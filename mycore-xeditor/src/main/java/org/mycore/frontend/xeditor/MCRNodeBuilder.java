@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.jdom2.Parent;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.frontend.xeditor.MCRXPathParser.MCRLocationStep;
 import org.mycore.frontend.xeditor.MCRXPathParser.MCRXPath;
@@ -41,12 +42,12 @@ public class MCRNodeBuilder {
 
     private final static Logger LOGGER = Logger.getLogger(MCRNodeBuilder.class);
 
-    public static Object build(String xPath, String value, Element parent) throws ParseException, JDOMException {
+    public static Object build(String xPath, String value, Parent parent) throws ParseException, JDOMException {
         MCRXPath path = MCRXPathParser.parse(xPath);
         return build(path, value, parent);
     }
 
-    public static Object build(MCRXPath xPath, String value, Element parent) throws ParseException, JDOMException {
+    public static Object build(MCRXPath xPath, String value, Parent parent) throws ParseException, JDOMException {
         LOGGER.debug("build xPath " + xPath + " relative to " + MCRXPathBuilder.buildXPath(parent));
 
         List<MCRLocationStep> steps = xPath.getLocationSteps();
@@ -93,7 +94,7 @@ public class MCRNodeBuilder {
         currentStep.getPredicates().add(nxp);
     }
 
-    private static Object build(List<MCRLocationStep> locationSteps, String value, Element parent) throws ParseException, JDOMException {
+    private static Object build(List<MCRLocationStep> locationSteps, String value, Parent parent) throws ParseException, JDOMException {
         Object node = null;
         for (MCRLocationStep step : locationSteps) {
             if (!canBeBuilt(step)) {
@@ -119,7 +120,7 @@ public class MCRNodeBuilder {
         return true;
     }
 
-    private static Object build(MCRLocationStep locationStep, String value, Element parent) throws ParseException, JDOMException {
+    private static Object build(MCRLocationStep locationStep, String value, Parent parent) throws ParseException, JDOMException {
         LOGGER.debug("build location step " + locationStep + " relative to " + MCRXPathBuilder.buildXPath(parent));
 
         String name = locationStep.getName();
@@ -127,7 +128,7 @@ public class MCRNodeBuilder {
             value = locationStep.getValue();
 
         if (name.startsWith("@")) {
-            return buildAttribute(name.substring(1), value, parent);
+            return buildAttribute(name.substring(1), value, (Element)parent);
         } else {
             Element element = buildElement(name, value, parent);
             for (MCRXPath predicate : locationStep.getPredicates())
@@ -145,7 +146,7 @@ public class MCRNodeBuilder {
         return attribute;
     }
 
-    private static Element buildElement(String name, String value, Element parent) {
+    private static Element buildElement(String name, String value, Parent parent) {
         Element element = new Element(name);
         if ((value != null) && (!value.isEmpty()))
             element.setText(value);

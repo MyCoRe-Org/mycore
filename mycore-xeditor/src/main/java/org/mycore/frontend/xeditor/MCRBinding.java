@@ -34,6 +34,7 @@ import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.jdom2.Parent;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
@@ -80,7 +81,7 @@ public class MCRBinding {
         LOGGER.debug("Bind to " + xPathExpression + " selected " + boundNodes.size() + " node(s)");
 
         if (boundNodes.isEmpty()) {
-            Object built = MCRNodeBuilder.build(xPathExpression, null, (Element) (parent.getBoundNode()));
+            Object built = MCRNodeBuilder.build(xPathExpression, null, (Parent)(parent.getBoundNode()));
             LOGGER.debug("Bind to " + xPathExpression + " generated node " + MCRXPathBuilder.buildXPath(built));
             boundNodes.add(built);
         }
