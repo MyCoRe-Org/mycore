@@ -203,7 +203,7 @@
       <text i18n="component.user2.admin.password" />
     </cell>
     <cell row="3" col="2" colspan="2" anchor="WEST" var="password">
-      <password id="password1" width="10">
+      <password id="password1" width="10" class="input-medium">
         <condition id="cond.password1.syntax" maxLength="16" regexp="[\S]*">
           <label xml:lang="de">Bitte maximal 16 Zeichen, keine Leerzeichen eingeben!</label>
           <label xml:lang="en">Please, enter maximum 16 characters, no blanks!</label>
@@ -214,7 +214,7 @@
       <text i18n="component.user2.admin.password" />
     </cell>
     <cell row="4" col="2" colspan="2" anchor="WEST" var="password2">
-      <password id="password2" width="10">
+      <password id="password2" width="10" class="input-medium">
         <condition id="cond.password2.syntax" maxLength="16" regexp="[\S]*">
           <label xml:lang="de">Bitte maximal 16 Zeichen, keine Leerzeichen eingeben!</label>
           <label xml:lang="en">Please, enter maximum 16 characters, no blanks!</label>
