@@ -45,7 +45,6 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.xml.sax.SAXException;
@@ -91,11 +90,14 @@ public class MCRXEditorTransformer {
 
     public void readSourceXML(String uri) throws JDOMException, IOException, SAXException, TransformerException {
         uri = replaceParameters(uri);
-        if ((!uri.contains("{")) && (editorSession.getEditedXML() == null)) {
-            LOGGER.info(editorSession.getID() + " reading edited XML from " + uri);
-            Document xml = MCRSourceContent.getInstance(uri).asXML();
-            editorSession.setEditedXML(xml);
-        }
+        if (!uri.contains("{"))
+            editorSession.setEditedXML(uri);
+    }
+
+    public void setCancelURL(String url) throws JDOMException, IOException, SAXException, TransformerException {
+        url = replaceParameters(url);
+        if (!url.contains("{"))
+            editorSession.setCancelURL(url);
     }
 
     public void bind(String xPath, String name) throws JDOMException, ParseException {

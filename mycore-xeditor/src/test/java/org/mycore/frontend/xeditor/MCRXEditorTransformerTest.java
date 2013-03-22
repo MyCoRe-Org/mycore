@@ -33,7 +33,6 @@ import org.jdom2.JDOMException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;

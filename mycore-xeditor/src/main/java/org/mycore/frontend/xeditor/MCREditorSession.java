@@ -23,15 +23,20 @@
 
 package org.mycore.frontend.xeditor;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.transform.TransformerException;
+
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.mycore.common.content.MCRSourceContent;
+import org.xml.sax.SAXException;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -46,6 +51,8 @@ public class MCREditorSession {
 
     private Set<String> xPathsOfDisplayedFields = new HashSet<String>();
 
+    private String cancelURL;
+
     public void setID(String id) {
         this.id = id;
     }
@@ -55,11 +62,30 @@ public class MCREditorSession {
     }
 
     public void setEditedXML(Document xml) throws JDOMException {
-        editedXML = xml;
+        if (editedXML == null)
+            editedXML = xml;
+    }
+
+    public void setEditedXML(String uri) throws JDOMException, IOException, SAXException, TransformerException {
+        if (editedXML == null) {
+            LOGGER.info(id + " reading edited XML from " + uri);
+            editedXML = MCRSourceContent.getInstance(uri).asXML();
+        }
     }
 
     public Document getEditedXML() {
         return editedXML;
+    }
+
+    public String getCancelURL() {
+        return cancelURL;
+    }
+
+    public void setCancelURL(String cancelURL) {
+        if (cancelURL == null) {
+            LOGGER.debug(id + " set cancel URL to " + cancelURL);
+            this.cancelURL = cancelURL;
+        }
     }
 
     public void markAsTransformedToInputField(Object node) {
@@ -74,7 +100,7 @@ public class MCREditorSession {
         xPathsOfDisplayedFields.remove(xPath);
     }
 
-    public void setSubmittedValues(String xPath, String[] values ) throws JDOMException, ParseException {
+    public void setSubmittedValues(String xPath, String[] values) throws JDOMException, ParseException {
         MCRBinding rootBinding = new MCRBinding(editedXML);
         MCRBinding binding = new MCRBinding(xPath, rootBinding);
         List<Object> boundNodes = binding.getBoundNodes();
@@ -91,7 +117,7 @@ public class MCREditorSession {
             }
         }
     }
-    
+
     public void removeDeletedNodes() throws JDOMException, ParseException {
         MCRBinding root = new MCRBinding(editedXML);
         for (String xPath : xPathsOfDisplayedFields)

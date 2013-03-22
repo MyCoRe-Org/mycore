@@ -31,8 +31,14 @@
 
   <!-- ========== <xed:source /> ========== -->
 
-  <xsl:template match="xed:source[@uri]" mode="xeditor">
+  <xsl:template match="xed:source" mode="xeditor">
     <xsl:value-of select="transformer:readSourceXML($transformer,@uri)" />
+  </xsl:template>
+
+  <!-- ========== <xed:cancel /> ========== -->
+
+  <xsl:template match="xed:cancel" mode="xeditor">
+    <xsl:value-of select="transformer:setCancelURL($transformer,@url)" />
   </xsl:template>
 
   <!-- ========== <xed:include /> ========== -->
