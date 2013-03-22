@@ -33,6 +33,7 @@ import javax.xml.transform.TransformerException;
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.jdom2.Document;
+import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;
@@ -83,7 +84,15 @@ public class MCRXEditorTransformer {
     }
 
     public void bind(String xPath, String name) throws JDOMException, ParseException {
-        currentBinding = new MCRBinding(xPath, name, currentBinding != null ? currentBinding : new MCRBinding(editorSession.getEditedXML()));
+        if (editorSession.getEditedXML() == null) {
+            String rPath = xPath.startsWith("/") ? xPath.substring(1) : xPath; 
+            String root = MCRXPathParser.parse(rPath).getLocationSteps().get(0).getName();
+            editorSession.setEditedXML(new Document(new Element(root)));
+        }
+        if (currentBinding == null) {
+            currentBinding = new MCRBinding(editorSession.getEditedXML());
+        }
+        currentBinding = new MCRBinding(xPath, name, currentBinding);
     }
 
     public void unbind() {

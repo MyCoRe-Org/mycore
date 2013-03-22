@@ -35,10 +35,6 @@
     <xsl:value-of select="transformer:readSourceXML($transformer,@uri)" />
   </xsl:template>
 
-  <xsl:template match="xed:source[@root]" mode="xeditor">
-    <xsl:value-of select="transformer:readSourceXML($transformer,concat('buildxml:_rootName_=',@root))" />
-  </xsl:template>
-
   <!-- ========== <xed:include /> ========== -->
 
   <xsl:template match="xed:include[@uri and @ref]" mode="xeditor">
