@@ -3,6 +3,7 @@ package org.mycore.solr.index.cs;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
@@ -28,12 +29,19 @@ public class MCRXMLSolrIndexer implements Runnable {
     }
 
     private ContentStreamBase stream;
+    
+    private SolrServer solrServer;
 
     /**
      * @param stream
      */
     public MCRXMLSolrIndexer(ContentStreamBase stream) {
+        this(stream, MCRSolrServerFactory.getConcurrentSolrServer());
+    }
+
+    public MCRXMLSolrIndexer(ContentStreamBase stream, SolrServer solrServer) {
         this.stream = stream;
+        this.solrServer = solrServer;
     }
 
     /* (non-Javadoc)
@@ -62,7 +70,12 @@ public class MCRXMLSolrIndexer implements Runnable {
         ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest(UPDATE_PATH);
         updateRequest.addContentStream(stream);
         updateRequest.setParam("tr", TRANSFORM);
-        MCRSolrServerFactory.getConcurrentSolrServer().request(updateRequest);
+        getSolrServer().request(updateRequest);
         LOGGER.trace("Indexing data of\"" + stream.getName() + "\" (" + (System.currentTimeMillis() - tStart) + "ms)");
     }
+
+    public SolrServer getSolrServer() {
+        return this.solrServer;
+    }
+
 }

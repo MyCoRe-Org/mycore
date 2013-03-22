@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import org.apache.solr.client.solrj.SolrServer;
 import org.jdom2.Document;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
@@ -18,16 +19,21 @@ import org.mycore.datamodel.metadata.MCRBase;
 public class MCRBaseContentStream extends MCRAbstractSolrContentStream<MCRContent> {
 
     /***/
-    protected MCRBaseContentStream() {
+    protected MCRBaseContentStream(String id, MCRContent content) {
         super();
+        init(id, content);
     }
 
     /**
      * @param objectOrDerivate
      * @param content
      */
-    public MCRBaseContentStream(String id, MCRContent content) {
-        this();
+    public MCRBaseContentStream(SolrServer solrServer, String id, MCRContent content) {
+        super(solrServer);
+        init(id, content);
+    }
+
+    protected void init(String id, MCRContent content) {
         this.name = id;
         this.sourceInfo = content.getSystemId();
         this.contentType = getTransformer().getMimeType();

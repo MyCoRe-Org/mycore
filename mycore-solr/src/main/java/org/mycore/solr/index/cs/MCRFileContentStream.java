@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
 
+import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.mycore.common.MCRConfiguration;
@@ -28,13 +29,26 @@ public class MCRFileContentStream extends MCRAbstractSolrContentStream<MCRFile> 
      * @param file
      * @throws IOException
      */
-
     public MCRFileContentStream(MCRFile file) throws IOException {
         super();
-        name = file.getAbsolutePath();
-        sourceInfo = file.getClass().getSimpleName();
-        contentType = file.getContentType().getLabel();
-        source = file;
+        init(file);
+    }
+
+    /**
+     * @param solrServer
+     * @param file
+     * @throws IOException
+     */
+    public MCRFileContentStream(SolrServer solrServer, MCRFile file) throws IOException {
+        super(solrServer);
+        init(file);
+    }
+
+    protected void init(MCRFile file) {
+        this.name = file.getAbsolutePath();
+        this.sourceInfo = file.getClass().getSimpleName();
+        this.contentType = file.getContentType().getLabel();
+        this.source = file;
     }
 
     @Override
@@ -100,8 +114,9 @@ public class MCRFileContentStream extends MCRAbstractSolrContentStream<MCRFile> 
                 + ") to solr server.");
         long t = System.currentTimeMillis();
         /* actually send the request */
-        MCRSolrServerFactory.getSolrServer().request(updateRequest);
+        getSolrServer().request(updateRequest);
         LOGGER.trace("Solr: sending binary data \"" + file.getAbsolutePath() + " (" + solrID + ")\"" + " done in "
                 + (System.currentTimeMillis() - t) + "ms");
     }
+
 }

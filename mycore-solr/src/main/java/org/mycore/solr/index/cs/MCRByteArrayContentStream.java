@@ -3,6 +3,8 @@ package org.mycore.solr.index.cs;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
+import org.apache.solr.client.solrj.SolrServer;
+
 public class MCRByteArrayContentStream extends MCRAbstractSolrContentStream<byte[]> {
 
     /**
@@ -11,8 +13,8 @@ public class MCRByteArrayContentStream extends MCRAbstractSolrContentStream<byte
      * @param sourceInfo
      * @throws IOException
      */
-    public MCRByteArrayContentStream(byte[] xmlAsByteArr, String name) throws IOException {
-        super();
+    public MCRByteArrayContentStream(SolrServer solrServer, byte[] xmlAsByteArr, String name) throws IOException {
+        super(solrServer);
         this.name = name;
         this.sourceInfo = xmlAsByteArr.getClass().getName();
         contentType = "text/xml";

@@ -7,11 +7,10 @@ import java.io.Reader;
 import java.text.SimpleDateFormat;
 
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.common.util.ContentStream;
 import org.apache.solr.common.util.ContentStreamBase;
-import org.hibernate.Session;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.solr.MCRSolrServerFactory;
 
@@ -22,7 +21,7 @@ import org.mycore.solr.MCRSolrServerFactory;
  * 
  * @author shermann
  * */
-abstract public class MCRAbstractSolrContentStream<T> extends ContentStreamBase implements Runnable {
+abstract public class MCRAbstractSolrContentStream<T> extends ContentStreamBase {
 
     private static final String UPDATE_PATH = MCRConfiguration.instance().getString("MCR.Module-solr.UpdatePath", "/update");
 
@@ -31,6 +30,8 @@ abstract public class MCRAbstractSolrContentStream<T> extends ContentStreamBase 
     final static Logger LOGGER = Logger.getLogger(MCRAbstractSolrContentStream.class);
 
     static String STYLESHEET = MCRConfiguration.instance().getString("MCR.Module-solr.transform", "object2fields.xsl");
+
+    protected SolrServer solrServer;
 
     protected InputStream inputStream;
 
@@ -41,10 +42,15 @@ abstract public class MCRAbstractSolrContentStream<T> extends ContentStreamBase 
     protected T source;
 
     protected MCRAbstractSolrContentStream() {
+        this(MCRSolrServerFactory.getSolrServer());
+    }
+
+    protected MCRAbstractSolrContentStream(SolrServer solrServer) {
         super();
-        inputStream = null;
-        streamReader = null;
-        setup = false;
+        this.solrServer = solrServer;
+        this.inputStream = null;
+        this.streamReader = null;
+        this.setup = false;
     }
 
     /**
@@ -105,27 +111,15 @@ abstract public class MCRAbstractSolrContentStream<T> extends ContentStreamBase 
             ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest(UPDATE_PATH);
             updateRequest.addContentStream(this);
             updateRequest.setParam("tr", STYLESHEET);
-            MCRSolrServerFactory.getSolrServer().request(updateRequest);
+            getSolrServer().request(updateRequest);
             LOGGER.trace("Solr: indexing data of\"" + getName() + "\" (" + (System.currentTimeMillis() - tStart) + "ms)");
         } catch (Exception ex) {
             LOGGER.error("Error sending content to solr through content stream " + this, ex);
         }
     }
 
-    /**
-     * Invoke this method if you want to index the object asynchronous.
-     * */
-    @Override
-    public void run() {
-        Session session = null;
-        try {
-            session = MCRHIBConnection.instance().getSession();
-            session.beginTransaction();
-            index();
-        } catch (Exception ex) {
-            LOGGER.error("Error executing index task for object " + getSourceInfo(), ex);
-        } finally {
-            session.close();
-        }
+    public SolrServer getSolrServer() {
+        return solrServer;
     }
+
 }

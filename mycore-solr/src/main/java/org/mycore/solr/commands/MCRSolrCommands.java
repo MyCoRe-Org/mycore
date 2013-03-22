@@ -6,6 +6,8 @@ package org.mycore.solr.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.mycore.common.MCRObjectUtils;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -13,6 +15,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.frontend.cli.MCRObjectCommands;
+import org.mycore.solr.MCRSolrServerFactory;
 import org.mycore.solr.index.cs.MCRSolrIndexer;
 
 /**
@@ -66,6 +69,13 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         com = new MCRCommand("delete from solr index by id {0}", "org.mycore.solr.index.cs.MCRSolrIndexer.deleteByIdFromSolr String",
                 "Deletes an document from the index by id");
         addCommand(com);
+
+        com = new MCRCommand("create solr metadata and content index at {0}",
+                "org.mycore.solr.commands.MCRSolrCommands.createIndex String", "create solr's metadata and content index on specific solr server");
+        addCommand(com);
+
+        com = new MCRCommand("set solr server {0}", "org.mycore.solr.MCRSolrServerFactory.setSolrServer String", "Sets the solr new server");
+        addCommand(com);
     }
 
     public static void rebuildMetadataIndexForSelected() {
@@ -77,10 +87,18 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(id));
         List<MCRObject> objectList = MCRObjectUtils.getDescendantsAndSelf(mcrObject);
         List<String> idList = new ArrayList<>();
-        for(MCRObject obj : objectList) {
+        for (MCRObject obj : objectList) {
             idList.add(obj.getId().toString());
         }
         MCRSolrIndexer.rebuildMetadataIndex(idList);
+    }
+
+    public static void createIndex(String url) throws Exception {
+        ConcurrentUpdateSolrServer cuss = MCRSolrServerFactory.createConcurrentUpdateSolrServer(url);
+        HttpSolrServer hss = MCRSolrServerFactory.createSolrServer(url);
+        MCRSolrIndexer.rebuildMetadataIndex(cuss);
+        MCRSolrIndexer.rebuildContentIndex(hss);
+        hss.optimize();
     }
 
 }
