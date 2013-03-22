@@ -31,10 +31,16 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.xalan.extensions.ExpressionContext;
+import org.apache.xpath.NodeSet;
+import org.apache.xpath.objects.XNodeSet;
+import org.apache.xpath.objects.XNodeSetForDOM;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -46,6 +52,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -140,10 +147,19 @@ public class MCRXEditorTransformer {
         return currentBinding.getRelativeXPath();
     }
 
-    public String numRepeats(int minRepeats) throws JDOMException {
+    public XNodeSet numRepeats(ExpressionContext context, int minRepeats) throws JDOMException, ParserConfigurationException,
+            TransformerException {
+        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        org.w3c.dom.Document doc = builder.newDocument();
+        NodeSet ns = new NodeSet();
+
         int numBoundNodes = currentBinding.getBoundNodes().size();
         int numRepeats = Math.max(numBoundNodes, Math.max(minRepeats, 1));
-        return StringUtils.repeat("a ", numRepeats);
+
+        for (int i = 0; i < numRepeats; i++)
+            ns.addNode(doc.createElement("a"));
+
+        return new XNodeSetForDOM((NodeList) ns, context.getXPathContext());
     }
 
     private final static Pattern PATTERN_URI = Pattern.compile("\\{\\{\\$(.+)\\}\\}");
@@ -185,5 +201,23 @@ public class MCRXEditorTransformer {
             LOGGER.debug(ex);
             return "";
         }
+    }
+
+    public XNodeSet getRequestParameters(ExpressionContext context) throws ParserConfigurationException, TransformerException {
+        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        org.w3c.dom.Document doc = builder.newDocument();
+        NodeSet ns = new NodeSet();
+        Map<String, String[]> parameters = editorSession.getRequestParameters();
+        for (String name : parameters.keySet()) {
+            for (String value : parameters.get(name)) {
+                if ((value != null) && !value.isEmpty()) {
+                    org.w3c.dom.Element element = doc.createElement("param");
+                    element.setAttribute("name", name);
+                    element.setTextContent(value);
+                    ns.addNode(element);
+                }
+            }
+        }
+        return new XNodeSetForDOM((NodeList) ns, context.getXPathContext());
     }
 }

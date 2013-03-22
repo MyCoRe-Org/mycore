@@ -25,6 +25,9 @@
         <xsl:value-of select="concat($ServletsBaseURL,'XEditor')" />
       </xsl:attribute>
       <input type="hidden" name="_xed_session" value="{transformer:getEditorSessionID($transformer)}" />
+      <xsl:for-each select="transformer:getRequestParameters($transformer)">
+        <input type="hidden" name="{@name}" value="{text()}" />
+      </xsl:for-each>
       <xsl:apply-templates select="node()" mode="xeditor" />
     </form>
   </xsl:template>
@@ -158,7 +161,7 @@
     <xsl:variable name="currentXPath" select="transformer:bindingXPath($transformer)" />
 
     <!-- Number of repeats to make -->
-    <xsl:variable name="repeats" select="xalan:tokenize(transformer:numRepeats($transformer,@min))" />
+    <xsl:variable name="repeats" select="transformer:numRepeats($transformer,@min)" />
 
     <!-- Unbind current binding to bind each node separately -->
     <xsl:value-of select="transformer:unbind($transformer)" />
