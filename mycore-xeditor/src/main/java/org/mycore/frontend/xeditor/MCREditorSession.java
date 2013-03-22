@@ -25,7 +25,6 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -38,8 +37,6 @@ import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.jdom2.Namespace;
-import org.mycore.common.MCRConstants;
 import org.mycore.common.content.MCRSourceContent;
 import org.xml.sax.SAXException;
 
@@ -56,15 +53,12 @@ public class MCREditorSession {
 
     private Document editedXML;
 
-    private List<Namespace> namespaces = new ArrayList<Namespace>();
-
     private Set<String> xPathsOfDisplayedFields = new HashSet<String>();
 
     private String cancelURL;
 
     public MCREditorSession(Map<String, String[]> requestParameters) {
         this.requestParameters = requestParameters;
-        this.namespaces.addAll(MCRConstants.getStandardNamespaces());
     }
 
     public MCREditorSession() {
@@ -93,10 +87,6 @@ public class MCREditorSession {
 
     public Document getEditedXML() {
         return editedXML;
-    }
-
-    public List<Namespace> getNamespaces() {
-        return namespaces;
     }
 
     public Map<String, String[]> getRequestParameters() {

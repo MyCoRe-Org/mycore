@@ -25,6 +25,7 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -41,6 +42,7 @@ import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
@@ -59,9 +61,12 @@ public class MCRXEditorTransformer {
 
     private MCRBinding currentBinding;
 
+    private List<Namespace> namespaces = new ArrayList<Namespace>();
+
     public MCRXEditorTransformer(MCREditorSession editorSession, MCRParameterCollector transformationParameters) {
         this.editorSession = editorSession;
         this.transformationParameters = transformationParameters;
+        this.namespaces.addAll(MCRConstants.getStandardNamespaces());
     }
 
     public MCRContent transform(MCRContent editorSource) throws IOException {
@@ -173,7 +178,6 @@ public class MCRXEditorTransformer {
             Map<String, Object> xPathVariables = currentBinding.buildXPathVariables();
             xPathVariables.putAll(transformationParameters.getParameterMap());
             XPathFactory factory = XPathFactory.instance();
-            List<Namespace> namespaces = editorSession.getNamespaces();
             XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), xPathVariables, namespaces);
             return xPath.evaluateFirst(currentBinding.getBoundNodes()).toString();
         } catch (Exception ex) {
