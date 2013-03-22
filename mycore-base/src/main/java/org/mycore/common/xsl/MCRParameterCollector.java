@@ -141,7 +141,7 @@ public class MCRParameterCollector {
     /**
      * Sets the parameter with the given name
      */
-    public void setParameter(String name, String value) {
+    public void setParameter(String name, Object value) {
         parameters.put(name, value);
     }
 
