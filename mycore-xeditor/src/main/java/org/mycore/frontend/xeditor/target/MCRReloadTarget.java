@@ -30,7 +30,7 @@ import javax.servlet.ServletException;
 
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
-import org.mycore.frontend.xeditor.MCRXEditorServlet;
+import org.mycore.frontend.xeditor.MCREditorSessionStore;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -43,7 +43,7 @@ public class MCRReloadTarget implements MCREditorTarget {
         String url = job.getRequest().getHeader("referer");
         if (url.contains("?"))
             url = url.substring(url.indexOf("?"));
-        url += "?" + MCRXEditorServlet.XEDITOR_SESSION_PARAM + "=" + session.getID();
+        url += "?" + MCREditorSessionStore.XEDITOR_SESSION_PARAM + "=" + session.getID();
         job.getResponse().sendRedirect(url);
     }
 }

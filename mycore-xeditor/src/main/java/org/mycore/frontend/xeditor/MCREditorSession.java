@@ -25,6 +25,7 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,7 +36,10 @@ import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.jdom2.Namespace;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.content.MCRSourceContent;
+import org.mycore.common.xsl.MCRParameterCollector;
 import org.xml.sax.SAXException;
 
 /**
@@ -47,11 +51,20 @@ public class MCREditorSession {
 
     private String id;
 
+    private MCRParameterCollector parameters;
+
     private Document editedXML;
+
+    private List<Namespace> namespaces = new ArrayList<Namespace>();
 
     private Set<String> xPathsOfDisplayedFields = new HashSet<String>();
 
     private String cancelURL;
+
+    public MCREditorSession(MCRParameterCollector parameters) {
+        this.parameters = parameters;
+        this.namespaces.addAll(MCRConstants.getStandardNamespaces());
+    }
 
     public void setID(String id) {
         this.id = id;
@@ -77,6 +90,14 @@ public class MCREditorSession {
         return editedXML;
     }
 
+    public List<Namespace> getNamespaces() {
+        return namespaces;
+    }
+
+    public MCRParameterCollector getParameters() {
+        return parameters;
+    }
+
     public String getCancelURL() {
         return cancelURL;
     }
@@ -94,7 +115,7 @@ public class MCREditorSession {
         xPathsOfDisplayedFields.add(xPath);
     }
 
-    public void markAsResubmittedFromInputField(Object node) {
+    private void markAsResubmittedFromInputField(Object node) {
         String xPath = MCRXPathBuilder.buildXPath(node);
         LOGGER.debug(id + " set value of " + xPath);
         xPathsOfDisplayedFields.remove(xPath);

@@ -25,8 +25,6 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -43,7 +41,6 @@ import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-import org.mycore.common.MCRConstants;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
@@ -56,26 +53,18 @@ public class MCRXEditorTransformer {
 
     private final static Logger LOGGER = Logger.getLogger(MCRXEditorTransformer.class);
 
-    private MCRParameterCollector parameters;
-
-    private Map<String, Object> xPathVariables = new HashMap<String, Object>();
-
-    private List<Namespace> xPathNamespaces = new ArrayList<Namespace>();
-
     private MCREditorSession editorSession;
 
     private MCRBinding currentBinding;
 
-    public MCRXEditorTransformer(MCRParameterCollector parameters, MCREditorSession editorSession) {
-        this.parameters = parameters;
+    public MCRXEditorTransformer(MCREditorSession editorSession) {
         this.editorSession = editorSession;
-        this.xPathVariables.putAll(parameters.getParameterMap());
-        this.xPathNamespaces.addAll(MCRConstants.getStandardNamespaces());
     }
 
     public MCRContent transform(MCRContent editorSource) throws IOException {
         MCRXSL2XMLTransformer transformer = MCRXSL2XMLTransformer.getInstance("xsl/xeditor.xsl");
         String key = MCRXEditorTransformerStore.storeTransformer(this);
+        MCRParameterCollector parameters = editorSession.getParameters();
         parameters.setParameter("XEditorTransformerKey", key);
         return transformer.transform(editorSource, parameters);
     }
@@ -150,20 +139,24 @@ public class MCRXEditorTransformer {
         return StringUtils.repeat("a ", numRepeats);
     }
 
+    private final static Pattern PATTERN_URI = Pattern.compile("\\{\\{\\$(.+)\\}\\}");
+
     public String replaceParameters(String uri) {
-        Matcher m = Pattern.compile("\\{\\{\\$(.+)\\}\\}").matcher(uri);
+        Matcher m = PATTERN_URI.matcher(uri);
         StringBuffer sb = new StringBuffer();
         while (m.find()) {
             String token = m.group(1);
-            String value = parameters.getParameter(token, null);
+            String value = editorSession.getParameters().getParameter(token, null);
             m.appendReplacement(sb, value == null ? m.group().replace("$", "\\$") : value);
         }
         m.appendTail(sb);
         return sb.toString();
     }
 
+    private final static Pattern PATTERN_XPATH = Pattern.compile("\\{\\{([^\\}]+)\\}\\}");
+
     public String replaceXPaths(String text) {
-        Matcher m = Pattern.compile("\\{\\{([^\\}]+)\\}\\}").matcher(text);
+        Matcher m = PATTERN_XPATH.matcher(text);
         StringBuffer sb = new StringBuffer();
         while (m.find()) {
             String xPath = m.group(1);
@@ -175,9 +168,11 @@ public class MCRXEditorTransformer {
 
     public String evaluateXPath(String xPathExpression) {
         try {
-            xPathVariables.putAll(currentBinding.buildXPathVariables());
+            Map<String, Object> xPathVariables = currentBinding.buildXPathVariables();
+            xPathVariables.putAll(editorSession.getParameters().getParameterMap());
             XPathFactory factory = XPathFactory.instance();
-            XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), xPathVariables, xPathNamespaces);
+            List<Namespace> namespaces = editorSession.getNamespaces();
+            XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), xPathVariables, namespaces);
             return xPath.evaluateFirst(currentBinding.getBoundNodes()).toString();
         } catch (Exception ex) {
             LOGGER.warn("unable to evaluate XPath: " + xPathExpression);

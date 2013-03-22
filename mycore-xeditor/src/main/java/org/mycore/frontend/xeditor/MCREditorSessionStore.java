@@ -25,8 +25,10 @@ package org.mycore.frontend.xeditor;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.xsl.MCRParameterCollector;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -37,18 +39,38 @@ public class MCREditorSessionStore {
 
     private AtomicInteger idGenerator = new AtomicInteger(0);
 
+    private final static Logger LOGGER = Logger.getLogger(MCREditorSessionStore.class);
+
     MCREditorSessionStore() {
         int maxEditorsInSession = MCRConfiguration.instance().getInt("MCR.XEditor.MaxEditorsInSession", 50);
         cachedSessions = new MCRCache<String, MCREditorSession>(maxEditorsInSession, "Stored XEditor Sessions");
     }
 
-    public String storeSession(MCREditorSession session) {
+    public void storeSession(MCREditorSession session) {
         String id = String.valueOf(idGenerator.incrementAndGet());
         cachedSessions.put(id, session);
-        return id;
+        session.setID(id);
     }
 
     public MCREditorSession getSession(String id) {
         return cachedSessions.get(id);
+    }
+
+    public final static String XEDITOR_SESSION_PARAM = "_xed_session";
+
+    public MCREditorSession getOrCreateAndStoreSession(MCRParameterCollector parameters) {
+        String sessionID = parameters.getParameter(MCREditorSessionStore.XEDITOR_SESSION_PARAM, null);
+        MCREditorSession session = null;
+        if (sessionID != null) {
+            session = getSession(sessionID);
+            if (session == null) {
+                LOGGER.warn("editor session " + sessionID + " is not stored any more, will create a new session");
+            }
+        }
+        if (session == null) {
+            session = new MCREditorSession(parameters);
+            storeSession(session);
+        }
+        return session;
     }
 }

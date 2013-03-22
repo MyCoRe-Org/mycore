@@ -51,10 +51,11 @@ public class MCRXEditorTransformerTest {
         if (editedXMLFile != null)
             parameters.setParameter("input", editedXMLFile);
 
-        MCREditorSession editorSession = new MCREditorSession();
+        MCREditorSession editorSession = new MCREditorSession(parameters);
         editorSession.setID("1");
+        
         MCRContent input = MCRSourceContent.getInstance("resource:" + inputFile);
-        MCRContent transformed = new MCRXEditorTransformer(parameters, editorSession).transform(input);
+        MCRContent transformed = new MCRXEditorTransformer(editorSession).transform(input);
 
         if (write) {
             File targetFile = File.createTempFile(expectedOutputFile.split("\\.")[0], expectedOutputFile.split("\\.")[1]);

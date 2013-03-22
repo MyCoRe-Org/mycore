@@ -42,11 +42,9 @@ public class MCRXEditorServlet extends MCRServlet {
 
     protected final static Logger LOGGER = Logger.getLogger(MCRXEditorServlet.class);
 
-    public final static String XEDITOR_SESSION_PARAM = "_xed_session";
-
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {
-        String xEditorSessionID = job.getRequest().getParameter(XEDITOR_SESSION_PARAM);
+        String xEditorSessionID = job.getRequest().getParameter(MCREditorSessionStore.XEDITOR_SESSION_PARAM);
         MCREditorSession session = MCREditorSessionStoreFactory.getSessionStore().getSession(xEditorSessionID);
         setSubmittedValues(job, session);
         sendToTarget(job, session);
