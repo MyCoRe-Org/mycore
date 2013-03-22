@@ -55,18 +55,20 @@ public class MCRXEditorTransformer {
 
     private MCREditorSession editorSession;
 
+    private MCRParameterCollector transformationParameters;
+
     private MCRBinding currentBinding;
 
-    public MCRXEditorTransformer(MCREditorSession editorSession) {
+    public MCRXEditorTransformer(MCREditorSession editorSession, MCRParameterCollector transformationParameters) {
         this.editorSession = editorSession;
+        this.transformationParameters = transformationParameters;
     }
 
     public MCRContent transform(MCRContent editorSource) throws IOException {
         MCRXSL2XMLTransformer transformer = MCRXSL2XMLTransformer.getInstance("xsl/xeditor.xsl");
         String key = MCRXEditorTransformerStore.storeTransformer(this);
-        MCRParameterCollector parameters = editorSession.getParameters();
-        parameters.setParameter("XEditorTransformerKey", key);
-        return transformer.transform(editorSource, parameters);
+        transformationParameters.setParameter("XEditorTransformerKey", key);
+        return transformer.transform(editorSource, transformationParameters);
     }
 
     public static MCRXEditorTransformer getTransformer(String key) {
@@ -146,7 +148,7 @@ public class MCRXEditorTransformer {
         StringBuffer sb = new StringBuffer();
         while (m.find()) {
             String token = m.group(1);
-            String value = editorSession.getParameters().getParameter(token, null);
+            String value = transformationParameters.getParameter(token, null);
             m.appendReplacement(sb, value == null ? m.group().replace("$", "\\$") : value);
         }
         m.appendTail(sb);
@@ -169,7 +171,7 @@ public class MCRXEditorTransformer {
     public String evaluateXPath(String xPathExpression) {
         try {
             Map<String, Object> xPathVariables = currentBinding.buildXPathVariables();
-            xPathVariables.putAll(editorSession.getParameters().getParameterMap());
+            xPathVariables.putAll(transformationParameters.getParameterMap());
             XPathFactory factory = XPathFactory.instance();
             List<Namespace> namespaces = editorSession.getNamespaces();
             XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), xPathVariables, namespaces);

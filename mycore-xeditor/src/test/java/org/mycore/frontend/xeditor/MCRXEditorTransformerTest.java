@@ -26,6 +26,7 @@ package org.mycore.frontend.xeditor;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 
 import javax.xml.transform.TransformerException;
 
@@ -47,15 +48,19 @@ public class MCRXEditorTransformerTest {
 
     private void testTransformation(String inputFile, String editedXMLFile, String expectedOutputFile, boolean write)
             throws TransformerException, IOException, JDOMException, SAXException {
-        MCRParameterCollector parameters = new MCRParameterCollector();
-        if (editedXMLFile != null)
-            parameters.setParameter("input", editedXMLFile);
+        HashMap<String, String[]> parameters = new HashMap<String, String[]>();
+        MCRParameterCollector pc = new MCRParameterCollector(false);
+
+        if (editedXMLFile != null) {
+            parameters.put("input", new String[] { editedXMLFile });
+            pc.setParameter("input", editedXMLFile);
+        }
 
         MCREditorSession editorSession = new MCREditorSession(parameters);
         editorSession.setID("1");
-        
+
         MCRContent input = MCRSourceContent.getInstance("resource:" + inputFile);
-        MCRContent transformed = new MCRXEditorTransformer(editorSession).transform(input);
+        MCRContent transformed = new MCRXEditorTransformer(editorSession, pc).transform(input);
 
         if (write) {
             File targetFile = File.createTempFile(expectedOutputFile.split("\\.")[0], expectedOutputFile.split("\\.")[1]);
@@ -87,7 +92,8 @@ public class MCRXEditorTransformerTest {
 
     @Test
     public void testXPathSubstitution() throws IOException, URISyntaxException, TransformerException, JDOMException, SAXException {
-        MCRSessionMgr.getCurrentSession().put("XSL.User", "John Doe");
-        testTransformation("testXPathSubstitution-editor.xml", "testBasicInputComponents-source.xml", "testXPathSubstitution-transformed.xml", false);
+        MCRSessionMgr.getCurrentSession().put("SomeUser", "John Doe");
+        testTransformation("testXPathSubstitution-editor.xml", "testBasicInputComponents-source.xml",
+                "testXPathSubstitution-transformed.xml", false);
     }
 }

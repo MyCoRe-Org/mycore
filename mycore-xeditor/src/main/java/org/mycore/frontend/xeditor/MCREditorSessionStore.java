@@ -23,12 +23,12 @@
 
 package org.mycore.frontend.xeditor;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.xsl.MCRParameterCollector;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -58,17 +58,16 @@ public class MCREditorSessionStore {
 
     public final static String XEDITOR_SESSION_PARAM = "_xed_session";
 
-    public MCREditorSession getOrCreateAndStoreSession(MCRParameterCollector parameters) {
-        String sessionID = parameters.getParameter(MCREditorSessionStore.XEDITOR_SESSION_PARAM, null);
+    public MCREditorSession getOrCreateAndStoreSession(Map<String,String[]> requestParameters, String sessionID) {
         MCREditorSession session = null;
         if (sessionID != null) {
             session = getSession(sessionID);
             if (session == null) {
                 LOGGER.warn("editor session " + sessionID + " is not stored any more, will create a new session");
+                return null;
             }
-        }
-        if (session == null) {
-            session = new MCREditorSession(parameters);
+        } else {
+            session = new MCREditorSession(requestParameters);
             storeSession(session);
         }
         return session;

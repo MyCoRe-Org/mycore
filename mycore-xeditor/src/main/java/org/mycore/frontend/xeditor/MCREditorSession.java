@@ -26,8 +26,10 @@ package org.mycore.frontend.xeditor;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.transform.TransformerException;
@@ -39,7 +41,6 @@ import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.content.MCRSourceContent;
-import org.mycore.common.xsl.MCRParameterCollector;
 import org.xml.sax.SAXException;
 
 /**
@@ -51,7 +52,7 @@ public class MCREditorSession {
 
     private String id;
 
-    private MCRParameterCollector parameters;
+    private Map<String, String[]> requestParameters;
 
     private Document editedXML;
 
@@ -61,9 +62,13 @@ public class MCREditorSession {
 
     private String cancelURL;
 
-    public MCREditorSession(MCRParameterCollector parameters) {
-        this.parameters = parameters;
+    public MCREditorSession(Map<String, String[]> requestParameters) {
+        this.requestParameters = requestParameters;
         this.namespaces.addAll(MCRConstants.getStandardNamespaces());
+    }
+
+    public MCREditorSession() {
+        this(new HashMap<String, String[]>());
     }
 
     public void setID(String id) {
@@ -94,8 +99,8 @@ public class MCREditorSession {
         return namespaces;
     }
 
-    public MCRParameterCollector getParameters() {
-        return parameters;
+    public Map<String, String[]> getRequestParameters() {
+        return requestParameters;
     }
 
     public String getCancelURL() {

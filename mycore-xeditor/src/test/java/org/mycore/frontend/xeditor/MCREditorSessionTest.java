@@ -34,7 +34,6 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.common.xsl.MCRParameterCollector;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -43,7 +42,7 @@ public class MCREditorSessionTest {
 
     @Test
     public void testResubmittingEditedValues() throws ParseException, JDOMException, UnsupportedEncodingException, IOException {
-        MCREditorSession session = new MCREditorSession(new MCRParameterCollector());
+        MCREditorSession session = new MCREditorSession();
 
         // Simulate reading source XML
         Document document = buildDocument("document[title='Titel'][author[@firstName='John'][@lastName='Doe']][category='a'][category='b'][category='c']");

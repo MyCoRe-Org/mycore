@@ -6,7 +6,7 @@
     <xed:bind xpath="/document">
       <xed:bind xpath="title">
         <div>
-          Diese Publikation mit dem Titel {{concat('"',text(),'"')}} dürfen Sie als {{$User}} bearbeiten.
+          Diese Publikation mit dem Titel {{concat('"',text(),'"')}} dürfen Sie als {{$SomeUser}} bearbeiten.
           <input type="text" size="{{string(string-length(.))}}" />
         </div>
       </xed:bind>
