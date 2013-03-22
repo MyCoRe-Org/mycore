@@ -33,17 +33,17 @@ public class MCRSecurityFilterFactory implements ResourceFilterFactory {
         List<ResourceFilter> filters = new ArrayList<ResourceFilter>();
         filters.add(new MCRSessionHookFilter(httpRequest));
         filters.add(TRANSACTION_FILTER);
-        MCRRestrictedAccess restrictedAccess = am.getAnnotation(MCRRestrictedAccess.class);
-        if (restrictedAccess != null) {
-            LOGGER.info("Access to " + am.getMethod().toString() + " is restricted by " + restrictedAccess.value().getCanonicalName());
-            MCRResourceAccessChecker accessChecker;
-            try {
-                accessChecker = MCRResourceAccessCheckerFactory.getInstance(restrictedAccess.value());
-            } catch (InstantiationException | IllegalAccessException e) {
-                throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
-            }
-            filters.add(new MCRResourceAccessFilter(accessChecker));
+        
+        MCRRestrictedAccess restrictedAccessMETHOD = am.getAnnotation(MCRRestrictedAccess.class);
+        MCRRestrictedAccess restrictedAccessTYPE = am.getResource().getAnnotation(MCRRestrictedAccess.class);
+        if (restrictedAccessMETHOD != null) {
+            LOGGER.info("Access to " + am.getMethod().toString() + " is restricted by " + restrictedAccessMETHOD.value().getCanonicalName());
+            addFilter(filters, restrictedAccessMETHOD);
+        } else if(restrictedAccessTYPE != null) {
+            LOGGER.info("Access to " + am.getResource().getResourceClass().getName() + " is restricted by " + restrictedAccessTYPE.value().getCanonicalName());
+            addFilter(filters, restrictedAccessTYPE);
         }
+        
         RolesAllowed ra = am.getAnnotation(RolesAllowed.class);
         if (ra != null) {
             LOGGER.warn(MessageFormat.format(
@@ -55,5 +55,15 @@ public class MCRSecurityFilterFactory implements ResourceFilterFactory {
             filters.add(filter);
         }
         return filters;
+    }
+
+    private void addFilter(List<ResourceFilter> filters, MCRRestrictedAccess restrictedAccess) {
+        MCRResourceAccessChecker accessChecker;
+        try {
+            accessChecker = MCRResourceAccessCheckerFactory.getInstance(restrictedAccess.value());
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
+        }
+        filters.add(new MCRResourceAccessFilter(accessChecker));
     }
 }
