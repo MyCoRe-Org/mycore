@@ -174,7 +174,7 @@ public class MCRBinding {
         return children;
     }
 
-    private Map<String, Object> buildXPathVariables() {
+    public Map<String, Object> buildXPathVariables() {
         Map<String, Object> variables = new HashMap<String, Object>();
         for (MCRBinding ancestor : getAncestorsAndSelf()) {
             for (MCRBinding child : ancestor.getChildren()) {

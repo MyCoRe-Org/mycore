@@ -25,6 +25,10 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,6 +39,11 @@ import org.codehaus.plexus.util.StringUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.jdom2.Namespace;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
@@ -50,6 +59,10 @@ public class MCRXEditorTransformer {
 
     private MCRParameterCollector parameters;
 
+    private Map<String, Object> xPathVariables = new HashMap<String, Object>();
+
+    private List<Namespace> xPathNamespaces = new ArrayList<Namespace>();
+
     private MCREditorSession editorSession;
 
     private MCRBinding currentBinding;
@@ -57,6 +70,8 @@ public class MCRXEditorTransformer {
     public MCRXEditorTransformer(MCRParameterCollector parameters, MCREditorSession editorSession) {
         this.parameters = parameters;
         this.editorSession = editorSession;
+        this.xPathVariables.putAll(parameters.getParameterMap());
+        this.xPathNamespaces.addAll(MCRConstants.getStandardNamespaces());
     }
 
     public MCRContent transform(MCRContent editorSource) throws IOException {
@@ -85,7 +100,7 @@ public class MCRXEditorTransformer {
 
     public void bind(String xPath, String name) throws JDOMException, ParseException {
         if (editorSession.getEditedXML() == null) {
-            String rPath = xPath.startsWith("/") ? xPath.substring(1) : xPath; 
+            String rPath = xPath.startsWith("/") ? xPath.substring(1) : xPath;
             String root = MCRXPathParser.parse(rPath).getLocationSteps().get(0).getName();
             editorSession.setEditedXML(new Document(new Element(root)));
         }
@@ -134,14 +149,38 @@ public class MCRXEditorTransformer {
     }
 
     public String replaceParameters(String uri) {
-        Matcher m = Pattern.compile("\\{(.+)\\}").matcher(uri);
+        Matcher m = Pattern.compile("\\{\\{\\$(.+)\\}\\}").matcher(uri);
         StringBuffer sb = new StringBuffer();
         while (m.find()) {
             String token = m.group(1);
             String value = parameters.getParameter(token, null);
-            m.appendReplacement(sb, value == null ? m.group() : value);
+            m.appendReplacement(sb, value == null ? m.group().replace("$", "\\$") : value);
         }
         m.appendTail(sb);
         return sb.toString();
+    }
+
+    public String replaceXPaths(String text) {
+        Matcher m = Pattern.compile("\\{\\{([^\\}]+)\\}\\}").matcher(text);
+        StringBuffer sb = new StringBuffer();
+        while (m.find()) {
+            String xPath = m.group(1);
+            m.appendReplacement(sb, evaluateXPath(xPath));
+        }
+        m.appendTail(sb);
+        return sb.toString();
+    }
+
+    public String evaluateXPath(String xPathExpression) {
+        try {
+            xPathVariables.putAll(currentBinding.buildXPathVariables());
+            XPathFactory factory = XPathFactory.instance();
+            XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), xPathVariables, xPathNamespaces);
+            return xPath.evaluateFirst(currentBinding.getBoundNodes()).toString();
+        } catch (Exception ex) {
+            LOGGER.warn("unable to evaluate XPath: " + xPathExpression);
+            LOGGER.debug(ex);
+            return "";
+        }
     }
 }

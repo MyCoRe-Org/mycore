@@ -32,6 +32,9 @@ import javax.xml.transform.TransformerException;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 import static org.junit.Assert.*;
+
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -80,5 +83,11 @@ public class MCRXEditorTransformerTest {
     @Test
     public void testRepeats() throws IOException, URISyntaxException, TransformerException, JDOMException, SAXException {
         testTransformation("testRepeats-editor.xml", "testBasicInputComponents-source.xml", "testRepeats-transformed.xml", false);
+    }
+
+    @Test
+    public void testXPathSubstitution() throws IOException, URISyntaxException, TransformerException, JDOMException, SAXException {
+        MCRSessionMgr.getCurrentSession().put("XSL.User", "John Doe");
+        testTransformation("testXPathSubstitution-editor.xml", "testBasicInputComponents-source.xml", "testXPathSubstitution-transformed.xml", false);
     }
 }

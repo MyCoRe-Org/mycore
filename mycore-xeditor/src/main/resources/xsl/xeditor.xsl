@@ -57,6 +57,18 @@
     <xsl:apply-templates mode="xeditor" />
   </xsl:template>
 
+  <!-- ========== Text ========== -->
+
+  <xsl:template match="@*" mode="xeditor">
+    <xsl:attribute name="{name()}">
+      <xsl:value-of select="transformer:replaceXPaths($transformer,.)" />
+    </xsl:attribute>
+  </xsl:template>
+
+  <xsl:template match="text()" mode="xeditor">
+    <xsl:value-of select="transformer:replaceXPaths($transformer,.)" />
+  </xsl:template>
+
   <!-- ========== <xed:bind /> ========== -->
 
   <xsl:template match="xed:bind" mode="xeditor">
@@ -67,11 +79,7 @@
 
   <xsl:template match="@xed:*|xed:*" mode="xeditor" />
 
-  <xsl:template match="@*" mode="xeditor">
-    <xsl:copy />
-  </xsl:template>
-
-  <xsl:template match="node()" mode="xeditor">
+  <xsl:template match="*" mode="xeditor">
     <xsl:copy>
       <xsl:apply-templates select="." mode="add-attributes" />
       <xsl:apply-templates select="@*|node()" mode="xeditor" />
