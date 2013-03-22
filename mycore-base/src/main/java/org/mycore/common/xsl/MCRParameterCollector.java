@@ -49,7 +49,10 @@ public class MCRParameterCollector {
     private final static Logger LOGGER = Logger.getLogger(MCRParameterCollector.class);
 
     /** The collected parameters */
-    private Map<String, String> parameters = new HashMap<String, String>();
+    private Map<String, Object> parameters = new HashMap<String, Object>();
+
+    /** If true (which is default), only those parameters starting with "XSL." are copied from session and request */
+    private boolean onlySetXSLParameters = true;
 
     /**
      * Collects parameters The collecting of parameters is done in steps,
@@ -57,13 +60,34 @@ public class MCRParameterCollector {
      * 
      * First, all configuration properties from MCRConfiguration are copied.
      * Second, those variables stored in the HTTP session, that start with "XSL." are copied.
-     * Next, those variables stored in the MCRSession, that start with "XSL." are copied.
-     * Next, those HTTP request parameters that start with "XSL." are copied.
-     * Next, those HTTP request attributes that start with "XSL." are copied.
+     * Next, variables stored in the MCRSession are copied.
+     * Next, HTTP request parameters are copied.
+     * Next, HTTP request attributes are copied.
+     * 
+     * Only those parameters starting with "XSL." are copied from session and request,
      * 
      * @param request the HttpRequest causing the XSL transformation, must NOT be null
      */
     public MCRParameterCollector(HttpServletRequest request) {
+        this(request, true);
+    }
+
+    /**
+     * Collects parameters The collecting of parameters is done in steps,
+     * each step may overwrite parameters that already have been set.
+     * 
+     * First, all configuration properties from MCRConfiguration are copied.
+     * Second, those variables stored in the HTTP session, that start with "XSL." are copied.
+     * Next, variables stored in the MCRSession are copied.
+     * Next, HTTP request parameters are copied.
+     * Next, HTTP request attributes are copied.
+     * 
+     * @param request the HttpRequest causing the XSL transformation, must NOT be null
+     * @param onlySetXSLParameters if true, only those parameters starting with "XSL." are copied from session and request
+     */
+    public MCRParameterCollector(HttpServletRequest request, boolean onlySetXSLParameters) {
+        this.onlySetXSLParameters = onlySetXSLParameters;
+
         setFromConfiguration();
 
         HttpSession session = request.getSession(false);
@@ -90,11 +114,23 @@ public class MCRParameterCollector {
      * each step may overwrite parameters that already have been set.
      * 
      * First, all configuration properties from MCRConfiguration are copied.
-     * Next, those variables stored in the MCRSession, that start with "XSL." are copied.
-     * 
-     * @param request the HttpRequest causing the XSL transformation, must NOT be null
+     * Next, those variables stored in the MCRSession that start with "XSL." are copied.
      */
     public MCRParameterCollector() {
+        this(true);
+    }
+
+    /**
+     * Collects parameters The collecting of parameters is done in steps,
+     * each step may overwrite parameters that already have been set.
+     * 
+     * First, all configuration properties from MCRConfiguration are copied.
+     * Next, those variables stored in the MCRSession are copied.
+     * 
+     * @param onlySetXSLParameters if true, only those parameters starting with "XSL." are copied from session
+     */
+    public MCRParameterCollector(boolean onlySetXSLParameters) {
+        this.onlySetXSLParameters = onlySetXSLParameters;
         setFromConfiguration();
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         setFromSession(mcrSession);
@@ -118,28 +154,30 @@ public class MCRParameterCollector {
     }
 
     /**
-     * Sets the parameter only if it starts with "XSL." and is not empty
+     * Sets the parameter only if it is not empty and starts with "XSL." or onlySetXSLParameters is false
      */
     private void setXSLParameter(String name, String value) {
-        if (name.startsWith("XSL.") && (value != null) && (!value.isEmpty()))
+        if ((value == null) || value.isEmpty())
+            return;
+        if (name.startsWith("XSL."))
             parameters.put(name.substring(4), value);
+        else if (!onlySetXSLParameters)
+            parameters.put(name, value);
     }
 
     /**
      * Returns the parameter with the given name
      */
     public String getParameter(String name, String defaultValue) {
-        String val = parameters.get(name);
-        return (val == null) ? defaultValue : val;
+        Object val = parameters.get(name);
+        return (val == null) ? defaultValue : val.toString();
     }
 
     /**
-     * Returns a complete copy of the parameter map. 
+     * Returns the parameter map.  
      */
-    public Map<String, String> getParameterMap() {
-        Map<String, String> copy = new HashMap<String, String>();
-        copy.putAll(parameters);
-        return copy;
+    public Map<String, Object> getParameterMap() {
+        return parameters;
     }
 
     /**
@@ -280,7 +318,7 @@ public class MCRParameterCollector {
      *            the Transformer object thats parameters should be set
      */
     public void setParametersTo(Transformer transformer) {
-        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+        for (Map.Entry<String, Object> entry : parameters.entrySet()) {
             transformer.setParameter(entry.getKey(), entry.getValue());
         }
     }
