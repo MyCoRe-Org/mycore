@@ -46,7 +46,7 @@ public class MCRXPathBuilder {
         String parentXPath = buildXPath(attribute.getParent());
         if (!parentXPath.isEmpty())
             parentXPath += "/";
-        return parentXPath + "@" + buildName(attribute);
+        return parentXPath + "@" + attribute.getQualifiedName();
     }
 
     public static String buildXPath(Element element) {
@@ -56,23 +56,7 @@ public class MCRXPathBuilder {
         String parentXPath = buildXPath(element.getParent());
         if ((!parentXPath.isEmpty()) || (element.getParent() instanceof Document))
             parentXPath += "/";
-        return parentXPath + buildName(element) + buildPositionPredicate(element);
-    }
-
-    public static String buildName(Attribute attribute) {
-        String prefix = attribute.getNamespacePrefix();
-        if (prefix.isEmpty())
-            return attribute.getName();
-        else
-            return prefix + ":" + attribute.getName();
-    }
-
-    public static String buildName(Element element) {
-        String prefix = element.getNamespacePrefix();
-        if (prefix.isEmpty())
-            return element.getName();
-        else
-            return prefix + ":" + element.getName();
+        return parentXPath + element.getQualifiedName() + buildPositionPredicate(element);
     }
 
     private static String buildPositionPredicate(Element element) {
