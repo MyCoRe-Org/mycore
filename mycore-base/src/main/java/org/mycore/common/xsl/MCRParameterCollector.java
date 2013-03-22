@@ -108,12 +108,12 @@ public class MCRParameterCollector {
     public void setParameter(String name, String value) {
         parameters.put(name, value);
     }
-    
+
     /**
      * Sets all parameters from the given map
      * @param param
      */
-    public void setParameters(Map<String, String> param){
+    public void setParameters(Map<String, String> param) {
         parameters.putAll(param);
     }
 
@@ -131,6 +131,15 @@ public class MCRParameterCollector {
     public String getParameter(String name, String defaultValue) {
         String val = parameters.get(name);
         return (val == null) ? defaultValue : val;
+    }
+
+    /**
+     * Returns a complete copy of the parameter map. 
+     */
+    public Map<String, String> getParameterMap() {
+        Map<String, String> copy = new HashMap<String, String>();
+        copy.putAll(parameters);
+        return copy;
     }
 
     /**
