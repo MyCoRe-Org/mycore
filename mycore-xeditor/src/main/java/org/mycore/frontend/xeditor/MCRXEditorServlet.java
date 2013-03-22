@@ -43,7 +43,7 @@ public class MCRXEditorServlet extends MCRServlet {
     protected final static Logger LOGGER = Logger.getLogger(MCRXEditorServlet.class);
 
     public final static String XEDITOR_SESSION_PARAM = "_xed_session";
-    
+
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {
         String xEditorSessionID = job.getRequest().getParameter(XEDITOR_SESSION_PARAM);
@@ -68,8 +68,10 @@ public class MCRXEditorServlet extends MCRServlet {
         for (Enumeration<String> parameters = job.getRequest().getParameterNames(); parameters.hasMoreElements();) {
             String name = parameters.nextElement();
             if (name.startsWith(TARGET_PATTERN)) {
-                String targetID = name.split("_")[2].toUpperCase();
-                String parameter = name.substring(TARGET_PATTERN.length() + targetID.length() + 1);
+                String targetID = name.split("_")[3].toUpperCase();
+                String parameter = name.substring(TARGET_PATTERN.length() + targetID.length());
+                if (!parameter.isEmpty())
+                    parameter = parameter.substring(1);
                 LOGGER.info("sending submission to target " + targetID + " " + parameter);
                 getTarget(targetID).handleSubmission(getServletContext(), job, session, parameter);
                 return;

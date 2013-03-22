@@ -29,6 +29,7 @@ import java.util.Enumeration;
 
 import javax.servlet.ServletContext;
 
+import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -55,13 +56,15 @@ public class MCRDebugTarget implements MCREditorTarget {
         }
 
         out.println("</pre></p>");
-        out.println("<p><pre>");
+        out.println("<p>");
 
-        Format fmt = Format.getPrettyFormat().setLineSeparator("\n").setOmitDeclaration(false);
+        Format fmt = Format.getPrettyFormat().setLineSeparator("\n").setOmitDeclaration(true);
         XMLOutputter outputter = new XMLOutputter(fmt);
-        out.println(outputter.outputString(session.getEditedXML()));
+        Element pre = new Element("pre");
+        pre.addContent(outputter.outputString(session.getEditedXML()));
+        outputter.output(pre, out);
 
-        out.println("</pre></p>");
+        out.println("</p>");
         out.println("</body></html>");
         out.close();
     }
