@@ -23,11 +23,8 @@
 
 package org.mycore.frontend.xeditor.target;
 
-import java.io.IOException;
-
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
@@ -35,11 +32,13 @@ import org.mycore.frontend.xeditor.MCREditorSession;
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRServletTarget implements MCREditorTarget {
+public class MCRServletTarget extends MCREditorTargetBase {
 
     @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String servletNameOrPath)
-            throws IOException, ServletException {
+            throws Exception {
+        super.handleSubmission(context, job, session, servletNameOrPath);
+
         RequestDispatcher dispatcher = context.getNamedDispatcher(servletNameOrPath);
         if (dispatcher == null)
             dispatcher = context.getRequestDispatcher(servletNameOrPath);

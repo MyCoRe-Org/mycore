@@ -23,26 +23,31 @@
 
 package org.mycore.frontend.xeditor.target;
 
+import java.text.ParseException;
+import java.util.Set;
+
 import javax.servlet.ServletContext;
 
+import org.jdom2.JDOMException;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
-import org.mycore.frontend.xeditor.MCREditorSessionStore;
 
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRReloadTarget extends MCREditorTargetBase {
+public class MCREditorTargetBase implements MCREditorTarget {
 
-    @Override
-    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String servletNameOrPath)
-            throws Exception {
-        super.handleSubmission(context, job, session, servletNameOrPath);
+    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter) throws Exception {
+        setSubmittedValues(job, session);
+        session.removeDeletedNodes();
+    }
 
-        String url = job.getRequest().getHeader("referer");
-        if (url.contains("?"))
-            url = url.substring(url.indexOf("?"));
-        url += "?" + MCREditorSessionStore.XEDITOR_SESSION_PARAM + "=" + session.getID();
-        job.getResponse().sendRedirect(url);
+    protected void setSubmittedValues(MCRServletJob job, MCREditorSession session) throws JDOMException, ParseException {
+        for (String xPath : (Set<String>) (job.getRequest().getParameterMap().keySet())) {
+            if (xPath.startsWith("/")) {
+                String[] values = job.getRequest().getParameterValues(xPath);
+                session.setSubmittedValues(xPath, values);
+            }
+        }
     }
 }

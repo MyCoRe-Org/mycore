@@ -23,12 +23,9 @@
 
 package org.mycore.frontend.xeditor;
 
-import java.text.ParseException;
 import java.util.Enumeration;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.jdom2.JDOMException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -46,18 +43,7 @@ public class MCRXEditorServlet extends MCRServlet {
     public void doGetPost(MCRServletJob job) throws Exception {
         String xEditorSessionID = job.getRequest().getParameter(MCREditorSessionStore.XEDITOR_SESSION_PARAM);
         MCREditorSession session = MCREditorSessionStoreFactory.getSessionStore().getSession(xEditorSessionID);
-        setSubmittedValues(job, session);
         sendToTarget(job, session);
-    }
-
-    private void setSubmittedValues(MCRServletJob job, MCREditorSession session) throws JDOMException, ParseException {
-        for (String xPath : (Set<String>) (job.getRequest().getParameterMap().keySet())) {
-            if (xPath.startsWith("/")) {
-                String[] values = job.getRequest().getParameterValues(xPath);
-                session.setSubmittedValues(xPath, values);
-            }
-        }
-        session.removeDeletedNodes();
     }
 
     private final static String TARGET_PATTERN = "_xed_submit_";

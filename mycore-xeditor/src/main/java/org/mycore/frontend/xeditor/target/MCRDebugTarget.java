@@ -29,6 +29,7 @@ import java.util.Enumeration;
 
 import javax.servlet.ServletContext;
 
+import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
@@ -38,14 +39,30 @@ import org.mycore.frontend.xeditor.MCREditorSession;
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRDebugTarget implements MCREditorTarget {
+public class MCRDebugTarget extends MCREditorTargetBase {
 
     @Override
-    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter) throws IOException {
+    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter) throws Exception {
         job.getResponse().setContentType("text/html; charset=UTF-8");
-
         PrintWriter out = job.getResponse().getWriter();
         out.println("<html><body>");
+
+        out.println("<h3>Before submit:</h3>");
+        outputXML(session.getEditedXML(), out);
+
+        out.println("<h3>Submitted parameters:</h3>");
+        outputParameters(job, out);
+
+        super.handleSubmission(context, job, session, parameter);
+
+        out.println("<h3>After submit:</h3>");
+        outputXML(session.getEditedXML(), out);
+
+        out.println("</body></html>");
+        out.close();
+    }
+
+    private void outputParameters(MCRServletJob job, PrintWriter out) {
         out.println("<p><pre>");
 
         for (Enumeration<String> parameters = job.getRequest().getParameterNames(); parameters.hasMoreElements();) {
@@ -56,16 +73,16 @@ public class MCRDebugTarget implements MCREditorTarget {
         }
 
         out.println("</pre></p>");
+    }
+
+    private Format format = Format.getPrettyFormat().setLineSeparator("\n").setOmitDeclaration(true);
+
+    private void outputXML(Document xml, PrintWriter out) throws IOException {
+        XMLOutputter outputter = new XMLOutputter(format);
         out.println("<p>");
-
-        Format fmt = Format.getPrettyFormat().setLineSeparator("\n").setOmitDeclaration(true);
-        XMLOutputter outputter = new XMLOutputter(fmt);
         Element pre = new Element("pre");
-        pre.addContent(outputter.outputString(session.getEditedXML()));
+        pre.addContent(outputter.outputString(xml));
         outputter.output(pre, out);
-
         out.println("</p>");
-        out.println("</body></html>");
-        out.close();
     }
 }

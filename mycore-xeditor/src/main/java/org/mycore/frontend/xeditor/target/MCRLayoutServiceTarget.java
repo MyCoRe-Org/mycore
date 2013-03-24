@@ -23,8 +23,6 @@
 
 package org.mycore.frontend.xeditor.target;
 
-import java.io.IOException;
-
 import javax.servlet.ServletContext;
 
 import org.mycore.common.content.MCRContent;
@@ -36,10 +34,12 @@ import org.mycore.frontend.xeditor.MCREditorSession;
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRLayoutServiceTarget implements MCREditorTarget {
+public class MCRLayoutServiceTarget extends MCREditorTargetBase {
 
     @Override
-    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String style) throws IOException {
+    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String style) throws Exception {
+        super.handleSubmission(context, job, session, style);
+        
         if ((style != null) && (!style.isEmpty()))
             job.getRequest().setAttribute("XSL.Style", style);
 
