@@ -23,6 +23,7 @@
 
 package org.mycore.frontend.xeditor.target;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.Set;
 
@@ -31,6 +32,7 @@ import javax.servlet.ServletContext;
 import org.jdom2.JDOMException;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
+import org.mycore.frontend.xeditor.MCREditorSessionStore;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -49,5 +51,13 @@ public class MCREditorTargetBase implements MCREditorTarget {
                 session.setSubmittedValues(xPath, values);
             }
         }
+    }
+
+    protected void redirectToEditorPage(MCRServletJob job, MCREditorSession session) throws IOException {
+        String url = job.getRequest().getHeader("referer");
+        if (url.contains("?"))
+            url = url.substring(url.indexOf("?"));
+        url += "?" + MCREditorSessionStore.XEDITOR_SESSION_PARAM + "=" + session.getID();
+        job.getResponse().sendRedirect(url);
     }
 }

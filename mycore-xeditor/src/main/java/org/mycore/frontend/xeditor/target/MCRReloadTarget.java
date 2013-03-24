@@ -27,7 +27,6 @@ import javax.servlet.ServletContext;
 
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
-import org.mycore.frontend.xeditor.MCREditorSessionStore;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -37,12 +36,8 @@ public class MCRReloadTarget extends MCREditorTargetBase {
     @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String servletNameOrPath)
             throws Exception {
-        super.handleSubmission(context, job, session, servletNameOrPath);
-
-        String url = job.getRequest().getHeader("referer");
-        if (url.contains("?"))
-            url = url.substring(url.indexOf("?"));
-        url += "?" + MCREditorSessionStore.XEDITOR_SESSION_PARAM + "=" + session.getID();
-        job.getResponse().sendRedirect(url);
+        setSubmittedValues(job, session);
+        session.forgetDisplayedFields();
+        redirectToEditorPage(job, session);
     }
 }
