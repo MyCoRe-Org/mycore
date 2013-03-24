@@ -52,7 +52,7 @@ public class MCRXEditorServlet extends MCRServlet {
         for (Enumeration<String> parameters = job.getRequest().getParameterNames(); parameters.hasMoreElements();) {
             String name = parameters.nextElement();
             if (name.startsWith(TARGET_PATTERN)) {
-                String targetID = name.split("_")[3].toUpperCase();
+                String targetID = name.split("_")[3].toLowerCase();
                 String parameter = name.substring(TARGET_PATTERN.length() + targetID.length());
                 if (!parameter.isEmpty())
                     parameter = parameter.substring(1);
