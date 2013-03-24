@@ -127,10 +127,9 @@ public class MCREditorSession {
         }
 
         for (int i = 0; i < values.length; i++) {
-            if ((values[i] != null) && (!values[i].trim().isEmpty())) {
-                binding.setValue(i, values[i].trim());
-                markAsResubmittedFromInputField(boundNodes.get(i));
-            }
+            String value = values[i] == null ? "" : values[i].trim();
+            binding.setValue(i, value);
+            markAsResubmittedFromInputField(boundNodes.get(i));
         }
     }
 
@@ -138,6 +137,11 @@ public class MCREditorSession {
         MCRBinding root = new MCRBinding(editedXML);
         for (String xPath : xPathsOfDisplayedFields)
             new MCRBinding(xPath, root).detachBoundNodes();
+
+        forgetDisplayedFields();
+    }
+
+    public void forgetDisplayedFields() {
         xPathsOfDisplayedFields.clear();
     }
 }
