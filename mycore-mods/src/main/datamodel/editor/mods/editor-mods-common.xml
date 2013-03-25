@@ -524,11 +524,7 @@
   <text id="mods.publisher.label" i18n="component.mods.metaData.dictionary.publisher" />
   <panel id="mods.publisher">
     <cell anchor="NORTHWEST" var="mods:publisher">
-      <panel>
-        <cell anchor="NORTHWEST">
-          <textfield id="mods.publisher.text" width="60" maxlength="512" />
-        </cell>
-      </panel>
+      <textfield id="mods.publisher.text" width="60" maxlength="512" />
     </cell>
   </panel>
 
@@ -543,6 +539,14 @@
     </label>
   </helpPopup>
   <!-- Publisher END -->
+  <!-- Place [text] -->
+  <text id="mods.publisher.place.label" i18n="component.mods.metaData.dictionary.placeTerm" />
+  <panel id="mods.publisher.place">
+    <cell anchor="NORTHWEST" var="mods:place/mods:placeTerm[@type='text']">
+      <textfield id="mods.publisher.place.text" width="60" maxlength="512" />
+    </cell>
+  </panel>
+  <!-- Place [text] -->
 
   <!-- Ort der Konferenz [text] -->
   <text id="mods.conferencePlace.label" i18n="component.mods.metaData.dictionary.conference.place" />
@@ -632,7 +636,7 @@
     <cell anchor="NORTHWEST" var="mods:dateIssued">
       <panel>
         <cell anchor="NORTHWEST">
-          <textfield d="mods.dateIssued.text2" width="20" maxlength="20" >
+          <textfield d="mods.dateIssued.text2" width="20" maxlength="20">
             <condition id="mods.dateIssued.cond2" type="datetime" format="yyyy-MM-dd;yyyy-MM;yyyy">
               <label xml:lang="de">Tragen Sie hier das Datum der Veröffentlichung im ISO Format mit Bindestrich (YYYY-MM-DD) ein.</label>
               <label xml:lang="en">Enter the date of publication here in the ISO Format (YYYY-MM-DD).</label>
@@ -1588,10 +1592,12 @@
     <label xml:lang="de">
       Unter welchen Rechten stellen Sie Ihr Dokument hier ein? Weitere Informationen finden Sie unter
       <a href="http://de.wikipedia.org/wiki/Alle_Rechte_vorbehalten"> http://de.wikipedia.org/wiki/Alle_Rechte_vorbehalten </a>
-      bzw. <a href="http://creativecommons.org/licenses/"> http://creativecommons.org/licenses/ </a>
+      bzw.
+      <a href="http://creativecommons.org/licenses/"> http://creativecommons.org/licenses/ </a>
     </label>
     <label xml:lang="en">
-      Rights/Licenses, e.g. CC. For more information see <a href="http://creativecommons.org/licenses/"> http://creativecommons.org/licenses/ </a>
+      Rights/Licenses, e.g. CC. For more information see
+      <a href="http://creativecommons.org/licenses/"> http://creativecommons.org/licenses/ </a>
     </label>
   </helpPopup>
   <!-- Rights END -->

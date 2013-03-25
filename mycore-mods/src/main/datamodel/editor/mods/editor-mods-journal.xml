@@ -65,6 +65,10 @@
     <cell row="23" col="2" anchor="NORTHWEST" ref="mods.publisher" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" style="padding-top:5px;" />
     <cell row="23" col="3" anchor="NORTHWEST" ref="mods.publisher.help" style="padding-top:5px;" />
     <!-- Publisher END -->
+    <!-- Place [text] -->
+    <cell row="24" col="1" anchor="NORTHEAST" ref="mods.publisher.place.label" style="padding-top:5px;" />
+    <cell row="24" col="2" colspan="2" anchor="NORTHWEST" ref="mods.publisher.place" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" style="padding-top:5px;" />
+    <!-- Place END -->
 
     <!-- Identifier -->
     <cell row="25" col="1" anchor="NORTHEAST" ref="mods.identifier.label" />
