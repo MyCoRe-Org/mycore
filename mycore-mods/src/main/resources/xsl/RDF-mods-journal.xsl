@@ -4,6 +4,7 @@
   xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:dcterms="http://purl.org/dc/terms/" xmlns:zdb="http://ld.zdb-services.de/resource/" xmlns:dnb_intern="http://dnb.de/"
   xmlns:isbd="http://iflastandards.info/ns/isbd/elements/" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" exclude-result-prefixes="rdf bibo foaf owl dc dcterms zdb dnb_intern isbd rdfs">
+  <xsl:include href="xslInclude:RDF-mods-journal"/>
   <xsl:template match="/rdf:RDF">
     <mycoreobject>
       <metadata>
@@ -18,10 +19,16 @@
   <xsl:template match="rdf:Description">
     <mods:mods>
       <!-- process input in deterministic order as editor forms depend on it -->
+      <xsl:apply-templates select="@rdf:type" />
       <xsl:apply-templates select="dcterms:title" />
       <xsl:apply-templates select="isbd:p1005|isbd:P1005" />
       <xsl:apply-templates select="bibo:shortTitle" />
-      <xsl:apply-templates select="dc:publisher" />
+      <xsl:if test="dc:publisher | isbd:p1006 | isbd:P1006">
+        <mods:originInfo>
+          <xsl:apply-templates select="dc:publisher" />
+          <xsl:apply-templates select="isbd:p1006|isbd:P1006" />
+        </mods:originInfo>
+      </xsl:if>
       <xsl:apply-templates select="bibo:issn" />
       <mods:identifier type="zdbid">
         <xsl:value-of select="substring-after(@rdf:about, 'http://ld.zdb-services.de/resource/')" />
@@ -50,15 +57,25 @@
     </mods:titleInfo>
   </xsl:template>
   <xsl:template match="dc:publisher">
-    <mods:originInfo>
-      <mods:publisher>
+    <mods:publisher>
+      <xsl:value-of select="." />
+    </mods:publisher>
+  </xsl:template>
+  <xsl:template match="isbd:p1006|isbd:P1006">
+    <mods:place>
+      <mods:placeTerm type="text">
         <xsl:value-of select="." />
-      </mods:publisher>
-    </mods:originInfo>
+      </mods:placeTerm>
+    </mods:place>
   </xsl:template>
   <xsl:template match="bibo:issn">
     <mods:identifier type="issn">
       <xsl:value-of select="." />
     </mods:identifier>
+  </xsl:template>
+  <xsl:template match="@rdf:type">
+    <xsl:message>
+      <xsl:value-of select="'Configure MCR.URIResolver.xslIncludes.RDF-mods-journal and overwrite template for @rdf:type.'"/>
+    </xsl:message>
   </xsl:template>
 </xsl:stylesheet>
