@@ -24,6 +24,8 @@
 package org.mycore.datamodel.metadata;
 
 import java.lang.ref.WeakReference;
+import java.util.Collections;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
@@ -32,7 +34,8 @@ import java.util.WeakHashMap;
  *
  */
 class MCRObjectIDPool {
-    private static WeakHashMap<String, WeakReference<MCRObjectID>> map = new WeakHashMap<String, WeakReference<MCRObjectID>>();
+    private static Map<String, WeakReference<MCRObjectID>> map = Collections
+        .synchronizedMap(new WeakHashMap<String, WeakReference<MCRObjectID>>());
 
     static MCRObjectID getMCRObjectID(String id) {
         WeakReference<MCRObjectID> ref = map.get(id);
@@ -43,7 +46,6 @@ class MCRObjectIDPool {
             }
         }
         //does not exist (anymore)
-        @SuppressWarnings("deprecation")
         MCRObjectID mcrId = new MCRObjectID(id);
         map.put(mcrId.toString(), new WeakReference<MCRObjectID>(mcrId));
         return mcrId;
