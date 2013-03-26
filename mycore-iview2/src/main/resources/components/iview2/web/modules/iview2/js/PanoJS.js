@@ -616,9 +616,9 @@ PanoJS.prototype = {
 	 */
 	recenter : function(coords, absolute) {
 		var currentImage = this.iview.currentImage;
-		this.x = this.getNewViewerPosition(this.width, coords.x, currentImage.curWidth, currentImage.curWidth);
-		this.y = this.getNewViewerPosition(this.height, coords.y, currentImage.curHeight, currentImage.curHeight);
-		this.positionTiles();
+		var x = this.x - this.getNewViewerPosition(this.width, coords.x, currentImage.curWidth, currentImage.curWidth);
+		var y = this.y - this.getNewViewerPosition(this.height, coords.y, currentImage.curHeight, currentImage.curHeight);
+		this.positionTiles( { 'x' : x, 'y' : y});
 	},
 
 	resize : function() {
@@ -688,20 +688,17 @@ PanoJS.prototype = {
 			var calculatedMinFitZoomLevel;
 			var maxDimCurZoomLevel;
 			
-			if(this.iview.currentImage.width/this.width > this.iview.currentImage.height/this.iview.context.viewer.outerHeight(true) || (stateBool && !screenZoom)){
-				maxDimViewer = this.width;
-				maxDimImg = this.iview.currentImage.width;
-				tileSizeMinZoomLevel = this.iview.currentImage.zoomInfo.dimensions[0].width;
-				calculatedMinFitZoomLevel =  Math.min(Math.max(Math.ceil(Math.log( maxDimViewer / tileSizeMinZoomLevel)/Math.LN2),0),this.iview.currentImage.zoomInfo.maxZoom);
-				maxDimCurZoomLevel = this.iview.currentImage.zoomInfo.dimensions[calculatedMinFitZoomLevel].width;
-			} else {
-				maxDimViewer = this.height;
-				maxDimImg = this.iview.currentImage.height
-				tileSizeMinZoomLevel = this.iview.currentImage.zoomInfo.dimensions[0].height;
-				calculatedMinFitZoomLevel = Math.min(Math.max(Math.ceil(Math.log( maxDimViewer / tileSizeMinZoomLevel)/Math.LN2),0),this.iview.currentImage.zoomInfo.maxZoom);
-				maxDimCurZoomLevel = this.iview.currentImage.zoomInfo.dimensions[calculatedMinFitZoomLevel].height;
-			}
+			var imageWidth = this.iview.currentImage.width;
+			var imageHeight = this.iview.currentImage.height;
 			
+			var screen = imageWidth/this.width > imageHeight/this.iview.context.viewer.outerHeight(true) || (stateBool && !screenZoom);
+			
+			maxDimViewer = this.getMaxDimViewer(screen);
+			maxDimImg = imageHeight
+			tileSizeMinZoomLevel = this.getTileSizeMinZoomLevel(screen);
+			calculatedMinFitZoomLevel = Math.min(Math.max(Math.ceil(Math.log( maxDimViewer / tileSizeMinZoomLevel)/Math.LN2),0),this.iview.currentImage.zoomInfo.maxZoom);
+			maxDimCurZoomLevel = this.getMaxDimCurZoomLevel(screen,calculatedMinFitZoomLevel);
+
 			var viewerRatio = maxDimViewer / maxDimCurZoomLevel;
 			this.tileSize = Math.floor(this.iview.properties.tileSize * viewerRatio) ;
 			this.iview.currentImage.zoomInfo.scale = this.tileSize  / this.iview.properties.tileSize;
@@ -721,6 +718,17 @@ PanoJS.prototype = {
 
 		return stateBool;
 	},
+	 getMaxDimViewer : function(screen){
+		 return (screen) ?  this.width : this.height;
+	 },
+	 getTileSizeMinZoomLevel : function(screen){
+		 return (screen) ? this.iview.currentImage.zoomInfo.dimensions[0].width : this.iview.currentImage.zoomInfo.dimensions[0].height;
+	 }
+	,
+	getMaxDimCurZoomLevel : function(screen, calculatedMinFitZoomLevel){
+		return (screen) ? this.iview.currentImage.zoomInfo.dimensions[calculatedMinFitZoomLevel].width : this.iview.currentImage.zoomInfo.dimensions[calculatedMinFitZoomLevel].height;
+	}
+	,
 
 	/**
 	 * Resolve the coordinates from this mouse event by subtracting the

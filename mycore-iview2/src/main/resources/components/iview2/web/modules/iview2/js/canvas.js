@@ -2,7 +2,7 @@
     "use strict";
 
     iview.isCanvasAvailable = (function() {
-        return !!document.createElement("canvas").getContext && URL.getParam("iview2.canvas") == "true";
+        return !!document.createElement("canvas").getContext && URL.getParam("iview2.canvas") != "false";
     })();
 
     iview.Canvas = (function() {
@@ -27,6 +27,22 @@
                 this.notLoadedTile = new Array();
                 var that = this;
 
+                
+                PanoJS.prototype.getMaxDimViewerOrig = PanoJS.prototype.getMaxDimViewer;
+                PanoJS.prototype.getMaxDimViewer = function cv_getMaxDimViewerOrig(screen) {
+                	 return that.getViewer().viewerBean.getMaxDimViewerOrig(screen);
+				};
+				
+                PanoJS.prototype.getTileSizeMinZoomLevelOrig = PanoJS.prototype.getTileSizeMinZoomLevel;
+                PanoJS.prototype.getTileSizeMinZoomLevel = function cv_getTileSizeMinZoomLevelOrig(screen) {
+                	 return that.getViewer().viewerBean.getTileSizeMinZoomLevelOrig(screen);
+				};
+				
+                PanoJS.prototype.getMaxDimCurZoomLevelOrig = PanoJS.prototype.getMaxDimCurZoomLevel;
+                PanoJS.prototype.getMaxDimCurZoomLevel = function cv_getMaxDimCurZoomLevelOrig(screen, calculatedMinFitZoomLevel) {
+                	 return that.getViewer().viewerBean.getMaxDimCurZoomLevelOrig(screen , calculatedMinFitZoomLevel);
+				};
+                
                 PanoJS.prototype.assignTileImageOrig = PanoJS.prototype.assignTileImage;
                 PanoJS.prototype.assignTileImage = function cv_assignTileImage() {
                     that.assignTileImage(arguments[0]);
@@ -114,7 +130,7 @@
                 this.clearDamagedArea();
                 this.drawArea(this.getFullScreenArea());
             } else {
-                // the viewer only moves, so we need only to draw the border Tiles
+                // the viewer only moves, so we need only to draw the border Tiles 
                 this.moveCanvas(moveVector);
                 jQuery(scope).trigger(iview.Canvas.BEFORE_DRAW_EVENT);
                 var moveDamagedArea = this.calculateDamagedArea(moveVector);
@@ -466,13 +482,6 @@
             return viewerBean.y;
         };
 
-        constructor.prototype.getCurrentImageWidth = function cv_getCurrentImageWidth() {
-            return this.getViewer().currentImage.curWidth;
-        };
-
-        constructor.prototype.getCurrentImageHeight = function cv_getCurrentImageHeight() {
-            return this.getViewer().currentImage.curHeight;
-        };
 
         constructor.prototype.getCurrentCanvasWidth = function cv_getCurrentCanvasWidth() {
             return this.context2D.canvas.width;

@@ -258,8 +258,8 @@ iview.overview.View = function(i18n) {
 			var coords = resolveCoordinates(e, that.my.self);
 			var position = {'x' : that._cur.x + (coords.x - that._mouse.x),
 				'y': that._cur.y + (coords.y - that._mouse.y)};
-
-			if (position.x != that._cur.x || position.x != that._cur.x) {
+			
+			if (position.x != that._cur.x || position.y != that._cur.y) {
 				jQuery(that).trigger("position.overview", {x: {"new": scale(that, position.x, true), "old": scale(that, that._cur.x, true)}, y: {"new": scale(that, position.y, false), "old": scale(that, that._cur.y, false)}});
 			}
 		}

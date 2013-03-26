@@ -1,6 +1,6 @@
 (function() {
     "use strict";
-
+    // TODO : fix rotation position bug 
     function cv_getRotateCurrentWidth() {
         var currentImage = this.getViewer().currentImage;
         return Math.floor((currentImage.rotation == 0 || currentImage.rotation == 180) ? currentImage.curWidth : currentImage.curHeight);
@@ -32,6 +32,39 @@
                 .floor((this.getViewer().currentImage.rotation == 0 || this.getViewer().currentImage.rotation == 180) ? this.context2D.canvas.height
                         : this.context2D.canvas.width);
     }
+    
+    function cv_getMaxDimViewer (screen){
+    	if( this.iview.currentImage.rotation == 0 ||  this.iview.currentImage.rotation == 180){
+    		return (screen) ? this.width : this.height ;
+    	} else {
+    		return (screen) ?  this.width : this.height;
+    	}
+	 }
+    
+
+	function cv_getTileSizeMinZoomLevel(screen) {
+		if ( this.iview.currentImage.rotation == 0 ||  this.iview.currentImage.rotation == 180) {
+			return (screen) ? this.iview.currentImage.zoomInfo.dimensions[0].width
+					: this.iview.currentImage.zoomInfo.dimensions[0].height;
+		} else {
+			return (!screen) ? this.iview.currentImage.zoomInfo.dimensions[0].width
+					: this.iview.currentImage.zoomInfo.dimensions[0].height;
+		}
+	}
+	
+	
+  
+
+	function cv_getMaxDimCurZoomLevel(screen, calculatedMinFitZoomLevel) {
+		if (this.iview.currentImage.rotation == 0
+				|| this.iview.currentImage.rotation == 180) {
+			return (screen) ? this.iview.currentImage.zoomInfo.dimensions[calculatedMinFitZoomLevel].width
+					: this.iview.currentImage.zoomInfo.dimensions[calculatedMinFitZoomLevel].height;
+		} else {
+			return (!screen) ? this.iview.currentImage.zoomInfo.dimensions[calculatedMinFitZoomLevel].width
+					: this.iview.currentImage.zoomInfo.dimensions[calculatedMinFitZoomLevel].height;
+		}
+	}
     
     function cv_isXBorderTile(tileX) {
         var viewerBean = this.getViewer().viewerBean;
@@ -184,6 +217,7 @@
             this.context2D.rotate(degree * (Math.PI / 180));
             this.context2D.translate(moveXAxis, moveYAxis);
         }
+        jQuery(this.getViewer()).trigger("move.viewer", {'x': viewerBean.x, 'y': viewerBean.y});
     }
 
     function cv_flipImageDimensions() {
@@ -212,10 +246,10 @@
         
         jQuery(currentImage).trigger(iview.CurrentImage.DIMENSION_EVENT);
         
-        this.setNewViewport(x,y);
+        var motion = this.setNewViewport(x,y);
         jQuery(currentImage).trigger(iview.CurrentImage.POS_CHANGE_EVENT);
         
-        viewerBean.positionTiles();
+        viewerBean.positionTiles(motion);
     }
 
     /**
@@ -421,12 +455,12 @@
             var button = new ToolbarButtonModel("rotateRight", {
                 'type' : 'buttonDefault'
             }, {
-                'label' : "Rotate right",
+                'label' : "rotate",
                 'text' : false,
                 'icons' : {
-                    primary : 'ui-icon-arrowrefresh-1-s'
+                    primary : 'iview2-icon iview2-icon-rotate'
                 }
-            }, "Rotate right", true, false);
+            }, "toolbar.rotate", true, false);
             toolbarModel.addElement(buttonSet, i);
             buttonSet.addButton(button); // attach to events of view
             jQuery.each(e.getViews(), function(index, view) {
@@ -444,15 +478,22 @@
     
     function cv_setNewViewport(x,y){
         
+    
        var viewerBean = this.getViewer().viewerBean;
        var currentImage = this.getViewer().currentImage;
        var rotation = currentImage.rotation;               
        var beanMiddleX = (viewerBean.width / 2);
        var beanMiddleY = (viewerBean.height / 2);
 
-       viewerBean.x = currentImage.curWidth  - (y + viewerBean.height) + (beanMiddleY - (viewerBean.width / 2));
-       viewerBean.y = x + (beanMiddleX - (viewerBean.height/ 2));
-    }
+       var newX = currentImage.curWidth  - (y + viewerBean.height) + (beanMiddleY - (viewerBean.width / 2));
+       var newY = x + (beanMiddleX - (viewerBean.height/ 2));
+       
+
+		return {
+			x : viewerBean.x - newX,
+			y : viewerBean.y - newY
+		};
+    } 
     
     function cv_getRotatedBeanX(){
         var viewerBean = this.getViewer().viewerBean;
@@ -534,6 +575,10 @@
 
         jQuery(document).bind(iview.IViewInstance.INIT_EVENT, function(event, iViewInst) {
             iViewInst.rotate = new iview.Canvas.Rotate(iViewInst);
+            //PanoJS.prototype.getMaxDimViewer = cv_getMaxDimViewer;
+            PanoJS.prototype.getMaxDimCurZoomLevel = cv_getMaxDimCurZoomLevel;
+            PanoJS.prototype.getTileSizeMinZoomLevel = cv_getTileSizeMinZoomLevel;
+            
             iViewInst.canvas.flipImageDimensions = cv_flipImageDimensions;
             iViewInst.canvas.rotateCanvas = cv_rotateCanvas;
             iViewInst.canvas.rotate90degree = cv_rotate90degree;

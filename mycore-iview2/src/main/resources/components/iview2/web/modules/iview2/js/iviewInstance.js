@@ -34,12 +34,15 @@
 	};
 
 	/**
-	 * The instance of a ImageViewer
+	 * @description The instance of a ImageViewer
+	 * @name iview.IViewInstance
+	 * @memberof iview
 	 */
 	iview.IViewInstance = (function() {
+
 		/**
-		 * Creates a new Iview Instance
-		 * 
+		 * @description Creates a new Iview Instance
+		 * @memberOf iview.IViewInstance
 		 * @param {Object}
 		 *            container were the viewer should be
 		 * @param {Object}
@@ -47,14 +50,13 @@
 		 */
 		function constructor(container, options) {
 			var that = this;
-
+			
 			this.processProperties(options);
 
 			// check if first instance
 			var paramDerId = URL.getParam("derivate");
 			this.properties.useParam = false;
-			
-			
+
 			if (typeof Iview[this.properties.derivateId] === "undefined") {
 				var first = true;
 				for ( var derId in Iview) {
@@ -80,47 +82,57 @@
 			// TODO load toolbar after all resources (css, images) are ready
 			createToolbars(this);
 		}
+		
+
+
+		constructor.prototype.changeScrollbar = function(size, position) {
+			var size = size || true;
+			var position = position || true;
+			if (this.scrollBar != null) {
+				if (size) {
+					var imageWidth = typeof this.viewerBean.getCurrentImageWidth != "undefined"
+							&& this.viewerBean.getCurrentImageWidth()
+							|| this.currentImage.curWidth;
+					var imageHeight = typeof this.viewerBean.getCurrentImageHeight != "undefined"
+							&& this.viewerBean.getCurrentImageHeight()
+							|| this.currentImage.curHeight;
+					this.scrollBar.setSize({
+						"width" : imageWidth,
+						"height" : imageHeight
+					});
+				}
+				if (position) {
+					this.scrollBar.setPosition({
+						"x" : this.viewerBean.x,
+						"y" : this.viewerBean.y
+					});
+				}
+			}
+		}
+
+		constructor.prototype.onImageDimesionEvent = function(event) {
+			this.changeScrollbar(true, true);
+		};
 
 		/**
 		 * @description Handler that is automatic called when the image changes.
-		 * 
+		 * @memberOf iview.IViewInstance
 		 */
-		constructor.prototype.onImageChangeHandler = function ii_onImageChangeHandler() {
+		constructor.prototype.onImageChangeHandler = function() {
 			this.processImageProperties();
+			this.changeScrollbar(true, true);
 
-			if (this.scrollBar != null) {
-				this.scrollBar.setSize({
-					"width" : this.currentImage.curWidth,
-					"height" : this.currentImage.curHeight
-				});
-				this.scrollBar.setPosition({
-					"x" : this.viewerBean.x,
-					"y" : this.viewerBean.y
-				});
-				
-			}
 			if (this.ThumbnailPanel != null) {
-				this.ThumbnailPanel
-						.setSelected(this.PhysicalModel.getCurPos());
+				this.ThumbnailPanel.setSelected(this.PhysicalModel.getCurPos());
 			}
 		};
 
 		/**
 		 * @description Handler that is automatic called when the viewer zooms
+		 * @memberOf iview.IViewInstance
 		 */
-		constructor.prototype.onViewerZoomHandler = function ii_onImageZoomHandler() {
-			if (this.scrollBar != null) {
-
-				this.scrollBar.setSize({
-					"width" : this.currentImage.curWidth,
-					"height" : this.currentImage.curHeight
-				});
-
-				this.scrollBar.setPosition({
-					"x" : this.viewerBean.x,
-					"y" : this.viewerBean.y
-				});
-			}
+		constructor.prototype.onViewerZoomHandler = function() {
+			this.changeScrollbar(true, true);
 		};
 
 		/**
@@ -129,10 +141,10 @@
 		 *            jq
 		 * @param {Object}
 		 *            event
+		 * @memberOf iview.IViewInstance
 		 */
-		constructor.prototype.onViewerMoveHandler = function ii_onImageMoveHandler(
-				jq, event) {	
-			
+		constructor.prototype.onViewerMoveHandler = function(jq, event) {
+			this.changeScrollbar(false, true);
 			
 			if(this.scrollBar != null){
 				this.scrollBar.setPosition(event);
@@ -141,56 +153,61 @@
 
 		/**
 		 * Will be called if the Viewer will be maximized
-		 * @param one (true if first time maximized)
+		 * @method
+		 * @param one
+		 *            (true if first time maximized)
+		 * @memberOf iview.IViewInstance
 		 */
-		constructor.prototype.onMaximizeViewerContainer = function ii_onMaximizeViewerContainer(one){
+		constructor.prototype.onMaximizeViewerContainer = function(one) {
 			var that = this;
-			if(one){
+			if (one) {
 				if (this.properties.useOverview) {
 					iview.overview.importOverview(this);
 				}
-				
+
 				var scrollbarContainer = jQuery("<div class=\"scrollBar\" />");
-				this.scrollBar = new iview.Scrollbar.Controller(
-								  scrollbarContainer.appendTo(this.viewerContainer));
-				
+
+				that.scrollBar = new iview.Scrollbar.Controller(
+						scrollbarContainer.appendTo(this.viewerContainer));
+
 				var scrollbarEvent = function(jq, e) {
 					if (e.getEventType() == "positionChanged") {
-						
+
 						that.viewerBean.positionTiles({
 							"x" : that.viewerBean.x - e.getXValue(),
 							"y" : that.viewerBean.y - e.getYValue()
 						});
-						
+
 					}
 				};
 				this.scrollBar.registerEventHandler(scrollbarEvent);
-				
 
-				
-				jQuery(window).resize(function() {
-					var sizeX = that.viewerBean.width + iview.Scrollbar.Controller.SCROLLBAR_WIDTH;
-					var sizeY = that.viewerBean.height + iview.Scrollbar.Controller.SCROLLBAR_HEIGHT;
+				jQuery(window)
+						.resize(
+								function() {
+									var sizeX = that.viewerBean.width
+											+ iview.Scrollbar.Controller.SCROLLBAR_WIDTH;
+									var sizeY = that.viewerBean.height
+											+ iview.Scrollbar.Controller.SCROLLBAR_HEIGHT;
 
-					scrollbarContainer.css({
-						"width" : sizeX + "px"
-					});
-					scrollbarContainer.css({
-						"height" : sizeY + "px"
-					});
+									scrollbarContainer.css({
+										"width" : sizeX + "px"
+									});
+									scrollbarContainer.css({
+										"height" : sizeY + "px"
+									});
 
-				});
+								});
 			}
-			
+
 			var scrollbarContainer = this.scrollBar.getContainer();
-			
-			this.scrollBar.setSize({
-				"width" : that.currentImage.curWidth,
-				"height" : that.currentImage.curHeight
-			});
-			
-			var sizeX = that.viewerBean.width + iview.Scrollbar.Controller.SCROLLBAR_WIDTH;
-			var sizeY = that.viewerBean.height + iview.Scrollbar.Controller.SCROLLBAR_HEIGHT;
+
+			this.changeScrollbar(true, false);
+
+			var sizeX = that.viewerBean.width
+					+ iview.Scrollbar.Controller.SCROLLBAR_WIDTH;
+			var sizeY = that.viewerBean.height
+					+ iview.Scrollbar.Controller.SCROLLBAR_HEIGHT;
 
 			scrollbarContainer.css({
 				"width" : sizeX + "px"
@@ -198,36 +215,39 @@
 			scrollbarContainer.css({
 				"height" : sizeY + "px"
 			});
-			
-			this.addDimensionSubstract(true, 'scrollbar', iview.Scrollbar.Controller.SCROLLBAR_WIDTH);
-			this.addDimensionSubstract(false, 'scrollbar', iview.Scrollbar.Controller.SCROLLBAR_HEIGHT);
-			
+
+			this.addDimensionSubstract(true, 'scrollbar',
+					iview.Scrollbar.Controller.SCROLLBAR_WIDTH);
+			this.addDimensionSubstract(false, 'scrollbar',
+					iview.Scrollbar.Controller.SCROLLBAR_HEIGHT);
+
 		};
-		constructor.prototype.onMinimizeViewerContainer = function ii_onMinimizeViewerContainer(){
+		/**
+		 * @memberOf iview.IViewInstance
+		 */
+		constructor.prototype.onMinimizeViewerContainer = function() {
 			if (this.ThumbnailPanel != null) {
 				this.ThumbnailPanel.hideView(false);
 			}
 		};
 
-		
 		/**
 		 * @method
-		 * @memberOf {IViewInstance}
+		 * @memberOf iview.IViewInstance
 		 * @description Assigns the the Components if there already loaded.
 		 *              Otherwise they get parent and loaded assigned.
 		 * @param {Object}
 		 *            container the viewer container were the components
 		 *            located.
 		 */
-		constructor.prototype.initaliseComponents = function ii_initaliseComponents(
-				container) {
+		constructor.prototype.initaliseComponents = function(container) {
 			var that = this;
-			
+
 			this.viewerContainer = container;
 			this.viewerContainer.isMax = function() {
 				return jQuery(this).hasClass("max");
 			};
-			
+
 			this.overview = jQuery.extend(this.overview || {}, {
 				'loaded' : (this.overview || {}).loaded || false,
 				'parent' : container
@@ -243,7 +263,7 @@
 
 			this.scrollBar = null;
 			this.thumbnailPanel = null;
-			
+
 			this.context = new iview.Context(this.viewerContainer, this);
 			this.currentImage = new iview.CurrentImage(this);
 			this.substractsDimension = {
@@ -256,16 +276,19 @@
 					'entries' : []
 				}
 			};
-			
-			jQuery(this.viewerContainer).one( "maximize.viewerContainer", function() {
-				that.onMaximizeViewerContainer(true);
-				jQuery(that.viewerContainer).bind( "maximize.viewerContainer", function() {
-					that.onMaximizeViewerContainer(false);
-				});
-			}).bind( "minimize.viewerContainer", function() {
+
+			jQuery(this.viewerContainer).one(
+					"maximize.viewerContainer",
+					function() {
+						that.onMaximizeViewerContainer(true);
+						jQuery(that.viewerContainer).bind(
+								"maximize.viewerContainer", function() {
+									that.onMaximizeViewerContainer(false);
+								});
+					}).bind("minimize.viewerContainer", function() {
 				that.onMinimizeViewerContainer();
 			});
-			
+
 			// other components which are lowering the width and the height of
 			// the viewer, can be applyed here
 			jQuery(this).trigger(iview.IViewInstance.INIT_COMPONENTS_EVENT,
@@ -273,19 +296,16 @@
 
 		};
 
-		
-		
 		/**
 		 * @description Sets the Default properties and applys extra properties.
 		 * @exception throws
 		 *                IviewInstanceError if properties.derivateId is
 		 *                undefined.
-		 * @memberOf {IViewInstance}
+		 * @memberOf iview.IViewInstance
 		 * @param {Object}
 		 *            properties the extra properties that should be set.
 		 */
-		constructor.prototype.processProperties = function ii_processPoperties(
-				properties) {
+		constructor.prototype.processProperties = function(properties) {
 			// apply the default properties
 			var defaultOpts = {
 				"useChapter" : true,
@@ -313,18 +333,22 @@
 		/**
 		 * @description applys the properties: maximized, tosize, zoominfo and
 		 *              zoom
+		 * @memberOf iview.IViewInstance
 		 */
 		constructor.prototype.applyProperties = function() {
 			var that = this;
 
 			// IE ignores surface if background is transparent
 			var surface = this.context.viewer.find(".surface");
-			surface.css({"background" : "white", "opacity":0.001});
-			
+			surface.css({
+				"background" : "white",
+				"opacity" : 0.001
+			});
+
 			surface.mousewheel(function(jq, e) {
-			
+
 				var oldPos = that.scrollBar.getPosition();
-				oldPos.y -=(e*10);
+				oldPos.y -= (e * 10);
 				that.scrollBar.setPosition(oldPos);
 			});
 
@@ -365,9 +389,9 @@
 		 * @param {boolean}
 		 *            should the viewer start maximized (overwrites container
 		 *            properties)
+		 * @memberOf iview.IViewInstance
 		 */
-		constructor.prototype.startViewer = function ii_startViewer(startFile,
-				maximized) {
+		constructor.prototype.startViewer = function(startFile, maximized) {
 			if (typeof maximized !== "undefined") {
 				this.properties.maximized = maximized;
 			}
@@ -386,6 +410,7 @@
 		 * 
 		 * @param {Object}
 		 *            startFile
+		 * @memberOf iview.IViewInstance
 		 */
 		constructor.prototype.loading = function ii_loading(startFile) {
 			PanoJS.USE_SLIDE = false;
@@ -408,16 +433,16 @@
 			// needs to be registered before any other listener for this event
 			var viewerBean = this.viewerBean;
 
-			jQuery(document).delegate(viewerBean.viewer, "zoom.viewer", function() {
-				that.onViewerZoomHandler(arguments);
-			});
+			jQuery(document).delegate(viewerBean.viewer, "zoom.viewer",
+					function() {
+						that.onViewerZoomHandler(arguments);
+					});
 			jQuery(viewerBean.viewer).bind("move.viewer", function(jq, event) {
 				that.onViewerMoveHandler(jq, event);
-			}).bind("zoom.viewer", function(){ // onViewerZoom handler runs to late cause its a delegate
+			}).bind("zoom.viewer", function() { // onViewerZoom handler runs to
+				// late cause its a delegate
 				viewerZoomed.apply(that, arguments);
 			});
-
-		
 
 			if (this.properties.useParam
 					&& !isNaN(parseInt(URL.getParam("zoom")))) {
@@ -436,9 +461,10 @@
 
 		/**
 		 * Initialises the ViewerBean.
+		 * 
+		 * @memberOf iview.IViewInstance
 		 */
-		constructor.prototype.initViewerBean = function ii_initViewerBean(
-				iviewTileUrlProvider) {
+		constructor.prototype.initViewerBean = function(iviewTileUrlProvider) {
 			var that = this;
 			if (this.viewerBean == null) {
 				this.viewerBean = new PanoJS(this.context.viewer[0], {
@@ -467,8 +493,9 @@
 		/**
 		 * @description loads the Mets file from MCRMETSServlet and runs
 		 *              iview.METS.processMETS
+		 * @memberOf iview.IViewInstance
 		 */
-		constructor.prototype.loadMetsFile = function ii_loadMetsFile() {
+		constructor.prototype.loadMetsFile = function () {
 			var metsDocURI = this.properties.webappBaseUri
 					+ "servlets/MCRMETSServlet/" + this.properties.derivateId;
 			var that = this;
@@ -504,6 +531,9 @@
 					});
 		};
 
+		/**
+		 * @memberOf iview.IViewInstance
+		 */
 		constructor.prototype.removeNavigationButtons = function() {
 			var that = this;
 			if (this.viewerContainer.isMax()) {
@@ -544,7 +574,7 @@
 		 * @public
 		 * @function
 		 * @name toggleViewerMode
-		 * @memberOf iview.iviewInstance
+		 * @memberOf iview.IViewInstance
 		 * @description maximize and show the viewer with the related image or
 		 *              minimize and close the viewer
 		 */
@@ -579,7 +609,7 @@
 		 * @public
 		 * @function
 		 * @name loadPage
-		 * @memberOf iview.iviewInstance
+		 * @memberOf iview.IViewInstance
 		 * @description reads out the imageinfo.xml, set the correct zoomvalues
 		 *              and loads the page
 		 * @param {function}
@@ -599,6 +629,10 @@
 				success : function(response) {
 					that.currentImage.processImageProperties(response, url);
 					callBack(callback);
+					jQuery(that.currentImage).bind(
+							iview.CurrentImage.DIMENSION_EVENT, function() {
+								that.onImageDimesionEvent();
+							});
 				},
 				error : function(request, status, exception) {
 					log("Error occured while loading image properties:\n"
@@ -611,7 +645,7 @@
 		 * @public
 		 * @function
 		 * @name processImageProperties
-		 * @memberOf iview.iviewInstance
+		 * @memberOf iview.IViewInstance
 		 * @description
 		 * @param {object}
 		 *            imageProperties
@@ -654,7 +688,7 @@
 		 * @public
 		 * @function
 		 * @name reinitializeGraphic
-		 * @memberOf iview.iviewInstance
+		 * @memberOf iview.IViewInstance
 		 * @param {function}
 		 *            callback which is called just before the event
 		 *            reinit.viewer is triggered
@@ -727,21 +761,22 @@
 			// that they possibly need adaptation of their own view
 			jQuery(viewerBean.viewer).trigger("reinit.viewer");
 
-			var sizeX = viewerBean.width + iview.Scrollbar.Controller.SCROLLBAR_WIDTH;
-			var sizeY = viewerBean.height + iview.Scrollbar.Controller.SCROLLBAR_HEIGHT;
+			var sizeX = viewerBean.width
+					+ iview.Scrollbar.Controller.SCROLLBAR_WIDTH;
+			var sizeY = viewerBean.height
+					+ iview.Scrollbar.Controller.SCROLLBAR_HEIGHT;
 
-			if(scrollbarContainer!=null){
+			if (scrollbarContainer != null) {
 				var scrollbarContainer = this.scrollBar.getContainer();
 				scrollbarContainer.css({
 					"width" : sizeX + "px"
 				});
 				scrollbarContainer.css({
 					"height" : sizeY + "px"
-				});	
-			}
-			
+				});
 
-			
+			}
+
 			viewerBean.x = 0;
 			viewerBean.y = 0;
 			if (!isNaN(URL.getParam("x")) && !isNaN(URL.getParam("x"))) {
@@ -752,7 +787,7 @@
 			} else {
 				viewerBean.positionTiles();
 			}
-			
+
 			// TODO: align image and toolbar to the center
 		};
 
@@ -781,7 +816,7 @@
 		 * @public
 		 * @function
 		 * @name addDimensionSubstract
-		 * @memberOf iview.IviewInstance
+		 * @memberOf iview.IViewInstance
 		 * @description allows it to modify the effective size of the viewer by
 		 *              telling what space some given components occupy
 		 * @param {boolean}
@@ -812,7 +847,7 @@
 		 * @public
 		 * @function
 		 * @name removeDimensionSubstract
-		 * @memberOf iview.iviewInstance
+		 * @memberOf iview.IViewInstance
 		 * @description deallocates a previously occupied space
 		 * @param {boolean}
 		 *            horizontal tells if the given name is used for a width or
