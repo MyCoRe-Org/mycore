@@ -55,6 +55,8 @@ public class MCREditorSession {
 
     private Set<String> xPathsOfDisplayedFields = new HashSet<String>();
 
+    private String sourceURI;
+
     private String cancelURL;
 
     public MCREditorSession(Map<String, String[]> requestParameters) {
@@ -81,12 +83,17 @@ public class MCREditorSession {
     public void setEditedXML(String uri) throws JDOMException, IOException, SAXException, TransformerException {
         if (editedXML == null) {
             LOGGER.info(id + " reading edited XML from " + uri);
+            sourceURI = uri;
             editedXML = MCRSourceContent.getInstance(uri).asXML();
         }
     }
 
     public Document getEditedXML() {
         return editedXML;
+    }
+
+    public String getSourceURI() {
+        return sourceURI;
     }
 
     public Map<String, String[]> getRequestParameters() {
@@ -122,7 +129,7 @@ public class MCREditorSession {
         List<Object> boundNodes = binding.getBoundNodes();
 
         while (boundNodes.size() < values.length) {
-            Element newElement = binding.cloneLastBoundElement();
+            Element newElement = binding.cloneBoundElement(boundNodes.size() - 1);
             markAsTransformedToInputField(newElement);
         }
 

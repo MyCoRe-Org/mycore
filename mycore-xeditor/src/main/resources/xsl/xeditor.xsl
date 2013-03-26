@@ -157,25 +157,39 @@
   <!-- ========== <xed:repeat /> ========== -->
 
   <xsl:template match="xed:repeat" mode="xeditor">
-    <xsl:variable name="currentName" select="transformer:bindingName($transformer)" />
-    <xsl:variable name="currentXPath" select="transformer:bindingXPath($transformer)" />
+    <xsl:variable name="xed_repeat" select="." />
 
-    <!-- Number of repeats to make -->
-    <xsl:variable name="repeats" select="transformer:numRepeats($transformer,@min)" />
-
-    <!-- Unbind current binding to bind each node separately -->
-    <xsl:value-of select="transformer:unbind($transformer)" />
-
-    <xsl:variable name="currentNodeSet" select="*" />
-    <xsl:for-each select="$repeats">
-      <xsl:variable name="xPath" select="concat($currentXPath,'[',position(),']')" />
-      <xsl:value-of select="transformer:bind($transformer,$xPath,'')" />
-      <xsl:apply-templates select="$currentNodeSet" mode="xeditor" />
-      <xsl:value-of select="transformer:unbind($transformer)" />
+    <xsl:for-each select="xalan:tokenize(transformer:repeat($transformer,@xpath,@min,@max))">
+      <xsl:value-of select="transformer:bindRepeatPosition($transformer)" />
+      <xsl:apply-templates select="$xed_repeat/node()" mode="xeditor" />
     </xsl:for-each>
+    <xsl:value-of select="transformer:endRepeat($transformer)" />  
+  </xsl:template>
 
-    <!-- Restore original binding -->
-    <xsl:value-of select="transformer:bind($transformer,$currentXPath,$currentName)" />
+  <!-- ========== <xed:controls /> ========== -->
+
+  <xsl:template match="xed:controls" mode="xeditor">
+    <xsl:variable name="pos" select="transformer:getRepeatPosition($transformer)" />
+    <xsl:variable name="num" select="transformer:getNumRepeats($transformer)" />
+    <xsl:variable name="max" select="transformer:getMaxRepeats($transformer)" />
+    
+    <xsl:variable name="controls">
+      <xsl:if test="string-length(.) = 0">insert remove up down</xsl:if>
+      <xsl:value-of select="." />
+    </xsl:variable>
+    
+    <xsl:for-each select="xalan:tokenize($controls)">
+      <xsl:choose>
+        <xsl:when test="(. = 'append') and ($pos &lt; $num)" />
+        <xsl:when test="(. = 'up') and ($pos = 1)" />
+        <xsl:when test="(. = 'down') and ($pos = $num)" />
+        <xsl:when test="(. = 'insert') and ($max = $num)" />
+        <xsl:when test="(. = 'append') and ($max = $num)" />
+        <xsl:otherwise>
+          <input type="submit" value="{.}" name="_xed_submit_{.}_{transformer:getControlsParameter($transformer)}" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
   </xsl:template>
 
 </xsl:stylesheet>

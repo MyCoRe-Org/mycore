@@ -38,7 +38,7 @@ import org.mycore.frontend.xeditor.MCREditorSession;
 public class MCRCancelTarget implements MCREditorTarget {
 
     @Override
-    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String servletNameOrPath)
+    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter)
             throws IOException, ServletException {
         String cancelURL = session.getCancelURL();
         job.getResponse().sendRedirect(cancelURL == null ? MCRServlet.getBaseURL() : cancelURL);

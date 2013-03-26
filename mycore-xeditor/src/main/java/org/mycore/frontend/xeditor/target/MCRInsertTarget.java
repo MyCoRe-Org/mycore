@@ -23,31 +23,27 @@
 
 package org.mycore.frontend.xeditor.target;
 
-import java.text.ParseException;
-import java.util.Set;
 
-import javax.servlet.ServletContext;
-
-import org.jdom2.JDOMException;
-import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.frontend.xeditor.MCREditorSession;
+import org.jdom2.Element;
+import org.mycore.frontend.xeditor.MCRBinding;
 
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCREditorTargetBase implements MCREditorTarget {
+public class MCRInsertTarget extends MCRControlTarget {
 
-    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter) throws Exception {
-        setSubmittedValues(job, session);
-        session.removeDeletedNodes();
-    }
+    @Override
+    protected void handleControl(MCRBinding baseBinding, String repeatXPath, String pos) throws Exception {
+        String buildXPath = repeatXPath + "[9999]";
+        MCRBinding newBinding = new MCRBinding(buildXPath, baseBinding);
+        Element newElement = (Element) (newBinding.getBoundNode());
+        newElement.detach();
 
-    protected void setSubmittedValues(MCRServletJob job, MCREditorSession session) throws JDOMException, ParseException {
-        for (String xPath : (Set<String>) (job.getRequest().getParameterMap().keySet())) {
-            if (xPath.startsWith("/")) {
-                String[] values = job.getRequest().getParameterValues(xPath);
-                session.setSubmittedValues(xPath, values);
-            }
-        }
+        String ancestorXPath = repeatXPath + "[" + pos + "]";
+        MCRBinding ancestorBinding = new MCRBinding(ancestorXPath, baseBinding);
+        Element ancestor = (Element) (ancestorBinding.getBoundNode());
+        Element parent = ancestor.getParentElement();
+        int posInParent = parent.indexOf(ancestor) + 1;
+        parent.addContent(posInParent, newElement);
     }
 }

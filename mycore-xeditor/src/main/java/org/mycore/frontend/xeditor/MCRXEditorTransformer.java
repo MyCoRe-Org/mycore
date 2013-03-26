@@ -24,10 +24,12 @@
 package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,6 +38,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.xalan.extensions.ExpressionContext;
 import org.apache.xpath.NodeSet;
@@ -67,6 +70,8 @@ public class MCRXEditorTransformer {
     private MCRParameterCollector transformationParameters;
 
     private MCRBinding currentBinding;
+
+    private Stack<MCRRepeat> repeats = new Stack<MCRRepeat>();
 
     private List<Namespace> namespaces = new ArrayList<Namespace>();
 
@@ -139,27 +144,34 @@ public class MCRXEditorTransformer {
         }
     }
 
-    public String bindingName() {
-        return currentBinding.getName();
+    public String repeat(String xPath, int minRepeats, int maxRepeats) throws JDOMException, ParseException {
+        MCRRepeat repeat = new MCRRepeat(currentBinding, xPath, minRepeats, maxRepeats);
+        repeats.push(repeat);
+        return StringUtils.repeat("a ", repeat.getNumRepeats());
     }
 
-    public String bindingXPath() {
-        return currentBinding.getRelativeXPath();
+    public int getNumRepeats() {
+        return repeats.peek().getNumRepeats();
     }
 
-    public XNodeSet numRepeats(ExpressionContext context, int minRepeats) throws JDOMException, ParserConfigurationException,
-            TransformerException {
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        org.w3c.dom.Document doc = builder.newDocument();
-        NodeSet ns = new NodeSet();
+    public int getMaxRepeats() {
+        return repeats.peek().getMaxRepeats();
+    }
 
-        int numBoundNodes = currentBinding.getBoundNodes().size();
-        int numRepeats = Math.max(numBoundNodes, Math.max(minRepeats, 1));
+    public int getRepeatPosition() {
+        return repeats.peek().getRepeatPosition();
+    }
 
-        for (int i = 0; i < numRepeats; i++)
-            ns.addNode(doc.createElement("a"));
+    public void bindRepeatPosition() throws JDOMException, ParseException {
+        currentBinding = repeats.peek().bindRepeatPosition();
+    }
 
-        return new XNodeSetForDOM((NodeList) ns, context.getXPathContext());
+    public void endRepeat() {
+        currentBinding = repeats.pop().getParentBinding();
+    }
+
+    public String getControlsParameter() throws UnsupportedEncodingException {
+        return repeats.peek().getControlsParameter();
     }
 
     private final static Pattern PATTERN_URI = Pattern.compile("\\{\\{\\$(.+)\\}\\}");

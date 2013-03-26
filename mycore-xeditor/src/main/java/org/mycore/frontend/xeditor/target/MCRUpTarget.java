@@ -23,21 +23,22 @@
 
 package org.mycore.frontend.xeditor.target;
 
-import javax.servlet.ServletContext;
-
-import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.frontend.xeditor.MCREditorSession;
+import org.jdom2.Element;
+import org.mycore.frontend.xeditor.MCRBinding;
 
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRReloadTarget extends MCREditorTargetBase {
+public class MCRUpTarget extends MCRControlTarget {
 
     @Override
-    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String servletNameOrPath)
-            throws Exception {
-        setSubmittedValues(job, session);
-        session.forgetDisplayedFields();
-        redirectToEditorPage(job, session);
+    protected void handleControl(MCRBinding baseBinding, String repeatXPath, String pos) throws Exception {
+        String xPath = repeatXPath + "[" + pos + "]";
+        MCRBinding binding = new MCRBinding(xPath, baseBinding);
+        Element element = (Element) (binding.getBoundNode());
+        Element parent = element.getParentElement();
+        int posInParent = parent.indexOf(element);
+        element.detach();
+        parent.addContent(posInParent - 1, element);
     }
 }

@@ -23,7 +23,6 @@
 
 package org.mycore.frontend.xeditor;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -46,7 +45,7 @@ import org.xml.sax.SAXException;
  */
 public class MCRXEditorTransformerTest {
 
-    private void testTransformation(String inputFile, String editedXMLFile, String expectedOutputFile, boolean write)
+    private void testTransformation(String inputFile, String editedXMLFile, String expectedOutputFile, boolean justShow)
             throws TransformerException, IOException, JDOMException, SAXException {
         HashMap<String, String[]> parameters = new HashMap<String, String[]>();
         MCRParameterCollector pc = new MCRParameterCollector(false);
@@ -62,10 +61,8 @@ public class MCRXEditorTransformerTest {
         MCRContent input = MCRSourceContent.getInstance("resource:" + inputFile);
         MCRContent transformed = new MCRXEditorTransformer(editorSession, pc).transform(input);
 
-        if (write) {
-            File targetFile = File.createTempFile(expectedOutputFile.split("\\.")[0], expectedOutputFile.split("\\.")[1]);
-            transformed.sendTo(targetFile);
-            System.out.println("Output written to " + targetFile.getAbsolutePath());
+        if (justShow) {
+            System.out.println(transformed.asString());
         } else {
             MCRContent output = MCRSourceContent.getInstance("resource:" + expectedOutputFile);
             String msg = "Transformed output is different to " + expectedOutputFile;

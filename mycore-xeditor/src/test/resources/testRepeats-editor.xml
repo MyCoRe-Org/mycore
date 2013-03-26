@@ -4,20 +4,17 @@
   <xed:form>
     <xed:source uri="resource:{{$input}}" />
     <xed:bind xpath="/document">
-      <xed:bind xpath="service">
-        <xed:repeat>
-          <div>
-            <input type="text" />
-          </div>
-        </xed:repeat>
-      </xed:bind>
-      <xed:bind xpath="name[@type='personal']">
-        <xed:repeat min="3">
-          <div>
-            <input type="text" />
-          </div>
-        </xed:repeat>
-      </xed:bind>
+      <xed:repeat xpath="service">
+        <div>
+          <input type="text" />
+        </div>
+      </xed:repeat>
+      <xed:repeat xpath="name[@type='personal']" min="3">
+        <div>
+          <input type="text" />
+        </div>
+        <xed:controls>up down append</xed:controls>
+      </xed:repeat>
     </xed:bind>
   </xed:form>
 </div>

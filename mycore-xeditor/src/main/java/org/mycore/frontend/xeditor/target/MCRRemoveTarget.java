@@ -23,31 +23,17 @@
 
 package org.mycore.frontend.xeditor.target;
 
-import java.text.ParseException;
-import java.util.Set;
-
-import javax.servlet.ServletContext;
-
-import org.jdom2.JDOMException;
-import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.frontend.xeditor.MCREditorSession;
+import org.mycore.frontend.xeditor.MCRBinding;
 
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCREditorTargetBase implements MCREditorTarget {
+public class MCRRemoveTarget extends MCRControlTarget {
 
-    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter) throws Exception {
-        setSubmittedValues(job, session);
-        session.removeDeletedNodes();
-    }
-
-    protected void setSubmittedValues(MCRServletJob job, MCREditorSession session) throws JDOMException, ParseException {
-        for (String xPath : (Set<String>) (job.getRequest().getParameterMap().keySet())) {
-            if (xPath.startsWith("/")) {
-                String[] values = job.getRequest().getParameterValues(xPath);
-                session.setSubmittedValues(xPath, values);
-            }
-        }
+    @Override
+    protected void handleControl(MCRBinding baseBinding, String repeatXPath, String pos) throws Exception {
+        String nodeXPath = repeatXPath + "[" + pos + "]";
+        MCRBinding nodeBinding = new MCRBinding(nodeXPath, baseBinding);
+        nodeBinding.detachBoundNode();
     }
 }

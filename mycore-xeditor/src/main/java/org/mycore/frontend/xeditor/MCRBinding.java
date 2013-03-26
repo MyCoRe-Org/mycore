@@ -81,7 +81,7 @@ public class MCRBinding {
         LOGGER.debug("Bind to " + xPathExpression + " selected " + boundNodes.size() + " node(s)");
 
         if (boundNodes.isEmpty()) {
-            Object built = MCRNodeBuilder.build(xPathExpression, null, (Parent)(parent.getBoundNode()));
+            Object built = MCRNodeBuilder.build(xPathExpression, null, (Parent) (parent.getBoundNode()));
             LOGGER.debug("Bind to " + xPathExpression + " generated node " + MCRXPathBuilder.buildXPath(built));
             boundNodes.add(built);
         }
@@ -95,11 +95,11 @@ public class MCRBinding {
         return boundNodes.get(0);
     }
 
-    public Element cloneLastBoundElement() {
-        Element lastBoundElement = (Element) (boundNodes.get(boundNodes.size() - 1));
-        Element newElement = lastBoundElement.clone();
-        Element parent = lastBoundElement.getParentElement();
-        int indexInParent = parent.indexOf(lastBoundElement) + 1;
+    public Element cloneBoundElement( int index ) {
+        Element template = (Element) (boundNodes.get(index));
+        Element newElement = template.clone();
+        Element parent = template.getParentElement();
+        int indexInParent = parent.indexOf(template) + 1;
         parent.addContent(indexInParent, newElement);
         boundNodes.add(newElement);
         return newElement;
@@ -107,10 +107,11 @@ public class MCRBinding {
 
     public void detachBoundNodes() {
         while (!boundNodes.isEmpty())
-            detachBoundNode(getBoundNode());
+            detachBoundNode();
     }
 
-    private void detachBoundNode(Object node) {
+    public void detachBoundNode() {
+        Object node = getBoundNode();
         if (node instanceof Attribute)
             ((Attribute) node).detach();
         else
