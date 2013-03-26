@@ -23,10 +23,9 @@
 
 package org.mycore.datamodel.metadata;
 
-import java.lang.ref.WeakReference;
-import java.util.Collections;
-import java.util.Map;
-import java.util.WeakHashMap;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 /**
  * holds weak references to generated {@link MCRObjectID} instances.
@@ -34,24 +33,28 @@ import java.util.WeakHashMap;
  *
  */
 class MCRObjectIDPool {
-    private static Map<String, WeakReference<MCRObjectID>> map = Collections
-        .synchronizedMap(new WeakHashMap<String, WeakReference<MCRObjectID>>());
+    private static LoadingCache<String, MCRObjectID> objectIDCache = CacheBuilder
+        .newBuilder()
+        .weakKeys()
+        .weakValues()
+        .build(new CacheLoader<String, MCRObjectID>() {
+            @Override
+            public MCRObjectID load(String id) throws Exception {
+                return new MCRObjectID(id);
+            }
+        });
 
     static MCRObjectID getMCRObjectID(String id) {
-        WeakReference<MCRObjectID> ref = map.get(id);
-        if (ref != null) {
-            MCRObjectID mcrId = ref.get();
-            if (mcrId != null) {
-                return mcrId;
-            }
-        }
-        //does not exist (anymore)
-        MCRObjectID mcrId = new MCRObjectID(id);
-        map.put(mcrId.toString(), new WeakReference<MCRObjectID>(mcrId));
-        return mcrId;
+        return objectIDCache.getUnchecked(id);
     }
 
-    static int getSize() {
-        return map.size();
+    static long getSize() {
+        objectIDCache.cleanUp();
+        return objectIDCache.size();
     }
+    
+    static MCRObjectID getIfPresent(String id){
+        return objectIDCache.getIfPresent(id);
+    }
+
 }

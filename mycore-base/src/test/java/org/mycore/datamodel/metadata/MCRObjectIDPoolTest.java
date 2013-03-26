@@ -24,6 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -48,7 +49,7 @@ public class MCRObjectIDPoolTest extends MCRTestCase {
     public void getInstance() {
         System.gc();
         System.runFinalization();
-        int before = MCRObjectIDPool.getSize();
+        long before = MCRObjectIDPool.getSize();
         String id = "MyCoRe_test_11111111";
         @SuppressWarnings("unused")
         MCRObjectID mcrId = MCRObjectIDPool.getMCRObjectID(id);
@@ -56,6 +57,7 @@ public class MCRObjectIDPoolTest extends MCRTestCase {
         mcrId = null;
         System.gc();
         System.runFinalization();
+        assertNull("ObjectIDPool should not contain ID anymore.", MCRObjectIDPool.getIfPresent(id));
         assertEquals("ObjectIDPool size is different", before, MCRObjectIDPool.getSize());
     }
 }

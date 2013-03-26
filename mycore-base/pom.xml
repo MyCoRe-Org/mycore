@@ -213,6 +213,10 @@
       <artifactId>gson</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+    <dependency>
       <!-- required for commons-vfs -->
       <groupId>com.jcraft</groupId>
       <artifactId>jsch</artifactId>
