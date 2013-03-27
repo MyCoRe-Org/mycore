@@ -185,7 +185,7 @@
               window.onbeforeunload = onEditorClose;
               function onEditorClose() {
                 <xsl:value-of select="concat('var msg = &quot;', i18n:translate('component.mets.editor.close'), '&quot;;')" />
-                return confirm(msg);
+                return msg;
               }
 
             </script>
