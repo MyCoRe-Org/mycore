@@ -188,8 +188,10 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
         GregorianCalendar greg = new GregorianCalendar();
         greg.setTime(node.getDate());
 
-        return MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(), node.getOwner(), node.getName(), node.getLabel(),
-            node.getSize(), greg, node.getStoreid(), node.getStorageid(), node.getFctid(), node.getMd5(), node.getNumchdd(), node.getNumchdf(),
-            node.getNumchtd(), node.getNumchtf());
+        MCRFilesystemNode filesystemNode = MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(),
+            node.getOwner(), node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(),
+            node.getFctid(), node.getMd5(), node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
+        getSession().evict(node);
+        return filesystemNode;
     }
 }
