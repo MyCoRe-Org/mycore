@@ -508,15 +508,22 @@
 							that.ThumbnailPanel = new iview.thumbnailPanel.Controller(
 									that.viewerContainer, that.PhysicalModel,
 									that.viewerBean.tileUrlProvider);
-
+							
+							function resize(){
+								if(typeof that.ThumbnailPanel != "undefined" && typeof that.ThumbnailPanel._container != "undefined"){
+									var sizeY = that.viewerBean.height;
+									that.ThumbnailPanel._container.css({
+										"width" : "100%",
+										"height" : sizeY + "px"
+									});
+								}
+							}
+							
 							jQuery(window).resize(function() {
-								var sizeY = that.viewerBean.height;
-								that.ThumbnailPanel._container.css({
-									"width" : "100%",
-									"height" : sizeY + "px"
-								});
+								resize();
 							});
-
+							resize();
+							
 							jQuery(that)
 									.trigger(
 											iview.IViewInstance.INIT_PHYSICAL_MODEL_EVENT,
