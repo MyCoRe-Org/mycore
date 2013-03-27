@@ -57,7 +57,7 @@
 				</xsl:variable>
 				<xsl:variable name="query">
 					<xsl:value-of select="substring-after($fq, $JoinPattern)" />
-					<xsl:value-of select="'+returnId:('" />
+					<xsl:value-of select="' +returnId:('" />
 					<xsl:value-of select="substring-after($orChain, 'OR ')" />
 					<xsl:value-of select="')'" />
 				</xsl:variable>

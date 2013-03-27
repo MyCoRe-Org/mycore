@@ -57,7 +57,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
      */
     private static List<String> solrParameterKeys() {
         String[] params = new String[] { "q", "sort", "start", "rows", "pageDoc", "pageScore", "fq", "cache", "fl", "glob", "debug",
-                "explainOther", "defType", "timeAllowed", "omitHeader", "sortOrder", "sortBy", "XSL.Style" };
+                "explainOther", "defType", "timeAllowed", "omitHeader", "sortOrder", "sortBy", "XSL.Style", "wt" };
         return Collections.unmodifiableList(Arrays.asList(params));
     }
 

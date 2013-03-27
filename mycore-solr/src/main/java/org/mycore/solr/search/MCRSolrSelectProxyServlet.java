@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HeaderElement;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
@@ -81,7 +82,9 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
                 }
             }
 
-            if (statusCode == HttpStatus.SC_OK) {
+            boolean isXML = solrHttpMethod.getResponseHeader("Content-Type").getValue().contains("/xml");
+
+            if (statusCode == HttpStatus.SC_OK && isXML) {
                 MCRStreamContent solrResponse = new MCRStreamContent(solrResponseStream, solrHttpMethod.getURI().toString(), "response");
                 MCRLayoutService.instance().doLayout(request, resp, solrResponse);
                 return;
