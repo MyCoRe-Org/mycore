@@ -39,8 +39,8 @@ public class MCRCacheManager implements MCRCacheManagerMBean {
         this.cache = cache;
     }
 
-    public int getCapacity() {
-        return cache.capacity;
+    public long getCapacity() {
+        return cache.getCapacity();
     }
 
     public double getFillRate() {
@@ -52,36 +52,30 @@ public class MCRCacheManager implements MCRCacheManagerMBean {
     }
 
     public long getHits() {
-        return cache.hits;
+        return cache.backingCache.stats().hitCount();
     }
 
     public long getRequests() {
-        return cache.gets;
+        return cache.backingCache.stats().requestCount();
+    }
+    
+    public long getEvictions() {
+        return cache.backingCache.stats().evictionCount();
     }
 
-    public int getSize() {
-        return cache.size;
+    public long getSize() {
+        return cache.getCurrentSize();
     }
 
     /**
      * jmx.managed-operation
      */
-    public void setCapacity(int capacity) {
+    public void setCapacity(long capacity) {
         cache.setCapacity(capacity);
     }
 
     public void clear() {
-        int capacity = getCapacity();
         cache.clear();
-        setCapacity(capacity);
-    }
-
-    public String getLeastRecentlyUsedElement() {
-        return cache.lru.key.toString();
-    }
-
-    public String getMostRecentlyUsedElement() {
-        return cache.mru.key.toString();
     }
 
 }

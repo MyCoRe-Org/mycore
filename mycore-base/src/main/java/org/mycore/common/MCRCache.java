@@ -25,10 +25,12 @@ package org.mycore.common;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import org.mycore.services.mbeans.MCRJMXBridge;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 /**
  * Instances of this class can be used as object cache. Each MCRCache has a
@@ -66,56 +68,25 @@ public class MCRCache<K, V> {
 
     }
 
-    /**
-     * For each object in the cache, there is one MCRCacheEntry object
-     * encapsulating it. The cache uses a double-linked list of MCRCacheEntries
-     * and holds references to the most and least recently used entry.
-     */
-    static class MCRCacheEntry<K, V> {
-        /** The entry before this one, more often used than this entry */
-        MCRCacheEntry<K, V> before;
+    private static class MCRCacheEntry<V> {
+        public MCRCacheEntry(V value) {
+            this.value = value;
+            this.insertTime = System.currentTimeMillis();
+        }
 
-        /** The entry after this one, less often used than this entry */
-        MCRCacheEntry<K, V> after;
-
-        /** The key for this object, to be used for removing the object */
-        K key;
-
-        /** The timestamp when this object was placed in the cache */
-        long time;
-
-        /**
-         * The timestamp when this object was last checked for actuality
-         */
-        long lookUpTime;
-
-        /** The stored object encapsulated by this entry */
         V value;
+
+        long insertTime;
+
+        public long lookUpTime;
     }
-
-    /** The most recently used object * */
-    protected MCRCacheEntry<K, V> mru;
-
-    /** The least recently used object * */
-    protected MCRCacheEntry<K, V> lru;
-
-    /** A hashtable for looking up a cached object by a given key */
-    protected HashMap<K, MCRCacheEntry<K, V>> index = new HashMap<K, MCRCacheEntry<K, V>>();
-
-    /** The number of requests to get an object from this cache */
-    protected long gets = 0;
-
-    /** The number of hits, where a requested object really was in the cache */
-    protected long hits = 0;
-
-    /** The number of objects currently stored in the cache */
-    protected int size = 0;
-
-    /** The maximum number of objects that the cache can hold */
-    protected int capacity;
 
     /** Tch type string for the MCRCacheJMXBridge */
     protected String type;
+
+    Cache<K, MCRCacheEntry<V>> backingCache;
+
+    private long capacity;
 
     /**
      * Creates a new cache with a given capacity.
@@ -124,8 +95,9 @@ public class MCRCache<K, V> {
      *            the maximum number of objects this cache will hold
      * @param type the type string for MCRCacheJMXBridge
      */
-    public MCRCache(int capacity, String type) {
-        setCapacity(capacity);
+    public MCRCache(long capacity, String type) {
+        backingCache = CacheBuilder.newBuilder().recordStats().maximumSize(capacity).build();
+        this.capacity = capacity;
         this.type = type;
         Object mbean = new MCRCacheManager(this);
         MCRJMXBridge.register(mbean, "MCRCache", type);
@@ -142,39 +114,15 @@ public class MCRCache<K, V> {
      * @param value
      *            the non-null object to be put into the cache
      */
-    public synchronized void put(K key, V value) {
+    public void put(K key, V value) {
         if (key == null) {
             throw new NullPointerException("The key of a cache entry may not be null.");
         }
         if (value == null) {
             throw new NullPointerException("The value of a cache entry may not be null.");
         }
-
-        if (capacity == 0) {
-            return;
-        }
-
-        remove(key);
-
-        if (isFull()) {
-            remove(lru.key);
-        }
-
-        MCRCacheEntry<K, V> added = new MCRCacheEntry<K, V>();
-        added.value = value;
-        added.key = key;
-        added.time = System.currentTimeMillis();
-        index.put(key, added);
-
-        if (isEmpty()) {
-            lru = mru = added;
-        } else {
-            added.before = mru;
-            mru.after = added;
-        }
-
-        size++;
-        mru = added;
+        MCRCacheEntry<V> entry = new MCRCacheEntry<>(value);
+        backingCache.put(key, entry);
     }
 
     /**
@@ -183,35 +131,11 @@ public class MCRCache<K, V> {
      * @param key
      *            the key for the object you want to remove from this cache
      */
-    public synchronized void remove(K key) {
+    public void remove(K key) {
         if (key == null) {
             throw new MCRUsageException("The value of the argument key is null.");
         }
-
-        MCRCacheEntry<K, V> removed = index.get(key);
-        if (removed == null) {
-            return;
-        }
-
-        if (removed == lru) {
-            lru = removed.after;
-        } else {
-            removed.before.after = removed.after;
-        }
-
-        if (removed == mru) {
-            mru = removed.before;
-        } else {
-            removed.after.before = removed.before;
-        }
-
-        removed.value = null;
-        removed.key = null;
-        removed.time = 0;
-        removed.before = null;
-        removed.after = null;
-        index.remove(key);
-        size--;
+        backingCache.invalidate(key);
     }
 
     /**
@@ -222,38 +146,9 @@ public class MCRCache<K, V> {
      *            the key for the object you want to get from this cache
      * @return the cached object, or null
      */
-    public synchronized V get(K key) {
-        MCRCacheEntry<K, V> found = getEntry(key);
+    public V get(K key) {
+        MCRCacheEntry<V> found = backingCache.getIfPresent(key);
         return found == null ? null : found.value;
-    }
-
-    private MCRCacheEntry<K, V> getEntry(K key) {
-        if (key == null) {
-            throw new MCRUsageException("The value of the argument key is null.");
-        }
-
-        gets++;
-
-        MCRCacheEntry<K, V> found = index.get(key);
-        if (found == null) {
-            return null;
-        }
-
-        hits++;
-
-        if (found != mru) {
-            found.after.before = found.before;
-            if (found == lru) {
-                lru = found.after;
-            } else {
-                found.before.after = found.after;
-            }
-            found.after = null;
-            found.before = mru;
-            mru.after = found;
-            mru = found;
-        }
-        return found;
     }
 
     /**
@@ -269,18 +164,18 @@ public class MCRCache<K, V> {
      *            the timestamp to check that the cache entry is up to date
      * @return the cached object, or null
      */
-    public synchronized V getIfUpToDate(K key, long time) {
-        MCRCacheEntry<K, V> found = getEntry(key);
+    public V getIfUpToDate(K key, long time) {
+        MCRCacheEntry<V> found = backingCache.getIfPresent(key);
 
-        if (found == null) {
+        if (found == null || found.insertTime < time) {
             return null;
         }
 
-        if (found.time >= time) {
+        if (found.insertTime >= time) {
             found.lookUpTime = System.currentTimeMillis();
             return found.value;
         }
-        remove(key);
+        backingCache.invalidate(key);
         return null;
     }
 
@@ -299,17 +194,17 @@ public class MCRCache<K, V> {
      * @throws IOException thrown by {@link ModifiedHandle#getLastModified()}
      * @since 2.1.81
      */
-    public synchronized V getIfUpToDate(K key, ModifiedHandle handle) throws IOException {
-        MCRCacheEntry<K, V> found = getEntry(key);
+    public V getIfUpToDate(K key, ModifiedHandle handle) throws IOException {
+        MCRCacheEntry<V> found = backingCache.getIfPresent(key);
         if (found == null) {
             return null;
         }
         if (System.currentTimeMillis() - found.lookUpTime > handle.getCheckPeriod()) {
-            if (found.time >= handle.getLastModified()) {
+            if (found.insertTime >= handle.getLastModified()) {
                 found.lookUpTime = System.currentTimeMillis();
                 return found.value;
             }
-            remove(key);
+            backingCache.invalidate(key);
             return null;
         } else {
             return found.value;
@@ -321,8 +216,9 @@ public class MCRCache<K, V> {
      * 
      * @return the number of objects currently cached
      */
-    public synchronized int getCurrentSize() {
-        return size;
+    public long getCurrentSize() {
+        backingCache.cleanUp();
+        return backingCache.size();
     }
 
     /**
@@ -331,7 +227,7 @@ public class MCRCache<K, V> {
      * 
      * @return the capacity of this cache
      */
-    public synchronized int getCapacity() {
+    public long getCapacity() {
         return capacity;
     }
 
@@ -344,16 +240,13 @@ public class MCRCache<K, V> {
      * @param capacity
      *            the maximum number of objects this cache will hold
      */
-    public synchronized void setCapacity(int capacity) {
-        if (capacity < 0) {
-            throw new MCRUsageException("The cache capacity must be >= 0.");
-        }
-
-        while (size > capacity) {
-            remove(lru.key);
-        }
-
+    public synchronized void setCapacity(long capacity) {
         this.capacity = capacity;
+        Cache<K, MCRCacheEntry<V>> newCache = CacheBuilder.newBuilder().recordStats().maximumSize(capacity).build();
+        newCache.putAll(backingCache.asMap());
+        Cache<K, MCRCacheEntry<V>> oldCache = backingCache;
+        backingCache = newCache;
+        oldCache.invalidateAll();
     }
 
     /**
@@ -361,8 +254,9 @@ public class MCRCache<K, V> {
      * 
      * @return true if this cache is full
      */
-    public synchronized boolean isFull() {
-        return size == capacity;
+    public boolean isFull() {
+        backingCache.cleanUp();
+        return backingCache.size() == capacity;
     }
 
     /**
@@ -370,8 +264,9 @@ public class MCRCache<K, V> {
      * 
      * @return true if this cache is empty
      */
-    public synchronized boolean isEmpty() {
-        return size == 0;
+    public boolean isEmpty() {
+        backingCache.cleanUp();
+        return backingCache.size() == 0;
     }
 
     /**
@@ -380,8 +275,8 @@ public class MCRCache<K, V> {
      * 
      * @return the fill rate of this cache as double value
      */
-    public synchronized double getFillRate() {
-        return capacity == 0 ? 1.0 : (double) size / (double) capacity;
+    public double getFillRate() {
+        return capacity == 0 ? 1.0 : (double) getCurrentSize() / (double) capacity;
     }
 
     /**
@@ -391,17 +286,15 @@ public class MCRCache<K, V> {
      * 
      * @return the hit rate of this cache as double value
      */
-    public synchronized double getHitRate() {
-        return gets == 0 ? 1.0 : (double) hits / (double) gets;
+    public double getHitRate() {
+        return backingCache.stats().hitRate();
     }
 
     /**
      * Clears the cache by removing all entries from the cache
      */
-    public synchronized void clear() {
-        index.clear();
-        size = 0;
-        mru = lru = null;
+    public void clear() {
+        backingCache.invalidateAll();
     }
 
     /**
@@ -412,7 +305,7 @@ public class MCRCache<K, V> {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Cache capacity:  ").append(capacity).append("\n");
-        sb.append("Cache size:      ").append(size).append("\n");
+        sb.append("Cache size:      ").append(backingCache.size()).append("\n");
         sb.append("Cache fill rate: ").append(getFillRate()).append("\n");
         sb.append("Cache hit rate:  ").append(getHitRate());
 
@@ -447,6 +340,6 @@ public class MCRCache<K, V> {
      * Returns an iterable list of keys to the cached objects. 
      */
     public List<K> keys() {
-        return Collections.list(Collections.enumeration(index.keySet()));
+        return Collections.list(Collections.enumeration(backingCache.asMap().keySet()));
     }
 }
