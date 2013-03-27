@@ -1,0 +1,82 @@
+package org.mycore.solr.index.cs;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+
+import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
+
+public class MCRSolrFileIndexHandler extends MCRSolrAbstractIndexHandler {
+
+    final static Logger LOGGER = Logger.getLogger(MCRSolrFileIndexHandler.class);
+
+    final static String EXTRACT_PATH = MCRConfiguration.instance().getString("MCR.Module-solr.ExtractPath", "/update/extract");
+
+    final static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
+
+    public MCRSolrFileIndexHandler(MCRSolrFileContentStream stream) {
+        super(stream);
+    }
+
+    public MCRSolrFileIndexHandler(MCRSolrFileContentStream stream, SolrServer solrServer) {
+        super(stream, solrServer);
+    }
+
+    @Override
+    public void index() throws SolrServerException, IOException {
+        MCRFile file = getStream().getSource();
+        String solrID = file.getID();
+        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(file.getOwnerID()));
+        String idOfMCRObjectForDerivate = null;
+        if (derivate != null) {
+            idOfMCRObjectForDerivate = derivate.getOwnerID().toString();
+        }
+        if(LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Solr: indexing file \"" + file.getAbsolutePath() + " (" + solrID + ")\"");
+        }
+        /* create the update request object */
+        ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest(EXTRACT_PATH);
+        updateRequest.addContentStream(getStream());
+
+        /* set the additional parameters */
+        updateRequest.setParam("literal.id", solrID);
+        updateRequest.setParam("literal.DerivateID", file.getOwnerID());
+        if (idOfMCRObjectForDerivate != null) {
+            updateRequest.setParam("literal.returnId", idOfMCRObjectForDerivate);
+        }
+        updateRequest.setParam("literal.filePath", file.getAbsolutePath());
+        updateRequest.setParam("literal.objectType", "data_file");
+        updateRequest.setParam("literal.fileName", file.getName());
+        updateRequest.setParam("literal.objectProject", MCRObjectID.getInstance(file.getOwnerID()).getProjectId());
+        updateRequest.setParam("literal.fileDateModified", DATE_FORMATTER.format(file.getLastModified().getTime()));
+
+        String urn = null;
+        if ((urn = derivate.getUrnMap().get(file.getAbsolutePath())) != null) {
+            updateRequest.setParam("literal.urn", urn);
+        }
+        if(LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Solr: sending binary data (" + file.getAbsolutePath() + " (" + solrID + "), size is " + file.getSizeFormatted()
+                    + ") to solr server.");
+        }
+        long t = System.currentTimeMillis();
+        /* actually send the request */
+        getSolrServer().request(updateRequest);
+        if(LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Solr: sending binary data \"" + file.getAbsolutePath() + " (" + solrID + ")\"" + " done in "
+                + (System.currentTimeMillis() - t) + "ms");
+        }
+    }
+
+    @Override
+    public MCRSolrFileContentStream getStream() {
+        return (MCRSolrFileContentStream) super.getStream();
+    }
+
+}

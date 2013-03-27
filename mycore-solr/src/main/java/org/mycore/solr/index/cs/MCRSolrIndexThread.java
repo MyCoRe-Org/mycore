@@ -13,10 +13,10 @@ public class MCRSolrIndexThread implements Runnable {
 
     final static Logger LOGGER = Logger.getLogger(MCRSolrIndexThread.class);
 
-    protected MCRAbstractSolrContentStream<?> contentStream;
+    protected MCRSolrIndexHandler indexHandler;
 
-    public MCRSolrIndexThread(MCRAbstractSolrContentStream<?> contentStream) {
-        this.contentStream = contentStream;
+    public MCRSolrIndexThread(MCRSolrIndexHandler indexHandler) {
+        this.indexHandler = indexHandler;
     }
 
     @Override
@@ -25,9 +25,9 @@ public class MCRSolrIndexThread implements Runnable {
         try {
             session = MCRHIBConnection.instance().getSession();
             session.beginTransaction();
-            this.contentStream.index();
+            this.indexHandler.index();
         } catch (Exception ex) {
-            LOGGER.error("Error executing index task for object " + this.contentStream.getSourceInfo(), ex);
+            LOGGER.error("Error executing index task for object " + this.indexHandler, ex);
         } finally {
             session.close();
         }

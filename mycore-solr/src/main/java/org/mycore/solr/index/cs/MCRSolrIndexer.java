@@ -60,7 +60,6 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
     @Override
     synchronized protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
         this.handleMCRBaseCreated(evt, obj);
-
     }
 
     @Override
@@ -96,15 +95,20 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
     synchronized protected void handleMCRBaseCreated(MCREvent evt, MCRBase objectOrDerivate) {
         long tStart = System.currentTimeMillis();
         try {
-            LOGGER.trace("Solr: submitting data of\"" + objectOrDerivate.getId().toString() + "\" for indexing");
+            if(LOGGER.isTraceEnabled()) {
+                LOGGER.trace("Solr: submitting data of\"" + objectOrDerivate.getId().toString() + "\" for indexing");
+            }
             MCRContent content = (MCRContent) evt.get("content");
             if (content == null) {
                 content = new MCRBaseContent(objectOrDerivate);
             }
-            MCRBaseContentStream contentStream = new MCRBaseContentStream(objectOrDerivate.getId().toString(), content);
-            executorService.submit(new MCRSolrIndexThread(contentStream));
-            LOGGER.trace("Solr: submitting data of\"" + objectOrDerivate.getId().toString() + "\" for indexing done in "
+            MCRSolrContentStream contentStream = new MCRSolrContentStream(objectOrDerivate.getId().toString(), content);
+            MCRSolrDefaultIndexHandler indexHandler = new MCRSolrDefaultIndexHandler(contentStream);
+            executorService.submit(new MCRSolrIndexThread(indexHandler));
+            if(LOGGER.isTraceEnabled()) {
+                LOGGER.trace("Solr: submitting data of\"" + objectOrDerivate.getId().toString() + "\" for indexing done in "
                     + (System.currentTimeMillis() - tStart) + "ms ");
+            }
         } catch (Exception ex) {
             LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Error creating transfer thread for object " + objectOrDerivate, ex);
         }
@@ -112,18 +116,19 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
 
     @Override
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
-
         try {
-            LOGGER.trace("Solr: submitting file \"" + file.getAbsolutePath() + " (" + file.getID() + ")\" for indexing");
+            if(LOGGER.isTraceEnabled()) {
+                LOGGER.trace("Solr: submitting file \"" + file.getAbsolutePath() + " (" + file.getID() + ")\" for indexing");
+            }
             if (file.getSize() > MCRSolrIndexer.OVER_THE_WIRE_THRESHOLD) {
-                MCRBaseContentStream contentStream = new MCRBaseContentStream(file.getID(), new MCRJDOMContent(file.createXML()));
-                executorService.submit(new MCRSolrIndexThread(contentStream));
+                MCRSolrContentStream contentStream = new MCRSolrContentStream(file.getID(), new MCRJDOMContent(file.createXML()));
+                MCRSolrDefaultIndexHandler objectHandler = new MCRSolrDefaultIndexHandler(contentStream);
+                executorService.submit(new MCRSolrIndexThread(objectHandler));
             } else {
                 /* extract metadata with tika */
-                MCRAbstractSolrContentStream<MCRFile> contentStream = new MCRFileContentStream(file);
-                executorService.submit(new MCRSolrIndexThread(contentStream));
+                MCRSolrFileIndexHandler fileHandler = new MCRSolrFileIndexHandler(new MCRSolrFileContentStream(file));
+                executorService.submit(new MCRSolrIndexThread(fileHandler));
             }
-
         } catch (Exception ex) {
             LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Error creating transfer thread for file " + file.toString(), ex);
         }
@@ -215,7 +220,9 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
                 objCollector.addContent(mcrObjXML.getRootElement().detach());
 
                 if (objCollector.getChildren().size() % BULK_SIZE == 0) {
-                    executorService.submit(new MCRXMLSolrIndexer(new MCRXMLContentCollectorStream(objCollector), solrServer));
+                    MCRSolrCollectorContentStream contentStream = new MCRSolrCollectorContentStream(new MCRJDOMContent(objCollector));
+                    MCRSolrDefaultIndexHandler indexHandler = new MCRSolrDefaultIndexHandler(contentStream, solrServer);
+                    executorService.submit(new MCRSolrIndexThread(indexHandler));
                     objCollector = new Element("mcrObjs");
                 }
             } catch (Exception ex) {
@@ -224,9 +231,13 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         }
         /* index remaining docs*/
         int remaining = objCollector.getChildren().size();
-        LOGGER.trace("Indexing almost done. Only " + remaining + " object(s) remaining");
+        if(LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Indexing almost done. Only " + remaining + " object(s) remaining");
+        }
         if (remaining > 0) {
-            executorService.submit(new MCRXMLSolrIndexer(new MCRXMLContentCollectorStream(objCollector), solrServer));
+            MCRSolrCollectorContentStream contentStream = new MCRSolrCollectorContentStream(new MCRJDOMContent(objCollector));
+            MCRSolrIndexHandler indexHandler = new MCRSolrDefaultIndexHandler(contentStream, solrServer);
+            executorService.submit(new MCRSolrIndexThread(indexHandler));
         }
 
         long durationInMilliSeconds = swatch.getTime();
@@ -262,7 +273,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "======================");
 
         List<String> list = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "No derivates to index");
             return;
         }
@@ -276,14 +287,18 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
 
             for (MCRFile file : files) {
                 try {
-                    LOGGER.trace("Solr: submitting file \"" + file.getAbsolutePath() + " (" + file.getID() + ")\" for indexing");
+                    if(LOGGER.isTraceEnabled()) {
+                        LOGGER.trace("Solr: submitting file \"" + file.getAbsolutePath() + " (" + file.getID() + ")\" for indexing");
+                    }
                     if (file.getSize() > MCRSolrIndexer.OVER_THE_WIRE_THRESHOLD) {
-                        MCRBaseContentStream contentStream = new MCRBaseContentStream(solrServer, file.getID(), new MCRJDOMContent(file.createXML()));
-                        executorService.submit(new MCRSolrIndexThread(contentStream));
+                        MCRSolrContentStream contentStream = new MCRSolrContentStream(file.getID(), new MCRJDOMContent(file.createXML()));
+                        MCRSolrIndexHandler indexHandler = new MCRSolrDefaultIndexHandler(contentStream, solrServer);
+                        executorService.submit(new MCRSolrIndexThread(indexHandler));
                     } else {
                         /* extract metadata with tika */
-                        MCRAbstractSolrContentStream<MCRFile> contentStream = new MCRFileContentStream(solrServer, file);
-                        executorService.submit(new MCRSolrIndexThread(contentStream));
+                        MCRSolrFileContentStream contentStream = new MCRSolrFileContentStream(file);
+                        MCRSolrFileIndexHandler fileIndexHandler = new MCRSolrFileIndexHandler(contentStream, solrServer);
+                        executorService.submit(new MCRSolrIndexThread(fileIndexHandler));
                     }
                 } catch (Exception ex) {
                     LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Error creating transfer thread", ex);
