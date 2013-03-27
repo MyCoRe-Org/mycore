@@ -5,7 +5,6 @@ package org.mycore.solr.index.cs;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.commons.lang.time.StopWatch;
@@ -18,7 +17,6 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -33,24 +31,31 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.MCRSolrServerFactory;
 import org.mycore.solr.logging.MCRSolrLogLevels;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
+
 /**
  * @author shermann
- *
+ * @author Matthias Eichner
  */
 public class MCRSolrIndexer extends MCREventHandlerBase {
     private static final Logger LOGGER = Logger.getLogger(MCRSolrIndexer.class);
 
     /** The Server used for indexing. */
-    final static HttpSolrServer solrServer = MCRSolrServerFactory.getSolrServer();
+    final static HttpSolrServer DEFAULT_SOLR_SERVER = MCRSolrServerFactory.getSolrServer();
 
     /** The executer service used for submitting the index requests. */
-    final static ExecutorService executorService = Executors.newFixedThreadPool(10);
+    final static ListeningExecutorService EXECUTOR_SERVICE = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
 
     /** Specify how many documents will be submitted to solr at a time when rebuilding the metadata index. Default is 100. */
     final static int BULK_SIZE = MCRConfiguration.instance().getInt("MCR.Module-solr.bulk.size", 100);
 
     /** the Threshold in bytes */
-    public final static long OVER_THE_WIRE_THRESHOLD = MCRConfiguration.instance().getLong("MCR.Module-solr.OverTheWireThresholdInMegaBytes", 32) * 1024 * 1024;
+    public final static long OVER_THE_WIRE_THRESHOLD = MCRConfiguration.instance().getLong(
+            "MCR.Module-solr.OverTheWireThresholdInMegaBytes", 32) * 1024 * 1024;
 
     @Override
     synchronized protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
@@ -95,7 +100,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
     synchronized protected void handleMCRBaseCreated(MCREvent evt, MCRBase objectOrDerivate) {
         long tStart = System.currentTimeMillis();
         try {
-            if(LOGGER.isTraceEnabled()) {
+            if (LOGGER.isTraceEnabled()) {
                 LOGGER.trace("Solr: submitting data of\"" + objectOrDerivate.getId().toString() + "\" for indexing");
             }
             MCRContent content = (MCRContent) evt.get("content");
@@ -104,10 +109,10 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
             }
             MCRSolrContentStream contentStream = new MCRSolrContentStream(objectOrDerivate.getId().toString(), content);
             MCRSolrDefaultIndexHandler indexHandler = new MCRSolrDefaultIndexHandler(contentStream);
-            executorService.submit(new MCRSolrIndexThread(indexHandler));
-            if(LOGGER.isTraceEnabled()) {
+            submitIndexHandler(indexHandler);
+            if (LOGGER.isTraceEnabled()) {
                 LOGGER.trace("Solr: submitting data of\"" + objectOrDerivate.getId().toString() + "\" for indexing done in "
-                    + (System.currentTimeMillis() - tStart) + "ms ");
+                        + (System.currentTimeMillis() - tStart) + "ms ");
             }
         } catch (Exception ex) {
             LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Error creating transfer thread for object " + objectOrDerivate, ex);
@@ -117,17 +122,17 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
     @Override
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
         try {
-            if(LOGGER.isTraceEnabled()) {
+            if (LOGGER.isTraceEnabled()) {
                 LOGGER.trace("Solr: submitting file \"" + file.getAbsolutePath() + " (" + file.getID() + ")\" for indexing");
             }
             if (file.getSize() > MCRSolrIndexer.OVER_THE_WIRE_THRESHOLD) {
                 MCRSolrContentStream contentStream = new MCRSolrContentStream(file.getID(), new MCRJDOMContent(file.createXML()));
                 MCRSolrDefaultIndexHandler objectHandler = new MCRSolrDefaultIndexHandler(contentStream);
-                executorService.submit(new MCRSolrIndexThread(objectHandler));
+                submitIndexHandler(objectHandler);
             } else {
                 /* extract metadata with tika */
                 MCRSolrFileIndexHandler fileHandler = new MCRSolrFileIndexHandler(new MCRSolrFileContentStream(file));
-                executorService.submit(new MCRSolrIndexThread(fileHandler));
+                submitIndexHandler(fileHandler);
             }
         } catch (Exception ex) {
             LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Error creating transfer thread for file " + file.toString(), ex);
@@ -154,8 +159,8 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         UpdateResponse updateResponse = null;
         try {
             LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Deleting \"" + solrID + "\" from solr");
-            updateResponse = solrServer.deleteById(solrID);
-            solrServer.commit();
+            updateResponse = DEFAULT_SOLR_SERVER.deleteById(solrID);
+            DEFAULT_SOLR_SERVER.commit();
         } catch (Exception e) {
             LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Error deleting document from solr", e);
         }
@@ -201,7 +206,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Building Metadata Index");
         LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "=======================");
 
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             LOGGER.info("Sorry, no documents to index");
             return;
         }
@@ -222,7 +227,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
                 if (objCollector.getChildren().size() % BULK_SIZE == 0) {
                     MCRSolrCollectorContentStream contentStream = new MCRSolrCollectorContentStream(new MCRJDOMContent(objCollector));
                     MCRSolrDefaultIndexHandler indexHandler = new MCRSolrDefaultIndexHandler(contentStream, solrServer);
-                    executorService.submit(new MCRSolrIndexThread(indexHandler));
+                    submitIndexHandler(indexHandler);
                     objCollector = new Element("mcrObjs");
                 }
             } catch (Exception ex) {
@@ -231,22 +236,27 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         }
         /* index remaining docs*/
         int remaining = objCollector.getChildren().size();
-        if(LOGGER.isTraceEnabled()) {
+        if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("Indexing almost done. Only " + remaining + " object(s) remaining");
         }
         if (remaining > 0) {
             MCRSolrCollectorContentStream contentStream = new MCRSolrCollectorContentStream(new MCRJDOMContent(objCollector));
             MCRSolrIndexHandler indexHandler = new MCRSolrDefaultIndexHandler(contentStream, solrServer);
-            executorService.submit(new MCRSolrIndexThread(indexHandler));
+            try {
+                submitIndexHandler(indexHandler);
+            } catch (Exception ex) {
+                LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Error submitting data to solr", ex);
+            }
         }
 
         long durationInMilliSeconds = swatch.getTime();
-        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Submitted data of " + list.size() + " objects for indexing done in " + Math.ceil(durationInMilliSeconds / 1000)
-                + " seconds (" + durationInMilliSeconds / list.size() + " ms/object)");
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO,
+                "Submitted data of " + list.size() + " objects for indexing done in " + Math.ceil(durationInMilliSeconds / 1000)
+                        + " seconds (" + durationInMilliSeconds / list.size() + " ms/object)");
         try {
             // we wait until all index threads are finished 
-            if(solrServer instanceof ConcurrentUpdateSolrServer) {
-                ((ConcurrentUpdateSolrServer)solrServer).blockUntilFinished();
+            if (solrServer instanceof ConcurrentUpdateSolrServer) {
+                ((ConcurrentUpdateSolrServer) solrServer).blockUntilFinished();
             }
             // one last commit before we are done
             solrServer.commit();
@@ -261,7 +271,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
      * Rebuilds solr's content index.
      */
     public static void rebuildContentIndex() {
-        rebuildContentIndex(MCRSolrServerFactory.getSolrServer());
+        rebuildContentIndex(DEFAULT_SOLR_SERVER);
     }
 
     /**
@@ -281,34 +291,41 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         long tStart = System.currentTimeMillis();
 
         LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Sending content of files of " + list.size() + " derivates to solr for reindexing");
-        for (String derivate : list) {
-            List<MCRFile> files = MCRUtils.getFiles(derivate);
-            LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Sending files (" + files.size() + ") for derivate \"" + derivate + "\"");
 
-            for (MCRFile file : files) {
-                try {
-                    if(LOGGER.isTraceEnabled()) {
-                        LOGGER.trace("Solr: submitting file \"" + file.getAbsolutePath() + " (" + file.getID() + ")\" for indexing");
-                    }
-                    if (file.getSize() > MCRSolrIndexer.OVER_THE_WIRE_THRESHOLD) {
-                        MCRSolrContentStream contentStream = new MCRSolrContentStream(file.getID(), new MCRJDOMContent(file.createXML()));
-                        MCRSolrIndexHandler indexHandler = new MCRSolrDefaultIndexHandler(contentStream, solrServer);
-                        executorService.submit(new MCRSolrIndexThread(indexHandler));
-                    } else {
-                        /* extract metadata with tika */
-                        MCRSolrFileContentStream contentStream = new MCRSolrFileContentStream(file);
-                        MCRSolrFileIndexHandler fileIndexHandler = new MCRSolrFileIndexHandler(contentStream, solrServer);
-                        executorService.submit(new MCRSolrIndexThread(fileIndexHandler));
-                    }
-                } catch (Exception ex) {
-                    LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Error creating transfer thread", ex);
-                }
-            }
+        for (String derivate : list) {
+            MCRSolrIndexHandler indexHandler = new MCRSolrDerivateFilesIndexHandler(derivate, solrServer);
+            submitIndexHandler(indexHandler);
         }
 
         long tStop = System.currentTimeMillis();
-        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Submitted data of " + list.size() + " derivates for indexing done in " + (tStop - tStart) + "ms ("
-                + ((float) (tStop - tStart) / list.size()) + " ms/derivate)");
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Submitted data of " + list.size() + " derivates for indexing done in " + (tStop - tStart)
+                + "ms (" + ((float) (tStop - tStart) / list.size()) + " ms/derivate)");
+    }
+
+    protected static void submitIndexHandler(MCRSolrIndexHandler indexHandler) {
+        ListenableFuture<List<MCRSolrIndexHandler>> future = EXECUTOR_SERVICE.submit(new MCRSolrIndexTask(indexHandler));
+        Futures.addCallback(future, new FutureIndexHandlerCallback());
+    }
+
+    /**
+     * Callback to handle a IndexHandlers future non blocking. 
+     */
+    private static class FutureIndexHandlerCallback implements FutureCallback<List<MCRSolrIndexHandler>> {
+        @Override
+        public void onFailure(Throwable t) {
+            LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "unable to submit tasks", t);
+        }
+
+        @Override
+        public void onSuccess(List<MCRSolrIndexHandler> indexHandlers) {
+            for (MCRSolrIndexHandler subHandler : indexHandlers) {
+                try {
+                    submitIndexHandler(subHandler);
+                } catch (Exception exc) {
+                    LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "unable to submit tasks", exc);
+                }
+            }
+        }
     }
 
     /**
@@ -325,7 +342,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
      */
     public static void dropIndex() throws Exception {
         LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Dropping solr index...");
-        MCRSolrServerFactory.getSolrServer().deleteByQuery("*:*");
+        DEFAULT_SOLR_SERVER.deleteByQuery("*:*");
         LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Dropping solr index...done");
     }
 
@@ -335,7 +352,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
     public static void optimize() {
         try {
             LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Sending optimize request to solr");
-            MCRSolrServerFactory.getSolrServer().optimize();
+            DEFAULT_SOLR_SERVER.optimize();
         } catch (Exception ex) {
             LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Could not optimize solr index", ex);
         }
