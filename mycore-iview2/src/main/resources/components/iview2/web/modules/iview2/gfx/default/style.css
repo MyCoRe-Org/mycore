@@ -478,7 +478,7 @@
 }
 
 .chapter div.content{
-	min-height: 200px;
+	height: 200px;
 }
 
 /* chapter Sort Button */
