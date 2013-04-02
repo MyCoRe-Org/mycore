@@ -1,7 +1,6 @@
 package org.mycore.solr.index.cs;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;

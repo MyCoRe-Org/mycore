@@ -31,6 +31,7 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.index.cs.strategy.MCRSolrIndexStrategyManager;
 import org.mycore.solr.logging.MCRSolrLogLevels;
 import org.mycore.util.concurrent.ListeningPriorityExecutorService;
 
@@ -55,10 +56,6 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
 
     /** Specify how many documents will be submitted to solr at a time when rebuilding the metadata index. Default is 100. */
     final static int BULK_SIZE = MCRConfiguration.instance().getInt("MCR.Module-solr.bulk.size", 100);
-
-    /** the Threshold in bytes */
-    public final static long OVER_THE_WIRE_THRESHOLD = MCRConfiguration.instance().getLong(
-            "MCR.Module-solr.OverTheWireThresholdInMegaBytes", 32) * 1024 * 1024;
 
     @Override
     synchronized protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
@@ -126,20 +123,22 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
     @Override
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
         try {
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace("Solr: submitting file \"" + file.getAbsolutePath() + " (" + file.getID() + ")\" for indexing");
-            }
-            if (file.getSize() > MCRSolrIndexer.OVER_THE_WIRE_THRESHOLD) {
-                MCRSolrContentStream contentStream = new MCRSolrContentStream(file.getID(), new MCRJDOMContent(file.createXML()));
-                MCRSolrDefaultIndexHandler objectHandler = new MCRSolrDefaultIndexHandler(contentStream);
-                submitIndexHandler(objectHandler);
-            } else {
-                /* extract metadata with tika */
-                MCRSolrFileIndexHandler fileHandler = new MCRSolrFileIndexHandler(new MCRSolrFileContentStream(file));
-                submitIndexHandler(fileHandler);
-            }
+            submitIndexHandler(getIndexHandler(file, DEFAULT_SOLR_SERVER));
         } catch (Exception ex) {
             LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Error creating transfer thread for file " + file.toString(), ex);
+        }
+    }
+
+    public static MCRSolrIndexHandler getIndexHandler(MCRFile file, SolrServer solrServer) throws IOException {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Solr: submitting file \"" + file.getAbsolutePath() + " (" + file.getID() + ")\" for indexing");
+        }
+        if(MCRSolrIndexStrategyManager.checkFile(file)) {
+            /* extract metadata with tika */
+            return new MCRSolrFileIndexHandler(new MCRSolrFileContentStream(file), solrServer);
+        } else {
+            MCRSolrContentStream contentStream = new MCRSolrContentStream(file.getID(), new MCRJDOMContent(file.createXML()));
+            return new MCRSolrDefaultIndexHandler(contentStream, solrServer);
         }
     }
 
@@ -297,7 +296,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Sending content of files of " + list.size() + " derivates to solr for reindexing");
 
         for (String derivate : list) {
-            MCRSolrIndexHandler indexHandler = new MCRSolrDerivateFilesIndexHandler(derivate, solrServer);
+            MCRSolrIndexHandler indexHandler = new MCRSolrFilesIndexHandler(derivate, solrServer);
             submitIndexHandler(indexHandler);
         }
 
