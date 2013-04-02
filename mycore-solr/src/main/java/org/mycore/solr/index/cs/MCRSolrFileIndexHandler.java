@@ -56,6 +56,9 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractIndexHandler {
         updateRequest.setParam("literal.fileName", file.getName());
         updateRequest.setParam("literal.objectProject", MCRObjectID.getInstance(file.getOwnerID()).getProjectId());
         updateRequest.setParam("literal.fileDateModified", DATE_FORMATTER.format(file.getLastModified().getTime()));
+        if(getCommitWithin() != null) {
+            updateRequest.setCommitWithin(getCommitWithin());
+        }
 
         String urn = null;
         if ((urn = derivate.getUrnMap().get(file.getAbsolutePath())) != null) {

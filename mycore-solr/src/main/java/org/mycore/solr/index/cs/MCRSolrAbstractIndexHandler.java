@@ -14,6 +14,8 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
 
     protected MCRSolrAbstractContentStream<?> stream;
 
+    protected Integer commitWithin;
+
     public MCRSolrAbstractIndexHandler(MCRSolrAbstractContentStream<?> stream) {
         this(stream, MCRSolrServerFactory.getSolrServer());
     }
@@ -21,6 +23,7 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
     public MCRSolrAbstractIndexHandler(MCRSolrAbstractContentStream<?> stream, SolrServer solrServer) {
         this.stream = stream;
         this.solrServer = solrServer;
+        this.commitWithin = null;
     }
 
     public MCRSolrAbstractContentStream<?> getStream() {
@@ -41,6 +44,18 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
     @Override
     public String toString() {
         return getStream().getSourceInfo();
+    }
+
+    /**
+     * Time in milliseconds solr should index the stream. Null by default,
+     * says that solr decide when to commit.
+     */
+    public void setCommitWithin(Integer commitWithin) {
+        this.commitWithin = commitWithin;
+    }
+
+    public Integer getCommitWithin() {
+        return commitWithin;
     }
 
 }

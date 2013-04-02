@@ -5,7 +5,9 @@ package org.mycore.solr.index.cs;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.Executors;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
@@ -30,12 +32,12 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.MCRSolrServerFactory;
 import org.mycore.solr.logging.MCRSolrLogLevels;
+import org.mycore.util.concurrent.ListeningPriorityExecutorService;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
 
 /**
  * @author shermann
@@ -48,7 +50,8 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
     final static HttpSolrServer DEFAULT_SOLR_SERVER = MCRSolrServerFactory.getSolrServer();
 
     /** The executer service used for submitting the index requests. */
-    final static ListeningExecutorService EXECUTOR_SERVICE = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
+    final static ListeningExecutorService EXECUTOR_SERVICE = new ListeningPriorityExecutorService(new ThreadPoolExecutor(10, 10, 0L,
+            TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>()));
 
     /** Specify how many documents will be submitted to solr at a time when rebuilding the metadata index. Default is 100. */
     final static int BULK_SIZE = MCRConfiguration.instance().getInt("MCR.Module-solr.bulk.size", 100);
@@ -109,7 +112,8 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
             }
             MCRSolrContentStream contentStream = new MCRSolrContentStream(objectOrDerivate.getId().toString(), content);
             MCRSolrDefaultIndexHandler indexHandler = new MCRSolrDefaultIndexHandler(contentStream);
-            submitIndexHandler(indexHandler);
+            indexHandler.setCommitWithin(1000);
+            submitIndexHandler(indexHandler, 10);
             if (LOGGER.isTraceEnabled()) {
                 LOGGER.trace("Solr: submitting data of\"" + objectOrDerivate.getId().toString() + "\" for indexing done in "
                         + (System.currentTimeMillis() - tStart) + "ms ");
@@ -225,7 +229,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
                 objCollector.addContent(mcrObjXML.getRootElement().detach());
 
                 if (objCollector.getChildren().size() % BULK_SIZE == 0) {
-                    MCRSolrCollectorContentStream contentStream = new MCRSolrCollectorContentStream(new MCRJDOMContent(objCollector));
+                    MCRSolrContentStream contentStream = new MCRSolrContentStream("MCRSolrObjs", new MCRJDOMContent(objCollector));
                     MCRSolrDefaultIndexHandler indexHandler = new MCRSolrDefaultIndexHandler(contentStream, solrServer);
                     submitIndexHandler(indexHandler);
                     objCollector = new Element("mcrObjs");
@@ -240,7 +244,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
             LOGGER.trace("Indexing almost done. Only " + remaining + " object(s) remaining");
         }
         if (remaining > 0) {
-            MCRSolrCollectorContentStream contentStream = new MCRSolrCollectorContentStream(new MCRJDOMContent(objCollector));
+            MCRSolrContentStream contentStream = new MCRSolrContentStream("MCRSolrObjs", new MCRJDOMContent(objCollector));
             MCRSolrIndexHandler indexHandler = new MCRSolrDefaultIndexHandler(contentStream, solrServer);
             try {
                 submitIndexHandler(indexHandler);
@@ -303,7 +307,11 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
     }
 
     protected static void submitIndexHandler(MCRSolrIndexHandler indexHandler) {
-        ListenableFuture<List<MCRSolrIndexHandler>> future = EXECUTOR_SERVICE.submit(new MCRSolrIndexTask(indexHandler));
+        submitIndexHandler(indexHandler, 0);
+    }
+
+    protected static void submitIndexHandler(MCRSolrIndexHandler indexHandler, int priority) {
+        ListenableFuture<List<MCRSolrIndexHandler>> future = EXECUTOR_SERVICE.submit(new MCRSolrIndexTask(indexHandler, priority));
         Futures.addCallback(future, new FutureIndexHandlerCallback());
     }
 
