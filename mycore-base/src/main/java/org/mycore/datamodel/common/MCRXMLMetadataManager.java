@@ -706,7 +706,7 @@ public class MCRXMLMetadataManager {
      * lists objects and their last modified date. 
      */
     public List<MCRObjectIDDate> listObjectDates() throws IOException {
-        return getObjectDateList(this.listIDs());
+        return retrieveObjectDates(this.listIDs());
     }
 
     /**
@@ -714,14 +714,15 @@ public class MCRXMLMetadataManager {
      * @param type type of object
      */
     public List<MCRObjectIDDate> listObjectDates(String type) throws IOException {
-        return getObjectDateList(this.listIDsOfType(type));
+        return retrieveObjectDates(this.listIDsOfType(type));
     }
 
     /**
+     * returns an enhanced list of object ids and their last modified date
      * @param ids MCRObject ids
      * @throws IOException thrown by {@link MCRObjectIDFileSystemDate}
      */
-    private List<MCRObjectIDDate> getObjectDateList(List<String> ids) throws IOException {
+    public List<MCRObjectIDDate> retrieveObjectDates(List<String> ids) throws IOException {
         List<MCRObjectIDDate> objidlist = new ArrayList<MCRObjectIDDate>(ids.size());
         for (String id : ids) {
             MCRStoredMetadata sm = this.retrieveStoredMetadata(MCRObjectID.getInstance(id));
