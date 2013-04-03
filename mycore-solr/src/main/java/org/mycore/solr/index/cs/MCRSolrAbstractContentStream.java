@@ -27,7 +27,11 @@ public abstract class MCRSolrAbstractContentStream<T> extends ContentStreamBase 
 
     protected InputStreamReader streamReader;
 
-    protected T source;
+    private T source;
+
+    public MCRSolrAbstractContentStream() {
+        this(null);
+    }
 
     public MCRSolrAbstractContentStream(T source) {
         this.inputStream = null;

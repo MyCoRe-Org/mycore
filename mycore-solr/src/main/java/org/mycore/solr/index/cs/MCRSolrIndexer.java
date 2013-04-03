@@ -218,33 +218,32 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         swatch.start();
         LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Sending " + list.size() + " objects to solr for reindexing");
 
-        Element objCollector = new Element("mcrObjs");
         MCRXMLMetadataManager metadataMgr = MCRXMLMetadataManager.instance();
-
+        MCRSolrListElementStream contentStream = new MCRSolrListElementStream("MCRSolrObjs");
+        List<Element> elementList = contentStream.getList();
         for (String id : list) {
             try {
                 LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Submitting data of\"" + id + "\" for indexing");
                 Document mcrObjXML = metadataMgr.retrieveXML(MCRObjectID.getInstance(id));
-                objCollector.addContent(mcrObjXML.getRootElement().detach());
+                elementList.add(mcrObjXML.getRootElement().detach());
 
-                if (objCollector.getChildren().size() % BULK_SIZE == 0) {
-                    MCRSolrContentStream contentStream = new MCRSolrContentStream("MCRSolrObjs", new MCRJDOMContent(objCollector));
-                    MCRSolrDefaultIndexHandler indexHandler = new MCRSolrDefaultIndexHandler(contentStream, solrServer);
+                if (elementList.size() % BULK_SIZE == 0) {
+                    MCRSolrIndexHandler indexHandler = new MCRSolrListElementIndexHandler(contentStream, solrServer);
                     submitIndexHandler(indexHandler);
-                    objCollector = new Element("mcrObjs");
+                    contentStream = new MCRSolrListElementStream("MCRSolrObjs");
+                    elementList = contentStream.getList();
                 }
             } catch (Exception ex) {
-                LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Error creating transfer thread", ex);
+                LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Error creating index thread for object " + id, ex);
             }
         }
         /* index remaining docs*/
-        int remaining = objCollector.getChildren().size();
+        int remaining = elementList.size();
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("Indexing almost done. Only " + remaining + " object(s) remaining");
         }
         if (remaining > 0) {
-            MCRSolrContentStream contentStream = new MCRSolrContentStream("MCRSolrObjs", new MCRJDOMContent(objCollector));
-            MCRSolrIndexHandler indexHandler = new MCRSolrDefaultIndexHandler(contentStream, solrServer);
+            MCRSolrIndexHandler indexHandler = new MCRSolrListElementIndexHandler(contentStream, solrServer);
             try {
                 submitIndexHandler(indexHandler);
             } catch (Exception ex) {
