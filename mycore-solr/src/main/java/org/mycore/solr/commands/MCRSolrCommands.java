@@ -52,8 +52,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
                 "rebuilds solr's metadata index for selected objects");
         addCommand(com);
 
-        com = new MCRCommand("restricted rebuild solr metadata index for object",
-                "org.mycore.solr.commands.MCRSolrCommands.rebuildMetadataIndexForObject",
+        com = new MCRCommand("restricted rebuild solr metadata index for object {0}",
+                "org.mycore.solr.commands.MCRSolrCommands.rebuildMetadataIndexForObject String",
                 "rebuilds solr's metadata index for object and all its children");
         addCommand(com);
 
