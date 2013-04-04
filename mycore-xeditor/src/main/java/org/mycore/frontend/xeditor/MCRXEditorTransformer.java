@@ -78,7 +78,6 @@ public class MCRXEditorTransformer {
     }
 
     public MCRContent transform(MCRContent editorSource) throws IOException, JDOMException, SAXException {
-        MCRUsedNamespaces.addNamespacesFrom(editorSource.asXML().getRootElement());
         MCRXSL2XMLTransformer transformer = MCRXSL2XMLTransformer.getInstance("xsl/xeditor.xsl");
         String key = MCRXEditorTransformerStore.storeTransformer(this);
         transformationParameters.setParameter("XEditorTransformerKey", key);
@@ -91,6 +90,10 @@ public class MCRXEditorTransformer {
 
     public String getEditorSessionID() {
         return editorSession.getID();
+    }
+
+    public void addNamespace(String prefix, String uri) {
+        MCRUsedNamespaces.addNamespace(Namespace.getNamespace(prefix, uri));
     }
 
     public void readSourceXML(String uri) throws JDOMException, IOException, SAXException, TransformerException {

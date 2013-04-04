@@ -19,6 +19,9 @@
   <!-- ========== <xed:form /> ========== -->
 
   <xsl:template match="xed:form">
+    <xsl:for-each select="namespace::*">
+      <xsl:value-of select="transformer:addNamespace($transformer,name(),.)" />
+    </xsl:for-each>
     <form>
       <xsl:apply-templates select="@*" mode="xeditor" />
       <xsl:attribute name="action">
