@@ -30,7 +30,9 @@ import org.apache.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.jdom2.Namespace;
 import org.jdom2.Parent;
+import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.frontend.xeditor.MCRXPathParser.MCRLocationStep;
 import org.mycore.frontend.xeditor.MCRXPathParser.MCRXPath;
@@ -57,7 +59,8 @@ public class MCRNodeBuilder {
         for (i = indexOfLastStep; i >= 0; i--) {
             String path = xPath.buildXPathExpression(i);
             LOGGER.debug("testing existence of subpath " + path);
-            existingNode = XPathFactory.instance().compile(path).evaluateFirst(parent);
+            existingNode = XPathFactory.instance().compile(path, Filters.fpassthrough(), null, MCRUsedNamespaces.getNamespaces())
+                    .evaluateFirst(parent);
             MCRLocationStep currentStep = xPath.getLocationSteps().get(i);
 
             if (existingNode instanceof Element) {
@@ -72,7 +75,8 @@ public class MCRNodeBuilder {
                 transformValueToAdditionalPredicate(currentStep);
                 path = xPath.buildXPathExpression(i);
                 LOGGER.debug("subpath with value transformed to predicate: " + path);
-                existingNode = XPathFactory.instance().compile(path).evaluateFirst(parent);
+                existingNode = XPathFactory.instance().compile(path, Filters.fpassthrough(), null, MCRUsedNamespaces.getNamespaces())
+                        .evaluateFirst(parent);
                 break;
 
             } else
@@ -110,7 +114,7 @@ public class MCRNodeBuilder {
     }
 
     private static boolean canBeBuilt(MCRLocationStep locationStep) {
-        String name = locationStep.getName();
+        String name = locationStep.getLocalName();
 
         if (name.matches("[0-9]+"))
             return false;
@@ -123,31 +127,33 @@ public class MCRNodeBuilder {
     private static Object build(MCRLocationStep locationStep, String value, Parent parent) throws ParseException, JDOMException {
         LOGGER.debug("build location step " + locationStep + " relative to " + MCRXPathBuilder.buildXPath(parent));
 
-        String name = locationStep.getName();
         if (locationStep.getValue() != null)
             value = locationStep.getValue();
 
-        if (name.startsWith("@")) {
-            return buildAttribute(name.substring(1), value, (Element)parent);
+        Namespace ns = locationStep.getNamespace();
+        String name = locationStep.getLocalName();
+
+        if (locationStep.isAttribute()) {
+            return buildAttribute(ns, name, value, (Element) parent);
         } else {
-            Element element = buildElement(name, value, parent);
+            Element element = buildElement(ns, name, value, parent);
             for (MCRXPath predicate : locationStep.getPredicates())
                 build(predicate, null, element);
             return element;
         }
     }
 
-    private static Attribute buildAttribute(String name, String value, Element parent) {
+    private static Attribute buildAttribute(Namespace ns, String name, String value, Element parent) {
         if (value == null)
             value = "";
-        Attribute attribute = new Attribute(name, value);
+        Attribute attribute = new Attribute(name, value, ns);
         if (parent != null)
             parent.setAttribute(attribute);
         return attribute;
     }
 
-    private static Element buildElement(String name, String value, Parent parent) {
-        Element element = new Element(name);
+    private static Element buildElement(Namespace ns, String name, String value, Parent parent) {
+        Element element = new Element(name, ns);
         if ((value != null) && (!value.isEmpty()))
             element.setText(value);
         if (parent != null)

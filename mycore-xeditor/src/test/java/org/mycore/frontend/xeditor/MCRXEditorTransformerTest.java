@@ -93,4 +93,9 @@ public class MCRXEditorTransformerTest {
         testTransformation("testXPathSubstitution-editor.xml", "testBasicInputComponents-source.xml",
                 "testXPathSubstitution-transformed.xml", false);
     }
+
+    @Test
+    public void testNamespaces() throws IOException, URISyntaxException, TransformerException, JDOMException, SAXException {
+        testTransformation("testNamespaces-editor.xml", "testNamespaces-source.xml", "testNamespaces-transformed.xml", false);
+    }
 }

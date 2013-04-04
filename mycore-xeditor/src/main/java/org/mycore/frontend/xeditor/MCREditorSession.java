@@ -76,15 +76,17 @@ public class MCREditorSession {
     }
 
     public void setEditedXML(Document xml) throws JDOMException {
-        if (editedXML == null)
+        if (editedXML == null) {
             editedXML = xml;
+            MCRUsedNamespaces.addNamespacesFrom(editedXML.getRootElement());
+        }
     }
 
     public void setEditedXML(String uri) throws JDOMException, IOException, SAXException, TransformerException {
         if (editedXML == null) {
             LOGGER.info(id + " reading edited XML from " + uri);
             sourceURI = uri;
-            editedXML = MCRSourceContent.getInstance(uri).asXML();
+            setEditedXML(MCRSourceContent.getInstance(uri).asXML());
         }
     }
 

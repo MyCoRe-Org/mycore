@@ -31,6 +31,7 @@ import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.junit.Test;
+import org.mycore.common.MCRConstants;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -221,5 +222,14 @@ public class MCRNodeBuilderTest {
         child = (Element) (MCRNodeBuilder.build("parent/child='X'", null, root));
         assertNotNull(child);
         assertEquals(parentWithChildValueX.getChild("child"), child);
+    }
+
+    @Test
+    public void testNamespaces() throws ParseException, JDOMException {
+        Element role = (Element) (MCRNodeBuilder.build("mods:name[@xlink:href='id']/mods:role[@type='creator']", null, null));
+        assertEquals("role", role.getName());
+        assertEquals(MCRConstants.MODS_NAMESPACE, role.getNamespace());
+        assertEquals("creator", role.getAttributeValue("type"));
+        assertEquals("id", role.getParentElement().getAttribute("href", MCRConstants.XLINK_NAMESPACE).getValue());
     }
 }

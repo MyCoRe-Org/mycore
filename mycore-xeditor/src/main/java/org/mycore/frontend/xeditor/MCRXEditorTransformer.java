@@ -26,7 +26,6 @@ package org.mycore.frontend.xeditor;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -51,10 +50,10 @@ import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-import org.mycore.common.MCRConstants;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
+import org.mycore.frontend.xeditor.MCRXPathParser.MCRLocationStep;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -73,15 +72,13 @@ public class MCRXEditorTransformer {
 
     private Stack<MCRRepeat> repeats = new Stack<MCRRepeat>();
 
-    private List<Namespace> namespaces = new ArrayList<Namespace>();
-
     public MCRXEditorTransformer(MCREditorSession editorSession, MCRParameterCollector transformationParameters) {
         this.editorSession = editorSession;
         this.transformationParameters = transformationParameters;
-        this.namespaces.addAll(MCRConstants.getStandardNamespaces());
     }
 
-    public MCRContent transform(MCRContent editorSource) throws IOException {
+    public MCRContent transform(MCRContent editorSource) throws IOException, JDOMException, SAXException {
+        MCRUsedNamespaces.addNamespacesFrom(editorSource.asXML().getRootElement());
         MCRXSL2XMLTransformer transformer = MCRXSL2XMLTransformer.getInstance("xsl/xeditor.xsl");
         String key = MCRXEditorTransformerStore.storeTransformer(this);
         transformationParameters.setParameter("XEditorTransformerKey", key);
@@ -111,8 +108,9 @@ public class MCRXEditorTransformer {
     public void bind(String xPath, String name) throws JDOMException, ParseException {
         if (editorSession.getEditedXML() == null) {
             String rPath = xPath.startsWith("/") ? xPath.substring(1) : xPath;
-            String root = MCRXPathParser.parse(rPath).getLocationSteps().get(0).getName();
-            editorSession.setEditedXML(new Document(new Element(root)));
+
+            MCRLocationStep root = MCRXPathParser.parse(rPath).getLocationSteps().get(0);
+            editorSession.setEditedXML(new Document(new Element(root.getLocalName(), root.getNamespace())));
         }
         if (currentBinding == null) {
             currentBinding = new MCRBinding(editorSession.getEditedXML());
@@ -206,6 +204,7 @@ public class MCRXEditorTransformer {
             Map<String, Object> xPathVariables = currentBinding.buildXPathVariables();
             xPathVariables.putAll(transformationParameters.getParameterMap());
             XPathFactory factory = XPathFactory.instance();
+            List<Namespace> namespaces = MCRUsedNamespaces.getNamespaces();
             XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), xPathVariables, namespaces);
             return xPath.evaluateFirst(currentBinding.getBoundNodes()).toString();
         } catch (Exception ex) {

@@ -38,7 +38,6 @@ import org.jdom2.Parent;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-import org.mycore.common.MCRConstants;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -58,7 +57,7 @@ public class MCRBinding {
     private MCRBinding parent;
 
     public MCRBinding(Document document) throws JDOMException {
-        this.xPath = XPathFactory.instance().compile("/", Filters.fpassthrough());
+        this.xPath = XPathFactory.instance().compile("/", Filters.fpassthrough(), null, MCRUsedNamespaces.getNamespaces());
         this.boundNodes.add(document);
     }
 
@@ -73,8 +72,7 @@ public class MCRBinding {
         parent.children.add(this);
         Map<String, Object> variables = buildXPathVariables();
 
-        this.xPath = XPathFactory.instance().compile(xPathExpression, Filters.fpassthrough(), variables,
-                MCRConstants.getStandardNamespaces());
+        this.xPath = XPathFactory.instance().compile(xPathExpression, Filters.fpassthrough(), variables, MCRUsedNamespaces.getNamespaces());
 
         boundNodes.addAll(xPath.evaluate(parent.getBoundNodes()));
 
@@ -95,7 +93,7 @@ public class MCRBinding {
         return boundNodes.get(0);
     }
 
-    public Element cloneBoundElement( int index ) {
+    public Element cloneBoundElement(int index) {
         Element template = (Element) (boundNodes.get(index));
         Element newElement = template.clone();
         Element parent = template.getParentElement();

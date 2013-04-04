@@ -36,43 +36,58 @@ import org.mycore.frontend.xeditor.MCRXPathParser.MCRXPath;
 public class MCRXPathParserTest {
 
     @Test
-    public void test() throws ParseException {
+    public void testParser() throws ParseException {
         MCRXPath xPath = MCRXPathParser.parse("element");
         assertNotNull(xPath);
         assertNotNull(xPath.getLocationSteps());
         assertNotNull(xPath.getLocationSteps().get(0));
-        assertEquals("element", xPath.getLocationSteps().get(0).getName());
+        assertEquals("element", xPath.getLocationSteps().get(0).getQualifiedName());
         assertNull(xPath.getLocationSteps().get(0).getValue());
         assertEquals(0, xPath.getLocationSteps().get(0).getPredicates().size());
         assertEquals("element", xPath.toString());
 
         xPath = MCRXPathParser.parse("parent/child/subchild");
-        assertEquals("parent", xPath.getLocationSteps().get(0).getName());
-        assertEquals("child", xPath.getLocationSteps().get(1).getName());
-        assertEquals("subchild", xPath.getLocationSteps().get(2).getName());
+        assertEquals("parent", xPath.getLocationSteps().get(0).getQualifiedName());
+        assertEquals("child", xPath.getLocationSteps().get(1).getQualifiedName());
+        assertEquals("subchild", xPath.getLocationSteps().get(2).getQualifiedName());
         assertEquals("parent/child/subchild", xPath.toString());
 
         xPath = MCRXPathParser.parse("@value=\"O'Brian [1918-1986]\"");
-        assertEquals("@value", xPath.getLocationSteps().get(0).getName());
+        assertEquals("value", xPath.getLocationSteps().get(0).getQualifiedName());
+        assertTrue(xPath.getLocationSteps().get(0).isAttribute());
         assertEquals("O'Brian [1918-1986]", xPath.getLocationSteps().get(0).getValue());
         assertEquals("@value=\"O'Brian [1918-1986]\"", xPath.toString());
 
         xPath = MCRXPathParser.parse("contributor[role/roleTerm[type='code'][encoding='text/plain']]/name");
         assertEquals(2, xPath.getLocationSteps().size());
-        assertEquals("contributor", xPath.getLocationSteps().get(0).getName());
-        assertEquals("name", xPath.getLocationSteps().get(1).getName());
+        assertEquals("contributor", xPath.getLocationSteps().get(0).getQualifiedName());
+        assertEquals("name", xPath.getLocationSteps().get(1).getQualifiedName());
         assertEquals(1, xPath.getLocationSteps().get(0).getPredicates().size());
-        assertEquals("role", xPath.getLocationSteps().get(0).getPredicates().get(0).getLocationSteps().get(0).getName());
-        assertEquals("roleTerm", xPath.getLocationSteps().get(0).getPredicates().get(0).getLocationSteps().get(1).getName());
+        assertEquals("role", xPath.getLocationSteps().get(0).getPredicates().get(0).getLocationSteps().get(0).getQualifiedName());
+        assertEquals("roleTerm", xPath.getLocationSteps().get(0).getPredicates().get(0).getLocationSteps().get(1).getQualifiedName());
         assertEquals(2, xPath.getLocationSteps().get(0).getPredicates().get(0).getLocationSteps().get(1).getPredicates().size());
         assertEquals("type", xPath.getLocationSteps().get(0).getPredicates().get(0).getLocationSteps().get(1).getPredicates().get(0)
-                .getLocationSteps().get(0).getName());
+                .getLocationSteps().get(0).getQualifiedName());
         assertEquals("code", xPath.getLocationSteps().get(0).getPredicates().get(0).getLocationSteps().get(1).getPredicates().get(0)
                 .getLocationSteps().get(0).getValue());
         assertEquals("encoding", xPath.getLocationSteps().get(0).getPredicates().get(0).getLocationSteps().get(1).getPredicates().get(1)
-                .getLocationSteps().get(0).getName());
+                .getLocationSteps().get(0).getQualifiedName());
         assertEquals("text/plain", xPath.getLocationSteps().get(0).getPredicates().get(0).getLocationSteps().get(1).getPredicates().get(1)
                 .getLocationSteps().get(0).getValue());
         assertEquals("contributor[role/roleTerm[type='code'][encoding='text/plain']]/name", xPath.toString());
+    }
+
+    @Test
+    public void testNamespaces() throws ParseException {
+        MCRXPath xPath = MCRXPathParser.parse("mods:name/mods:namePart[@type='corporate'][@xlink:href]");
+        assertEquals(2, xPath.getLocationSteps().size());
+        assertEquals("mods:name", xPath.getLocationSteps().get(0).getQualifiedName());
+        assertEquals("mods", xPath.getLocationSteps().get(0).getNamespacePrefix());
+        assertEquals("name", xPath.getLocationSteps().get(0).getLocalName());
+        assertEquals("mods:namePart", xPath.getLocationSteps().get(1).getQualifiedName());
+        assertEquals("type", xPath.getLocationSteps().get(1).getPredicates().get(0).getLocationSteps().get(0).getQualifiedName());
+        assertTrue(xPath.getLocationSteps().get(1).getPredicates().get(0).getLocationSteps().get(0).isAttribute());
+        assertEquals("xlink:href", xPath.getLocationSteps().get(1).getPredicates().get(1).getLocationSteps().get(0).getQualifiedName());
+        assertTrue(xPath.getLocationSteps().get(1).getPredicates().get(1).getLocationSteps().get(0).isAttribute());
     }
 }

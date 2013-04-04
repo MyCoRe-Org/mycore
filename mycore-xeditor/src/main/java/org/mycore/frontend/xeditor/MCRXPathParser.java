@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.jdom2.Namespace;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -103,6 +104,10 @@ public class MCRXPathParser {
 
     class MCRLocationStep {
 
+        private boolean isAttribute;
+
+        private String prefix;
+
         private String name;
 
         private String value;
@@ -119,7 +124,23 @@ public class MCRXPathParser {
                 parseValue();
         }
 
-        public String getName() {
+        public boolean isAttribute() {
+            return isAttribute;
+        }
+
+        public String getQualifiedName() {
+            return (prefix == null ? name : prefix + ":" + name);
+        }
+
+        public String getNamespacePrefix() {
+            return prefix;
+        }
+
+        public Namespace getNamespace() {
+            return prefix == null ? null : MCRUsedNamespaces.getNamespace(prefix);
+        }
+
+        public String getLocalName() {
             return name;
         }
 
@@ -140,11 +161,23 @@ public class MCRXPathParser {
         }
 
         private void parseName() {
+            if (thereIsMore() && (currentChar() == '@')) {
+                currentParsePosition++;
+                isAttribute = true;
+            }
+
             int begin = currentParsePosition;
             while (thereIsMore() && (Character.isLetterOrDigit(currentChar()) || "@:.,*()_-'\"|".contains(String.valueOf(currentChar()))))
                 currentParsePosition++;
-            this.name = xPathExpression.substring(begin, currentParsePosition);
+
+            name = xPathExpression.substring(begin, currentParsePosition);
             LOGGER.debug("parsed location step " + name);
+
+            int pos = name.indexOf(":");
+            if (pos != -1) {
+                prefix = name.substring(0, pos);
+                name = name.substring(pos + 1);
+            }
         }
 
         private void parsePredicate() throws ParseException {
@@ -170,7 +203,12 @@ public class MCRXPathParser {
         }
 
         public String toString() {
-            StringBuffer sb = new StringBuffer(name);
+            StringBuffer sb = new StringBuffer();
+            if (isAttribute())
+                sb.append("@");
+            if (prefix != null)
+                sb.append(prefix).append(":");
+            sb.append(name);
             for (MCRXPath xPath : predicates)
                 sb.append('[').append(xPath).append(']');
             if (value != null)
