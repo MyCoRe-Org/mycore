@@ -11,6 +11,7 @@
   <xsl:strip-space elements="xed:*" />
 
   <xsl:include href="copynodes.xsl" />
+  <xsl:include href="xeditor-custom.xsl" />
 
   <xsl:param name="XEditorTransformerKey" />
   <xsl:param name="ServletsBaseURL" />
@@ -204,7 +205,10 @@
         <xsl:when test="(. = 'insert') and ($max = $num)" />
         <xsl:when test="(. = 'append') and ($max = $num)" />
         <xsl:otherwise>
-          <input type="submit" value="{.}" name="_xed_submit_{.}_{transformer:getControlsParameter($transformer)}" />
+          <xsl:call-template name="xed_control">
+            <xsl:with-param name="name" select="concat('_xed_submit_',.,'_',transformer:getControlsParameter($transformer))" />
+            <xsl:with-param name="type" select="." />
+          </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:for-each>

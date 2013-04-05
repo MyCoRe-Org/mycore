@@ -13,16 +13,16 @@
     <div>
       <input name="/document/name" value="" type="text" />
     </div>
-    <input name="_xed_submit_down_/document_6e616d655b40747970653d27706572736f6e616c275d_1" value="down" type="submit" />
+    <input name="_xed_submit_down_/document_6e616d655b40747970653d27706572736f6e616c275d_1" value="&#8659;" type="submit" />
     <div>
       <input name="/document/name[2]" value="" type="text" />
     </div>
-    <input name="_xed_submit_up_/document_6e616d655b40747970653d27706572736f6e616c275d_2" value="up" type="submit" />
-    <input name="_xed_submit_down_/document_6e616d655b40747970653d27706572736f6e616c275d_2" value="down" type="submit" />
+    <input name="_xed_submit_up_/document_6e616d655b40747970653d27706572736f6e616c275d_2" value="&#8657;" type="submit" />
+    <input name="_xed_submit_down_/document_6e616d655b40747970653d27706572736f6e616c275d_2" value="&#8659;" type="submit" />
     <div>
       <input name="/document/name[3]" value="" type="text" />
     </div>
-    <input name="_xed_submit_up_/document_6e616d655b40747970653d27706572736f6e616c275d_3" value="up" type="submit" />
-    <input name="_xed_submit_append_/document_6e616d655b40747970653d27706572736f6e616c275d_3" value="append" type="submit" />
+    <input name="_xed_submit_up_/document_6e616d655b40747970653d27706572736f6e616c275d_3" value="&#8657;" type="submit" />
+    <input name="_xed_submit_append_/document_6e616d655b40747970653d27706572736f6e616c275d_3" value="+" type="submit" />
   </form>
 </div>
