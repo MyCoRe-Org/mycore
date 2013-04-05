@@ -27,40 +27,53 @@
                 this.notLoadedTile = new Array();
                 var that = this;
 
-                
-                PanoJS.prototype.getMaxDimViewerOrig = PanoJS.prototype.getMaxDimViewer;
+                if(!PanoJS.prototype.getMaxDimViewerOrig) {
+                	PanoJS.prototype.getMaxDimViewerOrig = PanoJS.prototype.getMaxDimViewer;
+                }
                 PanoJS.prototype.getMaxDimViewer = function cv_getMaxDimViewerOrig(screen) {
                 	 return that.getViewer().viewerBean.getMaxDimViewerOrig(screen);
 				};
-				
-                PanoJS.prototype.getTileSizeMinZoomLevelOrig = PanoJS.prototype.getTileSizeMinZoomLevel;
+
+				if(!PanoJS.prototype.getTileSizeMinZoomLevelOrig) {
+					PanoJS.prototype.getTileSizeMinZoomLevelOrig = PanoJS.prototype.getTileSizeMinZoomLevel;
+				}
                 PanoJS.prototype.getTileSizeMinZoomLevel = function cv_getTileSizeMinZoomLevelOrig(screen) {
                 	 return that.getViewer().viewerBean.getTileSizeMinZoomLevelOrig(screen);
 				};
 				
-                PanoJS.prototype.getMaxDimCurZoomLevelOrig = PanoJS.prototype.getMaxDimCurZoomLevel;
+				if(!PanoJS.prototype.getMaxDimCurZoomLevelOrig) {
+					PanoJS.prototype.getMaxDimCurZoomLevelOrig = PanoJS.prototype.getMaxDimCurZoomLevel;
+				}
                 PanoJS.prototype.getMaxDimCurZoomLevel = function cv_getMaxDimCurZoomLevelOrig(screen, calculatedMinFitZoomLevel) {
                 	 return that.getViewer().viewerBean.getMaxDimCurZoomLevelOrig(screen , calculatedMinFitZoomLevel);
 				};
                 
-                PanoJS.prototype.assignTileImageOrig = PanoJS.prototype.assignTileImage;
+				if(!PanoJS.prototype.assignTileImageOrig) {
+					PanoJS.prototype.assignTileImageOrig = PanoJS.prototype.assignTileImage;
+				}
                 PanoJS.prototype.assignTileImage = function cv_assignTileImage() {
                     that.assignTileImage(arguments[0]);
                 };
 
-                PanoJS.prototype.resizeOrig = PanoJS.prototype.resize;
+                if(!PanoJS.prototype.resizeOrig) {
+                	PanoJS.prototype.resizeOrig = PanoJS.prototype.resize;
+                }
                 PanoJS.prototype.resize = function cv_resize() {
                     that.context2D.canvas.width = that.getViewer().viewerBean.width;
                     that.context2D.canvas.height = that.getViewer().viewerBean.height;
                     that.getViewer().viewerBean.resizeOrig();
                 };
 
-                PanoJS.prototype.switchDisplayModeOrig = PanoJS.prototype.switchDisplayMode;
+                if(!PanoJS.prototype.switchDisplayModeOrig) {
+                	PanoJS.prototype.switchDisplayModeOrig = PanoJS.prototype.switchDisplayMode;
+                }
                 PanoJS.prototype.switchDisplayMode = function cv_switchDisplayMode() {
                     return that.switchDisplayMode(arguments[0], arguments[1], arguments[2], arguments[3]);
                 };
 
-                PanoJS.prototype.updateScreenOrig = PanoJS.prototype.updateScreen;
+                if(!PanoJS.prototype.updateScreenOrig) {
+                	PanoJS.prototype.updateScreenOrig = PanoJS.prototype.updateScreen;
+                }
                 PanoJS.prototype.updateScreen = function cv_updateScreen() {
                     that.updateScreen();
                 }
@@ -72,9 +85,7 @@
                         this.lastFrame = curTime;
                     });
                 }
-                
                 jQuery(this).trigger(iview.Canvas.AFTER_INIT_EVENT);
-
             }
         }
 
