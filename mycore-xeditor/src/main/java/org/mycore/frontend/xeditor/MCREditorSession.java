@@ -138,7 +138,8 @@ public class MCREditorSession {
         for (int i = 0; i < values.length; i++) {
             String value = values[i] == null ? "" : values[i].trim();
             binding.setValue(i, value);
-            markAsResubmittedFromInputField(boundNodes.get(i));
+            if (!value.isEmpty())
+                markAsResubmittedFromInputField(boundNodes.get(i));
         }
     }
 

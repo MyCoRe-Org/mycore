@@ -64,7 +64,7 @@ public class MCREditorSessionTest {
         session.removeDeletedNodes();
 
         // Test result against expected
-        Document result = buildDocument("document[title='Title'][author/@firstName='Jim'][category='a'][category[2]][category='c'][category='d']");
+        Document result = buildDocument("document[title='Title'][author/@firstName='Jim'][category='a'][category='c'][category='d']");
         assertTrue(MCRXMLHelper.deepEqual(document, result));
     }
 
