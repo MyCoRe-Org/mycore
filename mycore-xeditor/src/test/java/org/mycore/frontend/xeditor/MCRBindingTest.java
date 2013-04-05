@@ -123,12 +123,12 @@ public class MCRBindingTest extends MCRTestCase {
     @Test
     public void testVariables() throws JDOMException, ParseException {
         binding = new MCRBinding("document", binding);
-        new MCRBinding("title[1]", "inheritMe", binding);
-        new MCRBinding("title[2]", "overwriteMe", binding);
+        new MCRBinding("title[1]", null, "inheritMe", binding);
+        new MCRBinding("title[2]", null, "overwriteMe", binding);
         assertEquals("title1", new MCRBinding("$inheritMe", binding).getValue());
         assertEquals("title2", new MCRBinding("$overwriteMe", binding).getValue());
         binding = new MCRBinding("author", binding);
-        new MCRBinding("firstName", "overwriteMe", binding);
+        new MCRBinding("firstName", null, "overwriteMe", binding);
         assertEquals("title1", new MCRBinding("$inheritMe", binding).getValue());
         assertEquals("John", new MCRBinding("$overwriteMe", binding).getValue());
     }
@@ -140,7 +140,7 @@ public class MCRBindingTest extends MCRTestCase {
         MCRBinding rootBinding = new MCRBinding(new Document(document));
         MCRBinding documentBinding = new MCRBinding("document", rootBinding);
 
-        MCRBinding id = new MCRBinding("name[@id][1]/@id", "id", documentBinding);
+        MCRBinding id = new MCRBinding("name[@id][1]/@id", null, "id", documentBinding);
         assertEquals("/document/name/@id", id.getAbsoluteXPath());
         assertEquals("n1", id.getValue());
         binding = new MCRBinding("note[@href=concat('#',$id)]", documentBinding);
@@ -152,17 +152,17 @@ public class MCRBindingTest extends MCRTestCase {
         assertEquals("location", location.getName());
         assertEquals("#n1", location.getAttributeValue("href"));
 
-        id = new MCRBinding("name[@id][2]/@id", "id", documentBinding);
+        id = new MCRBinding("name[@id][2]/@id", null, "id", documentBinding);
         assertEquals("/document/name[2]/@id", id.getAbsoluteXPath());
         assertEquals("n2", id.getValue());
-        
+
         /*
         binding = new MCRBinding("note[@href=concat('#',$id)]", documentBinding);
         note = (Element)(binding.getBoundNode());
         assertEquals("note", note.getName());
         assertEquals("#n2", note.getAttributeValue("href"));
         */
-        
+
         binding = new MCRBinding("location[@href=concat('#',$id)]", documentBinding);
         location = (Element) (binding.getBoundNode());
         assertEquals("location", location.getName());

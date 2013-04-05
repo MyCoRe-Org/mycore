@@ -97,10 +97,10 @@
     <xsl:copy />
   </xsl:template>
 
-  <!-- ========== <xed:bind xpath="" name="" /> ========== -->
+  <!-- ========== <xed:bind xpath="" default="" name="" /> ========== -->
 
   <xsl:template match="xed:bind" mode="xeditor">
-    <xsl:value-of select="transformer:bind($transformer,@xpath,@name)" />
+    <xsl:value-of select="transformer:bind($transformer,@xpath,@default,@name)" />
     <xsl:apply-templates select="*" mode="xeditor" />
     <xsl:value-of select="transformer:unbind($transformer)" />
   </xsl:template>

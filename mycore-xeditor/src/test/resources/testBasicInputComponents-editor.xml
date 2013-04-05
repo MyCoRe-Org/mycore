@@ -30,7 +30,7 @@
             </optgroup>
           </select>
         </xed:bind>
-        <xed:bind xpath="service">
+        <xed:bind xpath="service" default="urn">
           <input id="oai" value="oai" type="checkbox" />
           <input id="urn" value="urn" type="checkbox" />
         </xed:bind>

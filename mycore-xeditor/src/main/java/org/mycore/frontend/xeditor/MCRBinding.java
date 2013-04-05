@@ -61,13 +61,14 @@ public class MCRBinding {
         this.boundNodes.add(document);
     }
 
-    public MCRBinding(String xPathExpression, String name, MCRBinding parent) throws JDOMException, ParseException {
-        this(xPathExpression, parent);
-        if (!((name == null) || name.isEmpty()))
-            this.name = name;
+    public MCRBinding(String xPathExpression, MCRBinding parent) throws JDOMException, ParseException {
+        this(xPathExpression, null, null, parent);
     }
 
-    public MCRBinding(String xPathExpression, MCRBinding parent) throws JDOMException, ParseException {
+    public MCRBinding(String xPathExpression, String defaultValue, String name, MCRBinding parent) throws JDOMException, ParseException {
+        if (!((name == null) || name.isEmpty()))
+            this.name = name;
+
         this.parent = parent;
         parent.children.add(this);
         Map<String, Object> variables = buildXPathVariables();
@@ -79,7 +80,7 @@ public class MCRBinding {
         LOGGER.debug("Bind to " + xPathExpression + " selected " + boundNodes.size() + " node(s)");
 
         if (boundNodes.isEmpty()) {
-            Object built = MCRNodeBuilder.build(xPathExpression, null, (Parent) (parent.getBoundNode()));
+            Object built = MCRNodeBuilder.build(xPathExpression, defaultValue, (Parent) (parent.getBoundNode()));
             LOGGER.debug("Bind to " + xPathExpression + " generated node " + MCRXPathBuilder.buildXPath(built));
             boundNodes.add(built);
         }

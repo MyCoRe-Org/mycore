@@ -109,7 +109,7 @@ public class MCRXEditorTransformer {
             editorSession.setCancelURL(url);
     }
 
-    public void bind(String xPath, String name) throws JDOMException, ParseException {
+    public void bind(String xPath, String defaultValue, String name) throws JDOMException, ParseException {
         if (editorSession.getEditedXML() == null) {
             String rPath = xPath.startsWith("/") ? xPath.substring(1) : xPath;
 
@@ -119,7 +119,7 @@ public class MCRXEditorTransformer {
         if (currentBinding == null) {
             currentBinding = new MCRBinding(editorSession.getEditedXML());
         }
-        currentBinding = new MCRBinding(xPath, name, currentBinding);
+        currentBinding = new MCRBinding(xPath, defaultValue, name, currentBinding);
     }
 
     public void unbind() {

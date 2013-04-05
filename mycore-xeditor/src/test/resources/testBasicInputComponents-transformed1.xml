@@ -18,7 +18,7 @@
         </optgroup>
       </select>
       <input name="/document/service" id="oai" value="oai" type="checkbox" />
-      <input name="/document/service" id="urn" value="urn" type="checkbox" />
+      <input name="/document/service" id="urn" value="urn" type="checkbox" checked="checked" />
     </form>
   </body>
 </html>
