@@ -33,7 +33,9 @@ public class MCRSolrDefaultIndexHandler extends MCRSolrAbstractIndexHandler {
      * Invokes an index request for the current content stream.
      */
     public void index() throws IOException, SolrServerException {
-        LOGGER.trace("Solr: indexing data of\"" + this.getStream().getName() + "\"");
+        if(LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Solr: indexing data of\"" + this.getStream().getName() + "\"");
+        }
         long tStart = System.currentTimeMillis();
         ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest(UPDATE_PATH);
         updateRequest.addContentStream(getStream());
@@ -42,7 +44,9 @@ public class MCRSolrDefaultIndexHandler extends MCRSolrAbstractIndexHandler {
             updateRequest.setCommitWithin(getCommitWithin());
         }
         getSolrServer().request(updateRequest);
-        LOGGER.trace("Solr: indexing data of\"" + this.getStream().getName() + "\" (" + (System.currentTimeMillis() - tStart) + "ms)");
+        if(LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Solr: indexing data of\"" + this.getStream().getName() + "\" (" + (System.currentTimeMillis() - tStart) + "ms)");
+        }
     }
 
 }

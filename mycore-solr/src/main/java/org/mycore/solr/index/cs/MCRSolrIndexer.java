@@ -273,29 +273,41 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
      * Rebuilds solr's content index.
      */
     public static void rebuildContentIndex() {
-        rebuildContentIndex(DEFAULT_SOLR_SERVER);
+        rebuildContentIndex(DEFAULT_SOLR_SERVER, MCRXMLMetadataManager.instance().listIDsOfType("derivate"));
+    }
+
+    public static void rebuildContentIndex(SolrServer solrServer) {
+        rebuildContentIndex(solrServer, MCRXMLMetadataManager.instance().listIDsOfType("derivate"));
+    }
+
+    /**
+     * Rebuilds the content index for the given mycore objects. You can mix derivates and
+     * mcrobjects here. For each mcrobject all its derivates are indexed.
+     * 
+     * @param list containing mycore object id's
+     */
+    public static void rebuildContentIndex(List<String> list) {
+        rebuildContentIndex(DEFAULT_SOLR_SERVER, list);
     }
 
     /**
      * Rebuilds solr's content index.
      */
-    public static void rebuildContentIndex(SolrServer solrServer) {
+    public static void rebuildContentIndex(SolrServer solrServer, List<String> list) {
         LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "======================");
         LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Building Content Index");
         LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "======================");
 
-        List<String> list = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         if (list.isEmpty()) {
-            LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "No derivates to index");
+            LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "No objects to index");
             return;
         }
-
         long tStart = System.currentTimeMillis();
 
-        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Sending content of files of " + list.size() + " derivates to solr for reindexing");
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Sending content of files of " + list.size() + " to solr for reindexing");
 
-        for (String derivate : list) {
-            MCRSolrIndexHandler indexHandler = new MCRSolrFilesIndexHandler(derivate, solrServer);
+        for (String id : list) {
+            MCRSolrIndexHandler indexHandler = new MCRSolrFilesIndexHandler(id, solrServer);
             submitIndexHandler(indexHandler);
         }
 
@@ -304,10 +316,21 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
                 + "ms (" + ((float) (tStop - tStart) / list.size()) + " ms/derivate)");
     }
 
+    /**
+     * Submits the index handler to the executor service (execute as a thread) with priority zero.
+     * 
+     * @param indexHandler index handler to submit
+     */
     protected static void submitIndexHandler(MCRSolrIndexHandler indexHandler) {
         submitIndexHandler(indexHandler, 0);
     }
 
+    /**
+     * Submits a index handler to the executor service (execute as a thread) with the given priority.
+     * 
+     * @param indexHandler index handler to submit
+     * @param priority priority
+     */
     protected static void submitIndexHandler(MCRSolrIndexHandler indexHandler, int priority) {
         ListenableFuture<List<MCRSolrIndexHandler>> future = EXECUTOR_SERVICE.submit(new MCRSolrIndexTask(indexHandler, priority));
         Futures.addCallback(future, new FutureIndexHandlerCallback());

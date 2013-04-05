@@ -52,6 +52,11 @@ public class MCRSolrCommands extends MCRAbstractCommands {
                 "rebuilds solr's metadata index for selected objects");
         addCommand(com);
 
+        com = new MCRCommand("restricted rebuild solr content index for selected",
+                "org.mycore.solr.commands.MCRSolrCommands.rebuildContentIndexForSelected",
+                "rebuilds solr's content index for selected objects and or derivates");
+        addCommand(com);
+
         com = new MCRCommand("restricted rebuild solr metadata index for object {0}",
                 "org.mycore.solr.commands.MCRSolrCommands.rebuildMetadataIndexForObject String",
                 "rebuilds solr's metadata index for object and all its children");
@@ -81,6 +86,11 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     public static void rebuildMetadataIndexForSelected() {
         List<String> selectedObjects = MCRObjectCommands.getSelectedObjectIDs();
         MCRSolrIndexer.rebuildMetadataIndex(selectedObjects);
+    }
+
+    public static void rebuildContentIndexForSelected() {
+        List<String> selectedObjects = MCRObjectCommands.getSelectedObjectIDs();
+        MCRSolrIndexer.rebuildContentIndex(selectedObjects);
     }
 
     public static void rebuildMetadataIndexForObject(String id) {

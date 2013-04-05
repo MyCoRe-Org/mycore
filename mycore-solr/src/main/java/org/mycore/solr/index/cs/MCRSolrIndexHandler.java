@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.solr.client.solrj.SolrServerException;
 
 /**
+ * General interface to handle a single solr index process.
  * 
  * @author Matthias Eichner
  */
@@ -22,7 +23,7 @@ public interface MCRSolrIndexHandler {
     /**
      * Returns a list of index handlers which should be executed after
      * the default index process. Return an empty list if no sub handlers
-     * defined.
+     * are defined.
      * 
      * @return list of <code>MCRSolrIndexHandler</code>
      */

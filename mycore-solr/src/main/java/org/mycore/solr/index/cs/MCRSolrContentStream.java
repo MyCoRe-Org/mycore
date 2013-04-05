@@ -4,10 +4,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.datamodel.metadata.MCRBase;
+
+import com.google.common.base.Charsets;
 
 /**
  * Content stream suitable for wrapping {@link MCRBase} and {@link Document} objects.
@@ -16,6 +19,8 @@ import org.mycore.datamodel.metadata.MCRBase;
  * @author Matthias Eichner
  */
 public class MCRSolrContentStream extends MCRSolrAbstractContentStream<MCRContent> {
+
+    final static Logger LOGGER = Logger.getLogger(MCRSolrContentStream.class);
 
     /**
      * @param objectOrDerivate
@@ -32,7 +37,9 @@ public class MCRSolrContentStream extends MCRSolrAbstractContentStream<MCRConten
         ByteArrayOutputStream out = new ByteArrayOutputStream(64 * 1024);
         getTransformer().transform(content, out);
         byte[] byteArray = out.toByteArray();
-
+        if(LOGGER.isTraceEnabled()) {
+            LOGGER.trace(new String(byteArray, Charsets.UTF_8));
+        }
         this.setSourceInfo(content.getSystemId());
         this.setContentType(getTransformer().getMimeType());
         this.setSize((long) byteArray.length);
