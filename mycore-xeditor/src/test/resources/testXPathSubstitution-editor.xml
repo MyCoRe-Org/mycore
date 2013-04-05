@@ -2,12 +2,12 @@
 
 <div xmlns:xed="http://www.mycore.de/xeditor">
   <xed:form>
-    <xed:source uri="resource:{{$input}}" />
+    <xed:source uri="resource:{$input}" />
     <xed:bind xpath="/document">
       <xed:bind xpath="title">
         <div>
-          Diese Publikation mit dem Titel {{concat('"',text(),'"')}} dürfen Sie als {{$SomeUser}} bearbeiten.
-          <input type="text" size="{{string(string-length(.))}}" />
+          Diese Publikation mit dem Titel "<xed:output />" dürfen Sie als <xed:output value="$SomeUser" /> bearbeiten.
+          <input type="text" size="{string-length(.)}" />
         </div>
       </xed:bind>
     </xed:bind>

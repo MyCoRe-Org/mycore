@@ -2,7 +2,7 @@
 
 <div xmlns:xed="http://www.mycore.de/xeditor">
   <xed:form>
-    <xed:source uri="resource:{{$input}}" />
+    <xed:source uri="resource:{$input}" />
     <xed:bind xpath="/document">
       <xed:repeat xpath="service">
         <div>

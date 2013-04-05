@@ -4,8 +4,9 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xed="http://www.mycore.de/xeditor"
   xmlns:xalan="http://xml.apache.org/xalan"
+  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
   xmlns:transformer="xalan://org.mycore.frontend.xeditor.MCRXEditorTransformer"
-  exclude-result-prefixes="xsl xed xalan transformer">
+  exclude-result-prefixes="xsl xed xalan transformer i18n">
 
   <xsl:strip-space elements="xed:*" />
 
@@ -13,41 +14,55 @@
 
   <xsl:param name="XEditorTransformerKey" />
   <xsl:param name="ServletsBaseURL" />
+  <xsl:param name="CurrentLang" />
+  <xsl:param name="DefaultLang" />
 
   <xsl:variable name="transformer" select="transformer:getTransformer($XEditorTransformerKey)" />
 
   <!-- ========== <xed:form /> ========== -->
 
   <xsl:template match="xed:form">
-    <xsl:for-each select="namespace::*">
-      <xsl:value-of select="transformer:addNamespace($transformer,name(),.)" />
-    </xsl:for-each>
+    <xsl:call-template name="registerAdditionalNamespaces" />
     <form>
       <xsl:apply-templates select="@*" mode="xeditor" />
       <xsl:attribute name="action">
         <xsl:value-of select="concat($ServletsBaseURL,'XEditor')" />
       </xsl:attribute>
       <input type="hidden" name="_xed_session" value="{transformer:getEditorSessionID($transformer)}" />
-      <xsl:for-each select="transformer:getRequestParameters($transformer)">
-        <input type="hidden" name="{@name}" value="{text()}" />
-      </xsl:for-each>
+      <xsl:call-template name="passRequestParameters" />
       <xsl:apply-templates select="node()" mode="xeditor" />
     </form>
   </xsl:template>
 
-  <!-- ========== <xed:source /> ========== -->
+  <!-- ========== register additional namespaces ========== -->
+  
+  <xsl:template name="registerAdditionalNamespaces">
+    <xsl:for-each select="namespace::*">
+      <xsl:value-of select="transformer:addNamespace($transformer,name(),.)" />
+    </xsl:for-each>
+  </xsl:template>
+
+  <!-- ========== pass request parameters ========== -->
+
+  <xsl:template name="passRequestParameters">
+    <xsl:for-each select="transformer:getRequestParameters($transformer)">
+      <input type="hidden" name="{@name}" value="{text()}" />
+    </xsl:for-each>
+  </xsl:template>
+
+  <!-- ========== <xed:source uri="" /> ========== -->
 
   <xsl:template match="xed:source" mode="xeditor">
     <xsl:value-of select="transformer:readSourceXML($transformer,@uri)" />
   </xsl:template>
 
-  <!-- ========== <xed:cancel /> ========== -->
+  <!-- ========== <xed:cancel url="" /> ========== -->
 
   <xsl:template match="xed:cancel" mode="xeditor">
     <xsl:value-of select="transformer:setCancelURL($transformer,@url)" />
   </xsl:template>
 
-  <!-- ========== <xed:include /> ========== -->
+  <!-- ========== <xed:include uri="" ref="" /> ========== -->
 
   <xsl:template match="xed:include[@uri and @ref]" mode="xeditor">
     <xsl:variable name="uri" select="transformer:replaceParameters($transformer,@uri)" />
@@ -78,10 +93,10 @@
   </xsl:template>
 
   <xsl:template match="text()" mode="xeditor">
-    <xsl:value-of select="transformer:replaceXPaths($transformer,.)" />
+    <xsl:copy />
   </xsl:template>
 
-  <!-- ========== <xed:bind /> ========== -->
+  <!-- ========== <xed:bind xpath="" name="" /> ========== -->
 
   <xsl:template match="xed:bind" mode="xeditor">
     <xsl:value-of select="transformer:bind($transformer,@xpath,@name)" />
@@ -157,7 +172,7 @@
     <xsl:value-of select="transformer:getValue($transformer)" />
   </xsl:template>
 
-  <!-- ========== <xed:repeat /> ========== -->
+  <!-- ========== <xed:repeat min="" max="" /> ========== -->
 
   <xsl:template match="xed:repeat" mode="xeditor">
     <xsl:variable name="xed_repeat" select="." />
@@ -193,6 +208,61 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:for-each>
+  </xsl:template>
+
+  <!-- ========== <xed:if test="" /> ========== -->
+
+  <xsl:template match="xed:if" mode="xeditor">
+    <xsl:if test="transformer:evaluateXPath($transformer,@test)='true'">
+      <xsl:apply-templates select="node()" mode="xeditor" />
+    </xsl:if>
+  </xsl:template>
+
+  <!-- ========== <xed:choose> <xed:when test=""/> <xed:otherwise /> </xed:choose> ========== -->
+
+  <xsl:template match="xed:choose" mode="xeditor">
+    <xsl:choose>
+      <xsl:when test="xed:when[transformer:evaluateXPath($transformer,@test)='true']">
+        <xsl:apply-templates select="xed:when[transformer:evaluateXPath($transformer,@test)='true'][1]/node()" mode="xeditor" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="xed:otherwise/node()" mode="xeditor" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- ========== <xed:output i18n="" value="" /> ========== -->
+  
+  <xsl:template match="xed:output[not(@value) and not(@i18n)]" mode="xeditor">
+    <xsl:value-of select="transformer:getOutputValue($transformer)" />
+  </xsl:template>
+
+  <xsl:template match="xed:output[@value and not(@i18n)]" mode="xeditor">
+    <xsl:value-of select="transformer:replaceXPathOrI18n($transformer,@value)" />
+  </xsl:template>
+
+  <xsl:template match="xed:output[@i18n and not(@value)]" mode="xeditor">
+    <xsl:value-of select="i18n:translate(@i18n)" />
+  </xsl:template>
+
+  <xsl:template match="xed:output[@i18n and @value]" mode="xeditor">
+    <xsl:value-of select="i18n:translate(@i18n,transformer:evaluateXPath($transformer,@value))" />
+  </xsl:template>
+
+  <!-- ========== <xed:multi-lang> <xed:lang xml:lang="" /> </xed:multi-lang> ========== -->
+
+  <xsl:template match="xed:multi-lang" mode="xeditor">
+    <xsl:choose>
+      <xsl:when test="xed:lang[lang($CurrentLang)]">
+        <xsl:apply-templates select="xed:lang[lang($CurrentLang)]/node()" mode="xeditor" />
+      </xsl:when>
+      <xsl:when test="xed:lang[lang($DefaultLang)]">
+        <xsl:apply-templates select="xed:lang[lang($DefaultLang)]/node()" mode="xeditor" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="xed:lang[1]/node()" mode="xeditor" />
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>

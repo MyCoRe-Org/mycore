@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<div xmlns:xed="http://www.mycore.de/xeditor">
+  <xed:form>
+    <xed:source uri="resource:{$input}" />
+    <xed:bind xpath="/document">
+      <input type="submit" xed:target="cancel" value="{i18n:label.cancel}" />
+      <label>
+        <xed:output i18n="output.language" value="$CurrentLang" />
+      </label>
+      <label>
+        <xed:output i18n="output.title" value="title" />
+      </label>
+      <label>
+        <xed:multi-lang>
+          <xed:lang xml:lang="fr">There is only french text.</xed:lang>
+        </xed:multi-lang>
+      </label>
+      <label>
+        <xed:multi-lang>
+          <xed:lang xml:lang="de">Dies ist die deutsche Ausgabe.</xed:lang>
+          <xed:lang xml:lang="en">This is the english output.</xed:lang>
+        </xed:multi-lang>
+      </label>
+    </xed:bind>
+  </xed:form>
+</div>

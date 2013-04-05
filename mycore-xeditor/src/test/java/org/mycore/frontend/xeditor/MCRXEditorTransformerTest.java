@@ -49,7 +49,6 @@ public class MCRXEditorTransformerTest {
             throws TransformerException, IOException, JDOMException, SAXException {
         HashMap<String, String[]> parameters = new HashMap<String, String[]>();
         MCRParameterCollector pc = new MCRParameterCollector(false);
-
         if (editedXMLFile != null) {
             parameters.put("input", new String[] { editedXMLFile });
             pc.setParameter("input", editedXMLFile);
@@ -97,5 +96,20 @@ public class MCRXEditorTransformerTest {
     @Test
     public void testNamespaces() throws IOException, URISyntaxException, TransformerException, JDOMException, SAXException {
         testTransformation("testNamespaces-editor.xml", "testNamespaces-source.xml", "testNamespaces-transformed.xml", false);
+    }
+
+    @Test
+    public void testConditions() throws IOException, URISyntaxException, TransformerException, JDOMException, SAXException {
+        MCRSessionMgr.getCurrentSession().put("switch", "on");
+        MCRSessionMgr.getCurrentSession().put("case", "2");
+        testTransformation("testConditions-editor.xml", null, "testConditions-transformed.xml", false);
+    }
+
+    @Test
+    public void testI18N() throws IOException, URISyntaxException, TransformerException, JDOMException, SAXException {
+        MCRSessionMgr.getCurrentSession().setCurrentLanguage("en");
+        testTransformation("testI18N-editor.xml", "testBasicInputComponents-source.xml", "testI18N-transformed-en.xml", false);
+        MCRSessionMgr.getCurrentSession().setCurrentLanguage("de");
+        testTransformation("testI18N-editor.xml", "testBasicInputComponents-source.xml", "testI18N-transformed-de.xml", false);
     }
 }

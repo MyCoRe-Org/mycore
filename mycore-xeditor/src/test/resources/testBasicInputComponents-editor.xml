@@ -3,7 +3,7 @@
 <html>
   <body>
     <xed:form xmlns:xed="http://www.mycore.de/xeditor">
-      <xed:source uri="resource:{{$input}}" />
+      <xed:source uri="resource:{$input}" />
       <xed:bind xpath="document">
         <xed:bind xpath="title">
           <input type="text" />

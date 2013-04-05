@@ -54,6 +54,7 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.xeditor.MCRXPathParser.MCRLocationStep;
+import org.mycore.services.i18n.MCRTranslation;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -134,6 +135,10 @@ public class MCRXEditorTransformer {
         return currentBinding.getValue();
     }
 
+    public String getOutputValue() {
+        return currentBinding.getValue();
+    }
+
     public boolean hasValue(String value) {
         markAsUsed();
         return currentBinding.hasValue(value);
@@ -175,7 +180,7 @@ public class MCRXEditorTransformer {
         return repeats.peek().getControlsParameter();
     }
 
-    private final static Pattern PATTERN_URI = Pattern.compile("\\{\\{\\$(.+)\\}\\}");
+    private final static Pattern PATTERN_URI = Pattern.compile("\\{\\$(.+)\\}");
 
     public String replaceParameters(String uri) {
         Matcher m = PATTERN_URI.matcher(uri);
@@ -189,20 +194,34 @@ public class MCRXEditorTransformer {
         return sb.toString();
     }
 
-    private final static Pattern PATTERN_XPATH = Pattern.compile("\\{\\{([^\\}]+)\\}\\}");
+    private final static Pattern PATTERN_XPATH = Pattern.compile("\\{([^\\}]+)\\}");
 
     public String replaceXPaths(String text) {
         Matcher m = PATTERN_XPATH.matcher(text);
         StringBuffer sb = new StringBuffer();
-        while (m.find()) {
-            String xPath = m.group(1);
-            m.appendReplacement(sb, evaluateXPath(xPath));
-        }
+        while (m.find())
+            m.appendReplacement(sb, replaceXPathOrI18n(m.group(1)));
         m.appendTail(sb);
         return sb.toString();
     }
 
+    public String replaceXPathOrI18n(String expression) {
+        if (expression.startsWith("i18n:")) {
+            String key = expression.substring(5);
+            int pos = key.indexOf(",");
+            if (pos != -1) {
+                String xPath = key.substring(pos + 1);
+                String value = evaluateXPath(xPath);
+                key = key.substring(0, pos);
+                return MCRTranslation.translate(key, value);
+            } else
+                return MCRTranslation.translate(key);
+        } else
+            return evaluateXPath(expression);
+    }
+
     public String evaluateXPath(String xPathExpression) {
+        xPathExpression = "string(" + xPathExpression + ")";
         try {
             Map<String, Object> xPathVariables = currentBinding.buildXPathVariables();
             xPathVariables.putAll(transformationParameters.getParameterMap());
