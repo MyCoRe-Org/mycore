@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import com.drew.lang.annotations.Nullable;
@@ -24,6 +25,11 @@ public class ListeningPriorityExecutorService extends AbstractListeningExecutorS
 
     final ExecutorService delegate;
 
+    /**
+     * Create a new executor service. The delegate should use a {@link PriorityBlockingQueue}.
+     * 
+     * @param delegate
+     */
     public ListeningPriorityExecutorService(ExecutorService delegate) {
         this.delegate = checkNotNull(delegate);
     }

@@ -28,7 +28,7 @@ public class PriorityRunnableDecorator implements Runnable, Comparable<PriorityR
     }
 
     public int compareTo(PriorityRunnableDecorator o) {
-        int diff = this.priority - o.priority;
+        int diff = o.priority - this.priority;
         return Integer.signum(diff);
     }
 
