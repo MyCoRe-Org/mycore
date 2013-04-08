@@ -42,7 +42,7 @@ public class MCRXPathParserTest {
         assertNotNull(xPath.getLocationSteps());
         assertNotNull(xPath.getLocationSteps().get(0));
         assertEquals("element", xPath.getLocationSteps().get(0).getQualifiedName());
-        assertNull(xPath.getLocationSteps().get(0).getValue());
+        assertNull(xPath.getLocationSteps().get(0).getAssignedValue());
         assertEquals(0, xPath.getLocationSteps().get(0).getPredicates().size());
         assertEquals("element", xPath.toString());
 
@@ -55,7 +55,7 @@ public class MCRXPathParserTest {
         xPath = MCRXPathParser.parse("@value=\"O'Brian [1918-1986]\"");
         assertEquals("value", xPath.getLocationSteps().get(0).getQualifiedName());
         assertTrue(xPath.getLocationSteps().get(0).isAttribute());
-        assertEquals("O'Brian [1918-1986]", xPath.getLocationSteps().get(0).getValue());
+        assertEquals("O'Brian [1918-1986]", xPath.getLocationSteps().get(0).getAssignedValue().getValue());
         assertEquals("@value=\"O'Brian [1918-1986]\"", xPath.toString());
 
         xPath = MCRXPathParser.parse("contributor[role/roleTerm[type='code'][encoding='text/plain']]/name");
@@ -69,11 +69,11 @@ public class MCRXPathParserTest {
         assertEquals("type", xPath.getLocationSteps().get(0).getPredicates().get(0).getLocationSteps().get(1).getPredicates().get(0)
                 .getLocationSteps().get(0).getQualifiedName());
         assertEquals("code", xPath.getLocationSteps().get(0).getPredicates().get(0).getLocationSteps().get(1).getPredicates().get(0)
-                .getLocationSteps().get(0).getValue());
+                .getLocationSteps().get(0).getAssignedValue().getValue());
         assertEquals("encoding", xPath.getLocationSteps().get(0).getPredicates().get(0).getLocationSteps().get(1).getPredicates().get(1)
                 .getLocationSteps().get(0).getQualifiedName());
         assertEquals("text/plain", xPath.getLocationSteps().get(0).getPredicates().get(0).getLocationSteps().get(1).getPredicates().get(1)
-                .getLocationSteps().get(0).getValue());
+                .getLocationSteps().get(0).getAssignedValue().getValue());
         assertEquals("contributor[role/roleTerm[type='code'][encoding='text/plain']]/name", xPath.toString());
     }
 

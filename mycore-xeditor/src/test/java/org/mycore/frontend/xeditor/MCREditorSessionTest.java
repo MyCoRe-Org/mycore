@@ -69,7 +69,7 @@ public class MCREditorSessionTest {
     }
 
     private Document buildDocument(String xPath) throws ParseException, JDOMException {
-        return new Document((Element) (MCRNodeBuilder.build(xPath, null, null)));
+        return new Document((Element) (MCRNodeBuilder.build(xPath, null, null, null)));
     }
 
     private Object xPath2Node(MCRBinding rootBinding, String xPath) throws JDOMException, ParseException {

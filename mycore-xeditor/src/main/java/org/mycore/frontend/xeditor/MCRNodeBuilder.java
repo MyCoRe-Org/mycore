@@ -25,6 +25,7 @@ package org.mycore.frontend.xeditor;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Attribute;
@@ -34,6 +35,7 @@ import org.jdom2.Namespace;
 import org.jdom2.Parent;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathFactory;
+import org.mycore.frontend.xeditor.MCRXPathParser.MCRLiteral;
 import org.mycore.frontend.xeditor.MCRXPathParser.MCRLocationStep;
 import org.mycore.frontend.xeditor.MCRXPathParser.MCRXPath;
 
@@ -44,12 +46,14 @@ public class MCRNodeBuilder {
 
     private final static Logger LOGGER = Logger.getLogger(MCRNodeBuilder.class);
 
-    public static Object build(String xPath, String value, Parent parent) throws ParseException, JDOMException {
+    public static Object build(String xPath, String value, Map<String, Object> variables, Parent parent) throws ParseException,
+            JDOMException {
         MCRXPath path = MCRXPathParser.parse(xPath);
-        return build(path, value, parent);
+        return build(path, value, variables, parent);
     }
 
-    public static Object build(MCRXPath xPath, String value, Parent parent) throws ParseException, JDOMException {
+    public static Object build(MCRXPath xPath, String value, Map<String, Object> variables, Parent parent) throws ParseException,
+            JDOMException {
         LOGGER.debug("build xPath " + xPath + " relative to " + MCRXPathBuilder.buildXPath(parent));
 
         List<MCRLocationStep> steps = xPath.getLocationSteps();
@@ -59,8 +63,9 @@ public class MCRNodeBuilder {
         for (i = indexOfLastStep; i >= 0; i--) {
             String path = xPath.buildXPathExpression(i);
             LOGGER.debug("testing existence of subpath " + path);
-            existingNode = XPathFactory.instance().compile(path, Filters.fpassthrough(), null, MCRUsedNamespaces.getNamespaces())
+            existingNode = XPathFactory.instance().compile(path, Filters.fpassthrough(), variables, MCRUsedNamespaces.getNamespaces())
                     .evaluateFirst(parent);
+            LOGGER.debug("Result is " + existingNode);
             MCRLocationStep currentStep = xPath.getLocationSteps().get(i);
 
             if (existingNode instanceof Element) {
@@ -70,7 +75,8 @@ public class MCRNodeBuilder {
             } else if (existingNode instanceof Attribute) {
                 LOGGER.debug("attribute already existing.");
                 break;
-            } else if ((existingNode instanceof Boolean) && ((Boolean) existingNode).booleanValue() && (currentStep.getValue() != null)) {
+            } else if ((existingNode instanceof Boolean) && ((Boolean) existingNode).booleanValue()
+                    && (currentStep.getAssignedValue() != null)) {
                 LOGGER.debug("subpath already existing, but is boolean true: " + path);
                 transformValueToAdditionalPredicate(currentStep);
                 path = xPath.buildXPathExpression(i);
@@ -86,19 +92,20 @@ public class MCRNodeBuilder {
         if (i == indexOfLastStep)
             return existingNode;
         else
-            return build(steps.subList(i + 1, steps.size()), value, parent);
+            return build(steps.subList(i + 1, steps.size()), value, variables, parent);
 
     }
 
     private static void transformValueToAdditionalPredicate(MCRLocationStep currentStep) throws ParseException {
-        String currentValue = currentStep.getValue();
+        MCRLiteral currentValue = (MCRLiteral) (currentStep.getAssignedValue());
         currentStep.setValue(null);
-        String nPath = ".=" + currentStep.getValueDelimiter() + currentValue + currentStep.getValueDelimiter();
+        String nPath = ".=" + currentValue.getDelimiter() + currentValue.getValue() + currentValue.getDelimiter();
         MCRXPath nxp = MCRXPathParser.parse(nPath);
         currentStep.getPredicates().add(nxp);
     }
 
-    private static Object build(List<MCRLocationStep> locationSteps, String value, Parent parent) throws ParseException, JDOMException {
+    private static Object build(List<MCRLocationStep> locationSteps, String value, Map<String, Object> variables, Parent parent)
+            throws ParseException, JDOMException {
         Object node = null;
         for (MCRLocationStep step : locationSteps) {
             if (!canBeBuilt(step)) {
@@ -106,7 +113,7 @@ public class MCRNodeBuilder {
                 break;
             }
 
-            node = build(step, value, parent);
+            node = build(step, value, variables, parent);
             if (node instanceof Element)
                 parent = (Element) node;
         }
@@ -124,11 +131,12 @@ public class MCRNodeBuilder {
         return true;
     }
 
-    private static Object build(MCRLocationStep locationStep, String value, Parent parent) throws ParseException, JDOMException {
+    private static Object build(MCRLocationStep locationStep, String value, Map<String, Object> variables, Parent parent)
+            throws ParseException, JDOMException {
         LOGGER.debug("build location step " + locationStep + " relative to " + MCRXPathBuilder.buildXPath(parent));
 
-        if (locationStep.getValue() != null)
-            value = locationStep.getValue();
+        if (locationStep.getAssignedValue() != null)
+            value = locationStep.getAssignedValue().getValue();
 
         Namespace ns = locationStep.getNamespace();
         String name = locationStep.getLocalName();
@@ -138,7 +146,7 @@ public class MCRNodeBuilder {
         } else {
             Element element = buildElement(ns, name, value, parent);
             for (MCRXPath predicate : locationStep.getPredicates())
-                build(predicate, null, element);
+                build(predicate, null, variables, element);
             return element;
         }
     }

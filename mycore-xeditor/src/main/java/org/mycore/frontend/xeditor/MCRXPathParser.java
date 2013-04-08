@@ -73,7 +73,7 @@ public class MCRXPathParser {
         return xPathExpression.charAt(currentParsePosition);
     }
 
-    class MCRXPath {
+    class MCRXPath implements MCRAssignedValue {
 
         private List<MCRLocationStep> locationSteps = new ArrayList<MCRLocationStep>();
 
@@ -100,6 +100,10 @@ public class MCRXPathParser {
             sb.setLength(sb.length() - 1);
             return sb.toString();
         }
+        
+        public String getValue() {
+            return toString();
+        }
     }
 
     class MCRLocationStep {
@@ -110,9 +114,7 @@ public class MCRXPathParser {
 
         private String name;
 
-        private String value;
-
-        private char delimiter;
+        private MCRAssignedValue assignedValue;
 
         private List<MCRXPath> predicates = new ArrayList<MCRXPath>();
 
@@ -144,16 +146,12 @@ public class MCRXPathParser {
             return name;
         }
 
-        public void setValue(String value) {
-            this.value = value;
+        public void setValue(MCRLiteral value) {
+            this.assignedValue = value;
         }
 
-        public String getValue() {
-            return value;
-        }
-
-        public char getValueDelimiter() {
-            return delimiter;
+        public MCRAssignedValue getAssignedValue() {
+            return assignedValue;
         }
 
         public List<MCRXPath> getPredicates() {
@@ -167,7 +165,7 @@ public class MCRXPathParser {
             }
 
             int begin = currentParsePosition;
-            while (thereIsMore() && (Character.isLetterOrDigit(currentChar()) || "@:.,*()_-'\"|".contains(String.valueOf(currentChar()))))
+            while (thereIsMore() && (Character.isLetterOrDigit(currentChar()) || "@:#$.,*()_-'\"|".contains(String.valueOf(currentChar()))))
                 currentParsePosition++;
 
             name = xPathExpression.substring(begin, currentParsePosition);
@@ -191,15 +189,12 @@ public class MCRXPathParser {
 
         private void parseValue() throws ParseException {
             expect('=');
-            delimiter = currentChar();
-            expect(delimiter);
-            int begin = currentParsePosition;
-            do {
-                ++currentParsePosition;
-            } while (delimiter != currentChar());
-            this.value = xPathExpression.substring(begin, currentParsePosition);
-            LOGGER.debug("value = " + value);
-            expect(delimiter);
+            char current = currentChar();
+            if ((current == '"') || (current == '\'')) {
+                assignedValue = new MCRLiteral();
+            } else {
+                assignedValue = new MCRXPath();
+            }
         }
 
         public String toString() {
@@ -211,9 +206,44 @@ public class MCRXPathParser {
             sb.append(name);
             for (MCRXPath xPath : predicates)
                 sb.append('[').append(xPath).append(']');
-            if (value != null)
-                sb.append('=').append(delimiter).append(value).append(delimiter);
+            if (assignedValue != null)
+                sb.append('=').append(assignedValue);
             return sb.toString();
+        }
+    }
+
+    interface MCRAssignedValue {
+        public String getValue();
+    }
+
+    class MCRLiteral implements MCRAssignedValue {
+
+        private char delimiter;
+
+        private String value;
+
+        MCRLiteral() throws ParseException {
+            delimiter = currentChar();
+            expect(delimiter);
+            int begin = currentParsePosition;
+            do {
+                ++currentParsePosition;
+            } while (delimiter != currentChar());
+            this.value = xPathExpression.substring(begin, currentParsePosition);
+            LOGGER.debug("value = " + value);
+            expect(delimiter);
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public char getDelimiter() {
+            return delimiter;
+        }
+
+        public String toString() {
+            return delimiter + value + delimiter;
         }
     }
 }

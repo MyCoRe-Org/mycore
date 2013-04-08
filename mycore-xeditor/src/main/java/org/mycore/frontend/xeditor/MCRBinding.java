@@ -80,7 +80,7 @@ public class MCRBinding {
         LOGGER.debug("Bind to " + xPathExpression + " selected " + boundNodes.size() + " node(s)");
 
         if (boundNodes.isEmpty()) {
-            Object built = MCRNodeBuilder.build(xPathExpression, defaultValue, (Parent) (parent.getBoundNode()));
+            Object built = MCRNodeBuilder.build(xPathExpression, defaultValue, variables, (Parent) (parent.getBoundNode()));
             LOGGER.debug("Bind to " + xPathExpression + " generated node " + MCRXPathBuilder.buildXPath(built));
             boundNodes.add(built);
         }
