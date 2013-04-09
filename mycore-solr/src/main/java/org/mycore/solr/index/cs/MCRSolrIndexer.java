@@ -51,8 +51,8 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
     final static HttpSolrServer DEFAULT_SOLR_SERVER = MCRSolrServerFactory.getSolrServer();
 
     /** The executer service used for submitting the index requests. */
-    final static ListeningExecutorService EXECUTOR_SERVICE = new ListeningPriorityExecutorService(new ThreadPoolExecutor(10, 10, 0L,
-            TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>()));
+    final static ListeningExecutorService EXECUTOR_SERVICE = new ListeningPriorityExecutorService(new ThreadPoolExecutor(10, 10, 0L, TimeUnit.MILLISECONDS,
+            new PriorityBlockingQueue<Runnable>()));
 
     /** Specify how many documents will be submitted to solr at a time when rebuilding the metadata index. Default is 100. */
     final static int BULK_SIZE = MCRConfiguration.instance().getInt("MCR.Module-solr.bulk.size", 100);
@@ -133,7 +133,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("Solr: submitting file \"" + file.getAbsolutePath() + " (" + file.getID() + ")\" for indexing");
         }
-        if(MCRSolrIndexStrategyManager.checkFile(file)) {
+        if (MCRSolrIndexStrategyManager.checkFile(file)) {
             /* extract metadata with tika */
             return new MCRSolrFileIndexHandler(new MCRSolrFileContentStream(file), solrServer);
         } else {
@@ -252,9 +252,8 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         }
 
         long durationInMilliSeconds = swatch.getTime();
-        LOGGER.log(MCRSolrLogLevels.SOLR_INFO,
-                "Submitted data of " + list.size() + " objects for indexing done in " + Math.ceil(durationInMilliSeconds / 1000)
-                        + " seconds (" + durationInMilliSeconds / list.size() + " ms/object)");
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Submitted data of " + list.size() + " objects for indexing done in " + Math.ceil(durationInMilliSeconds / 1000)
+                + " seconds (" + durationInMilliSeconds / list.size() + " ms/object)");
         try {
             // we wait until all index threads are finished 
             if (solrServer instanceof ConcurrentUpdateSolrServer) {
@@ -312,8 +311,8 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         }
 
         long tStop = System.currentTimeMillis();
-        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Submitted data of " + list.size() + " derivates for indexing done in " + (tStop - tStart)
-                + "ms (" + ((float) (tStop - tStart) / list.size()) + " ms/derivate)");
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Submitted data of " + list.size() + " derivates for indexing done in " + (tStop - tStart) + "ms ("
+                + ((float) (tStop - tStart) / list.size()) + " ms/derivate)");
     }
 
     /**
@@ -373,6 +372,21 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Dropping solr index...");
         DEFAULT_SOLR_SERVER.deleteByQuery("*:*");
         LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Dropping solr index...done");
+    }
+
+    /**
+     * @param type
+     * @throws Exception
+     */
+    public static void dropIndexByType(String type) throws Exception {
+        if (!MCRObjectID.isValidType(type) || "data_file".equals(type)) {
+            LOGGER.warn("The type " + type + " is not a valid type in the actual environment");
+            return;
+        }
+
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Dropping solr index for type " + type + "...");
+        DEFAULT_SOLR_SERVER.deleteByQuery("+objectType:" + type);
+        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Dropping solr index for type " + type + "...done");
     }
 
     /**
