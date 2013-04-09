@@ -123,7 +123,7 @@ public class MCRMetsSave {
         mets = MCRMetsSave.updateOnFileAdd(mets, file);
         if (mets != null)
             MCRMetsSave.saveMets(mets, derivateID);
-   
+
     }
 
     /**
@@ -161,37 +161,36 @@ public class MCRMetsSave {
             String fileId = org.mycore.mets.model.files.File.PREFIX_MASTER + uuid;
 
             /* add to file section "use=master" */
-            String contentType = MimetypesFileTypeMap.getDefaultFileTypeMap()
-                    .getContentType(new File(file.getName()));
-            LOGGER.info(MessageFormat.format("Content Type is : {0}", contentType) );
+            String contentType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(new File(file.getName()));
+            LOGGER.info(MessageFormat.format("Content Type is : {0}", contentType));
             org.mycore.mets.model.files.File f = new org.mycore.mets.model.files.File(fileId, contentType);
             FLocat fLocat = new FLocat(LOCTYPE.URL, file.getName());
             f.setFLocat(fLocat);
 
             // alter the mets document
             XPathExpression<Element> xpath = XPathFactory.instance().compile("mets:mets/mets:fileSec/mets:fileGrp", Filters.element(),
-                    null, MCRConstants.METS_NAMESPACE);
+                null, MCRConstants.METS_NAMESPACE);
             Element fileSec = xpath.evaluateFirst(mets);
             fileSec.addContent(f.asElement());
 
             /* add to structMap physical */
             XPathExpression<Attribute> attributeXpath = XPathFactory.instance().compile(
-                    "mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[last()]/@ORDER",
-                    Filters.attribute(), null, MCRConstants.METS_NAMESPACE);
+                "mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[last()]/@ORDER", Filters.attribute(),
+                null, MCRConstants.METS_NAMESPACE);
             Attribute orderAttribute = attributeXpath.evaluateFirst(mets);
             PhysicalSubDiv div = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE,
-                    orderAttribute.getIntValue() + 1);
+                orderAttribute.getIntValue() + 1);
             div.add(new Fptr(fileId));
 
             // actually alter the mets document
             xpath = XPathFactory.instance().compile("mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']",
-                    Filters.element(), null, MCRConstants.METS_NAMESPACE);
+                Filters.element(), null, MCRConstants.METS_NAMESPACE);
             Element structMapPhys = xpath.evaluateFirst(mets);
             structMapPhys.addContent(div.asElement());
 
             /* add to structLink */
             attributeXpath = XPathFactory.instance().compile("mets:mets/mets:structMap[@TYPE='LOGICAL']/mets:div/@ID", Filters.attribute(),
-                    null, MCRConstants.METS_NAMESPACE);
+                null, MCRConstants.METS_NAMESPACE);
             Attribute idAttribute = attributeXpath.evaluateFirst(mets);
             String rootID = idAttribute.getValue();
 
@@ -380,5 +379,54 @@ public class MCRMetsSave {
         }
     }
 
+    /**
+     * @param mets
+     * @param derivateId
+     * 
+     * @return true if all files owned by the derivate appearing in the master file group or false otherwise 
+     */
+    public static boolean isComplete(Mets mets, MCRObjectID derivateId) {
+        try {
+            FileGrp fileGroup = mets.getFileSec().getFileGroup(FileGrp.USE_MASTER);
+            MCRDirectory ifs = MCRDirectory.getRootDirectory(derivateId.toString());
+            return isComplete(fileGroup, ifs);
+        } catch (Exception ex) {
+            LOGGER.error("Error while validating mets", ex);
+            return false;
+        }
+    }
+
+    /**
+     * 
+     * @param fileGroup
+     * @param ifs
+     * @param derivateId
+     * @return true if all files in the {@link MCRDirectory} appears in the fileGroup
+     */
+    public static boolean isComplete(FileGrp fileGroup, MCRDirectory ifs) {
+        try {
+            for (MCRFilesystemNode node : ifs.getChildren()) {
+                if (node.getName().equals(MCRJSONProvider.DEFAULT_METS_FILENAME)) {
+                    continue;
+                }
+                if (node instanceof MCRDirectory && !isComplete(fileGroup, (MCRDirectory) node)) {
+                    return false;
+                } else if (node instanceof MCRDirectory) {
+                    continue;
+                }
+
+                String path = node.getAbsolutePath().substring(1);//remove leading '/'
+                if (!fileGroup.contains(path)) {
+                    LOGGER.warn(MessageFormat.format("{0} does not appear in {1}!", path, ifs.getOwnerID()));
+                    return false;
+                }
+            }
+        } catch (Exception ex) {
+            LOGGER.error("Error while validating mets", ex);
+            return false;
+        }
+
+        return true;
+    }
 
 }
