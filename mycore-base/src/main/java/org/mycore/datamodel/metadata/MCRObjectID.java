@@ -79,7 +79,7 @@ public final class MCRObjectID {
             if (property == null || !("true".equalsIgnoreCase(property))) {
                 continue;
             }
-            VALID_TYPE_LIST.add(key.substring(key.lastIndexOf("=")).trim());
+            VALID_TYPE_LIST.add(key.substring(key.lastIndexOf(".") + 1).trim());
         }
     }
 
