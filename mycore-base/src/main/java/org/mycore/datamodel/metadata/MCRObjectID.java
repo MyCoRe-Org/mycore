@@ -24,7 +24,12 @@
 package org.mycore.datamodel.metadata;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
@@ -62,6 +67,21 @@ public final class MCRObjectID {
     private static final MCRObjectIDFormat idFormat = new MCRObjectIDDefaultFormat();
 
     private static final Logger LOGGER = Logger.getLogger(MCRObjectID.class);
+
+    private static HashSet<String> VALID_TYPE_LIST;
+    static {
+        VALID_TYPE_LIST = new HashSet<String>();
+        Properties properties = CONFIG.getProperties("MCR.Metadata.Type");
+        Iterator<Object> iterator = properties.keySet().iterator();
+        while (iterator.hasNext()) {
+            String key = iterator.next().toString();
+            String property = properties.getProperty(key);
+            if (property == null || !("true".equalsIgnoreCase(property))) {
+                continue;
+            }
+            VALID_TYPE_LIST.add(key.substring(key.lastIndexOf("=")).trim());
+        }
+    }
 
     public interface MCRObjectIDFormat {
         public int numberDistance();
@@ -415,5 +435,25 @@ public final class MCRObjectID {
     @Override
     public int hashCode() {
         return toString().hashCode();
+    }
+
+    /**
+     * Returns a list of available mycore object types.
+     * 
+     * @return
+     */
+    public static List<String> listTypes() {
+        return new ArrayList<String>(VALID_TYPE_LIST);
+    }
+
+    /**
+     * Check whether the type passed is a valid type in the current mycore environment. 
+     * That being said property <code>MCR.Metadata.Type.&#60;type&#62;</code> must be set to <code>true</code> in mycore.properties.
+     * 
+     * @param type the type to check
+     * @return true if valid, false otherwise 
+     */
+    public static boolean isValidType(String type) {
+        return VALID_TYPE_LIST.contains(type);
     }
 }
