@@ -53,14 +53,11 @@ public class MCRDirectory extends MCRFilesystemNode {
      * Creates a new, empty root MCRDirectory with the given name, belonging to
      * the given ownerID. The directory is assumed to be a standalone
      * "root directory" that has no parent.
-     * 
-     * @param name
-     *            the name of the new MCRDirectory
      * @param ownerID
      *            any ID String of the logical owner of this file
      */
-    public MCRDirectory(String name, String ownerID) {
-        super(name, ownerID);
+    public MCRDirectory(String ownerID) {
+        super(ownerID, ownerID);
         storeNew();
     }
 

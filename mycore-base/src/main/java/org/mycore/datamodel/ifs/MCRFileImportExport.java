@@ -50,7 +50,7 @@ public class MCRFileImportExport {
         MCRArgumentChecker.ensureNotEmpty(ownerID, "owner ID");
 
         // Create new parent directory
-        MCRDirectory dir = new MCRDirectory(ownerID, ownerID);
+        MCRDirectory dir = new MCRDirectory(ownerID);
 
         try // Try to import local content into this new directory
         {

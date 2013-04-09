@@ -154,7 +154,7 @@ public final class MCRMetadataManager {
         // create data in IFS
         if (mcrDerivate.getDerivate().getInternals() != null) {
             if (mcrDerivate.getDerivate().getInternals().getSourcePath() == null) {
-                final MCRDirectory difs = new MCRDirectory(mcrDerivate.getId().toString(), mcrDerivate.getId().toString());
+                final MCRDirectory difs = new MCRDirectory(mcrDerivate.getId().toString());
                 mcrDerivate.getDerivate().getInternals().setIFSID(difs.getID());
             } else {
                 final String sourcepath = mcrDerivate.getDerivate().getInternals().getSourcePath();

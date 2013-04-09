@@ -296,6 +296,11 @@ public abstract class MCRFilesystemNode {
         return label;
     }
 
+    /**
+     * Returns an absolute path that is build like this: {@link #getOwnerID()}+{@link #getAbsolutePath()}.
+     * 
+     * If this node is a file that has no parent directory, this method returns the same as {@link #getName()}.
+     */
     public String getPath() {
         ensureNotDeleted();
 
@@ -305,6 +310,9 @@ public abstract class MCRFilesystemNode {
         return name;
     }
 
+    /**
+     * Returns the absolute path of this node starting with a '/'.
+     */
     public String getAbsolutePath() {
         ensureNotDeleted();
 

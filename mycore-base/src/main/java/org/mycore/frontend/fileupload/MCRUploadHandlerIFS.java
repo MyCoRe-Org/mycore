@@ -246,7 +246,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     private static MCRDirectory getRootDir(String derID) {
         MCRFilesystemNode root = MCRFilesystemNode.getRootNode(derID);
         if (!(root instanceof MCRDirectory)) {
-            root = new MCRDirectory(derID, derID);
+            root = new MCRDirectory(derID);
         }
         MCRDirectory rootDir = (MCRDirectory) root;
         return rootDir;
