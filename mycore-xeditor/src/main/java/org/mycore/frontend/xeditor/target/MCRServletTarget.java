@@ -43,7 +43,7 @@ public class MCRServletTarget extends MCREditorTargetBase {
         if (dispatcher == null)
             dispatcher = context.getRequestDispatcher(servletNameOrPath);
 
-        job.getRequest().setAttribute("MCRXEditorSubmission", session.getEditedXML());
+        job.getRequest().setAttribute("MCRXEditorSubmission", session.getPostProcessedXML());
         dispatcher.forward(job.getRequest(), job.getResponse());
     }
 }

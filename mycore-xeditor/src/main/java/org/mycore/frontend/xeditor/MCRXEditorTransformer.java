@@ -109,6 +109,10 @@ public class MCRXEditorTransformer {
             editorSession.setCancelURL(url);
     }
 
+    public void setPostProcessorXSL(String stylesheet) {
+        editorSession.setPostProcessorXSL(stylesheet);
+    }
+
     public void bind(String xPath, String defaultValue, String name) throws JDOMException, ParseException {
         if (editorSession.getEditedXML() == null) {
             String rPath = xPath.startsWith("/") ? xPath.substring(1) : xPath;

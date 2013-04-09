@@ -43,7 +43,7 @@ public class MCRLayoutServiceTarget extends MCREditorTargetBase {
         if ((style != null) && (!style.isEmpty()))
             job.getRequest().setAttribute("XSL.Style", style);
 
-        MCRContent editedXML = new MCRJDOMContent(session.getEditedXML());
+        MCRContent editedXML = new MCRJDOMContent(session.getPostProcessedXML());
         MCRLayoutService.instance().doLayout(job.getRequest(), job.getResponse(), editedXML);
     }
 }

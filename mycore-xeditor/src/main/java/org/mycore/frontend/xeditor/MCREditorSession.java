@@ -37,7 +37,10 @@ import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRSourceContent;
+import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 import org.xml.sax.SAXException;
 
 /**
@@ -58,6 +61,8 @@ public class MCREditorSession {
     private String sourceURI;
 
     private String cancelURL;
+
+    private String postProcessorXSL;
 
     public MCREditorSession(Map<String, String[]> requestParameters) {
         this.requestParameters = requestParameters;
@@ -92,6 +97,19 @@ public class MCREditorSession {
 
     public Document getEditedXML() {
         return editedXML;
+    }
+
+    public void setPostProcessorXSL(String stylesheet) {
+        this.postProcessorXSL = stylesheet;
+    }
+
+    public Document getPostProcessedXML() throws IOException, JDOMException, SAXException {
+        if (postProcessorXSL == null)
+            return editedXML;
+
+        MCRContent source = new MCRJDOMContent(editedXML);
+        MCRContent transformed = MCRXSL2XMLTransformer.getInstance("xsl/" + postProcessorXSL).transform(source);
+        return transformed.asXML();
     }
 
     public String getSourceURI() {

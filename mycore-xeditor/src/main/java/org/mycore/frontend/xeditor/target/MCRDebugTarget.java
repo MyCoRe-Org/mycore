@@ -33,6 +33,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
@@ -50,7 +51,8 @@ public class MCRDebugTarget extends MCREditorTargetBase {
 
         if (session.getSourceURI() != null) {
             out.println("<h3>When loading from source URI:</h3>");
-            outputXML(MCRSourceContent.getInstance(session.getSourceURI()).asXML(), out);
+            MCRContent source = MCRSourceContent.getInstance(session.getSourceURI());
+            outputXML(source.asXML(), out);
         }
 
         out.println("<h3>After form transformation, before submit:</h3>");
@@ -63,6 +65,9 @@ public class MCRDebugTarget extends MCREditorTargetBase {
 
         out.println("<h3>After submit:</h3>");
         outputXML(session.getEditedXML(), out);
+
+        out.println("<h3>After postprocessing:</h3>");
+        outputXML(session.getPostProcessedXML(), out);
 
         out.println("</body></html>");
         out.close();
