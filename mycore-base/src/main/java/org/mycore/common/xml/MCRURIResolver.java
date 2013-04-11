@@ -200,7 +200,7 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
         supportedSchemes.put("buildxml", getURIResolver(new MCRBuildXMLResolver()));
         supportedSchemes.put("notnull", new MCRNotNullResolver());
         supportedSchemes.put("xslStyle", new MCRXslStyleResolver());
-        supportedSchemes.put("xslInclude", getURIResolver(new MCRXslIncludeResolver()));
+        supportedSchemes.put("xslInclude", new MCRXslIncludeResolver());
         supportedSchemes.put("versioninfo", new MCRVersionInfoResolver());
         supportedSchemes.put("deletedMcrObject", new MCRDeletedObjectResolver());
         supportedSchemes.put("fieldsXSL", new MCRFieldsXSLResolver());
@@ -1268,19 +1268,19 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
      * 
      * @return A xsl file with the includes as href.
      */
-    private static class MCRXslIncludeResolver implements MCRResolver {
+    private static class MCRXslIncludeResolver implements URIResolver {
 
-        public Element resolveElement(String uri) throws Exception {
-            String includePart = uri.substring(uri.indexOf(":") + 1);
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            String includePart = href.substring(href.indexOf(":") + 1);
             Namespace xslNamespace = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
 
             Element root = new Element("stylesheet", xslNamespace);
             root.setAttribute("version", "1.0");
 
             // get the parameters from mycore.properties
-            Properties props = MCRConfiguration.instance().getProperties("MCR.URIResolver.xslIncludes." + includePart);
-            for (Object o : props.values()) {
-                String propValue = (String) o;
+            String propValue = MCRConfiguration.instance().getString("MCR.URIResolver.xslIncludes." + includePart, "").trim();
+            if (!propValue.isEmpty()) {
                 String[] includes = propValue.split(",");
                 for (String include : includes) {
                     // create a new include element
@@ -1289,7 +1289,7 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
                     root.addContent(includeElement);
                 }
             }
-            return root;
+            return new JDOMSource(root);
         }
     }
 
