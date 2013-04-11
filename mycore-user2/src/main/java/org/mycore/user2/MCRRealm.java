@@ -26,6 +26,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 
@@ -55,6 +57,8 @@ public class MCRRealm {
 
     private String redirectParameter;
 
+    private static String DEFAULT_LANG = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
+
     /** 
      * Creates a new realm.
      * 
@@ -78,7 +82,15 @@ public class MCRRealm {
      */
     public String getLabel() {
         String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
-        return labels.get(lang);
+        String label = labels.get(lang);
+        if (label != null) {
+            return label;
+        }
+        label = labels.get(DEFAULT_LANG);
+        if (label != null) {
+            return label;
+        }
+        return id;
     }
 
     /**
