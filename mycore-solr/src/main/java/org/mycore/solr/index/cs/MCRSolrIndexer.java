@@ -76,8 +76,9 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
                         LOGGER.info("Waiting for shutdown of MCRSolrIndexer, still working...");
                         executorService.awaitTermination(10, TimeUnit.SECONDS);
                     }
-                } catch (InterruptedException e) {
-                    LOGGER.warn("Error while closing " + toString(), e);
+                    MCRSolrServerFactory.getSolrServer().commit();
+                } catch (InterruptedException | SolrServerException | IOException e) {
+                    LOGGER.warn("Error while closing MCRSolrIndexer executor service.", e);
                 }
             }
         };
