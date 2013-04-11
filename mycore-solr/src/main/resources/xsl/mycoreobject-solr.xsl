@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3"
   xmlns:xalan="http://xml.apache.org/xalan">
 
   <xsl:include href="xslInclude:solr-export" />
@@ -29,7 +29,8 @@
   </xsl:template>
 
   <xsl:template match="*[@class='MCRMetaClassification']/*">
-    <xsl:variable name="classTree" select="document(concat('classification:metadata:0:parents:', @classid, ':', @categid))/mycoreclass/categories//category" />
+    <xsl:variable name="classTree"
+      select="document(concat('classification:metadata:0:parents:', @classid, ':', @categid))/mycoreclass/categories//category" />
 
     <xsl:apply-templates mode="classi2fields" select="$classTree" />
 
@@ -54,6 +55,16 @@
     </field>
 
     <xsl:apply-templates mode="labels" select="label" />
+  </xsl:template>
+  
+  <xsl:template match="/mycoreobject/metadata//mods:*[@authority or @authorityURI]">
+    <xsl:variable name="uri" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport" select="mcrmods:getClassCategParentLink(.)" />
+    <xsl:if test="string-length($uri) &gt; 0">
+      <xsl:variable name="classTree" select="document($uri)/mycoreclass/categories//category" />
+      <xsl:apply-templates mode="classi2fields" select="$classTree" />
+      <!-- TODO: Currently we do not have to think of releatedItem[@type='host'] here -->
+      <xsl:apply-templates mode="classi2fieldsTop" select="$classTree" />
+    </xsl:if>
   </xsl:template>
 
   <xsl:template mode="classi2fieldsTop" match="category">
