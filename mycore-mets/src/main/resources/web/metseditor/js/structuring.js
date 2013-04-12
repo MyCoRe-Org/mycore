@@ -256,6 +256,7 @@ function displayEditItemDiaglog() {
 
     if (commonLabelTextBox.name != null) {
         commonLabelTextBox.setValue(selItem.name);
+        commonLabelTextBox.attr('disabled', 'true');
     }
 
     var checkDisplay = dijit.byId("checkDisplay");
