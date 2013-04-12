@@ -5,7 +5,7 @@ package org.mycore.util.concurrent;
  * 
  * @author Matthias Eichner
  */
-public class PriorityRunnableDecorator implements Runnable, Comparable<PriorityRunnableDecorator> {
+public class MCRPriorityRunnableDecorator implements Runnable, Comparable<MCRPriorityRunnableDecorator> {
 
     protected Runnable delegate;
     
@@ -17,7 +17,7 @@ public class PriorityRunnableDecorator implements Runnable, Comparable<PriorityR
      * @param delegate runnable which should be delegated
      * @param priority priority of the task
      */
-    public PriorityRunnableDecorator(Runnable delegate, int priority) {
+    public MCRPriorityRunnableDecorator(Runnable delegate, int priority) {
         this.delegate = delegate;
         this.priority = priority;
     }
@@ -27,7 +27,7 @@ public class PriorityRunnableDecorator implements Runnable, Comparable<PriorityR
         this.delegate.run();
     }
 
-    public int compareTo(PriorityRunnableDecorator o) {
+    public int compareTo(MCRPriorityRunnableDecorator o) {
         int diff = o.priority - this.priority;
         return Integer.signum(diff);
     }

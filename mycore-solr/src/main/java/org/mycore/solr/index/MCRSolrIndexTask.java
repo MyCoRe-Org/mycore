@@ -9,7 +9,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.util.concurrent.Prioritizable;
+import org.mycore.util.concurrent.MCRPrioritizable;
 
 /**
  * Solr index task which handles <code>MCRSolrIndexHandler</code>'s.
@@ -17,7 +17,7 @@ import org.mycore.util.concurrent.Prioritizable;
  * 
  * @author Matthias Eichner
  */
-public class MCRSolrIndexTask implements Callable<List<MCRSolrIndexHandler>>, Prioritizable<Integer> {
+public class MCRSolrIndexTask implements Callable<List<MCRSolrIndexHandler>>, MCRPrioritizable<Integer> {
 
     final static Logger LOGGER = Logger.getLogger(MCRSolrIndexTask.class);
 

@@ -16,12 +16,12 @@ import com.google.common.util.concurrent.ListenableFutureTask;
 /**
  * Execution service where tasks can be prioritized and listened. Extends the guava
  * {@link AbstractListeningExecutorService} class.
- * To prioritize a task it must implement the {@link Prioritizable} interface. If a task
+ * To prioritize a task it must implement the {@link MCRPrioritizable} interface. If a task
  * does not implement the interface its priority is set to zero (executed at last).
  * 
  * @author Matthias Eichner
  */
-public class ListeningPriorityExecutorService extends AbstractListeningExecutorService {
+public class MCRListeningPriorityExecutorService extends AbstractListeningExecutorService {
 
     final ExecutorService delegate;
 
@@ -30,7 +30,7 @@ public class ListeningPriorityExecutorService extends AbstractListeningExecutorS
      * 
      * @param delegate
      */
-    public ListeningPriorityExecutorService(ExecutorService delegate) {
+    public MCRListeningPriorityExecutorService(ExecutorService delegate) {
         this.delegate = checkNotNull(delegate);
     }
 
@@ -82,8 +82,8 @@ public class ListeningPriorityExecutorService extends AbstractListeningExecutorS
 
     @SuppressWarnings("unchecked")
     private int getPriority(Object task) {
-        if (task instanceof Prioritizable) {
-            return ((Prioritizable<Integer>) task).getPriority();
+        if (task instanceof MCRPrioritizable) {
+            return ((MCRPrioritizable<Integer>) task).getPriority();
         }
         return 0;
     }
@@ -94,7 +94,7 @@ public class ListeningPriorityExecutorService extends AbstractListeningExecutorS
     }
 
     public void execute(Runnable command, int priority) {
-        PriorityRunnableDecorator prd = new PriorityRunnableDecorator(command, priority);
+        MCRPriorityRunnableDecorator prd = new MCRPriorityRunnableDecorator(command, priority);
         delegate.execute(prd);
     }
 

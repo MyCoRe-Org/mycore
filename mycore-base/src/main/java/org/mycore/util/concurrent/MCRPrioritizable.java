@@ -5,7 +5,7 @@ package org.mycore.util.concurrent;
  * 
  * @author Matthias Eichner
  */
-public interface Prioritizable<T> {
+public interface MCRPrioritizable<T> {
 
     /**
      * Returns the priority.

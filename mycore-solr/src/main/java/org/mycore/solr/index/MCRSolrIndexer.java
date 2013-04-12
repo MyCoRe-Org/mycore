@@ -40,7 +40,7 @@ import org.mycore.solr.index.handlers.MCRSolrFilesIndexHandler;
 import org.mycore.solr.index.handlers.MCRSolrListElementIndexHandler;
 import org.mycore.solr.index.handlers.MCRSolrOptimizeIndexHandler;
 import org.mycore.solr.index.strategy.MCRSolrIndexStrategyManager;
-import org.mycore.util.concurrent.ListeningPriorityExecutorService;
+import org.mycore.util.concurrent.MCRListeningPriorityExecutorService;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -61,7 +61,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
     final static ListeningExecutorService EXECUTOR_SERVICE;
 
     static {
-        final ListeningPriorityExecutorService executorService = new ListeningPriorityExecutorService(new ThreadPoolExecutor(10, 10, 0L,
+        final MCRListeningPriorityExecutorService executorService = new MCRListeningPriorityExecutorService(new ThreadPoolExecutor(10, 10, 0L,
             TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>()));
         MCRShutdownHandler.Closeable cleaner = new MCRShutdownHandler.Closeable() {
             @Override

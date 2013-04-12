@@ -17,7 +17,7 @@ public class ListeningPriortiyExecutorServiceTest {
 
     @Test
     public void priortiy() throws Exception {
-        ListeningPriorityExecutorService es = new ListeningPriorityExecutorService(new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
+        MCRListeningPriorityExecutorService es = new MCRListeningPriorityExecutorService(new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
                 new PriorityBlockingQueue<Runnable>()));
         UnimportantTask unimportantTask1 = new UnimportantTask(1);
         UnimportantTask unimportantTask2 = new UnimportantTask(2);
@@ -53,7 +53,7 @@ public class ListeningPriortiyExecutorServiceTest {
         }
     }
 
-    private static class ImportantTask implements Callable<Integer>, Prioritizable<Integer> {
+    private static class ImportantTask implements Callable<Integer>, MCRPrioritizable<Integer> {
         private int id;
 
         public ImportantTask(Integer id) {
@@ -72,7 +72,7 @@ public class ListeningPriortiyExecutorServiceTest {
         }
     }
 
-    private static class UnimportantTask implements Callable<Integer>, Prioritizable<Integer> {
+    private static class UnimportantTask implements Callable<Integer>, MCRPrioritizable<Integer> {
         private int id;
 
         public UnimportantTask(Integer id) {
