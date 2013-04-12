@@ -1,4 +1,4 @@
-package org.mycore.solr.index.cs;
+package org.mycore.solr.index.handlers;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -12,6 +12,7 @@ import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.solr.index.cs.MCRSolrFileContentStream;
 
 public class MCRSolrFileIndexHandler extends MCRSolrAbstractIndexHandler {
 

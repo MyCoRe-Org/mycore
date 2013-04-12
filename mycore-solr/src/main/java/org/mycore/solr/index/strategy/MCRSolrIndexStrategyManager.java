@@ -1,4 +1,4 @@
-package org.mycore.solr.index.cs.strategy;
+package org.mycore.solr.index.strategy;
 
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -12,7 +12,7 @@ public class MCRSolrIndexStrategyManager {
 
     static {
         FILE_STRATEGY = MCRConfiguration.instance().getInstanceOf("MCR.Module-solr.FileIndexStrategy",
-                "org.mycore.solr.index.cs.strategy.MCRSolrFileSizeStrategy", MCRSolrFileStrategy.class);
+                "org.mycore.solr.index.strategy.MCRSolrFileSizeStrategy", MCRSolrFileStrategy.class);
     }
 
     public static boolean checkFile(MCRFile file) {

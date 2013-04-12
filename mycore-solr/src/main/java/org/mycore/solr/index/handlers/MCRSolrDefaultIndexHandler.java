@@ -1,4 +1,4 @@
-package org.mycore.solr.index.cs;
+package org.mycore.solr.index.handlers;
 
 import java.io.IOException;
 import java.util.Map;
@@ -9,6 +9,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.common.util.NamedList;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.solr.index.cs.MCRSolrAbstractContentStream;
 
 /**
  * This class can handle a index process for a content stream.

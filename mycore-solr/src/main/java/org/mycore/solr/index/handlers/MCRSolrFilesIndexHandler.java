@@ -1,4 +1,4 @@
-package org.mycore.solr.index.cs;
+package org.mycore.solr.index.handlers;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,6 +13,8 @@ import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.solr.index.MCRSolrIndexHandler;
+import org.mycore.solr.index.MCRSolrIndexer;
 
 /**
  * Commits <code>MCRFile</code> objects to solr, be aware that the files are

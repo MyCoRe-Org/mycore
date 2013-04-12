@@ -1,4 +1,4 @@
-package org.mycore.solr.index.cs.strategy;
+package org.mycore.solr.index.strategy;
 
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRFile;

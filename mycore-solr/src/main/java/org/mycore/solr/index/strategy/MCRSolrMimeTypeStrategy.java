@@ -1,4 +1,4 @@
-package org.mycore.solr.index.cs.strategy;
+package org.mycore.solr.index.strategy;
 
 import java.util.regex.Pattern;
 

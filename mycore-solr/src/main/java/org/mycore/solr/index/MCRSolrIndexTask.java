@@ -1,4 +1,4 @@
-package org.mycore.solr.index.cs;
+package org.mycore.solr.index;
 
 import java.io.IOException;
 import java.util.List;

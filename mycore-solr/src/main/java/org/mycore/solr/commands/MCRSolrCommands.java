@@ -16,7 +16,7 @@ import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.solr.MCRSolrServerFactory;
-import org.mycore.solr.index.cs.MCRSolrIndexer;
+import org.mycore.solr.index.MCRSolrIndexer;
 
 /**
  * Class provides useful solr related commands.

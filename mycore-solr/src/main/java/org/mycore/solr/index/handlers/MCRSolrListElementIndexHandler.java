@@ -1,4 +1,4 @@
-package org.mycore.solr.index.cs;
+package org.mycore.solr.index.handlers;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,6 +8,9 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.jdom2.Element;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.solr.index.MCRSolrIndexHandler;
+import org.mycore.solr.index.cs.MCRSolrContentStream;
+import org.mycore.solr.index.cs.MCRSolrListElementStream;
 
 /**
  * This class index a {@link MCRSolrListElementStream}. The stream contains a list of xml elements (mycore objects)

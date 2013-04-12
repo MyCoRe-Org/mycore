@@ -1,4 +1,4 @@
-package org.mycore.solr.index.cs.strategy;
+package org.mycore.solr.index.strategy;
 
 /**
  * Base interface for all solr specific index strategies.

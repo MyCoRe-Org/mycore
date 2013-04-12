@@ -1,4 +1,4 @@
-package org.mycore.solr.index.cs;
+package org.mycore.solr.index.handlers;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,6 +7,8 @@ import java.util.List;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.index.MCRSolrIndexHandler;
+import org.mycore.solr.index.cs.MCRSolrAbstractContentStream;
 
 public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler {
 

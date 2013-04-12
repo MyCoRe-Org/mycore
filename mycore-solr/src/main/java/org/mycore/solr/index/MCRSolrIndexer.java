@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.mycore.solr.index.cs;
+package org.mycore.solr.index;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,7 +31,15 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.MCRSolrServerFactory;
-import org.mycore.solr.index.cs.strategy.MCRSolrIndexStrategyManager;
+import org.mycore.solr.index.cs.MCRSolrContentStream;
+import org.mycore.solr.index.cs.MCRSolrFileContentStream;
+import org.mycore.solr.index.cs.MCRSolrListElementStream;
+import org.mycore.solr.index.handlers.MCRSolrDefaultIndexHandler;
+import org.mycore.solr.index.handlers.MCRSolrFileIndexHandler;
+import org.mycore.solr.index.handlers.MCRSolrFilesIndexHandler;
+import org.mycore.solr.index.handlers.MCRSolrListElementIndexHandler;
+import org.mycore.solr.index.handlers.MCRSolrOptimizeIndexHandler;
+import org.mycore.solr.index.strategy.MCRSolrIndexStrategyManager;
 import org.mycore.util.concurrent.ListeningPriorityExecutorService;
 
 import com.google.common.util.concurrent.FutureCallback;
