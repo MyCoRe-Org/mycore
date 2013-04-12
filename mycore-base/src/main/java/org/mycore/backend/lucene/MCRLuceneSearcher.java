@@ -28,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -48,6 +49,7 @@ import org.apache.lucene.analysis.de.GermanAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.NumericField;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 import org.apache.lucene.index.Term;
@@ -86,7 +88,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
     /** The logger */
     private final static Logger LOGGER = Logger.getLogger(MCRLuceneSearcher.class);
 
-    static Analyzer analyzer = new PerFieldAnalyzerWrapper(new GermanAnalyzer(Version.LUCENE_30));
+    static Analyzer analyzer = new PerFieldAnalyzerWrapper(new GermanAnalyzer(Version.LUCENE_36));
 
     File IndexDir;
 
@@ -249,32 +251,38 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
      */
     @Override
     public MCRResults search(MCRCondition condition, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) {
+        List<Element> f = new ArrayList<Element>();
+        f.add(condition.toXML());
+        Set<String> usedFields = (queryFieldLogger == null) ? null : new HashSet<String>();
+        boolean reqf = true;
+        // required flag Term with AND (true) or OR (false) combined
+        MCRResults luceneHits;
         try {
-            List<Element> f = new ArrayList<Element>();
-            f.add(condition.toXML());
-            Set<String> usedFields = (queryFieldLogger == null) ? null : new HashSet<String>();
-            boolean reqf = true;
-            // required flag Term with AND (true) or OR (false) combined
             Query luceneQuery = MCRBuildLuceneQuery.buildLuceneQuery(null, reqf, f, analyzer, usedFields);
-            LOGGER.debug("Lucene Query: " + luceneQuery.toString());
-            MCRResults luceneHits = getLuceneHits(luceneQuery, maxResults, sortBy, addSortData, usedFields);
-            if (initializeResult) {
-                return MCRResults.union(luceneHits);
+            if (luceneQuery == null) {
+                LOGGER.warn("Condition: " + condition.toString() + " did not result in lucene query.");
+                return null;
             }
-            return luceneHits;
-        } catch (Exception e) {
-            LOGGER.error("Exception in MCRLuceneSearcher", e);
-            return new MCRResults();
+            LOGGER.debug("Lucene Query: " + luceneQuery.toString());
+            luceneHits = getLuceneHits(luceneQuery, maxResults, sortBy, addSortData, usedFields);
+        } catch (IOException | ParseException | org.apache.lucene.queryParser.ParseException e) {
+            throw new MCRException(e);
         }
+        if (initializeResult) {
+            return MCRResults.union(luceneHits);
+        }
+        return luceneHits;
     }
 
     /**
      * method does lucene query
      * 
      * @return result set
+     * @throws IOException 
+     * @throws CorruptIndexException 
      */
     private MCRResults getLuceneHits(Query luceneQuery, int maxResults, List<MCRSortBy> sortBy, boolean addSortData, Set<String> usedFields)
-            throws Exception {
+        throws CorruptIndexException, IOException {
         if (maxResults <= 0) {
             maxResults = 1000000;
         }
@@ -590,7 +598,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             for (int tSec = 0; !modifyExecutor.isTerminated() && tSec < 60 * 6; tSec++) {
                 long numProcessed = modifyExecutor.getCompletedTaskCount();
                 LOGGER.info(MessageFormat.format("Processed {0} of {1} modification requests, still working...", numProcessed, taskCount,
-                        toString()));
+                    toString()));
                 modifyExecutor.awaitTermination(10, TimeUnit.SECONDS);
             }
         } catch (InterruptedException e) {

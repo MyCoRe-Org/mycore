@@ -23,10 +23,9 @@
 
 package org.mycore.backend.lucene;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.text.ParseException;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -55,7 +54,6 @@ import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.parsers.bool.MCRParseException;
 import org.mycore.services.fieldquery.MCRFieldDef;
 
-
 /**
  * This class builds a Lucene Query from XML query (specified by Frank Lützenkirchen)
  * 
@@ -75,9 +73,13 @@ public class MCRBuildLuceneQuery {
      * Build Lucene Query from XML
      * 
      * @return Lucene Query
+     * @throws IOException 
+     * @throws org.apache.lucene.queryParser.ParseException 
+     * @throws ParseException 
      * 
      */
-    public static Query buildLuceneQuery(BooleanQuery r, boolean reqf, List<Element> f, Analyzer analyzer, Set<String> usedFields) throws Exception {
+    public static Query buildLuceneQuery(BooleanQuery r, boolean reqf, List<Element> f, Analyzer analyzer, Set<String> usedFields)
+        throws IOException, ParseException, org.apache.lucene.queryParser.ParseException {
         for (Element xEle : f) {
             String name = xEle.getName();
             if ("boolean".equals(name)) {
@@ -88,7 +90,6 @@ public class MCRBuildLuceneQuery {
             boolean reqfn = reqf;
             boolean prof = false;
 
-            @SuppressWarnings("unchecked")
             List<Element> children = xEle.getChildren();
             if (name.equals("and")) {
                 x = buildLuceneQuery(null, true, children, analyzer, usedFields);
@@ -152,7 +153,8 @@ public class MCRBuildLuceneQuery {
         return r;
     }
 
-    private static Query handleCondition(String field, String operator, String value, String fieldtype, boolean reqf, Analyzer analyzer) throws Exception {
+    private static Query handleCondition(String field, String operator, String value, String fieldtype, boolean reqf, Analyzer analyzer)
+        throws IOException, ParseException, org.apache.lucene.queryParser.ParseException {
         if ("text".equals(fieldtype) && "contains".equals(operator)) {
             BooleanQuery bq = null;
 
@@ -189,8 +191,8 @@ public class MCRBuildLuceneQuery {
             if (null != bq) {
                 return bq;
             }
-            return tq;
-        } else if (("text".equals(fieldtype) || "identifier".equals(fieldtype)) && "like".equals(operator)) {
+            return tq; //may be null for stop words
+        } else if (("text".equals(fieldtype) || "identifier".equals(fieldtype)) && ("like".equals(operator))) {
             Term te;
 
             String help = value.endsWith("*") ? value.substring(0, value.length() - 1) : value;
@@ -263,12 +265,11 @@ public class MCRBuildLuceneQuery {
             LOGGER.debug("Lucene query: " + query.toString());
 
             return query;
-        } else if(("text".equals(fieldtype) || "identifier".equals(fieldtype) || "index".equals(fieldtype))
-        		  &&("<".equals(operator) || "<=".equals(operator) 
-        				  || ">=".equals(operator) || ">".equals(operator))){
-        	return TermInequalityQuery(field, fieldtype, operator, value);
+        } else if (("text".equals(fieldtype) || "identifier".equals(fieldtype) || "index".equals(fieldtype))
+            && ("<".equals(operator) || "<=".equals(operator) || ">=".equals(operator) || ">".equals(operator))) {
+            return TermInequalityQuery(field, fieldtype, operator, value);
         }
-        
+
         else {
             LOGGER.info("Not supported, fieldtype: " + fieldtype + " operator: " + operator);
         }

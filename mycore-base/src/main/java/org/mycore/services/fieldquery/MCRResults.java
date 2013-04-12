@@ -283,7 +283,6 @@ public class MCRResults implements Iterable<MCRHit> {
         int numHitsBefore = getNumHits();
         int numRemoteHits = Integer.parseInt(xml.getAttributeValue("numHits"));
 
-        @SuppressWarnings("unchecked")
         List<Element> connectionList = xml.getChildren("hostconnection", MCRConstants.MCR_NAMESPACE);
         for (Element connectionElement : connectionList) {
             String conKey = connectionElement.getAttributeValue("host");
@@ -291,7 +290,6 @@ public class MCRResults implements Iterable<MCRHit> {
             hostconnection.put(conKey, conValue);
         }
 
-        @SuppressWarnings("unchecked")
         List<Element> hitList = xml.getChildren("hit", MCRConstants.MCR_NAMESPACE);
         hits.ensureCapacity(numHitsBefore + numRemoteHits);
         for (Element hitElement : hitList) {
@@ -372,9 +370,11 @@ public class MCRResults implements Iterable<MCRHit> {
     public static MCRResults union(MCRResults... others) {
         MCRResults totalResult = new MCRResults();
         for (MCRResults other : others) {
-            other.fetchAllHits();
-            for (MCRHit hit : other) {
-                totalResult.addHit(hit);
+            if (other != null) {
+                other.fetchAllHits();
+                for (MCRHit hit : other) {
+                    totalResult.addHit(hit);
+                }
             }
         }
         return totalResult;
@@ -408,6 +408,6 @@ public class MCRResults implements Iterable<MCRHit> {
     }
 
     public void fetchAllHits() {
-        
+
     }
 }
