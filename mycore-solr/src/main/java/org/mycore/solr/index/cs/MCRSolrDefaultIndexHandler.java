@@ -43,9 +43,7 @@ public class MCRSolrDefaultIndexHandler extends MCRSolrAbstractIndexHandler {
         ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest(UPDATE_PATH);
         updateRequest.addContentStream(getStream());
         updateRequest.setParam("tr", STYLESHEET);
-        if (getCommitWithin() != null) {
-            updateRequest.setCommitWithin(getCommitWithin());
-        }
+        updateRequest.setCommitWithin(getCommitWithin());
         NamedList<Object> request = solrServer.request(updateRequest);
         if (LOGGER.isTraceEnabled()) {
             StringBuilder stringBuilder = new StringBuilder();

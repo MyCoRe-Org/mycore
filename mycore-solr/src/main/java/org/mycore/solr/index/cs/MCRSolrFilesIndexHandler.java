@@ -31,6 +31,8 @@ public class MCRSolrFilesIndexHandler implements MCRSolrIndexHandler {
 
     protected List<MCRSolrIndexHandler> subHandlerList;
 
+    private int commitWithin;
+
     /**
      * Creates a new solr file index handler.
      * 
@@ -42,12 +44,13 @@ public class MCRSolrFilesIndexHandler implements MCRSolrIndexHandler {
         this.mcrID = mcrID;
         this.solrServer = solrServer;
         this.subHandlerList = new ArrayList<>();
+        this.commitWithin = -1;
     }
 
     @Override
     public void index() throws IOException, SolrServerException {
         MCRObjectID mcrID = MCRObjectID.getInstance(getID());
-        if(mcrID.getTypeId().equals("derivate")) {
+        if (mcrID.getTypeId().equals("derivate")) {
             indexDerivate(mcrID.toString());
         } else {
             indexObject(mcrID);
@@ -68,7 +71,7 @@ public class MCRSolrFilesIndexHandler implements MCRSolrIndexHandler {
 
     protected void indexObject(MCRObjectID objectID) {
         MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(objectID);
-        for(MCRMetaLinkID link : mcrObject.getStructure().getDerivates()) {
+        for (MCRMetaLinkID link : mcrObject.getStructure().getDerivates()) {
             String derivateID = link.getXLinkHref();
             indexDerivate(derivateID);
         }
@@ -81,6 +84,16 @@ public class MCRSolrFilesIndexHandler implements MCRSolrIndexHandler {
 
     public String getID() {
         return mcrID;
+    }
+
+    @Override
+    public void setCommitWithin(int commitWithin) {
+        this.commitWithin = commitWithin;
+    }
+
+    @Override
+    public int getCommitWithin() {
+        return commitWithin;
     }
 
 }

@@ -13,7 +13,6 @@ import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.jdom2.Document;
@@ -88,6 +87,8 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
 
     /** Specify how many documents will be submitted to solr at a time when rebuilding the metadata index. Default is 100. */
     final static int BULK_SIZE = MCRConfiguration.instance().getInt("MCR.Module-solr.bulk.size", 100);
+
+    private static final int BATCH_AUTO_COMMIT_WITHIN_MS = 60000;
 
     @Override
     synchronized protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
@@ -240,7 +241,6 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "=======================");
         LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Building Metadata Index");
         LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "=======================");
-
         if (list.isEmpty()) {
             LOGGER.info("Sorry, no documents to index");
             return;
@@ -260,7 +260,8 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
                 elementList.add(mcrObjXML.getRootElement().detach());
 
                 if (elementList.size() % BULK_SIZE == 0) {
-                    MCRSolrIndexHandler indexHandler = new MCRSolrListElementIndexHandler(contentStream, solrServer);
+                    MCRSolrListElementIndexHandler indexHandler = new MCRSolrListElementIndexHandler(contentStream, solrServer);
+                    indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
                     submitIndexHandler(indexHandler);
                     contentStream = new MCRSolrListElementStream("MCRSolrObjs");
                     elementList = contentStream.getList();
@@ -275,7 +276,8 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
             LOGGER.trace("Indexing almost done. Only " + remaining + " object(s) remaining");
         }
         if (remaining > 0) {
-            MCRSolrIndexHandler indexHandler = new MCRSolrListElementIndexHandler(contentStream, solrServer);
+            MCRSolrListElementIndexHandler indexHandler = new MCRSolrListElementIndexHandler(contentStream, solrServer);
+            indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
             try {
                 submitIndexHandler(indexHandler);
             } catch (Exception ex) {
@@ -284,21 +286,10 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         }
 
         long durationInMilliSeconds = swatch.getTime();
+        //TODO: Just prints out how fast an MCRObject could be parsed to JDOM
         LOGGER.log(MCRSolrLogLevels.SOLR_INFO,
             "Submitted data of " + list.size() + " objects for indexing done in " + Math.ceil(durationInMilliSeconds / 1000) + " seconds ("
                 + durationInMilliSeconds / list.size() + " ms/object)");
-        try {
-            // we wait until all index threads are finished 
-            if (solrServer instanceof ConcurrentUpdateSolrServer) {
-                ((ConcurrentUpdateSolrServer) solrServer).blockUntilFinished();
-            }
-            // one last commit before we are done
-            solrServer.commit();
-        } catch (SolrServerException e) {
-            LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Could not commit changes to index", e);
-        } catch (IOException e) {
-            LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "An " + e.getClass() + " occured", e);
-        }
     }
 
     /**
@@ -339,7 +330,8 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Sending content of files of " + list.size() + " to solr for reindexing");
 
         for (String id : list) {
-            MCRSolrIndexHandler indexHandler = new MCRSolrFilesIndexHandler(id, solrServer);
+            MCRSolrFilesIndexHandler indexHandler = new MCRSolrFilesIndexHandler(id, solrServer);
+            indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
             submitIndexHandler(indexHandler);
         }
 
@@ -427,8 +419,9 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
      */
     public static void optimize() {
         try {
-            LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Sending optimize request to solr");
-            DEFAULT_SOLR_SERVER.optimize();
+            MCRSolrOptimizeIndexHandler indexHandler = new MCRSolrOptimizeIndexHandler();
+            indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
+            submitIndexHandler(indexHandler);
         } catch (Exception ex) {
             LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Could not optimize solr index", ex);
         }

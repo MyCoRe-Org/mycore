@@ -35,7 +35,8 @@ public class MCRSolrListElementIndexHandler extends MCRSolrDefaultIndexHandler {
             for(Element e : elementList) {
                 e = e.detach();
                 MCRSolrContentStream stream = new MCRSolrContentStream("element", new MCRJDOMContent(e));
-                MCRSolrIndexHandler indexHandler = new MCRSolrDefaultIndexHandler(stream);
+                MCRSolrDefaultIndexHandler indexHandler = new MCRSolrDefaultIndexHandler(stream);
+                indexHandler.setCommitWithin(getCommitWithin());
                 this.fallBackList.add(indexHandler);
             }
         }

@@ -38,7 +38,7 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractIndexHandler {
         if (derivate != null) {
             idOfMCRObjectForDerivate = derivate.getOwnerID().toString();
         }
-        if(LOGGER.isTraceEnabled()) {
+        if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("Solr: indexing file \"" + file.getAbsolutePath() + " (" + solrID + ")\"");
         }
         /* create the update request object */
@@ -56,22 +56,20 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractIndexHandler {
         updateRequest.setParam("literal.fileName", file.getName());
         updateRequest.setParam("literal.objectProject", MCRObjectID.getInstance(file.getOwnerID()).getProjectId());
         updateRequest.setParam("literal.fileDateModified", DATE_FORMATTER.format(file.getLastModified().getTime()));
-        if(getCommitWithin() != null) {
-            updateRequest.setCommitWithin(getCommitWithin());
-        }
+        updateRequest.setCommitWithin(getCommitWithin());
 
         String urn = null;
         if ((urn = derivate.getUrnMap().get(file.getAbsolutePath())) != null) {
             updateRequest.setParam("literal.urn", urn);
         }
-        if(LOGGER.isTraceEnabled()) {
+        if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("Solr: sending binary data (" + file.getAbsolutePath() + " (" + solrID + "), size is " + file.getSizeFormatted()
-                    + ") to solr server.");
+                + ") to solr server.");
         }
         long t = System.currentTimeMillis();
         /* actually send the request */
         getSolrServer().request(updateRequest);
-        if(LOGGER.isTraceEnabled()) {
+        if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("Solr: sending binary data \"" + file.getAbsolutePath() + " (" + solrID + ")\"" + " done in "
                 + (System.currentTimeMillis() - t) + "ms");
         }
