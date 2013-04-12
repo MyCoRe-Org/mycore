@@ -44,7 +44,8 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractIndexHandler {
         }
         /* create the update request object */
         ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest(EXTRACT_PATH);
-        updateRequest.addContentStream(getStream());
+        MCRSolrFileContentStream fileContentStream = getStream();
+        updateRequest.addContentStream(fileContentStream);
 
         /* set the additional parameters */
         updateRequest.setParam("literal.id", solrID);
@@ -57,6 +58,11 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractIndexHandler {
         updateRequest.setParam("literal.fileName", file.getName());
         updateRequest.setParam("literal.objectProject", MCRObjectID.getInstance(file.getOwnerID()).getProjectId());
         updateRequest.setParam("literal.fileDateModified", DATE_FORMATTER.format(file.getLastModified().getTime()));
+        //set tika fields
+        updateRequest.setParam("literal.stream_size", String.valueOf(fileContentStream.getSize()));
+        updateRequest.setParam("literal.stream_source_info", fileContentStream.getSourceInfo());
+        updateRequest.setParam("literal.stream_name", fileContentStream.getName());
+        updateRequest.setParam("literal.stream_content_type", fileContentStream.getContentType());
         updateRequest.setCommitWithin(getCommitWithin());
 
         String urn = null;
