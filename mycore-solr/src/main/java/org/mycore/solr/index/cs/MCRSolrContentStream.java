@@ -37,8 +37,8 @@ public class MCRSolrContentStream extends MCRSolrAbstractContentStream<MCRConten
         ByteArrayOutputStream out = new ByteArrayOutputStream(64 * 1024);
         getTransformer().transform(content, out);
         byte[] byteArray = out.toByteArray();
-        if(LOGGER.isTraceEnabled()) {
-            LOGGER.trace(new String(byteArray, Charsets.UTF_8));
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug(new String(byteArray, Charsets.UTF_8));
         }
         this.setSourceInfo(content.getSystemId());
         this.setContentType(getTransformer().getMimeType());

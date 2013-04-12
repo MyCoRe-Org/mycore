@@ -13,7 +13,6 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.tokenattributes.TermAttribute;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -32,7 +31,6 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSortBy;
 import org.mycore.solr.MCRSolrServerFactory;
-import org.mycore.solr.logging.MCRSolrLogLevels;
 
 public class MCRSolrAdapter {
 
@@ -50,7 +48,7 @@ public class MCRSolrAdapter {
     public MCRResults search(MCRCondition condition, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) {
         MCRSolrResults solrResults = null;
         if (maxResults == 0) {
-            LOGGER.trace("maxResults should be explicitly set. Try to use paging.");
+            LOGGER.debug("maxResults should be explicitly set. Try to use paging.");
         }
         try {
             SolrQuery q = getSolrQuery(condition, sortBy, maxResults);
@@ -78,7 +76,7 @@ public class MCRSolrAdapter {
         } catch (Exception e) {
             throw new MCRException("Error while building SOLR query.", e);
         }
-        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Legacy Query transformed by \"" + this.getClass().getCanonicalName() + "\" to \""
+        LOGGER.info("Legacy Query transformed by \"" + this.getClass().getCanonicalName() + "\" to \""
                 + luceneQuery.toString() + "\"");
         SolrQuery q = applySortOptions(new SolrQuery(luceneQuery.toString()), sortBy);
         q.setIncludeScore(true);

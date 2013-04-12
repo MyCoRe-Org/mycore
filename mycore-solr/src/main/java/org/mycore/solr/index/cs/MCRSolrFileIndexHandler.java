@@ -38,8 +38,8 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractIndexHandler {
         if (derivate != null) {
             idOfMCRObjectForDerivate = derivate.getOwnerID().toString();
         }
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("Solr: indexing file \"" + file.getAbsolutePath() + " (" + solrID + ")\"");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Solr: indexing file \"" + file.getAbsolutePath() + " (" + solrID + ")\"");
         }
         /* create the update request object */
         ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest(EXTRACT_PATH);
@@ -62,15 +62,15 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractIndexHandler {
         if ((urn = derivate.getUrnMap().get(file.getAbsolutePath())) != null) {
             updateRequest.setParam("literal.urn", urn);
         }
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("Solr: sending binary data (" + file.getAbsolutePath() + " (" + solrID + "), size is " + file.getSizeFormatted()
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Solr: sending binary data (" + file.getAbsolutePath() + " (" + solrID + "), size is " + file.getSizeFormatted()
                 + ") to solr server.");
         }
         long t = System.currentTimeMillis();
         /* actually send the request */
         getSolrServer().request(updateRequest);
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("Solr: sending binary data \"" + file.getAbsolutePath() + " (" + solrID + ")\"" + " done in "
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Solr: sending binary data \"" + file.getAbsolutePath() + " (" + solrID + ")\"" + " done in "
                 + (System.currentTimeMillis() - t) + "ms");
         }
     }

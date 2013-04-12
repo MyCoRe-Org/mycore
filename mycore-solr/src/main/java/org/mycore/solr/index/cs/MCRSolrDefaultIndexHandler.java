@@ -35,8 +35,8 @@ public class MCRSolrDefaultIndexHandler extends MCRSolrAbstractIndexHandler {
      * Invokes an index request for the current content stream.
      */
     public void index() throws IOException, SolrServerException {
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("Solr: indexing data of\"" + this.getStream().getName() + "\"");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Solr: indexing data of\"" + this.getStream().getName() + "\"");
         }
         long tStart = System.currentTimeMillis();
         SolrServer solrServer = getSolrServer();
@@ -45,7 +45,7 @@ public class MCRSolrDefaultIndexHandler extends MCRSolrAbstractIndexHandler {
         updateRequest.setParam("tr", STYLESHEET);
         updateRequest.setCommitWithin(getCommitWithin());
         NamedList<Object> request = solrServer.request(updateRequest);
-        if (LOGGER.isTraceEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("Solr: indexing data of \"");
             stringBuilder.append(this.getStream().getName());
@@ -58,7 +58,7 @@ public class MCRSolrDefaultIndexHandler extends MCRSolrAbstractIndexHandler {
                 stringBuilder.append('=');
                 stringBuilder.append(entry.getValue().toString());
             }
-            LOGGER.trace(stringBuilder.toString());
+            LOGGER.debug(stringBuilder.toString());
         }
     }
 

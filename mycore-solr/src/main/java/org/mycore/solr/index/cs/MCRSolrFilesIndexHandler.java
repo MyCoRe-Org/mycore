@@ -13,7 +13,6 @@ import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.solr.logging.MCRSolrLogLevels;
 
 /**
  * Commits <code>MCRFile</code> objects to solr, be aware that the files are
@@ -59,12 +58,12 @@ public class MCRSolrFilesIndexHandler implements MCRSolrIndexHandler {
 
     protected void indexDerivate(String derivateID) {
         List<MCRFile> files = MCRUtils.getFiles(derivateID);
-        LOGGER.log(MCRSolrLogLevels.SOLR_INFO, "Sending files (" + files.size() + ") for derivate \"" + getID() + "\"");
+        LOGGER.info("Sending files (" + files.size() + ") for derivate \"" + getID() + "\"");
         for (MCRFile file : files) {
             try {
                 this.subHandlerList.add(MCRSolrIndexer.getIndexHandler(file, this.solrServer));
             } catch (Exception ex) {
-                LOGGER.log(MCRSolrLogLevels.SOLR_ERROR, "Error creating transfer thread", ex);
+                LOGGER.error("Error creating transfer thread", ex);
             }
         }
     }

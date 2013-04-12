@@ -164,7 +164,7 @@ public class MCRClassificationBrowserSolr extends MCRServlet {
         xml.addContent(data);
         renderToHTML(job, req, xml);
 
-        LOGGER.trace("ClassificationBrowser finished in " + (System.currentTimeMillis() - time) + " ms");
+        LOGGER.debug("ClassificationBrowser finished in " + (System.currentTimeMillis() - time) + " ms");
     }
 
     /**
