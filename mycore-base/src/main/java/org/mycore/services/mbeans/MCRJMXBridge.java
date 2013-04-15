@@ -47,11 +47,16 @@ public class MCRJMXBridge implements Closeable {
 
     private static java.util.List<WeakReference<ObjectName>> ONAME_LIST = new ArrayList<WeakReference<ObjectName>>();
 
+    private static boolean shutdown;
+
     private MCRJMXBridge() {
         MCRShutdownHandler.getInstance().addCloseable(this);
     }
 
     public static void register(Object mbean, String type, String component) {
+        if (shutdown) {
+            return;
+        }
         ObjectName name;
         try {
             name = getObjectName(type, component);
@@ -73,6 +78,9 @@ public class MCRJMXBridge implements Closeable {
     }
 
     public static void unregister(String type, String component) {
+        if (shutdown) {
+            return;
+        }
         ObjectName name;
         try {
             name = getObjectName(type, component);
@@ -99,12 +107,12 @@ public class MCRJMXBridge implements Closeable {
     }
 
     private static ObjectName getObjectName(String type, String component) throws MalformedObjectNameException {
-        return new ObjectName(MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe-Application").replace(':', ' ') + ":type=" + type
-            + ",component=" + component);
+        return new ObjectName(MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe-Application").replace(':', ' ') + ":type="
+            + type + ",component=" + component);
     }
 
     public void prepareClose() {
-        //nothing to be done to prepare close()
+        shutdown = true;
     }
 
     public void close() {
@@ -123,13 +131,13 @@ public class MCRJMXBridge implements Closeable {
         }
         SINGLETON.clear();
     }
-    
+
     @Override
-    public int getPriority(){
+    public int getPriority() {
         return MCRShutdownHandler.Closeable.DEFAULT_PRIORITY;
     }
-    
-    public static ObjectInstance getMBean(String type, String component) throws MalformedObjectNameException, InstanceNotFoundException  {
+
+    public static ObjectInstance getMBean(String type, String component) throws MalformedObjectNameException, InstanceNotFoundException {
         ObjectName name = getObjectName(type, component);
 
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
