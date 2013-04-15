@@ -313,6 +313,6 @@ public class MCRHIBConnection implements Closeable {
 
     @Override
     public int getPriority() {
-        return MCRShutdownHandler.Closeable.DEFAULT_PRIORITY;
+        return Integer.MIN_VALUE;
     }
 }
