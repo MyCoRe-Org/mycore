@@ -10,6 +10,8 @@ import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.common.util.NamedList;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.solr.index.cs.MCRSolrAbstractContentStream;
+import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
+import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
 
 /**
  * This class can handle a index process for a content stream.
@@ -61,6 +63,11 @@ public class MCRSolrDefaultIndexHandler extends MCRSolrAbstractIndexHandler {
             }
             LOGGER.debug(stringBuilder.toString());
         }
+    }
+
+    @Override
+    public MCRSolrIndexStatistic getStatistic() {
+        return MCRSolrIndexStatisticCollector.xml;
     }
 
 }

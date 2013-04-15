@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrServerException;
+import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 
 /**
  * General interface to handle a single solr index process.
@@ -35,5 +36,7 @@ public interface MCRSolrIndexHandler {
     public void setCommitWithin(int commitWithin);
 
     public int getCommitWithin();
+    
+    public MCRSolrIndexStatistic getStatistic();
 
 }

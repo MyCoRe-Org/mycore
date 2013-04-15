@@ -15,6 +15,8 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.MCRSolrIndexer;
+import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
+import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 
 /**
  * Commits <code>MCRFile</code> objects to solr, be aware that the files are
@@ -34,6 +36,8 @@ public class MCRSolrFilesIndexHandler implements MCRSolrIndexHandler {
 
     private int commitWithin;
 
+    private int documents;
+
     /**
      * Creates a new solr file index handler.
      * 
@@ -46,6 +50,7 @@ public class MCRSolrFilesIndexHandler implements MCRSolrIndexHandler {
         this.solrServer = solrServer;
         this.subHandlerList = new ArrayList<>();
         this.commitWithin = -1;
+        this.documents = -1;
     }
 
     @Override
@@ -56,9 +61,11 @@ public class MCRSolrFilesIndexHandler implements MCRSolrIndexHandler {
         } else {
             indexObject(mcrID);
         }
+        getStatistic().addDocument(documents);
     }
 
     protected void indexDerivate(String derivateID) {
+        documents++;
         List<MCRFile> files = MCRUtils.getFiles(derivateID);
         LOGGER.info("Sending files (" + files.size() + ") for derivate \"" + getID() + "\"");
         for (MCRFile file : files) {
@@ -95,6 +102,11 @@ public class MCRSolrFilesIndexHandler implements MCRSolrIndexHandler {
     @Override
     public int getCommitWithin() {
         return commitWithin;
+    }
+
+    @Override
+    public MCRSolrIndexStatistic getStatistic() {
+        return MCRSolrIndexStatisticCollector.xml;
     }
 
 }

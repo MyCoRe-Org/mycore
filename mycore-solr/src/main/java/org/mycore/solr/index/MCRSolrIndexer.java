@@ -4,10 +4,12 @@
 package org.mycore.solr.index;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
@@ -24,6 +26,7 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.common.events.MCRShutdownHandler;
+import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRBase;
@@ -39,6 +42,8 @@ import org.mycore.solr.index.handlers.MCRSolrFileIndexHandler;
 import org.mycore.solr.index.handlers.MCRSolrFilesIndexHandler;
 import org.mycore.solr.index.handlers.MCRSolrListElementIndexHandler;
 import org.mycore.solr.index.handlers.MCRSolrOptimizeIndexHandler;
+import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
+import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
 import org.mycore.solr.index.strategy.MCRSolrIndexStrategyManager;
 import org.mycore.util.concurrent.MCRListeningPriorityExecutorService;
 
@@ -60,35 +65,32 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
     /** The executer service used for submitting the index requests. */
     final static ListeningExecutorService EXECUTOR_SERVICE;
 
+    private final static FutureIndexHandlerCounter FUTURE_COUNTER;
+
     static {
-        final MCRListeningPriorityExecutorService executorService = new MCRListeningPriorityExecutorService(new ThreadPoolExecutor(10, 10, 0L,
-            TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>()));
-        MCRShutdownHandler.Closeable cleaner = new MCRShutdownHandler.Closeable() {
+        final MCRListeningPriorityExecutorService executorService = new MCRListeningPriorityExecutorService(new ThreadPoolExecutor(10, 10,
+            0L, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>()));
+        Runnable onShutdown = new Runnable() {
+
             @Override
-            public void prepareClose() {
-                LOGGER.info("Preparing shutdown of MCRSolrIndexer");
+            public void run() {
                 executorService.shutdown();
-            }
-
-            @Override
-            public int getPriority() {
-                return 0;
-            }
-
-            @Override
-            public void close() {
+                String metadataStats = MessageFormat.format("XML documents: {0}, each: {1} ms.",
+                    MCRSolrIndexStatisticCollector.xml.getDocuments(), MCRSolrIndexStatisticCollector.xml.reset());
+                String fileStats = MessageFormat.format("File transfers: {0}, each: {1} ms.",
+                    MCRSolrIndexStatisticCollector.fileTransfer.getDocuments(), MCRSolrIndexStatisticCollector.fileTransfer.reset());
+                String operationsStats = MessageFormat.format("Other index operations: {0}, each: {1} ms.",
+                    MCRSolrIndexStatisticCollector.operations.getDocuments(), MCRSolrIndexStatisticCollector.operations.reset());
+                String msg = MessageFormat.format("\nFinal statistics:\n{0}\n{1}\n{2}", metadataStats, fileStats, operationsStats);
+                LOGGER.info(msg);
                 try {
-                    for (int tSec = 0; !executorService.isTerminated() && tSec < 60 * 6; tSec++) {
-                        LOGGER.info("Waiting for shutdown of MCRSolrIndexer, still working...");
-                        executorService.awaitTermination(10, TimeUnit.SECONDS);
-                    }
                     MCRSolrServerFactory.getSolrServer().commit();
-                } catch (InterruptedException | SolrServerException | IOException e) {
+                } catch (SolrServerException | IOException e) {
                     LOGGER.warn("Error while closing MCRSolrIndexer executor service.", e);
                 }
             }
         };
-        MCRShutdownHandler.getInstance().addCloseable(cleaner);
+        FUTURE_COUNTER = new FutureIndexHandlerCounter(onShutdown);
         EXECUTOR_SERVICE = executorService;
     }
 
@@ -173,13 +175,18 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Solr: submitting file \"" + file.getAbsolutePath() + " (" + file.getID() + ")\" for indexing");
         }
+        MCRSolrIndexHandler indexHandler;
+        long start = System.currentTimeMillis();
         if (MCRSolrIndexStrategyManager.checkFile(file)) {
             /* extract metadata with tika */
-            return new MCRSolrFileIndexHandler(new MCRSolrFileContentStream(file), solrServer);
+            indexHandler = new MCRSolrFileIndexHandler(new MCRSolrFileContentStream(file), solrServer);
         } else {
             MCRSolrContentStream contentStream = new MCRSolrContentStream(file.getID(), new MCRJDOMContent(file.createXML()));
-            return new MCRSolrDefaultIndexHandler(contentStream, solrServer);
+            indexHandler = new MCRSolrDefaultIndexHandler(contentStream, solrServer);
         }
+        long end = System.currentTimeMillis();
+        indexHandler.getStatistic().addTime(end - start);
+        return indexHandler;
     }
 
     @Override
@@ -200,6 +207,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
      */
     synchronized public static UpdateResponse deleteByIdFromSolr(String solrID) {
         UpdateResponse updateResponse = null;
+        long start = System.currentTimeMillis();
         try {
             LOGGER.info("Deleting \"" + solrID + "\" from solr");
             updateResponse = DEFAULT_SOLR_SERVER.deleteById(solrID);
@@ -207,6 +215,10 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         } catch (Exception e) {
             LOGGER.error("Error deleting document from solr", e);
         }
+        long end = System.currentTimeMillis();
+        MCRSolrIndexStatistic operations = MCRSolrIndexStatisticCollector.operations;
+        operations.addDocument(1);
+        operations.addTime(end - start);
         return updateResponse;
     }
 
@@ -292,9 +304,8 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         }
 
         long durationInMilliSeconds = swatch.getTime();
-        //TODO: Just prints out how fast an MCRObject could be parsed to JDOM
-        LOGGER.info("Submitted data of " + totalCount + " objects for indexing done in " + Math.ceil(durationInMilliSeconds / 1000)
-            + " seconds (" + durationInMilliSeconds / totalCount + " ms/object)");
+        MCRSolrIndexStatisticCollector.xml.addDocument(totalCount);
+        MCRSolrIndexStatisticCollector.xml.addTime(durationInMilliSeconds);
     }
 
     /**
@@ -340,8 +351,8 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         }
 
         long tStop = System.currentTimeMillis();
-        LOGGER.info("Submitted data of " + totalCount + " derivates for indexing done in " + (tStop - tStart) + "ms ("
-            + ((float) (tStop - tStart) / totalCount) + " ms/derivate)");
+        MCRSolrIndexStatisticCollector.xml.addDocument(totalCount);
+        MCRSolrIndexStatisticCollector.xml.addTime(tStop - tStart);
     }
 
     /**
@@ -368,21 +379,75 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
      * Callback to handle a IndexHandlers future non blocking. 
      */
     private static class FutureIndexHandlerCallback implements FutureCallback<List<MCRSolrIndexHandler>> {
+        public FutureIndexHandlerCallback() {
+            FUTURE_COUNTER.add();
+        }
+
         @Override
         public void onFailure(Throwable t) {
             LOGGER.error("unable to submit tasks", t);
+            FUTURE_COUNTER.remove();
         }
 
         @Override
         public void onSuccess(List<MCRSolrIndexHandler> indexHandlers) {
-            for (MCRSolrIndexHandler subHandler : indexHandlers) {
-                try {
-                    submitIndexHandler(subHandler);
-                } catch (Exception exc) {
-                    LOGGER.error("unable to submit tasks", exc);
+            try {
+                for (MCRSolrIndexHandler subHandler : indexHandlers) {
+                    try {
+                        submitIndexHandler(subHandler);
+                    } catch (Exception exc) {
+                        LOGGER.error("unable to submit tasks", exc);
+                    }
                 }
+            } finally {
+                FUTURE_COUNTER.remove();
             }
         }
+
+    }
+
+    private static class FutureIndexHandlerCounter implements Closeable {
+        AtomicLong awaitingEvents = new AtomicLong();
+
+        Runnable onShutdown;
+
+        public FutureIndexHandlerCounter(Runnable onShutdown) {
+            this.onShutdown = onShutdown;
+            MCRShutdownHandler.getInstance().addCloseable(this);
+        }
+
+        @Override
+        public void prepareClose() {
+        }
+
+        @Override
+        public void close() {
+            while (awaitingEvents.get() != 0) {
+                LOGGER.info("Waiting for " + awaitingEvents.get() + " task to complete.");
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    Thread.yield();
+                }
+            }
+            if (onShutdown != null) {
+                onShutdown.run();
+            }
+        }
+
+        @Override
+        public int getPriority() {
+            return Closeable.DEFAULT_PRIORITY;
+        }
+
+        public void add() {
+            awaitingEvents.incrementAndGet();
+        }
+
+        public void remove() {
+            awaitingEvents.decrementAndGet();
+        }
+
     }
 
     /**

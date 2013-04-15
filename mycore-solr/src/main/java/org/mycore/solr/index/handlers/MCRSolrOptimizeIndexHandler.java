@@ -29,6 +29,8 @@ import java.text.MessageFormat;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
+import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -43,6 +45,11 @@ public class MCRSolrOptimizeIndexHandler extends MCRSolrAbstractIndexHandler {
         UpdateResponse response = getSolrServer().optimize();
         LOGGER.info(MessageFormat.format("Optimize was {0}({1}ms)", (response.getStatus() == 0 ? "successful." : "UNSUCCESSFUL!"),
             response.getElapsedTime()));
+    }
+
+    @Override
+    public MCRSolrIndexStatistic getStatistic() {
+        return MCRSolrIndexStatisticCollector.operations;
     }
 
 }

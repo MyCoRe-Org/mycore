@@ -13,6 +13,8 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.index.cs.MCRSolrFileContentStream;
+import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
+import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 
 public class MCRSolrFileIndexHandler extends MCRSolrAbstractIndexHandler {
 
@@ -85,6 +87,11 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractIndexHandler {
     @Override
     public MCRSolrFileContentStream getStream() {
         return (MCRSolrFileContentStream) super.getStream();
+    }
+
+    @Override
+    public MCRSolrIndexStatistic getStatistic() {
+        return MCRSolrIndexStatisticCollector.fileTransfer;
     }
 
 }
