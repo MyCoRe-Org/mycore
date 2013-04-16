@@ -46,7 +46,7 @@ public class MCRSolrIndexTask implements Callable<List<MCRSolrIndexHandler>>, MC
             long start = System.currentTimeMillis();
             this.indexHandler.index();
             long end = System.currentTimeMillis();
-            indexHandler.getStatistic().addDocument(1);
+            indexHandler.getStatistic().addDocument(indexHandler.getDocuments());
             indexHandler.getStatistic().addTime(end - start);
             return this.indexHandler.getSubHandlers();
         } finally {

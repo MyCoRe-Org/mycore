@@ -26,17 +26,24 @@ package org.mycore.solr.index.statistic;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author Thomas Scheffler (yagee)
  *
  */
 public class MCRSolrIndexStatistic {
 
+    private static final Logger LOGGER = Logger.getLogger(MCRSolrIndexStatistic.class);
+
     AtomicInteger documents;
 
     AtomicLong accumulatedTime;
 
-    public MCRSolrIndexStatistic() {
+    String name;
+
+    public MCRSolrIndexStatistic(String name) {
+        this.name = name;
         this.documents = new AtomicInteger();
         this.accumulatedTime = new AtomicLong();
     }
@@ -46,6 +53,7 @@ public class MCRSolrIndexStatistic {
     }
 
     public int addDocument(int docs) {
+        LOGGER.info(name + ": adding " + docs + " documents");
         return documents.addAndGet(docs);
     }
 

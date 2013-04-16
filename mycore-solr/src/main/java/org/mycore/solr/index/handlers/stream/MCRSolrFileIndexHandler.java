@@ -1,4 +1,4 @@
-package org.mycore.solr.index.handlers;
+package org.mycore.solr.index.handlers.stream;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -16,7 +16,7 @@ import org.mycore.solr.index.cs.MCRSolrFileContentStream;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 
-public class MCRSolrFileIndexHandler extends MCRSolrAbstractIndexHandler {
+public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
 
     final static Logger LOGGER = Logger.getLogger(MCRSolrFileIndexHandler.class);
 
@@ -92,6 +92,11 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractIndexHandler {
     @Override
     public MCRSolrIndexStatistic getStatistic() {
         return MCRSolrIndexStatisticCollector.fileTransfer;
+    }
+
+    @Override
+    public int getDocuments() {
+        return 1;
     }
 
 }

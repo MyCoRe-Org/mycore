@@ -1,4 +1,4 @@
-package org.mycore.solr.index.handlers;
+package org.mycore.solr.index.handlers.stream;
 
 import java.io.IOException;
 import java.util.Map;
@@ -18,7 +18,7 @@ import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
  * 
  * @author Matthias Eichner
  */
-public class MCRSolrDefaultIndexHandler extends MCRSolrAbstractIndexHandler {
+public class MCRSolrDefaultIndexHandler extends MCRSolrAbstractStreamIndexHandler {
 
     private final static Logger LOGGER = Logger.getLogger(MCRSolrDefaultIndexHandler.class);
 
@@ -38,9 +38,6 @@ public class MCRSolrDefaultIndexHandler extends MCRSolrAbstractIndexHandler {
      * Invokes an index request for the current content stream.
      */
     public void index() throws IOException, SolrServerException {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Solr: indexing data of\"" + this.getStream().getName() + "\"");
-        }
         long tStart = System.currentTimeMillis();
         SolrServer solrServer = getSolrServer();
         ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest(UPDATE_PATH);

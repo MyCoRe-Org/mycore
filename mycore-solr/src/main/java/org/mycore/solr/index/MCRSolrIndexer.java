@@ -5,6 +5,7 @@ package org.mycore.solr.index;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -37,11 +38,12 @@ import org.mycore.solr.MCRSolrServerFactory;
 import org.mycore.solr.index.cs.MCRSolrContentStream;
 import org.mycore.solr.index.cs.MCRSolrFileContentStream;
 import org.mycore.solr.index.cs.MCRSolrListElementStream;
-import org.mycore.solr.index.handlers.MCRSolrDefaultIndexHandler;
-import org.mycore.solr.index.handlers.MCRSolrFileIndexHandler;
-import org.mycore.solr.index.handlers.MCRSolrFilesIndexHandler;
-import org.mycore.solr.index.handlers.MCRSolrListElementIndexHandler;
+import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
 import org.mycore.solr.index.handlers.MCRSolrOptimizeIndexHandler;
+import org.mycore.solr.index.handlers.stream.MCRSolrDefaultIndexHandler;
+import org.mycore.solr.index.handlers.stream.MCRSolrFileIndexHandler;
+import org.mycore.solr.index.handlers.stream.MCRSolrFilesIndexHandler;
+import org.mycore.solr.index.handlers.stream.MCRSolrListElementIndexHandler;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
 import org.mycore.solr.index.strategy.MCRSolrIndexStrategyManager;
@@ -75,13 +77,16 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
             @Override
             public void run() {
                 executorService.shutdown();
+                String documentStats = MessageFormat.format("Solr documents: {0}, each: {1} ms.",
+                    MCRSolrIndexStatisticCollector.documents.getDocuments(), MCRSolrIndexStatisticCollector.documents.reset());
                 String metadataStats = MessageFormat.format("XML documents: {0}, each: {1} ms.",
                     MCRSolrIndexStatisticCollector.xml.getDocuments(), MCRSolrIndexStatisticCollector.xml.reset());
                 String fileStats = MessageFormat.format("File transfers: {0}, each: {1} ms.",
                     MCRSolrIndexStatisticCollector.fileTransfer.getDocuments(), MCRSolrIndexStatisticCollector.fileTransfer.reset());
                 String operationsStats = MessageFormat.format("Other index operations: {0}, each: {1} ms.",
                     MCRSolrIndexStatisticCollector.operations.getDocuments(), MCRSolrIndexStatisticCollector.operations.reset());
-                String msg = MessageFormat.format("\nFinal statistics:\n{0}\n{1}\n{2}", metadataStats, fileStats, operationsStats);
+                String msg = MessageFormat.format("\nFinal statistics:\n{0}\n{1}\n{2}\n{3}", documentStats, metadataStats, fileStats,
+                    operationsStats);
                 LOGGER.info(msg);
                 try {
                     MCRSolrServerFactory.getSolrServer().commit();
@@ -149,8 +154,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
             if (content == null) {
                 content = new MCRBaseContent(objectOrDerivate);
             }
-            MCRSolrContentStream contentStream = new MCRSolrContentStream(objectOrDerivate.getId().toString(), content);
-            MCRSolrDefaultIndexHandler indexHandler = new MCRSolrDefaultIndexHandler(contentStream);
+            MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(content, objectOrDerivate.getId());
             indexHandler.setCommitWithin(1000);
             submitIndexHandler(indexHandler, 10);
             if (LOGGER.isDebugEnabled()) {
@@ -247,7 +251,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
     }
 
     public static void rebuildMetadataIndex(List<String> list) {
-        rebuildMetadataIndex(list, MCRSolrServerFactory.getConcurrentSolrServer());
+        rebuildMetadataIndex(list, MCRSolrServerFactory.getSolrServer());
     }
 
     /**
@@ -269,42 +273,27 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         LOGGER.info("Sending " + totalCount + " objects to solr for reindexing");
 
         MCRXMLMetadataManager metadataMgr = MCRXMLMetadataManager.instance();
-        MCRSolrListElementStream contentStream = new MCRSolrListElementStream("MCRSolrObjs");
-        List<Element> elementList = contentStream.getList();
+        HashMap<MCRObjectID, MCRContent> contentMap = new HashMap<>((int) (BULK_SIZE * 1.4));
+        int i = 0;
         for (String id : list) {
+            i++;
             try {
-                LOGGER.info("Submitting data of \"" + id + "\" for indexing");
-                Document mcrObjXML = metadataMgr.retrieveXML(MCRObjectID.getInstance(id));
-                elementList.add(mcrObjXML.getRootElement().detach());
-
-                if (elementList.size() % BULK_SIZE == 0) {
-                    MCRSolrListElementIndexHandler indexHandler = new MCRSolrListElementIndexHandler(contentStream, solrServer);
+                LOGGER.info("Preparing \"" + id + "\" for indexing");
+                MCRObjectID objId = MCRObjectID.getInstance(id);
+                MCRContent content = metadataMgr.retrieveContent(objId);
+                contentMap.put(objId, content);
+                if (i % BULK_SIZE == 0 || totalCount == i) {
+                    MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(contentMap);
                     indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
+                    indexHandler.setSolrServer(solrServer);
                     submitIndexHandler(indexHandler);
-                    contentStream = new MCRSolrListElementStream("MCRSolrObjs");
-                    elementList = contentStream.getList();
+                    contentMap.clear();
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error creating index thread for object " + id, ex);
             }
         }
-        /* index remaining docs*/
-        int remaining = elementList.size();
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Indexing almost done. Only " + remaining + " object(s) remaining");
-        }
-        if (remaining > 0) {
-            MCRSolrListElementIndexHandler indexHandler = new MCRSolrListElementIndexHandler(contentStream, solrServer);
-            indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
-            try {
-                submitIndexHandler(indexHandler);
-            } catch (Exception ex) {
-                LOGGER.error("Error submitting data to solr", ex);
-            }
-        }
-
         long durationInMilliSeconds = swatch.getTime();
-        MCRSolrIndexStatisticCollector.xml.addDocument(totalCount);
         MCRSolrIndexStatisticCollector.xml.addTime(durationInMilliSeconds);
     }
 
@@ -342,7 +331,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         long tStart = System.currentTimeMillis();
 
         int totalCount = list.size();
-        LOGGER.info("Sending content of files of " + totalCount + " to solr for reindexing");
+        LOGGER.info("Sending content of " + totalCount + " derivates to solr for reindexing");
 
         for (String id : list) {
             MCRSolrFilesIndexHandler indexHandler = new MCRSolrFilesIndexHandler(id, solrServer);
@@ -351,8 +340,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         }
 
         long tStop = System.currentTimeMillis();
-        MCRSolrIndexStatisticCollector.xml.addDocument(totalCount);
-        MCRSolrIndexStatisticCollector.xml.addTime(tStop - tStart);
+        MCRSolrIndexStatisticCollector.fileTransfer.addTime(tStop - tStart);
     }
 
     /**

@@ -1,6 +1,6 @@
 /*
  * $Id$
- * $Revision: 5697 $ $Date: Apr 15, 2013 $
+ * $Revision: 5697 $ $Date: Apr 16, 2013 $
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -21,21 +21,8 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.solr.index.statistic;
-
-
 /**
  * @author Thomas Scheffler (yagee)
- *
+ * Handler that use client side generated {@link org.apache.solr.common.SolrInputDocument}
  */
-public class MCRSolrIndexStatisticCollector {
-
-    public static MCRSolrIndexStatistic xml = new MCRSolrIndexStatistic("XML documents");
-
-    public static MCRSolrIndexStatistic documents = new MCRSolrIndexStatistic("Solr documents");
-
-    public static MCRSolrIndexStatistic fileTransfer = new MCRSolrIndexStatistic("File transfers");
-
-    public static MCRSolrIndexStatistic operations = new MCRSolrIndexStatistic("Other Solr operations");
-
-}
+package org.mycore.solr.index.handlers.document;
