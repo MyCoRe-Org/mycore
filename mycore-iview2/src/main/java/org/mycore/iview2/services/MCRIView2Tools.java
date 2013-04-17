@@ -28,6 +28,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -41,12 +42,14 @@ import org.jdom2.JDOMException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
 
@@ -208,8 +211,7 @@ public class MCRIView2Tools {
             double zoomFactor = Math.pow(2, (imageProps.getZoomlevel() - zoomLevel));
             int maxX = (int) Math.ceil((imageProps.getWidth() / zoomFactor) / MCRImage.getTileSize());
             int maxY = (int) Math.ceil((imageProps.getHeight() / zoomFactor) / MCRImage.getTileSize());
-            LOGGER.debug(MessageFormat.format("Image size:{0}x{1}, tiles:{2}x{3}", imageProps.getWidth(), imageProps.getHeight(), maxX,
-                    maxY));
+            LOGGER.debug(MessageFormat.format("Image size:{0}x{1}, tiles:{2}x{3}", imageProps.getWidth(), imageProps.getHeight(), maxX, maxY));
             BufferedImage sampleTile = readTile(iviewImage, reader, zoomLevel, maxX - 1, 0);
             int xDim = ((maxX - 1) * MCRImage.getTileSize() + sampleTile.getWidth());
             int yDim = ((maxY - 1) * MCRImage.getTileSize() + readTile(iviewImage, reader, zoomLevel, 0, maxY - 1).getHeight());
@@ -277,4 +279,22 @@ public class MCRIView2Tools {
         return MCRConfiguration.instance().getString("MCR.Module-iview2." + propName, null);
     }
 
+    /**
+     * Calculates the url to the image viewer displaying the given file. 
+     * 
+     * @param file the file to display
+     * @return the url to the image viewer displaying given file unless {@link MCRIView2Tools#isFileSupported(MCRFile)} returns <code>false</code> in this case <code>null</code> is returned
+     * 
+     * @see {@link MCRIView2Tools#isFileSupported(MCRFile)}
+     */
+    public static String getViewerURL(MCRFile file) throws URISyntaxException {
+        if (!MCRIView2Tools.isFileSupported(file)) {
+            return null;
+        }
+        String params = MCRXMLFunctions.encodeURIPath(MessageFormat.format("jumpback=true&maximized=true&page={0}&derivate={1}", file.getAbsolutePath(),
+                file.getOwnerID()));
+        String url = MessageFormat.format("{0}receive/{1}?{2}", MCRServlet.getBaseURL(), file.getMCRObjectID(), params);
+
+        return url;
+    }
 }
