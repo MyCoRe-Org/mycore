@@ -117,8 +117,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     /*
      * Internal constructor, do not use on your own.
      */
-    MCRFile(String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, String storeID,
-            String storageID, String fctID, String md5) {
+    MCRFile(String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, String storeID, String storageID,
+            String fctID, String md5) {
         super(ID, parentID, ownerID, name, label, size, date);
 
         this.storageID = storageID;
@@ -539,9 +539,9 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(super.toString());
-        sb.append("ContentType = ").append(contentTypeID).append("\n");
-        sb.append("MD5         = ").append(md5).append("\n");
-        sb.append("StoreID     = ").append(storeID).append("\n");
+        sb.append("ContentType = ").append(contentTypeID).append(" ");
+        sb.append("MD5         = ").append(md5).append(" ");
+        sb.append("StoreID     = ").append(storeID).append(" ");
         sb.append("StorageID   = ").append(storageID);
 
         return sb.toString();
@@ -591,7 +591,9 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     /**
-     * @return
+     * Gets the {@link MCRObjectID} for the {@link MCRObject} where this file is related to (the owner id of the derivate).
+     * 
+     * @return the {@link MCRObjectID}
      */
     public MCRObjectID getMCRObjectID() {
         return MCRMetadataManager.getObjectId(MCRObjectID.getInstance(getOwnerID()), 10000);
