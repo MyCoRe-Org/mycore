@@ -225,7 +225,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         return new MCRByteContent(baos.getBuffer(), 0, baos.size());
     }
 
-    private LinkedList<TransformerHandler> getTransformHandlerList(MCRParameterCollector parameterCollector)
+    protected LinkedList<TransformerHandler> getTransformHandlerList(MCRParameterCollector parameterCollector)
         throws TransformerConfigurationException, SAXException {
         checkTemplateUptodate();
         LinkedList<TransformerHandler> xslSteps = new LinkedList<TransformerHandler>();
@@ -256,7 +256,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
      * @return
      * @throws SAXException
      */
-    private XMLReader getXMLReader(LinkedList<TransformerHandler> transformHandlerList) throws SAXException {
+    protected XMLReader getXMLReader(LinkedList<TransformerHandler> transformHandlerList) throws SAXException {
         XMLReader reader = XMLReaderFactory.createXMLReader();
         reader.setEntityResolver(URI_RESOLVER);
         reader.setContentHandler(transformHandlerList.getFirst());
