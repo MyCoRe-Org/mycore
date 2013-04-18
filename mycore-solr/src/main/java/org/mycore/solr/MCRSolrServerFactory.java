@@ -8,6 +8,7 @@ import org.apache.solr.client.solrj.impl.BinaryRequestWriter;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.solr.utils.MCRSolrUtils;
 
 /**
@@ -28,6 +29,28 @@ public class MCRSolrServerFactory {
     static {
         try {
             setSolrServer(MCRSolrUtils.getSolrPropertyValue("ServerURL"));
+            MCRShutdownHandler.getInstance().addCloseable(new MCRShutdownHandler.Closeable() {
+
+                @Override
+                public void prepareClose() {
+                }
+
+                @Override
+                public int getPriority() {
+                    return Integer.MIN_VALUE;
+                }
+
+                @Override
+                public void close() {
+                    SolrServer solrServer = getSolrServer();
+                    LOGGER.info("Shutting down solr server: " + solrServer);
+                    solrServer.shutdown();
+                    SolrServer concurrentSolrServer = getConcurrentSolrServer();
+                    LOGGER.info("Shutting down concurrent solr server: " + concurrentSolrServer);
+                    concurrentSolrServer.shutdown();
+                    LOGGER.info("Solr shutdown process completed.");
+                }
+            });
         } catch (Exception e) {
             LOGGER.error("Exception creating solr server object", e);
         } catch (Error error) {
