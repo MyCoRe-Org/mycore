@@ -66,7 +66,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
     private final static FutureIndexHandlerCounter FUTURE_COUNTER;
 
     static {
-        int poolSize = MCRConfiguration.instance().getInt("MCR.Module-solr.Indexer.PoolSize", 4);
+        int poolSize = MCRConfiguration.instance().getInt("MCR.Module-solr.Indexer.ThreadCount", 4);
         final MCRListeningPriorityExecutorService executorService = new MCRListeningPriorityExecutorService(new ThreadPoolExecutor(
             poolSize, poolSize, 0L, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>()));
         Runnable onShutdown = new Runnable() {
