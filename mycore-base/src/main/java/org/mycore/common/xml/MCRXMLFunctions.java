@@ -780,7 +780,7 @@ public class MCRXMLFunctions {
 
     public static boolean hasNextImportStep(String uri) {
         boolean returns = !nextImportStep(uri).isEmpty();
-        LOGGER.info("hasNextImportStep('" + uri + "') -> " + returns);
+        LOGGER.debug("hasNextImportStep('" + uri + "') -> " + returns);
         return returns;
     }
 
