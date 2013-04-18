@@ -32,6 +32,7 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.xml.sax.SAXException;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -46,14 +47,14 @@ public abstract class MCRSolrInputDocumentFactory {
         return instance;
     }
 
-    public abstract SolrInputDocument getDocument(MCRObjectID id, MCRContent content);
+    public abstract SolrInputDocument getDocument(MCRObjectID id, MCRContent content) throws SAXException, IOException;
 
-    public SolrInputDocument getDocument(MCRObjectID id) throws IOException {
+    public SolrInputDocument getDocument(MCRObjectID id) throws SAXException, IOException {
         MCRContent content = MCRXMLMetadataManager.instance().retrieveContent(id);
         return getDocument(id, content);
     }
 
-    public SolrInputDocument getDocument(MCRBase derOrObj) {
+    public SolrInputDocument getDocument(MCRBase derOrObj) throws SAXException, IOException {
         MCRBaseContent content = new MCRBaseContent(derOrObj);
         return getDocument(derOrObj.getId(), content);
     }

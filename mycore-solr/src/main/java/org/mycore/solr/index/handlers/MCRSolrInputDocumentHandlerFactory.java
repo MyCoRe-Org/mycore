@@ -23,16 +23,20 @@
 
 package org.mycore.solr.index.handlers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
+import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.document.MCRSolrInputDocumentFactory;
 import org.mycore.solr.index.handlers.document.MCRSolrInputDocumentHandler;
 import org.mycore.solr.index.handlers.document.MCRSolrInputDocumentsHandler;
+import org.xml.sax.SAXException;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -40,14 +44,29 @@ import org.mycore.solr.index.handlers.document.MCRSolrInputDocumentsHandler;
  */
 public class MCRSolrInputDocumentHandlerFactory extends MCRSolrIndexHandlerFactory {
 
+    private static Logger LOGGER = Logger.getLogger(MCRSolrInputDocumentHandlerFactory.class);
+
     /* (non-Javadoc)
      * @see org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory#getIndexHandler(org.mycore.common.content.MCRContent, org.mycore.datamodel.metadata.MCRObjectID)
      */
     @Override
     public MCRSolrIndexHandler getIndexHandler(MCRContent content, MCRObjectID id) {
-        SolrInputDocument document = MCRSolrInputDocumentFactory.getInstance().getDocument(id, content);
+        SolrInputDocument document = getDocument(id, content);
         MCRSolrIndexHandler indexHandler = new MCRSolrInputDocumentHandler(document);
         return indexHandler;
+    }
+
+    private SolrInputDocument getDocument(MCRObjectID id, MCRContent content) {
+        SolrInputDocument document;
+        try {
+            document = MCRSolrInputDocumentFactory.getInstance().getDocument(id, content);
+        } catch (SAXException | IOException e) {
+            throw new MCRException(e);
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(id + " results in: " + document);
+        }
+        return document;
     }
 
     /* (non-Javadoc)
@@ -57,7 +76,7 @@ public class MCRSolrInputDocumentHandlerFactory extends MCRSolrIndexHandlerFacto
     public MCRSolrIndexHandler getIndexHandler(Map<MCRObjectID, MCRContent> contentMap) {
         ArrayList<SolrInputDocument> documents = new ArrayList<>(contentMap.size());
         for (Map.Entry<MCRObjectID, MCRContent> entry : contentMap.entrySet()) {
-            SolrInputDocument document = MCRSolrInputDocumentFactory.getInstance().getDocument(entry.getKey(), entry.getValue());
+            SolrInputDocument document = getDocument(entry.getKey(), entry.getValue());
             documents.add(document);
         }
         MCRSolrIndexHandler indexHandler = new MCRSolrInputDocumentsHandler(documents);

@@ -12,5 +12,9 @@
                 propertyfile="${build.config}/mycore.properties"
                 key="MCR.URIResolver.xslIncludes.objectTypes"
                 value="mods.xsl" />
+    <mcr:config action="addInclude"
+                propertyfile="${build.config}/mycore.properties"
+                key="MCR.URIResolver.xslImports.solr-document"
+                value="mods-solr.xsl" />
   </target>
 </project>

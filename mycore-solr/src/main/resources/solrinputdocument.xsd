@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="doc" type="MCRSolrInputDocument" />
+
+  <xs:complexType name="MCRSolrInputDocument">
+    <xs:sequence>
+      <xs:element name="field" maxOccurs="unbounded" minOccurs="0" type="MCRSolrInputField" />
+    </xs:sequence>
+    <xs:attribute type="xs:ID" name="id" />
+  </xs:complexType>
+
+  <xs:complexType name="MCRSolrInputField">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:Name" name="name" use="required" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+</xs:schema>
