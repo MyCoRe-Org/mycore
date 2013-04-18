@@ -251,7 +251,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
     }
 
     public static void rebuildMetadataIndex(List<String> list) {
-        rebuildMetadataIndex(list, MCRSolrServerFactory.getSolrServer());
+        rebuildMetadataIndex(list, MCRSolrServerFactory.getConcurrentSolrServer());
     }
 
     /**

@@ -6,6 +6,7 @@ package org.mycore.solr.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.mycore.common.MCRObjectUtils;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -106,9 +107,11 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     }
 
     public static void createIndex(String url) throws Exception {
+        ConcurrentUpdateSolrServer cuss = MCRSolrServerFactory.createConcurrentUpdateSolrServer(url);
         HttpSolrServer hss = MCRSolrServerFactory.createSolrServer(url);
-        MCRSolrIndexer.rebuildMetadataIndex(hss);
+        MCRSolrIndexer.rebuildMetadataIndex(cuss);
         MCRSolrIndexer.rebuildContentIndex(hss);
+        cuss.blockUntilFinished();
         hss.optimize();
     }
 

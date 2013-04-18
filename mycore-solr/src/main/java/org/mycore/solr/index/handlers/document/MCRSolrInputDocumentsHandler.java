@@ -31,6 +31,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.solr.MCRSolrServerFactory;
@@ -80,6 +81,13 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
             return;
         }
         SolrServer server = getSolrServer();
+        if (server instanceof ConcurrentUpdateSolrServer) {
+            LOGGER.info("Detected ConcurrentUpdateSolrServer. Split up batch update.");
+            splitDocuments();
+            //for statistics:
+            documents.clear();
+            return;
+        }
         UpdateResponse updateResponse;
         try {
             updateResponse = server.add(documents, getCommitWithin());
