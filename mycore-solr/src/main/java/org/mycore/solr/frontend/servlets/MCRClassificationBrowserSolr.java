@@ -35,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.SolrServer;
 import org.jdom2.Element;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
@@ -61,15 +61,13 @@ public class MCRClassificationBrowserSolr extends MCRServlet {
 
     private static final Logger LOGGER = Logger.getLogger(MCRClassificationBrowserSolr.class);
 
-    private static HttpSolrServer SOLR_SERVER;
+    private static SolrServer SOLR_SERVER;
 
     static {
         try {
             SOLR_SERVER = MCRSolrServerFactory.getSolrServer();
         } catch (Exception e) {
             LOGGER.error("Error creating solr server object", e);
-        } finally {
-            LOGGER.info("Solr: using server at address \"" + SOLR_SERVER.getBaseURL() + "\"");
         }
     }
 

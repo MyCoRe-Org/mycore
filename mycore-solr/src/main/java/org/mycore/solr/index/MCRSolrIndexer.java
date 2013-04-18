@@ -18,8 +18,6 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.jdom2.Document;
-import org.jdom2.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
@@ -37,13 +35,11 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.MCRSolrServerFactory;
 import org.mycore.solr.index.cs.MCRSolrContentStream;
 import org.mycore.solr.index.cs.MCRSolrFileContentStream;
-import org.mycore.solr.index.cs.MCRSolrListElementStream;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
 import org.mycore.solr.index.handlers.MCRSolrOptimizeIndexHandler;
 import org.mycore.solr.index.handlers.stream.MCRSolrDefaultIndexHandler;
 import org.mycore.solr.index.handlers.stream.MCRSolrFileIndexHandler;
 import org.mycore.solr.index.handlers.stream.MCRSolrFilesIndexHandler;
-import org.mycore.solr.index.handlers.stream.MCRSolrListElementIndexHandler;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
 import org.mycore.solr.index.strategy.MCRSolrIndexStrategyManager;
@@ -62,7 +58,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
     private static final Logger LOGGER = Logger.getLogger(MCRSolrIndexer.class);
 
     /** The Server used for indexing. */
-    final static HttpSolrServer DEFAULT_SOLR_SERVER = MCRSolrServerFactory.getSolrServer();
+    final static SolrServer DEFAULT_SOLR_SERVER = MCRSolrServerFactory.getSolrServer();
 
     /** The executer service used for submitting the index requests. */
     final static ListeningExecutorService EXECUTOR_SERVICE;
@@ -70,8 +66,9 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
     private final static FutureIndexHandlerCounter FUTURE_COUNTER;
 
     static {
-        final MCRListeningPriorityExecutorService executorService = new MCRListeningPriorityExecutorService(new ThreadPoolExecutor(10, 10,
-            0L, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>()));
+        int poolSize = MCRConfiguration.instance().getInt("MCR.Module-solr.Indexer.PoolSize", 4);
+        final MCRListeningPriorityExecutorService executorService = new MCRListeningPriorityExecutorService(new ThreadPoolExecutor(
+            poolSize, poolSize, 0L, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>()));
         Runnable onShutdown = new Runnable() {
 
             @Override
@@ -274,6 +271,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
 
         MCRXMLMetadataManager metadataMgr = MCRXMLMetadataManager.instance();
         HashMap<MCRObjectID, MCRContent> contentMap = new HashMap<>((int) (BULK_SIZE * 1.4));
+        MCRSolrIndexStatistic statistic = null;
         int i = 0;
         for (String id : list) {
             i++;
@@ -286,6 +284,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
                     MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(contentMap);
                     indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
                     indexHandler.setSolrServer(solrServer);
+                    statistic = indexHandler.getStatistic();
                     submitIndexHandler(indexHandler);
                     contentMap.clear();
                 }
@@ -294,7 +293,9 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
             }
         }
         long durationInMilliSeconds = swatch.getTime();
-        MCRSolrIndexStatisticCollector.xml.addTime(durationInMilliSeconds);
+        if (statistic != null) {
+            statistic.addTime(durationInMilliSeconds);
+        }
     }
 
     /**

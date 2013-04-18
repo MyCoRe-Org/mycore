@@ -9,8 +9,8 @@ import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -53,7 +53,7 @@ public class MCRSolrIndexBrowser implements MCRIIndexBrowserSearcher {
         solrQuery.setRows(20);
 
         try {
-            HttpSolrServer solrServer = MCRSolrServerFactory.getSolrServer();
+            SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
             QueryResponse queryResponse = solrServer.query(solrQuery);
             SolrDocumentList docs = queryResponse.getResults();
             results = createResultList(docs);

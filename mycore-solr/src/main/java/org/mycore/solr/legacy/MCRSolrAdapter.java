@@ -22,8 +22,8 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.util.Version;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrDocumentList;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
@@ -61,7 +61,7 @@ public class MCRSolrAdapter {
     }
 
     public MCRSolrResults getResults(SolrQuery q) throws SolrServerException {
-        HttpSolrServer solrServer = MCRSolrServerFactory.getSolrServer();
+        SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
         SolrDocumentList solrDocumentList = solrServer.query(q).getResults();
         return new MCRSolrResults(solrDocumentList);
     }

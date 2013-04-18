@@ -3,6 +3,7 @@ package org.mycore.solr;
 import java.text.MessageFormat;
 
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.BinaryRequestWriter;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -11,14 +12,18 @@ import org.mycore.solr.utils.MCRSolrUtils;
 
 /**
  * @author shermann
+ * @author Thomas Scheffler (yagee)
  */
 public class MCRSolrServerFactory {
 
     private static final Logger LOGGER = Logger.getLogger(MCRSolrServerFactory.class);
 
-    private static HttpSolrServer SOLR_SERVER;
+    private static SolrServer SOLR_SERVER;
 
-    private static ConcurrentUpdateSolrServer CONCURRENT_SOLR_SERVER;
+    private static SolrServer CONCURRENT_SOLR_SERVER;
+
+    private static boolean USE_CONCURRENT_SERVER = MCRConfiguration.instance().getBoolean(
+        "MCR.Module-solr.ConcurrentUpdateSolrServer.Enabled", true);
 
     static {
         try {
@@ -28,23 +33,26 @@ public class MCRSolrServerFactory {
         } catch (Error error) {
             LOGGER.error("Error creating solr server object", error);
         } finally {
-            LOGGER.info(MessageFormat.format("Using server at address \"{0}\"", SOLR_SERVER != null ? SOLR_SERVER.getBaseURL() : "n/a"));
+            LOGGER.info(MessageFormat.format("Using server at address \"{0}\"",
+                SOLR_SERVER instanceof HttpSolrServer ? ((HttpSolrServer) SOLR_SERVER).getBaseURL() : "n/a"));
         }
     }
 
-    public static HttpSolrServer createSolrServer(String solrServerUrl) {
+    public static SolrServer createSolrServer(String solrServerUrl) {
         HttpSolrServer hss = new HttpSolrServer(solrServerUrl);
         hss.setRequestWriter(new BinaryRequestWriter());
         return hss;
     }
 
-    public static ConcurrentUpdateSolrServer createConcurrentUpdateSolrServer(String solrServerUrl) {
-        String queueSize = MCRConfiguration.instance().getString("MCR.Solr.Server.queueSize", "10");
-        String threadSize = MCRConfiguration.instance().getString("MCR.Solr.Server.threadSize", "10");
-        ConcurrentUpdateSolrServer cuss = new ConcurrentUpdateSolrServer(solrServerUrl, Integer.parseInt(queueSize),
-            Integer.parseInt(threadSize));
-        cuss.setRequestWriter(new BinaryRequestWriter());
-        return cuss;
+    public static SolrServer createConcurrentUpdateSolrServer(String solrServerUrl) {
+        if (USE_CONCURRENT_SERVER) {
+            int queueSize = MCRConfiguration.instance().getInt("MCR.Module-solr.ConcurrentUpdateSolrServer.QueueSize", 100);
+            int threadSize = MCRConfiguration.instance().getInt("MCR.Module-solr.ConcurrentUpdateSolrServer.ThreadSize", 4);
+            ConcurrentUpdateSolrServer cuss = new ConcurrentUpdateSolrServer(solrServerUrl, queueSize, threadSize);
+            cuss.setRequestWriter(new BinaryRequestWriter());
+            return cuss;
+        }
+        return createSolrServer(solrServerUrl);
     }
 
     /**
@@ -54,29 +62,55 @@ public class MCRSolrServerFactory {
     }
 
     /**
-     * Returns an instance of {@link HttpSolrServer}. The underlying HttpClient is threadsafe.
+     * Returns an instance of {@link SolrServer}.
      * 
-     * @return an instance of {@link HttpSolrServer}
+     * @return an instance of {@link SolrServer}
      */
-    public static HttpSolrServer getSolrServer() {
+    public static SolrServer getSolrServer() {
         return SOLR_SERVER;
     }
 
-    public static ConcurrentUpdateSolrServer getConcurrentSolrServer() {
+    public static SolrServer getConcurrentSolrServer() {
         return CONCURRENT_SOLR_SERVER;
     }
 
-    public static void setSolrServer(HttpSolrServer solrServer) {
-        SOLR_SERVER = solrServer;
+    public static void setSolrServer(SolrServer solrServer) {
+        if (solrServer instanceof ConcurrentUpdateSolrServer) {
+            LOGGER.error("Do not set a ConcurrentUpdateSolrServer instance as current solr server!");
+            return;
+        }
+        replaceSolrServer(solrServer);
     }
 
     public static void setConcurrentSolrServer(ConcurrentUpdateSolrServer concurrentUpdateSolrServer) {
-        CONCURRENT_SOLR_SERVER = concurrentUpdateSolrServer;
+        replaceConcurrentUpdateSolrServer(concurrentUpdateSolrServer);
     }
 
     public static void setSolrServer(String solrServerURL) {
-        SOLR_SERVER = createSolrServer(solrServerURL);
-        CONCURRENT_SOLR_SERVER = createConcurrentUpdateSolrServer(solrServerURL);
+        replaceSolrServer(createSolrServer(solrServerURL));
+        replaceConcurrentUpdateSolrServer(createConcurrentUpdateSolrServer(solrServerURL));
+    }
+
+    private synchronized static void replaceConcurrentUpdateSolrServer(SolrServer server) {
+        if (CONCURRENT_SOLR_SERVER == server) {
+            return;
+        }
+        SolrServer oldServer = CONCURRENT_SOLR_SERVER;
+        CONCURRENT_SOLR_SERVER = server;
+        if (oldServer != null) {
+            oldServer.shutdown();
+        }
+    }
+
+    private synchronized static void replaceSolrServer(SolrServer server) {
+        if (SOLR_SERVER == server) {
+            return;
+        }
+        SolrServer oldServer = SOLR_SERVER;
+        SOLR_SERVER = server;
+        if (oldServer != null) {
+            oldServer.shutdown();
+        }
     }
 
 }

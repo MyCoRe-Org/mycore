@@ -73,6 +73,9 @@ public class MCRSolrIndexStatistic {
             synchronized (documents) {
                 long time = accumulatedTime.getAndSet(0);
                 int docs = documents.getAndSet(0);
+                if (docs == 0) {
+                    return time == 0 ? 0 : Double.MAX_VALUE;
+                }
                 return ((double) time / (double) docs);
             }
         }
