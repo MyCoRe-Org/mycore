@@ -80,6 +80,8 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
             LOGGER.warn("No input documents to index.");
             return;
         }
+        int totalCount = documents.size();
+        LOGGER.info("Handling " + totalCount + " documents");
         SolrServer server = getSolrServer();
         if (server instanceof ConcurrentUpdateSolrServer) {
             LOGGER.info("Detected ConcurrentUpdateSolrServer. Split up batch update.");
@@ -100,7 +102,7 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
             LOGGER.error("Error while indexing document collection. Split and retry: " + updateResponse.getResponse());
             splitDocuments();
         } else {
-            LOGGER.info("Sending " + documents.size() + " documents was successful in " + updateResponse.getElapsedTime() + " ms.");
+            LOGGER.info("Sending " + totalCount + " documents was successful in " + updateResponse.getElapsedTime() + " ms.");
         }
     }
 

@@ -77,6 +77,8 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
 
     @Override
     public void index() throws IOException, SolrServerException {
+        int totalCount = contentMap.size();
+        LOGGER.info("Handling " + totalCount + " documents");
         SolrServer server = getSolrServer();
         if (server instanceof ConcurrentUpdateSolrServer) {
             //split up to speed up processing
@@ -90,7 +92,7 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
             if (server instanceof HttpSolrServer) {
                 updateResponse = ((HttpSolrServer) server).add(iter);
             } else {
-                ArrayList<SolrInputDocument> docs = new ArrayList<>(contentMap.size());
+                ArrayList<SolrInputDocument> docs = new ArrayList<>(totalCount);
                 while (iter.hasNext()) {
                     docs.add(iter.next());
                 }
@@ -105,7 +107,7 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
             LOGGER.error("Error while indexing document collection. Split and retry: " + updateResponse.getResponse());
             splitup();
         } else {
-            LOGGER.info("Sending " + contentMap.size() + " documents was successful in " + updateResponse.getElapsedTime() + " ms.");
+            LOGGER.info("Sending " + totalCount + " documents was successful in " + updateResponse.getElapsedTime() + " ms.");
         }
 
     }
