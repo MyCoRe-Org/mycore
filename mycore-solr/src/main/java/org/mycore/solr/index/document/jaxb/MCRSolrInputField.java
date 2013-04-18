@@ -35,17 +35,13 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * 
  * 
  */
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(name = "MCRSolrInputField", propOrder = {
     "value"
 })
 public class MCRSolrInputField {
 
-    @XmlValue
     protected String value;
-    @XmlAttribute(name = "name", required = true)
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlSchemaType(name = "Name")
     protected String name;
 
     /**
@@ -56,6 +52,7 @@ public class MCRSolrInputField {
      *     {@link String }
      *     
      */
+    @XmlValue
     public String getValue() {
         return value;
     }
@@ -69,7 +66,7 @@ public class MCRSolrInputField {
      *     
      */
     public void setValue(String value) {
-        this.value = value;
+        this.value = value.trim();
     }
 
     /**
@@ -80,6 +77,9 @@ public class MCRSolrInputField {
      *     {@link String }
      *     
      */
+    @XmlAttribute(name = "name", required = true)
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    @XmlSchemaType(name = "Name")
     public String getName() {
         return name;
     }
@@ -94,6 +94,44 @@ public class MCRSolrInputField {
      */
     public void setName(String value) {
         this.name = value;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((value == null) ? 0 : value.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof MCRSolrInputField)) {
+            return false;
+        }
+        MCRSolrInputField other = (MCRSolrInputField) obj;
+        if (name == null) {
+            if (other.name != null) {
+                return false;
+            }
+        } else if (!name.equals(other.name)) {
+            return false;
+        }
+        if (value == null) {
+            if (other.value != null) {
+                return false;
+            }
+        } else if (!value.equals(other.value)) {
+            return false;
+        }
+        return true;
     }
 
 }

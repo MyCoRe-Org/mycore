@@ -24,6 +24,7 @@
 package org.mycore.solr.index.document;
 
 import java.io.IOException;
+import java.util.HashSet;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -56,14 +57,15 @@ public class MCRSolrInputDocumentGenerator {
 
     public static SolrInputDocument getSolrInputDocument(MCRSolrInputDocument jaxbDoc) {
         SolrInputDocument doc = new SolrInputDocument();
+        HashSet<MCRSolrInputField> duplicateFilter = new HashSet<>();
         for (MCRSolrInputField field : jaxbDoc.getField()) {
-            field.setValue(field.getValue().trim());
-            if (field.getValue().isEmpty()) {
+            if (field.getValue().isEmpty() || duplicateFilter.contains(field)) {
                 continue;
             }
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("adding " + field.getName() + "=" + field.getValue());
             }
+            duplicateFilter.add(field);
             doc.addField(field.getName(), field.getValue());
         }
         return doc;
