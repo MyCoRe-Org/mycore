@@ -74,6 +74,8 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;
+import org.mycore.common.content.transformer.MCRContentTransformer;
+import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -200,7 +202,9 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
         supportedSchemes.put("buildxml", getURIResolver(new MCRBuildXMLResolver()));
         supportedSchemes.put("notnull", new MCRNotNullResolver());
         supportedSchemes.put("xslStyle", new MCRXslStyleResolver());
+        supportedSchemes.put("xslTransform", new MCRLayoutTransformerResolver());
         supportedSchemes.put("xslInclude", new MCRXslIncludeResolver());
+        supportedSchemes.put("xslImport", new MCRXslImportResolver());
         supportedSchemes.put("versioninfo", new MCRVersionInfoResolver());
         supportedSchemes.put("deletedMcrObject", new MCRDeletedObjectResolver());
         supportedSchemes.put("fieldsXSL", new MCRFieldsXSLResolver());
@@ -1261,6 +1265,65 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
     }
 
     /**
+     * Transform result of other resolver with stylesheet. Usage:
+     * xslTransform:<transformer><?param1=value1<&param2=value2>>:<anyMyCoReURI>
+     */
+    private static class MCRLayoutTransformerResolver implements URIResolver {
+
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            String help = href.substring(href.indexOf(":") + 1);
+            String transformerId = new StringTokenizer(help, ":").nextToken();
+            String target = help.substring(help.indexOf(":") + 1);
+
+            String subUri = target.substring(target.indexOf(":") + 1);
+            if (subUri.length() == 0) {
+                return new JDOMSource(new Element("null"));
+            }
+
+            Map<String, String> params;
+            StringTokenizer tok = new StringTokenizer(transformerId, "?");
+            transformerId = tok.nextToken();
+
+            if (tok.hasMoreTokens()) {
+                params = getParameterMap(tok.nextToken());
+            } else {
+                params = Collections.emptyMap();
+            }
+            Source resolved = MCRURIResolver.instance().resolve(target, base);
+
+            try {
+                if (resolved != null) {
+                    MCRSourceContent content = new MCRSourceContent(resolved);
+                    MCRContentTransformer transformer = MCRLayoutTransformerFactory.getTransformer(transformerId);
+                    MCRContent result;
+                    if (transformer instanceof MCRParameterizedTransformer) {
+                        MCRParameterCollector paramcollector = MCRParameterCollector.getInstanceFromUserSession();
+                        paramcollector.setParameters(params);
+                        result = ((MCRParameterizedTransformer) transformer).transform(content, paramcollector);
+                    } else {
+                        result = transformer.transform(content);
+                    }
+                    return result.getSource();
+                } else {
+                    LOGGER.debug("MCRLayoutStyleResolver returning empty xml");
+                    return new JDOMSource(new Element("null"));
+                }
+            } catch (IOException e) {
+                Throwable cause = e.getCause();
+                while (cause != null) {
+                    if (cause instanceof TransformerException) {
+                        throw (TransformerException) cause;
+                    }
+                    cause = cause.getCause();
+                }
+                throw new TransformerException(e);
+            }
+        }
+
+    }
+
+    /**
      * <p>
      * Includes xsl files which are set in the mycore.properties file.
      * </p>
@@ -1290,6 +1353,36 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
                 }
             }
             return new JDOMSource(root);
+        }
+    }
+
+    /**
+     * Imports xsl files which are set in the mycore.properties file.
+     *
+     * Example: MCR.URIResolver.xslImports.components=first.xsl,second.xsl
+     * 
+     * Every file must import this URIResolver to form a import chain:
+     * <pre>
+     *  &lt;xsl:import href="xslImport:components:first.xsl"&gt;
+     * </pre>
+     * 
+     * @return A xsl file with the import as href.
+     */
+    private static class MCRXslImportResolver implements URIResolver {
+
+        URIResolver fallback = new MCRResourceResolver();
+
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            String importXSL = MCRXMLFunctions.nextImportStep(href.substring(href.indexOf(':') + 1));
+            if (importXSL.isEmpty()) {
+                Namespace xslNamespace = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
+                Element root = new Element("stylesheet", xslNamespace);
+                root.setAttribute("version", "1.0");
+                return new JDOMSource(root);
+            }
+            LOGGER.info("xslImport importing " + importXSL);
+            return fallback.resolve("resource:xsl/" + importXSL, base);
         }
     }
 

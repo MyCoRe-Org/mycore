@@ -733,4 +733,55 @@ public class MCRXMLFunctions {
         return new DOMOutputter().output(document).getDocumentElement().getChildNodes();
     }
 
+    /**
+     * Helper function for xslImport URI Resolver and {@link #hasNextImportStep(String)}
+     * @param includePart substring after "xmlImport:"
+     */
+    public static String nextImportStep(String includePart) {
+        int border = includePart.indexOf(':');
+        String selfName = null;
+        if (border > 0) {
+            selfName = includePart.substring(border + 1);
+            includePart = includePart.substring(0, border);
+        }
+
+        // get the parameters from mycore.properties
+        String propValue = MCRConfiguration.instance().getString("MCR.URIResolver.xslImports." + includePart, "").trim();
+        if (!propValue.isEmpty()) {
+            String[] includes = propValue.split(",");
+            String importXSL = null;
+            int pos = -1;
+            if (selfName == null) {
+                importXSL = includes[0];
+            } else {
+                for (int i = 0; i < includes.length; i++) {
+                    if (includes[i].equals(selfName)) {
+                        pos = i + 1;
+                        break;
+                    }
+                }
+                if (pos < includes.length && pos > 0) {
+                    importXSL = includes[pos];
+                }
+            }
+            if (importXSL != null) {
+                return importXSL;
+            }
+            if (pos >= 0) {
+                LOGGER.debug("xslImport reached end of chain:" + propValue);
+            } else {
+                LOGGER.warn("xslImport could not find " + selfName + " in " + propValue);
+            }
+        } else {
+            LOGGER.info("MCR.URIResolver.xslImports." + includePart + " has no Stylesheets defined");
+        }
+        return "";
+    }
+
+    public static boolean hasNextImportStep(String uri) {
+        boolean returns = !nextImportStep(uri).isEmpty();
+        LOGGER.info("hasNextImportStep('" + uri + "') -> " + returns);
+        return returns;
+    }
+
 }
