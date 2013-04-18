@@ -53,7 +53,9 @@ public class MCRSolrIndexStatistic {
     }
 
     public int addDocument(int docs) {
-        LOGGER.info(name + ": adding " + docs + " documents");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(name + ": adding " + docs + " documents");
+        }
         return documents.addAndGet(docs);
     }
 
