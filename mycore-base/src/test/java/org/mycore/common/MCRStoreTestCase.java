@@ -11,7 +11,9 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 public abstract class MCRStoreTestCase extends MCRHibTestCase {
 
     private static MCRXMLMetadataManager store;
+
     private static Path storeBaseDir;
+
     private static Path svnBaseDir;
 
     @BeforeClass
@@ -19,17 +21,17 @@ public abstract class MCRStoreTestCase extends MCRHibTestCase {
         storeBaseDir = Files.createTempDirectory(MCRStoreTestCase.class.getSimpleName());
         setProperty("MCR.Metadata.Store.BaseDir", storeBaseDir.toString(), true);
         svnBaseDir = Files.createTempDirectory(MCRStoreTestCase.class.getSimpleName() + "_svn");
-        setProperty("MCR.Metadata.Store.SVNBase", "file://" + svnBaseDir.toString(), true);
+        setProperty("MCR.Metadata.Store.SVNBase", svnBaseDir.toUri().toString(), true);
         store = MCRXMLMetadataManager.instance();
         store.reload();
     }
 
     @AfterClass
     public static void destroy() throws Exception {
-        if(storeBaseDir != null) {
+        if (storeBaseDir != null) {
             FileUtils.deleteDirectory(storeBaseDir.toFile());
         }
-        if(svnBaseDir != null) {
+        if (svnBaseDir != null) {
             FileUtils.deleteDirectory(svnBaseDir.toFile());
         }
     }
