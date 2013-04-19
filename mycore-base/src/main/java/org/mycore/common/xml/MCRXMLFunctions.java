@@ -153,10 +153,8 @@ public class MCRXMLFunctions {
 
     public static StringBuffer getBaseLink(String hostAlias) {
         StringBuffer returns = new StringBuffer();
-        returns
-            .append(CONFIG.getString(HOST_PREFIX + hostAlias + PROTOCOLL_SUFFIX, "http"))
-            .append("://")
-            .append(CONFIG.getString(HOST_PREFIX + hostAlias + HOST_SUFFIX));
+        returns.append(CONFIG.getString(HOST_PREFIX + hostAlias + PROTOCOLL_SUFFIX, "http")).append("://")
+                .append(CONFIG.getString(HOST_PREFIX + hostAlias + HOST_SUFFIX));
         String port = CONFIG.getString(HOST_PREFIX + hostAlias + PORT_SUFFIX, DEFAULT_PORT);
         if (!port.equals(DEFAULT_PORT)) {
             returns.append(":").append(port);
@@ -171,13 +169,8 @@ public class MCRXMLFunctions {
     public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language) throws ParseException {
         if (LOGGER.isDebugEnabled()) {
             StringBuilder sb = new StringBuilder("isoDate=");
-            sb.append(isoDate)
-                .append(", simpleFormat=")
-                .append(simpleFormat)
-                .append(", isoFormat=")
-                .append(isoFormat)
-                .append(", iso649Language=")
-                .append(iso639Language);
+            sb.append(isoDate).append(", simpleFormat=").append(simpleFormat).append(", isoFormat=").append(isoFormat).append(", iso649Language=")
+                    .append(iso639Language);
             LOGGER.debug(sb.toString());
         }
         Locale locale = new Locale(iso639Language);
@@ -441,8 +434,8 @@ public class MCRXMLFunctions {
             return new URI(url).toASCIIString();
         } catch (Exception e) {
             URL testURL = new URL(url);
-            URI uri = new URI(testURL.getProtocol(), testURL.getUserInfo(), testURL.getHost(), testURL.getPort(), testURL.getPath(),
-                testURL.getQuery(), testURL.getRef());
+            URI uri = new URI(testURL.getProtocol(), testURL.getUserInfo(), testURL.getHost(), testURL.getPort(), testURL.getPath(), testURL.getQuery(),
+                    testURL.getRef());
             return uri.toASCIIString();
         }
     }
@@ -533,8 +526,7 @@ public class MCRXMLFunctions {
                 return true;
             }
         }
-        LOGGER.info("URN assignment disabled as the object type " + givenType + " is not in the list of allowed objects. See property \""
-            + propertyName + "\"");
+        LOGGER.info("URN assignment disabled as the object type " + givenType + " is not in the list of allowed objects. See property \"" + propertyName + "\"");
         return false;
     }
 
@@ -604,6 +596,9 @@ public class MCRXMLFunctions {
      * @return the mime type of the given file
      */
     public static String getMimeType(String f) {
+        if (f == null) {
+            return null;
+        }
         MimetypesFileTypeMap mTypes = new MimetypesFileTypeMap();
         return mTypes.getContentType(f.toLowerCase());
     }
