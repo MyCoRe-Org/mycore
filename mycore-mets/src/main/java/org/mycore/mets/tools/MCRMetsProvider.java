@@ -160,6 +160,8 @@ public class MCRMetsProvider {
              */
             else {
                 String path = MCRJSONTools.stripBracketsAndQuotes(json.get("path").getAsString());
+                path = encode(path);
+
                 boolean hide = json.get("hide").getAsBoolean();
 
                 /* create the file object and add it to the file section */
@@ -171,7 +173,6 @@ public class MCRMetsProvider {
                     int physicalOrder = json.get("physicalOrder").getAsInt();
                     String orderLabel = MCRJSONTools.stripBracketsAndQuotes(json.get("orderLabel").getAsString());
                     orderLabel = orderLabel.equals("undefined") ? "" : orderLabel;
-                    path = encode(path);
 
                     /* create the physical div and add it to the physical struct map */
                     PhysicalSubDiv physDiv = createPhysicalDiv(id, physicalOrder, orderLabel);

@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
@@ -121,7 +122,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
                 final String fileID = "master_" + uuid.toString();
                 final String physicalID = "phys_" + uuid.toString();
                 try {
-                    final String href = new URI(null, mcrFile.getAbsolutePath().substring(1), null).toString();
+                    final String href = MCRXMLFunctions.encodeURIPath(mcrFile.getAbsolutePath().substring(1)).toString();//new URI(null, null,mcrFile.getAbsolutePath().substring(1), null, null).toString();
                     // file
                     File file = new File(fileID, getMimeType(mcrFile));
                     FLocat fLocat = new FLocat(FLocat.LOCTYPE_URL, href);

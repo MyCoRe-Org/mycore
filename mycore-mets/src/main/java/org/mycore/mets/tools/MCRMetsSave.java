@@ -26,6 +26,8 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRUtils;
+import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
@@ -414,8 +416,8 @@ public class MCRMetsSave {
                 } else if (node instanceof MCRDirectory) {
                     continue;
                 }
-
-                String path = node.getAbsolutePath().substring(1);//remove leading '/'
+                
+                String path = MCRXMLFunctions.encodeURIPath(node.getAbsolutePath()).substring(1);//remove leading '/'
                 if (!fileGroup.contains(path)) {
                     LOGGER.warn(MessageFormat.format("{0} does not appear in {1}!", path, ifs.getOwnerID()));
                     return false;
