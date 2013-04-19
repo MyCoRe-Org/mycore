@@ -65,7 +65,7 @@ fieldtypes.xsd">
 		<operator token="&lt;="/>
 	</type>
 	<type name="timestamp" default="=">
-		<!-- date and time value in ISO-8601 format "yyyy-MM-dd hh:mm:ss" -->
+		<!-- date and time value in ISO-8601 format "yyyy-MM-ddThh:mm:ss.SSSZ" -->
 		<operator token="="/>
 		<operator token="&gt;"/>
 		<operator token="&lt;"/>
