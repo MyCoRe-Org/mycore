@@ -597,7 +597,7 @@ public class MCRXMLFunctions {
      */
     public static String getMimeType(String f) {
         if (f == null) {
-            return null;
+            return "application/octet-stream";
         }
         MimetypesFileTypeMap mTypes = new MimetypesFileTypeMap();
         return mTypes.getContentType(f.toLowerCase());
