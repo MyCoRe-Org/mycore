@@ -77,7 +77,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
             "Deletes an document from the index by id");
         addCommand(com);
 
-        com = new MCRCommand("create solr metadata and content index at {0}", solrIndexerClassName + ".createIndex String",
+        com = new MCRCommand("create solr metadata and content index at {0}", commandClassName + ".createIndex String",
             "create solr's metadata and content index on specific solr server");
         addCommand(com);
 
