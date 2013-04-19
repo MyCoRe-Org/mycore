@@ -3,7 +3,7 @@
   xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" exclude-result-prefixes="mods mcrxsl">
   <xsl:import href="xslImport:solr-document:mods-solr.xsl" />
 
-  <xsl:template match="/*[contains(@ID,'_mods_')]">
+  <xsl:template match="mycoreobject[contains(@ID,'_mods_')]">
     <xsl:variable name="hasImports" select="mcrxsl:hasNextImportStep('solr-document:mods-solr.xsl')" />
     <!-- fields from mycore-mods -->
     <xsl:apply-templates select="metadata/def.modsContainer/modsContainer/mods:mods">

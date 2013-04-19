@@ -24,15 +24,21 @@
 package org.mycore.solr.index.document;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.transform.TransformerConfigurationException;
 
 import org.apache.solr.common.SolrInputDocument;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.content.transformer.MCRXSL2JAXBTransformer;
@@ -47,34 +53,87 @@ import org.xml.sax.SAXException;
  */
 public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocumentFactory {
 
-    private static MCRXSL2JAXBTransformer<JAXBElement<MCRSolrInputDocument>> transformer = getTransformer();
+    //    private static MCRXSL2JAXBTransformer<JAXBElement<MCRSolrInputDocument>> transformer = getTransformer();
+    private static MCRContentTransformer transformer = getTransformer();
+
+    private static boolean isJAXBTransformer;
 
     /* (non-Javadoc)
      * @see org.mycore.solr.index.document.MCRSolrInputDocumentFactory#getDocument(org.mycore.datamodel.metadata.MCRObjectID, org.mycore.common.content.MCRContent)
      */
     @Override
     public SolrInputDocument getDocument(MCRObjectID id, MCRContent content) throws SAXException, IOException {
-        MCRParameterCollector param = MCRParameterCollector.getInstanceFromUserSession();
+        //we need no parameter for searchfields - hopefully
         try {
-            MCRSolrInputDocument input = transformer.getJAXBObject(content, param).getValue();
-            SolrInputDocument document = MCRSolrInputDocumentGenerator.getSolrInputDocument(input);
+            SolrInputDocument document;
+            if (isJAXBTransformer) {
+                MCRParameterCollector param = new MCRParameterCollector();
+                @SuppressWarnings("unchecked")
+                MCRXSL2JAXBTransformer<JAXBElement<MCRSolrInputDocument>> jaxbTransformer = (MCRXSL2JAXBTransformer<JAXBElement<MCRSolrInputDocument>>) transformer;
+                MCRSolrInputDocument input = jaxbTransformer.getJAXBObject(content, param).getValue();
+                document = MCRSolrInputDocumentGenerator.getSolrInputDocument(input);
+            } else {
+                MCRContent result = transformer.transform(content);
+                document = MCRSolrInputDocumentGenerator.getSolrInputDocument(result.asXML().getRootElement());
+            }
             return document;
-        } catch (TransformerConfigurationException | JAXBException e) {
+        } catch (TransformerConfigurationException | JAXBException | JDOMException e) {
             throw new IOException(e);
         }
     }
 
-    private static MCRXSL2JAXBTransformer<JAXBElement<MCRSolrInputDocument>> getTransformer() {
+    private static MCRContentTransformer getTransformer() {
         String property = "MCR.Module-solr.SolrInputDocumentTransformer";
         String transformerId = MCRConfiguration.instance().getString(property);
         MCRContentTransformer contentTransformer = MCRContentTransformerFactory.getTransformer(transformerId);
-        if (!(contentTransformer instanceof MCRXSL2JAXBTransformer)) {
-            throw new MCRConfigurationException(property + ".Class does not define an instance of "
-                + MCRXSL2JAXBTransformer.class.getCanonicalName());
+        isJAXBTransformer = contentTransformer instanceof MCRXSL2JAXBTransformer;
+        return contentTransformer;
+    }
+
+    @Override
+    public Iterator<SolrInputDocument> getDocuments(Map<MCRObjectID, MCRContent> contentMap) throws IOException, SAXException {
+        if (contentMap.isEmpty()) {
+            return Collections.emptyIterator();
         }
-        @SuppressWarnings("unchecked")
-        MCRXSL2JAXBTransformer<JAXBElement<MCRSolrInputDocument>> jaxbTransformer = (MCRXSL2JAXBTransformer<JAXBElement<MCRSolrInputDocument>>) contentTransformer;
-        return jaxbTransformer;
+        try {
+            Document doc = getMergedDocument(contentMap);
+            MCRContent result = transformer.transform(new MCRJDOMContent(doc));
+            return getSolrInputDocuments(result);
+        } catch (JDOMException e) {
+            throw new IOException(e);
+        }
+    }
+
+    private Iterator<SolrInputDocument> getSolrInputDocuments(MCRContent result) throws IOException, SAXException, JDOMException {
+        final Iterator<Element> delegate;
+        delegate = result.asXML().getRootElement().getChildren("doc").iterator();
+        return new Iterator<SolrInputDocument>() {
+
+            @Override
+            public boolean hasNext() {
+                return delegate.hasNext();
+            }
+
+            @Override
+            public SolrInputDocument next() {
+                SolrInputDocument solrInputDocument = MCRSolrInputDocumentGenerator.getSolrInputDocument(delegate.next());
+                return solrInputDocument;
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException("remove() is not supported on this iterator.");
+            }
+        };
+    }
+
+    private Document getMergedDocument(Map<MCRObjectID, MCRContent> contentMap) throws IOException, SAXException, JDOMException {
+        Element rootElement = new Element("add");
+        Document doc = new Document(rootElement);
+        for (Map.Entry<MCRObjectID, MCRContent> entry : contentMap.entrySet()) {
+            rootElement.addContent(entry.getValue().asXML().detachRootElement());
+        }
+        return doc;
     }
 
 }

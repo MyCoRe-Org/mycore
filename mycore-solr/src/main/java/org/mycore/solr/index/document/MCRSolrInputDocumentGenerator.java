@@ -25,6 +25,7 @@ package org.mycore.solr.index.document;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -32,6 +33,8 @@ import javax.xml.bind.Unmarshaller;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJAXBContent;
@@ -80,5 +83,25 @@ public class MCRSolrInputDocumentGenerator {
         Unmarshaller unmarshaller = JAXB_CONTEXT.createUnmarshaller();
         MCRSolrInputDocument solrDocument = (MCRSolrInputDocument) unmarshaller.unmarshal(source.getSource());
         return getSolrInputDocument(solrDocument);
+    }
+
+    public static SolrInputDocument getSolrInputDocument(Element input) {
+        SolrInputDocument doc = new SolrInputDocument();
+        HashSet<MCRSolrInputField> duplicateFilter = new HashSet<>();
+        List<Element> fieldElements = input.getChildren("field");
+        for (Element fieldElement : fieldElements) {
+            MCRSolrInputField field = new MCRSolrInputField();
+            field.setName(fieldElement.getAttributeValue("name"));
+            field.setValue(fieldElement.getText());
+            if (field.getValue().isEmpty() || duplicateFilter.contains(field)) {
+                continue;
+            }
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("adding " + field.getName() + "=" + field.getValue());
+            }
+            duplicateFilter.add(field);
+            doc.addField(field.getName(), field.getValue());
+        }
+        return doc;
     }
 }

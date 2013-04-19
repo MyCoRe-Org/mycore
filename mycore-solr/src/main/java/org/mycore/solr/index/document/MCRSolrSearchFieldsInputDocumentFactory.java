@@ -23,17 +23,25 @@
 
 package org.mycore.solr.index.document;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
+import org.jdom2.Element;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.data2fields.MCRData2FieldsContent;
 import org.mycore.services.fieldquery.data2fields.MCRIndexEntry;
+import org.xml.sax.SAXException;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -93,5 +101,28 @@ public class MCRSolrSearchFieldsInputDocumentFactory extends MCRSolrInputDocumen
             LOGGER.debug(indexEntry.getEntryID() + " transformed to:\n" + document.toString());
         }
         return document;
+    }
+
+    @Override
+    public Iterator<SolrInputDocument> getDocuments(Map<MCRObjectID, MCRContent> contentMap) throws IOException, SAXException {
+        final Iterator<Map.Entry<MCRObjectID, MCRContent>> delegate = contentMap.entrySet().iterator();
+        return new Iterator<SolrInputDocument>() {
+
+            @Override
+            public boolean hasNext() {
+                return delegate.hasNext();
+            }
+
+            @Override
+            public SolrInputDocument next() {
+                Entry<MCRObjectID, MCRContent> entry = delegate.next();
+                return getDocument(entry.getKey(), entry.getValue());
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException("remove() is not supported on this iterator.");
+            }
+        };
     }
 }

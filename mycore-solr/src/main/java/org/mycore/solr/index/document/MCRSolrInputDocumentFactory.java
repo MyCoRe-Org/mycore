@@ -24,8 +24,14 @@
 package org.mycore.solr.index.document;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.solr.common.SolrInputDocument;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
@@ -49,6 +55,8 @@ public abstract class MCRSolrInputDocumentFactory {
 
     public abstract SolrInputDocument getDocument(MCRObjectID id, MCRContent content) throws SAXException, IOException;
 
+    public abstract Iterator<SolrInputDocument> getDocuments(Map<MCRObjectID, MCRContent> contentMap) throws IOException, SAXException;
+
     public SolrInputDocument getDocument(MCRObjectID id) throws SAXException, IOException {
         MCRContent content = MCRXMLMetadataManager.instance().retrieveContent(id);
         return getDocument(id, content);
@@ -58,4 +66,5 @@ public abstract class MCRSolrInputDocumentFactory {
         MCRBaseContent content = new MCRBaseContent(derOrObj);
         return getDocument(derOrObj.getId(), content);
     }
+
 }

@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
@@ -37,16 +36,15 @@ import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
-import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.MCRSolrServerFactory;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.document.MCRSolrInputDocumentFactory;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
+import org.mycore.solr.index.handlers.document.MCRSolrInputDocumentHandler;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
-import org.xml.sax.SAXException;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -79,22 +77,22 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
     public void index() throws IOException, SolrServerException {
         int totalCount = contentMap.size();
         LOGGER.info("Handling " + totalCount + " documents");
-        SolrServer server = getSolrServer();
-        if (server instanceof ConcurrentUpdateSolrServer) {
-            //split up to speed up processing
-            splitup();
-            return;
-        }
         //multithread processing will result in too many http request
         UpdateResponse updateResponse;
         try {
-            Iterator<SolrInputDocument> iter = getSolrInputDocumentIterator();
+            Iterator<SolrInputDocument> documents = MCRSolrInputDocumentFactory.getInstance().getDocuments(contentMap);
+            SolrServer server = getSolrServer();
+            if (server instanceof ConcurrentUpdateSolrServer) {
+                //split up to speed up processing
+                splitup(documents);
+                return;
+            }
             if (server instanceof HttpSolrServer) {
-                updateResponse = ((HttpSolrServer) server).add(iter);
+                updateResponse = ((HttpSolrServer) server).add(documents);
             } else {
                 ArrayList<SolrInputDocument> docs = new ArrayList<>(totalCount);
-                while (iter.hasNext()) {
-                    docs.add(iter.next());
+                while (documents.hasNext()) {
+                    docs.add(documents.next());
                 }
                 updateResponse = server.add(docs);
             }
@@ -112,31 +110,13 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
 
     }
 
-    private Iterator<SolrInputDocument> getSolrInputDocumentIterator() {
-        final Iterator<Map.Entry<MCRObjectID, MCRContent>> delegate = contentMap.entrySet().iterator();
-        Iterator<SolrInputDocument> iter = new Iterator<SolrInputDocument>() {
-
-            @Override
-            public boolean hasNext() {
-                return delegate.hasNext();
-            }
-
-            @Override
-            public SolrInputDocument next() {
-                Entry<MCRObjectID, MCRContent> entry = delegate.next();
-                try {
-                    return MCRSolrInputDocumentFactory.getInstance().getDocument(entry.getKey(), entry.getValue());
-                } catch (SAXException | IOException e) {
-                    throw new MCRException(e);
-                }
-            }
-
-            @Override
-            public void remove() {
-                delegate.remove();
-            }
-        };
-        return iter;
+    private void splitup(Iterator<SolrInputDocument> documents) {
+        while (documents.hasNext()) {
+            MCRSolrInputDocumentHandler subhandler = new MCRSolrInputDocumentHandler(documents.next());
+            subhandler.setCommitWithin(getCommitWithin());
+            subhandlers.add(subhandler);
+        }
+        contentMap.clear();
     }
 
     private void splitup() {
