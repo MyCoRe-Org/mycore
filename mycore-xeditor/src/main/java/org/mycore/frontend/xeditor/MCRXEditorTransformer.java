@@ -56,6 +56,7 @@ import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.xeditor.MCRXPathParser.MCRLocationStep;
 import org.mycore.services.i18n.MCRTranslation;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.traversal.NodeIterator;
 import org.xml.sax.SAXException;
 
 /**
@@ -79,6 +80,8 @@ public class MCRXEditorTransformer {
     }
 
     public MCRContent transform(MCRContent editorSource) throws IOException, JDOMException, SAXException {
+        editorSession.getValidator().removeValidationRules();
+
         MCRXSL2XMLTransformer transformer = MCRXSL2XMLTransformer.getInstance("xsl/xeditor.xsl");
         String key = MCRXEditorTransformerStore.storeTransformer(this);
         transformationParameters.setParameter("XEditorTransformerKey", key);
@@ -182,6 +185,18 @@ public class MCRXEditorTransformer {
 
     public String getControlsParameter() throws UnsupportedEncodingException {
         return repeats.peek().getControlsParameter();
+    }
+
+    public void addValidationRule(NodeIterator attributes) {
+        editorSession.getValidator().addValidationRule(currentBinding.getAbsoluteXPath(), attributes);
+    }
+
+    public boolean validationFailed() {
+        return editorSession.getValidator().failed();
+    }
+
+    public boolean currentIsInvalid() {
+        return editorSession.getValidator().failed(currentBinding.getAbsoluteXPath());
     }
 
     private final static Pattern PATTERN_URI = Pattern.compile("\\{\\$(.+)\\}");

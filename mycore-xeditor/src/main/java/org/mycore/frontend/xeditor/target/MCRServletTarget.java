@@ -32,12 +32,19 @@ import org.mycore.frontend.xeditor.MCREditorSession;
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRServletTarget extends MCREditorTargetBase {
+public class MCRServletTarget extends MCREditorTarget {
 
     @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String servletNameOrPath)
             throws Exception {
-        super.handleSubmission(context, job, session, servletNameOrPath);
+        setSubmittedValues(job, session);
+
+        if (session.validate().failed()) {
+            redirectToEditorPage(job, session);
+            return;
+        }
+
+        session.removeDeletedNodes();
 
         RequestDispatcher dispatcher = context.getNamedDispatcher(servletNameOrPath);
         if (dispatcher == null)

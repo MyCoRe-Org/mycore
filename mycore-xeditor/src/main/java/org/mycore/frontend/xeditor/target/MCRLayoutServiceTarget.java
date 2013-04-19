@@ -34,12 +34,19 @@ import org.mycore.frontend.xeditor.MCREditorSession;
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRLayoutServiceTarget extends MCREditorTargetBase {
+public class MCRLayoutServiceTarget extends MCREditorTarget {
 
     @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String style) throws Exception {
-        super.handleSubmission(context, job, session, style);
-        
+        setSubmittedValues(job, session);
+
+        if (session.validate().failed()) {
+            redirectToEditorPage(job, session);
+            return;
+        }
+
+        session.removeDeletedNodes();
+
         if ((style != null) && (!style.isEmpty()))
             job.getRequest().setAttribute("XSL.Style", style);
 

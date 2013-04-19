@@ -65,7 +65,7 @@
 
   <!-- ========== <xed:postprocessor xsl="" /> ========== -->
   
-  <xsl:template match="xed:postprocessor" mode="xeditor">
+  <xsl:template match="xed:post-processor" mode="xeditor">
     <xsl:value-of select="transformer:setPostProcessorXSL($transformer,@xsl)" />
   </xsl:template>
 
@@ -100,7 +100,7 @@
   </xsl:template>
 
   <xsl:template match="text()" mode="xeditor">
-    <xsl:copy />
+    <xsl:value-of select="." />
   </xsl:template>
 
   <!-- ========== <xed:bind xpath="" default="" name="" /> ========== -->
@@ -116,14 +116,14 @@
   <xsl:template match="*" mode="xeditor">
     <xsl:copy>
       <xsl:apply-templates select="." mode="add-attributes" />
-      <xsl:apply-templates select="@*|node()" mode="xeditor" />
+      <xsl:apply-templates select="@*|text()|*" mode="xeditor" />
       <xsl:apply-templates select="." mode="add-content" />
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="node()" mode="add-attributes" />
+  <xsl:template match="*" mode="add-attributes" />
 
-  <xsl:template match="node()" mode="add-content" />
+  <xsl:template match="*" mode="add-content" />
 
   <!-- ========== <input /> ========== -->
 
@@ -132,6 +132,7 @@
       <xsl:text>_xed_submit_</xsl:text>
       <xsl:value-of select="@xed:target" />
     </xsl:attribute>
+    <xsl:call-template name="set.class.if.validation.failed" />
   </xsl:template>
 
   <xsl:template
@@ -143,15 +144,17 @@
     <xsl:attribute name="value">
       <xsl:value-of select="transformer:getValue($transformer)" />
     </xsl:attribute>
+    <xsl:call-template name="set.class.if.validation.failed" />
   </xsl:template>
 
   <xsl:template match="input[contains('checkbox,radio',@type)]" mode="add-attributes">
     <xsl:attribute name="name">
-    <xsl:value-of select="transformer:getAbsoluteXPath($transformer)" />
-  </xsl:attribute>
+      <xsl:value-of select="transformer:getAbsoluteXPath($transformer)" />
+    </xsl:attribute>
     <xsl:if test="transformer:hasValue($transformer,@value)">
       <xsl:attribute name="checked">checked</xsl:attribute>
     </xsl:if>
+    <xsl:call-template name="set.class.if.validation.failed" />
   </xsl:template>
 
   <xsl:template match="option[ancestor::select]" mode="add-attributes">
@@ -171,8 +174,9 @@
 
   <xsl:template match="textarea|select" mode="add-attributes">
     <xsl:attribute name="name">
-    <xsl:value-of select="transformer:getAbsoluteXPath($transformer)" />
-  </xsl:attribute>
+      <xsl:value-of select="transformer:getAbsoluteXPath($transformer)" />
+    </xsl:attribute>
+    <xsl:call-template name="set.class.if.validation.failed" />
   </xsl:template>
 
   <xsl:template match="textarea" mode="add-content">
@@ -218,6 +222,39 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:for-each>
+  </xsl:template>
+
+  <!-- ========== <xed:validate /> ========== -->
+  
+  <xsl:template match="xed:validate" mode="xeditor">
+    <xsl:value-of select="transformer:addValidationRule($transformer,@*)" />
+  </xsl:template>
+
+  <!-- ========== <xed:if-validation-failed /> ========== -->
+  
+  <xsl:template match="xed:if-validation-failed" mode="xeditor">
+    <xsl:if test="transformer:validationFailed($transformer)">
+      <xsl:apply-templates select="node()" mode="xeditor" />
+    </xsl:if>
+  </xsl:template>
+
+  <!-- ========== mark input controls where validation failed ========== -->
+  
+  <xsl:template match="input/@class|textarea/@class|select/@class" mode="xeditor">
+    <xsl:attribute name="class">
+      <xsl:value-of select="." />
+      <xsl:if test="transformer:currentIsInvalid($transformer)">
+        <xsl:text> xed-validation-failed</xsl:text>
+      </xsl:if>
+    </xsl:attribute>
+  </xsl:template>
+  
+  <xsl:template name="set.class.if.validation.failed">
+    <xsl:if test="not(@class) and transformer:currentIsInvalid($transformer)">
+      <xsl:attribute name="class">
+        <xsl:text>xed-validation-failed</xsl:text>
+      </xsl:attribute>
+    </xsl:if>
   </xsl:template>
 
   <!-- ========== <xed:if test="" /> ========== -->

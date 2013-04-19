@@ -64,6 +64,8 @@ public class MCREditorSession {
 
     private String postProcessorXSL;
 
+    private MCRXEditorValidator validator = new MCRXEditorValidator();
+
     public MCREditorSession(Map<String, String[]> requestParameters) {
         this.requestParameters = requestParameters;
     }
@@ -171,5 +173,14 @@ public class MCREditorSession {
 
     public void forgetDisplayedFields() {
         xPathsOfDisplayedFields.clear();
+    }
+
+    public MCRXEditorValidator getValidator() {
+        return validator;
+    }
+
+    public MCRXEditorValidator validate() throws JDOMException, ParseException {
+        validator.validate(editedXML);
+        return validator;
     }
 }

@@ -35,11 +35,11 @@ import org.mycore.frontend.xeditor.MCREditorSession;
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRCancelTarget implements MCREditorTarget {
+public class MCRCancelTarget extends MCREditorTarget {
 
     @Override
-    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter)
-            throws IOException, ServletException {
+    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter) throws IOException,
+            ServletException {
         String cancelURL = session.getCancelURL();
         job.getResponse().sendRedirect(cancelURL == null ? MCRServlet.getBaseURL() : cancelURL);
     }

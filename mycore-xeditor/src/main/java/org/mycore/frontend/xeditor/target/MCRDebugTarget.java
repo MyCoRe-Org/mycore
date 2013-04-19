@@ -41,7 +41,7 @@ import org.mycore.frontend.xeditor.MCREditorSession;
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRDebugTarget extends MCREditorTargetBase {
+public class MCRDebugTarget extends MCREditorTarget {
 
     @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter) throws Exception {
@@ -61,7 +61,8 @@ public class MCRDebugTarget extends MCREditorTargetBase {
         out.println("<h3>Submitted parameters:</h3>");
         outputParameters(job, out);
 
-        super.handleSubmission(context, job, session, parameter);
+        setSubmittedValues(job, session);
+        session.removeDeletedNodes();
 
         out.println("<h3>After submit:</h3>");
         outputXML(session.getEditedXML(), out);

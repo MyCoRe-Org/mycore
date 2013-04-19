@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<html>
+  <body>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:source uri="resource:{$input}" />
+      <xed:bind xpath="document">
+        <xed:if-validation-failed>
+          <p>Fehlerhafte Eingabe!</p> 
+        </xed:if-validation-failed>
+        <xed:bind xpath="title">
+          <input type="text" class="text" />
+          <xed:validate required="true" xsl="contains(.,'Utopie')" />
+        </xed:bind>
+      </xed:bind>
+    </xed:form>
+  </body>
+</html>

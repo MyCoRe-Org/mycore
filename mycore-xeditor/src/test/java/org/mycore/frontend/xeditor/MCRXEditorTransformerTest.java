@@ -25,6 +25,7 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.HashMap;
 
 import javax.xml.transform.TransformerException;
@@ -45,20 +46,32 @@ import org.xml.sax.SAXException;
  */
 public class MCRXEditorTransformerTest {
 
-    private void testTransformation(String inputFile, String editedXMLFile, String expectedOutputFile, boolean justShow)
-            throws TransformerException, IOException, JDOMException, SAXException {
+    private MCREditorSession buildEditorSession(String editedXMLFile) {
         HashMap<String, String[]> parameters = new HashMap<String, String[]>();
-        MCRParameterCollector pc = new MCRParameterCollector(false);
         if (editedXMLFile != null) {
             parameters.put("input", new String[] { editedXMLFile });
+        }
+        MCREditorSession editorSession = new MCREditorSession(parameters);
+        editorSession.setID("1");
+        return editorSession;
+    }
+
+    private MCREditorSession testTransformation(String inputFile, String editedXMLFile, String expectedOutputFile, boolean justShow)
+            throws TransformerException, IOException, JDOMException, SAXException {
+        MCREditorSession editorSession = buildEditorSession(editedXMLFile);
+        testTransformation(inputFile, editedXMLFile, editorSession, expectedOutputFile, justShow);
+        return editorSession;
+    }
+
+    private void testTransformation(String inputFile, String editedXMLFile, MCREditorSession session, String expectedOutputFile,
+            boolean justShow) throws TransformerException, IOException, JDOMException, SAXException {
+        MCRParameterCollector pc = new MCRParameterCollector(false);
+        if (editedXMLFile != null) {
             pc.setParameter("input", editedXMLFile);
         }
 
-        MCREditorSession editorSession = new MCREditorSession(parameters);
-        editorSession.setID("1");
-
         MCRContent input = MCRSourceContent.getInstance("resource:" + inputFile);
-        MCRContent transformed = new MCRXEditorTransformer(editorSession, pc).transform(input);
+        MCRContent transformed = new MCRXEditorTransformer(session, pc).transform(input);
 
         if (justShow) {
             System.out.println(transformed.asString());
@@ -111,5 +124,15 @@ public class MCRXEditorTransformerTest {
         testTransformation("testI18N-editor.xml", "testBasicInputComponents-source.xml", "testI18N-transformed-en.xml", false);
         MCRSessionMgr.getCurrentSession().setCurrentLanguage("de");
         testTransformation("testI18N-editor.xml", "testBasicInputComponents-source.xml", "testI18N-transformed-de.xml", false);
+    }
+
+    @Test
+    public void testValidation() throws IOException, URISyntaxException, TransformerException, JDOMException, SAXException, ParseException {
+        MCREditorSession session = testTransformation("testValidation-editor.xml", "testBasicInputComponents-source.xml",
+                "testValidation-transformed1.xml", false);
+        assertFalse(session.validate().failed());
+        session = testTransformation("testValidation-editor.xml", null, "testValidation-transformed2.xml", false);
+        assertTrue(session.validate().failed());
+        testTransformation("testValidation-editor.xml", null, session, "testValidation-transformed3.xml", false);
     }
 }
