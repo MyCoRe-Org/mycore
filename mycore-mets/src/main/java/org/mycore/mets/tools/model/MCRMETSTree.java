@@ -33,4 +33,11 @@ public class MCRMETSTree {
 
         return gson.toJson(this);
     }
+
+    /**
+     * @param item
+     */
+    public void add(MCRMETSNode item) {
+        items.add(item);
+    }
 }

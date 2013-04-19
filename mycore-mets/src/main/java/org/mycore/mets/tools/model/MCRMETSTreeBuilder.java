@@ -1,5 +1,7 @@
 package org.mycore.mets.tools.model;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,15 +30,6 @@ public class MCRMETSTreeBuilder {
 
     final private static Logger LOGGER = Logger.getLogger(MCRMETSTreeBuilder.class);
 
-    public MCRMETSTreeBuilder(Mets mets) {
-        this.mets = mets;
-        this.tree = new MCRMETSTree();
-
-        this.idDivMap = new HashMap<String, PhysicalSubDiv>();
-        this.idFileMap = new HashMap<String, File>();
-        this.idFolderMap = new HashMap<String, MCRMETSNode>();
-    }
-
     private Mets mets;
 
     private MCRMETSTree tree;
@@ -46,6 +39,15 @@ public class MCRMETSTreeBuilder {
     private Map<String, File> idFileMap;
 
     private Map<String, MCRMETSNode> idFolderMap;
+
+    public MCRMETSTreeBuilder(Mets mets) {
+        this.mets = mets;
+        this.tree = new MCRMETSTree();
+
+        this.idDivMap = new HashMap<String, PhysicalSubDiv>();
+        this.idFileMap = new HashMap<String, File>();
+        this.idFolderMap = new HashMap<String, MCRMETSNode>();
+    }
 
     /**
      * Builds the {@link MCRMETSTree} for Metseditor. 
@@ -72,16 +74,19 @@ public class MCRMETSTreeBuilder {
         List<LogicalSubDiv> metsFolderList = logDiv.getDivContainer().getChildren();
 
         // add root node to tree
-        MCRMETSNode metsStructureFolder;
-        metsStructureFolder = new MCRMETSNode();
-        metsStructureFolder.setId(logDiv.getDivContainer().getId());
-        metsStructureFolder.setName(logDiv.getDivContainer().getLabel());
-        metsStructureFolder.setType("category");
-        metsStructureFolder.setStructureType(logDiv.getDivContainer().getType());
-        tree.items.add(metsStructureFolder);
-        idFolderMap.put(metsStructureFolder.getId(), metsStructureFolder);
+        MCRMETSNode structure = new MCRMETSNode();
+        structure.setId(logDiv.getDivContainer().getId());
+        try {
+            structure.setName(URLDecoder.decode(logDiv.getDivContainer().getLabel(), "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.error("Could not decode name", e);
+        }
+        structure.setType(MCRMETSNode.CATEGORY);
+        structure.setStructureType(logDiv.getDivContainer().getType());
+        tree.add(structure);
+        idFolderMap.put(structure.getId(), structure);
 
-        MCRMETSNode root = metsStructureFolder;
+        MCRMETSNode root = structure;
         buildFolderTree(root, metsFolderList);
 
         StructLink metsStructLink = mets.getStructLink();
@@ -104,9 +109,9 @@ public class MCRMETSTreeBuilder {
      * @param listToSort the list of Children that should be sorted.
      */
     private void sort(List<MCRMETSNode> listToSort) {
-        for (MCRMETSNode mcrmetsStructureNode : listToSort) {
-            if (mcrmetsStructureNode != null && mcrmetsStructureNode.children != null) {
-                sort(mcrmetsStructureNode.children);
+        for (MCRMETSNode structureNode : listToSort) {
+            if (structureNode != null && structureNode.children != null) {
+                sort(structureNode.children);
             }
         }
         Collections.sort(listToSort);
@@ -133,16 +138,22 @@ public class MCRMETSTreeBuilder {
         int index = path.lastIndexOf("/");
 
         destinationNode.setId(fileId);
-        destinationNode.setPath(path);
-        destinationNode.setName(path.substring(index == -1 ? 0 : index + 1));
+        String name = path.substring(index == -1 ? 0 : index + 1);
+        try {
+            destinationNode.setPath(URLDecoder.decode(path, "UTF-8"));
+            destinationNode.setName(URLDecoder.decode(name, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.error(MessageFormat.format("Could not decode path \"{0}\" or name \"{1}\"", path, name), e);
+        }
+
         destinationNode.setStructureType(fileDiv.getType());
-        destinationNode.setType("item");
+        destinationNode.setType(MCRMETSNode.ITEM);
         destinationNode.setContentIds(fileDiv.getContentids());
         destinationNode.setOrder(fileDiv.getOrder());
         destinationNode.setOrderLabel(fileDiv.getOrderLabel());
 
         if (sourceNode == null) {
-            LOGGER.error("Can´t link with " + from);
+            LOGGER.error("Cannot link with " + from);
             return;
         }
 
@@ -159,11 +170,15 @@ public class MCRMETSTreeBuilder {
         for (LogicalSubDiv metsFolder : metsFolderList) {
             MCRMETSNode metsStructureFolder = new MCRMETSNode();
             metsStructureFolder.setId(UUID.randomUUID().toString());
-            metsStructureFolder.setName(metsFolder.getLabel());
-            metsStructureFolder.setType("category");
+            try {
+                metsStructureFolder.setName(URLDecoder.decode(metsFolder.getLabel(), "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                LOGGER.error("Could not decode label " + metsFolder.getLabel(), e);
+            }
+            metsStructureFolder.setType(MCRMETSNode.CATEGORY);
             metsStructureFolder.setStructureType(metsFolder.getType());
             metsStructureFolder.setOrder(metsFolder.getOrder());
-            
+
             idFolderMap.put(metsFolder.getId(), metsStructureFolder);
             root.addChild(metsStructureFolder);
 
@@ -194,10 +209,16 @@ public class MCRMETSTreeBuilder {
                 int index = path.lastIndexOf("/");
 
                 destinationNode.setId(currentFileId);
-                destinationNode.setPath(path);
-                destinationNode.setName(path.substring(index == -1 ? 0 : index + 1));
+                String name = path.substring(index == -1 ? 0 : index + 1);
+                try {
+                    destinationNode.setPath(URLDecoder.decode(path, "UTF-8"));
+                    destinationNode.setName(URLDecoder.decode(name, "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    LOGGER.error(MessageFormat.format("Could not decode path \"{0}\" or name \"{1}\"", path, name), e);
+                }
+
                 destinationNode.setStructureType("page");
-                destinationNode.setType("item");
+                destinationNode.setType(MCRMETSNode.ITEM);
                 destinationNode.setHide(true);
 
                 root.addChild(destinationNode);

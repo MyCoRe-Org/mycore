@@ -9,11 +9,21 @@ import java.util.List;
  */
 public class MCRMETSNode implements Comparable<MCRMETSNode> {
 
-    protected String id, type, path, contentIds, orderLabel, structureType, name;
+    /**
+     * default item string
+     */
+    public static final String ITEM = "item";
 
-    protected int order;
+    /**
+     * default category string
+     */
+    public static final String CATEGORY = "category";
 
-    protected boolean hide;
+    private String id, type, path, contentIds, orderLabel, structureType, name;
+
+    private int order;
+
+    private boolean hide;
 
     protected List<MCRMETSNode> children;
 
@@ -54,6 +64,7 @@ public class MCRMETSNode implements Comparable<MCRMETSNode> {
 
     /**
      * @param path
+     * 
      */
     public void setPath(String path) {
         this.path = path;
@@ -83,6 +94,10 @@ public class MCRMETSNode implements Comparable<MCRMETSNode> {
         return name;
     }
 
+    /**
+     * @param name
+     * 
+     */
     public void setName(String name) {
         this.name = name;
     }
@@ -137,7 +152,7 @@ public class MCRMETSNode implements Comparable<MCRMETSNode> {
         if (children == null) {
             children = new ArrayList<MCRMETSNode>();
         }
-        getChildren().add(node);
+        children.add(node);
     }
 
     /**

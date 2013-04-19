@@ -20,7 +20,6 @@ package org.mycore.mets.servlets;
 
 import java.io.PrintWriter;
 import java.util.HashSet;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,13 +29,10 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
-import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.mets.model.MCRMETSGenerator;
-import org.mycore.mets.model.Mets;
 import org.mycore.mets.tools.MCRJSONProvider;
-import org.mycore.mets.tools.MCRMetsSave;
 
 /**
  * This servlet provides the data in json format for the dijit tree at the
