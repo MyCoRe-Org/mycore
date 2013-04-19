@@ -31,7 +31,7 @@ public class MCRMycoreObjectSolrXSLTest {
 
     @Test
     public void singleTransform() throws JDOMException, IOException, TransformerFactoryConfigurationError, TransformerException {
-        String testFilePath = File.separator + getClass().getSimpleName() + File.separator + "oneObj.xml";
+        String testFilePath = "/" + getClass().getSimpleName() + "/oneObj.xml";
         InputStream testXMLAsStream = getClass().getResourceAsStream(testFilePath);
 
         JDOMResult jdomResult = xslTransformation(testXMLAsStream);
@@ -53,7 +53,7 @@ public class MCRMycoreObjectSolrXSLTest {
 
     @Test
     public void multiTransform() throws JDOMException, IOException, TransformerFactoryConfigurationError, TransformerException {
-        String testFilePath = File.separator + getClass().getSimpleName() + File.separator + "multiplObj.xml";
+        String testFilePath = "/" + getClass().getSimpleName() + "/multiplObj.xml";
         InputStream testXMLAsStream = getClass().getResourceAsStream(testFilePath);
 
         JDOMResult jdomResult = xslTransformation(testXMLAsStream);
@@ -114,8 +114,8 @@ public class MCRMycoreObjectSolrXSLTest {
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
-            String testFilePath = File.separator + MCRMycoreObjectSolrXSLTest.class.getSimpleName() + File.separator
-                    + "mockClassification.xml";
+            String testFilePath = "/" + MCRMycoreObjectSolrXSLTest.class.getSimpleName() 
+                    + "/mockClassification.xml";
             InputStream testXMLAsStream = getClass().getResourceAsStream(testFilePath);
             return new StreamSource(testXMLAsStream);
         }
