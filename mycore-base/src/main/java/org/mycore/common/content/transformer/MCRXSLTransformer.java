@@ -82,7 +82,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     private static MCRCache<String, MCRXSLTransformer> INSTANCE_CACHE = new MCRCache<String, MCRXSLTransformer>(100,
         "MCRXSLTransformer instance cache");
 
-    private static long CHECK_PERIOD = MCRConfiguration.instance().getLong("MCR.LayoutService.LastModifiedCheckPeriod", 10000);
+    private static long CHECK_PERIOD = MCRConfiguration.instance().getLong("MCR.LayoutService.LastModifiedCheckPeriod", 60000);
 
     /** The compiled XSL stylesheet */
     protected MCRTemplatesSource[] templateSources;
@@ -91,7 +91,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     protected long[] modified;
 
-    protected long[] modifiedChecked;
+    protected long modifiedChecked;
 
     protected SAXTransformerFactory tFactory;
 
@@ -138,27 +138,25 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             this.templateSources[i] = new MCRTemplatesSource(stylesheets[i].trim());
         }
         this.modified = new long[templateSources.length];
-        this.modifiedChecked = new long[templateSources.length];
+        this.modifiedChecked = 0;
         this.templates = new Templates[templateSources.length];
     }
 
     private void checkTemplateUptodate() throws TransformerConfigurationException, SAXException {
-        for (int i = 0; i < templateSources.length; i++) {
-            long lastModifiedChecked = modifiedChecked[i];
-            boolean check = System.currentTimeMillis() - lastModifiedChecked > CHECK_PERIOD;
-            long lastModified = modified[i];
-            if (check) {
-                lastModified = templateSources[i].getLastModified();
-                modifiedChecked[i] = System.currentTimeMillis();
-            }
-            if (templates[i] == null || modified[i] < lastModified) {
-                SAXSource source = templateSources[i].getSource();
-                templates[i] = tFactory.newTemplates(source);
-                if (templates[i] == null) {
-                    throw new TransformerConfigurationException("XSLT Stylesheet could not be compiled: " + templateSources[i].getURL());
+        boolean check = System.currentTimeMillis() - modifiedChecked > CHECK_PERIOD;
+        if (check) {
+            for (int i = 0; i < templateSources.length; i++) {
+                long lastModified = templateSources[i].getLastModified();
+                if (templates[i] == null || modified[i] < lastModified) {
+                    SAXSource source = templateSources[i].getSource();
+                    templates[i] = tFactory.newTemplates(source);
+                    if (templates[i] == null) {
+                        throw new TransformerConfigurationException("XSLT Stylesheet could not be compiled: " + templateSources[i].getURL());
+                    }
+                    modified[i] = lastModified;
                 }
-                modified[i] = lastModified;
             }
+            modifiedChecked = System.currentTimeMillis();
         }
     }
 
