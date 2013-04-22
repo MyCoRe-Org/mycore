@@ -16,6 +16,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.MCRSolrIndexer;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
+import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 
 /**
@@ -61,7 +62,7 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
         LOGGER.info("Sending files (" + files.size() + ") for derivate \"" + getID() + "\"");
         for (MCRFile file : files) {
             try {
-                this.subHandlerList.add(MCRSolrIndexer.getIndexHandler(file, this.solrServer));
+                this.subHandlerList.add(MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(file, this.solrServer));
             } catch (Exception ex) {
                 LOGGER.error("Error creating transfer thread", ex);
             }

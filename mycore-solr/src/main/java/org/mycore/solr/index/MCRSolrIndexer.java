@@ -19,30 +19,17 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.common.events.MCREvent;
-import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.MCRSolrServerFactory;
-import org.mycore.solr.index.cs.MCRSolrContentStream;
-import org.mycore.solr.index.cs.MCRSolrFileContentStream;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
 import org.mycore.solr.index.handlers.MCRSolrOptimizeIndexHandler;
-import org.mycore.solr.index.handlers.stream.MCRSolrDefaultIndexHandler;
-import org.mycore.solr.index.handlers.stream.MCRSolrFileIndexHandler;
 import org.mycore.solr.index.handlers.stream.MCRSolrFilesIndexHandler;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
-import org.mycore.solr.index.strategy.MCRSolrIndexStrategyManager;
 import org.mycore.util.concurrent.MCRListeningPriorityExecutorService;
 
 import com.google.common.util.concurrent.FutureCallback;
@@ -54,11 +41,8 @@ import com.google.common.util.concurrent.ListeningExecutorService;
  * @author shermann
  * @author Matthias Eichner
  */
-public class MCRSolrIndexer extends MCREventHandlerBase {
+public class MCRSolrIndexer {
     private static final Logger LOGGER = Logger.getLogger(MCRSolrIndexer.class);
-
-    /** The Server used for indexing. */
-    final static SolrServer DEFAULT_SOLR_SERVER = MCRSolrServerFactory.getSolrServer();
 
     /** The executer service used for submitting the index requests. */
     final static ListeningExecutorService EXECUTOR_SERVICE;
@@ -101,105 +85,6 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
 
     private static final int BATCH_AUTO_COMMIT_WITHIN_MS = 60000;
 
-    @Override
-    synchronized protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        this.handleMCRBaseCreated(evt, obj);
-    }
-
-    @Override
-    synchronized protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        this.handleMCRBaseCreated(evt, obj);
-    }
-
-    @Override
-    protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
-        this.handleMCRBaseCreated(evt, obj);
-    }
-
-    @Override
-    synchronized protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
-        MCRSolrIndexer.deleteByIdFromSolr(obj.getId().toString());
-    }
-
-    @Override
-    protected void handleDerivateCreated(MCREvent evt, MCRDerivate derivate) {
-        this.handleMCRBaseCreated(evt, derivate);
-    }
-
-    @Override
-    protected void handleDerivateUpdated(MCREvent evt, MCRDerivate derivate) {
-        this.handleMCRBaseCreated(evt, derivate);
-    }
-
-    @Override
-    protected void handleDerivateRepaired(MCREvent evt, MCRDerivate derivate) {
-        this.handleMCRBaseCreated(evt, derivate);
-    }
-
-    @Override
-    protected void handleDerivateDeleted(MCREvent evt, MCRDerivate derivate) {
-        MCRSolrIndexer.deleteByIdFromSolr(derivate.getId().toString());
-    }
-
-    synchronized protected void handleMCRBaseCreated(MCREvent evt, MCRBase objectOrDerivate) {
-        long tStart = System.currentTimeMillis();
-        try {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId().toString() + "\" for indexing");
-            }
-            MCRContent content = (MCRContent) evt.get("content");
-            if (content == null) {
-                content = new MCRBaseContent(objectOrDerivate);
-            }
-            MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(content, objectOrDerivate.getId());
-            indexHandler.setCommitWithin(1000);
-            submitIndexHandler(indexHandler, 10);
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId().toString() + "\" for indexing done in "
-                    + (System.currentTimeMillis() - tStart) + "ms ");
-            }
-        } catch (Exception ex) {
-            LOGGER.error("Error creating transfer thread for object " + objectOrDerivate, ex);
-        }
-    }
-
-    @Override
-    protected void handleFileCreated(MCREvent evt, MCRFile file) {
-        try {
-            submitIndexHandler(getIndexHandler(file, DEFAULT_SOLR_SERVER));
-        } catch (Exception ex) {
-            LOGGER.error("Error creating transfer thread for file " + file.toString(), ex);
-        }
-    }
-
-    public static MCRSolrIndexHandler getIndexHandler(MCRFile file, SolrServer solrServer) throws IOException {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Solr: submitting file \"" + file.getAbsolutePath() + " (" + file.getID() + ")\" for indexing");
-        }
-        MCRSolrIndexHandler indexHandler;
-        long start = System.currentTimeMillis();
-        if (MCRSolrIndexStrategyManager.checkFile(file)) {
-            /* extract metadata with tika */
-            indexHandler = new MCRSolrFileIndexHandler(new MCRSolrFileContentStream(file), solrServer);
-        } else {
-            MCRSolrContentStream contentStream = new MCRSolrContentStream(file.getID(), new MCRJDOMContent(file.createXML()));
-            indexHandler = new MCRSolrDefaultIndexHandler(contentStream, solrServer);
-        }
-        long end = System.currentTimeMillis();
-        indexHandler.getStatistic().addTime(end - start);
-        return indexHandler;
-    }
-
-    @Override
-    protected void handleFileUpdated(MCREvent evt, MCRFile file) {
-        this.handleFileCreated(evt, file);
-    }
-
-    @Override
-    protected void handleFileDeleted(MCREvent evt, MCRFile file) {
-        MCRSolrIndexer.deleteByIdFromSolr(file.getID());
-    }
-
     /**
      * @param solrID
      * @return
@@ -207,12 +92,13 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
      * @see {@link HttpSolrServer#deleteById(String)}
      */
     synchronized public static UpdateResponse deleteByIdFromSolr(String solrID) {
+        SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
         UpdateResponse updateResponse = null;
         long start = System.currentTimeMillis();
         try {
             LOGGER.info("Deleting \"" + solrID + "\" from solr");
-            updateResponse = DEFAULT_SOLR_SERVER.deleteById(solrID);
-            DEFAULT_SOLR_SERVER.commit();
+            updateResponse = solrServer.deleteById(solrID);
+            solrServer.commit();
         } catch (Exception e) {
             LOGGER.error("Error deleting document from solr", e);
         }
@@ -302,7 +188,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
      * Rebuilds solr's content index.
      */
     public static void rebuildContentIndex() {
-        rebuildContentIndex(DEFAULT_SOLR_SERVER, MCRXMLMetadataManager.instance().listIDsOfType("derivate"));
+        rebuildContentIndex(MCRSolrServerFactory.getSolrServer(), MCRXMLMetadataManager.instance().listIDsOfType("derivate"));
     }
 
     public static void rebuildContentIndex(SolrServer solrServer) {
@@ -316,7 +202,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
      * @param list containing mycore object id's
      */
     public static void rebuildContentIndex(List<String> list) {
-        rebuildContentIndex(DEFAULT_SOLR_SERVER, list);
+        rebuildContentIndex(MCRSolrServerFactory.getSolrServer(), list);
     }
 
     /**
@@ -349,7 +235,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
      * 
      * @param indexHandler index handler to submit
      */
-    protected static void submitIndexHandler(MCRSolrIndexHandler indexHandler) {
+    public static void submitIndexHandler(MCRSolrIndexHandler indexHandler) {
         submitIndexHandler(indexHandler, 0);
     }
 
@@ -359,84 +245,9 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
      * @param indexHandler index handler to submit
      * @param priority priority
      */
-    protected static void submitIndexHandler(MCRSolrIndexHandler indexHandler, int priority) {
+    public static void submitIndexHandler(MCRSolrIndexHandler indexHandler, int priority) {
         ListenableFuture<List<MCRSolrIndexHandler>> future = EXECUTOR_SERVICE.submit(new MCRSolrIndexTask(indexHandler, priority));
         Futures.addCallback(future, new FutureIndexHandlerCallback());
-    }
-
-    /**
-     * Callback to handle a IndexHandlers future non blocking. 
-     */
-    private static class FutureIndexHandlerCallback implements FutureCallback<List<MCRSolrIndexHandler>> {
-        public FutureIndexHandlerCallback() {
-            FUTURE_COUNTER.add();
-        }
-
-        @Override
-        public void onFailure(Throwable t) {
-            LOGGER.error("unable to submit tasks", t);
-            FUTURE_COUNTER.remove();
-        }
-
-        @Override
-        public void onSuccess(List<MCRSolrIndexHandler> indexHandlers) {
-            try {
-                for (MCRSolrIndexHandler subHandler : indexHandlers) {
-                    try {
-                        submitIndexHandler(subHandler);
-                    } catch (Exception exc) {
-                        LOGGER.error("unable to submit tasks", exc);
-                    }
-                }
-            } finally {
-                FUTURE_COUNTER.remove();
-            }
-        }
-
-    }
-
-    private static class FutureIndexHandlerCounter implements Closeable {
-        AtomicLong awaitingEvents = new AtomicLong();
-
-        Runnable onShutdown;
-
-        public FutureIndexHandlerCounter(Runnable onShutdown) {
-            this.onShutdown = onShutdown;
-            MCRShutdownHandler.getInstance().addCloseable(this);
-        }
-
-        @Override
-        public void prepareClose() {
-        }
-
-        @Override
-        public void close() {
-            while (awaitingEvents.get() != 0) {
-                LOGGER.info("Waiting for " + awaitingEvents.get() + " task to complete.");
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    Thread.yield();
-                }
-            }
-            if (onShutdown != null) {
-                onShutdown.run();
-            }
-        }
-
-        @Override
-        public int getPriority() {
-            return Closeable.DEFAULT_PRIORITY;
-        }
-
-        public void add() {
-            awaitingEvents.incrementAndGet();
-        }
-
-        public void remove() {
-            awaitingEvents.decrementAndGet();
-        }
-
     }
 
     /**
@@ -453,7 +264,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
      */
     public static void dropIndex() throws Exception {
         LOGGER.info("Dropping solr index...");
-        DEFAULT_SOLR_SERVER.deleteByQuery("*:*");
+        MCRSolrServerFactory.getSolrServer().deleteByQuery("*:*");
         LOGGER.info("Dropping solr index...done");
     }
 
@@ -468,7 +279,7 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         }
 
         LOGGER.info("Dropping solr index for type " + type + "...");
-        DEFAULT_SOLR_SERVER.deleteByQuery("+objectType:" + type);
+        MCRSolrServerFactory.getSolrServer().deleteByQuery("+objectType:" + type);
         LOGGER.info("Dropping solr index for type " + type + "...done");
     }
 
@@ -483,6 +294,81 @@ public class MCRSolrIndexer extends MCREventHandlerBase {
         } catch (Exception ex) {
             LOGGER.error("Could not optimize solr index", ex);
         }
+    }
+
+    /**
+     * Callback to handle a IndexHandlers future non blocking. 
+     */
+    private static class FutureIndexHandlerCallback implements FutureCallback<List<MCRSolrIndexHandler>> {
+        public FutureIndexHandlerCallback() {
+            FUTURE_COUNTER.add();
+        }
+    
+        @Override
+        public void onFailure(Throwable t) {
+            LOGGER.error("unable to submit tasks", t);
+            FUTURE_COUNTER.remove();
+        }
+    
+        @Override
+        public void onSuccess(List<MCRSolrIndexHandler> indexHandlers) {
+            try {
+                for (MCRSolrIndexHandler subHandler : indexHandlers) {
+                    try {
+                        submitIndexHandler(subHandler);
+                    } catch (Exception exc) {
+                        LOGGER.error("unable to submit tasks", exc);
+                    }
+                }
+            } finally {
+                FUTURE_COUNTER.remove();
+            }
+        }
+    
+    }
+
+    private static class FutureIndexHandlerCounter implements Closeable {
+        AtomicLong awaitingEvents = new AtomicLong();
+    
+        Runnable onShutdown;
+    
+        public FutureIndexHandlerCounter(Runnable onShutdown) {
+            this.onShutdown = onShutdown;
+            MCRShutdownHandler.getInstance().addCloseable(this);
+        }
+    
+        @Override
+        public void prepareClose() {
+        }
+    
+        @Override
+        public void close() {
+            while (awaitingEvents.get() != 0) {
+                LOGGER.info("Waiting for " + awaitingEvents.get() + " task to complete.");
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    Thread.yield();
+                }
+            }
+            if (onShutdown != null) {
+                onShutdown.run();
+            }
+        }
+    
+        @Override
+        public int getPriority() {
+            return Closeable.DEFAULT_PRIORITY;
+        }
+    
+        public void add() {
+            awaitingEvents.incrementAndGet();
+        }
+    
+        public void remove() {
+            awaitingEvents.decrementAndGet();
+        }
+    
     }
 
 }
