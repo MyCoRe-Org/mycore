@@ -2,16 +2,6 @@
 <!-- **************************************************************** -->
 <!-- Servlets and mappings of metsmods -->
 <!-- **************************************************************** -->
-<servlet id="MCRStartMetsMods">
-    <servlet-name>MCRStartMetsModsServlet</servlet-name>
-    <servlet-class>org.mycore.frontend.servlets.MCRStartMetsModsServlet</servlet-class>
-</servlet>
-
-<servlet-mapping>
-    <servlet-name>MCRStartMetsModsServlet</servlet-name>
-    <url-pattern>/servlets/MCRStartMetsModsServlet</url-pattern>
-</servlet-mapping>
-
 <servlet id="SaveMetsServlet">
     <servlet-name>SaveMetsServlet</servlet-name>
     <servlet-class>org.mycore.mets.servlets.MCRSaveMETSServlet</servlet-class>

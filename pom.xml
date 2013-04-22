@@ -1240,7 +1240,6 @@
     <module>mycore-webservices</module>
     <module>mycore-wfc</module>
     <module>mycore-z3950</module>
-    <module>mycore-zoomify</module>
     <module>mycore-solr</module>
     <module>mycore-xeditor</module>
     <module>mycore-complete</module>

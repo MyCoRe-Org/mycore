@@ -20,10 +20,7 @@
 
 package org.mycore.frontend.cli;
 
-import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -34,14 +31,12 @@ import javax.xml.transform.TransformerFactory;
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
+import org.jdom2.Namespace;
+import org.jdom2.filter.Filters;
 import org.jdom2.transform.JDOMResult;
-import org.jdom2.xpath.XPath;
-import org.mycore.common.MCRConfiguration;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRUtils;
-import org.mycore.common.content.MCRFileContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -52,11 +47,8 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectStructure;
-import org.mycore.frontend.metsmods.MCRMetsModsUtil;
 import org.mycore.mets.tools.MCRMetsResolver;
 import org.mycore.mets.tools.MCRMetsSave;
-import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryCondition;
@@ -78,14 +70,6 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
 
     private static Logger LOGGER = Logger.getLogger(MCRMetsModsCommands.class);
 
-    private static MCRConfiguration CONFIG = MCRConfiguration.instance();
-
-    private static String known_image_list = CONFIG.getString("MCR.Component.MetsMods.allowed", "");
-
-    private static String metsfile = CONFIG.getString("MCR.MetsMots.ConfigFile", "mets.xml");
-
-    private static String activated = CONFIG.getString("MCR.Component.MetsMods.activated", "");
-
     /**
      * 
      */
@@ -93,24 +77,6 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         super();
 
         MCRCommand com = null;
-
-        com = new MCRCommand("build mets files for type {0}", "org.mycore.frontend.cli.MCRMetsModsCommands.buildMetsForType String",
-                "Create the mets.xml file in the derivate directory of given type.");
-        addCommand(com);
-
-        com = new MCRCommand("build mets files for Object {0}",
-                "org.mycore.frontend.cli.MCRMetsModsCommands.buildMetsForMCRObjectID String",
-                "Create the mets.xml file for all derivates for the given object ID.");
-        addCommand(com);
-
-        com = new MCRCommand("build mets files for Derivate {0}",
-                "org.mycore.frontend.cli.MCRMetsModsCommands.buildMetsForMCRDerivateID String",
-                "Create the mets.xml file in the derivate of the given derivate ID.");
-        addCommand(com);
-
-        com = new MCRCommand("build mets files", "org.mycore.frontend.cli.MCRMetsModsCommands.buildMets",
-                "Create the mets.xml file in the derivate directory.");
-        addCommand(com);
 
         com = new MCRCommand("check mets files for type {0} with exclude label {1}",
                 "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForType String String", "Check mets files for given type.");
@@ -124,12 +90,12 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
                 "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForMCRObjectID String String", "Check mets files for given object.");
         addCommand(com);
 
-        com = new MCRCommand("check mets files for Object {0}",
-                "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForMCRObjectID String", "Check mets files for given object ID.");
+        com = new MCRCommand("check mets files for Object {0}", "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForMCRObjectID String",
+                "Check mets files for given object ID.");
         addCommand(com);
 
-        com = new MCRCommand("check mets files for Derivate {0}",
-                "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForMCRDerivateID String", "Check mets files for given derivate ID.");
+        com = new MCRCommand("check mets files for Derivate {0}", "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForMCRDerivateID String",
+                "Check mets files for given derivate ID.");
         addCommand(com);
 
         com = new MCRCommand("check mets files", "org.mycore.frontend.cli.MCRMetsModsCommands.checkMets", "Check the mets.xml file.");
@@ -138,132 +104,9 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         com = new MCRCommand("remove mets files", "org.mycore.frontend.cli.MCRMetsModsCommands.removeMets", "Remove all mets files.");
         addCommand(com);
 
-        com = new MCRCommand("add file {0} to mets document in {1}",
-                "org.mycore.frontend.cli.MCRMetsModsCommands.addFileToMets String String",
+        com = new MCRCommand("add file {0} to mets document in {1}", "org.mycore.frontend.cli.MCRMetsModsCommands.addFileToMets String String",
                 "Adds the given file with name {0} to the mets document contained in derivate {1}.");
         addCommand(com);
-    }
-
-    /**
-     * The command build mets.xml files in the derivates if it does not exist
-     * and the content are images.
-     */
-    public static void buildMets() throws Exception {
-        LOGGER.info("Build all METS files start.");
-        final long start = System.currentTimeMillis();
-        List<String> derlist = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
-        for (String der : derlist) {
-            buildMetsForMCRDerivateID(der);
-        }
-        LOGGER.info("Build all METS files took " + (System.currentTimeMillis() - start) + "ms.");
-    }
-
-    /*
-     * The command look for derivates with images and build mets.xml files if it
-     * not exist for all MCRObjects of the given type.
-     * 
-     * @param type the data type of the MCRObjectIDs
-     */
-    public static void buildMetsForType(String type) {
-        LOGGER.info("Build METS file for type " + type + " start.");
-        final long start = System.currentTimeMillis();
-        MCRQueryCondition fromcond = new MCRQueryCondition("objectType", "=", type);
-        MCRQuery fromquery = new MCRQuery(fromcond);
-        MCRResults fromresult = MCRQueryManager.search(fromquery);
-        for (MCRHit fromhit : fromresult) {
-            String fromid = fromhit.getID();
-            buildMetsForMCRObjectID(fromid);
-        }
-        LOGGER.info("Build METS file for type " + type + " took " + (System.currentTimeMillis() - start) + "ms.");
-    }
-
-    /*
-     * The command look for derivates with images and build mets.xml files if it
-     * not exist for a given MCRObject.
-     * 
-     * @param MCRID the MCRObjectID to check and build
-     */
-    public static void buildMetsForMCRObjectID(String MCRID) {
-        LOGGER.info("Build METS file for ID " + MCRID + " start.");
-        final long start = System.currentTimeMillis();
-        MCRObject mcrobj = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(MCRID));
-        MCRObjectStructure structure = mcrobj.getStructure();
-        List<MCRMetaLinkID> derivates = structure.getDerivates();
-        for (MCRMetaLinkID mcrder : derivates) {
-            LOGGER.debug("For ID " + MCRID + " found derivate " + mcrder.getXLinkHref());
-            buildMetsForMCRDerivateID(mcrder.getXLinkHrefID().toString());
-        }
-        LOGGER.debug("Build METS file for ID " + MCRID + " took " + (System.currentTimeMillis() - start) + "ms.");
-    }
-
-    /*
-     * The command build a mets.xml file for a given MCRDerivate if it does not
-     * exist and the derivate contains images.
-     * 
-     * @param MCRID the MCRObjectID
-     */
-    public static void buildMetsForMCRDerivateID(String MCRID) {
-        String baseurl = MCRConfiguration.instance().getString("MCR.baseurl", "http://127.0.0.1:8080");
-        LOGGER.debug("Build METS file for ID " + MCRID + "  start.");
-        final long start = System.currentTimeMillis();
-        MCRDerivate derxml = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(MCRID));
-        MCRObjectID docid = derxml.getDerivate().getMetaLink().getXLinkHrefID();
-        MCRDirectory difs = MCRDirectory.getRootDirectory(MCRID);
-        if (difs != null) {
-            MCRFilesystemNode mets = difs.getChild("mets.xml");
-            if (mets == null) {
-                LOGGER.warn("No mets.xml file was found for " + docid.toString() + " in " + MCRID + ".");
-                MCRFilesystemNode[] fsnode = difs.getChildren();
-                boolean checkimage = false;
-                for (MCRFilesystemNode aFsnode : fsnode) {
-                    StringTokenizer st = new StringTokenizer(known_image_list, ",");
-                    while (st.hasMoreElements()) {
-                        if (aFsnode.getName().endsWith(st.nextToken())) {
-                            checkimage = true;
-                            break;
-                        }
-                    }
-                    if (checkimage)
-                        break;
-                }
-                if (checkimage) {
-                    LOGGER.debug("Start create mets.xml");
-                    ArrayList<String> pic_list = new ArrayList<String>();
-                    addPicturesToList(difs, pic_list);
-                    Collections.sort(pic_list);
-
-                    MCRMetsModsUtil mmu = new MCRMetsModsUtil();
-                    Element new_mets_file = mmu.createNewMetsFile(MCRID);
-                    if (activated.contains("CONTENTIDS"))
-                        new_mets_file = mmu.createMetsElement(pic_list, new_mets_file, baseurl + "servlets/MCRFileNodeServlet", baseurl
-                                + "receive/" + docid);
-                    else
-                        new_mets_file = mmu.createMetsElement(pic_list, new_mets_file, baseurl + "servlets/MCRFileNodeServlet");
-
-                    if (LOGGER.isDebugEnabled()) {
-                        MCRUtils.writeElementToSysout(new_mets_file);
-                    }
-                    try {
-                        XMLOutputter xmlout = new XMLOutputter(Format.getPrettyFormat());
-                        String full_mets = xmlout.outputString(new_mets_file);
-                        LOGGER.debug("storing new mets file...");
-                        MCRFile file = new MCRFile(metsfile, difs);
-                        ByteArrayInputStream bais = new ByteArrayInputStream(full_mets.getBytes());
-                        long sizeDiff = file.setContentFrom(bais, false);
-                        file.storeContentChange(sizeDiff);
-                    } catch (Exception e) {
-                        if (LOGGER.isDebugEnabled()) {
-                            e.printStackTrace();
-                        } else {
-                            LOGGER.error("Error while storing new mets file...", e);
-                        }
-                    }
-                }
-            }
-        } else {
-            LOGGER.debug("mets.xml exist");
-        }
-        LOGGER.debug("Build METS file for ID " + MCRID + " took " + (System.currentTimeMillis() - start) + "ms.");
     }
 
     public static void checkMetsForType(String type) {
@@ -401,8 +244,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
     }
 
     public static void fixExistingMets() throws Exception {
-        MCRCondition urnCond = new MCRQueryParser().parse("objectsWithURN = true");
-        MCRQuery q = new MCRQuery(urnCond);
+        MCRQuery q = new MCRQuery(new MCRQueryParser().parse("objectsWithURN = true"));
         MCRResults result = MCRQueryManager.search(q);
 
         for (MCRHit hit : result) {
@@ -447,28 +289,16 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         LOGGER.debug("Remove METS file request took " + (System.currentTimeMillis() - start) + "ms.");
     }
 
-    private static void addPicturesToList(MCRDirectory dir, ArrayList<String> list) {
-        for (int i = 0; i < dir.getChildren().length; i++) {
-            try {
-                dir = (MCRDirectory) dir.getChildren()[i];
-                addPicturesToList(dir, list);
-            } catch (Exception ClassCastException) {
-                if (!list.contains(dir.getPath() + "/" + ((MCRFile) dir.getChildren()[i]).getName()))
-                    list.add(dir.getPath() + "/" + ((MCRFile) dir.getChildren()[i]).getName());
-            }
-        }
-    }
-
     /**
-     * This method adds the given file to the mets document. If the filename is
-     * already present in the mets file nothing is done. If there no mets file
-     * within the given derivate nothing is done.
-     * 
-     * @param filename
-     *            the name of the file to add
-     * @param derivate
-     *            the derivate where the mets file is located
-     */
+      * This method adds the given file to the mets document. If the filename is
+      * already present in the mets file nothing is done. If there no mets file
+      * within the given derivate nothing is done.
+      * 
+      * @param filename
+      *            the name of the file to add
+      * @param derivate
+      *            the derivate where the mets file is located
+      */
     public static void addFileToMets(String filename, String derivate) {
         LOGGER.info("Adding file " + filename + " to mets file in " + derivate);
         if (filename == null || filename.length() == 0 || derivate == null || derivate.length() == 0) {
@@ -514,13 +344,12 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         if (mets == null) {
             return false;
         }
-
-        XPath xp = XPath.newInstance("mets:mets/mets:fileSec/mets:fileGrp[@USE='MASTER']/mets:file/mets:FLocat[@xlink:href='" + filename
-                + "']");
-        xp.addNamespace(MCRConstants.METS_NAMESPACE);
-        xp.addNamespace(MCRConstants.XLINK_NAMESPACE);
-
-        Object obj = xp.selectSingleNode(mets);
+        ArrayList<Namespace> al = new ArrayList<Namespace>();
+        al.add(MCRConstants.METS_NAMESPACE);
+        al.add(MCRConstants.XLINK_NAMESPACE);
+        XPathFactory xpf = XPathFactory.instance();
+        XPathExpression<Element> obj = xpf.compile("mets:mets/mets:fileSec/mets:fileGrp[@USE='MASTER']/mets:file/mets:FLocat[@xlink:href='" + filename + "']",
+                Filters.element(), null, al);
         return obj != null;
 
     }
