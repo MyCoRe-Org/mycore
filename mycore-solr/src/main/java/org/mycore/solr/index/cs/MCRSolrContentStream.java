@@ -6,8 +6,10 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
+import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.datamodel.metadata.MCRBase;
 
 import com.google.common.base.Charsets;
@@ -21,6 +23,13 @@ import com.google.common.base.Charsets;
 public class MCRSolrContentStream extends MCRSolrAbstractContentStream<MCRContent> {
 
     final static Logger LOGGER = Logger.getLogger(MCRSolrContentStream.class);
+
+    private final static MCRXSLTransformer TRANSFORMER;
+
+    static {
+        String stylesheet = MCRConfiguration.instance().getString("MCR.Module-solr.cs.stylesheet", "xsl/mycoreobject-solr.xsl");
+        TRANSFORMER = new MCRXSLTransformer(stylesheet);
+    }
 
     /**
      * @param objectOrDerivate
@@ -46,8 +55,8 @@ public class MCRSolrContentStream extends MCRSolrAbstractContentStream<MCRConten
         this.setInputStream(new ByteArrayInputStream(byteArray));
     }
 
-    public MCRContentTransformer getTransformer() {
-        return MCRSolrAppender.getTransformer();
+    public static MCRContentTransformer getTransformer() {
+        return TRANSFORMER;
     }
 
 }

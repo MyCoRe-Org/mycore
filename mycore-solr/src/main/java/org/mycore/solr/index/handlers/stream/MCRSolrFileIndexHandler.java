@@ -59,7 +59,7 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
         updateRequest.setParam("literal.objectType", "data_file");
         updateRequest.setParam("literal.fileName", file.getName());
         updateRequest.setParam("literal.objectProject", MCRObjectID.getInstance(file.getOwnerID()).getProjectId());
-        updateRequest.setParam("literal.fileDateModified", DATE_FORMATTER.format(file.getLastModified().getTime()));
+        updateRequest.setParam("literal.modified", DATE_FORMATTER.format(file.getLastModified().getTime()));
         //set tika fields
         updateRequest.setParam("literal.stream_size", String.valueOf(fileContentStream.getSize()));
         updateRequest.setParam("literal.stream_source_info", fileContentStream.getSourceInfo());
