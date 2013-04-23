@@ -23,13 +23,9 @@
 
 package org.mycore.solr.index;
 
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServer;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -37,12 +33,7 @@ import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.solr.MCRSolrServerFactory;
-import org.mycore.solr.index.cs.MCRSolrContentStream;
-import org.mycore.solr.index.cs.MCRSolrFileContentStream;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
-import org.mycore.solr.index.handlers.stream.MCRSolrDefaultIndexHandler;
-import org.mycore.solr.index.handlers.stream.MCRSolrFileIndexHandler;
-import org.mycore.solr.index.strategy.MCRSolrIndexStrategyManager;
 
 /**
  * @author Thomas Scheffler (yagee)

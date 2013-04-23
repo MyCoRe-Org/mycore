@@ -27,15 +27,12 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
-import org.jdom2.Element;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.fieldquery.MCRFieldValue;

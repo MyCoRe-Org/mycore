@@ -33,7 +33,6 @@ import javax.xml.bind.Unmarshaller;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
-import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;

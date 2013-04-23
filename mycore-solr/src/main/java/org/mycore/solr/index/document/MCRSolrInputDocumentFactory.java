@@ -25,13 +25,9 @@ package org.mycore.solr.index.document;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.solr.common.SolrInputDocument;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
