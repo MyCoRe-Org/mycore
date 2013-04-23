@@ -3,6 +3,8 @@
  */
 package org.mycore.solr.index;
 
+import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
+
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -49,8 +51,13 @@ public class MCRSolrIndexer {
 
     private final static FutureIndexHandlerCounter FUTURE_COUNTER;
 
+    /** Specify how many documents will be submitted to solr at a time when rebuilding the metadata index. Default is 100. */
+    final static int BULK_SIZE = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Indexer.BulkSize", 100);
+
+    private static final int BATCH_AUTO_COMMIT_WITHIN_MS = 60000;
+
     static {
-        int poolSize = MCRConfiguration.instance().getInt("MCR.Module-solr.Indexer.ThreadCount", 4);
+        int poolSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Indexer.ThreadCount", 4);
         final MCRListeningPriorityExecutorService executorService = new MCRListeningPriorityExecutorService(new ThreadPoolExecutor(
             poolSize, poolSize, 0L, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>()));
         Runnable onShutdown = new Runnable() {
@@ -79,11 +86,6 @@ public class MCRSolrIndexer {
         FUTURE_COUNTER = new FutureIndexHandlerCounter(onShutdown);
         EXECUTOR_SERVICE = executorService;
     }
-
-    /** Specify how many documents will be submitted to solr at a time when rebuilding the metadata index. Default is 100. */
-    final static int BULK_SIZE = MCRConfiguration.instance().getInt("MCR.Module-solr.bulk.size", 100);
-
-    private static final int BATCH_AUTO_COMMIT_WITHIN_MS = 60000;
 
     /**
      * @param solrID
@@ -303,13 +305,13 @@ public class MCRSolrIndexer {
         public FutureIndexHandlerCallback() {
             FUTURE_COUNTER.add();
         }
-    
+
         @Override
         public void onFailure(Throwable t) {
             LOGGER.error("unable to submit tasks", t);
             FUTURE_COUNTER.remove();
         }
-    
+
         @Override
         public void onSuccess(List<MCRSolrIndexHandler> indexHandlers) {
             try {
@@ -324,23 +326,23 @@ public class MCRSolrIndexer {
                 FUTURE_COUNTER.remove();
             }
         }
-    
+
     }
 
     private static class FutureIndexHandlerCounter implements Closeable {
         AtomicLong awaitingEvents = new AtomicLong();
-    
+
         Runnable onShutdown;
-    
+
         public FutureIndexHandlerCounter(Runnable onShutdown) {
             this.onShutdown = onShutdown;
             MCRShutdownHandler.getInstance().addCloseable(this);
         }
-    
+
         @Override
         public void prepareClose() {
         }
-    
+
         @Override
         public void close() {
             while (awaitingEvents.get() != 0) {
@@ -355,20 +357,20 @@ public class MCRSolrIndexer {
                 onShutdown.run();
             }
         }
-    
+
         @Override
         public int getPriority() {
             return Closeable.DEFAULT_PRIORITY;
         }
-    
+
         public void add() {
             awaitingEvents.incrementAndGet();
         }
-    
+
         public void remove() {
             awaitingEvents.decrementAndGet();
         }
-    
+
     }
 
 }

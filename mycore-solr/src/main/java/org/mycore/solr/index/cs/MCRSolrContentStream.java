@@ -1,5 +1,7 @@
 package org.mycore.solr.index.cs;
 
+import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -9,7 +11,7 @@ import org.jdom2.Document;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
-import org.mycore.common.content.transformer.MCRXSLTransformer;
+import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.datamodel.metadata.MCRBase;
 
 import com.google.common.base.Charsets;
@@ -24,11 +26,11 @@ public class MCRSolrContentStream extends MCRSolrAbstractContentStream<MCRConten
 
     final static Logger LOGGER = Logger.getLogger(MCRSolrContentStream.class);
 
-    private final static MCRXSLTransformer TRANSFORMER;
+    private final static MCRContentTransformer TRANSFORMER;
 
     static {
-        String stylesheet = MCRConfiguration.instance().getString("MCR.Module-solr.cs.stylesheet", "xsl/mycoreobject-solr.xsl");
-        TRANSFORMER = new MCRXSLTransformer(stylesheet);
+        String transformerId = MCRConfiguration.instance().getString(CONFIG_PREFIX + "IndexHandler.ContentStream.Transformer");
+        TRANSFORMER = MCRContentTransformerFactory.getTransformer(transformerId);
     }
 
     /**
@@ -46,7 +48,7 @@ public class MCRSolrContentStream extends MCRSolrAbstractContentStream<MCRConten
         ByteArrayOutputStream out = new ByteArrayOutputStream(64 * 1024);
         getTransformer().transform(content, out);
         byte[] byteArray = out.toByteArray();
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(new String(byteArray, Charsets.UTF_8));
         }
         this.setSourceInfo(content.getSystemId());

@@ -23,6 +23,7 @@
 
 package org.mycore.solr.index.document;
 
+import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
@@ -83,7 +84,7 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
     }
 
     private static MCRContentTransformer getTransformer() {
-        String property = "MCR.Module-solr.SolrInputDocumentTransformer";
+        String property = CONFIG_PREFIX + "SolrInputDocument.Transformer";
         String transformerId = MCRConfiguration.instance().getString(property);
         MCRContentTransformer contentTransformer = MCRContentTransformerFactory.getTransformer(transformerId);
         isJAXBTransformer = contentTransformer instanceof MCRXSL2JAXBTransformer;

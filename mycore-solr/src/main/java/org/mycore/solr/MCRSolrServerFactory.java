@@ -1,6 +1,7 @@
 package org.mycore.solr;
 
 import static org.mycore.solr.MCRSolrConstants.SERVER_URL;
+import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
 
 import java.text.MessageFormat;
 
@@ -25,7 +26,7 @@ public class MCRSolrServerFactory {
     private static SolrServer CONCURRENT_SOLR_SERVER;
 
     private static boolean USE_CONCURRENT_SERVER = MCRConfiguration.instance().getBoolean(
-        "MCR.Module-solr.ConcurrentUpdateSolrServer.Enabled", true);
+        CONFIG_PREFIX + "ConcurrentUpdateSolrServer.Enabled", true);
 
     static {
         try {
@@ -70,8 +71,8 @@ public class MCRSolrServerFactory {
 
     public static SolrServer createConcurrentUpdateSolrServer(String solrServerUrl) {
         if (USE_CONCURRENT_SERVER) {
-            int queueSize = MCRConfiguration.instance().getInt("MCR.Module-solr.ConcurrentUpdateSolrServer.QueueSize", 100);
-            int threadSize = MCRConfiguration.instance().getInt("MCR.Module-solr.ConcurrentUpdateSolrServer.ThreadSize", 4);
+            int queueSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "ConcurrentUpdateSolrServer.QueueSize", 100);
+            int threadSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "ConcurrentUpdateSolrServer.ThreadSize", 4);
             ConcurrentUpdateSolrServer cuss = new ConcurrentUpdateSolrServer(solrServerUrl, queueSize, threadSize);
             cuss.setRequestWriter(new BinaryRequestWriter());
             return cuss;

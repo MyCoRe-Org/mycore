@@ -35,14 +35,19 @@ public class MCRSolrConstants {
 
     public static final String SERVER_URL;
 
-    public static final String QUERY_XML_PROTOCOL_VERSION = MCRConfiguration.instance().getString(CONFIG_PREFIX + "XMLProtocolVersion", "4.0");
+    public static final String QUERY_XML_PROTOCOL_VERSION = MCRConfiguration.instance().getString(CONFIG_PREFIX + "XMLProtocolVersion",
+        "4.0");
 
-    public static final String QUERY_PATH = MCRConfiguration.instance().getString(CONFIG_PREFIX + "SelectPath", "select/");
+    public static final String QUERY_PATH = MCRConfiguration.instance().getString(CONFIG_PREFIX + "SelectPath", "/select");
+
+    public static final String EXTRACT_PATH = MCRConfiguration.instance().getString(CONFIG_PREFIX + "ExtractPath", "/update/extract");
+
+    public static final String UPDATE_PATH = MCRConfiguration.instance().getString(CONFIG_PREFIX + "UpdatePath", "/update");
 
     static {
         String serverURL = MCRConfiguration.instance().getString(CONFIG_PREFIX + "ServerURL");
-        if (!serverURL.endsWith("/")) {
-            serverURL += "/";
+        if (serverURL.endsWith("/")) {
+            serverURL = serverURL.substring(0, serverURL.length() - 1);
         }
         SERVER_URL = serverURL;
     }

@@ -1,5 +1,7 @@
 package org.mycore.solr.index.handlers.stream;
 
+import static org.mycore.solr.MCRSolrConstants.EXTRACT_PATH;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 
@@ -7,20 +9,17 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.index.cs.MCRSolrFileContentStream;
-import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
+import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
 
 public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
 
     final static Logger LOGGER = Logger.getLogger(MCRSolrFileIndexHandler.class);
-
-    final static String EXTRACT_PATH = MCRConfiguration.instance().getString("MCR.Module-solr.ExtractPath", "/update/extract");
 
     final static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
 

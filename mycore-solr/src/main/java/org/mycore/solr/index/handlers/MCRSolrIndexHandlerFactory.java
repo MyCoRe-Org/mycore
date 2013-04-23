@@ -23,6 +23,8 @@
 
 package org.mycore.solr.index.handlers;
 
+import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,7 +55,7 @@ public abstract class MCRSolrIndexHandlerFactory {
     private static final Logger LOGGER = Logger.getLogger(MCRSolrIndexHandlerFactory.class);
 
     private static MCRSolrIndexHandlerFactory instance = (MCRSolrIndexHandlerFactory) MCRConfiguration.instance().getInstanceOf(
-        "MCR.Module-solr.IndexHandlerFactory", MCRSolrContentStreamHandlerFactory.class.getCanonicalName());
+        CONFIG_PREFIX + "IndexHandler.Factory", MCRSolrContentStreamHandlerFactory.class.getCanonicalName());
 
     public static MCRSolrIndexHandlerFactory getInstance() {
         return instance;

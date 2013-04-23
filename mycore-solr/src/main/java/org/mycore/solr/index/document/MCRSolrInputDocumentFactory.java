@@ -23,6 +23,7 @@
 
 package org.mycore.solr.index.document;
 
+import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
@@ -42,8 +43,8 @@ import org.xml.sax.SAXException;
  */
 public abstract class MCRSolrInputDocumentFactory {
 
-    private static MCRSolrInputDocumentFactory instance = (MCRSolrInputDocumentFactory) MCRConfiguration.instance().getInstanceOf(
-        "MCR.Module-solr.SolrInputDocumentFactory", MCRSolrTransformerInputDocumentFactory.class.getCanonicalName());
+    private static MCRSolrInputDocumentFactory instance = MCRConfiguration.instance().getInstanceOf(
+        CONFIG_PREFIX + "SolrInputDocument.Factory", MCRSolrInputDocumentFactory.class);
 
     public static MCRSolrInputDocumentFactory getInstance() {
         return instance;

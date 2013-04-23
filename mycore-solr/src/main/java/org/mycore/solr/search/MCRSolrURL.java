@@ -25,8 +25,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrServer;
 public class MCRSolrURL {
     private static final Logger LOGGER = Logger.getLogger(MCRSolrURL.class);
 
-    public static final String FIXED_URL_PART = MessageFormat.format("{0}{1}?version={2}", QUERY_PATH.startsWith("/") ? "" : "/",
-        QUERY_PATH, QUERY_XML_PROTOCOL_VERSION);
+    public static final String FIXED_URL_PART = MessageFormat.format("{0}?version={1}", QUERY_PATH, QUERY_XML_PROTOCOL_VERSION);
 
     private HttpSolrServer solrServer;
 

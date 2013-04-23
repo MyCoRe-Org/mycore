@@ -1,5 +1,7 @@
 package org.mycore.solr.index.handlers.stream;
 
+import static org.mycore.solr.MCRSolrConstants.UPDATE_PATH;
+import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
 import java.io.IOException;
 import java.util.Map;
 
@@ -22,9 +24,7 @@ public class MCRSolrDefaultIndexHandler extends MCRSolrAbstractStreamIndexHandle
 
     private final static Logger LOGGER = Logger.getLogger(MCRSolrDefaultIndexHandler.class);
 
-    final static String STYLESHEET = MCRConfiguration.instance().getString("MCR.Module-solr.transform", "object2fields.xsl");
-
-    final static String UPDATE_PATH = MCRConfiguration.instance().getString("MCR.Module-solr.UpdatePath", "/update");
+    final static String STYLESHEET = MCRConfiguration.instance().getString(CONFIG_PREFIX + "IndexHandler.ContentStream.ServerStyleSheet");
 
     public MCRSolrDefaultIndexHandler(MCRSolrAbstractContentStream<?> stream) {
         super(stream);
@@ -42,7 +42,7 @@ public class MCRSolrDefaultIndexHandler extends MCRSolrAbstractStreamIndexHandle
         SolrServer solrServer = getSolrServer();
         ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest(UPDATE_PATH);
         updateRequest.addContentStream(getStream());
-        if(STYLESHEET != null && STYLESHEET.length() > 0) {
+        if (STYLESHEET.length() > 0) {
             updateRequest.setParam("tr", STYLESHEET);
         }
         updateRequest.setCommitWithin(getCommitWithin());
