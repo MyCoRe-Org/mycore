@@ -373,7 +373,7 @@ public class MCRConfiguration {
      */
     private void loadFromFile(String filename) {
         File mycoreProperties = new File(filename);
-        MCRContent input=null;
+        MCRContent input = null;
         try {
             if (mycoreProperties.canRead()) {
                 input = new MCRFileContent(mycoreProperties);
@@ -487,7 +487,7 @@ public class MCRConfiguration {
      *            the qualified class name
      * @param type
      *            return type of this method
-     * @return the value of the configuration property as a String, or null
+     * @return Instance of the value of the configuration property
      * @throws MCRConfigurationException
      *             if the property is not set or the class can not be loaded or
      *             instantiated
@@ -547,13 +547,30 @@ public class MCRConfiguration {
      *            the non-null and non-empty qualified name of the configuration property
      * @param defaultname
      *            the qualified class name
-     * @return the value of the configuration property as a String, or null
+     * @return Instance of the value of the configuration property
      * @throws MCRConfigurationException
      *             if the property is not set or the class can not be loaded or
      *             instantiated
      */
     public Object getInstanceOf(String name, String defaultname) throws MCRConfigurationException {
         return getInstanceOf(name, defaultname, Object.class);
+    }
+
+    /**
+     * Returns a new instance of the class specified in the configuration
+     * property with the given name.
+     * 
+     * @param name
+     *            the non-null and non-empty qualified name of the configuration property
+     * @param type
+     *            return type of this method
+     * @return Instance of the value of the configuration property
+     * @throws MCRConfigurationException
+     *             if the property is not set or the class can not be loaded or
+     *             instantiated
+     */
+    public <T> T getInstanceOf(String name, Class<T> type) throws MCRConfigurationException {
+        return getInstanceOf(name, null, type);
     }
 
     /**
@@ -568,7 +585,7 @@ public class MCRConfiguration {
      *             instantiated
      */
     public Object getInstanceOf(String name) throws MCRConfigurationException {
-        return getInstanceOf(name, null);
+        return getInstanceOf(name, (String) null);
     }
 
     /**
@@ -624,13 +641,30 @@ public class MCRConfiguration {
      * @param name
      *            non-null and non-empty name of the configuration property
      * @return the instance of the class named by the value of the configuration
-     *         propertyl
+     *         property
      * @throws MCRConfigurationException
      *             if the property is not set or the class can not be loaded or
      *             instantiated
      */
     public Object getSingleInstanceOf(String name) {
-        return getSingleInstanceOf(name, null);
+        return getSingleInstanceOf(name, (String) null);
+    }
+
+    /**
+     * Returns a instance of the class specified in the configuration property
+     * with the given name. If the class was prevously instantiated by this
+     * method this instance is returned.
+     * 
+     * @param name
+     *            non-null and non-empty name of the configuration property
+     * @return the instance of the class named by the value of the configuration
+     *         property
+     * @throws MCRConfigurationException
+     *             if the property is not set or the class can not be loaded or
+     *             instantiated
+     */
+    public <T> T getSingleInstanceOf(String name, Class<T> type) {
+        return getSingleInstanceOf(name, null, type);
     }
 
     /**
