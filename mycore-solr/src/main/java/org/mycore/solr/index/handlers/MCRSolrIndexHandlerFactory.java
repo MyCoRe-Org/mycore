@@ -92,12 +92,16 @@ public abstract class MCRSolrIndexHandlerFactory {
     }
 
     public MCRSolrIndexHandler getIndexHandler(MCRFile file, SolrServer solrServer) throws IOException {
+        return this.getIndexHandler(file, solrServer, checkFile(file));
+    }
+
+    public MCRSolrIndexHandler getIndexHandler(MCRFile file, SolrServer solrServer, boolean sendContent) throws IOException {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Solr: submitting file \"" + file.getAbsolutePath() + " (" + file.getID() + ")\" for indexing");
         }
         MCRSolrIndexHandler indexHandler;
         long start = System.currentTimeMillis();
-        if (MCRSolrIndexStrategyManager.checkFile(file)) {
+        if (sendContent) {
             /* extract metadata with tika */
             indexHandler = new MCRSolrFileIndexHandler(new MCRSolrFileContentStream(file), solrServer);
         } else {
@@ -107,6 +111,10 @@ public abstract class MCRSolrIndexHandlerFactory {
         long end = System.currentTimeMillis();
         indexHandler.getStatistic().addTime(end - start);
         return indexHandler;
+    }
+
+    public boolean checkFile(MCRFile file) {
+        return MCRSolrIndexStrategyManager.checkFile(file);
     }
 
 }

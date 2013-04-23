@@ -35,9 +35,9 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.cs.MCRSolrContentStream;
-import org.mycore.solr.index.cs.MCRSolrListElementStream;
+import org.mycore.solr.index.cs.MCRSolrBulkXMLStream;
 import org.mycore.solr.index.handlers.stream.MCRSolrDefaultIndexHandler;
-import org.mycore.solr.index.handlers.stream.MCRSolrListElementIndexHandler;
+import org.mycore.solr.index.handlers.stream.MCRSolrBulkXMLIndexHandler;
 import org.xml.sax.SAXException;
 
 /**
@@ -60,7 +60,7 @@ public class MCRSolrContentStreamHandlerFactory extends MCRSolrIndexHandlerFacto
 
     @Override
     public MCRSolrIndexHandler getIndexHandler(Map<MCRObjectID, MCRContent> contentMap) {
-        MCRSolrListElementStream contentStream = new MCRSolrListElementStream("MCRSolrObjs");
+        MCRSolrBulkXMLStream contentStream = new MCRSolrBulkXMLStream("MCRSolrObjs");
         List<Element> elementList = contentStream.getList();
         for (Map.Entry<MCRObjectID, MCRContent> entry : contentMap.entrySet()) {
             LOGGER.info("Submitting data of \"" + entry.getKey() + "\" for indexing");
@@ -72,7 +72,7 @@ public class MCRSolrContentStreamHandlerFactory extends MCRSolrIndexHandlerFacto
                 LOGGER.error("Error while parsing content for id: " + entry.getKey(), e);
             }
         }
-        MCRSolrListElementIndexHandler indexHandler = new MCRSolrListElementIndexHandler(contentStream, elementList.size());
+        MCRSolrBulkXMLIndexHandler indexHandler = new MCRSolrBulkXMLIndexHandler(contentStream);
         return indexHandler;
     }
 

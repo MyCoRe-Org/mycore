@@ -13,11 +13,11 @@ import org.mycore.common.content.MCRJDOMContent;
  * 
  * @author Matthias Eichner
  */
-public class MCRSolrListElementStream extends MCRSolrContentStream {
+public class MCRSolrBulkXMLStream extends MCRSolrContentStream {
 
     public List<Element> elementList;
-    
-    public MCRSolrListElementStream(String name) {
+
+    public MCRSolrBulkXMLStream(String name) {
         super(name, null);
         this.elementList = new ArrayList<>();
     }
