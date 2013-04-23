@@ -57,7 +57,7 @@ public class MCRMediaParser {
             for (Object name : names) {
                 try {
                     LOGGER.info("instantiate Parser \"" + config.getString((String) name) + "\"...");
-                    MCRMediaParser parser = (MCRMediaParser) config.getInstanceOf((String) name, null);
+                    MCRMediaParser parser = config.getInstanceOf((String) name, null, MCRMediaParser.class);
                     parsers.add(parser);
                 } catch (Throwable ex) {
                     LOGGER.warn("Couldn't instantiate Parser \"" + config.getString((String) name) + "\" because " + ex.getMessage() + ".");
