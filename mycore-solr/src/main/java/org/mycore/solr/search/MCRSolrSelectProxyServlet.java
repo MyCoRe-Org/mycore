@@ -54,8 +54,7 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
      */
     public static final String QUERY_KEY = MCRSolrSelectProxyServlet.class.getName() + ".query";
 
-    private static int MAX_CONNECTIONS = MCRConfiguration.instance().getInt(MCRSolrConstants.CONFIG_PREFIX + "SelectProxy.MaxConnections",
-        20);
+    private static int MAX_CONNECTIONS = MCRConfiguration.instance().getInt(MCRSolrConstants.CONFIG_PREFIX + "SelectProxy.MaxConnections", 20);
 
     private HttpClient httpClient;
 
@@ -87,7 +86,9 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
             boolean isXML = solrHttpMethod.getResponseHeader("Content-Type").getValue().contains("/xml");
 
             if (statusCode == HttpStatus.SC_OK && isXML) {
-                MCRStreamContent solrResponse = new MCRStreamContent(solrResponseStream, solrHttpMethod.getURI().toString(), "response");
+                String[] xslt = solrParameter.get("xslt");
+                MCRStreamContent solrResponse = new MCRStreamContent(solrResponseStream, solrHttpMethod.getURI().toString(), xslt != null ? xslt[0]
+                        : "response");
                 MCRLayoutService.instance().doLayout(request, resp, solrResponse);
                 return;
             }
