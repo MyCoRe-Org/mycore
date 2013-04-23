@@ -1,5 +1,7 @@
 package org.mycore.solr;
 
+import static org.mycore.solr.MCRSolrConstants.SERVER_URL;
+
 import java.text.MessageFormat;
 
 import org.apache.log4j.Logger;
@@ -9,7 +11,6 @@ import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.events.MCRShutdownHandler;
-import org.mycore.solr.utils.MCRSolrUtils;
 
 /**
  * @author shermann
@@ -28,7 +29,7 @@ public class MCRSolrServerFactory {
 
     static {
         try {
-            setSolrServer(MCRSolrUtils.getSolrPropertyValue("ServerURL"));
+            setSolrServer(SERVER_URL);
             MCRShutdownHandler.getInstance().addCloseable(new MCRShutdownHandler.Closeable() {
 
                 @Override

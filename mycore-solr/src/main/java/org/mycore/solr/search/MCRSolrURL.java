@@ -3,6 +3,9 @@
  */
 package org.mycore.solr.search;
 
+import static org.mycore.solr.MCRSolrConstants.QUERY_PATH;
+import static org.mycore.solr.MCRSolrConstants.QUERY_XML_PROTOCOL_VERSION;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -13,7 +16,6 @@ import java.text.MessageFormat;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.mycore.solr.utils.MCRSolrUtils;
 
 /**
  * Convenience class for holding the parameters for the solr search url.
@@ -23,12 +25,8 @@ import org.mycore.solr.utils.MCRSolrUtils;
 public class MCRSolrURL {
     private static final Logger LOGGER = Logger.getLogger(MCRSolrURL.class);
 
-    public static final String SOLR_VERSION = MCRSolrUtils.getSolrPropertyValue("XMLProtocolVersion", "4.0");
-
-    private static final String SOLR_SELECT_PATH = MCRSolrUtils.getSolrPropertyValue("SelectPath", "select/");
-
-    public static final String FIXED_URL_PART = MessageFormat.format("{0}{1}?version={2}", SOLR_SELECT_PATH.startsWith("/") ? "" : "/",
-            SOLR_SELECT_PATH, SOLR_VERSION);
+    public static final String FIXED_URL_PART = MessageFormat.format("{0}{1}?version={2}", QUERY_PATH.startsWith("/") ? "" : "/",
+        QUERY_PATH, QUERY_XML_PROTOCOL_VERSION);
 
     private HttpSolrServer solrServer;
 
@@ -80,8 +78,8 @@ public class MCRSolrURL {
         try {
             if (this.urlQuery == null) {
                 return new URL(solrServer.getBaseURL() + FIXED_URL_PART + "&q=" + URLEncoder.encode(q, "UTF-8") + "&start=" + start
-                        + "&rows=" + rows + "&sort=" + URLEncoder.encode(sortOptions, "UTF-8") + (returnScore ? "&fl=*,score" : "")
-                        + (wt != null ? "&wt=" + wt : ""));
+                    + "&rows=" + rows + "&sort=" + URLEncoder.encode(sortOptions, "UTF-8") + (returnScore ? "&fl=*,score" : "")
+                    + (wt != null ? "&wt=" + wt : ""));
             } else {
                 return new URL(solrServer.getBaseURL() + FIXED_URL_PART + "&" + urlQuery);
             }

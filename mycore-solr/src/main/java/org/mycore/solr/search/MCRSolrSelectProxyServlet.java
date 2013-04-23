@@ -1,5 +1,9 @@
 package org.mycore.solr.search;
 
+import static org.mycore.solr.MCRSolrConstants.QUERY_PATH;
+import static org.mycore.solr.MCRSolrConstants.QUERY_XML_PROTOCOL_VERSION;
+import static org.mycore.solr.MCRSolrConstants.SERVER_URL;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
@@ -22,22 +26,19 @@ import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.solr.utils.MCRSolrUtils;
+import org.mycore.solr.MCRSolrConstants;
 
 public class MCRSolrSelectProxyServlet extends MCRServlet {
 
     private static final Logger LOGGER = Logger.getLogger(MCRSolrSelectProxyServlet.class);
 
     private static final long serialVersionUID = 1L;
-
-    private static final String SOLR_QUERY_VERSION = MCRSolrUtils.getSolrPropertyValue("XMLProtocolVersion", "4.0");
-
-    private static final String SOLR_SELECT_PATH = MCRSolrUtils.getSolrPropertyValue("SelectPath", "select/");
 
     /**
      * Attribute key to store Query parameters as <code>Map&lt;String, String[]&gt;</code> for SOLR.
@@ -52,6 +53,9 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
      * This takes precedence over {@link #MAP_KEY} or any {@link HttpServletRequest} parameter.
      */
     public static final String QUERY_KEY = MCRSolrSelectProxyServlet.class.getName() + ".query";
+
+    private static int MAX_CONNECTIONS = MCRConfiguration.instance().getInt(MCRSolrConstants.CONFIG_PREFIX + "SelectProxy.MaxConnections",
+        20);
 
     private HttpClient httpClient;
 
@@ -124,12 +128,10 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
     public void init() throws ServletException {
         super.init();
 
-        int maxConnections = Integer.parseInt(MCRSolrUtils.getSolrPropertyValue("SelectProxy.MaxConnections", "20"));
         connectionManager = new MultiThreadedHttpConnectionManager();
-
         HttpConnectionManagerParams connectionManagerParams = connectionManager.getParams();
-        connectionManagerParams.setDefaultMaxConnectionsPerHost(maxConnections);
-        connectionManagerParams.setMaxTotalConnections(maxConnections);
+        connectionManagerParams.setDefaultMaxConnectionsPerHost(MAX_CONNECTIONS);
+        connectionManagerParams.setMaxTotalConnections(MAX_CONNECTIONS);
 
         httpClient = new HttpClient(connectionManager);
     }
@@ -149,19 +151,11 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
      * @return a method to make the request
      */
     public static HttpMethod getSolrHttpMethod(Map<String, String[]> parameterMap) {
-        String solrServerUrl = MCRSolrUtils.getSolrPropertyValue("ServerURL");
-        if (solrServerUrl == null) {
-            throw new MCRException(MessageFormat.format("Property \"{0}ServerURL\" is undefined.", MCRSolrUtils.CONFIG_PREFIX));
-        }
-        if (!solrServerUrl.endsWith("/")) {
-            solrServerUrl += '/';
-        }
-
         String queryString = getQueryString(parameterMap);
         if (!parameterMap.containsKey("version")) {
-            queryString += "&version=" + SOLR_QUERY_VERSION;
+            queryString += "&version=" + QUERY_XML_PROTOCOL_VERSION;
         }
-        GetMethod getMethod = new GetMethod(MessageFormat.format("{0}{1}?{2}", solrServerUrl, SOLR_SELECT_PATH, queryString));
+        GetMethod getMethod = new GetMethod(MessageFormat.format("{0}{1}?{2}", SERVER_URL, QUERY_PATH, queryString));
 
         return getMethod;
     }
