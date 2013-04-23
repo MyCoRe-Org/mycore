@@ -11,11 +11,6 @@
   <xsl:param name="WebApplicationBaseURL" />
   <xsl:param name="DisplaySearchForm" select="'false'" />
 
-  <xsl:param name="subselect.session" />
-  <xsl:param name="subselect.varpath" />
-  <xsl:param name="subselect.webpage" /> 
-
-
   <xsl:variable name="PageTitle">
     <xsl:choose>
       <xsl:when test="$DisplaySearchForm = 'true'">
@@ -59,20 +54,6 @@
   <xsl:template match="doc">
     <xsl:variable name="identifier" select="str[@name='id']" />
 
-	<xsl:variable name="linkText">
-		<xsl:choose>
-			<xsl:when test="./arr[@name='search_result_link_text']">
-				<xsl:value-of
-					select="./arr[@name='search_result_link_text']/str[position() = 1]" />
-			</xsl:when>
-			<xsl:when test="./str[@name='fileName']">
-				<xsl:value-of select="./str[@name='fileName']" />
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:value-of select="$identifier" />
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:variable>
     <xsl:variable name="linkTo">
       <xsl:choose>
         <xsl:when test="str[@name='objectType'] = 'data_file'">
@@ -83,10 +64,21 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+
     <tr>
       <td class="resultTitle" colspan="2">
         <a href="{$linkTo}" target="_self">
-			<xsl:value-of select="$linkText" />
+          <xsl:choose>
+            <xsl:when test="./arr[@name='search_result_link_text']">
+              <xsl:value-of select="./arr[@name='search_result_link_text']/str[position() = 1]" />
+            </xsl:when>
+            <xsl:when test="./str[@name='fileName']">
+              <xsl:value-of select="./str[@name='fileName']" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$identifier" />
+            </xsl:otherwise>
+          </xsl:choose>
         </a>
       </td>
       <td rowspan="2" class="preview">
@@ -132,26 +124,6 @@
           <xsl:value-of select="i18n:translate('results.lastChanged', $date)" />
         </span>
         <br />
-         <xsl:if test="string-length($subselect.session) &gt; 0">
-         	<xsl:variable name="subselectLink">
-   				<xsl:value-of select="concat($ServletsBaseURL, 'XMLEditor?_action=end.subselect')" />
-		   		<xsl:text>&amp;_var_@xlink:href=</xsl:text>
-				<xsl:value-of select="$identifier" /> 
-				<xsl:text>&amp;_var_@xlink:title=</xsl:text>
-				<xsl:value-of select="$linkText" />  
-				<xsl:text>&amp;_var_@editor.output=</xsl:text>
-				<xsl:value-of select="$linkText" />  
-				<xsl:text>&amp;subselect.session=</xsl:text>
-				<xsl:value-of select="$subselect.session" />
-				<xsl:text>&amp;subselect.varpath=</xsl:text>
-				<xsl:value-of select="$subselect.varpath" />
-				<xsl:text>&amp;subselect.webpage=</xsl:text>
-				<xsl:value-of select="encoder:encode($subselect.webpage,'UTF-8')" /> 
-         	</xsl:variable>
-         	<a href="{$subselectLink}">
-         		<xsl:value-of select="i18n:translate('searchResults.select')" />
-         	</a>
-        </xsl:if>
       </td>
     </tr>
   </xsl:template>
