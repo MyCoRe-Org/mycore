@@ -44,7 +44,7 @@ public class MCRMODSDateHelper {
 
     static {
         formats.put("w3cdtf-10", "yyyy-MM-dd");
-        formats.put("w3cdtf-19", "yyyy-MM-dd'T'HH:m:ss");
+        formats.put("w3cdtf-19", "yyyy-MM-dd'T'HH:mm:ss");
         formats.put("marc-4", "yyyy");
         formats.put("iso8601-4", "yyyy");
         formats.put("iso8601-7", "yyyy-MM");
@@ -55,7 +55,7 @@ public class MCRMODSDateHelper {
         formats.put("unknown-4", "yyyy");
         formats.put("unknown-8", "yyyyMMdd");
         formats.put("unknown-10", "yyyy-MM-dd");
-        formats.put("unknown-19", "yyyy-MM-dd'T'HH:m:ss");
+        formats.put("unknown-19", "yyyy-MM-dd'T'HH:mm:ss");
         formats.put("unknown-15", "yyyyMMdd'T'HHmmss");
     }
 
