@@ -27,9 +27,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.jdom2.Element;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.parsers.bool.MCRBooleanClauseParser;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRFalseCondition;
+import org.mycore.parsers.bool.MCRIPCondition;
 import org.mycore.parsers.bool.MCRParseException;
 import org.mycore.parsers.bool.MCRTrueCondition;
 
@@ -91,7 +93,7 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
         } else if (field.equals("user")) {
             return new MCRUserClause(value, not);
         } else if (field.equals("ip")) {
-            return new MCRIPClause(value);
+            return getIPClause(value);
         } else if (field.equals("date")) {
             if (operator.equals("<")) {
                 return new MCRDateBeforeClause(parseDate(value, false));
@@ -106,6 +108,17 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
             }
         }
         return null;
+    }
+
+    private MCRCondition<MCRAccessData> getIPClause(String value) {
+        MCRIPCondition ipCond = (MCRIPCondition) MCRConfiguration.instance().getInstanceOf("MCR.RuleParser.ip");
+        
+        if(ipCond == null) {
+            return new MCRIPClause(value);
+        }
+        
+        ipCond.set(value);
+        return ipCond;
     }
 
     /**
@@ -145,7 +158,7 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
         }
 
         if (s.startsWith("ip ")) {
-            return new MCRIPClause(s.substring(3).trim());
+            return getIPClause(s.substring(3).trim());
         }
 
         if (s.startsWith("date ")) {

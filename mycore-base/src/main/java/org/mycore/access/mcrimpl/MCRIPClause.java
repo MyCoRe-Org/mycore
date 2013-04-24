@@ -32,33 +32,18 @@ import org.mycore.parsers.bool.MCRParseException;
  * 
  * @author Matthias Kramm
  */
-class MCRIPClause implements MCRCondition<MCRAccessData> {
+public class MCRIPClause implements MCRCondition<MCRAccessData> {
     private MCRIPAddress ip;
 
-    private String ipRange = null;
-
-    MCRIPClause(String ip) throws MCRParseException {
+    public MCRIPClause(String ip) throws MCRParseException {
         try {
-            if (ip.contains("-")) {
-                this.ipRange = ip;
-            } else {
-                this.ip = new MCRIPAddress(ip);
-            }
+            this.ip = new MCRIPAddress(ip);
         } catch (java.net.UnknownHostException e) {
             throw new MCRParseException("Couldn't parse/resolve host " + ip);
         }
     }
 
     public boolean evaluate(MCRAccessData data) {
-        if (ipRange != null) {
-            try {
-                return data.getIp() != null && ipIsInRange(data.getIp().toString(),ipRange);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
-        
         return data.getIp() != null && ip.contains(data.getIp());
     }
 
@@ -73,48 +58,5 @@ class MCRIPClause implements MCRCondition<MCRAccessData> {
         cond.setAttribute("operator", "=");
         cond.setAttribute("value", ip.toString());
         return cond;
-    }
-
-    private boolean ipIsInRange(String ip, String ipRange) throws Exception {
-        String[] ipAddress = ip.split("\\.");
-        String[] ipRangeAddress = ipRange.split("\\.");
-
-        for (int i = 0; i < ipRangeAddress.length; i++) {
-            String[] splitedRange = ipRangeAddress[i].split("-");
-            if (splitedRange.length < 1) {
-                throw new Exception("Wrong range " + ipRangeAddress[i] + "!");
-            }
-
-            try {
-                int currentAdress = parseAdress(ipAddress[i]);
-                int ipStart = parseAdress(splitedRange[0]);
-
-                if (currentAdress - ipStart < 0) {
-                    return false;
-                }
-
-                if (splitedRange.length > 1) {
-                    int ipEnd = parseAdress(splitedRange[1]);
-
-                    if (ipEnd - currentAdress < 0) {
-                        return false;
-                    }
-                }
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-
-        return true;
-    }
-
-    private Integer parseAdress(String string) throws Exception {
-        String trimedString = string.trim();
-        if (trimedString.equals("")) {
-            throw new Exception("Blank Adress!");
-        }
-
-        return Integer.valueOf(trimedString).intValue();
     }
 }

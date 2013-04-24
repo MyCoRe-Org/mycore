@@ -74,7 +74,7 @@ public class MCRIPAddress {
         }
     }
 
-    boolean contains(MCRIPAddress other) {
+    public boolean contains(MCRIPAddress other) {
         int t;
 
         if (address.length != other.address.length) {
@@ -90,6 +90,9 @@ public class MCRIPAddress {
         return true;
     }
 
+    public byte[] getAddress(){
+        return address;
+    }
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("");
