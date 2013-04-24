@@ -164,7 +164,7 @@ public class MCRSolrIndexer {
         for (String id : list) {
             i++;
             try {
-                LOGGER.info("Preparing \"" + id + "\" for indexing");
+                LOGGER.debug("Preparing \"" + id + "\" for indexing");
                 MCRObjectID objId = MCRObjectID.getInstance(id);
                 MCRContent content = metadataMgr.retrieveContent(objId);
                 contentMap.put(objId, content);
