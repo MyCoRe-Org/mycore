@@ -5,14 +5,12 @@
 // Generated on: 2013.04.16 at 05:45:02 PM CEST 
 //
 
-
 package org.mycore.solr.index.document.jaxb;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
-
 
 /**
  * This object contains factory methods for each 
@@ -33,11 +31,21 @@ public class ObjectFactory {
 
     private final static QName _Doc_QNAME = new QName("", "doc");
 
+    private final static QName _Add_QNAME = new QName("", "add");
+
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.mycore.solr.index.document.jaxb
      * 
      */
     public ObjectFactory() {
+    }
+
+    /**
+     * Create an instance of {@link MCRSolrInputDocumentList }
+     * 
+     */
+    public MCRSolrInputDocumentList createMCRSolrInputDocumentList() {
+        return new MCRSolrInputDocumentList();
     }
 
     /**
@@ -63,6 +71,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "doc")
     public JAXBElement<MCRSolrInputDocument> createDoc(MCRSolrInputDocument value) {
         return new JAXBElement<MCRSolrInputDocument>(_Doc_QNAME, MCRSolrInputDocument.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MCRSolrInputDocumentList }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "add")
+    public JAXBElement<MCRSolrInputDocumentList> createAdd(MCRSolrInputDocumentList value) {
+        return new JAXBElement<MCRSolrInputDocumentList>(_Add_QNAME, MCRSolrInputDocumentList.class, null, value);
     }
 
 }

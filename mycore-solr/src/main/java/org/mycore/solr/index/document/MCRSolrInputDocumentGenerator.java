@@ -24,6 +24,7 @@
 package org.mycore.solr.index.document;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -38,6 +39,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.solr.index.document.jaxb.MCRSolrInputDocument;
+import org.mycore.solr.index.document.jaxb.MCRSolrInputDocumentList;
 import org.mycore.solr.index.document.jaxb.MCRSolrInputField;
 
 /**
@@ -73,15 +75,23 @@ public class MCRSolrInputDocumentGenerator {
         return doc;
     }
 
-    public static SolrInputDocument getSolrInputDocument(MCRContent source) throws JAXBException, IOException {
+    public static List<SolrInputDocument> getSolrInputDocument(MCRContent source) throws JAXBException, IOException {
         if (source instanceof MCRJAXBContent) {
             @SuppressWarnings("unchecked")
-            MCRJAXBContent<MCRSolrInputDocument> jaxbContent = (MCRJAXBContent<MCRSolrInputDocument>) source;
-            return getSolrInputDocument(jaxbContent.getObject());
+            MCRJAXBContent<MCRSolrInputDocumentList> jaxbContent = (MCRJAXBContent<MCRSolrInputDocumentList>) source;
+            return getSolrInputDocuments(jaxbContent.getObject().getDoc());
         }
         Unmarshaller unmarshaller = JAXB_CONTEXT.createUnmarshaller();
-        MCRSolrInputDocument solrDocument = (MCRSolrInputDocument) unmarshaller.unmarshal(source.getSource());
-        return getSolrInputDocument(solrDocument);
+        MCRSolrInputDocumentList solrDocuments = (MCRSolrInputDocumentList) unmarshaller.unmarshal(source.getSource());
+        return getSolrInputDocuments(solrDocuments.getDoc());
+    }
+
+    public static List<SolrInputDocument> getSolrInputDocuments(List<MCRSolrInputDocument> inputDocuments) {
+        ArrayList<SolrInputDocument> returnList = new ArrayList<>(inputDocuments.size());
+        for (MCRSolrInputDocument doc : inputDocuments) {
+            returnList.add(getSolrInputDocument(doc));
+        }
+        return returnList;
     }
 
     public static SolrInputDocument getSolrInputDocument(Element input) {

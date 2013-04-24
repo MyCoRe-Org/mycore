@@ -24,6 +24,7 @@
 package org.mycore.solr.index.document;
 
 import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
@@ -45,7 +46,7 @@ import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.content.transformer.MCRXSL2JAXBTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.solr.index.document.jaxb.MCRSolrInputDocument;
+import org.mycore.solr.index.document.jaxb.MCRSolrInputDocumentList;
 import org.xml.sax.SAXException;
 
 /**
@@ -70,9 +71,9 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
             if (isJAXBTransformer) {
                 MCRParameterCollector param = new MCRParameterCollector();
                 @SuppressWarnings("unchecked")
-                MCRXSL2JAXBTransformer<JAXBElement<MCRSolrInputDocument>> jaxbTransformer = (MCRXSL2JAXBTransformer<JAXBElement<MCRSolrInputDocument>>) transformer;
-                MCRSolrInputDocument input = jaxbTransformer.getJAXBObject(content, param).getValue();
-                document = MCRSolrInputDocumentGenerator.getSolrInputDocument(input);
+                MCRXSL2JAXBTransformer<JAXBElement<MCRSolrInputDocumentList>> jaxbTransformer = (MCRXSL2JAXBTransformer<JAXBElement<MCRSolrInputDocumentList>>) transformer;
+                MCRSolrInputDocumentList input = jaxbTransformer.getJAXBObject(content, param).getValue();
+                document = MCRSolrInputDocumentGenerator.getSolrInputDocument(input.getDoc().iterator().next());
             } else {
                 MCRContent result = transformer.transform(content);
                 document = MCRSolrInputDocumentGenerator.getSolrInputDocument(result.asXML().getRootElement());
@@ -98,9 +99,17 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
         }
         try {
             Document doc = getMergedDocument(contentMap);
-            MCRContent result = transformer.transform(new MCRJDOMContent(doc));
-            return getSolrInputDocuments(result);
-        } catch (JDOMException e) {
+            if (isJAXBTransformer) {
+                MCRParameterCollector param = new MCRParameterCollector();
+                @SuppressWarnings("unchecked")
+                MCRXSL2JAXBTransformer<JAXBElement<MCRSolrInputDocumentList>> jaxbTransformer = (MCRXSL2JAXBTransformer<JAXBElement<MCRSolrInputDocumentList>>) transformer;
+                MCRSolrInputDocumentList input = jaxbTransformer.getJAXBObject(new MCRJDOMContent(doc), param).getValue();
+                return MCRSolrInputDocumentGenerator.getSolrInputDocuments(input.getDoc()).iterator();
+            } else {
+                MCRContent result = transformer.transform(new MCRJDOMContent(doc));
+                return getSolrInputDocuments(result);
+            }
+        } catch (TransformerConfigurationException | JAXBException | JDOMException e) {
             throw new IOException(e);
         }
     }

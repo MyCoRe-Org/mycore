@@ -5,12 +5,12 @@
 
   <xsl:import href="xslImport:solr-document" />
 
-  <xsl:template match="/add">
-    <xsl:copy>
+  <xsl:template match="/">
+    <add>
       <xsl:apply-templates />
-    </xsl:copy>
+    </add>
   </xsl:template>
-
+  
   <xsl:template match="text()" />
 
   <xsl:template match="mycoreobject">
