@@ -28,6 +28,7 @@ import java.util.Date;
 
 import org.jdom2.Element;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
 import org.mycore.parsers.bool.MCRBooleanClauseParser;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRFalseCondition;
@@ -111,14 +112,14 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
     }
 
     private MCRCondition<MCRAccessData> getIPClause(String value) {
-        MCRIPCondition ipCond = (MCRIPCondition) MCRConfiguration.instance().getInstanceOf("MCR.RuleParser.ip", (String) null);
-        
-        if(ipCond == null) {
+        try {
+            MCRIPCondition ipCond = (MCRIPCondition) MCRConfiguration.instance().getInstanceOf("MCR.RuleParser.ip", (String) null);
+            ipCond.set(value);
+            return ipCond;
+        } catch (MCRConfigurationException e) {
             return new MCRIPClause(value);
         }
         
-        ipCond.set(value);
-        return ipCond;
     }
 
     /**
