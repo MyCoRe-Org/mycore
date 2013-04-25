@@ -111,7 +111,7 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
     }
 
     private MCRCondition<MCRAccessData> getIPClause(String value) {
-        MCRIPCondition ipCond = (MCRIPCondition) MCRConfiguration.instance().getInstanceOf("MCR.RuleParser.ip");
+        MCRIPCondition ipCond = (MCRIPCondition) MCRConfiguration.instance().getInstanceOf("MCR.RuleParser.ip", (String) null);
         
         if(ipCond == null) {
             return new MCRIPClause(value);
