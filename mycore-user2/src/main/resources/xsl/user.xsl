@@ -143,7 +143,7 @@
             <td>
               <xsl:call-template name="formatISODate">
                 <xsl:with-param name="date" select="lastLogin" />
-                <xsl:with-param name="format" select="i18n:translate('metaData.dateTime')" />
+                <xsl:with-param name="format" select="i18n:translate('component.user2.metaData.dateTime')" />
               </xsl:call-template>
             </td>
           </tr>
@@ -154,7 +154,7 @@
             <td>
               <xsl:call-template name="formatISODate">
                 <xsl:with-param name="date" select="validUntil" />
-                <xsl:with-param name="format" select="i18n:translate('metaData.dateTime')" />
+                <xsl:with-param name="format" select="i18n:translate('component.user2.metaData.dateTime')" />
               </xsl:call-template>
             </td>
           </tr>
