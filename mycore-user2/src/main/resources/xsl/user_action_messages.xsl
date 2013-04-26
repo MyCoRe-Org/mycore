@@ -1,8 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
-<!-- ============================================== -->
-<!-- $Revision$ $Date$ -->
-<!-- ============================================== --> 
+<?xml version="1.0" encoding="UTF-8"?>
 
 <xsl:stylesheet 
   version="1.0" 
@@ -15,30 +11,37 @@
 <xsl:variable name="printable"  select="'no'" />
 <xsl:include href="section.xsl"    />
 
-<!-- ============ Seitentitel ============ -->
-<xsl:variable name="page.title" select="Eingabefehler" /> 
+<xsl:variable name="page.title" select="i18n:translate('component.user2.message.inputError')" /> 
 <xsl:variable name="PageID" select="'admin'" />
 
 <xsl:template match="user_action_messages"> 
     <xsl:choose>
       <xsl:when test="@section = 'pw_changed'">
         <div class="section">
-          <xsl:value-of select="'Passwort geändert von: '" />
+          <xsl:value-of select="i18n:translate('component.user2.message.passwordChangedFrom')" />
           <xsl:value-of select="@value" />
         </div>
-        <input type="button" onClick="javascript:history.back()" value="Zurück zum Formular" class="editorButton"/>
+        <input type="button" onClick="javascript:history.back()" class="editorButton">
+          <xsl:attribute name="value">
+            <xsl:value-of select="i18n:translate('component.user2.message.backToForm')" />
+          </xsl:attribute>
+        </input>
       </xsl:when>
       <xsl:when test="@section = 'user_created'">
         <div class="section">
-          <xsl:value-of select="'Nutzer eingerichtet: '" />
+          <xsl:value-of select="i18n:translate('component.user2.message.userCreated')" />
           <xsl:value-of select="@value" />
         </div>
-        <input type="button" onClick="javascript:history.back()" value="Zurück zum Formular" class="editorButton"/>
+        <input type="button" onClick="javascript:history.back()" class="editorButton">
+          <xsl:attribute name="value">
+            <xsl:value-of select="i18n:translate('component.user2.message.backToForm')" />
+          </xsl:attribute>
+        </input>
       </xsl:when>
       <xsl:when test="@section = 'user_deleted'">
         <div class="section">
         <p>
-          Nutzer gelöscht:
+          <xsl:value-of select="i18n:translate('component.user2.message.userDeleted')" />
         </p>
           <xsl:for-each select="section">
             <xsl:value-of select="./@value" />
@@ -47,21 +50,29 @@
       </xsl:when>
       <xsl:when test="@section = 'action_not_found'">
         <div class="section">
-          <xsl:value-of select="'Ungültiger Wert von action in user_action_message: '" />
+          <xsl:value-of select="i18n:translate('component.user2.message.badValue')" />
           <xsl:value-of select="@value" />
         </div>
-        <input type="button" onClick="javascript:history.back()" value="Zurück zum Formular" class="editorButton"/>
+        <input type="button" onClick="javascript:history.back()" class="editorButton">
+          <xsl:attribute name="value">
+            <xsl:value-of select="i18n:translate('component.user2.message.backToForm')" />
+          </xsl:attribute>
+        </input>
       </xsl:when>
       <xsl:when test="@section = 'user_changed'">
         <div class="section">
-          <xsl:value-of select="'Nutzerdaten geändert: '" />
+          <xsl:value-of select="i18n:translate('component.user2.message.userDataChanged')" />
           <xsl:value-of select="@value" />
         </div>
-        <input type="button" onClick="javascript:history.back()" value="Zurück zum Formular" class="editorButton"/>
+        <input type="button" onClick="javascript:history.back()" class="editorButton">
+          <xsl:attribute name="value">
+            <xsl:value-of select="i18n:translate('component.user2.message.backToForm')" />
+          </xsl:attribute>
+        </input>
       </xsl:when>
       <xsl:otherwise>
         <div class="section">
-          Bitte korrigieren Sie die folgenden Eingabefehler im Formular:
+          <xsl:value-of select="i18n:translate('component.user2.message.userErrorMessage')" />
           <ul>
             <xsl:for-each select="*">
               <li>
@@ -69,13 +80,15 @@
               </li>
             </xsl:for-each>
           </ul>
-          <input type="button" onClick="javascript:history.back()" value="Zurück zum Formular" class="editorButton"/>
+          <input type="button" onClick="javascript:history.back()" class="editorButton">
+            <xsl:attribute name="value">
+              <xsl:value-of select="i18n:translate('component.user2.message.backToForm')" />
+            </xsl:attribute>
+          </input>
         </div>
       </xsl:otherwise>
     </xsl:choose>    
 </xsl:template>        
-
-<!-- ======== Kopiere ======== -->
 
 <xsl:template match="*">
   <xsl:copy>
@@ -87,65 +100,63 @@
 </xsl:template>
 
 <xsl:template match="no_user_data">
-  Bitte geben Sie die <b>Nutzerkennung</b> ein!
+  <xsl:value-of select="i18n:translate('component.user2.message.noUserData')" />
 </xsl:template>
 
 <xsl:template match="no_access">
-  Ungültige Kombination von Nutzerkennung und Passwort!
+  <xsl:value-of select="i18n:translate('component.user2.message.noAccess')" />
 </xsl:template>
 
 <xsl:template match="no_pwold">
-  Bitte geben Sie das aktuelle <b>Passwort</b> ein!
+  <xsl:value-of select="i18n:translate('component.user2.message.noPWOld')" />
 </xsl:template>
 
 <xsl:template match="no_pwnew1">
-  Bitte geben Sie das neue <b>Passwort</b> ein!
+  <xsl:value-of select="i18n:translate('component.user2.message.noPWNew1')" />
 </xsl:template>
  
 <xsl:template match="no_pwnew2">
-  Bitte wiederholen Sie das neue <b>Passwort</b>!
+  <xsl:value-of select="i18n:translate('component.user2.message.noPWNew2')" />
 </xsl:template>
 
 <xsl:template match="no_pwnewident">
-  Die neuen Passworte sind unterschiedlich!
+  <xsl:value-of select="i18n:translate('component.user2.message.noPWNewIdent')" />
 </xsl:template>
 
 <xsl:template match="not_allowed_changepw">
-  Sie dürfen das Passwort nicht ändern!
+  <xsl:value-of select="i18n:translate('component.user2.message.notAllowedChangepw')" />
 </xsl:template>
 
 <xsl:template match="not_allowed_createuser">
-  Sie dürfen keine Nutzer anlegen!
+  <xsl:value-of select="i18n:translate('component.user2.message.notAllowedCreateUser')" />
 </xsl:template>
 
 <xsl:template match="user_exists">
-  Nutzer bereits vorhanden!
+  <xsl:value-of select="i18n:translate('component.user2.message.userExists')" />
 </xsl:template>
 
 <xsl:template match="no_le_exists">
-  Legal Entity mit der angegebenen ID existiert nicht!
+  <xsl:value-of select="i18n:translate('component.user2.message.noLeExists')" />
 </xsl:template>
 
 <xsl:template match="not_allowed_delete">
-  Sie dürfen sich nicht selbst löschen!
+  <xsl:value-of select="i18n:translate('component.user2.message.notAllowedDelete')" />
 </xsl:template>
 
 <xsl:template match="not_allowed_changeuser">
-  Sie dürfen die Nutzerdaten nicht ändern!
+  <xsl:value-of select="i18n:translate('component.user2.message.notAllowedChangeUser')" />
 </xsl:template>
 
 <xsl:template match="not_allowed_changegroup">
-  Sie dürfen keine Gruppenzugehörigkeit ändern!
+  <xsl:value-of select="i18n:translate('component.user2.message.notAllowedChangeRole')" />
 </xsl:template>
 
 <xsl:template match="not_allowed_changeowngroup">
-  Sie können Ihre eigene Gruppenzugehörigkeit nicht ändern!
+  <xsl:value-of select="i18n:translate('component.user2.message.notAllowedChangeOwnRole')" />
 </xsl:template>
 
 <xsl:template match="no_user_selected">
-  Kein Nutzer ausgewählt!
+  <xsl:value-of select="i18n:translate('component.user2.message.noUserSelected')" />
 </xsl:template>
-
-<!-- ============ Ende Stylesheet ============ -->
 
 </xsl:stylesheet>

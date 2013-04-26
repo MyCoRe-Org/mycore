@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!-- XSL to search for users and display the list users found -->
 
@@ -9,7 +9,7 @@
 
   <xsl:variable name="PageID" select="'select-user'" />
 
-  <xsl:variable name="PageTitle" select="'Nutzer auswählen'" />
+  <xsl:variable name="PageTitle" select="'Nutzer auswÃ¤hlen'" />
 
 <!-- ========== Subselect Parameter ========== -->
   <xsl:param name="subselect.session" />
@@ -25,7 +25,7 @@
         <div class="section">
           <form action="{$ServletsBaseURL}MCRUserServlet" onsubmit="document.getElementById('indicator').style.display='inline';">
             <p>
-              Suche nach Nutzerkennung oder Name:
+              <xsl:value-of select="i18n:translate('component.user2.admin.search')"/>
               <input type="text" name="search" value="{@search}" />
               <img id="indicator" style="display:none" src="{$WebApplicationBaseURL}{$MCR.Ajax.LoadingImage}" />
             </p>
@@ -38,19 +38,28 @@
           <xsl:when test="user">
             <table class="user">
               <caption>
-                <xsl:value-of select="count(user)" />
-                <xsl:text> Nutzer gefunden:</xsl:text>
+                <xsl:value-of select="i18n:translate('component.user2.admin.search.found', count(user))"/>
               </caption>
               <tr>
-                <th scope="col">Nutzerkennung:</th>
+                <th scope="col">
+                  <xsl:value-of select="i18n:translate('component.user2.admin.userAccount')"/>
+                </th>
                 <xsl:choose>
                   <xsl:when test="@num">
-                    <th scope="col">Herkunft:</th>
-                    <th scope="col">Name:</th>
-                    <th scope="col">E-Mail:</th>
+                    <th scope="col">
+                      <xsl:value-of select="i18n:translate('component.user2.admin.user.origin')"/>
+                    </th>
+                    <th scope="col">
+                      <xsl:value-of select="i18n:translate('component.user2.admin.user.name')"/>
+                    </th>
+                    <th scope="col">
+                      <xsl:value-of select="i18n:translate('component.user2.admin.user.email')"/>
+                    </th>
                   </xsl:when>
                   <xsl:otherwise>
-                    <th scope="col">Bezeichnung:</th>
+                    <th scope="col">
+                      <xsl:value-of select="i18n:translate('component.user2.admin.user.description')"/>
+                    </th>
                   </xsl:otherwise>
                 </xsl:choose>
               </tr>
@@ -59,24 +68,17 @@
           </xsl:when>
           <xsl:when test="string-length(@num) = 0">
             <p>
-              Sie besitzen keine Lesenutzer.
+              <xsl:value-of select="i18n:translate('component.user2.admin.search.error.noRight')"/>
             </p>
           </xsl:when>
           <xsl:when test="@num = 0">
             <p>
-              Keine Nutzer gefunden.
-              Bitte passen Sie Ihre Suchkriterien an.
+              <xsl:value-of select="i18n:translate('component.user2.admin.search.error.noUserFound')"/>
             </p>
           </xsl:when>
           <xsl:when test="number(@num) &gt; number(@max)">
             <p>
-              Zu viele (
-              <xsl:value-of select="@num" />
-              ) Nutzer, um alle anzuzeigen.
-              Bitte passen Sie Ihre Suchkriterien an.
-              Es werden maximal
-              <xsl:value-of select="@max" />
-              Nutzer angezeigt.
+              <xsl:value-of select="i18n:translate('component.user2.admin.search.error.tooManyUsers', @num, @max)"/>
             </p>
           </xsl:when>
         </xsl:choose>

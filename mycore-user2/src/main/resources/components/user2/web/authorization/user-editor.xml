@@ -7,7 +7,7 @@
 
   <include id="validation.message">
     <validationMessage>
-      <label xml:lang="de">
+      <!--<label xml:lang="de">
         Eingabefehler: Bitte korrigieren Sie die markierten Felder.
         <br />
         Wenn Sie den Mauszeiger auf das rote Symbol neben dem fehlerhaften
@@ -18,7 +18,8 @@
         Input error: Please, correct the marked fields.
         <br />
         To get hints, move the mouse pointer on the red symbol next to the wrong input field.
-      </label>
+      </label>-->
+      <text i18n="component.user2.admin.inputhints" />
     </validationMessage>
   </include>
   
@@ -115,8 +116,9 @@
     <cell row="10" col="2" colspan="2" anchor="WEST" var="validUntil">
       <textfield width="20" maxlength="20" id="tf.valid">
         <condition id="cond.valid" type="datetime" format="yyyy-MM-dd;yyyy-MM-dd'T'HH:mm:ss'Z'">
-          <label xml:lang="de">Bitte geben Sie das Datum im Format YYYY-MM-TT ein!</label>
-          <label xml:lang="en">Please enter the date in form YYYY-MM-DD!</label>
+          <!--<label xml:lang="de">Bitte geben Sie das Datum im Format YYYY-MM-TT ein!</label>
+          <label xml:lang="en">Please enter the date in form YYYY-MM-DD!</label>-->
+          <text i18n="component.user2.admin.inputhints.date" />
         </condition>
       </textfield>
     </cell>
@@ -183,14 +185,17 @@
 
   <include id="email">
     <cell row="7" col="1" anchor="EAST">
-      <text label="E-Mail" />
+      <!--<text label="E-Mail" />
       <text label=": " />
+        -->
+      <text i18n="component.user2.admin.user.email" />
     </cell>
     <cell row="7" col="2" colspan="2" anchor="WEST" var="eMail">
       <textfield width="60" maxlength="64" id="tf.email">
         <condition id="cond.email" regexp="\S+@\S+\.\S+">
           <label xml:lang="de">Bitte geben Sie eine syntaktisch korrekte EMail-Adresse ein!</label>
           <label xml:lang="en">Please, enter a syntactically correct email address!</label>
+          <!--<text i18n="component.user2.admin.inputhints.email" />-->
         </condition>
       </textfield>
     </cell>
@@ -205,8 +210,9 @@
     <cell row="3" col="2" colspan="2" anchor="WEST" var="password">
       <password id="password1" width="10" class="input-medium">
         <condition id="cond.password1.syntax" maxLength="16" regexp="[\S]*">
-          <label xml:lang="de">Bitte maximal 16 Zeichen, keine Leerzeichen eingeben!</label>
-          <label xml:lang="en">Please, enter maximum 16 characters, no blanks!</label>
+          <!--<label xml:lang="de">Bitte maximal 16 Zeichen, keine Leerzeichen eingeben!</label>
+          <label xml:lang="en">Please, enter maximum 16 characters, no blanks!</label>-->
+          <text i18n="component.user2.admin.inputhints.password" />
         </condition>
       </password>
     </cell>
@@ -216,17 +222,19 @@
     <cell row="4" col="2" colspan="2" anchor="WEST" var="password2">
       <password id="password2" width="10" class="input-medium">
         <condition id="cond.password2.syntax" maxLength="16" regexp="[\S]*">
-          <label xml:lang="de">Bitte maximal 16 Zeichen, keine Leerzeichen eingeben!</label>
-          <label xml:lang="en">Please, enter maximum 16 characters, no blanks!</label>
+          <!--<label xml:lang="de">Bitte maximal 16 Zeichen, keine Leerzeichen eingeben!</label>
+          <label xml:lang="en">Please, enter maximum 16 characters, no blanks!</label>-->
+          <text i18n="component.user2.admin.inputhints.password" />
         </condition>
       </password>
       <text i18n="component.user2.admin.passwordIdentically" />
     </cell>
 
-    <!-- Password is only required for local users, then both password fields must be same and are required -->
+    <!-- Password is only required for local users. Then both password fields must be same and are required -->
     <condition id="cond.passwords" xsl="(realm/@id != 'local') or ((string-length(password) &gt; 0) and (password = password2 ))">
-      <label xml:lang="de">Für neue lokale Benutzer, füllen Sie bitte beide Passwortfelder identisch aus!</label>
-      <label xml:lang="en">For new local users, please fill both password fields identically!</label>
+      <!--<label xml:lang="de">Für neue lokale Benutzer, füllen Sie bitte beide Passwortfelder identisch aus!</label>
+      <label xml:lang="en">For new local users, please fill both password fields identically!</label>-->
+      <text i18n="component.user2.admin.inputhints.passwordLocalUsers" />
     </condition>
 
   </include>
@@ -243,8 +251,9 @@
     <cell row="2" col="2" anchor="WEST" var="@name">
       <textfield id="tf.userName" width="16" maxlength="16">
         <condition id="cond.userName" required="true" maxLength="16" regexp="[\S]*">
-          <label xml:lang="de">Benutzerkennungen dürfen nur maximal 16 Zeichen lang sein, keine Leerzeichen!</label>
-          <label xml:lang="en">For user accounts please enter maximum 16 characters, no blanks!</label>
+          <!--<label xml:lang="de">Benutzerkennungen dürfen nur maximal 16 Zeichen lang sein, keine Leerzeichen!</label>
+          <label xml:lang="en">For user accounts please enter maximum 16 characters, no blanks!</label>-->
+          <text i18n="component.user2.admin.inputhints.username" />
         </condition>
       </textfield>
     </cell>
@@ -259,8 +268,9 @@
   </panel>
   <panel id="newUser">
     <condition id="checkUserName" class="org.mycore.user2.MCRUserServlet" method="checkUserName">
-      <label xml:lang="de">Diese Nutzerkennung ist im Bereich bereits vergeben!</label>
-      <label xml:lang="en">This user account already exists in the area!</label>
+      <!--<label xml:lang="de">Diese Nutzerkennung ist im Bereich bereits vergeben!</label>
+      <label xml:lang="en">This user account already exists in the area!</label>-->
+      <text i18n="component.user2.admin.inputhints.sameUsername" />
     </condition>
   </panel>
 

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!-- XSL to display data of a login user -->
 
@@ -159,14 +159,18 @@
             </td>
           </tr>
           <tr class="abstand">
-            <th scope="row">Name:</th>
+            <th scope="row">
+              <xsl:value-of select="il8n:translate('component.user2.admin.user.name')" />
+            </th>
             <td>
               <xsl:value-of select="realName" />
             </td>
           </tr>
           <xsl:if test="eMail">
             <tr>
-              <th scope="row">E-Mail:</th>
+              <th scope="row">
+                <xsl:value-of select="il8n:translate('component.user2.admin.user.email')" />
+              </th>
               <td>
                 <a href="mailto:{eMail}">
                   <xsl:value-of select="eMail" />
