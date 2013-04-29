@@ -799,47 +799,6 @@
     </tr>
   </xsl:template>
 
-  <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="title.confpro">
-    <xsl:choose>
-      <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title">
-        <xsl:call-template name="ShortenText">
-          <xsl:with-param name="text" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title[1]" />
-          <xsl:with-param name="length" select="70" />
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@type='conference']">
-        <xsl:variable name="completeTitle">
-          <xsl:for-each select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@type='conference']">
-            <xsl:for-each select="mods:namePart[not(@type)]">
-              <xsl:choose>
-                <xsl:when test="position()=1">
-                  <xsl:value-of select="." />
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="concat(' – ',.)" />
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:for-each>
-            <xsl:if test="mods:namePart[@type='date']">
-              <xsl:value-of select="', '" />
-              <xsl:value-of select="mods:namePart[@type='date']" />
-            </xsl:if>
-            <xsl:for-each select="mods:affiliation">
-              <xsl:value-of select="concat(', ',.)" />
-            </xsl:for-each>
-          </xsl:for-each>
-        </xsl:variable>
-        <xsl:call-template name="ShortenText">
-          <xsl:with-param name="text" select="i18n:translate('component.mods.metaData.dictionary.proceedingOf',$completeTitle)" />
-          <xsl:with-param name="length" select="70" />
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="@ID" />
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
   <xsl:template name="printMetaDate.mods.categoryContent">
     <xsl:if
       test="(./metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']) or
