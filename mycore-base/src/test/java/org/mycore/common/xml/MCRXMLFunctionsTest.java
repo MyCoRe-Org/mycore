@@ -53,4 +53,13 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
         assertEquals("Result URI path is not correct", result, MCRXMLFunctions.encodeURIPath(source, true));
     }
 
+    @Test
+    public void shortenText() {
+        String test = "Foo bar";
+        String result = "Foo...";
+        assertEquals("Shortened text did not match", result, MCRXMLFunctions.shortenText(test, 3));
+        assertEquals("Shortened text did not match", result, MCRXMLFunctions.shortenText(test, 0));
+        assertEquals("Shortened text did not match", test, MCRXMLFunctions.shortenText(test, test.length()));
+    }
+
 }

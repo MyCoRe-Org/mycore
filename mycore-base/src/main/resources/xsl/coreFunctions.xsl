@@ -4,7 +4,7 @@
 <!-- ============================================== -->
 <!-- Authors: Thomas Scheffler (yagee) -->
 <!-- Authors: Andreas Trappe (lezard) -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:xlink="http://www.w3.org/1999/xlink" exclude-result-prefixes="xlink i18n layoutUtils"
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:xlink="http://www.w3.org/1999/xlink" exclude-result-prefixes="xlink i18n layoutUtils mcrxml"
     xmlns:layoutUtils="xalan://org.mycore.frontend.MCRLayoutUtilities">
   <xsl:param name="CurrentLang" />
   <xsl:param name="DefaultLang" />
@@ -62,7 +62,7 @@
     -->
     <xsl:template name="UrlDeleteSession">
         <xsl:param name="url" />
-        <xsl:value-of xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions" select="mcrxml:regexp($url, ';jsessionid=[^?#]+', '')"/>
+        <xsl:value-of select="mcrxml:regexp($url, ';jsessionid=[^?#]+', '')"/>
     </xsl:template>
     <!--
         Template: UrlSetParam
@@ -253,14 +253,7 @@
     <xsl:template name="ShortenText">
         <xsl:param name="text" />
         <xsl:param name="length" />
-        <xsl:choose>
-            <xsl:when test="string-length($text) > $length">
-                <xsl:value-of select="concat(substring($text,1,$length),substring-before(substring($text,($length+1)),' '),'...')" />
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="$text" />
-            </xsl:otherwise>
-        </xsl:choose>
+        <xsl:value-of select="mcrxml:shortenText($text, $length)"/>
     </xsl:template>
 
     <!--
@@ -616,8 +609,7 @@
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-        <xsl:value-of xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions"
-            select="mcrxml:formatISODate( string( $date ),string( $formatArg ),string( $locale ) )" />
+        <xsl:value-of select="mcrxml:formatISODate( string( $date ),string( $formatArg ),string( $locale ) )" />
     </xsl:template>
 
     <!-- ====================================================================================={
