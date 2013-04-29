@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xalan="http://xml.apache.org/xalan" xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions"
-  exclude-result-prefixes="mcrxsl xalan mods xlink">
+  xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xalan="http://xml.apache.org/xalan" xmlns:iview2="xalan://org.mycore.iview2.frontend.MCRIView2XSLFunctions"
+  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" exclude-result-prefixes="mcrxsl xalan mods xlink iview2">
 
   <xsl:import href="xslImport:solr-document" />
 
@@ -10,13 +10,27 @@
       <xsl:apply-templates />
     </add>
   </xsl:template>
-  
+
   <xsl:template match="text()" />
 
   <xsl:template match="mycoreobject">
     <xsl:variable name="hasImports" select="mcrxsl:hasNextImportStep('solr-document')" />
     <doc>
       <xsl:call-template name="baseFields" />
+      <xsl:for-each select="structure/parents/parent">
+        <field name="parent">
+          <xsl:value-of select="@xlink:href" />
+        </field>
+      </xsl:for-each>
+      <xsl:variable name="derobject" select="structure/derobjects/derobject" />
+      <field name="derCount">
+        <xsl:value-of select="count($derobject)" />
+      </field>
+      <xsl:for-each select="$derobject">
+        <field name="derivates">
+          <xsl:value-of select="@xlink:href" />
+        </field>
+      </xsl:for-each>
       <xsl:for-each select="./descendant::*[@classid and @categid]">
         <xsl:variable name="classid" select="@classid" />
         <xsl:variable name="uri" select="concat('classification:metadata:0:parents:',@classid,':',@categid)" />
@@ -57,11 +71,20 @@
     <xsl:variable name="hasImports" select="mcrxsl:hasNextImportStep('solr-document')" />
     <doc>
       <xsl:call-template name="baseFields" />
-      <xsl:for-each select="derivate/fileset/file/urn | /mycorederivate/derivate/fileset/@urn">
+      <xsl:for-each select="derivate/fileset/file/urn | derivate/fileset/@urn">
         <field name="derivateURN">
           <xsl:value-of select="." />
         </field>
       </xsl:for-each>
+      <xsl:variable name="iviewMainFile" select="iview2:getSupportedMainFile(@ID)" />
+      <xsl:if test="string-length($iviewMainFile) &gt; 0">
+        <field name="iviewFile">
+          <xsl:value-of select="concat(@xlink:href,$iviewMainFile)" />
+        </field>
+      </xsl:if>
+      <field name="maindoc">
+        <xsl:value-of select="derivate/internals/internal/@maindoc"/>
+      </field>
     </doc>
   </xsl:template>
 
@@ -72,7 +95,7 @@
     <field name="returnId">
       <xsl:choose>
         <xsl:when test="contains(@ID, '_derivate_')">
-          <xsl:value-of select="/mycorederivate/derivate/linkmetas/linkmeta/@xlink:href" />
+          <xsl:value-of select="derivate/linkmetas/linkmeta/@xlink:href" />
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="@ID" />
@@ -87,11 +110,6 @@
     </field>
     <xsl:for-each select="descendant::*[@xlink:href]">
       <field name="link">
-        <xsl:value-of select="@xlink:href" />
-      </field>
-    </xsl:for-each>
-    <xsl:for-each select="/mycoreobject/structure/parents/parent">
-      <field name="parent">
         <xsl:value-of select="@xlink:href" />
       </field>
     </xsl:for-each>
