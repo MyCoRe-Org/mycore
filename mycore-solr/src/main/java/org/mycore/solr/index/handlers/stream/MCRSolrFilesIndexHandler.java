@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -15,8 +16,10 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.cs.MCRSolrBulkXMLStream;
+import org.mycore.solr.index.file.MCRSolrMCRFileDocumentFactory;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
+import org.mycore.solr.index.handlers.document.MCRSolrInputDocumentsHandler;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 
 /**
@@ -60,22 +63,26 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
     protected void indexDerivate(String derivateID) {
         MCRSolrIndexHandlerFactory ihf = MCRSolrIndexHandlerFactory.getInstance();
         List<MCRFile> files = MCRUtils.getFiles(derivateID);
-        LOGGER.info("Sending files (" + files.size() + ") for derivate \"" + getID() + "\"");
-        MCRSolrBulkXMLStream bulkStream = new MCRSolrBulkXMLStream("MCRSolrFiles");
+        int fileCount = files.size();
+        List<SolrInputDocument> docs = new ArrayList<>(fileCount);
+        LOGGER.info("Sending " + fileCount + " file(s) for derivate \"" + getID() + "\"");
         for (MCRFile file : files) {
             boolean sendContent = ihf.checkFile(file);
             try {
                 if (sendContent) {
                     this.subHandlerList.add(ihf.getIndexHandler(file, this.solrServer, true));
                 } else {
-                    bulkStream.getList().add(file.createXML().getRootElement().detach());
+                    SolrInputDocument fileDoc = MCRSolrMCRFileDocumentFactory.getInstance().getDocument(file);
+                    docs.add(fileDoc);
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error creating transfer thread", ex);
             }
         }
-        if(!bulkStream.getList().isEmpty()) {
-            this.subHandlerList.add(new MCRSolrBulkXMLIndexHandler(bulkStream));
+        if (!docs.isEmpty()) {
+            MCRSolrInputDocumentsHandler subHandler = new MCRSolrInputDocumentsHandler(docs, solrServer);
+            subHandler.setCommitWithin(getCommitWithin());
+            this.subHandlerList.add(subHandler);
         }
     }
 

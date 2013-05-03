@@ -31,18 +31,18 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.index.MCRSolrIndexHandler;
-import org.mycore.solr.index.cs.MCRSolrContentStream;
 import org.mycore.solr.index.cs.MCRSolrFileContentStream;
-import org.mycore.solr.index.handlers.stream.MCRSolrDefaultIndexHandler;
+import org.mycore.solr.index.file.MCRSolrMCRFileDocumentFactory;
+import org.mycore.solr.index.handlers.document.MCRSolrInputDocumentHandler;
 import org.mycore.solr.index.handlers.stream.MCRSolrFileIndexHandler;
 import org.mycore.solr.index.strategy.MCRSolrIndexStrategyManager;
 
@@ -105,8 +105,8 @@ public abstract class MCRSolrIndexHandlerFactory {
             /* extract metadata with tika */
             indexHandler = new MCRSolrFileIndexHandler(new MCRSolrFileContentStream(file), solrServer);
         } else {
-            MCRSolrContentStream contentStream = new MCRSolrContentStream(file.getID(), new MCRJDOMContent(file.createXML()));
-            indexHandler = new MCRSolrDefaultIndexHandler(contentStream, solrServer);
+            SolrInputDocument doc = MCRSolrMCRFileDocumentFactory.getInstance().getDocument(file);
+            indexHandler = new MCRSolrInputDocumentHandler(doc, solrServer);
         }
         long end = System.currentTimeMillis();
         indexHandler.getStatistic().addTime(end - start);

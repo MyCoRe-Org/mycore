@@ -60,7 +60,7 @@ public class MCRSolrSearchFieldsInputDocumentFactory extends MCRSolrInputDocumen
         return document;
     }
 
-    private SolrInputDocument getSolrInputDocument(MCRIndexEntry indexEntry) {
+    public static SolrInputDocument getSolrInputDocument(MCRIndexEntry indexEntry) {
         SolrInputDocument document = new SolrInputDocument();
         for (MCRFieldValue field : indexEntry.getFieldValues()) {
             String name = field.getFieldName();
