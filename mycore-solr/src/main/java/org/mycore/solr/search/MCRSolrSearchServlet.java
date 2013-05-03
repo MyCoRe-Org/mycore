@@ -56,8 +56,8 @@ public class MCRSolrSearchServlet extends MCRServlet {
      * @return the list.
      */
     private static List<String> solrParameterKeys() {
-        String[] params = new String[] { "q", "sort", "start", "rows", "pageDoc", "pageScore", "fq", "cache", "fl", "glob", "debug",
-                "explainOther", "defType", "timeAllowed", "omitHeader", "sortOrder", "sortBy", "XSL.Style", "wt" };
+        String[] params = new String[] { "q", "sort", "start", "rows", "pageDoc", "pageScore", "fq", "cache", "fl", "glob", "debug", "explainOther", "defType",
+                "timeAllowed", "omitHeader", "sortOrder", "sortBy", "XSL.Style", "wt", "qf", "q.alt", "mm", "pf", "ps", "qs", "tie", "bq", "bf" };
         return Collections.unmodifiableList(Arrays.asList(params));
     }
 
@@ -111,6 +111,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
             // Build the q parameter without solr.type.fields
             if (!fieldTypeMap.containsKey(fieldName)) {
                 addFieldToQuery(query, fieldValues, fieldName);
+
             } else {
                 String fieldType = fieldTypeMap.get(fieldName);
                 StringBuilder filterQueryBuilder = getFilterQueryBuilder(filterQueryMap, fieldType);
@@ -228,8 +229,8 @@ public class MCRSolrSearchServlet extends MCRServlet {
      * @param typeParameter all type-parameters will be stored here.
      * @param sortParameter all sort-parameters will be stored here.
      */
-    protected void extractParameterList(Map<String, String[]> requestParameter, Map<String, String[]> queryParameter,
-            Map<String, String[]> solrParameter, Map<String, String[]> typeParameter, Map<String, String[]> sortParameter) {
+    protected void extractParameterList(Map<String, String[]> requestParameter, Map<String, String[]> queryParameter, Map<String, String[]> solrParameter,
+            Map<String, String[]> typeParameter, Map<String, String[]> sortParameter) {
         for (Entry<String, String[]> currentEntry : requestParameter.entrySet()) {
             String parameterName = currentEntry.getKey();
             SolrParameterGroup parameterGroup = getParameterType(parameterName);
