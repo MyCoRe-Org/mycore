@@ -35,11 +35,11 @@ import org.mycore.frontend.servlets.MCRServletJob;
  *      <dd>They are used to build the query for solr. All parameters wich arent reserved, type or sort parameters will be stored here.</dd>
  * </dl>
  * 
- * 
- * 
  * @author mcrshofm
  */
 public class MCRSolrSearchServlet extends MCRServlet {
+
+    private static final long serialVersionUID = 1L;
 
     private enum SolrParameterGroup {
         QueryParameter, SolrParameter, SortParameter, TypeParameter
@@ -49,22 +49,14 @@ public class MCRSolrSearchServlet extends MCRServlet {
 
     private static final String JOIN_PATTERN = "{!join from=returnId to=id}";
 
-    private static final long serialVersionUID = 1L;
+    /** Parameters that can be used within a select request to solr*/
+    static final List<String> RESERVED_PARAMETER_KEYS;
 
-    /**
-     * Creates a list with all parameters that can be used within a select request to solr.
-     * @return the list.
-     */
-    private static List<String> solrParameterKeys() {
-        String[] params = new String[] { "q", "sort", "start", "rows", "pageDoc", "pageScore", "fq", "cache", "fl", "glob", "debug", "explainOther", "defType",
-                "timeAllowed", "omitHeader", "sortOrder", "sortBy", "XSL.Style", "wt", "qf", "q.alt", "mm", "pf", "ps", "qs", "tie", "bq", "bf" };
-        return Collections.unmodifiableList(Arrays.asList(params));
+    static {
+        String[] parameter = new String[] { "q", "sort", "start", "rows", "pageDoc", "pageScore", "fq", "cache", "fl", "glob", "debug", "explainOther",
+                "defType", "timeAllowed", "omitHeader", "sortOrder", "sortBy", "XSL.Style", "wt", "qf", "q.alt", "mm", "pf", "ps", "qs", "tie", "bq", "bf" };
+        RESERVED_PARAMETER_KEYS = Collections.unmodifiableList(Arrays.asList(parameter));
     }
-
-    /**
-     * Holds the solr reserved parameters.
-     */
-    private List<String> reservedParameterKeys;
 
     /**
      * Adds a field  with all values to a {@link StringBuilder}
@@ -221,6 +213,11 @@ public class MCRSolrSearchServlet extends MCRServlet {
         requestDispatcher.forward(request, response);
     }
 
+    @Override
+    public void init() throws ServletException {
+        super.init();
+    }
+
     /**
      * Splits the parameters into three groups.
      * @param requestParameter the map of parameters to split.
@@ -253,7 +250,6 @@ public class MCRSolrSearchServlet extends MCRServlet {
                 continue;
             }
         }
-
     }
 
     /**
@@ -291,28 +287,12 @@ public class MCRSolrSearchServlet extends MCRServlet {
     }
 
     /**
-     * This method is used to generate the solr reserved parameters.
-     * @return A list of all Parameters that can be used within a select request to solr.
-     *          <strong>WARNING: the list should not be modified</strong>
-     */
-    protected List<String> getReservedParameters() {
-        return reservedParameterKeys;
-    }
-
-    @Override
-    public void init() throws ServletException {
-        super.init();
-
-        reservedParameterKeys = solrParameterKeys();
-    }
-
-    /**
      * Detects if a parameter is a solr parameter
      * @param parameterName the name of the parameter
      * @return true if the parameter is a solr parameter
      */
     private boolean isSolrParameter(String parameterName) {
-        return reservedParameterKeys.contains(parameterName);
+        return RESERVED_PARAMETER_KEYS.contains(parameterName);
     }
 
     /**
