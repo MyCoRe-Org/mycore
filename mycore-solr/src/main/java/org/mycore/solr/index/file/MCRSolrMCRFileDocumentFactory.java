@@ -84,13 +84,13 @@ public class MCRSolrMCRFileDocumentFactory {
         doc.setField("filePath", absolutePath);
         doc.setField("stream_size", input.getSize());
         doc.setField("stream_name", absolutePath);
-        doc.setField("stream_source_info", input.getClass().getCanonicalName());
+        doc.setField("stream_source_info", input.getStoreID() + ":" + input.getStorageID());
         doc.setField("stream_content_type", input.getContentType().getMimeType());
         doc.setField("extension", input.getExtension());
         doc.setField("contentTypeID", input.getContentTypeID());
         doc.setField("contentType", input.getContentType().getLabel());
-        String urn = MCRURNManager.getURNForFile(input.getOwnerID(), absolutePath.substring(0, absolutePath.lastIndexOf("/") + 1),
-            input.getName());
+        String urn = MCRURNManager.getURNForFile(input.getOwnerID(),
+            absolutePath.substring(0, absolutePath.lastIndexOf("/") + 1), input.getName());
         if (urn != null) {
             doc.setField("urn", urn);
         }
