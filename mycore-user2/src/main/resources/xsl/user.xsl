@@ -160,7 +160,7 @@
           </tr>
           <tr class="abstand">
             <th scope="row">
-              <xsl:value-of select="il8n:translate('component.user2.admin.user.name')" />
+              <xsl:value-of select="i18n:translate('component.user2.admin.user.name')" />
             </th>
             <td>
               <xsl:value-of select="realName" />
@@ -169,7 +169,7 @@
           <xsl:if test="eMail">
             <tr>
               <th scope="row">
-                <xsl:value-of select="il8n:translate('component.user2.admin.user.email')" />
+                <xsl:value-of select="i18n:translate('component.user2.admin.user.email')" />
               </th>
               <td>
                 <a href="mailto:{eMail}">
