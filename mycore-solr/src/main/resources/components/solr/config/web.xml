@@ -30,11 +30,6 @@
 </servlet-mapping>
 
 <servlet-mapping>
-  <servlet-name>MCRSolrSelectProxyServlet</servlet-name>
-  <url-pattern>/servlets/SolrSelectProxy</url-pattern>
-</servlet-mapping>
-
-<servlet-mapping>
   <servlet-name>MCRLegacySearchServlet</servlet-name>
   <url-pattern>/servlets/MCRQueryServlet</url-pattern>
 </servlet-mapping>
