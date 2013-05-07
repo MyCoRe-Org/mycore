@@ -3,7 +3,6 @@ package org.mycore.solr.index.handlers.stream;
 import static org.mycore.solr.MCRSolrConstants.EXTRACT_PATH;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -24,7 +23,7 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
 
     final static Logger LOGGER = Logger.getLogger(MCRSolrFileIndexHandler.class);
 
-    final static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
+    final static float DEFAULT_BOOST = (new SolrInputField(null)).getBoost(); //normally 1.0f
 
     public MCRSolrFileIndexHandler(MCRSolrFileContentStream stream) {
         super(stream);
@@ -51,8 +50,8 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
         updateRequest.setCommitWithin(getCommitWithin());
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Solr: sending binary data (" + file.getAbsolutePath() + " (" + solrID + "), size is " + file.getSizeFormatted()
-                + ") to solr server.");
+            LOGGER.debug("Solr: sending binary data (" + file.getAbsolutePath() + " (" + solrID + "), size is "
+                + file.getSizeFormatted() + ") to solr server.");
         }
         long t = System.currentTimeMillis();
         /* actually send the request */
@@ -73,6 +72,9 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
                 params.set(name, values);
             } else {
                 params.set(name, field.getValue().toString());
+            }
+            if (field.getBoost() != DEFAULT_BOOST) {
+                params.set("boost." + field.getName(), Float.toString(field.getBoost()));
             }
         }
         return params;
