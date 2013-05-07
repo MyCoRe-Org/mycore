@@ -44,15 +44,15 @@ public class MCRSolrLegacySearchServlet extends MCRSearchServlet {
 
     @Override
     protected void showResults(HttpServletRequest request, HttpServletResponse response, MCRQuery query, Document input)
-            throws IOException, ServletException {
-        SolrQuery mergedSolrQuery = getSolrQuery(query);
+        throws IOException, ServletException {
+        SolrQuery mergedSolrQuery = getSolrQuery(query, getNumPerPage(request));
         request.setAttribute(MCRSolrSelectProxyServlet.QUERY_KEY, mergedSolrQuery);
         RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher("/servlets/SolrSelectProxy");
         requestDispatcher.forward(request, response);
     }
 
     @SuppressWarnings("rawtypes")
-    private SolrQuery getSolrQuery(MCRQuery query) {
+    private SolrQuery getSolrQuery(MCRQuery query, int rows) {
         MCRCondition condition = query.getCondition();
         HashMap<String, List<MCRCondition>> table;
 
@@ -70,22 +70,26 @@ public class MCRSolrLegacySearchServlet extends MCRSearchServlet {
 
         }
 
-        SolrQuery mergedSolrQuery = MCRSolrQueryEngine.buildMergedSolrQuery(query.getSortBy(), false, true, table, query.getMaxResults());
+        SolrQuery mergedSolrQuery = MCRSolrQueryEngine
+            .buildMergedSolrQuery(query.getSortBy(), false, true, table, rows);
         return mergedSolrQuery;
     }
 
     @Override
-    protected void sendRedirect(HttpServletRequest req, HttpServletResponse res, MCRQuery query, Document input) throws IOException {
-        SolrQuery mergedSolrQuery = getSolrQuery(query);
+    protected void sendRedirect(HttpServletRequest req, HttpServletResponse res, MCRQuery query, Document input)
+        throws IOException {
+        SolrQuery mergedSolrQuery = getSolrQuery(query, getNumPerPage(req));
         @SuppressWarnings("unchecked")
-        String selectProxyURL = MCRServlet.getServletBaseURL() + "SolrSelectProxy?" + mergedSolrQuery.toString() + getReservedParameterString(req.getParameterMap()) ;
+        String selectProxyURL = MCRServlet.getServletBaseURL() + "SolrSelectProxy?" + mergedSolrQuery.toString()
+            + getReservedParameterString(req.getParameterMap());
         res.sendRedirect(res.encodeRedirectURL(selectProxyURL));
     }
 
     @Override
-    protected void showResults(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    protected void showResults(HttpServletRequest request, HttpServletResponse response) throws IOException,
+        ServletException {
         throw new MCRException(new OperationNotSupportedException("showResults(request, response) is not supported by "
-                + MCRSolrLegacySearchServlet.class.getCanonicalName()));
+            + MCRSolrLegacySearchServlet.class.getCanonicalName()));
     }
 
     /**
@@ -95,11 +99,11 @@ public class MCRSolrLegacySearchServlet extends MCRSearchServlet {
      */
     private String getReservedParameterString(Map<String, String[]> requestParameter) {
         StringBuilder sb = new StringBuilder();
-        
+
         Set<Entry<String, String[]>> requestEntrys = requestParameter.entrySet();
-        for (Entry<String,String[]> entry : requestEntrys) {
+        for (Entry<String, String[]> entry : requestEntrys) {
             String parameterName = entry.getKey();
-            if(parameterName.startsWith("XSL.")){
+            if (parameterName.startsWith("XSL.")) {
                 for (String parameterValue : entry.getValue()) {
                     sb.append("&");
                     sb.append(parameterName);

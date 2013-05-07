@@ -83,8 +83,8 @@ public class MCRSearchServlet extends MCRServlet {
     /** Maximum number of hits to display per page (numPerPage) */
     private int maxPerPage;
 
-    private static HashSet<String> SEARCH_PARAMETER = new HashSet<>(Arrays.asList(new String[] { "search", "query", "maxResults",
-            "numPerPage", "page", "mask", "mode", "redirect" }));;
+    private static HashSet<String> SEARCH_PARAMETER = new HashSet<>(Arrays.asList(new String[] { "search", "query",
+            "maxResults", "numPerPage", "page", "mask", "mode", "redirect" }));;
 
     @Override
     public void init() throws ServletException {
@@ -133,7 +133,7 @@ public class MCRSearchServlet extends MCRServlet {
             if (name.contains(".sortField")) {
                 continue;
             }
-            if (SEARCH_PARAMETER.contains(name)){
+            if (SEARCH_PARAMETER.contains(name)) {
                 continue;
             }
             if (name.startsWith("XSL.")) {
@@ -323,7 +323,8 @@ public class MCRSearchServlet extends MCRServlet {
      * Shows a results page. Usage:
      * MCRSearchServlet?mode=results&numPerPage=10&page=1
      */
-    protected void showResults(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    protected void showResults(HttpServletRequest request, HttpServletResponse response) throws IOException,
+        ServletException {
         // Get cached results
         String id = request.getParameter("id");
         MCRCachedQueryData qd = MCRCachedQueryData.getData(id);
@@ -342,7 +343,8 @@ public class MCRSearchServlet extends MCRServlet {
         showResults(request, response, qd);
     }
 
-    private void showResults(HttpServletRequest request, HttpServletResponse response, MCRCachedQueryData qd) throws IOException {
+    private void showResults(HttpServletRequest request, HttpServletResponse response, MCRCachedQueryData qd)
+        throws IOException {
         MCRResults results = qd.getResults();
 
         // Number of hits per page
@@ -407,19 +409,22 @@ public class MCRSearchServlet extends MCRServlet {
      * the maximum number of hits to display per result page.  
      */
     protected int getNumPerPage(HttpServletRequest req, MCRResults results) {
-        String snpp = req.getParameter("numPerPage");
-        if (snpp == null) {
-            snpp = "0";
-        }
-        int npp = Integer.parseInt(snpp);
+        int npp = getNumPerPage(req);
         if ((npp > results.getNumHits()) || (npp <= 0)) {
             npp = results.getNumHits();
         }
+        return npp;
+    }
 
-        if (maxPerPage > 0) {
-            npp = Math.min(npp, maxPerPage);
+    protected int getNumPerPage(HttpServletRequest req) {
+        String snpp = req.getParameter("numPerPage");
+        if (snpp == null) {
+            snpp = "10";
         }
-
+        int npp = Integer.parseInt(snpp);
+        if (maxPerPage > 0) {
+            npp = Math.min(maxPerPage, Math.max(0, npp));
+        }
         return npp;
     }
 
@@ -427,7 +432,8 @@ public class MCRSearchServlet extends MCRServlet {
      * Executes a query that comes from editor search mask, and redirects the
      * browser to the first results page
      */
-    protected void doQuery(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    protected void doQuery(HttpServletRequest request, HttpServletResponse response) throws IOException,
+        ServletException {
         MCREditorSubmission sub = (MCREditorSubmission) request.getAttribute("MCREditorSubmission");
         String searchString = getReqParameter(request, "search", null);
         String queryString = getReqParameter(request, "query", null);
@@ -471,7 +477,8 @@ public class MCRSearchServlet extends MCRServlet {
      *   
      * see its overwritten in jspdocportal     
      */
-    protected void sendRedirect(HttpServletRequest req, HttpServletResponse res, MCRQuery query, Document input) throws IOException {
+    protected void sendRedirect(HttpServletRequest req, HttpServletResponse res, MCRQuery query, Document input)
+        throws IOException {
 
         MCRCachedQueryData qd = MCRCachedQueryData.cache(query, input);
         // Redirect browser to first results page   
