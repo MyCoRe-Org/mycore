@@ -5,7 +5,8 @@
   <xsl:template match="/response">
     <xsl:copy>
       <xsl:copy-of select="@*|node()" />
-      <xsl:if test="result/doc">
+      <!-- query extends by about 36 bytes per MCROBjectID, limit to 100 results  -->
+      <xsl:if test="result/doc and not(result/doc[101]) ">
         <xsl:variable name="orChain">
           <xsl:apply-templates mode="query" select="result/doc/@id" />
         </xsl:variable>
