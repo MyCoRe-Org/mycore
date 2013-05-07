@@ -8,6 +8,17 @@
   <servlet-class>org.mycore.solr.search.MCRSolrSelectProxyServlet</servlet-class>
 </servlet>
 
+  <!-- to use old search forms with new result pages
+  <servlet id="MCRSearch">
+    <servlet-name>MCRSearchServlet</servlet-name>
+    <servlet-class>org.mycore.solr.search.MCRSolrLegacySearchServlet</servlet-class>
+  </servlet>  -->
+
+<servlet>
+  <servlet-name>MCRLegacySearchServlet</servlet-name>
+  <servlet-class>org.mycore.solr.search.MCRSolrLegacySearchServlet</servlet-class>
+</servlet>
+
 <servlet-mapping>
   <servlet-name>MCRSolrSearchServlet</servlet-name>
   <url-pattern>/servlets/search</url-pattern>
@@ -17,3 +28,30 @@
   <servlet-name>MCRSolrSelectProxyServlet</servlet-name>
   <url-pattern>/servlets/SolrSelectProxy</url-pattern>
 </servlet-mapping>
+
+<servlet-mapping>
+  <servlet-name>MCRSolrSelectProxyServlet</servlet-name>
+  <url-pattern>/servlets/SolrSelectProxy</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+  <servlet-name>MCRLegacySearchServlet</servlet-name>
+  <url-pattern>/servlets/MCRQueryServlet</url-pattern>
+</servlet-mapping>
+
+<filter-mapping>
+  <filter-name>UriResolverDebugFilter</filter-name>
+  <servlet-name>MCRLegacySearchServlet</servlet-name>
+  <dispatcher>REQUEST</dispatcher>
+</filter-mapping>
+<filter-mapping>
+  <filter-name>UriResolverDebugFilter</filter-name>
+  <servlet-name>MCRSolrSearchServlet</servlet-name>
+  <dispatcher>REQUEST</dispatcher>
+</filter-mapping>
+<filter-mapping>
+  <filter-name>UriResolverDebugFilter</filter-name>
+  <servlet-name>MCRSolrSelectProxyServlet</servlet-name>
+  <dispatcher>REQUEST</dispatcher>
+</filter-mapping>
+  
