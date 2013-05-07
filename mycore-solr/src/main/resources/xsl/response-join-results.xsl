@@ -48,9 +48,9 @@
   <xsl:template match="/response">
     <xsl:copy>
       <xsl:copy-of select="@*|node()" />
+      <xsl:variable name="fq" select="lst[@name='responseHeader']/lst[@name='params']/str[@name='fq' and starts-with(.,$JoinPattern)]" />
       <!-- query extends by about 36 bytes per MCROBjectID, limit to 100 results  -->
-      <xsl:if test="result/doc and not(result/doc[101]) ">
-        <xsl:variable name="fq" select="lst[@name='responseHeader']/lst[@name='params']/str[@name='fq' and starts-with(.,$JoinPattern)]" />
+      <xsl:if test="$fq and result/doc and not(result/doc[101]) ">
         <xsl:variable name="orChain">
           <xsl:apply-templates mode="query" select="result/doc/@id" />
         </xsl:variable>
