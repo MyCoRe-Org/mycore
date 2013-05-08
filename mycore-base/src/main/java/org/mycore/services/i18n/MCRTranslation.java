@@ -98,7 +98,23 @@ public class MCRTranslation {
         Locale currentLocale = getCurrentLocale();
         return translate(label, currentLocale);
     }
-
+    
+    /**
+     * provides translation for the given label (property key).
+     * 
+     * The current locale that is needed for translation is gathered by the
+     * language of the current MCRSession.
+     * 
+     * @param label
+     * @param baseName a fully qualified class name 
+     * @return translated String
+     */
+    
+    public static String translateWithBaseName(String label, String baseName) {
+        Locale currentLocale = getCurrentLocale();
+        return translate(label, currentLocale, baseName);
+    }
+    
     /**
      * provides translation for the given label (property key).
      * 
@@ -107,8 +123,20 @@ public class MCRTranslation {
      * @return translated String
      */
     public static String translate(String label, Locale locale) {
+        return translate(label, locale, MESSAGES_BUNDLE);
+    }
+    
+    /**
+     * provides translation for the given label (property key).
+     * 
+     * @param label
+     * @param locale target locale of translation 
+     * @param baseName a fully qualified class name 
+     * @return translated String
+     */
+    public static String translate(String label, Locale locale, String baseName) {
         LOGGER.debug("Translation for current locale: " + locale.getLanguage());
-        ResourceBundle message = ResourceBundle.getBundle(MESSAGES_BUNDLE, locale);
+        ResourceBundle message = ResourceBundle.getBundle(baseName, locale);
         String result = null;
         try {
             result = message.getString(label);
