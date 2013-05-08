@@ -122,14 +122,14 @@
       Do not read MyCoRe object at this time
     -->
     <xsl:variable name="identifier" select="@id" />
-    <xsl:variable name="mcrobj" select="."/>
+    <xsl:variable name="mcrobj" select="." />
     <xsl:variable name="mods-type">
       <xsl:choose>
         <xsl:when test="str[@name='mods.type']">
-          <xsl:value-of select="str[@name='mods.type']"/>
+          <xsl:value-of select="str[@name='mods.type']" />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="'article'"/>
+          <xsl:value-of select="'article'" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -215,62 +215,47 @@
   </xsl:template>
 
   <xsl:template name="iViewLinkPrev">
-    <xsl:param name="derivates" />
+    <xsl:param name="derivate" />
     <xsl:param name="mcrid" />
     <xsl:param name="fileName" />
-    <xsl:param name="derivateLinks" />
+    <xsl:param name="derivateLink" />
 
-    <xsl:for-each select="$derivates">
-      <xsl:variable name="firstSupportedFile">
+    <xsl:param name="derId">
+      <xsl:choose>
+        <xsl:when test="$derivate">
+          <xsl:value-of select="$derivate" />
+        </xsl:when>
+        <xsl:when test="$derivateLink">
+          <xsl:value-of select="substring-before($derivateLink , '/')" />
+        </xsl:when>
+      </xsl:choose>
+    </xsl:param>
+    <xsl:if test="string-length($derId) &gt; 0 and $mcrid">
+      <xsl:variable name="pageToDisplay">
         <xsl:choose>
           <xsl:when test="$fileName">
             <xsl:value-of select="$fileName" />
           </xsl:when>
+          <xsl:when test="$derivateLink">
+            <xsl:value-of select="concat('/', substring-after($derivateLink, '/'))" />
+          </xsl:when>
           <xsl:otherwise>
             <xsl:call-template name="iview2.getSupport">
-              <xsl:with-param select="." name="derivID" />
+              <xsl:with-param select="$derivate" name="derivID" />
             </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-
-      <!-- MCR-IView ..start -->
-      <xsl:if test="$firstSupportedFile != ''">
-        <a>
-          <xsl:attribute name="href">
-          <xsl:value-of
-            select="concat($WebApplicationBaseURL, 'receive/', $mcrid, '?jumpback=true&amp;maximized=true&amp;page=',$firstSupportedFile,'&amp;derivate=', .)" />
-        </xsl:attribute>
-          <xsl:attribute name="title">
-          <xsl:value-of select="i18n:translate('metaData.iView')" />
-        </xsl:attribute>
+      <xsl:if test="$pageToDisplay != ''">
+        <a
+          href="{concat($WebApplicationBaseURL, 'receive/', $mcrid, '?jumpback=true&amp;maximized=true&amp;page=',$pageToDisplay,'&amp;derivate=', $derId)}"
+          tile="{i18n:translate('metaData.iView')}">
           <xsl:call-template name="iview2.getImageElement">
-            <xsl:with-param select="." name="derivate" />
-            <xsl:with-param select="$firstSupportedFile" name="imagePath" />
-          </xsl:call-template>
-        </a>
-      </xsl:if>
-    </xsl:for-each>
-
-    <!-- display linked images -->
-    <xsl:if test="$derivateLinks">
-      <xsl:for-each select="$derivateLinks[string-length(.) &gt; 0]">
-        <xsl:variable name="derivate" select="substring-before(. , '/')" />
-        <xsl:variable name="pageToDisplay" select="concat('/', substring-after(., '/'))" />
-        <a>
-          <xsl:attribute name="href">
-            <xsl:value-of
-            select="concat($WebApplicationBaseURL,'receive/',$mcrid,'?jumpback=true&amp;maximized=true&amp;page=',$pageToDisplay,'&amp;derivate=', $derivate)" />
-          </xsl:attribute>
-          <xsl:attribute name="title">
-            <xsl:value-of select="i18n:translate('metaData.iView')" />
-          </xsl:attribute>
-          <xsl:call-template name="iview2.getImageElement">
-            <xsl:with-param select="$derivate" name="derivate" />
+            <xsl:with-param select="$derId" name="derivate" />
             <xsl:with-param select="$pageToDisplay" name="imagePath" />
           </xsl:call-template>
         </a>
-      </xsl:for-each>
+      </xsl:if>
     </xsl:if>
   </xsl:template>
 
