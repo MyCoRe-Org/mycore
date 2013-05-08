@@ -5,7 +5,63 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2.1.81" date="2013-03-XX" description="Beta 2">
+    <release version="2013.05" date="2013-05-XX" description="Beta 2">
+      <action dev="mcrtchef" type="update">
+        MCRSearchServlet parameter numPerPage defaults to "10" (was "0")
+      </action>
+      <action dev="mcrjkupf" type="add">
+        add I18N support to mycore-user2
+      </action>
+      <action dev="mcrjkupf" type="remove">
+        removed applet from mycore-mets and removed mycore-zoomify component
+      </action>
+      <action dev="mcrsherm" type="fix">
+        Mets Editor does not support files with blanks 
+        <fixes issue="625" />
+      </action>
+      <action dev="mcrtchef" type="add">
+        added MCRXSL2JAXBTransformer to generate JAVA Objects via XSLT
+      </action>
+      <action dev="mcrtchef" type="fix">
+        wait for index process to complete on shutdown (lucene &amp; solr)
+      </action>
+      <action dev="mcrtchef" type="update">
+        better statistics for mycore-solr component
+      </action>
+      <action dev="mcrsherm" type="add">
+        added command "delete index part for type {0}" in mycore-solr
+      </action>
+      <action dev="mcrmeich" type="add">
+        added MCRListeningPriorityExecutorService where tasks can be prioritized and listened
+      </action>
+      <action dev="mcrshofm" type="add">
+        MCRSolrSelectProxyServlet supports "wt" parameter of SOLR
+      </action>
+      <action dev="mcrtchef" type="update">
+        use Google guava cache for for MCRObjectIDPool and MCRCache
+      </action>
+      <action dev="mcrshofm" type="add">
+        added support for canvas HTML element in mycore-iview2 (adds rotate function) 
+      </action>
+      <action dev="mcrmeich" type="update">
+        refactored mycore-solr component
+      </action>
+      <action dev="mcrtchef" type="update">
+        bootstraped editor forms of mycore-user2
+      </action>
+      <action dev="mcrsherm" type="add">
+        added Handle support
+      </action>
+      <action dev="mcrfluet" type="add">
+        added mycore-xeditor component
+      </action>
+      <action dev="mcrfluet" type="fix">
+        MCRSearchServlet: on redirect pass XSL.Transformer parameter
+      </action>
+      <action dev="mcrfluet" type="fix">
+        Editor: &lt;hidden var="..." descendants="true" /&gt; may duplicate data when attribute predicates are used in xpath
+        <fixes issue="622"/>
+      </action>
       <action dev="mcrtchef" type="add">
         MCRObjectTypeStrategy allows "default_class" rules for classifications
       </action>
