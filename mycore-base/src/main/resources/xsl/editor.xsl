@@ -993,6 +993,11 @@
     <xsl:attribute name="value">
       <xsl:call-template name="output.label" />
     </xsl:attribute>
+    <xsl:if test="@onClick">
+      <xsl:attribute name="onClick">
+        <xsl:value-of select="@onClick"/>         
+      </xsl:attribute>
+    </xsl:if>
   </input>
 </xsl:template>
 
