@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -55,16 +56,26 @@ import org.mycore.user2.MCRUserManager;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRLoginServlet extends MCRServlet {
+    private static final String HTTPS_ONLY_PROPERTY = MCRUser2Constants.CONFIG_PREFIX + "LoginHttpsOnly";
+
     private static final long serialVersionUID = 1L;
 
     private static final String LOGIN_REDIRECT_URL_PARAMETER = "url";
 
     private static final String LOGIN_REDIRECT_URL_KEY = "loginRedirectURL";
 
-    private static final boolean LOCAL_LOGIN_SECURE_ONLY = MCRConfiguration.instance().getBoolean(
-        MCRUser2Constants.CONFIG_PREFIX + "LoginHttpsOnly");
+    private static final boolean LOCAL_LOGIN_SECURE_ONLY = MCRConfiguration.instance().getBoolean(HTTPS_ONLY_PROPERTY);
 
     private static Logger LOGGER = Logger.getLogger(MCRLoginServlet.class);
+
+    @Override
+    public void init() throws ServletException {
+        if (!LOCAL_LOGIN_SECURE_ONLY) {
+            LOGGER.warn("Login over unsecure connection is permitted. Set '" + HTTPS_ONLY_PROPERTY
+                + "=true' to prevent cleartext transmissions of passwords.");
+        }
+        super.init();
+    }
 
     /**
      * MCRLoginServlet handles four actions:
@@ -141,7 +152,7 @@ public class MCRLoginServlet extends MCRServlet {
     private void presentLoginForm(MCRServletJob job) throws IOException {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
-        if (LOCAL_LOGIN_SECURE_ONLY && !req.isSecure()){
+        if (LOCAL_LOGIN_SECURE_ONLY && !req.isSecure()) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN, getErrorI18N("component.user2.login", "httpsOnly"));
             return;
         }
