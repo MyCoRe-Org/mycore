@@ -2,8 +2,6 @@ package org.mycore.solr.legacy;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,6 +30,8 @@ import org.apache.solr.common.SolrDocumentList;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.parsers.bool.MCROrCondition;
+import org.mycore.parsers.bool.MCRSetCondition;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSortBy;
 import org.mycore.solr.MCRSolrServerFactory;
@@ -78,12 +78,23 @@ public class MCRSolrAdapter {
      */
     @SuppressWarnings("rawtypes")
     public SolrQuery getSolrQuery(MCRCondition condition, List<MCRSortBy> sortBy, int maxResults) {
+        boolean required = true;
         List<Element> f = new ArrayList<Element>();
-        f.add(condition.toXML());
+        if (condition instanceof MCRSetCondition) {
+            //special case to strip away surrounding "+()"
+            @SuppressWarnings("unchecked")
+            List<MCRCondition> children = ((MCRSetCondition) condition).getChildren();
+            for (MCRCondition child : children) {
+                f.add(child.toXML());
+            }
+            required = !(condition instanceof MCROrCondition);
+        } else {
+            f.add(condition.toXML());
+        }
         Query luceneQuery;
         try {
-            luceneQuery = buildLuceneQuery(null, true, f, new HashSet<String>());
-        } catch (Exception e) {
+            luceneQuery = buildLuceneQuery(null, required, f, new HashSet<String>());
+        } catch (IOException | ParseException | org.apache.lucene.queryParser.ParseException e) {
             throw new MCRException("Error while building SOLR query.", e);
         }
 
@@ -91,14 +102,7 @@ public class MCRSolrAdapter {
         q.setIncludeScore(true);
         q.setRows(maxResults == 0 ? Integer.MAX_VALUE : maxResults);
 
-        String humanReadable = q.toString().substring(2);
-        try {
-            humanReadable = URLDecoder.decode(humanReadable, "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            LOGGER.error(ex);
-        }
-
-        LOGGER.info("Legacy Query transformed by \"" + this.getClass().getName() + "\" to \"" + humanReadable + "\"");
+        LOGGER.info("Legacy Query transformed to: " + q.getQuery());
         return q;
     }
 
@@ -109,7 +113,8 @@ public class MCRSolrAdapter {
      */
     protected SolrQuery applySortOptions(SolrQuery q, List<MCRSortBy> sortBy) {
         for (MCRSortBy option : sortBy) {
-            SortClause sortClause = new SortClause(option.getFieldName(), option.getSortOrder() ? ORDER.asc : ORDER.desc);
+            SortClause sortClause = new SortClause(option.getFieldName(), option.getSortOrder() ? ORDER.asc
+                : ORDER.desc);
             q.addSort(sortClause);
         }
         return q;
@@ -124,8 +129,8 @@ public class MCRSolrAdapter {
      * @throws IOException 
      * 
      */
-    protected Query buildLuceneQuery(BooleanQuery r, boolean reqf, List<Element> f, Set<String> usedFields) throws IOException, ParseException,
-            org.apache.lucene.queryParser.ParseException {
+    protected Query buildLuceneQuery(BooleanQuery r, boolean reqf, List<Element> f, Set<String> usedFields)
+        throws IOException, ParseException, org.apache.lucene.queryParser.ParseException {
         for (Element xEle : f) {
             String name = xEle.getName();
             if ("boolean".equals(name)) {
@@ -173,8 +178,8 @@ public class MCRSolrAdapter {
         return r;
     }
 
-    protected Query handleCondition(String field, String operator, String value, boolean required) throws IOException, ParseException,
-            org.apache.lucene.queryParser.ParseException {
+    protected Query handleCondition(String field, String operator, String value, boolean required) throws IOException,
+        ParseException, org.apache.lucene.queryParser.ParseException {
         if (operator.equals("=") || operator.equals("like") || operator.equals("contains")) {
             return new TermQuery(new Term(field, value));
         } else if (operator.contains(">") || operator.contains("<")) {
