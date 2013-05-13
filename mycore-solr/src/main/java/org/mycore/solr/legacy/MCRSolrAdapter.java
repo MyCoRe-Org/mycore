@@ -22,6 +22,8 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.util.Version;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrQuery.ORDER;
+import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
@@ -76,17 +78,22 @@ public class MCRSolrAdapter {
         } catch (Exception e) {
             throw new MCRException("Error while building SOLR query.", e);
         }
-        LOGGER.info("Legacy Query transformed by \"" + this.getClass().getCanonicalName() + "\" to \""
-                + luceneQuery.toString() + "\"");
+        LOGGER.info("Legacy Query transformed by \"" + this.getClass().getCanonicalName() + "\" to \"" + luceneQuery.toString() + "\"");
         SolrQuery q = applySortOptions(new SolrQuery(luceneQuery.toString()), sortBy);
         q.setIncludeScore(true);
         q.setRows(maxResults == 0 ? Integer.MAX_VALUE : maxResults);
         return q;
     }
 
+    /**
+     * @param q
+     * @param sortBy
+     * @return
+     */
     protected SolrQuery applySortOptions(SolrQuery q, List<MCRSortBy> sortBy) {
         for (MCRSortBy option : sortBy) {
-            q.addSortField(option.getFieldName(), option.getSortOrder() ? SolrQuery.ORDER.asc : SolrQuery.ORDER.desc);
+            SortClause sortClause = new SortClause(option.getFieldName(), option.getSortOrder() ? ORDER.asc : ORDER.desc);
+            q.addSort(sortClause);
         }
         return q;
     }
@@ -100,8 +107,8 @@ public class MCRSolrAdapter {
      * @throws IOException 
      * 
      */
-    protected Query buildLuceneQuery(BooleanQuery r, boolean reqf, List<Element> f, Set<String> usedFields) throws IOException,
-            ParseException, org.apache.lucene.queryParser.ParseException {
+    protected Query buildLuceneQuery(BooleanQuery r, boolean reqf, List<Element> f, Set<String> usedFields) throws IOException, ParseException,
+            org.apache.lucene.queryParser.ParseException {
         for (Element xEle : f) {
             String name = xEle.getName();
             if ("boolean".equals(name)) {
@@ -153,9 +160,9 @@ public class MCRSolrAdapter {
             org.apache.lucene.queryParser.ParseException {
         if (operator.equals("=") || operator.equals("like") || operator.equals("contains")) {
             return new TermQuery(new Term(field, value));
-        } else if(operator.contains(">") || operator.contains("<")) {
+        } else if (operator.contains(">") || operator.contains("<")) {
             return getTermRangeQuery(field, operator, value);
-        } else if(operator.equals("phrase")) {
+        } else if (operator.equals("phrase")) {
             PhraseQuery pq = new PhraseQuery();
             TokenStream ts = ANALYZER.tokenStream(field, new StringReader(value));
             while (ts.incrementToken()) {
