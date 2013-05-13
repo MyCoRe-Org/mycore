@@ -6,6 +6,15 @@
   </properties>
   <body>
     <release version="2013.05" date="2013-05-XX" description="Beta 2">
+      <action dev="mcrtchef" type="fix" due-to="Silvio Hermann">
+        The login page should be accessible only through https
+        <fixes issue="608" />
+      </action>
+      <action dev="mcrtchef" type="fix">
+        WCMS: Assigning read and write permissions does not work
+        <fixes issue="628"/>
+        <fixes issue="617"/>
+      </action>
       <action dev="mcrtchef" type="update">
         MCRSearchServlet parameter numPerPage defaults to "10" (was "0")
       </action>
