@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
@@ -41,6 +42,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.user2.MCRRealm;
 import org.mycore.user2.MCRRealmFactory;
 import org.mycore.user2.MCRUser;
+import org.mycore.user2.MCRUser2Constants;
 import org.mycore.user2.MCRUserManager;
 
 /**
@@ -58,6 +60,9 @@ public class MCRLoginServlet extends MCRServlet {
     private static final String LOGIN_REDIRECT_URL_PARAMETER = "url";
 
     private static final String LOGIN_REDIRECT_URL_KEY = "loginRedirectURL";
+
+    private static final boolean LOCAL_LOGIN_SECURE_ONLY = MCRConfiguration.instance().getBoolean(
+        MCRUser2Constants.CONFIG_PREFIX + "LoginHttpsOnly");
 
     private static Logger LOGGER = Logger.getLogger(MCRLoginServlet.class);
 
@@ -134,10 +139,14 @@ public class MCRLoginServlet extends MCRServlet {
     }
 
     private void presentLoginForm(MCRServletJob job) throws IOException {
-        Element root = new Element("login");
-
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
+        if (LOCAL_LOGIN_SECURE_ONLY && !req.isSecure()){
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, getErrorI18N("component.user2.login", "httpsOnly"));
+            return;
+        }
+        Element root = new Element("login");
+
         String uid = getProperty(req, "uid");
         String pwd = getProperty(req, "pwd");
         if (uid != null) {
@@ -174,13 +183,14 @@ public class MCRLoginServlet extends MCRServlet {
     private void addCurrentUserInfo(Element rootElement) {
         MCRUserInformation userInfo = MCRSessionMgr.getCurrentSession().getUserInformation();
         rootElement.setAttribute("user", userInfo.getUserID());
-        rootElement.setAttribute("realm", (userInfo instanceof MCRUser) ? ((MCRUser) userInfo).getRealm().getLabel() : MCRRealmFactory
-                .getLocalRealm().getLabel());
+        rootElement.setAttribute("realm", (userInfo instanceof MCRUser) ? ((MCRUser) userInfo).getRealm().getLabel()
+            : MCRRealmFactory.getLocalRealm().getLabel());
         rootElement.setAttribute("guest", String.valueOf(currentUserIsGuest()));
     }
 
     private static boolean currentUserIsGuest() {
-        return MCRSessionMgr.getCurrentSession().getUserInformation().equals(MCRSystemUserInformation.getGuestInstance());
+        return MCRSessionMgr.getCurrentSession().getUserInformation()
+            .equals(MCRSystemUserInformation.getGuestInstance());
     }
 
     private int getNumLoginOptions() {
