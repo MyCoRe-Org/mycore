@@ -2,6 +2,8 @@ package org.mycore.solr.legacy;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -68,6 +70,12 @@ public class MCRSolrAdapter {
         return new MCRSolrResults(solrDocumentList);
     }
 
+    /**
+     * @param condition
+     * @param sortBy
+     * @param maxResults
+     * @return
+     */
     @SuppressWarnings("rawtypes")
     public SolrQuery getSolrQuery(MCRCondition condition, List<MCRSortBy> sortBy, int maxResults) {
         List<Element> f = new ArrayList<Element>();
@@ -78,10 +86,19 @@ public class MCRSolrAdapter {
         } catch (Exception e) {
             throw new MCRException("Error while building SOLR query.", e);
         }
-        LOGGER.info("Legacy Query transformed by \"" + this.getClass().getCanonicalName() + "\" to \"" + luceneQuery.toString() + "\"");
+
         SolrQuery q = applySortOptions(new SolrQuery(luceneQuery.toString()), sortBy);
         q.setIncludeScore(true);
         q.setRows(maxResults == 0 ? Integer.MAX_VALUE : maxResults);
+
+        String humanReadable = q.toString().substring(2);
+        try {
+            humanReadable = URLDecoder.decode(humanReadable, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            LOGGER.error(ex);
+        }
+
+        LOGGER.info("Legacy Query transformed by \"" + this.getClass().getName() + "\" to \"" + humanReadable + "\"");
         return q;
     }
 
