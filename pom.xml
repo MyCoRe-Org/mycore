@@ -23,7 +23,7 @@
     <hibernate.version>3.6.10.Final</hibernate.version>
     <lucene.version>3.6.2</lucene.version>
     <xalan.version>2.7.1</xalan.version>
-    <jersey.version>1.17</jersey.version>
+    <jersey.version>1.17.1</jersey.version>
     <changelog.since>2013-01-18</changelog.since>
   </properties>
   <issueManagement>
@@ -430,22 +430,22 @@
       <dependency>
         <groupId>org.mycore.iview2</groupId>
         <artifactId>image-tiler</artifactId>
-        <version>1.8-SNAPSHOT</version>
+        <version>1.8</version>
       </dependency>
       <dependency>
         <groupId>org.mycore.mets</groupId>
         <artifactId>mets-model</artifactId>
-        <version>0.3-SNAPSHOT</version>
+        <version>0.3</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>oaipmh</artifactId>
-        <version>0.2-SNAPSHOT</version>
+        <version>0.2</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>oaipmh-dataprovider</artifactId>
-        <version>0.2-SNAPSHOT</version>
+        <version>0.2</version>
       </dependency>
       <dependency>
         <groupId>junit</groupId>
@@ -488,7 +488,7 @@
       <dependency>
         <groupId>org.jdom</groupId>
         <artifactId>jdom2</artifactId>
-        <version>2.0.4</version>
+        <version>2.0.5</version>
       </dependency>
       <dependency>
         <groupId>jaxen</groupId>
@@ -528,12 +528,12 @@
       <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
-        <version>1.7</version>
+        <version>1.8</version>
       </dependency>
       <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
-        <version>2.2.2</version>
+        <version>2.2.3</version>
       </dependency>
       <dependency>
         <groupId>com.google.guava</groupId>
@@ -544,7 +544,7 @@
         <!-- required for commons-vfs -->
         <groupId>com.jcraft</groupId>
         <artifactId>jsch</artifactId>
-        <version>0.1.49</version>
+        <version>0.1.50</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -696,7 +696,7 @@
       <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
-        <version>3.5.1</version>
+        <version>3.5.2</version>
         <optional>true</optional>
         <scope>runtime</scope>
       </dependency>
@@ -741,7 +741,7 @@
       <dependency>
         <groupId>org.apache.ws.security</groupId>
         <artifactId>wss4j</artifactId>
-        <version>1.6.9</version>
+        <version>1.6.10</version>
       </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>
@@ -779,7 +779,7 @@
       <dependency>
         <groupId>net.sf.ehcache</groupId>
         <artifactId>ehcache-core</artifactId>
-        <version>2.6.3</version>
+        <version>2.6.6</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -814,7 +814,7 @@
       <dependency>
         <groupId>wsdl4j</groupId>
         <artifactId>wsdl4j</artifactId>
-        <version>1.6.2</version>
+        <version>1.6.3</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -852,7 +852,7 @@
       <dependency>
         <groupId>com.sun.jersey.jersey-test-framework</groupId>
         <artifactId>jersey-test-framework-grizzly</artifactId>
-        <version>1.16</version>
+        <version>${jersey.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
