@@ -134,7 +134,7 @@
           <plugin>
             <artifactId>maven-changelog-plugin</artifactId>
             <configuration>
-              <issueIDRegexPattern>\d{3,}</issueIDRegexPattern>
+              <issueIDRegexPattern>bug (#)?\d{3,}</issueIDRegexPattern>
               <issueLinkUrl>http://sourceforge.net/p/mycore/bugs/%ISSUE%</issueLinkUrl>
               <type>date</type>
               <dates>
