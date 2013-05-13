@@ -10,7 +10,7 @@
     <!-- redirectURL is the position where you came from -->
     <xsl:variable name="redirectURL">
         <xsl:if test="//redirect">
-            <xsl:value-of select="concat('&amp;redir=', /mcr_access_set/redirect)" />
+            <xsl:value-of select="concat('&amp;redir=', encoder:encode(//redirect))" />
         </xsl:if>
     </xsl:variable>
 

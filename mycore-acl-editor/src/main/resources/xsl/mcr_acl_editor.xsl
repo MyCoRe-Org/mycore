@@ -76,10 +76,8 @@
 
                 </xsl:when>
                 <xsl:when test="editor = $embPermEditor">
-                    <xsl:variable name="redirectURL" select="redirect" />
-                    
-                    <xsl:variable name="embPermEditor" select="document(concat('acl-module:getPermEditor:emb=true&amp;cmd=', cmd, $filter))" />
-                    <xsl:apply-templates select="$ruleEditor/*" />
+                    <xsl:variable name="embPermEditor" select="document(concat('acl-module:getPermEditor:emb=true&amp;cmd=', cmd, $filter,$redirectURL))" />
+                    <xsl:apply-templates select="$embPermEditor/*" />
  
                     <!-- <xsl:variable name="embPermEditor" select="concat($dataRequest, '&amp;action=getPermEditor&amp;emb=true&amp;cmd=', cmd, $filter)" />
                     <xsl:copy-of select="document(concat($embPermEditor, '&amp;redir=', $redirectURL))" />-->

@@ -99,7 +99,6 @@
                             <form id="aclEditPermBoxForm" name="MappingTableForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
                                 action="{concat($dataRequest, '&amp;action=submitPerm', $redirectURL)}" method="post" accept-charset="UTF-8">
                                 <input type="hidden" name="redir" value="{$aclEditorURL}" />
-                                <xsl:value-of select="$redirectURL" />
                                 <!-- handle tabs reqs -->
                                 <xsl:variable name="toc.pos.verif">
                                     <xsl:choose>
@@ -178,6 +177,11 @@
                                                         </tr>
                                                     </xsl:when>
                                                     <xsl:otherwise>
+                                                        <tr>
+                                                            <td>
+                                                              <xsl:value-of select="OBJID" />
+                                                            </td>
+                                                        </tr>
                                                         <tr>
                                                             <td>
                                                                 <xsl:apply-templates select="xalan:nodeset($ruleItems)/items">
