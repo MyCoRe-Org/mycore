@@ -30,6 +30,7 @@
   <xsl:param name="RequestURL" />
   <xsl:param name="HttpSession" />
   <xsl:param name="MCR.Ajax.LoadingImage" />
+  <xsl:param name="MCR.classbrowser.Servlet" select="'ClassificationBrowser'"/>
   
   <xsl:template match="classificationbrowser">
     <xsl:call-template name="mcrClassificationBrowser">
@@ -114,7 +115,7 @@
               <xsl:value-of select="concat('?',$addParameter)"/>
             </xsl:if>
           </xsl:variable>
-          jQuery(document.getElementById(elementID)).load('<xsl:value-of select="concat($ServletsBaseURL,'ClassificationBrowser',$HttpSession,$addParam)" />', requestParam, f );      
+          jQuery(document.getElementById(elementID)).load('<xsl:value-of select="concat($ServletsBaseURL,$MCR.classbrowser.Servlet,$HttpSession,$addParam)" />', requestParam, f );      
         }
        
         function toogle(categID, closedImageURL, openImageURL) {

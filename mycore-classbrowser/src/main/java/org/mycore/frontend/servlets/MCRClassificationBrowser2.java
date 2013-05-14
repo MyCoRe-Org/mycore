@@ -35,9 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.jdom2.Document;
 import org.jdom2.Element;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -46,7 +44,6 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryCondition;
 import org.mycore.services.fieldquery.MCRQueryManager;
@@ -64,6 +61,10 @@ public class MCRClassificationBrowser2 extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = Logger.getLogger(MCRClassificationBrowser2.class);
+
+    protected MCRQueryAdapter getQueryAdapter(final String fieldName) {
+        return new MCRSearcherQueryAdapter(fieldName);
+    }
 
     public void doGetPost(MCRServletJob job) throws Exception {
         long time = System.nanoTime();
@@ -93,23 +94,17 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         xml.setAttribute("classification", classifID);
         xml.setAttribute("webpage", req.getParameter("webpage"));
 
-        MCRQueryCondition categCondition = null;
-        MCRAndCondition queryCondition = null;
+        MCRQueryAdapter queryAdapter = null;
+
         if (countResults || field.length() > 0) {
-            queryCondition = new MCRAndCondition();
-            final MCRFieldDef fieldDef;
-            fieldDef = MCRFieldDef.getDef(field);
-            categCondition = new MCRQueryCondition(fieldDef, "=", "DUMMY");
-            queryCondition.addChild(categCondition);
+            queryAdapter = getQueryAdapter(field);
 
             if ((objectType != null) && (objectType.trim().length() > 0)) {
                 xml.setAttribute("objectType", objectType);
-                MCRCondition cond = new MCRQueryCondition(MCRFieldDef.getDef("objectType"), "=", objectType);
-                queryCondition.addChild(cond);
+                queryAdapter.setObjectType(objectType);
             }
             if ((restriction != null) && (restriction.trim().length() > 0)) {
-                MCRCondition cond = new MCRQueryParser().parse(restriction);
-                queryCondition.addChild(cond);
+                queryAdapter.setRestriction(restriction);
             }
 
         }
@@ -125,10 +120,10 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         }
         for (MCRCategory child : category.getChildren()) {
             String childID = child.getId().getID();
-            int numResults = 0;
+            long numResults = 0;
             if (countResults) {
-                categCondition.setValue(addClassId ? child.getId().toString() : childID);
-                numResults = MCRQueryManager.search(new MCRQuery(queryCondition)).getNumHits();
+                queryAdapter.setCategory(addClassId ? child.getId().toString() : childID);
+                numResults = queryAdapter.getResultCount();
                 if ((!emptyLeaves) && (numResults < 1))
                     continue;
             }
@@ -140,8 +135,8 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
             categoryE.setAttribute("id", childID);
             categoryE.setAttribute("children", Boolean.toString(child.hasChildren()));
-            if (queryCondition != null)
-                categoryE.setAttribute("query", URLEncoder.encode(queryCondition.toString(), "UTF-8"));
+            if (queryAdapter != null)
+                categoryE.setAttribute("query", URLEncoder.encode(queryAdapter.getQueryAsString(), "UTF-8"));
 
             if (uri && (child.getURI() != null))
                 categoryE.addContent(new Element("uri").setText(child.getURI().toString()));
@@ -174,13 +169,15 @@ public class MCRClassificationBrowser2 extends MCRServlet {
     }
 
     /** Add link count to each category */
-    private void countLinks(HttpServletRequest req, boolean emptyLeaves, String objectType, MCRCategory category, List<Element> data) {
+    private void countLinks(HttpServletRequest req, boolean emptyLeaves, String objectType, MCRCategory category,
+        List<Element> data) {
         if (!Boolean.valueOf(req.getParameter("countlinks")))
             return;
         if (objectType.trim().length() == 0)
             objectType = null;
         String classifID = category.getId().getRootID();
-        Map<MCRCategoryID, Number> count = MCRCategLinkServiceFactory.getInstance().countLinksForType(category, objectType, true);
+        Map<MCRCategoryID, Number> count = MCRCategLinkServiceFactory.getInstance().countLinksForType(category,
+            objectType, true);
         for (Iterator<Element> it = data.iterator(); it.hasNext();) {
             Element child = it.next();
             MCRCategoryID childID = new MCRCategoryID(classifID, child.getAttributeValue("id"));
@@ -219,5 +216,66 @@ public class MCRClassificationBrowser2 extends MCRServlet {
     @Override
     protected boolean allowCrossDomainRequests() {
         return true;
+    }
+
+    protected static interface MCRQueryAdapter {
+        public void setRestriction(String text);
+
+        public void setCategory(String text);
+
+        public void setObjectType(String text);
+
+        public long getResultCount();
+
+        public String getQueryAsString();
+    }
+
+    protected static final class MCRSearcherQueryAdapter implements MCRQueryAdapter {
+        MCRQueryCondition categCondition;
+
+        MCRQueryCondition objectType = null;
+
+        MCRCondition<Object> restriction = null;
+
+        MCRAndCondition<Object> query = null;
+
+        protected MCRSearcherQueryAdapter(String fieldName) {
+            categCondition = new MCRQueryCondition(fieldName, "=", null);
+        }
+
+        @Override
+        public void setRestriction(String restriction) {
+            this.restriction = new MCRQueryParser().parse(restriction);
+            if (query == null) {
+                query = new MCRAndCondition<>(categCondition, this.restriction);
+            } else {
+                query.getChildren().add(this.restriction);
+            }
+        }
+
+        @Override
+        public void setObjectType(String objectType) {
+            this.objectType = new MCRQueryCondition("objectType", "=", objectType);
+            if (query == null) {
+                query = new MCRAndCondition<>(categCondition, this.objectType);
+            } else {
+                query.getChildren().add(this.objectType);
+            }
+        }
+
+        @Override
+        public void setCategory(String categId) {
+            categCondition.setValue(categId);
+        }
+
+        @Override
+        public long getResultCount() {
+            return MCRQueryManager.search(new MCRQuery(query == null ? categCondition : query)).getNumHits();
+        }
+
+        @Override
+        public String getQueryAsString() {
+            return query == null ? categCondition.toString() : query.toString();
+        }
     }
 }
