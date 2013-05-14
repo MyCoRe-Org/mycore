@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
@@ -59,24 +60,26 @@ public class MCRFieldDef {
      */
     static {
         Element def = getConfigFile();
-        collectAllNamespaces(def);
+        if (def != null) {
+            collectAllNamespaces(def);
 
-        @SuppressWarnings("unchecked")
-        List<Element> children = def.getChildren("index", MCRConstants.MCR_NAMESPACE);
+            List<Element> children = def.getChildren("index", MCRConstants.MCR_NAMESPACE);
 
-        for (Element index : children) {
-            String id = index.getAttributeValue("id");
+            for (Element index : children) {
+                String id = index.getAttributeValue("id");
 
-            @SuppressWarnings("unchecked")
-            List<Element> fields = index.getChildren("field", MCRConstants.MCR_NAMESPACE);
+                List<Element> fields = index.getChildren("field", MCRConstants.MCR_NAMESPACE);
 
-            for (Element field : fields) {
-                new MCRFieldDef(id, field);
+                for (Element field : fields) {
+                    new MCRFieldDef(id, field);
+                }
             }
+        } else {
+            Logger.getLogger(MCRFieldDef.class).warn("Continue without " + configFile + ".");
         }
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({ "rawtypes" })
     private static void collectAllNamespaces(Element searchfields) {
         for (Iterator iter = searchfields.getDescendants(); iter.hasNext();) {
             Object obj = iter.next();
