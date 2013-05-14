@@ -146,6 +146,28 @@
           window.location.href=addState(window.location.href);
         }
         
+        function toggleClass(categID, closedClass, openClass){
+          var childrenID = 'cbChildren_<xsl:value-of select="$classification" />_' + categID;
+          var button = document.getElementById( 'cbButton_<xsl:value-of select="$classification" />_' + categID );
+          var children = document.getElementById( childrenID );
+          var jButton=jQuery(button);
+          jButton.toggleClass(closedClass);
+          jButton.toggleClass(openClass);
+          if (jButton.data("open")==true){
+            children.className='cbHidden';
+            children.innerHTML = '';
+            openCategs=jQuery.grep(openCategs,function(value){
+              return value != categID;
+            });
+            jButton.data("open", false);
+          } else {
+            children.className='cbVisible';
+            update( childrenID, categID );
+            openCategs.push(categID);
+            jButton.data("open", true);
+          }
+        }
+        
         function addState(url){
           var state=(openCategs.length>0)? "#open"+escape('["'+openCategs.join('","')+'"]') :"#open[]";
           var pos=url.indexOf("#open");
