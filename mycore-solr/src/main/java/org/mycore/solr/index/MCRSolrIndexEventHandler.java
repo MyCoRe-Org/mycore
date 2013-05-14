@@ -98,7 +98,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
             MCRSolrIndexer.submitIndexHandler(indexHandler, 10);
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId().toString() + "\" for indexing done in "
-                    + (System.currentTimeMillis() - tStart) + "ms ");
+                        + (System.currentTimeMillis() - tStart) + "ms ");
             }
         } catch (Exception ex) {
             LOGGER.error("Error creating transfer thread for object " + objectOrDerivate, ex);
@@ -108,8 +108,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     @Override
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
         try {
-            MCRSolrIndexer.submitIndexHandler(MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(file,
-                MCRSolrServerFactory.getSolrServer()));
+            MCRSolrIndexer.submitIndexHandler(MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(file, MCRSolrServerFactory.getSolrServer()));
         } catch (Exception ex) {
             LOGGER.error("Error creating transfer thread for file " + file.toString(), ex);
         }
@@ -125,4 +124,8 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
         MCRSolrIndexer.deleteByIdFromSolr(file.getID());
     }
 
+    @Override
+    protected void updateFileIndex(MCREvent evt, MCRFile file) {
+        handleFileCreated(evt, file);
+    }
 }

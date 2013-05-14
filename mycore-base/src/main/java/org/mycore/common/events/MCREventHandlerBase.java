@@ -93,8 +93,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
         if (evt.getObjectType().equals(MCREvent.FILE_TYPE)) {
             MCRFile file = (MCRFile) evt.get("file");
             if (file != null) {
-                logger.debug(getClass().getName() + " handling " + file.getOwnerID() + "/" + file.getAbsolutePath() + " "
-                        + evt.getEventType());
+                logger.debug(getClass().getName() + " handling " + file.getOwnerID() + "/" + file.getAbsolutePath() + " " + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
                     handleFileCreated(evt, file);
                 } else if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
@@ -103,6 +102,8 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                     handleFileDeleted(evt, file);
                 } else if (evt.getEventType().equals(MCREvent.REPAIR_EVENT)) {
                     handleFileRepaired(evt, file);
+                } else if (evt.getEventType().equals(MCREvent.INDEX_EVENT)) {
+                    updateFileIndex(evt, file);
                 } else {
                     logger.warn("Can't find method for file data handler for event type " + evt.getEventType());
                 }
@@ -189,8 +190,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
         if (evt.getObjectType().equals(MCREvent.FILE_TYPE)) {
             MCRFile file = (MCRFile) evt.get("file");
             if (file != null) {
-                logger.debug(getClass().getName() + " handling " + file.getOwnerID() + "/" + file.getAbsolutePath() + " "
-                        + evt.getEventType());
+                logger.debug(getClass().getName() + " handling " + file.getOwnerID() + "/" + file.getAbsolutePath() + " " + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
                     undoFileCreated(evt, file);
                 } else if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
@@ -233,8 +233,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
 
     /** This method does nothing. It is very useful for debugging events. */
     public void doNothing(MCREvent evt, Object obj) {
-        logger.debug(getClass().getName() + " does nothing on " + evt.getEventType() + " " + evt.getObjectType() + " "
-                + obj.getClass().getName());
+        logger.debug(getClass().getName() + " does nothing on " + evt.getEventType() + " " + evt.getObjectType() + " " + obj.getClass().getName());
     }
 
     /**
@@ -650,6 +649,16 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRFile that caused the event
      */
     protected void undoFileRepaired(MCREvent evt, MCRFile file) {
+        doNothing(evt, file);
+    }
+
+    /**
+     * Updates the index content of the given file.
+     * 
+     * @param evt
+     * @param file
+     */
+    protected void updateFileIndex(MCREvent evt, MCRFile file) {
         doNothing(evt, file);
     }
 }

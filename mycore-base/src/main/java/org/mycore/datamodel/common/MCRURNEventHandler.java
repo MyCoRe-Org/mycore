@@ -7,8 +7,11 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.common.events.MCREventManager;
+import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRFileMetadata;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -96,6 +99,10 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
-        // TODO
+        for (MCRFile file : MCRUtils.getFiles(der.getId().toString())) {
+            MCREvent indexEvent = new MCREvent(MCREvent.FILE_TYPE, MCREvent.INDEX_EVENT);
+            indexEvent.put("file", file);
+            MCREventManager.instance().handleEvent(indexEvent);
+        }
     }
 }
