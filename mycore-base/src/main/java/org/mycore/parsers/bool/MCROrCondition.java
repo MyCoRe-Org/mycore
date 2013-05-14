@@ -32,6 +32,7 @@ public class MCROrCondition<T> extends MCRSetCondition<T> {
         super("or");
     }
     
+    @SafeVarargs
     public MCROrCondition(MCRCondition<T>...conditions) {
         this();
         for (MCRCondition<T> mcrCondition : conditions) {

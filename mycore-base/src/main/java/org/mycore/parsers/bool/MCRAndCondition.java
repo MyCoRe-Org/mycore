@@ -32,6 +32,7 @@ public class MCRAndCondition<T> extends MCRSetCondition<T> {
         super("and");
     }
 
+    @SafeVarargs
     public MCRAndCondition(MCRCondition<T>... children) {
         this();
         for (MCRCondition<T> mcrCondition : children) {
