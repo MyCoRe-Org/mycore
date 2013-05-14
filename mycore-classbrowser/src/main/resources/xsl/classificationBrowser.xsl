@@ -180,7 +180,7 @@
         
         function startSearch(baseURL, query, mask, parameters){
           mask=escape(addState(unescape(mask)));
-          window.location.href=baseURL+"?query="+query+"&amp;mask="+mask+"&amp;"+parameters;
+          window.location.href=baseURL+((baseURL.indexOf("?") == -1)?"?query=":"")+query+"&amp;mask="+mask+"&amp;"+parameters;
           return false;
         }
         
