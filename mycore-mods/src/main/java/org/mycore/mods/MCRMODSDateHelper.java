@@ -31,6 +31,7 @@ import java.util.Map;
 
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
+import org.mycore.datamodel.common.MCRISO8601Date;
 
 /**
  * Helper class to parse and build MODS date elements, see
@@ -40,9 +41,12 @@ import org.mycore.common.MCRException;
  */
 public class MCRMODSDateHelper {
 
+    private static final String ISO8601 = "iso8601";
+
     private final static Map<String, String> formats = new HashMap<String, String>();
 
     static {
+        formats.put(ISO8601, null);
         formats.put("w3cdtf-10", "yyyy-MM-dd");
         formats.put("w3cdtf-19", "yyyy-MM-dd'T'HH:mm:ss");
         formats.put("marc-4", "yyyy");
@@ -72,6 +76,10 @@ public class MCRMODSDateHelper {
 
         String format = formats.get(key);
         if (format == null) {
+            if (encoding.equals(ISO8601)) {
+                MCRISO8601Date isoDate = new MCRISO8601Date(text);
+                return isoDate.getDate();
+            }
             throw reportParseException(encoding, text, null);
         }
 
@@ -89,8 +97,9 @@ public class MCRMODSDateHelper {
 
     public static GregorianCalendar getCalendar(Element element) {
         Date date = getDate(element);
-        if (date == null)
+        if (date == null) {
             return null;
+        }
 
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTime(date);
@@ -99,9 +108,15 @@ public class MCRMODSDateHelper {
 
     public static void setDate(Element element, Date date, String encoding) {
         String format = formats.get(encoding);
-        String text = new SimpleDateFormat(format).format(date);
-        element.setText(text);
-        encoding = encoding.split("-")[0];
+        if (format != null) {
+            String text = new SimpleDateFormat(format).format(date);
+            element.setText(text);
+            encoding = encoding.split("-")[0];
+        } else {
+            MCRISO8601Date isoDate = new MCRISO8601Date();
+            isoDate.setDate(date);
+            element.setText(isoDate.getISOString());
+        }
         element.setAttribute("encoding", encoding);
     }
 
