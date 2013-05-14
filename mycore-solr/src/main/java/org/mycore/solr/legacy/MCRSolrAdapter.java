@@ -102,7 +102,8 @@ public class MCRSolrAdapter {
         q.setIncludeScore(true);
         q.setRows(maxResults == 0 ? Integer.MAX_VALUE : maxResults);
 
-        LOGGER.info("Legacy Query transformed to: " + q.getQuery());
+        String sort = q.getSortField();
+        LOGGER.info("Legacy Query transformed by " + getClass().getName() + " to: " + q.getQuery() + (sort != null ? " " + sort : ""));
         return q;
     }
 
@@ -113,8 +114,7 @@ public class MCRSolrAdapter {
      */
     protected SolrQuery applySortOptions(SolrQuery q, List<MCRSortBy> sortBy) {
         for (MCRSortBy option : sortBy) {
-            SortClause sortClause = new SortClause(option.getFieldName(), option.getSortOrder() ? ORDER.asc
-                : ORDER.desc);
+            SortClause sortClause = new SortClause(option.getFieldName(), option.getSortOrder() ? ORDER.asc : ORDER.desc);
             q.addSort(sortClause);
         }
         return q;
@@ -129,8 +129,8 @@ public class MCRSolrAdapter {
      * @throws IOException 
      * 
      */
-    protected Query buildLuceneQuery(BooleanQuery r, boolean reqf, List<Element> f, Set<String> usedFields)
-        throws IOException, ParseException, org.apache.lucene.queryParser.ParseException {
+    protected Query buildLuceneQuery(BooleanQuery r, boolean reqf, List<Element> f, Set<String> usedFields) throws IOException, ParseException,
+            org.apache.lucene.queryParser.ParseException {
         for (Element xEle : f) {
             String name = xEle.getName();
             if ("boolean".equals(name)) {
@@ -178,8 +178,8 @@ public class MCRSolrAdapter {
         return r;
     }
 
-    protected Query handleCondition(String field, String operator, String value, boolean required) throws IOException,
-        ParseException, org.apache.lucene.queryParser.ParseException {
+    protected Query handleCondition(String field, String operator, String value, boolean required) throws IOException, ParseException,
+            org.apache.lucene.queryParser.ParseException {
         if (operator.equals("=") || operator.equals("like") || operator.equals("contains")) {
             return new TermQuery(new Term(field, value));
         } else if (operator.contains(">") || operator.contains("<")) {
