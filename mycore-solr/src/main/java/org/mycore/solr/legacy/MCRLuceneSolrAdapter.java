@@ -55,8 +55,12 @@ public class MCRLuceneSolrAdapter extends MCRSolrAdapter {
 
     protected static Analyzer ANALYZER = new StandardAnalyzer(LUCENE_VERSION);
 
-    protected Query handleCondition(String field, String operator, String value, boolean reqf) throws IOException, ParseException,
-            org.apache.lucene.queryParser.ParseException {
+    static {
+        BooleanQuery.setMaxClauseCount(10000);
+    }
+
+    protected Query handleCondition(String field, String operator, String value, boolean reqf) throws IOException,
+        ParseException, org.apache.lucene.queryParser.ParseException {
         LOGGER.debug("field: " + field + " operator: " + operator + " value: " + value);
 
         String fieldtype = MCRFieldDef.getDef(field).getDataType();
@@ -178,7 +182,7 @@ public class MCRLuceneSolrAdapter extends MCRSolrAdapter {
 
             return query;
         } else if (("text".equals(fieldtype) || "identifier".equals(fieldtype) || "index".equals(fieldtype))
-                && ("<".equals(operator) || "<=".equals(operator) || ">=".equals(operator) || ">".equals(operator))) {
+            && ("<".equals(operator) || "<=".equals(operator) || ">=".equals(operator) || ">".equals(operator))) {
             return TermInequalityQuery(field, fieldtype, operator, value);
         }
 
@@ -211,7 +215,7 @@ public class MCRLuceneSolrAdapter extends MCRSolrAdapter {
         } catch (IOException | ParseException | org.apache.lucene.queryParser.ParseException e) {
             throw new MCRException("Error while building SOLR query.", e);
         }
-    
+
         String queryString = luceneQuery.toString();
         return queryString;
     }
@@ -233,10 +237,10 @@ public class MCRLuceneSolrAdapter extends MCRSolrAdapter {
                 name = xEle.getAttributeValue("operator").toLowerCase();
             }
             Query x = null;
-    
+
             boolean reqfn = reqf;
             boolean prof = false;
-    
+
             List<Element> children = xEle.getChildren();
             if (name.equals("and")) {
                 x = buildLuceneQuery(null, true, children, usedFields);
@@ -302,7 +306,8 @@ public class MCRLuceneSolrAdapter extends MCRSolrAdapter {
         while (_tokenizer.hasMoreTokens()) {
             String _token = _tokenizer.nextToken();
 
-            if (!"NOT".equals(_token) && !"AND".equals(_token) && !"OR".equals(_token) && !"TO".equals(_token) || _inString) {
+            if (!"NOT".equals(_token) && !"AND".equals(_token) && !"OR".equals(_token) && !"TO".equals(_token)
+                || _inString) {
                 _fixedQuery.append(_token.toLowerCase());
             } else {
                 _fixedQuery.append(_token);
@@ -423,21 +428,21 @@ public class MCRLuceneSolrAdapter extends MCRSolrAdapter {
 
     private static long getLongValue(String isoDate) throws ParseException {
         switch (isoDate.length()) {
-        case YYYY_MM_DD_HH_MM_SS:
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-            df.setTimeZone(TimeZone.getTimeZone("UTC"));
-            return df.parse(isoDate).getTime();
-        case HH_MM_SS:
-            short hour = Short.parseShort(isoDate.substring(0, 2));
-            short minute = Short.parseShort(isoDate.substring(3, 5));
-            short second = Short.parseShort(isoDate.substring(6));
-            return (hour * 60 + minute) * 60 + second;
-        default:
-            MCRISO8601Date date = new MCRISO8601Date(isoDate);
-            if (date.getDate() == null) {
-                throw new MCRException("Could not parse to long value: " + isoDate);
-            }
-            return date.getDate().getTime();
+            case YYYY_MM_DD_HH_MM_SS:
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                df.setTimeZone(TimeZone.getTimeZone("UTC"));
+                return df.parse(isoDate).getTime();
+            case HH_MM_SS:
+                short hour = Short.parseShort(isoDate.substring(0, 2));
+                short minute = Short.parseShort(isoDate.substring(3, 5));
+                short second = Short.parseShort(isoDate.substring(6));
+                return (hour * 60 + minute) * 60 + second;
+            default:
+                MCRISO8601Date date = new MCRISO8601Date(isoDate);
+                if (date.getDate() == null) {
+                    throw new MCRException("Could not parse to long value: " + isoDate);
+                }
+                return date.getDate().getTime();
         }
     }
 }

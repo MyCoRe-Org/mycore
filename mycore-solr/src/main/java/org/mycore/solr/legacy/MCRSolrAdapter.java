@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.apache.lucene.search.BooleanQuery;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
@@ -20,10 +19,6 @@ import org.mycore.solr.MCRSolrServerFactory;
 public class MCRSolrAdapter {
 
     private static final Logger LOGGER = Logger.getLogger(MCRSolrAdapter.class);
-
-    static {
-        BooleanQuery.setMaxClauseCount(10000);
-    }
 
     @SuppressWarnings("rawtypes")
     public MCRResults search(MCRCondition condition, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) {
