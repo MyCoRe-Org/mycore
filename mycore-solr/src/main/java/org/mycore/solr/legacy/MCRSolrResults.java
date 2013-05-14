@@ -11,7 +11,6 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
@@ -56,7 +55,8 @@ public class MCRSolrResults extends MCRResults {
 
     @Override
     public int getNumHits() {
-        LOGGER.debug("getNumHits() might be inaccurate because of explicit cast from long to int. Better you fully migrate to solr soon.");
+        LOGGER
+            .debug("getNumHits() might be inaccurate because of explicit cast from long to int. Better you fully migrate to solr soon.");
         return (int) this.sdl.getNumFound();
     }
 
