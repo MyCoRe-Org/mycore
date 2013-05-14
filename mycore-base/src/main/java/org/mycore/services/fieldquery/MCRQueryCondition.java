@@ -53,6 +53,10 @@ public class MCRQueryCondition extends MCRFieldValue implements MCRCondition<Obj
         this.operator = operator;
     }
 
+    public void setOperator(String operator) {
+        this.operator = operator;
+    }
+
     /** Returns the comparison operator used in this condition */
     public String getOperator() {
         return this.operator;

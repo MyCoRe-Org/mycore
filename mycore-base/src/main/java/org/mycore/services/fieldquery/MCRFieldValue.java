@@ -81,14 +81,20 @@ public class MCRFieldValue {
      *            the value of the field, as a String
      */
     public MCRFieldValue(String fieldName, String value) {
+        setFieldName(fieldName);
+        this.value = value;
+    }
+
+    public void setFieldName(String fieldName) {
         if (fieldName == null) {
             throw new NullPointerException("field name cannot be null.");
         }
         this.fieldName = fieldName;
-        this.value = value;
         try {
             this.field = MCRFieldDef.getDef(fieldName);
-        } catch(MCRConfigurationException ce) {}
+        } catch (MCRConfigurationException ce) {
+            this.field = null;
+        }
     }
 
     /**
@@ -132,7 +138,7 @@ public class MCRFieldValue {
      */
     public Element buildXML() {
         Element eField = new Element("field", MCRConstants.MCR_NAMESPACE);
-        if(field != null) {
+        if (field != null) {
             eField.setAttribute("name", field.getName());
         } else {
             eField.setAttribute("name", getFieldName());
