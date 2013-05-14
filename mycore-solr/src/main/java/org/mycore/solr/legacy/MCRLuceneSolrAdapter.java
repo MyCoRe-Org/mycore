@@ -7,11 +7,17 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.TermAttribute;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.QueryParser;
@@ -25,10 +31,15 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.WildcardQuery;
+import org.apache.lucene.util.Version;
+import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRNormalizer;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.common.MCRISO8601Date;
+import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.parsers.bool.MCROrCondition;
+import org.mycore.parsers.bool.MCRSetCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
 
 /**
@@ -40,7 +51,10 @@ public class MCRLuceneSolrAdapter extends MCRSolrAdapter {
     /**/
     private static final Logger LOGGER = Logger.getLogger(MCRLuceneSolrAdapter.class);
 
-    @Override
+    protected static Version LUCENE_VERSION = Version.LUCENE_36;
+
+    protected static Analyzer ANALYZER = new StandardAnalyzer(LUCENE_VERSION);
+
     protected Query handleCondition(String field, String operator, String value, boolean reqf) throws IOException, ParseException,
             org.apache.lucene.queryParser.ParseException {
         LOGGER.debug("field: " + field + " operator: " + operator + " value: " + value);
@@ -172,6 +186,103 @@ public class MCRLuceneSolrAdapter extends MCRSolrAdapter {
             LOGGER.info("Not supported, fieldtype: " + fieldtype + " operator: " + operator);
         }
 
+        return null;
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    protected String getQueryString(MCRCondition condition) {
+        boolean required = true;
+        List<Element> f = new ArrayList<Element>();
+        if (condition instanceof MCRSetCondition) {
+            //special handling to strip away surrounding "+()"
+            @SuppressWarnings("unchecked")
+            List<MCRCondition> children = ((MCRSetCondition) condition).getChildren();
+            for (MCRCondition child : children) {
+                f.add(child.toXML());
+            }
+            required = !(condition instanceof MCROrCondition);
+        } else {
+            f.add(condition.toXML());
+        }
+        Query luceneQuery;
+        try {
+            luceneQuery = buildLuceneQuery(null, required, f, new HashSet<String>());
+        } catch (IOException | ParseException | org.apache.lucene.queryParser.ParseException e) {
+            throw new MCRException("Error while building SOLR query.", e);
+        }
+    
+        String queryString = luceneQuery.toString();
+        return queryString;
+    }
+
+    /**
+     * Build Lucene Query from XML
+     * 
+     * @return Lucene Query
+     * @throws ParseException 
+     * @throws org.apache.lucene.queryParser.ParseException 
+     * @throws IOException 
+     * 
+     */
+    protected Query buildLuceneQuery(BooleanQuery r, boolean reqf, List<Element> f, Set<String> usedFields)
+        throws IOException, ParseException, org.apache.lucene.queryParser.ParseException {
+        for (Element xEle : f) {
+            String name = xEle.getName();
+            if ("boolean".equals(name)) {
+                name = xEle.getAttributeValue("operator").toLowerCase();
+            }
+            Query x = null;
+    
+            boolean reqfn = reqf;
+            boolean prof = false;
+    
+            List<Element> children = xEle.getChildren();
+            if (name.equals("and")) {
+                x = buildLuceneQuery(null, true, children, usedFields);
+            } else if (name.equalsIgnoreCase("or")) {
+                x = buildLuceneQuery(null, false, children, usedFields);
+            } else if (name.equalsIgnoreCase("not")) {
+                x = buildLuceneQuery(null, false, children, usedFields);
+                reqfn = false; // javadoc lucene: It is an error to specify a
+                // clause as both required and prohibited
+                prof = true;
+            } else if (name.equalsIgnoreCase("condition")) {
+                String field = xEle.getAttributeValue("field", "").intern();
+                String operator = xEle.getAttributeValue("operator", "").intern();
+                String value = xEle.getAttributeValue("value", "");
+                if (usedFields != null) {
+                    usedFields.add(field);
+                }
+                x = handleCondition(field, operator, value, reqf);
+            }
+            if (null != x) {
+                if (null == r) {
+                    r = new BooleanQuery();
+                }
+                BooleanClause.Occur occur = BooleanClause.Occur.MUST;
+                if (reqfn && !prof) {
+                } else if (!reqfn && !prof) {
+                    occur = BooleanClause.Occur.SHOULD;
+                } else if (!reqfn && prof) {
+                    occur = BooleanClause.Occur.MUST_NOT;
+                }
+                BooleanClause bq = new BooleanClause(x, occur);
+                r.add(bq);
+            }
+        }
+        return r;
+    }
+
+    protected Query getTermRangeQuery(String fieldname, String op, String value) {
+        if (value == null) {
+            return null;
+        }
+        if (op.contains(">")) {
+            return new TermRangeQuery(fieldname, value, null, op.length() == 2, true);
+        } else if (op.contains("<")) {
+            return new TermRangeQuery(fieldname, null, value, true, op.length() == 2);
+        }
         return null;
     }
 
