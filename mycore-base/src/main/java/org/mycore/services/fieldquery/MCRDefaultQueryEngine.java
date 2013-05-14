@@ -167,22 +167,27 @@ public class MCRDefaultQueryEngine extends MCRBaseClass implements MCRQueryEngin
         checkCondition(cond);
         String index = getIndex(cond);
         if (index != mixed) {
-            // All fields are from same index, just one searcher
-            MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex(index);
-            // Filter sort criteria only for those fields of the same index
-            List<MCRSortBy> sortByCopy = new ArrayList<MCRSortBy>();
-            for (MCRSortBy sb : sortBy) {
-                if (sb.getField().getIndex().equals(index)) {
-                    sortByCopy.add(sb);
-                }
-            }
-            return searcher.search(cond, maxResults, sortByCopy, addSortData);
+            return buildResults(cond, maxResults, sortBy, addSortData, index);
         } else if (cond instanceof MCRSetCondition) {
             return buildCombinedResults((MCRSetCondition) cond, sortBy, false, maxResults);
         } else { // Move not down: not(a and/or b)=(not a) and/or (not b)
             MCRCondition child = ((MCRNotCondition) cond).getChild();
             return buildCombinedResults((MCRSetCondition) child, sortBy, true, maxResults);
         }
+    }
+
+    protected MCRResults buildResults(MCRCondition cond, int maxResults, List<MCRSortBy> sortBy, boolean addSortData,
+        String index) {
+        // All fields are from same index, just one searcher
+        MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex(index);
+        // Filter sort criteria only for those fields of the same index
+        List<MCRSortBy> sortByCopy = new ArrayList<MCRSortBy>();
+        for (MCRSortBy sb : sortBy) {
+            if (sb.getField().getIndex().equals(index)) {
+                sortByCopy.add(sb);
+            }
+        }
+        return searcher.search(cond, maxResults, sortByCopy, addSortData);
     }
 
     /**
