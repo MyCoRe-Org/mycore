@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <artifactId>mycore</artifactId>
     <groupId>org.mycore</groupId>
-    <version>2.1.81-SNAPSHOT</version>
+    <version>2013.05</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
@@ -90,9 +89,7 @@
                 <echo message="compile classpath: ${compile.classpath}" />
                 <echo message="target directory: ${target.applet.classes}" />
                 <mkdir dir="${target.applet.classes}" />
-                <javac destdir="${target.applet.classes}" includes="org/mycore/frontend/fileupload/**"
-                  excludes="org/mycore/frontend/fileupload/*Handler* org/mycore/frontend/fileupload/*Servlet*" classpathref="compile.classpath"
-                  debug="true" optimize="true" target="1.5" source="1.5" encoding="UTF-8" fork="yes" deprecation="off">
+                <javac destdir="${target.applet.classes}" includes="org/mycore/frontend/fileupload/**" excludes="org/mycore/frontend/fileupload/*Handler* org/mycore/frontend/fileupload/*Servlet*" classpathref="compile.classpath" debug="true" optimize="true" target="1.5" source="1.5" encoding="UTF-8" fork="yes" deprecation="off">
                   <src>
                     <path refid="sources.path" />
                   </src>
