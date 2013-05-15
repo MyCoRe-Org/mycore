@@ -5,7 +5,10 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2013.05" date="2013-05-XX" description="Beta 2">
+    <release version="2013.05" date="2013-05-15" description="Beta 2">
+      <action dev="mcrtchef" type="add">
+        ClassificationBrowser implementation for solr
+      </action>
       <action dev="mcrtchef" type="fix" due-to="Silvio Hermann">
         The login page should be accessible only through https
         <fixes issue="608" />
@@ -19,7 +22,7 @@
         MCRSearchServlet parameter numPerPage defaults to "10" (was "0")
       </action>
       <action dev="mcrjkupf" type="add">
-        add I18N support to mycore-user2
+        I18N support to mycore-user2
       </action>
       <action dev="mcrjkupf" type="remove">
         removed applet from mycore-mets and removed mycore-zoomify component
@@ -29,7 +32,7 @@
         <fixes issue="625" />
       </action>
       <action dev="mcrtchef" type="add">
-        added MCRXSL2JAXBTransformer to generate JAVA Objects via XSLT
+        MCRXSL2JAXBTransformer to generate JAVA Objects via XSLT
       </action>
       <action dev="mcrtchef" type="fix">
         wait for index process to complete on shutdown (lucene &amp; solr)
@@ -38,10 +41,10 @@
         better statistics for mycore-solr component
       </action>
       <action dev="mcrsherm" type="add">
-        added command "delete index part for type {0}" in mycore-solr
+        command "delete index part for type {0}" in mycore-solr
       </action>
       <action dev="mcrmeich" type="add">
-        added MCRListeningPriorityExecutorService where tasks can be prioritized and listened
+        MCRListeningPriorityExecutorService where tasks can be prioritized and listened
       </action>
       <action dev="mcrshofm" type="add">
         MCRSolrSelectProxyServlet supports "wt" parameter of SOLR
@@ -50,7 +53,7 @@
         use Google guava cache for for MCRObjectIDPool and MCRCache
       </action>
       <action dev="mcrshofm" type="add">
-        added support for canvas HTML element in mycore-iview2 (adds rotate function) 
+        support for canvas HTML element in mycore-iview2 (adds rotate function) 
       </action>
       <action dev="mcrmeich" type="update">
         refactored mycore-solr component
@@ -59,10 +62,10 @@
         bootstraped editor forms of mycore-user2
       </action>
       <action dev="mcrsherm" type="add">
-        added Handle support
+        Handle support
       </action>
       <action dev="mcrfluet" type="add">
-        added mycore-xeditor component
+        mycore-xeditor component
       </action>
       <action dev="mcrfluet" type="fix">
         MCRSearchServlet: on redirect pass XSL.Transformer parameter
@@ -102,15 +105,15 @@
         <fixes issue="609" />
       </action>
       <action dev="mcrtchef" type="add" due-to="Frank Lützenkirchen">
-        added MCRXMLFunctions.encodeURIPath(String path, boolean asciiOnly) to ensure that encoded path contains only ASCII characters.
+        MCRXMLFunctions.encodeURIPath(String path, boolean asciiOnly) to ensure that encoded path contains only ASCII characters.
         <fixes issue="610" />
       </action>
       <action dev="mcrtchef" type="add" due-to="Frank Lützenkirchen">
-        added MCRXMLFunctions.normalizeAbsoluteURL(String) to ensure that a absolute URL is RFC 2396 compliant.
+        MCRXMLFunctions.normalizeAbsoluteURL(String) to ensure that a absolute URL is RFC 2396 compliant.
         <fixes issue="607" />
       </action>
       <action dev="mcrtchef" type="add">
-        added MCRURNManager.assignURN(String urn, String derivateID, String path)
+        MCRURNManager.assignURN(String urn, String derivateID, String path)
       </action>
       <action dev="mcrtchef" type="add">
         MCRXSLInfoServlet generates graphs that display call-template calls: XSL.mode=uses
@@ -120,7 +123,7 @@
         "MCR.LayoutService.LastModifiedCheckPeriod" ms (default 10000).
       </action>
       <action dev="mcrtchef" type="add">
-        added o.m.d.m.MCRMetadataManager.getObjectId(MCRObjectID, long) to retrieve objectID of metadata object for derivate id
+        o.m.d.m.MCRMetadataManager.getObjectId(MCRObjectID, long) to retrieve objectID of metadata object for derivate id
       </action>
       <action dev="mcrtchef" type="update">
         improved speed of MCRCache
