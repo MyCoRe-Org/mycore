@@ -122,8 +122,25 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
         solrHttpMethod.releaseConnection();
     }
 
+    /**
+     * Gets a HttpGet to make a request to the Solr-Server.
+     * 
+     * @param parameterMap
+     *            Parameters to use with the Request
+     * @return a method to make the request
+     */
+    private static HttpGet getSolrHttpMethod(Map<String, String[]> parameterMap) {
+        String queryString = getQueryString(parameterMap);
+        if (!parameterMap.containsKey("version")) {
+            queryString += "&version=" + QUERY_XML_PROTOCOL_VERSION;
+        }
+        HttpGet httpGet = new HttpGet(MessageFormat.format("{0}{1}?{2}", SERVER_URL, QUERY_PATH, queryString));
+    
+        return httpGet;
+    }
+
     @SuppressWarnings("unchecked")
-    private Map<String, String[]> getSolrQueryParameter(HttpServletRequest request) {
+    private static Map<String, String[]> getSolrQueryParameter(HttpServletRequest request) {
         SolrQuery query = (SolrQuery) request.getAttribute(QUERY_KEY);
         Map<String, String[]> solrParameter;
         if (query == null) {
@@ -138,7 +155,7 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
         return solrParameter;
     }
 
-    private Map<String, String[]> getMap(SolrQuery query) {
+    private static Map<String, String[]> getMap(SolrQuery query) {
         Map<String, String[]> parameter = new HashMap<String, String[]>();
         for (String name : query.getParameterNames()) {
             parameter.put(name, query.getParams(name));
@@ -177,23 +194,6 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
         ClientConnectionManager clientConnectionManager = httpClient.getConnectionManager();
         clientConnectionManager.shutdown();
         super.destroy();
-    }
-
-    /**
-     * Gets a GetMethod to make a request to the Solr-Server.
-     * 
-     * @param parameterMap
-     *            Parameters to use with the Request
-     * @return a method to make the request
-     */
-    public static HttpGet getSolrHttpMethod(Map<String, String[]> parameterMap) {
-        String queryString = getQueryString(parameterMap);
-        if (!parameterMap.containsKey("version")) {
-            queryString += "&version=" + QUERY_XML_PROTOCOL_VERSION;
-        }
-        HttpGet httpGet = new HttpGet(MessageFormat.format("{0}{1}?{2}", SERVER_URL, QUERY_PATH, queryString));
-
-        return httpGet;
     }
 
     private static String getQueryString(Map<String, String[]> parameters) {
