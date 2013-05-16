@@ -173,10 +173,9 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
 
     @Override
     public void destroy() {
-        ClientConnectionManager clientConnectionManager = httpClient.getConnectionManager();
-        clientConnectionManager.closeIdleConnections(0, TimeUnit.SECONDS);
-        clientConnectionManager.closeExpiredConnections();
         this.idleConnectionMonitorThread.shutdown();
+        ClientConnectionManager clientConnectionManager = httpClient.getConnectionManager();
+        clientConnectionManager.shutdown();
         super.destroy();
     }
 
