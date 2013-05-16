@@ -96,13 +96,6 @@
                 </configuration>
               </execution>
             </executions>
-            <dependencies>
-              <dependency>
-                <groupId>org.mycore</groupId>
-                <artifactId>build-tools</artifactId>
-                <version>1.1</version>
-              </dependency>
-            </dependencies>
           </plugin>
           <plugin>
             <artifactId>maven-pmd-plugin</artifactId>
