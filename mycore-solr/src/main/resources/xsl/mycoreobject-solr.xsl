@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3"
-  xmlns:xalan="http://xml.apache.org/xalan">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xalan="http://xml.apache.org/xalan">
 
   <xsl:include href="xslInclude:solr-export" />
 
@@ -32,7 +32,9 @@
     <xsl:variable name="classTree"
       select="document(concat('classification:metadata:0:parents:', @classid, ':', @categid))/mycoreclass/categories//category" />
 
-    <xsl:apply-templates mode="classi2fields" select="$classTree" />
+    <xsl:apply-templates mode="classi2fields" select="$classTree">
+      <xsl:with-param name="categid" select="@categid" />
+    </xsl:apply-templates>
 
     <!-- if mycore object is not a child -->
     <xsl:if test="@inherited = '0'">
@@ -42,6 +44,7 @@
   </xsl:template>
 
   <xsl:template mode="classi2fields" match="category">
+    <xsl:param name="categid" />
     <xsl:variable name="classid" select="ancestor-or-self::node()[last()]/mycoreclass/@ID" />
 
     <!-- classid as fieldname -->
@@ -53,10 +56,19 @@
     <field name="category">
       <xsl:value-of select="concat($classid, ':', @ID)" />
     </field>
-
+    
+    <field name="{$classid}_Label">
+      <xsl:value-of select="label/@text" />
+    </field>
+    <xsl:for-each select="label">
+      <field name="{$classid}_Label.{@xml:lang}">
+        <!-- text as value -->
+        <xsl:value-of select="@text" />
+      </field>
+    </xsl:for-each>
     <xsl:apply-templates mode="labels" select="label" />
   </xsl:template>
-  
+
   <xsl:template match="/mycoreobject/metadata//mods:*[@authority or @authorityURI]">
     <xsl:variable name="uri" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport" select="mcrmods:getClassCategParentLink(.)" />
     <xsl:if test="string-length($uri) &gt; 0">
