@@ -2,7 +2,6 @@ package org.mycore.solr.index.test;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -44,11 +43,8 @@ public class MCRMycoreObjectSolrXSLTest {
         List mycoreojectTags = XPath.selectNodes(resultXML, "/solr-document-container/source/mycoreobject");
         assertEquals(1, mycoreojectTags.size());
 
-        List userFieldTags = XPath.selectNodes(resultXML, "/solr-document-container/source/user/field");
-        assertEquals(16, userFieldTags.size());
-
-        List userTopFieldTags = XPath.selectNodes(resultXML, "/solr-document-container/source/user/field[contains(@name, '.top')]");
-        assertEquals(4, userTopFieldTags.size());
+        List userFieldTags = XPath.selectNodes(resultXML, "/solr-document-container/source/user");
+        assertEquals(1, userFieldTags.size());
     }
 
     @Test
@@ -66,11 +62,8 @@ public class MCRMycoreObjectSolrXSLTest {
         List mycoreojectTags = XPath.selectNodes(resultXML, "/solr-document-container/source/mycoreobject");
         assertEquals(3, mycoreojectTags.size());
 
-        List userFieldTags = XPath.selectNodes(resultXML, "/solr-document-container/source/user/field");
-        assertEquals(48, userFieldTags.size());
-
-        List userTopFieldTags = XPath.selectNodes(resultXML, "/solr-document-container/source/user/field[contains(@name, '.top')]");
-        assertEquals(12, userTopFieldTags.size());
+        List userFieldTags = XPath.selectNodes(resultXML, "/solr-document-container/source/user");
+        assertEquals(3, userFieldTags.size());
     }
 
     @Test
