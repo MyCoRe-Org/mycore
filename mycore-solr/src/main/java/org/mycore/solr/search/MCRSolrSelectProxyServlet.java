@@ -11,6 +11,7 @@ import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.text.MessageFormat;
@@ -26,11 +27,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIUtils;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
@@ -69,11 +72,13 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
     public static final String QUERY_KEY = MCRSolrSelectProxyServlet.class.getName() + ".query";
 
     private static int MAX_CONNECTIONS = MCRConfiguration.instance().getInt(
-        CONFIG_PREFIX + "SelectProxy.MaxConnections", 20);
+        CONFIG_PREFIX + "SelectProxy.MaxConnections");
 
     private HttpClient httpClient;
 
     private IdleConnectionMonitorThread idleConnectionMonitorThread;
+
+    protected HttpHost solrHost;
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
@@ -83,7 +88,7 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
         HttpGet solrHttpMethod = MCRSolrSelectProxyServlet.getSolrHttpMethod(solrParameter);
         try {
             LOGGER.info("Sending Request: " + solrHttpMethod.getURI());
-            HttpResponse response = httpClient.execute(solrHttpMethod);
+            HttpResponse response = httpClient.execute(solrHost, solrHttpMethod);
             int statusCode = response.getStatusLine().getStatusCode();
 
             HttpServletResponse resp = job.getResponse();
@@ -91,27 +96,29 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
             // set status code
             resp.setStatus(statusCode);
 
-            // set all header
+            boolean isXML = response.getFirstHeader(HTTP.CONTENT_TYPE).getValue().contains("/xml");
+            boolean justCopyInput = (statusCode != HttpStatus.SC_OK) || !isXML;
+
+            // set all headers
             for (Header header : response.getAllHeaders()) {
-                if (!(HTTP.TRANSFER_ENCODING.equals(header.getName()) && statusCode == HttpStatus.SC_OK)) {
+                if (justCopyInput || !HTTP.TRANSFER_ENCODING.equals(header.getName())) {
                     resp.setHeader(header.getName(), header.getValue());
                 }
             }
 
-            boolean isXML = response.getFirstHeader(HTTP.CONTENT_TYPE).getValue().contains("/xml");
-
             HttpEntity solrResponseEntity = response.getEntity();
             if (solrResponseEntity != null) {
                 try (InputStream solrResponseStream = solrResponseEntity.getContent()) {
-                    if (statusCode == HttpStatus.SC_OK && isXML) {
-                        String[] xslt = solrParameter.get("xslt");
-                        MCRStreamContent solrResponse = new MCRStreamContent(solrResponseStream, solrHttpMethod
-                            .getURI().toString(), xslt != null ? xslt[0] : "response");
-                        MCRLayoutService.instance().doLayout(request, resp, solrResponse);
-                    } else {
+                    if (justCopyInput) {
                         // copy solr response to servlet outputstream
                         OutputStream servletOutput = resp.getOutputStream();
                         IOUtils.copy(solrResponseStream, servletOutput);
+                    } else {
+                        String[] xslt = solrParameter.get("xslt");
+                        String docType = xslt != null ? xslt[0] : "response";
+                        MCRStreamContent solrResponse = new MCRStreamContent(solrResponseStream, solrHttpMethod
+                            .getURI().toString(), docType);
+                        MCRLayoutService.instance().doLayout(request, resp, solrResponse);
                     }
                 }
             }
@@ -130,12 +137,12 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
      * @return a method to make the request
      */
     private static HttpGet getSolrHttpMethod(Map<String, String[]> parameterMap) {
-        String queryString = getQueryString(parameterMap);
         if (!parameterMap.containsKey("version")) {
-            queryString += "&version=" + QUERY_XML_PROTOCOL_VERSION;
+            parameterMap.put("version", new String[] { QUERY_XML_PROTOCOL_VERSION });
         }
+        String queryString = getQueryString(parameterMap);
         HttpGet httpGet = new HttpGet(MessageFormat.format("{0}{1}?{2}", SERVER_URL, QUERY_PATH, queryString));
-    
+
         return httpGet;
     }
 
@@ -167,23 +174,33 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
     public void init() throws ServletException {
         super.init();
 
+        //determine host name
+        HttpGet serverGet = new HttpGet(SERVER_URL);
+        final URI requestURI = serverGet.getURI();
+        if (requestURI.isAbsolute()) {
+            solrHost = URIUtils.extractHost(requestURI);
+            if (solrHost == null) {
+                throw new ServletException("URI does not specify a valid host name: " + requestURI);
+            }
+        }
+
+        //configure connection manager
         PoolingClientConnectionManager connectionManager = new PoolingClientConnectionManager();
         connectionManager.setDefaultMaxPerRoute(MAX_CONNECTIONS);
         connectionManager.setMaxTotal(MAX_CONNECTIONS);
 
-        HttpRequestRetryHandler retryHandler = new SolrRetryHandler(MAX_CONNECTIONS);
-
+        //setup http client
         DefaultHttpClient defaultHttpClient = new DefaultHttpClient(connectionManager);
-        defaultHttpClient.setHttpRequestRetryHandler(retryHandler);
-
+        defaultHttpClient.setHttpRequestRetryHandler(new SolrRetryHandler(MAX_CONNECTIONS));
         String userAgent = MessageFormat.format("MyCoRe/{0} ({1}; java {2})", MCRCoreVersion.getCompleteVersion(),
             MCRConfiguration.instance().getString("MCR.NameOfProject"), System.getProperty("java.version"));
         defaultHttpClient.getParams().setParameter(CoreProtocolPNames.HTTP_CONTENT_CHARSET, "UTF-8")
             .setParameter(CoreProtocolPNames.USER_AGENT, userAgent)
             .setBooleanParameter(CoreConnectionPNames.TCP_NODELAY, true)
             .setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false);
-
         httpClient = defaultHttpClient;
+
+        //start thread to monitor stalled connections
         this.idleConnectionMonitorThread = new IdleConnectionMonitorThread(connectionManager);
         idleConnectionMonitorThread.start();
     }
