@@ -471,6 +471,7 @@
       </xsl:if>
     </xsl:variable>
     <xsl:if test="./structure/derobjects">
+      <xsl:variable name="parentObjID" select="./@ID" />
       <tr>
         <td style="vertical-align:top;" class="metaname">
           <xsl:value-of select="concat(i18n:translate('component.mods.metaData.[derivates]'), ':')" />
@@ -498,6 +499,7 @@
                     <!-- MCR - IView ..end -->
                   </td>
                   <xsl:if test="acl:checkPermission(./@xlink:href,'writedb')">
+                    <xsl:variable name="derivateWithURN" select="mcrxsl:hasURNDefined(@xlink:href)" />
                     <td align="right" valign="top">
                       <a href="{$ServletsBaseURL}derivate/update{$HttpSession}?objectid={../../../@ID}&amp;id={@xlink:href}{$suffix}">
                         <img title="Datei hinzufügen" src="{$WebApplicationBaseURL}images/workflow_deradd.gif" />
@@ -505,6 +507,14 @@
                       <a href="{$ServletsBaseURL}derivate/update{$HttpSession}?id={@xlink:href}{$suffix}">
                         <img title="Derivat bearbeiten" src="{$WebApplicationBaseURL}images/workflow_deredit.gif" />
                       </a>
+                      <xsl:if test="$derivateWithURN=false() and mcrxsl:isAllowedObjectForURNAssignment($parentObjID)">
+                        <xsl:variable name="apos">
+                          <xsl:text>'</xsl:text>
+                        </xsl:variable>
+                        <a href="{$ServletsBaseURL}MCRAddURNToObjectServlet{$HttpSession}?object={@xlink:href}" onclick="{concat('return confirm(',$apos, i18n:translate('component.mods.metaData.options.urn.confirm'), $apos, ');')}">
+                          <img src="{$WebApplicationBaseURL}images/workflow_addnbn.gif" title="{i18n:translate('component.mods.metaData.options.urn')}" />
+                        </a>
+                      </xsl:if>
                       <xsl:if test="acl:checkPermission(./@xlink:href,'deletedb')">
                         <a href="{$ServletsBaseURL}derivate/delete{$HttpSession}?id={@xlink:href}">
                           <img title="Derivat löschen" src="{$WebApplicationBaseURL}images/workflow_derdelete.gif" />
