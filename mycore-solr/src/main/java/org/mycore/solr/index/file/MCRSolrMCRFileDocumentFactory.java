@@ -92,12 +92,12 @@ public class MCRSolrMCRFileDocumentFactory {
         String urn = MCRURNManager.getURNForFile(input.getOwnerID(),
             absolutePath.substring(0, absolutePath.lastIndexOf("/") + 1), input.getName());
         if (urn != null) {
-            doc.setField("urn", urn);
+            doc.setField("fileURN", urn);
         }
         Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.getInstance().getLinksFromReference(
             MCRFile.getCategLinkReference(MCRObjectID.getInstance(input.getOwnerID()), absolutePath));
         for (MCRCategoryID category : linksFromReference) {
-            doc.addField("category", category.toString());
+            doc.addField("fileCategory", category.toString());
         }
         MCRISO8601Date iDate = new MCRISO8601Date();
         iDate.setDate(input.getLastModified().getTime());
