@@ -23,7 +23,7 @@
     <lucene.version>3.6.2</lucene.version>
     <xalan.version>2.7.1</xalan.version>
     <jersey.version>1.17.1</jersey.version>
-    <changelog.since>2013-01-18</changelog.since>
+    <changelog.since>2013-05-15</changelog.since>
   </properties>
   <issueManagement>
     <system>sourceforge</system>
