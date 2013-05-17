@@ -5,6 +5,12 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
+    <release version="2013.06" date="2013-06-XX" description="2013 LTS">
+      <action dev="mcrtchef" type="add">
+        auto-generate dynamic solr fields
+        set 'MCR.Module-solr.DynamicFields=false' do deactivate
+      </action>
+    </release>
     <release version="2013.05" date="2013-05-15" description="Beta 2">
       <action dev="mcrtchef" type="add">
         ClassificationBrowser implementation for solr

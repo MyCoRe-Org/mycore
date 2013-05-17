@@ -8,5 +8,9 @@
                 propertyfile="${build.config}/mycore.properties"
                 key="MCR.CLI.Classes.Internal"
                 value="org.mycore.solr.commands.MCRSolrCommands" />
+    <mcr:config action="addInclude"
+                propertyfile="${build.config}/mycore.properties"
+                key="MCR.URIResolver.xslImports.solr-document"
+                value="mycoreobject-dynamicfields.xsl" />
   </target>
 </project>
