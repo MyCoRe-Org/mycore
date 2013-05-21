@@ -137,9 +137,6 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
      * @return a method to make the request
      */
     private static HttpGet getSolrHttpMethod(Map<String, String[]> parameterMap) {
-        if (!parameterMap.containsKey("version")) {
-            parameterMap.put("version", new String[] { QUERY_XML_PROTOCOL_VERSION });
-        }
         String queryString = getQueryString(parameterMap);
         HttpGet httpGet = new HttpGet(MessageFormat.format("{0}{1}?{2}", SERVER_URL, QUERY_PATH, queryString));
 
@@ -223,6 +220,10 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
             }
         } catch (UnsupportedEncodingException e) {
             throw new MCRException(e);
+        }
+        if (!parameters.containsKey("version")) {
+            sb.append("&version=");
+            sb.append(QUERY_XML_PROTOCOL_VERSION);
         }
         if (sb.length() != 0) {
             sb.deleteCharAt(0);// removes first "&"
