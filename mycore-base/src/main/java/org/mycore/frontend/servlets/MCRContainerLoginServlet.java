@@ -103,7 +103,7 @@ public class MCRContainerLoginServlet extends MCRServlet {
         }
 
         private HttpServletRequest getCurrentRequest() {
-            Logger.getLogger(getClass()).debug("Gettring Request from session: " + session.getID());
+            Logger.getLogger(getClass()).debug("Getting request from session: " + session.getID());
             MCRServletJob job = (MCRServletJob) session.get(MCRServlet.MCR_SERVLET_JOB_KEY);
             return job == null ? null : job.getRequest();
         }
