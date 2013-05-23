@@ -27,11 +27,15 @@ import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
+import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.ifs.MCRAudioVideoExtender;
@@ -52,6 +56,8 @@ public class MCRSolrMCRFileDocumentFactory {
 
     private static MCRSolrMCRFileDocumentFactory instance = MCRConfiguration.instance().getInstanceOf(
         CONFIG_PREFIX + "SolrInputDocument.MCRFile.Factory", MCRSolrMCRFileDocumentFactory.class);
+
+    private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
 
     public static MCRSolrMCRFileDocumentFactory getInstance() {
         return instance;
@@ -96,7 +102,13 @@ public class MCRSolrMCRFileDocumentFactory {
         }
         Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.getInstance().getLinksFromReference(
             MCRFile.getCategLinkReference(MCRObjectID.getInstance(input.getOwnerID()), absolutePath));
+        HashSet<MCRCategoryID> linkedCategories = new HashSet<>(linksFromReference);
         for (MCRCategoryID category : linksFromReference) {
+            for (MCRCategory parent : CATEGORY_DAO.getParents(category)) {
+                linkedCategories.add(parent.getId());
+            }
+        }
+        for (MCRCategoryID category : linkedCategories) {
             doc.addField("fileCategory", category.toString());
         }
         MCRISO8601Date iDate = new MCRISO8601Date();
