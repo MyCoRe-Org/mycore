@@ -49,6 +49,7 @@
       <xsl:with-param name="adddescription" select="@adddescription"/>
       <xsl:with-param name="addclassid" select="@addclassid"/>
       <xsl:with-param name="style" select="@style"/>
+      <xsl:with-param name="filterCategory" select="@filterCategory='true'"/>
       <xsl:with-param name="addParameter" select="@addParameter"/>
     </xsl:call-template>
   </xsl:template>
@@ -69,6 +70,8 @@
     <xsl:param name="adddescription" />
     <xsl:param name="addclassid" />
     <xsl:param name="style" />
+    <!-- SOLR: if true join returnId to id, ignored with lucene -->
+    <xsl:param name="filterCategory" select="false()"/>
     <xsl:param name="addParameter" />
 
     <div>
@@ -108,6 +111,7 @@
             adddescription : '<xsl:value-of select="$adddescription" />',
             addclassid     : '<xsl:value-of select="$addclassid" />',
             style          : '<xsl:value-of select="$style" />',
+            filterCategory : '<xsl:value-of select="$filterCategory" />',
             webpage        : '<xsl:value-of select="substring-after($RequestURL,$WebApplicationBaseURL)" />'
           };
           <xsl:variable name="addParam">

@@ -23,6 +23,7 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -66,6 +67,17 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         return new MCRSearcherQueryAdapter(fieldName);
     }
 
+    protected void configureQueryAdapter(MCRQueryAdapter queryAdapter, HttpServletRequest req) {
+        String objectType = req.getParameter("objecttype");
+        if ((objectType != null) && (objectType.trim().length() > 0)) {
+            queryAdapter.setObjectType(objectType);
+        }
+        String restriction = req.getParameter("restriction");
+        if ((restriction != null) && (restriction.trim().length() > 0)) {
+            queryAdapter.setRestriction(restriction);
+        }
+    }
+
     public void doGetPost(MCRServletJob job) throws Exception {
         long time = System.nanoTime();
 
@@ -73,10 +85,6 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
         String classifID = req.getParameter("classification");
         String categID = req.getParameter("category");
-        String objectType = req.getParameter("objecttype");
-        String field = req.getParameter("field");
-        String restriction = req.getParameter("restriction");
-        String parameters = req.getParameter("parameters");
 
         boolean countResults = Boolean.valueOf(req.getParameter("countresults"));
         boolean addClassId = Boolean.valueOf(req.getParameter("addclassid"));
@@ -96,21 +104,20 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
         MCRQueryAdapter queryAdapter = null;
 
+        String field = req.getParameter("field");
         if (countResults || field.length() > 0) {
             queryAdapter = getQueryAdapter(field);
 
-            if ((objectType != null) && (objectType.trim().length() > 0)) {
-                xml.setAttribute("objectType", objectType);
-                queryAdapter.setObjectType(objectType);
+            configureQueryAdapter(queryAdapter, req);
+            if (queryAdapter.getObjectType() != null) {
+                xml.setAttribute("objectType", queryAdapter.getObjectType());
             }
-            if ((restriction != null) && (restriction.trim().length() > 0)) {
-                queryAdapter.setRestriction(restriction);
-            }
-
         }
 
-        if (parameters != null)
+        String parameters = req.getParameter("parameters");
+        if (parameters != null) {
             xml.setAttribute("parameters", parameters);
+        }
 
         List<Element> data = new ArrayList<Element>();
         MCRCategory category = MCRCategoryDAOFactory.getInstance().getCategory(id, 1);
@@ -136,7 +143,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             categoryE.setAttribute("id", childID);
             categoryE.setAttribute("children", Boolean.toString(child.hasChildren()));
             if (queryAdapter != null)
-                categoryE.setAttribute("query", URLEncoder.encode(queryAdapter.getQueryAsString(), "UTF-8"));
+                categoryE.setAttribute("query", queryAdapter.getQueryAsString());
 
             if (uri && (child.getURI() != null))
                 categoryE.addContent(new Element("uri").setText(child.getURI().toString()));
@@ -144,7 +151,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             addLabel(req, child, categoryE);
         }
 
-        countLinks(req, emptyLeaves, objectType, category, data);
+        countLinks(req, emptyLeaves, queryAdapter.getObjectType(), category, data);
         sortCategories(req, data);
         xml.addContent(data);
         renderToHTML(job, req, xml);
@@ -169,15 +176,13 @@ public class MCRClassificationBrowser2 extends MCRServlet {
     }
 
     /** Add link count to each category */
-    private void countLinks(HttpServletRequest req, boolean emptyLeaves, String objectType, MCRCategory category,
-        List<Element> data) {
+    private void countLinks(HttpServletRequest req, boolean emptyLeaves, String objectType, MCRCategory category, List<Element> data) {
         if (!Boolean.valueOf(req.getParameter("countlinks")))
             return;
         if (objectType.trim().length() == 0)
             objectType = null;
         String classifID = category.getId().getRootID();
-        Map<MCRCategoryID, Number> count = MCRCategLinkServiceFactory.getInstance().countLinksForType(category,
-            objectType, true);
+        Map<MCRCategoryID, Number> count = MCRCategLinkServiceFactory.getInstance().countLinksForType(category, objectType, true);
         for (Iterator<Element> it = data.iterator(); it.hasNext();) {
             Element child = it.next();
             MCRCategoryID childID = new MCRCategoryID(classifID, child.getAttributeValue("id"));
@@ -225,9 +230,11 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
         public void setObjectType(String text);
 
+        public String getObjectType();
+
         public long getResultCount();
 
-        public String getQueryAsString();
+        public String getQueryAsString() throws UnsupportedEncodingException;
     }
 
     protected static final class MCRSearcherQueryAdapter implements MCRQueryAdapter {
@@ -264,6 +271,11 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         }
 
         @Override
+        public String getObjectType() {
+            return this.objectType == null ? null : this.objectType.getValue();
+        }
+
+        @Override
         public void setCategory(String categId) {
             categCondition.setValue(categId);
         }
@@ -274,8 +286,8 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         }
 
         @Override
-        public String getQueryAsString() {
-            return query == null ? categCondition.toString() : query.toString();
+        public String getQueryAsString() throws UnsupportedEncodingException {
+            return URLEncoder.encode(query == null ? categCondition.toString() : query.toString(), "UTF-8");
         }
     }
 }

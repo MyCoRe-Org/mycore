@@ -22,7 +22,7 @@ public class MCRSolrQueryEngine extends MCRDefaultQueryEngine {
 
     private static final Logger LOGGER = Logger.getLogger(MCRSolrQueryEngine.class);
 
-    private static final String JOIN_PATTERN = "{!join from=returnId to=id}";
+    public static final String JOIN_PATTERN = "{!join from=returnId to=id}";
 
     private static MCRSolrAdapter ADAPTER = new MCRSolrAdapter();
 
