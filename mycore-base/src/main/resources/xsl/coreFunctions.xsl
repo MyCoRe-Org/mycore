@@ -271,7 +271,7 @@
     <xsl:param name="categid" />
     <xsl:param name="host" select="'local'" />
     <xsl:choose>
-      <xsl:when test="$host != 'local'">
+      <xsl:when test="$host != 'local' and string-length($host) &gt; 0">
         <xsl:value-of
           select="concat('mcrws:operation=MCRDoRetrieveClassification&amp;level=0&amp;type=children&amp;classid=',$classid,'&amp;categid=',$categid,'&amp;format=metadata','&amp;host=',$host)" />
       </xsl:when>
