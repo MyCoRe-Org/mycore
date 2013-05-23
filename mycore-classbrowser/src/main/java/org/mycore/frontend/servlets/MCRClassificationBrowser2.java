@@ -151,7 +151,8 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             addLabel(req, child, categoryE);
         }
 
-        countLinks(req, emptyLeaves, queryAdapter.getObjectType(), category, data);
+        String objectType = queryAdapter == null ? null : queryAdapter.getObjectType();
+        countLinks(req, emptyLeaves, objectType, category, data);
         sortCategories(req, data);
         xml.addContent(data);
         renderToHTML(job, req, xml);
