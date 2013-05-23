@@ -80,8 +80,8 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
                 LOGGER.warn("File is linked to category but does not exist:" + der.getId() + ref.getObjectID());
                 continue;
             }
-            MCREvent fileEvent = new MCREvent(MCREvent.FILE_TYPE, MCREvent.REPAIR_EVENT);
-            evt.put("file", file);
+            MCREvent fileEvent = new MCREvent(MCREvent.FILE_TYPE, MCREvent.INDEX_EVENT);
+            fileEvent.put("file", file);
             MCREventManager.instance().handleEvent(fileEvent);
         }
     }
@@ -112,8 +112,6 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
      * @param file
      *
      * TODO handle directory structures 
-     * 
-     * @author shermann
      * */
     @Override
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
@@ -135,4 +133,5 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
         derivate.getDerivate().getOrCreateFileMetadata(file, urn);
         MCRMetadataManager.update(derivate);
     }
+
 }
