@@ -345,7 +345,7 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
     public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId) throws SAXException, IOException {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(MessageFormat.format("Resolving: \nname: {0}\npublicId: {1}\nbaseURI: {2}\nsystemId: {3}", name, publicId,
-                baseURI, systemId));
+                    baseURI, systemId));
         }
         if (systemId == null) {
             return null; // Use default resolver
@@ -913,7 +913,7 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
         private static final String SORT_CONFIG_PREFIX = CONFIG_PREFIX + "Classification.Sort.";
 
         private static MCRCache<String, Element> categoryCache = new MCRCache<String, Element>(MCRConfiguration.instance().getInt(
-            CONFIG_PREFIX + "Classification.CacheSize", 1000), "URIResolver categories");
+                CONFIG_PREFIX + "Classification.CacheSize", 1000), "URIResolver categories");
 
         private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
@@ -938,7 +938,9 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
             Element returns = categoryCache.getIfUpToDate(cacheKey, getSystemLastModified());
             if (returns == null) {
                 returns = getClassElement(uri);
-                categoryCache.put(cacheKey, returns);
+                if (returns != null) {
+                    categoryCache.put(cacheKey, returns);
+                }
             }
             return returns;
         }
@@ -1001,7 +1003,7 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
                 if (categ.length() == 0) {
                     LOGGER.error("Cannot resolve parent axis without a CategID. URI: " + uri);
                     throw new IllegalArgumentException(
-                        "Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: " + uri);
+                            "Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: " + uri);
                 }
                 cl = DAO.getRootCategory(new MCRCategoryID(classID, categ), levels);
             }
