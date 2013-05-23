@@ -171,6 +171,7 @@ public class MCRSolrSelectProxyServlet extends MCRServlet {
     public void init() throws ServletException {
         super.init();
 
+        LOGGER.info("Initializing SOLR connection to \"" + SERVER_URL + "\"");
         //determine host name
         HttpGet serverGet = new HttpGet(SERVER_URL);
         final URI requestURI = serverGet.getURI();
