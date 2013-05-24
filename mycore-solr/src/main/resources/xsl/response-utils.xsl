@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
   xmlns:encoder="xalan://java.net.URLEncoder" exclude-result-prefixes="encoder xalan">
+  <xsl:param name="RequestURL" />
   <xsl:key name="derivate" match="/response/response[@subresult='derivate']/result/doc" use="str[@name='returnId']" />
   <xsl:variable name="params" select="/response/lst[@name='responseHeader']/lst[@name='params']" />
   <xsl:variable name="result" select="/response/result[@name='response']" />
@@ -27,6 +28,19 @@
   <xsl:variable name="rows" select="number($rowTemp)" />
   <xsl:variable name="currentPage" select="ceiling((($start + 1) - $rows) div $rows)+1" />
   <xsl:variable name="query" select="$params/str[@name='q']" />
+  <xsl:variable name="proxyBaseURL">
+    <xsl:choose>
+      <xsl:when test="string-length($HttpSession) &gt; 0 and contains($RequestURL, $HttpSession)">
+        <xsl:value-of select="substring-before($RequestURL, $HttpSession)" />
+      </xsl:when>
+      <xsl:when test="contains($RequestURL, '?')">
+        <xsl:value-of select="substring-before($RequestURL, '?')" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$RequestURL" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
 
   <xsl:variable name="totalPages">
     <xsl:choose>
@@ -52,7 +66,7 @@
   </xsl:variable>
   <xsl:template name="solr.Pagination">
     <xsl:param name="i" select="1" />
-    <xsl:param name="href" select="concat($ServletsBaseURL, 'SolrSelectProxy',$HttpSession,$solrParams)" />
+    <xsl:param name="href" select="concat($proxyBaseURL,$HttpSession,$solrParams)" />
     <xsl:param name="size" />
     <xsl:param name="currentpage" />
     <xsl:param name="totalpage" />
@@ -108,7 +122,7 @@
 
   <xsl:template name="solr.PageGen">
     <xsl:param name="i" select="1" />
-    <xsl:param name="href" select="concat($ServletsBaseURL, 'SolrSelectProxy',$HttpSession,$solrParams)" />
+    <xsl:param name="href" select="concat($proxyBaseURL,$HttpSession,$solrParams)" />
     <xsl:param name="size" />
     <xsl:param name="currentpage" />
     <xsl:param name="totalpage" />
