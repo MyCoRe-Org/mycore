@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
-  xmlns:encoder="xalan://java.net.URLEncoder" exclude-result-prefixes="encoder xalan">
+  xmlns:encoder="xalan://java.net.URLEncoder" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" exclude-result-prefixes="encoder xalan i18n">
   <xsl:param name="RequestURL" />
   <xsl:key name="derivate" match="/response/response[@subresult='derivate']/result/doc" use="str[@name='returnId']" />
   <xsl:variable name="params" select="/response/lst[@name='responseHeader']/lst[@name='params']" />
@@ -223,6 +223,69 @@
         <xsl:with-param name="currentpage" select="$currentpage" />
         <xsl:with-param name="totalpage" select="$totalpage" />
       </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="doc" mode="iview">
+    <xsl:variable name="mcrid" select="@id" />
+    <xsl:variable name="derivates" select="key('derivate', $mcrid)" />
+    <xsl:for-each select="$derivates/str[@name='iviewFile']">
+      <xsl:call-template name="iViewLinkPrev">
+        <xsl:with-param name="mcrid" select="$mcrid" />
+        <xsl:with-param name="derivate" select="../str[@name='id']" />
+        <xsl:with-param name="fileName" select="." />
+      </xsl:call-template>
+    </xsl:for-each>
+    <xsl:for-each select="./arr[@name='derivateLink']/str">
+      <xsl:call-template name="iViewLinkPrev">
+        <xsl:with-param name="mcrid" select="$mcrid" />
+        <xsl:with-param name="derivateLink" select="." />
+      </xsl:call-template>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="iViewLinkPrev">
+    <xsl:param name="derivate" />
+    <xsl:param name="mcrid" />
+    <xsl:param name="fileName" />
+    <xsl:param name="derivateLink" />
+
+    <xsl:param name="derId">
+      <xsl:choose>
+        <xsl:when test="$derivate">
+          <xsl:value-of select="$derivate" />
+        </xsl:when>
+        <xsl:when test="$derivateLink">
+          <xsl:value-of select="substring-before($derivateLink , '/')" />
+        </xsl:when>
+      </xsl:choose>
+    </xsl:param>
+    <xsl:if test="string-length($derId) &gt; 0 and $mcrid">
+      <xsl:variable name="pageToDisplay">
+        <xsl:choose>
+          <xsl:when test="$fileName">
+            <xsl:value-of select="$fileName" />
+          </xsl:when>
+          <xsl:when test="$derivateLink">
+            <xsl:value-of select="concat('/', substring-after($derivateLink, '/'))" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="iview2.getSupport">
+              <xsl:with-param select="$derivate" name="derivID" />
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:if test="$pageToDisplay != ''">
+        <a
+          href="{concat($WebApplicationBaseURL, 'receive/', $mcrid, '?jumpback=true&amp;maximized=true&amp;page=',$pageToDisplay,'&amp;derivate=', $derId)}"
+          tile="{i18n:translate('metaData.iView')}">
+          <xsl:call-template name="iview2.getImageElement">
+            <xsl:with-param select="$derId" name="derivate" />
+            <xsl:with-param select="$pageToDisplay" name="imagePath" />
+          </xsl:call-template>
+        </a>
+      </xsl:if>
     </xsl:if>
   </xsl:template>
 
