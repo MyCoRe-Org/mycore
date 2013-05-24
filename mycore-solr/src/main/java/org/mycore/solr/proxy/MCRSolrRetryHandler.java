@@ -10,6 +10,10 @@ import javax.net.ssl.SSLException;
 import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.protocol.HttpContext;
 
+/**
+ * Handles request retries. 
+ * @author Thomas Scheffler (yagee)
+ */
 class MCRSolrRetryHandler implements HttpRequestRetryHandler {
     int maxExecutionCount;
 

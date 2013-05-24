@@ -4,6 +4,12 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.http.conn.ClientConnectionManager;
 
+/**
+ * Monitors a {@link ClientConnectionManager} for expired or idle connections.
+ * 
+ * These connections will be closed every 5 seconds.
+ * @author Thomas Scheffler (yagee)
+ */
 class MCRIdleConnectionMonitorThread extends Thread {
     private final ClientConnectionManager connMgr;
 
