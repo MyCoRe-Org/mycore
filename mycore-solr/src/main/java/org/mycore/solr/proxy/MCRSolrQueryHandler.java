@@ -23,6 +23,7 @@
 
 package org.mycore.solr.proxy;
 
+import java.util.Comparator;
 import java.util.Map;
 
 import org.apache.solr.common.util.NamedList;
@@ -97,4 +98,14 @@ class MCRSolrQueryHandler {
             + (description != null ? "description=" + description + ", " : "")
             + (clazz != null ? "class=" + clazz : "") + "]";
     }
+
+    public static Comparator<MCRSolrQueryHandler> getPathComparator() {
+        return new Comparator<MCRSolrQueryHandler>() {
+            @Override
+            public int compare(MCRSolrQueryHandler o1, MCRSolrQueryHandler o2) {
+                return o1.getPath().compareTo(o2.getPath());
+            }
+        };
+    }
+
 }

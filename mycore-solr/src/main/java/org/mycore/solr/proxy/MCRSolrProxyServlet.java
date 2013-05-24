@@ -8,7 +8,9 @@ import static org.mycore.solr.MCRSolrConstants.SERVER_URL;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -75,13 +77,10 @@ public class MCRSolrProxyServlet extends MCRServlet {
         if (queryHandlerPath == null) {
             boolean refresh = "true".equals(getProperty(request, "refresh"));
             if (refresh) {
-                queryHandlerMap = MCRSolrProxyUtils.getQueryHandlerMap();
-                resp.sendError(HttpServletResponse.SC_OK, queryHandlerMap.toString());
+                updateQueryHandlerMap(resp);
                 return;
             }
-            String selectProxyURL = MessageFormat.format("{0}solr{1}?{2}", MCRServlet.getServletBaseURL(), QUERY_PATH,
-                getSolrQueryParameter(request).toString());
-            resp.sendRedirect(resp.encodeRedirectURL(selectProxyURL));
+            redirectToDefaultQueryHandler(request, resp);
             return;
         }
         MCRSolrQueryHandler queryHandler = queryHandlerMap.get(queryHandlerPath);
@@ -94,8 +93,12 @@ public class MCRSolrProxyServlet extends MCRServlet {
             return;
         }
 
-        ModifiableSolrParams solrParameter = getSolrQueryParameter(request);
+        handleQuery(queryHandler, request, resp);
+    }
 
+    private void handleQuery(MCRSolrQueryHandler queryHandler, HttpServletRequest request, HttpServletResponse resp)
+        throws IOException {
+        ModifiableSolrParams solrParameter = getSolrQueryParameter(request);
         HttpGet solrHttpMethod = MCRSolrProxyServlet.getSolrHttpMethod(queryHandler, solrParameter);
         try {
             LOGGER.info("Sending Request: " + solrHttpMethod.getURI());
@@ -135,6 +138,24 @@ public class MCRSolrProxyServlet extends MCRServlet {
             throw ex;
         }
         solrHttpMethod.releaseConnection();
+    }
+
+    private void redirectToDefaultQueryHandler(HttpServletRequest request, HttpServletResponse resp) throws IOException {
+        String selectProxyURL = MessageFormat.format("{0}solr{1}?{2}", MCRServlet.getServletBaseURL(), QUERY_PATH,
+            getSolrQueryParameter(request).toString());
+        resp.sendRedirect(resp.encodeRedirectURL(selectProxyURL));
+    }
+
+    private void updateQueryHandlerMap(HttpServletResponse resp) throws IOException {
+        Map<String, MCRSolrQueryHandler> handlerMap = MCRSolrProxyUtils.getQueryHandlerMap();
+        queryHandlerMap = handlerMap;
+        MCRSolrQueryHandler[] handler = handlerMap.values().toArray(new MCRSolrQueryHandler[handlerMap.size()]);
+        Arrays.sort(handler, MCRSolrQueryHandler.getPathComparator());
+        PrintWriter writer = resp.getWriter();
+        for (MCRSolrQueryHandler h : handler) {
+            writer.write(h.toString());
+            writer.append('\n');
+        }
     }
 
     /**
