@@ -64,18 +64,43 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
     protected HttpHost solrHost;
 
+    private Map<String, MCRSolrQueryHandler> queryHandlerMap;
+
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest request = job.getRequest();
+        HttpServletResponse resp = job.getResponse();
+
+        String queryHandlerPath = request.getPathInfo();
+        if (queryHandlerPath == null) {
+            boolean refresh = "true".equals(getProperty(request, "refresh"));
+            if (refresh) {
+                queryHandlerMap = MCRSolrProxyUtils.getQueryHandlerMap();
+                resp.sendError(HttpServletResponse.SC_OK, queryHandlerMap.toString());
+                return;
+            }
+            String selectProxyURL = MessageFormat.format("{0}solr{1}?{2}", MCRServlet.getServletBaseURL(), QUERY_PATH,
+                getSolrQueryParameter(request).toString());
+            resp.sendRedirect(resp.encodeRedirectURL(selectProxyURL));
+            return;
+        }
+        MCRSolrQueryHandler queryHandler = queryHandlerMap.get(queryHandlerPath);
+        if (queryHandler == null) {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        if (queryHandler.isRestricted()) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "No access to " + queryHandler.toString());
+            return;
+        }
+
         ModifiableSolrParams solrParameter = getSolrQueryParameter(request);
 
-        HttpGet solrHttpMethod = MCRSolrProxyServlet.getSolrHttpMethod(solrParameter);
+        HttpGet solrHttpMethod = MCRSolrProxyServlet.getSolrHttpMethod(queryHandler, solrParameter);
         try {
             LOGGER.info("Sending Request: " + solrHttpMethod.getURI());
             HttpResponse response = httpClient.execute(solrHost, solrHttpMethod);
             int statusCode = response.getStatusLine().getStatusCode();
-
-            HttpServletResponse resp = job.getResponse();
 
             // set status code
             resp.setStatus(statusCode);
@@ -114,13 +139,15 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
     /**
      * Gets a HttpGet to make a request to the Solr-Server.
+     * @param queryHandler 
      * 
      * @param parameterMap
      *            Parameters to use with the Request
      * @return a method to make the request
      */
-    private static HttpGet getSolrHttpMethod(ModifiableSolrParams params) {
-        HttpGet httpGet = new HttpGet(MessageFormat.format("{0}{1}?{2}", SERVER_URL, QUERY_PATH, params.toString()));
+    private static HttpGet getSolrHttpMethod(MCRSolrQueryHandler queryHandler, ModifiableSolrParams params) {
+        HttpGet httpGet = new HttpGet(MessageFormat.format("{0}{1}?{2}", SERVER_URL, queryHandler.getPath(),
+            params.toString()));
         return httpGet;
     }
 
@@ -144,6 +171,8 @@ public class MCRSolrProxyServlet extends MCRServlet {
         super.init();
 
         LOGGER.info("Initializing SOLR connection to \"" + SERVER_URL + "\"");
+
+        queryHandlerMap = MCRSolrProxyUtils.getQueryHandlerMap();
 
         solrHost = MCRSolrProxyUtils.getHttpHost(SERVER_URL);
         if (solrHost == null) {

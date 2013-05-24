@@ -6,6 +6,10 @@
   </properties>
   <body>
     <release version="2013.06" date="2013-06-XX" description="2013 LTS">
+      <action dev="mcrtchef" type="update">
+        MCRSolrSelectProxyServlet is now MCRSolrProxyServlet and supports different request handler.
+        <fixes issue="633" />
+      </action>
       <action dev="mcrtchef" type="add">
         auto-generate dynamic solr fields
         set 'MCR.Module-solr.DynamicFields=false' do deactivate
@@ -21,8 +25,8 @@
       </action>
       <action dev="mcrtchef" type="fix">
         WCMS: Assigning read and write permissions does not work
-        <fixes issue="628"/>
-        <fixes issue="617"/>
+        <fixes issue="628" />
+        <fixes issue="617" />
       </action>
       <action dev="mcrtchef" type="update">
         MCRSearchServlet parameter numPerPage defaults to "10" (was "0")
@@ -34,7 +38,7 @@
         removed applet from mycore-mets and removed mycore-zoomify component
       </action>
       <action dev="mcrsherm" type="fix">
-        Mets Editor does not support files with blanks 
+        Mets Editor does not support files with blanks
         <fixes issue="625" />
       </action>
       <action dev="mcrtchef" type="add">
@@ -59,7 +63,7 @@
         use Google guava cache for for MCRObjectIDPool and MCRCache
       </action>
       <action dev="mcrshofm" type="add">
-        support for canvas HTML element in mycore-iview2 (adds rotate function) 
+        support for canvas HTML element in mycore-iview2 (adds rotate function)
       </action>
       <action dev="mcrmeich" type="update">
         refactored mycore-solr component
@@ -78,33 +82,34 @@
       </action>
       <action dev="mcrfluet" type="fix">
         Editor: &lt;hidden var="..." descendants="true" /&gt; may duplicate data when attribute predicates are used in xpath
-        <fixes issue="622"/>
+        <fixes issue="622" />
       </action>
       <action dev="mcrtchef" type="add">
         MCRObjectTypeStrategy allows "default_class" rules for classifications
       </action>
       <action dev="mcrtchef" type="add">
         Added commands to check consistency of classifications and fix any errors found
-        <fixes issue="606"/>
+        <fixes issue="606" />
       </action>
       <action dev="mcrtchef" type="fix" due-to="Frank Lützenkirchen">
         Editing user data produces erroneous links in "Search and manage users"
-        <fixes issue="606"/>
+        <fixes issue="606" />
       </action>
       <action dev="mcrtchef" type="update">
-        MCRLayoutService: buffer output gives about 30% faster downloads and big improvements in browser render speed on fast connections.
+        MCRLayoutService: buffer output gives about 30% faster downloads and big improvements in browser
+        render speed on fast connections.
       </action>
       <action dev="mcrtchef" type="fix" due-to="Matthias Eichner">
         Password hint is not displayed
-        <fixes issue="613"/>
+        <fixes issue="613" />
       </action>
       <action dev="mcrtchef" type="fix" due-to="Kathleen Neumann">
-         Workflow looses action and type
-        <fixes issue="611"/>
+        Workflow looses action and type
+        <fixes issue="611" />
       </action>
       <action dev="mcrtchef" type="fix" due-to="Matthias Eichner">
         Categories have wrong left-/right- values when using new classification editor
-        <fixes issue="612"/>
+        <fixes issue="612" />
       </action>
       <action dev="mcrtchef" type="fix" due-to="Marcus Müller">
         ClassificationEditor does not work for non super users.
@@ -129,7 +134,8 @@
         "MCR.LayoutService.LastModifiedCheckPeriod" ms (default 10000).
       </action>
       <action dev="mcrtchef" type="add">
-        o.m.d.m.MCRMetadataManager.getObjectId(MCRObjectID, long) to retrieve objectID of metadata object for derivate id
+        o.m.d.m.MCRMetadataManager.getObjectId(MCRObjectID, long) to retrieve objectID of metadata object
+        for derivate id
       </action>
       <action dev="mcrtchef" type="update">
         improved speed of MCRCache
@@ -335,7 +341,8 @@
       <action dev="mcrheinz" type="update">
         refactored iview2:
         - jQuery Eventing is used for all JS code
-        - Added component for dynamic change of translations
+        - Added component for dynamic change of
+        translations
         - Capsulation of Functions
       </action>
       <action dev="mcrjkupf" type="fix">
@@ -408,7 +415,8 @@
     </release>
     <release version="2.0.94" date="2011-03-22" description="Beta 4">
       <action dev="mcrfluet" type="add">
-        Added functionality to disable editing of a textfield and set it read-only with @disabled="true", same as for list elements.
+        Added functionality to disable editing of a textfield and set it read-only with @disabled="true",
+        same as for list elements.
       </action>
       <action dev="mcrtchef" type="add">
         added MCRLocalServlet to allow multi lingual javascript applications
@@ -430,16 +438,19 @@
       </action>
       <action dev="mcrvuchi" type="update">
         adding manager class for creating, get, removing store in IFS2. MCRStore is no longer
-        responsible for these operations.
+        responsible
+        for these operations.
       </action>
       <action dev="mcrtchef" type="update">
         merged mycore-useradmin and mycore-userlogin component into mycore-user
-        moved user system related code from mycore-base to mycore-user
+        moved user system related
+        code from mycore-base to mycore-user
       </action>
       <action dev="mcrtchef" type="update">
         Separate ACL system from User system
         MCRUserMagr.login() now actually logs a (MCR) user in
-        Guest User is not physically stored in database anymore
+        Guest User
+        is not physically stored in database anymore
         A default group for new users can be configured via property (defaults to "users"):
         MCR.Users.DefaultGroupName
       </action>
@@ -448,7 +459,8 @@
       </action>
       <action dev="mcrheinz" type="add">
         ImageViewer uses structure information of METS-files for "chapter overview" using
-        - jsTree (http://www.jstree.com/)
+        - jsTree
+        (http://www.jstree.com/)
         - fg-menu 3.0 (http://www.filamentgroup.com/lab/jquery_ipod_style_and_flyout_menus/)
       </action>
     </release>
@@ -457,7 +469,8 @@
         Add a copy function for MCRObjects in the Simple Workflow.
       </action>
       <action dev="mcrjkupf" type="update">
-        Add the id-attribute in MCRIndexBrowser XML output for ranges to get the object data directly over Xalan extensions.
+        Add the id-attribute in MCRIndexBrowser XML output for ranges to get the object data directly over
+        Xalan extensions.
       </action>
       <action dev="mcrfluet" type="add">
         Added new built-in command "get uri {uri} to file {path}" to test or use MCRURIResolver
