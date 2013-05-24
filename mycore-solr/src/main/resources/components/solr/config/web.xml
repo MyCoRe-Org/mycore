@@ -5,7 +5,7 @@
 
 <servlet>
   <servlet-name>MCRSolrSelectProxyServlet</servlet-name>
-  <servlet-class>org.mycore.solr.search.MCRSolrSelectProxyServlet</servlet-class>
+  <servlet-class>org.mycore.solr.proxy.MCRSolrProxyServlet</servlet-class>
 </servlet>
 
   <!-- to use old search forms with new result pages
@@ -27,6 +27,16 @@
 <servlet-mapping>
   <servlet-name>MCRSolrSelectProxyServlet</servlet-name>
   <url-pattern>/servlets/SolrSelectProxy</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+  <servlet-name>MCRSolrSelectProxyServlet</servlet-name>
+  <url-pattern>/servlets/solr</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+  <servlet-name>MCRSolrSelectProxyServlet</servlet-name>
+  <url-pattern>/servlets/solr/*</url-pattern>
 </servlet-mapping>
 
 <servlet-mapping>

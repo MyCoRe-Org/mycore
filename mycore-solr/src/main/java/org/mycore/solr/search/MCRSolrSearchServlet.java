@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.solr.proxy.MCRSolrProxyServlet;
 
 /**
  * Used to map a formular-post to a solr request. </br></br>
@@ -88,7 +89,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
     /**
      * @param queryParameters all parameter where <code>getParameterGroup.equals(QueryParameter)</code> 
      * @param typeParameters all parameter where <code>getParameterGroup.equals(TypeParameter)</code>
-     * @return a map wich can be forwarded to {@link MCRSolrSelectProxyServlet}
+     * @return a map wich can be forwarded to {@link MCRSolrProxyServlet}
      */
     protected Map<String, String[]> buildSelectParameterMap(Map<String, String[]> queryParameters,
         Map<String, String[]> typeParameters, Map<String, String[]> sortParameters) {
@@ -211,7 +212,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
             sortParameters);
         buildedSolrParameters.putAll(solrParameters);
 
-        request.setAttribute(MCRSolrSelectProxyServlet.MAP_KEY, buildedSolrParameters);
+        request.setAttribute(MCRSolrProxyServlet.MAP_KEY, buildedSolrParameters);
         RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher("/servlets/SolrSelectProxy");
         requestDispatcher.forward(request, response);
     }

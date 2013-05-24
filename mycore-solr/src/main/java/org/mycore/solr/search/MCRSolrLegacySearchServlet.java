@@ -24,6 +24,7 @@ import org.mycore.parsers.bool.MCRSetCondition;
 import org.mycore.services.fieldquery.MCRDefaultQueryEngine;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRSearchServlet;
+import org.mycore.solr.proxy.MCRSolrProxyServlet;
 
 public class MCRSolrLegacySearchServlet extends MCRSearchServlet {
 
@@ -37,7 +38,7 @@ public class MCRSolrLegacySearchServlet extends MCRSearchServlet {
         MCRQuery query = qd.getQuery();
         
         SolrQuery solrQuery = MCRLuceneSolrAdapter.getSolrQuery(query.getCondition(), query.getSortBy(), query.getMaxResults());
-        request.setAttribute(MCRSolrSelectProxyServlet.QUERY_KEY, solrQuery);
+        request.setAttribute(MCRSolrProxyServlet.QUERY_KEY, solrQuery);
         RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher("/servlets/SolrSelectProxy");
         requestDispatcher.forward(request, response);
     }*/
@@ -46,7 +47,7 @@ public class MCRSolrLegacySearchServlet extends MCRSearchServlet {
     protected void showResults(HttpServletRequest request, HttpServletResponse response, MCRQuery query, Document input)
         throws IOException, ServletException {
         SolrQuery mergedSolrQuery = getSolrQuery(query, getNumPerPage(request));
-        request.setAttribute(MCRSolrSelectProxyServlet.QUERY_KEY, mergedSolrQuery);
+        request.setAttribute(MCRSolrProxyServlet.QUERY_KEY, mergedSolrQuery);
         RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher("/servlets/SolrSelectProxy");
         requestDispatcher.forward(request, response);
     }
