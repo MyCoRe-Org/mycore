@@ -27,7 +27,7 @@
   </xsl:variable>
   <xsl:variable name="rows" select="number($rowTemp)" />
   <xsl:variable name="currentPage" select="ceiling((($start + 1) - $rows) div $rows)+1" />
-  <xsl:variable name="query" select="$params/str[@name='q']" />
+  <xsl:variable name="query" select="xalan:nodeset($params)/str[@name='q']" />
   <xsl:variable name="proxyBaseURL">
     <xsl:choose>
       <xsl:when test="string-length($HttpSession) &gt; 0 and contains($RequestURL, $HttpSession)">
