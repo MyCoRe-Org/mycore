@@ -25,14 +25,18 @@ package org.mycore.solr.proxy;
 
 import java.util.Comparator;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.solr.common.util.NamedList;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.solr.MCRSolrConstants;
 
 /**
  * Holds information about the remote SOLR request handler. 
  * @author Thomas Scheffler (yagee)
  */
 class MCRSolrQueryHandler {
+    private static Pattern restrictedClassPattern = getRestrictedClassPattern();
 
     String clazz;
 
@@ -67,8 +71,13 @@ class MCRSolrQueryHandler {
                     break;
             }
         }
-        restricted = clazz == null || clazz.length() == 0 || clazz.contains("admin") || clazz.contains("Update")
-            || clazz.contains("Replication");
+        restricted = clazz == null || clazz.length() == 0 || restrictedClassPattern.matcher(clazz).find();
+    }
+
+    private static Pattern getRestrictedClassPattern() {
+        final String agentRegEx = MCRConfiguration.instance().getString(
+            MCRSolrConstants.CONFIG_PREFIX + "Proxy.ClassFilter");
+        return Pattern.compile(agentRegEx);
     }
 
     public boolean isRestricted() {
