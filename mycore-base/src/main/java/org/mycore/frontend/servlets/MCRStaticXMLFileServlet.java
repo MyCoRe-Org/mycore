@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
+import org.jdom2.output.Format;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
@@ -103,13 +104,15 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
     }
 
     /** For defined document types like static webpages, replace editor elements with complete editor definition */
-    protected MCRContent expandEditorElements(HttpServletRequest request, File file) throws IOException, JDOMException, SAXException,
-            MalformedURLException {
+    protected MCRContent expandEditorElements(HttpServletRequest request, File file) throws IOException, JDOMException,
+        SAXException, MalformedURLException {
         MCRContent content = new MCRFileContent(file);
         if (mayContainEditorForm(content)) {
             Document xml = content.asXML();
             MCREditorServlet.replaceEditorElements(request, file.toURI().toURL().toString(), xml);
-            content = new MCRJDOMContent(xml);
+            MCRJDOMContent jdomContent = new MCRJDOMContent(xml);
+            jdomContent.setFormat(Format.getRawFormat());
+            return jdomContent;
         }
         return content;
     }
