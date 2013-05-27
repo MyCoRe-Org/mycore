@@ -56,6 +56,11 @@ class MCRSolrQueryHandler {
             throw new IllegalArgumentException("Path must start with '/': " + path);
         }
         this.path = path;
+        if (queryHandler == null) {
+            //probably no connection to SOLR server
+            restricted = false;
+            return;
+        }
         for (Map.Entry<String, Object> entry : queryHandler) {
             switch (entry.getKey()) {
                 case "class":
