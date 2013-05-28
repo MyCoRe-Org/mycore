@@ -126,9 +126,8 @@ public class MCRSolrProxyServlet extends MCRServlet {
                         OutputStream servletOutput = resp.getOutputStream();
                         IOUtils.copy(solrResponseStream, servletOutput);
                     } else {
-                        String docType = solrParameter.get("xslt", "response");
                         MCRStreamContent solrResponse = new MCRStreamContent(solrResponseStream, solrHttpMethod
-                            .getURI().toString(), docType);
+                            .getURI().toString(), "response");
                         MCRLayoutService.instance().doLayout(request, resp, solrResponse);
                     }
                 }
