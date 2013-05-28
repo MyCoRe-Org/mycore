@@ -27,6 +27,11 @@
 
   <xsl:template match="/response">
     <xsl:apply-templates select="result" />
+    <!-- layer for the img tooltips, is initially not visable -->
+    <div id="toolTipLayer" style="position:absolute; visibility: hidden;left:0;right:0"></div>
+    <script>
+      initToolTips();
+    </script>
   </xsl:template>
 
   <xsl:template match="/response/result">

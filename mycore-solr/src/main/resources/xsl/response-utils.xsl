@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
-  xmlns:encoder="xalan://java.net.URLEncoder" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" exclude-result-prefixes="encoder xalan i18n">
+  xmlns:encoder="xalan://java.net.URLEncoder" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions"
+  exclude-result-prefixes="mcrxsl encoder xalan i18n">
   <xsl:param name="RequestURL" />
   <xsl:key name="derivate" match="/response/response[@subresult='derivate']/result/doc" use="str[@name='returnId']" />
+  <xsl:key name="file" match="/response/response[@subresult='unmerged']/result/doc" use="str[@name='returnId']" />
   <xsl:variable name="params" select="/response/lst[@name='responseHeader']/lst[@name='params']" />
   <xsl:variable name="result" select="/response/result[@name='response']" />
   <xsl:variable name="hits" select="number($result/@numFound)" />
@@ -244,6 +246,45 @@
     </xsl:for-each>
   </xsl:template>
 
+  <xsl:template match="doc" mode="hitInFiles">
+    <xsl:param name="fileNodeServlet" select="concat($ServletsBaseURL,'MCRFileNodeServlet/')" />
+    <xsl:variable name="mcrid" select="@id" />
+    <xsl:variable name="files" select="key('file', $mcrid)" />
+    <xsl:if test="$files">
+      <div class="hitInFile">
+        <span class="hitInFileLabel">
+          <xsl:value-of select="concat(i18n:translate('results.file'),' ')" />
+        </span>
+        <ul>
+          <xsl:for-each select="$files">
+            <li>
+            <!-- doc element of 'unmerged' response -->
+              <xsl:variable name="derivateId" select="str[@name='derivateID']" />
+              <xsl:variable name="filePath" select="str[@name='filePath']" />
+              <xsl:variable name="fileName" select="str[@name='fileName']" />
+              <xsl:choose>
+                <xsl:when test="key('derivate',$mcrid)[str/@name='iviewFile' and str[@name='id']=$derivateId]">
+                  <!-- iview support detected generate link to image viewer -->
+                  <xsl:variable name="toolTipImg" select="concat($ServletsBaseURL,'MCRThumbnailServlet/',$derivateId,mcrxsl:encodeURIPath($filePath),$HttpSession)" />
+                  <a onMouseOver="show('{$toolTipImg}')" onMouseOut="toolTip()"
+                    href="{concat($WebApplicationBaseURL, 'receive/', $mcrid, '?jumpback=true&amp;maximized=true&amp;page=',$filePath,'&amp;derivate=', $derivateId)}"
+                    title="{i18n:translate('metaData.iView')}">
+                    <xsl:value-of select="$fileName" />
+                  </a>
+                </xsl:when>
+                <xsl:otherwise>
+                  <a href="{concat($fileNodeServlet,$derivateId,mcrxsl:encodeURIPath($filePath),$HttpSession)}">
+                    <xsl:value-of select="$fileName" />
+                  </a>
+                </xsl:otherwise>
+              </xsl:choose>
+            </li>
+          </xsl:for-each>
+        </ul>
+      </div>
+    </xsl:if>
+  </xsl:template>
+
   <xsl:template name="iViewLinkPrev">
     <xsl:param name="derivate" />
     <xsl:param name="mcrid" />
@@ -279,7 +320,7 @@
       <xsl:if test="$pageToDisplay != ''">
         <a
           href="{concat($WebApplicationBaseURL, 'receive/', $mcrid, '?jumpback=true&amp;maximized=true&amp;page=',$pageToDisplay,'&amp;derivate=', $derId)}"
-          tile="{i18n:translate('metaData.iView')}">
+          title="{i18n:translate('metaData.iView')}">
           <xsl:call-template name="iview2.getImageElement">
             <xsl:with-param select="$derId" name="derivate" />
             <xsl:with-param select="$pageToDisplay" name="imagePath" />
