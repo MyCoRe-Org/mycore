@@ -83,7 +83,7 @@
         </field>
       </xsl:if>
       <field name="maindoc">
-        <xsl:value-of select="derivate/internals/internal/@maindoc"/>
+        <xsl:value-of select="derivate/internals/internal/@maindoc" />
       </field>
     </doc>
   </xsl:template>
@@ -112,6 +112,11 @@
       <field name="link">
         <xsl:value-of select="@xlink:href" />
       </field>
+      <xsl:if test="../@class = 'MCRMetaDerivateLink'">
+        <field name="derivateLink">
+          <xsl:value-of select="@xlink:href" />
+        </field>
+      </xsl:if>
     </xsl:for-each>
     <xsl:for-each select="service/servdates/servdate[@type='modifydate']">
       <field name="modified">
