@@ -138,7 +138,7 @@
           <hidden descendants="true" var="label" />
           <hidden var="@name" />
           <cell row="1" col="1" anchor="WEST">
-            <subselect i18n="component.user2.button.select" id="role.select" type="webpage" href="servlets/MCRRoleServlet" style="width: 100px;" />
+            <subselect i18n="component.user2.button.select" id="role.select" type="webpage" href="servlets/MCRRoleServlet" />
           </cell>
           <cell row="1" col="2" anchor="WEST">
             <output var="@name" />
