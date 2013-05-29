@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ** M y C o R e **
@@ -63,7 +63,7 @@ import org.xml.sax.SAXParseException;
 
 /**
  * Commands for the classification system.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 public class MCRClassification2Commands extends MCRAbstractCommands {
@@ -90,10 +90,10 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             "org.mycore.frontend.cli.MCRClassification2Commands.updateFromDirectory String",
             "The command update all classifications in the directory {0} to the system."));
         addCommand(new MCRCommand(
-            "export classification {0} to {1} with {2}",
+            "export classification {0} to file {1} with {2}",
             "org.mycore.frontend.cli.MCRClassification2Commands.export String String String",
             "The command store the classification with MCRObjectID {0} to the file named {1} with the stylesheet {2}-object.xsl. For {2} save is the default.."));
-        addCommand(new MCRCommand("export all classifications to {0} with {1}",
+        addCommand(new MCRCommand("export all classifications to directory {0} with {1}",
             "org.mycore.frontend.cli.MCRClassification2Commands.exportAll String String",
             "The command store all classifications to the directory with name {0} with the stylesheet {1}-object.xsl. For {1} save is the default."));
         addCommand(new MCRCommand("count classification children of {0}",
@@ -123,7 +123,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
 
     /**
      * Deletes a classification
-     * 
+     *
      * @param classID
      * @see MCRCategoryDAO#deleteCategory(MCRCategoryID)
      */
@@ -133,7 +133,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
 
     /**
      * Deletes a classification
-     * 
+     *
      * @param classID
      * @see MCRCategoryDAO#deleteCategory(MCRCategoryID)
      */
@@ -144,14 +144,14 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
 
     /**
      * Adds a classification.
-     * 
+     *
      * Classification is built from a file.
-     * 
+     *
      * @param filename
      *            file in mcrclass xml format
-     * @throws URISyntaxException 
-     * @throws SAXParseException 
-     * @throws MCRException 
+     * @throws URISyntaxException
+     * @throws SAXParseException
+     * @throws MCRException
      * @see MCRCategoryDAO#addCategory(MCRCategoryID, MCRCategory)
      */
     public static void loadFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException, IOException {
@@ -162,12 +162,12 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
 
     /**
      * Replaces a classification with a new version
-     * 
+     *
      * @param filename
      *            file in mcrclass xml format
-     * @throws URISyntaxException 
-     * @throws SAXParseException 
-     * @throws MCRException 
+     * @throws URISyntaxException
+     * @throws SAXParseException
+     * @throws MCRException
      * @see MCRCategoryDAO#replaceCategory(MCRCategory)
      */
     public static void updateFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException, IOException {
@@ -183,7 +183,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
 
     /**
      * Loads MCRClassification from all XML files in a directory.
-     * 
+     *
      * @param directory
      *            the directory containing the XML files
      * @throws MCRActiveLinkException
@@ -194,7 +194,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
 
     /**
      * Updates MCRClassification from all XML files in a directory.
-     * 
+     *
      * @param directory
      *            the directory containing the XML files
      * @throws MCRActiveLinkException
@@ -205,7 +205,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
 
     /**
      * Loads or updates MCRClassification from all XML files in a directory.
-     * 
+     *
      * @param directory
      *            the directory containing the XML files
      * @param update
@@ -240,7 +240,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
 
     /**
      * Save a MCRClassification.
-     * 
+     *
      * @param ID
      *            the ID of the MCRClassification to be save.
      * @param dirname
@@ -290,7 +290,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     /**
      * The method search for a stylesheet mcr_<em>style</em>_object.xsl and
      * build the transformer. Default is <em>mcr_save-object.xsl</em>.
-     * 
+     *
      * @param style
      *            the style attribute for the transformer stylesheet
      * @return the transformer
@@ -319,7 +319,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
 
     /**
      * Save all MCRClassifications.
-     * 
+     *
      * @param dirname
      *            the directory name to store all classifications
      * @param style
@@ -349,7 +349,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
 
     /**
      * List a MCRClassification.
-     * 
+     *
      * @param classid
      *            the MCRObjectID of the classification
      */
