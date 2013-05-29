@@ -41,6 +41,9 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
+import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.imagetiler.MCRImage;
@@ -66,6 +69,8 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     private static Endpoint tileService;
 
     public MCRIView2Commands() {
+        addCommand(new MCRCommand("tile images of object {0}", CMD_CLASS + "tileDerivatesOfObject String",
+                "tiles all images of derivates of object {0} with a supported image type as main document"));
         addCommand(new MCRCommand("tile images of all derivates", CMD_CLASS + "tileAll",
             "tiles all images of all derivates with a supported image type as main document"));
         addCommand(new MCRCommand("tile images of derivate {0}", CMD_CLASS + "tileDerivate String",
@@ -79,10 +84,12 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         addCommand(new MCRCommand("check tiles of image {0} {1}", CMD_CLASS + "checkImage String String",
             "checks if tiles a specific file identified by its derivate {0} and absolute path {1} are valid or generates new one"));
         addCommand(new MCRCommand("delete all tiles", CMD_CLASS + "deleteAllTiles", "removes all tiles of all derivates"));
+        addCommand(new MCRCommand("delete tiles of object {0}", CMD_CLASS + "deleteDerivateTilesOfObject String",
+                "removes tiles of a specific file identified by its object ID {0}"));
         addCommand(new MCRCommand("delete tiles of derivate {0}", CMD_CLASS + "deleteDerivateTiles String",
-            "removes tiles of a specific file identified by its absolute path {0}"));
+            "removes tiles of a specific file identified by its derivate ID {0}"));
         addCommand(new MCRCommand("delete tiles of image {0} {1}", CMD_CLASS + "deleteImageTiles String String",
-            "removes tiles of a specific file identified by its derivate {0} and absolute path {1}"));
+            "removes tiles of a specific file identified by its derivate ID {0} and absolute path {1}"));
         addCommand(new MCRCommand("start tile webservice on {0}", CMD_CLASS + "startTileWebService String",
             "start a tile web service on adress {0}, e.g. 'http//localhost:8084/tileService', and stopping any other running service"));
         addCommand(new MCRCommand("stop tile webservice", CMD_CLASS + "stopTileWebService", "stops the tile web service'"));
@@ -113,6 +120,43 @@ public class MCRIView2Commands extends MCRAbstractCommands {
             cmds.add(command + " of derivate " + id);
         }
         return cmds;
+    }
+
+    /**
+     * meta command to tile all images of derivates of an object .
+     * @param objectID a object ID
+     * @return list of commands to execute.
+     */
+    public static List<String> tileDerivatesOfObject(String objectID) {
+        MCRObjectID mcrobjid;
+        try {
+            mcrobjid = MCRObjectID.getInstance(objectID);
+        } catch (Exception e) {
+            LOGGER.warn("The object ID " + objectID + " is wrong");
+            return new ArrayList<String>();
+        }
+        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
+        if (mgr.exists(mcrobjid)) {
+            String command = "tile image";
+            ArrayList<String> filelist = new ArrayList<String>();
+            MCRObject obj;
+            try {
+                obj = new MCRObject(mgr.retrieveXML(MCRObjectID.getInstance(objectID)));
+            } catch (Exception e) {
+                LOGGER.warn("The object ID " + objectID + " has a read error");
+                return filelist;
+            }
+            for (MCRMetaLinkID derivate : obj.getStructure().getDerivates()) {
+                List<String> list = forAllImages(derivate.getXLinkHref(), command);
+                if (list != null) {
+                    filelist.addAll(list);
+                }
+            }
+            return filelist;
+        } else {
+            LOGGER.warn("The object ID " + objectID + " does not exist");
+            return new ArrayList<String>();
+        }
     }
 
     /**
@@ -273,6 +317,42 @@ public class MCRIView2Commands extends MCRAbstractCommands {
                 deleteDirectory(sub);
         }
         TILE_QUEUE.clear();
+    }
+
+    /**
+     * Deletes all image tiles of derivates of this object.
+     * @param objectID a object ID
+     */
+    public static void deleteDerivateTilesOfObject(String objectID) {
+        MCRObjectID mcrobjid;
+        try {
+            mcrobjid = MCRObjectID.getInstance(objectID);
+        } catch (Exception e) {
+            LOGGER.warn("The object ID " + objectID + " is wrong");
+            return;
+        }
+        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
+        if (mgr.exists(mcrobjid)) {
+            MCRObject obj;
+            try {
+                obj = new MCRObject(mgr.retrieveXML(MCRObjectID.getInstance(objectID)));
+            } catch (Exception e) {
+                LOGGER.warn("The object ID " + objectID + " has a read error");
+                return;
+            }
+            ArrayList<String> filelist = new ArrayList<String>();
+            for (MCRMetaLinkID derivate : obj.getStructure().getDerivates()) {
+                String derivateID = derivate.getXLinkHref();
+                File derivateDir = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivateID, null);
+                if (derivateDir != null) {
+                    deleteDirectory(derivateDir);
+                    TILE_QUEUE.remove(derivateID);
+                }
+            }
+            return;
+        } else {
+            LOGGER.warn("The object ID " + objectID + " does not exist");
+        }
     }
 
     /**
