@@ -16,7 +16,7 @@
         Set 'MCR.Module-solr.DynamicFields=false' to exclude these:
       </xsl:comment>
       <!-- dynamic field for leaf nodes -->
-      <xsl:for-each select="//*[not(*)]">
+      <xsl:for-each select=".//*[not(*)]">
         <xsl:variable name="element" select="local-name(.)" />
 
         <xsl:if test="string-length(.) &gt; 0">
