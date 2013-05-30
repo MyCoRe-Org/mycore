@@ -79,9 +79,9 @@
             </xsl:for-each>
           </xsl:for-each>
         </div>
-        <!-- you could insert here a preview for your metadata, e.g. uncomment the next block and replace "your-tags/here" by something of your 
+        <!-- you could insert here a preview for your metadata, e.g. uncomment the next block and replace "your-tags/here" by something of your
           metadata -->
-        <!-- <div> short description: <xsl:call-template name="printI18N"> <xsl:with-param name="nodes" select="$mcrobj/metadata/your-tags/here" 
+        <!-- <div> short description: <xsl:call-template name="printI18N"> <xsl:with-param name="nodes" select="$mcrobj/metadata/your-tags/here"
           /> </xsl:call-template> </div> -->
         <span class="properties">
           <xsl:variable name="date">
@@ -95,7 +95,7 @@
       </td>
     </tr>
   </xsl:template>
-  
+
   <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="basketContent">
     <xsl:call-template name="objectLink">
       <xsl:with-param select="." name="mcrobj" />
@@ -270,7 +270,7 @@
                 </xsl:for-each>
               </xsl:variable>
               <xsl:variable select="xalan:nodeset($objectTypes)/id[not(.=following::id)]" name="unique-ids" />
-              <!-- the for-each would iterate over <id> with root not beeing /mycoreobject so we save the current node in variable context to access 
+              <!-- the for-each would iterate over <id> with root not beeing /mycoreobject so we save the current node in variable context to access
                 needed nodes -->
               <xsl:variable select="." name="context" />
               <xsl:for-each select="$unique-ids">
@@ -336,130 +336,6 @@
       </div>
 
     </div>
-
-  </xsl:template>
-  <xsl:template name="mods.editobject_with_der">
-    <xsl:param name="accessedit" />
-    <xsl:param name="accessdelete" />
-    <xsl:param name="id" />
-    <xsl:param name="hasURN" select="'false'" />
-    <xsl:param name="displayAddDerivate" select="'true'" />
-    <xsl:param name="layout" select="'$'" />
-    <xsl:variable name="layoutparam">
-      <xsl:if test="$layout != '$'">
-        <xsl:value-of select="concat('&amp;layout=',$layout)" />
-      </xsl:if>
-    </xsl:variable>
-    <xsl:variable name="editURL">
-      <xsl:call-template name="mods.getObjectEditURL">
-        <xsl:with-param name="id" select="$id" />
-        <xsl:with-param name="layout" select="$layout" />
-      </xsl:call-template>
-    </xsl:variable>
-    <xsl:if test="$objectHost = 'local'">
-      <xsl:choose>
-        <xsl:when test="acl:checkPermission($id,'writedb') or acl:checkPermission($id,'deletedb')">
-          <xsl:variable name="type" select="substring-before(substring-after($id,'_'),'_')" />
-          <tr>
-            <td class="metaname">
-              <xsl:value-of select="concat(i18n:translate('metaData.edit'),':')" />
-            </td>
-            <td class="metavalue">
-              <div class="editorButtons">
-                <xsl:if test="acl:checkPermission('default-derivate','writedb') or acl:checkPermission('default-derivate','writedb')">
-                  <xsl:choose>
-                    <!-- ***************** -->
-                    <!-- object has no urn -->
-                    <!-- ***************** -->
-                    <xsl:when test="not(mcrxsl:hasURNDefined($id))">
-                      <a href="{$editURL}">
-                        <img src="{$WebApplicationBaseURL}images/workflow_objedit.gif" title="{i18n:translate('object.editObject')}" />
-                      </a>
-                      <xsl:if test="$displayAddDerivate='true'">
-                        <a href="{$ServletsBaseURL}derivate/create{$HttpSession}?id={$id}">
-                          <img src="{$WebApplicationBaseURL}images/workflow_deradd.gif" title="{i18n:translate('derivate.addDerivate')}" />
-                        </a>
-                      </xsl:if>
-                      <!-- xsl:if test="mcrxsl:isAllowedObjectForURNAssignment($id)" -->
-                      <a
-                        href="{$ServletsBaseURL}MCRAddURNToObjectServlet{$HttpSession}?object={$id}&amp;xpath=.mycoreobject/metadata/def.modsContainer[@class='MCRMetaXML' and @heritable='false' and @notinherit='true']/modsContainer/mods:mods/mods:identifier[@type='hdl']">
-                        <img src="{$WebApplicationBaseURL}images/workflow_addnbn.gif" title="{i18n:translate('derivate.urn.addURN')}" />
-                      </a>
-                     <!-- /xsl:if -->
-                    </xsl:when>
-                    <!-- **************** -->
-                    <!-- object has a urn -->
-                    <!-- **************** -->
-                    <xsl:otherwise>
-                      <xsl:if test="$CurrentUser=$MCR.Users.Superuser.UserName">
-                        <a href="{$editURL}">
-                          <img src="{$WebApplicationBaseURL}images/workflow_objedit.gif" title="{i18n:translate('object.editObject')}" />
-                        </a>
-                      </xsl:if>
-                      <xsl:if test="$displayAddDerivate=true()">
-                        <a href="{$ServletsBaseURL}derivate/create{$HttpSession}?id={$id}">
-                          <img src="{$WebApplicationBaseURL}images/workflow_deradd.gif" title="{i18n:translate('derivate.addDerivate')}" />
-                        </a>
-                      </xsl:if>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:if>
-                <xsl:if
-                  test="acl:checkPermission($id,'deletedb') and (not(mcrxsl:hasURNDefined($id)) or (mcrxsl:hasURNDefined($id) and $CurrentUser=$MCR.Users.Superuser.UserName))">
-                  <a href="{$ServletsBaseURL}object/delete{$HttpSession}?id={$id}">
-                    <img src="{$WebApplicationBaseURL}images/workflow_objdelete.gif" title="{i18n:translate('object.delObject')}" />
-                  </a>
-                </xsl:if>
-              </div>
-            </td>
-          </tr>
-        </xsl:when>
-      </xsl:choose>
-    </xsl:if>
-  </xsl:template>
-  <xsl:template name="mods.getObjectEditURL">
-    <xsl:param name="id" />
-    <xsl:param name="layout" select="'$'" />
-    <xsl:choose>
-      <xsl:when test="mcrxsl:resourceAvailable('actionmappings.xml')">
-      <!-- URL mapping enabled -->
-        <xsl:variable name="url">
-          <xsl:choose>
-            <xsl:when test="$layout = 'all'">
-              <xsl:value-of select="actionmapping:getURLforID('update-xml',$id,true())" xmlns:actionmapping="xalan://org.mycore.wfc.actionmapping.MCRURLRetriever" />
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="actionmapping:getURLforID('update',$id,true())" xmlns:actionmapping="xalan://org.mycore.wfc.actionmapping.MCRURLRetriever" />
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:variable> 
-        <xsl:choose>
-          <xsl:when test="string-length($url)=0" />
-          <xsl:otherwise>
-            <xsl:variable name="urlWithParam">
-              <xsl:call-template name="UrlSetParam">
-                <xsl:with-param name="url" select="$url"/>
-                <xsl:with-param name="par" select="'id'"/>
-                <xsl:with-param name="value" select="$id" />
-              </xsl:call-template>
-            </xsl:variable>
-            <xsl:call-template name="UrlAddSession">
-              <xsl:with-param name="url" select="$urlWithParam" />
-            </xsl:call-template>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
-      <xsl:otherwise>
-      <!-- URL mapping disabled -->
-        <xsl:variable name="layoutSuffix">
-          <xsl:if test="$layout != '$'">
-            <xsl:value-of select="concat('-',$layout)" />
-          </xsl:if>
-        </xsl:variable>
-        <xsl:variable name="form" select="concat('editor_form_commit-mods',$layoutSuffix,'.xml')" />
-        <xsl:value-of select="concat($WebApplicationBaseURL,$form,$HttpSession,'?id=',$id)" />
-      </xsl:otherwise>
-    </xsl:choose>
   </xsl:template>
   <xsl:template mode="printDerivates" match="/mycoreobject[contains(@ID,'_mods_')]" priority="1">
     <xsl:param name="staticURL" />
@@ -530,10 +406,10 @@
       </tr>
     </xsl:if>
   </xsl:template>
-  <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="objectActions">
-    <xsl:param name="accessedit" />
-    <xsl:param name="accessdelete" />
-    <xsl:param name="id" select="./@ID"/>
+  <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="objectActions" priority="1">
+    <xsl:param name="id" select="./@ID" />
+    <xsl:param name="accessedit" select="acl:checkPermission($id,'writedb')" />
+    <xsl:param name="accessdelete" select="acl:checkPermission($id,'deletedb')" />
     <xsl:param name="hasURN" select="'false'" />
     <xsl:param name="displayAddDerivate" select="'true'" />
     <xsl:param name="layout" select="'$'" />
@@ -557,7 +433,7 @@
     </xsl:variable>
     <xsl:if test="$objectHost = 'local'">
       <xsl:choose>
-        <xsl:when test="acl:checkPermission($id,'writedb') or acl:checkPermission($id,'deletedb')">
+        <xsl:when test="$accessedit or $accessdelete">
           <div class="document_options">
             <img class="button_options" src="{$WebApplicationBaseURL}templates/master/{$template}/IMAGES/icon_arrow_circled_red_down.png"
               alt="" title="{i18n:translate('component.mods.metaData.options')}" />
@@ -565,7 +441,7 @@
               <ul>
                 <xsl:variable name="type" select="substring-before(substring-after($id,'_'),'_')" />
 
-                <xsl:if test="acl:checkPermission($id,'writedb')">
+                <xsl:if test="$accessedit">
 
                   <li>
                     <xsl:choose>
@@ -597,7 +473,7 @@
 
                 </xsl:if>
                 <xsl:if
-                  test="acl:checkPermission($id,'deletedb') and (not(mcrxsl:hasURNDefined($id)) or (mcrxsl:hasURNDefined($id) and $CurrentUser=$MCR.Users.Superuser.UserName))">
+                  test="$accessdelete and (not(mcrxsl:hasURNDefined($id)) or (mcrxsl:hasURNDefined($id) and $CurrentUser=$MCR.Users.Superuser.UserName))">
                   <li>
                     <xsl:choose>
                       <xsl:when test="/mycoreobject/structure/children/child">
@@ -666,5 +542,51 @@
       </xsl:choose>
     </xsl:if>
   </xsl:template>
+
+  <xsl:template name="mods.getObjectEditURL">
+    <xsl:param name="id" />
+    <xsl:param name="layout" select="'$'" />
+    <xsl:choose>
+      <xsl:when test="mcrxsl:resourceAvailable('actionmappings.xml')">
+      <!-- URL mapping enabled -->
+        <xsl:variable name="url">
+          <xsl:choose>
+            <xsl:when test="$layout = 'all'">
+              <xsl:value-of select="actionmapping:getURLforID('update-xml',$id,true())" xmlns:actionmapping="xalan://org.mycore.wfc.actionmapping.MCRURLRetriever" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="actionmapping:getURLforID('update',$id,true())" xmlns:actionmapping="xalan://org.mycore.wfc.actionmapping.MCRURLRetriever" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:choose>
+          <xsl:when test="string-length($url)=0" />
+          <xsl:otherwise>
+            <xsl:variable name="urlWithParam">
+              <xsl:call-template name="UrlSetParam">
+                <xsl:with-param name="url" select="$url"/>
+                <xsl:with-param name="par" select="'id'"/>
+                <xsl:with-param name="value" select="$id" />
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:call-template name="UrlAddSession">
+              <xsl:with-param name="url" select="$urlWithParam" />
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+      <!-- URL mapping disabled -->
+        <xsl:variable name="layoutSuffix">
+          <xsl:if test="$layout != '$'">
+            <xsl:value-of select="concat('-',$layout)" />
+          </xsl:if>
+        </xsl:variable>
+        <xsl:variable name="form" select="concat('editor_form_commit-mods',$layoutSuffix,'.xml')" />
+        <xsl:value-of select="concat($WebApplicationBaseURL,$form,$HttpSession,'?id=',$id)" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
 
 </xsl:stylesheet>
