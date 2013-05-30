@@ -97,7 +97,7 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
                 updateResponse = server.add(docs);
             }
         } catch (Throwable e) {
-            LOGGER.warn("Error while indexing document collection. Split and retry.");
+            LOGGER.warn("Error while indexing document collection. Split and retry.", e);
             splitup();
             return;
         }
