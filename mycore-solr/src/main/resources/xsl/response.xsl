@@ -139,34 +139,10 @@
       </xsl:choose>
     </xsl:variable>
 
-    <xsl:variable name="linkTo">
-      <xsl:choose>
-        <xsl:when test="str[@name='objectType'] = 'data_file'">
-          <xsl:value-of select="concat($WebApplicationBaseURL, 'receive/', str[@name='returnId'])" />
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="concat($WebApplicationBaseURL, 'receive/',$identifier)" />
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
     <article class="result clearfix" itemscope="" itemtype="http://schema.org/Book">
       <header class="top-head">
         <h3>
-          <a href="{$linkTo}" itemprop="url">
-            <span itemprop="name">
-              <xsl:choose>
-                <xsl:when test="./arr[@name='search_result_link_text']">
-                  <xsl:value-of select="./arr[@name='search_result_link_text']/str[1]" />
-                </xsl:when>
-                <xsl:when test="./str[@name='fileName']">
-                  <xsl:value-of select="./str[@name='fileName']" />
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="$identifier" />
-                </xsl:otherwise>
-              </xsl:choose>
-            </span>
-          </a>
+          <xsl:apply-templates select="." mode="linkTo" />
         </h3>
       </header>
       <footer class="date">

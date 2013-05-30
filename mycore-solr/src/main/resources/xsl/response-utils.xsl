@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
-  xmlns:encoder="xalan://java.net.URLEncoder" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions"
-  exclude-result-prefixes="mcrxsl encoder xalan i18n">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:acl="xalan://org.mycore.access.MCRAccessManager"
+  xmlns:xalan="http://xml.apache.org/xalan" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
+  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" exclude-result-prefixes="acl mcrxsl encoder xalan i18n">
   <xsl:param name="RequestURL" />
+  <xsl:variable name="loginURL"
+    select="concat( $ServletsBaseURL, 'MCRLoginServlet',$HttpSession,'?url=', encoder:encode( string( $RequestURL ) ) )" />
   <xsl:key name="derivate" match="/response/response[@subresult='derivate']/result/doc" use="str[@name='returnId']" />
   <xsl:key name="file" match="/response/response[@subresult='unmerged']/result/doc" use="str[@name='returnId']" />
   <xsl:variable name="params" select="/response/lst[@name='responseHeader']/lst[@name='params']" />
@@ -228,6 +230,69 @@
     </xsl:if>
   </xsl:template>
 
+  <xsl:template match="doc" mode="linkTo">
+    <xsl:variable name="identifier" select="@id" />
+    <xsl:variable name="linkTo">
+      <xsl:choose>
+        <xsl:when test="str[@name='objectType'] = 'data_file'">
+          <xsl:value-of select="concat($WebApplicationBaseURL, 'receive/', str[@name='returnId'])" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="acl:checkPermission($identifier,'read')">
+              <xsl:value-of select="concat($WebApplicationBaseURL, 'receive/',$identifier,$HttpSession)" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$loginURL" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="displayText">
+      <xsl:choose>
+        <xsl:when test="./str[@name='search_result_link_text']">
+          <xsl:value-of select="./str[@name='search_result_link_text']" />
+        </xsl:when>
+        <xsl:when test="./str[@name='fileName']">
+          <xsl:value-of select="./str[@name='fileName']" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$identifier" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$linkTo = $loginURL">
+        <span itemprop="name">
+          <xsl:value-of select="$displayText" />
+        </span>
+        &#160;
+        <a href="{$linkTo}">
+          <img src="{concat($WebApplicationBaseURL,'images/paper_lock.gif')}" />
+        </a>
+      </xsl:when>
+      <xsl:otherwise>
+        <a href="{$linkTo}" itemprop="url">
+          <xsl:variable name="shorter" select="mcrxsl:shortenText($displayText, 70)" />
+          <span itemprop="name">
+            <xsl:choose>
+              <xsl:when test="string-length($displayText) != string-length($shorter)">
+                <xsl:attribute name="title">
+                <xsl:value-of select="$displayText" />
+              </xsl:attribute>
+                <xsl:value-of select="$shorter" />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$displayText" />
+              </xsl:otherwise>
+            </xsl:choose>
+          </span>
+        </a>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template match="doc" mode="iview">
     <xsl:variable name="mcrid" select="@id" />
     <xsl:variable name="derivates" select="key('derivate', $mcrid)" />
@@ -265,7 +330,8 @@
               <xsl:choose>
                 <xsl:when test="key('derivate',$mcrid)[str/@name='iviewFile' and str[@name='id']=$derivateId]">
                   <!-- iview support detected generate link to image viewer -->
-                  <xsl:variable name="toolTipImg" select="concat($ServletsBaseURL,'MCRThumbnailServlet/',$derivateId,mcrxsl:encodeURIPath($filePath),$HttpSession)" />
+                  <xsl:variable name="toolTipImg"
+                    select="concat($ServletsBaseURL,'MCRThumbnailServlet/',$derivateId,mcrxsl:encodeURIPath($filePath),$HttpSession)" />
                   <a onMouseOver="show('{$toolTipImg}')" onMouseOut="toolTip()"
                     href="{concat($WebApplicationBaseURL, 'receive/', $mcrid, '?jumpback=true&amp;maximized=true&amp;page=',$filePath,'&amp;derivate=', $derivateId)}"
                     title="{i18n:translate('metaData.iView')}">
