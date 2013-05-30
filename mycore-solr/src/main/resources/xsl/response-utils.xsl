@@ -327,7 +327,7 @@
           <xsl:for-each select="$files[count(.|key('files-by-derivate',str[@name='derivateID'])[1]) = 1]">
             <xsl:sort select="str[@name='derivateID']" />
             <xsl:variable name="derivateId" select="str[@name='derivateID']" />
-            <xsl:variable name="object-view-derivate" select="acl:checkPermission($derivateId,'view-derivate')" />
+            <xsl:variable name="object-view-derivate" select="acl:checkPermission($mcrid,'view-derivate')" />
             <xsl:variable name="isDisplayedEnabled" select="mcrxsl:isDisplayedEnabledDerivate($derivateId)" />
             <xsl:variable name="mayWriteDerivate" select="acl:checkPermission($derivateId,'writedb')" />
             <xsl:choose>
@@ -375,22 +375,16 @@
   </xsl:template>
 
   <xsl:template name="iViewLinkPrev">
-    <xsl:param name="derivate" />
+    <xsl:param name="derivateLink" />
+    <xsl:param name="derivate">
+      <xsl:if test="$derivateLink">
+        <xsl:value-of select="substring-before($derivateLink , '/')" />
+      </xsl:if>
+    </xsl:param>
     <xsl:param name="mcrid" />
     <xsl:param name="fileName" />
-    <xsl:param name="derivateLink" />
 
-    <xsl:param name="derId">
-      <xsl:choose>
-        <xsl:when test="$derivate">
-          <xsl:value-of select="$derivate" />
-        </xsl:when>
-        <xsl:when test="$derivateLink">
-          <xsl:value-of select="substring-before($derivateLink , '/')" />
-        </xsl:when>
-      </xsl:choose>
-    </xsl:param>
-    <xsl:if test="string-length($derId) &gt; 0 and $mcrid">
+    <xsl:if test="string-length($derivate) &gt; 0 and $mcrid">
       <xsl:variable name="pageToDisplay">
         <xsl:choose>
           <xsl:when test="$fileName">
@@ -407,14 +401,31 @@
         </xsl:choose>
       </xsl:variable>
       <xsl:if test="$pageToDisplay != ''">
-        <a
-          href="{concat($WebApplicationBaseURL, 'receive/', $mcrid, '?jumpback=true&amp;maximized=true&amp;page=',$pageToDisplay,'&amp;derivate=', $derId)}"
-          title="{i18n:translate('metaData.iView')}">
-          <xsl:call-template name="iview2.getImageElement">
-            <xsl:with-param select="$derId" name="derivate" />
-            <xsl:with-param select="$pageToDisplay" name="imagePath" />
-          </xsl:call-template>
-        </a>
+        <xsl:variable name="object-view-derivate" select="acl:checkPermission($mcrid,'view-derivate')" />
+        <xsl:variable name="isDisplayedEnabled" select="mcrxsl:isDisplayedEnabledDerivate($derivate)" />
+        <xsl:variable name="mayWriteDerivate" select="acl:checkPermission($derivate,'writedb')" />
+        <xsl:choose>
+          <xsl:when
+            test="acl:checkPermissionForReadingDerivate($derivate) and $object-view-derivate and $isDisplayedEnabled = 'true' or $mayWriteDerivate">
+            <a
+              href="{concat($WebApplicationBaseURL, 'receive/', $mcrid, '?jumpback=true&amp;maximized=true&amp;page=',$pageToDisplay,'&amp;derivate=', $derivate)}"
+              title="{i18n:translate('metaData.iView')}">
+              <xsl:call-template name="iview2.getImageElement">
+                <xsl:with-param select="$derivate" name="derivate" />
+                <xsl:with-param select="$pageToDisplay" name="imagePath" />
+              </xsl:call-template>
+            </a>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:if test="$isDisplayedEnabled = 'true'">
+              <xsl:variable name="objectType" select="substring-before(substring-after($mcrid,'_'),'_')" />
+              <span>
+                <!-- Zugriff auf 'Abbildung' gesperrt -->
+                <xsl:value-of select="i18n:translate('metaData.derivateLocked',i18n:translate(concat('metaData.',$objectType,'.[derivates]')))" />
+              </span>
+            </xsl:if>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:if>
     </xsl:if>
   </xsl:template>
