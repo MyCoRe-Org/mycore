@@ -27,7 +27,9 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
@@ -58,7 +60,9 @@ public final class MCRMetadataManager {
 
     private static final Logger LOGGER = Logger.getLogger(MCRMetadataManager.class);
 
-    private static final MCRCache<MCRObjectID, MCRObjectID> derivateObjectMap = new MCRCache<MCRObjectID, MCRObjectID>(10000, "derivate objectid cache");
+    private static final MCRCache<MCRObjectID, MCRObjectID> derivateObjectMap = new MCRCache<>(10000, "derivate objectid cache");
+
+    private static final MCRCache<MCRObjectID, List<MCRObjectID>> objectDerivateMap = new MCRCache<>(10000, "derivate objectid cache");
 
     private static MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.instance();
 
@@ -71,6 +75,7 @@ public final class MCRMetadataManager {
      * @param derivateID derivateID
      * @param expire when should lastModified information expire
      * @return null if derivateID has no object referenced
+     * @see #getDerivateIds(MCRObjectID, long)
      */
     public static MCRObjectID getObjectId(final MCRObjectID derivateID, final long expire) {
         ModifiedHandle modifiedHandle = XML_MANAGER.getLastModifiedHandle(derivateID, expire);
@@ -99,6 +104,43 @@ public final class MCRMetadataManager {
         }
         derivateObjectMap.put(derivateID, mcrObjectID);
         return mcrObjectID;
+    }
+    
+    /**
+     * Returns a list of MCRObjectID of the derivates contained in the object with the given ID.
+     * @param objectId objectId
+     * @param expire when should lastModified information expire
+     * @return null if object with objectId does not exist
+     * @see #getObjectId(MCRObjectID, long)
+     */
+    public static List<MCRObjectID> getDerivateIds(final MCRObjectID objectId, final long expire){
+        ModifiedHandle modifiedHandle = XML_MANAGER.getLastModifiedHandle(objectId, expire);
+        List<MCRObjectID> derivateIds = null;
+        try {
+            derivateIds = objectDerivateMap.getIfUpToDate(objectId, modifiedHandle);
+        } catch (IOException e) {
+            LOGGER.warn("Could not determine last modified timestamp of derivate " + objectId);
+        }
+        if (derivateIds != null) {
+            return derivateIds;
+        }
+        Collection<String> destinationOf = MCRLinkTableManager.instance().getDestinationOf(objectId, MCRLinkTableManager.ENTRY_TYPE_DERIVATE);
+        if (!(destinationOf==null||destinationOf.isEmpty())){
+            derivateIds=new ArrayList<>(destinationOf.size());
+            for (String strId:destinationOf){
+                derivateIds.add(MCRObjectID.getInstance(strId));
+            }
+        } else {
+            if (XML_MANAGER.exists(objectId)){
+                MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(objectId);
+                List<MCRMetaLinkID> derivates = mcrObject.getStructure().getDerivates();
+                derivateIds=new ArrayList<>(derivates.size());
+                for (MCRMetaLinkID der:derivates){
+                    derivateIds.add(der.getXLinkHrefID());
+                }
+            }
+        }
+        return derivateIds;
     }
 
     /**
