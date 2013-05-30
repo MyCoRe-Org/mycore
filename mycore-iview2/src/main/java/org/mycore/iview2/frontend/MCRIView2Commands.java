@@ -26,6 +26,7 @@ package org.mycore.iview2.frontend;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -41,8 +42,7 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
-import org.mycore.datamodel.metadata.MCRMetaLinkID;
-import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
@@ -62,6 +62,24 @@ import org.mycore.iview2.services.webservice.MCRIView2RemoteFunctions;
 public class MCRIView2Commands extends MCRAbstractCommands {
     private static final String CMD_CLASS = MCRIView2Commands.class.getCanonicalName() + ".";
 
+    private static final MCRCommand CHECK_TILES_OF_DERIVATE_COMMAND = new MCRCommand(
+        "check tiles of derivate {0}",
+        CMD_CLASS + "checkTilesOfDerivate String",
+        "checks if all images of derivate {0} with a supported image type as main document have valid iview2 files and start tiling if not ");
+
+    private static final MCRCommand TILE_IMAGE_COMMAND = new MCRCommand("tile image {0} {1}", CMD_CLASS + "tileImage String String",
+        "tiles a specific file identified by its derivate {0} and absolute path {1}");
+
+    private static final MCRCommand CHECK_TILES_OF_IMAGE_COMMAND = new MCRCommand("check tiles of image {0} {1}", CMD_CLASS + "checkImage String String",
+        "checks if tiles a specific file identified by its derivate {0} and absolute path {1} are valid or generates new one");
+
+    private static final MCRCommand TILE_DERIVATE_TILES_COMMAND = new MCRCommand("tile images of derivate {0}",
+        CMD_CLASS + "tileDerivate String",
+        "tiles all images of derivate {0} with a supported image type as main document");
+
+    private static final MCRCommand DEL_DERIVATE_TILES_COMMAND = new MCRCommand("delete tiles of derivate {0}",
+        CMD_CLASS + "deleteDerivateTiles String", "removes tiles of a specific file identified by its derivate ID {0}");
+
     private static final MCRTilingQueue TILE_QUEUE = MCRTilingQueue.getInstance();
 
     private static final Logger LOGGER = Logger.getLogger(MCRIView2Commands.class);
@@ -70,29 +88,28 @@ public class MCRIView2Commands extends MCRAbstractCommands {
 
     public MCRIView2Commands() {
         addCommand(new MCRCommand("tile images of object {0}", CMD_CLASS + "tileDerivatesOfObject String",
-                "tiles all images of derivates of object {0} with a supported image type as main document"));
+            "tiles all images of derivates of object {0} with a supported image type as main document"));
         addCommand(new MCRCommand("tile images of all derivates", CMD_CLASS + "tileAll",
             "tiles all images of all derivates with a supported image type as main document"));
-        addCommand(new MCRCommand("tile images of derivate {0}", CMD_CLASS + "tileDerivate String",
-            "tiles all images of derivate {0} with a supported image type as main document"));
-        addCommand(new MCRCommand("tile image {0} {1}", CMD_CLASS + "tileImage String String",
-            "tiles a specific file identified by its derivate {0} and absolute path {1}"));
+        addCommand(TILE_DERIVATE_TILES_COMMAND);
+        addCommand(TILE_IMAGE_COMMAND);
         addCommand(new MCRCommand("check tiles of all derivates", CMD_CLASS + "checkAll",
             "checks if all images have valid iview2 files and start tiling if not"));
-        addCommand(new MCRCommand("check tiles of derivate {0}", CMD_CLASS + "checkTilesOfDerivate String",
-            "checks if all images of derivate {0} with a supported image type as main document have valid iview2 files and start tiling if not "));
-        addCommand(new MCRCommand("check tiles of image {0} {1}", CMD_CLASS + "checkImage String String",
-            "checks if tiles a specific file identified by its derivate {0} and absolute path {1} are valid or generates new one"));
-        addCommand(new MCRCommand("delete all tiles", CMD_CLASS + "deleteAllTiles", "removes all tiles of all derivates"));
+        addCommand(CHECK_TILES_OF_DERIVATE_COMMAND);
+        addCommand(CHECK_TILES_OF_IMAGE_COMMAND);
+        addCommand(new MCRCommand("delete all tiles", CMD_CLASS + "deleteAllTiles",
+            "removes all tiles of all derivates"));
         addCommand(new MCRCommand("delete tiles of object {0}", CMD_CLASS + "deleteDerivateTilesOfObject String",
-                "removes tiles of a specific file identified by its object ID {0}"));
-        addCommand(new MCRCommand("delete tiles of derivate {0}", CMD_CLASS + "deleteDerivateTiles String",
-            "removes tiles of a specific file identified by its derivate ID {0}"));
+            "removes tiles of a specific file identified by its object ID {0}"));
+        addCommand(DEL_DERIVATE_TILES_COMMAND);
         addCommand(new MCRCommand("delete tiles of image {0} {1}", CMD_CLASS + "deleteImageTiles String String",
             "removes tiles of a specific file identified by its derivate ID {0} and absolute path {1}"));
-        addCommand(new MCRCommand("start tile webservice on {0}", CMD_CLASS + "startTileWebService String",
+        addCommand(new MCRCommand(
+            "start tile webservice on {0}",
+            CMD_CLASS + "startTileWebService String",
             "start a tile web service on adress {0}, e.g. 'http//localhost:8084/tileService', and stopping any other running service"));
-        addCommand(new MCRCommand("stop tile webservice", CMD_CLASS + "stopTileWebService", "stops the tile web service'"));
+        addCommand(new MCRCommand("stop tile webservice", CMD_CLASS + "stopTileWebService",
+            "stops the tile web service'"));
     }
 
     /**
@@ -100,8 +117,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
      * @return list of commands to execute.
      */
     public static List<String> tileAll() {
-        String command = "tile images";
-        return forAllDerivates(command);
+        return forAllDerivates(TILE_DERIVATE_TILES_COMMAND);
     }
 
     /**
@@ -109,15 +125,14 @@ public class MCRIView2Commands extends MCRAbstractCommands {
      * @return list of commands to execute.
      */
     public static List<String> checkAll() {
-        String command = "check tiles";
-        return forAllDerivates(command);
+        return forAllDerivates(CHECK_TILES_OF_DERIVATE_COMMAND);
     }
 
-    private static List<String> forAllDerivates(String command) {
+    private static List<String> forAllDerivates(MCRCommand command) {
         List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         List<String> cmds = new ArrayList<String>(ids.size());
         for (String id : ids) {
-            cmds.add(command + " of derivate " + id);
+            cmds.add(MessageFormat.format(command.getSyntax(), id));
         }
         return cmds;
     }
@@ -128,35 +143,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
      * @return list of commands to execute.
      */
     public static List<String> tileDerivatesOfObject(String objectID) {
-        MCRObjectID mcrobjid;
-        try {
-            mcrobjid = MCRObjectID.getInstance(objectID);
-        } catch (Exception e) {
-            LOGGER.warn("The object ID " + objectID + " is wrong");
-            return new ArrayList<String>();
-        }
-        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
-        if (mgr.exists(mcrobjid)) {
-            String command = "tile image";
-            ArrayList<String> filelist = new ArrayList<String>();
-            MCRObject obj;
-            try {
-                obj = new MCRObject(mgr.retrieveXML(MCRObjectID.getInstance(objectID)));
-            } catch (Exception e) {
-                LOGGER.warn("The object ID " + objectID + " has a read error");
-                return filelist;
-            }
-            for (MCRMetaLinkID derivate : obj.getStructure().getDerivates()) {
-                List<String> list = forAllImages(derivate.getXLinkHref(), command);
-                if (list != null) {
-                    filelist.addAll(list);
-                }
-            }
-            return filelist;
-        } else {
-            LOGGER.warn("The object ID " + objectID + " does not exist");
-            return new ArrayList<String>();
-        }
+        return forAllDerivatesOfObject(objectID, TILE_DERIVATE_TILES_COMMAND);
     }
 
     /**
@@ -165,8 +152,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
      * @return list of commands to execute.
      */
     public static List<String> tileDerivate(String derivateID) {
-        String command = "tile image";
-        return forAllImages(derivateID, command);
+        return forAllImages(derivateID, TILE_IMAGE_COMMAND);
     }
 
     /**
@@ -175,11 +161,10 @@ public class MCRIView2Commands extends MCRAbstractCommands {
      * @return list of commands to execute.
      */
     public static List<String> checkTilesOfDerivate(String derivateID) {
-        String command = "check tiles of image";
-        return forAllImages(derivateID, command);
+        return forAllImages(derivateID, CHECK_TILES_OF_IMAGE_COMMAND);
     }
 
-    private static List<String> forAllImages(String derivateID, String command) {
+    private static List<String> forAllImages(String derivateID, MCRCommand command) {
         if (!MCRIView2Tools.isDerivateSupported(derivateID)) {
             LOGGER.info("Skipping tiling of derivate " + derivateID + " as it's main file is not supported by IView2.");
             return null;
@@ -194,9 +179,8 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         derivate = (MCRDirectory) node;
 
         List<MCRFile> supportedFiles = getSupportedFiles(derivate);
-        String baseCmd = command + " " + derivateID + " ";
         for (MCRFile image : supportedFiles) {
-            returns.add(baseCmd + image.getAbsolutePath());
+            returns.add(MessageFormat.format(command.getSyntax(), derivateID, image.getAbsolutePath()));
         }
         return returns;
     }
@@ -323,36 +307,27 @@ public class MCRIView2Commands extends MCRAbstractCommands {
      * Deletes all image tiles of derivates of this object.
      * @param objectID a object ID
      */
-    public static void deleteDerivateTilesOfObject(String objectID) {
+    public static List<String> deleteDerivateTilesOfObject(String objectID) {
+        return forAllDerivatesOfObject(objectID, DEL_DERIVATE_TILES_COMMAND);
+    }
+
+    private static List<String> forAllDerivatesOfObject(String objectID, MCRCommand batchCommand) {
         MCRObjectID mcrobjid;
         try {
             mcrobjid = MCRObjectID.getInstance(objectID);
         } catch (Exception e) {
-            LOGGER.warn("The object ID " + objectID + " is wrong");
-            return;
+            LOGGER.error("The object ID " + objectID + " is wrong");
+            return null;
         }
-        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
-        if (mgr.exists(mcrobjid)) {
-            MCRObject obj;
-            try {
-                obj = new MCRObject(mgr.retrieveXML(MCRObjectID.getInstance(objectID)));
-            } catch (Exception e) {
-                LOGGER.warn("The object ID " + objectID + " has a read error");
-                return;
-            }
-            ArrayList<String> filelist = new ArrayList<String>();
-            for (MCRMetaLinkID derivate : obj.getStructure().getDerivates()) {
-                String derivateID = derivate.getXLinkHref();
-                File derivateDir = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivateID, null);
-                if (derivateDir != null) {
-                    deleteDirectory(derivateDir);
-                    TILE_QUEUE.remove(derivateID);
-                }
-            }
-            return;
-        } else {
-            LOGGER.warn("The object ID " + objectID + " does not exist");
+        List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(mcrobjid, 0);
+        if (derivateIds == null) {
+            LOGGER.error("Object does not exist: " + mcrobjid);
         }
+        ArrayList<String> cmds = new ArrayList<>(derivateIds.size());
+        for (MCRObjectID derId : derivateIds) {
+            cmds.add(MessageFormat.format(batchCommand.getSyntax(), derId));
+        }
+        return cmds;
     }
 
     /**
