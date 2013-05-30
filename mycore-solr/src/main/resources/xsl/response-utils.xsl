@@ -6,7 +6,8 @@
   <xsl:variable name="loginURL"
     select="concat( $ServletsBaseURL, 'MCRLoginServlet',$HttpSession,'?url=', encoder:encode( string( $RequestURL ) ) )" />
   <xsl:key name="derivate" match="/response/response[@subresult='derivate']/result/doc" use="str[@name='returnId']" />
-  <xsl:key name="file" match="/response/response[@subresult='unmerged']/result/doc" use="str[@name='returnId']" />
+  <xsl:key name="files-by-object" match="/response/response[@subresult='unmerged']/result/doc" use="str[@name='returnId']" />
+  <xsl:key name="files-by-derivate" match="/response/response[@subresult='unmerged']/result/doc" use="str[@name='derivateID']" />
   <xsl:variable name="params" select="/response/lst[@name='responseHeader']/lst[@name='params']" />
   <xsl:variable name="result" select="/response/result[@name='response']" />
   <xsl:variable name="hits" select="number($result/@numFound)" />
@@ -314,37 +315,59 @@
   <xsl:template match="doc" mode="hitInFiles">
     <xsl:param name="fileNodeServlet" select="concat($ServletsBaseURL,'MCRFileNodeServlet/')" />
     <xsl:variable name="mcrid" select="@id" />
-    <xsl:variable name="files" select="key('file', $mcrid)" />
+    <xsl:variable name="objectType" select="@objectType" />
+    <xsl:variable name="files" select="key('files-by-object', $mcrid)" />
     <xsl:if test="$files">
       <div class="hitInFile">
         <span class="hitInFileLabel">
           <xsl:value-of select="concat(i18n:translate('results.file'),' ')" />
         </span>
         <ul>
-          <xsl:for-each select="$files">
-            <li>
-            <!-- doc element of 'unmerged' response -->
-              <xsl:variable name="derivateId" select="str[@name='derivateID']" />
-              <xsl:variable name="filePath" select="str[@name='filePath']" />
-              <xsl:variable name="fileName" select="str[@name='fileName']" />
-              <xsl:choose>
-                <xsl:when test="key('derivate',$mcrid)[str/@name='iviewFile' and str[@name='id']=$derivateId]">
-                  <!-- iview support detected generate link to image viewer -->
-                  <xsl:variable name="toolTipImg"
-                    select="concat($ServletsBaseURL,'MCRThumbnailServlet/',$derivateId,mcrxsl:encodeURIPath($filePath),$HttpSession)" />
-                  <a onMouseOver="show('{$toolTipImg}')" onMouseOut="toolTip()"
-                    href="{concat($WebApplicationBaseURL, 'receive/', $mcrid, '?jumpback=true&amp;maximized=true&amp;page=',$filePath,'&amp;derivate=', $derivateId)}"
-                    title="{i18n:translate('metaData.iView')}">
-                    <xsl:value-of select="$fileName" />
-                  </a>
-                </xsl:when>
-                <xsl:otherwise>
-                  <a href="{concat($fileNodeServlet,$derivateId,mcrxsl:encodeURIPath($filePath),$HttpSession)}">
-                    <xsl:value-of select="$fileName" />
-                  </a>
-                </xsl:otherwise>
-              </xsl:choose>
-            </li>
+          <!-- check read permission once per derivate id -->
+          <xsl:for-each select="$files[count(.|key('files-by-derivate',str[@name='derivateID'])[1]) = 1]">
+            <xsl:sort select="str[@name='derivateID']" />
+            <xsl:variable name="derivateId" select="str[@name='derivateID']" />
+            <xsl:variable name="object-view-derivate" select="acl:checkPermission($derivateId,'view-derivate')" />
+            <xsl:variable name="isDisplayedEnabled" select="mcrxsl:isDisplayedEnabledDerivate($derivateId)" />
+            <xsl:variable name="mayWriteDerivate" select="acl:checkPermission($derivateId,'writedb')" />
+            <xsl:choose>
+              <xsl:when
+                test="acl:checkPermissionForReadingDerivate($derivateId) and $object-view-derivate and $isDisplayedEnabled = 'true' or $mayWriteDerivate">
+                <!-- for every hit in derivate list files -->
+                <xsl:for-each select="key('files-by-derivate',$derivateId)">
+                  <li>
+                    <!-- doc element of 'unmerged' response -->
+                    <xsl:variable name="filePath" select="str[@name='filePath']" />
+                    <xsl:variable name="fileName" select="str[@name='fileName']" />
+                    <xsl:choose>
+                      <xsl:when test="key('derivate',$mcrid)[str/@name='iviewFile' and str[@name='id']=$derivateId]">
+                        <!-- iview support detected generate link to image viewer -->
+                        <xsl:variable name="toolTipImg"
+                          select="concat($ServletsBaseURL,'MCRThumbnailServlet/',$derivateId,mcrxsl:encodeURIPath($filePath),$HttpSession)" />
+                        <a onMouseOver="show('{$toolTipImg}')" onMouseOut="toolTip()"
+                          href="{concat($WebApplicationBaseURL, 'receive/', $mcrid, '?jumpback=true&amp;maximized=true&amp;page=',$filePath,'&amp;derivate=', $derivateId)}"
+                          title="{i18n:translate('metaData.iView')}">
+                          <xsl:value-of select="$fileName" />
+                        </a>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <a href="{concat($fileNodeServlet,$derivateId,mcrxsl:encodeURIPath($filePath),$HttpSession)}">
+                          <xsl:value-of select="$fileName" />
+                        </a>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </li>
+                </xsl:for-each>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:if test="$isDisplayedEnabled = 'true'">
+                  <span>
+                  <!-- Zugriff auf 'Abbildung' gesperrt -->
+                    <xsl:value-of select="i18n:translate('metaData.derivateLocked',i18n:translate(concat('metaData.',$objectType,'.[derivates]')))" />
+                  </span>
+                </xsl:if>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:for-each>
         </ul>
       </div>
