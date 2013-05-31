@@ -158,7 +158,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             try {
                 rollbackTransaction();
             } catch (Exception e2) {
-                LOGGER.debug("Error while rolling back transaction", e);
+                LOGGER.error("Error while rolling back transaction", e);
             }
             return 0;
         }
