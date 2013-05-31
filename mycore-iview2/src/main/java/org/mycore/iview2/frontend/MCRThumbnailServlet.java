@@ -26,11 +26,14 @@ package org.mycore.iview2.frontend;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -39,6 +42,7 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
@@ -49,12 +53,19 @@ import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
 import org.mycore.iview2.services.MCRIView2Tools;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
 /**
  * @author Thomas Scheffler (yagee)
  *
  */
 public class MCRThumbnailServlet extends MCRServlet {
-    private static final long serialVersionUID = 3374758626351806939L;
+    private static final long serialVersionUID = 1506443527774956290L;
+
+    //stores max png size for byte array buffer of output
+    private AtomicInteger maxPngSize = new AtomicInteger(64 * 1024);
 
     private ImageWriteParam imageWriteParam;
 
@@ -63,6 +74,17 @@ public class MCRThumbnailServlet extends MCRServlet {
     private static Logger LOGGER = Logger.getLogger(MCRThumbnailServlet.class);
 
     private int thumbnailSize = MCRImage.getTileSize();
+
+    private transient static LoadingCache<String, Long> modifiedCache = CacheBuilder.newBuilder().maximumSize(5000)
+        .expireAfterWrite(MCRTileServlet.MAX_AGE, TimeUnit.SECONDS).weakKeys().build(new CacheLoader<String, Long>() {
+            @Override
+            public Long load(String id) throws Exception {
+                ThumnailInfo thumbnailInfo = getThumbnailInfo(id);
+                File iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), thumbnailInfo.derivate,
+                    thumbnailInfo.imagePath);
+                return iviewFile.exists() ? iviewFile.lastModified() : -1;
+            }
+        });
 
     @Override
     public void init() throws ServletException {
@@ -90,19 +112,22 @@ public class MCRThumbnailServlet extends MCRServlet {
     }
 
     @Override
+    protected long getLastModified(HttpServletRequest request) {
+        return modifiedCache.getUnchecked(request.getPathInfo());
+    }
+
+    @Override
     protected void render(MCRServletJob job, Exception ex) throws IOException, JDOMException {
         try {
-            String pathInfo = job.getRequest().getPathInfo();
-            if (pathInfo.startsWith("/"))
-                pathInfo = pathInfo.substring(1);
-            final String derivate = pathInfo.substring(0, pathInfo.indexOf('/'));
-            String imagePath = pathInfo.substring(derivate.length());
-            LOGGER.debug("derivate: " + derivate + ", image: " + imagePath);
-            File iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, imagePath);
+            ThumnailInfo thumbnailInfo = getThumbnailInfo(job.getRequest().getPathInfo());
+            File iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), thumbnailInfo.derivate,
+                thumbnailInfo.imagePath);
             LOGGER.info("IView2 file: " + iviewFile.getAbsolutePath());
             if (!iviewFile.exists()) {
-                job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND,
-                    MessageFormat.format("Could not find iview2 file for {0}{1}", derivate, imagePath));
+                job.getResponse().sendError(
+                    HttpServletResponse.SC_NOT_FOUND,
+                    MessageFormat.format("Could not find iview2 file for {0}{1}", thumbnailInfo.derivate,
+                        thumbnailInfo.imagePath));
                 return;
             }
             String centerThumb = job.getRequest().getParameter("centerThumb");
@@ -120,11 +145,16 @@ public class MCRThumbnailServlet extends MCRServlet {
 
                 ImageWriter imageWriter = getImageWriter();
                 try (ServletOutputStream sout = job.getResponse().getOutputStream();
-                    ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout)) {
+                    ByteArrayOutputStream bout = new ByteArrayOutputStream(maxPngSize.get());
+                    ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(bout)) {
                     imageWriter.setOutput(imageOutputStream);
                     //tile = addWatermark(scaleBufferedImage(tile));        
                     IIOImage iioImage = new IIOImage(thumbnail, null, null);
                     imageWriter.write(null, iioImage, imageWriteParam);
+                    int contentLength = bout.size();
+                    maxPngSize.set(Math.max(maxPngSize.get(), contentLength));
+                    job.getResponse().setContentLength(contentLength);
+                    bout.writeTo(sout);
                 } finally {
                     imageWriter.reset();
                     imageWriters.add(imageWriter);
@@ -136,6 +166,15 @@ public class MCRThumbnailServlet extends MCRServlet {
         } finally {
             LOGGER.debug("Finished sending " + job.getRequest().getPathInfo());
         }
+    }
+
+    private static ThumnailInfo getThumbnailInfo(String pathInfo) {
+        if (pathInfo.startsWith("/"))
+            pathInfo = pathInfo.substring(1);
+        final String derivate = pathInfo.substring(0, pathInfo.indexOf('/'));
+        String imagePath = pathInfo.substring(derivate.length());
+        LOGGER.debug("derivate: " + derivate + ", image: " + imagePath);
+        return new ThumnailInfo(derivate, imagePath);
     }
 
     private BufferedImage getThumbnail(File iviewFile, boolean centered) throws IOException, JDOMException {
@@ -154,7 +193,8 @@ public class MCRThumbnailServlet extends MCRServlet {
             imageType = BufferedImage.TYPE_INT_RGB;
         }
         //if centered make thumbnailSize x thumbnailSize image
-        final BufferedImage bicubic = new BufferedImage(centered ? thumbnailSize : newWidth, centered ? thumbnailSize : newHeight, imageType);
+        final BufferedImage bicubic = new BufferedImage(centered ? thumbnailSize : newWidth, centered ? thumbnailSize
+            : newHeight, imageType);
         final Graphics2D bg = bicubic.createGraphics();
         bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         int x = centered ? (thumbnailSize - newWidth) / 2 : 0;
@@ -162,7 +202,8 @@ public class MCRThumbnailServlet extends MCRServlet {
         if (x != 0 && y != 0) {
             LOGGER.warn("Writing at position " + x + "," + y);
         }
-        bg.drawImage(level1Image, x, y, x + newWidth, y + newHeight, 0, 0, (int) Math.ceil(width), (int) Math.ceil(height), null);
+        bg.drawImage(level1Image, x, y, x + newWidth, y + newHeight, 0, 0, (int) Math.ceil(width),
+            (int) Math.ceil(height), null);
         bg.dispose();
         return bicubic;
     }
@@ -173,6 +214,20 @@ public class MCRThumbnailServlet extends MCRServlet {
             imageWriter = ImageIO.getImageWritersBySuffix("png").next();
         }
         return imageWriter;
+    }
+
+    private static class ThumnailInfo {
+        String derivate, imagePath;
+
+        public ThumnailInfo(final String derivate, final String imagePath) {
+            this.derivate = derivate;
+            this.imagePath = imagePath;
+        }
+
+        @Override
+        public String toString() {
+            return "TileInfo [derivate=" + derivate + ", imagePath=" + imagePath + "]";
+        }
     }
 
 }
