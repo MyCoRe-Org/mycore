@@ -27,11 +27,9 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
-
 import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
