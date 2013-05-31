@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
@@ -31,8 +30,6 @@ import org.mycore.migration21_22.cli.MCRMigrationCommands22;
 import org.xml.sax.SAXException;
 
 public class MCRMigrationCommands22Test {
-    private static Logger LOGGER = Logger.getLogger(MCRMigrationCommands22Test.class);
-
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
 
@@ -62,9 +59,9 @@ public class MCRMigrationCommands22Test {
         List<String> listIDs = xmlMetaManager.listIDs();
 
         XPathExpression<Text> xlinkLabel = XPathFactory.instance().compile("/mycoreobject/*/*[starts-with(@class,'MCRMetaLink')]/*/@xlink:label",
-            Filters.textOnly(), null, MCRConstants.XLINK_NAMESPACE);
+                Filters.textOnly(), null, MCRConstants.XLINK_NAMESPACE);
         XPathExpression<Attribute> xlinkTitle = XPathFactory.instance().compile("/mycoreobject/*/*[starts-with(@class,'MCRMetaLink')]/*/@xlink:title",
-            Filters.attribute(), null, MCRConstants.XLINK_NAMESPACE);
+                Filters.attribute(), null, MCRConstants.XLINK_NAMESPACE);
         for (String ID : listIDs) {
             MCRObjectID mcrid = MCRObjectID.getInstance(ID);
             Document mcrObjXML = xmlMetaManager.retrieveXML(mcrid);
