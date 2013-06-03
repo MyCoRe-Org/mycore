@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 
+import javax.activation.MimetypesFileTypeMap;
+
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.MCRConfiguration;
@@ -40,6 +42,8 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.ifs.MCRAudioVideoExtender;
 import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.ifs.MCRFileContentType;
+import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.urn.MCRURNManager;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
@@ -52,12 +56,16 @@ import org.mycore.solr.index.handlers.stream.MCRSolrFilesIndexHandler;
  */
 public class MCRSolrMCRFileDocumentFactory {
 
+    private static final String DEFAULT_CONTENT_TYPE_ID = MCRFileContentTypeFactory.getDefaultType().getID();
+
     private static Logger LOGGER = Logger.getLogger(MCRSolrMCRFileDocumentFactory.class);
 
     private static MCRSolrMCRFileDocumentFactory instance = MCRConfiguration.instance().getInstanceOf(
         CONFIG_PREFIX + "SolrInputDocument.MCRFile.Factory", MCRSolrMCRFileDocumentFactory.class);
 
     private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
+
+    private static MimetypesFileTypeMap mimetypesMap = new MimetypesFileTypeMap();
 
     public static MCRSolrMCRFileDocumentFactory getInstance() {
         return instance;
@@ -91,7 +99,15 @@ public class MCRSolrMCRFileDocumentFactory {
         doc.setField("stream_size", input.getSize());
         doc.setField("stream_name", absolutePath);
         doc.setField("stream_source_info", input.getStoreID() + ":" + input.getStorageID());
-        doc.setField("stream_content_type", input.getContentType().getMimeType());
+        MCRFileContentType contentType = input.getContentType();
+        String mimeType;
+        //if file content type is default: look for correct mime type
+        if (contentType.getID().equals(DEFAULT_CONTENT_TYPE_ID)) {
+            mimeType = mimetypesMap.getContentType(input.getName());
+        } else {
+            mimeType = contentType.getMimeType();
+        }
+        doc.setField("stream_content_type", mimeType);
         doc.setField("extension", input.getExtension());
         doc.setField("contentTypeID", input.getContentTypeID());
         doc.setField("contentType", input.getContentType().getLabel());
