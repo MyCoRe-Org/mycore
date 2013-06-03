@@ -23,6 +23,8 @@
 
 package org.mycore.solr.index;
 
+import java.util.Arrays;
+
 import org.apache.log4j.Logger;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
@@ -93,12 +95,13 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
             if (content == null) {
                 content = new MCRBaseContent(objectOrDerivate);
             }
-            MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(content, objectOrDerivate.getId());
+            MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(content,
+                objectOrDerivate.getId());
             indexHandler.setCommitWithin(1000);
             MCRSolrIndexer.submitIndexHandler(indexHandler, 10);
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId().toString() + "\" for indexing done in "
-                        + (System.currentTimeMillis() - tStart) + "ms ");
+                LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId().toString()
+                    + "\" for indexing done in " + (System.currentTimeMillis() - tStart) + "ms ");
             }
         } catch (Exception ex) {
             LOGGER.error("Error creating transfer thread for object " + objectOrDerivate, ex);
@@ -108,7 +111,8 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     @Override
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
         try {
-            MCRSolrIndexer.submitIndexHandler(MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(file, MCRSolrServerFactory.getSolrServer()));
+            MCRSolrIndexer.submitIndexHandler(MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(file,
+                MCRSolrServerFactory.getSolrServer()));
         } catch (Exception ex) {
             LOGGER.error("Error creating transfer thread for file " + file.toString(), ex);
         }
@@ -127,5 +131,10 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     @Override
     protected void updateFileIndex(MCREvent evt, MCRFile file) {
         handleFileCreated(evt, file);
+    }
+
+    @Override
+    protected void updateDerivateFileIndex(MCREvent evt, MCRDerivate derivate) {
+        MCRSolrIndexer.rebuildContentIndex(Arrays.asList(derivate.getId().toString()));
     }
 }

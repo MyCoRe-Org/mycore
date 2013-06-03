@@ -81,6 +81,8 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                     handleDerivateDeleted(evt, der);
                 } else if (evt.getEventType().equals(MCREvent.REPAIR_EVENT)) {
                     handleDerivateRepaired(evt, der);
+                } else if (evt.getEventType().equals(MCREvent.INDEX_EVENT)) {
+                    updateDerivateFileIndex(evt, der);
                 } else {
                     logger.warn("Can't find method for a derivate data handler for event type " + evt.getEventType());
                 }
@@ -659,6 +661,15 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      * @param file
      */
     protected void updateFileIndex(MCREvent evt, MCRFile file) {
+        doNothing(evt, file);
+    }
+    /**
+     * Updates the index content of the given file.
+     * 
+     * @param evt
+     * @param file
+     */
+    protected void updateDerivateFileIndex(MCREvent evt, MCRDerivate file) {
         doNothing(evt, file);
     }
 }
