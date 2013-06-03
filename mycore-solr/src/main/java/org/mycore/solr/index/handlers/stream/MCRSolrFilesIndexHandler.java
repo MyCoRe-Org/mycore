@@ -10,12 +10,9 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.index.MCRSolrIndexHandler;
-import org.mycore.solr.index.cs.MCRSolrBulkXMLStream;
 import org.mycore.solr.index.file.MCRSolrMCRFileDocumentFactory;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
@@ -54,18 +51,18 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
     public void index() throws IOException, SolrServerException {
         MCRObjectID mcrID = MCRObjectID.getInstance(getID());
         if (mcrID.getTypeId().equals("derivate")) {
-            indexDerivate(mcrID.toString());
+            indexDerivate(mcrID);
         } else {
             indexObject(mcrID);
         }
     }
 
-    protected void indexDerivate(String derivateID) {
+    protected void indexDerivate(MCRObjectID derivateID) {
         MCRSolrIndexHandlerFactory ihf = MCRSolrIndexHandlerFactory.getInstance();
-        List<MCRFile> files = MCRUtils.getFiles(derivateID);
+        List<MCRFile> files = MCRUtils.getFiles(derivateID.toString());
         int fileCount = files.size();
         List<SolrInputDocument> docs = new ArrayList<>(fileCount);
-        LOGGER.info("Sending " + fileCount + " file(s) for derivate \"" + getID() + "\"");
+        LOGGER.info("Sending " + fileCount + " file(s) for derivate \"" + derivateID + "\"");
         for (MCRFile file : files) {
             boolean sendContent = ihf.checkFile(file);
             try {
@@ -87,9 +84,8 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
     }
 
     protected void indexObject(MCRObjectID objectID) {
-        MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(objectID);
-        for (MCRMetaLinkID link : mcrObject.getStructure().getDerivates()) {
-            String derivateID = link.getXLinkHref();
+        List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(objectID, 0);
+        for (MCRObjectID derivateID : derivateIds) {
             indexDerivate(derivateID);
         }
     }
