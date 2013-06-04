@@ -25,6 +25,7 @@
                 this.lastScale = -1;
                 this.damagedArea = new Array();
                 this.notLoadedTile = new Array();
+                this.loadingTile = new Array();
                 var that = this;
 
                 if(!PanoJS.prototype.getMaxDimViewerOrig) {
@@ -395,7 +396,7 @@
 
 
         constructor.prototype.drawTileImage = function cv_drawTileImage(tileX, tileY, tileImg) {
-            var dx, dy, dw, dh, sx, sy, sw, sh;
+        	var dx, dy, dw, dh, sx, sy, sw, sh;
             var viewerBean = this.getViewer().viewerBean;
             var currentImage = this.getViewer().currentImage;
             var tileSize = viewerBean.tileSize;// currentImage.zoomInfo.scale;
@@ -456,7 +457,7 @@
                 that.drawTileImage(tx, ty, tileImg);
                 jQuery(that).trigger(iview.Canvas.AFTER_DRAW_EVENT);
             };
-
+            this.loadingTile.push(tileImg);
             tileImg.src = tileImgId;
             return tileImg;
         };
@@ -556,7 +557,17 @@
                 that.preView.src = this.getViewer().context.container.find(".preload")[0].firstChild.src;
                 this.getViewer().context.container.find(".well").find(".preload")[0].style.display = "none";
 
+                jQuery(this.getViewer().currentImage).on(iview.CurrentImage.CHANGE_EVENT, function(){
+                	that.clearCanvas();
+                	var current;
+                	while(current = that.loadingTile.pop()){
+                		// the image changes and the tiles shouldnt be drawn.
+                		// replace the onload with dummy function.
+                		current.onload=function(){}; 
+                	}
+                });
                 jQuery(this.getViewer().currentImage).bind(iview.CurrentImage.CHANGE_EVENT, function() {
+                	that.preView.loaded = false;
                     that.preView.src = this.getViewer().context.container.find(".preload")[0].firstChild.src;
                     that.lastZoomLevel = -1;
                 });
