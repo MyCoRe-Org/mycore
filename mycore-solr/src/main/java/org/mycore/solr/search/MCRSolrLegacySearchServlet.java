@@ -46,14 +46,15 @@ public class MCRSolrLegacySearchServlet extends MCRSearchServlet {
     @Override
     protected void showResults(HttpServletRequest request, HttpServletResponse response, MCRQuery query, Document input)
         throws IOException, ServletException {
-        SolrQuery mergedSolrQuery = getSolrQuery(query, getNumPerPage(request));
+        SolrQuery mergedSolrQuery = getSolrQuery(query, input);
         request.setAttribute(MCRSolrProxyServlet.QUERY_KEY, mergedSolrQuery);
         RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher("/servlets/SolrSelectProxy");
         requestDispatcher.forward(request, response);
     }
 
     @SuppressWarnings("rawtypes")
-    private SolrQuery getSolrQuery(MCRQuery query, int rows) {
+    private SolrQuery getSolrQuery(MCRQuery query, Document input) {
+        int rows = Integer.parseInt(input.getRootElement().getAttributeValue("numPerPage", "10"));
         MCRCondition condition = query.getCondition();
         HashMap<String, List<MCRCondition>> table;
 
@@ -73,13 +74,17 @@ public class MCRSolrLegacySearchServlet extends MCRSearchServlet {
 
         SolrQuery mergedSolrQuery = MCRSolrQueryEngine
             .buildMergedSolrQuery(query.getSortBy(), false, true, table, rows);
+        String mask = input.getRootElement().getAttributeValue("mask");
+        if (mask != null) {
+            mergedSolrQuery.setParam("mask", mask);
+        }
         return mergedSolrQuery;
     }
 
     @Override
     protected void sendRedirect(HttpServletRequest req, HttpServletResponse res, MCRQuery query, Document input)
         throws IOException {
-        SolrQuery mergedSolrQuery = getSolrQuery(query, getNumPerPage(req));
+        SolrQuery mergedSolrQuery = getSolrQuery(query, input);
         @SuppressWarnings("unchecked")
         String selectProxyURL = MCRServlet.getServletBaseURL() + "SolrSelectProxy?" + mergedSolrQuery.toString()
             + getReservedParameterString(req.getParameterMap());
