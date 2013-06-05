@@ -124,6 +124,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
      */
     @Override
     public boolean acceptFile(String path, String checksum, long length) throws Exception {
+        LOGGER.debug("incoming acceptFile request: " + path + " " + checksum + " " + length + " bytes");
         MCRFilesystemNode child = rootDir.getChildByPath(path);
         if (!(child instanceof MCRFile)) {
             return true;
@@ -133,7 +134,8 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     }
 
     @Override
-    public synchronized long receiveFile(String path, InputStream in, long length, String md5) throws Exception {
+    public synchronized long receiveFile(String path, InputStream in, long length, String checksum) throws Exception {
+        LOGGER.debug("incoming receiveFile request: " + path + " " + checksum + " " + length + " bytes");
         try {
             LOGGER.debug("adding file: " + path);
             startTransaction();
@@ -145,11 +147,14 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             commitTransaction();
 
             long myLength = file.getSize();
+
+            LOGGER.debug("file size expected=" + length + " setContent=" + sizeDiff + " getSize=" + sizeDiff);
             if (myLength >= length) {
                 return myLength;
             } else {
+                LOGGER.debug("file size < expected size, upload seems canceled or broken, will delete incomplete file");
                 startTransaction();
-                file.delete(); // Incomplete file transfer, user canceled upload
+                file.delete();
                 commitTransaction();
                 return 0;
             }
