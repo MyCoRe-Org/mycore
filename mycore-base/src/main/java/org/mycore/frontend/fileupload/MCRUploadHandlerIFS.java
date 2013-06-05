@@ -148,7 +148,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
             long myLength = file.getSize();
 
-            LOGGER.debug("file size expected=" + length + " setContent=" + sizeDiff + " getSize=" + sizeDiff);
+            LOGGER.debug("file size expected=" + length + " setContent=" + sizeDiff + " getSize=" + myLength);
             if (myLength >= length) {
                 return myLength;
             } else {
