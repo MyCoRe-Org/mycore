@@ -80,9 +80,9 @@ public class MCRSolrSearchServlet extends MCRServlet {
         StringBuilder sb = new StringBuilder();
         sb.append("+");
         sb.append(fieldName);
-        sb.append(":");
+        sb.append(":(");
         sb.append(value);
-        sb.append(" ");
+        sb.append(") ");
         return sb.toString();
     }
 
