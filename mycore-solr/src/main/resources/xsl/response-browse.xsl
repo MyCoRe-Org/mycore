@@ -86,8 +86,12 @@
     <script type="text/javascript">
     	<xsl:value-of select="concat('var pageurl = &quot;', $WebApplicationBaseURL, 'receive/', str[@name='id'], '&quot;;')" />	
     	if(typeof window.history.replaceState == &quot;function&quot;){
+    		var originalPage = {title: document.title, url: document.location.toString()};
     		window.history.replaceState({path:pageurl},&quot; <xsl:value-of select="i18n:translate('component.solr.searchresult.resultList')" /> &quot;,pageurl);
     		document.getElementById(&quot;permalink&quot;).style.display = &quot;none&quot;;
+    		window.onbeforeunload = function(){
+    		  window.history.replaceState({path:originalPage.url}, originalPage.title, originalPage.url);
+    		}
     	}
     </script>
     <xsl:apply-templates select="document(concat('mcrobject:',str[@name='id']))/mycoreobject" mode="present" />
