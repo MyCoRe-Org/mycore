@@ -1,5 +1,24 @@
-/**
+/*
  * 
+ * $Revision: 25642 $ $Date: 2012-12-21 11:37:10 +0100 (Fr, 21 Dez 2012) $
+ *
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * This program is free software; you can use it, redistribute it
+ * and / or modify it under the terms of the GNU General Public License
+ * (GPL) as published by the Free Software Foundation; either version 2
+ * of the License or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program, in a file called gpl.txt or license.txt.
+ * If not, write to the Free Software Foundation Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 package org.mycore.datamodel.common;
 
@@ -7,6 +26,15 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.jdom2.Attribute;
+import org.jdom2.Content;
+import org.jdom2.Document;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConstants;
+import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.common.events.MCREventManager;
@@ -22,10 +50,85 @@ import org.mycore.services.urn.MCRURNManager;
  * database
  * 
  * @author shermann
+ * @author Robert Stephan
  */
 public class MCRURNEventHandler extends MCREventHandlerBase {
 
     private static final Logger LOGGER = Logger.getLogger(MCRURNEventHandler.class);
+
+    /**
+     * Handles object created events. This method updates the urn store.
+     * The urn is retrieved from object metadata with an XPath expression which can be configured by properties
+     * MCR.Persistence.URN.XPath.{type} or as a default MCR.Persistence.URN.XPath 
+     * 
+     * @param evt
+     *            the event that occured
+     * @param obj
+     *            the MCRObject that caused the event
+     */
+    @Override
+    protected final void handleObjectCreated(MCREvent evt, MCRObject obj) {
+        try {
+            MCRBaseContent content = new MCRBaseContent(obj);
+            Document doc = content.asXML();
+            String type = obj.getId().getTypeId();
+
+            MCRConfiguration conf = MCRConfiguration.instance();
+            String xPathString = conf.getString(" MCR.Persistence.URN.XPath." + type,
+                    conf.getString("MCR.Persistence.URN.XPath", ""));
+
+            if (!xPathString.isEmpty()) {
+                String urn = null;
+                XPathExpression<Object> xpath = XPathFactory.instance().compile(xPathString, Filters.fpassthrough(), null,
+                        MCRConstants.getStandardNamespaces());
+                Object o = xpath.evaluateFirst(doc);
+                if (o instanceof Attribute) {
+                    urn = ((Attribute) o).getValue();
+                }
+                //element or text node
+                else if (o instanceof Content) {
+                    urn = ((Content) o).getValue();
+                }
+
+                if (urn != null) {
+                    MCRURNManager.assignURN(urn, obj.getId().toString());
+                } else {
+                    if (MCRURNManager.hasURNAssigned(obj.getId().toString())) {
+                        MCRURNManager.removeURNByObjectID(obj.getId().toString());
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            LOGGER.error("Could not store / update the urn for object with id " + obj.getId().toString()
+                    + " into the database", ex);
+        }
+    }
+
+    /**
+     * Handles object updated events
+     * 
+     * @param evt
+     *            the event that occured
+     * @param obj
+     *            the MCRObject that caused the event
+     */
+    @Override
+    protected final void handleObjectUpdated(MCREvent evt, MCRObject obj) {
+        handleObjectCreated(evt, obj);
+    }
+
+    /**
+     * Handles object repaired events
+     * 
+     * @param evt
+     *            the event that occured
+     * @param obj
+     *            the MCRObject that caused the event
+     */
+    @Override
+    protected final void handleObjectRepaired(MCREvent evt, MCRObject obj) {
+        handleObjectCreated(evt, obj);
+    }
 
     /**
      * Handles object deleted events. This implementation deletes the urn
