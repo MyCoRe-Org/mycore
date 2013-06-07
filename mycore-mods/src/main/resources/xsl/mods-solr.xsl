@@ -77,7 +77,7 @@
         <xsl:value-of select="text()" />
       </field>
     </xsl:for-each>
-    <xsl:for-each select="mods:abstract">
+    <xsl:for-each select="mods:abstract[1]">
       <field name="mods.abstract">
         <xsl:value-of select="text()" />
       </field>
