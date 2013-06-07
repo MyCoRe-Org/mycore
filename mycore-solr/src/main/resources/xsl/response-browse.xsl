@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xsl:stylesheet [
+  <!ENTITY html-output SYSTEM "xsl/xsl-output-html.fragment">
+]>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:mcr="http://www.mycore.org/" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:encoder="xalan://java.net.URLEncoder"
   exclude-result-prefixes="xlink mcr i18n xsl">
-  <xsl:output method="html" />
-  <xsl:include href="MyCoReLayout.xsl" />
+  &html-output;
+  <xsl:include href="mycoreobject.xsl" />
   <xsl:include href="response-utils.xsl" />
   <xsl:include href="xslInclude:solrResponse" />
-  <!-- include custom templates for supported objecttypes -->
-  <xsl:include href="xslInclude:objectTypes" />
   <xsl:param name="WebApplicationBaseURL" />
   <xsl:variable name="PageTitle" />
 
@@ -69,32 +70,34 @@
   </xsl:template>
 
   <xsl:template match="doc">
+    <xsl:variable name="objId" select="str[@name='id']" />
+    <xsl:variable name="staticUrl" select="concat($WebApplicationBaseURL, 'receive/', $objId)" />
     <div id="permalink">
       <span class="linklabel">
         <xsl:value-of select="concat(i18n:translate('component.solr.searchresult.objectlink'), ' : ')" />
       </span>
       <span class="linktext">
         <xsl:variable name="linkToDocument">
-          <xsl:value-of select="concat($WebApplicationBaseURL, 'receive/', str[@name='id'])" />
+          <xsl:value-of select="$staticUrl" />
         </xsl:variable>
-        <a href="{$linkToDocument}">
-          <xsl:value-of select="$linkToDocument" />
+        <a href="{concat($staticUrl,$HttpSession)}">
+          <xsl:value-of select="$staticUrl" />
         </a>
       </span>
     </div>
   	<!-- change url in browser -->
     <script type="text/javascript">
-    	<xsl:value-of select="concat('var pageurl = &quot;', $WebApplicationBaseURL, 'receive/', str[@name='id'], '&quot;;')" />	
-    	if(typeof window.history.replaceState == &quot;function&quot;){
-    		var originalPage = {title: document.title, url: document.location.toString()};
-    		window.history.replaceState({path:pageurl},&quot; <xsl:value-of select="i18n:translate('component.solr.searchresult.resultList')" /> &quot;,pageurl);
-    		document.getElementById(&quot;permalink&quot;).style.display = &quot;none&quot;;
-    		window.onbeforeunload = function(){
-    		  window.history.replaceState({path:originalPage.url}, originalPage.title, originalPage.url);
-    		}
-    	}
+      <xsl:value-of select="concat('var pageurl = &quot;', $staticUrl, '&quot;;')" />	
+      if(typeof window.history.replaceState == &quot;function&quot;){
+      	var originalPage = {title: document.title, url: document.location.toString()};
+      	window.history.replaceState({path:pageurl},&quot; <xsl:value-of select="i18n:translate('component.solr.searchresult.resultList')" /> &quot;,pageurl);
+      	document.getElementById(&quot;permalink&quot;).style.display = &quot;none&quot;;
+      	window.onbeforeunload = function(){
+      	  window.history.replaceState({path:originalPage.url}, originalPage.title, originalPage.url);
+      	}
+      }
     </script>
-    <xsl:apply-templates select="document(concat('mcrobject:',str[@name='id']))/mycoreobject" mode="present" />
+    <xsl:apply-templates select="document(concat('mcrobject:',$objId))/mycoreobject" />
   </xsl:template>
 
 </xsl:stylesheet>
