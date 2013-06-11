@@ -62,23 +62,57 @@ import org.mycore.iview2.services.webservice.MCRIView2RemoteFunctions;
 public class MCRIView2Commands extends MCRAbstractCommands {
     private static final String CMD_CLASS = MCRIView2Commands.class.getCanonicalName() + ".";
 
+    // check tiles
+    private static final MCRCommand CHECK_ALL_IMAGES_COMMAND = new MCRCommand("check tiles of all derivates", CMD_CLASS
+            + "checkAll", "checks if all images have valid iview2 files and start tiling if not");
+
     private static final MCRCommand CHECK_TILES_OF_DERIVATE_COMMAND = new MCRCommand(
-        "check tiles of derivate {0}",
-        CMD_CLASS + "checkTilesOfDerivate String",
-        "checks if all images of derivate {0} with a supported image type as main document have valid iview2 files and start tiling if not ");
+            "check tiles of derivate {0}",
+            CMD_CLASS + "checkTilesOfDerivate String",
+            "checks if all images of derivate {0} with a supported image type as main document have valid iview2 files and start tiling if not ");
 
-    private static final MCRCommand TILE_IMAGE_COMMAND = new MCRCommand("tile image {0} {1}", CMD_CLASS + "tileImage String String",
-        "tiles a specific file identified by its derivate {0} and absolute path {1}");
+    private static final MCRCommand CHECK_TILES_OF_IMAGE_COMMAND = new MCRCommand("check tiles of image {0} {1}",
+            CMD_CLASS + "checkImage String String",
+            "checks if tiles a specific file identified by its derivate {0} and absolute path {1} are valid or generates new one");
 
-    private static final MCRCommand CHECK_TILES_OF_IMAGE_COMMAND = new MCRCommand("check tiles of image {0} {1}", CMD_CLASS + "checkImage String String",
-        "checks if tiles a specific file identified by its derivate {0} and absolute path {1} are valid or generates new one");
+    // tile images
+    private static final MCRCommand TILE_ALL_IMAGES_COMMAND = new MCRCommand("tile images of all derivates", CMD_CLASS
+            + "tileAll", "tiles all images of all derivates with a supported image type as main document");
+
+    private static final MCRCommand TILE_OBJECT_TILES_COMMAND = new MCRCommand("tile images of object {0}", CMD_CLASS
+            + "tileDerivatesOfObject String",
+            "tiles all images of derivates of object {0} with a supported image type as main document");
 
     private static final MCRCommand TILE_DERIVATE_TILES_COMMAND = new MCRCommand("tile images of derivate {0}",
-        CMD_CLASS + "tileDerivate String",
-        "tiles all images of derivate {0} with a supported image type as main document");
+            CMD_CLASS + "tileDerivate String",
+            "tiles all images of derivate {0} with a supported image type as main document");
+
+    private static final MCRCommand TILE_IMAGE_COMMAND = new MCRCommand("tile image {0} {1}", CMD_CLASS
+            + "tileImage String String", "tiles a specific file identified by its derivate {0} and absolute path {1}");
+
+    // delete tiles
+    private static final MCRCommand DEL_ALL_TILES_COMMAND = new MCRCommand("delete all tiles", CMD_CLASS
+            + "deleteAllTiles", "removes all tiles of all derivates");
+
+    private static final MCRCommand DEL_OBJECT_TILES_COMMAND = new MCRCommand("delete tiles of object {0}", CMD_CLASS
+            + "deleteDerivateTilesOfObject String", "removes tiles of a specific file identified by its object ID {0}");
 
     private static final MCRCommand DEL_DERIVATE_TILES_COMMAND = new MCRCommand("delete tiles of derivate {0}",
-        CMD_CLASS + "deleteDerivateTiles String", "removes tiles of a specific file identified by its derivate ID {0}");
+            CMD_CLASS + "deleteDerivateTiles String",
+            "removes tiles of a specific file identified by its derivate ID {0}");
+
+    private static final MCRCommand DEL_IMAGE_TILES_COMMAND = new MCRCommand("delete tiles of image {0} {1}", CMD_CLASS
+            + "deleteImageTiles String String",
+            "removes tiles of a specific file identified by its derivate ID {0} and absolute path {1}");
+
+    // webservices
+    private static final MCRCommand START_TILE_WEBSERVICE_COMMAND = new MCRCommand(
+            "start tile webservice on {0}",
+            CMD_CLASS + "startTileWebService String",
+            "start a tile web service on adress {0}, e.g. 'http//localhost:8084/tileService', and stopping any other running service");
+
+    private static final MCRCommand STOP_TILE_WEBSERVICE_COMMAND = new MCRCommand("stop tile webservice", CMD_CLASS
+            + "stopTileWebService", "stops the tile web service");
 
     private static final MCRTilingQueue TILE_QUEUE = MCRTilingQueue.getInstance();
 
@@ -87,29 +121,19 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     private static Endpoint tileService;
 
     public MCRIView2Commands() {
-        addCommand(new MCRCommand("tile images of object {0}", CMD_CLASS + "tileDerivatesOfObject String",
-            "tiles all images of derivates of object {0} with a supported image type as main document"));
-        addCommand(new MCRCommand("tile images of all derivates", CMD_CLASS + "tileAll",
-            "tiles all images of all derivates with a supported image type as main document"));
-        addCommand(TILE_DERIVATE_TILES_COMMAND);
-        addCommand(TILE_IMAGE_COMMAND);
-        addCommand(new MCRCommand("check tiles of all derivates", CMD_CLASS + "checkAll",
-            "checks if all images have valid iview2 files and start tiling if not"));
+        addCommand(CHECK_ALL_IMAGES_COMMAND);
         addCommand(CHECK_TILES_OF_DERIVATE_COMMAND);
         addCommand(CHECK_TILES_OF_IMAGE_COMMAND);
-        addCommand(new MCRCommand("delete all tiles", CMD_CLASS + "deleteAllTiles",
-            "removes all tiles of all derivates"));
-        addCommand(new MCRCommand("delete tiles of object {0}", CMD_CLASS + "deleteDerivateTilesOfObject String",
-            "removes tiles of a specific file identified by its object ID {0}"));
+        addCommand(TILE_ALL_IMAGES_COMMAND);
+        addCommand(TILE_OBJECT_TILES_COMMAND);
+        addCommand(TILE_DERIVATE_TILES_COMMAND);
+        addCommand(TILE_IMAGE_COMMAND);
+        addCommand(DEL_ALL_TILES_COMMAND);
+        addCommand(DEL_OBJECT_TILES_COMMAND);
         addCommand(DEL_DERIVATE_TILES_COMMAND);
-        addCommand(new MCRCommand("delete tiles of image {0} {1}", CMD_CLASS + "deleteImageTiles String String",
-            "removes tiles of a specific file identified by its derivate ID {0} and absolute path {1}"));
-        addCommand(new MCRCommand(
-            "start tile webservice on {0}",
-            CMD_CLASS + "startTileWebService String",
-            "start a tile web service on adress {0}, e.g. 'http//localhost:8084/tileService', and stopping any other running service"));
-        addCommand(new MCRCommand("stop tile webservice", CMD_CLASS + "stopTileWebService",
-            "stops the tile web service'"));
+        addCommand(DEL_IMAGE_TILES_COMMAND);
+        addCommand(START_TILE_WEBSERVICE_COMMAND);
+        addCommand(STOP_TILE_WEBSERVICE_COMMAND);
     }
 
     /**
