@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.proxy.MCRSolrProxyServlet;
 
 /**
@@ -81,7 +82,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
         sb.append("+");
         sb.append(fieldName);
         sb.append(":(");
-        sb.append(value);
+        sb.append(MCRSolrUtils.escapeSearchValue(value));
         sb.append(") ");
         return sb.toString();
     }

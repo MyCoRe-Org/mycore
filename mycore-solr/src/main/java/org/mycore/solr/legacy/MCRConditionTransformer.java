@@ -34,6 +34,7 @@ import org.mycore.parsers.bool.MCRNotCondition;
 import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.parsers.bool.MCRSetCondition;
 import org.mycore.services.fieldquery.MCRQueryCondition;
+import org.mycore.solr.MCRSolrUtils;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -141,9 +142,9 @@ public class MCRConditionTransformer {
         sb.append(field);
         sb.append(":");
         sb.append(includeLower ? '[' : '{');
-        sb.append(lowerTerm != null ? ("*".equals(lowerTerm) ? "\\*" : lowerTerm) : "*");
+        sb.append(lowerTerm != null ? ("*".equals(lowerTerm) ? "\\*" : MCRSolrUtils.escapeSearchValue(lowerTerm)) : "*");
         sb.append(" TO ");
-        sb.append(upperTerm != null ? ("*".equals(upperTerm) ? "\\*" : upperTerm) : "*");
+        sb.append(upperTerm != null ? ("*".equals(upperTerm) ? "\\*" : MCRSolrUtils.escapeSearchValue(upperTerm)) : "*");
         sb.append(includeUpper ? ']' : '}');
         return sb;
     }
@@ -172,12 +173,11 @@ public class MCRConditionTransformer {
         sb.append(field);
         sb.append(":");
         String replaced = value.replaceAll("\\s+", " AND ");
-        String[] values = value.split(" ");
-        if (values.length == replaced.length()) {
-            sb.append(value);
+        if (value.length() == replaced.length()) {
+            sb.append(MCRSolrUtils.escapeSearchValue(value));
         } else {
             sb.append("(");
-            sb.append(replaced);
+            sb.append(MCRSolrUtils.escapeSearchValue(replaced));
             sb.append(")");
         }
         return sb;
@@ -189,7 +189,7 @@ public class MCRConditionTransformer {
         sb.append(field);
         sb.append(":");
         sb.append('"');
-        sb.append(value);
+        sb.append(MCRSolrUtils.escapeSearchValue(value));
         sb.append('"');
         return sb;
     }
