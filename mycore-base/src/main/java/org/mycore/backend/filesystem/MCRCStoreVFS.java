@@ -36,6 +36,7 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemManager;
 import org.apache.commons.vfs2.FileSystemOptions;
+import org.apache.commons.vfs2.Selectors;
 import org.apache.commons.vfs2.VFS;
 import org.apache.commons.vfs2.provider.sftp.SftpFileSystemConfigBuilder;
 import org.apache.log4j.Logger;
@@ -137,6 +138,12 @@ public class MCRCStoreVFS extends MCRContentStore {
         FileContent targetContent = targetObject.getContent();
         MCRStreamContent content = new MCRStreamContent(targetContent.getInputStream(), targetObject.getURL().toString());
         return content;
+    }
+
+    @Override
+    public File getLocalFile(MCRFileReader fr) throws IOException {
+        FileObject fileObject = fsManager.resolveFile(getBase(), fr.getStorageID());
+        return fileObject.getFileSystem().replicateFile(fileObject, Selectors.SELECT_SELF);
     }
 
     protected FileObject getBase() throws FileSystemException {

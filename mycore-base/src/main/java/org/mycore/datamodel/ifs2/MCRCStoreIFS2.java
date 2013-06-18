@@ -214,6 +214,13 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         return file.getContent();
     }
 
+    @Override
+    public File getLocalFile(MCRFileReader fr) throws IOException {
+        String storageID = fr.getStorageID();
+        MCRFile file = getFile(storageID);
+        return file.getLocalFile();
+    }
+
     private MCRFileCollection getSlot(String storageID) throws IOException {
         int pos = storageID.indexOf("/");
         String first = storageID.substring(0, pos);

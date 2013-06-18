@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.ifs;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -268,6 +269,11 @@ public abstract class MCRContentStore {
             throw (MCRException) exc;
         }
     }
+    
+    /**
+     * Returns the local java.io.File that really stores the content of the MCRFile 
+     */
+    public abstract File getLocalFile(MCRFileReader reader) throws IOException;
 
     /** DateFormat used to construct new unique IDs based on timecode */
     protected static DateFormat formatter = new SimpleDateFormat("yyMMdd-HHmmss-SSS");

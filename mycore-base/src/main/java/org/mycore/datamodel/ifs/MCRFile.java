@@ -207,6 +207,16 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     /**
+     * Returns the local java.io.File representing this stored file. Be careful
+     * to use this only for reading data, do never modify directly!
+     * 
+     * @return the file in the local filesystem representing this file
+     */
+    public File getLocalFile() throws IOException {
+        return getContentStore().getLocalFile(this);
+    }
+
+    /**
      * Returns the MCRContentStore instance that holds the content of this file
      * 
      * @return the MCRContentStore instance that holds the content of this file, or null if no content is stored
