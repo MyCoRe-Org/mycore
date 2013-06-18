@@ -53,7 +53,8 @@ public class MCRSolrInputDocumentGenerator {
 
     private static JAXBContext initContext() {
         try {
-            return JAXBContext.newInstance(MCRSolrInputDocument.class.getPackage().getName(), MCRSolrInputDocument.class.getClassLoader());
+            return JAXBContext.newInstance(MCRSolrInputDocument.class.getPackage().getName(),
+                MCRSolrInputDocument.class.getClassLoader());
         } catch (JAXBException e) {
             throw new MCRException("Could not instantiate JAXBContext.", e);
         }
@@ -62,6 +63,9 @@ public class MCRSolrInputDocumentGenerator {
     public static SolrInputDocument getSolrInputDocument(MCRSolrInputDocument jaxbDoc) {
         SolrInputDocument doc = new SolrInputDocument();
         HashSet<MCRSolrInputField> duplicateFilter = new HashSet<>();
+        if (jaxbDoc.getBoost() != null) {
+            doc.setDocumentBoost(jaxbDoc.getBoost().floatValue());
+        }
         for (MCRSolrInputField field : jaxbDoc.getField()) {
             if (field.getValue().isEmpty() || duplicateFilter.contains(field)) {
                 continue;
@@ -70,7 +74,11 @@ public class MCRSolrInputDocumentGenerator {
                 LOGGER.debug("adding " + field.getName() + "=" + field.getValue());
             }
             duplicateFilter.add(field);
-            doc.addField(field.getName(), field.getValue());
+            if (field.getBoost() != null) {
+                doc.addField(field.getName(), field.getValue(), field.getBoost().floatValue());
+            } else {
+                doc.addField(field.getName(), field.getValue());
+            }
         }
         return doc;
     }
