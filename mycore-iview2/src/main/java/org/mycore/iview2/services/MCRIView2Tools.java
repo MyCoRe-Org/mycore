@@ -101,10 +101,11 @@ public class MCRIView2Tools {
      * @param derivateID ID of derivate
      * @param absolutePath absolute path to file of derivate
      * @return local {@link File} of {@link MCRFile} instance
+     * @throws IOException 
      */
-    public static File getFile(String derivateID, String absolutePath) {
+    public static File getFile(String derivateID, String absolutePath) throws IOException {
         MCRFile mcrFile = getMCRFile(derivateID, absolutePath);
-        return getFile(mcrFile);
+        return mcrFile.getLocalFile();
     }
 
     /**
@@ -255,19 +256,6 @@ public class MCRIView2Tools {
             LOGGER.warn("Did not find " + tileName + " in " + iviewImage.getName());
             return null;
         }
-    }
-
-    /**
-     * transforms {@link MCRFile} instance to {@link File} if <code>image</code> is local file.
-     * @param image image file
-     * @return local {@link File} representing {@link MCRFile}
-     */
-    static File getFile(MCRFile image) {
-        String storageID = image.getStorageID();
-        String storeID = image.getStoreID();
-        String baseDirName = MCRConfiguration.instance().getString("MCR.IFS.ContentStore." + storeID + ".URI");
-        File file = new File(baseDirName + File.separatorChar + storageID);
-        return file;
     }
 
     /**

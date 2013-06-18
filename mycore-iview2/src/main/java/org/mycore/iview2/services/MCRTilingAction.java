@@ -92,7 +92,7 @@ public class MCRTilingAction implements Runnable {
      */
     protected MCRImage getMCRImage() throws IOException {
         MCRFile file = MCRIView2Tools.getMCRFile(tileJob.getDerivate(), tileJob.getPath());
-        MCRImage imgTiler = MCRImage.getInstance(MCRIView2Tools.getFile(file), file.getOwnerID(), file.getAbsolutePath());
+        MCRImage imgTiler = MCRImage.getInstance(file.getLocalFile(), file.getOwnerID(), file.getAbsolutePath());
         return imgTiler;
     }
 
