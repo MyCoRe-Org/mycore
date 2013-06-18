@@ -126,7 +126,8 @@
           <plugin>
             <artifactId>maven-changelog-plugin</artifactId>
             <configuration>
-              <issueIDRegexPattern>bug (#)?\d{3,}</issueIDRegexPattern>
+              <!-- simple regex until http://jira.codehaus.org/browse/MCHANGELOG-125 is fixed -->
+              <issueIDRegexPattern>\d{3,}</issueIDRegexPattern>
               <issueLinkUrl>http://sourceforge.net/p/mycore/bugs/%ISSUE%</issueLinkUrl>
               <type>date</type>
               <dates>
