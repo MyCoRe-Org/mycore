@@ -23,9 +23,12 @@
 
 package org.mycore.datamodel.metadata;
 
+import org.mycore.common.MCRException;
+
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 
 /**
  * holds weak references to generated {@link MCRObjectID} instances.
@@ -45,7 +48,15 @@ class MCRObjectIDPool {
         });
 
     static MCRObjectID getMCRObjectID(String id) {
-        return objectIDCache.getUnchecked(id);
+        try {
+            return objectIDCache.getUnchecked(id);
+        } catch (UncheckedExecutionException e) {
+            Throwable cause = e.getCause();
+            if(cause instanceof MCRException) {
+                throw (MCRException)cause;
+            }
+            throw e;
+        }
     }
 
     static long getSize() {
