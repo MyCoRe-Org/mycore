@@ -32,28 +32,17 @@ public class MCRSolrLegacySearchServlet extends MCRSearchServlet {
 
     private static final Logger LOGGER = Logger.getLogger(MCRSolrLegacySearchServlet.class);
 
-    /*
-    @Override
-    protected void showResults(HttpServletRequest request, HttpServletResponse response, MCRCachedQueryData qd) throws IOException, ServletException {
-        MCRQuery query = qd.getQuery();
-        
-        SolrQuery solrQuery = MCRLuceneSolrAdapter.getSolrQuery(query.getCondition(), query.getSortBy(), query.getMaxResults());
-        request.setAttribute(MCRSolrProxyServlet.QUERY_KEY, solrQuery);
-        RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher("/servlets/SolrSelectProxy");
-        requestDispatcher.forward(request, response);
-    }*/
-
     @Override
     protected void showResults(HttpServletRequest request, HttpServletResponse response, MCRQuery query, Document input)
         throws IOException, ServletException {
-        SolrQuery mergedSolrQuery = getSolrQuery(query, input);
+        SolrQuery mergedSolrQuery = getSolrQuery(query, input, request);
         request.setAttribute(MCRSolrProxyServlet.QUERY_KEY, mergedSolrQuery);
         RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher("/servlets/SolrSelectProxy");
         requestDispatcher.forward(request, response);
     }
 
     @SuppressWarnings("rawtypes")
-    private SolrQuery getSolrQuery(MCRQuery query, Document input) {
+    private SolrQuery getSolrQuery(MCRQuery query, Document input, HttpServletRequest request) {
         int rows = Integer.parseInt(input.getRootElement().getAttributeValue("numPerPage", "10"));
         MCRCondition condition = query.getCondition();
         HashMap<String, List<MCRCondition>> table;
@@ -77,6 +66,7 @@ public class MCRSolrLegacySearchServlet extends MCRSearchServlet {
         String mask = input.getRootElement().getAttributeValue("mask");
         if (mask != null) {
             mergedSolrQuery.setParam("mask", mask);
+            mergedSolrQuery.setParam("_session", request.getParameter("_session"));
         }
         return mergedSolrQuery;
     }
@@ -84,7 +74,7 @@ public class MCRSolrLegacySearchServlet extends MCRSearchServlet {
     @Override
     protected void sendRedirect(HttpServletRequest req, HttpServletResponse res, MCRQuery query, Document input)
         throws IOException {
-        SolrQuery mergedSolrQuery = getSolrQuery(query, input);
+        SolrQuery mergedSolrQuery = getSolrQuery(query, input, req);
         @SuppressWarnings("unchecked")
         String selectProxyURL = MCRServlet.getServletBaseURL() + "SolrSelectProxy?" + mergedSolrQuery.toString()
             + getReservedParameterString(req.getParameterMap());
