@@ -109,7 +109,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
             resp.setStatus(statusCode);
 
             boolean isXML = response.getFirstHeader(HTTP.CONTENT_TYPE).getValue().contains("/xml");
-            boolean justCopyInput = (statusCode != HttpStatus.SC_OK) || !isXML;
+            boolean justCopyInput = !isXML;
 
             // set all headers
             for (Header header : response.getAllHeaders()) {
