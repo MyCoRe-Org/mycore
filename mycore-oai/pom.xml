@@ -16,12 +16,21 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-solr</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jdom</groupId>
       <artifactId>jdom2</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-solrj</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>

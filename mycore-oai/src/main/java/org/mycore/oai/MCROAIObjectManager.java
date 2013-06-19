@@ -36,8 +36,10 @@ import org.jdom2.output.XMLOutputter;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRDELETEDITEMS;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.oai.pmh.DateUtils;
@@ -168,12 +170,25 @@ public class MCROAIObjectManager {
         return e;
     }
 
-    protected String formatURI(String uri, String mcrId, String metadataPrefix) {
-        String objectType = MCRObjectID.getIDParts(mcrId)[1];
-        boolean exists = MCRMetadataManager.exists(MCRObjectID.getInstance(mcrId));
-        String value = uri.replace("{id}", mcrId).replace("{format}", metadataPrefix).replace("{objectType}", objectType)
+    protected String formatURI(String uri, String id, String metadataPrefix) {
+        MCRObjectID mcrID = null;
+        try {
+            mcrID = MCRObjectID.getInstance(id);
+        } catch(Exception exc) {
+            // just check if its a valid mcr id
+        }
+        boolean exists;
+        String objectType;
+        if(mcrID != null) {
+            exists = MCRMetadataManager.exists(mcrID);
+            objectType = mcrID.getTypeId();
+        } else {
+            MCRFilesystemNode node = MCRFilesystemNode.getNode(id);
+            exists = node != null;
+            objectType = "data_file";
+        }
+        return uri.replace("{id}", id).replace("{format}", metadataPrefix).replace("{objectType}", objectType)
                 .replace(":{flag}", !exists ? ":deletedMcrObject" : "");
-        return value;
     }
 
     Header headerToHeader(Element headerElement) {

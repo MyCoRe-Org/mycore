@@ -2,12 +2,9 @@ package org.mycore.oai;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
-import org.mycore.oai.pmh.MetadataFormat;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
 
@@ -16,65 +13,21 @@ import org.mycore.services.fieldquery.MCRResults;
  * 
  * @author Matthias Eichner
  */
-public class MCROAIResults implements Iterable<MCRHit> {
-    
-    protected Date expirationDate;
-
-    /**
-     * increase every time a {@link #getHit(int)} is called
-     */
-    protected long runningExpirationTimer;
-
-    protected MetadataFormat metadataFormat;
+public class MCROAICombinedResult implements Iterable<MCRHit> {
 
     protected List<MCRResults> results;
 
-    /** The unique ID of this result set */
-    protected String id;
-    
-    private static Random random = new Random(System.currentTimeMillis());
-    
-    public MCROAIResults(Date expirationDate, MetadataFormat format) {
-        this.expirationDate = expirationDate;
-        this.metadataFormat = format;
+    public MCROAICombinedResult() {
         this.results = new ArrayList<MCRResults>();
-        this.id = Long.toString(random.nextLong(), 36) + Long.toString(System.currentTimeMillis(), 36);
-        updateRunningExpirationTimer();
-    }
-
-    boolean isExpired() {
-        long currentTime = System.currentTimeMillis();
-        return (new Date(currentTime).compareTo(expirationDate) > 0) && currentTime > runningExpirationTimer;
-    }
-
-    public MetadataFormat getMetadataFormat() {
-        return metadataFormat;
-    }
-
-    public Date getExpirationDate() {
-        return expirationDate;
     }
 
     public List<MCRResults> getResults() {
         return results;
     }
 
-    public String getId() {
-        return id;
-    }
-
     @Override
     public Iterator<MCRHit> iterator() {
         return new MCROAIResultsIterator();
-    }
-
-    /**
-     * Set the running expiration timer.
-     * 
-     * TODO: make this configurable (currently five minutes in future)
-     */
-    protected void updateRunningExpirationTimer() {
-        this.runningExpirationTimer = System.currentTimeMillis() + (1000 * 60 * 5);
     }
 
     /**
@@ -86,15 +39,14 @@ public class MCROAIResults implements Iterable<MCRHit> {
      * @throws IndexOutOfBoundsException if the index is out of range (index < 0 || index >= size())
      */
     public MCRHit getHit(int i) {
-        updateRunningExpirationTimer();
-        if(i < 0) {
+        if (i < 0) {
             throw new IndexOutOfBoundsException("index is < 0");
         }
         int internalCursor = 0;
-        for(MCRResults r : results) {
+        for (MCRResults r : results) {
             int numHits = r.getNumHits();
             internalCursor += numHits;
-            if(i < internalCursor) {
+            if (i < internalCursor) {
                 return r.getHit((i + numHits) - internalCursor);
             }
         }
@@ -103,7 +55,7 @@ public class MCROAIResults implements Iterable<MCRHit> {
 
     public int size() {
         int size = 0;
-        for(MCRResults r : results) {
+        for (MCRResults r : results) {
             size += r.getNumHits();
         }
         return size;

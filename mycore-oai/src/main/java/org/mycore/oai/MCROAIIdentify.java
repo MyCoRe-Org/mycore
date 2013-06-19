@@ -110,14 +110,7 @@ public class MCROAIIdentify extends SimpleIdentify {
         Date datestamp = DateUtils.parseUTC(config.getString(this.configPrefix + "EarliestDatestamp", "1970-01-01"));
         try {
             // existing items
-            MCRCondition condition = MCROAIUtils.getDefaultRestriction(this.configPrefix);
-            List<MCRSortBy> sortByList = MCROAIUtils.getSortByList(this.configPrefix + "EarliestDatestamp.SortBy", "modified ascending");
-            MCRQuery q = new MCRQuery(condition, sortByList, 1);
-            MCRResults result = MCRQueryManager.search(q);
-            if (result.getNumHits() > 0) {
-                MCRBase obj = MCRMetadataManager.retrieve(MCRObjectID.getInstance(result.getHit(0).getID()));
-                datestamp = obj.getService().getDate(MCRObjectService.DATE_TYPE_MODIFYDATE);
-            }
+            datestamp = MCROAISearchManager.getSearcher(this.configPrefix, null, null, 1).getEarliestTimestamp();
             // deleted items
             if(DeletedRecordPolicy.Persistent.equals(this.getDeletedRecordPolicy())) {
                 MCRHIBConnection conn = MCRHIBConnection.instance();

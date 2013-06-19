@@ -255,8 +255,7 @@ public class MCROAIAdapter implements OAIAdapter {
      */
     @Override
     public OAIDataList<Record> getRecords(String resumptionToken) throws BadResumptionTokenException {
-        MCROAISearchManager searchManager = getSearchManager();
-        OAIDataList<Record> recordList = searchManager.searchRecord(resumptionToken);
+        OAIDataList<Record> recordList = getSearchManager().searchRecord(resumptionToken);
         if (recordList.isEmpty()) {
             throw new BadResumptionTokenException(resumptionToken);
         }
@@ -266,8 +265,7 @@ public class MCROAIAdapter implements OAIAdapter {
     @Override
     public OAIDataList<Record> getRecords(MetadataFormat format, Set set, Date from, Date until) throws CannotDisseminateFormatException,
             NoSetHierarchyException, NoRecordsMatchException {
-        MCROAISearchManager searchManager = getSearchManager();
-        OAIDataList<Record> recordList = searchManager.searchRecord(format, set, from, until);
+        OAIDataList<Record> recordList = getSearchManager().searchRecord(format, set, from, until);
         if (recordList.isEmpty()) {
             throw new NoRecordsMatchException();
         }
@@ -276,8 +274,7 @@ public class MCROAIAdapter implements OAIAdapter {
 
     @Override
     public OAIDataList<Header> getHeaders(String resumptionToken) throws BadResumptionTokenException {
-        MCROAISearchManager searchManager = getSearchManager();
-        OAIDataList<Header> headerList = searchManager.searchHeader(resumptionToken);
+        OAIDataList<Header> headerList = getSearchManager().searchHeader(resumptionToken);
         if (headerList.isEmpty()) {
             throw new BadResumptionTokenException(resumptionToken);
         }
@@ -287,8 +284,7 @@ public class MCROAIAdapter implements OAIAdapter {
     @Override
     public OAIDataList<Header> getHeaders(MetadataFormat format, Set set, Date from, Date until) throws CannotDisseminateFormatException,
             NoSetHierarchyException, NoRecordsMatchException {
-        MCROAISearchManager searchManager = getSearchManager();
-        OAIDataList<Header> headerList = searchManager.searchHeader(format, set, from, until);
+        OAIDataList<Header> headerList = getSearchManager().searchHeader(format, set, from, until);
         if (headerList.isEmpty()) {
             throw new NoRecordsMatchException();
         }
