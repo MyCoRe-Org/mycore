@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xalan="http://xml.apache.org/xalan" xmlns:iview2="xalan://org.mycore.iview2.frontend.MCRIView2XSLFunctions"
-  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" exclude-result-prefixes="mcrxsl xalan mods xlink iview2">
+  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:ex="http://exslt.org/dates-and-times" exclude-result-prefixes="mcrxsl xalan mods xlink iview2 ex">
 
   <xsl:import href="xslImport:solr-document" />
 
@@ -16,6 +16,7 @@
   <xsl:template match="mycoreobject">
     <xsl:variable name="hasImports" select="mcrxsl:hasNextImportStep('solr-document')" />
     <doc>
+      <xsl:apply-templates select="." mode="boost" />
       <xsl:call-template name="baseFields" />
       <xsl:for-each select="structure/parents/parent">
         <field name="parent">
@@ -70,6 +71,7 @@
   <xsl:template match="mycorederivate">
     <xsl:variable name="hasImports" select="mcrxsl:hasNextImportStep('solr-document')" />
     <doc>
+      <xsl:apply-templates select="." mode="boost" />
       <xsl:call-template name="baseFields" />
       <xsl:for-each select="derivate/fileset/file/urn | derivate/fileset/@urn">
         <field name="derivateURN">
@@ -149,6 +151,13 @@
     <field name="allMeta">
       <xsl:value-of select="." />
     </field>
+  </xsl:template>
+
+  <xsl:template match="mycoreobject|mycorederivate" mode="boost">
+    <xsl:attribute name="boost">
+      <!-- 2012-11-10T09:08:07.006Z will result in '1.121110090807'-->
+      <xsl:value-of select="concat('1.',substring(ex:format-date(substring-before(service/servdates/servdate[@type='createdate'],'Z'),'yyyyMMddHHmmss'),3))"/>
+    </xsl:attribute>
   </xsl:template>
 
 </xsl:stylesheet>
