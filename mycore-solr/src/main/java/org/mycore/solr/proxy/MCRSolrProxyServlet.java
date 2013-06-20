@@ -113,7 +113,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
             // set all headers
             for (Header header : response.getAllHeaders()) {
-                if (justCopyInput || !HTTP.TRANSFER_ENCODING.equals(header.getName())) {
+                if (!HTTP.TRANSFER_ENCODING.equals(header.getName())) {
                     resp.setHeader(header.getName(), header.getValue());
                 }
             }
