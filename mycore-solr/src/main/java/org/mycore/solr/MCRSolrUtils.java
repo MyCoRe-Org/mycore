@@ -30,7 +30,9 @@ import java.util.regex.Pattern;
  *
  */
 public class MCRSolrUtils {
-    private static String specialChars = "!&|+-(){}[]\"~*?:\\/^";
+//    private static String specialChars = "!&|+-(){}[]\"~*?:\\/^";
+    /* '*' and '?' should always be threatened as special character */
+    private static String specialChars = "!&|+-(){}[]\"~:\\/^";
     private static Pattern PATTERN_RESTRICTED = Pattern.compile("([\\Q" + specialChars + "\\E])");
 
     /**

@@ -38,7 +38,7 @@ public class MCRSolrUtilsTest {
      */
     @Test
     public final void testEscapeSearchValue() {
-        String restrictedChars = "+-&|!(){}[]^\"~*?:\\/";
+        String restrictedChars = "+-&|!(){}[]^\"~:\\/";
         StringBuilder sb = new StringBuilder();
         for (char c : restrictedChars.toCharArray()) {
             sb.append("\\");
