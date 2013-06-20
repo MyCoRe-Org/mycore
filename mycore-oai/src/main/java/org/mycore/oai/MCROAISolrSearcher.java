@@ -84,13 +84,13 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         } else {
             MCRISO8601Date mcrDate = new MCRISO8601Date();
             mcrDate.setDate(from);
-            query.append(mcrDate.getISOString()).append(" ");
+            query.append(mcrDate.getISOString()).append(" TO ");
         }
         if (until == null) {
             query.append("*]");
         } else {
             MCRISO8601Date mcrDate = new MCRISO8601Date();
-            mcrDate.setDate(from);
+            mcrDate.setDate(until);
             query.append(mcrDate.getISOString()).append("]");
         }
         return query.toString();
