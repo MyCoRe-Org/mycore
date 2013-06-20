@@ -5,7 +5,41 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2013.06" date="2013-06-XX" description="2013 LTS">
+    <release version="2013.06" date="2013-06-20" description="2013 LTS">
+      <action dev="mcrmeich" type="add">
+        Added SOLR support for OAI (MCR.OAIDataProvider.XXX.Searcher=org.mycore.oai.MCROAISolrSearcher)
+      </action>
+      <action dev="mcrtchef" type="update">
+        Forward "_session" parameter in MCRSolrLegacySearchServlet. Allows to refine a query.
+      </action>
+      <action dev="mcrtchef" type="update">
+        Use MCRFile.getLocalFile() to get image for tiling. Should work with more content stores.
+      </action>
+      <action dev="mcrfluet" type="remove">
+        Removed hibernate implementation of the content store.
+      </action>
+      <action dev="mcrfluet" type="add">
+        Added method getLocalFile() to the IFS1 MCRFile API.
+      </action>
+      <action dev="mcrshofm" type="add">
+        Added support to browse through solr response and display single hits as "receive"-links.
+      </action>
+      <action dev="mcrsteph" type="update">
+        MCRURNEventhandler handles now object events to register URNs for MyCoRe objects, XPath expressions
+        to URNs must be specified in properties.
+      </action>
+      <action dev="mcrtchef" type="remove">
+        Removed javax.activation dependency as it is included in JRE since 1.6
+      </action>
+      <action dev="mcrtchef" type="update">
+        Speed up thumbnail servlet.
+      </action>
+      <action dev="mcrjkupf" type="add">
+        Added commands to handle all tiles of an object.
+      </action>
+      <action dev="mcrtchef" type="fix">
+        Fixed several bugs in mycore-solr
+      </action>
       <action dev="mcrtchef" type="update">
         MCRSolrSelectProxyServlet is now MCRSolrProxyServlet and supports different request handler.
         <fixes issue="633" />
