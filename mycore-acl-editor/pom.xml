@@ -21,7 +21,7 @@
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <!-- provided as transitive dependency from mycore-base but is direct dependency -->
     <dependency>

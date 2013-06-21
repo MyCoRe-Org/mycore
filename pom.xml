@@ -603,7 +603,7 @@
       <dependency>
         <groupId>org.apache.solr</groupId>
         <artifactId>solr-solrj</artifactId>
-        <version>4.3.0</version>
+        <version>4.3.1</version>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
@@ -618,7 +618,7 @@
       <dependency>
         <groupId>com.ibm.icu</groupId>
         <artifactId>icu4j</artifactId>
-        <version>51.1</version>
+        <version>51.2</version>
       </dependency>
       <dependency>
         <groupId>javax.mail</groupId>
@@ -676,7 +676,7 @@
       <dependency>
         <groupId>org.apache.pdfbox</groupId>
         <artifactId>pdfbox</artifactId>
-        <version>1.8.1</version>
+        <version>1.8.2</version>
       </dependency>
       <dependency>
         <groupId>org.tmatesoft.svnkit</groupId>
@@ -735,8 +735,8 @@
       </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>
-        <artifactId>servlet-api</artifactId>
-        <version>2.4</version>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>3.0.1</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -757,7 +757,7 @@
       <dependency>
         <groupId>org.apache.ant</groupId>
         <artifactId>ant</artifactId>
-        <version>1.9.0</version>
+        <version>1.9.1</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -780,7 +780,7 @@
       <dependency>
         <groupId>org.javassist</groupId>
         <artifactId>javassist</artifactId>
-        <version>3.17.1-GA</version>
+        <version>3.18.0-GA</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
