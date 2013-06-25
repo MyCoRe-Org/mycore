@@ -164,14 +164,6 @@
   <target name="webapp" description="--> integrates component in web application">
     <componentPreHook target="webapp"/>
     <copy tofile="${build.webapps}/WEB-INF/web.xml" file="${integration.dir}/config/web.xml" overwrite="true"/>
-    <copy todir="${build.webapps}">
-      <mapper type="regexp" from="^[^/\\]+[/\\]web[/\\](.*)$$" to="\1"/>
-      <fileset dir="${integration.dir}/components" includes="*/web/**"/>
-      <fileset dir="${integration.dir}" includes="web/**"/>
-    </copy>
-    <copy todir="${build.webapps}">
-      <fileset dir="${integration.dir}/web" includes="**"/>
-    </copy>
     <for param="web.xml.file">
       <fileset id="web.xml.components" dir="${integration.dir}/components">
         <include name="*/config/web.xml"/>

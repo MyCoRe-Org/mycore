@@ -5,7 +5,6 @@
   <taskdef name="getJar" classname="org.mycore.buildtools.anttasks.MCRGetMyCoReJarTask" />
   <taskdef name="integrate" classname="org.mycore.buildtools.anttasks.MCRIntegrateTask" />
   <taskdef name="execute" classname="org.mycore.buildtools.anttasks.MCRExecuteCommandTask" />
-  <taskdef name="templatecheck" classname="org.mycore.buildtools.anttasks.MCRTemplateTask" />
   <taskdef name="mergeSearchfields" classname="org.mycore.buildtools.anttasks.MCRMergeSearchfieldsXMLTask" />
   <typedef name="appModuleSelector" classname="org.mycore.buildtools.anttypes.MCRApplicationModuleSelector"/>
 </antlib>
