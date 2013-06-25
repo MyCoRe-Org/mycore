@@ -24,71 +24,120 @@
 package org.mycore.backend.hibernate;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.URL;
-import java.net.URLConnection;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.List;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLFilterImpl;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
- * replacement for <code>org.hsqldb.util.ShutdownServer</code> which is missing in hsqldb 2.0
+ * replacement for <code>org.hsqldb.util.ShutdownServer</code> which is missing
+ * in hsqldb 2.0
+ * 
  * @author Thomas Scheffler (yagee)
- *
+ * 
  */
 public class MCRShutdownServer {
 
+    private static final ClassLoader CLASS_LOADER = MCRShutdownServer.class.getClassLoader();
+
     /**
      * @param args
-     * @throws SQLException 
-     * @throws ClassNotFoundException 
-     * @throws JDOMException 
-     * @throws IOException 
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws JDOMException
+     * @throws IOException
+     * @throws SAXException 
      */
-    public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException, JDOMException {
-        Properties properties = getConnectionProperties();
-        String dbURL = properties.getProperty("connection.url");
-        String dbDriver = properties.getProperty("connection.driver_class");
-        String user = properties.getProperty("connection.user");
-        String pwd = properties.getProperty("connection.password");
-        Class.forName(dbDriver);
-        Connection con = DriverManager.getConnection(dbURL, user, pwd);
-        Statement statement = con.createStatement();
-        try {
-            statement.executeUpdate("SHUTDOWN");
-        } finally {
-            statement.close();
-            con.close();
+    public static void main(String[] args) throws IOException, SAXException {
+        Map<String, String> properties = getConnectionProperties();
+        String dbURL = properties.get("connection.url");
+        String user = properties.get("connection.user");
+        String pwd = properties.get("connection.password");
+        try (Connection con = DriverManager.getConnection(dbURL, user, pwd);
+            Statement statement = con.createStatement()) {
+            statement.execute("SHUTDOWN");
+        } catch (SQLException e) {
+            if (e.getErrorCode() == -1305 && "08006".equals(e.getSQLState())) {
+                //ignore EOF Exception on closing connection, database shutdown to fast
+            } else {
+                System.err.printf("Error while shutting down HSQLDB.\nCode: %d\nState: %s\nMessage: %s\n",
+                    e.getErrorCode(), e.getSQLState(), e.getMessage());
+            }
         }
     }
 
-    private static Properties getConnectionProperties() throws IOException, JDOMException {
-        URL hibernateCfg = MCRShutdownServer.class.getClassLoader().getResource("hibernate.cfg.xml");
-        URLConnection con = null;
-        Document document;
-        try {
-            con = hibernateCfg.openConnection();
-            SAXBuilder builder = new SAXBuilder();
-            builder.setValidation(false);
-            document = builder.build(con.getInputStream());
-        } finally {
-            if (con != null)
-                con.getInputStream().close();
+    private static Map<String, String> getConnectionProperties() throws IOException, SAXException {
+        URL hibernateCfg = CLASS_LOADER.getResource("hibernate.cfg.xml");
+        if (hibernateCfg == null) {
+            throw new IOException("Could not find 'hibernate.cfg.xml'");
         }
-        Properties prop = new Properties();
-        @SuppressWarnings({ "unchecked" })
-        List<Element> children = document.getRootElement().getChild("session-factory").getChildren("property");
-        for (Element p : children) {
-            prop.setProperty(p.getAttributeValue("name"), p.getTextTrim());
+        PropertyHandler propertyHandler = new PropertyHandler(XMLReaderFactory.createXMLReader());
+        propertyHandler.parse(hibernateCfg.toString());
+        return propertyHandler.getProperties();
+    }
+
+    private static class PropertyHandler extends XMLFilterImpl {
+        String property;
+
+        StringBuilder value;
+
+        HashMap<String, String> properties;
+
+        public PropertyHandler(XMLReader parent) {
+            super(parent);
+            this.property = null;
+            this.value = new StringBuilder();
+            this.properties = new HashMap<>();
         }
-        return prop;
+
+        public Map<String, String> getProperties() {
+            return properties;
+        }
+
+        @Override
+        public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
+            if (localName.equals("property")) {
+                property = atts.getValue("", "name");
+            }
+        }
+
+        @Override
+        public void endElement(String uri, String localName, String qName) throws SAXException {
+            if (localName.equals("property")) {
+                if (value.length() == 0) {
+                    //System.err.println(System.currentTimeMillis() + " No value found for property: " + property);
+                } else {
+                    properties.put(property, value.toString().trim());
+                }
+                property = null;
+                value.setLength(0);
+            }
+        }
+
+        @Override
+        public void characters(char[] ch, int start, int length) throws SAXException {
+            if (property != null) {
+                value.append(ch, start, length);
+            }
+        }
+
+        @Override
+        public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+            //do not resolve DTD
+            return new InputSource(new StringReader(""));
+        }
     }
 
 }
