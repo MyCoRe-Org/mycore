@@ -141,7 +141,7 @@
     </for>
     <replace file="${build.config}/searchfields.xml" token='xmlns=""' />
     <for param="table.class"
-      list="MCRACCESS,MCRACCESSRULE,MCRCSTORE,MCRFSNODES,MCRLINKHREF,MCRURN,MCRDELETEDITEMS,MCRDNBTRANSFERRESULTS">
+      list="MCRACCESS,MCRACCESSRULE,MCRFSNODES,MCRLINKHREF,MCRURN,MCRDELETEDITEMS,MCRDNBTRANSFERRESULTS">
       <sequential>
         <AddHibernateMapping class="org.mycore.backend.hibernate.tables.@{table.class}"/>
       </sequential>
