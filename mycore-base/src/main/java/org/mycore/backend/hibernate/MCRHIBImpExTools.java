@@ -73,19 +73,21 @@ import org.hibernate.dialect.HSQLDialect;
 import org.hibernate.dialect.MySQLDialect;
 import org.hibernate.dialect.Oracle10gDialect;
 import org.hibernate.dialect.Oracle8iDialect;
-import org.hibernate.dialect.PostgreSQLDialect;
+import org.hibernate.dialect.PostgreSQL81Dialect;
+import org.hibernate.dialect.PostgreSQL82Dialect;
 import org.hibernate.dialect.SQLServerDialect;
-import org.hibernate.dialect.resolver.DialectFactory;
+import org.hibernate.service.jdbc.dialect.spi.DialectFactory;
 import org.xml.sax.InputSource;
 
 /**
  * @author Thomas Scheffler (yagee)
- *
+ * 
  */
 class MCRHIBImpExTools {
     private static final Logger LOGGER = Logger.getLogger(MCRHIBImpExTools.class.getName());
 
-    public static void exportDatabase(File outputFile, String... rootTables) throws HibernateException, DatabaseUnitException, SQLException, IOException {
+    public static void exportDatabase(File outputFile, String... rootTables) throws HibernateException,
+        DatabaseUnitException, SQLException, IOException {
         DatabaseConnection jdbcConnection = getDatabaseConnection();
         LOGGER.info("Present tables: " + getAvailableTables(jdbcConnection));
         try {
@@ -96,14 +98,16 @@ class MCRHIBImpExTools {
         }
     }
 
-    private static List<String> getAvailableTables(DatabaseConnection jdbcConnection) throws SQLException, DataSetException {
+    private static List<String> getAvailableTables(DatabaseConnection jdbcConnection) throws SQLException,
+        DataSetException {
         IDataSet dataSet = jdbcConnection.createDataSet();
         return Arrays.asList(dataSet.getTableNames());
     }
 
     private static DatabaseConnection getDatabaseConnection() throws DatabaseUnitException, SQLException {
         MCRHIBConnection mcrhibConnection = MCRHIBConnection.instance();
-        int batchSize = Integer.parseInt(mcrhibConnection.getConfiguration().getProperties().getProperty("jdbc.batch_size", "0"), 10);
+        int batchSize = Integer.parseInt(
+            mcrhibConnection.getConfiguration().getProperties().getProperty("jdbc.batch_size", "0"), 10);
         StatelessSession session = mcrhibConnection.getSessionFactory().openStatelessSession();
         Connection jdbcConnection = session.connection();
         DatabaseMetaData metaData = jdbcConnection.getMetaData();
@@ -134,7 +138,8 @@ class MCRHIBImpExTools {
             metaData.supportsTransactions();
             DatabaseOperation operation;
             if (metaData.supportsTransactions()) {
-                LOGGER.info(metaData.getDatabaseProductName() + " v" + metaData.getDatabaseProductVersion() + " does not support transactions.");
+                LOGGER.info(metaData.getDatabaseProductName() + " v" + metaData.getDatabaseProductVersion()
+                    + " does not support transactions.");
                 operation = DatabaseOperation.INSERT;
             } else {
                 LOGGER.info("Importing with transaction support");
@@ -148,7 +153,8 @@ class MCRHIBImpExTools {
 
     static IDataTypeFactory getDataTypeFactory() {
         Properties properties = MCRHIBConnection.instance().getConfiguration().getProperties();
-        Dialect dialect = DialectFactory.buildDialect(properties);
+        Dialect dialect = MCRHIBConnection.instance().getServiceRegistry().getService(DialectFactory.class)
+            .buildDialect(properties, null);
         if (dialect == null) {
             LOGGER.info("Could not detect Hibernate dialect: " + properties);
             return new DefaultDataTypeFactory();
@@ -165,7 +171,7 @@ class MCRHIBImpExTools {
             LOGGER.info("MySQL detected.");
             return new MySqlDataTypeFactory();
         }
-        if (dialect instanceof PostgreSQLDialect) {
+        if (dialect instanceof PostgreSQL81Dialect || dialect instanceof PostgreSQL82Dialect) {
             LOGGER.info("PostgreSQL detected.");
             return new PostgresqlDataTypeFactory();
         }
@@ -189,7 +195,8 @@ class MCRHIBImpExTools {
         return new DefaultDataTypeFactory();
     }
 
-    private static IDataSet getExportDataSet(DatabaseConnection jdbcConnection, String... rootTables) throws SQLException, SearchException, DataSetException {
+    private static IDataSet getExportDataSet(DatabaseConnection jdbcConnection, String... rootTables)
+        throws SQLException, SearchException, DataSetException {
         ITableFilter filter = new DatabaseSequenceFilter(jdbcConnection);
         IDataSet dataSet;
         if (rootTables.length == 0) {
@@ -201,7 +208,8 @@ class MCRHIBImpExTools {
         return getExportableOrder(jdbcConnection, filter, dataSet);
     }
 
-    static IDataSet getExportableOrder(DatabaseConnection jdbcConnection, ITableFilter filter, IDataSet dataSet) throws DataSetException {
+    static IDataSet getExportableOrder(DatabaseConnection jdbcConnection, ITableFilter filter, IDataSet dataSet)
+        throws DataSetException {
         FilteredDataSet baseSet = new FilteredDataSet(filter, dataSet);
         String[] tableNames = baseSet.getTableNames();
         QueryDataSet qDataSet = new QueryDataSet(jdbcConnection);
@@ -219,7 +227,8 @@ class MCRHIBImpExTools {
         return null;
     }
 
-    static void exportDataSet(File outputFile, IDataSet exportSet) throws FileNotFoundException, IOException, DataSetException {
+    static void exportDataSet(File outputFile, IDataSet exportSet) throws FileNotFoundException, IOException,
+        DataSetException {
         File dtdFile = getDTDFile(outputFile);
         FileOutputStream dout = new FileOutputStream(dtdFile);
         try {

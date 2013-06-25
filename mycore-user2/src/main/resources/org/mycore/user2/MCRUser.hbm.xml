@@ -12,9 +12,10 @@
       <property name="userName" length="128" />
       <property name="realmID" access="field" length="128" />
     </natural-id>
-    <property name="hashType" not-null="false">
-      <type name="org.mycore.backend.hibernate.MCRGenericEnumUserType">
+    <property name="hashType" not-null="false" length="8">
+      <type name="org.hibernate.type.EnumType">
         <param name="enumClass">org.mycore.user2.MCRPasswordHashType</param>
+        <param name="useNamed">true</param>
       </type>
     </property>
     <property name="password" />

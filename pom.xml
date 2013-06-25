@@ -19,7 +19,7 @@
   <properties>
     <java.target.version>1.7</java.target.version>
     <uniqueVersion>false</uniqueVersion>
-    <hibernate.version>3.6.10.Final</hibernate.version>
+    <hibernate.version>4.2.2.Final</hibernate.version>
     <lucene.version>3.6.2</lucene.version>
     <xalan.version>2.7.1</xalan.version>
     <jersey.version>1.17.1</jersey.version>
@@ -765,11 +765,6 @@
         <artifactId>hsqldb</artifactId>
         <version>2.2.9</version>
         <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>net.sf.ehcache</groupId>
-        <artifactId>ehcache-core</artifactId>
-        <version>2.6.6</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>

@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.hibernate.collection.PersistentList;
+import org.hibernate.collection.internal.PersistentList;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;

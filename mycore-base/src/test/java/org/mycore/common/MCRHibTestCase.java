@@ -30,10 +30,10 @@ import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.classic.Session;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.junit.After;
 import org.junit.AfterClass;
