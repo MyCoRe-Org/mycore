@@ -1,0 +1,74 @@
+<web-fragment xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0" metadata-complete="true">
+  <servlet>
+    <servlet-name>MCRSolrSearchServlet</servlet-name>
+    <servlet-class>org.mycore.solr.search.MCRSolrSearchServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>MCRSolrSelectProxyServlet</servlet-name>
+    <servlet-class>org.mycore.solr.proxy.MCRSolrProxyServlet</servlet-class>
+  </servlet>
+
+  <!-- to use old search forms with new result pages
+  <servlet id="MCRSearch">
+    <servlet-name>MCRSearchServlet</servlet-name>
+    <servlet-class>org.mycore.solr.search.MCRSolrLegacySearchServlet</servlet-class>
+  </servlet>  -->
+
+  <servlet>
+    <servlet-name>MCRLegacySearchServlet</servlet-name>
+    <servlet-class>org.mycore.solr.search.MCRSolrLegacySearchServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>MCRSolrSearchServlet</servlet-name>
+    <url-pattern>/servlets/search</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>MCRSolrSelectProxyServlet</servlet-name>
+    <url-pattern>/servlets/SolrSelectProxy</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>MCRSolrSelectProxyServlet</servlet-name>
+    <url-pattern>/servlets/solr</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>MCRSolrSelectProxyServlet</servlet-name>
+    <url-pattern>/servlets/solr/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>MCRLegacySearchServlet</servlet-name>
+    <url-pattern>/servlets/MCRQueryServlet</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ClassificationBrowserSolr</servlet-name>
+    <servlet-class>org.mycore.solr.frontend.servlets.MCRClassificationBrowserSolr</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ClassificationBrowserSolr</servlet-name>
+    <url-pattern>/servlets/ClassificationBrowserSolr</url-pattern>
+  </servlet-mapping>
+
+  <filter-mapping>
+    <filter-name>UriResolverDebugFilter</filter-name>
+    <servlet-name>MCRLegacySearchServlet</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>UriResolverDebugFilter</filter-name>
+    <servlet-name>MCRSolrSearchServlet</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>UriResolverDebugFilter</filter-name>
+    <servlet-name>MCRSolrSelectProxyServlet</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+</web-fragment>

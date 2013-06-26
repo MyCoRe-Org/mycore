@@ -83,6 +83,12 @@
                   </manifestEntries>
                 </transformer>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer" />
+                <transformer implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
+                  <resource>META-INF/web-fragment.xml</resource>
+                  <!-- Add this to enable loading of DTDs
+                  <ignoreDtd>false</ignoreDtd>
+                  -->
+                </transformer>
               </transformers>
               <artifactSet>
                 <includes>

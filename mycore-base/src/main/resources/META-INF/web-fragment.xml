@@ -1,9 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- @metadata-complete='true' until we switched to web-fragments and/or annotations -->
-<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<web-fragment xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0" metadata-complete="true">
-  <display-name>MyCoRe Application</display-name>
-
+  <name>mycore</name>
   <!-- **************************************************************** -->
   <!-- Servlets and mapping from MyCoRe kernel -->
   <!-- **************************************************************** -->
@@ -171,7 +168,7 @@
   <servlet id="MCRSearch">
     <servlet-name>MCRSearchServlet</servlet-name>
     <servlet-class>org.mycore.services.fieldquery.MCRSearchServlet</servlet-class>
-  </servlet> 
+  </servlet>
   <servlet id="MCRLink">
     <servlet-name>MCRLinkServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRLinkServlet</servlet-class>
@@ -350,12 +347,12 @@
     <servlet-name>MCRDerivateServlet</servlet-name>
     <url-pattern>/servlets/MCRDerivateServlet/*</url-pattern>
   </servlet-mapping>
-  
+
   <servlet>
     <servlet-name>MCRLogoutServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRLogoutServlet</servlet-class>
   </servlet>
-  
+
   <servlet-mapping>
     <servlet-name>MCRLogoutServlet</servlet-name>
     <url-pattern>/servlets/logout</url-pattern>
@@ -370,7 +367,7 @@
     <servlet-name>MCRLocaleServlet</servlet-name>
     <url-pattern>/servlets/MCRLocaleServlet/*</url-pattern>
   </servlet-mapping>
-  
+
   <servlet id="MCRTarServlet">
     <servlet-name>MCRTarServlet</servlet-name>
     <servlet-class>org.mycore.services.zipper.MCRTarServlet</servlet-class>
@@ -380,7 +377,7 @@
     <servlet-name>MCRTarServlet</servlet-name>
     <url-pattern>/servlets/MCRTarServlet</url-pattern>
   </servlet-mapping>
-  
+
   <servlet id="MCRExportServlet">
     <servlet-name> MCRExportServlet </servlet-name>
     <servlet-class> org.mycore.frontend.export.MCRExportServlet </servlet-class>
@@ -395,26 +392,26 @@
   <!-- **************************************************************** -->
 
   <servlet>
-      <servlet-name>MyCoRe Jersey Resource</servlet-name>
-      <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
-      <init-param>
-          <param-name>com.sun.jersey.config.property.resourceConfigClass</param-name>
-          <param-value>org.mycore.frontend.jersey.config.MCRResourceConfig</param-value>
-      </init-param>
-      <init-param>
-          <param-name>com.sun.jersey.config.feature.DisableXmlSecurity</param-name>
-          <param-value>true</param-value>
-      </init-param>
-      <init-param>
-           <param-name>com.sun.jersey.spi.container.ResourceFilters</param-name>
-           <param-value>org.mycore.frontend.jersey.filter.MCRSecurityFilterFactory</param-value>
-       </init-param>
-      <load-on-startup>0</load-on-startup>
+    <servlet-name>MyCoRe Jersey Resource</servlet-name>
+    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>com.sun.jersey.config.property.resourceConfigClass</param-name>
+      <param-value>org.mycore.frontend.jersey.config.MCRResourceConfig</param-value>
+    </init-param>
+    <init-param>
+      <param-name>com.sun.jersey.config.feature.DisableXmlSecurity</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <init-param>
+      <param-name>com.sun.jersey.spi.container.ResourceFilters</param-name>
+      <param-value>org.mycore.frontend.jersey.filter.MCRSecurityFilterFactory</param-value>
+    </init-param>
+    <load-on-startup>0</load-on-startup>
   </servlet>
 
   <servlet-mapping>
-      <servlet-name>MyCoRe Jersey Resource</servlet-name>
-      <url-pattern>/rsc/*</url-pattern>
+    <servlet-name>MyCoRe Jersey Resource</servlet-name>
+    <url-pattern>/rsc/*</url-pattern>
   </servlet-mapping>
 
   <!-- **************************************************************** -->
@@ -542,7 +539,7 @@
     <error-code>504</error-code>
     <location>/servlets/ErrorServlet</location>
   </error-page>
-  
+
   <login-config>
     <auth-method>DIGEST</auth-method>
     <realm-name>Restricted</realm-name>
@@ -561,4 +558,4 @@
     </auth-constraint>
   </security-constraint>
 
-</web-app>
+</web-fragment>

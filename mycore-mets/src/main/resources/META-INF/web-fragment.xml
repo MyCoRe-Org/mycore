@@ -1,45 +1,47 @@
-
+<web-fragment xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0" metadata-complete="true">
 <!-- **************************************************************** -->
 <!-- Servlets and mappings of metsmods -->
 <!-- **************************************************************** -->
-<servlet id="SaveMetsServlet">
+  <servlet id="SaveMetsServlet">
     <servlet-name>SaveMetsServlet</servlet-name>
     <servlet-class>org.mycore.mets.servlets.MCRSaveMETSServlet</servlet-class>
-</servlet>
+  </servlet>
 
-<servlet-mapping>
+  <servlet-mapping>
     <servlet-name>SaveMetsServlet</servlet-name>
     <url-pattern>/servlets/SaveMetsServlet</url-pattern>
-</servlet-mapping>
+  </servlet-mapping>
 
-<servlet id="MCRMETSServlet">
+  <servlet id="MCRMETSServlet">
     <servlet-name>MCRMETSServlet</servlet-name>
     <servlet-class>org.mycore.mets.servlets.MCRMETSServlet</servlet-class>
-</servlet>
+  </servlet>
 
-<servlet-mapping>
+  <servlet-mapping>
     <servlet-name>MCRMETSServlet</servlet-name>
     <url-pattern>/servlets/MCRMETSServlet/*</url-pattern>
-</servlet-mapping>
+  </servlet-mapping>
 
-<filter-mapping>
-  <filter-name>UserAgentFilter</filter-name>
-  <servlet-name>MCRMETSServlet</servlet-name>
-  <dispatcher>REQUEST</dispatcher>
-</filter-mapping>
+  <filter-mapping>
+    <filter-name>UserAgentFilter</filter-name>
+    <servlet-name>MCRMETSServlet</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
 
-<servlet id="MCRJSONProviderServlet">
+  <servlet id="MCRJSONProviderServlet">
     <servlet-name>MCRJSONProviderServlet</servlet-name>
     <servlet-class>org.mycore.mets.servlets.MCRJSONProviderServlet</servlet-class>
-</servlet>
+  </servlet>
 
-<servlet-mapping>
+  <servlet-mapping>
     <servlet-name>MCRJSONProviderServlet</servlet-name>
     <url-pattern>/servlets/MCRJSONProviderServlet</url-pattern>
-</servlet-mapping>
+  </servlet-mapping>
 
-<filter-mapping>
-  <filter-name>UserAgentFilter</filter-name>
-  <servlet-name>MCRMETSServlet</servlet-name>
-  <dispatcher>REQUEST</dispatcher>
-</filter-mapping>
+  <filter-mapping>
+    <filter-name>UserAgentFilter</filter-name>
+    <servlet-name>MCRMETSServlet</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+</web-fragment>

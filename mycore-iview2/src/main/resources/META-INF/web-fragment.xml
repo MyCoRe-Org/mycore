@@ -1,0 +1,50 @@
+<web-fragment xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0" metadata-complete="true">
+<!-- **************************************************************** -->
+<!-- Servlets and mappings of iview2                                  -->
+<!-- **************************************************************** -->
+  <listener>
+    <listener-class>org.mycore.iview2.events.MCRIView2ServletContextListener</listener-class>
+  </listener>
+
+  <servlet>
+    <servlet-name>MCRTileServlet</servlet-name>
+    <servlet-class>org.mycore.iview2.frontend.MCRTileServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>MCRTileCombineServlet</servlet-name>
+    <servlet-class>org.mycore.iview2.frontend.MCRTileCombineServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>MCRThumbnailServlet</servlet-name>
+    <servlet-class>org.mycore.iview2.frontend.MCRThumbnailServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>MCRTileServlet</servlet-name>
+    <url-pattern>/servlets/MCRTileServlet/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>MCRTileCombineServlet</servlet-name>
+    <url-pattern>/servlets/MCRTileCombineServlet/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>MCRThumbnailServlet</servlet-name>
+    <url-pattern>/servlets/MCRThumbnailServlet/*</url-pattern>
+  </servlet-mapping>
+
+  <filter-mapping>
+    <filter-name>UserAgentFilter</filter-name>
+    <servlet-name>MCRTileCombineServlet</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>UserAgentFilter</filter-name>
+    <servlet-name>MCRThumbnailServlet</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+</web-fragment>
