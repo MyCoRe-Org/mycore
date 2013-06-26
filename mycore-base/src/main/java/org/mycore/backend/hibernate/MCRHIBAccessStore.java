@@ -34,7 +34,6 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
 import org.mycore.backend.hibernate.tables.MCRACCESS;
@@ -50,9 +49,6 @@ import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
 public class MCRHIBAccessStore extends MCRAccessStore {
     private final DateFormat dateFormat = new SimpleDateFormat(sqlDateformat);
     private static final Logger LOGGER = Logger.getLogger(MCRHIBAccessStore.class);
-    public MCRHIBAccessStore() {
-        createTables();
-    }
 
     @Override
     public String getRuleID(String objID, String ACPool) {
@@ -61,16 +57,6 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         Criteria c = session.createCriteria(MCRACCESS.class).setProjection(Projections.property("rule.rid")).add(
                 Restrictions.eq("key.objid", objID)).add(Restrictions.eq("key.acpool", ACPool));
         return (String) c.uniqueResult();
-    }
-
-    @Override
-    public void createTables() {
-        try {
-            // update schema -> first time create table
-            new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);
-        } catch (Exception e) {
-            LOGGER.error("error at createTables()", e);
-        }
     }
 
     /**

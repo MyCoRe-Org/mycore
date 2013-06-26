@@ -45,20 +45,9 @@ public class MCRAccessCtrlCommands extends MCRAbstractCommands {
 
         MCRCommand com = null;
 
-        com = new MCRCommand("create accesstable", "org.mycore.access.MCRAccessCtrlCommands.createTables",
-                "The command creates all tables for the Access Control System.");
-        addCommand(com);
-
         com = new MCRCommand("validate objectid {0} in pool {1}", "org.mycore.access.MCRAccessCtrlCommands.validate String String",
                 "Validates access for given object and given permission");
         addCommand(com);
-    }
-
-    /**
-     * method creates sql tables
-     */
-    public static void createTables() {
-        MCRAccessStore.getInstance().createTables();
     }
 
     /**

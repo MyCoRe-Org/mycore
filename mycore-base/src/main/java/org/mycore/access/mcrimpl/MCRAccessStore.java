@@ -44,8 +44,6 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
  * @version $Revision$ $Date$
  */
 public abstract class MCRAccessStore {
-    public abstract void createTables();
-
     public abstract String getRuleID(String objID, String ACPool);
 
     public abstract void createAccessDefinition(MCRRuleMapping accessdata);
