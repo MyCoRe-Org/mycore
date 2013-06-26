@@ -7,7 +7,7 @@
       <key-property name="acpool" type="string" column="ACPOOL" length="64" node="@permission" />
       <key-property name="objid" type="string" column="OBJID" length="128" node="@id" />
     </composite-id>
-    <many-to-one name="rule" column="rid" class="MCRACCESSRULE" cascade="none" node="rule" embed-xml="false" not-null="true" />
+    <many-to-one name="rule" column="rid" class="MCRACCESSRULE" cascade="none" node="rule" not-null="true" />
     <property name="creator" type="string" column="CREATOR" length="64" not-null="true" unique="false" node="@creator" />
     <property name="creationdate" type="timestamp" column="CREATIONDATE" length="64" not-null="true" unique="false"
       node="@date" />
