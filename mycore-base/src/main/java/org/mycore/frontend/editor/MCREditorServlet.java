@@ -24,6 +24,7 @@
 package org.mycore.frontend.editor;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -287,7 +288,8 @@ public class MCREditorServlet extends MCRServlet {
         sendToSubSelect(job.getResponse(), parms, variables, root);
     }
 
-    private void processSubmit(MCRServletJob job, MCRRequestParameters parms) throws ServletException, java.io.IOException {
+    private void processSubmit(MCRServletJob job, MCRRequestParameters parms) throws ServletException,
+        java.io.IOException {
         LOGGER.debug("Editor: process submit");
 
         String sessionID = parms.getParameter("_session");
@@ -303,7 +305,8 @@ public class MCREditorServlet extends MCRServlet {
         for (Enumeration e = parms.getParameterNames(); e.hasMoreElements();) {
             String name = (String) e.nextElement();
 
-            if (name.startsWith("_p-") || name.startsWith("_m-") || name.startsWith("_u-") || name.startsWith("_d-") || name.startsWith("_s-")) {
+            if (name.startsWith("_p-") || name.startsWith("_m-") || name.startsWith("_u-") || name.startsWith("_d-")
+                || name.startsWith("_s-")) {
                 button = name;
 
                 break;
@@ -414,7 +417,8 @@ public class MCREditorServlet extends MCRServlet {
         }
     }
 
-    private void processTargetSubmission(MCRServletJob job, MCRRequestParameters parms, Element editor) throws ServletException, java.io.IOException {
+    private void processTargetSubmission(MCRServletJob job, MCRRequestParameters parms, Element editor)
+        throws ServletException, java.io.IOException {
         LOGGER.debug("Editor: processTargetSubmission ");
 
         HttpServletRequest req = job.getRequest();
@@ -496,7 +500,8 @@ public class MCREditorServlet extends MCRServlet {
         }
     }
 
-    private void sendToServlet(HttpServletRequest req, HttpServletResponse res, MCREditorSubmission sub) throws IOException, ServletException {
+    private void sendToServlet(HttpServletRequest req, HttpServletResponse res, MCREditorSubmission sub)
+        throws IOException, ServletException {
         String name = sub.getParameters().getParameter("_target-name");
         String url = sub.getParameters().getParameter("_target-url");
 
@@ -532,12 +537,16 @@ public class MCREditorServlet extends MCRServlet {
      * 
      * @throws IOException
      */
-    private void sendToWebAppFile(HttpServletRequest req, HttpServletResponse res, MCREditorSubmission sub, Element editor) throws IOException {
+    private void sendToWebAppFile(HttpServletRequest req, HttpServletResponse res, MCREditorSubmission sub,
+        Element editor) throws IOException {
         String path = sub.getParameters().getParameter("_target-name");
 
         LOGGER.debug("Writing editor output to webapp file " + path);
 
-        File f = new File(getServletContext().getRealPath(path));
+        File f = getWebAppFile(path);
+        if (!f.getParentFile().exists()) {
+            f.getParentFile().mkdirs();
+        }
         FileOutputStream fout = new FileOutputStream(f);
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat().setEncoding("UTF-8"));
         outputter.output(sub.getXML(), fout);
@@ -553,7 +562,23 @@ public class MCREditorServlet extends MCRServlet {
         res.sendRedirect(res.encodeRedirectURL(url));
     }
 
-    private void sendToSubSelect(HttpServletResponse res, MCRRequestParameters parms, List variables, String root) throws IOException {
+    private File getWebAppFile(String path) throws FileNotFoundException {
+        String realPath = getServletContext().getRealPath(path);
+        if (realPath != null) {
+            return new File(realPath);
+        }
+        //resource is resolvable but not mappable (inside JAR?) 
+        String contextPath = getServletContext().getRealPath("/");
+        if (contextPath == null) {
+            //WAR is not unpacked
+            throw new FileNotFoundException("Cannot map " + path + " to local file");
+        }
+        File baseDir = new File(contextPath);
+        return new File(baseDir, path);
+    }
+
+    private void sendToSubSelect(HttpServletResponse res, MCRRequestParameters parms, List variables, String root)
+        throws IOException {
         String webpage = parms.getParameter("subselect.webpage");
         String sessionID = parms.getParameter("subselect.session");
 
@@ -578,7 +603,8 @@ public class MCREditorServlet extends MCRServlet {
         res.sendRedirect(res.encodeRedirectURL(sb.toString()));
     }
 
-    private void sendToDebug(HttpServletResponse res, Document unprocessed, MCREditorSubmission sub) throws IOException, UnsupportedEncodingException {
+    private void sendToDebug(HttpServletResponse res, Document unprocessed, MCREditorSubmission sub)
+        throws IOException, UnsupportedEncodingException {
         res.setContentType("text/html; charset=UTF-8");
 
         PrintWriter pw = res.getWriter();
