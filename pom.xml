@@ -19,7 +19,7 @@
   <properties>
     <java.target.version>1.7</java.target.version>
     <uniqueVersion>false</uniqueVersion>
-    <hibernate.version>4.3.0.Beta3</hibernate.version>
+    <hibernate.version>4.2.2.Final</hibernate.version>
     <lucene.version>3.6.2</lucene.version>
     <xalan.version>2.7.1</xalan.version>
     <jersey.version>1.17.1</jersey.version>
