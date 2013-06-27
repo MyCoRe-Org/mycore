@@ -10,7 +10,6 @@
   <artifactId>mycore-iview2</artifactId>
   <name>MyCoRe IView2</name>
   <build>
-    
     <plugins>
       <plugin>
         <groupId>com.samaxes.maven</groupId>
@@ -24,7 +23,7 @@
               <verbose>true</verbose>
               <webappSourceDir>${basedir}/src/main/resources</webappSourceDir>
               <webappTargetDir>${project.build.outputDirectory}</webappTargetDir>
-              <cssSourceDir>components/iview2/web/modules/iview2/gfx/default</cssSourceDir>
+              <cssSourceDir>META-INF/resources/modules/iview2/gfx/default</cssSourceDir>
               <cssSourceFiles>
                 <cssSourceFile>../../lib/fg-menu/fg.menu.css</cssSourceFile>
                 <cssSourceFile>iview2.toolbar.css</cssSourceFile>
@@ -33,7 +32,7 @@
                 <cssSourceFile>style.css</cssSourceFile>
               </cssSourceFiles>
               <cssFinalFile>iview2.css</cssFinalFile>
-              <jsSourceDir>components/iview2/web/modules/iview2/js</jsSourceDir>
+              <jsSourceDir>META-INF/resources/modules/iview2/js</jsSourceDir>
               <jsSourceFiles>
                 <jsSourceFile>Utils.js</jsSourceFile>
                 <!--General Util Funktionen-->
