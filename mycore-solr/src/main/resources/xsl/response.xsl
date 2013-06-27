@@ -175,24 +175,6 @@
         </ul>
       </section>
     </article>
-    <!-- 
-        <xsl:choose>
-          <xsl:when test="str[@name='objectType'] = 'data_file'">
-            <xsl:call-template name="iViewLinkPrev">
-              <xsl:with-param name="derivates" select="./str[@name='DerivateID']" />
-              <xsl:with-param name="mcrid" select="./str[@name='returnId']" />
-              <xsl:with-param name="fileName" select="./str[@name='filePath']" />
-            </xsl:call-template>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:call-template name="iViewLinkPrev">
-              <xsl:with-param name="derivates" select="./arr[@name='derivates']/str" />
-              <xsl:with-param name="mcrid" select="$identifier" />
-              <xsl:with-param name="derivateLinks" select="./arr[@name='derivateLink']/str" />
-            </xsl:call-template>
-          </xsl:otherwise>
-        </xsl:choose>
-     -->
   </xsl:template>
 
 </xsl:stylesheet>
