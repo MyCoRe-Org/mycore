@@ -71,7 +71,8 @@ public class MCRISO8601Date {
         if (locale != null) {
             df = df.withLocale(locale);
         }
-        return dt == null ? null : df.print(dt);
+
+        return dt == null ? null : format.indexOf("G") == -1 ? df.print(dt) : df.print(dt).replace("-", "");
     }
 
     /**
