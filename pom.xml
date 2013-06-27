@@ -1196,8 +1196,6 @@
     <module>mycore-buildtools</module>
     <module>mycore-classbrowser</module>
     <module>mycore-classeditor</module>
-    <module>mycore-doubletfinder</module>
-    <module>mycore-importer</module>
     <module>mycore-indexing</module>
     <module>mycore-iview2</module>
     <module>mycore-media</module>
