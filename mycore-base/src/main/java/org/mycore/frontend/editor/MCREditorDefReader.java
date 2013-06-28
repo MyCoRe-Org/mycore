@@ -54,14 +54,19 @@ public class MCREditorDefReader {
 
     HashMap<Element, String> referencing2ref = new HashMap<Element, String>();
 
+    private MCRTokenSubstitutor tokenSubstitutor;
+
     /**
      * Reads the editor definition from the given URI
      * 
      * @param validate
      *            if true, validate editor definition against schema
+     * @param parameters
+     *            http request parameters           
      */
-    MCREditorDefReader(String uri, String ref, boolean validate) {
+    MCREditorDefReader(String uri, String ref, boolean validate, MCRParameters parameters) {
         long time = System.nanoTime();
+        this.tokenSubstitutor = new MCRTokenSubstitutor(parameters);
 
         Element include = new Element("include").setAttribute("uri", uri);
         if (ref != null && ref.length() > 0) {
@@ -141,9 +146,12 @@ public class MCREditorDefReader {
         boolean replaced = false;
 
         String ref = element.getAttributeValue("ref", "");
+        ref = tokenSubstitutor.substituteTokens(ref);
+        
         if (element.getName().equals("include")) {
             String uri = element.getAttributeValue("uri");
             if (uri != null) {
+                uri = tokenSubstitutor.substituteTokens(uri);
                 LOGGER.info("Including " + uri + (ref.length() > 0 ? "#" + ref : ""));
                 Element parent = element.getParentElement();
                 int pos = parent.indexOf(element);

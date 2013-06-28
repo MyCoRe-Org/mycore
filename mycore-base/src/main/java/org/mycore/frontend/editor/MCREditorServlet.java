@@ -184,10 +184,11 @@ public class MCREditorServlet extends MCRServlet {
     private static Element startSession(Map parameters, String ref, String uri, boolean validate) {
         LOGGER.debug("Editor start editor session from " + ref + "@" + uri);
 
+        MCRParameters mp = new MCRParameters(parameters);
         Element param = getTargetParameters(parameters);
-        Element editor = new MCREditorDefReader(uri, ref, validate).getEditor();
+        Element editor = new MCREditorDefReader(uri, ref, validate, mp).getEditor();
 
-        MCREditorSession mcrEditor = new MCREditorSession(editor, new MCRParameters(parameters));
+        MCREditorSession mcrEditor = new MCREditorSession(editor, mp);
         MCREditorSessionCache.instance().storeEditorSession(mcrEditor);
 
         if (param != null) {
