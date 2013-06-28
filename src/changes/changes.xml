@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2013.07" date="2013-07-XX" description="July developer release 2013">
+      <action dev="mcrfluet" type="update">
+        editor framework: added support for request parameters in include/@uri and @ref (as in source/@uri) to allow dynamic includes
+      </action>
       <action dev="mcrkrebs" type="fix">
         mycore-mods: fixed typo in solr field for identifier
       </action>
