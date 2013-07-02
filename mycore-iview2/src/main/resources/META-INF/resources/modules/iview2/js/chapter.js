@@ -50,9 +50,7 @@ iview.chapter.View = function() {
 		        "ui" : {
 		        	"select_limit" : 1,
 		        	"selected_parent_open" : true
-		        },
-		       
-		        
+		        }
 		};
 
 	};
