@@ -27,6 +27,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+
+import org.xml.sax.InputSource;
+
 /**
  * @author Thomas Scheffler (yagee)
  *
@@ -47,6 +52,16 @@ public class MCRURLContent extends MCRContent {
     @Override
     public InputStream getInputStream() throws IOException {
         return url.openStream();
+    }
+
+    @Override
+    public Source getSource() throws IOException {
+        return new StreamSource(getSystemId());
+    }
+
+    @Override
+    public InputSource getInputSource() throws IOException {
+        return new InputSource(getSystemId());
     }
 
 }
