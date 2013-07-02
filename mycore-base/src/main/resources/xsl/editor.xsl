@@ -964,7 +964,7 @@
 </xsl:template>
 
 <!-- ======== button ======== -->
-<xsl:template match="button">
+<xsl:template match="button[ancestor::editor]">
   <xsl:variable name="url">
     <xsl:call-template name="UrlAddSession">
       <xsl:with-param name="url" select="@url" />
