@@ -32,6 +32,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
@@ -50,6 +51,7 @@ import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
+import org.xml.sax.SAXException;
 
 public class MCRWCMSAdminServlet extends MCRWCMSServlet {
 
@@ -63,7 +65,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
      * @see wcms.WCMSServlet#processRequest(javax.servlet.http.HttpServletRequest,
      *      javax.servlet.http.HttpServletResponse)
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, TransformerException, SAXException {
 
         // http://141.35.20.199:8291/servlets/MCRWCMSAdminServlet;jsessionid=32e28trrnp07r?action=logs&sort=date&sortOrder=descending
 
@@ -130,7 +132,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
         return root;
     }
 
-    private void manageWCMSAdminAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void manageWCMSAdminAccess(HttpServletRequest request, HttpServletResponse response) throws IOException, TransformerException, SAXException {
         Element answer = new Element("cms");
         answer.addContent(new Element("rightsManagement").setAttribute("mode", MCRWCMSUtilities.getPermRightsManagementWCMSAccess()));
         // add all users to xml
@@ -158,7 +160,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
         return root;
     }
 
-    private void manageReadAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void manageReadAccess(HttpServletRequest request, HttpServletResponse response) throws IOException, TransformerException, SAXException {
         Element answer = new Element("cms");
         answer.addContent(new Element("rightsManagement").setAttribute("mode", MCRWCMSUtilities.getPermRightsManagementReadAccess()));
         // add all users to xml

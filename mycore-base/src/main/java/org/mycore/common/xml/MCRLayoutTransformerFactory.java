@@ -53,8 +53,9 @@ public class MCRLayoutTransformerFactory {
     /** 
      * Returns the transformer with the given ID. If the transformer is not instantiated yet,
      * it is created and initialized.
+     * @throws Exception 
      */
-    public static MCRContentTransformer getTransformer(String id) {
+    public static MCRContentTransformer getTransformer(String id) throws Exception {
         MCRContentTransformer transformer = transformers.get(id);
         if (transformer != null) {
             return transformer;
@@ -68,7 +69,7 @@ public class MCRLayoutTransformerFactory {
         return buildLayoutTransformer(id);
     }
 
-    private static MCRContentTransformer buildLayoutTransformer(String id) {
+    private static MCRContentTransformer buildLayoutTransformer(String id) throws Exception {
         String idStripped = id.replaceAll("-default$", "");
         LOGGER.info("Configure property MCR.ContentTransformer." + idStripped + ".Class if you do not want to use default behaviour.");
         String stylesheet = getResourceName(id);

@@ -36,6 +36,8 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.xml.transform.TransformerException;
+
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.filter.Filters;
@@ -45,7 +47,7 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.xml.sax.SAXParseException;
+import org.xml.sax.SAXException;
 
 /**
  * Lists all *.xsl stylesheets in the web application located in any 
@@ -92,7 +94,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
         }
     }
 
-    private void buildOutput(MCRServletJob job) throws SAXParseException, IOException {
+    private void buildOutput(MCRServletJob job) throws IOException, TransformerException, SAXException {
         Element output = new Element("stylesheets");
         for (Entry<String, Stylesheet> entry : stylesheets.entrySet()) {
             Stylesheet stylesheet = entry.getValue();

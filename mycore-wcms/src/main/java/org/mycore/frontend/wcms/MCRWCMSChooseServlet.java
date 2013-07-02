@@ -37,6 +37,7 @@ import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.TransformerException;
 
 import org.jdom2.Comment;
 import org.jdom2.Document;
@@ -52,6 +53,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRJDOMContent;
+import org.xml.sax.SAXException;
 
 /**
  * Select action process for Web-Content-Management-System (WCMS).
@@ -126,7 +128,7 @@ public class MCRWCMSChooseServlet extends MCRWCMSServlet {
     /**
      * Main program called by doGet and doPost.
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, TransformerException, SAXException {
 
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         String userID = (String) mcrSession.get("userID");

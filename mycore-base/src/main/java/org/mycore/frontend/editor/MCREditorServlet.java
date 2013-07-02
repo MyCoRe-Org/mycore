@@ -41,6 +41,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.TransformerException;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
@@ -57,6 +58,7 @@ import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.frontend.editor.postprocessor.MCREditorPostProcessor;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.xml.sax.SAXException;
 
 /**
  * This servlet handles form submissions from MyCoRe XML Editor pages and
@@ -72,7 +74,7 @@ public class MCREditorServlet extends MCRServlet {
 
     private final static Logger LOGGER = Logger.getLogger(MCREditorServlet.class);
 
-    public void doGetPost(MCRServletJob job) throws ServletException, java.io.IOException {
+    public void doGetPost(MCRServletJob job) throws ServletException, IOException, TransformerException, SAXException {
         MCRRequestParameters parms = new MCRRequestParameters(job.getRequest());
         String action = parms.getParameter("_action");
 
@@ -119,7 +121,7 @@ public class MCREditorServlet extends MCRServlet {
     /**
      * Shows a help popup window
      */
-    private void processShowPopup(MCRServletJob job) throws java.io.IOException {
+    private void processShowPopup(MCRServletJob job) throws IOException, TransformerException, SAXException {
         String sessionID = job.getRequest().getParameter("_session");
         String ref = job.getRequest().getParameter("_ref");
 
@@ -289,8 +291,8 @@ public class MCREditorServlet extends MCRServlet {
         sendToSubSelect(job.getResponse(), parms, variables, root);
     }
 
-    private void processSubmit(MCRServletJob job, MCRRequestParameters parms) throws ServletException,
-        java.io.IOException {
+    private void processSubmit(MCRServletJob job, MCRRequestParameters parms) throws ServletException, IOException,
+        TransformerException, SAXException {
         LOGGER.debug("Editor: process submit");
 
         String sessionID = parms.getParameter("_session");
@@ -419,7 +421,7 @@ public class MCREditorServlet extends MCRServlet {
     }
 
     private void processTargetSubmission(MCRServletJob job, MCRRequestParameters parms, Element editor)
-        throws ServletException, java.io.IOException {
+        throws ServletException, IOException, TransformerException, SAXException {
         LOGGER.debug("Editor: processTargetSubmission ");
 
         HttpServletRequest req = job.getRequest();

@@ -1398,7 +1398,10 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
                     LOGGER.debug("MCRLayoutStyleResolver returning empty xml");
                     return new JDOMSource(new Element("null"));
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
+                if (e instanceof TransformerException) {
+                    throw (TransformerException) e;
+                }
                 Throwable cause = e.getCause();
                 while (cause != null) {
                     if (cause instanceof TransformerException) {

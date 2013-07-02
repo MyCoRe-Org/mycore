@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
+import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -52,6 +53,7 @@ import org.mycore.datamodel.metadata.validator.MCREditorOutValidator;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
+import org.xml.sax.SAXException;
 
 /**
  * This class is the superclass of servlets which checks the MCREditorServlet
@@ -208,9 +210,11 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
      * @param lang
      *            the current language
      * @throws IOException 
+     * @throws SAXException 
+     * @throws TransformerException 
      */
     protected org.jdom2.Document prepareMetadata(org.jdom2.Document jdom_in, MCRObjectID ID, MCRServletJob job, String lang)
-            throws IOException {
+            throws IOException, TransformerException, SAXException {
         MCREditorOutValidator ev = null;
         try {
             ev = new MCREditorOutValidator(jdom_in, ID);
@@ -235,8 +239,10 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
     /**
      * A method to handle valid errors.
      * @throws IOException 
+     * @throws SAXException 
+     * @throws TransformerException 
      */
-    private void errorHandlerValid(MCRServletJob job, List<String> logtext, MCRObjectID ID, String lang) throws IOException {
+    private void errorHandlerValid(MCRServletJob job, List<String> logtext, MCRObjectID ID, String lang) throws IOException, TransformerException, SAXException {
         // handle HttpSession
         String sessionID = "";
         HttpSession session = job.getRequest().getSession(false);

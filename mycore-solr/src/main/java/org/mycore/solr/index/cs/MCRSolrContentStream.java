@@ -9,6 +9,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
@@ -29,7 +30,8 @@ public class MCRSolrContentStream extends MCRSolrAbstractContentStream<MCRConten
     private final static MCRContentTransformer TRANSFORMER;
 
     static {
-        String transformerId = MCRConfiguration.instance().getString(CONFIG_PREFIX + "IndexHandler.ContentStream.Transformer");
+        String transformerId = MCRConfiguration.instance().getString(
+            CONFIG_PREFIX + "IndexHandler.ContentStream.Transformer");
         TRANSFORMER = MCRContentTransformerFactory.getTransformer(transformerId);
     }
 
@@ -52,7 +54,15 @@ public class MCRSolrContentStream extends MCRSolrAbstractContentStream<MCRConten
             LOGGER.debug(new String(byteArray, Charsets.UTF_8));
         }
         this.setSourceInfo(content.getSystemId());
-        this.setContentType(getTransformer().getMimeType());
+        try {
+            this.setContentType(getTransformer().getMimeType());
+        } catch (Exception e) {
+            Exception unwrapExCeption = MCRUtils.unwrapExCeption(e, IOException.class);
+            if (unwrapExCeption instanceof IOException) {
+                throw (IOException) unwrapExCeption;
+            }
+            throw new IOException(e);
+        }
         this.setSize((long) byteArray.length);
         this.setInputStream(new ByteArrayInputStream(byteArray));
     }

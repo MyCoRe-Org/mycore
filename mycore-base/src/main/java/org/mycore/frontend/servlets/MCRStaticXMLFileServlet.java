@@ -33,6 +33,7 @@ import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
@@ -73,7 +74,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
 
     @Override
     public void doGetPost(MCRServletJob job) throws java.io.IOException, MCRException, SAXException, JDOMException,
-        URISyntaxException {
+        URISyntaxException, TransformerException {
         URL resource = resolveResource(job);
         if (resource != null) {
             HttpServletRequest request = job.getRequest();

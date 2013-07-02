@@ -40,6 +40,8 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
@@ -436,46 +438,46 @@ public class MCRUtils {
         T id;
 
         switch (operation) {
-        case COMMAND_OR:
-            merged.addAll(set1);
-            merged.addAll(set2);
+            case COMMAND_OR:
+                merged.addAll(set1);
+                merged.addAll(set2);
 
-            break;
+                break;
 
-        case COMMAND_AND:
+            case COMMAND_AND:
 
-            for (T aSet11 : set1) {
-                id = aSet11;
+                for (T aSet11 : set1) {
+                    id = aSet11;
 
-                if (set2.contains(id)) {
-                    merged.add(id);
+                    if (set2.contains(id)) {
+                        merged.add(id);
+                    }
                 }
-            }
 
-            break;
+                break;
 
-        case COMMAND_XOR:
+            case COMMAND_XOR:
 
-            for (T aSet1 : set1) {
-                id = aSet1;
+                for (T aSet1 : set1) {
+                    id = aSet1;
 
-                if (!set2.contains(id)) {
-                    merged.add(id);
+                    if (!set2.contains(id)) {
+                        merged.add(id);
+                    }
                 }
-            }
 
-            for (T aSet2 : set2) {
-                id = aSet2;
+                for (T aSet2 : set2) {
+                    id = aSet2;
 
-                if (!set1.contains(id) && !merged.contains(id)) {
-                    merged.add(id);
+                    if (!set1.contains(id) && !merged.contains(id)) {
+                        merged.add(id);
+                    }
                 }
-            }
 
-            break;
+                break;
 
-        default:
-            throw new IllegalArgumentException("operation not permited: " + operation);
+            default:
+                throw new IllegalArgumentException("operation not permited: " + operation);
         }
 
         return merged;
@@ -902,7 +904,8 @@ public class MCRUtils {
         return MCRCrypt.crypt(salt, text);
     }
 
-    private static String getHash(int iterations, byte[] salt, String text, String algorithm) throws NoSuchAlgorithmException {
+    private static String getHash(int iterations, byte[] salt, String text, String algorithm)
+        throws NoSuchAlgorithmException {
         MessageDigest digest;
         if (--iterations < 0) {
             iterations = 0;
@@ -965,7 +968,8 @@ public class MCRUtils {
      */
     public static List<MCRFile> getFiles(String derivate) {
         List<MCRFile> fList = new Vector<MCRFile>();
-        if (derivate == null || derivate.length() == 0 || !(MCRMetadataManager.exists(MCRObjectID.getInstance(derivate)))) {
+        if (derivate == null || derivate.length() == 0
+            || !(MCRMetadataManager.exists(MCRObjectID.getInstance(derivate)))) {
             return fList;
         }
 
@@ -1032,4 +1036,45 @@ public class MCRUtils {
             tarOutputStream.close();
         }
     }
+
+    @SafeVarargs
+    public static Exception unwrapExCeption(Exception e, Class<? extends Exception>... classes) {
+        if (classes.length == 0) {
+            return e;
+        }
+        Class<? extends Exception> mainExceptionClass = classes[0];
+        Throwable check = e;
+        for (Class<? extends Exception> instChk : classes) {
+            if (instChk.isInstance(check)) {
+                return (Exception) check;
+            }
+            check = check.getCause();
+            if (check == null) {
+                break;
+            }
+        }
+        @SuppressWarnings("unchecked")
+        Constructor<? extends Exception>[] constructors = (Constructor<? extends Exception>[]) mainExceptionClass
+            .getConstructors();
+        for (Constructor<? extends Exception> c : constructors) {
+            Class<?>[] parameterTypes = c.getParameterTypes();
+            try {
+                if (parameterTypes.length == 0) {
+                    Exception exception = c.newInstance((Object[]) null);
+                    exception.initCause(e);
+                    return exception;
+                }
+                if (parameterTypes.length == 1 && parameterTypes[0].isAssignableFrom(mainExceptionClass)) {
+                    return c.newInstance(e);
+                }
+            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException ex) {
+                LOGGER.warn("Exception while initializing exception " + mainExceptionClass.getCanonicalName(), ex);
+                return e;
+            }
+        }
+        LOGGER.warn("Could not instanciate Exception " + mainExceptionClass.getCanonicalName());
+        return e;
+    }
+
 }

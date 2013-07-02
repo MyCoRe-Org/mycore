@@ -13,6 +13,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRDOMContent;
 import org.mycore.common.content.MCRFileContent;
@@ -21,6 +22,7 @@ import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.common.xsl.MCRTemplatesSource;
 import org.mycore.common.xsl.MCRXSLTransformerFactory;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 public class MCRDeprecatedLayoutService {
@@ -73,7 +75,19 @@ public class MCRDeprecatedLayoutService {
      */
     @Deprecated
     public void doLayout(HttpServletRequest req, HttpServletResponse res, org.jdom2.Document jdom) throws IOException {
-        SINGLETON.doLayout(req, res, new MCRJDOMContent(jdom));
+        try {
+            SINGLETON.doLayout(req, res, new MCRJDOMContent(jdom));
+        } catch (TransformerException | SAXException e) {
+            throwIOException(e);
+        }
+    }
+
+    private void throwIOException(Exception e) throws IOException {
+        Exception unwrapExCeption = MCRUtils.unwrapExCeption(e, IOException.class);
+        if (unwrapExCeption instanceof IOException) {
+            throw (IOException) e;
+        }
+        throw new IOException(e);
     }
 
     /**
@@ -82,7 +96,8 @@ public class MCRDeprecatedLayoutService {
      * @deprecated will be removed without replacement
      */
     @Deprecated
-    public void doLayout(HttpServletRequest req, HttpServletResponse res, Writer out, org.jdom2.Document jdom) throws IOException {
+    public void doLayout(HttpServletRequest req, HttpServletResponse res, Writer out, org.jdom2.Document jdom)
+        throws IOException {
         MCRContent content = new MCRJDOMContent(jdom);
         String docType = content.getDocType();
         MCRParameterCollector parameters = new MCRParameterCollector(req);
@@ -116,8 +131,13 @@ public class MCRDeprecatedLayoutService {
      * @deprecated use {@link #doLayout(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
      */
     @Deprecated
-    public void doLayout(HttpServletRequest req, HttpServletResponse res, org.w3c.dom.Document dom) throws IOException, SAXParseException {
-        SINGLETON.doLayout(req, res, new MCRDOMContent(dom));
+    public void doLayout(HttpServletRequest req, HttpServletResponse res, org.w3c.dom.Document dom) throws IOException,
+        SAXParseException {
+        try {
+            SINGLETON.doLayout(req, res, new MCRDOMContent(dom));
+        } catch (TransformerException | SAXException e) {
+            throwIOException(e);
+        }
     }
 
     /**
@@ -125,8 +145,13 @@ public class MCRDeprecatedLayoutService {
      * @deprecated use {@link #doLayout(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
      */
     @Deprecated
-    public void doLayout(HttpServletRequest req, HttpServletResponse res, InputStream is) throws IOException, SAXParseException {
-        SINGLETON.doLayout(req, res, new MCRStreamContent(is));
+    public void doLayout(HttpServletRequest req, HttpServletResponse res, InputStream is) throws IOException,
+        SAXParseException {
+        try {
+            SINGLETON.doLayout(req, res, new MCRStreamContent(is));
+        } catch (TransformerException | SAXException e) {
+            throwIOException(e);
+        }
     }
 
     /**
@@ -135,7 +160,11 @@ public class MCRDeprecatedLayoutService {
      */
     @Deprecated
     public void doLayout(HttpServletRequest req, HttpServletResponse res, File file) throws IOException {
-        SINGLETON.doLayout(req, res, new MCRFileContent(file));
+        try {
+            SINGLETON.doLayout(req, res, new MCRFileContent(file));
+        } catch (TransformerException | SAXException e) {
+            throwIOException(e);
+        }
     }
 
     private static String getResourceName(HttpServletRequest req, MCRParameterCollector parameters, String docType) {
@@ -145,7 +174,8 @@ public class MCRDeprecatedLayoutService {
         String styleName = buildStylesheetName(docType, style);
         boolean resourceExist = false;
         try {
-            resourceExist = MCRXMLResource.instance().exists(styleName, MCRDeprecatedLayoutService.class.getClassLoader());
+            resourceExist = MCRXMLResource.instance().exists(styleName,
+                MCRDeprecatedLayoutService.class.getClassLoader());
             if (resourceExist) {
                 return styleName;
             }

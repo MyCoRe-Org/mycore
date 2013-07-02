@@ -29,17 +29,18 @@ import java.util.ArrayList;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.TransformerException;
 
-import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRJDOMContent;
+import org.xml.sax.SAXException;
 
 public class MCRWCMSLoginServlet extends MCRWCMSServlet {
 	private static final long serialVersionUID = 1L;
 
-	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, TransformerException, SAXException {
 		// init 
 		MCRSession session = MCRSessionMgr.getCurrentSession();
 		String userID = session.getUserInformation().getUserID();

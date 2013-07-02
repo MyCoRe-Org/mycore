@@ -29,6 +29,7 @@ import java.util.StringTokenizer;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
@@ -45,6 +46,7 @@ import org.mycore.user2.MCRRealmFactory;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUser2Constants;
 import org.mycore.user2.MCRUserManager;
+import org.xml.sax.SAXException;
 
 /**
  * Provides functionality to select login method,
@@ -149,7 +151,7 @@ public class MCRLoginServlet extends MCRServlet {
         loginToRealm(req, res, realmID);
     }
 
-    private void presentLoginForm(MCRServletJob job) throws IOException {
+    private void presentLoginForm(MCRServletJob job) throws IOException, TransformerException, SAXException {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
         if (LOCAL_LOGIN_SECURE_ONLY && !req.isSecure()) {
@@ -177,7 +179,7 @@ public class MCRLoginServlet extends MCRServlet {
         getLayoutService().doLayout(req, res, new MCRJDOMContent(root));
     }
 
-    private void listRealms(HttpServletRequest req, HttpServletResponse res) throws IOException {
+    private void listRealms(HttpServletRequest req, HttpServletResponse res) throws IOException, TransformerException, SAXException {
         String redirectURL = getReturnURL(req);
         Document realmsDoc = MCRRealmFactory.getRealmsDocument();
         Element realms = realmsDoc.getRootElement();

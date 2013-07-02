@@ -30,19 +30,19 @@ import java.util.ArrayList;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.TransformerException;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
-import org.mycore.access.MCRAccessInterface;
-import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.xml.sax.SAXException;
 
 /**
  * @author Andreas Trappe, Thomas Scheffler
@@ -113,7 +113,7 @@ public abstract class MCRWCMSServlet extends MCRServlet {
     /*
      * final void WriteJDOM2XMLFile(Document doc, String pathOfFile) { }
      */
-    protected abstract void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException;
+    protected abstract void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, TransformerException, SAXException;
 
     /**
      * Attaches on the given JDOM-Element an JDOM-Element with the configuration

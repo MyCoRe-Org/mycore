@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Transaction;
@@ -42,6 +43,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.xml.sax.SAXException;
 
 /**
  * This servlet delivers the contents of an MCRFilesystemNode to the client
@@ -109,7 +111,7 @@ public class MCRFileNodeServlet extends MCRServlet {
      * Handles the HTTP request
      */
     @Override
-    public void doGetPost(MCRServletJob job) throws IOException {
+    public void doGetPost(MCRServletJob job) throws IOException, TransformerException, SAXException {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
         if (!isParametersValid(request, response)) {
@@ -133,9 +135,11 @@ public class MCRFileNodeServlet extends MCRServlet {
      * @param request
      * @param response
      * @throws IOException
+     * @throws SAXException 
+     * @throws TransformerException 
      * @throws ServletException
      */
-    private void handleLocalRequest(MCRServletJob job) throws IOException {
+    private void handleLocalRequest(MCRServletJob job) throws IOException, TransformerException, SAXException {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
         String ownerID = getOwnerID(request);
@@ -263,12 +267,13 @@ public class MCRFileNodeServlet extends MCRServlet {
 
     /**
      * Sends the contents of an MCRDirectory as XML data to the client
+     * @throws SAXException 
+     * @throws TransformerException 
      */
-    private void sendDirectory(HttpServletRequest req, HttpServletResponse res, MCRDirectory dir) throws IOException {
+    private void sendDirectory(HttpServletRequest req, HttpServletResponse res, MCRDirectory dir) throws IOException, TransformerException, SAXException {
         LOGGER.info("MCRFileNodeServlet: Sending listing of directory " + dir.getName());
         Document jdom = MCRDirectoryXML.getInstance().getDirectoryXML(dir);
         layoutDirectory(req, res, jdom);
-
     }
 
     /**
@@ -282,8 +287,10 @@ public class MCRFileNodeServlet extends MCRServlet {
      *            the jdom document
      * @throws IOException
      * see overwritten in JSPDocportal
+     * @throws SAXException 
+     * @throws TransformerException 
      */
-    protected void layoutDirectory(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException {
+    protected void layoutDirectory(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException, TransformerException, SAXException {
         getLayoutService().doLayout(req, res, new MCRJDOMContent(jdom));
     }
 
@@ -291,8 +298,10 @@ public class MCRFileNodeServlet extends MCRServlet {
      * Forwards the error to generate the output
      * 
      * see its overwritten in jspdocportal
+     * @throws SAXException 
+     * @throws TransformerException 
      */
-    protected void errorPage(HttpServletRequest req, HttpServletResponse res, int error, String msg, Exception ex, boolean xmlstyle) throws IOException {
+    protected void errorPage(HttpServletRequest req, HttpServletResponse res, int error, String msg, Exception ex, boolean xmlstyle) throws IOException, TransformerException, SAXException {
         generateErrorPage(req, res, error, msg, ex, xmlstyle);
     }
 }

@@ -25,11 +25,11 @@ package org.mycore.frontend.wcms;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.TransformerException;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -38,11 +38,11 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRJDOMContent;
+import org.xml.sax.SAXException;
 
 public class MCRWCMSFileUploadServlet extends MCRWCMSServlet {
     private static final long serialVersionUID = 1L;
@@ -55,8 +55,10 @@ public class MCRWCMSFileUploadServlet extends MCRWCMSServlet {
 
     /**
      * Main program called by doGet and doPost.
+     * @throws SAXException 
+     * @throws TransformerException 
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, TransformerException, SAXException {
         boolean isMultiPart = ServletFileUpload.isMultipartContent(request);
 
         if (isMultiPart) {
@@ -87,17 +89,17 @@ public class MCRWCMSFileUploadServlet extends MCRWCMSServlet {
         }
     }
 
-    private void generateStatusPage(HttpServletRequest request, HttpServletResponse response, boolean success, String message) throws IOException {
+    private void generateStatusPage(HttpServletRequest request, HttpServletResponse response, boolean success, String message) throws IOException, TransformerException, SAXException {
         String msg = (message != null) ? message : "";
         String status = (success) ? "done" : "failed";
         forwardPage(request, response, status, msg);
     }
 
-    private void generateUploadPage(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void generateUploadPage(HttpServletRequest request, HttpServletResponse response) throws IOException, TransformerException, SAXException {
         forwardPage(request, response, "upload", "2");
     }
 
-    private void forwardPage(HttpServletRequest request, HttpServletResponse response, String status, String error) throws IOException {
+    private void forwardPage(HttpServletRequest request, HttpServletResponse response, String status, String error) throws IOException, TransformerException, SAXException {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         Element rootOut = new Element("cms");
         rootOut.addContent(new Element("session").setText("fileUpload"));

@@ -23,6 +23,14 @@
  **/
 package org.mycore.common.events;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.security.CodeSource;
+import java.security.ProtectionDomain;
+import java.util.Enumeration;
+
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -54,11 +62,52 @@ public class MCRServletContextListener implements ServletContextListener {
         MCRURIResolver.init(sce.getServletContext(), MCRConfiguration.instance().getString("MCR.baseurl"));
         // register to MCRShutdownHandler
         LOGGER.info("Register ServletContextListener to MCRShutdownHandler");
+        try {
+            Enumeration<URL> resources = this.getClass().getClassLoader().getResources("META-INF/web-fragment.xml");
+            while (resources.hasMoreElements()) {
+                LOGGER.info("Found: " + resources.nextElement().toString());
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         MCRShutdownHandler.getInstance().isWebAppRunning = true;
+        LOGGER.info("This class is here: " + getSource(this.getClass()));
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
         // shutdown event
         MCRShutdownHandler.getInstance().shutDown();
+    }
+
+    private static String getKey(ServletContext sc) {
+        String systemContext = System.getProperty("mycore.context");
+        String contextPath = sc.getContextPath();
+        if (contextPath.startsWith("/")) {
+            contextPath = contextPath.substring(1);
+        } else {
+            //ROOT context
+            contextPath = sc.getInitParameter("defaultContext");
+        }
+        if (contextPath.length() > 0) {
+
+        }
+        return null;
+    }
+
+    private static String getSource(Class clazz) {
+        if (clazz == null) {
+            return null;
+        }
+        ProtectionDomain protectionDomain = clazz.getProtectionDomain();
+        CodeSource codeSource = protectionDomain.getCodeSource();
+        if (codeSource == null) {
+            LOGGER.warn("Cannot get CodeSource.");
+            return null;
+        }
+        URL location = codeSource.getLocation();
+        String fileName = location.getFile();
+        File sourceFile = new File(fileName);
+        return sourceFile.getName();
     }
 }

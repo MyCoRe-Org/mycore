@@ -78,7 +78,7 @@ public class MCRErrorListener implements ErrorListener {
         throw exception;
     }
 
-    private TransformerException unwrapException(TransformerException exception) {
+    public static TransformerException unwrapException(TransformerException exception) {
         Throwable cause = exception.getCause();
         while (cause != null) {
             if (cause instanceof TransformerException) {
@@ -93,7 +93,7 @@ public class MCRErrorListener implements ErrorListener {
         return exception;
     }
 
-    private String getMyMessageAndLocation(TransformerException exception) {
+    public static String getMyMessageAndLocation(TransformerException exception) {
         SourceLocator locator = exception.getLocator();
         StringBuilder msg = new StringBuilder();
         if (locator != null) {

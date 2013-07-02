@@ -69,7 +69,7 @@ public abstract class MCRContentTransformer {
     }
 
     /** Returns the MIME type of the transformed content, may return the default mime type */
-    public String getMimeType() {
+    public String getMimeType() throws Exception {
         return mimeType;
     }
     
@@ -78,7 +78,7 @@ public abstract class MCRContentTransformer {
      * 
      * Will return null if the encoding is unknown or the results does not represent character data.
      */
-    public String getEncoding() {
+    public String getEncoding() throws Exception {
         return null;
     }
 
@@ -86,7 +86,7 @@ public abstract class MCRContentTransformer {
      * Returns the file extension that is usually related to the transformed content.
      * @return
      */
-    public String getFileExtension() {
+    public String getFileExtension() throws Exception {
         return fileExtension;
     }
 

@@ -23,7 +23,6 @@
 
 package org.mycore.frontend.export;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -131,8 +130,9 @@ public class MCRExportServlet extends MCRServlet {
 
     /**
      * Sends the resulting, transformed MCRContent to the client
+     * @throws Exception 
      */
-    private void sendResponse(HttpServletResponse res, MCRContent content, MCRContentTransformer transformer, String filename) throws IOException {
+    private void sendResponse(HttpServletResponse res, MCRContent content, MCRContentTransformer transformer, String filename) throws Exception {
         res.setHeader("Content-Disposition", "inline;filename=\"" + filename + "\"");
         res.setContentType(transformer.getMimeType());
         OutputStream out = res.getOutputStream();

@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.jdom2.DocType;
@@ -15,6 +16,7 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.xml.sax.SAXException;
 
 public class MCRACLEditorServlet_v2 extends MCRServlet {
 
@@ -94,7 +96,7 @@ public class MCRACLEditorServlet_v2 extends MCRServlet {
         }
     }
 
-    private void doLayout(HttpServletRequest request, HttpServletResponse response, Element elem, String format, boolean mcrWebPage) throws IOException {
+    private void doLayout(HttpServletRequest request, HttpServletResponse response, Element elem, String format, boolean mcrWebPage) throws IOException, TransformerException, SAXException {
         Document doc = new Document();
 
         if (mcrWebPage) {
@@ -109,7 +111,7 @@ public class MCRACLEditorServlet_v2 extends MCRServlet {
         doLayout(request, response, doc, format);
     }
 
-    private void doLayout(HttpServletRequest request, HttpServletResponse response, Document doc, String format) throws IOException {
+    private void doLayout(HttpServletRequest request, HttpServletResponse response, Document doc, String format) throws IOException, TransformerException, SAXException {
 
         if (format.equals("xml"))
             getLayoutService().sendXML(request, response, new MCRJDOMContent(doc));
