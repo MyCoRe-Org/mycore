@@ -386,21 +386,16 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
         byte[] bytes = bytesCache.get(classResource);
 
         if (bytes == null) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             LOGGER.debug("Resolving resource " + classResource);
-            InputStream in = this.getClass().getResourceAsStream(classResource);
-
-            if (in == null) {
-                LOGGER.debug(classResource + " not found");
-                return null;
-            }
-            try {
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                InputStream in = this.getClass().getResourceAsStream(classResource)) {
+                if (in == null) {
+                    LOGGER.debug(classResource + " not found");
+                    return null;
+                }
                 IOUtils.copy(in, baos);
-            } finally {
-                baos.close();
-                in.close();
+                bytes = baos.toByteArray();
             }
-            bytes = baos.toByteArray();
             bytesCache.put(classResource, bytes);
         }
 
