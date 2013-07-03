@@ -23,7 +23,11 @@
 
 package org.mycore.user2;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Date;
@@ -45,6 +49,7 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImplTest;
+import org.mycore.datamodel.common.MCRXMLMetadataManagerTest;
 import org.mycore.user2.utils.MCRUserTransformer;
 
 /**
@@ -55,6 +60,8 @@ public class MCRUserManagerTest extends MCRHibTestCase {
     public static final String RESOURCE_REALMS_URI = MCRRealmFactory.RESOURCE_REALMS_URI;
 
     public static final String REALMS_URI_CFG_KEY = MCRRealmFactory.REALMS_URI_CFG_KEY;
+
+    MCRXMLMetadataManagerTest crutch;
 
     MCRUser user;
 
@@ -75,6 +82,8 @@ public class MCRUserManagerTest extends MCRHibTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        crutch = new MCRXMLMetadataManagerTest();
+        crutch.setUp();
         MCRCategory groupsCategory = MCRCategoryDAOImplTest.loadClassificationResource("/mcr-roles.xml");
         MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
         DAO.addCategory(null, groupsCategory);
@@ -91,6 +100,8 @@ public class MCRUserManagerTest extends MCRHibTestCase {
     @After
     public void tearDown() throws Exception {
         super.tearDown();
+        crutch.tearDown();
+        crutch = null;
     }
 
     /**
@@ -200,7 +211,8 @@ public class MCRUserManagerTest extends MCRHibTestCase {
         user.setValidUntil(new Date());
         MCRUserManager.updateUser(user);
         startNewTransaction();
-        assertNull("Should not login user when password is expired", MCRUserManager.login(this.user.getUserName(), clearPasswd));
+        assertNull("Should not login user when password is expired",
+            MCRUserManager.login(this.user.getUserName(), clearPasswd));
     }
 
     @Test
@@ -223,13 +235,13 @@ public class MCRUserManagerTest extends MCRHibTestCase {
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
         xout.output(exportableXML, System.out);
     }
-    
-   @Test
-   public final void testLoadTestUser(){
-       Element input = MCRURIResolver.instance().resolve("resource:test-user.xml");
-       MCRUser mcrUser = MCRUserTransformer.buildMCRUser(input);
-       mcrUser.setUserName("junit2");
-       MCRUserManager.createUser(mcrUser);
-   }
+
+    @Test
+    public final void testLoadTestUser() {
+        Element input = MCRURIResolver.instance().resolve("resource:test-user.xml");
+        MCRUser mcrUser = MCRUserTransformer.buildMCRUser(input);
+        mcrUser.setUserName("junit2");
+        MCRUserManager.createUser(mcrUser);
+    }
 
 }
