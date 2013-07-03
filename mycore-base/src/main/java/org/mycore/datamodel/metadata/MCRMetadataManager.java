@@ -24,12 +24,14 @@ package org.mycore.datamodel.metadata;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
@@ -77,8 +79,8 @@ public final class MCRMetadataManager {
      * @return null if derivateID has no object referenced
      * @see #getDerivateIds(MCRObjectID, long)
      */
-    public static MCRObjectID getObjectId(final MCRObjectID derivateID, final long expire) {
-        ModifiedHandle modifiedHandle = XML_MANAGER.getLastModifiedHandle(derivateID, expire);
+    public static MCRObjectID getObjectId(final MCRObjectID derivateID, final long expire, TimeUnit unit) {
+        ModifiedHandle modifiedHandle = XML_MANAGER.getLastModifiedHandle(derivateID, expire, unit);
         MCRObjectID mcrObjectID = null;
         try {
             mcrObjectID = derivateObjectMap.getIfUpToDate(derivateID, modifiedHandle);
@@ -113,8 +115,8 @@ public final class MCRMetadataManager {
      * @return null if object with objectId does not exist
      * @see #getObjectId(MCRObjectID, long)
      */
-    public static List<MCRObjectID> getDerivateIds(final MCRObjectID objectId, final long expire){
-        ModifiedHandle modifiedHandle = XML_MANAGER.getLastModifiedHandle(objectId, expire);
+    public static List<MCRObjectID> getDerivateIds(final MCRObjectID objectId, final long expire, final TimeUnit unit){
+        ModifiedHandle modifiedHandle = XML_MANAGER.getLastModifiedHandle(objectId, expire, unit);
         List<MCRObjectID> derivateIds = null;
         try {
             derivateIds = objectDerivateMap.getIfUpToDate(objectId, modifiedHandle);

@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.concurrent.TimeUnit;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -606,7 +607,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
      * @return the {@link MCRObjectID}
      */
     public MCRObjectID getMCRObjectID() {
-        return MCRMetadataManager.getObjectId(MCRObjectID.getInstance(getOwnerID()), 10000);
+        return MCRMetadataManager.getObjectId(MCRObjectID.getInstance(getOwnerID()), 10, TimeUnit.SECONDS);
     }
 
     /**

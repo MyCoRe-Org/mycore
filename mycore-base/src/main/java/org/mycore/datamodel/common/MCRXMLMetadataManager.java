@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
@@ -97,8 +98,8 @@ public class MCRXMLMetadataManager {
 
         private final MCRObjectID id;
 
-        private StoreModifiedHandle(MCRObjectID id, long expire) {
-            this.expire = expire;
+        private StoreModifiedHandle(MCRObjectID id, long time, TimeUnit unit) {
+            this.expire = unit.toMillis(time);
             this.id = id;
         }
 
@@ -141,7 +142,8 @@ public class MCRXMLMetadataManager {
         baseDir = new File(base);
         checkDir(baseDir, "base");
 
-        defaultClass = config.getString("MCR.Metadata.Store.DefaultClass", "org.mycore.datamodel.ifs2.MCRVersioningMetadataStore");
+        defaultClass = config.getString("MCR.Metadata.Store.DefaultClass",
+            "org.mycore.datamodel.ifs2.MCRVersioningMetadataStore");
         Class<?> impl;
         try {
             impl = Class.forName(defaultClass);
@@ -253,14 +255,15 @@ public class MCRXMLMetadataManager {
 
         MCRMetadataStore store = MCRStoreManager.getStore(projectType, MCRMetadataStore.class);
         if (store == null) {
-            throw new MCRPersistenceException(MessageFormat.format("Metadata store for project {0} and object type {1} is unconfigured.",
-                project, type));
+            throw new MCRPersistenceException(MessageFormat.format(
+                "Metadata store for project {0} and object type {1} is unconfigured.", project, type));
         }
         return store;
     }
 
     @SuppressWarnings("unchecked")
-    private void setupStore(String project, String objectType, String configPrefix) throws InstantiationException, IllegalAccessException {
+    private void setupStore(String project, String objectType, String configPrefix) throws InstantiationException,
+        IllegalAccessException {
         MCRConfiguration config = MCRConfiguration.instance();
         String baseID = project + "_" + objectType;
         String clazz = config.getString(configPrefix + "Class", null);
@@ -753,7 +756,7 @@ public class MCRXMLMetadataManager {
         return -1;
     }
 
-    public MCRCache.ModifiedHandle getLastModifiedHandle(final MCRObjectID id, final long expire) {
-        return new StoreModifiedHandle(id, expire);
+    public MCRCache.ModifiedHandle getLastModifiedHandle(final MCRObjectID id, final long expire, TimeUnit unit) {
+        return new StoreModifiedHandle(id, expire, unit);
     }
 }
