@@ -50,32 +50,68 @@
       <xsl:copy-of select="@*|node()" />
       <xsl:variable name="fq" select="lst[@name='responseHeader']/lst[@name='params']/str[@name='fq' and starts-with(.,$JoinPattern)]" />
       <!-- query extends by about 36 bytes per MCROBjectID, limit to 100 results  -->
-      <xsl:if test="$fq and result/doc and not(result/doc[101]) ">
-        <xsl:variable name="orChain">
-          <xsl:apply-templates mode="query" select="result/doc/@id" />
-        </xsl:variable>
-        <xsl:variable name="query">
-          <xsl:value-of select="substring-after($fq, $JoinPattern)" />
-          <xsl:value-of select="' +returnId:('" />
-          <xsl:value-of select="substring-after($orChain, 'OR ')" />
-          <xsl:value-of select="')'" />
-        </xsl:variable>
-        <xsl:apply-templates select="document(concat('solr:q=', encoder:encode($query)))" mode="join"/>
-      </xsl:if>
+      <xsl:choose>
+        <xsl:when test="lst[@name='grouped']/lst[@name='returnId']">
+          <xsl:variable name="groupBase" select="lst[@name='grouped']/lst[@name='returnId']/arr[@name='groups']" />
+          <xsl:variable name="orChain">
+            <xsl:apply-templates mode="query" select="$groupBase/lst/str[@name='groupValue']" />
+          </xsl:variable>
+          <xsl:variable name="query">
+            <xsl:value-of select="'+id:('" />
+            <xsl:value-of select="substring-after($orChain, 'OR ')" />
+            <xsl:value-of select="')'" />
+          </xsl:variable>
+          <xsl:variable name="queryStr">
+            <xsl:value-of select="concat('q=',encoder:encode($query))" />
+            <xsl:apply-templates select="lst[@name='responseHeader']/lst[@name='params']/str" mode="queryParms" />
+          </xsl:variable>
+          <xsl:apply-templates select="document(concat('solr:', $queryStr))/response" mode="join">
+            <xsl:with-param name="resultName" select="'groupOwner'" />
+          </xsl:apply-templates>
+        </xsl:when>
+        <xsl:when test="$fq and result/doc and not(result/doc[101]) ">
+          <xsl:variable name="orChain">
+            <xsl:apply-templates mode="query" select="result/doc/str[@name='id']" />
+          </xsl:variable>
+          <xsl:variable name="query">
+            <xsl:value-of select="substring-after($fq, $JoinPattern)" />
+            <xsl:value-of select="' +returnId:('" />
+            <xsl:value-of select="substring-after($orChain, 'OR ')" />
+            <xsl:value-of select="')'" />
+          </xsl:variable>
+          <xsl:apply-templates select="document(concat('solr:q=', encoder:encode($query)))/response" mode="join">
+            <xsl:with-param name="resultName" select="'unmerged'" />
+          </xsl:apply-templates>
+        </xsl:when>
+      </xsl:choose>
     </xsl:copy>
   </xsl:template>
 
   <xsl:template match="response" mode="join">
+    <xsl:param name="resultName" />
     <xsl:copy>
       <xsl:attribute name="subresult">
-        <xsl:value-of select="'unmerged'" />
+        <xsl:value-of select="$resultName" />
       </xsl:attribute>
       <xsl:copy-of select="@*|node()" />
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template mode="query" match="@id">
+  <xsl:template mode="query" match="str">
     <xsl:value-of select="concat(' OR ',.)" />
+  </xsl:template>
+
+  <xsl:template match="str" mode="queryParms">
+    <xsl:choose>
+      <xsl:when test="starts-with(@name, 'group') or @name='rows' or @name='start' or @name='q' or @name='version'">
+<!--         <xsl:message> -->
+<!--           <xsl:value-of select="concat('ignoring ',@name)" /> -->
+<!--         </xsl:message> -->
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="concat('&amp;',@name,'=',encoder:encode(.))" />
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>

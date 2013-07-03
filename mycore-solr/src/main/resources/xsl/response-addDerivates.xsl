@@ -6,16 +6,16 @@
     <xsl:copy>
       <xsl:copy-of select="@*|node()" />
       <!-- query extends by about 36 bytes per MCROBjectID, limit to 100 results  -->
-      <xsl:if test="result/doc and not(result/doc[101]) ">
+      <xsl:if test="(result/doc and not(result/doc[101])) or (response[@subresult='groupOwner']/result/doc and not(response[@subresult='groupOwner']/result/doc[101]))">
         <xsl:variable name="orChain">
-          <xsl:apply-templates mode="query" select="result/doc/@id" />
+          <xsl:apply-templates mode="query" select="result/doc/@id|response[@subresult='groupOwner']/result/doc/@id" />
         </xsl:variable>
         <xsl:variable name="query">
           <xsl:value-of select="'+objectType:derivate +returnId:('" />
           <xsl:value-of select="substring-after($orChain, 'OR ')" />
           <xsl:value-of select="')'" />
         </xsl:variable>
-        <xsl:apply-templates select="document(concat('solr:fl=id,returnId,maindoc,iviewFile&amp;rows=',(count(result/doc)*10),'&amp;q=', encoder:encode($query)))" mode="derivate"/>
+        <xsl:apply-templates select="document(concat('solr:fl=id,returnId,maindoc,iviewFile,derivateDisplay&amp;rows=',(count(result/doc|response[@subresult='groupOwner']/result/doc)*10),'&amp;q=', encoder:encode($query)))" mode="derivate"/>
       </xsl:if>
     </xsl:copy>
   </xsl:template>

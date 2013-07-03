@@ -26,7 +26,7 @@
   </xsl:variable>
 
   <xsl:template match="/response">
-    <xsl:apply-templates select="result" />
+    <xsl:apply-templates select="result|response[@subresult='groupOwner']/result" />
     <!-- layer for the img tooltips, is initially not visable -->
     <div id="toolTipLayer" style="position:absolute; visibility: hidden;left:0;right:0"></div>
     <script>
@@ -34,7 +34,7 @@
     </script>
   </xsl:template>
 
-  <xsl:template match="/response/result">
+  <xsl:template match="/response/result|/response/response[@subresult='groupOwner']/result">
     <xsl:variable name="ResultPages">
       <xsl:call-template name="solr.Pagination">
         <xsl:with-param name="size" select="$rows" />
@@ -156,6 +156,7 @@
             </xsl:call-template>
           </time>
         </p>
+        <xsl:apply-templates select="." mode="hitInFiles" />
       </footer>
       <section>
         <ul class="actions">

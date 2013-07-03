@@ -6,21 +6,56 @@
   <xsl:variable name="loginURL"
     select="concat( $ServletsBaseURL, 'MCRLoginServlet',$HttpSession,'?url=', encoder:encode( string( $RequestURL ) ) )" />
   <xsl:key name="derivate" match="/response/response[@subresult='derivate']/result/doc" use="str[@name='returnId']" />
-  <xsl:key name="files-by-object" match="/response/response[@subresult='unmerged']/result/doc" use="str[@name='returnId']" />
-  <xsl:key name="files-by-derivate" match="/response/response[@subresult='unmerged']/result/doc" use="str[@name='derivateID']" />
+  <xsl:key name="files-by-object"
+    match="/response/response[@subresult='unmerged']/result/doc|/response/lst[@name='grouped']/lst[@name='returnId']/arr[@name='groups']/lst/result/doc[str[@name='objectType']='data_file']"
+    use="str[@name='returnId']" />
+  <xsl:key name="files-by-derivate"
+    match="/response/response[@subresult='unmerged']/result/doc|/response/lst[@name='grouped']/lst[@name='returnId']/arr[@name='groups']/lst/result/doc[str[@name='objectType']='data_file']"
+    use="str[@name='derivateID']" />
   <xsl:variable name="params" select="/response/lst[@name='responseHeader']/lst[@name='params']" />
   <xsl:variable name="result" select="/response/result[@name='response']" />
-  <xsl:variable name="hits" select="number($result/@numFound)" />
-  <xsl:variable name="start" select="number($result/@start)" />
+  <xsl:variable name="groups" select="/response/lst[@name='grouped']/lst[@name='returnId']/arr[@name='groups']" />
+  <xsl:variable name="hits">
+    <xsl:choose>
+      <xsl:when test="$result/@numFound">
+        <xsl:value-of select="number($result/@numFound)" />
+      </xsl:when>
+      <xsl:when test="/response/lst[@name='grouped']/lst[@name='returnId']/int[@name='ngroups']">
+        <xsl:value-of select="number(/response/lst[@name='grouped']/lst[@name='returnId']/int[@name='ngroups'])" />
+      </xsl:when>
+      <xsl:when test="/response/lst[@name='grouped']/lst[@name='returnId']/int[@name='matches']">
+        <xsl:value-of select="number(/response/lst[@name='grouped']/lst[@name='returnId']/int[@name='matches'])" />
+      </xsl:when>
+      <xsl:when test="$groups">
+        <xsl:value-of select="count($groups/lst)" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="0" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+  <xsl:variable name="start">
+    <xsl:choose>
+      <xsl:when test="$result/@start">
+        <xsl:value-of select="number($result/@start)" />
+      </xsl:when>
+      <xsl:when test="xalan:nodeset($params)/str[@name='start']">
+        <xsl:value-of select="number(xalan:nodeset($params)/str[@name='start'])" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="0" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
   <xsl:variable name="rowTemp">
     <xsl:choose>
       <xsl:when test="xalan:nodeset($params)/str[@name='rows']">
         <xsl:value-of select="number(xalan:nodeset($params)/str[@name='rows'])" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:variable name="docCount" select="count($result/doc)" />
+        <xsl:variable name="docCount" select="count($result/doc|$groups/lst)" />
         <xsl:choose>
-          <xsl:when test="$result/@numFound &gt; $docCount">
+          <xsl:when test="not($result/@numFound) or $result/@numFound &gt; $docCount">
             <xsl:value-of select="$docCount" />
           </xsl:when>
           <xsl:otherwise>
