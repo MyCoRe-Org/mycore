@@ -23,15 +23,11 @@
 
 package org.mycore.frontend.export;
 
-import java.io.OutputStream;
-
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
-import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.frontend.basket.MCRBasket;
 import org.mycore.frontend.basket.MCRBasketManager;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -69,19 +65,19 @@ public class MCRExportServlet extends MCRServlet {
 
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {
-        String transformerID = job.getRequest().getParameter("transformer");
+        MCRExportCollection collection = createCollection(job.getRequest());
+        fillCollection(job.getRequest(), collection);
+        MCRContent content2export = collection.getContent();
+
         String filename = getProperty(job.getRequest(), "filename");
         if (filename == null) {
             filename = "export-" + System.currentTimeMillis();
         }
-        MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer(transformerID);
-        if (transformer == null) {
-            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "Transformer " + transformerID + " is not configured.");
-            return;
-        }
-        MCRExportCollection collection = createCollection(job.getRequest());
-        fillCollection(job.getRequest(), collection);
-        sendResponse(job.getResponse(), collection.getContent(), transformer, filename + "." + transformer.getFileExtension());
+        job.getResponse().setHeader("Content-Disposition", "inline;filename=\"" + filename + "\"");
+
+        String transformerID = job.getRequest().getParameter("transformer");
+        job.getRequest().setAttribute("XSL.Transformer", transformerID);
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), content2export);
     }
 
     /**
@@ -126,18 +122,5 @@ public class MCRExportServlet extends MCRServlet {
         if (!((root == null) || root.isEmpty()))
             collection.setRootElement(root, ns);
         return collection;
-    }
-
-    /**
-     * Sends the resulting, transformed MCRContent to the client
-     * @throws Exception 
-     */
-    private void sendResponse(HttpServletResponse res, MCRContent content, MCRContentTransformer transformer, String filename) throws Exception {
-        res.setHeader("Content-Disposition", "inline;filename=\"" + filename + "\"");
-        res.setContentType(transformer.getMimeType());
-        OutputStream out = res.getOutputStream();
-        transformer.transform(content, out);
-        out.flush();
-        out.close();
     }
 }
