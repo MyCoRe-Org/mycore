@@ -100,16 +100,16 @@
   <xsl:template mode="query" match="str">
     <xsl:value-of select="concat(' OR ',.)" />
   </xsl:template>
-
+  
   <xsl:template match="str" mode="queryParms">
     <xsl:choose>
-      <xsl:when test="starts-with(@name, 'group') or @name='rows' or @name='start' or @name='q' or @name='version'">
+      <xsl:when test="@name='fq' or @name='fl' or @name='sort' or starts-with(@name, 'hl') or starts-with(@name, 'facet')">
+        <xsl:value-of select="concat('&amp;',@name,'=',encoder:encode(.))" />
+      </xsl:when>
+      <xsl:otherwise>
 <!--         <xsl:message> -->
 <!--           <xsl:value-of select="concat('ignoring ',@name)" /> -->
 <!--         </xsl:message> -->
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="concat('&amp;',@name,'=',encoder:encode(.))" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
