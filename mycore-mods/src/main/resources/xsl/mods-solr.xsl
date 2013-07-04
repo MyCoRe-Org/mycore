@@ -21,7 +21,7 @@
       <field name="parentLinkText">
         <xsl:apply-templates select="$parent" mode="resulttitle"/>
       </field>
-    </xsl:for-each>
+    </xsl:for-each>    
     <xsl:if test="$hasImports">
       <xsl:apply-imports />
     </xsl:if>
@@ -73,7 +73,7 @@
       </field>
     </xsl:for-each>
     <xsl:for-each select="mods:identifier">
-      <field name="mods.identifier">
+      <field name="mods.identifer">
         <xsl:value-of select="text()" />
       </field>
     </xsl:for-each>
