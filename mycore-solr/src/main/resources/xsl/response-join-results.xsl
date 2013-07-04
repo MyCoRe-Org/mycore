@@ -53,21 +53,23 @@
       <xsl:choose>
         <xsl:when test="lst[@name='grouped']/lst[@name='returnId']">
           <xsl:variable name="groupBase" select="lst[@name='grouped']/lst[@name='returnId']/arr[@name='groups']" />
-          <xsl:variable name="orChain">
-            <xsl:apply-templates mode="query" select="$groupBase/lst/str[@name='groupValue']" />
-          </xsl:variable>
-          <xsl:variable name="query">
-            <xsl:value-of select="'+id:('" />
-            <xsl:value-of select="substring-after($orChain, 'OR ')" />
-            <xsl:value-of select="')'" />
-          </xsl:variable>
-          <xsl:variable name="queryStr">
-            <xsl:value-of select="concat('q=',encoder:encode($query))" />
-            <xsl:apply-templates select="lst[@name='responseHeader']/lst[@name='params']/str" mode="queryParms" />
-          </xsl:variable>
-          <xsl:apply-templates select="document(concat('solr:', $queryStr))/response" mode="join">
-            <xsl:with-param name="resultName" select="'groupOwner'" />
-          </xsl:apply-templates>
+          <xsl:if test="$groupBase/lst">
+            <xsl:variable name="orChain">
+              <xsl:apply-templates mode="query" select="$groupBase/lst/str[@name='groupValue']" />
+            </xsl:variable>
+            <xsl:variable name="query">
+              <xsl:value-of select="'+id:('" />
+              <xsl:value-of select="substring-after($orChain, 'OR ')" />
+              <xsl:value-of select="')'" />
+            </xsl:variable>
+            <xsl:variable name="queryStr">
+              <xsl:value-of select="concat('q=',encoder:encode($query))" />
+              <xsl:apply-templates select="lst[@name='responseHeader']/lst[@name='params']/str" mode="queryParms" />
+            </xsl:variable>
+            <xsl:apply-templates select="document(concat('solr:', $queryStr))/response" mode="join">
+              <xsl:with-param name="resultName" select="'groupOwner'" />
+            </xsl:apply-templates>
+          </xsl:if>
         </xsl:when>
         <xsl:when test="$fq and result/doc and not(result/doc[101]) ">
           <xsl:variable name="orChain">

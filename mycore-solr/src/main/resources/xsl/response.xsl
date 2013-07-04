@@ -26,7 +26,7 @@
   </xsl:variable>
 
   <xsl:template match="/response">
-    <xsl:apply-templates select="result|response[@subresult='groupOwner']/result" />
+    <xsl:apply-templates select="result|response[@subresult='groupOwner']/result|lst[@name='grouped']/lst[@name='returnId' and int[@name='matches']='0']" />
     <!-- layer for the img tooltips, is initially not visable -->
     <div id="toolTipLayer" style="position:absolute; visibility: hidden;left:0;right:0"></div>
     <script>
@@ -34,24 +34,26 @@
     </script>
   </xsl:template>
 
-  <xsl:template match="/response/result|/response/response[@subresult='groupOwner']/result">
+  <xsl:template match="/response/result|/response/response[@subresult='groupOwner']/result|lst[@name='grouped']/lst[@name='returnId' and int[@name='matches']='0']">
     <xsl:variable name="ResultPages">
-      <xsl:call-template name="solr.Pagination">
-        <xsl:with-param name="size" select="$rows" />
-        <xsl:with-param name="currentpage" select="$currentPage" />
-        <xsl:with-param name="totalpage" select="$totalPages" />
-      </xsl:call-template>
+      <xsl:if test="$hits &gt; 0">
+        <xsl:call-template name="solr.Pagination">
+          <xsl:with-param name="size" select="$rows" />
+          <xsl:with-param name="currentpage" select="$currentPage" />
+          <xsl:with-param name="totalpage" select="$totalPages" />
+        </xsl:call-template>
+      </xsl:if>
     </xsl:variable>
     <h3>
       <xsl:choose>
-        <xsl:when test="@numFound=0">
+        <xsl:when test="$hits=0">
           <xsl:value-of select="i18n:translate('results.noObject')" />
         </xsl:when>
-        <xsl:when test="@numFound=1">
+        <xsl:when test="$hits=1">
           <xsl:value-of select="i18n:translate('results.oneObject')" />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="i18n:translate('results.nObjects',@numFound)" />
+          <xsl:value-of select="i18n:translate('results.nObjects',$hits)" />
         </xsl:otherwise>
       </xsl:choose>
     </h3>
