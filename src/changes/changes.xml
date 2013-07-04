@@ -7,7 +7,10 @@
   <body>
     <release version="2013.06.0.1" date="TBA" description="2013.06.0 maintenance release 1">
       <action dev="mcrkrebs" type="fix">
-      	fixed typo in solr field for identifier (merged revision 27261 from trunk)
+        fixed typo in solr field for identifier (merged revision 27261 from trunk)
+      </action>
+      <action dev="mcrfluet" type="fix">
+        Fix for bug #639 Editor Framework changes HTML button element in static webpages (merged revision 27294 from trunk)
       </action>
     </release>
     <release version="2013.06.0" date="2013-06-20" description="2013 LTS" />
