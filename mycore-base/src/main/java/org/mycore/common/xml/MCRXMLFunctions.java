@@ -91,8 +91,11 @@ import org.xml.sax.SAXException;
  * @author shermann
  */
 public class MCRXMLFunctions {
-
-    private static final MCRXMLMetadataManager MCRXML_METADATA_MANAGER = MCRXMLMetadataManager.instance();
+    
+    //use holder to not initialize MCRXMLMetadataManager to early (simplifies junit testing)
+    private static class MCRXMLMetaDataManagerHolder {
+        public static final MCRXMLMetadataManager instance = MCRXMLMetadataManager.instance();
+    }
 
     static MCRConfiguration CONFIG = MCRConfiguration.instance();
 
@@ -479,7 +482,7 @@ public class MCRXMLFunctions {
 
     public static boolean isDisplayedEnabledDerivate(String derivateId) {
         MCRObjectID derId = MCRObjectID.getInstance(derivateId);
-        ModifiedHandle modifiedHandle = MCRXML_METADATA_MANAGER.getLastModifiedHandle(derId, 30, TimeUnit.SECONDS);
+        ModifiedHandle modifiedHandle = MCRXMLMetaDataManagerHolder.instance.getLastModifiedHandle(derId, 30, TimeUnit.SECONDS);
         Boolean result;
         try {
             result = DISPLAY_DERIVATE_CACHE.getIfUpToDate(derivateId, modifiedHandle);
@@ -492,7 +495,7 @@ public class MCRXMLFunctions {
         }
         MCRDerivate der;
         try {
-            org.jdom2.Document derDoc = MCRXML_METADATA_MANAGER.retrieveXML(derId);
+            org.jdom2.Document derDoc = MCRXMLMetaDataManagerHolder.instance.retrieveXML(derId);
             if (derDoc == null) {
                 LOGGER.error("Derivate \"" + derId + "\" does not exist");
                 return false;

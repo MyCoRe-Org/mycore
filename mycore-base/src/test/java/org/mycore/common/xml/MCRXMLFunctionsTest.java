@@ -8,23 +8,8 @@ import java.text.ParseException;
 
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
-import org.mycore.datamodel.common.MCRXMLMetadataManagerTest;
 
 public class MCRXMLFunctionsTest extends MCRTestCase {
-
-    MCRXMLMetadataManagerTest crutch;
-
-    @Override
-    public void setUp() throws Exception {
-        crutch = new MCRXMLMetadataManagerTest();
-        crutch.setUp();
-    }
-
-    @Override
-    public void tearDown() throws Exception {
-        crutch.tearDown();
-        crutch = null;
-    }
 
     /*
      * Test method for 'org.mycore.common.xml.MCRXMLFunctions.formatISODate(String, String, String, String)'
@@ -50,13 +35,11 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
         String source = "http://www.mycore.de/Space Character.test";
         String result = "http://www.mycore.de/Space%20Character.test";
         assertEquals("Result URL is not correct", result, MCRXMLFunctions.normalizeAbsoluteURL(source));
-        assertEquals("URL differs,  but was already RFC 2396 conform.", result,
-            MCRXMLFunctions.normalizeAbsoluteURL(result));
+        assertEquals("URL differs,  but was already RFC 2396 conform.", result, MCRXMLFunctions.normalizeAbsoluteURL(result));
         source = "http://www.mycore.de/Hühnerstall.pdf";
         result = "http://www.mycore.de/H%C3%BChnerstall.pdf";
         assertEquals("Result URL is not correct", result, MCRXMLFunctions.normalizeAbsoluteURL(source));
-        assertEquals("URL differs,  but was already RFC 2396 conform.", result,
-            MCRXMLFunctions.normalizeAbsoluteURL(result));
+        assertEquals("URL differs,  but was already RFC 2396 conform.", result, MCRXMLFunctions.normalizeAbsoluteURL(result));
     }
 
     @Test
