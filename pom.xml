@@ -1216,5 +1216,6 @@
     <module>mycore-xeditor</module>
     <module>mycore-complete</module>
     <module>iview2-addons</module>
+    <module>mycore-acl-editor2</module>
   </modules>
 </project>
