@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+<MyCoReWebPage>
+  <section xml:lang="all" title="ACL Editor">
+    <div id="jportal_acl_editor_module">
+      	<link href="/rsc/ACLE/gui/css/webpage.css" rel="stylesheet" type="text/css" />
+      	<link href="/rsc/ACLE/gui/select2/select2.css" rel="stylesheet" type="text/css" />      
+      	<div id="header" class="jp-layout-maintitle jp-layout-border">
+        	<span>          		
+          		<text i18n="ACLE.labels.header"/>
+        	</span>
+        	<ul class="nav nav-tabs" id="tab-nav">
+        		<li class="active">
+					<a class="tab-active tab" href="#ruleAllocation" data-toggle=""><text i18n="ACLE.labels.tab.access"/></a>
+				</li>
+				<li><a class="tab" href="#rules" data-toggle=""><text i18n="ACLE.labels.tab.rule"/></a></li>
+			</ul>
+			<div id="alert-area" class="alert fade">...</div>
+      	</div>
+      	
+      	<div id="loading" ><i class="icon-spinner icon-spin icon-4x offset5"></i></div>
+      	
+      	<div class="tab-content">
+	      	<div class="tab-pane active" id="ruleAllocation" style="display:none">
+	      		<div id="access-filter" class="row">
+	      			<input id="access-filter-input-id" type="text" placeholder="filtern nach Objekt ID" class="input-xlarge access-filter-input"></input>
+	      			<input id="access-filter-input-pool" type="text" placeholder="filtern nach Zugrifssrecht" class="input-xlarge access-filter-input"></input>
+	      			<input id="access-filter-input-rule" type="text" placeholder="filtern nach Regel" class="input-xlarge access-filter-input"></input>
+	      			<i id="button-access-filter" class="icon-search icon-large icon"></i>
+	      		</div>
+		      	<table id="access-table" class="table table-hover table-condensed" cellspacing="0">
+		      		<thead>
+				   		<tr id="table-head">
+				   			<th></th>
+				   			<th class="sort-table-head" data-sort="string-ins" data-resort="true"><text i18n="ACLE.labels.access.table.id"/><i class="icon-large icon sort-icon"></i></th>
+				   			<th class="sort-table-head" data-sort="string-ins" data-resort="true"><text i18n="ACLE.labels.access.table.pool"/><i class="icon-large icon sort-icon"></i></th>
+				   			<th class="sort-table-head" data-sort="string-ins" data-resort="true"><text i18n="ACLE.labels.access.table.rule"/><i class="icon-large icon sort-icon"></i></th>
+				   			<th></th>
+				   		</tr>
+			   		
+				   		<tr id="table-new-access">
+				   			<th></th>
+				   			<th><input id="new-access-id" type="text" class="input-xlarge"></input></th>
+				   			<th><input id="new-access-pool" type="text" class="input-xlarge"></input></th>
+				   			<th><select id="new-access-rule" type="text" class="input-xlarge"></select></th>
+				   			<th>
+				    			<i id="button-new-access" class="icon-ok icon-save icon-large icon"></i>
+				   			</th>
+				   		</tr>
+				   	</thead>
+			   		<tbody>
+			   		</tbody>
+		     	</table>
+		     	<div id="bottom-buttons" class="">
+					<input type='checkbox' id="button-select-multi-access" class="icon-check-empty icon-large icon"/>
+		     		<i id="button-remove-multi-access" class="btn btn-primary"><text i18n="ACLE.buttons.access.delete"/></i>
+		     		<div class="pagination pagination-right">
+					    <ul>
+					    </ul>
+					</div>
+					<div id="elem-per-page">
+						<text i18n="ACLE.labels.access.elemPerPage"/>
+						<input class="input-mini" id="elem-per-page-input" type="text" value="10"></input>
+					</div>
+		      	</div>
+		     	
+				<div class="modal hide fade" id="lightbox-new-rule" tabindex="-1" role="dialog" aria-labelledby="lightbox-label" aria-hidden="true">
+				 	<div class="modal-header">
+						<i type="button" class="close new-rule-cancel" data-dismiss="modal" aria-hidden="true">x</i>
+						<h3 id="lightbox-label"><text i18n="ACLE.labels.access.newRule"/></h3>
+					</div>
+					<div class="modal-body">
+						<div id="lightbox-alert-area" class="alert fade alert-error"><text i18n="ACLE.alert.rule.noRule"/></div>
+						<dl id="rule-detail-table" class="dl-horizontal">
+							<dt><text i18n="ACLE.labels.rule.desc"/></dt>
+							<dd><input id="new-rule-desc" type="text" class="input-xlarge" tabindex="1"></input></dd>
+							<dt><text i18n="ACLE.labels.rule.text"/></dt>
+							<dd><textarea class="new-rule-text input-xlarge" tabindex="2"></textarea></dd>
+						</dl>
+					</div>						
+					<div class="modal-footer">
+						<i class="btn new-rule-cancel" data-dismiss="modal" aria-hidden="true"><text i18n="ACLE.buttons.access.cancel"/></i>
+						<i id="new-rule-add" class="btn btn-primary" ><text i18n="ACLE.buttons.access.newRule"/></i>
+					</div>
+				</div>
+			</div>
+			
+			<div class="tab-pane" id="rules">
+				<ul id="rule-list" class="unstyled">
+				</ul>
+				<dl id="rule-detail-table" class="dl-horizontal">
+					<dt><text i18n="ACLE.labels.rule.id"/></dt>
+					<dd id="rule-detail-ruleID" class=""></dd>
+					<dt><text i18n="ACLE.labels.rule.desc"/></dt>
+					<dd><input id="rule-detail-ruleDesc" type="text" class="input-xlarge" tabindex="1"></input></dd>
+					<dt><text i18n="ACLE.labels.rule.text"/></dt>
+					<dd><textarea class="rule-detail-ruleText input-xlarge" rows="6" tabindex="2"></textarea></dd>
+					<dt></dt>
+					<dd>
+						<i id="button-save-rule" class="icon-ok icon-save icon-large icon"></i>
+		    			<i id="button-delete-rule" class="icon-trash icon-large icon"></i>
+					</dd>
+				</dl>
+			</div>
+		</div>
+      	<script type="text/javascript" src="/rsc/ACLE/gui/js/jp-acl-editor.js" />
+      	<script type="text/javascript" src="/rsc/ACLE/gui/js/jp-acl-editor-ruleSelector.js" />
+      	<script type="text/javascript" src="/rsc/ACLE/gui/js/jp-acl-editor-accessTable.js" />
+      	<script type="text/javascript" src="/rsc/ACLE/gui/js/jp-acl-editor-ruleList.js" />
+    	<script type="text/javascript" src="/rsc/ACLE/gui/select2/select2.js" />
+    	<script type="text/javascript" src="/rsc/ACLE/gui/js/stupidtable.js" />
+    </div>
+  </section>
+</MyCoReWebPage>

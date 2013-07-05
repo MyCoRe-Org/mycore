@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+<MyCoReWebPage>
+  <section xml:lang="all" title="ACL Editor">
+    <div id="jportal_acl_editor_module">
+    	<link href="/rsc/ACLE/gui/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"/>
+      	<link href="/rsc/ACLE/gui/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+      	<link href="/rsc/ACLE/gui/css/webpage.css" rel="stylesheet" type="text/css" />
+      	<link href="/rsc/ACLE/gui/select2/select2.css" rel="stylesheet" type="text/css" />      
+      	<div id="header" class="jp-layout-maintitle jp-layout-border">
+        	<span>
+          		<text i18n="ACLE.labels.header"/>
+        	</span>
+			<div id="alert-area" class="alert fade">...</div>
+      	</div>
+      	<div id="access-input" class="row">
+      		<input id="access-input-id" type="text" placeholder="Objekt ID" class="input-xlarge access-filter-input"></input>
+      		<input id="access-input-pool" type="text" placeholder="Zugrifssrecht" class="input-xlarge access-filter-input"></input>
+      		<select id="access-input-rule" size="1" class="access-input input-xlarge" style="display:none"></select>
+ 		</div>
+      	<div id="loading" style="display:none"><i class="icon-spinner icon-spin icon-4x offset5"></i></div>
+		<script src="/rsc/ACLE/gui/bootstrap/js/bootstrap.min.js"></script>
+      	<script type="text/javascript" src="/rsc/ACLE/gui/js/jp-acl-editor-objectid.js" />
+    	<script type="text/javascript" src="/rsc/ACLE/gui/select2/select2.js" />
+    </div>
+  </section>
+</MyCoReWebPage>
