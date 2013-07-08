@@ -216,7 +216,11 @@ public class MCRIView2Tools {
             BufferedImage sampleTile = readTile(iviewImage, reader, zoomLevel, maxX - 1, 0);
             int xDim = ((maxX - 1) * MCRImage.getTileSize() + sampleTile.getWidth());
             int yDim = ((maxY - 1) * MCRImage.getTileSize() + readTile(iviewImage, reader, zoomLevel, 0, maxY - 1).getHeight());
-            BufferedImage resultImage = new BufferedImage(xDim, yDim, sampleTile.getType());
+            int imageType = sampleTile.getType();
+            if(imageType == BufferedImage.TYPE_CUSTOM) {
+                imageType = BufferedImage.TYPE_INT_RGB;
+            }
+            BufferedImage resultImage = new BufferedImage(xDim, yDim, imageType);
             graphics = resultImage.getGraphics();
             for (int x = 0; x < maxX; x++) {
                 for (int y = 0; y < maxY; y++) {
