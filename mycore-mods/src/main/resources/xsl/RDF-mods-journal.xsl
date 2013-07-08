@@ -20,7 +20,7 @@
     <mods:mods>
       <!-- process input in deterministic order as editor forms depend on it -->
       <xsl:apply-templates select="@rdf:type" />
-      <xsl:apply-templates select="dcterms:title" />
+      <xsl:apply-templates select="dc:title" />
       <xsl:apply-templates select="isbd:p1005|isbd:P1005" />
       <xsl:apply-templates select="bibo:shortTitle" />
       <xsl:if test="dc:publisher | isbd:p1016 | isbd:P1016">
@@ -35,7 +35,7 @@
       </mods:identifier>
     </mods:mods>
   </xsl:template>
-  <xsl:template match="dcterms:title">
+  <xsl:template match="dc:title">
     <mods:titleInfo altRepGroup="1" xlink:type="simple">
       <mods:title>
         <xsl:value-of select="." />
