@@ -12,6 +12,9 @@
       <action dev="mcrfluet" type="fix">
         Fix for bug #639 Editor Framework changes HTML button element in static webpages (merged revision 27294 from trunk)
       </action>
+      <action dev="mcrkrebs" type="fix">
+        updated to recent zdb format changes (merged revision 27351 from trunk)
+      </action>
     </release>
     <release version="2013.06.0" date="2013-06-20" description="2013 LTS" />
   </body>
