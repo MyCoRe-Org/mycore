@@ -35,7 +35,7 @@
       </mods:identifier>
     </mods:mods>
   </xsl:template>
-  <xsl:template match="dcterms:title">
+  <xsl:template match="dcterms:title | dc:title">
     <mods:titleInfo altRepGroup="1" xlink:type="simple">
       <mods:title>
         <xsl:value-of select="." />
