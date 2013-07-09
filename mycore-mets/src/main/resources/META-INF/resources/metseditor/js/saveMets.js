@@ -44,27 +44,22 @@ function performValidation(items, invalidItems){
     for(var i = 0; i < items.length; i++) {
         if(items[i].type == "item"){
             continue;
-        } else {
-            if(items[i].type == "category"){
-                if(items[i].children.length == 0){
-                    var msg = "Empty category " + items[i].name ;
+        } else if(items[i].type == "category" && (items[i].children == null || items[i].children.length == 0)) {
+            var msg = "Empty category " + items[i].name ;
+            var pushMe = {"item": items[i], "msg": msg};
+            log(pushMe);
+            invalidItems.push(pushMe);
+        } else if(items[i].type == "category") {
+            for(var j = 0; j < items[i].children.length; j++){
+                if(items[i].children[j].hide == true){
+                    var msg = "Structure contains a hidden page, please remove page " + items[i].children[j].name;
                     var pushMe = {"item": items[i], "msg": msg};
                     log(pushMe);
+                    
                     invalidItems.push(pushMe);
                 }
-                
-                for(var j = 0; j < items[i].children.length; j++){
-                    if(items[i].children[j].hide == true){
-                        var msg = "Structure contains a hidden page, please remove page " + items[i].children[j].name;
-                        var pushMe = {"item": items[i], "msg": msg};
-                        log(pushMe);
-                        
-                        invalidItems.push(pushMe);
-                    }
-                }
-                
-                performValidation(items[i].children, invalidItems);
             }
+            performValidation(items[i].children, invalidItems);
         }
     }
 }
