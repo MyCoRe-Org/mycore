@@ -15,6 +15,9 @@
       <action dev="mcrkrebs" type="fix">
         updated to recent zdb format changes (merged revision 27351 from trunk)
       </action>
+      <action dev="mcrkrebs" type="add">
+        added message property for poster in conference (merged revision 27360 from trunk)
+      </action>
     </release>
     <release version="2013.06.0" date="2013-06-20" description="2013 LTS" />
   </body>
