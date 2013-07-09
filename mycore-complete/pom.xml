@@ -12,6 +12,7 @@
   <description>jar packaging of MyCoRe containing mycore-base and all components</description>
   <properties>
     <include.dependencies>org.mycore*</include.dependencies>
+    <exclude.dependencies>org.mycore.*</exclude.dependencies>
   </properties>
   <profiles>
     <profile>
@@ -94,6 +95,9 @@
                 <includes>
                   <include>${include.dependencies}</include>
                 </includes>
+                <excludes>
+                  <exclude>${exclude.dependencies}</exclude>
+                </excludes>
               </artifactSet>
             </configuration>
           </execution>
