@@ -237,11 +237,11 @@ public class MCRIView2Tools {
         }
     }
 
-    private static ImageReader getTileImageReader() {
+    public static ImageReader getTileImageReader() {
         return ImageIO.getImageReadersByMIMEType("image/jpeg").next();
     }
 
-    private static BufferedImage readTile(ZipFile iviewImage, ImageReader imageReader, int zoomLevel, int x, int y)
+    public static BufferedImage readTile(ZipFile iviewImage, ImageReader imageReader, int zoomLevel, int x, int y)
         throws IOException {
         String tileName = MessageFormat.format("{0}/{1}/{2}.jpg", zoomLevel, y, x);
         ZipEntry tile = iviewImage.getEntry(tileName);

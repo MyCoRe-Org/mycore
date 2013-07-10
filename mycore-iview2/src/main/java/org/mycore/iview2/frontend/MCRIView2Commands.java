@@ -36,6 +36,7 @@ import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import javax.imageio.ImageReader;
 import javax.xml.ws.Endpoint;
 
 import org.apache.log4j.Logger;
@@ -256,11 +257,27 @@ public class MCRIView2Commands extends MCRAbstractCommands {
             return;
         }
         try {
-            BufferedImage zoomLevel = MCRIView2Tools.getZoomLevel(iviewFile, 0);
-            if (zoomLevel.getType() == BufferedImage.TYPE_CUSTOM) {
-                LOGGER.warn("Found tiles in 'CUSTOM' image type format: " + iviewFile.getAbsolutePath());
+            BufferedImage thumbnail = MCRIView2Tools.getZoomLevel(iviewFile, 0);
+            if (thumbnail.getType() == BufferedImage.TYPE_CUSTOM) {
+                LOGGER.warn("Found thumbnail in 'CUSTOM' image type format: " + iviewFile.getAbsolutePath());
                 tileImage(derivate, absoluteImagePath);
                 return;
+            }
+            int maxX = (int) Math.ceil((double) props.getWidth() / MCRImage.getTileSize());
+            int maxY = (int) Math.ceil((double) props.getHeight() / MCRImage.getTileSize());
+            LOGGER.debug(MessageFormat.format("Image size:{0}x{1}, tiles:{2}x{3}", props.getWidth(), props.getHeight(),
+                maxX, maxY));
+            ImageReader imageReader = MCRIView2Tools.getTileImageReader();
+            try {
+                BufferedImage sampleTile = MCRIView2Tools.readTile(iviewImage, imageReader, props.getZoomlevel(),
+                    maxX - 1, 0);
+                if (sampleTile.getType() == BufferedImage.TYPE_CUSTOM) {
+                    LOGGER.warn("Found tiles in 'CUSTOM' image type format: " + iviewFile.getAbsolutePath());
+                    tileImage(derivate, absoluteImagePath);
+                    return;
+                }
+            } finally {
+                imageReader.dispose();
             }
         } catch (IOException | JDOMException e) {
             LOGGER.warn("Could not read thumbnail of " + iviewFile.getAbsolutePath(), e);
