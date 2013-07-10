@@ -358,48 +358,61 @@
           </xsl:if>
           <xsl:if test="$objectHost = 'local'">
             <xsl:for-each select="./structure/derobjects/derobject">
-              <table class="derobjects">
-                <tr>
-                  <td valign="top" align="left">
-                    <xsl:variable select="@xlink:href" name="deriv" />
-                    <div class="derivateBox">
-                      <xsl:variable select="concat('mcrobject:',$deriv)" name="derivlink" />
-                      <xsl:variable select="document($derivlink)" name="derivate" />
-                      <xsl:apply-templates select="$derivate/mycorederivate/derivate/internals" />
-                      <xsl:apply-templates select="$derivate/mycorederivate/derivate/externals" />
+              <xsl:variable select="@xlink:href" name="deriv" />
+
+              <div class="derivateBox">
+                <xsl:variable select="concat('mcrobject:',$deriv)" name="derivlink" />
+                <xsl:variable select="document($derivlink)" name="derivate" />
+                <xsl:apply-templates select="$derivate/mycorederivate/derivate/internals" />
+                <div class="derivate">
+                  <xsl:apply-templates select="$derivate/mycorederivate/derivate/externals" />
+                </div>
+
+                <!-- MCR-IView ..start -->
+                <xsl:call-template name="derivateView">
+                  <xsl:with-param name="derivateID" select="$deriv" />
+                </xsl:call-template>
+                <!-- MCR - IView ..end -->
+
+                <xsl:if test="acl:checkPermission(./@xlink:href,'writedb')">
+                  <xsl:variable name="derivateWithURN" select="mcrxsl:hasURNDefined(@xlink:href)" />
+                  <div class="derivate_options">
+                    <img class="button_options" src="{$WebApplicationBaseURL}templates/master/{$template}/IMAGES/icon_arrow_circled_red_down.png"
+                         alt="" title="{i18n:translate('component.mods.metaData.options')}" />
+                    <div class="options">
+                      <ul>
+                        <li>
+                          <a href="{$ServletsBaseURL}derivate/update{$HttpSession}?objectid={../../../@ID}&amp;id={@xlink:href}{$suffix}">
+                            <xsl:value-of select="i18n:translate('component.swf.derivate.addFile')" />
+                          </a>
+                        </li>
+                        <li>
+                          <a href="{$ServletsBaseURL}derivate/update{$HttpSession}?id={@xlink:href}{$suffix}">
+                            <xsl:value-of select="i18n:translate('component.swf.derivate.editDerivate')" />
+                          </a>
+                        </li>
+                        <xsl:if test="$derivateWithURN=false() and mcrxsl:isAllowedObjectForURNAssignment($parentObjID)">
+                          <xsl:variable name="apos">
+                            <xsl:text>'</xsl:text>
+                          </xsl:variable>
+                          <li>
+                            <a href="{$ServletsBaseURL}MCRAddURNToObjectServlet{$HttpSession}?object={@xlink:href}" onclick="{concat('return confirm(',$apos, i18n:translate('component.mods.metaData.options.urn.confirm'), $apos, ');')}">
+                              <xsl:value-of select="i18n:translate('component.mods.metaData.options.urn')" />
+                            </a>
+                          </li>
+                        </xsl:if>
+                        <xsl:if test="acl:checkPermission(./@xlink:href,'deletedb') and $derivateWithURN=false()">
+                          <li>
+                            <a href="{$ServletsBaseURL}derivate/delete{$HttpSession}?id={@xlink:href}">
+                              <xsl:value-of select="i18n:translate('component.swf.derivate.delDerivate')" />
+                            </a>
+                          </li>
+                        </xsl:if>
+                      </ul>
                     </div>
-                    <!-- MCR-IView ..start -->
-                    <xsl:call-template name="derivateView">
-                      <xsl:with-param name="derivateID" select="$deriv" />
-                    </xsl:call-template>
-                    <!-- MCR - IView ..end -->
-                  </td>
-                  <xsl:if test="acl:checkPermission(./@xlink:href,'writedb')">
-                    <xsl:variable name="derivateWithURN" select="mcrxsl:hasURNDefined(@xlink:href)" />
-                    <td align="right" valign="top">
-                      <a href="{$ServletsBaseURL}derivate/update{$HttpSession}?objectid={../../../@ID}&amp;id={@xlink:href}{$suffix}">
-                        <img title="Datei hinzufügen" src="{$WebApplicationBaseURL}images/workflow_deradd.gif" />
-                      </a>
-                      <a href="{$ServletsBaseURL}derivate/update{$HttpSession}?id={@xlink:href}{$suffix}">
-                        <img title="Derivat bearbeiten" src="{$WebApplicationBaseURL}images/workflow_deredit.gif" />
-                      </a>
-                      <xsl:if test="$derivateWithURN=false() and mcrxsl:isAllowedObjectForURNAssignment($parentObjID)">
-                        <xsl:variable name="apos">
-                          <xsl:text>'</xsl:text>
-                        </xsl:variable>
-                        <a href="{$ServletsBaseURL}MCRAddURNToObjectServlet{$HttpSession}?object={@xlink:href}" onclick="{concat('return confirm(',$apos, i18n:translate('component.mods.metaData.options.urn.confirm'), $apos, ');')}">
-                          <img src="{$WebApplicationBaseURL}images/workflow_addnbn.gif" title="{i18n:translate('component.mods.metaData.options.urn')}" />
-                        </a>
-                      </xsl:if>
-                      <xsl:if test="acl:checkPermission(./@xlink:href,'deletedb')">
-                        <a href="{$ServletsBaseURL}derivate/delete{$HttpSession}?id={@xlink:href}">
-                          <img title="Derivat löschen" src="{$WebApplicationBaseURL}images/workflow_derdelete.gif" />
-                        </a>
-                      </xsl:if>
-                    </td>
-                  </xsl:if>
-                </tr>
-              </table>
+                  </div>
+                </xsl:if>
+              </div>
             </xsl:for-each>
           </xsl:if>
         </td>
@@ -462,15 +475,6 @@
                       </a>
                     </li>
                   </xsl:if>
-
-                <!-- ToDo: Fix URN/Handle Generator, xpath is not mods valid -->
-                <!-- xsl:if test="mcrxsl:isAllowedObjectForURNAssignment($id) and not(mcrxsl:hasURNDefined($id))">
-                <a
-                  href="{$ServletsBaseURL}MCRAddURNToObjectServlet{$HttpSession}?object={$id}&amp;xpath=.mycoreobject/metadata/def.modsContainer[@class='MCRMetaXML' and @heritable='false' and @notinherit='true']/modsContainer/mods:mods/mods:identifier[@type='hdl']">
-                  <img src="{$WebApplicationBaseURL}images/workflow_addnbn.gif" title="{i18n:translate('derivate.urn.addURN')}" />
-                </a>
-               </xsl:if -->
-
                 </xsl:if>
                 <xsl:if
                   test="$accessdelete and (not(mcrxsl:hasURNDefined($id)) or (mcrxsl:hasURNDefined($id) and $CurrentUser=$MCR.Users.Superuser.UserName))">
