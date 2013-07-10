@@ -18,6 +18,9 @@
       <action dev="mcrkrebs" type="add">
         added message property for poster in conference (merged revision 27360 from trunk)
       </action>
+      <action dev="mcrkrebs" type="fix">
+        bugfix: check *all* issn entries in sherpa/romeo list (merged revision 27375 from trunk)
+      </action>
     </release>
     <release version="2013.06.0" date="2013-06-20" description="2013 LTS" />
   </body>
