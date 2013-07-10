@@ -1304,14 +1304,17 @@
           </xsl:if>
           <xsl:variable name="identifier" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
           <xsl:apply-templates mode="present" select="$identifier" />
-          <xsl:if test="$identifier[@type='issn'] and document(concat('http://www.sherpa.ac.uk/romeo/api29.php?issn=', $identifier[@type='issn']))//numhits &gt; 0">
-            <tr>
-              <td class="metaname" valign="top">SHERPA/RoMEO:</td>
-              <td class="metavalue">
-                <a href="http://www.sherpa.ac.uk/romeo/search.php?issn={$identifier[@type='issn']}">RoMEO <xsl:value-of select="document(concat('http://www.sherpa.ac.uk/romeo/api29.php?issn=', $identifier[@type='issn']))//romeocolour" /> Journal</a>
-              </td>
-            </tr>
-          </xsl:if>
+          <xsl:for-each select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier[@type='issn']">
+            <xsl:if test="document(concat('http://www.sherpa.ac.uk/romeo/api29.php?issn=', .))//numhits &gt; 0">
+              <xsl:variable name="sherpa_issn" select="." />
+              <tr>
+                <td class="metaname" valign="top">SHERPA/RoMEO:</td>
+                <td class="metavalue">
+                  <a href="http://www.sherpa.ac.uk/romeo/search.php?issn={$sherpa_issn}">RoMEO <xsl:value-of select="document(concat('http://www.sherpa.ac.uk/romeo/api29.php?issn=', $sherpa_issn))//romeocolour" /> Journal</a>
+                </td>
+              </tr>
+            </xsl:if>
+          </xsl:for-each>
           <xsl:call-template name="printMetaDate.mods.permalink" />
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:extension" />
           <xsl:call-template name="printMetaDate.mods">
@@ -1343,14 +1346,17 @@
           </xsl:if>
           <xsl:variable name="identifier" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
           <xsl:apply-templates mode="present" select="$identifier" />
-          <xsl:if test="$identifier[@type='issn'] and document(concat('http://www.sherpa.ac.uk/romeo/api29.php?issn=', $identifier[@type='issn']))//numhits &gt; 0">
-            <tr>
-              <td class="metaname" valign="top">SHERPA/RoMEO:</td>
-              <td class="metavalue">
-                <a href="http://www.sherpa.ac.uk/romeo/search.php?issn={$identifier[@type='issn']}">RoMEO <xsl:value-of select="document(concat('http://www.sherpa.ac.uk/romeo/api29.php?issn=', $identifier[@type='issn']))//romeocolour" /> Journal</a>
-              </td>
-            </tr>
-          </xsl:if>
+          <xsl:for-each select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier[@type='issn']">
+            <xsl:if test="document(concat('http://www.sherpa.ac.uk/romeo/api29.php?issn=', .))//numhits &gt; 0">
+              <xsl:variable name="sherpa_issn" select="." />
+              <tr>
+                <td class="metaname" valign="top">SHERPA/RoMEO:</td>
+                <td class="metavalue">
+                  <a href="http://www.sherpa.ac.uk/romeo/search.php?issn={$sherpa_issn}">RoMEO <xsl:value-of select="document(concat('http://www.sherpa.ac.uk/romeo/api29.php?issn=', $sherpa_issn))//romeocolour" /> Journal</a>
+                </td>
+              </tr>
+            </xsl:if>
+          </xsl:for-each>
           <xsl:call-template name="printMetaDate.mods.permalink" />
           <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:extension" />
           <xsl:call-template name="printMetaDate.mods">
