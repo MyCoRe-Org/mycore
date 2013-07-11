@@ -1525,7 +1525,7 @@
       <xsl:if test="$derivateURN">
         <tr>
           <td class="metaname">
-            <xsl:value-of select="concat(i18n:translate('derivate.urn'),':')" />
+            <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.identifier.urn'),':')" />
           </td>
           <td class="metavalue">
             <a href="{concat('http://nbn-resolving.de/urn/resolver.pl?urn=',$derivateURN)}">
