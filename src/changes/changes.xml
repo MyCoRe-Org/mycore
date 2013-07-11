@@ -24,6 +24,9 @@
       <action dev="mcrkrebs" type="add">
         refactured derivate view, display URN (merged revision 27377 from trunk)
       </action>
+      <action dev="mcrsteph" type="fix">
+        forward validation parameter to XML parser in MCRBase.setFromXML() (merged revision  27383 from trunk)
+      </action>
     </release>
     <release version="2013.06.0" date="2013-06-20" description="2013 LTS" />
   </body>
