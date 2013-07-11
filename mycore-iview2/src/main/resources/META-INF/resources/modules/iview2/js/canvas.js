@@ -9,7 +9,7 @@
 
         function constructor(iviewInst) {
             iview.IViewObject.call(this, iviewInst);
-
+           
             if (iview.isCanvasAvailable) {
 
                 this.context2D = document.createElement('canvas').getContext('2d');
@@ -337,8 +337,9 @@
             }
             ctx.restore();
             
+          
             // draw the preview picture to the not loaded tiles
-            if (this.notLoadedTile.lenght != 0) {
+            if (this.notLoadedTile.length != 0) {
                 ctx.save();
                 ctx.beginPath();
                 ctx.strokeStyle = "#a00";
@@ -347,10 +348,12 @@
                     ctx.rect(current.x, current.y, current.w, current.h);
                 }
                 ctx.clip();
-                this.drawPreview();
+                this.drawPreview(); 
                 ctx.restore();
-
-            }
+            } 
+            
+            this.tilesComplete = true;
+            
         };
 
         constructor.prototype.isAreaInBean = function isAreaInBean(area) {
@@ -434,6 +437,7 @@
                     "w" : dw,
                     "h" : dh
                 });
+                this.tilesComplete = false;
             }
 
         };
@@ -459,6 +463,7 @@
             };
             this.loadingTile.push(tileImg);
             tileImg.src = tileImgId;
+            
             return tileImg;
         };
 
