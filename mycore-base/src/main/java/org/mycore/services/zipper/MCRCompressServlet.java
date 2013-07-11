@@ -144,7 +144,7 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
             try (T container = createContainer(sout, comment);) {
                 job.getResponse().setContentType(getMimeType());
                 String filename = getFileName(id, path);
-                job.getResponse().addHeader("Content-Disposition", "atachment; filename=\"" + filename + "\"");
+                job.getResponse().addHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
                 if (id.getTypeId().equals("derivate")) {
                     sendDerivate(id, path, container);
                 } else {
