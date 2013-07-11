@@ -381,11 +381,13 @@
                          alt="" title="{i18n:translate('component.mods.metaData.options')}" />
                     <div class="options">
                       <ul>
-                        <li>
-                          <a href="{$ServletsBaseURL}derivate/update{$HttpSession}?objectid={../../../@ID}&amp;id={@xlink:href}{$suffix}">
-                            <xsl:value-of select="i18n:translate('component.swf.derivate.addFile')" />
-                          </a>
-                        </li>
+                        <xsl:if test="$derivateWithURN=false()">
+                          <li>
+                            <a href="{$ServletsBaseURL}derivate/update{$HttpSession}?objectid={../../../@ID}&amp;id={@xlink:href}{$suffix}">
+                              <xsl:value-of select="i18n:translate('component.swf.derivate.addFile')" />
+                            </a>
+                          </li>
+                        </xsl:if>
                         <li>
                           <xsl:if test="not($derivateWithURN=false() and mcrxsl:isAllowedObjectForURNAssignment($parentObjID))">
                             <xsl:attribute name="class">last</xsl:attribute>
