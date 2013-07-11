@@ -835,7 +835,7 @@
               </tr>
             </xsl:if>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
-            <xsl:call-template name="displayDerivateURN">
+            <xsl:call-template name="displayModsDerivateURN">
               <xsl:with-param name="derivates" select="./structure/derobjects" />
             </xsl:call-template>
             <xsl:call-template name="printMetaDate.mods.permalink" />
@@ -1043,7 +1043,7 @@
         <div id="category_content" class="block_content">
           <table class="metaData">
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
-            <xsl:call-template name="displayDerivateURN">
+            <xsl:call-template name="displayModsDerivateURN">
               <xsl:with-param name="derivates" select="./structure/derobjects" />
             </xsl:call-template>
             <xsl:call-template name="printMetaDate.mods.permalink" />
@@ -1131,7 +1131,7 @@
               </tr>
             </xsl:if>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
-            <xsl:call-template name="displayDerivateURN">
+            <xsl:call-template name="displayModsDerivateURN">
               <xsl:with-param name="derivates" select="./structure/derobjects" />
             </xsl:call-template>
             <xsl:call-template name="printMetaDate.mods.permalink" />
@@ -1198,7 +1198,7 @@
               </xsl:call-template>
             </xsl:if>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
-            <xsl:call-template name="displayDerivateURN">
+            <xsl:call-template name="displayModsDerivateURN">
               <xsl:with-param name="derivates" select="./structure/derobjects" />
             </xsl:call-template>
             <xsl:call-template name="printMetaDate.mods.permalink" />
@@ -1279,7 +1279,7 @@
               </xsl:call-template>
             </xsl:if>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
-            <xsl:call-template name="displayDerivateURN">
+            <xsl:call-template name="displayModsDerivateURN">
               <xsl:with-param name="derivates" select="./structure/derobjects" />
             </xsl:call-template>
             <xsl:call-template name="printMetaDate.mods.permalink" />
@@ -1330,7 +1330,7 @@
               </tr>
             </xsl:if>
           </xsl:for-each>
-          <xsl:call-template name="displayDerivateURN">
+          <xsl:call-template name="displayModsDerivateURN">
             <xsl:with-param name="derivates" select="./structure/derobjects" />
           </xsl:call-template>
           <xsl:call-template name="printMetaDate.mods.permalink" />
@@ -1375,7 +1375,7 @@
               </tr>
             </xsl:if>
           </xsl:for-each>
-          <xsl:call-template name="displayDerivateURN">
+          <xsl:call-template name="displayModsDerivateURN">
             <xsl:with-param name="derivates" select="./structure/derobjects" />
           </xsl:call-template>
           <xsl:call-template name="printMetaDate.mods.permalink" />
@@ -1472,7 +1472,7 @@
               <xsl:with-param name="sep" select="'; '" />
             </xsl:call-template>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
-            <xsl:call-template name="displayDerivateURN">
+            <xsl:call-template name="displayModsDerivateURN">
               <xsl:with-param name="derivates" select="./structure/derobjects" />
             </xsl:call-template>
             <xsl:call-template name="printMetaDate.mods.permalink" />
@@ -1515,7 +1515,7 @@
   </xsl:template>
   <!-- END: view av nedia metadata -->
 
-  <xsl:template name="displayDerivateURN">
+  <xsl:template name="displayModsDerivateURN">
     <xsl:param name="derivates" />
 
     <xsl:for-each select="$derivates/derobject">
