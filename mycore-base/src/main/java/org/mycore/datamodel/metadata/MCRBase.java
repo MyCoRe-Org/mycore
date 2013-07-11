@@ -212,7 +212,7 @@ public abstract class MCRBase {
      * @throws SAXParseException 
      */
     protected final void setFromXML(byte[] xml, boolean valid) throws MCRException, SAXParseException, IOException {
-        Document jdom = MCRXMLParserFactory.getParser().parseXML(new MCRByteContent(xml));
+        Document jdom = MCRXMLParserFactory.getParser(valid).parseXML(new MCRByteContent(xml));
         setFromJDOM(jdom);
     }
 
