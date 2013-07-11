@@ -272,6 +272,10 @@
     <url-pattern>/servlets/MCRZipServlet</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
+    <servlet-name>MCRZipServlet</servlet-name>
+    <url-pattern>/servlets/MCRZipServlet/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
     <servlet-name>MCRBasketServlet</servlet-name>
     <url-pattern>/servlets/MCRBasketServlet</url-pattern>
   </servlet-mapping>
@@ -376,6 +380,10 @@
   <servlet-mapping>
     <servlet-name>MCRTarServlet</servlet-name>
     <url-pattern>/servlets/MCRTarServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRTarServlet</servlet-name>
+    <url-pattern>/servlets/MCRTarServlet/*</url-pattern>
   </servlet-mapping>
 
   <servlet id="MCRExportServlet">

@@ -77,15 +77,10 @@ public class MCRLayoutService extends MCRDeprecatedLayoutService {
     }
 
     public void doLayout(HttpServletRequest req, HttpServletResponse res, MCRContent source) throws IOException, TransformerException, SAXException {
-        MCRParameterCollector parameter = new MCRParameterCollector(req);
         String docType = source.getDocType();
-        String transformerId = parameter.getParameter("Transformer", null);
-        if (transformerId == null) {
-            String style = parameter.getParameter("Style", "default");
-            transformerId = MessageFormat.format("{0}-{1}", docType, style);
-        }
         try {
-            MCRContentTransformer transformer = MCRLayoutTransformerFactory.getTransformer(transformerId);
+            MCRParameterCollector parameter = new MCRParameterCollector(req);
+            MCRContentTransformer transformer = getContentTransformer(docType, parameter);
             String filename = getFileName(req, parameter);
             transform(res, transformer, source, parameter, filename);
         } catch (IOException | TransformerException | SAXException ex) {
@@ -103,6 +98,16 @@ public class MCRLayoutService extends MCRDeprecatedLayoutService {
         } catch (Exception e) {
             throw new MCRException(e);
         }
+    }
+
+    public static MCRContentTransformer getContentTransformer(String docType, MCRParameterCollector parameter) throws Exception {
+        String transformerId = parameter.getParameter("Transformer", null);
+        if (transformerId == null) {
+            String style = parameter.getParameter("Style", "default");
+            transformerId = MessageFormat.format("{0}-{1}", docType, style);
+        }
+        MCRContentTransformer transformer = MCRLayoutTransformerFactory.getTransformer(transformerId);
+        return transformer;
     }
 
     private String getFileName(HttpServletRequest req, MCRParameterCollector parameter) {
