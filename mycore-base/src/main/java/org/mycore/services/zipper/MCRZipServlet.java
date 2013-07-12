@@ -32,6 +32,7 @@ import javax.servlet.ServletOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.io.IOUtils;
+import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 
 /**
@@ -43,9 +44,20 @@ public class MCRZipServlet extends MCRCompressServlet<ZipArchiveOutputStream> {
     private static final long serialVersionUID = 1L;
 
     @Override
+    protected void sendCompressed(MCRDirectory dir, ZipArchiveOutputStream container) throws IOException {
+        ZipArchiveEntry entry = new ZipArchiveEntry(dir.getPath() + "/");
+        entry.setComment(dir.getLabel());
+        entry.setTime(dir.getLastModified().getTimeInMillis());
+        container.putArchiveEntry(entry);
+        container.closeArchiveEntry();
+        super.sendCompressed(dir, container);
+    }
+
+    @Override
     protected void sendCompressed(MCRFile file, ZipArchiveOutputStream container) throws IOException {
         ZipArchiveEntry entry = new ZipArchiveEntry(file.getPath());
         entry.setTime(file.getLastModified().getTimeInMillis());
+        entry.setComment(file.getLabel());
         entry.setSize(file.getSize());
         container.putArchiveEntry(entry);
         try (InputStream in = file.getContentAsInputStream()) {

@@ -9,6 +9,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 
 /**
@@ -22,6 +23,15 @@ public class MCRTarServlet extends MCRCompressServlet<TarArchiveOutputStream> {
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = Logger.getLogger(MCRTarServlet.class);
+
+    @Override
+    protected void sendCompressed(MCRDirectory dir, TarArchiveOutputStream container) throws IOException {
+        TarArchiveEntry entry = new TarArchiveEntry(dir.getPath(), TarArchiveEntry.LF_DIR);
+        entry.setModTime(dir.getLastModified().getTimeInMillis());
+        container.putArchiveEntry(entry);
+        container.closeArchiveEntry();
+        super.sendCompressed(dir, container);
+    }
 
     @Override
     protected void sendCompressed(MCRFile file, TarArchiveOutputStream container) throws IOException {
