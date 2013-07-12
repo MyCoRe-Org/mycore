@@ -326,7 +326,7 @@
 	top: 44px;
 }
 
-.viewer .well,.viewer .surface {
+.viewer .iview_well,.viewer .surface {
 	margin: 0;
 	padding: 0;
 	width: 100%;
@@ -346,11 +346,11 @@
 	/* NOTE: required for IE to"see" the surface */
 }
 
-.viewer .well {
+.viewer .iview_well {
 	overflow: hidden;
 }
 
-.viewer .well .tile {
+.viewer .iview_well .tile {
 	border: 0;
 	margin: 0;
 	padding: 0;

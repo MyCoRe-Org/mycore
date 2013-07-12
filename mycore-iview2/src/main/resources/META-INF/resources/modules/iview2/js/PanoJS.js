@@ -9,7 +9,7 @@
  * python library.
  *
  * <div class="viewer">
- *   <div class="well"><!-- --></div>
+ *   <div class="iview_well"><!-- --></div>
  *   <div class="surface"><!-- --></div>
  *   <div class="controls">
  *     <a href="#" class="zoomIn">+</a>
@@ -17,12 +17,12 @@
  *   </div>
  * </div>
  * 
- * The "well" node is where generated IMG elements are appended. It
+ * The "iview_well" node is where generated IMG elements are appended. It
  * should have the CSS rule "overflow: hidden", to occlude image tiles
  * that have scrolled out of view.
  * 
  * The "surface" node is the transparent mouse-responsive layer of the
- * image viewer, and should match the well in size.
+ * image viewer, and should match the iview_well in size.
  *
  * var viewerBean = new PanoJS(element, 'tiles', 256, 3, 1);
  *
@@ -136,7 +136,7 @@ PanoJS.REVISION_FLAG = '';
 
 // CSS definition settings
 PanoJS.SURFACE_STYLE_CLASS = 'surface';
-PanoJS.WELL_STYLE_CLASS = 'well';
+PanoJS.WELL_STYLE_CLASS = 'iview_well';
 PanoJS.CONTROLS_STYLE_CLASS = 'controls'
 PanoJS.TILE_STYLE_CLASS = 'tile';
 

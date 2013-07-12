@@ -38,7 +38,7 @@
 °	#viewer:
 		--> Main-Viewer
 		--> enthält:
-°				.well --> Anzeigebereich für Kacheln und Preload
+°				.iview_well --> Anzeigebereich für Kacheln und Preload
 
 °				.surface --> Bereich auf dem Events zum Verschieben des Anzeigebereiches abgefangen werden
 

@@ -560,7 +560,7 @@
                     that.getViewer().viewerBean.positionTiles();
                 };
                 that.preView.src = this.getViewer().context.container.find(".preload")[0].firstChild.src;
-                this.getViewer().context.container.find(".well").find(".preload")[0].style.display = "none";
+                this.getViewer().context.container.find(".iview_well").find(".preload")[0].style.display = "none";
 
                 jQuery(this.getViewer().currentImage).on(iview.CurrentImage.CHANGE_EVENT, function(){
                 	that.clearCanvas();
@@ -594,8 +594,8 @@
          * Ads the canvas to the viewer Container
          */
         constructor.prototype.appendCanvas = function cv_appendCanvas() {
-            this.getViewer().context.container.find(".well").prepend(this.context2D.canvas);//before,prepend,append
-            this.getViewer().context.container.find(".well").prepend(this.redrawPreview);
+            this.getViewer().context.container.find(".iview_well").prepend(this.context2D.canvas);//before,prepend,append
+            this.getViewer().context.container.find(".iview_well").prepend(this.redrawPreview);
         };
 
         /**

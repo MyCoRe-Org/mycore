@@ -121,5 +121,5 @@ iview.Preload.Controller.prototype = {
  * @param	{IviewInst} viewer to which the Preload shall be attached to
  */
 iview.Preload.View = function(viewer) {
-	this.me = jQuery("<div>").addClass("preload").append(jQuery("<img>")).appendTo(jQuery(viewer.viewerContainer).find(".well"));
+	this.me = jQuery("<div>").addClass("preload").append(jQuery("<img>")).appendTo(jQuery(viewer.viewerContainer).find(".iview_well"));
 };

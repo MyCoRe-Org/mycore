@@ -374,3 +374,8 @@ if (!window.requestAnimationFrame) {
 		};
 	})();
 }
+https://github.com/twitter/bootstrap/issues/6094
+
+// https://github.com/twitter/bootstrap/issues/6094
+//var btn = $.fn.button.noConflict() // reverts $.fn.button to jqueryui btn
+//$.fn.btn = btn // assigns bootstrap button functionality to $.fn.btn
