@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>mycore-parent</artifactId>
@@ -205,8 +206,12 @@
                   <packages>org.mycore.importer*</packages>
                 </group>
                 <group>
-                  <title>MyCoRe Component: Migration 2.0 -&gt; 2.1</title>
-                  <packages>org.mycore.migration20_21*</packages>
+                  <title>MyCoRe Component: Migration 2.1 -&gt; 2013.06</title>
+                  <packages>org.mycore.migration21_22*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Component: Media</title>
+                  <packages>org.mycore.media*</packages>
                 </group>
                 <group>
                   <title>MyCoRe Component: METS</title>
@@ -221,8 +226,20 @@
                   <packages>org.mycore.oai*</packages>
                 </group>
                 <group>
+                  <title>MyCoRe Component: SOLR</title>
+                  <packages>org.mycore.solr*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Component: Sword</title>
+                  <packages>org.mycore.sword*</packages>
+                </group>
+                <group>
                   <title>MyCoRe Component: Web-CLI</title>
                   <packages>org.mycore.webcli*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Component: WFC</title>
+                  <packages>org.mycore.wfc*</packages>
                 </group>
               </groups>
               <tags>
@@ -241,11 +258,12 @@
               </tags>
               <links>
                 <link>http://docs.oracle.com/javase/7/docs/api/</link>
-                <link>http://tomcat.apache.org/tomcat-5.5-doc/servletapi/</link>
+                <link>http://tomcat.apache.org/tomcat-7.0-doc/servletapi/</link>
                 <link>http://www.jdom.org/docs/apidocs/</link>
                 <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
-                <link>http://docs.jboss.org/hibernate/core/3.6/javadocs/</link>
+                <link>http://docs.jboss.org/hibernate/core/4.2/javadocs/</link>
                 <link>http://lucene.apache.org/core/3_6_2/api/all/</link>
+                <link>http://lucene.apache.org/solr/4_3_1/solr-solrj/</link>
               </links>
             </configuration>
             <reportSets>
@@ -356,6 +374,10 @@
                 <packages>org.mycore.datamodel*</packages>
               </group>
               <group>
+                <title>MyCoRe Authorization System</title>
+                <packages>org.mycore.access*</packages>
+              </group>
+              <group>
                 <title>MyCoRe Persistence Backend Implementations</title>
                 <packages>org.mycore.backend*</packages>
               </group>
@@ -375,6 +397,54 @@
                 <title>MyCoRe User and Group Management</title>
                 <packages>org.mycore.user*</packages>
               </group>
+              <group>
+                <title>MyCoRe Component: BuildTools</title>
+                <packages>org.mycore.buildtools*</packages>
+              </group>
+              <group>
+                <title>MyCoRe Component: IView 2</title>
+                <packages>org.mycore.iview2*</packages>
+              </group>
+              <group>
+                <title>MyCoRe Component: Importer</title>
+                <packages>org.mycore.importer*</packages>
+              </group>
+              <group>
+                <title>MyCoRe Component: Migration 2.1 -&gt; 2013.06</title>
+                <packages>org.mycore.migration21_22*</packages>
+              </group>
+              <group>
+                <title>MyCoRe Component: Media</title>
+                <packages>org.mycore.media*</packages>
+              </group>
+              <group>
+                <title>MyCoRe Component: METS</title>
+                <packages>org.mycore.mets*</packages>
+              </group>
+              <group>
+                <title>MyCoRe Component: MODS</title>
+                <packages>org.mycore.mods*</packages>
+              </group>
+              <group>
+                <title>MyCoRe Component: OAI</title>
+                <packages>org.mycore.oai*</packages>
+              </group>
+              <group>
+                <title>MyCoRe Component: SOLR</title>
+                <packages>org.mycore.solr*</packages>
+              </group>
+              <group>
+                <title>MyCoRe Component: Sword</title>
+                <packages>org.mycore.sword*</packages>
+              </group>
+              <group>
+                <title>MyCoRe Component: Web-CLI</title>
+                <packages>org.mycore.webcli*</packages>
+              </group>
+              <group>
+                <title>MyCoRe Component: WFC</title>
+                <packages>org.mycore.wfc*</packages>
+              </group>
             </groups>
             <tags>
               <tag>
@@ -392,11 +462,12 @@
             </tags>
             <links>
               <link>http://docs.oracle.com/javase/7/docs/api/</link>
-              <link>http://tomcat.apache.org/tomcat-5.5-doc/servletapi/</link>
+              <link>http://tomcat.apache.org/tomcat-7.0-doc/servletapi/</link>
               <link>http://www.jdom.org/docs/apidocs/</link>
               <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
-              <link>http://docs.jboss.org/hibernate/core/3.6/javadocs/</link>
+              <link>http://docs.jboss.org/hibernate/core/4.2/javadocs/</link>
               <link>http://lucene.apache.org/core/3_6_2/api/all/</link>
+              <link>http://lucene.apache.org/solr/4_3_1/solr-solrj/</link>
             </links>
           </configuration>
         </plugin>
