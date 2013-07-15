@@ -30,6 +30,9 @@
       <action dev="mcrkrebs" type="fix">
         refactured derivate and document options (merged revision 27385, 27389 and 27390 from trunk)
       </action>
+      <action dev="mcrkrebs" type="update">
+        show derivate urn in derivate section (merged revision 27411 from trunk)
+      </action>
     </release>
     <release version="2013.06.0" date="2013-06-20" description="2013 LTS" />
   </body>
