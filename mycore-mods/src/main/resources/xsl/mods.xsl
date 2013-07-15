@@ -337,6 +337,7 @@
 
     </div>
   </xsl:template>
+
   <xsl:template mode="printDerivates" match="/mycoreobject[contains(@ID,'_mods_')]" priority="1">
     <xsl:param name="staticURL" />
     <xsl:param name="layout" />
@@ -363,10 +364,16 @@
               <div class="derivateBox">
                 <xsl:variable select="concat('mcrobject:',$deriv)" name="derivlink" />
                 <xsl:variable select="document($derivlink)" name="derivate" />
+                <xsl:variable name="derivateWithURN" select="mcrxsl:hasURNDefined($deriv)" />
+
                 <xsl:apply-templates select="$derivate/mycorederivate/derivate/internals" />
-                <div class="derivate">
-                  <xsl:apply-templates select="$derivate/mycorederivate/derivate/externals" />
-                </div>
+                <xsl:if test="$derivateWithURN">
+                  <xsl:variable name="derivateURN" select="$derivate/mycorederivate/derivate/fileset/@urn" />
+                  <a href="{concat('http://nbn-resolving.de/urn/resolver.pl?urn=',$derivateURN)}">
+                    <xsl:value-of select="$derivateURN" />
+                  </a>
+                </xsl:if>
+                <xsl:apply-templates select="$derivate/mycorederivate/derivate/externals" />
 
                 <!-- MCR-IView ..start -->
                 <xsl:call-template name="derivateView">
@@ -375,7 +382,6 @@
                 <!-- MCR - IView ..end -->
 
                 <xsl:if test="acl:checkPermission(./@xlink:href,'writedb')">
-                  <xsl:variable name="derivateWithURN" select="mcrxsl:hasURNDefined(@xlink:href)" />
                   <div class="derivate_options">
                     <img class="button_options" src="{$WebApplicationBaseURL}templates/master/{$template}/IMAGES/icon_arrow_circled_red_down.png"
                          alt="" title="{i18n:translate('component.mods.metaData.options')}" />
@@ -623,6 +629,5 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
 
 </xsl:stylesheet>
