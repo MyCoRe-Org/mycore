@@ -114,7 +114,11 @@ public class MCRURL {
     public MCRURL removeParameterValue(String name, String value) {
         List<String> values = this.getParameterMap().get(name);
         if (values != null) {
-            if (values.remove(value)) {
+            boolean removed = false;
+            while (values.remove(value)) {
+                removed = true;
+            }
+            if(removed) {
                 rebuild();
             }
         }
