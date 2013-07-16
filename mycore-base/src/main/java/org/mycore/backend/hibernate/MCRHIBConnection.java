@@ -225,18 +225,18 @@ public class MCRHIBConnection implements Closeable {
             return;
         }
         LOGGER.debug("Closing hibernate sessions.");
-        Statistics stats = sessionFactory.getStatistics();
-        if (stats.isStatisticsEnabled()) {
-            try {
-                handleStatistics(stats);
-            } catch (FileNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
+//        Statistics stats = sessionFactory.getStatistics();
+//        if (stats.isStatisticsEnabled()) {
+//            try {
+//                handleStatistics(stats);
+//            } catch (FileNotFoundException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            }
+//        }
         sessionFactory.close();
         sessionFactory = null;
         SINGLETON = null;
