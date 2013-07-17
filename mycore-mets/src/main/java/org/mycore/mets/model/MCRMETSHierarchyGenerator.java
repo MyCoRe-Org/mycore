@@ -17,7 +17,6 @@ import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaDerivateLink;
 import org.mycore.datamodel.metadata.MCRMetaElement;
-import org.mycore.datamodel.metadata.MCRMetaInterface;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -30,6 +29,7 @@ import org.mycore.mets.model.sections.AmdSec;
 import org.mycore.mets.model.sections.DmdSec;
 import org.mycore.mets.model.struct.AbstractLogicalDiv;
 import org.mycore.mets.model.struct.Fptr;
+import org.mycore.mets.model.struct.LOCTYPE;
 import org.mycore.mets.model.struct.LogicalDiv;
 import org.mycore.mets.model.struct.LogicalStructMap;
 import org.mycore.mets.model.struct.LogicalSubDiv;
@@ -158,7 +158,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
                 // set fLocat
                 try {
                     final String href = new URI(null, subFile.getAbsolutePath().substring(1), null).toString();
-                    FLocat fLocat = new FLocat(FLocat.LOCTYPE_URL, href);
+                    FLocat fLocat = new FLocat(LOCTYPE.URL, href);
                     file.setFLocat(fLocat);
                 } catch(URISyntaxException uriSyntaxException) {
                     LOGGER.error("invalid href",uriSyntaxException);
@@ -201,7 +201,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         // create main div
         String id = "log_" + objId.toString();
         String amdId = this.dmdSection.getId();
-        String dmdId = this.dmdSection.getId();
+        String dmdId = this.amdSection.getId();
         LogicalDiv logicalDiv = new LogicalDiv(id, getType(this.rootObj), getLabel(this.rootObj), 1, amdId, dmdId);
         lstr.setDivContainer(logicalDiv);
         // run through all children
