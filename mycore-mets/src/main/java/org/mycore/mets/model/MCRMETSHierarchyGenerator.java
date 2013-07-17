@@ -200,8 +200,8 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         MCRObjectID objId = this.rootObj.getId();
         // create main div
         String id = "log_" + objId.toString();
-        String amdId = this.dmdSection.getId();
-        String dmdId = this.amdSection.getId();
+        String amdId = this.amdSection.getId();
+        String dmdId = this.dmdSection.getId();
         LogicalDiv logicalDiv = new LogicalDiv(id, getType(this.rootObj), getLabel(this.rootObj), 1, amdId, dmdId);
         lstr.setDivContainer(logicalDiv);
         // run through all children
