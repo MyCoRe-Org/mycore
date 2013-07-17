@@ -20,7 +20,7 @@
   <properties>
     <java.target.version>1.7</java.target.version>
     <uniqueVersion>false</uniqueVersion>
-    <hibernate.version>4.2.2.Final</hibernate.version>
+    <hibernate.version>4.2.3.Final</hibernate.version>
     <lucene.version>3.6.2</lucene.version>
     <xalan.version>2.7.1</xalan.version>
     <jersey.version>1.17.1</jersey.version>
@@ -746,7 +746,7 @@
       <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
-        <version>3.5.2</version>
+        <version>4.0.0</version>
         <optional>true</optional>
         <scope>runtime</scope>
       </dependency>
@@ -791,7 +791,7 @@
       <dependency>
         <groupId>org.apache.ws.security</groupId>
         <artifactId>wss4j</artifactId>
-        <version>1.6.10</version>
+        <version>1.6.11</version>
       </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>
@@ -817,7 +817,7 @@
       <dependency>
         <groupId>org.apache.ant</groupId>
         <artifactId>ant</artifactId>
-        <version>1.9.1</version>
+        <version>1.9.2</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
