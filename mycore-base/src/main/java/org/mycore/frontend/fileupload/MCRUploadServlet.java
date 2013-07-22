@@ -168,7 +168,8 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             LOGGER.debug("Received md5      = " + md5);
 
             // start transaction after MCRSession is initialized
-            long numBytesStored = MCRUploadHandlerManager.getHandler(uploadId).receiveFile(path, zis, length, md5);
+            MCRUploadHandler uploadHandler = MCRUploadHandlerManager.getHandler(uploadId);
+            long numBytesStored = uploadHandler.receiveFile(path, zis, length, md5);
 
             LOGGER.debug("Stored incoming file content");
 
@@ -179,6 +180,10 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
         } catch (Exception ex) {
             LOGGER.error("Exception while receiving and storing file content from applet:", ex);
         } finally {
+            if (MCRSessionMgr.hasCurrentSession()) {
+                //bug fix for: http://sourceforge.net/p/mycore/bugs/643/
+                MCRSessionMgr.releaseCurrentSession();
+            }
             try {
                 if (socket != null) {
                     socket.close();
@@ -398,7 +403,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     private void uploadZipFile(MCRUploadHandler handler, InputStream in) throws IOException, Exception {
         ZipInputStream zis = new ZipInputStream(in);
         MCRNotClosingInputStream nis = new MCRNotClosingInputStream(zis);
-        ZipEntry entry = null; 
+        ZipEntry entry = null;
         while ((entry = zis.getNextEntry()) != null) {
             String path = entry.getName();
 
