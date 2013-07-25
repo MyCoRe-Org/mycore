@@ -60,14 +60,16 @@ import org.mycore.common.MCRException;
  * @version $Revision$ $Date$
  */
 public class MCRObjectService {
-	/**
-	 * constant for create date
-	 */
-	public static final String DATE_TYPE_CREATEDATE = "createdate";
-	/**
-	 * constant for modify date
-	 */
-	public static final String DATE_TYPE_MODIFYDATE = "modifydate";
+    /**
+     * constant for create date
+     */
+    public static final String DATE_TYPE_CREATEDATE = "createdate";
+
+    /**
+     * constant for modify date
+     */
+    public static final String DATE_TYPE_MODIFYDATE = "modifydate";
+
     private final ArrayList<MCRMetaISO8601Date> dates;
 
     private final ArrayList<MCRMetaAccessRule> rules;
@@ -110,7 +112,7 @@ public class MCRObjectService {
             @SuppressWarnings("unchecked")
             List<Element> dateList = dates_element.getChildren();
 
-            for (Element dateElement:dateList) {
+            for (Element dateElement : dateList) {
                 String date_element_name = dateElement.getName();
 
                 if (!date_element_name.equals("servdate")) {
@@ -129,7 +131,7 @@ public class MCRObjectService {
         if (servacls != null) {
             @SuppressWarnings("unchecked")
             List<Element> ruleList = servacls.getChildren();
-            for (Element ruleElement:ruleList) {
+            for (Element ruleElement : ruleList) {
                 if (!ruleElement.getName().equals("servacl")) {
                     continue;
                 }
@@ -144,7 +146,7 @@ public class MCRObjectService {
         if (flagsElement != null) {
             @SuppressWarnings("unchecked")
             List<Element> flagList = flagsElement.getChildren();
-            for (Element flagElement:flagList) {
+            for (Element flagElement : flagList) {
                 if (!flagElement.getName().equals("servflag")) {
                     continue;
                 }
@@ -169,8 +171,10 @@ public class MCRObjectService {
      * null was returned.
      * 
      * @param type
-     *            the type of the date
+     *            the type of the date 
      * @return the date as GregorianCalendar
+     * 
+     * @see {@link MCRObjectService#DATE_TYPE_CREATEDATE} and {@link MCRObjectService#DATE_TYPE_MODIFYDATE} 
      */
     public final Date getDate(String type) {
         MCRMetaISO8601Date isoDate = getISO8601Date(type);
