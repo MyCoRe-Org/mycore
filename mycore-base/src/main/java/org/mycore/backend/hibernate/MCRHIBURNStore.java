@@ -77,6 +77,7 @@ public class MCRHIBURNStore implements MCRURNStore {
         MCRURN tab = new MCRURN(id, urn);
         logger.debug("Inserting " + id + "/" + urn + " into database");
         session.saveOrUpdate(tab);
+        session.flush();
     }
 
     /**
