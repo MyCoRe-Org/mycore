@@ -35,8 +35,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.HashSet;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfigurationException;
-import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRFileContentType;
 import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
 
@@ -46,7 +47,8 @@ import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
  * @author Thomas Scheffler (yagee)
  */
 public class PdfPlugin implements TextFilterPlugin {
-    private static HashSet contentTypes = null;
+    private static final Logger LOGGER = Logger.getLogger(PdfPlugin.class);
+    private static HashSet<MCRFileContentType> contentTypes = null;
 
     private static final String name = "Yagee's amazing PDF Filter";
 
@@ -67,7 +69,7 @@ public class PdfPlugin implements TextFilterPlugin {
         super();
 
         if (contentTypes == null) {
-            contentTypes = new HashSet();
+            contentTypes = new HashSet<MCRFileContentType>();
 
             if (MCRFileContentTypeFactory.isTypeAvailable("pdf")) {
                 contentTypes.add(MCRFileContentTypeFactory.getType("pdf"));
@@ -117,6 +119,7 @@ public class PdfPlugin implements TextFilterPlugin {
 
             rc = p.waitFor();
             p2t_info = infofetch.deleteCharAt(infofetch.length() - 2).toString();
+            LOGGER.debug("PdfPlugin availability check: rc="+rc+", p2t_info="+p2t_info);
         } catch (IOException e) {
             if (e.getMessage().indexOf("not found") > 0) {
                 //NOTE: It is a ugly pain to parse a error message, but at worst we throw the wrong error message
@@ -127,7 +130,7 @@ public class PdfPlugin implements TextFilterPlugin {
             throw new FilterPluginInstantiationException("Error while excuting " + testcommand, e);
         }
 
-        return rc == 99;
+        return rc == 99 || rc == 0;
     }
 
     private boolean pdftotext(File pdffile, File txtfile) {
@@ -170,7 +173,7 @@ public class PdfPlugin implements TextFilterPlugin {
      * 
      * @see org.mycore.services.plugins.TextFilterPlugin#getSupportedContentTypes()
      */
-    public HashSet getSupportedContentTypes() {
+    public HashSet<MCRFileContentType> getSupportedContentTypes() {
         return contentTypes;
     }
 
@@ -185,7 +188,7 @@ public class PdfPlugin implements TextFilterPlugin {
             File pdffile = File.createTempFile("inp", ".pdf");
             BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(pdffile));
             pdffile.deleteOnExit();
-            MCRUtils.copyStream(input, out);
+            IOUtils.copy(input, out);
             out.close();
 
             File txtfile = File.createTempFile("out", ".txt");
