@@ -142,8 +142,7 @@ public class MCRXMLMetadataManager {
         baseDir = new File(base);
         checkDir(baseDir, "base");
 
-        defaultClass = config.getString("MCR.Metadata.Store.DefaultClass",
-            "org.mycore.datamodel.ifs2.MCRVersioningMetadataStore");
+        defaultClass = config.getString("MCR.Metadata.Store.DefaultClass", "org.mycore.datamodel.ifs2.MCRVersioningMetadataStore");
         Class<?> impl;
         try {
             impl = Class.forName(defaultClass);
@@ -247,7 +246,7 @@ public class MCRXMLMetadataManager {
                         setupStore(project, type, prefix);
                     } catch (Exception e) {
                         throw new MCRPersistenceException(MessageFormat.format(
-                            "Could not instantiate store for project {0} and object type {1}.", project, type), e);
+                                "Could not instantiate store for project {0} and object type {1}.", project, type), e);
                     }
                 }
             }
@@ -255,15 +254,14 @@ public class MCRXMLMetadataManager {
 
         MCRMetadataStore store = MCRStoreManager.getStore(projectType, MCRMetadataStore.class);
         if (store == null) {
-            throw new MCRPersistenceException(MessageFormat.format(
-                "Metadata store for project {0} and object type {1} is unconfigured.", project, type));
+            throw new MCRPersistenceException(MessageFormat.format("Metadata store for project {0} and object type {1} is unconfigured.",
+                    project, type));
         }
         return store;
     }
 
     @SuppressWarnings("unchecked")
-    private void setupStore(String project, String objectType, String configPrefix) throws InstantiationException,
-        IllegalAccessException {
+    private void setupStore(String project, String objectType, String configPrefix) throws InstantiationException, IllegalAccessException {
         MCRConfiguration config = MCRConfiguration.instance();
         String baseID = project + "_" + objectType;
         String clazz = config.getString(configPrefix + "Class", null);
@@ -511,10 +509,11 @@ public class MCRXMLMetadataManager {
      * 
      * @param mcrid the MCRObjectID 
      * @throws IOException 
+     * @returns null if metadata is not present 
      */
     public byte[] retrieveBLOB(MCRObjectID mcrid) throws IOException {
         MCRContent metadata = retrieveContent(mcrid);
-        return metadata.asByteArray();
+        return metadata == null ? null : metadata.asByteArray();
     }
 
     public MCRContent retrieveContent(MCRObjectID mcrid) throws IOException {
