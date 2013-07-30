@@ -138,7 +138,8 @@ public class MCRNodeBuilderTest {
 
     @Test
     public void testPredicatesWithValues() throws ParseException, JDOMException {
-        Element built = (Element) (MCRNodeBuilder.build("contributor[role/roleTerm[@type='code'][@authority='ude']='author']", null, null, null));
+        Element built = (Element) (MCRNodeBuilder.build("contributor[role/roleTerm[@type='code'][@authority='ude']='author']", null, null,
+                null));
         assertNotNull(built);
         assertEquals("contributor", built.getName());
         assertNotNull(built.getChild("role"));
@@ -231,5 +232,20 @@ public class MCRNodeBuilderTest {
         assertEquals(MCRConstants.MODS_NAMESPACE, role.getNamespace());
         assertEquals("creator", role.getAttributeValue("type"));
         assertEquals("id", role.getParentElement().getAttribute("href", MCRConstants.XLINK_NAMESPACE).getValue());
+    }
+
+    @Test
+    public void testAssigningValueToLastGenreatedNode() throws ParseException, JDOMException {
+        String value = "value";
+        Element generated = (Element) (MCRNodeBuilder.build("titleInfo/title", value, null, null));
+        assertEquals(value, generated.getText());
+        assertNotEquals(value, generated.getParentElement().getText());
+    }
+
+    @Test
+    public void testBuildingNodeName() throws ParseException, JDOMException {
+        Element generated = (Element) (MCRNodeBuilder.build("mycoreobject/metadata/def.modsContainer/modsContainer", null, null, null));
+        assertEquals("modsContainer", generated.getName());
+        assertEquals("def.modsContainer", generated.getParentElement().getName());
     }
 }

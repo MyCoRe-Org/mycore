@@ -107,13 +107,16 @@ public class MCRNodeBuilder {
     private static Object build(List<MCRLocationStep> locationSteps, String value, Map<String, Object> variables, Parent parent)
             throws ParseException, JDOMException {
         Object node = null;
-        for (MCRLocationStep step : locationSteps) {
+
+        for (int i = 0; i < locationSteps.size(); i++) {
+            MCRLocationStep step = locationSteps.get(i);
             if (!canBeBuilt(step)) {
                 LOGGER.debug("location step can not be built, breaking build: " + step);
                 break;
             }
 
-            node = build(step, value, variables, parent);
+            String valueToSet = i == locationSteps.size() - 1 ? value : null;
+            node = build(step, valueToSet, variables, parent);
             if (node instanceof Element)
                 parent = (Element) node;
         }
@@ -125,7 +128,7 @@ public class MCRNodeBuilder {
 
         if (name.matches("[0-9]+"))
             return false;
-        if (name.contains("(") || name.contains("*") || name.contains(".") || name.contains("|") || name.contains(":"))
+        if (name.contains("(") || name.contains("*") || name.startsWith(".") || name.contains("|") || name.contains(":"))
             return false;
 
         return true;
