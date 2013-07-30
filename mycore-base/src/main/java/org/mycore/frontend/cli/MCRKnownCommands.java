@@ -19,6 +19,8 @@ package org.mycore.frontend.cli;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -62,24 +64,25 @@ public class MCRKnownCommands {
     protected void initBuiltInCommands() {
         ArrayList<MCRCommand> commands = new ArrayList<MCRCommand>();
         commands.add(new MCRCommand("process {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.readCommandsFile String",
-            "Execute the commands listed in the text file {0}."));
+                "Execute the commands listed in the text file {0}."));
         commands.add(new MCRCommand("help {0}", "org.mycore.frontend.cli.MCRKnownCommands.showCommandsHelp String",
-            "Show the help text for the commands beginning with {0}."));
+                "Show the help text for the commands beginning with {0}."));
         commands.add(new MCRCommand("help", "org.mycore.frontend.cli.MCRKnownCommands.listKnownCommands", "List all possible commands."));
         commands.add(new MCRCommand("exit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit", "Stop and exit the commandline tool."));
         commands.add(new MCRCommand("quit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit", "Stop and exit the commandline tool."));
         commands.add(new MCRCommand("! {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.executeShellCommand String",
-            "Execute the shell command {0}, for example '! ls' or '! cmd /c dir'"));
-        commands.add(new MCRCommand("show file {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.show String", "Show contents of local file {0}"));
+                "Execute the shell command {0}, for example '! ls' or '! cmd /c dir'"));
+        commands.add(new MCRCommand("show file {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.show String",
+                "Show contents of local file {0}"));
         commands.add(new MCRCommand("whoami", "org.mycore.frontend.cli.MCRCommandLineInterface.whoami", "Print the current user."));
         commands.add(new MCRCommand("show command statistics", "org.mycore.frontend.cli.MCRCommandStatistics.showCommandStatistics",
-            "Show statistics on number of commands processed and execution time needed per command"));
+                "Show statistics on number of commands processed and execution time needed per command"));
         commands.add(new MCRCommand("cancel on error", "org.mycore.frontend.cli.MCRCommandLineInterface.cancelOnError",
-            "Cancel execution of further commands in case of error"));
+                "Cancel execution of further commands in case of error"));
         commands.add(new MCRCommand("skip on error", "org.mycore.frontend.cli.MCRCommandLineInterface.skipOnError",
-            "Skip execution of failed command in case of error"));
+                "Skip execution of failed command in case of error"));
         commands.add(new MCRCommand("get uri {0} to file {1}", "org.mycore.frontend.cli.MCRCommandLineInterface.getURI String String",
-            "Get XML content from URI {0} and save it to a local file {1}"));
+                "Get XML content from URI {0} and save it to a local file {1}"));
         knownCommands.put("Basic commands", commands);
     }
 
@@ -126,8 +129,22 @@ public class MCRKnownCommands {
                     groupName = cliClass.getSimpleName();
                 }
                 Method[] methods = cliClass.getMethods();
+                final Class<org.mycore.frontend.cli.annotation.MCRCommand> mcrCommandAnnotation = org.mycore.frontend.cli.annotation.MCRCommand.class;
+                Arrays.sort(methods, new Comparator<Method>() {
+                    @Override
+                    public int compare(Method m1, Method m2) {
+                        int im1 = -1, im2 = -1;
+                        if (m1.isAnnotationPresent(mcrCommandAnnotation)) {
+                            im1 = m1.getAnnotation(mcrCommandAnnotation).order();
+                        }
+                        if (m2.isAnnotationPresent(mcrCommandAnnotation)) {
+                            im2 = m2.getAnnotation(mcrCommandAnnotation).order();
+                        }
+                        return im2 - im1;
+                    }
+                });
                 for (Method method : methods) {
-                    if (method.isAnnotationPresent(org.mycore.frontend.cli.annotation.MCRCommand.class)) {
+                    if (method.isAnnotationPresent(mcrCommandAnnotation)) {
                         commands.add(new MCRCommand(method));
                     }
                 }
