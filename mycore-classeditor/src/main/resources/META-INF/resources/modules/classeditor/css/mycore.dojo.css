@@ -38,18 +38,19 @@ div, span {
 	vertical-align: top;
 }
 
-.mycoreRepeater .i18nRow .language {
+.mycoreRepeater .i18nRow .lang {
 	width: 15%;
 }
 
-.mycoreRepeater .i18nRow .label {
+.mycoreRepeater .i18nRow .text {
 	width: 40%;
-	padding-top: 2px;
+	min-width: 150px;
 }
 
 .mycoreRepeater .i18nRow .description {
 	padding: 0px;
 	width: 45%;
+	min-width: 150px;
 }
 
 /***********************************************************

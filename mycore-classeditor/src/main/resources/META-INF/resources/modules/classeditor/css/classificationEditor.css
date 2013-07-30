@@ -11,7 +11,14 @@
 	width: 100%;
 	height: 100%;
 }
-
+.claro .classeditor .dijitDialogCloseIcon {
+	height: 22px;
+	background-position: left;
+}
+.claro .classeditor .dijitDialogCloseIconHover {
+	height: 22px;
+	background-position: -21px center;
+}
 /****************************************
 * general settings
 ****************************************/
@@ -72,8 +79,8 @@
 
 .classeditor .categoryEditorMainTable .dijitTextArea {
 	/*it's odd, the textarea does not inherit from .classeditor*/
-	font-family: Helvetica,sans-serif;
-	font-size: 12px;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 .classeditor .categoryEditorMainTable .dijitSelect {
@@ -120,9 +127,10 @@
 	width: 450px;
 }
 .classeditor.settingsDialog .dijitDialogTitle {
-	padding: 0 1px 0 20px;
-	background-image: url(../img/settings_16.png);
-	background-repeat: no-repeat;
+    background-image: url("../img/settings_16.png");
+    background-position: left center;
+    background-repeat: no-repeat;
+    padding: 0 0 0 22px;
 }
 .classeditor.settingsDialog h1 {
 	font-size: 14px;
@@ -139,9 +147,10 @@
 }
 
 .classeditor.exportDialog .dijitDialogTitle {
-	padding: 0 1px 0 20px;
+    padding: 0 0 0 22px;
 	background-image: url(../img/classification_16.png);
 	background-repeat: no-repeat;
+	background-position: left center;
 }
 .classeditor.exportDialog .content .classTextArea {
 	width: 600px;
