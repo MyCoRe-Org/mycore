@@ -4,14 +4,17 @@ define([
 	"dojo/Evented", // to use on.emit
 	"mycore/classification/_SettingsMixin",
 	"dojo/on", // on
+	"dojo/aspect",
 	"dojo/_base/lang", // hitch, clone
 	"dojo/dom-construct", // create place
+	"dojo/_base/array", // forEach
+	"dojo/request/xhr",
 	"mycore/classification/Util",
 	"mycore/classification/TreeDndSource",
 	"mycore/common/I18nManager",
 	"dijit/Tree",
 	"dijit/tree/TreeStoreModel"
-], function(declare, ContentPane, Evented, _SettingsMixin, on, lang, domConstruct, classUtil, dndSource, i18n) {
+], function(declare, ContentPane, Evented, _SettingsMixin, on, aspect, lang, domConstruct, array, xhr, classUtil, dndSource, i18n) {
 
 return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _SettingsMixin], {
 
@@ -74,8 +77,8 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 		this.tree.startup();
 
 		// events
-        dojo.connect(this.tree.dndController, "onDndDrop", this, this._onDndDrop);
-		dojo.connect(this.tree, "focusNode", this, this._onFocusNode);
+		aspect.after(this.tree.dndController, "onDndDrop", lang.hitch(this, this._onDndDrop));
+		aspect.after(this.tree, "focusNode", lang.hitch(this, this._onFocusNode));
 		on.emit(this, "treeCreated");
 	},
 
@@ -85,9 +88,11 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 	 * @param source
 	 * @param nodes
 	 */
-    _onDndDrop: function(source, nodes) {
+    _onDndDrop: function(deferred, args) {
     	var parent = null;
-    	dojo.forEach(nodes, lang.hitch(this, function(node) {
+    	var source = args[0];
+    	var nodes = args[1];
+    	array.forEach(nodes, lang.hitch(this, function(node) {
     		var sourceItem = source.getItem(node.id);
     		var item = sourceItem.data.item;
     		if(parent == null) {
@@ -255,21 +260,17 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 		var rootId = classUtil.getClassificationId(selectedItem);
 		var rootIdRequestPath = rootId.length > 0 ? "/" + rootId : "";
 		// get new category id
-		var xhrArgs = {
-			url :  this.settings.resourceURL + "newID" + rootIdRequestPath,
-			handleAs : "json",
-			load : lang.hitch(this, function(newId) {
-				this.newItem(selectedItem, newId);
-				// expand node if its not expanded yet
-				if(selectedNode.isExpandable && !selectedNode.isExpanded) {
-					this.tree.expandNode(selectedNode);
-				}
-			}),
-			error : lang.hitch(this, function(error) {
-				console.log("error while retrieving new id: " + error);
-			})
-		};
-		dojo.xhrGet(xhrArgs);
+		xhr(this.settings.resourceURL + "newID" + rootIdRequestPath, {
+			handleAs : "json"
+		}).then(lang.hitch(this, function(newID) {
+			this.newItem(selectedItem, newID);
+			// expand node if its not expanded yet
+			if(selectedNode.isExpandable && !selectedNode.isExpanded) {
+				this.tree.expandNode(selectedNode);
+			}
+		}), function(err) {
+			console.log("error while retrieving new id: " + error);
+		});
 	},
 
 	/**

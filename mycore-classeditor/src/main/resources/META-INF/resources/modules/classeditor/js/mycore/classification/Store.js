@@ -5,10 +5,11 @@ define([
 	"dojo/_base/lang", // hitch, clone
 	"dojo/on", // on
 	"dojo/request/xhr", // xhr
+	'dojo/_base/json',
 	"mycore/common/I18nManager",
 	"mycore/classification/Util",
 	"mycore/classification/SimpleRESTStore"
-], function(declare, Evented, _SettingsMixin, lang, on, xhr, i18n, classUtil) {
+], function(declare, Evented, _SettingsMixin, lang, on, xhr, json, i18n, classUtil) {
 
 /**
  * 
@@ -37,7 +38,7 @@ return declare("mycore.classification.Store", [Evented, _SettingsMixin], {
 			url += "/" + categoryId;
 		}
 		xhr(url, {handleAs: "json"}).then(lang.hitch(this, function(items) {
-			if(dojo.isArray(items)) {
+			if(lang.isArray(items)) {
 				items = {
 					id: "_placeboid_",
 					labels: [
@@ -118,7 +119,7 @@ return declare("mycore.classification.Store", [Evented, _SettingsMixin], {
 		}
 		xhr(this.settings.resourceURL + "save", {
 			method: "POST",
-			data : dojo.toJson(finalArray),
+			data : json.toJson(finalArray),
 			handleAs : "xml", // a possible error is returned as xml 
 			headers: {"Content-Type": "application/json; charset=utf-8"}
 		}).then(lang.hitch(this, function() {

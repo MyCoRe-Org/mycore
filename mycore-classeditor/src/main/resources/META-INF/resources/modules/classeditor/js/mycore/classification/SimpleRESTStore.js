@@ -1,7 +1,10 @@
 define([
 	"dojo/_base/declare", // declare
-	"dojo/data/ItemFileWriteStore"
-], function(declare, itemFileWriteStore) {
+	"dojo/data/ItemFileWriteStore",
+	"dojo/_base/lang", // hitch, clone
+	"dojo/_base/array", // forEach
+	"dojo/request/xhr"
+], function(declare, itemFileWriteStore, lang, array, xhr) {
 
 return declare("mycore.classification.SimpleRESTStore", itemFileWriteStore, {
 	constructor: function(/* object */ keywordParameters){
@@ -36,29 +39,26 @@ return declare("mycore.classification.SimpleRESTStore", itemFileWriteStore, {
 			url += "/" + categId;
 		}
 		var newItems = [];
-		var xhrArgs = {
-			url :  url,
+		
+		xhr(url, {
 			sync: true,
-			handleAs : "json",
-			load : dojo.hitch(this, function(data) {
-				var items = data;
-				if(!dojo.isArray(items)) {
-					items = data.children;
-				}
-				dojo.forEach(items, function(child) {
-					if(parent != null) {
-						newItems.push(this.newItem(child, {parent: parent, attribute: "children"}));
-					} else {
-						newItems.push(this.newItem(child));
-					}
-				}, this);
-				this.save();
-			}),
-			error : function(error) {
-				console.log(error);
+			handleAs : "json"
+		}).then(lang.hitch(this, function(data) {
+			var items = data;
+			if(!lang.isArray(items)) {
+				items = data.children;
 			}
-		};
-		dojo.xhrGet(xhrArgs);
+			array.forEach(items, function(child) {
+				if(parent != null) {
+					newItems.push(this.newItem(child, {parent: parent, attribute: "children"}));
+				} else {
+					newItems.push(this.newItem(child));
+				}
+			}, this);
+			this.save();
+		}), function(error) {
+			console.log(error);
+		});
 		return newItems;
 	},
 

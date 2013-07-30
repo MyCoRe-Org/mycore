@@ -286,11 +286,11 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 		}
 		// move outer div's
 		if(fullscreen) {
-			dojo.place(this.settingsDialog.domNode, query("body")[0]);
-			dojo.place(this.treePane.exportDialog.domNode, query("body")[0]);
+			domConstruct.place(this.settingsDialog.domNode, query("body")[0]);
+			domConstruct.place(this.treePane.exportDialog.domNode, query("body")[0]);
 		} else {
-			dojo.place(this.settingsDialog.domNode, this.domNode);
-			dojo.place(this.treePane.exportDialog.domNode, this.domNode);
+			domConstruct.place(this.settingsDialog.domNode, this.domNode);
+			domConstruct.place(this.treePane.exportDialog.domNode, this.domNode);
 		}
 	},
 

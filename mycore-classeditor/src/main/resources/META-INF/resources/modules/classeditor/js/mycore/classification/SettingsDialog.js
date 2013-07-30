@@ -6,6 +6,7 @@ define([
 	"dojo/text!./templates/SettingsDialog.html",
 	"dojo/_base/lang", // hitch, clone
 	"dojo/on", // on
+	"dojo/dom",
 	"dojo/dom-attr",
 	"dojo/request/xhr",
 	"dojo/dom-construct",
@@ -17,7 +18,7 @@ define([
 	"dijit/form/CheckBox",
 	"mycore/dijit/Repeater",
 	"mycore/dijit/TextRow"
-], function(declare, Dialog, _Templated, _SettingsMixin, template, lang, on, domAttr, xhr, domConstruct, ioIframe, i18n) {
+], function(declare, Dialog, _Templated, _SettingsMixin, template, lang, on, dom, domAttr, xhr, domConstruct, ioIframe, i18n) {
 
 return declare("mycore.classification.SettingsDialog", [Dialog, _Templated, _SettingsMixin], {
 	templateString: template,
@@ -96,7 +97,7 @@ return declare("mycore.classification.SettingsDialog", [Dialog, _Templated, _Set
 
 	submitClassification: function() {
 		ioIframe.send({
-			form: dojo.byId("classImportForm"),
+			form: dom.byId("classImportForm"),
 			method: "post",
 			handleAs: "html",
 			url: this.settings.resourceURL + "import"
