@@ -423,7 +423,13 @@ public class MCRSession implements Cloneable {
      * @return true if the transaction is still alive
      */
     public boolean isTransactionActive() {
-        return dataBaseAccess && transaction.get() != null && transaction.get().isActive();
+        if (!dataBaseAccess) {
+            return false;
+        }
+        if (transaction.get() == null) {
+            transaction.set(MCRHIBConnection.instance().getSession().getTransaction());
+        }
+        return transaction.get() != null && transaction.get().isActive();
     }
 
     public StackTraceElement[] getConstructingStackTrace() {
