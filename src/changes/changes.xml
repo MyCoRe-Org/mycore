@@ -5,9 +5,74 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2013.07" date="2013-07-XX" description="July developer release 2013">
+    <release version="2013.07" date="2013-07-31" description="Codenamed &apos;Old Pascas&apos;">
+      <action dev="mcrfluet" type="fix" date="2013-07-30">
+        xeditor don't allow dot in element name
+        <fixes issue="644" />
+      </action>
+      <action dev="mcrmeich" type="update">
+        update classification editor to dojo 1.9.1 
+      </action>
+      <action dev="mcrtchef" type="update">
+        use order to specify the order of command invocation per @MCRCommandGroup
+      </action>
+      <action dev="mcrsteph" type="fix" date="2013-07-26">
+        fixed NonUniqueObjectException on object import with URN
+      </action>
+      <action dev="mcrsteph" type="fix" date="2013-07-26">
+        accept different exit code for newer versions of "pdftotext" tool
+      </action>
+      <action dev="mcrtchef" type="fix" date="2013-07-22">
+        MCRUploadHandlerIFS leaks JDBC Connection
+        <fixes issue="643" />
+      </action>
+      <action dev="mcrmeich" type="add">
+        added MCRURL class to parse http parameters
+      </action>
+      <action dev="mcrtchef" type="update">
+        refactored MCRTarServlet and MCRZipServlet:
+
+        fixed permission checking and removed redundant code;
+        MCRTarServlet supports the same requests as MCRZipServlet;
+        added pathInfo support (makes 'id' parameter supported but obsolete)
+      </action>
+      <action dev="mcrtchef" type="update">
+        mycore-complete does only contain mycore components but no external libraries
+      </action>
+      <action dev="mcrkrebs" type="fix" date="2013-07-09">
+        mycore-mods: updated to recent zdb format changes
+      </action>
+      <action dev="mcrmeich" type="add">
+        added mycore component: mycore-acl-editor2
+      </action>
+      <action dev="mcrtchef" type="remove">
+        MCRHibImpExTools is no longer needed
+      </action>
+      <action dev="mcrtchef" type="update">
+        added cache for MCRXMLFunctions.isDisplayedEnabledDerivate(String)
+      </action>
       <action dev="mcrfluet" type="update">
-        editor framework: added support for request parameters in include/@uri and @ref (as in source/@uri) to allow dynamic includes
+        Simplify MCRExportServlet by letting MCRLayoutService do the layout and transformation job. This
+        allows to use MCRParameterizedTransformers like XSL Transformer with http request parameters. So we now can pass "XSL." parameters
+        to stylesheets in export transformers.
+      </action>
+      <action dev="mcrfluet" type="fix" date="2013-07-02">
+        Editor Framework changes HTML button element in static webpages
+        <fixes issue="639" />
+      </action>
+      <action dev="mcrtchef" type="update">
+        Better error pages for TransformerExceptions (displays source)
+      </action>
+      <action dev="mcrfluet" type="fix" date="2013-07-02" due-to="Nils">
+        content length header of MCRFileNodeServlets handles files over 2 GB
+        correctly.
+      </action>
+      <action dev="mcrtchef" type="add">
+        batch user import/update support
+      </action>
+      <action dev="mcrfluet" type="update">
+        editor framework: added support for request parameters in include/@uri and @ref (as in source/@uri)
+        to allow dynamic includes
       </action>
       <action dev="mcrkrebs" type="fix">
         mycore-mods: fixed typo in solr field for identifier
