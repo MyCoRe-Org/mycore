@@ -276,12 +276,14 @@ iview.Pdf.Controller.prototype = {
     if (iview.Pdf.enabled) {
       var pdfEl = this.view.getPdfCreator();
       var that = this;
-      jQuery("input[type=radio]", pdfEl).focus(function() {
-        that.validateRangeInput(this);
-      });
       jQuery("input.manualInput", pdfEl).change(function() {
         that.changeManualInput(this);
+      }).keyup(function(){
+    	that.validateRangeInput(this);
+      }).focus(function(){
+    	that.view.getManualInput().attr("checked","true");
       });
+      
       jQuery("form", pdfEl).submit(function(event) {
         return iview.Pdf.Controller.validateForm(event.target, that.maxPages, that.i18n);
       });
@@ -364,12 +366,18 @@ iview.Pdf.Controller.prototype = {
  * @description throw a validation error if {range} is not valid
  */
 iview.Pdf.Controller.validateRange = function(range, maxPages, i18n) {
+  var regex = new RegExp("^[0-9]+(-[0-9]+)?(,[0-9]+(-[0-9]+)?)*$");
+  
   var pages = iview.Pdf.Controller.amountPages(range, i18n);
   if (pages == 0) {
     throw new Error(i18n.translate("createPdf.errors.noPages"));
   }
   if (pages > maxPages) {
     throw new Error(i18n.translate("createPdf.errors.tooManyPages") + ": " + pages);
+  }
+  
+  if (!regex.test(range)){
+	  throw new Error(i18n.translate("createPdf.errors.rangeInvalid"));
   }
 };
 
