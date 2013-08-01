@@ -73,8 +73,10 @@ public abstract class MCRHibTestCase extends MCRTestCase {
 
     @BeforeClass
     public static void setUpHibernate() {
-        CONNECTION.buildSessionFactory(CONNECTION.getConfiguration());
+        Logger.getLogger(MCRHibTestCase.class).debug("Setup hibernate");
         SESSION_FACTORY = CONNECTION.getSessionFactory();
+        SchemaExport export = new SchemaExport(MCRHIBConnection.instance().getConfiguration());
+        export.execute(false, true, false, true);
     }
 
     @Before
@@ -89,6 +91,7 @@ public abstract class MCRHibTestCase extends MCRTestCase {
             CONFIG.configureLogging();
         }
         try {
+            Logger.getLogger(MCRHibTestCase.class).debug("Prepare hibernate test");
             SchemaExport export = new SchemaExport(getHibernateConfiguration());
             export.create(false, true);
             beginTransaction();
@@ -109,9 +112,9 @@ public abstract class MCRHibTestCase extends MCRTestCase {
         endTransaction();
         SESSION_FACTORY.getCurrentSession().close();
     }
-    
+
     @AfterClass
-    public static void shutdownHibernate(){
+    public static void shutdownHibernate() {
         SESSION_FACTORY.close();
         SESSION_FACTORY = null;
     }
