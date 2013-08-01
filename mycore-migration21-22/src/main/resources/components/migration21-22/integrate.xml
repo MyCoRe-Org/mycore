@@ -7,7 +7,7 @@
   <target name="config">
     <mcr:config action="addInclude"
                 propertyfile="${build.config}/mycore.properties"
-                key="MCR.CLI.Classes.Annotated"
+    			key="MCR.CLI.Classes.Internal"
                 value="org.mycore.migration21_22.cli.MCRMigrationCommands22" />
     <AddHibernateMapping class="org.mycore.migration21_22.user.hibernate.MCRGROUPADMINS" />
     <AddHibernateMapping class="org.mycore.migration21_22.user.hibernate.MCRGROUPMEMBERS" />

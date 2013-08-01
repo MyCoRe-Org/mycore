@@ -51,7 +51,8 @@ import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.frontend.cli.MCRAbstractCommands;
-import org.mycore.frontend.cli.MCRCommand;
+import org.mycore.frontend.cli.annotation.MCRCommandGroup;
+import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.user2.utils.MCRRoleTransformer;
 import org.mycore.user2.utils.MCRUserTransformer;
 import org.xml.sax.SAXParseException;
@@ -59,121 +60,17 @@ import org.xml.sax.SAXParseException;
 /**
  * This class provides a set of commands for the org.mycore.user2 management
  * which can be used by the command line interface.
- *
+ * 
  * @author Thomas Scheffler (yagee)
  */
+@MCRCommandGroup(name = "MCR User Commands")
 public class MCRUserCommands extends MCRAbstractCommands {
     /** The logger */
     private static Logger LOGGER = Logger.getLogger(MCRUserCommands.class.getName());
 
     private static final String SYSTEM = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName",
-        "MyCoRe")
-        + ":";
-
-    /**
-     * The constructor.
-     */
-    public MCRUserCommands() {
-        super();
-
-        MCRCommand com = null;
-
-        addCommand(new MCRCommand("change to user {0} with {1}",
-            "org.mycore.user2.MCRUserCommands.changeToUser String String",
-            "Change the user {0} with the given password in {1}."));
-        addCommand(new MCRCommand("login {0}", "org.mycore.user2.MCRUserCommands.login String",
-            "Start the login dialog for the user {0}."));
-
-        com = new MCRCommand("init superuser", "org.mycore.user2.MCRUserCommands.initSuperuser",
-            "Initialized the user system. This command runs only if the user database does not exist.");
-        addCommand(com);
-
-        com = new MCRCommand("encrypt passwords in user xml file {0} to file {1}",
-            "org.mycore.user2.MCRUserCommands.encryptPasswordsInXMLFile String String",
-            "This is a migration tool to change old plain text password entries to encrpted entries.");
-        addCommand(com);
-
-        com = new MCRCommand("set password for user {0} to {1}",
-            "org.mycore.user2.MCRUserCommands.setPassword String String",
-            "This command sets a new password for the user. You must be this user or you must have administrator access.");
-        addCommand(com);
-
-        com = new MCRCommand("enable user {0}", "org.mycore.user2.MCRUserCommands.enableUser String",
-            "The command enables the user for the access.");
-        addCommand(com);
-
-        com = new MCRCommand("disable user {0}", "org.mycore.user2.MCRUserCommands.disableUser String",
-            "The command disables the user from the access.");
-        addCommand(com);
-
-        com = new MCRCommand("delete role {0}", "org.mycore.user2.MCRUserCommands.deleteRole String",
-            "The command delete the role {0} from the user system, but only if it has no user assigned.");
-        addCommand(com);
-
-        com = new MCRCommand("import role from file {0}", "org.mycore.user2.MCRUserCommands.addRole String",
-            "The command imports a role from file, if that role does not exist");
-        addCommand(com);
-
-        com = new MCRCommand("add roles from user file {0}", "org.mycore.user2.MCRUserCommands.addRoles String",
-            "The command adds roles found in user file {0} that do not exist");
-        addCommand(com);
-
-        com = new MCRCommand("delete user {0}", "org.mycore.user2.MCRUserCommands.deleteUser String",
-            "The command delete the user {0}.");
-        addCommand(com);
-
-        com = new MCRCommand("assign user {0} to role {1}",
-            "org.mycore.user2.MCRUserCommands.assignUserToRole String String",
-            "The command add a user {0} as secondary member in the role {1}.");
-        addCommand(com);
-
-        com = new MCRCommand("unassign user {0} from role {1}",
-            "org.mycore.user2.MCRUserCommands.unassignUserFromRole String String",
-            "The command remove the user {0} as secondary member from the role {1}.");
-        addCommand(com);
-
-        com = new MCRCommand("list all roles", "org.mycore.user2.MCRUserCommands.listAllRoles",
-            "The command list all roles.");
-        addCommand(com);
-
-        com = new MCRCommand("list role {0}", "org.mycore.user2.MCRUserCommands.listRole String",
-            "The command list the role {0}.");
-        addCommand(com);
-
-        com = new MCRCommand("list all users", "org.mycore.user2.MCRUserCommands.listAllUsers",
-            "The command list all users.");
-        addCommand(com);
-
-        com = new MCRCommand("list user {0}", "org.mycore.user2.MCRUserCommands.listUser String",
-            "The command list the user {0}.");
-        addCommand(com);
-
-        com = new MCRCommand("export user {0} to file {1}",
-            "org.mycore.user2.MCRUserCommands.exportUserToFile String String",
-            "The command exports the data of user {0} to the file {1}.");
-        addCommand(com);
-
-        com = new MCRCommand("export all users to directory {0}",
-            "org.mycore.user2.MCRUserCommands.exportAllUserToDirectory String",
-            "The command exports the data of all users to the directory {0}.");
-        addCommand(com);
-
-        com = new MCRCommand("import user from file {0}", "org.mycore.user2.MCRUserCommands.importUserFromFile String",
-            "The command imports a user from file {0}.");
-        addCommand(com);
-
-        com = new MCRCommand("import all users from directory {0}", "org.mycore.user2.MCRUserCommands.importAllUsersFromDirectory String",
-            "The command imports all users from directory {0}.");
-        addCommand(com);
-
-        com = new MCRCommand("update user from file {0}", "org.mycore.user2.MCRUserCommands.updateUserFromFile String",
-            "The command updates a user from file {0}.");
-        addCommand(com);
-
-        com = new MCRCommand("update all users from directory {0}", "org.mycore.user2.MCRUserCommands.updateAllUsersFromDirectory String",
-            "The command updates all users from directory {0}.");
-        addCommand(com);
-    }
+            "MyCoRe")
+            + ":";
 
     /**
      * This command changes the user of the session context to a new user.
@@ -183,6 +80,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @param password
      *            the password of the new user
      */
+    @MCRCommand(syntax = "change to user {0} with {1}", help = "Changes to the user {0} with the given password {1}.",
+            order = 10)
     public static void changeToUser(String user, String password) {
         MCRSession session = MCRSessionMgr.getCurrentSession();
         System.out.println(SYSTEM + " The old user ID is " + session.getUserInformation().getUserID());
@@ -199,6 +98,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @param user
      *            the new user ID
      */
+    @MCRCommand(syntax = "login {0}", help = "Starts the login dialog for the user {0}.", order = 20)
     public static void login(String user) {
         char[] password = {};
         do {
@@ -213,6 +113,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * with values set in mycore.properties.private As 'super' default, if no
      * properties were set, mcradmin with password mycore will be used.
      */
+    @MCRCommand(syntax = "init superuser",
+            help = "Initializes the user system. This command runs only if the user database does not exist.",
+            order = 30)
     public static List<String> initSuperuser() {
         final String suser = CONFIG.getString("MCR.Users.Superuser.UserName", "administrator");
         final String spasswd = CONFIG.getString("MCR.Users.Superuser.UserPasswd", "alleswirdgut");
@@ -252,24 +155,29 @@ public class MCRUserCommands extends MCRAbstractCommands {
     }
 
     /**
-     * This method invokes {@link MCRRoleManager#deleteRole(String)} and permanently removes a
-     * role from the system.
+     * This method invokes {@link MCRRoleManager#deleteRole(String)} and
+     * permanently removes a role from the system.
      * 
      * @param roleID
      *            the ID of the role which will be deleted
      */
+    @MCRCommand(syntax = "delete role {0}",
+            help = "Deletes the role {0} from the user system, but only if it has no user assigned.", order = 80)
     public static void deleteRole(String roleID) {
         MCRRoleManager.deleteRole(roleID);
     }
 
     /**
-     * Loads XML from a user and looks for roles currently not present in the system and creates them.
+     * Loads XML from a user and looks for roles currently not present in the
+     * system and creates them.
      * 
      * @param fileName
      *            a valid user XML file
-     * @throws IOException 
-     * @throws SAXParseException 
+     * @throws IOException
+     * @throws SAXParseException
      */
+    @MCRCommand(syntax = "add roles from user file {0}", help = "Adds roles found in user file {0} that do not exist",
+            order = 100)
     public static void addRoles(String fileName) throws SAXParseException, IOException {
         LOGGER.info("Reading file " + fileName + " ...");
         Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(fileName));
@@ -290,13 +198,16 @@ public class MCRUserCommands extends MCRAbstractCommands {
     }
 
     /**
-     * Loads XML from a user and looks for roles currently not present in the system and creates them.
+     * Loads XML from a user and looks for roles currently not present in the
+     * system and creates them.
      * 
      * @param fileName
      *            a valid user XML file
-     * @throws IOException 
-     * @throws SAXParseException 
+     * @throws IOException
+     * @throws SAXParseException
      */
+    @MCRCommand(syntax = "import role from file {0}", help = "Imports a role from file, if that role does not exist",
+            order = 90)
     public static void addRole(String fileName) throws SAXParseException, IOException {
         LOGGER.info("Reading file " + fileName + " ...");
         Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(fileName));
@@ -315,6 +226,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @param userID
      *            the ID of the user which will be deleted
      */
+    @MCRCommand(syntax = "delete user {0}", help = "Delete the user {0}.", order = 110)
     public static void deleteUser(String userID) throws Exception {
         MCRUserManager.deleteUser(userID);
     }
@@ -325,6 +237,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @param userID
      *            the ID of the user which will be enabled
      */
+    @MCRCommand(syntax = "enable user {0}", help = "Enables the user for the access.", order = 60)
     public static void enableUser(String userID) throws Exception {
         MCRUser mcrUser = MCRUserManager.getUser(userID);
         mcrUser.enableLogin();
@@ -341,10 +254,12 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the filename of the user data input
      * @param newFile
      *            the filename of the user data output (encrypted passwords)
-     * @throws IOException 
-     * @throws SAXParseException 
-     * @throws MCRException 
+     * @throws IOException
+     * @throws SAXParseException
+     * @throws MCRException
      */
+    @MCRCommand(syntax = "encrypt passwords in user xml file {0} to file {1}",
+            help = "A migration tool to change old plain text password entries to encrpted entries.", order = 40)
     public static void encryptPasswordsInXMLFile(String oldFile, String newFile) throws SAXParseException, IOException {
         File inputFile = getCheckedFile(oldFile);
         if (inputFile == null) {
@@ -372,6 +287,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @param userID
      *            the ID of the user which will be enabled
      */
+    @MCRCommand(syntax = "disable user {0}", help = "Disables access of the user {0}", order = 70)
     public static void disableUser(String userID) throws Exception {
         MCRUser mcrUser = MCRUserManager.getUser(userID);
         mcrUser.disableLogin();
@@ -382,6 +298,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * This method invokes MCRUserMgr.getAllUserIDs() and retrieves a ArrayList
      * of all users stored in the persistent datastore.
      */
+    @MCRCommand(syntax = "list all users", help = "Lists all users.", order = 160)
     public static void listAllUsers() throws Exception {
         List<MCRUser> users = MCRUserManager.listUsers(null, null, null);
 
@@ -391,9 +308,10 @@ public class MCRUserCommands extends MCRAbstractCommands {
     }
 
     /**
-     * This method invokes {@link MCRRoleManager#listSystemRoles()} and retrieves a list
-     * of all roles stored in the persistent datastore.
+     * This method invokes {@link MCRRoleManager#listSystemRoles()} and
+     * retrieves a list of all roles stored in the persistent datastore.
      */
+    @MCRCommand(syntax = "list all roles", help = "List all roles.", order = 140)
     public static void listAllRoles() throws Exception {
         List<MCRRole> roles = MCRRoleManager.listSystemRoles();
 
@@ -411,6 +329,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @param filename
      *            Name of the file to store the exported user
      */
+    @MCRCommand(syntax = "export user {0} to file {1}", help = "Exports the data of user {0} to the file {1}.",
+            order = 180)
     public static void exportUserToFile(String userID, String filename) throws IOException {
         MCRUser user = MCRUserManager.getUser(userID);
         if (user.getSystemRoleIDs().isEmpty()) {
@@ -421,6 +341,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
         saveToXMLFile(user, outFile);
     }
 
+    @MCRCommand(syntax = "export all users to directory {0}",
+            help = "Exports the data of all users to the directory {0}.")
     public static List<String> exportAllUserToDirectory(String directory) throws IOException {
         File dir = new File(directory);
         if (!dir.exists() || !dir.isDirectory()) {
@@ -435,10 +357,12 @@ public class MCRUserCommands extends MCRAbstractCommands {
         return commands;
     }
 
+    @MCRCommand(syntax = "import all users from directory {0}", help = "Imports all users from directory {0}.")
     public static List<String> importAllUsersFromDirectory(String directory) throws FileNotFoundException {
         return batchLoadFromDirectory("import user from file", directory);
     }
 
+    @MCRCommand(syntax = "update all users from directory {0}", help = "Updates all users from directory {0}.")
     public static List<String> updateAllUsersFromDirectory(String directory) throws FileNotFoundException {
         return batchLoadFromDirectory("update user from file", directory);
     }
@@ -468,14 +392,15 @@ public class MCRUserCommands extends MCRAbstractCommands {
     }
 
     /**
-     * This command takes a file name as a parameter, creates the
-     * MCRUser instances stores it in the database if it does not exists.
+     * This command takes a file name as a parameter, creates the MCRUser
+     * instances stores it in the database if it does not exists.
      * 
      * @param filename
      *            Name of the file to import user from
-     * @throws IOException 
-     * @throws SAXParseException 
+     * @throws IOException
+     * @throws SAXParseException
      */
+    @MCRCommand(syntax = "import user from file {0}", help = "Imports a user from file {0}.")
     public static void importUserFromFile(String filename) throws SAXParseException, IOException {
         MCRUser user = getMCRUserFromFile(filename);
         if (MCRUserManager.exists(user.getUserName(), user.getRealmID())) {
@@ -491,6 +416,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @param userID
      *            the ID of the user for which the password will be set
      */
+    @MCRCommand(syntax = "set password for user {0} to {1}",
+            help = "Sets a new password for the user. You must be this user or you must have administrator access.",
+            order = 50)
     public static void setPassword(String userID, String password) throws MCRException {
         MCRUser user = MCRUserManager.getUser(userID);
         MCRUserManager.updatePasswordHashToSHA1(user, password);
@@ -498,12 +426,13 @@ public class MCRUserCommands extends MCRAbstractCommands {
     }
 
     /**
-     * This method invokes {@link MCRRoleManager#getRole(String)} and then works with the
-     * retrieved role object to get an XML-Representation.
+     * This method invokes {@link MCRRoleManager#getRole(String)} and then works
+     * with the retrieved role object to get an XML-Representation.
      * 
      * @param roleID
      *            the ID of the role for which the XML-representation is needed
      */
+    @MCRCommand(syntax = "list role {0}", help = "Lists the role {0}.", order = 150)
     public static void listRole(String roleID) throws MCRException {
         MCRRole role = MCRRoleManager.getRole(roleID);
         listRole(role);
@@ -529,6 +458,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @param userID
      *            the ID of the user for which the XML-representation is needed
      */
+    @MCRCommand(syntax = "list user {0}", help = "Lists the user {0}.", order = 170)
     public static void listUser(String userID) throws MCRException {
         MCRUser user = MCRUserManager.getUser(userID);
         listUser(user);
@@ -537,7 +467,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
     public static void listUser(MCRUser user) {
         StringBuilder sb = new StringBuilder("\n");
         sb.append("       user=").append(user.getUserName()).append("   real name=").append(user.getRealName())
-            .append('\n').append("   loginAllowed=").append(user.loginAllowed()).append('\n');
+                .append('\n').append("   loginAllowed=").append(user.loginAllowed()).append('\n');
         List<String> roles = new ArrayList<String>(user.getSystemRoleIDs());
         roles.addAll(user.getExternalRoleIDs());
         for (String rid : roles) {
@@ -575,7 +505,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * 
      * @param filename
      *            the filename of the user data input
-     * @throws SAXParseException 
+     * @throws SAXParseException
      */
     public static void createUserFromFile(String filename) throws SAXParseException, IOException {
         MCRUser user = getMCRUserFromFile(filename);
@@ -587,8 +517,10 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * 
      * @param filename
      *            the filename of the user data input
-     * @throws SAXParseException if file could not be parsed
+     * @throws SAXParseException
+     *             if file could not be parsed
      */
+    @MCRCommand(syntax = "update user from file {0}", help = "Updates a user from file {0}.", order = 200)
     public static void updateUserFromFile(String filename) throws SAXParseException, IOException {
         MCRUser user = getMCRUserFromFile(filename);
         MCRUserManager.updateUser(user);
@@ -611,10 +543,12 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the ID of the user which will be a member of the role
      *            represented by roleID
      * @param roleID
-     *            the ID of the role to which the user with ID mbrUserID will
-     *            be added
+     *            the ID of the role to which the user with ID mbrUserID will be
+     *            added
      * @throws MCRException
      */
+    @MCRCommand(syntax = "assign user {0} to role {1}", help = "Adds a user {0} as secondary member in the role {1}.",
+            order = 120)
     public static void assignUserToRole(String userID, String roleID) throws MCRException {
         try {
             MCRUser user = MCRUserManager.getUser(userID);
@@ -636,6 +570,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            be removed
      * @throws MCRException
      */
+    @MCRCommand(syntax = "unassign user {0} from role {1}",
+            help = "Removes the user {0} as secondary member from the role {1}.", order = 130)
     public static void unassignUserFromRole(String userID, String roleID) throws MCRException {
         try {
             MCRUser user = MCRUserManager.getUser(userID);
@@ -655,7 +591,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the JDOM XML document to be printed
      * @param outFile
      *            a FileOutputStream object for the output
-     * @throws IOException if output file can not be closed
+     * @throws IOException
+     *             if output file can not be closed
      */
     private static void saveToXMLFile(MCRUser mcrUser, FileOutputStream outFile) throws MCRException, IOException {
         // Create the output

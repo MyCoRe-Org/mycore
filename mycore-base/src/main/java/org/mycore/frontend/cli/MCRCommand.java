@@ -234,7 +234,7 @@ public class MCRCommand {
         return invoke(input, MCRCommand.class.getClassLoader());
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<String> invoke(String input, ClassLoader classLoader) throws IllegalAccessException, InvocationTargetException, ClassNotFoundException,
         NoSuchMethodException {
         if (!input.startsWith(suffix)) {

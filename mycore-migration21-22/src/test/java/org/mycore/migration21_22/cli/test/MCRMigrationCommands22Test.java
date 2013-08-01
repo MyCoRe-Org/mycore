@@ -37,7 +37,7 @@ public class MCRMigrationCommands22Test {
     public void init() throws IOException {
         File baseDir = tmpFolder.newFolder("baseDir");
         File svnBase = tmpFolder.newFolder("SVNBase");
-        MCRConfiguration.instance().set("MCR.CLI.Classes.Annotated", MCRMigrationCommands22.class.getName());
+        MCRConfiguration.instance().set("MCR.CLI.Classes.Internal", MCRMigrationCommands22.class.getName());
         MCRConfiguration.instance().set("MCR.Metadata.Store.BaseDir", baseDir.getAbsolutePath());
         MCRConfiguration.instance().set("MCR.Metadata.Store.SVNBase", "file:///" + svnBase.getAbsolutePath().replace('\\', '/'));
         MCRConfiguration.instance().set("MCR.Metadata.Type.cbu", true);

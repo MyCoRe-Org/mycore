@@ -46,7 +46,7 @@ import org.mycore.user2.MCRRoleManager;
 import org.mycore.user2.MCRUserManager;
 import org.xml.sax.SAXException;
 
-@MCRCommandGroup(name = "Migrate from 2.1 to 2.2")
+@MCRCommandGroup(name = "MCR Migration Commands from MyCoRe version 2.1 to 2.2")
 public class MCRMigrationCommands22 extends MCRAbstractCommands {
     private static Logger LOGGER = Logger.getLogger(MCRMigrationCommands22.class);
 
@@ -81,7 +81,7 @@ public class MCRMigrationCommands22 extends MCRAbstractCommands {
         }
     }
 
-    @MCRCommand(help = "Replace ':' in categID with '_'", syntax = "fix colone in categID")
+    @MCRCommand(help = "Replace ':' in categID with '_'", syntax = "fix colon in categID")
     public static void fixCategID() throws JDOMException, TransformerException, IOException, SAXException {
         Session dbSession = MCRHIBConnection.instance().getSession();
         dbSession.createSQLQuery("update MCRCATEGORY set CATEGID=replace(categid,':','-') where CATEGID like '%:%'").executeUpdate();

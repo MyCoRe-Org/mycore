@@ -25,7 +25,6 @@ package org.mycore.services.fieldquery;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
@@ -35,7 +34,8 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.frontend.cli.MCRAbstractCommands;
-import org.mycore.frontend.cli.MCRCommand;
+import org.mycore.frontend.cli.annotation.MCRCommand;
+import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.parsers.bool.MCRCondition;
 
 /**
@@ -44,27 +44,11 @@ import org.mycore.parsers.bool.MCRCondition;
  * @author Frank Lützenkirchen
  * @author Arne Seifert
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2013-01-31 14:14:26 +0100 (Do, 31 Jan
+ *          2013) $
  */
+@MCRCommandGroup(name = "MCR Query Commands")
 public class MCRQueryCommands extends MCRAbstractCommands {
-
-    /**
-     * The method returns all available commands.
-     * 
-     * @return an ArrayList of MCRCommands
-     */
-    public ArrayList<MCRCommand> getPossibleCommands() {
-        ArrayList<MCRCommand> commands = new ArrayList<MCRCommand>();
-        commands.add(new MCRCommand("run query from file {0}", "org.mycore.services.fieldquery.MCRQueryCommands.runQueryFromFile String",
-                "Runs a query that is specified as XML in the given file"));
-        commands.add(new MCRCommand("run local query {0}",
-                "org.mycore.services.fieldquery.MCRQueryCommands.runLocalQueryFromString String",
-                "Runs a query specified as String on the local host"));
-        commands.add(new MCRCommand("run distributed query {0}",
-                "org.mycore.services.fieldquery.MCRQueryCommands.runAllQueryFromString String",
-                "Runs a query specified as String on the local host and all remote hosts"));
-        return commands;
-    }
 
     /**
      * Runs a query that is specified as XML in the given file. The results are
@@ -74,6 +58,8 @@ public class MCRQueryCommands extends MCRAbstractCommands {
      * @param filename
      *            the name of the XML file with the query condition
      */
+    @MCRCommand(syntax = "run query from file {0}", help = "Runs a query that is specified as XML in the given file",
+            order = 10)
     public static void runQueryFromFile(String filename) throws JDOMException, IOException {
         File file = new File(filename);
         if (!file.exists()) {
@@ -98,22 +84,25 @@ public class MCRQueryCommands extends MCRAbstractCommands {
      * @param querystring
      *            the string with the query condition
      */
+    @MCRCommand(syntax = "run local query {0}", help = "Runs a query specified as String on the local host", order = 20)
     public static void runLocalQueryFromString(String querystring) {
-        MCRCondition cond = new MCRQueryParser().parse(querystring);
+        MCRCondition<Object> cond = new MCRQueryParser().parse(querystring);
         MCRQuery query = new MCRQuery(cond);
         MCRResults results = MCRQueryManager.search(query);
         buildOutput(results);
     }
 
     /**
-     * Runs a query that is specified as String against all hosts. The
-     * results are written to stdout.
+     * Runs a query that is specified as String against all hosts. The results
+     * are written to stdout.
      * 
      * @param querystring
      *            the string with the query condition
      */
+    @MCRCommand(syntax = "run distributed query {0}",
+            help = "Runs a query specified as String on the local host and all remote hosts", order = 30)
     public static void runAllQueryFromString(String querystring) {
-        MCRCondition cond = new MCRQueryParser().parse(querystring);
+        MCRCondition<Object> cond = new MCRQueryParser().parse(querystring);
         MCRQuery query = new MCRQuery(cond);
         query.setHosts(MCRQueryClient.ALL_HOSTS);
         MCRResults results = MCRQueryManager.search(query);

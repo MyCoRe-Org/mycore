@@ -29,7 +29,8 @@ import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.frontend.cli.MCRAbstractCommands;
-import org.mycore.frontend.cli.MCRCommand;
+import org.mycore.frontend.cli.annotation.MCRCommand;
+import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 
 /**
  * This class provides a set of commands for the org.mycore.access package which
@@ -38,31 +39,20 @@ import org.mycore.frontend.cli.MCRCommand;
  * @author Thomas Scheffler (yagee)
  * @author Arne Seifert
  */
+@MCRCommandGroup(name = "MCR Hibernate Control Commands")
 public class MCRHIBCtrlCommands extends MCRAbstractCommands {
     /** The logger */
     private static final Logger LOGGER = Logger.getLogger(MCRHIBCtrlCommands.class.getName());
 
     /**
-     * constructor with commands.
-     */
-    public MCRHIBCtrlCommands() {
-        super();
-
-        MCRCommand com = null;
-
-        com = new MCRCommand("init hibernate", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.createTables",
-            "The command creates all tables for MyCoRe by hibernate.");
-        addCommand(com);
-    }
-
-    /**
      * 
      * method creates tables using hibernate
      */
+    @MCRCommand(syntax = "init hibernate", help = "Creates all database tables for MyCoRe used by hibernate",
+            order = 10)
     public static void createTables() {
         try {
             new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);
-
             LOGGER.info("tables created.");
         } catch (MCRPersistenceException e) {
             throw new MCRException("error while creating tables.", e);
@@ -70,5 +60,4 @@ public class MCRHIBCtrlCommands extends MCRAbstractCommands {
             throw new MCRException("Hibernate error while creating database tables.", e);
         }
     }
-
 }

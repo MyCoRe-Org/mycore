@@ -45,6 +45,7 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRSearcherFactory;
@@ -55,12 +56,13 @@ import org.mycore.services.fieldquery.data2fields.MCRIndexEntryBuilder;
 import org.mycore.services.fieldquery.data2fields.MCRXSLBuilder;
 import org.xml.sax.SAXException;
 
+import org.mycore.frontend.cli.annotation.MCRCommand;
 /**
  * provides static methods to manipulate MCRSearcher indexes.
  * 
  * @author Thomas Scheffler (yagee)
  */
-
+@MCRCommandGroup(name="MCRSearcher Commands")
 public class MCRSearcherCommands extends MCRAbstractCommands {
 
     private static Logger LOGGER = Logger.getLogger(MCRSearcherCommands.class);
@@ -73,13 +75,9 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
 
     public MCRSearcherCommands() {
         super();
-        addCommand(new MCRCommand("rebuild metadata index", "org.mycore.frontend.cli.MCRSearcherCommands.repairMetaIndex",
-                "Repairs metadata index"));
-        addCommand(new MCRCommand("rebuild content index", "org.mycore.frontend.cli.MCRSearcherCommands.repairContentIndex",
-                "Repairs metadata index"));
-        addCommand(new MCRCommand("save searchfields of index {0} to stylesheet file {1}",
-                "org.mycore.frontend.cli.MCRSearcherCommands.saveXSL String String",
-                "Generates XSL file {0} that is used to index metadata."));
+
+
+
     }
 
     static class RepairIndex {
@@ -247,6 +245,8 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
      * @throws IOException
      * @throws JDOMException
      */
+    @MCRCommand(syntax="rebuild metadata index",
+    		help="Repairs the metadata index", order=10)
     public static void repairMetaIndex() throws IOException, JDOMException {
         new RepairIndex(new MetaIndexRepairMechanism()).repair();
     }
@@ -257,6 +257,8 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
      * @throws IOException
      * @throws JDOMException
      */
+    @MCRCommand(syntax="rebuild content index",
+    		help="Repairs the content index", order=20)
     public static void repairContentIndex() throws IOException, JDOMException {
         new RepairIndex(new ContentIndexRepairMechanism()).repair();
     }
@@ -266,6 +268,8 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
      * @param index
      * @param filename
      */
+    @MCRCommand(syntax="save searchfields of index {0} to stylesheet file {1}",
+    		help="Generates XSL file {0} that is used to index metadata.", order=30)
     public static void saveXSL(String index, String filename) {
         saveXSL(index, new File(filename));
     }

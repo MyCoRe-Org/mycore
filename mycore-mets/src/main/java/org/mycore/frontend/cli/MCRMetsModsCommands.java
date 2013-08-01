@@ -47,6 +47,8 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectStructure;
+import org.mycore.frontend.cli.annotation.MCRCommand;
+import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.mets.tools.MCRMetsResolver;
 import org.mycore.mets.tools.MCRMetsSave;
 import org.mycore.services.fieldquery.MCRHit;
@@ -66,53 +68,18 @@ import org.mycore.services.fieldquery.MCRResults;
  * @version $Revision: 13085 $ $Date: 2008-02-06 18:27:24 +0100 (Mi, 06 Feb
  *          2008) $
  */
+@MCRCommandGroup(name = "MCR METS Commands")
 public final class MCRMetsModsCommands extends MCRAbstractCommands {
 
     private static Logger LOGGER = Logger.getLogger(MCRMetsModsCommands.class);
 
-    /**
-     * 
-     */
-    public MCRMetsModsCommands() {
-        super();
-
-        MCRCommand com = null;
-
-        com = new MCRCommand("check mets files for type {0} with exclude label {1}",
-                "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForType String String", "Check mets files for given type.");
-        addCommand(com);
-
-        com = new MCRCommand("check mets files for type {0}", "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForType String",
-                "Check mets files for given type.");
-        addCommand(com);
-
-        com = new MCRCommand("check mets files for Object {0} with exclude label {1}",
-                "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForMCRObjectID String String", "Check mets files for given object.");
-        addCommand(com);
-
-        com = new MCRCommand("check mets files for Object {0}", "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForMCRObjectID String",
-                "Check mets files for given object ID.");
-        addCommand(com);
-
-        com = new MCRCommand("check mets files for Derivate {0}", "org.mycore.frontend.cli.MCRMetsModsCommands.checkMetsForMCRDerivateID String",
-                "Check mets files for given derivate ID.");
-        addCommand(com);
-
-        com = new MCRCommand("check mets files", "org.mycore.frontend.cli.MCRMetsModsCommands.checkMets", "Check the mets.xml file.");
-        addCommand(com);
-
-        com = new MCRCommand("remove mets files", "org.mycore.frontend.cli.MCRMetsModsCommands.removeMets", "Remove all mets files.");
-        addCommand(com);
-
-        com = new MCRCommand("add file {0} to mets document in {1}", "org.mycore.frontend.cli.MCRMetsModsCommands.addFileToMets String String",
-                "Adds the given file with name {0} to the mets document contained in derivate {1}.");
-        addCommand(com);
-    }
-
+    @MCRCommand(syntax = "check mets files for type {0}", help = "Check mets files for given type.", order = 20)
     public static void checkMetsForType(String type) {
         checkMetsForType(type, null);
     }
 
+    @MCRCommand(syntax = "check mets files for type {0} with exclude label {1}",
+            help = "Check mets files for given type.", order = 10)
     public static void checkMetsForType(String type, String exclude) {
         LOGGER.info("Check METS file for type " + type + " start.");
         final long start = System.currentTimeMillis();
@@ -136,7 +103,8 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
 
         }
 
-        LOGGER.debug("Check METS file for type " + type + " request took " + (System.currentTimeMillis() - start) + "ms.");
+        LOGGER.debug("Check METS file for type " + type + " request took " + (System.currentTimeMillis() - start)
+                + "ms.");
     }
 
     /**
@@ -145,6 +113,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
      * @param MCRID
      *            the MCRObjectID
      */
+    @MCRCommand(syntax = "check mets files for Object {0}", help = "Check mets files for given object ID.", order = 40)
     public static void checkMetsForMCRObjectID(String MCRID) {
         checkMetsForMCRObjectID(MCRID, null);
     }
@@ -158,6 +127,8 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
      *            the label to exclude dataset of the derivate refernce in the
      *            object
      */
+    @MCRCommand(syntax = "check mets files for Object {0} with exclude label {1}",
+            help = "Check mets files for given object.", order = 30)
     public static void checkMetsForMCRObjectID(String MCRID, String excludelabel) {
         LOGGER.info("Check METS file for ID " + MCRID + " start.");
         final long start = System.currentTimeMillis();
@@ -185,6 +156,8 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
      * @param MCRID
      *            the MCRObjectID
      */
+    @MCRCommand(syntax = "check mets files for Derivate {0}", help = "Check mets files for given derivate ID.",
+            order = 50)
     public static void checkMetsForMCRDerivateID(String MCRID) {
         LOGGER.info("Check METS file for ID " + MCRID + "  start.");
         final long start = System.currentTimeMillis();
@@ -203,6 +176,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
     /**
      * The command check mets.xml files in the derivates.
      */
+    @MCRCommand(syntax = "check mets files", help = "Check the mets.xml file.", order = 60)
     public static void checkMets() throws Exception {
         LOGGER.debug("Check METS file start.");
         final long start = System.currentTimeMillis();
@@ -272,6 +246,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
      * 
      * @throws Exception
      */
+    @MCRCommand(syntax = "remove mets files", help = "Remove all mets files.", order = 70)
     public static void removeMets() throws Exception {
         LOGGER.debug("Remove METS file start.");
         final long start = System.currentTimeMillis();
@@ -290,15 +265,17 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
     }
 
     /**
-      * This method adds the given file to the mets document. If the filename is
-      * already present in the mets file nothing is done. If there no mets file
-      * within the given derivate nothing is done.
-      * 
-      * @param filename
-      *            the name of the file to add
-      * @param derivate
-      *            the derivate where the mets file is located
-      */
+     * This method adds the given file to the mets document. If the filename is
+     * already present in the mets file nothing is done. If there no mets file
+     * within the given derivate nothing is done.
+     * 
+     * @param filename
+     *            the name of the file to add
+     * @param derivate
+     *            the derivate where the mets file is located
+     */
+    @MCRCommand(syntax = "add file {0} to mets document in {1}",
+            help = "Adds the given file with name {0} to the mets document contained in derivate {1}.", order = 80)
     public static void addFileToMets(String filename, String derivate) {
         LOGGER.info("Adding file " + filename + " to mets file in " + derivate);
         if (filename == null || filename.length() == 0 || derivate == null || derivate.length() == 0) {
@@ -348,8 +325,9 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         al.add(MCRConstants.METS_NAMESPACE);
         al.add(MCRConstants.XLINK_NAMESPACE);
         XPathFactory xpf = XPathFactory.instance();
-        XPathExpression<Element> obj = xpf.compile("mets:mets/mets:fileSec/mets:fileGrp[@USE='MASTER']/mets:file/mets:FLocat[@xlink:href='" + filename + "']",
-                Filters.element(), null, al);
+        XPathExpression<Element> obj = xpf.compile(
+                "mets:mets/mets:fileSec/mets:fileGrp[@USE='MASTER']/mets:file/mets:FLocat[@xlink:href='" + filename
+                        + "']", Filters.element(), null, al);
         return obj != null;
 
     }

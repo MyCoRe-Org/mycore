@@ -13,8 +13,9 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.MCRAbstractCommands;
-import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.frontend.cli.MCRObjectCommands;
+import org.mycore.frontend.cli.annotation.MCRCommand;
+import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.solr.MCRSolrServerFactory;
 import org.mycore.solr.index.MCRSolrIndexer;
 
@@ -24,78 +25,72 @@ import org.mycore.solr.index.MCRSolrIndexer;
  * @author shermann
  *
  */
+@MCRCommandGroup(name="MCR SOLR Commands")
 public class MCRSolrCommands extends MCRAbstractCommands {
+        @MCRCommand(syntax="rebuild solr metadata and content index", help="rebuilds solr's metadata and content index", order=10)
+        public static void rebuildMetadataAndContentIndex() throws Exception{
+            MCRSolrIndexer.rebuildMetadataAndContentIndex();
+        }
 
-    public MCRSolrCommands() {
-        super("Solr Commands");
-        MCRCommand com = null;
+        @MCRCommand(syntax="rebuild solr metadata index", help="rebuilds solr's metadata index", order=20)
+        public static void rebuildMetadataIndex(){
+            MCRSolrIndexer.rebuildMetadataIndex();
+        }
 
-        String solrIndexerClassName = MCRSolrIndexer.class.getCanonicalName();
-        String commandClassName = getClass().getCanonicalName();
+        @MCRCommand(syntax="rebuild solr content index", help="rebuilds solr's content index", order=30)
+        public static void rebuildContentIndex(){
+            MCRSolrIndexer.rebuildContentIndex();
+        }
 
-        com = new MCRCommand("rebuild solr metadata and content index", solrIndexerClassName + ".rebuildMetadataAndContentIndex",
-            "rebuilds solr's metadata and content index");
-        addCommand(com);
+        @MCRCommand(syntax="restricted rebuild solr metadata index for objecttype {0}", help="rebuilds solr's metadata index for the given type in {0}", order=40)
+        public static void rebuildMetadataIndex(String type){
+            MCRSolrIndexer.rebuildMetadataIndex(type);
+        }
 
-        com = new MCRCommand("rebuild solr metadata index", solrIndexerClassName + ".rebuildMetadataIndex",
-            "rebuilds solr's metadata index");
-        addCommand(com);
-
-        com = new MCRCommand("rebuild solr content index", solrIndexerClassName + ".rebuildContentIndex", "rebuilds solr's content index");
-        addCommand(com);
-
-        com = new MCRCommand("restricted rebuild solr metadata index for objecttype {0}", solrIndexerClassName
-            + ".rebuildMetadataIndex String", "rebuilds solr's metadata index for the given type in {0}");
-        addCommand(com);
-
-        com = new MCRCommand("restricted rebuild solr metadata index for selected", commandClassName + ".rebuildMetadataIndexForSelected",
-            "rebuilds solr's metadata index for selected objects");
-        addCommand(com);
-
-        com = new MCRCommand("restricted rebuild solr content index for selected", commandClassName + ".rebuildContentIndexForSelected",
-            "rebuilds solr's content index for selected objects and or derivates");
-        addCommand(com);
-
-        com = new MCRCommand("restricted rebuild solr metadata index for object {0}", commandClassName
-            + ".rebuildMetadataIndexForObject String", "rebuilds solr's metadata index for object and all its children");
-        addCommand(com);
-
-        com = new MCRCommand("optimize solr index", solrIndexerClassName + ".optimize",
+        @MCRCommand(syntax="optimize solr index", help=
             "An optimize is like a hard commit except that it forces all of the index segments to be merged into a single segment first. "
                 + "Depending on the use cases, this operation should be performed infrequently (like nightly), "
-                + "if at all, since it is very expensive and involves reading and re-writing the entire index");
-        addCommand(com);
+                + "if at all, since it is very expensive and involves reading and re-writing the entire index", order=80)
+        public static void optimize(){
+            MCRSolrIndexer.optimize();
+        }
 
-        com = new MCRCommand("drop solr index", solrIndexerClassName + ".dropIndex", "Deletes an existing index from solr");
-        addCommand(com);
+        @MCRCommand(syntax="drop solr index", help="Deletes an existing index from solr", order=90)
+        public static void dropIndex() throws Exception{
+            MCRSolrIndexer.dropIndex();
+        }
 
-        com = new MCRCommand("delete index part for type {0}", solrIndexerClassName + ".dropIndexByType String",
-            "Deletes an existing index from solr but only for the given object type.");
-        addCommand(com);
+        @MCRCommand(syntax="delete index part for type {0}", help="Deletes an existing index from solr but only for the given object type.", order=100)
+        public static void dropIndexByType(String type) throws Exception{
+            MCRSolrIndexer.dropIndexByType(type);
+        }
 
-        com = new MCRCommand("delete from solr index by id {0}", solrIndexerClassName + ".deleteByIdFromSolr String",
-            "Deletes an document from the index by id");
-        addCommand(com);
+        @MCRCommand(syntax="delete from solr index by id {0}", help="Deletes an document from the index by id", order=110)
+        public static void deleteByIdFromSolr(String solrID){
+            MCRSolrIndexer.deleteByIdFromSolr(solrID);
+        }
 
-        com = new MCRCommand("create solr metadata and content index at {0}", commandClassName + ".createIndex String",
-            "create solr's metadata and content index on specific solr server");
-        addCommand(com);
+ 
+        @MCRCommand(syntax="set solr server {0}", help="Sets a new SOLR server, {0} specifies the URL of the SOLR Server", order=130)
+        public static void setSolrServer(String solrServerURL){
+            MCRSolrServerFactory.setSolrServer(solrServerURL);
+        }
+        
+    
 
-        com = new MCRCommand("set solr server {0}", MCRSolrServerFactory.class.getCanonicalName() + ".setSolrServer String",
-            "Sets the solr new server");
-        addCommand(com);
-    }
-
+    @MCRCommand(syntax="restricted rebuild solr metadata index for selected", help="rebuilds solr's metadata index for selected objects", order=50)
     public static void rebuildMetadataIndexForSelected() {
         List<String> selectedObjects = MCRObjectCommands.getSelectedObjectIDs();
         MCRSolrIndexer.rebuildMetadataIndex(selectedObjects);
     }
 
+    @MCRCommand(syntax="restricted rebuild solr content index for selected", help="rebuilds solr's content index for selected objects and or derivates", order=60)
     public static void rebuildContentIndexForSelected() {
         List<String> selectedObjects = MCRObjectCommands.getSelectedObjectIDs();
         MCRSolrIndexer.rebuildContentIndex(selectedObjects);
     }
 
+    @MCRCommand(syntax="restricted rebuild solr metadata index for object {0}", help="rebuilds solr's metadata index for object and all its children", order=70)
     public static void rebuildMetadataIndexForObject(String id) {
         MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(id));
         List<MCRObject> objectList = MCRObjectUtils.getDescendantsAndSelf(mcrObject);
@@ -106,6 +101,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         MCRSolrIndexer.rebuildMetadataIndex(idList);
     }
 
+    
+    @MCRCommand(syntax="create solr metadata and content index at {0}", help="create solr's metadata and content index on specific solr server", order=120)
     public static void createIndex(String url) throws Exception {
         SolrServer cuss = MCRSolrServerFactory.createConcurrentUpdateSolrServer(url);
         SolrServer hss = MCRSolrServerFactory.createSolrServer(url);
