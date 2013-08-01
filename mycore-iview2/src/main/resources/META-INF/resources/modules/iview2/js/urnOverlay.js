@@ -100,6 +100,7 @@
 
 
 				}
+				this._toolBarVisible = true;
 
 				jQuery(window).trigger("resize");
 			} else {
@@ -117,7 +118,6 @@
 
 				if (this._iViewInstance.removeDimensionSubstract(true,
 						'UrnToolbar')) {
-					this._toolBarVisible = false;
 					jQuery(container).find(".toolbars").css({
 						top : "-=27px",
 					});
@@ -133,6 +133,7 @@
 					}
 
 				}
+				this._toolBarVisible = false;
 				jQuery(window).trigger("resize");
 			}
 		};
@@ -183,7 +184,6 @@
 						.getStoragePair(that._URN_TOOLBAR_STORAGE_KEY);
 				if (that.hasUrn && toolBarVisible != "false") {
 					that._view.setUrnToolbarVisible(true);
-					that._view.setUrnButtonVisible(false, false);
 					that.updateUrn();
 				} else {
 					if (that.hasUrn) {
@@ -222,8 +222,8 @@
 
 		constructor.prototype.urnButtonClicked = function urn_urnButtonClicked(
 				button) {
-			this._view.setUrnToolbarVisible(true);
-			this._view.setUrnButtonVisible(false, true);
+			
+			this._view.setUrnToolbarVisible(!this._view._toolBarVisible);
 		}
 
 		return constructor;
