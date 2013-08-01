@@ -16,6 +16,10 @@
 	z-index: 50;
 }
 
+div.urnBox:not([style*="none;"])~ div.permalinkArea {
+	top: 73px;
+} 
+
 .viewerContainer .permalinkArea .content {
 	background-color: #efefef;
 	width:100%;
@@ -23,4 +27,3 @@
 	overflow:scroll;
 	border: 0;
 }
-

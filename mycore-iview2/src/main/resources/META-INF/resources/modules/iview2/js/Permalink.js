@@ -46,7 +46,7 @@ iview.Permalink.View.prototype = {
 	 * @description displays the permalink container with slide-down effect
 	 */    
     show : function () {
-    	this.permalink.show("blind");
+    	this.permalink.show();
     },
   
 	/**
@@ -55,7 +55,7 @@ iview.Permalink.View.prototype = {
 	 * @description hides the permalink container with slide-up effect
 	 */  
     hide : function () {
-    	this.permalink.hide("blind");
+    	this.permalink.hide();
     },
  
 	/**
