@@ -73,10 +73,10 @@ public class MCRBasicCommands {
             MCRCommandLineInterface.output("Unknown command:" + pattern);
         }
     }
-
+    
     @MCRCommand(syntax = "process {0}", help = "Execute the commands listed in the text file {0}.", order = 30)
-    public static void readCommandsFile(String file) throws IOException, FileNotFoundException {
-        MCRCommandLineInterface.readCommandsFile(file);
+    public static List<String> readCommandsFile(String file) throws IOException, FileNotFoundException {
+        return MCRCommandLineInterface.readCommandsFile(file);
     }
 
     @MCRCommand(syntax = "exit", help = "Stop and exit the commandline tool.", order = 40)
