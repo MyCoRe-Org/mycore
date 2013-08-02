@@ -281,7 +281,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * @throws SAXParseException
      * @throws MCRException
      */
-    @MCRCommand(syntax = "update permission {0} for id {1} with rulefile {2} and description {3}",
+    @MCRCommand(syntax = "update permission {0} for id {1} with rulefile {2} described by {3}",
             help = "The command updates access rule for a given id of a given permission with a given special rule",
             order = 60)
     public static void permissionUpdateForID(String permission, String id, String strFileRule, String description)
@@ -330,7 +330,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      */
 
     @MCRCommand(
-            syntax = "update permission {0} for selected with rulefile {1} and description {2}",
+            syntax = "update permission {0} for selected with rulefile {1} described by {2}",
             help = "The command updates access rule for a given permission and all ids of a given MCRObject-Type with a given special rule",
             order = 80)
     public static void permissionUpdateForSelected(String permission, String strFileRule, String description)
