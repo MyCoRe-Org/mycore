@@ -55,6 +55,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
+import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -62,10 +63,11 @@ import org.xml.sax.SAXParseException;
  * interface.
  * 
  * @author Jens Kupferschmidt
- * @author Frank L�tzenkirchen
+ * @author Frank Lützenkirchen
  * @version $Revision$ $Date: 2010-10-29 15:17:03 +0200 (Fri, 29 Oct
  *          2010) $
  */
+@MCRCommandGroup(name="MCR Derivate Commands")
 public class MCRDerivateCommands extends MCRAbstractCommands {
     /** The logger */
     private static Logger LOGGER = Logger.getLogger(MCRDerivateCommands.class.getName());
