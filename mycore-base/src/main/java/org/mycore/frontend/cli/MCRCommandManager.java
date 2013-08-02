@@ -43,6 +43,7 @@ public class MCRCommandManager {
 
     public MCRCommandManager() {
         try {
+            initBuiltInCommands();
             initCommands();
         } catch (Exception ex) {
             MCRCLIExceptionHandler.handleException(ex);
@@ -53,9 +54,13 @@ public class MCRCommandManager {
     public static TreeMap<String, List<MCRCommand>> getKnownCommands(){
         return knownCommands;
     }
+    
+    protected void initBuiltInCommands(){
+        addAnnotatedCLIClass(MCRBasicCommands.class);
+    }
+    
     protected void initCommands() {
         // load build-in commands
-        addAnnotatedCLIClass(MCRBasicCommands.class);
         initConfiguredCommands("Internal");
         initConfiguredCommands("External");
     }
