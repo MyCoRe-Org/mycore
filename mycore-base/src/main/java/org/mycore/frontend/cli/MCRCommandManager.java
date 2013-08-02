@@ -46,19 +46,23 @@ public class MCRCommandManager {
             initBuiltInCommands();
             initCommands();
         } catch (Exception ex) {
-            MCRCLIExceptionHandler.handleException(ex);
-            System.exit(1);
+            handleInitException(ex);
         }
     }
 
-    public static TreeMap<String, List<MCRCommand>> getKnownCommands(){
+    protected void handleInitException(Exception ex) {
+        MCRCLIExceptionHandler.handleException(ex);
+        System.exit(1);
+    }
+
+    public static TreeMap<String, List<MCRCommand>> getKnownCommands() {
         return knownCommands;
     }
-    
-    protected void initBuiltInCommands(){
+
+    protected void initBuiltInCommands() {
         addAnnotatedCLIClass(MCRBasicCommands.class);
     }
-    
+
     protected void initCommands() {
         // load build-in commands
         initConfiguredCommands("Internal");
@@ -66,7 +70,7 @@ public class MCRCommandManager {
     }
 
     /** Read internal and/or external commands */
-    private void initConfiguredCommands(String type) {
+    protected void initConfiguredCommands(String type) {
         String prefix = "MCR.CLI.Classes." + type;
         Properties p = MCRConfiguration.instance().getProperties(prefix);
         for (Object propertyName : p.keySet()) {
@@ -101,7 +105,7 @@ public class MCRCommandManager {
         } else {
             groupName = cliClass.getSimpleName();
         }
-        Method[] methods = cliClass.getMethods();
+        Method[] methods = cliClass.getDeclaredMethods();
         final Class<org.mycore.frontend.cli.annotation.MCRCommand> mcrCommandAnnotation = org.mycore.frontend.cli.annotation.MCRCommand.class;
         Arrays.sort(methods, new Comparator<Method>() {
             @Override

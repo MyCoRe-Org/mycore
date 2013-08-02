@@ -8,7 +8,12 @@ import java.util.ArrayList;
 
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.frontend.cli.MCRCommand;
+import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 
+/**
+ * Please remove this class and use annotation {@link org.mycore.frontend.cli.annotation.MCRCommand} and {@link MCRCommandGroup}
+ */
+@Deprecated
 public abstract class MCRWebCLICommand extends MCRCommand {
     
     public MCRWebCLICommand() {
