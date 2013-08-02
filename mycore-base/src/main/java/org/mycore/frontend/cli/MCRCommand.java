@@ -141,7 +141,7 @@ public class MCRCommand {
 
         for (int i = 0; i < parameterTypes.length; i++) {
             Class<?> paramtype = parameterTypes[i];
-            if (Integer.class.isAssignableFrom(paramtype)) {
+            if (Integer.class.isAssignableFrom(paramtype) || Long.class.isAssignableFrom(paramtype) ) {
                 messageFormat.setFormat(i, NumberFormat.getIntegerInstance());
             } else if (!String.class.isAssignableFrom(paramtype)) {
                 unsupportedArgException(className + "." + methodName, paramtype.getName());
