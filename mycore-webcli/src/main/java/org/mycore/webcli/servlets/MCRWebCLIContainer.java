@@ -46,7 +46,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.webcli.cli.MCRCommandPool;
-import org.mycore.webcli.cli.MCRKnownWebCLICommands;
+import org.mycore.webcli.cli.MCRWebCLICommandManager;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -175,7 +175,7 @@ class MCRWebCLIContainer {
     protected static void initializeCommands() {
         if (knownCommands == null) {
             knownCommands = new TreeMap<String, List<MCRCommand>>();
-            knownCommands.putAll(new MCRKnownWebCLICommands().getCommandsMap());
+            knownCommands.putAll(new MCRWebCLICommandManager().getCommandsMap());
         } else if (knownCommands.containsKey(JSON_POOL_NAME)) {
             knownCommands.remove(JSON_POOL_NAME);
         }

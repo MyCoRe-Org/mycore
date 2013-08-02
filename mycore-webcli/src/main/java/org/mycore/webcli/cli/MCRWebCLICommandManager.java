@@ -29,35 +29,37 @@ import java.util.TreeMap;
 
 import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.frontend.cli.MCRCommandLineInterface;
-import org.mycore.frontend.cli.MCRKnownCommands;
+import org.mycore.frontend.cli.MCRCommandManager;
 import org.mycore.webcli.cli.command.MCRAddCommands;
 
 /**
  * @author Thomas Scheffler (yagee)
- *
+ * 
  */
-public class MCRKnownWebCLICommands extends MCRKnownCommands {
+public class MCRWebCLICommandManager extends MCRCommandManager {
 
-    public MCRKnownWebCLICommands() {
+    public MCRWebCLICommandManager() {
         initCommands();
     }
 
     @Override
     protected void initBuiltInCommands() {
         ArrayList<MCRCommand> commands = new ArrayList<MCRCommand>();
-        commands.add(new MCRCommand("process {0}", MCRCommandLineInterface.class.getName() + ".readCommandsFile String",
-            "Execute the commands listed in the text file {0}."));
-        commands.add(new MCRCommand("show command statistics", MCRCommandLineInterface.class.getName() + ".showCommandStatistics",
-            "Show statistics on number of commands processed and execution time needed per command"));
+        commands.add(new MCRCommand("process {0}",
+                MCRCommandLineInterface.class.getName() + ".readCommandsFile String",
+                "Execute the commands listed in the text file {0}."));
+        commands.add(new MCRCommand("show command statistics", MCRCommandLineInterface.class.getName()
+                + ".showCommandStatistics",
+                "Show statistics on number of commands processed and execution time needed per command"));
         commands.add(new MCRCommand("cancel on error", "org.mycore.frontend.cli.MCRCommandLineInterface.cancelOnError",
-            "Cancel execution of further commands in case of error"));
+                "Cancel execution of further commands in case of error"));
         commands.add(new MCRCommand("skip on error", "org.mycore.frontend.cli.MCRCommandLineInterface.skipOnError",
-            "Skip execution of failed command in case of error"));
+                "Skip execution of failed command in case of error"));
         commands.add(new MCRAddCommands());
         knownCommands.put("Basic commands", commands);
     }
-    
-    public TreeMap<String, List<MCRCommand>> getCommandsMap(){
+
+    public TreeMap<String, List<MCRCommand>> getCommandsMap() {
         return knownCommands;
     }
 
