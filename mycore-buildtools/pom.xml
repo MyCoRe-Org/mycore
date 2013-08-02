@@ -32,7 +32,7 @@
     <dependency>
       <groupId>org.codehaus.cargo</groupId>
       <artifactId>cargo-core-api-module</artifactId>
-      <version>1.0.1-alpha-2</version>
+      <version>1.4.3</version>
       <exclusions>
         <exclusion>
           <groupId>jdom</groupId>
