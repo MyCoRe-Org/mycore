@@ -117,7 +117,7 @@ public class MCRCommandManager {
                 if (m2.isAnnotationPresent(mcrCommandAnnotation)) {
                     im2 = m2.getAnnotation(mcrCommandAnnotation).order();
                 }
-                return im2 - im1;
+                return im1 - im2;
             }
         });
         for (Method method : methods) {
