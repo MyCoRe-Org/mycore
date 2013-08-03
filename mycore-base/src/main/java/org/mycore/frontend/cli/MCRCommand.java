@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang.ClassUtils;
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfigurationException;
 
 /**
@@ -48,6 +49,9 @@ import org.mycore.common.MCRConfigurationException;
  * @version $Revision$ $Date$
  */
 public class MCRCommand {
+    
+    private static final Logger LOGGER = Logger.getLogger(MCRCommand.class);
+    
     /** The input format used for invoking this command */
     protected MessageFormat messageFormat;
 
@@ -251,9 +255,11 @@ public class MCRCommand {
         Object[] commandParameters = parseCommandLine(input);
 
         if (commandParameters == null) {
+            LOGGER.info("No match for syntax: "+getSyntax());
             return null;
         }
-
+        LOGGER.info("Syntax matched (executed): "+getSyntax());
+        
         initMethod(classLoader);
         prepareInvocationParameters(commandParameters);
         Object result = method.invoke(null, commandParameters);
