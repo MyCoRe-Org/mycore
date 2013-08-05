@@ -23,9 +23,9 @@
 
 package org.mycore.frontend.xeditor;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -44,9 +44,9 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
     protected final static Logger LOGGER = Logger.getLogger(MCRStaticXEditorFileServlet.class);
 
     @Override
-    protected MCRContent expandEditorElements(HttpServletRequest request, File file) throws IOException, JDOMException, SAXException,
+    protected MCRContent expandEditorElements(HttpServletRequest request, URL resource) throws IOException, JDOMException, SAXException,
             MalformedURLException {
-        MCRContent content = super.expandEditorElements(request, file);
+        MCRContent content = super.expandEditorElements(request, resource);
         if (mayContainEditorForm(content)) {
             String sessionID = request.getParameter(MCREditorSessionStore.XEDITOR_SESSION_PARAM);
             MCREditorSession session = null;

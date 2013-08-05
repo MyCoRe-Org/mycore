@@ -41,8 +41,17 @@
         show derivate urn in derivate section (merged revision 27411 from trunk)
       </action>
       <action dev="mcrtchef" type="fix" date="2013-07-22">
-        MCRUploadHandlerIFS leaks JDBC Connection  (merged revision 27461 and 27461 from trunk)
+        MCRUploadHandlerIFS leaks JDBC Connection (merged revision 27461 and 27461 from trunk)
         <fixes issue="643"/>
+      </action>
+      <action dev="mcrsteph" type="fix" date="2013-07-26">
+        accept different exit code for newer versions of "pdftotext" tool (merged revision 27500 and 27502 from trunk)
+      </action>
+      <action dev="mcrfluet" type="fix">
+        Fix for bug #644 (xeditor don't allow dot in element name) and another bug
+        (xed:bind/@value sets the value not only for the last generated node, but
+        for all generated parent elements also) (merged revision 27513 and 27518 from trunk)
+        <fixes issue="644"/>
       </action>
     </release>
     <release version="2013.06.0" date="2013-06-20" description="2013 LTS" />

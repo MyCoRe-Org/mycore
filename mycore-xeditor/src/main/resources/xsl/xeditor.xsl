@@ -63,7 +63,7 @@
     <xsl:value-of select="transformer:setCancelURL($transformer,@url)" />
   </xsl:template>
 
-  <!-- ========== <xed:postprocessor xsl="" /> ========== -->
+  <!-- ========== <xed:post-processor xsl="" /> ========== -->
   
   <xsl:template match="xed:post-processor" mode="xeditor">
     <xsl:value-of select="transformer:setPostProcessorXSL($transformer,@xsl)" />
