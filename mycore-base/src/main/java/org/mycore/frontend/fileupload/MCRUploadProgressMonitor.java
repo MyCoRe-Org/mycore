@@ -534,25 +534,29 @@ public class MCRUploadProgressMonitor extends JDialog {
             upm.startFile(file.getName(), file.length());
 
             FileInputStream fin = new FileInputStream(file);
-            byte[] buffer = new byte[65536];
-            long num = 0;
-
-            if (upm.isCanceled()) {
-                break;
-            }
-            while ((num = fin.read(buffer, 0, buffer.length)) != -1) {
-                // Simulate a read error and the following cancel() invocation
-                // if( i == 2 ) { upm.cancel( new java.io.IOException(
-                // "Simulierter Lesefehler" ) ); return; }
+            try {
+                byte[] buffer = new byte[65536];
+                long num = 0;
 
                 if (upm.isCanceled()) {
                     break;
                 }
-                upm.progressFile(num);
-                Thread.sleep(300); // Simulate network transfer time
-                if (upm.isCanceled()) {
-                    break;
+                while ((num = fin.read(buffer, 0, buffer.length)) != -1) {
+                    // Simulate a read error and the following cancel() invocation
+                    // if( i == 2 ) { upm.cancel( new java.io.IOException(
+                    // "Simulierter Lesefehler" ) ); return; }
+
+                    if (upm.isCanceled()) {
+                        break;
+                    }
+                    upm.progressFile(num);
+                    Thread.sleep(300); // Simulate network transfer time
+                    if (upm.isCanceled()) {
+                        break;
+                    }
                 }
+            } finally {
+                fin.close();
             }
 
             if (!upm.isCanceled()) {

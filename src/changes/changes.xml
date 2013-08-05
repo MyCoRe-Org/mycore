@@ -9,8 +9,15 @@
       <action dev="mcrkrebs" type="fix">
         fixed typo in solr field for identifier (merged revision 27261 from trunk)
       </action>
+      <action dev="mcrfluet" type="add">
+        Added support for request parameters in include/@uri and @ref (as in source/@uri) to allow dynamic includes (merged revision 27273 from trunk)
+      </action>
+      <action dev="mcrfluet" type="fix" date="2013-07-02" due-to="Nils">
+        content length header of MCRFileNodeServlets handles files over 2 GB correctly. (merged revision 27286 from trunk)
+      </action>
       <action dev="mcrfluet" type="fix">
         Fix for bug #639 Editor Framework changes HTML button element in static webpages (merged revision 27294 from trunk)
+        <fixes issue="639"/>
       </action>
       <action dev="mcrkrebs" type="fix">
         updated to recent zdb format changes (merged revision 27351 from trunk)
@@ -32,6 +39,10 @@
       </action>
       <action dev="mcrkrebs" type="update">
         show derivate urn in derivate section (merged revision 27411 from trunk)
+      </action>
+      <action dev="mcrtchef" type="fix" date="2013-07-22">
+        MCRUploadHandlerIFS leaks JDBC Connection  (merged revision 27461 and 27461 from trunk)
+        <fixes issue="643"/>
       </action>
     </release>
     <release version="2013.06.0" date="2013-06-20" description="2013 LTS" />

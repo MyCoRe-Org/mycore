@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -168,7 +169,8 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             LOGGER.debug("Received md5      = " + md5);
 
             // start transaction after MCRSession is initialized
-            long numBytesStored = MCRUploadHandlerManager.getHandler(uploadId).receiveFile(path, zis, length, md5);
+            MCRUploadHandler uploadHandler = MCRUploadHandlerManager.getHandler(uploadId);
+            long numBytesStored = uploadHandler.receiveFile(path, zis, length, md5);
 
             LOGGER.debug("Stored incoming file content");
 
@@ -179,6 +181,10 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
         } catch (Exception ex) {
             LOGGER.error("Exception while receiving and storing file content from applet:", ex);
         } finally {
+            if (MCRSessionMgr.hasCurrentSession()) {
+                //bug fix for: http://sourceforge.net/p/mycore/bugs/643/
+                MCRSessionMgr.releaseCurrentSession();
+            }
             try {
                 if (socket != null) {
                     socket.close();
@@ -256,11 +262,9 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             String uploadId = req.getParameter("uploadId");
             if (uploadId == null) {
                 StringBuilder sb = new StringBuilder("'uploadId' was not submitted. Request:\n");
-                @SuppressWarnings("unchecked")
                 Enumeration<String> headerNames = req.getHeaderNames();
                 while (headerNames.hasMoreElements()) {
                     String header = headerNames.nextElement();
-                    @SuppressWarnings("unchecked")
                     Enumeration<String> headerValues = req.getHeaders(header);
                     while (headerValues.hasMoreElements()) {
                         sb.append(header).append(':').append(headerValues.nextElement()).append('\n');
@@ -360,7 +364,6 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
      * @return a new {@link LinkedHashMap} with all extracted filenames and file
      *         items
      */
-    @SuppressWarnings("unchecked")
     private LinkedHashMap<String, FileItem> getFileItems(MCREditorSubmission sub) {
         LinkedHashMap<String, FileItem> result = new LinkedHashMap<String, FileItem>();
         Element uploads = sub.getXML().getRootElement();
@@ -383,7 +386,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
      */
     private LinkedHashMap<String, FileItem> getFileItems(MCRRequestParameters params) {
         LinkedHashMap<String, FileItem> result = new LinkedHashMap<String, FileItem>();
-        Enumeration parameterNames = params.getParameterNames();
+        Enumeration<String> parameterNames = params.getParameterNames();
         while (parameterNames.hasMoreElements()) {
             String path = parameterNames.nextElement().toString();
             String prefix = "/upload/path/";
@@ -398,7 +401,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     private void uploadZipFile(MCRUploadHandler handler, InputStream in) throws IOException, Exception {
         ZipInputStream zis = new ZipInputStream(in);
         MCRNotClosingInputStream nis = new MCRNotClosingInputStream(zis);
-        ZipEntry entry = null; 
+        ZipEntry entry = null;
         while ((entry = zis.getNextEntry()) != null) {
             String path = entry.getName();
 
@@ -452,7 +455,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     }
 
     protected void sendException(HttpServletResponse res, Exception ex) throws Exception {
-        HashMap response = new HashMap();
+        HashMap<String, String> response = new HashMap<>();
         response.put("clname", ex.getClass().getName());
         response.put("strace", MCRException.getStackTraceAsString(ex));
 
@@ -463,8 +466,8 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
         sendResponse(res, "upload/exception", response);
     }
 
-    protected void sendResponse(HttpServletResponse res, Object value) throws Exception {
-        HashMap parameters = new HashMap();
+    protected void sendResponse(HttpServletResponse res, String value) throws Exception {
+        HashMap<String, String> parameters = new HashMap<>();
 
         if (value != null) {
             parameters.put("return", value);
@@ -473,27 +476,21 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
         sendResponse(res, "upload/response", parameters);
     }
 
-    protected void sendResponse(HttpServletResponse res, String mime, Map parameters) throws Exception {
+    protected void sendResponse(HttpServletResponse res, String mime, Map<String, String> parameters) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
         DataOutputStream dos = new DataOutputStream(baos);
-        Set entries = parameters.entrySet();
+        Set<Entry<String, String>> entries = parameters.entrySet();
 
         dos.writeUTF(mime);
 
-        for (Object entry1 : entries) {
-            Map.Entry entry = (Map.Entry) entry1;
+        for (Entry<String, String> entry : entries) {
 
             // write out key
             dos.writeUTF(entry.getKey().toString());
 
             // write out class
             dos.writeUTF(entry.getValue().getClass().getName());
-
-            if (entry.getValue().getClass() == Integer.class) {
-                dos.writeInt(((Integer) entry.getValue()).intValue());
-            } else {
-                dos.writeUTF(entry.getValue().toString());
-            }
+            dos.writeUTF(entry.getValue().toString());
         }
 
         dos.close();

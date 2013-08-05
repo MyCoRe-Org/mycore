@@ -202,7 +202,6 @@ public class MCRUploadCommunicator {
         zos.putNextEntry(ze);
 
         int num = 0;
-        long sended = 0;
         byte[] buffer = new byte[bufferSize];
 
         System.out.println("Starting to send file content...");
@@ -215,13 +214,12 @@ public class MCRUploadCommunicator {
                 break;
             }
             zos.write(buffer, 0, num);
-            sended += num;
             upm.progressFile(num);
 
             // Send a "ping" to MCRUploadServlet so that server keeps HTTP Session alive
             if (System.currentTimeMillis() - lastPing > 10000) {
                 lastPing = System.currentTimeMillis();
-                Hashtable ping = new Hashtable();
+                Hashtable <String, String> ping = new Hashtable<String, String>();
                 ping.put("method", "ping");
                 System.out.println("Sending ping to servlet...");
                 String pong = (String) send(ping);
@@ -234,9 +232,6 @@ public class MCRUploadCommunicator {
         System.out.println("Releasing file: " + file);
         source.close();
         System.out.println("Finished sending file content.");
-
-        long numBytesStored = din.readLong();
-        System.out.println("Server reports that " + numBytesStored + " bytes have been stored.");
 
         socket.close();
 
