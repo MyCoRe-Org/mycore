@@ -5,13 +5,24 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2013.07" date="2013-07-31" description="Codenamed &apos;Old Pascas&apos;">
+    <release version="2013.08" date="2013-08-0X" description="Codenamed &apos;Old Pascas&apos;">
+      <action dev="mcrtchef" type="fix" date="2013-08-05" due-to="Kathleen Neumann">
+        SearchURL from BasketServlet is not UTF-8 encoded
+        <fixes issue="646" />
+      </action>
+      <action dev="mcrtchef" type="remove">
+        mycore-webcli: removed "add commands" command an related classes
+      </action>
+      <action dev="mcrsteph" type="update">
+        use annotated style (@MCRCommandGroup, @MCRCommand) for commands (old style is still working)
+        removed support for MCR.CLI.Classes.Annotated
+      </action>
       <action dev="mcrfluet" type="fix" date="2013-07-30">
         xeditor don't allow dot in element name
         <fixes issue="644" />
       </action>
       <action dev="mcrmeich" type="update">
-        update classification editor to dojo 1.9.1 
+        update classification editor to dojo 1.9.1
       </action>
       <action dev="mcrtchef" type="update">
         use order to specify the order of command invocation per @MCRCommandGroup
