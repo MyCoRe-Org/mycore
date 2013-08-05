@@ -23,6 +23,7 @@
 
 package org.mycore.frontend.servlets;
 
+import java.net.URL;
 import java.util.Map;
 import java.util.Set;
 
@@ -66,34 +67,38 @@ public class MCRLockServlet extends MCRServlet {
         String urlValue = getProperty(job.getRequest(), PARAM_REDIRECT);
         if (urlValue == null) {
             LOGGER.debug("Redirect URL is undefined, trying referrer.");
-            urlValue = getReferer(job.getRequest()).toString();
+            URL referer = getReferer(job.getRequest());
+            urlValue = referer == null ? null : referer.toString();
         }
         if (urlValue == null) {
-            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "You must provide parameter: " + PARAM_REDIRECT);
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST,
+                "You must provide parameter: " + PARAM_REDIRECT);
             return;
         }
         String actionValue = getProperty(job.getRequest(), PARAM_ACTION);
         String idValue = getProperty(job.getRequest(), PARAM_OBJECTID);
         if (idValue == null) {
-            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "You must provide parameter: " + PARAM_OBJECTID);
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST,
+                "You must provide parameter: " + PARAM_OBJECTID);
             return;
         }
         Action action = null;
         try {
             action = actionValue != null ? Action.valueOf(actionValue) : Action.lock;
         } catch (IllegalArgumentException e) {
-            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "Unsupported value for parameter " + PARAM_ACTION + ": " + actionValue);
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST,
+                "Unsupported value for parameter " + PARAM_ACTION + ": " + actionValue);
             return;
         }
         MCRObjectID objectID = MCRObjectID.getInstance(idValue);
         switch (action) {
-        case lock:
-            MCRObjectIDLockTable.lock(objectID);
-            break;
+            case lock:
+                MCRObjectIDLockTable.lock(objectID);
+                break;
 
-        case unlock:
-            MCRObjectIDLockTable.unlock(objectID);
-            break;
+            case unlock:
+                MCRObjectIDLockTable.unlock(objectID);
+                break;
         }
         job.getRequest().setAttribute(OBJECT_ID_KEY, objectID);
         job.getRequest().setAttribute(ACTION_KEY, action);
@@ -120,7 +125,8 @@ public class MCRLockServlet extends MCRServlet {
             url = addQueryParameter(url, req);
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(url));
         } else {
-            String errorI18N = getErrorI18N("error", "lockedBy", objectId.toString(), lockingSession.getUserInformation().getUserID());
+            String errorI18N = getErrorI18N("error", "lockedBy", objectId.toString(), lockingSession
+                .getUserInformation().getUserID());
             job.getResponse().sendError(HttpServletResponse.SC_CONFLICT, errorI18N);
         }
     }
@@ -131,7 +137,8 @@ public class MCRLockServlet extends MCRServlet {
         @SuppressWarnings("unchecked")
         Set<Map.Entry<String, String[]>> entrySet = req.getParameterMap().entrySet();
         for (Map.Entry<String, String[]> parameter : entrySet) {
-            if (!(parameter.getKey().equals(PARAM_REDIRECT) || parameter.getKey().equals(PARAM_ACTION) || url.contains(parameter.getKey() + "="))) {
+            if (!(parameter.getKey().equals(PARAM_REDIRECT) || parameter.getKey().equals(PARAM_ACTION) || url
+                .contains(parameter.getKey() + "="))) {
                 for (String value : parameter.getValue()) {
                     if (hasQueryParameter) {
                         sb.append('&');

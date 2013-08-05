@@ -24,7 +24,9 @@
 package org.mycore.frontend.servlets;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
+
 import java.io.IOException;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Hashtable;
 import java.util.regex.Matcher;
@@ -122,7 +124,8 @@ public class MCRObjectServlet extends MCRServlet {
             }
             getLayoutService().doLayout(job.getRequest(), job.getResponse(), localObject);
         } else {
-            getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRDOMContent(requestRemoteObject(job)));
+            getLayoutService().doLayout(job.getRequest(), job.getResponse(),
+                new MCRDOMContent(requestRemoteObject(job)));
         }
     }
 
@@ -151,7 +154,8 @@ public class MCRObjectServlet extends MCRServlet {
         if (MCRMetadataManager.exists(mcrid)) {
             return TM.retrieveContent(mcrid);
         }
-        job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, getErrorI18N(I18N_ERROR_PREFIX, "notFound", mcrid));
+        job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND,
+            getErrorI18N(I18N_ERROR_PREFIX, "notFound", mcrid));
         return null;
     }
 
@@ -162,7 +166,8 @@ public class MCRObjectServlet extends MCRServlet {
         try {
             mcrid = MCRObjectID.getInstance(id); // create Object with given ID, only ID syntax check performed
         } catch (MCRException e) { // handle exception: invalid ID syntax, set HTTP error 400 "Invalid request"
-            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, getErrorI18N(I18N_ERROR_PREFIX, "invalidID", id));
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST,
+                getErrorI18N(I18N_ERROR_PREFIX, "invalidID", id));
             return null; // sorry, no object to return
         }
 
@@ -170,8 +175,8 @@ public class MCRObjectServlet extends MCRServlet {
             MCRSession currentSession = MCRSessionMgr.getCurrentSession();
             job.getResponse().sendError(
                 HttpServletResponse.SC_UNAUTHORIZED,
-                getErrorI18N(I18N_ERROR_PREFIX, "accessDenied", mcrid.toString(), currentSession.getUserInformation().getUserID(),
-                    currentSession.getCurrentIP()));
+                getErrorI18N(I18N_ERROR_PREFIX, "accessDenied", mcrid.toString(), currentSession.getUserInformation()
+                    .getUserID(), currentSession.getCurrentIP()));
             return null;
         }
         return mcrid;
@@ -189,10 +194,12 @@ public class MCRObjectServlet extends MCRServlet {
             if (content != null) {
                 return content;
             }
-            job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, getErrorI18N(I18N_ERROR_PREFIX, "revisionNotFound", rev, mcrid));
+            job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND,
+                getErrorI18N(I18N_ERROR_PREFIX, "revisionNotFound", rev, mcrid));
             return null;
         }
-        job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, getErrorI18N(I18N_ERROR_PREFIX, "noVersions", mcrid));
+        job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST,
+            getErrorI18N(I18N_ERROR_PREFIX, "noVersions", mcrid));
         return null;
     }
 
@@ -273,10 +280,11 @@ public class MCRObjectServlet extends MCRServlet {
         if (referer != null) {
             return resolveEditorID(referer);
         }
-        referer = getReferer(request).toString();
-        if (referer == null) {
+        URL refererURL = getReferer(request);
+        if (refererURL == null) {
             return null;
         }
+        referer = refererURL.toString();
         if (referer.contains("MCRSearchServlet")) {
             return getEditorIDFromSearch(referer);
         }
@@ -315,7 +323,8 @@ public class MCRObjectServlet extends MCRServlet {
 
     protected static String resolveEditorID(String objectID) {
         @SuppressWarnings("unchecked")
-        Hashtable<String, String> h = (Hashtable<String, String>) MCRSessionMgr.getCurrentSession().get(EDITOR_ID_TABLE_KEY);
+        Hashtable<String, String> h = (Hashtable<String, String>) MCRSessionMgr.getCurrentSession().get(
+            EDITOR_ID_TABLE_KEY);
         if (h == null) {
             return null;
         }
@@ -325,7 +334,8 @@ public class MCRObjectServlet extends MCRServlet {
 
     protected static void storeEditorID(String objectID, String editorID) {
         @SuppressWarnings("unchecked")
-        Hashtable<String, String> h = (Hashtable<String, String>) MCRSessionMgr.getCurrentSession().get(EDITOR_ID_TABLE_KEY);
+        Hashtable<String, String> h = (Hashtable<String, String>) MCRSessionMgr.getCurrentSession().get(
+            EDITOR_ID_TABLE_KEY);
         if (h == null) {
             h = new Hashtable<String, String>();
             MCRSessionMgr.getCurrentSession().put(EDITOR_ID_TABLE_KEY, h);
