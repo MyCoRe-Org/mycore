@@ -31,10 +31,10 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -51,15 +51,17 @@ import org.mycore.common.MCRException;
 public class MCRRequestParameters {
     protected final static Logger logger = Logger.getLogger(MCREditorServlet.class);
 
-    private Hashtable<String,String[]> parameters = new Hashtable<String,String[]>();
+    private Hashtable<String, String[]> parameters = new Hashtable<String, String[]>();
 
-    private Hashtable<String,FileItem> files = new Hashtable<String,FileItem>();
+    private Hashtable<String, FileItem> files = new Hashtable<String, FileItem>();
 
     private static int threshold;
 
     private static long maxSize;
 
     private static String tmpPath;
+
+    private static DiskFileItemFactory factory;
 
     static {
         MCRConfiguration config = MCRConfiguration.instance();
@@ -72,20 +74,21 @@ public class MCRRequestParameters {
         if (!tmp.isDirectory()) {
             tmp.mkdir();
         }
+        factory = new DiskFileItemFactory();
+        factory.setSizeThreshold(threshold);
+        factory.setRepository(tmp);
     }
 
     public MCRRequestParameters(HttpServletRequest req) {
-        if (FileUploadBase.isMultipartContent(req)) {
-            DiskFileUpload parser = new DiskFileUpload();
-            parser.setHeaderEncoding("UTF-8");
-            parser.setSizeThreshold(threshold);
-            parser.setSizeMax(maxSize);
-            parser.setRepositoryPath(tmpPath);
+        if (ServletFileUpload.isMultipartContent(req)) {
+            ServletFileUpload upload = new ServletFileUpload(factory);
+            upload.setSizeMax(maxSize);
+            upload.setHeaderEncoding("UTF-8");
 
-            List items = null;
+            List<FileItem> items = null;
 
             try {
-                items = parser.parseRequest(req);
+                items = upload.parseRequest(req);
             } catch (FileUploadException ex) {
                 String msg = "Error while parsing http multipart/form-data request from file upload webpage";
                 throw new MCRException(msg, ex);
@@ -118,7 +121,7 @@ public class MCRRequestParameters {
                 }
             }
         } else {
-            for (Enumeration e = req.getParameterNames(); e.hasMoreElements();) {
+            for (Enumeration<String> e = req.getParameterNames(); e.hasMoreElements();) {
                 String name = (String) e.nextElement();
                 String[] values = req.getParameterValues(name);
 
@@ -129,7 +132,7 @@ public class MCRRequestParameters {
         }
     }
 
-    public Enumeration getParameterNames() {
+    public Enumeration<String> getParameterNames() {
         return parameters.keys();
     }
 
@@ -139,7 +142,7 @@ public class MCRRequestParameters {
         if (values == null || values.length == 0) {
             return null;
         }
-        return values[0]; 
+        return values[0];
     }
 
     public String[] getParameterValues(String name) {
