@@ -722,14 +722,14 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
             LOGGER.debug("Reading xml from webapp " + path);
             try {
                 URL resource = context.getResource(path);
-                if (resource == null) {
-                    LOGGER.error("Could not find web resource: " + path);
-                    return null;
+                if (resource != null) {
+                    return new StreamSource(resource.toURI().toASCIIString());
                 }
-                return new StreamSource(resource.toURI().toASCIIString());
             } catch (Exception ex) {
                 throw new TransformerException(ex);
             }
+            LOGGER.error("File does not exist: " + context.getRealPath(path));
+            throw new TransformerException("Could not find web resource: " + path);
         }
     }
 
