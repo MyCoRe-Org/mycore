@@ -66,7 +66,7 @@ public class MCRLockServlet extends MCRServlet {
         String urlValue = getProperty(job.getRequest(), PARAM_REDIRECT);
         if (urlValue == null) {
             LOGGER.debug("Redirect URL is undefined, trying referrer.");
-            urlValue = getReferer(job.getRequest());
+            urlValue = getReferer(job.getRequest()).toString();
         }
         if (urlValue == null) {
             job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "You must provide parameter: " + PARAM_REDIRECT);

@@ -23,6 +23,8 @@
 
 package org.mycore.frontend.basket;
 
+import java.net.URL;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -78,7 +80,7 @@ public class MCRBasketServlet extends MCRServlet {
         String[] uris = req.getParameterValues("uri");
         String[] ids = req.getParameterValues("id");
         String redirect = getProperty(req, "redirect");
-        String referer = getReferer(req);
+        URL referer = getReferer(req);
         boolean resolveContent = "true".equals(req.getParameter("resolve"));
 
         LOGGER.info(action + " " + type + " " + (ids == null ? "" : ids));
@@ -134,7 +136,7 @@ public class MCRBasketServlet extends MCRServlet {
             return;
         }
         if (referer != null && "referer".equals(redirect)) {
-            res.sendRedirect(res.encodeRedirectURL(referer));
+            res.sendRedirect(res.encodeRedirectURL(referer.toExternalForm()));
         } else {
             res.sendRedirect(res.encodeRedirectURL(getServletBaseURL() + "MCRBasketServlet?action=show&type=" + type));
         }

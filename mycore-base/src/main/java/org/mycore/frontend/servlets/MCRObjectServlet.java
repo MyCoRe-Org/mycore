@@ -273,7 +273,7 @@ public class MCRObjectServlet extends MCRServlet {
         if (referer != null) {
             return resolveEditorID(referer);
         }
-        referer = getReferer(request);
+        referer = getReferer(request).toString();
         if (referer == null) {
             return null;
         }
