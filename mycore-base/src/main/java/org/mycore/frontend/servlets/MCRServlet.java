@@ -763,18 +763,19 @@ public class MCRServlet extends HttpServlet {
      * Returns the referer of the given request.
      * @param request
      */
-    protected String getReferer(HttpServletRequest request) {
+    protected URL getReferer(HttpServletRequest request) {
         String referer;
         referer = request.getHeader("Referer");
         if (referer == null) {
             return null;
         }
         try {
-            return URLDecoder.decode(referer, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.warn("Unsupported encoding \"UTF-8\"?", e);
+            return new URL(referer);
+        } catch (MalformedURLException e) {
+            //should not happen
+            LOGGER.error("Referer is not a valid URL: " + referer, e);
+            return null;
         }
-        return referer;
     }
 
     /**
@@ -805,9 +806,9 @@ public class MCRServlet extends HttpServlet {
      * @throws IOException
      */
     protected void toReferrer(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String referrer = getReferer(request);
-        if (referrer != null && referrer.length() > 0) {
-            response.sendRedirect(response.encodeRedirectURL(referrer));
+        URL referrer = getReferer(request);
+        if (referrer != null) {
+            response.sendRedirect(response.encodeRedirectURL(referrer.toString()));
         } else {
             LOGGER.warn("Could not get referrer, returning to the application's base url");
             response.sendRedirect(response.encodeRedirectURL(MCRServlet.getBaseURL()));
