@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2013.06.0.1" date="TBA" description="2013.06.0 maintenance release 1">
+      <action dev="mcrkrebs" type="fix">
+        highwire press tags now also matches mods:dateXXX without @encoding (workaround for now)
+      </action>
       <action dev="mcrtchef" type="fix" date="2013-08-05" due-to="Kathleen Neumann">
         SearchURL from BasketServlet is not UTF-8 encoded
         <fixes issue="646"/>

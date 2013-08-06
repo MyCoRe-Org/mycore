@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- ====================================================================== 
-  Transforms MODS metadata to Highwire Press tags for the HTML <head>, 
+<!-- ======================================================================
+  Transforms MODS metadata to Highwire Press tags for the HTML <head>,
   for example
-  
+
   <meta name="citation_author" content="Doe, John" />
-  
+
   These tags may be embedded into any HTML frontpage outputting metadata.
   The tags are indexed by Google Scholar, see their inclusion guidelines:
   http://scholar.google.com/intl/en/scholar/inclusion.html
-  
+
   Usage:
   <xsl:apply-templates select="mods:mods" mode="highwire" />
 ======================================================================  -->
 
-<xsl:stylesheet version="1.0" 
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+<xsl:stylesheet version="1.0"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:mods="http://www.loc.gov/mods/v3"
   exclude-result-prefixes="xsl mods"
 >
@@ -100,10 +100,10 @@
             </xsl:for-each>
           </xsl:when>
           <xsl:when test="mods:namePart">
-            <xsl:value-of select="mods:namePart" />        
+            <xsl:value-of select="mods:namePart" />
           </xsl:when>
           <xsl:when test="mods:displayForm">
-            <xsl:value-of select="mods:displayForm" />        
+            <xsl:value-of select="mods:displayForm" />
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="text()|*" />
@@ -132,6 +132,11 @@
         </xsl:choose>
       </xsl:attribute>
     </meta>
+  </xsl:template>
+
+  <!-- FIXME: workaround while some mods applications have no encoding attribute -->
+  <xsl:template match="mods:dateIssued | mods:dateCreated | mods:dateModified" mode="highwire">
+    <xsl:value-of select="translate(text(),'-','/')" />
   </xsl:template>
 
   <xsl:template match="mods:*[@encoding='w3cdtf']" mode="highwire">
