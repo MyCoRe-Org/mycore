@@ -27,12 +27,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
+import org.apache.commons.vfs2.FileSystemException;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -237,7 +239,7 @@ public abstract class MCRContentStore {
      * @deprecated use {@link #doRetrieveMCRContent(MCRFileReader)} instead
      */
     protected abstract InputStream doRetrieveContent(MCRFileReader file) throws IOException;
-    
+
     /**
      * Retrieves the content of an MCRFile. Uses the
      * StorageID to indentify the place where the file content was stored in
@@ -269,11 +271,18 @@ public abstract class MCRContentStore {
             throw (MCRException) exc;
         }
     }
-    
+
     /**
      * Returns the local java.io.File that really stores the content of the MCRFile 
      */
-    public abstract File getLocalFile(MCRFileReader reader) throws IOException;
+    public File getLocalFile(MCRFileReader reader) throws IOException {
+        return getLocalFile(reader.getStorageID());
+    }
+
+    /**
+     * Returns the local java.io.File that really stores the content of the MCRFile 
+     */
+    public abstract File getLocalFile(String storageId) throws IOException;
 
     /** DateFormat used to construct new unique IDs based on timecode */
     protected static DateFormat formatter = new SimpleDateFormat("yyMMdd-HHmmss-SSS");
@@ -338,4 +347,5 @@ public abstract class MCRContentStore {
 
         return slots;
     }
+
 }

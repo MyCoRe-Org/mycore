@@ -118,7 +118,8 @@ public class MCRIFSCommands {
             addBaseAttributes(node, atts);
             if (localFile.length() != node.getSize()) {
                 LOGGER.warn("File size does not match for file: " + localFile);
-                atts.addAttribute(MCRIFSCommands.NS_URI, "actualSize", "actualSize", MCRIFSCommands.CDATA, Long.toString(localFile.length()));
+                atts.addAttribute(MCRIFSCommands.NS_URI, "actualSize", "actualSize", MCRIFSCommands.CDATA,
+                        Long.toString(localFile.length()));
                 return false;
             }
             //we can check MD5Sum
@@ -294,8 +295,8 @@ public class MCRIFSCommands {
         writeReport(targetDir, checker);
     }
 
-    private static void writeReport(File targetDir, FSNodeChecker checker) throws TransformerFactoryConfigurationError, SAXException, IOException,
-        FileNotFoundException, TransformerConfigurationException {
+    private static void writeReport(File targetDir, FSNodeChecker checker) throws TransformerFactoryConfigurationError, SAXException,
+            IOException, FileNotFoundException, TransformerConfigurationException {
         Session session = MCRHIBConnection.instance().getSession();
         Criteria criteria = session.createCriteria(MCRFSNODES.class);
         criteria.addOrder(Order.asc("storeid"));
@@ -361,14 +362,11 @@ public class MCRIFSCommands {
                     }
                     th.startElement(nsURI, rootName, rootName, atts);
                 }
-                if (currentStoreBaseDir == null) {
-                    continue;
-                }
                 if (!fsNode.getOwner().equals(owner)) {
                     owner = fsNode.getOwner();
                     LOGGER.info("Checking owner/derivate: " + owner);
                 }
-                File f = new File(currentStoreBaseDir, storageID);
+                File f = currentStore.getLocalFile(storageID);
                 if (!checker.checkNode(fsNode, f, atts)) {
                     th.startElement(nsURI, elementName, elementName, atts);
                     th.endElement(nsURI, elementName, elementName);
@@ -467,7 +465,8 @@ public class MCRIFSCommands {
                                 if (endOfList || checkFile == 1) {
                                     LOGGER.warn("Found orphaned file: " + currentFile);
                                     atts.clear();
-                                    atts.addAttribute(NS_URI, ATT_FILE_NAME, ATT_FILE_NAME, CDATA, baseURI.relativize(currentFile.toURI()).getPath());
+                                    atts.addAttribute(NS_URI, ATT_FILE_NAME, ATT_FILE_NAME, CDATA, baseURI.relativize(currentFile.toURI())
+                                            .getPath());
                                     th.startElement(NS_URI, ELEMENT_FILE, ELEMENT_FILE, atts);
                                     th.endElement(NS_URI, ELEMENT_FILE, ELEMENT_FILE);
                                 }

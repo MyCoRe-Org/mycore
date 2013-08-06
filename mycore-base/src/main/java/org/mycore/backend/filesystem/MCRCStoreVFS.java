@@ -141,8 +141,8 @@ public class MCRCStoreVFS extends MCRContentStore {
     }
 
     @Override
-    public File getLocalFile(MCRFileReader fr) throws IOException {
-        FileObject fileObject = fsManager.resolveFile(getBase(), fr.getStorageID());
+    public File getLocalFile(String storageId) throws IOException{
+        FileObject fileObject = fsManager.resolveFile(getBase(), storageId);
         return fileObject.getFileSystem().replicateFile(fileObject, Selectors.SELECT_SELF);
     }
 
