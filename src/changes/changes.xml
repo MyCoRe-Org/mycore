@@ -60,6 +60,9 @@
       <action dev="mcrkrebs" type="fix">
         fixed typo in solr field for identifier (merged revision 27261 from trunk)
       </action>
+      <action dev="mcrtchef" type="fix">
+        fixed handling of resources in MCRStaticXMLFileServlet (merged revision 27235 from trunk)
+      </action>
     </release>
     <release version="2013.06.0" date="2013-06-20" description="2013 LTS" />
   </body>

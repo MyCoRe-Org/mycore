@@ -23,15 +23,17 @@
 
 package org.mycore.frontend.servlets;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
@@ -40,8 +42,8 @@ import org.jdom2.output.Format;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.MCRURLContent;
 import org.mycore.frontend.editor.MCREditorServlet;
 import org.xml.sax.SAXException;
 
@@ -71,32 +73,38 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
     }
 
     @Override
-    public void doGetPost(MCRServletJob job) throws java.io.IOException, MCRException, SAXException, JDOMException {
-        File file = resolveFile(job);
-        if (file != null) {
+    public void doGetPost(MCRServletJob job) throws java.io.IOException, MCRException, SAXException, JDOMException,
+        URISyntaxException, TransformerException {
+        URL resource = resolveResource(job);
+        if (resource != null) {
             HttpServletRequest request = job.getRequest();
             HttpServletResponse response = job.getResponse();
-            setXSLParameters(file, request);
-            MCRContent content = expandEditorElements(request, file);
+            setXSLParameters(resource, request);
+            MCRContent content = expandEditorElements(request, resource);
             getLayoutService().doLayout(request, response, content);
         }
     }
 
-    private void setXSLParameters(File file, HttpServletRequest request) {
+    private void setXSLParameters(URL resource, HttpServletRequest request) throws MalformedURLException,
+        URISyntaxException {
+        String path = resource.getProtocol().equals("file") ? resource.getPath() : resource.toExternalForm();
+        int lastPathElement = path.lastIndexOf('/') + 1;
+        String fileName = path.substring(lastPathElement);
+        String parent = path.substring(0, lastPathElement);
         request.setAttribute("XSL.StaticFilePath", request.getServletPath().substring(1));
-        request.setAttribute("XSL.DocumentBaseURL", file.getParent() + File.separator);
-        request.setAttribute("XSL.FileName", file.getName());
-        request.setAttribute("XSL.FilePath", file.getPath());
+        request.setAttribute("XSL.DocumentBaseURL", parent.toString());
+        request.setAttribute("XSL.FileName", fileName);
+        request.setAttribute("XSL.FilePath", path);
     }
 
-    private File resolveFile(MCRServletJob job) throws IOException {
+    private URL resolveResource(MCRServletJob job) throws IOException {
         String requestedPath = job.getRequest().getServletPath();
         LOGGER.info("MCRStaticXMLFileServlet " + requestedPath);
 
-        String path = getServletContext().getRealPath(requestedPath);
-        File file = new File(path);
-        if (file.exists())
-            return file;
+        URL resource = getServletContext().getResource(requestedPath);
+        if (resource != null) {
+            return resource;
+        }
 
         String msg = "Could not find file " + requestedPath;
         job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, msg);
@@ -104,12 +112,12 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
     }
 
     /** For defined document types like static webpages, replace editor elements with complete editor definition */
-    protected MCRContent expandEditorElements(HttpServletRequest request, File file) throws IOException, JDOMException,
-        SAXException, MalformedURLException {
-        MCRContent content = new MCRFileContent(file);
+    protected MCRContent expandEditorElements(HttpServletRequest request, URL resource) throws IOException,
+        JDOMException, SAXException, MalformedURLException {
+        MCRContent content = new MCRURLContent(resource);
         if (mayContainEditorForm(content)) {
             Document xml = content.asXML();
-            MCREditorServlet.replaceEditorElements(request, file.toURI().toURL().toString(), xml);
+            MCREditorServlet.replaceEditorElements(request, resource.toString(), xml);
             MCRJDOMContent jdomContent = new MCRJDOMContent(xml);
             jdomContent.setFormat(Format.getRawFormat());
             return jdomContent;
