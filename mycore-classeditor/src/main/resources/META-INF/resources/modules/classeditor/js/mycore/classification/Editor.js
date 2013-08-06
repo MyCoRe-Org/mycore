@@ -23,19 +23,19 @@ define([
 	"mycore/classification/SettingsDialog"
 ], function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _SettingsMixin, template, on, dom, query, lang, domConstruct, i18n) {
 
-	/**
-	 * Create a new instance of the classification editor.
-	 * 
-	 * @param settings json object to configure the classification editor.
-	 * The following parameters are required:
-	 *   webAppBaseURL: base url of web application (e.g. http://localhost:8291/)
-	 *   resourceURL: url of resource (e.g. http://localhost:8291/rsc/classifications/)
-	 * The following parameters are optional:
-	 *   showId: are classification id and category id are editable (true | false)
-	 *   supportedLanguages: which languages are available for selection (json array ["de", "en", "pl"])
-	 *   language: the current language (e.g. "de")
-	 *   editable: if the user can edit and dnd
-	 */
+/**
+ * Create a new instance of the classification editor.
+ * 
+ * @param settings json object to configure the classification editor.
+ * The following parameters are required:
+ *   webAppBaseURL: base url of web application (e.g. http://localhost:8291/)
+ *   resourceURL: url of resource (e.g. http://localhost:8291/rsc/classifications/)
+ * The following parameters are optional:
+ *   showId: are classification id and category id are editable (true | false)
+ *   supportedLanguages: which languages are available for selection (json array ["de", "en", "pl"])
+ *   language: the current language (e.g. "de")
+ *   editable: if the user can edit and dnd
+ */
 return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _SettingsMixin], {
 	templateString: template,
 	widgetsInTemplate: true,
@@ -66,6 +66,9 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 		this.store = new mycore.classification.Store();
 		// call inherited (includes distributing settings to other classes)
 		this.inherited(arguments);
+		// store events
+		this.store.restStore.onRootLoadError = lang.hitch(this, this.onRootLoadError);
+		this.store.restStore.onNodeLoadError = lang.hitch(this, this.onNodeLoadError);
 		// toolbar tooltips
 		i18n.resolveTooltip(this.saveButton);
 		i18n.resolveTooltip(this.refreshButton);
@@ -79,7 +82,7 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 		on(this.treePane.tree, "itemSelected", lang.hitch(this, this.onTreeItemSelected));
 		on(this.treePane.tree, "itemAdded", lang.hitch(this, this.onTreeItemAddedOrMoved));
 		on(this.treePane.tree, "itemMoved", lang.hitch(this, this.onTreeItemAddedOrMoved));
-		on(this.treePane.tree, "itemsRemoved", lang.hitch(this, this.onTreeItemsRemoved));
+		on(this.treePane.tree, "itemRemoved", lang.hitch(this, this.onTreeItemRemoved));
 		// category editor pane events
 		on(this.categoryEditorPane, "labelChanged", lang.hitch(this, this.onCategoryEditorLabelChanged));
 		on(this.categoryEditorPane, "urlChanged", lang.hitch(this, this.onCategoryEditorURLChanged));
@@ -89,8 +92,8 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 		on(this.settingsDialog, "saveBeforeImport", lang.hitch(this, this.onSaveBeforeImport));
 		// store events
 		on(this.store, "saved", lang.hitch(this, this.onStoreSaved));
-		on(this.store, "saveEvent", lang.hitch(this, this.onStoreSaveEvent));
 		on(this.store, "saveError", lang.hitch(this, this.onStoreSaveError));
+		on(this.store, "saveEvent", lang.hitch(this, this.onStoreSaveEvent));
 	},
 
 	startup: function() {
@@ -112,35 +115,35 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 		this.updateToolbar();
 	},
 
-	onTreeItemsRemoved: function(args) {
-		for(var i = 0; i < args.items.length; i++) {
-			this.store.updateSaveArray("delete", args.items[i]);
-		}
+	onTreeItemRemoved: function(args) {
+		this.store.updateSaveArray("delete", args.item);
 		this.categoryEditorPane.set("disabled", true);
 		this.updateToolbar();
 	},
 
 	onCategoryEditorLabelChanged: function(args) {
-		this._updateItem(args.item, "labels", args.value);
+		this._updateItem(args.item);
 	},
 
 	onCategoryEditorURLChanged: function(args) {
-		this._updateItem(args.item, "uri", args.value);
+		this._updateItem(args.item);
 	},
 
 	onCategoryEditorIdChanged: function(args) {
-		this._updateItem(args.item, "id", args.value);
+		var item = args.item;
+		this.treePane.tree.updateIdOfNode(item, args.oldID);
+		this._updateItem(item);
 	},
 
-	_updateItem: function(item, type, value) {
-		this.store.setValue(item, type, value);
-		this.store.setValue(item, "modified", true);
+	_updateItem: function(item) {
+		item.modified = true;
+		this.treePane.tree.updateLabel(item);
 		this.store.updateSaveArray("update", item);
 		this.updateToolbar();
 	},
 
 	onSaveClicked: function() {
-		this.store.save(this.treePane.tree);
+		this.store.save();
 	},
 
 	onRefreshClicked: function() {
@@ -184,12 +187,13 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 	},
 
 	onSaveBeforeImport: function() {
-		this.store.save(this.treePane.tree);
+		this.store.save();
 	},
 
 	onStoreSaved: function() {
 		this.updateToolbar();
 		this.categoryEditorPane.update();
+		this.treePane.tree.updateLabels();
 		alert(i18n.getFromCache("component.classeditor.save.successfull"));
 	},
 
@@ -197,14 +201,28 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 		console.log(error);
 	},
 
-	onStoreSaveEvent: function(event) {
-		if(event.xhr.status == 401) {
+	onStoreSaveEvent: function(evt) {
+		var xhr = evt.xhr;
+		if(xhr.status == 401) {
 	        alert(i18n.getFromCache("component.classeditor.save.nopermission"));
 	    } else{
-	        alert(i18n.getFromCache("component.classeditor.save.generalerror") + " - " + evt.error);
-			console.log("error while saving");
-			console.log(evt.error);
+	        alert(i18n.getFromCache("component.classeditor.save.generalerror") + ": " + xhr.statusText);
 	    }
+	},
+
+	onRootLoadError: function(error) {
+		if(error.xhr.status == 401) {
+			alert(i18n.getFromCache("component.classeditor.error.noReadPermission"));
+		} else {
+			alert(error.xhr.statusText);
+			console.log(error);
+		}
+		domConstruct.empty(this.treePane.tree.domNode);
+		this.set("disabled", true);
+	},
+
+	onNodeLoadError: function(error) {
+		alert(i18n.getFromCache("component.classeditor.error.loadError") + " " + error.xhr.statusText);
 	},
 
 	/**
@@ -221,22 +239,10 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 	 * Reloads the tree.
 	 */
 	reloadClassification: function() {
-		this.store.load(
-			lang.hitch(this, function(store) {
-				this.treePane.tree.createTree(store);
-				this.treePane.updateToolbar();
-				this.updateToolbar();
-			}),
-			lang.hitch(this, function(event) {
-				if(event.xhr.status == 401) {
-					alert(i18n.getFromCache("component.classeditor.error.noReadPermission"));
-				} else {
-					alert(event.xhr.statusText);
-					console.log(event);
-				}
-				this.set("disabled", true);
-			})
-		);
+		this.store.reset();
+		this.treePane.tree.createTree(this.store.restStore);
+		this.treePane.updateToolbar();
+		this.updateToolbar();
 		this.categoryEditorPane.set("disabled", true);
 	},
 

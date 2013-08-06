@@ -1,9 +1,11 @@
 define([
 	"dojo/_base/declare", // declare
-	"dijit/tree/dndSource"
-], function(declare, dndSource) {
+	"dijit/tree/dndSource",
+	"dojo/_base/lang" // hitch, clone
+], function(declare, dndSource, lang) {
 
 return declare("mycore.classification.TreeDndSource", dndSource, {
+
 	onMouseDown: function(e) {
 		// this is a workaround to fix dnd support in tree
 		// the id is only set if the scrollbar is hit, this allows us
@@ -27,6 +29,16 @@ return declare("mycore.classification.TreeDndSource", dndSource, {
 
 	setEnabled: function(e) {
 		enabled = e;
+	},
+
+	getSelectedTreeNodes: function(){
+		var nodes = this.inherited("getSelectedTreeNodes", arguments);
+		// sort items by index not time of selection
+		nodes.sort(lang.hitch(this, function(nodeA, nodeB) {
+			return this.tree.model.indexAt(nodeB.item) - this.tree.model.indexAt(nodeA.item);
+		}));
+		return nodes;
 	}
+
 });
 });

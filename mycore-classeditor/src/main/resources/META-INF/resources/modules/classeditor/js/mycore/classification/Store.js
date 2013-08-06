@@ -8,74 +8,46 @@ define([
 	'dojo/_base/json',
 	"mycore/common/I18nManager",
 	"mycore/classification/Util",
-	"mycore/classification/SimpleRESTStore"
-], function(declare, Evented, _SettingsMixin, lang, on, xhr, json, i18n, classUtil) {
+	"mycore/classification/RestStore",
+], function(declare, Evented, _SettingsMixin, lang, on, xhr, json, i18n, classUtil, RestStore) {
 
 /**
  * 
  */
 return declare("mycore.classification.Store", [Evented, _SettingsMixin], {
 
-	classificationId: "",
-
-	categoryId: "",
-
-	items: null,
-
 	restStore: null,
 
-	saveArray: null,
+	saveArray: [],
 
     constructor: function(/*Object*/ args) {
-		this.saveArray = [];
     	declare.safeMixin(this, args);
     },
 
-    load: function(/*function*/ onSuccess, /*function*/ onEvent) {
-		var url = this.settings.resourceURL + this.classificationId;
-		if(this.classificationId != null && this.classificationId != "" &&
-				this.categoryId != null && this.categoryId != "") {
-			url += "/" + categoryId;
+    onSettingsReady: function() {
+		var url = this.settings.resourceURL;
+		var classID = classeditor.classId;
+		var categID = classeditor.categoryId;
+		var query = classID;
+		if(classID != null && classID != "" && categID != null && categID != "") {
+			query += "/" + categID;
 		}
-		xhr(url, {handleAs: "json"}).then(lang.hitch(this, function(items) {
-			if(lang.isArray(items)) {
-				items = {
-					id: "_placeboid_",
-					labels: [
-						{lang: "de", text: "Klassifikationen"},
-						{lang: "en", text: "Classifications"}
-					],
-					notAnItem: true,
-					children: items
-				};
-			}
-			this.items = items;
-			this.restStore = new mycore.classification.SimpleRESTStore({
-				settings: this.settings,
-				data: {items: [items]}
-			});
-			this.saveArray = [];
-			if(onSuccess) {
-				onSuccess(this.restStore);
-			}
-		}), function(error) {
-			console.log("error while retrieving classification items from url " + url + "! " + error);
-		}, function(evt) {
-			if(onEvent) {
-				onEvent(evt);
-			}
+		this.restStore = new RestStore({
+			target: this.settings.resourceURL,
+			rootQuery: query
 		});
     },
 
-    setValue: function(item, type, value) {
-    	this.restStore.setValue(item, type, value);
+    reset: function() {
+    	this.saveArray = [];
+    	this.restStore.root = null;
     },
 
 	updateSaveArray: function(/*String*/ state, /*dojo.data.item*/ item, /*dojo.data.item*/ parent) {
 		// get object from array
 		var saveObject = null;
 		for(var i = 0; i < this.saveArray.length; i++) {
-			if(classUtil.isIdEqual(this.saveArray[i].item.id[0], item.id[0])) {
+			if(classUtil.isIdEqual(this.saveArray[i].item.id, item.id)) {
 				saveObject = this.saveArray[i];
 			}
 		}
@@ -94,9 +66,8 @@ return declare("mycore.classification.Store", [Evented, _SettingsMixin], {
 
 	/**
 	 * Commit all changes to the MyCoRe Application.
-	 * @tree TODO bad practice using the lazyloadingtree here
 	 */
-	save: function(tree) {
+	save: function() {
 		var finalArray = [];
 		for(var i = 0; i < this.saveArray.length; i++) {
 			var saveObject = this.saveArray[i];
@@ -106,9 +77,9 @@ return declare("mycore.classification.Store", [Evented, _SettingsMixin], {
 			}
 			if(saveObject.state == "update" && saveObject.parent) {
 				if(saveObject.parent.children) {
-					cleanedSaveObject.parentId = saveObject.parent.id[0];
-					var level = tree.getLevel(saveObject);
-					var index = tree.indexAt(saveObject.parent, saveObject.item.id[0]);
+					cleanedSaveObject.parentId = saveObject.parent.id;
+					var level = this.restStore.getLevel(saveObject.item);
+					var index = this.restStore.indexAt(saveObject.item, saveObject.parent);
 					cleanedSaveObject.depthLevel = level;
 					cleanedSaveObject.index = index;
 				} else {
@@ -124,13 +95,8 @@ return declare("mycore.classification.Store", [Evented, _SettingsMixin], {
 			headers: {"Content-Type": "application/json; charset=utf-8"}
 		}).then(lang.hitch(this, function() {
 			console.log("saving done");
-			for(var i = 0; i < this.saveArray.length; i++) {
-				var saveObject = this.saveArray[i];
-				if(saveObject.item.added) {
-					saveObject.item.added = false;
-				}
-			}
 			this.saveArray = [];
+			this.restStore.reset();
 			on.emit(this, "saved");
 		}), lang.hitch(this, function(error) {
 			on.emit(this, "saveError", error);
@@ -151,11 +117,11 @@ return declare("mycore.classification.Store", [Evented, _SettingsMixin], {
 
 	_cloneAndCleanUp: function(/*dojo.data.item*/ item) {
 		var newItem = {
-			id: item.id[0],
+			id: item.id,
 			labels: item.labels
 		};
 		if(item.uri) {
-			newItem.uri = item.uri[0];
+			newItem.uri = item.uri;
 		}
 		return newItem;
 	}

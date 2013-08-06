@@ -60,7 +60,7 @@
   <xsl:template name="classeditor.includeDojoJS">
     <xsl:choose>
       <xsl:when test="$classeditor.debug = true()">
-        <script src="http://ajax.googleapis.com/ajax/libs/dojo/{$classeditor.dojoVersion}/dojo/dojo.js.uncompressed.js"></script>  
+        <script src="http://ajax.googleapis.com/ajax/libs/dojo/{$classeditor.dojoVersion}/dojo/dojo.js.uncompressed.js"></script>
       </xsl:when>
       <xsl:otherwise>
         <script src="http://ajax.googleapis.com/ajax/libs/dojo/{$classeditor.dojoVersion}/dojo/dojo.js"></script>  

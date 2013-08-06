@@ -57,14 +57,16 @@ return declare("mycore.classification.CategoryEditorPane", [_Widget, Evented, _T
 		}
 		// events
 		on(this.labelEditor, "change", lang.hitch(this, function() {
-			on.emit(this, "labelChanged", {"item": this.currentItem, "value": this.labelEditor.get("value")});
+			this.currentItem.labels = this.labelEditor.get("value");
+			on.emit(this, "labelChanged", {"item": this.currentItem});
 		}));
 		on(this.urlEditor, "change", lang.hitch(this, function(newURL) {
 			if((newURL == null || newURL == "") && !this.currentItem.uri) {
 				return;
 			}
 			if(!this.currentItem.uri || newURL != this.currentItem.uri[0]) {
-				on.emit(this, "urlChanged", {"item": this.currentItem, "value": this.urlEditor.get("value")});	
+				this.currentItem.uri = this.urlEditor.get("value");
+				on.emit(this, "urlChanged", {"item": this.currentItem});	
 			}
 		}));
 		on(this.classIdEditor, "change", lang.hitch(this, this._handleIdChanged));
@@ -130,13 +132,18 @@ return declare("mycore.classification.CategoryEditorPane", [_Widget, Evented, _T
 			return;
 		}
 		// check if something has changed
-		var classId = classUtil.getClassificationId(this.currentItem);
-		var categId = classUtil.getCategoryId(this.currentItem);
-		if(classId != newClassId || categId != newCategId) {
-			on.emit(this, "idChanged", {"item": this.currentItem, "value": {
-				rootid: newClassId,
-				categid: newCategId
-			}});
+		var classID = classUtil.getClassificationId(this.currentItem);
+		var categID = classUtil.getCategoryId(this.currentItem);
+		if(classID != newClassId || categID != newCategId) {
+			this.currentItem.id.rootid = newClassId;
+			this.currentItem.id.categid = newCategId;
+			on.emit(this, "idChanged", {
+				"item": this.currentItem,
+				"oldID": {
+					rootid: classID,
+					categid: categID
+				}
+			});
 		}
 	}
 

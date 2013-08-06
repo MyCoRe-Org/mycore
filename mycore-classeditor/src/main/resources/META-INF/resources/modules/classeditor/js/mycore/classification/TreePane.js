@@ -51,7 +51,7 @@ return declare("mycore.classification.TreePane", [ContentPane, _Templated, _Sett
 		var removeVisable = selectedItems != null && selectedItems.length > 0 && !disabled;
 		if(selectedItems) {
 			for(var i = 0; i < selectedItems.length; i++) {
-				if(selectedItems[i]._RI || (selectedItems[i].haslink && selectedItems[i].haslink[0] == true)) {
+				if(selectedItems[i].haslink || selectedItems[i].fakeRoot) {
 					removeVisable = false;
 					break;
 				}

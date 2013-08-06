@@ -12,8 +12,7 @@ define([
 	"mycore/classification/Util",
 	"mycore/classification/TreeDndSource",
 	"mycore/common/I18nManager",
-	"dijit/Tree",
-	"dijit/tree/TreeStoreModel"
+	"dijit/Tree"
 ], function(declare, ContentPane, Evented, _SettingsMixin, on, aspect, lang, domConstruct, array, xhr, classUtil, dndSource, i18n) {
 
 return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _SettingsMixin], {
@@ -24,8 +23,6 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 
 	enableDnD: true,
 	
-	store: null,
-
 	disabled: false,
 
     constructor: function(/*Object*/ args) {
@@ -42,17 +39,11 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
     	this.showIdInLabel = this.settings.showId ? this.settings.showId : false;
     },
 
-    createTree: function(store) {
-    	this.store = store;
-
-		this.treeModel = new dijit.tree.TreeStoreModel({
-			store: this.store,
-			deferItemLoadingUntilExpand: false,
-			mayHaveChildren: classUtil.hasChildren
-		});
+    createTree: function(model) {
+    	model.onChildrenChange = lang.hitch(this, this.onChildrenChange);
 
 		this.tree = new dijit.Tree({
-			model: this.treeModel,
+			model: model,
 			dndController: dndSource,
 			betweenThreshold: "5",
 			dragThreshold: "5",
@@ -61,10 +52,6 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 			getLabel: lang.hitch(this, this.getLabel),
 			getIconClass: lang.hitch(this, this.getIconClass),
 			checkItemAcceptance: lang.hitch(this, this.checkItemAcceptance),
-			expandNode: function(/*TreeNode*/ node) {
-				// TODO - maybe there is a better solution than calling a private method
-				this._expandNode(node, false);
-			},
 			getIconStyle: function () {
 				return {
 					height: "22px",
@@ -77,8 +64,8 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 		this.tree.startup();
 
 		// events
-		aspect.after(this.tree.dndController, "onDndDrop", lang.hitch(this, this._onDndDrop));
-		aspect.after(this.tree, "focusNode", lang.hitch(this, this._onFocusNode));
+		aspect.after(this.tree.dndController, "onDndDrop", lang.hitch(this, this.onDndDrop));
+		aspect.after(this.tree, "focusNode", lang.hitch(this, this.onFocusNode));
 		on.emit(this, "treeCreated");
 	},
 
@@ -88,7 +75,7 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 	 * @param source
 	 * @param nodes
 	 */
-    _onDndDrop: function(deferred, args) {
+    onDndDrop: function(deferred, args) {
     	var parent = null;
     	var source = args[0];
     	var nodes = args[1];
@@ -98,77 +85,75 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
     		if(parent == null) {
     			var parent = sourceItem.data.getParent().item;
     		}
-    		var index = this.indexAt(parent, item.id[0]);
-    		on.emit(this, "itemMoved", {item: item, parent: parent, index: index});
+    		on.emit(this, "itemMoved", {
+    			item: item,
+    			parent: parent,
+    			index: this.tree.model.indexAt(item, parent)
+    		});
     	}));
 	},
 
 	/**
-	 * Returns the position of the children.
-	 * 
-	 * @param parent
-	 * @param id
-	 *            id of children
-	 * @return position as integer
+	 * Is called when the children of an item are changed.
 	 */
-    indexAt: function(/* dojo.data.item */ parent, /* JSON */ id) {
-		for(var index = 0; index < parent.children.length; index++) {
-			var childItem = parent.children[index];
-			if(classUtil.isIdEqual(childItem.id[0], id)) {
-				return index;
-			}
+	onChildrenChange: function(item) {
+		if(item.fakeRoot) {
+			return;
 		}
-		return -1;
-    },
+		item.modified = true;
+		if(item.children && item.children.length <= 0) {
+			delete (item.children);
+			delete (item.haschildren);
+		}
+		// just expand the nodes
+		var nodes = this.tree.getNodesByItem(item);
+		array.forEach(nodes, function(node) {
+			node.expand();
+		});
+		this.updateLabel(item);
+	},
 
-	getLevel: function(obj) {
-    	var item = obj.item, root = this.treeModel.root;
-    	if(classUtil.isIdEqual(root.id[0], item.id[0])) {
-    		return 0;
-    	}
-    	return this._getLevel(1, item, root);
-    },
-
-    _getLevel: function (level, item, ancestor) {
-		if(!ancestor.children)
-			return -1;
-    	for(var i = 0; i < ancestor.children.length; i++) {
-    		var child = ancestor.children[i];
-			if(classUtil.isIdEqual(child.id[0], item.id[0])) {
-				return level;
-			}
-			var ancestorLevel = this._getLevel(level + 1, item, child);
-			if(ancestorLevel != -1) {
-				return ancestorLevel;
-			}
-    	}
-    	return -1;
-    },
+	updateLabel: function(item) {
+		this.setLabel(item, this.getLabel(item));
+	},
 
     updateLabels: function() {
-    	var root = this.treeModel.root;
-    	var label = this.getLabel(root);
-    	this.store.setValue(root, "name", label);
-    	this._updateLabels(root);
+    	var rootItem = this.tree.model.root;
+    	var label = this.getLabel(rootItem);
+    	this.setLabel(rootItem, label);
+    	this._updateLabels(rootItem);
     },
 
-    _updateLabels: function(/*TreeItem*/ item) {
+    _updateLabels: function(item) {
     	if(!item.children) {
     		return;
     	}
     	for(var i = 0; i < item.children.length; i++) {
-    		var child = item.children[i];
-    		this.store.setValue(child, "name", this.getLabel(child));
-    		this._updateLabels(child);
+    		this.updateLabel(item.children[i]);
+    		this._updateLabels(item.children[i]);
     	}
     },
 
-    getLabel: function(/* TreeItem */ treeItem) {
+    setLabel: function(item, label) {
+    	var nodes = this.tree.getNodesByItem(item);
+    	array.forEach(nodes, function(node) {
+    		if(node != null) {
+    			node.set("label", label);
+    		} else {
+    			console.log("Unable to get node of item " + classUtil.toString(item));
+    		}
+    	});
+    },
+
+    getLabel: function(item) {
 		var currentLang = i18n.getLanguage();
-		if(treeItem.labels && treeItem.labels.length > 0) {
-			label = this.getLabelText(currentLang, treeItem.labels);
-			if(this.showIdInLabel && treeItem.id[0].rootid) {
-				label += " [" + this.getLabelId(treeItem.id[0]) + "]";
+		if(item.labels && item.labels.length > 0) {
+			label = this.getLabelText(currentLang, item.labels);
+			if(this.showIdInLabel && item.id.rootid) {
+				label += " [" + this.getLabelId(item.id) + "]";
+			}
+			if(item.modified || item.added) {
+				label = "> " + label;
 			}
 			return label;
 		}
@@ -190,16 +175,16 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 		return id.categid;
 	},
 
-	getIconClass: function(/* TreeItem */ treeItem) {
+	getIconClass: function(item) {
 		// root
-		if(treeItem.notAnItem && treeItem.notAnItem[0] == true) {
+		if(item.fakeRoot) {
 			return "icon22 classification";
 		}
 		// klassifikation (ends with a point)
-		if(classUtil.isClassification(treeItem)) { 
+		if(classUtil.isClassification(item)) { 
 			return "icon22 classification";
 		} else {
-			if(classUtil.hasChildren(treeItem)) {
+			if(classUtil.hasChildren(item)) {
 				return "icon22 internalNode"
 			} else {
 				return "icon22 leafNode";
@@ -222,29 +207,15 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 			if(classUtil.isClassification(item) && position != "over")
 				return false;
 			// cannot drop an item in another classification
-			if(item.id[0].rootid != draggedItem.id[0].rootid)
+			if(item.id.rootid != draggedItem.id.rootid)
 				return false;
 		}
 		return true;
 	},
 
-	focusItem: function(/*dojo.data.item*/ item) {
-		// select it
-		this.tree.set("selectedItem", item);
-		// try to focus
-		var treeNode = this.tree.getNodesByItem(item)[0];
-		var parentNode = treeNode.getParent();
-		// expand parent node if its not expanded yet
-		if(parentNode.isExpandable && !parentNode.isExpanded) {
-			this.tree.expandNode(parentNode);
-		}
-		// focus it!
-		this.tree.focusNode(treeNode);
-	},
-
-	_onFocusNode: function() {
+	onFocusNode: function() {
 		var treeItem = this.tree.lastFocused.item;
-		if(treeItem.notAnItem && treeItem.notAnItem[0] == true) {
+		if(treeItem.fakeRoot) {
 			treeItem = null;
 		}
 		on.emit(this, "itemSelected", {item: treeItem});
@@ -264,10 +235,6 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 			handleAs : "json"
 		}).then(lang.hitch(this, function(newID) {
 			this.newItem(selectedItem, newID);
-			// expand node if its not expanded yet
-			if(selectedNode.isExpandable && !selectedNode.isExpanded) {
-				this.tree.expandNode(selectedNode);
-			}
 		}), function(err) {
 			console.log("error while retrieving new id: " + error);
 		});
@@ -284,7 +251,7 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 		for(var i = 0; i < selectedTreeItems.length; i++) {
 			var descendant = false;
 			for(var j = 0; j < selectedTreeItems.length; j++) {
-				if(this.isDescendant(selectedTreeItems[i], selectedTreeItems[j])) {
+				if(this.tree.model.isDescendant(selectedTreeItems[i], selectedTreeItems[j])) {
 					descendant = true;
 					break;
 				}
@@ -297,22 +264,21 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 		for(var i = 0; i < itemsToRemoveArray.length; i++) {
 			this.removeTreeItem(itemsToRemoveArray[i]);
 		}
-		on.emit(this, "itemsRemoved", {items: itemsToRemoveArray});
 	},
 
-	newItem: function(/*dojo.data.item*/ parent, /*JSON*/ newId) {
+	newItem: function(/*dojo.data.item*/ parent, /*JSON*/ newID) {
 		if(parent.children && parent.children[0] == false) {
 			delete(parent.children);
 		}
 		var newItem = {
-			id: newId,
+			id: newID,
 			labels: [
-			    {lang: "de", text: "neuer Eintrag"}
+			    {lang: "de", text: "neuer Eintrag"},
+			    {lang: "en", text: "new entry"}
 			],
 			added: true	
 		};
-		newItem = this.store.newItem(newItem, {parent: parent, attribute: "children"});
-		this.store.save();
+		this.tree.model.insert(newItem, parent);
 		on.emit(this, "itemAdded", {item: newItem, parent: parent});
 	},
 
@@ -321,32 +287,8 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 	 * necessary because store.deleteItem() doesn't delete recursive.
 	 */
 	removeTreeItem: function(/* dojo.data.item */ item) {
-		// delete children
-		while(classUtil.hasChildrenLoaded(item)) {
-			this.removeTreeItem(item.children[0]);
-		}
-		// delete tree item
-		this.store.deleteItem(item);
-		// FIRE!!!!!
+		this.tree.model.remove(item);
 		on.emit(this, "itemRemoved", {item: item});
-	},
-
-	/**
-	 * Checks if an item is an descendant of another item.
-	 */
-	isDescendant: function(/*dojo.data.item*/ item, /*dojo.data.item*/ ancestor) {
-		// same item
-		if(item.id == ancestor.id)
-			return false;
-		if(ancestor.children && (typeof ancestor.children[0]) != "boolean") {
-			for(var i = 0; i < ancestor.children.length; i++) {
-				var childItem = ancestor.children[i];
-				if(item.id == childItem.id || this.isDescendant(item, childItem)) {
-					return true;
-				}
-			}
-		}
-		return false;
 	},
 
 	/**
@@ -378,6 +320,14 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 		if(this.tree != null) {
 			this.tree.set("disabled", disabled);
 		}
+	},
+
+	updateIdOfNode: function(item, oldID) {
+		var newIdentity = this.tree.model.getIdentity(item);
+		var oldIdentity = this.tree.model.getIdentity(oldID);
+		// well we have to use the internal array _itemNodesMap cause there is no alternative
+		this.tree._itemNodesMap[newIdentity] = this.tree._itemNodesMap[oldIdentity];
+		delete this.tree._itemNodesMap[oldIdentity];
 	}
 
 });
