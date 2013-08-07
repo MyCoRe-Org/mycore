@@ -44,10 +44,10 @@
 	<xsl:template match="/">
 		<xsl:choose>
 			<!-- WS: updated schema location -->
-		<xsl:when test="mods:collection">			
+		<xsl:when test="//mods:modsCollection">			
 			<srw_dc:dcCollection xsi:schemaLocation="info:srw/schema/1/dc-schema http://www.loc.gov/standards/sru/resources/dc-schema.xsd">
 				<xsl:apply-templates/>
-			<xsl:for-each select="mods:collection/mods:mods">			
+			<xsl:for-each select="mods:modsCollection/mods:mods">			
 				<srw_dc:dc xsi:schemaLocation="info:srw/schema/1/dc-schema http://www.loc.gov/standards/sru/resources/dc-schema.xsd">
 				<xsl:apply-templates/>
 			</srw_dc:dc>
