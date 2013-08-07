@@ -86,13 +86,13 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         if (!ignoreOwnerBase) {
             sid += "_" + base;
             storeBaseDir += File.separatorChar + base.replace("_", File.separator);
-            prefix = base+"_";
+            prefix = base + "_";
         }
 
         MCRFileStore store = MCRStoreManager.getStore(sid, MCRFileStore.class);
         if (store == null)
             store = createStore(sid, storeBaseDir);
-        	store.prefix = prefix;
+        store.prefix = prefix;
         return store;
     }
 
@@ -234,5 +234,10 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         int pos = storageID.indexOf("/") + 1;
         String path = storageID.substring(pos);
         return (MCRFile) (slot.getNodeByPath(path));
+    }
+
+    @Override
+    public File getBaseDir() throws IOException {
+        return new File(baseDir);
     }
 }

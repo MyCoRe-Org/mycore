@@ -34,7 +34,6 @@ import org.hibernate.StatelessSession;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.mycore.backend.filesystem.MCRCStoreVFS;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
 import org.mycore.common.MCRConfiguration;
@@ -119,7 +118,7 @@ public class MCRIFSCommands {
             if (localFile.length() != node.getSize()) {
                 LOGGER.warn("File size does not match for file: " + localFile);
                 atts.addAttribute(MCRIFSCommands.NS_URI, "actualSize", "actualSize", MCRIFSCommands.CDATA,
-                        Long.toString(localFile.length()));
+                    Long.toString(localFile.length()));
                 return false;
             }
             //we can check MD5Sum
@@ -253,18 +252,15 @@ public class MCRIFSCommands {
                     File outputFile = new File(targetDir, MessageFormat.format("{0}-{1}.md5", nameOfProject, storeID));
                     LOGGER.info("Writing to file: " + outputFile.getAbsolutePath());
                     fw = new FileWriter(outputFile);
-                    if (currentStore instanceof MCRCStoreVFS) {
-                        try {
-                            currentStoreBaseDir = ((MCRCStoreVFS) currentStore).getBaseDir();
-                        } catch (Exception e) {
-                            LOGGER.warn("Could not get baseDir of store: " + storeID, e);
-                            currentStoreBaseDir = null;
-                        }
-                    } else {
+                    try {
+                        currentStoreBaseDir = currentStore.getBaseDir();
+                    } catch (Exception e) {
+                        LOGGER.warn("Could not get baseDir of store: " + storeID, e);
                         currentStoreBaseDir = null;
                     }
                 }
-                String path = currentStoreBaseDir != null ? new File(currentStoreBaseDir, storageID).getAbsolutePath() : storageID;
+                String path = currentStoreBaseDir != null ? currentStore.getLocalFile(storageID).getAbsolutePath()
+                    : storageID;
                 //current store initialized
                 String line = MessageFormat.format("{0}  {1}\n", md5, path);
                 fw.write(line);
@@ -282,21 +278,23 @@ public class MCRIFSCommands {
     }
 
     @MCRCommand(syntax = "generate missing file report in directory {0}", help = "Writes XML report about missing files in directory {0}")
-    public static void writeMissingFileReport(String targetDirectory) throws IOException, SAXException, TransformerConfigurationException {
+    public static void writeMissingFileReport(String targetDirectory) throws IOException, SAXException,
+        TransformerConfigurationException {
         File targetDir = getDirectory(targetDirectory);
         FSNodeChecker checker = new LocalFileExistChecker();
         writeReport(targetDir, checker);
     }
 
     @MCRCommand(syntax = "generate md5 file report in directory {0}", help = "Writes XML report about failed md5 checks in directory {0}")
-    public static void writeFileMD5Report(String targetDirectory) throws IOException, SAXException, TransformerConfigurationException {
+    public static void writeFileMD5Report(String targetDirectory) throws IOException, SAXException,
+        TransformerConfigurationException {
         File targetDir = getDirectory(targetDirectory);
         FSNodeChecker checker = new MD5Checker();
         writeReport(targetDir, checker);
     }
 
-    private static void writeReport(File targetDir, FSNodeChecker checker) throws TransformerFactoryConfigurationError, SAXException,
-            IOException, FileNotFoundException, TransformerConfigurationException {
+    private static void writeReport(File targetDir, FSNodeChecker checker) throws TransformerFactoryConfigurationError,
+        SAXException, IOException, FileNotFoundException, TransformerConfigurationException {
         Session session = MCRHIBConnection.instance().getSession();
         Criteria criteria = session.createCriteria(MCRFSNODES.class);
         criteria.addOrder(Order.asc("storeid"));
@@ -338,7 +336,8 @@ public class MCRIFSCommands {
                             outputStream.close();
                         }
                     }
-                    File outputFile = new File(targetDir, MessageFormat.format("{0}-{1}-{2}.xml", nameOfProject, storeID, rootName));
+                    File outputFile = new File(targetDir, MessageFormat.format("{0}-{1}-{2}.xml", nameOfProject,
+                        storeID, rootName));
                     streamResult = new StreamResult(new FileOutputStream(outputFile));
                     th = tf.newTransformerHandler();
                     Transformer serializer = th.getTransformer();
@@ -349,15 +348,12 @@ public class MCRIFSCommands {
                     th.startDocument();
                     atts.clear();
                     atts.addAttribute(nsURI, "project", "project", ATT_TYPE, nameOfProject);
-                    if (currentStore instanceof MCRCStoreVFS) {
-                        try {
-                            currentStoreBaseDir = ((MCRCStoreVFS) currentStore).getBaseDir();
-                            atts.addAttribute(nsURI, ATT_BASEDIR, ATT_BASEDIR, ATT_TYPE, currentStoreBaseDir.getAbsolutePath());
-                        } catch (Exception e) {
-                            LOGGER.warn("Could not get baseDir of store: " + storeID, e);
-                            currentStoreBaseDir = null;
-                        }
-                    } else {
+                    try {
+                        currentStoreBaseDir = currentStore.getBaseDir();
+                        atts.addAttribute(nsURI, ATT_BASEDIR, ATT_BASEDIR, ATT_TYPE,
+                            currentStoreBaseDir.getAbsolutePath());
+                    } catch (Exception e) {
+                        LOGGER.warn("Could not get baseDir of store: " + storeID, e);
                         currentStoreBaseDir = null;
                     }
                     th.startElement(nsURI, rootName, rootName, atts);
@@ -396,13 +392,15 @@ public class MCRIFSCommands {
     static File getDirectory(String targetDirectory) {
         File targetDir = new File(targetDirectory);
         if (!targetDir.isDirectory()) {
-            throw new IllegalArgumentException("Target directory " + targetDir.getAbsolutePath() + " is not a directory.");
+            throw new IllegalArgumentException("Target directory " + targetDir.getAbsolutePath()
+                + " is not a directory.");
         }
         return targetDir;
     }
 
     @MCRCommand(syntax = "generate missing nodes report in directory {0}", help = "Writes XML report about missing ifs nodes in directory {0}")
-    public static void writeMissingNodesReport(String targetDirectory) throws SAXException, TransformerConfigurationException, IOException {
+    public static void writeMissingNodesReport(String targetDirectory) throws SAXException,
+        TransformerConfigurationException, IOException {
         File targetDir = getDirectory(targetDirectory);
         Map<String, MCRContentStore> availableStores = MCRContentStoreFactory.getAvailableStores();
         final String nsURI = NS_URI;
@@ -413,73 +411,74 @@ public class MCRIFSCommands {
         StatelessSession session = MCRHIBConnection.instance().getSessionFactory().openStatelessSession();
         try {
             for (MCRContentStore currentStore : availableStores.values()) {
-                if (currentStore instanceof MCRCStoreVFS) {
-                    MCRCStoreVFS storeVFS;
-                    File baseDir;
-                    try {
-                        storeVFS = (MCRCStoreVFS) currentStore;
-                        baseDir = storeVFS.getBaseDir();
-                    } catch (Exception e) {
-                        LOGGER.warn("Could not get baseDir of store: " + currentStore.getID(), e);
+                File baseDir;
+                try {
+                    baseDir = currentStore.getBaseDir();
+                    if (baseDir == null) {
+                        LOGGER.warn("Could not get baseDir of store: " + currentStore.getID());
                         continue;
                     }
-                    Criteria criteria = session.createCriteria(MCRFSNODES.class);
-                    criteria.add(Restrictions.eq("type", "F"));
-                    criteria.add(Restrictions.eq("storeid", storeVFS.getID()));
-                    criteria.addOrder(Order.asc("storageid"));
-                    criteria.setProjection(Projections.property("storageid"));
-                    ScrollableResults storageIds = criteria.scroll(ScrollMode.FORWARD_ONLY);
-                    boolean endOfList = false;
-                    String nameOfProject = MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe");
-                    String storeID = storeVFS.getID();
-                    File outputFile = new File(targetDir, MessageFormat.format("{0}-{1}-{2}.xml", nameOfProject, storeID, rootName));
-                    StreamResult streamResult;
-                    try {
-                        streamResult = new StreamResult(new FileOutputStream(outputFile));
-                    } catch (FileNotFoundException e) {
-                        //should not happen as we checked it before
-                        LOGGER.error(e);
-                        return;
-                    }
-                    try {
-                        TransformerHandler th = tf.newTransformerHandler();
-                        Transformer serializer = th.getTransformer();
-                        serializer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-                        serializer.setOutputProperty(OutputKeys.INDENT, "yes");
-                        th.setResult(streamResult);
-                        LOGGER.info("Writing to file: " + outputFile.getAbsolutePath());
-                        th.startDocument();
-                        atts.clear();
-                        atts.addAttribute(nsURI, "project", "project", ATT_TYPE, nameOfProject);
-                        atts.addAttribute(nsURI, "store", "store", ATT_TYPE, storeID);
-                        atts.addAttribute(nsURI, "baseDir", "baseDir", ATT_TYPE, baseDir.getAbsolutePath());
-                        th.startElement(nsURI, rootName, rootName, atts);
-                        URI baseURI = baseDir.toURI();
-                        for (File currentFile : new FileStoreIterator(baseDir)) {
-                            if (currentFile.isDirectory()) {
-                                String relative = baseURI.relativize(currentFile.toURI()).getPath();
-                                LOGGER.info("Checking segment: " + relative);
-                            } else {
-                                int checkFile = endOfList ? -1 : checkFile(baseURI, currentFile, storageIds);
-                                endOfList = checkFile == -1;
-                                if (endOfList || checkFile == 1) {
-                                    LOGGER.warn("Found orphaned file: " + currentFile);
-                                    atts.clear();
-                                    atts.addAttribute(NS_URI, ATT_FILE_NAME, ATT_FILE_NAME, CDATA, baseURI.relativize(currentFile.toURI())
-                                            .getPath());
-                                    th.startElement(NS_URI, ELEMENT_FILE, ELEMENT_FILE, atts);
-                                    th.endElement(NS_URI, ELEMENT_FILE, ELEMENT_FILE);
-                                }
+                } catch (Exception e) {
+                    LOGGER.warn("Could not get baseDir of store: " + currentStore.getID(), e);
+                    continue;
+                }
+                Criteria criteria = session.createCriteria(MCRFSNODES.class);
+                criteria.add(Restrictions.eq("type", "F"));
+                criteria.add(Restrictions.eq("storeid", currentStore.getID()));
+                criteria.addOrder(Order.asc("storageid"));
+                criteria.setProjection(Projections.property("storageid"));
+                ScrollableResults storageIds = criteria.scroll(ScrollMode.FORWARD_ONLY);
+                boolean endOfList = false;
+                String nameOfProject = MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe");
+                String storeID = currentStore.getID();
+                File outputFile = new File(targetDir, MessageFormat.format("{0}-{1}-{2}.xml", nameOfProject, storeID,
+                    rootName));
+                StreamResult streamResult;
+                try {
+                    streamResult = new StreamResult(new FileOutputStream(outputFile));
+                } catch (FileNotFoundException e) {
+                    //should not happen as we checked it before
+                    LOGGER.error(e);
+                    return;
+                }
+                try {
+                    TransformerHandler th = tf.newTransformerHandler();
+                    Transformer serializer = th.getTransformer();
+                    serializer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+                    serializer.setOutputProperty(OutputKeys.INDENT, "yes");
+                    th.setResult(streamResult);
+                    LOGGER.info("Writing to file: " + outputFile.getAbsolutePath());
+                    th.startDocument();
+                    atts.clear();
+                    atts.addAttribute(nsURI, "project", "project", ATT_TYPE, nameOfProject);
+                    atts.addAttribute(nsURI, "store", "store", ATT_TYPE, storeID);
+                    atts.addAttribute(nsURI, "baseDir", "baseDir", ATT_TYPE, baseDir.getAbsolutePath());
+                    th.startElement(nsURI, rootName, rootName, atts);
+                    URI baseURI = baseDir.toURI();
+                    for (File currentFile : new FileStoreIterator(baseDir)) {
+                        if (currentFile.isDirectory()) {
+                            String relative = baseURI.relativize(currentFile.toURI()).getPath();
+                            LOGGER.info("Checking segment: " + relative);
+                        } else {
+                            int checkFile = endOfList ? -1 : checkFile(baseURI, currentFile, storageIds);
+                            endOfList = checkFile == -1;
+                            if (endOfList || checkFile == 1) {
+                                LOGGER.warn("Found orphaned file: " + currentFile);
+                                atts.clear();
+                                atts.addAttribute(NS_URI, ATT_FILE_NAME, ATT_FILE_NAME, CDATA,
+                                    baseURI.relativize(currentFile.toURI()).getPath());
+                                th.startElement(NS_URI, ELEMENT_FILE, ELEMENT_FILE, atts);
+                                th.endElement(NS_URI, ELEMENT_FILE, ELEMENT_FILE);
                             }
                         }
-                        storageIds.close();
-                        th.endElement(nsURI, rootName, rootName);
-                        th.endDocument();
-                    } finally {
-                        OutputStream stream = streamResult.getOutputStream();
-                        if (stream != null) {
-                            stream.close();
-                        }
+                    }
+                    storageIds.close();
+                    th.endElement(nsURI, rootName, rootName);
+                    th.endDocument();
+                } finally {
+                    OutputStream stream = streamResult.getOutputStream();
+                    if (stream != null) {
+                        stream.close();
                     }
                 }
             }
@@ -495,7 +494,8 @@ public class MCRIFSCommands {
             LOGGER.warn("IFS Node " + nodeID + " does not exist.");
             return;
         }
-        LOGGER.info(MessageFormat.format("Deleting IFS Node {0}: {1}{2}", nodeID, node.getOwnerID(), node.getAbsolutePath()));
+        LOGGER.info(MessageFormat.format("Deleting IFS Node {0}: {1}{2}", nodeID, node.getOwnerID(),
+            node.getAbsolutePath()));
         node.delete();
     }
 

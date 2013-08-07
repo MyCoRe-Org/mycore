@@ -27,8 +27,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.FileContent;
@@ -136,12 +136,13 @@ public class MCRCStoreVFS extends MCRContentStore {
     protected MCRContent doRetrieveMCRContent(MCRFileReader file) throws IOException {
         FileObject targetObject = fsManager.resolveFile(getBase(), file.getStorageID());
         FileContent targetContent = targetObject.getContent();
-        MCRStreamContent content = new MCRStreamContent(targetContent.getInputStream(), targetObject.getURL().toString());
+        MCRStreamContent content = new MCRStreamContent(targetContent.getInputStream(), targetObject.getURL()
+            .toString());
         return content;
     }
 
     @Override
-    public File getLocalFile(String storageId) throws IOException{
+    public File getLocalFile(String storageId) throws IOException {
         FileObject fileObject = fsManager.resolveFile(getBase(), storageId);
         return fileObject.getFileSystem().replicateFile(fileObject, Selectors.SELECT_SELF);
     }
@@ -150,13 +151,18 @@ public class MCRCStoreVFS extends MCRContentStore {
         return fsManager.resolveFile(uri, opts);
     }
 
-    public File getBaseDir() throws FileSystemException, URISyntaxException {
-        URI baseURI = getBase().getURL().toURI();
-        if ("file".equals(baseURI.getScheme())) {
-            File baseDir = new File(baseURI);
-            return baseDir;
+    @Override
+    public File getBaseDir() throws IOException {
+        URL baseURL = getBase().getURL();
+        if ("file".equals(baseURL.getProtocol())) {
+            try {
+                File baseDir = new File(baseURL.toURI());
+                return baseDir;
+            } catch (URISyntaxException e) {
+                throw new IOException("baseURI for content store " + getID() + " is invalid: " + baseURL, e);
+            }
         } else {
-            LOGGER.warn("Base URI is not a file URI: " + baseURI.toString());
+            LOGGER.warn("Base URI is not a file URI: " + baseURL.toString());
             return null;
         }
     }
