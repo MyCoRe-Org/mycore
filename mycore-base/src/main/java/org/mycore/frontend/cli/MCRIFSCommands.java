@@ -11,6 +11,8 @@ import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
@@ -27,6 +29,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.io.comparator.NameFileComparator;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
@@ -38,8 +41,10 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRContentStore;
 import org.mycore.datamodel.ifs.MCRContentStoreFactory;
+import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
@@ -525,6 +530,114 @@ public class MCRIFSCommands {
             }
         }
         return comp == 0 ? 0 : 1;
+    }
+    
+    private static int MAX_COUNTER = 1000;
+
+    @MCRCommand(syntax = "move derivates from content store {0} to content store {1} for owner {2}", help = "moves all files of derivates from content store {0} to content store {1} for defined owner {2}")
+    public static void moveContentOfOwnerToNewStore(String source_store, String target_store, String owner) {
+        LOGGER.info("Start move data from content store " + source_store + " to store " + target_store + " for owner "
+                + owner);
+        moveContentToNewStore(source_store, target_store, "owner", owner, 0);
+    }
+
+    @MCRCommand(syntax = "move derivates from content store {0} to content store {1} for filetype {2}", help = "moves all files of derivates from content store {0} to content store {1} for defined file type {2}")
+    public static void moveContentOfFiletypeToNewStore(String source_store, String target_store, String file_type) {
+        LOGGER.info("Start move data from content store " + source_store + " to store " + target_store
+                + " for file type " + file_type);
+        moveContentToNewStore(source_store, target_store, "fctid", file_type, MAX_COUNTER);
+    }
+
+    private static void moveContentToNewStore(String source_store, String target_store, String select_key,
+            String select_value, int max_counter) {
+        // check stores
+        Map<String, MCRContentStore> availableStores = MCRContentStoreFactory.getAvailableStores();
+        MCRContentStore from_store = availableStores.get(source_store);
+        if (from_store == null) {
+            LOGGER.error("Can't find content store " + source_store);
+            return;
+        }
+        MCRContentStore to_store = availableStores.get(target_store);
+        if (to_store == null) {
+            LOGGER.error("Can't find content store " + target_store);
+            return;
+        }
+        LOGGER.info("Running for " + Integer.toString(max_counter) + "entries");
+        Session session = MCRHIBConnection.instance().getSession();
+        int counter = 0;
+
+        try {
+            Criteria criteria = session.createCriteria(MCRFSNODES.class);
+            criteria.addOrder(Order.asc("owner"));
+            criteria.add(Restrictions.eq("storeid", source_store));
+            criteria.add(Restrictions.eq(select_key, select_value));
+            ScrollableResults fsnodes = criteria.scroll(ScrollMode.FORWARD_ONLY);
+            while (fsnodes.next() && (max_counter == 0 || counter < max_counter)) {
+                LOGGER.debug("Entry " + counter);
+                MCRFSNODES fsNode = (MCRFSNODES) fsnodes.get(0);
+                String id = fsNode.getId();
+                String pid = fsNode.getPid();
+                String owner = fsNode.getOwner();
+                String name = fsNode.getName();
+                long size = fsNode.getSize();
+                Date date = fsNode.getDate();
+                GregorianCalendar datecal = new GregorianCalendar();
+                datecal.setTime(date);
+                String storageid = fsNode.getStorageid();
+                String fctid = fsNode.getFctid();
+                String md5 = fsNode.getMd5();
+                session.evict(fsNode);
+                LOGGER.info("File for [id] " + id + " [pid] " + pid + " [owner] " + owner + " [name] " + name
+                        + " [size] " + size + " [storageid] " + storageid + " [fctid] " + fctid + " [md5] " + md5);
+                // get input
+                MCRFile file_reader_from = new MCRFile(id, pid, owner, name, "", size, datecal, source_store,
+                        storageid, fctid, md5);
+                File file_from = from_store.getLocalFile(file_reader_from);
+                LOGGER.debug("File in source under store " + source_store + " with path " + file_from.getAbsolutePath());
+                // copy file
+                MCRFile file_reader_to = new MCRFile(id, pid, owner, name, "", size, datecal, target_store, "", fctid,
+                        md5);
+                MCRContentInputStream ins = new MCRContentInputStream(new FileInputStream(file_from));
+                String new_storageid = to_store.storeContent(file_reader_to, ins);
+                LOGGER.debug("Copied to new store " + target_store + " as STORAGEID " + new_storageid + " with MD5 "
+                        + file_reader_to.getMD5() + " and file size " + file_reader_to.getSize());
+                if (new_storageid != null && new_storageid.length() != 0 && md5.equals(file_reader_to.getMD5())) {
+                    // update database
+                    String queryString="UPDATE MCRFSNODES SET pid = :pid , storeid = :storeid , storageid = :storageid WHERE md5 like :md5 AND owner LIKE :owner";
+                    Query query=session.createQuery(queryString);
+                    query.setParameter("pid", pid);
+                    query.setParameter("storeid", target_store);
+                    query.setParameter("storageid", new_storageid);
+                    query.setParameter("md5", md5);
+                    query.setParameter("owner", owner);
+                    int result = query.executeUpdate();
+                    LOGGER.debug("Update MCRFSNODES entry for OWNER " + owner + " AND MD5 " + md5 + " to STORAGEID "
+                            + new_storageid + " for " + Integer.toBinaryString(result) + " entries");
+                    if (result == 1) {
+                        // remove old file
+                        file_from.delete();
+                        LOGGER.debug("Delete file from " + file_from.getAbsolutePath());
+                        LOGGER.info("Move was successful");
+                    } else {
+                        // remove new file
+                        to_store.getLocalFile(file_reader_to).delete();
+                    }
+                } else {
+                    LOGGER.error("Error while copy storageid " + storageid + " to new file store " + target_store);
+                    // remove new file
+                    to_store.getLocalFile(file_reader_to).delete();
+                }
+                counter++;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            session.clear();
+        }
+        // continue
+        if (max_counter != 0 && counter == max_counter) {
+            LOGGER.info(max_counter + " entries finished, for continue restart this command!");
+        }
     }
     
 }
