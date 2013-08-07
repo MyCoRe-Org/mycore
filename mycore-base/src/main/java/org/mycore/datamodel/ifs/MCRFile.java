@@ -118,7 +118,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     /*
      * Internal constructor, do not use on your own.
      */
-    MCRFile(String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, String storeID, String storageID,
+    public MCRFile(String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, String storeID, String storageID,
             String fctID, String md5) {
         super(ID, parentID, ownerID, name, label, size, date);
 
