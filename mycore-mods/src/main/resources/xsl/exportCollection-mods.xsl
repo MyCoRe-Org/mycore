@@ -7,9 +7,9 @@
         <xsl:apply-templates mode="mods" />
       </xsl:when>
       <xsl:otherwise>
-        <mods:collection>
+        <mods:modsCollection>
           <xsl:apply-templates mode="mods" />
-        </mods:collection>
+        </mods:modsCollection>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>

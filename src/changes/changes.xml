@@ -3,9 +3,16 @@
   <properties>
     <title>MyCoRe Changes Report</title>
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
+    <author email="kathleen.neumann(at)gbv.de">Kathleen Neumann</author>
   </properties>
   <body>
     <release version="2013.06.0.1" date="TBA" description="2013.06.0 maintenance release 1">
+      <action dev="mcrtchef" type="fix" date="2013-08-07">
+        fixed mods collection export (merged revision 27612 from trunk)
+      </action>
+      <action dev="mcrkrebs" type="add" date="2013-08-07">
+        added stylesheet: mods 3.4 to dublin core (from loc) (merged revision 27603 from trunk)
+      </action>
       <action dev="mcrkrebs" type="fix">
         highwire press tags now also matches mods:dateXXX without @encoding (workaround for now)
       </action>
