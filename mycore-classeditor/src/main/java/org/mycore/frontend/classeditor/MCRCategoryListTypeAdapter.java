@@ -53,7 +53,7 @@ public class MCRCategoryListTypeAdapter extends MCRJSONTypeAdapter<MCRCategoryLi
         
         return categJsonArray;
     }
-    
+
     private JsonElement createCategRefJSONObj(MCRCategory categ, Boolean hasLink) {
         JsonObject categRefJsonObject = new JsonObject();
         categRefJsonObject.add(ID, serializationContext.serialize(categ.getId()));
@@ -63,13 +63,10 @@ public class MCRCategoryListTypeAdapter extends MCRJSONTypeAdapter<MCRCategoryLi
         if(uri != null) {
             categRefJsonObject.addProperty(URISTR, uri.toString());
         }
-        
         categRefJsonObject.addProperty(HASCHILDREN, categ.hasChildren());
         categRefJsonObject.addProperty(HASLINK, hasLink);
-        
         return categRefJsonObject;
     }
-
 
     @Override
     public MCRCategoryListWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {

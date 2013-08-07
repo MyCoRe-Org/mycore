@@ -2,6 +2,7 @@ package org.mycore.frontend.classeditor;
 
 import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.CHILDREN;
 import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.ID;
+import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.HASLINK;
 import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.LABELS;
 import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.PARENTID;
 import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.POSITION;
@@ -89,6 +90,9 @@ public class MCRCategoryTypeAdapter extends MCRJSONTypeAdapter<MCRJSONCategory> 
         if (category.hasChildren()) {
             List<MCRCategory> children = category.getChildren();
             Map<MCRCategoryID, Boolean> linkMap = getLinkService().hasLinks(category);
+            if(linkMap.values().contains(true)) {
+                rubricJsonObject.addProperty(HASLINK, true);
+            }
             rubricJsonObject.add(CHILDREN, contextSerialization.serialize(new MCRCategoryListWrapper(children, linkMap)));
         }
 
