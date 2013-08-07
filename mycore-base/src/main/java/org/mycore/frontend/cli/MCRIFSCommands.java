@@ -277,7 +277,7 @@ public class MCRIFSCommands {
         }
     }
 
-    @MCRCommand(syntax = "generate missing file report in directory {0}", help = "Writes XML report about missing files in directory {0}")
+    @MCRCommand(syntax = "generate missing file report in directory {0}", help = "generates XML a report over all content stores about missing files and write it in directory {0}")
     public static void writeMissingFileReport(String targetDirectory) throws IOException, SAXException,
         TransformerConfigurationException {
         File targetDir = getDirectory(targetDirectory);
@@ -285,7 +285,7 @@ public class MCRIFSCommands {
         writeReport(targetDir, checker);
     }
 
-    @MCRCommand(syntax = "generate md5 file report in directory {0}", help = "Writes XML report about failed md5 checks in directory {0}")
+    @MCRCommand(syntax = "generate md5 file report in directory {0}", help = "generates XML a report over all content stores about failed md5 checks and write it in directory {0}")
     public static void writeFileMD5Report(String targetDirectory) throws IOException, SAXException,
         TransformerConfigurationException {
         File targetDir = getDirectory(targetDirectory);
@@ -398,7 +398,7 @@ public class MCRIFSCommands {
         return targetDir;
     }
 
-    @MCRCommand(syntax = "generate missing nodes report in directory {0}", help = "Writes XML report about missing ifs nodes in directory {0}")
+    @MCRCommand(syntax = "generate missing nodes report in directory {0}", help = "generates XML report over all content stores about missing ifs nodes and write it in directory {0}")
     public static void writeMissingNodesReport(String targetDirectory) throws SAXException,
         TransformerConfigurationException, IOException {
         File targetDir = getDirectory(targetDirectory);
@@ -526,4 +526,5 @@ public class MCRIFSCommands {
         }
         return comp == 0 ? 0 : 1;
     }
+    
 }
