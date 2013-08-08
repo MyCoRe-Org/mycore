@@ -18,7 +18,7 @@
 			<div id="alert-area" class="alert fade">...</div>
       	</div>
       	
-      	<div id="loading" ><i class="icon-spinner icon-spin icon-4x offset5"></i></div>
+      	<div id="loading" ><i class="icon-spinner icon-spin icon-4x"></i></div>
       	
       	<div class="tab-content">
 	      	<div class="tab-pane active" id="ruleAllocation" style="display:none">
@@ -66,7 +66,7 @@
 		     	
 				<div class="modal hide fade" id="lightbox-new-rule" tabindex="-1" role="dialog" aria-labelledby="lightbox-label" aria-hidden="true">
 				 	<div class="modal-header">
-						<i type="button" class="close new-rule-cancel" data-dismiss="modal" aria-hidden="true">x</i>
+						<i type="button" class="close new-rule-cancel pull-right icon icon-remove icon-large" data-dismiss="modal" aria-hidden="true"></i>
 						<h3 id="lightbox-label"><text i18n="ACLE.labels.access.newRule"/></h3>
 					</div>
 					<div class="modal-body">

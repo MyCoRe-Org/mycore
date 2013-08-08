@@ -233,3 +233,7 @@ input.control-group.error{
 #contentArea .pagination ul > li {
     display: inline;
 }
+
+#loading .icon-spinner{
+	margin-left: 420px;
+}

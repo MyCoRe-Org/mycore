@@ -1,5 +1,6 @@
 package org.mycore.frontend.acl2.resources;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
@@ -18,9 +19,9 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
@@ -29,6 +30,7 @@ import org.mycore.access.mcrimpl.MCRAccessRule;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
 import org.mycore.access.mcrimpl.MCRRuleStore;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRContent;
@@ -37,6 +39,7 @@ import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.xml.MCRLayoutService;
+import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.services.i18n.MCRTranslation;
 
@@ -47,6 +50,8 @@ import com.google.gson.JsonParser;
 @Path("ACLE")
 public class MCRAclEditorResource {
 
+    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
+     
     @Context
     HttpServletRequest request;
 
@@ -63,19 +68,7 @@ public class MCRAclEditorResource {
             throw new WebApplicationException(Response.status(HttpServletResponse.SC_UNAUTHORIZED)
                     .entity(MCRTranslation.translate("component.session-listing.page.text")).build());
         }
-        InputStream guiXML = getClass().getResourceAsStream("/META-INF/resources/modules/acl-editor2/gui/xml/webpage.xml");
-        SAXBuilder saxBuilder = new SAXBuilder();
-        Document webPage = saxBuilder.build(guiXML);
-        XPathExpression<Object> xpath = XPathFactory.instance().compile("/MyCoReWebPage/section/div[@id='jportal_acl_editor_module']");
-        Object node = xpath.evaluateFirst(webPage);
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String lang = mcrSession.getCurrentLanguage();
-        if (node != null) {
-            Element mainDiv = (Element) node;
-            mainDiv.setAttribute("lang", lang);
-        }
-        MCRJDOMContent source = new MCRJDOMContent(webPage);
-        return transform(request, "MyCoReWebPage", source);
+        return doLayout(request, "/META-INF/resources/modules/acl-editor2/gui/xml/webpage.xml");
     }
 
     @GET
@@ -85,8 +78,28 @@ public class MCRAclEditorResource {
             throw new WebApplicationException(Response.status(HttpServletResponse.SC_UNAUTHORIZED)
                     .entity(MCRTranslation.translate("component.session-listing.page.text")).build());
         }
-        URL resource = context.getResource("/modules/acl-editor2/gui/xml/objectid.xml");
-        MCRURLContent source = new MCRURLContent(resource);
+        return doLayout(request, "/META-INF/resources/modules/acl-editor2/gui/xml/objectid.xml");
+    }
+    
+    protected byte[] doLayout(HttpServletRequest request, String xmlPath) throws Exception{
+        InputStream guiXML = getClass().getResourceAsStream(xmlPath);
+        SAXBuilder saxBuilder = new SAXBuilder();
+        Document webPage = saxBuilder.build(guiXML);
+        XPathExpression<Object> xpath = XPathFactory.instance().compile("/MyCoReWebPage/section/div[@id='jportal_acl_editor_module']");
+        Object node = xpath.evaluateFirst(webPage);
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        String lang = mcrSession.getCurrentLanguage();
+        if (node != null) {
+            Element mainDiv = (Element) node;
+            mainDiv.setAttribute("lang", lang);
+            String bsPath = CONFIG.getString("MCR.bootstrap.path", "");
+            if (!bsPath.equals("")) {
+                bsPath = MCRServlet.getBaseURL() + bsPath;
+                Element item = new Element("link").setAttribute("href", bsPath).setAttribute("rel", "stylesheet").setAttribute("type", "text/css");
+                mainDiv.addContent(0,item);
+            }
+        }
+        MCRJDOMContent source = new MCRJDOMContent(webPage);
         return transform(request, "MyCoReWebPage", source);
     }
 
