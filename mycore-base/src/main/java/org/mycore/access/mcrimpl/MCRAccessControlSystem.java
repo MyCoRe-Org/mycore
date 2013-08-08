@@ -280,9 +280,11 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         }
         LOGGER.debug("accessStore.getRuleID()");
         String ruleID = accessStore.getRuleID(objID, pool);
-        LOGGER.debug("accessStore.getRuleID() done.");
         if (ruleID == null) {
+            LOGGER.debug("accessStore.getRuleID() done with null");
             return null;
+        } else {
+            LOGGER.debug("accessStore.getRuleID() done with " + ruleID);
         }
         MCRAccessRule a = cache.get(ruleID);
         if (a == null) {
