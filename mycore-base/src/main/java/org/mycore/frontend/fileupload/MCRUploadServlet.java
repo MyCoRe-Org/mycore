@@ -455,7 +455,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     }
 
     protected void sendException(HttpServletResponse res, Exception ex) throws Exception {
-        HashMap<String, String> response = new HashMap<>();
+        HashMap<String, String> response = new HashMap<String, String>();
         response.put("clname", ex.getClass().getName());
         response.put("strace", MCRException.getStackTraceAsString(ex));
 
@@ -467,7 +467,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     }
 
     protected void sendResponse(HttpServletResponse res, String value) throws Exception {
-        HashMap<String, String> parameters = new HashMap<>();
+        HashMap<String, String> parameters = new HashMap<String, String>();
 
         if (value != null) {
             parameters.put("return", value);
