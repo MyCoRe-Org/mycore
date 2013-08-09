@@ -70,14 +70,8 @@ public class MCRParentRuleStrategy implements MCRAccessCheckStrategy {
         Document parentDoc;
         try {
             parentDoc = MCRXMLMetadataManager.instance().retrieveXML(MCRObjectID.getInstance(objectID));
-        } catch (IOException e) {
-            LOGGER.error("IOException - Could not read object: " + objectID, e);
-            return null;
-        } catch (JDOMException e) {
-            LOGGER.error("JDOMException - Could not read object: " + objectID, e);
-            return null;
-        } catch (SAXException e) {
-            LOGGER.error("SAXException - Could not read object: " + objectID, e);
+        } catch (IOException | JDOMException | SAXException e) {
+            LOGGER.error("Could not read object: " + objectID, e);
             return null;
         }
         final Element parentElement = parentDoc.getRootElement().getChild("structure").getChild("parents");
