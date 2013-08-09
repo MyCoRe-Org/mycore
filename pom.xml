@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>mycore-parent</artifactId>
     <groupId>org.mycore</groupId>
-    <version>16-SNAPSHOT</version>
+    <version>16</version>
   </parent>
   <artifactId>mycore</artifactId>
   <packaging>pom</packaging>
-  <version>2013.07-SNAPSHOT</version>
+  <version>2013.08</version>
   <name>MyCoRe</name>
 
   <!-- Keep the description on a single line. Otherwise Maven might generate a corrupted MANIFEST.MF (see http://jira.codehaus.org/browse/MJAR-4) -->
@@ -47,9 +46,9 @@
     </notifiers>
   </ciManagement>
   <scm>
-    <connection>scm:svn:http://server.mycore.de/svn/mycore/trunk</connection>
-    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/trunk</developerConnection>
-    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/trunk</url>
+    <connection>scm:svn:http://server.mycore.de/svn/mycore/tags/mycore-2013.08</connection>
+    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/tags/mycore-2013.08</developerConnection>
+    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/tags/mycore-2013.08</url>
   </scm>
   <profiles>
     <profile>
@@ -494,7 +493,7 @@
       <dependency>
         <groupId>org.mycore.iview2</groupId>
         <artifactId>image-tiler</artifactId>
-        <version>1.9-SNAPSHOT</version>
+        <version>1.9</version>
       </dependency>
       <dependency>
         <groupId>org.mycore.mets</groupId>
