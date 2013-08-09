@@ -62,6 +62,10 @@ public class MCRObjectTypeStrategy implements MCRAccessCheckStrategy {
             LOGGER.debug("using access rule defined for object.");
             return MCRAccessManager.getAccessImpl().checkPermission(id, permission);
         }
+        return checkObjectTypePermission(id, permission);
+    }
+
+    public static boolean checkObjectTypePermission(String id, String permission) {
         String objectType = getObjectType(id);
         if (objectType != null && MCRAccessManager.getAccessImpl().hasRule("default_" + objectType, permission)) {
             LOGGER.debug("using access rule defined for object type.");

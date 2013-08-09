@@ -23,20 +23,24 @@
 
 package org.mycore.access.strategies;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.log4j.Logger;
-import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRException;
-import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
- * Use this class if you want to have a fallback to some default access permissions.
+ * Use this class if you want to have a fallback to some default access rules.
  * 
- * First a check is done for the MCRObjectID. If no rule for the ID is specified
- * it will be tried to check the permission<code>&lt;permission&gt;-&lt;ID&gt;</code>. 
- * if it is not yet it test agains the permission
- * <code>&lt;permission&gt;-default</code> if it exists.
- * 
+ * These are the rules that will be checked against if available
+ * <ol>
+ *  <li><code>{id}</code>, e.g. "MyCoRe_mods_12345678"</li>
+ *  <li><code>default_{baseId}</code>, e.g. "default_MyCoRe_mods"</li>
+ *  <li><code>default_{objectType}</code>, e.g. "default_mods"</li>
+ *  <li><code>default</code></li>
+ * </ol>
+ *
+ * This is the same behaviour as {@link MCRObjectTypeStrategy} but step 2 is inserted here. 
  * @author Thomas Scheffler (yagee)
  * @author Jens Kupferschmidt
  * 
@@ -44,6 +48,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRObjectBaseStrategy implements MCRAccessCheckStrategy {
     private static final Logger LOGGER = Logger.getLogger(MCRObjectBaseStrategy.class);
+
+    private static final Pattern BASE_PATTERN = Pattern.compile("([^_]*_[^_]*)_*");
 
     /*
      * (non-Javadoc)
@@ -53,23 +59,26 @@ public class MCRObjectBaseStrategy implements MCRAccessCheckStrategy {
      */
     public boolean checkPermission(String id, String permission) {
         LOGGER.debug("check permission " + permission + " for MCRBaseID " + id);
-        if (id == null | id.length() == 0 || permission == null || permission.length() == 0)
+        if (id == null || id.length() == 0 || permission == null || permission.length() == 0)
             return false;
-        MCRAccessInterface ai = MCRAccessManager.getAccessImpl();
-        if (ai.hasRule(id, permission)) {
+        if (MCRAccessManager.getAccessImpl().hasRule(id, permission)) {
             LOGGER.debug("using access rule defined for object.");
-            return ai.checkPermission(id, permission);
+            return MCRAccessManager.getAccessImpl().checkPermission(id, permission);
         }
-        try {
-            MCRObjectID mid = MCRObjectID.getInstance(id);
-            if (ai.checkPermission(permission + "-" + mid.getBase())) {
-                LOGGER.debug("using check permission for id " + id + " and permission " + permission);
-                return true;
-            }
-        } catch (MCRException e) {
+        String objectBase = getObjectBase(id);
+        if (objectBase != null && MCRAccessManager.getAccessImpl().hasRule("default_" + objectBase, permission)) {
+            LOGGER.debug("using access rule defined for object base.");
+            return MCRAccessManager.getAccessImpl().checkPermission("default_" + objectBase, permission);
         }
-        LOGGER.debug("using system default permission for " + permission);
-        return MCRAccessManager.getAccessImpl().checkPermission("default", permission);
+        return MCRObjectTypeStrategy.checkObjectTypePermission(id, permission);
+    }
+
+    private static String getObjectBase(String id) {
+        Matcher m = BASE_PATTERN.matcher(id);
+        if (m.find() && m.groupCount() == 1) {
+            return m.group(1);
+        }
+        return null;
     }
 
 }
