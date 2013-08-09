@@ -14,10 +14,16 @@
     <script type="text/javascript">
       require(["dojo/ready", "dojo/promise/all", "mycore/util/DOMUtil"], function(ready, all, domUtil) {
         ready(function() {
-          all([domUtil.loadCSS("http://ajax.googleapis.com/ajax/libs/dojo/"+classeditor.dojoVersion +"/dijit/themes/claro/claro.css"),
-               domUtil.loadCSS(classeditor.settings.cssURL + "/classificationEditor.css"),
-               domUtil.loadCSS(classeditor.settings.cssURL + "/mycore.dojo.css"),
-               domUtil.loadCSS(classeditor.settings.cssURL + "/modern-pictograms.css")]).then(function() {
+          var preloadCSS = [
+            domUtil.loadCSS("http://ajax.googleapis.com/ajax/libs/dojo/"+classeditor.dojoVersion +"/dijit/themes/claro/claro.css"),
+            domUtil.loadCSS(classeditor.settings.cssURL + "/classificationEditor.css"),
+            domUtil.loadCSS(classeditor.settings.cssURL + "/mycore.dojo.css")
+          ];
+          // check if font-awesome is already loaded
+          if(query("link[href*='font-awesome']").length == 0) {
+            preloadCSS.push(domUtil.loadCSS(classeditor.settings.cssURL + "/font-awesome.min.css"));
+          }
+          all(preloadCSS).then(function() {
             require([
               "dijit/registry", "dojo/dom-construct", "dojo/on", "dojo/parser",
               "dijit/form/Button", "dijit/Dialog", "mycore/classification/Editor"
