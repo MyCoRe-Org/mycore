@@ -188,10 +188,7 @@ public class MCRThumbnailServlet extends MCRServlet {
         final int newWidth = width < height ? (int) Math.ceil(thumbnailSize * width / height) : thumbnailSize;
         final int newHeight = width < height ? thumbnailSize : (int) Math.ceil(thumbnailSize * height / width);
         //if centered make transparent image
-        int imageType = centered ? BufferedImage.TYPE_INT_ARGB : level1Image.getType();
-        if (imageType == BufferedImage.TYPE_CUSTOM) {
-            imageType = BufferedImage.TYPE_INT_RGB;
-        }
+        int imageType = centered ? BufferedImage.TYPE_INT_ARGB : MCRImage.getImageType(level1Image);
         //if centered make thumbnailSize x thumbnailSize image
         final BufferedImage bicubic = new BufferedImage(centered ? thumbnailSize : newWidth, centered ? thumbnailSize
             : newHeight, imageType);

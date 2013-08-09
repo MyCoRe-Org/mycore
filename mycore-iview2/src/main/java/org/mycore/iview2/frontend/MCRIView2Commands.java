@@ -204,25 +204,17 @@ public class MCRIView2Commands extends MCRAbstractCommands {
             return;
         }
         try {
+            @SuppressWarnings("unused")
             BufferedImage thumbnail = MCRIView2Tools.getZoomLevel(iviewFile, 0);
-            if (thumbnail.getType() == BufferedImage.TYPE_CUSTOM) {
-                LOGGER.warn("Found thumbnail in 'CUSTOM' image type format: " + iviewFile.getAbsolutePath());
-                tileImage(derivate, absoluteImagePath);
-                return;
-            }
             int maxX = (int) Math.ceil((double) props.getWidth() / MCRImage.getTileSize());
             int maxY = (int) Math.ceil((double) props.getHeight() / MCRImage.getTileSize());
             LOGGER.debug(MessageFormat.format("Image size:{0}x{1}, tiles:{2}x{3}", props.getWidth(), props.getHeight(),
                 maxX, maxY));
             ImageReader imageReader = MCRIView2Tools.getTileImageReader();
             try {
+                @SuppressWarnings("unused")
                 BufferedImage sampleTile = MCRIView2Tools.readTile(iviewImage, imageReader, props.getZoomlevel(),
                     maxX - 1, 0);
-                if (sampleTile.getType() == BufferedImage.TYPE_CUSTOM) {
-                    LOGGER.warn("Found tiles in 'CUSTOM' image type format: " + iviewFile.getAbsolutePath());
-                    tileImage(derivate, absoluteImagePath);
-                    return;
-                }
             } finally {
                 imageReader.dispose();
             }
