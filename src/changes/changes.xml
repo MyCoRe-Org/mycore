@@ -5,10 +5,31 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2013.08" date="2013-08-0X" description="Codenamed &apos;Old Pascas&apos;">
+    <release version="2013.08" date="2013-08-09" description="Codenamed &apos;Old Pascas&apos;">
+      <action dev="mcrtchef" type="fix" date="2013-08-07">
+        mycore-mods: fixed export of serveral mycore objects as a MODS collection
+      </action>
+      <action dev="mcrmeich" type="fix" date="2013-08-07">
+        mycore-classeditor: fix haslink is not set for root categories via get request
+      </action>
+      <action dev="mcrjkupf" type="add">
+        mycore-base: add a command to move files from one store to an other
+      </action>
+      <action dev="mcrjkupf" type="add">
+        mycore-base: add MCRObjectBaseStrategy
+      </action>
       <action dev="mcrtchef" type="fix" date="2013-08-05" due-to="Kathleen Neumann">
         SearchURL from BasketServlet is not UTF-8 encoded
         <fixes issue="646" />
+      </action>
+      <action dev="mcrkrebs" type="add">
+        mycore-mods: added stylesheet to export to Dublin Core
+      </action>
+      <action dev="mcrshofm" type="update">
+        mycore-iview2: added compatibility to jQuery 1.10 
+      </action>
+      <action dev="mcrmeich" type="update">
+        mycore-classeditor: use new dojo store api to hold tree data
       </action>
       <action dev="mcrtchef" type="remove">
         mycore-webcli: removed "add commands" command an related classes
