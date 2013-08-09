@@ -78,6 +78,9 @@
           <xsl:value-of select="." />
         </field>
       </xsl:for-each>
+      <field name="derivateDisplay">
+        <xsl:value-of select="not(derivate/@display='false')" />
+      </field>
       <xsl:variable name="iviewMainFile" select="iview2:getSupportedMainFile(@ID)" />
       <xsl:if test="string-length($iviewMainFile) &gt; 0">
         <field name="iviewFile">
