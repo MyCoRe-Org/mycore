@@ -9,6 +9,9 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.util.concurrent.MCRPrioritizable;
 
 /**
@@ -38,6 +41,9 @@ public class MCRSolrIndexTask implements Callable<List<MCRSolrIndexHandler>>, MC
 
     @Override
     public List<MCRSolrIndexHandler> call() throws SolrServerException, IOException {
+        //this.indexHandler.index() creates a session anyway
+        MCRSession mcrSession=MCRSessionMgr.getCurrentSession();
+        mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
         Session session = null;
         Transaction transaction = null;
         try {
@@ -57,6 +63,8 @@ public class MCRSolrIndexTask implements Callable<List<MCRSolrIndexHandler>>, MC
                 }
             } finally {
                 session.close();
+                MCRSessionMgr.releaseCurrentSession();
+                mcrSession.close();
             }
         }
     }
