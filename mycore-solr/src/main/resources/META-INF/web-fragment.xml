@@ -71,4 +71,20 @@
     <servlet-name>MCRSolrSelectProxyServlet</servlet-name>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>UserAgentFilter</filter-name>
+    <servlet-name>MCRLegacySearchServlet</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>UserAgentFilter</filter-name>
+    <servlet-name>MCRSolrSearchServlet</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>UserAgentFilter</filter-name>
+    <servlet-name>MCRSolrSelectProxyServlet</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
 </web-fragment>
