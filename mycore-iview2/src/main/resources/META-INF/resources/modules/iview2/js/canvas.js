@@ -30,54 +30,55 @@
 
                 if(!PanoJS.prototype.getMaxDimViewerOrig) {
                 	PanoJS.prototype.getMaxDimViewerOrig = PanoJS.prototype.getMaxDimViewer;
+                	PanoJS.prototype.getMaxDimViewer = function cv_getMaxDimViewerOrig(screen) {
+                		return this.getMaxDimViewerOrig(screen);
+                	};
                 }
-                PanoJS.prototype.getMaxDimViewer = function cv_getMaxDimViewerOrig(screen) {
-                	 return that.getViewer().viewerBean.getMaxDimViewerOrig(screen);
-				};
 
 				if(!PanoJS.prototype.getTileSizeMinZoomLevelOrig) {
 					PanoJS.prototype.getTileSizeMinZoomLevelOrig = PanoJS.prototype.getTileSizeMinZoomLevel;
+					PanoJS.prototype.getTileSizeMinZoomLevel = function cv_getTileSizeMinZoomLevelOrig(screen) {
+						return this.getTileSizeMinZoomLevelOrig(screen);
+					};
 				}
-                PanoJS.prototype.getTileSizeMinZoomLevel = function cv_getTileSizeMinZoomLevelOrig(screen) {
-                	 return that.getViewer().viewerBean.getTileSizeMinZoomLevelOrig(screen);
-				};
 				
 				if(!PanoJS.prototype.getMaxDimCurZoomLevelOrig) {
 					PanoJS.prototype.getMaxDimCurZoomLevelOrig = PanoJS.prototype.getMaxDimCurZoomLevel;
+					PanoJS.prototype.getMaxDimCurZoomLevel = function cv_getMaxDimCurZoomLevelOrig(screen, calculatedMinFitZoomLevel) {
+						return this.getMaxDimCurZoomLevelOrig(screen , calculatedMinFitZoomLevel);
+					};
 				}
-                PanoJS.prototype.getMaxDimCurZoomLevel = function cv_getMaxDimCurZoomLevelOrig(screen, calculatedMinFitZoomLevel) {
-                	 return that.getViewer().viewerBean.getMaxDimCurZoomLevelOrig(screen , calculatedMinFitZoomLevel);
-				};
                 
 				if(!PanoJS.prototype.assignTileImageOrig) {
 					PanoJS.prototype.assignTileImageOrig = PanoJS.prototype.assignTileImage;
+					PanoJS.prototype.assignTileImage = function cv_assignTileImage() {
+						this.assignTileImage(arguments[0]);
+					};
 				}
-                PanoJS.prototype.assignTileImage = function cv_assignTileImage() {
-                    that.assignTileImage(arguments[0]);
-                };
 
                 if(!PanoJS.prototype.resizeOrig) {
                 	PanoJS.prototype.resizeOrig = PanoJS.prototype.resize;
+                	PanoJS.prototype.resize = function cv_resize() {
+                		this.iview.canvas.context2D.canvas.width = this.width;
+                		this.iview.canvas.context2D.canvas.height = this.height;
+                		this.resizeOrig();
+                	};
                 }
-                PanoJS.prototype.resize = function cv_resize() {
-                    that.context2D.canvas.width = that.getViewer().viewerBean.width;
-                    that.context2D.canvas.height = that.getViewer().viewerBean.height;
-                    that.getViewer().viewerBean.resizeOrig();
-                };
 
                 if(!PanoJS.prototype.switchDisplayModeOrig) {
                 	PanoJS.prototype.switchDisplayModeOrig = PanoJS.prototype.switchDisplayMode;
+                	PanoJS.prototype.switchDisplayMode = function cv_switchDisplayMode() {
+                		return this.iview.canvas.switchDisplayMode(arguments[0], arguments[1], arguments[2], arguments[3]);
+                	};
                 }
-                PanoJS.prototype.switchDisplayMode = function cv_switchDisplayMode() {
-                    return that.switchDisplayMode(arguments[0], arguments[1], arguments[2], arguments[3]);
-                };
 
                 if(!PanoJS.prototype.updateScreenOrig) {
                 	PanoJS.prototype.updateScreenOrig = PanoJS.prototype.updateScreen;
+                	PanoJS.prototype.updateScreen = function cv_updateScreen() {
+                		this.iview.canvas.updateScreen();
+                	}
                 }
-                PanoJS.prototype.updateScreen = function cv_updateScreen() {
-                    that.updateScreen();
-                }
+                
                 if (false) {
                     jQuery(this).bind(iview.Canvas.AFTER_DRAW_EVENT, function(event) {
                         var curTime = new Date();
