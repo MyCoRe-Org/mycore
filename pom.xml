@@ -4,7 +4,7 @@
   <parent>
     <artifactId>mycore-parent</artifactId>
     <groupId>org.mycore</groupId>
-    <version>15</version>
+    <version>16</version>
   </parent>
   <artifactId>mycore</artifactId>
   <packaging>pom</packaging>
