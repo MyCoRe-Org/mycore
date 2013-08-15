@@ -99,18 +99,19 @@ public class MCROAISolrSearcher extends MCROAISearcher {
     @Override
     public Date getEarliestTimestamp() {
         String sortBy = getConfig().getString(getConfigPrefix() + "EarliestDatestamp.SortBy", "modified asc");
+        String fieldName = getConfig().getString(getConfigPrefix() + "EarliestDatestamp.fieldName", "modified");
         String restriction = getConfig().getString(getConfigPrefix() + "Search.Restriction", null);
         ModifiableSolrParams params = new ModifiableSolrParams();
         params.add("sort", sortBy);
         params.add("q", restriction);
-        params.add("fl", "modified");
+        params.add("fl", fieldName);
         params.add("rows", "1");
         SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
         try {
             QueryResponse response = solrServer.query(params);
             SolrDocumentList list = response.getResults();
             if(list.size() >= 1) {
-                return (Date) list.get(0).getFieldValue("modified");
+                return (Date) list.get(0).getFieldValue(fieldName);
             }
         } catch (Exception exc) {
             LOGGER.error("Unable to handle solr request", exc);
