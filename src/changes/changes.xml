@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2013.06.0.2" date="TBA" description="2013.06.0 maintenance release 2">
+      <action dev="mcrmeich" type="update" date="2013-08-15">
+        oai: make earliest date stamp field configurable (merged revision 27674 from trunk)
+      </action>
       <action dev="mcrtchef" type="fix" date="2013-08-14">
         release MCRSession in SolrIndexTask and added filter mappings for UserAgentFilter (merged revision 27665 and 27666 from trunk)
       </action>
