@@ -24,11 +24,11 @@
   <xsl:variable name="owns" select="document(concat('user:getOwnedUsers:',$uid))/owns" />
 
   <xsl:template match="user" mode="actions">
-    <xsl:variable name="isCurrentUser" select="$CurrentUser = /user/@name"/>
-    
+    <xsl:variable name="isCurrentUser" select="$CurrentUser = /user/@name" />
     <xsl:if test="(string-length($step) = 0) or ($step = 'changedPassword')">
+      <xsl:variable name="isUserAdmin" select="acl:checkPermission(const:getUserAdminPermission())" />
       <xsl:choose>
-        <xsl:when test="acl:checkPermission(const:getUserAdminPermission())">
+        <xsl:when test="$isUserAdmin">
           <form action="{$WebApplicationBaseURL}authorization/change-user.xml" method="get">
             <input type="hidden" name="action" value="save" />
             <input type="hidden" name="id" value="{$uid}" />
@@ -56,7 +56,7 @@
           <input type="submit" class="action" value="{i18n:translate('component.user2.admin.changepw')}" />
         </form>
       </xsl:if>
-      <xsl:if test="mcrxsl:isCurrentUserInRole('admin') and not($isCurrentUser)">
+      <xsl:if test="$isUserAdmin and not($isCurrentUser)">
         <form action="MCRUserServlet" method="get">
           <input type="hidden" name="action" value="show" />
           <input type="hidden" name="id" value="{$uid}" />
