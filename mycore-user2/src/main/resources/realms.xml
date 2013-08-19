@@ -4,7 +4,7 @@
   <realm id="local">
     <label xml:lang="de">lokal</label>
     <label xml:lang="en">local</label>
-    <login url="MCRLoginServlet?action=login" redirectParameter="url">
+    <login url="MCRLoginServlet?action=login" redirectParameter="url" realmParameter="realm">
       <label xml:lang="de">Anmeldung mit lokaler Nutzerkennung</label>
       <label xml:lang="en">Login with local user account</label>
       <info>
@@ -31,4 +31,22 @@
      -->
     <passwordChangeURL>../authorization/change-password.xml?action=password</passwordChangeURL>
   </realm>
+  <!-- 
+  <realm id="servlet3">
+    <label xml:lang="de">Servlet 3 Login</label>
+    <label xml:lang="en">Servlet 3 login</label>
+    <login url="MCRServlet3LoginServlet" redirectParameter="url" realmParameter="realm">
+      <label xml:lang="de">Anmeldung mit Servlet-Container Nutzerkennung (Servlet 3)</label>
+      <label xml:lang="en">Login with servlet container user account (Servlet 3)</label>
+      <info>
+        <label xml:lang="de">
+          Diese Kennung gilt für alle Anwendungen innerhalb des Servlet-Containers.
+        </label>
+        <label xml:lang="en">
+          This account is available to all applications of this servlet container.
+        </label>
+      </info>
+    </login>
+  </realm>
+   -->
 </realms>

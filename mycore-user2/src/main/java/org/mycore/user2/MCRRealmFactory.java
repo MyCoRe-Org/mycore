@@ -147,6 +147,7 @@ public class MCRRealmFactory {
             Element login = child.getChild("login");
             realm.setLoginURL(login.getAttributeValue("url"));
             realm.setRedirectParameter(login.getAttributeValue("redirectParameter"));
+            realm.setRealmParameter(login.getAttributeValue("realmParameter"));
             Element createElement = child.getChild("create");
             if (createElement != null) {
                 realm.setCreateURL(createElement.getAttributeValue("url"));

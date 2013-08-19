@@ -58,7 +58,7 @@ import org.xml.sax.SAXException;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRLoginServlet extends MCRServlet {
-    private static final String HTTPS_ONLY_PROPERTY = MCRUser2Constants.CONFIG_PREFIX + "LoginHttpsOnly";
+    static final String HTTPS_ONLY_PROPERTY = MCRUser2Constants.CONFIG_PREFIX + "LoginHttpsOnly";
 
     private static final long serialVersionUID = 1L;
 
@@ -66,7 +66,7 @@ public class MCRLoginServlet extends MCRServlet {
 
     private static final String LOGIN_REDIRECT_URL_KEY = "loginRedirectURL";
 
-    private static final boolean LOCAL_LOGIN_SECURE_ONLY = MCRConfiguration.instance().getBoolean(HTTPS_ONLY_PROPERTY);
+    static final boolean LOCAL_LOGIN_SECURE_ONLY = MCRConfiguration.instance().getBoolean(HTTPS_ONLY_PROPERTY);
 
     private static Logger LOGGER = Logger.getLogger(MCRLoginServlet.class);
 
@@ -137,7 +137,7 @@ public class MCRLoginServlet extends MCRServlet {
             listRealms(req, res);
     }
 
-    private String getReturnURL(HttpServletRequest req) {
+    static String getReturnURL(HttpServletRequest req) {
         String returnURL = req.getParameter(LOGIN_REDIRECT_URL_PARAMETER);
         if (returnURL == null) {
             String referer = req.getHeader("Referer");
@@ -179,7 +179,8 @@ public class MCRLoginServlet extends MCRServlet {
         getLayoutService().doLayout(req, res, new MCRJDOMContent(root));
     }
 
-    private void listRealms(HttpServletRequest req, HttpServletResponse res) throws IOException, TransformerException, SAXException {
+    private void listRealms(HttpServletRequest req, HttpServletResponse res) throws IOException, TransformerException,
+        SAXException {
         String redirectURL = getReturnURL(req);
         Document realmsDoc = MCRRealmFactory.getRealmsDocument();
         Element realms = realmsDoc.getRootElement();
@@ -193,11 +194,15 @@ public class MCRLoginServlet extends MCRServlet {
         getLayoutService().doLayout(req, res, new MCRJDOMContent(realmsDoc));
     }
 
-    private void addCurrentUserInfo(Element rootElement) {
+    static void addCurrentUserInfo(Element rootElement) {
         MCRUserInformation userInfo = MCRSessionMgr.getCurrentSession().getUserInformation();
         rootElement.setAttribute("user", userInfo.getUserID());
-        rootElement.setAttribute("realm", (userInfo instanceof MCRUser) ? ((MCRUser) userInfo).getRealm().getLabel()
-            : MCRRealmFactory.getLocalRealm().getLabel());
+        String realmId = (userInfo instanceof MCRUser) ? ((MCRUser) userInfo).getRealm().getLabel() : userInfo
+            .getUserAttribute(MCRRealm.USER_INFORMATION_ATTR);
+        if (realmId == null) {
+            realmId = MCRRealmFactory.getLocalRealm().getLabel();
+        }
+        rootElement.setAttribute("realm", realmId);
         rootElement.setAttribute("guest", String.valueOf(currentUserIsGuest()));
     }
 

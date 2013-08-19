@@ -33,6 +33,9 @@
   &html-output;
   <xsl:include href="MyCoReLayout.xsl" />
   <xsl:param name="MCR.Users.Guestuser.UserName" />
+  <xsl:param name="FormTarget" select="concat($ServletsBaseURL,'MCRLoginServlet')" />
+  <xsl:param name="Realm" select="'local'" />
+  <xsl:variable name="loginToRealm" select="document(concat('realm:',$Realm))" />
 
   <xsl:variable name="PageTitle" select="i18n:translate('component.user2.login.form.title')" />
 
@@ -47,14 +50,15 @@
   </xsl:template>
 
   <xsl:template match="login" mode="userAction">
-    <form action="{$ServletsBaseURL}MCRLoginServlet{$HttpSession}" method="post" class="form-login">
+    <form action="{$FormTarget}{$HttpSession}" method="post" class="form-login">
       <h2 class="form-login-heading">
         <xsl:value-of select="i18n:translate('component.user2.login.heading')" />
       </h2>
+      <xsl:apply-templates select="$loginToRealm" mode="form" />
       <input type="hidden" name="action" value="login" />
       <input type="hidden" name="url" value="{returnURL}" />
-      <xsl:variable name="userNameText" select="i18n:translate('component.user2.login.form.userName')"/>
-      <xsl:variable name="passwordText" select="i18n:translate('component.user2.login.form.password')"/>
+      <xsl:variable name="userNameText" select="i18n:translate('component.user2.login.form.userName')" />
+      <xsl:variable name="passwordText" select="i18n:translate('component.user2.login.form.password')" />
       <fieldset>
         <!-- Here come the input fields... -->
         <div>
@@ -120,6 +124,12 @@
         <xsl:value-of select="' error'" />
       </xsl:if>
     </xsl:attribute>
+  </xsl:template>
+
+  <xsl:template match="realm" mode="form">
+    <xsl:if test="login/@realmParameter">
+      <input type="hidden" name="{login/@realmParameter}" value="{@id}" />
+    </xsl:if>
   </xsl:template>
 
 </xsl:stylesheet>

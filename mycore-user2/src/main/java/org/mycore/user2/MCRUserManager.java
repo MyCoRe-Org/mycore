@@ -373,8 +373,9 @@ public class MCRUserManager {
         MCRUserInformation userInformation = MCRSessionMgr.getCurrentSession().getUserInformation();
         if (userInformation instanceof MCRUser) {
             return (MCRUser) userInformation;
+        } else {
+            return new MCRTransientUser(userInformation);
         }
-        return null;
     }
 
     /**

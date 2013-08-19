@@ -49,6 +49,9 @@ public class MCRLogoutServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        if (req.getUserPrincipal() != null) {
+            req.logout();
+        }
         HttpSession session = req.getSession(false);
         if (session != null) {
             LOGGER.debug("Invalidate HTTP-Session: " + session.getId());
