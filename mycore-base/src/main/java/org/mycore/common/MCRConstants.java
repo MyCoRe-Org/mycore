@@ -98,6 +98,8 @@ public final class MCRConstants {
 
     public static final Namespace SRW_NAMESPACE = Namespace.getNamespace("srw", "http://www.loc.gov/zing/srw/");
 
+    public static final Namespace INFO_SRW_NAMESPACE = Namespace.getNamespace("info", "info:srw/schema/5/picaXML-v1.0");
+
     /** The URL of the MCR */
     private final static String MCR_URL = "http://www.mycore.org/";
 
