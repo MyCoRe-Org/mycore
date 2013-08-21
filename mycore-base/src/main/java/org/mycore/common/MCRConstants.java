@@ -92,6 +92,12 @@ public final class MCRConstants {
 
     public final static Namespace MODS_NAMESPACE = Namespace.getNamespace("mods", MODS_URL);
 
+    public static final Namespace ZS_NAMESPACE = Namespace.getNamespace("zs", "http://www.loc.gov/zing/srw/");
+
+    public static final Namespace ZR_NAMESPACE = Namespace.getNamespace("zr", "http://explain.z3950.org/dtd/2.0/");
+
+    public static final Namespace SRW_NAMESPACE = Namespace.getNamespace("srw", "http://www.loc.gov/zing/srw/");
+
     /** The URL of the MCR */
     private final static String MCR_URL = "http://www.mycore.org/";
 
