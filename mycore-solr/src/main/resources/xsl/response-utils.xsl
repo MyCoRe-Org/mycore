@@ -113,8 +113,8 @@
     <xsl:variable name="prev" select="'«'" />
     <xsl:variable name="next" select="'»'" />
 
-    <div class="pagination pagination-centered">
-      <ul>
+    <div class="text-center">
+      <ul class="pagination">
         <li>
           <xsl:choose>
             <xsl:when test="$currentpage = 1">
