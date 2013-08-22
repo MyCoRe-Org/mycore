@@ -63,7 +63,7 @@
         <div class="result_options">
           <div class="btn-group">
             <xsl:if test="$searchMask">
-              <a class="btn" href="{$WebApplicationBaseURL}{$searchMask}{$HttpSession}">
+              <a class="btn btn-default" href="{$WebApplicationBaseURL}{$searchMask}{$HttpSession}">
                 <i class="icon-search">
                   <xsl:value-of select="' '" />
                 </i>
@@ -71,9 +71,6 @@
               </a>
             </xsl:if>
             <xsl:if test="doc">
-              <a class="btn btn-primary" href="" onclick="jQuery('form.basket_form').submit();return false;">
-                <xsl:value-of select="i18n:translate('basket.add.searchpage')" />
-              </a>
               <form action="{$ServletsBaseURL}MCRBasketServlet{$HttpSession}" method="post" class="basket_form">
                 <input type="hidden" name="action" value="add" />
                 <input type="hidden" name="redirect" value="referer" />
@@ -83,6 +80,9 @@
                   <input type="hidden" name="uri" value="{concat('mcrobject:',@id)}" />
                 </xsl:for-each>
               </form>
+              <a class="btn btn-primary" href="" onclick="jQuery('form.basket_form').submit();return false;">
+                <xsl:value-of select="i18n:translate('basket.add.searchpage')" />
+              </a>
             </xsl:if>
           </div>
         </div>
