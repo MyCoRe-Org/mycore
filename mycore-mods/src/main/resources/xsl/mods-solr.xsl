@@ -82,9 +82,9 @@
         <xsl:value-of select="text()" />
       </field>
     </xsl:for-each>
-    <xsl:if test="mods:originInfo/mods:dateIssued">
+    <xsl:if test="//mods:originInfo/mods:dateIssued">
       <field name="mods.dateIssued">
-        <xsl:value-of select="mods:originInfo/mods:dateIssued" />
+        <xsl:value-of select="//mods:originInfo/mods:dateIssued" />
       </field>
     </xsl:if>
     <xsl:if test="$hasImports">
