@@ -6,8 +6,11 @@
   </properties>
   <body>
     <release version="2013.06.0.2" date="TBA" description="2013.06.0 maintenance release 2">
+      <action dev="mcrkrebs" type="fix" date="2013-08-26">
+        mycore-mods: fixed solr index field mods.dateIssued
+      </action>
       <action dev="mcrtchef" type="fix" date="2013-08-19">
-        fixed buttons for users of different realms (merged revision 27681 from trunk)
+        fixed buttons for users of different realms and fixed role name 'admin' needed for deletion of user (merged revision 27681 and 27684 from trunk)
       </action>
       <action dev="mcrmeich" type="update" date="2013-08-15">
         oai: make earliest date stamp field configurable (merged revision 27674 from trunk)
