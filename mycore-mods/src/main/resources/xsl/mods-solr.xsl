@@ -21,6 +21,11 @@
       <field name="parentLinkText">
         <xsl:apply-templates select="$parent" mode="resulttitle"/>
       </field>
+      <xsl:if test="not(//mods:originInfo/mods:dateIssued)">
+        <field name="mods.dateIssued">
+          <xsl:value-of select="$parent//mods:originInfo/mods:dateIssued" />
+        </field>
+      </xsl:if>
     </xsl:for-each>
     <xsl:if test="$hasImports">
       <xsl:apply-imports />

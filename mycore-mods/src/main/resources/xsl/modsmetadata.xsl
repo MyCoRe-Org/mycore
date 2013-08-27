@@ -1268,6 +1268,19 @@
             </xsl:if>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
             <xsl:call-template name="printMetaDate.mods.permalink" />
+            <xsl:choose>
+              <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:originInfo/mods:dateIssued">
+                <xsl:call-template name="printMetaDate.mods">
+                  <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:originInfo/mods:dateIssued" />
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:when test="./structure/parents/parent/@xlink:href">
+                <xsl:variable name="parent" select="document(concat('mcrobject:',./structure/parents/parent/@xlink:href))/mycoreobject"/>
+                <xsl:call-template name="printMetaDate.mods">
+                  <xsl:with-param name="nodes" select="$parent//mods:mods/mods:originInfo/mods:dateIssued" />
+                </xsl:call-template>
+              </xsl:when>
+            </xsl:choose>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification" />
             <xsl:call-template name="printMetaDate.mods">

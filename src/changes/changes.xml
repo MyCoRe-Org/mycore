@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2013.08" date="2013-08-09" description="Codenamed &apos;Old Pascas&apos;">
+      <action dev="mcrkrebs" type="fix" date="2013-08-27">
+        mycore-mods: index and show dateIssued from book also in its corresponding chapters (merged from branch revision 27747-49)
+      </action>
       <action dev="mcrkrebs" type="fix" date="2013-08-26">
         mycore-mods: fixed solr index field mods.dateIssued (merged from branch revision 27743)
       </action>
