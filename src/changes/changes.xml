@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2013.06.0.2" date="TBA" description="2013.06.0 maintenance release 2">
+      <action dev="mcrkrebs" type="fix" date="2013-08-27">
+        mycore-mods: index and show dateIssued from book also in its corresponding chapters
+      </action>
       <action dev="mcrkrebs" type="fix" date="2013-08-26">
         mycore-mods: fixed solr index field mods.dateIssued
       </action>
