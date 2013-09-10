@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Attribute;
+import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
@@ -167,8 +168,12 @@ public class MCRNodeBuilder {
         Element element = new Element(name, ns);
         if ((value != null) && (!value.isEmpty()))
             element.setText(value);
-        if (parent != null)
+
+        if (parent instanceof Document)
+            ((Document) parent).setRootElement(element);
+        else if (parent != null)
             parent.addContent(element);
+
         return element;
     }
 }
