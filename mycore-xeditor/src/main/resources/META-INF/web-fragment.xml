@@ -21,4 +21,8 @@
     <servlet-name>MCRStaticXEditorFileServlet</servlet-name>
     <url-pattern>*.xhtml</url-pattern>
   </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRStaticXEditorFileServlet</servlet-name>
+    <url-pattern>*.xed</url-pattern>
+  </servlet-mapping>
 </web-fragment>
