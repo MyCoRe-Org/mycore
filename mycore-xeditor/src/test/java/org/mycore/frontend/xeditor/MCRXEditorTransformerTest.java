@@ -135,4 +135,9 @@ public class MCRXEditorTransformerTest {
         assertTrue(session.validate().failed());
         testTransformation("testValidation-editor.xml", null, session, "testValidation-transformed3.xml", false);
     }
+    
+    @Test
+    public void testRootWithChild() throws TransformerException, IOException, JDOMException, SAXException{
+        testTransformation("testRootWithChildBind-editor.xml", "testBasicInputComponents-source.xml", null, true);
+    }
 }
