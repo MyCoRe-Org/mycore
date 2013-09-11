@@ -127,8 +127,8 @@ public class MCRSearchServlet extends MCRServlet {
     protected MCRQuery buildNameValueQuery(HttpServletRequest req) {
         MCRAndCondition condition = new MCRAndCondition();
 
-        for (Enumeration names = req.getParameterNames(); names.hasMoreElements();) {
-            String name = (String) names.nextElement();
+        for (Enumeration<String> names = req.getParameterNames(); names.hasMoreElements();) {
+            String name = names.nextElement();
             if (name.endsWith(".operator")) {
                 continue;
             }
@@ -182,7 +182,6 @@ public class MCRSearchServlet extends MCRServlet {
             String operator = element.getAttributeValue("operator", defaultOperator);
             element.setAttribute("operator", operator);
 
-            @SuppressWarnings("unchecked")
             List<Element> values = element.getChildren("value");
             if (values != null && values.size() > 0) {
                 element.removeAttribute("field");
@@ -218,8 +217,7 @@ public class MCRSearchServlet extends MCRServlet {
 
             // Remove conditions without values
             List<Element> empty = new ArrayList<Element>();
-            for (@SuppressWarnings("unchecked")
-            Iterator<Element> it = conditions.getDescendants(new ElementFilter("condition")); it.hasNext();) {
+            for (Iterator<Element> it = conditions.getDescendants(new ElementFilter("condition")); it.hasNext();) {
                 Element cond = it.next();
                 if (cond.getAttribute("value") == null) {
                     empty.add(cond);
@@ -229,8 +227,7 @@ public class MCRSearchServlet extends MCRServlet {
             // Remove empty sort conditions
             Element sortBy = root.getChild("sortBy");
             if (sortBy != null) {
-                for (@SuppressWarnings("unchecked")
-                Iterator<Element> iterator = sortBy.getChildren("field").iterator(); iterator.hasNext();) {
+                for (Iterator<Element> iterator = sortBy.getChildren("field").iterator(); iterator.hasNext();) {
                     Element field = iterator.next();
                     if (field.getAttributeValue("name", "").length() == 0) {
                         empty.add(field);
@@ -264,8 +261,7 @@ public class MCRSearchServlet extends MCRServlet {
         query.setMaxResults(Integer.parseInt(maxResults));
 
         List<String> sortFields = new ArrayList<String>();
-        for (@SuppressWarnings("unchecked")
-        Enumeration<String> names = req.getParameterNames(); names.hasMoreElements();) {
+        for (Enumeration<String> names = req.getParameterNames(); names.hasMoreElements();) {
             String name = (String) names.nextElement();
             if (name.contains(".sortField")) {
                 sortFields.add(name);
@@ -440,22 +436,27 @@ public class MCRSearchServlet extends MCRServlet {
         String searchString = getReqParameter(request, "search", null);
         String queryString = getReqParameter(request, "query", null);
 
-        Document input;
+        Document input = (Document) request.getAttribute("MCRXEditorSubmission");
         MCRQuery query;
 
         if (sub != null) {
             input = (Document) sub.getXML().clone();
             query = buildFormQuery(sub.getXML().getRootElement());
         } else {
-            if (queryString != null) {
-                query = buildComplexQuery(queryString);
-            } else if (searchString != null) {
-                query = buildDefaultQuery(searchString);
+            if (input != null) {
+                //xeditor input
+                query = buildFormQuery(input.getRootElement());
             } else {
-                query = buildNameValueQuery(request);
-            }
+                if (queryString != null) {
+                    query = buildComplexQuery(queryString);
+                } else if (searchString != null) {
+                    query = buildDefaultQuery(searchString);
+                } else {
+                    query = buildNameValueQuery(request);
+                }
 
-            input = setQueryOptions(query, request);
+                input = setQueryOptions(query, request);
+            }
         }
 
         // Show incoming query document
@@ -525,7 +526,8 @@ public class MCRSearchServlet extends MCRServlet {
       * 
       * see its overwritten in jspdocportal
       */
-    protected void sendToLayout(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException, TransformerException, SAXException {
+    protected void sendToLayout(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException,
+        TransformerException, SAXException {
         getLayoutService().doLayout(req, res, new MCRJDOMContent(jdom));
     }
 }
