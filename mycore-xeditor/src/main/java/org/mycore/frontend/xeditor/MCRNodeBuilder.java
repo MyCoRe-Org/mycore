@@ -147,13 +147,8 @@ public class MCRNodeBuilder {
 
         if (locationStep.isAttribute()) {
             return buildAttribute(ns, name, value, (Element) parent);
-        } else if (parent instanceof Document) {
-            Element element = ((Document) parent).getRootElement();
-            for (MCRXPath predicate : locationStep.getPredicates())
-                build(predicate, null, variables, element);
-            return element;
         } else {
-            Element element = buildElement(ns, name, value, parent);
+            Element element = parent instanceof Document ? ((Document) parent).getRootElement() : buildElement(ns, name, value, parent);
             for (MCRXPath predicate : locationStep.getPredicates())
                 build(predicate, null, variables, element);
             return element;
