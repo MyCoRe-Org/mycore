@@ -63,6 +63,9 @@ public class MCRTemplatesSource {
         XMLReader reader = XMLReaderFactory.createXMLReader();
         reader.setEntityResolver(MCRURIResolver.instance());
         URL resourceURL = MCRXSLTransformerFactory.class.getClassLoader().getResource(resource);
+        if (resourceURL == null) {
+            throw new SAXException("Could not find resource: " + resource);
+        }
         InputSource input = new InputSource(resourceURL.toString());
         return new SAXSource(reader, input);
     }
@@ -97,6 +100,7 @@ public class MCRTemplatesSource {
     }
 
     public MCRCache.ModifiedHandle getModifiedHandle(long checkPeriod) {
-        return MCRXMLResource.instance().getModifiedHandle(resource, MCRXSLTransformerFactory.class.getClassLoader(), checkPeriod);
+        return MCRXMLResource.instance().getModifiedHandle(resource, MCRXSLTransformerFactory.class.getClassLoader(),
+            checkPeriod);
     }
 }
