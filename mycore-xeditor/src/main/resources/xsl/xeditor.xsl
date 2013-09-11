@@ -127,7 +127,7 @@
 
   <!-- ========== <input /> ========== -->
 
-  <xsl:template match="input[contains('submit image',@type)]" mode="add-attributes">
+  <xsl:template match="input[contains('submit image',@type)]|button[@type='submit']" mode="add-attributes">
     <xsl:attribute name="name">
       <xsl:text>_xed_submit_</xsl:text>
       <xsl:value-of select="@xed:target" />
