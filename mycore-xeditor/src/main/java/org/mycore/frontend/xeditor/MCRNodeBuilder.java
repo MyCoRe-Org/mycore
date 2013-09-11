@@ -55,7 +55,7 @@ public class MCRNodeBuilder {
 
     public static Object build(MCRXPath xPath, String value, Map<String, Object> variables, Parent parent) throws ParseException,
             JDOMException {
-        LOGGER.debug("build xPath " + xPath + " relative to " + MCRXPathBuilder.buildXPath(parent));
+        LOGGER.info("build xPath " + xPath + " relative to " + MCRXPathBuilder.buildXPath(parent));
 
         List<MCRLocationStep> steps = xPath.getLocationSteps();
         int i, indexOfLastStep = steps.size() - 1;
@@ -63,31 +63,31 @@ public class MCRNodeBuilder {
 
         for (i = indexOfLastStep; i >= 0; i--) {
             String path = xPath.buildXPathExpression(i);
-            LOGGER.debug("testing existence of subpath " + path);
+            LOGGER.info("testing existence of subpath " + path);
             existingNode = XPathFactory.instance().compile(path, Filters.fpassthrough(), variables, MCRUsedNamespaces.getNamespaces())
                     .evaluateFirst(parent);
-            LOGGER.debug("Result is " + existingNode);
+            LOGGER.info("Result is " + existingNode);
             MCRLocationStep currentStep = xPath.getLocationSteps().get(i);
 
             if (existingNode instanceof Element) {
-                LOGGER.debug("element already existing.");
+                LOGGER.info("element already existing.");
                 parent = (Element) existingNode;
                 break;
             } else if (existingNode instanceof Attribute) {
-                LOGGER.debug("attribute already existing.");
+                LOGGER.info("attribute already existing.");
                 break;
             } else if ((existingNode instanceof Boolean) && ((Boolean) existingNode).booleanValue()
                     && (currentStep.getAssignedValue() != null)) {
-                LOGGER.debug("subpath already existing, but is boolean true: " + path);
+                LOGGER.info("subpath already existing, but is boolean true: " + path);
                 transformValueToAdditionalPredicate(currentStep);
                 path = xPath.buildXPathExpression(i);
-                LOGGER.debug("subpath with value transformed to predicate: " + path);
+                LOGGER.info("subpath with value transformed to predicate: " + path);
                 existingNode = XPathFactory.instance().compile(path, Filters.fpassthrough(), null, MCRUsedNamespaces.getNamespaces())
                         .evaluateFirst(parent);
                 break;
 
             } else
-                LOGGER.debug("subpath does not exist or is not a node, ignoring: " + path);
+                LOGGER.info("subpath does not exist or is not a node, ignoring: " + path);
         }
 
         if (i == indexOfLastStep)
@@ -112,7 +112,7 @@ public class MCRNodeBuilder {
         for (int i = 0; i < locationSteps.size(); i++) {
             MCRLocationStep step = locationSteps.get(i);
             if (!canBeBuilt(step)) {
-                LOGGER.debug("location step can not be built, breaking build: " + step);
+                LOGGER.info("location step can not be built, breaking build: " + step);
                 break;
             }
 
@@ -137,7 +137,7 @@ public class MCRNodeBuilder {
 
     private static Object build(MCRLocationStep locationStep, String value, Map<String, Object> variables, Parent parent)
             throws ParseException, JDOMException {
-        LOGGER.debug("build location step " + locationStep + " relative to " + MCRXPathBuilder.buildXPath(parent));
+        LOGGER.info("build location step " + locationStep + " relative to " + MCRXPathBuilder.buildXPath(parent));
 
         if (locationStep.getAssignedValue() != null)
             value = locationStep.getAssignedValue().getValue();
@@ -147,6 +147,11 @@ public class MCRNodeBuilder {
 
         if (locationStep.isAttribute()) {
             return buildAttribute(ns, name, value, (Element) parent);
+        } else if (parent instanceof Document) {
+            Element element = ((Document) parent).getRootElement();
+            for (MCRXPath predicate : locationStep.getPredicates())
+                build(predicate, null, variables, element);
+            return element;
         } else {
             Element element = buildElement(ns, name, value, parent);
             for (MCRXPath predicate : locationStep.getPredicates())

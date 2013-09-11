@@ -28,6 +28,7 @@ import static org.junit.Assert.*;
 import java.text.ParseException;
 
 import org.jdom2.Attribute;
+import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.junit.Test;
@@ -247,5 +248,28 @@ public class MCRNodeBuilderTest {
         Element generated = (Element) (MCRNodeBuilder.build("mycoreobject/metadata/def.modsContainer/modsContainer", null, null, null));
         assertEquals("modsContainer", generated.getName());
         assertEquals("def.modsContainer", generated.getParentElement().getName());
+    }
+
+    @Test
+    public void testBuildingRootComponents() throws ParseException, JDOMException {
+        Element existingRoot = new Element("root");
+        existingRoot.setAttribute("type", "existing");
+        Document document = new Document(existingRoot);
+
+        Element returned = (Element) (MCRNodeBuilder.build("root", null, null, document));
+        assertSame(existingRoot, returned);
+
+        returned = (Element) (MCRNodeBuilder.build("root[foo]", null, null, document));
+        assertSame(existingRoot, returned);
+        assertNotNull(returned.getChild("foo"));
+
+        returned = (Element) (MCRNodeBuilder.build("root[@foo='bar']", null, null, document));
+        assertSame(existingRoot, returned);
+        assertEquals("bar", returned.getAttributeValue("foo"));
+
+        returned = (Element) (MCRNodeBuilder.build("root/child", "bar", null, document));
+        assertEquals("child", returned.getName());
+        assertSame(existingRoot, returned.getParent());
+        assertEquals("bar", returned.getText());
     }
 }
