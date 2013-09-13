@@ -90,4 +90,9 @@ public class MCRXPathParserTest {
         assertEquals("xlink:href", xPath.getLocationSteps().get(1).getPredicates().get(1).getLocationSteps().get(0).getQualifiedName());
         assertTrue(xPath.getLocationSteps().get(1).getPredicates().get(1).getLocationSteps().get(0).isAttribute());
     }
+    
+    @Test
+    public void testComplexPredicate() throws ParseException {
+        MCRXPath xPath = MCRXPathParser.parse("condition[contains(',mods.title,mods.author,mods.name,allMeta,', concat(',',@field,','))]");
+    }
 }
