@@ -38,7 +38,7 @@ public class MCRXPathParser {
     private final static Logger LOGGER = Logger.getLogger(MCRXPathParser.class);
 
     public static MCRXPath parse(String xPath) throws ParseException {
-        LOGGER.info("parsing " + xPath);
+        LOGGER.debug("parsing " + xPath);
         return new MCRXPathParser(xPath).parse();
     }
 
@@ -169,7 +169,7 @@ public class MCRXPathParser {
                 currentParsePosition++;
 
             name = xPathExpression.substring(begin, currentParsePosition);
-            LOGGER.info("parsed location step " + name);
+            LOGGER.debug("parsed location step " + name);
 
             int pos = name.indexOf(":");
             if (pos != -1) {
@@ -179,10 +179,10 @@ public class MCRXPathParser {
         }
 
         private void parsePredicate() throws ParseException {
-            LOGGER.info("begin parsing predicate...");
+            LOGGER.debug("begin parsing predicate...");
             expect('[');
             MCRXPath path = new MCRXPath();
-            LOGGER.info("parsed predicate " + path);
+            LOGGER.debug("parsed predicate " + path);
             predicates.add(path);
             expect(']');
         }
@@ -230,7 +230,7 @@ public class MCRXPathParser {
                 ++currentParsePosition;
             } while (delimiter != currentChar());
             this.value = xPathExpression.substring(begin, currentParsePosition);
-            LOGGER.info("value = " + value);
+            LOGGER.debug("value = " + value);
             expect(delimiter);
         }
 
