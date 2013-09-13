@@ -311,4 +311,10 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- ========== <xed:cleanup-rule xpath="" relevant-if="" ========== -->
+  
+  <xsl:template match="xed:cleanup-rule">
+    <xsl:value-of select="transformer:addCleanupRule($transformer,@xpath,@relevant-if)" />
+  </xsl:template>
+
 </xsl:stylesheet>

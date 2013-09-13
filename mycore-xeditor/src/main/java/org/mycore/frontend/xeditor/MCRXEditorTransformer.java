@@ -272,4 +272,8 @@ public class MCRXEditorTransformer {
         }
         return new XNodeSetForDOM((NodeList) ns, context.getXPathContext());
     }
+
+    public void addCleanupRule(String xPath, String relevantIf) {
+        editorSession.getXMLCleaner().addRule(xPath, relevantIf);
+    }
 }
