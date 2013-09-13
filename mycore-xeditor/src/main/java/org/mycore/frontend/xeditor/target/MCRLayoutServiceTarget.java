@@ -46,6 +46,7 @@ public class MCRLayoutServiceTarget extends MCREditorTarget {
         }
 
         session.removeDeletedNodes();
+        session.getXMLCleaner().clean();
 
         if ((style != null) && (!style.isEmpty()))
             job.getRequest().setAttribute("XSL.Style", style);

@@ -45,6 +45,7 @@ public class MCRServletTarget extends MCREditorTarget {
         }
 
         session.removeDeletedNodes();
+        session.getXMLCleaner().clean();
 
         RequestDispatcher dispatcher = context.getNamedDispatcher(servletNameOrPath);
         if (dispatcher == null)

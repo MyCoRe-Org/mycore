@@ -66,6 +66,8 @@ public class MCREditorSession {
 
     private MCRXEditorValidator validator = new MCRXEditorValidator();
 
+    private MCRXMLCleaner cleaner;
+
     public MCREditorSession(Map<String, String[]> requestParameters) {
         this.requestParameters = requestParameters;
     }
@@ -86,6 +88,7 @@ public class MCREditorSession {
         if (editedXML == null) {
             editedXML = xml;
             MCRUsedNamespaces.addNamespacesFrom(editedXML.getRootElement());
+            cleaner = new MCRXMLCleaner(editedXML);
         }
     }
 
@@ -112,6 +115,10 @@ public class MCREditorSession {
         MCRContent source = new MCRJDOMContent(editedXML);
         MCRContent transformed = MCRXSL2XMLTransformer.getInstance("xsl/" + postProcessorXSL).transform(source);
         return transformed.asXML();
+    }
+
+    public MCRXMLCleaner getXMLCleaner() {
+        return cleaner;
     }
 
     public String getSourceURI() {
