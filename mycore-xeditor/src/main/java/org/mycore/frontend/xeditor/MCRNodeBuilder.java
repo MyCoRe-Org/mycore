@@ -53,7 +53,7 @@ public class MCRNodeBuilder {
         return build(path, value, variables, parent);
     }
 
-    public static Object build(MCRXPath xPath, String value, Map<String, Object> variables, Parent parent) throws ParseException,
+    private static Object build(MCRXPath xPath, String value, Map<String, Object> variables, Parent parent) throws ParseException,
             JDOMException {
         LOGGER.debug("build xPath " + xPath + " relative to " + MCRXPathBuilder.buildXPath(parent));
 
