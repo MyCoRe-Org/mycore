@@ -68,9 +68,8 @@ public class MCRDebugTarget extends MCREditorTarget {
         outputXML(session.getEditedXML(), out);
 
         session.getXMLCleaner().clean();
+        
         out.println("<h3>After cleanup:</h3>");
-        outputXML(session.getEditedXML(), out);
-
         outputXML(session.getEditedXML(), out);
 
         out.println("<h3>After postprocessing:</h3>");
