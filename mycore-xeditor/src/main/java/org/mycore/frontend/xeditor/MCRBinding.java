@@ -86,6 +86,18 @@ public class MCRBinding {
         }
     }
 
+    public MCRBinding(int pos, MCRBinding parent) {
+        this.parent = parent;
+        parent.children.add(this);
+        
+        String xPathExpression = parent.getRelativeXPath() + "[" + pos + "]";
+        Map<String, Object> variables = buildXPathVariables();
+        this.xPath = XPathFactory.instance().compile(xPathExpression, Filters.fpassthrough(), variables, MCRUsedNamespaces.getNamespaces());
+        
+        boundNodes.add(parent.getBoundNodes().get(pos - 1));
+        LOGGER.debug("Repeater bind to " + xPathExpression + " selected " + boundNodes.size() + " node(s)");
+    }
+
     public List<Object> getBoundNodes() {
         return boundNodes;
     }
@@ -100,7 +112,7 @@ public class MCRBinding {
         Element parent = template.getParentElement();
         int indexInParent = parent.indexOf(template) + 1;
         parent.addContent(indexInParent, newElement);
-        boundNodes.add(newElement);
+        boundNodes.add(index + 1, newElement);
         return newElement;
     }
 

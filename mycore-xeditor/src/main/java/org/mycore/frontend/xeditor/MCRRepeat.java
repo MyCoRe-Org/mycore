@@ -37,6 +37,8 @@ public class MCRRepeat {
 
     private MCRBinding parentBinding;
 
+    private MCRBinding repeatBinding;
+    
     private String xPath;
 
     private int repeatPosition;
@@ -46,10 +48,15 @@ public class MCRRepeat {
     private int maxRepeats;
 
     public MCRRepeat(MCRBinding parentBinding, String xPath, int minRepeats, int maxRepeats) throws JDOMException, ParseException {
-        this.parentBinding = parentBinding;
         this.xPath = xPath;
-        int numBoundNodes = new MCRBinding(xPath, parentBinding).getBoundNodes().size();
+
+        this.parentBinding = parentBinding;
+        this.repeatBinding = new MCRBinding(xPath, parentBinding); 
+        int numBoundNodes = repeatBinding.getBoundNodes().size();
+        
         this.numRepeats = Math.max(numBoundNodes, Math.max(minRepeats, 1));
+        for( int i = numBoundNodes; i < numRepeats; i++ ) repeatBinding.cloneBoundElement(i-1);
+
         this.maxRepeats = maxRepeats < 1 ? Integer.MAX_VALUE : maxRepeats;
         this.maxRepeats = Math.max(this.maxRepeats, this.numRepeats);
     }
@@ -58,17 +65,13 @@ public class MCRRepeat {
         return parentBinding;
     }
 
-    private String getRepeatPositionXPath() {
-        return xPath + "[" + repeatPosition + "]";
-    }
-
     public int getRepeatPosition() {
         return repeatPosition;
     }
 
     public MCRBinding bindRepeatPosition() throws JDOMException, ParseException {
         repeatPosition++;
-        return new MCRBinding(getRepeatPositionXPath(), parentBinding);
+        return new MCRBinding(repeatPosition, repeatBinding);
     }
 
     public int getNumRepeats() {
