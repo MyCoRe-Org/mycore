@@ -91,10 +91,14 @@ import org.xml.sax.SAXException;
  * @author shermann
  */
 public class MCRXMLFunctions {
-    
+
     //use holder to not initialize MCRXMLMetadataManager to early (simplifies junit testing)
     private static class MCRXMLMetaDataManagerHolder {
         public static final MCRXMLMetadataManager instance = MCRXMLMetadataManager.instance();
+    }
+
+    private static class MCRCategLinkServiceHolder {
+        public static final MCRCategLinkService instance = MCRCategLinkServiceFactory.getInstance();
     }
 
     static MCRConfiguration CONFIG = MCRConfiguration.instance();
@@ -114,8 +118,6 @@ public class MCRXMLFunctions {
     private static final String DEFAULT_PORT = "80";
 
     private static final Logger LOGGER = Logger.getLogger(MCRXMLFunctions.class);
-
-    private static final MCRCategLinkService LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
 
     private static MCRCache<String, Boolean> DISPLAY_DERIVATE_CACHE = new MCRCache<>(10000,
         "Derivate display value cache");
@@ -482,7 +484,8 @@ public class MCRXMLFunctions {
 
     public static boolean isDisplayedEnabledDerivate(String derivateId) {
         MCRObjectID derId = MCRObjectID.getInstance(derivateId);
-        ModifiedHandle modifiedHandle = MCRXMLMetaDataManagerHolder.instance.getLastModifiedHandle(derId, 30, TimeUnit.SECONDS);
+        ModifiedHandle modifiedHandle = MCRXMLMetaDataManagerHolder.instance.getLastModifiedHandle(derId, 30,
+            TimeUnit.SECONDS);
         Boolean result;
         try {
             result = DISPLAY_DERIVATE_CACHE.getIfUpToDate(derivateId, modifiedHandle);
@@ -710,7 +713,7 @@ public class MCRXMLFunctions {
             MCRCategoryID categID = MCRCategoryID.fromString(categoryId);
             MCRObjectID mcrObjectID = MCRObjectID.getInstance(objectId);
             MCRCategLinkReference reference = new MCRCategLinkReference(mcrObjectID);
-            return LINK_SERVICE.isInCategory(reference, categID);
+            return MCRCategLinkServiceHolder.instance.isInCategory(reference, categID);
         } catch (Throwable e) {
             LOGGER.error("Error while checking if object is in category", e);
             return false;
@@ -745,7 +748,8 @@ public class MCRXMLFunctions {
      * Same as {@link MCRMetadataManager#getObjectId(MCRObjectID, long)} with String representation.
      */
     public static String getMCRObjectID(final String derivateID, final long expire) {
-        return MCRMetadataManager.getObjectId(MCRObjectID.getInstance(derivateID), expire, TimeUnit.MILLISECONDS).toString();
+        return MCRMetadataManager.getObjectId(MCRObjectID.getInstance(derivateID), expire, TimeUnit.MILLISECONDS)
+            .toString();
     }
 
     /**
