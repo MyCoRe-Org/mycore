@@ -142,12 +142,6 @@ public class MCRSolrMCRFileDocumentFactory {
         MCRISO8601Date iDate = new MCRISO8601Date();
         iDate.setDate(input.getLastModified().getTime());
         doc.setField("modified", iDate.getISOString());
-
-        //        MCRDerivate d = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(input.getOwnerID()));
-        //        Date date = d.getService().getDate(MCRObjectService.DATE_TYPE_MODIFYDATE);
-        //        MCRISO8601Date date2 = new MCRISO8601Date();
-        //        date2.setDate(date);
-        //        doc.setField("derivateModified", date2.getISOString());
         doc.setField("derivateModified", getDerivateModified(ownerID));
 
         if (input.hasAudioVideoExtender()) {
