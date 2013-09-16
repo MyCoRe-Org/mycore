@@ -62,7 +62,7 @@ public class MCRNodeBuilder {
         return buildExpression(baseXPath.getRootExpr(), value, variables, parent);
     }
 
-    private static Object buildExpression(Expr expression, String value, Map<String, Object> variables, Parent parent) {
+    private static Object buildExpression(Expr expression, String value, Map<String, Object> variables, Parent parent) throws JaxenException {
         if (expression instanceof EqualityExpr)
             return buildEqualityExpression((EqualityExpr) expression, variables, parent);
         else if (expression instanceof LocationPath)
@@ -72,7 +72,7 @@ public class MCRNodeBuilder {
     }
 
     @SuppressWarnings("unchecked")
-    private static Object buildLocationPath(LocationPath locationPath, String value, Map<String, Object> variables, Parent parent) {
+    private static Object buildLocationPath(LocationPath locationPath, String value, Map<String, Object> variables, Parent parent) throws JaxenException {
         Object existingNode = null;
         List<Step> steps = locationPath.getSteps();
         int i, indexOfLastStep = steps.size() - 1;
@@ -115,7 +115,7 @@ public class MCRNodeBuilder {
         return simplify(path.substring(1));
     }
 
-    private static Object buildLocationSteps(List<Step> steps, String value, Map<String, Object> variables, Parent parent) {
+    private static Object buildLocationSteps(List<Step> steps, String value, Map<String, Object> variables, Parent parent) throws JaxenException {
         Object built = null;
 
         for (Iterator<Step> iterator = steps.iterator(); iterator.hasNext();) {
@@ -131,7 +131,7 @@ public class MCRNodeBuilder {
         return built;
     }
 
-    private static Object buildStep(Step step, String value, Map<String, Object> variables, Parent parent) {
+    private static Object buildStep(Step step, String value, Map<String, Object> variables, Parent parent) throws JaxenException {
         if (step instanceof NameStep)
             return buildNameStep((NameStep) step, value, variables, parent);
         else {
@@ -142,7 +142,7 @@ public class MCRNodeBuilder {
     }
 
     @SuppressWarnings("unchecked")
-    private static Object buildNameStep(NameStep nameStep, String value, Map<String, Object> variables, Parent parent) {
+    private static Object buildNameStep(NameStep nameStep, String value, Map<String, Object> variables, Parent parent) throws JaxenException {
         String name = nameStep.getLocalName();
         String prefix = nameStep.getPrefix();
         Namespace ns = prefix.isEmpty() ? Namespace.NO_NAMESPACE : MCRUsedNamespaces.getNamespace(prefix);
@@ -161,13 +161,13 @@ public class MCRNodeBuilder {
         }
     }
 
-    private static Element buildPredicates(List<Predicate> predicates, Map<String, Object> variables, Element parent) {
+    private static Element buildPredicates(List<Predicate> predicates, Map<String, Object> variables, Element parent) throws JaxenException {
         for (Predicate predicate : predicates)
             buildExpression(predicate.getExpr(), null, variables, parent);
         return parent;
     }
 
-    private static Object buildEqualityExpression(EqualityExpr ee, Map<String, Object> variables, Parent parent) {
+    private static Object buildEqualityExpression(EqualityExpr ee, Map<String, Object> variables, Parent parent) throws JaxenException {
         if ((ee.getLHS() instanceof LocationPath) && (ee.getRHS() instanceof LiteralExpr) && ee.getOperator().equals("="))
             return assignLiteral(ee.getLHS(), (LiteralExpr) (ee.getRHS()), variables, parent);
         else if ((ee.getRHS() instanceof LocationPath) && (ee.getLHS() instanceof LiteralExpr) && ee.getOperator().equals("="))
@@ -176,7 +176,7 @@ public class MCRNodeBuilder {
             return canNotBuild(ee);
     }
 
-    private static Object assignLiteral(Expr expression, LiteralExpr literal, Map<String, Object> variables, Parent parent) {
+    private static Object assignLiteral(Expr expression, LiteralExpr literal, Map<String, Object> variables, Parent parent) throws JaxenException {
         String xPath = simplify(expression.getText()) + "[.=" + literal.getText() + "]";
         Object result = evaluateFirst(xPath, variables, parent);
 
@@ -184,11 +184,7 @@ public class MCRNodeBuilder {
             return result;
         else {
             xPath = simplify(expression.getText()) + "[9999]";
-            try {
-                return build(xPath, literal.getLiteral(), variables, parent);
-            } catch (Exception ex) {
-                return null;
-            }
+            return build(xPath, literal.getLiteral(), variables, parent);
         }
     }
 
