@@ -23,7 +23,7 @@
 
 package org.mycore.frontend.xeditor;
 
-import java.text.ParseException;
+import org.jaxen.JaxenException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -64,7 +64,7 @@ public class MCRXEditorValidator {
         validationRules.clear();
     }
 
-    public void validate(Document editedXML) throws JDOMException, ParseException {
+    public void validate(Document editedXML) throws JDOMException, JaxenException {
         xPathsOfInvalidFields.clear();
 
         MCRBinding root = new MCRBinding(editedXML);

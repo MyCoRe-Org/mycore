@@ -25,7 +25,7 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.text.ParseException;
+import org.jaxen.JaxenException;
 import java.util.HashMap;
 
 import javax.xml.transform.TransformerException;
@@ -127,7 +127,7 @@ public class MCRXEditorTransformerTest {
     }
 
     @Test
-    public void testValidation() throws IOException, URISyntaxException, TransformerException, JDOMException, SAXException, ParseException {
+    public void testValidation() throws IOException, URISyntaxException, TransformerException, JDOMException, SAXException, JaxenException {
         MCREditorSession session = testTransformation("testValidation-editor.xml", "testBasicInputComponents-source.xml",
                 "testValidation-transformed1.xml", false);
         assertFalse(session.validate().failed());

@@ -23,22 +23,29 @@
 
 package org.mycore.frontend.xeditor;
 
-import java.text.ParseException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.jaxen.BaseXPath;
+import org.jaxen.JaxenException;
+import org.jaxen.dom.DocumentNavigator;
+import org.jaxen.expr.EqualityExpr;
+import org.jaxen.expr.Expr;
+import org.jaxen.expr.LiteralExpr;
+import org.jaxen.expr.LocationPath;
+import org.jaxen.expr.NameStep;
+import org.jaxen.expr.Predicate;
+import org.jaxen.expr.Step;
+import org.jaxen.saxpath.Axis;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.Parent;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathFactory;
-import org.mycore.frontend.xeditor.MCRXPathParser.MCRLiteral;
-import org.mycore.frontend.xeditor.MCRXPathParser.MCRLocationStep;
-import org.mycore.frontend.xeditor.MCRXPathParser.MCRXPath;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -47,133 +54,170 @@ public class MCRNodeBuilder {
 
     private final static Logger LOGGER = Logger.getLogger(MCRNodeBuilder.class);
 
-    public static Object build(String xPath, String value, Map<String, Object> variables, Parent parent) throws ParseException,
-            JDOMException {
-        MCRXPath path = MCRXPathParser.parse(xPath);
-        return build(path, value, variables, parent);
+    public static Object build(String xPath, String value, Map<String, Object> variables, Parent parent) throws JaxenException {
+        BaseXPath baseXPath = new BaseXPath(xPath, new DocumentNavigator());
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("start building " + simplify(baseXPath.getRootExpr().getText()) + " relative to "
+                    + MCRXPathBuilder.buildXPath(parent));
+        return buildExpression(baseXPath.getRootExpr(), value, variables, parent);
     }
 
-    private static Object build(MCRXPath xPath, String value, Map<String, Object> variables, Parent parent) throws ParseException,
-            JDOMException {
-        LOGGER.debug("build xPath " + xPath + " relative to " + MCRXPathBuilder.buildXPath(parent));
+    private static Object buildExpression(Expr expression, String value, Map<String, Object> variables, Parent parent) {
+        if (expression instanceof EqualityExpr)
+            return buildEqualityExpression((EqualityExpr) expression, variables, parent);
+        else if (expression instanceof LocationPath)
+            return buildLocationPath((LocationPath) expression, value, variables, parent);
+        else
+            return canNotBuild(expression);
+    }
 
-        List<MCRLocationStep> steps = xPath.getLocationSteps();
-        int i, indexOfLastStep = steps.size() - 1;
+    @SuppressWarnings("unchecked")
+    private static Object buildLocationPath(LocationPath locationPath, String value, Map<String, Object> variables, Parent parent) {
         Object existingNode = null;
+        List<Step> steps = locationPath.getSteps();
+        int i, indexOfLastStep = steps.size() - 1;
 
         for (i = indexOfLastStep; i >= 0; i--) {
-            String path = xPath.buildXPathExpression(i);
-            LOGGER.debug("testing existence of subpath " + path);
-            existingNode = XPathFactory.instance().compile(path, Filters.fpassthrough(), variables, MCRUsedNamespaces.getNamespaces())
-                    .evaluateFirst(parent);
-            LOGGER.debug("Result is " + existingNode);
-            MCRLocationStep currentStep = xPath.getLocationSteps().get(i);
+            String xPath = buildXPath(steps.subList(0, i + 1));
+            existingNode = evaluateFirst(xPath, variables, parent);
 
             if (existingNode instanceof Element) {
-                LOGGER.debug("element already existing.");
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug("element already existing");
                 parent = (Element) existingNode;
                 break;
             } else if (existingNode instanceof Attribute) {
-                LOGGER.debug("attribute already existing.");
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug("attribute already existing");
                 break;
-            } else if ((existingNode instanceof Boolean) && ((Boolean) existingNode).booleanValue()
-                    && (currentStep.getAssignedValue() != null)) {
-                LOGGER.debug("subpath already existing, but is boolean true: " + path);
-                transformValueToAdditionalPredicate(currentStep);
-                path = xPath.buildXPathExpression(i);
-                LOGGER.debug("subpath with value transformed to predicate: " + path);
-                existingNode = XPathFactory.instance().compile(path, Filters.fpassthrough(), null, MCRUsedNamespaces.getNamespaces())
-                        .evaluateFirst(parent);
-                break;
-
-            } else
-                LOGGER.debug("subpath does not exist or is not a node, ignoring: " + path);
+            } else if (LOGGER.isDebugEnabled())
+                LOGGER.debug(xPath + " does not exist or is not a node, will try to build it");
         }
 
         if (i == indexOfLastStep)
             return existingNode;
         else
-            return build(steps.subList(i + 1, steps.size()), value, variables, parent);
-
+            return buildLocationSteps(steps.subList(i + 1, steps.size()), value, variables, parent);
     }
 
-    private static void transformValueToAdditionalPredicate(MCRLocationStep currentStep) throws ParseException {
-        MCRLiteral currentValue = (MCRLiteral) (currentStep.getAssignedValue());
-        currentStep.setValue(null);
-        String nPath = ".=" + currentValue.getDelimiter() + currentValue.getValue() + currentValue.getDelimiter();
-        MCRXPath nxp = MCRXPathParser.parse(nPath);
-        currentStep.getPredicates().add(nxp);
+    private static Object evaluateFirst(String xPath, Map<String, Object> variables, Parent parent) {
+        XPathFactory factory = XPathFactory.instance();
+        Object result = factory.compile(xPath, Filters.fpassthrough(), variables, MCRUsedNamespaces.getNamespaces()).evaluateFirst(parent);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("evaluating " + xPath + " returns " + result);
+        return result;
     }
 
-    private static Object build(List<MCRLocationStep> locationSteps, String value, Map<String, Object> variables, Parent parent)
-            throws ParseException, JDOMException {
-        Object node = null;
+    private static String buildXPath(List<Step> steps) {
+        StringBuffer path = new StringBuffer();
+        for (Step step : steps)
+            path.append("/").append(step.getText());
+        return simplify(path.substring(1));
+    }
 
-        for (int i = 0; i < locationSteps.size(); i++) {
-            MCRLocationStep step = locationSteps.get(i);
-            if (!canBeBuilt(step)) {
-                LOGGER.debug("location step can not be built, breaking build: " + step);
-                break;
-            }
+    private static Object buildLocationSteps(List<Step> steps, String value, Map<String, Object> variables, Parent parent) {
+        Object built = null;
 
-            String valueToSet = i == locationSteps.size() - 1 ? value : null;
-            node = build(step, valueToSet, variables, parent);
-            if (node instanceof Element)
-                parent = (Element) node;
+        for (Iterator<Step> iterator = steps.iterator(); iterator.hasNext();) {
+            Step step = iterator.next();
+
+            built = buildStep(step, iterator.hasNext() ? null : value, variables, parent);
+            if (built == null)
+                return parent;
+            if (built instanceof Parent)
+                parent = (Parent) built;
         }
-        return node;
+
+        return built;
     }
 
-    private static boolean canBeBuilt(MCRLocationStep locationStep) {
-        String name = locationStep.getLocalName();
-
-        if (name.matches("[0-9]+"))
-            return false;
-        if (name.contains("(") || name.contains("*") || name.startsWith(".") || name.contains("|") || name.contains(":"))
-            return false;
-
-        return true;
+    private static Object buildStep(Step step, String value, Map<String, Object> variables, Parent parent) {
+        if (step instanceof NameStep)
+            return buildNameStep((NameStep) step, value, variables, parent);
+        else {
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("ignoring step, can not be built: " + step.getClass().getName() + " " + simplify(step.getText()));
+            return null;
+        }
     }
 
-    private static Object build(MCRLocationStep locationStep, String value, Map<String, Object> variables, Parent parent)
-            throws ParseException, JDOMException {
-        LOGGER.debug("build location step " + locationStep + " relative to " + MCRXPathBuilder.buildXPath(parent));
+    @SuppressWarnings("unchecked")
+    private static Object buildNameStep(NameStep nameStep, String value, Map<String, Object> variables, Parent parent) {
+        String name = nameStep.getLocalName();
+        String prefix = nameStep.getPrefix();
+        Namespace ns = prefix.isEmpty() ? Namespace.NO_NAMESPACE : MCRUsedNamespaces.getNamespace(prefix);
 
-        if (locationStep.getAssignedValue() != null)
-            value = locationStep.getAssignedValue().getValue();
-
-        Namespace ns = locationStep.getNamespace();
-        String name = locationStep.getLocalName();
-
-        if (locationStep.isAttribute()) {
+        if (nameStep.getAxis() == Axis.CHILD) {
+            if (parent instanceof Document)
+                return buildPredicates(nameStep.getPredicates(), variables, ((Document) parent).getRootElement());
+            else
+                return buildPredicates(nameStep.getPredicates(), variables, buildElement(ns, name, value, (Element) parent));
+        } else if (nameStep.getAxis() == Axis.ATTRIBUTE) {
             return buildAttribute(ns, name, value, (Element) parent);
         } else {
-            Element element = parent instanceof Document ? ((Document) parent).getRootElement() : buildElement(ns, name, value, parent);
-            for (MCRXPath predicate : locationStep.getPredicates())
-                build(predicate, null, variables, element);
-            return element;
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("ignoring axis, can not be built: " + nameStep.getAxis() + " " + (prefix.isEmpty() ? "" : prefix + ":") + name);
+            return null;
         }
+    }
+
+    private static Element buildPredicates(List<Predicate> predicates, Map<String, Object> variables, Element parent) {
+        for (Predicate predicate : predicates)
+            buildExpression(predicate.getExpr(), null, variables, parent);
+        return parent;
+    }
+
+    private static Object buildEqualityExpression(EqualityExpr ee, Map<String, Object> variables, Parent parent) {
+        if ((ee.getLHS() instanceof LocationPath) && (ee.getRHS() instanceof LiteralExpr) && ee.getOperator().equals("="))
+            return assignLiteral(ee.getLHS(), (LiteralExpr) (ee.getRHS()), variables, parent);
+        else if ((ee.getRHS() instanceof LocationPath) && (ee.getLHS() instanceof LiteralExpr) && ee.getOperator().equals("="))
+            return assignLiteral(ee.getRHS(), (LiteralExpr) (ee.getLHS()), variables, parent);
+        else
+            return canNotBuild(ee);
+    }
+
+    private static Object assignLiteral(Expr expression, LiteralExpr literal, Map<String, Object> variables, Parent parent) {
+        String xPath = simplify(expression.getText()) + "[.=" + literal.getText() + "]";
+        Object result = evaluateFirst(xPath, variables, parent);
+
+        if ((result instanceof Element) || (result instanceof Attribute))
+            return result;
+        else {
+            xPath = simplify(expression.getText()) + "[9999]";
+            try {
+                return build(xPath, literal.getLiteral(), variables, parent);
+            } catch (Exception ex) {
+                return null;
+            }
+        }
+    }
+
+    private static Element buildElement(Namespace ns, String name, String value, Element parent) {
+        Element element = new Element(name, ns);
+        element.setText(value == null ? "" : value);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("building new element " + element.getName());
+        if (parent != null)
+            parent.addContent(element);
+        return element;
     }
 
     private static Attribute buildAttribute(Namespace ns, String name, String value, Element parent) {
-        if (value == null)
-            value = "";
-        Attribute attribute = new Attribute(name, value, ns);
+        Attribute attribute = new Attribute(name, value == null ? "" : value, ns);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("building new attribute " + attribute.getName());
         if (parent != null)
             parent.setAttribute(attribute);
         return attribute;
     }
 
-    private static Element buildElement(Namespace ns, String name, String value, Parent parent) {
-        Element element = new Element(name, ns);
-        if ((value != null) && (!value.isEmpty()))
-            element.setText(value);
+    private static String simplify(String xPath) {
+        return xPath.replaceAll("child::", "").replaceAll("attribute::", "@");
+    }
 
-        if (parent instanceof Document)
-            ((Document) parent).setRootElement(element);
-        else if (parent != null)
-            parent.addContent(element);
-
-        return element;
+    private static Object canNotBuild(Expr expression) {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("ignoring expression, can not be built: " + expression.getClass().getName() + " " + simplify(expression.getText()));
+        return null;
     }
 }

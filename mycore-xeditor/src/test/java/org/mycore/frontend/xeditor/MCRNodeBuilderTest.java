@@ -25,7 +25,7 @@ package org.mycore.frontend.xeditor;
 
 import static org.junit.Assert.*;
 
-import java.text.ParseException;
+import org.jaxen.JaxenException;
 
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -40,7 +40,7 @@ import org.mycore.common.MCRConstants;
 public class MCRNodeBuilderTest {
 
     @Test
-    public void testBuildingElements() throws ParseException, JDOMException {
+    public void testBuildingElements() throws JaxenException, JDOMException {
         Element built = (Element) (MCRNodeBuilder.build("element", null, null, null));
         assertNotNull(built);
         assertEquals("element", built.getName());
@@ -60,7 +60,7 @@ public class MCRNodeBuilderTest {
     }
 
     @Test
-    public void testBuildingAttributes() throws ParseException, JDOMException {
+    public void testBuildingAttributes() throws JaxenException, JDOMException {
         Attribute built = (Attribute) (MCRNodeBuilder.build("@attribute", null, null, null));
         assertNotNull(built);
         assertEquals("attribute", built.getName());
@@ -80,7 +80,7 @@ public class MCRNodeBuilderTest {
     }
 
     @Test
-    public void testBuildingValues() throws ParseException, JDOMException {
+    public void testBuildingValues() throws JaxenException, JDOMException {
         Attribute built = (Attribute) (MCRNodeBuilder.build("@attribute='A \"test\"'", "ignore", null, null));
         assertNotNull(built);
         assertEquals("attribute", built.getName());
@@ -103,7 +103,7 @@ public class MCRNodeBuilderTest {
     }
 
     @Test
-    public void testBuildingTrees() throws ParseException, JDOMException {
+    public void testBuildingTrees() throws JaxenException, JDOMException {
         Element root = new Element("root");
         Attribute built = (Attribute) (MCRNodeBuilder.build("parent/child/@attribute", null, null, root));
         assertNotNull(built);
@@ -117,7 +117,7 @@ public class MCRNodeBuilderTest {
     }
 
     @Test
-    public void testSimplePredicates() throws ParseException, JDOMException {
+    public void testSimplePredicates() throws JaxenException, JDOMException {
         Element built = (Element) (MCRNodeBuilder.build("element[child]", null, null, null));
         assertNotNull(built);
         assertEquals("element", built.getName());
@@ -138,7 +138,7 @@ public class MCRNodeBuilderTest {
     }
 
     @Test
-    public void testPredicatesWithValues() throws ParseException, JDOMException {
+    public void testPredicatesWithValues() throws JaxenException, JDOMException {
         Element built = (Element) (MCRNodeBuilder.build("contributor[role/roleTerm[@type='code'][@authority='ude']='author']", null, null,
                 null));
         assertNotNull(built);
@@ -150,7 +150,7 @@ public class MCRNodeBuilderTest {
     }
 
     @Test
-    public void testMultiplePredicates() throws ParseException, JDOMException {
+    public void testMultiplePredicates() throws JaxenException, JDOMException {
         Element built = (Element) (MCRNodeBuilder.build("element[child1][child2]", null, null, null));
         assertNotNull(built);
         assertEquals("element", built.getName());
@@ -160,7 +160,7 @@ public class MCRNodeBuilderTest {
     }
 
     @Test
-    public void testNestedPredicates() throws ParseException, JDOMException {
+    public void testNestedPredicates() throws JaxenException, JDOMException {
         Element built = (Element) (MCRNodeBuilder.build("element[child[grandchild1]/grandchild2]", null, null, null));
         assertNotNull(built);
         assertEquals("element", built.getName());
@@ -171,7 +171,7 @@ public class MCRNodeBuilderTest {
     }
 
     @Test
-    public void testExpressionsToIgnore() throws ParseException, JDOMException {
+    public void testExpressionsToIgnore() throws JaxenException, JDOMException {
         Element built = (Element) (MCRNodeBuilder.build("element[2]", null, null, null));
         assertNotNull(built);
         assertEquals("element", built.getName());
@@ -198,7 +198,7 @@ public class MCRNodeBuilderTest {
     }
 
     @Test
-    public void testAlreadyExisting() throws ParseException, JDOMException {
+    public void testAlreadyExisting() throws JaxenException, JDOMException {
         Element existingChild = (Element) (MCRNodeBuilder.build("parent/child", null, null, null));
         Element existingParent = existingChild.getParentElement();
         assertEquals(existingChild, MCRNodeBuilder.build("child", null, null, existingParent));
@@ -227,7 +227,7 @@ public class MCRNodeBuilderTest {
     }
 
     @Test
-    public void testNamespaces() throws ParseException, JDOMException {
+    public void testNamespaces() throws JaxenException, JDOMException {
         Element role = (Element) (MCRNodeBuilder.build("mods:name[@xlink:href='id']/mods:role[@type='creator']", null, null, null));
         assertEquals("role", role.getName());
         assertEquals(MCRConstants.MODS_NAMESPACE, role.getNamespace());
@@ -236,7 +236,7 @@ public class MCRNodeBuilderTest {
     }
 
     @Test
-    public void testAssigningValueToLastGenreatedNode() throws ParseException, JDOMException {
+    public void testAssigningValueToLastGenreatedNode() throws JaxenException, JDOMException {
         String value = "value";
         Element generated = (Element) (MCRNodeBuilder.build("titleInfo/title", value, null, null));
         assertEquals(value, generated.getText());
@@ -244,14 +244,14 @@ public class MCRNodeBuilderTest {
     }
 
     @Test
-    public void testBuildingNodeName() throws ParseException, JDOMException {
+    public void testBuildingNodeName() throws JaxenException, JDOMException {
         Element generated = (Element) (MCRNodeBuilder.build("mycoreobject/metadata/def.modsContainer/modsContainer", null, null, null));
         assertEquals("modsContainer", generated.getName());
         assertEquals("def.modsContainer", generated.getParentElement().getName());
     }
 
     @Test
-    public void testBuildingRootComponents() throws ParseException, JDOMException {
+    public void testBuildingRootComponents() throws JaxenException, JDOMException {
         Element existingRoot = new Element("root");
         existingRoot.setAttribute("type", "existing");
         Document document = new Document(existingRoot);

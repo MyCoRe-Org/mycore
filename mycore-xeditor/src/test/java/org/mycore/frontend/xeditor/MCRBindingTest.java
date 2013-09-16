@@ -25,7 +25,7 @@ package org.mycore.frontend.xeditor;
 
 import static org.junit.Assert.*;
 
-import java.text.ParseException;
+import org.jaxen.JaxenException;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -55,7 +55,7 @@ public class MCRBindingTest extends MCRTestCase {
     }
 
     @Test
-    public void testSimpleBindings() throws JDOMException, ParseException {
+    public void testSimpleBindings() throws JDOMException, JaxenException {
         binding = new MCRBinding("document", binding);
         binding = new MCRBinding("title", binding);
         assertEquals("title1", binding.getValue());
@@ -82,7 +82,7 @@ public class MCRBindingTest extends MCRTestCase {
     }
 
     @Test
-    public void testComplexBindings() throws JDOMException, ParseException {
+    public void testComplexBindings() throws JDOMException, JaxenException {
         binding = new MCRBinding("document/title[contains(text(),'1')]", binding);
         assertEquals("title1", binding.getValue());
         binding = binding.getParent();
@@ -107,7 +107,7 @@ public class MCRBindingTest extends MCRTestCase {
     }
 
     @Test
-    public void testHasValue() throws JDOMException, ParseException {
+    public void testHasValue() throws JDOMException, JaxenException {
         binding = new MCRBinding("document/title", binding);
         assertTrue(binding.hasValue("title1"));
         assertTrue(binding.hasValue("title2"));
@@ -121,7 +121,7 @@ public class MCRBindingTest extends MCRTestCase {
     }
 
     @Test
-    public void testVariables() throws JDOMException, ParseException {
+    public void testVariables() throws JDOMException, JaxenException {
         binding = new MCRBinding("document", binding);
         new MCRBinding("title[1]", null, "inheritMe", binding);
         new MCRBinding("title[2]", null, "overwriteMe", binding);
@@ -134,7 +134,7 @@ public class MCRBindingTest extends MCRTestCase {
     }
 
     @Test
-    public void testGroupByReferencedID() throws JDOMException, ParseException {
+    public void testGroupByReferencedID() throws JDOMException, JaxenException {
         String builder = "document[name/@id='n1'][note/@href='#n1'][location/@href='#n1'][name[@id='n2']][location[@href='#n2']]";
         Element document = (Element) (MCRNodeBuilder.build(builder, null, null, null));
         MCRBinding rootBinding = new MCRBinding(new Document(document));

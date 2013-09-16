@@ -23,7 +23,7 @@
 
 package org.mycore.frontend.xeditor;
 
-import java.text.ParseException;
+import org.jaxen.JaxenException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,11 +61,11 @@ public class MCRBinding {
         this.boundNodes.add(document);
     }
 
-    public MCRBinding(String xPathExpression, MCRBinding parent) throws JDOMException, ParseException {
+    public MCRBinding(String xPathExpression, MCRBinding parent) throws JDOMException, JaxenException {
         this(xPathExpression, null, null, parent);
     }
 
-    public MCRBinding(String xPathExpression, String defaultValue, String name, MCRBinding parent) throws JDOMException, ParseException {
+    public MCRBinding(String xPathExpression, String defaultValue, String name, MCRBinding parent) throws JDOMException, JaxenException {
         if (!((name == null) || name.isEmpty()))
             this.name = name;
 

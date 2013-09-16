@@ -24,7 +24,7 @@
 package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
-import java.text.ParseException;
+import org.jaxen.JaxenException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -152,7 +152,7 @@ public class MCREditorSession {
         xPathsOfDisplayedFields.remove(xPath);
     }
 
-    public void setSubmittedValues(String xPath, String[] values) throws JDOMException, ParseException {
+    public void setSubmittedValues(String xPath, String[] values) throws JDOMException, JaxenException {
         MCRBinding rootBinding = new MCRBinding(editedXML);
         MCRBinding binding = new MCRBinding(xPath, rootBinding);
         List<Object> boundNodes = binding.getBoundNodes();
@@ -170,7 +170,7 @@ public class MCREditorSession {
         }
     }
 
-    public void removeDeletedNodes() throws JDOMException, ParseException {
+    public void removeDeletedNodes() throws JDOMException, JaxenException {
         MCRBinding root = new MCRBinding(editedXML);
         for (String xPath : xPathsOfDisplayedFields)
             new MCRBinding(xPath, root).detachBoundNodes();
@@ -186,7 +186,7 @@ public class MCREditorSession {
         return validator;
     }
 
-    public MCRXEditorValidator validate() throws JDOMException, ParseException {
+    public MCRXEditorValidator validate() throws JDOMException, JaxenException {
         validator.validate(editedXML);
         return validator;
     }

@@ -25,7 +25,13 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.text.ParseException;
+
+import org.jaxen.BaseXPath;
+import org.jaxen.JaxenException;
+import org.jaxen.dom.DocumentNavigator;
+import org.jaxen.expr.LocationPath;
+import org.jaxen.expr.NameStep;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -53,7 +59,6 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
-import org.mycore.frontend.xeditor.MCRXPathParser.MCRLocationStep;
 import org.mycore.services.i18n.MCRTranslation;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.traversal.NodeIterator;
@@ -116,17 +121,26 @@ public class MCRXEditorTransformer {
         editorSession.setPostProcessorXSL(stylesheet);
     }
 
-    public void bind(String xPath, String defaultValue, String name) throws JDOMException, ParseException {
-        if (editorSession.getEditedXML() == null) {
-            String rPath = xPath.startsWith("/") ? xPath.substring(1) : xPath;
+    public void bind(String xPath, String defaultValue, String name) throws JDOMException, JaxenException {
+        if (editorSession.getEditedXML() == null)
+            createEmptyDocument(xPath);
 
-            MCRLocationStep root = MCRXPathParser.parse(rPath).getLocationSteps().get(0);
-            editorSession.setEditedXML(new Document(new Element(root.getLocalName(), root.getNamespace())));
-        }
-        if (currentBinding == null) {
+        if (currentBinding == null)
             currentBinding = new MCRBinding(editorSession.getEditedXML());
-        }
+
         currentBinding = new MCRBinding(xPath, defaultValue, name, currentBinding);
+    }
+
+    private void createEmptyDocument(String xPath) throws JaxenException, JDOMException {
+        BaseXPath baseXPath = new BaseXPath(xPath, new DocumentNavigator());
+        LocationPath lp = (LocationPath) (baseXPath.getRootExpr());
+        NameStep nameStep = (NameStep) (lp.getSteps().get(0));
+        String name = nameStep.getLocalName();
+        String prefix = nameStep.getPrefix();
+        Namespace ns = prefix.isEmpty() ? Namespace.NO_NAMESPACE : MCRUsedNamespaces.getNamespace(prefix);
+        Element root = new Element(name, ns);
+        Document editedXML = new Document(root);
+        editorSession.setEditedXML(editedXML);
     }
 
     public void unbind() {
@@ -157,7 +171,7 @@ public class MCRXEditorTransformer {
         }
     }
 
-    public String repeat(String xPath, int minRepeats, int maxRepeats) throws JDOMException, ParseException {
+    public String repeat(String xPath, int minRepeats, int maxRepeats) throws JDOMException, JaxenException {
         MCRRepeat repeat = new MCRRepeat(currentBinding, xPath, minRepeats, maxRepeats);
         repeats.push(repeat);
         return StringUtils.repeat("a ", repeat.getNumRepeats());
@@ -175,7 +189,7 @@ public class MCRXEditorTransformer {
         return repeats.peek().getRepeatPosition();
     }
 
-    public void bindRepeatPosition() throws JDOMException, ParseException {
+    public void bindRepeatPosition() throws JDOMException, JaxenException {
         currentBinding = repeats.peek().bindRepeatPosition();
     }
 

@@ -24,7 +24,7 @@
 package org.mycore.frontend.xeditor.target;
 
 import java.io.IOException;
-import java.text.ParseException;
+import org.jaxen.JaxenException;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -42,7 +42,7 @@ public abstract class MCREditorTarget {
     public abstract void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter)
             throws Exception;
 
-    protected void setSubmittedValues(MCRServletJob job, MCREditorSession session) throws JDOMException, ParseException {
+    protected void setSubmittedValues(MCRServletJob job, MCREditorSession session) throws JDOMException, JaxenException {
         for (String xPath : (Set<String>) (job.getRequest().getParameterMap().keySet())) {
             if (xPath.startsWith("/")) {
                 String[] values = job.getRequest().getParameterValues(xPath);

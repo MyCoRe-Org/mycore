@@ -24,7 +24,7 @@
 package org.mycore.frontend.xeditor;
 
 import java.io.UnsupportedEncodingException;
-import java.text.ParseException;
+import org.jaxen.JaxenException;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
@@ -47,7 +47,7 @@ public class MCRRepeat {
 
     private int maxRepeats;
 
-    public MCRRepeat(MCRBinding parentBinding, String xPath, int minRepeats, int maxRepeats) throws JDOMException, ParseException {
+    public MCRRepeat(MCRBinding parentBinding, String xPath, int minRepeats, int maxRepeats) throws JDOMException, JaxenException {
         this.xPath = xPath;
 
         this.parentBinding = parentBinding;
@@ -69,7 +69,7 @@ public class MCRRepeat {
         return repeatPosition;
     }
 
-    public MCRBinding bindRepeatPosition() throws JDOMException, ParseException {
+    public MCRBinding bindRepeatPosition() throws JDOMException, JaxenException {
         repeatPosition++;
         return new MCRBinding(repeatPosition, repeatBinding);
     }

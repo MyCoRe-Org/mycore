@@ -27,8 +27,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.text.ParseException;
 
+import org.jaxen.JaxenException;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -41,7 +41,7 @@ import org.mycore.common.xml.MCRXMLHelper;
 public class MCREditorSessionTest {
 
     @Test
-    public void testResubmittingEditedValues() throws ParseException, JDOMException, UnsupportedEncodingException, IOException {
+    public void testResubmittingEditedValues() throws JaxenException, JDOMException, UnsupportedEncodingException, IOException {
         MCREditorSession session = new MCREditorSession();
 
         // Simulate reading source XML
@@ -68,11 +68,11 @@ public class MCREditorSessionTest {
         assertTrue(MCRXMLHelper.deepEqual(document, result));
     }
 
-    private Document buildDocument(String xPath) throws ParseException, JDOMException {
+    private Document buildDocument(String xPath) throws JaxenException, JDOMException {
         return new Document((Element) (MCRNodeBuilder.build(xPath, null, null, null)));
     }
 
-    private Object xPath2Node(MCRBinding rootBinding, String xPath) throws JDOMException, ParseException {
+    private Object xPath2Node(MCRBinding rootBinding, String xPath) throws JDOMException, JaxenException {
         return new MCRBinding(xPath, rootBinding).getBoundNode();
     }
 }

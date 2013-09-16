@@ -25,7 +25,7 @@ package org.mycore.frontend.xeditor;
 
 import static org.junit.Assert.*;
 
-import java.text.ParseException;
+import org.jaxen.JaxenException;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -40,7 +40,7 @@ import org.mycore.frontend.xeditor.MCRBinding;
 public class MCRRepeatTest extends MCRTestCase {
 
     @Test
-    public void testRepeatBindingWithComplexPredicate() throws ParseException, JDOMException {
+    public void testRepeatBindingWithComplexPredicate() throws JaxenException, JDOMException {
         Element template = (Element) (MCRNodeBuilder.build("conditions[condition/@type='bingo'][condition[2]/@type='bongo']", null, null,
                 null));
         Document doc = new Document(template);

@@ -25,7 +25,7 @@ package org.mycore.frontend.xeditor;
 
 import static org.junit.Assert.*;
 
-import java.text.ParseException;
+import org.jaxen.JaxenException;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -40,7 +40,7 @@ import org.mycore.common.xml.MCRXMLHelper;
 public class MCRXMLCleanerTest extends MCRTestCase {
 
     @Test
-    public void testUnmodified() throws JDOMException, ParseException {
+    public void testUnmodified() throws JDOMException, JaxenException {
         String xPath1 = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau']]";
         cleanAndCompareTo(xPath1, xPath1);
 
@@ -49,7 +49,7 @@ public class MCRXMLCleanerTest extends MCRTestCase {
     }
 
     @Test
-    public void testRemoveEmptyNodes() throws JDOMException, ParseException {
+    public void testRemoveEmptyNodes() throws JDOMException, JaxenException {
         String xPath3i = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:namePart]]";
         String xPath3o = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau']]";
         cleanAndCompareTo(xPath3i, xPath3o);
@@ -60,14 +60,14 @@ public class MCRXMLCleanerTest extends MCRTestCase {
     }
 
     @Test
-    public void testRootAlwaysRemains() throws JDOMException, ParseException {
+    public void testRootAlwaysRemains() throws JDOMException, JaxenException {
         String xPath5i = "mods:mods[mods:name[@type][mods:namePart[@type]][mods:namePart]]";
         String xPath5o = "mods:mods";
         cleanAndCompareTo(xPath5i, xPath5o);
     }
 
     @Test
-    public void testOverwriteDefaultRules() throws JDOMException, ParseException {
+    public void testOverwriteDefaultRules() throws JDOMException, JaxenException {
         String xPath2i = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:namePart[@type='given']][mods:relatedItem/@xlink:href='test']]";
         String xPath2o = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:relatedItem/@xlink:href='test']]";
 
@@ -77,7 +77,7 @@ public class MCRXMLCleanerTest extends MCRTestCase {
         cleanAndCompareTo(xPath2i, xPath2o, removeElementsWithoutChildrenOrText, keepRelatedItemWithReference);
     }
 
-    private void cleanAndCompareTo(String xPathInput, String xPathExpectedOutput, MCRCleaningRule... rules) throws ParseException,
+    private void cleanAndCompareTo(String xPathInput, String xPathExpectedOutput, MCRCleaningRule... rules) throws JaxenException,
             JDOMException {
         Document xmlToClean = buildTestDocument(xPathInput);
         Document expectedXML = buildTestDocument(xPathExpectedOutput);
@@ -90,7 +90,7 @@ public class MCRXMLCleanerTest extends MCRTestCase {
         assertTrue(MCRXMLHelper.deepEqual(expectedXML, xmlToClean));
     }
 
-    private Document buildTestDocument(String xPath) throws ParseException, JDOMException {
+    private Document buildTestDocument(String xPath) throws JaxenException, JDOMException {
         Element root = (Element) (MCRNodeBuilder.build(xPath, null, null, null));
         return new Document(root);
     }
