@@ -23,8 +23,7 @@
 
 package org.mycore.frontend.xeditor.target;
 
-import org.jdom2.Element;
-import org.mycore.frontend.xeditor.MCRBinding;
+import org.mycore.frontend.xeditor.MCRRepeatBinding;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -32,13 +31,7 @@ import org.mycore.frontend.xeditor.MCRBinding;
 public class MCRUpTarget extends MCRControlTarget {
 
     @Override
-    protected void handleControl(MCRBinding baseBinding, String repeatXPath, String pos) throws Exception {
-        String xPath = repeatXPath + "[" + pos + "]";
-        MCRBinding binding = new MCRBinding(xPath, baseBinding);
-        Element element = (Element) (binding.getBoundNode());
-        Element parent = element.getParentElement();
-        int posInParent = parent.indexOf(element);
-        element.detach();
-        parent.addContent(posInParent - 1, element);
+    protected void handleControl(MCRRepeatBinding repeatBinding, int pos) throws Exception {
+        repeatBinding.up(pos);
     }
 }

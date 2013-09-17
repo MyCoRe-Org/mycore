@@ -23,9 +23,7 @@
 
 package org.mycore.frontend.xeditor.target;
 
-
-import org.jdom2.Element;
-import org.mycore.frontend.xeditor.MCRBinding;
+import org.mycore.frontend.xeditor.MCRRepeatBinding;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -33,17 +31,7 @@ import org.mycore.frontend.xeditor.MCRBinding;
 public class MCRInsertTarget extends MCRControlTarget {
 
     @Override
-    protected void handleControl(MCRBinding baseBinding, String repeatXPath, String pos) throws Exception {
-        String buildXPath = repeatXPath + "[9999]";
-        MCRBinding newBinding = new MCRBinding(buildXPath, baseBinding);
-        Element newElement = (Element) (newBinding.getBoundNode());
-        newElement.detach();
-
-        String ancestorXPath = repeatXPath + "[" + pos + "]";
-        MCRBinding ancestorBinding = new MCRBinding(ancestorXPath, baseBinding);
-        Element ancestor = (Element) (ancestorBinding.getBoundNode());
-        Element parent = ancestor.getParentElement();
-        int posInParent = parent.indexOf(ancestor) + 1;
-        parent.addContent(posInParent, newElement);
+    protected void handleControl(MCRRepeatBinding repeatBinding, int pos) throws Exception {
+        repeatBinding.cloneBoundElement(pos - 1);
     }
 }

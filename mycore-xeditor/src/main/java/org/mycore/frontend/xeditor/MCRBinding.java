@@ -46,15 +46,15 @@ public class MCRBinding {
 
     private final static Logger LOGGER = Logger.getLogger(MCRBinding.class);
 
-    private XPathExpression<Object> xPath;
+    protected XPathExpression<Object> xPath;
 
-    private List<Object> boundNodes = new ArrayList<Object>();
+    protected List<Object> boundNodes = new ArrayList<Object>();
 
-    private String name;
+    protected String name;
 
-    private List<MCRBinding> children = new ArrayList<MCRBinding>();
+    protected List<MCRBinding> children = new ArrayList<MCRBinding>();
 
-    private MCRBinding parent;
+    protected MCRBinding parent;
 
     public MCRBinding(Document document) throws JDOMException {
         this.xPath = XPathFactory.instance().compile("/", Filters.fpassthrough(), null, MCRUsedNamespaces.getNamespaces());

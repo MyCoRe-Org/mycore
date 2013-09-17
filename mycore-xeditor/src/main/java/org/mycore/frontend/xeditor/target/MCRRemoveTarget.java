@@ -23,7 +23,7 @@
 
 package org.mycore.frontend.xeditor.target;
 
-import org.mycore.frontend.xeditor.MCRBinding;
+import org.mycore.frontend.xeditor.MCRRepeatBinding;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -31,9 +31,7 @@ import org.mycore.frontend.xeditor.MCRBinding;
 public class MCRRemoveTarget extends MCRControlTarget {
 
     @Override
-    protected void handleControl(MCRBinding baseBinding, String repeatXPath, String pos) throws Exception {
-        String nodeXPath = repeatXPath + "[" + pos + "]";
-        MCRBinding nodeBinding = new MCRBinding(nodeXPath, baseBinding);
-        nodeBinding.detachBoundNode();
+    protected void handleControl(MCRRepeatBinding repeatBinding, int pos) throws Exception {
+        repeatBinding.remove(pos);
     }
 }

@@ -50,13 +50,23 @@ public class MCRXMLCleanerTest extends MCRTestCase {
 
     @Test
     public void testRemoveEmptyNodes() throws JDOMException, JaxenException {
-        String xPath3i = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:namePart]]";
-        String xPath3o = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau']]";
-        cleanAndCompareTo(xPath3i, xPath3o);
+        String xPath1i = "root[child]";
+        String xPath1o = "root";
+        cleanAndCompareTo(xPath1i, xPath1o);
+        
+        String xPath2i = "root[child='a']";
+        cleanAndCompareTo(xPath2i, xPath2i);
 
-        String xPath4i = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:role/mods:roleTerm[@type]]]";
-        String xPath4o = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau']]";
-        cleanAndCompareTo(xPath4i, xPath4o);
+        String xPath3i = "root[child[@foo='bar']]";
+        cleanAndCompareTo(xPath3i, xPath3i);
+
+        String xPath7i = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:namePart]]";
+        String xPath7o = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau']]";
+        cleanAndCompareTo(xPath7i, xPath7o);
+
+        String xPath8i = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:role/mods:roleTerm[@type]]]";
+        String xPath8o = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau']]";
+        cleanAndCompareTo(xPath8i, xPath8o);
     }
 
     @Test

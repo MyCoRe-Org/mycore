@@ -37,7 +37,7 @@ import org.mycore.frontend.xeditor.MCRBinding;
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRRepeatTest extends MCRTestCase {
+public class MCRRepeatBindingTest extends MCRTestCase {
 
     @Test
     public void testRepeatBindingWithComplexPredicate() throws JaxenException, JDOMException {
@@ -47,19 +47,42 @@ public class MCRRepeatTest extends MCRTestCase {
         MCRBinding root = new MCRBinding(doc);
         MCRBinding conditions = new MCRBinding("conditions", root);
 
-        MCRRepeat repeat = new MCRRepeat(conditions, "condition[contains(' foo bar ',concat(' ',@type,' '))]", 3, 5);
-        assertEquals(3, repeat.getNumRepeats());
+        MCRRepeatBinding repeat = new MCRRepeatBinding("condition[contains(' foo bar ',concat(' ',@type,' '))]", conditions, 3, 5);
+        assertEquals(3, repeat.getBoundNodes().size());
 
         MCRBinding binding = repeat.bindRepeatPosition();
         assertEquals(1, binding.getBoundNodes().size());
         assertEquals("/conditions/condition[3]", binding.getAbsoluteXPath());
+        ((Element) (binding.getBoundNode())).setAttribute("value", "a");
 
         binding = repeat.bindRepeatPosition();
         assertEquals(1, binding.getBoundNodes().size());
         assertEquals("/conditions/condition[4]", binding.getAbsoluteXPath());
+        ((Element) (binding.getBoundNode())).setAttribute("value", "b");
 
         binding = repeat.bindRepeatPosition();
         assertEquals(1, binding.getBoundNodes().size());
         assertEquals("/conditions/condition[5]", binding.getAbsoluteXPath());
+        ((Element) (binding.getBoundNode())).setAttribute("value", "c");
+        
+        repeat.up(2);
+        assertEquals("b", ((Element) (repeat.getBoundNodes().get(0))).getAttributeValue("value"));
+        assertEquals("b", doc.getRootElement().getChildren().get(2).getAttributeValue("value") );
+
+        repeat.down(2);
+        assertEquals("a", ((Element) (repeat.getBoundNodes().get(2))).getAttributeValue("value"));
+        assertEquals("a", doc.getRootElement().getChildren().get(4).getAttributeValue("value") );
+        
+        repeat.remove(1);
+        assertEquals(2, repeat.getBoundNodes().size());
+        assertEquals("c", ((Element) (repeat.getBoundNodes().get(0))).getAttributeValue("value"));
+        assertEquals("a", ((Element) (repeat.getBoundNodes().get(1))).getAttributeValue("value"));
+        assertEquals( 4, doc.getRootElement().getChildren().size() );
+        
+        repeat.cloneBoundElement(0);
+        assertEquals( 5, doc.getRootElement().getChildren().size() );
+        assertEquals("c", ((Element) (repeat.getBoundNodes().get(0))).getAttributeValue("value"));
+        assertEquals("c", ((Element) (repeat.getBoundNodes().get(1))).getAttributeValue("value"));
+        assertEquals("a", ((Element) (repeat.getBoundNodes().get(2))).getAttributeValue("value"));
     }
 }

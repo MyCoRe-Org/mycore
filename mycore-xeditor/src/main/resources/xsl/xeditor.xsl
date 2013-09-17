@@ -191,8 +191,9 @@
     <xsl:for-each select="xalan:tokenize(transformer:repeat($transformer,@xpath,@min,@max))">
       <xsl:value-of select="transformer:bindRepeatPosition($transformer)" />
       <xsl:apply-templates select="$xed_repeat/node()" mode="xeditor" />
+      <xsl:value-of select="transformer:unbind($transformer)" />
     </xsl:for-each>
-    <xsl:value-of select="transformer:endRepeat($transformer)" />  
+    <xsl:value-of select="transformer:unbind($transformer)" />  
   </xsl:template>
 
   <!-- ========== <xed:controls /> ========== -->

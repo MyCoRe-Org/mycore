@@ -34,7 +34,6 @@ import org.jaxen.expr.NameStep;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,8 +75,6 @@ public class MCRXEditorTransformer {
     private MCRParameterCollector transformationParameters;
 
     private MCRBinding currentBinding;
-
-    private Stack<MCRRepeat> repeats = new Stack<MCRRepeat>();
 
     public MCRXEditorTransformer(MCREditorSession editorSession, MCRParameterCollector transformationParameters) {
         this.editorSession = editorSession;
@@ -172,33 +169,36 @@ public class MCRXEditorTransformer {
     }
 
     public String repeat(String xPath, int minRepeats, int maxRepeats) throws JDOMException, JaxenException {
-        MCRRepeat repeat = new MCRRepeat(currentBinding, xPath, minRepeats, maxRepeats);
-        repeats.push(repeat);
-        return StringUtils.repeat("a ", repeat.getNumRepeats());
+        MCRRepeatBinding repeat = new MCRRepeatBinding(xPath, currentBinding, minRepeats, maxRepeats);
+        currentBinding = repeat;
+        return StringUtils.repeat("a ", repeat.getBoundNodes().size());
+    }
+
+    private MCRRepeatBinding getCurrentRepeat() {
+        MCRBinding binding = currentBinding;
+        while (!(binding instanceof MCRRepeatBinding))
+            binding = binding.getParent();
+        return (MCRRepeatBinding) binding;
     }
 
     public int getNumRepeats() {
-        return repeats.peek().getNumRepeats();
+        return getCurrentRepeat().getBoundNodes().size();
     }
 
     public int getMaxRepeats() {
-        return repeats.peek().getMaxRepeats();
+        return getCurrentRepeat().getMaxRepeats();
     }
 
     public int getRepeatPosition() {
-        return repeats.peek().getRepeatPosition();
+        return getCurrentRepeat().getRepeatPosition();
     }
 
     public void bindRepeatPosition() throws JDOMException, JaxenException {
-        currentBinding = repeats.peek().bindRepeatPosition();
-    }
-
-    public void endRepeat() {
-        currentBinding = repeats.pop().getParentBinding();
+        currentBinding = getCurrentRepeat().bindRepeatPosition();
     }
 
     public String getControlsParameter() throws UnsupportedEncodingException {
-        return repeats.peek().getControlsParameter();
+        return getCurrentRepeat().getControlsParameter();
     }
 
     public void addValidationRule(NodeIterator attributes) {

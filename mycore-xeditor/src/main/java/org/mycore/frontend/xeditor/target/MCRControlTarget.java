@@ -5,7 +5,7 @@ import javax.servlet.ServletContext;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
-import org.mycore.frontend.xeditor.MCRRepeat;
+import org.mycore.frontend.xeditor.MCRRepeatBinding;
 
 public abstract class MCRControlTarget extends MCREditorTarget {
 
@@ -20,14 +20,15 @@ public abstract class MCRControlTarget extends MCREditorTarget {
     protected void handleControlParameter(MCREditorSession session, String parameter) throws Exception {
         String[] tokens = parameter.split("_");
         String baseXPath = tokens[0];
-        String repeatXPath = MCRRepeat.decode(tokens[1]);
-        String pos = tokens[2];
+        String repeatXPath = MCRRepeatBinding.decode(tokens[1]);
+        int pos = Integer.parseInt(tokens[2]);
 
         MCRBinding rootBinding = new MCRBinding(session.getEditedXML());
         MCRBinding baseBinding = new MCRBinding(baseXPath, rootBinding);
+        MCRRepeatBinding repeatBinding = new MCRRepeatBinding(repeatXPath, baseBinding);
 
-        handleControl(baseBinding, repeatXPath, pos);
+        handleControl(repeatBinding, pos);
     }
 
-    protected abstract void handleControl(MCRBinding baseBinding, String repeatXPath, String pos) throws Exception;
+    protected abstract void handleControl(MCRRepeatBinding repeatBinding, int pos) throws Exception;
 }
