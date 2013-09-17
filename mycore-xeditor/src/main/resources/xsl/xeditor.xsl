@@ -91,6 +91,9 @@
     <xsl:apply-templates mode="xeditor" />
   </xsl:template>
 
+  <!-- ========== <xed:template /> ========== -->
+
+  <xsl:template match="xed:template" mode="xeditor" />
   <xsl:template match="xed:template" />
 
   <!-- ========== Text ========== -->
@@ -316,7 +319,7 @@
 
   <!-- ========== <xed:cleanup-rule xpath="" relevant-if="" ========== -->
   
-  <xsl:template match="xed:cleanup-rule">
+  <xsl:template match="xed:cleanup-rule" mode="xeditor">
     <xsl:value-of select="transformer:addCleanupRule($transformer,@xpath,@relevant-if)" />
   </xsl:template>
 
