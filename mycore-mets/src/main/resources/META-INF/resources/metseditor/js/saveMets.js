@@ -110,6 +110,12 @@ function save(){
        postData: "jsontree=" + encodeURIComponent(data) + "&derivate=" + derivateId,
        load: function(response) {
             log('Mets successfully saved');
+            var onSuccessfulSaveDialog = new dijit.Dialog({
+                title: "METS speicher...",
+                style: "width: 300px"
+            });
+            onSuccessfulSaveDialog.attr("content", "Mets konnte erfolgreich erzeugt und gespeichert werden.");
+            onSuccessfulSaveDialog.show();
         },
         error: function(err, ioArgs){
             var secondDlg = new dijit.Dialog({
