@@ -91,6 +91,8 @@
     <xsl:apply-templates mode="xeditor" />
   </xsl:template>
 
+  <xsl:template match="xed:template" />
+
   <!-- ========== Text ========== -->
 
   <xsl:template match="@*" mode="xeditor">

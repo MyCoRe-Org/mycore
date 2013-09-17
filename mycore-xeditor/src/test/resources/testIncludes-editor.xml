@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <div xmlns:xed="http://www.mycore.de/xeditor">
-  <span id="a">
+  <xed:template id="a">
     <a />
-  </span>
+  </xed:template>
   <xed:form>
     <i1>
       <xed:include ref="a" /> 
