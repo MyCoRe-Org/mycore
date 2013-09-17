@@ -111,7 +111,7 @@ function save(){
        load: function(response) {
             log('Mets successfully saved');
             var onSuccessfulSaveDialog = new dijit.Dialog({
-                title: "METS speicher...",
+                title: "METS speichern...",
                 style: "width: 300px"
             });
             onSuccessfulSaveDialog.attr("content", "Mets konnte erfolgreich erzeugt und gespeichert werden.");
