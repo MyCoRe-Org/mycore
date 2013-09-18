@@ -19,21 +19,13 @@ public class MCRXMLCleaner {
 
     private static final MCRCleaningRule REMOVE_EMPTY_ELEMENTS = new MCRCleaningRule("//*", "@* or * or (string-length(text()) > 0)");
 
-    private Document xml;
-
     private List<MCRCleaningRule> rules = new ArrayList<MCRCleaningRule>();
 
     private Map<Object, MCRCleaningRule> nodes2rules = new HashMap<Object, MCRCleaningRule>();
 
-    public MCRXMLCleaner(Document xml) {
-        this.xml = xml;
-
+    public MCRXMLCleaner() {
         addRule(REMOVE_EMPTY_ATTRIBUTES);
         addRule(REMOVE_EMPTY_ELEMENTS);
-    }
-
-    public Document getXML() {
-        return xml;
     }
 
     public void addRule(String xPathExprNodesToInspect, String xPathExprRelevancyTest) {
@@ -45,13 +37,13 @@ public class MCRXMLCleaner {
         rules.add(rule);
     }
 
-    public void clean() {
+    public void clean(Document xml) {
         do
-            mapNodesToRules();
+            mapNodesToRules(xml);
         while (clean(xml.getRootElement()));
     }
 
-    private void mapNodesToRules() {
+    private void mapNodesToRules(Document xml) {
         nodes2rules.clear();
         for (MCRCleaningRule rule : rules)
             for (Object object : rule.getNodesToInspect(xml))

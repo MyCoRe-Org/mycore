@@ -92,10 +92,10 @@ public class MCRXMLCleanerTest extends MCRTestCase {
         Document xmlToClean = buildTestDocument(xPathInput);
         Document expectedXML = buildTestDocument(xPathExpectedOutput);
 
-        MCRXMLCleaner cleaner = new MCRXMLCleaner(xmlToClean);
+        MCRXMLCleaner cleaner = new MCRXMLCleaner();
         for (MCRCleaningRule rule : rules)
             cleaner.addRule(rule);
-        cleaner.clean();
+        cleaner.clean(xmlToClean);
 
         assertTrue(MCRXMLHelper.deepEqual(expectedXML, xmlToClean));
     }
