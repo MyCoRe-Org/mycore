@@ -5,6 +5,7 @@ import javax.servlet.ServletContext;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
+import org.mycore.frontend.xeditor.MCREditorStep;
 import org.mycore.frontend.xeditor.MCRRepeatBinding;
 
 public abstract class MCRControlTarget extends MCREditorTarget {
@@ -25,6 +26,9 @@ public abstract class MCRControlTarget extends MCREditorTarget {
 
         MCRBinding baseBinding = session.getCurrentStep().bind(baseXPath);
         MCRRepeatBinding repeatBinding = new MCRRepeatBinding(repeatXPath, baseBinding);
+
+        MCREditorStep step = session.getCurrentStep();
+        step.setLabel(step.getLabel().replaceAll(parameter, baseXPath + "/" + repeatXPath + "[" + pos + "]"));
 
         handleControl(repeatBinding, pos);
     }

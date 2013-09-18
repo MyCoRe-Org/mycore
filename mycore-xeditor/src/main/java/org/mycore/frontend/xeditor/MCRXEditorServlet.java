@@ -46,7 +46,8 @@ public class MCRXEditorServlet extends MCRServlet {
         MCREditorSession session = MCREditorSessionStoreFactory.getSessionStore().getSession(sessionID);
 
         int stepNr = Integer.parseInt(xEditorStepID.split("-")[1]);
-        session.startNextStepFrom(stepNr);
+        session.setCurrentStep(stepNr);
+        session.startNextStep();
 
         sendToTarget(job, session);
     }

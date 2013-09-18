@@ -48,29 +48,31 @@ public class MCRDebugTarget extends MCREditorTarget {
         PrintWriter out = job.getResponse().getWriter();
         out.println("<html><body>");
 
+        int posBeforeApplyingSubmit = session.getSteps().size();
+
+        session.startNextStep();
+        session.getCurrentStep().setLabel("After applying submitted values");
+        setSubmittedValues(job, session.getCurrentStep());
+        session.getCurrentStep().removeDeletedNodes();
+
+        session.startNextStep();
+        session.getCurrentStep().setLabel("After cleanup");
+        session.getXMLCleaner().clean(session.getCurrentStep().getDocument());
+
+        session.startNextStep();
+        session.getCurrentStep().setLabel("After postprocessing");
+        session.getPostProcessedXML();
+
         int i = 1;
         for (MCREditorStep step : session.getSteps()) {
-            out.println("<h3>Step " + i++ + ": " + step.getLabel() + "</h3>");
+            out.println("<h3>Step " + i + ": " + step.getLabel() + "</h3>");
             outputXML(step.getDocument(), out);
+
+            if (i++ == posBeforeApplyingSubmit) {
+                out.println("<h3>Submitted parameters:</h3>");
+                outputParameters(job, out);
+            }
         }
-
-        out.println("<h3>Submitted parameters:</h3>");
-        outputParameters(job, out);
-
-        MCREditorStep step = session.getCurrentStep();
-        setSubmittedValues(job, step);
-        step.removeDeletedNodes();
-
-        out.println("<h3>After applying submitted values:</h3>");
-        outputXML(step.getDocument(), out);
-
-        session.getXMLCleaner().clean(step.getDocument());
-
-        out.println("<h3>After cleanup:</h3>");
-        outputXML(step.getDocument(), out);
-
-        out.println("<h3>After postprocessing:</h3>");
-        outputXML(session.getPostProcessedXML(), out);
 
         out.println("</body></html>");
         out.close();

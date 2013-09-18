@@ -121,15 +121,17 @@ public class MCREditorSession {
         return steps;
     }
 
-    public MCREditorStep startNextStepFrom(int stepID) {
+    public MCREditorStep startNextStep() {
+        MCREditorStep nextStep = getCurrentStep().clone();
+        steps.add(nextStep);
+        return nextStep;
+    }
+
+    public void setCurrentStep(int stepID) {
         if (stepID < steps.size()) {
             LOGGER.info("Detected resubmission of old editor step, going back in time now...");
             steps = steps.subList(0, stepID); // Forget all following steps
         }
-
-        MCREditorStep nextStep = getCurrentStep().clone();
-        steps.add(nextStep);
-        return nextStep;
     }
 
     public MCRXMLCleaner getXMLCleaner() {
