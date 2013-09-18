@@ -58,16 +58,23 @@ public class MCRBinding {
         this.boundNodes.add(document);
     }
 
+    private MCRBinding(MCRBinding parent) {
+        this.parent = parent;
+        parent.children.add(this);
+    }
+
     public MCRBinding(String xPath, MCRBinding parent) throws JDOMException, JaxenException {
-        this(xPath, null, null, parent);
+        this(parent);
+        bind(xPath, null);
     }
 
     public MCRBinding(String xPath, String defaultValue, String name, MCRBinding parent) throws JDOMException, JaxenException {
-        if ((name != null) && !name.isEmpty())
-            this.name = name;
+        this(parent);
+        this.name = (name != null) && !name.isEmpty() ? name : null;
+        bind(xPath, defaultValue);
+    }
 
-        this.parent = parent;
-        parent.children.add(this);
+    private void bind(String xPath, String defaultValue) throws JaxenException {
         Map<String, Object> variables = buildXPathVariables();
 
         XPathExpression<Object> xPathExpr = XPathFactory.instance().compile(xPath, Filters.fpassthrough(), variables,
@@ -85,9 +92,7 @@ public class MCRBinding {
     }
 
     public MCRBinding(int pos, MCRBinding parent) {
-        this.parent = parent;
-        parent.children.add(this);
-
+        this(parent);
         boundNodes.add(parent.getBoundNodes().get(pos - 1));
         LOGGER.debug("Repeater bind to child [" + pos + "]");
     }
