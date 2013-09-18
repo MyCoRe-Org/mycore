@@ -2,7 +2,7 @@
   <head>
     <title>MyCoRe WebCLI</title>
     <link type="text/css" rel="stylesheet" href="css/webcli.css" />
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/dojo/1.8.0/dojo/dojo.js.uncompressed.js" djConfig="parseOnLoad: true"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/dojo/1.8.0/dojo/dojo.js.uncompressed.js" djConfig="parseOnLoad: true"></script>
     <script type="text/javascript" src="js/webcli.js"></script>
     <!-- if you want to use firebug lite to debug IE please comment out blow -->
     <!-- 

@@ -81,7 +81,7 @@
   </xsl:template>
 
   <xsl:template name="classeditor.includeDojoCSS">
-    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/{$classeditor.dojoVersion}/dijit/themes/claro/claro.css"></link>
+    <link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/dojo/{$classeditor.dojoVersion}/dijit/themes/claro/claro.css"></link>
   </xsl:template>
 
   <xsl:template name="classeditor.includeCSS">
