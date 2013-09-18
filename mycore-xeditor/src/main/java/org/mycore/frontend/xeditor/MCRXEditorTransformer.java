@@ -260,7 +260,8 @@ public class MCRXEditorTransformer {
             xPathVariables.putAll(transformationParameters.getParameterMap());
             XPathFactory factory = XPathFactory.instance();
             List<Namespace> namespaces = MCRUsedNamespaces.getNamespaces();
-            XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), xPathVariables, namespaces);
+            XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), xPathVariables,
+                namespaces);
             return xPath.evaluateFirst(currentBinding.getBoundNodes()).toString();
         } catch (Exception ex) {
             LOGGER.warn("unable to evaluate XPath: " + xPathExpression);
@@ -269,7 +270,8 @@ public class MCRXEditorTransformer {
         }
     }
 
-    public XNodeSet getRequestParameters(ExpressionContext context) throws ParserConfigurationException, TransformerException {
+    public XNodeSet getRequestParameters(ExpressionContext context) throws ParserConfigurationException,
+        TransformerException {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         org.w3c.dom.Document doc = builder.newDocument();
         NodeSet ns = new NodeSet();
@@ -288,6 +290,11 @@ public class MCRXEditorTransformer {
     }
 
     public void addCleanupRule(String xPath, String relevantIf) {
-        editorSession.getXMLCleaner().addRule(xPath, relevantIf);
+        MCRXMLCleaner xmlCleaner = editorSession.getXMLCleaner();
+        if (xmlCleaner == null) {
+            LOGGER.warn("Could not get MCRXMLCleaner instance to add rule: " + xPath + '[' + relevantIf + ']');
+            return;
+        }
+        xmlCleaner.addRule(xPath, relevantIf);
     }
 }
