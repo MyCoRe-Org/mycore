@@ -78,7 +78,7 @@
           </xsl:when>
           <xsl:when test="number(@num) &gt; number(@max)">
             <p>
-              <xsl:value-of select="i18n:translate('component.user2.admin.search.error.tooManyUsers', @num, @max)"/>
+              <xsl:value-of select="i18n:translate('component.user2.admin.search.error.tooManyUsers', concat(@num,';',@max))"/>
             </p>
           </xsl:when>
         </xsl:choose>
