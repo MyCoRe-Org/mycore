@@ -126,8 +126,8 @@ public class MCREditorSession {
             LOGGER.info("Detected resubmission of old editor step, going back in time now...");
             steps = steps.subList(0, stepID); // Forget all following steps
         }
-        Document editedXML = getCurrentStep().getDocument();
-        MCREditorStep nextStep = new MCREditorStep(editedXML.clone());
+
+        MCREditorStep nextStep = getCurrentStep().clone();
         steps.add(nextStep);
         return nextStep;
     }

@@ -1,28 +1,20 @@
 package org.mycore.frontend.xeditor;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.transform.TransformerException;
-
 import org.apache.log4j.Logger;
-import org.jaxen.BaseXPath;
 import org.jaxen.JaxenException;
-import org.jaxen.dom.DocumentNavigator;
-import org.jaxen.expr.LocationPath;
-import org.jaxen.expr.NameStep;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.jdom2.Namespace;
-import org.mycore.common.content.MCRSourceContent;
-import org.xml.sax.SAXException;
 
-public class MCREditorStep {
+public class MCREditorStep implements Cloneable {
 
     private final static Logger LOGGER = Logger.getLogger(MCREditorStep.class);
+
+    private String label;
 
     private Document editedXML;
 
@@ -33,22 +25,12 @@ public class MCREditorStep {
         MCRUsedNamespaces.addNamespacesFrom(editedXML.getRootElement());
     }
 
-    public static MCREditorStep loadFromURI(String uri) throws JDOMException, IOException, SAXException, TransformerException {
-        LOGGER.info("Reading edited XML from " + uri);
-        Document xml = MCRSourceContent.getInstance(uri).asXML();
-        return new MCREditorStep(xml);
+    public String getLabel() {
+        return label;
     }
 
-    public static MCREditorStep createFromXPath(String xPath) throws JaxenException {
-        BaseXPath baseXPath = new BaseXPath(xPath, new DocumentNavigator());
-        LocationPath lp = (LocationPath) (baseXPath.getRootExpr());
-        NameStep nameStep = (NameStep) (lp.getSteps().get(0));
-        String name = nameStep.getLocalName();
-        String prefix = nameStep.getPrefix();
-        Namespace ns = prefix.isEmpty() ? Namespace.NO_NAMESPACE : MCRUsedNamespaces.getNamespace(prefix);
-        Element root = new Element(name, ns);
-        Document document = new Document(root);
-        return new MCREditorStep(document);
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public Document getDocument() {
@@ -99,5 +81,13 @@ public class MCREditorStep {
 
     public void forgetDisplayedFields() {
         xPathsOfDisplayedFields.clear();
+    }
+
+    @Override
+    public MCREditorStep clone() {
+        Document xml = editedXML.getDocument().clone();
+        MCREditorStep copy = new MCREditorStep(xml);
+        copy.xPathsOfDisplayedFields.addAll(this.xPathsOfDisplayedFields);
+        return copy;
     }
 }

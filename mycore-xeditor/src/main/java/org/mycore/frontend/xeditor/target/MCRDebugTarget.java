@@ -48,9 +48,10 @@ public class MCRDebugTarget extends MCREditorTarget {
         PrintWriter out = job.getResponse().getWriter();
         out.println("<html><body>");
 
-        for (int i = 0; i < session.getSteps().size(); i++) {
-            out.println("<h3>Step " + (i + 1) + ":</h3>");
-            outputXML(session.getSteps().get(i).getDocument(), out);
+        int i = 1;
+        for (MCREditorStep step : session.getSteps()) {
+            out.println("<h3>Step " + i++ + ": " + step.getLabel() + "</h3>");
+            outputXML(step.getDocument(), out);
         }
 
         out.println("<h3>Submitted parameters:</h3>");

@@ -26,7 +26,11 @@ package org.mycore.frontend.xeditor;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import org.jaxen.BaseXPath;
 import org.jaxen.JaxenException;
+import org.jaxen.dom.DocumentNavigator;
+import org.jaxen.expr.LocationPath;
+import org.jaxen.expr.NameStep;
 
 import java.util.List;
 import java.util.Map;
@@ -44,12 +48,15 @@ import org.apache.xalan.extensions.ExpressionContext;
 import org.apache.xpath.NodeSet;
 import org.apache.xpath.objects.XNodeSet;
 import org.apache.xpath.objects.XNodeSetForDOM;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.services.i18n.MCRTranslation;
@@ -97,9 +104,14 @@ public class MCRXEditorTransformer {
     }
 
     public void readSourceXML(String uri) throws JDOMException, IOException, SAXException, TransformerException {
-        uri = replaceParameters(uri);
-        if ((!uri.contains("{")) && (editorSession.getCurrentStep() == null))
-            editorSession.setInitialStep(MCREditorStep.loadFromURI(uri));
+        if ((editorSession.getCurrentStep() != null) || (uri = replaceParameters(uri)).contains("{"))
+            return;
+
+        LOGGER.info("Reading edited XML from " + uri);
+        Document xml = MCRSourceContent.getInstance(uri).asXML();
+        MCREditorStep step = new MCREditorStep(xml);
+        step.setLabel("Loading XML from " + uri);
+        editorSession.setInitialStep(step);
     }
 
     public void setCancelURL(String url) throws JDOMException, IOException, SAXException, TransformerException {
@@ -114,12 +126,28 @@ public class MCRXEditorTransformer {
 
     public void bind(String xPath, String defaultValue, String name) throws JDOMException, JaxenException {
         if (editorSession.getCurrentStep() == null)
-            editorSession.setInitialStep(MCREditorStep.createFromXPath(xPath));
+            createInitialStepFromXPath(xPath);
 
         if (currentBinding == null)
             currentBinding = editorSession.getCurrentStep().getRootBinding();
 
         currentBinding = new MCRBinding(xPath, defaultValue, name, currentBinding);
+    }
+
+    private void createInitialStepFromXPath(String xPath) throws JaxenException {
+        Element root = createRootElement(xPath);
+        MCREditorStep step = new MCREditorStep(new Document(root));
+        step.setLabel("Starting with empty XML document");
+        editorSession.setInitialStep(step);
+    }
+
+    private Element createRootElement(String xPath) throws JaxenException {
+        BaseXPath baseXPath = new BaseXPath(xPath, new DocumentNavigator());
+        LocationPath lp = (LocationPath) (baseXPath.getRootExpr());
+        NameStep nameStep = (NameStep) (lp.getSteps().get(0));
+        String prefix = nameStep.getPrefix();
+        Namespace ns = prefix.isEmpty() ? Namespace.NO_NAMESPACE : MCRUsedNamespaces.getNamespace(prefix);
+        return new Element(nameStep.getLocalName(), ns);
     }
 
     public void unbind() {
