@@ -46,7 +46,6 @@ public class MCRServletTarget extends MCREditorTarget {
             return;
         }
 
-        step.emptyNotResubmittedNodes();
         session.getXMLCleaner().clean(step.getDocument());
 
         RequestDispatcher dispatcher = context.getNamedDispatcher(servletNameOrPath);

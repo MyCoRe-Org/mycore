@@ -50,6 +50,7 @@ public abstract class MCREditorTarget {
                 step.setSubmittedValues(xPath, values);
             }
         }
+        step.emptyNotResubmittedNodes();
     }
 
     protected void redirectToEditorPage(MCRServletJob job, MCREditorSession session) throws IOException {

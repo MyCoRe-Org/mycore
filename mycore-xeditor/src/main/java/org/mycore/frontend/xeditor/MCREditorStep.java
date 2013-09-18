@@ -74,12 +74,10 @@ public class MCREditorStep implements Cloneable {
     }
 
     public void emptyNotResubmittedNodes() throws JDOMException, JaxenException {
-        for (String xPath : xPathsOfDisplayedFields)
+        for (String xPath : xPathsOfDisplayedFields) {
             bind(xPath).setValue("");
-    }
-
-    public void forgetDisplayedFields() {
-        xPathsOfDisplayedFields.clear();
+            xPathsOfDisplayedFields.remove(xPath);
+        }
     }
 
     @Override
