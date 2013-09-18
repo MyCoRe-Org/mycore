@@ -25,7 +25,10 @@ package org.mycore.frontend.xeditor.target;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Enumeration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 
@@ -48,11 +51,7 @@ public class MCRDebugTarget extends MCREditorTarget {
         PrintWriter out = job.getResponse().getWriter();
         out.println("<html><body>");
 
-        int posBeforeApplyingSubmit = session.getSteps().size();
-
-        session.startNextStep();
-        session.getCurrentStep().setLabel("After applying submitted values");
-        setSubmittedValues(job, session.getCurrentStep());
+        session.getCurrentStep().setSubmittedValues(job.getRequest().getParameterMap());
 
         session.startNextStep();
         session.getCurrentStep().setLabel("After cleanup");
@@ -62,30 +61,35 @@ public class MCRDebugTarget extends MCREditorTarget {
         session.getCurrentStep().setLabel("After postprocessing");
         session.getPostProcessedXML();
 
-        int i = 1;
-        for (MCREditorStep step : session.getSteps()) {
-            out.println("<h3>Step " + i + ": " + step.getLabel() + "</h3>");
-            outputXML(step.getDocument(), out);
-
-            if (i++ == posBeforeApplyingSubmit) {
-                out.println("<h3>Submitted parameters:</h3>");
-                outputParameters(job, out);
-            }
-        }
+        for (MCREditorStep step : session.getSteps())
+            outputStep(out, step);
 
         out.println("</body></html>");
         out.close();
     }
 
-    private void outputParameters(MCRServletJob job, PrintWriter out) {
+    private void outputStep(PrintWriter out, MCREditorStep step) throws IOException {
+        out.println("<h3>" + step.getLabel() + ":</h3>");
+
+        if (step.getSubmittedValues() != null) {
+            out.println("<h3>Submitted parameters:</h3>");
+            outputParameters(step, out);
+            out.println("<h3>After applying submitted parameters:</h3>");
+        }
+
+        outputXML(step.getDocument(), out);
+    }
+
+    private void outputParameters(MCREditorStep step, PrintWriter out) {
         out.println("<p><pre>");
 
-        for (Enumeration<String> parameters = job.getRequest().getParameterNames(); parameters.hasMoreElements();) {
-            String name = parameters.nextElement();
-            for (String value : job.getRequest().getParameterValues(name)) {
+        Map<String, String[]> values = step.getSubmittedValues();
+        List<String> names = new ArrayList<String>(values.keySet());
+        Collections.sort(names);
+
+        for (String name : names)
+            for (String value : values.get(name))
                 out.println(name + " = " + value);
-            }
-        }
 
         out.println("</pre></p>");
     }

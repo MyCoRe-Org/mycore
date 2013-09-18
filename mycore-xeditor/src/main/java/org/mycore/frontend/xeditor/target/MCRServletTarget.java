@@ -39,7 +39,7 @@ public class MCRServletTarget extends MCREditorTarget {
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String servletNameOrPath)
             throws Exception {
         MCREditorStep step = session.getCurrentStep();
-        setSubmittedValues(job, step);
+        session.getCurrentStep().setSubmittedValues(job.getRequest().getParameterMap());
 
         if (session.validate().failed()) {
             redirectToEditorPage(job, session);

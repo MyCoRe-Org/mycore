@@ -11,7 +11,7 @@ import org.mycore.frontend.xeditor.MCRRepeatBinding;
 public abstract class MCRControlTarget extends MCREditorTarget {
 
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter) throws Exception {
-        setSubmittedValues(job, session.getCurrentStep());
+        session.getCurrentStep().setSubmittedValues(job.getRequest().getParameterMap());
         session.getValidator().forgetInvalidFields();
         handleControlParameter(session, parameter);
         redirectToEditorPage(job, session);

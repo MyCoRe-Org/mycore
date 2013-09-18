@@ -24,16 +24,12 @@
 package org.mycore.frontend.xeditor.target;
 
 import java.io.IOException;
-import org.jaxen.JaxenException;
-import java.util.Set;
 
 import javax.servlet.ServletContext;
 
-import org.jdom2.JDOMException;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
 import org.mycore.frontend.xeditor.MCREditorSessionStore;
-import org.mycore.frontend.xeditor.MCREditorStep;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -42,16 +38,6 @@ public abstract class MCREditorTarget {
 
     public abstract void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter)
             throws Exception;
-
-    protected void setSubmittedValues(MCRServletJob job, MCREditorStep step) throws JDOMException, JaxenException {
-        for (String xPath : (Set<String>) (job.getRequest().getParameterMap().keySet())) {
-            if (xPath.startsWith("/")) {
-                String[] values = job.getRequest().getParameterValues(xPath);
-                step.setSubmittedValues(xPath, values);
-            }
-        }
-        step.emptyNotResubmittedNodes();
-    }
 
     protected void redirectToEditorPage(MCRServletJob job, MCREditorSession session) throws IOException {
         String url = job.getRequest().getHeader("referer");

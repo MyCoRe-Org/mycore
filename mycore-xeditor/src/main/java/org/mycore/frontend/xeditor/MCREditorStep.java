@@ -2,6 +2,7 @@ package org.mycore.frontend.xeditor;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -17,6 +18,8 @@ public class MCREditorStep implements Cloneable {
     private String label;
 
     private Document editedXML;
+
+    private Map<String, String[]> submittedValues;
 
     private Set<String> xPathsOfDisplayedFields = new HashSet<String>();
 
@@ -55,6 +58,20 @@ public class MCREditorStep implements Cloneable {
         String xPath = MCRXPathBuilder.buildXPath(node);
         LOGGER.debug("set value of " + xPath);
         xPathsOfDisplayedFields.remove(xPath);
+    }
+
+    public void setSubmittedValues(Map<String, String[]> values) throws JaxenException, JDOMException {
+        this.submittedValues = values;
+
+        for (String xPath : values.keySet())
+            if (xPath.startsWith("/"))
+                setSubmittedValues(xPath, values.get(xPath));
+
+        emptyNotResubmittedNodes();
+    }
+
+    public Map<String, String[]> getSubmittedValues() {
+        return submittedValues;
     }
 
     public void setSubmittedValues(String xPath, String[] values) throws JDOMException, JaxenException {
