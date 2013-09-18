@@ -46,42 +46,40 @@ public class MCRBinding {
 
     private final static Logger LOGGER = Logger.getLogger(MCRBinding.class);
 
-    protected XPathExpression<Object> xPath;
+    protected String name;
 
     protected List<Object> boundNodes = new ArrayList<Object>();
 
-    protected String name;
+    protected MCRBinding parent;
 
     protected List<MCRBinding> children = new ArrayList<MCRBinding>();
 
-    protected MCRBinding parent;
-
     public MCRBinding(Document document) throws JDOMException {
-        this.xPath = XPathFactory.instance().compile("/", Filters.fpassthrough(), null, MCRUsedNamespaces.getNamespaces());
         this.boundNodes.add(document);
     }
 
-    public MCRBinding(String xPathExpression, MCRBinding parent) throws JDOMException, JaxenException {
-        this(xPathExpression, null, null, parent);
+    public MCRBinding(String xPath, MCRBinding parent) throws JDOMException, JaxenException {
+        this(xPath, null, null, parent);
     }
 
-    public MCRBinding(String xPathExpression, String defaultValue, String name, MCRBinding parent) throws JDOMException, JaxenException {
-        if (!((name == null) || name.isEmpty()))
+    public MCRBinding(String xPath, String defaultValue, String name, MCRBinding parent) throws JDOMException, JaxenException {
+        if ((name != null) && !name.isEmpty())
             this.name = name;
 
         this.parent = parent;
         parent.children.add(this);
         Map<String, Object> variables = buildXPathVariables();
 
-        this.xPath = XPathFactory.instance().compile(xPathExpression, Filters.fpassthrough(), variables, MCRUsedNamespaces.getNamespaces());
+        XPathExpression<Object> xPathExpr = XPathFactory.instance().compile(xPath, Filters.fpassthrough(), variables,
+                MCRUsedNamespaces.getNamespaces());
 
-        boundNodes.addAll(xPath.evaluate(parent.getBoundNodes()));
+        boundNodes.addAll(xPathExpr.evaluate(parent.getBoundNodes()));
 
-        LOGGER.debug("Bind to " + xPathExpression + " selected " + boundNodes.size() + " node(s)");
+        LOGGER.debug("Bind to " + xPath + " selected " + boundNodes.size() + " node(s)");
 
         if (boundNodes.isEmpty()) {
-            Object built = MCRNodeBuilder.build(xPathExpression, defaultValue, variables, (Parent) (parent.getBoundNode()));
-            LOGGER.debug("Bind to " + xPathExpression + " generated node " + MCRXPathBuilder.buildXPath(built));
+            Object built = MCRNodeBuilder.build(xPath, defaultValue, variables, (Parent) (parent.getBoundNode()));
+            LOGGER.debug("Bind to " + xPath + " generated node " + MCRXPathBuilder.buildXPath(built));
             boundNodes.add(built);
         }
     }
@@ -90,12 +88,8 @@ public class MCRBinding {
         this.parent = parent;
         parent.children.add(this);
 
-        String xPathExpression = parent.getRelativeXPath() + "[" + pos + "]";
-        Map<String, Object> variables = buildXPathVariables();
-        this.xPath = XPathFactory.instance().compile(xPathExpression, Filters.fpassthrough(), variables, MCRUsedNamespaces.getNamespaces());
-
         boundNodes.add(parent.getBoundNodes().get(pos - 1));
-        LOGGER.debug("Repeater bind to " + xPathExpression + " selected " + boundNodes.size() + " node(s)");
+        LOGGER.debug("Repeater bind to child [" + pos + "]");
     }
 
     public List<Object> getBoundNodes() {
@@ -176,7 +170,6 @@ public class MCRBinding {
             ((Element) node).setText(value);
         else if (node instanceof Attribute)
             ((Attribute) node).setValue(value);
-        System.out.println("binding setvalue " + MCRXPathBuilder.buildXPath(node) + " " + value);
     }
 
     public String getName() {
@@ -197,10 +190,6 @@ public class MCRBinding {
             }
         }
         return variables;
-    }
-
-    public String getRelativeXPath() {
-        return xPath.getExpression();
     }
 
     public String getAbsoluteXPath() {
