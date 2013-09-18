@@ -41,8 +41,14 @@ public class MCRXEditorServlet extends MCRServlet {
 
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {
-        String xEditorSessionID = job.getRequest().getParameter(MCREditorSessionStore.XEDITOR_SESSION_PARAM);
-        MCREditorSession session = MCREditorSessionStoreFactory.getSessionStore().getSession(xEditorSessionID);
+        String xEditorStepID = job.getRequest().getParameter(MCREditorSessionStore.XEDITOR_SESSION_PARAM);
+        
+        String sessionID = xEditorStepID.split("-")[0];
+        MCREditorSession session = MCREditorSessionStoreFactory.getSessionStore().getSession(sessionID);
+        
+        int stepNr = Integer.parseInt( xEditorStepID.split("-")[1] );
+        session.startNextStepFrom( stepNr );
+        
         sendToTarget(job, session);
     }
 

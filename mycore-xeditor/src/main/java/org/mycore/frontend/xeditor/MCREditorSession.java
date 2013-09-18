@@ -25,21 +25,17 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import org.jaxen.JaxenException;
+
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
-import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 import org.xml.sax.SAXException;
 
@@ -54,19 +50,15 @@ public class MCREditorSession {
 
     private Map<String, String[]> requestParameters;
 
-    private Document editedXML;
-
-    private Set<String> xPathsOfDisplayedFields = new HashSet<String>();
-
-    private String sourceURI;
-
     private String cancelURL;
 
     private String postProcessorXSL;
 
-    private MCRXEditorValidator validator = new MCRXEditorValidator();
+    private List<MCREditorStep> steps = new ArrayList<MCREditorStep>();
 
-    private MCRXMLCleaner cleaner;
+    private MCRXMLCleaner cleaner = new MCRXMLCleaner();
+
+    private MCRXEditorValidator validator = new MCRXEditorValidator();
 
     public MCREditorSession(Map<String, String[]> requestParameters) {
         this.requestParameters = requestParameters;
@@ -84,47 +76,6 @@ public class MCREditorSession {
         return id;
     }
 
-    public void setEditedXML(Document xml) throws JDOMException {
-        if (editedXML == null) {
-            editedXML = xml;
-            MCRUsedNamespaces.addNamespacesFrom(editedXML.getRootElement());
-            cleaner = new MCRXMLCleaner(editedXML);
-        }
-    }
-
-    public void setEditedXML(String uri) throws JDOMException, IOException, SAXException, TransformerException {
-        if (editedXML == null) {
-            LOGGER.info(id + " reading edited XML from " + uri);
-            sourceURI = uri;
-            setEditedXML(MCRSourceContent.getInstance(uri).asXML());
-        }
-    }
-
-    public Document getEditedXML() {
-        return editedXML;
-    }
-
-    public void setPostProcessorXSL(String stylesheet) {
-        this.postProcessorXSL = stylesheet;
-    }
-
-    public Document getPostProcessedXML() throws IOException, JDOMException, SAXException {
-        if (postProcessorXSL == null)
-            return editedXML;
-
-        MCRContent source = new MCRJDOMContent(editedXML);
-        MCRContent transformed = MCRXSL2XMLTransformer.getInstance("xsl/" + postProcessorXSL).transform(source);
-        return transformed.asXML();
-    }
-
-    public MCRXMLCleaner getXMLCleaner() {
-        return cleaner;
-    }
-
-    public String getSourceURI() {
-        return sourceURI;
-    }
-
     public Map<String, String[]> getRequestParameters() {
         return requestParameters;
     }
@@ -140,46 +91,49 @@ public class MCREditorSession {
         }
     }
 
-    public void markAsTransformedToInputField(Object node) {
-        String xPath = MCRXPathBuilder.buildXPath(node);
-        LOGGER.debug(id + " uses " + xPath);
-        xPathsOfDisplayedFields.add(xPath);
+    public void setPostProcessorXSL(String stylesheet) {
+        this.postProcessorXSL = stylesheet;
     }
 
-    private void markAsResubmittedFromInputField(Object node) {
-        String xPath = MCRXPathBuilder.buildXPath(node);
-        LOGGER.debug(id + " set value of " + xPath);
-        xPathsOfDisplayedFields.remove(xPath);
+    public Document getPostProcessedXML() throws IOException, JDOMException, SAXException {
+        if (postProcessorXSL == null)
+            return getCurrentStep().getDocument();
+
+        MCRContent source = new MCRJDOMContent(getCurrentStep().getDocument());
+        MCRContent transformed = MCRXSL2XMLTransformer.getInstance("xsl/" + postProcessorXSL).transform(source);
+        return transformed.asXML();
     }
 
-    public void setSubmittedValues(String xPath, String[] values) throws JDOMException, JaxenException {
-        MCRBinding rootBinding = new MCRBinding(editedXML);
-        MCRBinding binding = new MCRBinding(xPath, rootBinding);
-        List<Object> boundNodes = binding.getBoundNodes();
+    public void setInitialStep(MCREditorStep step) {
+        steps.clear();
+        steps.add(step);
+    }
 
-        while (boundNodes.size() < values.length) {
-            Element newElement = binding.cloneBoundElement(boundNodes.size() - 1);
-            markAsTransformedToInputField(newElement);
+    public MCREditorStep getCurrentStep() {
+        return steps.isEmpty() ? null : steps.get(steps.size() - 1);
+    }
+
+    public String getCombinedSessionStepID() {
+        return id + "-" + steps.size();
+    }
+
+    public List<MCREditorStep> getSteps() {
+        return steps;
+    }
+
+    public MCREditorStep startNextStepFrom(int stepID) {
+        if (stepID < steps.size()) {
+            LOGGER.info("Detected resubmission of old editor step, going back in time now...");
+            steps = steps.subList(0, stepID); // Forget all following steps
         }
-
-        for (int i = 0; i < values.length; i++) {
-            String value = values[i] == null ? "" : values[i].trim();
-            binding.setValue(i, value);
-            if (!value.isEmpty())
-                markAsResubmittedFromInputField(boundNodes.get(i));
-        }
+        Document editedXML = getCurrentStep().getDocument();
+        MCREditorStep nextStep = new MCREditorStep(editedXML.clone());
+        steps.add(nextStep);
+        return nextStep;
     }
 
-    public void removeDeletedNodes() throws JDOMException, JaxenException {
-        MCRBinding root = new MCRBinding(editedXML);
-        for (String xPath : xPathsOfDisplayedFields)
-            new MCRBinding(xPath, root).detachBoundNodes();
-
-        forgetDisplayedFields();
-    }
-
-    public void forgetDisplayedFields() {
-        xPathsOfDisplayedFields.clear();
+    public MCRXMLCleaner getXMLCleaner() {
+        return cleaner;
     }
 
     public MCRXEditorValidator getValidator() {
@@ -187,7 +141,7 @@ public class MCREditorSession {
     }
 
     public MCRXEditorValidator validate() throws JDOMException, JaxenException {
-        validator.validate(editedXML);
+        validator.validate(getCurrentStep().getDocument());
         return validator;
     }
 }

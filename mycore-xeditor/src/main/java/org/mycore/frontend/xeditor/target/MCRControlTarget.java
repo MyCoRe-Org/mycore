@@ -10,8 +10,8 @@ import org.mycore.frontend.xeditor.MCRRepeatBinding;
 public abstract class MCRControlTarget extends MCREditorTarget {
 
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter) throws Exception {
-        setSubmittedValues(job, session);
-        session.forgetDisplayedFields();
+        setSubmittedValues(job, session.getCurrentStep());
+        session.getCurrentStep().forgetDisplayedFields();
         session.getValidator().forgetInvalidFields();
         handleControlParameter(session, parameter);
         redirectToEditorPage(job, session);
@@ -23,8 +23,7 @@ public abstract class MCRControlTarget extends MCREditorTarget {
         String repeatXPath = MCRRepeatBinding.decode(tokens[1]);
         int pos = Integer.parseInt(tokens[2]);
 
-        MCRBinding rootBinding = new MCRBinding(session.getEditedXML());
-        MCRBinding baseBinding = new MCRBinding(baseXPath, rootBinding);
+        MCRBinding baseBinding = session.getCurrentStep().bind(baseXPath);
         MCRRepeatBinding repeatBinding = new MCRRepeatBinding(repeatXPath, baseBinding);
 
         handleControl(repeatBinding, pos);

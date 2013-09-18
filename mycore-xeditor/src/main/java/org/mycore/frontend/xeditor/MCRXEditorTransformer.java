@@ -26,11 +26,7 @@ package org.mycore.frontend.xeditor;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import org.jaxen.BaseXPath;
 import org.jaxen.JaxenException;
-import org.jaxen.dom.DocumentNavigator;
-import org.jaxen.expr.LocationPath;
-import org.jaxen.expr.NameStep;
 
 import java.util.List;
 import java.util.Map;
@@ -48,8 +44,6 @@ import org.apache.xalan.extensions.ExpressionContext;
 import org.apache.xpath.NodeSet;
 import org.apache.xpath.objects.XNodeSet;
 import org.apache.xpath.objects.XNodeSetForDOM;
-import org.jdom2.Document;
-import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
@@ -94,8 +88,8 @@ public class MCRXEditorTransformer {
         return MCRXEditorTransformerStore.getAndRemoveTransformer(key);
     }
 
-    public String getEditorSessionID() {
-        return editorSession.getID();
+    public String getCombinedSessionStepID() {
+        return editorSession.getCombinedSessionStepID();
     }
 
     public void addNamespace(String prefix, String uri) {
@@ -104,8 +98,8 @@ public class MCRXEditorTransformer {
 
     public void readSourceXML(String uri) throws JDOMException, IOException, SAXException, TransformerException {
         uri = replaceParameters(uri);
-        if (!uri.contains("{"))
-            editorSession.setEditedXML(uri);
+        if ((!uri.contains("{")) && (editorSession.getCurrentStep() == null))
+            editorSession.setInitialStep(MCREditorStep.loadFromURI(uri));
     }
 
     public void setCancelURL(String url) throws JDOMException, IOException, SAXException, TransformerException {
@@ -119,25 +113,13 @@ public class MCRXEditorTransformer {
     }
 
     public void bind(String xPath, String defaultValue, String name) throws JDOMException, JaxenException {
-        if (editorSession.getEditedXML() == null)
-            createEmptyDocument(xPath);
+        if (editorSession.getCurrentStep() == null)
+            editorSession.setInitialStep(MCREditorStep.createFromXPath(xPath));
 
         if (currentBinding == null)
-            currentBinding = new MCRBinding(editorSession.getEditedXML());
+            currentBinding = editorSession.getCurrentStep().getRootBinding();
 
         currentBinding = new MCRBinding(xPath, defaultValue, name, currentBinding);
-    }
-
-    private void createEmptyDocument(String xPath) throws JaxenException, JDOMException {
-        BaseXPath baseXPath = new BaseXPath(xPath, new DocumentNavigator());
-        LocationPath lp = (LocationPath) (baseXPath.getRootExpr());
-        NameStep nameStep = (NameStep) (lp.getSteps().get(0));
-        String name = nameStep.getLocalName();
-        String prefix = nameStep.getPrefix();
-        Namespace ns = prefix.isEmpty() ? Namespace.NO_NAMESPACE : MCRUsedNamespaces.getNamespace(prefix);
-        Element root = new Element(name, ns);
-        Document editedXML = new Document(root);
-        editorSession.setEditedXML(editedXML);
     }
 
     public void unbind() {
@@ -164,7 +146,7 @@ public class MCRXEditorTransformer {
 
     private void markAsUsed() {
         for (Object node : currentBinding.getBoundNodes()) {
-            editorSession.markAsTransformedToInputField(node);
+            editorSession.getCurrentStep().markAsTransformedToInputField(node);
         }
     }
 
@@ -260,8 +242,7 @@ public class MCRXEditorTransformer {
             xPathVariables.putAll(transformationParameters.getParameterMap());
             XPathFactory factory = XPathFactory.instance();
             List<Namespace> namespaces = MCRUsedNamespaces.getNamespaces();
-            XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), xPathVariables,
-                namespaces);
+            XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), xPathVariables, namespaces);
             return xPath.evaluateFirst(currentBinding.getBoundNodes()).toString();
         } catch (Exception ex) {
             LOGGER.warn("unable to evaluate XPath: " + xPathExpression);
@@ -270,8 +251,7 @@ public class MCRXEditorTransformer {
         }
     }
 
-    public XNodeSet getRequestParameters(ExpressionContext context) throws ParserConfigurationException,
-        TransformerException {
+    public XNodeSet getRequestParameters(ExpressionContext context) throws ParserConfigurationException, TransformerException {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         org.w3c.dom.Document doc = builder.newDocument();
         NodeSet ns = new NodeSet();
@@ -290,11 +270,6 @@ public class MCRXEditorTransformer {
     }
 
     public void addCleanupRule(String xPath, String relevantIf) {
-        MCRXMLCleaner xmlCleaner = editorSession.getXMLCleaner();
-        if (xmlCleaner == null) {
-            LOGGER.warn("Could not get MCRXMLCleaner instance to add rule: " + xPath + '[' + relevantIf + ']');
-            return;
-        }
-        xmlCleaner.addRule(xPath, relevantIf);
+        editorSession.getXMLCleaner().addRule(xPath, relevantIf);
     }
 }

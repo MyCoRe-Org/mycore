@@ -30,6 +30,7 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
+import org.mycore.frontend.xeditor.MCREditorStep;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -38,15 +39,16 @@ public class MCRLayoutServiceTarget extends MCREditorTarget {
 
     @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String style) throws Exception {
-        setSubmittedValues(job, session);
+        MCREditorStep step = session.getCurrentStep();
+        setSubmittedValues(job, step);
 
         if (session.validate().failed()) {
             redirectToEditorPage(job, session);
             return;
         }
 
-        session.removeDeletedNodes();
-        session.getXMLCleaner().clean();
+        step.removeDeletedNodes();
+        session.getXMLCleaner().clean(step.getDocument());
 
         if ((style != null) && (!style.isEmpty()))
             job.getRequest().setAttribute("XSL.Style", style);

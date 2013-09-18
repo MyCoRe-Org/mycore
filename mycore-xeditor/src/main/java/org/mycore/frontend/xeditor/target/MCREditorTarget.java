@@ -33,6 +33,7 @@ import org.jdom2.JDOMException;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
 import org.mycore.frontend.xeditor.MCREditorSessionStore;
+import org.mycore.frontend.xeditor.MCREditorStep;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -42,11 +43,11 @@ public abstract class MCREditorTarget {
     public abstract void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter)
             throws Exception;
 
-    protected void setSubmittedValues(MCRServletJob job, MCREditorSession session) throws JDOMException, JaxenException {
+    protected void setSubmittedValues(MCRServletJob job, MCREditorStep step) throws JDOMException, JaxenException {
         for (String xPath : (Set<String>) (job.getRequest().getParameterMap().keySet())) {
             if (xPath.startsWith("/")) {
                 String[] values = job.getRequest().getParameterValues(xPath);
-                session.setSubmittedValues(xPath, values);
+                step.setSubmittedValues(xPath, values);
             }
         }
     }

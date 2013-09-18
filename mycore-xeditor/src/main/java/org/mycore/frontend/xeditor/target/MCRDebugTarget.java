@@ -33,10 +33,9 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRSourceContent;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
+import org.mycore.frontend.xeditor.MCREditorStep;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -49,28 +48,25 @@ public class MCRDebugTarget extends MCREditorTarget {
         PrintWriter out = job.getResponse().getWriter();
         out.println("<html><body>");
 
-        if (session.getSourceURI() != null) {
-            out.println("<h3>When loading from source URI:</h3>");
-            MCRContent source = MCRSourceContent.getInstance(session.getSourceURI());
-            outputXML(source.asXML(), out);
+        for (int i = 0; i < session.getSteps().size(); i++) {
+            out.println("<h3>Step " + (i + 1) + ":</h3>");
+            outputXML(session.getSteps().get(i).getDocument(), out);
         }
-
-        out.println("<h3>After form transformation, before submit:</h3>");
-        outputXML(session.getEditedXML(), out);
 
         out.println("<h3>Submitted parameters:</h3>");
         outputParameters(job, out);
 
-        setSubmittedValues(job, session);
-        session.removeDeletedNodes();
+        MCREditorStep step = session.getCurrentStep();
+        setSubmittedValues(job, step);
+        step.removeDeletedNodes();
 
-        out.println("<h3>After submit:</h3>");
-        outputXML(session.getEditedXML(), out);
+        out.println("<h3>After applying submitted values:</h3>");
+        outputXML(step.getDocument(), out);
 
-        session.getXMLCleaner().clean();
-        
+        session.getXMLCleaner().clean(step.getDocument());
+
         out.println("<h3>After cleanup:</h3>");
-        outputXML(session.getEditedXML(), out);
+        outputXML(step.getDocument(), out);
 
         out.println("<h3>After postprocessing:</h3>");
         outputXML(session.getPostProcessedXML(), out);

@@ -28,6 +28,7 @@ import javax.servlet.ServletContext;
 
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
+import org.mycore.frontend.xeditor.MCREditorStep;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -37,15 +38,16 @@ public class MCRServletTarget extends MCREditorTarget {
     @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String servletNameOrPath)
             throws Exception {
-        setSubmittedValues(job, session);
+        MCREditorStep step = session.getCurrentStep();
+        setSubmittedValues(job, step);
 
         if (session.validate().failed()) {
             redirectToEditorPage(job, session);
             return;
         }
 
-        session.removeDeletedNodes();
-        session.getXMLCleaner().clean();
+        step.removeDeletedNodes();
+        session.getXMLCleaner().clean(step.getDocument());
 
         RequestDispatcher dispatcher = context.getNamedDispatcher(servletNameOrPath);
         if (dispatcher == null)

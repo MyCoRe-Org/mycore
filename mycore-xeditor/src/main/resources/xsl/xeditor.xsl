@@ -29,9 +29,9 @@
       <xsl:attribute name="action">
         <xsl:value-of select="concat($ServletsBaseURL,'XEditor')" />
       </xsl:attribute>
-      <input type="hidden" name="_xed_session" value="{transformer:getEditorSessionID($transformer)}" />
       <xsl:call-template name="passRequestParameters" />
       <xsl:apply-templates select="node()" mode="xeditor" />
+      <input type="hidden" name="_xed_session" value="{transformer:getCombinedSessionStepID($transformer)}" />
     </form>
   </xsl:template>
 
