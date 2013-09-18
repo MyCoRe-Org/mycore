@@ -69,14 +69,13 @@ public class MCREditorStep implements Cloneable {
         for (int i = 0; i < values.length; i++) {
             String value = values[i] == null ? "" : values[i].trim();
             binding.setValue(i, value);
-            if (!value.isEmpty())
-                markAsResubmittedFromInputField(boundNodes.get(i));
+            markAsResubmittedFromInputField(boundNodes.get(i));
         }
     }
 
-    public void removeDeletedNodes() throws JDOMException, JaxenException {
+    public void emptyNotResubmittedNodes() throws JDOMException, JaxenException {
         for (String xPath : xPathsOfDisplayedFields)
-            bind(xPath).detachBoundNodes();
+            bind(xPath).setValue("");
     }
 
     public void forgetDisplayedFields() {

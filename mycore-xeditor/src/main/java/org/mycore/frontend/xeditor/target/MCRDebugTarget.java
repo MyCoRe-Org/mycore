@@ -53,7 +53,7 @@ public class MCRDebugTarget extends MCREditorTarget {
         session.startNextStep();
         session.getCurrentStep().setLabel("After applying submitted values");
         setSubmittedValues(job, session.getCurrentStep());
-        session.getCurrentStep().removeDeletedNodes();
+        session.getCurrentStep().emptyNotResubmittedNodes();
 
         session.startNextStep();
         session.getCurrentStep().setLabel("After cleanup");

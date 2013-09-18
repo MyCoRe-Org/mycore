@@ -58,10 +58,10 @@ public class MCREditorStepTest {
         step.setSubmittedValues("/document/title", new String[] { "Title" });
         step.setSubmittedValues("/document/author/@firstName", new String[] { "Jim" });
         step.setSubmittedValues("/document/category", new String[] { "a", "", "c", "d" });
-        step.removeDeletedNodes();
+        step.emptyNotResubmittedNodes();
 
         // Test result against expected
-        template = "document[title='Title'][author/@firstName='Jim'][category='a'][category='c'][category='d']";
+        template = "document[title='Title'][author[@firstName='Jim'][@lastName='']][category='a'][category=''][category='c'][category='d']";
         Document expected = xPath2Document(template);
         assertTrue(MCRXMLHelper.deepEqual(expected, step.getDocument()));
     }

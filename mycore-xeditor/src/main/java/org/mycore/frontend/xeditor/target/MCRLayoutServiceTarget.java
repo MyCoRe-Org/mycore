@@ -47,7 +47,7 @@ public class MCRLayoutServiceTarget extends MCREditorTarget {
             return;
         }
 
-        step.removeDeletedNodes();
+        step.emptyNotResubmittedNodes();
         session.getXMLCleaner().clean(step.getDocument());
 
         if ((style != null) && (!style.isEmpty()))

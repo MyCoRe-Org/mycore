@@ -128,8 +128,10 @@ public class MCRXEditorTransformer {
         if (editorSession.getCurrentStep() == null)
             createInitialStepFromXPath(xPath);
 
-        if (currentBinding == null)
+        if (currentBinding == null) {
+            editorSession.startNextStep().setLabel("After transformation to HTML form");
             currentBinding = editorSession.getCurrentStep().getRootBinding();
+        }
 
         currentBinding = new MCRBinding(xPath, defaultValue, name, currentBinding);
     }
