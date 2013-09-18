@@ -30,7 +30,6 @@ import java.io.UnsupportedEncodingException;
 
 import org.jaxen.JaxenException;
 import org.jdom2.Document;
-import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -44,7 +43,7 @@ public class MCREditorStepTest {
     public void testResubmittingEditedValues() throws JaxenException, JDOMException, UnsupportedEncodingException, IOException {
         // Simulate reading source XML
         String template = "document[title='Titel'][author[@firstName='John'][@lastName='Doe']][category='a'][category='b'][category='c']";
-        MCREditorStep step = new MCREditorStep(xPath2Document(template));
+        MCREditorStep step = new MCREditorStep(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
 
         // Simulate transformation to input fields
         step.markAsTransformedToInputField(step.bind("/document/title").getBoundNode());
@@ -62,12 +61,7 @@ public class MCREditorStepTest {
 
         // Test result against expected
         template = "document[title='Title'][author[@firstName='Jim'][@lastName='']][category='a'][category=''][category='c'][category='d']";
-        Document expected = xPath2Document(template);
+        Document expected = new Document(new MCRNodeBuilder().buildElement(template, null, null));
         assertTrue(MCRXMLHelper.deepEqual(expected, step.getDocument()));
-    }
-
-    private Document xPath2Document(String xPath) throws JaxenException {
-        Element root = (Element) (MCRNodeBuilder.build(xPath, null, null, null));
-        return new Document(root);
     }
 }

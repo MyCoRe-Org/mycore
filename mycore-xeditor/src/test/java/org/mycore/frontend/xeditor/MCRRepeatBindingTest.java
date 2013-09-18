@@ -41,8 +41,7 @@ public class MCRRepeatBindingTest extends MCRTestCase {
 
     @Test
     public void testRepeatBindingWithComplexPredicate() throws JaxenException, JDOMException {
-        Element template = (Element) (MCRNodeBuilder.build("conditions[condition/@type='bingo'][condition[2]/@type='bongo']", null, null,
-                null));
+        Element template = new MCRNodeBuilder().buildElement("conditions[condition/@type='bingo'][condition[2]/@type='bongo']", null, null);
         Document doc = new Document(template);
         MCRBinding root = new MCRBinding(doc);
         MCRBinding conditions = new MCRBinding("conditions", root);
@@ -64,23 +63,23 @@ public class MCRRepeatBindingTest extends MCRTestCase {
         assertEquals(1, binding.getBoundNodes().size());
         assertEquals("/conditions/condition[5]", binding.getAbsoluteXPath());
         ((Element) (binding.getBoundNode())).setAttribute("value", "c");
-        
+
         repeat.up(2);
         assertEquals("b", ((Element) (repeat.getBoundNodes().get(0))).getAttributeValue("value"));
-        assertEquals("b", doc.getRootElement().getChildren().get(2).getAttributeValue("value") );
+        assertEquals("b", doc.getRootElement().getChildren().get(2).getAttributeValue("value"));
 
         repeat.down(2);
         assertEquals("a", ((Element) (repeat.getBoundNodes().get(2))).getAttributeValue("value"));
-        assertEquals("a", doc.getRootElement().getChildren().get(4).getAttributeValue("value") );
-        
+        assertEquals("a", doc.getRootElement().getChildren().get(4).getAttributeValue("value"));
+
         repeat.remove(1);
         assertEquals(2, repeat.getBoundNodes().size());
         assertEquals("c", ((Element) (repeat.getBoundNodes().get(0))).getAttributeValue("value"));
         assertEquals("a", ((Element) (repeat.getBoundNodes().get(1))).getAttributeValue("value"));
-        assertEquals( 4, doc.getRootElement().getChildren().size() );
-        
+        assertEquals(4, doc.getRootElement().getChildren().size());
+
         repeat.cloneBoundElement(0);
-        assertEquals( 5, doc.getRootElement().getChildren().size() );
+        assertEquals(5, doc.getRootElement().getChildren().size());
         assertEquals("c", ((Element) (repeat.getBoundNodes().get(0))).getAttributeValue("value"));
         assertEquals("c", ((Element) (repeat.getBoundNodes().get(1))).getAttributeValue("value"));
         assertEquals("a", ((Element) (repeat.getBoundNodes().get(2))).getAttributeValue("value"));

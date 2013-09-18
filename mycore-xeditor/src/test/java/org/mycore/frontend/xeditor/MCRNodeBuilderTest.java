@@ -41,18 +41,18 @@ public class MCRNodeBuilderTest {
 
     @Test
     public void testBuildingElements() throws JaxenException, JDOMException {
-        Element built = (Element) (MCRNodeBuilder.build("element", null, null, null));
+        Element built = new MCRNodeBuilder().buildElement("element", null, null);
         assertNotNull(built);
         assertEquals("element", built.getName());
         assertTrue(built.getText().isEmpty());
 
-        built = (Element) (MCRNodeBuilder.build("element", "text", null, null));
+        built = new MCRNodeBuilder().buildElement("element", "text", null);
         assertNotNull(built);
         assertEquals("element", built.getName());
         assertEquals("text", built.getText());
 
         Element root = new Element("root");
-        built = (Element) (MCRNodeBuilder.build("element", null, null, root));
+        built = new MCRNodeBuilder().buildElement("element", null, root);
         assertNotNull(built);
         assertEquals("element", built.getName());
         assertNotNull(built.getParentElement());
@@ -61,18 +61,18 @@ public class MCRNodeBuilderTest {
 
     @Test
     public void testBuildingAttributes() throws JaxenException, JDOMException {
-        Attribute built = (Attribute) (MCRNodeBuilder.build("@attribute", null, null, null));
+        Attribute built = new MCRNodeBuilder().buildAttribute("@attribute", null, null);
         assertNotNull(built);
         assertEquals("attribute", built.getName());
         assertTrue(built.getValue().isEmpty());
 
-        built = (Attribute) (MCRNodeBuilder.build("@attribute", "value", null, null));
+        built = new MCRNodeBuilder().buildAttribute("@attribute", "value", null);
         assertNotNull(built);
         assertEquals("attribute", built.getName());
         assertEquals("value", built.getValue());
 
         Element parent = new Element("parent");
-        built = (Attribute) (MCRNodeBuilder.build("@attribute", null, null, parent));
+        built = new MCRNodeBuilder().buildAttribute("@attribute", null, parent);
         assertNotNull(built);
         assertEquals("attribute", built.getName());
         assertNotNull(built.getParent());
@@ -81,22 +81,22 @@ public class MCRNodeBuilderTest {
 
     @Test
     public void testBuildingValues() throws JaxenException, JDOMException {
-        Attribute built = (Attribute) (MCRNodeBuilder.build("@attribute='A \"test\"'", "ignore", null, null));
+        Attribute built = new MCRNodeBuilder().buildAttribute("@attribute='A \"test\"'", "ignore", null);
         assertNotNull(built);
         assertEquals("attribute", built.getName());
         assertEquals("A \"test\"", built.getValue());
 
-        built = (Attribute) (MCRNodeBuilder.build("@attribute=\"O'Brian\"", null, null, null));
+        built = new MCRNodeBuilder().buildAttribute("@attribute=\"O'Brian\"", null, null);
         assertNotNull(built);
         assertEquals("attribute", built.getName());
         assertEquals("O'Brian", built.getValue());
 
-        built = (Attribute) (MCRNodeBuilder.build("@mime=\"text/plain\"", null, null, null));
+        built = new MCRNodeBuilder().buildAttribute("@mime=\"text/plain\"", null, null);
         assertNotNull(built);
         assertEquals("mime", built.getName());
         assertEquals("text/plain", built.getValue());
 
-        Element element = (Element) (MCRNodeBuilder.build("name=\"O'Brian\"", null, null, null));
+        Element element = new MCRNodeBuilder().buildElement("name=\"O'Brian\"", null, null);
         assertNotNull(element);
         assertEquals("name", element.getName());
         assertEquals("O'Brian", element.getText());
@@ -105,7 +105,7 @@ public class MCRNodeBuilderTest {
     @Test
     public void testBuildingTrees() throws JaxenException, JDOMException {
         Element root = new Element("root");
-        Attribute built = (Attribute) (MCRNodeBuilder.build("parent/child/@attribute", null, null, root));
+        Attribute built = new MCRNodeBuilder().buildAttribute("parent/child/@attribute", null, root);
         assertNotNull(built);
         assertEquals("attribute", built.getName());
         assertNotNull(built.getParent());
@@ -118,18 +118,18 @@ public class MCRNodeBuilderTest {
 
     @Test
     public void testSimplePredicates() throws JaxenException, JDOMException {
-        Element built = (Element) (MCRNodeBuilder.build("element[child]", null, null, null));
+        Element built = new MCRNodeBuilder().buildElement("element[child]", null, null);
         assertNotNull(built);
         assertEquals("element", built.getName());
         assertNotNull(built.getChild("child"));
 
-        built = (Element) (MCRNodeBuilder.build("element[child/grandchild]", null, null, null));
+        built = new MCRNodeBuilder().buildElement("element[child/grandchild]", null, null);
         assertNotNull(built);
         assertEquals("element", built.getName());
         assertNotNull(built.getChild("child"));
         assertNotNull(built.getChild("child").getChild("grandchild"));
 
-        built = (Element) (MCRNodeBuilder.build("parent[child1]/child2", null, null, null));
+        built = new MCRNodeBuilder().buildElement("parent[child1]/child2", null, null);
         assertNotNull(built);
         assertEquals("child2", built.getName());
         assertNotNull(built.getParentElement());
@@ -139,8 +139,8 @@ public class MCRNodeBuilderTest {
 
     @Test
     public void testPredicatesWithValues() throws JaxenException, JDOMException {
-        Element built = (Element) (MCRNodeBuilder.build("contributor[role/roleTerm[@type='code'][@authority='ude']='author']", null, null,
-                null));
+        Element built = new MCRNodeBuilder()
+                .buildElement("contributor[role/roleTerm[@type='code'][@authority='ude']='author']", null, null);
         assertNotNull(built);
         assertEquals("contributor", built.getName());
         assertNotNull(built.getChild("role"));
@@ -151,7 +151,7 @@ public class MCRNodeBuilderTest {
 
     @Test
     public void testMultiplePredicates() throws JaxenException, JDOMException {
-        Element built = (Element) (MCRNodeBuilder.build("element[child1][child2]", null, null, null));
+        Element built = new MCRNodeBuilder().buildElement("element[child1][child2]", null, null);
         assertNotNull(built);
         assertEquals("element", built.getName());
         assertNotNull(built.getChild("child1"));
@@ -161,7 +161,7 @@ public class MCRNodeBuilderTest {
 
     @Test
     public void testNestedPredicates() throws JaxenException, JDOMException {
-        Element built = (Element) (MCRNodeBuilder.build("element[child[grandchild1]/grandchild2]", null, null, null));
+        Element built = new MCRNodeBuilder().buildElement("element[child[grandchild1]/grandchild2]", null, null);
         assertNotNull(built);
         assertEquals("element", built.getName());
         assertNotNull(built.getChild("child"));
@@ -172,23 +172,23 @@ public class MCRNodeBuilderTest {
 
     @Test
     public void testExpressionsToIgnore() throws JaxenException, JDOMException {
-        Element built = (Element) (MCRNodeBuilder.build("element[2]", null, null, null));
+        Element built = new MCRNodeBuilder().buildElement("element[2]", null, null);
         assertNotNull(built);
         assertEquals("element", built.getName());
 
-        built = (Element) (MCRNodeBuilder.build("element[contains(.,'foo')]", null, null, null));
+        built = new MCRNodeBuilder().buildElement("element[contains(.,'foo')]", null, null);
         assertNotNull(built);
         assertEquals("element", built.getName());
 
-        built = (Element) (MCRNodeBuilder.build("foo|bar", null, null, null));
+        built = new MCRNodeBuilder().buildElement("foo|bar", null, null);
         assertNull(built);
 
-        Attribute attribute = (Attribute) (MCRNodeBuilder.build("@lang[preceding::*/foo='bar']", "value", null, null));
+        Attribute attribute = new MCRNodeBuilder().buildAttribute("@lang[preceding::*/foo='bar']", "value", null);
         assertNotNull(attribute);
         assertEquals("lang", attribute.getName());
         assertEquals("value", attribute.getValue());
 
-        built = (Element) (MCRNodeBuilder.build("parent/child/following::node/foo='bar'", null, null, null));
+        built = new MCRNodeBuilder().buildElement("parent/child/following::node/foo='bar'", null, null);
         assertNotNull(built);
         assertEquals("child", built.getName());
         assertNotNull(built.getParentElement());
@@ -199,36 +199,36 @@ public class MCRNodeBuilderTest {
 
     @Test
     public void testAlreadyExisting() throws JaxenException, JDOMException {
-        Element existingChild = (Element) (MCRNodeBuilder.build("parent/child", null, null, null));
+        Element existingChild = new MCRNodeBuilder().buildElement("parent/child", null, null);
         Element existingParent = existingChild.getParentElement();
-        assertEquals(existingChild, MCRNodeBuilder.build("child", null, null, existingParent));
+        assertEquals(existingChild, new MCRNodeBuilder().buildNode("child", null, existingParent));
 
-        Attribute existingAttribute = (Attribute) (MCRNodeBuilder.build("parent/@attribute", null, null, null));
+        Attribute existingAttribute = new MCRNodeBuilder().buildAttribute("parent/@attribute", null, null);
         existingParent = existingAttribute.getParent();
-        Attribute resolvedAttribute = (Attribute) (MCRNodeBuilder.build("@attribute", null, null, existingParent));
+        Attribute resolvedAttribute = new MCRNodeBuilder().buildAttribute("@attribute", null, existingParent);
         assertEquals(existingAttribute, resolvedAttribute);
         assertEquals(existingParent, resolvedAttribute.getParent());
 
-        Element child = (Element) (MCRNodeBuilder.build("root/parent/child", null, null, null));
+        Element child = new MCRNodeBuilder().buildElement("root/parent/child", null, null);
         Element root = child.getParentElement().getParentElement();
-        Attribute attribute = (Attribute) (MCRNodeBuilder.build("parent/child/@attribute", null, null, root));
+        Attribute attribute = new MCRNodeBuilder().buildAttribute("parent/child/@attribute", null, root);
         assertEquals(child, attribute.getParent());
-        Element foo = (Element) (MCRNodeBuilder.build("parent[child]/foo", null, null, root));
+        Element foo = new MCRNodeBuilder().buildElement("parent[child]/foo", null, root);
         assertEquals(child, foo.getParentElement().getChild("child"));
 
-        Element parentWithChildValueX = (Element) (MCRNodeBuilder.build("parent[child='X']", null, null, root));
+        Element parentWithChildValueX = new MCRNodeBuilder().buildElement("parent[child='X']", null, root);
         assertNotSame(child.getParentElement(), parentWithChildValueX);
-        Element resolved = (Element) (MCRNodeBuilder.build("parent[child='X']", null, null, root));
+        Element resolved = new MCRNodeBuilder().buildElement("parent[child='X']", null, root);
         assertEquals(parentWithChildValueX, resolved);
 
-        child = (Element) (MCRNodeBuilder.build("parent/child='X'", null, null, root));
+        child = new MCRNodeBuilder().buildElement("parent/child='X'", null, root);
         assertNotNull(child);
         assertEquals(parentWithChildValueX.getChild("child"), child);
     }
 
     @Test
     public void testNamespaces() throws JaxenException, JDOMException {
-        Element role = (Element) (MCRNodeBuilder.build("mods:name[@xlink:href='id']/mods:role[@type='creator']", null, null, null));
+        Element role = new MCRNodeBuilder().buildElement("mods:name[@xlink:href='id']/mods:role[@type='creator']", null, null);
         assertEquals("role", role.getName());
         assertEquals(MCRConstants.MODS_NAMESPACE, role.getNamespace());
         assertEquals("creator", role.getAttributeValue("type"));
@@ -238,14 +238,14 @@ public class MCRNodeBuilderTest {
     @Test
     public void testAssigningValueToLastGenreatedNode() throws JaxenException, JDOMException {
         String value = "value";
-        Element generated = (Element) (MCRNodeBuilder.build("titleInfo/title", value, null, null));
+        Element generated = new MCRNodeBuilder().buildElement("titleInfo/title", value, null);
         assertEquals(value, generated.getText());
         assertNotEquals(value, generated.getParentElement().getText());
     }
 
     @Test
     public void testBuildingNodeName() throws JaxenException, JDOMException {
-        Element generated = (Element) (MCRNodeBuilder.build("mycoreobject/metadata/def.modsContainer/modsContainer", null, null, null));
+        Element generated = new MCRNodeBuilder().buildElement("mycoreobject/metadata/def.modsContainer/modsContainer", null, null);
         assertEquals("modsContainer", generated.getName());
         assertEquals("def.modsContainer", generated.getParentElement().getName());
     }
@@ -256,18 +256,18 @@ public class MCRNodeBuilderTest {
         existingRoot.setAttribute("type", "existing");
         Document document = new Document(existingRoot);
 
-        Element returned = (Element) (MCRNodeBuilder.build("root", null, null, document));
+        Element returned = new MCRNodeBuilder().buildElement("root", null, document);
         assertSame(existingRoot, returned);
 
-        returned = (Element) (MCRNodeBuilder.build("root[foo]", null, null, document));
+        returned = new MCRNodeBuilder().buildElement("root[foo]", null, document);
         assertSame(existingRoot, returned);
         assertNotNull(returned.getChild("foo"));
 
-        returned = (Element) (MCRNodeBuilder.build("root[@foo='bar']", null, null, document));
+        returned = new MCRNodeBuilder().buildElement("root[@foo='bar']", null, document);
         assertSame(existingRoot, returned);
         assertEquals("bar", returned.getAttributeValue("foo"));
 
-        returned = (Element) (MCRNodeBuilder.build("root/child", "bar", null, document));
+        returned = new MCRNodeBuilder().buildElement("root/child", "bar", document);
         assertEquals("child", returned.getName());
         assertSame(existingRoot, returned.getParent());
         assertEquals("bar", returned.getText());

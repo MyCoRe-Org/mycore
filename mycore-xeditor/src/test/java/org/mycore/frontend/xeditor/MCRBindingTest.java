@@ -136,7 +136,7 @@ public class MCRBindingTest extends MCRTestCase {
     @Test
     public void testGroupByReferencedID() throws JDOMException, JaxenException {
         String builder = "document[name/@id='n1'][note/@href='#n1'][location/@href='#n1'][name[@id='n2']][location[@href='#n2']]";
-        Element document = (Element) (MCRNodeBuilder.build(builder, null, null, null));
+        Element document = new MCRNodeBuilder().buildElement(builder, null, null);
         MCRBinding rootBinding = new MCRBinding(new Document(document));
         MCRBinding documentBinding = new MCRBinding("document", rootBinding);
 
@@ -157,10 +157,9 @@ public class MCRBindingTest extends MCRTestCase {
         assertEquals("n2", id.getValue());
 
         binding = new MCRBinding("note[@href=concat('#',$id)]", documentBinding);
-        note = (Element)(binding.getBoundNode());
+        note = (Element) (binding.getBoundNode());
         assertEquals("note", note.getName());
-        // TODO: Enhance MCRNodeBuilder for this:
-        // assertEquals("#n2", note.getAttributeValue("href")); 
+        assertEquals("#n2", note.getAttributeValue("href"));
 
         binding = new MCRBinding("location[@href=concat('#',$id)]", documentBinding);
         location = (Element) (binding.getBoundNode());

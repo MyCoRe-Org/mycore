@@ -53,7 +53,7 @@ public class MCRXMLCleanerTest extends MCRTestCase {
         String xPath1i = "root[child]";
         String xPath1o = "root";
         cleanAndCompareTo(xPath1i, xPath1o);
-        
+
         String xPath2i = "root[child='a']";
         cleanAndCompareTo(xPath2i, xPath2i);
 
@@ -101,7 +101,6 @@ public class MCRXMLCleanerTest extends MCRTestCase {
     }
 
     private Document buildTestDocument(String xPath) throws JaxenException, JDOMException {
-        Element root = (Element) (MCRNodeBuilder.build(xPath, null, null, null));
-        return new Document(root);
+        return new Document(new MCRNodeBuilder().buildElement(xPath, null, null));
     }
 }
