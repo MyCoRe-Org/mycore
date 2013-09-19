@@ -25,13 +25,6 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-
-import org.jaxen.BaseXPath;
-import org.jaxen.JaxenException;
-import org.jaxen.dom.DocumentNavigator;
-import org.jaxen.expr.LocationPath;
-import org.jaxen.expr.NameStep;
-
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -48,6 +41,11 @@ import org.apache.xalan.extensions.ExpressionContext;
 import org.apache.xpath.NodeSet;
 import org.apache.xpath.objects.XNodeSet;
 import org.apache.xpath.objects.XNodeSetForDOM;
+import org.jaxen.BaseXPath;
+import org.jaxen.JaxenException;
+import org.jaxen.dom.DocumentNavigator;
+import org.jaxen.expr.LocationPath;
+import org.jaxen.expr.NameStep;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -55,9 +53,12 @@ import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;
-import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
+import org.mycore.common.content.transformer.MCRContentTransformer;
+import org.mycore.common.content.transformer.MCRContentTransformerFactory;
+import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.services.i18n.MCRTranslation;
 import org.w3c.dom.NodeList;
@@ -85,10 +86,14 @@ public class MCRXEditorTransformer {
     public MCRContent transform(MCRContent editorSource) throws IOException, JDOMException, SAXException {
         editorSession.getValidator().removeValidationRules();
 
-        MCRXSL2XMLTransformer transformer = MCRXSL2XMLTransformer.getInstance("xsl/xeditor.xsl");
-        String key = MCRXEditorTransformerStore.storeTransformer(this);
-        transformationParameters.setParameter("XEditorTransformerKey", key);
-        return transformer.transform(editorSource, transformationParameters);
+        MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("xeditor");
+        if (transformer instanceof MCRParameterizedTransformer) {
+            String key = MCRXEditorTransformerStore.storeTransformer(this);
+            transformationParameters.setParameter("XEditorTransformerKey", key);
+            return ((MCRParameterizedTransformer) transformer).transform(editorSource, transformationParameters);
+        } else {
+            throw new MCRException("Xeditor needs parameterized MCRContentTransformer: " + transformer);
+        }
     }
 
     public static MCRXEditorTransformer getTransformer(String key) {
@@ -272,7 +277,8 @@ public class MCRXEditorTransformer {
             xPathVariables.putAll(transformationParameters.getParameterMap());
             XPathFactory factory = XPathFactory.instance();
             List<Namespace> namespaces = MCRUsedNamespaces.getNamespaces();
-            XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), xPathVariables, namespaces);
+            XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), xPathVariables,
+                namespaces);
             return xPath.evaluateFirst(currentBinding.getBoundNodes()).toString();
         } catch (Exception ex) {
             LOGGER.warn("unable to evaluate XPath: " + xPathExpression);
@@ -281,7 +287,8 @@ public class MCRXEditorTransformer {
         }
     }
 
-    public XNodeSet getRequestParameters(ExpressionContext context) throws ParserConfigurationException, TransformerException {
+    public XNodeSet getRequestParameters(ExpressionContext context) throws ParserConfigurationException,
+        TransformerException {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         org.w3c.dom.Document doc = builder.newDocument();
         NodeSet ns = new NodeSet();
