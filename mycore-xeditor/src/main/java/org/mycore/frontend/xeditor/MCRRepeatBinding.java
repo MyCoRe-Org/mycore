@@ -2,8 +2,6 @@ package org.mycore.frontend.xeditor;
 
 import java.io.UnsupportedEncodingException;
 
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
 import org.jaxen.JaxenException;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -64,14 +62,6 @@ public class MCRRepeatBinding extends MCRBinding {
     }
 
     public String getControlsParameter() throws UnsupportedEncodingException {
-        return parent.getAbsoluteXPath() + "_" + MCRRepeatBinding.encode(xPath) + "_" + repeatPosition;
-    }
-
-    public static String encode(String text) throws UnsupportedEncodingException {
-        return Hex.encodeHexString(text.getBytes("UTF-8"));
-    }
-
-    public static String decode(String text) throws DecoderException {
-        return new String(Hex.decodeHex(text.toCharArray()));
+        return parent.getAbsoluteXPath() + "_" + MCREncoder.encode(xPath) + "_" + repeatPosition;
     }
 }

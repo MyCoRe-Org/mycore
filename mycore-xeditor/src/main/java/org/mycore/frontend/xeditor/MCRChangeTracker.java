@@ -43,6 +43,10 @@ public class MCRChangeTracker {
         undoChanges(doc, 0);
     }
 
+    public int getChangeCounter() {
+        return counter;
+    }
+
     public void undoChanges(Document doc, int stepNumber) {
         while (counter > stepNumber) {
             ProcessingInstruction pi = findNextProcessingInstruction(doc);
@@ -76,7 +80,7 @@ abstract class MCRChangeType {
 
     private static Map<String, MCRChangeType> changeTypes = new HashMap<String, MCRChangeType>();
 
-    private static final XMLOutputter RAW_OUTPUTTER = new XMLOutputter(Format.getRawFormat());
+    private static final XMLOutputter RAW_OUTPUTTER = new XMLOutputter(Format.getRawFormat().setEncoding("UTF-8"));
 
     public static MCRChangeType getType(String id) {
         return changeTypes.get(id);
@@ -89,6 +93,14 @@ abstract class MCRChangeType {
     public abstract String getID();
 
     public abstract void undo(ProcessingInstruction pi);
+
+    protected ProcessingInstruction buildProcessingInstruction(String data) {
+        return new ProcessingInstruction(getID(), MCREncoder.encode(data));
+    }
+
+    protected String getData(ProcessingInstruction pi) {
+        return MCREncoder.decode(pi.getData());
+    }
 
     protected String element2text(Element element) {
         return RAW_OUTPUTTER.outputString(element);
@@ -139,7 +151,7 @@ class MCRRemoveElement extends MCRChangeType {
 
     public ProcessingInstruction remove(Element element) {
         String elementAsText = element2text(element);
-        ProcessingInstruction pi = new ProcessingInstruction(getID(), elementAsText);
+        ProcessingInstruction pi = buildProcessingInstruction(elementAsText);
         Parent parent = element.getParent();
         int index = parent.indexOf(element);
         parent.addContent(index, pi);
@@ -150,7 +162,7 @@ class MCRRemoveElement extends MCRChangeType {
     public void undo(ProcessingInstruction pi) {
         Parent parent = pi.getParent();
         int index = parent.indexOf(pi);
-        Element child = text2element(pi.getData());
+        Element child = text2element(getData(pi));
         parent.addContent(index, child);
     }
 }
@@ -163,7 +175,7 @@ class MCRRemoveAttribute extends MCRChangeType {
 
     public ProcessingInstruction remove(Attribute attribute) {
         String attributeAsText = attribute2text(attribute);
-        ProcessingInstruction pi = new ProcessingInstruction(getID(), attributeAsText);
+        ProcessingInstruction pi = buildProcessingInstruction(attributeAsText);
         attribute.getParent().addContent(0, pi);
         attribute.detach();
         return pi;
@@ -171,7 +183,7 @@ class MCRRemoveAttribute extends MCRChangeType {
 
     public void undo(ProcessingInstruction pi) {
         Element parent = pi.getParentElement();
-        Attribute attribute = text2attribute(pi.getData());
+        Attribute attribute = text2attribute(getData(pi));
         parent.setAttribute(attribute);
     }
 }
@@ -184,13 +196,13 @@ class MCRAddAttribute extends MCRChangeType {
 
     public ProcessingInstruction added(Attribute attribute) {
         String attributeAsText = attribute2text(attribute);
-        ProcessingInstruction pi = new ProcessingInstruction(getID(), attributeAsText);
+        ProcessingInstruction pi = buildProcessingInstruction(attributeAsText);
         attribute.getParent().addContent(0, pi);
         return pi;
     }
 
     public void undo(ProcessingInstruction pi) {
-        Attribute attribute = text2attribute(pi.getData());
+        Attribute attribute = text2attribute(getData(pi));
         Element parent = pi.getParentElement();
         parent.removeAttribute(attribute.getName(), attribute.getNamespace());
     }
@@ -205,13 +217,13 @@ class MCRSetAttributeValue extends MCRChangeType {
     public ProcessingInstruction set(Attribute attribute, String value) {
         String attributeAsText = attribute2text(attribute);
         attribute.setValue(value);
-        ProcessingInstruction pi = new ProcessingInstruction(getID(), attributeAsText);
+        ProcessingInstruction pi = buildProcessingInstruction(attributeAsText);
         attribute.getParent().addContent(0, pi);
         return pi;
     }
 
     public void undo(ProcessingInstruction pi) {
-        Attribute attribute = text2attribute(pi.getData());
+        Attribute attribute = text2attribute(getData(pi));
         Element parent = pi.getParentElement();
         parent.removeAttribute(attribute.getName(), attribute.getNamespace());
         parent.setAttribute(attribute);
@@ -233,7 +245,7 @@ class MCRSetElementText extends MCRChangeType {
         }
 
         String elementAsText = element2text(clone);
-        ProcessingInstruction pi = new ProcessingInstruction(getID(), elementAsText);
+        ProcessingInstruction pi = buildProcessingInstruction(elementAsText);
         element.setText(text);
         element.addContent(0, pi);
         return pi;
@@ -241,6 +253,6 @@ class MCRSetElementText extends MCRChangeType {
 
     public void undo(ProcessingInstruction pi) {
         Element element = pi.getParentElement();
-        element.setContent(text2element(pi.getData()).cloneContent());
+        element.setContent(text2element(getData(pi)).cloneContent());
     }
 }

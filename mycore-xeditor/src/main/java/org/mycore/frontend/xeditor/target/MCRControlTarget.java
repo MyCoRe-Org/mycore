@@ -6,6 +6,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
 import org.mycore.frontend.xeditor.MCREditorStep;
+import org.mycore.frontend.xeditor.MCREncoder;
 import org.mycore.frontend.xeditor.MCRRepeatBinding;
 
 public abstract class MCRControlTarget extends MCREditorTarget {
@@ -20,7 +21,7 @@ public abstract class MCRControlTarget extends MCREditorTarget {
     protected void handleControlParameter(MCREditorSession session, String parameter) throws Exception {
         String[] tokens = parameter.split("_");
         String baseXPath = tokens[0];
-        String repeatXPath = MCRRepeatBinding.decode(tokens[1]);
+        String repeatXPath = MCREncoder.decode(tokens[1]);
         int pos = Integer.parseInt(tokens[2]);
 
         MCRBinding baseBinding = session.getCurrentStep().bind(baseXPath);
