@@ -74,9 +74,9 @@ public class MCRChangeTracker {
 
 abstract class MCRChangeType {
 
-    private static final Map<String, MCRChangeType> changeTypes = new HashMap<String, MCRChangeType>();
+    private static Map<String, MCRChangeType> changeTypes = new HashMap<String, MCRChangeType>();
 
-    protected static final XMLOutputter rawOutputter = new XMLOutputter(Format.getRawFormat());
+    private static final XMLOutputter RAW_OUTPUTTER = new XMLOutputter(Format.getRawFormat());
 
     public static MCRChangeType getType(String id) {
         return changeTypes.get(id);
@@ -90,20 +90,27 @@ abstract class MCRChangeType {
 
     public abstract void undo(ProcessingInstruction pi);
 
+    protected String element2text(Element element) {
+        return RAW_OUTPUTTER.outputString(element);
+    }
+
+    protected Element text2element(String text) {
+        try {
+            return new SAXBuilder().build(new StringReader(text)).detachRootElement();
+        } catch (JDOMException | IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     protected String attribute2text(Attribute attribute) {
         Element x = new Element("x").setAttribute(attribute.clone());
-        String text = rawOutputter.outputString(x);
+        String text = element2text(x);
         return text.substring(3, text.length() - 2).trim();
     }
 
     protected Attribute text2attribute(String text) {
-        try {
-            text = "<x " + text + " />";
-            Document doc = new SAXBuilder().build(new StringReader(text));
-            return doc.getRootElement().getAttributes().get(0).detach();
-        } catch (JDOMException | IOException ex) {
-            throw new RuntimeException(ex);
-        }
+        text = "<x " + text + " />";
+        return text2element(text).getAttributes().get(0).detach();
     }
 }
 
@@ -131,7 +138,7 @@ class MCRRemoveElement extends MCRChangeType {
     }
 
     public ProcessingInstruction remove(Element element) {
-        String elementAsText = rawOutputter.outputString(element);
+        String elementAsText = element2text(element);
         ProcessingInstruction pi = new ProcessingInstruction(getID(), elementAsText);
         Parent parent = element.getParent();
         int index = parent.indexOf(element);
@@ -145,14 +152,6 @@ class MCRRemoveElement extends MCRChangeType {
         int index = parent.indexOf(pi);
         Element child = text2element(pi.getData());
         parent.addContent(index, child);
-    }
-
-    private Element text2element(String text) {
-        try {
-            return new SAXBuilder().build(new StringReader(text)).detachRootElement();
-        } catch (JDOMException | IOException ex) {
-            throw new RuntimeException(ex);
-        }
     }
 }
 
@@ -233,7 +232,7 @@ class MCRSetElementText extends MCRChangeType {
             attributes.remove();
         }
 
-        String elementAsText = rawOutputter.outputString(clone);
+        String elementAsText = element2text(clone);
         ProcessingInstruction pi = new ProcessingInstruction(getID(), elementAsText);
         element.setText(text);
         element.addContent(0, pi);
@@ -241,12 +240,7 @@ class MCRSetElementText extends MCRChangeType {
     }
 
     public void undo(ProcessingInstruction pi) {
-        try {
-            Element element = pi.getParentElement();
-            Document doc = new SAXBuilder().build(new StringReader(pi.getData()));
-            element.setContent(doc.getRootElement().cloneContent());
-        } catch (JDOMException | IOException ex) {
-            throw new RuntimeException(ex);
-        }
+        Element element = pi.getParentElement();
+        element.setContent(text2element(pi.getData()).cloneContent());
     }
 }
