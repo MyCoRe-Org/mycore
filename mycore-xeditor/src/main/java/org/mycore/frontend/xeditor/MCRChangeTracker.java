@@ -12,6 +12,7 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Parent;
 import org.jdom2.ProcessingInstruction;
+import org.jdom2.Text;
 import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
@@ -31,7 +32,7 @@ public class MCRChangeTracker {
 
     public static final MCRSetElementText SET_TEXT = new MCRSetElementText();
 
-    public static final String PREFIX = "xed-";
+    public static final String PREFIX = "xed-tracker-";
 
     private int counter = 0;
 
@@ -95,11 +96,13 @@ abstract class MCRChangeType {
     public abstract void undo(ProcessingInstruction pi);
 
     protected ProcessingInstruction buildProcessingInstruction(String data) {
-        return new ProcessingInstruction(getID(), MCREncoder.encode(data));
+        data = RAW_OUTPUTTER.outputString(new Text(data));
+        return new ProcessingInstruction(getID(), data);
     }
 
     protected String getData(ProcessingInstruction pi) {
-        return MCREncoder.decode(pi.getData());
+        String xml = "<x>" + pi.getData() + "</x>";
+        return text2element(xml).getText();
     }
 
     protected String element2text(Element element) {
