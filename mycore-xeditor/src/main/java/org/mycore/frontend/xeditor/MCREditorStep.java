@@ -1,6 +1,7 @@
 package org.mycore.frontend.xeditor;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -91,9 +92,9 @@ public class MCREditorStep implements Cloneable {
     }
 
     public void emptyNotResubmittedNodes() throws JDOMException, JaxenException {
-        for (String xPath : xPathsOfDisplayedFields) {
-            bind(xPath).setValue("");
-            xPathsOfDisplayedFields.remove(xPath);
+        for (Iterator<String> xPaths = xPathsOfDisplayedFields.iterator(); xPaths.hasNext();) {
+            bind(xPaths.next()).setValue("");
+            xPaths.remove();
         }
     }
 
