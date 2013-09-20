@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.jaxen.JaxenException;
+import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -19,6 +20,8 @@ public class MCREditorStep implements Cloneable {
     private String label;
 
     private Document editedXML;
+
+    private MCRChangeTracker tracker = new MCRChangeTracker();
 
     private Map<String, String[]> submittedValues;
 
@@ -79,21 +82,29 @@ public class MCREditorStep implements Cloneable {
         MCRBinding binding = bind(xPath);
         List<Object> boundNodes = binding.getBoundNodes();
 
-        while (boundNodes.size() < values.length) {
-            Element newElement = binding.cloneBoundElement(boundNodes.size() - 1);
-            markAsTransformedToInputField(newElement);
-        }
-
         for (int i = 0; i < values.length; i++) {
             String value = values[i] == null ? "" : values[i].trim();
-            binding.setValue(i, value);
-            markAsResubmittedFromInputField(boundNodes.get(i));
+            if (i == boundNodes.size()) {
+                Element newElement = binding.cloneBoundElement(i - 1).setText(value);
+                tracker.track(MCRChangeTracker.ADD_ELEMENT.added(newElement));
+            } else {
+                Object node = binding.getBoundNodes().get(i);
+                setValue(node, value);
+                markAsResubmittedFromInputField(boundNodes.get(i));
+            }
         }
+    }
+
+    private void setValue(Object node, String value) {
+        if (node instanceof Attribute)
+            tracker.track(MCRChangeTracker.SET_ATTRIBUTE_VALUE.set((Attribute) node, value));
+        else
+            tracker.track(MCRChangeTracker.SET_TEXT.set((Element) node, value));
     }
 
     public void emptyNotResubmittedNodes() throws JDOMException, JaxenException {
         for (Iterator<String> xPaths = xPathsOfDisplayedFields.iterator(); xPaths.hasNext();) {
-            bind(xPaths.next()).setValue("");
+            setValue(bind(xPaths.next()).getBoundNode(), "");
             xPaths.remove();
         }
     }
@@ -101,6 +112,7 @@ public class MCREditorStep implements Cloneable {
     @Override
     public MCREditorStep clone() {
         Document xml = editedXML.getDocument().clone();
+        MCRChangeTracker.removeChangeTracking(xml);
         MCREditorStep copy = new MCREditorStep(xml);
         copy.xPathsOfDisplayedFields.addAll(this.xPathsOfDisplayedFields);
         return copy;
