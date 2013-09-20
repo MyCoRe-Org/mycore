@@ -28,7 +28,6 @@ import static org.junit.Assert.*;
 import org.jaxen.JaxenException;
 
 import org.jdom2.Document;
-import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
