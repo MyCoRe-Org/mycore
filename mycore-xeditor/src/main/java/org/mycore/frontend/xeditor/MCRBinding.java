@@ -162,21 +162,6 @@ public class MCRBinding {
         return false;
     }
 
-    public void setValue(String value) {
-        setValue(getBoundNode(), value);
-    }
-
-    public void setValue(int index, String value) {
-        setValue(getBoundNodes().get(index), value);
-    }
-
-    private void setValue(Object node, String value) {
-        if (node instanceof Element)
-            ((Element) node).setText(value);
-        else if (node instanceof Attribute)
-            ((Attribute) node).setValue(value);
-    }
-
     public String getName() {
         return name;
     }
