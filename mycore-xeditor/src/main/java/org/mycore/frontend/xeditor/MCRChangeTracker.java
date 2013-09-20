@@ -70,7 +70,11 @@ public class MCRChangeTracker {
     }
 
     public static void removeChangeTracking(Document doc) {
-        for (Iterator<ProcessingInstruction> iter = doc.getDescendants(Filters.processinginstruction()).iterator(); iter.hasNext();) {
+        removeChangeTracking(doc.getRootElement());
+    }
+
+    public static void removeChangeTracking(Element element) {
+        for (Iterator<ProcessingInstruction> iter = element.getDescendants(Filters.processinginstruction()).iterator(); iter.hasNext();) {
             if (iter.next().getTarget().startsWith(PREFIX))
                 iter.remove();
         }
