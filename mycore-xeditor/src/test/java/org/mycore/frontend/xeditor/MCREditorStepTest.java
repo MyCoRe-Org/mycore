@@ -62,6 +62,8 @@ public class MCREditorStepTest {
         // Test result against expected
         template = "document[title='Title'][author[@firstName='Jim'][@lastName='']][category='a'][category=''][category='c'][category='d']";
         Document expected = new Document(new MCRNodeBuilder().buildElement(template, null, null));
-        assertTrue(MCRXMLHelper.deepEqual(expected, step.getDocument()));
+        Document result = step.getDocument();
+        MCRChangeTracker.removeChangeTracking(result);
+        assertTrue(MCRXMLHelper.deepEqual(expected, result));
     }
 }
