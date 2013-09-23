@@ -1211,4 +1211,37 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
     }
 
+    /**
+     * Check the derivate links in objects of MCR base ID for existing. It looks to the XML store on the disk to get all object IDs.
+     * 
+     * @param base_id
+     *            the base part of a MCRObjectID e.g. DocPortal_document
+     */
+    @MCRCommand(syntax="check derivate entries in objects for base {0}",
+            help="check in all objects with MCR base ID {0} for existing linked derivates", order=400)
+    public static void checkDerivatesInObjects(String base_id) {
+        if (base_id == null || base_id.length() == 0) {
+            LOGGER.error("Base ID missed for check derivate entries in objects for base {0}");
+            return;
+        }
+        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
+        List <String> id_list = mgr.listIDsForBase(base_id);
+        int counter = 0;
+        int maxresults = id_list.size();
+        for (String objid : id_list) {
+            counter++;
+            LOGGER.info("Processing dataset " + counter + " from " + maxresults + " with ID: " + objid);
+            // get from data
+            MCRObjectID mcrobjid = MCRObjectID.getInstance(objid);
+            MCRObject obj = MCRMetadataManager.retrieveMCRObject(mcrobjid);
+            List <MCRMetaLinkID> derivate_entries = obj.getStructure().getDerivates();
+            for (MCRMetaLinkID derivate_entry : derivate_entries) {
+                String derid = derivate_entry.getXLinkHref();
+                if (! mgr.exists(MCRObjectID.getInstance(derid))) {
+                    LOGGER.error("   !!! Missing derivate " + derid + " in database for base ID " + base_id);
+                }
+            }
+        }
+        LOGGER.info("Check done for " + Integer.toString(counter) + " entries");
+    }
 }
