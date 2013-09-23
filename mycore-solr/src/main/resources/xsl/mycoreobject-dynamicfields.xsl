@@ -7,9 +7,7 @@
   <xsl:param name="MCR.Module-solr.DynamicFields" select="'true'" />
 
   <xsl:template match="mycoreobject">
-    <xsl:if test="mcrxsl:hasNextImportStep('solr-document:mycoreobject-dynamicfields.xsl')">
-      <xsl:apply-imports />
-    </xsl:if>
+    <xsl:apply-imports />
     <xsl:if test="$MCR.Module-solr.DynamicFields='true'">
       <xsl:comment>
         Start of dynamic fields:

@@ -782,24 +782,24 @@ public class MCRXMLFunctions {
         if (!propValue.isEmpty()) {
             String[] includes = propValue.split(",");
             String importXSL = null;
-            int pos = -1;
+            int pos = includes.length;
             if (selfName == null) {
-                importXSL = includes[0];
+                importXSL = includes[includes.length - 1];
             } else {
-                for (int i = 0; i < includes.length; i++) {
+                for (int i = includes.length - 1; i >= 0; i--) {
                     if (includes[i].equals(selfName)) {
-                        pos = i + 1;
+                        pos = i - 1;
                         break;
                     }
                 }
-                if (pos < includes.length && pos > 0) {
+                if (pos < includes.length && pos >= 0) {
                     importXSL = includes[pos];
                 }
             }
             if (importXSL != null) {
                 return importXSL;
             }
-            if (pos >= 0) {
+            if (pos == -1) {
                 LOGGER.debug("xslImport reached end of chain:" + propValue);
             } else {
                 LOGGER.warn("xslImport could not find " + selfName + " in " + propValue);
