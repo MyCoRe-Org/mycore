@@ -678,7 +678,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
     /**
      * The method sychronize the xlink:label of the mycorederivate with the
-     * xlink:label of the derivate refernce of mycoreobject.
+     * xlink:label of the derivate reference of mycoreobject.
      * 
      * @param id
      *            the MCRObjectID as String
@@ -777,4 +777,41 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         LOGGER.info("Unlinking derivate " + derID + " from object " + oldOwnerId + ". Success=" + flag);
         MCRMetadataManager.fireUpdateEvent(oldOwner);
     }
+    
+    /**
+     * Check the object links in derivates of MCR base ID for existing. It looks to the XML store on the disk to get all object IDs.
+     * 
+     * @param base_id
+     *            the base part of a MCRObjectID e.g. DocPortal_derivate
+     */
+    @MCRCommand(syntax="check object entries in derivates for base {0}",
+            help="check in all derivates of MCR base ID {0} for existing linked objects", order=400)
+    public static void checkObjectsInDerivates(String base_id) {
+        if (base_id == null || base_id.length() == 0) {
+            LOGGER.error("Base ID missed for check object entries in derivates for base {0}");
+            return;
+        }
+        int project_part_position = base_id.indexOf('_');
+        if (project_part_position == -1) {
+            LOGGER.error("The given base ID " + base_id + " has not the syntax of project_type");
+            return;            
+        }
+        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
+        List <String> id_list = mgr.listIDsForBase(base_id.substring(0,project_part_position+1) + "derivate");
+        int counter = 0;
+        int maxresults = id_list.size();
+        for (String derid : id_list) {
+            counter++;
+            LOGGER.info("Processing dataset " + counter + " from " + maxresults + " with ID: " + derid);
+            // get from data
+            MCRObjectID mcrderid = MCRObjectID.getInstance(derid);
+            MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(mcrderid);
+            MCRObjectID objid = der.getOwnerID();
+            if (! mgr.exists(objid)) {
+                LOGGER.error("   !!! Missing object " + objid.toString() + " in database for derivate ID " + mcrderid.toString());
+            }
+        }
+        LOGGER.info("Check done for " + Integer.toString(counter) + " entries");
+    }
+
 }
