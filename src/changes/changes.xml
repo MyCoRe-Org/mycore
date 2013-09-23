@@ -6,6 +6,12 @@
   </properties>
   <body>
     <release version="2013.06.0.2" date="TBA" description="2013.06.0 maintenance release 2">
+      <action dev="mcrtchef" type="fix" date="2013-09-18">
+        bugfix: load resources via https if needed (merged revision 27892 from trunk)
+      </action>
+      <action dev="mcrtchef" type="fix" date="2013-09-18">
+        mycore-user2: fixed bug to show message if too many users would be displayed (merged revision 27887 from trunk)
+      </action>
       <action dev="mcrkrebs" type="fix" date="2013-08-27">
         mycore-mods: index and show dateIssued from book also in its corresponding chapters
       </action>
