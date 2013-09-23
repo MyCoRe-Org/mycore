@@ -166,23 +166,12 @@ public class MCRXEditorTransformer {
     }
 
     public String getValue() {
-        markAsUsed();
-        return currentBinding.getValue();
-    }
-
-    public String getOutputValue() {
         return currentBinding.getValue();
     }
 
     public boolean hasValue(String value) {
-        markAsUsed();
+        editorSession.getCurrentStep().mark2checkResubmission(currentBinding);
         return currentBinding.hasValue(value);
-    }
-
-    private void markAsUsed() {
-        for (Object node : currentBinding.getBoundNodes()) {
-            editorSession.getCurrentStep().markAsTransformedToInputField(node);
-        }
     }
 
     public String repeat(String xPath, int minRepeats, int maxRepeats) throws JDOMException, JaxenException {
@@ -277,8 +266,7 @@ public class MCRXEditorTransformer {
             xPathVariables.putAll(transformationParameters.getParameterMap());
             XPathFactory factory = XPathFactory.instance();
             List<Namespace> namespaces = MCRUsedNamespaces.getNamespaces();
-            XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), xPathVariables,
-                namespaces);
+            XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), xPathVariables, namespaces);
             return xPath.evaluateFirst(currentBinding.getBoundNodes()).toString();
         } catch (Exception ex) {
             LOGGER.warn("unable to evaluate XPath: " + xPathExpression);
@@ -287,8 +275,7 @@ public class MCRXEditorTransformer {
         }
     }
 
-    public XNodeSet getRequestParameters(ExpressionContext context) throws ParserConfigurationException,
-        TransformerException {
+    public XNodeSet getRequestParameters(ExpressionContext context) throws ParserConfigurationException, TransformerException {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         org.w3c.dom.Document doc = builder.newDocument();
         NodeSet ns = new NodeSet();
@@ -303,6 +290,20 @@ public class MCRXEditorTransformer {
                 }
             }
         }
+        return new XNodeSetForDOM((NodeList) ns, context.getXPathContext());
+    }
+
+    public XNodeSet getXPaths2CheckResubmission(ExpressionContext context) throws ParserConfigurationException, TransformerException {
+        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        org.w3c.dom.Document doc = builder.newDocument();
+        NodeSet ns = new NodeSet();
+
+        if (editorSession.getCurrentStep() != null)
+            for (String xPath : editorSession.getCurrentStep().getXPaths2CheckResubmission()) {
+                org.w3c.dom.Element element = doc.createElement("resubmit");
+                element.setTextContent(xPath);
+                ns.addNode(element);
+            }
         return new XNodeSetForDOM((NodeList) ns, context.getXPathContext());
     }
 

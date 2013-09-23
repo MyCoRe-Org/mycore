@@ -153,15 +153,15 @@ public class MCRBinding {
         return ancestors;
     }
 
+    public String getValue() {
+        return getValue(getBoundNode());
+    }
+
     private String getValue(Object node) {
         if (node instanceof Element)
             return ((Element) node).getTextTrim();
         else
             return ((Attribute) node).getValue();
-    }
-
-    public String getValue() {
-        return getValue(getBoundNode());
     }
 
     public boolean hasValue(String value) {
@@ -170,6 +170,23 @@ public class MCRBinding {
                 return true;
 
         return false;
+    }
+
+    public void setValue(String value) {
+        setValue(getBoundNode(), value);
+    }
+
+    public void setValue(int index, String value) {
+        setValue(boundNodes.get(index), value);
+    }
+
+    private void setValue(Object node, String value) {
+        if (value.equals(getValue(node)))
+            return;
+        else if (node instanceof Attribute)
+            getChangeTracker().track(MCRChangeTracker.SET_ATTRIBUTE_VALUE.set((Attribute) node, value));
+        else
+            getChangeTracker().track(MCRChangeTracker.SET_TEXT.set((Element) node, value));
     }
 
     public String getName() {

@@ -2,12 +2,12 @@
 
 <div>
   <form action="/servlets/XEditor">
-    <input value="testBasicInputComponents-source.xml" name="input" type="hidden" />
     <input name="_xed_submit_cancel" type="submit" value="abbrechen" />
     <label>Die aktuelle Sprache ist de.</label>
     <label>Der Titel "Der neue XEditor - Utopie oder Wahnsinn?" wird hier bearbeitet.</label>
     <label>There is only french text.</label>
     <label>Dies ist die deutsche Ausgabe.</label>
+    <input value="testBasicInputComponents-source.xml" name="input" type="hidden" />
     <input value="1-2" name="_xed_session" type="hidden" />
   </form>
 </div>

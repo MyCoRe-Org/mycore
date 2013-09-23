@@ -51,7 +51,11 @@ public class MCRDebugTarget extends MCREditorTarget {
         PrintWriter out = job.getResponse().getWriter();
         out.println("<html><body>");
 
-        session.getCurrentStep().setSubmittedValues(job.getRequest().getParameterMap());
+        out.println("<h3>Submitted parameters:</h3>");
+        Map<String, String[]> parameters = job.getRequest().getParameterMap();
+        outputParameters(parameters, out);
+
+        session.getCurrentStep().setSubmittedValues(parameters);
 
         session.startNextStep();
         session.getCurrentStep().setLabel("After cleanup");
@@ -70,20 +74,12 @@ public class MCRDebugTarget extends MCREditorTarget {
 
     private void outputStep(PrintWriter out, MCREditorStep step) throws IOException {
         out.println("<h3>" + step.getLabel() + ":</h3>");
-
-        if (step.getSubmittedValues() != null) {
-            out.println("<h3>Submitted parameters:</h3>");
-            outputParameters(step, out);
-            out.println("<h3>After applying submitted parameters:</h3>");
-        }
-
         outputXML(step.getDocument(), out);
     }
 
-    private void outputParameters(MCREditorStep step, PrintWriter out) {
+    private void outputParameters(Map<String, String[]> values, PrintWriter out) {
         out.println("<p><pre>");
 
-        Map<String, String[]> values = step.getSubmittedValues();
         List<String> names = new ArrayList<String>(values.keySet());
         Collections.sort(names);
 

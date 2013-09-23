@@ -3,8 +3,8 @@
 <html>
   <body>
     <form action="/servlets/XEditor">
-      <input value="testBasicInputComponents-source.xml" name="input" type="hidden" />
       <input xmlns:xed="http://www.mycore.de/xeditor" name="/document/title" value="Der neue XEditor - Utopie oder Wahnsinn?" type="text" class="text" />
+      <input value="testBasicInputComponents-source.xml" name="input" type="hidden" />
       <input value="1-2" name="_xed_session" type="hidden" />
     </form>
   </body>

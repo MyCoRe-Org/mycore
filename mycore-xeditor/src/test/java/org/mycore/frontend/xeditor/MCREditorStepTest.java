@@ -23,13 +23,15 @@
 
 package org.mycore.frontend.xeditor;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 import org.jaxen.JaxenException;
 import org.jdom2.Document;
+import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -40,30 +42,72 @@ import org.mycore.common.xml.MCRXMLHelper;
 public class MCREditorStepTest {
 
     @Test
-    public void testResubmittingEditedValues() throws JaxenException, JDOMException, UnsupportedEncodingException, IOException {
-        // Simulate reading source XML
-        String template = "document[title='Titel'][author[@firstName='John'][@lastName='Doe']][category='a'][category='b'][category='c']";
+    public void testSubmitTextfields() throws JaxenException, JDOMException, UnsupportedEncodingException, IOException {
+        String template = "document[title='Titel'][author[@firstName='John'][@lastName='Doe']]";
         MCREditorStep step = new MCREditorStep(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
 
-        // Simulate transformation to input fields
-        step.markAsTransformedToInputField(step.bind("/document/title").getBoundNode());
-        step.markAsTransformedToInputField(step.bind("/document/author/@firstName").getBoundNode());
-        step.markAsTransformedToInputField(step.bind("/document/author/@lastName").getBoundNode());
-        step.markAsTransformedToInputField(step.bind("/document/category").getBoundNode());
-        step.markAsTransformedToInputField(step.bind("/document/category[2]").getBoundNode());
-        step.markAsTransformedToInputField(step.bind("/document/category[3]").getBoundNode());
-
-        // Simulate resubmission of edited values
         step.setSubmittedValues("/document/title", new String[] { "Title" });
         step.setSubmittedValues("/document/author/@firstName", new String[] { "Jim" });
-        step.setSubmittedValues("/document/category", new String[] { "a", "", "c", "d" });
+        step.setSubmittedValues("/document/author/@lastName", new String[] { "" });
         step.emptyNotResubmittedNodes();
 
-        // Test result against expected
-        template = "document[title='Title'][author[@firstName='Jim'][@lastName='']][category='a'][category=''][category='c'][category='d']";
+        template = "document[title='Title'][author[@firstName='Jim'][@lastName='']]";
         Document expected = new Document(new MCRNodeBuilder().buildElement(template, null, null));
         Document result = step.getDocument();
         MCRChangeTracker.removeChangeTracking(result);
         assertTrue(MCRXMLHelper.deepEqual(expected, result));
+    }
+
+    @Test
+    public void testSubmitCheckbox() throws JaxenException, JDOMException, UnsupportedEncodingException, IOException {
+        String template = "document[@archive='false']";
+        MCREditorStep step = new MCREditorStep(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
+
+        step.setXPaths2CheckResubmission(new String[] { "/document/@archive" });
+        step.emptyNotResubmittedNodes();
+
+        assertEquals("", step.getDocument().getRootElement().getAttributeValue("archive"));
+
+        step.setXPaths2CheckResubmission(new String[] { "/document/@archive" });
+        step.setSubmittedValues("/document/@archive", new String[] { "true" });
+        step.emptyNotResubmittedNodes();
+
+        assertEquals("true", step.getDocument().getRootElement().getAttributeValue("archive"));
+    }
+
+    @Test
+    public void testSubmitSelectOptions() throws JaxenException, JDOMException, UnsupportedEncodingException, IOException {
+        String template = "document[category='a'][category[2]='b'][category[3]='c']";
+        MCREditorStep step = new MCREditorStep(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
+
+        step.mark2checkResubmission(new MCRBinding("/document/category", step.getRootBinding()));
+        step.emptyNotResubmittedNodes();
+
+        List<Element> categories = step.getDocument().getRootElement().getChildren("category");
+        assertEquals(3, categories.size());
+        assertEquals("", categories.get(0).getText());
+        assertEquals("", categories.get(1).getText());
+        assertEquals("", categories.get(2).getText());
+
+        step.mark2checkResubmission(new MCRBinding("/document/category", step.getRootBinding()));
+        step.setSubmittedValues("/document/category", new String[] { "c", "d" });
+        step.emptyNotResubmittedNodes();
+
+        categories = step.getDocument().getRootElement().getChildren("category");
+        assertEquals(3, categories.size());
+        assertEquals("c", categories.get(0).getText());
+        assertEquals("d", categories.get(1).getText());
+        assertEquals("", categories.get(2).getText());
+        
+        step.mark2checkResubmission(new MCRBinding("/document/category", step.getRootBinding()));
+        step.setSubmittedValues("/document/category", new String[] { "a", "b", "c", "d" });
+        step.emptyNotResubmittedNodes();
+
+        categories = step.getDocument().getRootElement().getChildren("category");
+        assertEquals(4, categories.size());
+        assertEquals("a", categories.get(0).getText());
+        assertEquals("b", categories.get(1).getText());
+        assertEquals("c", categories.get(2).getText());
+        assertEquals("d", categories.get(3).getText());
     }
 }

@@ -6,13 +6,13 @@
   </xed:template>
   <xed:form>
     <i1>
-      <xed:include ref="a" /> 
+      <xed:include ref="a" />
     </i1>
     <i2>
-      <xed:include uri="resource:testIncludes-includes.xml" /> 
+      <xed:include uri="resource:testIncludes-includes.xml" />
     </i2>
     <i3>
-      <xed:include uri="resource:testIncludes-includes.xml" ref="b" /> 
+      <xed:include uri="resource:testIncludes-includes.xml" ref="b" />
     </i3>
   </xed:form>
 </div>

@@ -1,21 +1,15 @@
 package org.mycore.frontend.xeditor;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.jaxen.JaxenException;
-import org.jdom2.Attribute;
 import org.jdom2.Document;
-import org.jdom2.Element;
 import org.jdom2.JDOMException;
 
 public class MCREditorStep implements Cloneable {
-
-    private final static Logger LOGGER = Logger.getLogger(MCREditorStep.class);
 
     private String label;
 
@@ -23,9 +17,7 @@ public class MCREditorStep implements Cloneable {
 
     private MCRChangeTracker tracker = new MCRChangeTracker();
 
-    private Map<String, String[]> submittedValues;
-
-    private Set<String> xPathsOfDisplayedFields = new HashSet<String>();
+    private Set<String> xPaths2CheckResubmission = new HashSet<String>();
 
     public MCREditorStep(Document editedXML) {
         this.editedXML = editedXML;
@@ -52,20 +44,33 @@ public class MCREditorStep implements Cloneable {
         return new MCRBinding(xPath, getRootBinding());
     }
 
-    public void markAsTransformedToInputField(Object node) {
-        String xPath = MCRXPathBuilder.buildXPath(node);
-        LOGGER.debug("mark as used " + xPath);
-        xPathsOfDisplayedFields.add(xPath);
+    public void mark2checkResubmission(MCRBinding binding) {
+        for (Object node : binding.getBoundNodes())
+            xPaths2CheckResubmission.add(MCRXPathBuilder.buildXPath(node));
     }
 
-    private void markAsResubmittedFromInputField(Object node) {
-        String xPath = MCRXPathBuilder.buildXPath(node);
-        LOGGER.debug("set value of " + xPath);
-        xPathsOfDisplayedFields.remove(xPath);
+    public Set<String> getXPaths2CheckResubmission() {
+        return xPaths2CheckResubmission;
+    }
+
+    public void setXPaths2CheckResubmission(String[] xPaths) {
+        xPaths2CheckResubmission.clear();
+        for (String xPath : xPaths)
+            xPaths2CheckResubmission.add(xPath);
+    }
+
+    private void removeXPaths2CheckResubmission(MCRBinding binding) {
+        for (Object node : binding.getBoundNodes())
+            xPaths2CheckResubmission.remove(MCRXPathBuilder.buildXPath(node));
+    }
+
+    public void emptyNotResubmittedNodes() throws JDOMException, JaxenException {
+        for (String xPath : xPaths2CheckResubmission)
+            new MCRBinding(xPath, getRootBinding()).setValue("");
     }
 
     public void setSubmittedValues(Map<String, String[]> values) throws JaxenException, JDOMException {
-        this.submittedValues = values;
+        setXPaths2CheckResubmission(values.get("_xed_check"));
 
         for (String xPath : values.keySet())
             if (xPath.startsWith("/"))
@@ -74,51 +79,25 @@ public class MCREditorStep implements Cloneable {
         emptyNotResubmittedNodes();
     }
 
-    public Map<String, String[]> getSubmittedValues() {
-        return submittedValues;
-    }
-
     public void setSubmittedValues(String xPath, String[] values) throws JDOMException, JaxenException {
         MCRBinding binding = bind(xPath);
         List<Object> boundNodes = binding.getBoundNodes();
 
+        while (boundNodes.size() < values.length)
+            binding.cloneBoundElement(boundNodes.size() - 1);
+
         for (int i = 0; i < values.length; i++) {
             String value = values[i] == null ? "" : values[i].trim();
-            if (i == boundNodes.size()) {
-                Element newElement = binding.cloneBoundElement(i - 1);
-                tracker.track(MCRChangeTracker.SET_TEXT.set(newElement, value));
-            } else {
-                Object node = binding.getBoundNodes().get(i);
-                setValue(node, value);
-                markAsResubmittedFromInputField(boundNodes.get(i));
-            }
+            binding.setValue(i, value);
         }
-    }
 
-    private void setValue(Object node, String value) {
-        if (node instanceof Attribute)
-            tracker.track(MCRChangeTracker.SET_ATTRIBUTE_VALUE.set((Attribute) node, value));
-        else
-            tracker.track(MCRChangeTracker.SET_TEXT.set((Element) node, value));
-    }
-
-    public void emptyNotResubmittedNodes() throws JDOMException, JaxenException {
-        for (Iterator<String> xPaths = xPathsOfDisplayedFields.iterator(); xPaths.hasNext();) {
-            setValue(bind(xPaths.next()).getBoundNode(), "");
-            xPaths.remove();
-        }
-    }
-
-    public MCRChangeTracker getChangeTracker() {
-        return tracker;
+        removeXPaths2CheckResubmission(binding);
     }
 
     @Override
     public MCREditorStep clone() {
         Document xml = editedXML.getDocument().clone();
         MCRChangeTracker.removeChangeTracking(xml);
-        MCREditorStep copy = new MCREditorStep(xml);
-        copy.xPathsOfDisplayedFields.addAll(this.xPathsOfDisplayedFields);
-        return copy;
+        return new MCREditorStep(xml);
     }
 }

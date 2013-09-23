@@ -29,8 +29,9 @@
       <xsl:attribute name="action">
         <xsl:value-of select="concat($ServletsBaseURL,'XEditor')" />
       </xsl:attribute>
-      <xsl:call-template name="passRequestParameters" />
       <xsl:apply-templates select="node()" mode="xeditor" />
+      <xsl:call-template name="passRequestParameters" />
+      <xsl:call-template name="submitXPaths2CheckResubmission" />
       <input type="hidden" name="_xed_session" value="{transformer:getCombinedSessionStepID($transformer)}" />
     </form>
   </xsl:template>
@@ -48,6 +49,14 @@
   <xsl:template name="passRequestParameters">
     <xsl:for-each select="transformer:getRequestParameters($transformer)">
       <input type="hidden" name="{@name}" value="{text()}" />
+    </xsl:for-each>
+  </xsl:template>
+
+  <!-- ========== pass resubmit fields ========== -->
+
+  <xsl:template name="submitXPaths2CheckResubmission">
+    <xsl:for-each select="transformer:getXPaths2CheckResubmission($transformer)">
+      <input type="hidden" name="_xed_check" value="{text()}" />
     </xsl:for-each>
   </xsl:template>
 
@@ -286,7 +295,7 @@
   <!-- ========== <xed:output i18n="" value="" /> ========== -->
   
   <xsl:template match="xed:output[not(@value) and not(@i18n)]" mode="xeditor">
-    <xsl:value-of select="transformer:getOutputValue($transformer)" />
+    <xsl:value-of select="transformer:getValue($transformer)" />
   </xsl:template>
 
   <xsl:template match="xed:output[@value and not(@i18n)]" mode="xeditor">
