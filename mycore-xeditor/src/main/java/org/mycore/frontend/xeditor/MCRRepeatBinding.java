@@ -44,13 +44,19 @@ public class MCRRepeatBinding extends MCRBinding {
     }
 
     public void remove(int pos) {
-        ((Element) (boundNodes.remove(pos - 1))).detach();
+        Element node = (Element) (boundNodes.remove(pos - 1));
+
+        MCRChangeTracker tracker = getChangeTracker();
+        if (tracker != null)
+            tracker.track(MCRChangeTracker.REMOVE_ELEMENT.remove(node));
+        else
+            node.detach();
     }
 
     public void up(int pos) {
         Element element = (Element) (boundNodes.remove(pos - 1));
         boundNodes.add(pos - 2, element);
-        
+
         Element parent = element.getParentElement();
         int posInParent = parent.indexOf(element);
         element.detach();

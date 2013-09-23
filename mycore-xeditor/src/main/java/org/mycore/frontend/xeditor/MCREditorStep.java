@@ -45,7 +45,7 @@ public class MCREditorStep implements Cloneable {
     }
 
     public MCRBinding getRootBinding() throws JDOMException {
-        return new MCRBinding(editedXML);
+        return new MCRBinding(editedXML, tracker);
     }
 
     public MCRBinding bind(String xPath) throws JaxenException, JDOMException {
@@ -85,8 +85,8 @@ public class MCREditorStep implements Cloneable {
         for (int i = 0; i < values.length; i++) {
             String value = values[i] == null ? "" : values[i].trim();
             if (i == boundNodes.size()) {
-                Element newElement = binding.cloneBoundElement(i - 1).setText(value);
-                tracker.track(MCRChangeTracker.ADD_ELEMENT.added(newElement));
+                Element newElement = binding.cloneBoundElement(i - 1);
+                tracker.track(MCRChangeTracker.SET_TEXT.set(newElement, value));
             } else {
                 Object node = binding.getBoundNodes().get(i);
                 setValue(node, value);
@@ -107,6 +107,10 @@ public class MCREditorStep implements Cloneable {
             setValue(bind(xPaths.next()).getBoundNode(), "");
             xPaths.remove();
         }
+    }
+
+    public MCRChangeTracker getChangeTracker() {
+        return tracker;
     }
 
     @Override

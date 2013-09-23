@@ -54,8 +54,16 @@ public class MCRBinding {
 
     protected List<MCRBinding> children = new ArrayList<MCRBinding>();
 
+    protected MCRChangeTracker tracker;
+
     public MCRBinding(Document document) throws JDOMException {
         this.boundNodes.add(document);
+    }
+
+    public MCRBinding(Document document, MCRChangeTracker tracker) throws JDOMException {
+        this(document);
+        this.tracker = tracker;
+
     }
 
     private MCRBinding(MCRBinding parent) {
@@ -87,6 +95,7 @@ public class MCRBinding {
         if (boundNodes.isEmpty()) {
             Object built = new MCRNodeBuilder(variables).buildNode(xPath, defaultValue, (Parent) (parent.getBoundNode()));
             LOGGER.debug("Bind to " + xPath + " generated node " + MCRXPathBuilder.buildXPath(built));
+            trackNodeCreated(built);
             boundNodes.add(built);
         }
     }
@@ -112,21 +121,22 @@ public class MCRBinding {
         int indexInParent = parent.indexOf(template) + 1;
         parent.addContent(indexInParent, newElement);
         boundNodes.add(index + 1, newElement);
+        trackNodeCreated(newElement);
         return newElement;
     }
 
-    public void detachBoundNodes() {
-        while (!boundNodes.isEmpty())
-            detachBoundNode();
-    }
-
-    public void detachBoundNode() {
-        Object node = getBoundNode();
-        if (node instanceof Attribute)
-            ((Attribute) node).detach();
-        else
-            ((Element) node).detach();
-        boundNodes.remove(node);
+    private void trackNodeCreated(Object node) {
+        MCRChangeTracker tracker = getChangeTracker();
+        if (tracker != null) {
+            if (node instanceof Element) {
+                Element element = (Element) node;
+                MCRChangeTracker.removeChangeTracking(element);
+                tracker.track(MCRChangeTracker.ADD_ELEMENT.added(element));
+            } else {
+                Attribute attribute = (Attribute) node;
+                tracker.track(MCRChangeTracker.ADD_ATTRIBUTE.added(attribute));
+            }
+        }
     }
 
     public MCRBinding getParent() {
@@ -184,5 +194,14 @@ public class MCRBinding {
 
     public String getAbsoluteXPath() {
         return MCRXPathBuilder.buildXPath(getBoundNode());
+    }
+
+    public MCRChangeTracker getChangeTracker() {
+        if (tracker != null)
+            return tracker;
+        else if (parent != null)
+            return parent.getChangeTracker();
+        else
+            return null;
     }
 }
