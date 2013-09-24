@@ -149,23 +149,23 @@ public class MCRConditionTransformer {
         return sb;
     }
 
-    private static StringBuilder getLTQuery(String field, String value) {
+    public static StringBuilder getLTQuery(String field, String value) {
         return getRangeQuery(field, null, true, value, false);
     }
 
-    private static StringBuilder getLTEQuery(String field, String value) {
+    public static StringBuilder getLTEQuery(String field, String value) {
         return getRangeQuery(field, null, true, value, true);
     }
 
-    private static StringBuilder getGTQuery(String field, String value) {
+    public static StringBuilder getGTQuery(String field, String value) {
         return getRangeQuery(field, value, false, null, true);
     }
 
-    private static StringBuilder getGTEQuery(String field, String value) {
+    public static StringBuilder getGTEQuery(String field, String value) {
         return getRangeQuery(field, value, true, null, true);
     }
 
-    private static StringBuilder getTermQuery(String field, String value) {
+    public static StringBuilder getTermQuery(String field, String value) {
         if (value.length() == 0)
             return null;
         StringBuilder sb = new StringBuilder();
@@ -183,7 +183,7 @@ public class MCRConditionTransformer {
         return sb;
     }
 
-    private static StringBuilder getPhraseQuery(String field, String value) {
+    public static StringBuilder getPhraseQuery(String field, String value) {
         StringBuilder sb = new StringBuilder();
         sb.append('+');
         sb.append(field);
