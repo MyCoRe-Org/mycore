@@ -37,10 +37,12 @@ public class MCRXMLCleaner {
         rules.add(rule);
     }
 
-    public void clean(Document xml) {
+    public Document clean(Document xml) {
+        Document clone = xml.clone();
         do
-            mapNodesToRules(xml);
-        while (clean(xml.getRootElement()));
+            mapNodesToRules(clone);
+        while (clean(clone.getRootElement()));
+        return clone;
     }
 
     private void mapNodesToRules(Document xml) {

@@ -8,6 +8,6 @@
     <label>There is only french text.</label>
     <label>This is the english output.</label>
     <input value="testBasicInputComponents-source.xml" name="input" type="hidden" />
-    <input value="1-2" name="_xed_session" type="hidden" />
+    <input value="1-0" name="_xed_session" type="hidden" />
   </form>
 </div>

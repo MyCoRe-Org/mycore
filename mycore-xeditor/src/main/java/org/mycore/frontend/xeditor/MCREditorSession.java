@@ -23,21 +23,14 @@
 
 package org.mycore.frontend.xeditor;
 
-import java.io.IOException;
-import org.jaxen.JaxenException;
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
-import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
-import org.xml.sax.SAXException;
+import org.mycore.frontend.xeditor.tracker.MCRBreakpoint;
+import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -52,13 +45,17 @@ public class MCREditorSession {
 
     private String cancelURL;
 
-    private String postProcessorXSL;
+    private Document editedXML;
 
-    private List<MCREditorStep> steps = new ArrayList<MCREditorStep>();
+    private MCRChangeTracker tracker = new MCRChangeTracker();
+
+    private MCREditorSubmission submission = new MCREditorSubmission(this);
+
+    private MCRXEditorValidator validator = new MCRXEditorValidator();
 
     private MCRXMLCleaner cleaner = new MCRXMLCleaner();
 
-    private MCRXEditorValidator validator = new MCRXEditorValidator();
+    private MCRXEditorPostProcessor postProcessor = new MCRXEditorPostProcessor();
 
     public MCREditorSession(Map<String, String[]> requestParameters) {
         this.requestParameters = requestParameters;
@@ -91,59 +88,41 @@ public class MCREditorSession {
         }
     }
 
-    public void setPostProcessorXSL(String stylesheet) {
-        this.postProcessorXSL = stylesheet;
+    public Document getEditedXML() {
+        return editedXML;
     }
 
-    public Document getPostProcessedXML() throws IOException, JDOMException, SAXException {
-        if (postProcessorXSL == null)
-            return getCurrentStep().getDocument();
-
-        MCRContent source = new MCRJDOMContent(getCurrentStep().getDocument());
-        MCRContent transformed = MCRXSL2XMLTransformer.getInstance("xsl/" + postProcessorXSL).transform(source);
-        return transformed.asXML();
+    public void setEditedXML(Document editedXML) throws JDOMException {
+        this.editedXML = editedXML;
+        MCRUsedNamespaces.addNamespacesFrom(editedXML.getRootElement());
     }
 
-    public void setInitialStep(MCREditorStep step) {
-        steps.clear();
-        steps.add(step);
+    public MCRBinding getRootBinding() throws JDOMException {
+        return new MCRBinding(editedXML, tracker);
     }
 
-    public MCREditorStep getCurrentStep() {
-        return steps.isEmpty() ? null : steps.get(steps.size() - 1);
+    public void setBreakpoint(String msg) {
+        if (editedXML != null)
+            tracker.track(MCRBreakpoint.setBreakpoint(editedXML.getRootElement(), msg));
     }
 
-    public String getCombinedSessionStepID() {
-        return id + "-" + steps.size();
+    public MCRChangeTracker getChangeTracker() {
+        return tracker;
     }
 
-    public List<MCREditorStep> getSteps() {
-        return steps;
-    }
-
-    public MCREditorStep startNextStep() {
-        MCREditorStep nextStep = getCurrentStep().clone();
-        steps.add(nextStep);
-        return nextStep;
-    }
-
-    public void setCurrentStep(int stepID) {
-        if (stepID < steps.size()) {
-            LOGGER.info("Detected resubmission of old editor step, going back in time now...");
-            steps = steps.subList(0, stepID); // Forget all following steps
-        }
-    }
-
-    public MCRXMLCleaner getXMLCleaner() {
-        return cleaner;
+    public MCREditorSubmission getSubmission() {
+        return submission;
     }
 
     public MCRXEditorValidator getValidator() {
         return validator;
     }
 
-    public MCRXEditorValidator validate() throws JDOMException, JaxenException {
-        validator.validate(getCurrentStep().getDocument());
-        return validator;
+    public MCRXMLCleaner getXMLCleaner() {
+        return cleaner;
+    }
+
+    public MCRXEditorPostProcessor getPostProcessor() {
+        return postProcessor;
     }
 }

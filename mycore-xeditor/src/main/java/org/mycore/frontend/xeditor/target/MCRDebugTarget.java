@@ -38,7 +38,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
-import org.mycore.frontend.xeditor.MCREditorStep;
+import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -51,33 +51,38 @@ public class MCRDebugTarget extends MCREditorTarget {
         PrintWriter out = job.getResponse().getWriter();
         out.println("<html><body>");
 
-        out.println("<h3>Submitted parameters:</h3>");
         Map<String, String[]> parameters = job.getRequest().getParameterMap();
-        outputParameters(parameters, out);
+        session.getSubmission().setSubmittedValues(parameters);
 
-        session.getCurrentStep().setSubmittedValues(parameters);
+        Document result = session.getEditedXML().clone();
+        MCRChangeTracker tracker = session.getChangeTracker().clone();
 
-        session.startNextStep();
-        session.getCurrentStep().setLabel("After cleanup");
-        session.getXMLCleaner().clean(session.getCurrentStep().getDocument());
+        List<Step> steps = new ArrayList<Step>();
+        for (String label; (label = tracker.undoLastBreakpoint(result)) != null;)
+            steps.add(0, new Step(label, MCRChangeTracker.removeChangeTracking(result)));
 
-        session.startNextStep();
-        session.getCurrentStep().setLabel("After postprocessing");
-        session.getPostProcessedXML();
+        result = session.getEditedXML().clone();
+        result = MCRChangeTracker.removeChangeTracking(result);
 
-        for (MCREditorStep step : session.getSteps())
-            outputStep(out, step);
+        result = session.getXMLCleaner().clean(result);
+        steps.add(new Step("After cleaning", result));
+
+        result = session.getPostProcessor().process(result);
+        steps.add(new Step("After postprocessing", result));
+
+        for (int i = 0; i < steps.size(); i++) {
+            if (i == steps.size() - 3)
+                outputParameters(parameters, out);
+
+            steps.get(i).output(out);
+        }
 
         out.println("</body></html>");
         out.close();
     }
 
-    private void outputStep(PrintWriter out, MCREditorStep step) throws IOException {
-        out.println("<h3>" + step.getLabel() + ":</h3>");
-        outputXML(step.getDocument(), out);
-    }
-
     private void outputParameters(Map<String, String[]> values, PrintWriter out) {
+        out.println("<h3>Submitted parameters:</h3>");
         out.println("<p><pre>");
 
         List<String> names = new ArrayList<String>(values.keySet());
@@ -90,14 +95,27 @@ public class MCRDebugTarget extends MCREditorTarget {
         out.println("</pre></p>");
     }
 
-    private Format format = Format.getPrettyFormat().setLineSeparator("\n").setOmitDeclaration(true);
+    class Step {
 
-    private void outputXML(Document xml, PrintWriter out) throws IOException {
-        XMLOutputter outputter = new XMLOutputter(format);
-        out.println("<p>");
-        Element pre = new Element("pre");
-        pre.addContent(outputter.outputString(xml));
-        outputter.output(pre, out);
-        out.println("</p>");
+        private String label;
+
+        private Document xml;
+
+        public Step(String label, Document xml) {
+            this.label = label;
+            this.xml = xml;
+        }
+
+        private Format format = Format.getPrettyFormat().setLineSeparator("\n").setOmitDeclaration(true);
+
+        public void output(PrintWriter out) throws IOException {
+            out.println("<h3>" + label + ":</h3>");
+            XMLOutputter outputter = new XMLOutputter(format);
+            out.println("<p>");
+            Element pre = new Element("pre");
+            pre.addContent(outputter.outputString(xml));
+            outputter.output(pre, out);
+            out.println("</p>");
+        }
     }
 }

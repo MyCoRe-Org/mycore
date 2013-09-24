@@ -38,6 +38,12 @@ import org.jdom2.Parent;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.mycore.frontend.xeditor.tracker.MCRAddedAttribute;
+import org.mycore.frontend.xeditor.tracker.MCRAddedElement;
+import org.mycore.frontend.xeditor.tracker.MCRChangeData;
+import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
+import org.mycore.frontend.xeditor.tracker.MCRSetAttributeValue;
+import org.mycore.frontend.xeditor.tracker.MCRSetElementText;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -95,9 +101,17 @@ public class MCRBinding {
         if (boundNodes.isEmpty()) {
             Object built = new MCRNodeBuilder(variables).buildNode(xPath, defaultValue, (Parent) (parent.getBoundNode()));
             LOGGER.debug("Bind to " + xPath + " generated node " + MCRXPathBuilder.buildXPath(built));
-            trackNodeCreated(built);
             boundNodes.add(built);
+            trackNodeCreated(findFirstBuilt(built, (Parent) (parent.getBoundNode())));
         }
+    }
+
+    public Object findFirstBuilt(Object built, Parent root) {
+        Parent parent = built instanceof Element ? ((Element) built).getParent() : ((Attribute) built).getParent();
+        if ((parent == root) || (parent == null))
+            return built;
+        else
+            return findFirstBuilt(parent, root);
     }
 
     public MCRBinding(int pos, MCRBinding parent) {
@@ -126,21 +140,25 @@ public class MCRBinding {
     }
 
     private void trackNodeCreated(Object node) {
-        MCRChangeTracker tracker = getChangeTracker();
-        if (tracker != null) {
-            if (node instanceof Element) {
-                Element element = (Element) node;
-                MCRChangeTracker.removeChangeTracking(element);
-                tracker.track(MCRChangeTracker.ADD_ELEMENT.added(element));
-            } else {
-                Attribute attribute = (Attribute) node;
-                tracker.track(MCRChangeTracker.ADD_ATTRIBUTE.added(attribute));
-            }
+        if (node instanceof Element) {
+            Element element = (Element) node;
+            MCRChangeTracker.removeChangeTracking(element);
+            track(MCRAddedElement.added(element));
+        } else {
+            Attribute attribute = (Attribute) node;
+            track(MCRAddedAttribute.added(attribute));
         }
     }
 
     public MCRBinding getParent() {
         return parent;
+    }
+
+    public void detach() {
+        if (parent != null) {
+            parent.children.remove(this);
+            this.parent = null;
+        }
     }
 
     public List<MCRBinding> getAncestorsAndSelf() {
@@ -184,9 +202,9 @@ public class MCRBinding {
         if (value.equals(getValue(node)))
             return;
         else if (node instanceof Attribute)
-            getChangeTracker().track(MCRChangeTracker.SET_ATTRIBUTE_VALUE.set((Attribute) node, value));
+            track(MCRSetAttributeValue.setValue((Attribute) node, value));
         else
-            getChangeTracker().track(MCRChangeTracker.SET_TEXT.set((Element) node, value));
+            track(MCRSetElementText.setText((Element) node, value));
     }
 
     public String getName() {
@@ -213,12 +231,10 @@ public class MCRBinding {
         return MCRXPathBuilder.buildXPath(getBoundNode());
     }
 
-    public MCRChangeTracker getChangeTracker() {
+    public void track(MCRChangeData change) {
         if (tracker != null)
-            return tracker;
+            tracker.track(change);
         else if (parent != null)
-            return parent.getChangeTracker();
-        else
-            return null;
+            parent.track(change);
     }
 }

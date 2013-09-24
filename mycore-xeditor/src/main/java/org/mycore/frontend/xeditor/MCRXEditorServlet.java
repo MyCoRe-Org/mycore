@@ -46,8 +46,7 @@ public class MCRXEditorServlet extends MCRServlet {
         MCREditorSession session = MCREditorSessionStoreFactory.getSessionStore().getSession(sessionID);
 
         int stepNr = Integer.parseInt(xEditorStepID.split("-")[1]);
-        session.setCurrentStep(stepNr);
-        session.startNextStep();
+        session.getChangeTracker().undoChanges(session.getEditedXML(), stepNr);
 
         sendToTarget(job, session);
     }
@@ -73,8 +72,8 @@ public class MCRXEditorServlet extends MCRServlet {
             }
         }
         LOGGER.info("sending submission to target " + targetID + " " + parameter);
-        session.getCurrentStep().setLabel("Submit to target " + targetID + " " + parameter);
         getTarget(targetID).handleSubmission(getServletContext(), job, session, parameter);
+        session.setBreakpoint("After handling target " + targetID + " " + parameter);
     }
 
     private MCREditorTarget getTarget(String targetID) {

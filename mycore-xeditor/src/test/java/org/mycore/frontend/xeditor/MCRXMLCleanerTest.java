@@ -94,9 +94,9 @@ public class MCRXMLCleanerTest extends MCRTestCase {
         MCRXMLCleaner cleaner = new MCRXMLCleaner();
         for (MCRCleaningRule rule : rules)
             cleaner.addRule(rule);
-        cleaner.clean(xmlToClean);
+        Document result = cleaner.clean(xmlToClean);
 
-        assertTrue(MCRXMLHelper.deepEqual(expectedXML, xmlToClean));
+        assertTrue(MCRXMLHelper.deepEqual(expectedXML, result));
     }
 
     private Document buildTestDocument(String xPath) throws JaxenException, JDOMException {

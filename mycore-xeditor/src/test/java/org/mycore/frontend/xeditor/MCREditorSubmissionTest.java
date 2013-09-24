@@ -39,71 +39,74 @@ import org.mycore.common.xml.MCRXMLHelper;
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCREditorStepTest {
+public class MCREditorSubmissionTest {
 
     @Test
     public void testSubmitTextfields() throws JaxenException, JDOMException, UnsupportedEncodingException, IOException {
         String template = "document[title='Titel'][author[@firstName='John'][@lastName='Doe']]";
-        MCREditorStep step = new MCREditorStep(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
+        MCREditorSession session = new MCREditorSession();
+        session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
 
-        step.setSubmittedValues("/document/title", new String[] { "Title" });
-        step.setSubmittedValues("/document/author/@firstName", new String[] { "Jim" });
-        step.setSubmittedValues("/document/author/@lastName", new String[] { "" });
-        step.emptyNotResubmittedNodes();
+        session.getSubmission().setSubmittedValues("/document/title", new String[] { "Title" });
+        session.getSubmission().setSubmittedValues("/document/author/@firstName", new String[] { "Jim" });
+        session.getSubmission().setSubmittedValues("/document/author/@lastName", new String[] { "" });
+        session.getSubmission().emptyNotResubmittedNodes();
 
         template = "document[title='Title'][author[@firstName='Jim'][@lastName='']]";
         Document expected = new Document(new MCRNodeBuilder().buildElement(template, null, null));
-        Document result = step.getDocument();
-        MCRChangeTracker.removeChangeTracking(result);
+        Document result = session.getEditedXML();
+        result = session.getChangeTracker().removeChangeTracking(result);
         assertTrue(MCRXMLHelper.deepEqual(expected, result));
     }
 
     @Test
     public void testSubmitCheckbox() throws JaxenException, JDOMException, UnsupportedEncodingException, IOException {
         String template = "document[@archive='false']";
-        MCREditorStep step = new MCREditorStep(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
+        MCREditorSession session = new MCREditorSession();
+        session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
 
-        step.setXPaths2CheckResubmission(new String[] { "/document/@archive" });
-        step.emptyNotResubmittedNodes();
+        session.getSubmission().setXPaths2CheckResubmission(new String[] { "/document/@archive" });
+        session.getSubmission().emptyNotResubmittedNodes();
 
-        assertEquals("", step.getDocument().getRootElement().getAttributeValue("archive"));
+        assertEquals("", session.getEditedXML().getRootElement().getAttributeValue("archive"));
 
-        step.setXPaths2CheckResubmission(new String[] { "/document/@archive" });
-        step.setSubmittedValues("/document/@archive", new String[] { "true" });
-        step.emptyNotResubmittedNodes();
+        session.getSubmission().setXPaths2CheckResubmission(new String[] { "/document/@archive" });
+        session.getSubmission().setSubmittedValues("/document/@archive", new String[] { "true" });
+        session.getSubmission().emptyNotResubmittedNodes();
 
-        assertEquals("true", step.getDocument().getRootElement().getAttributeValue("archive"));
+        assertEquals("true", session.getEditedXML().getRootElement().getAttributeValue("archive"));
     }
 
     @Test
     public void testSubmitSelectOptions() throws JaxenException, JDOMException, UnsupportedEncodingException, IOException {
         String template = "document[category='a'][category[2]='b'][category[3]='c']";
-        MCREditorStep step = new MCREditorStep(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
+        MCREditorSession session = new MCREditorSession();
+        session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
 
-        step.mark2checkResubmission(new MCRBinding("/document/category", step.getRootBinding()));
-        step.emptyNotResubmittedNodes();
+        session.getSubmission().mark2checkResubmission(new MCRBinding("/document/category", session.getRootBinding()));
+        session.getSubmission().emptyNotResubmittedNodes();
 
-        List<Element> categories = step.getDocument().getRootElement().getChildren("category");
+        List<Element> categories = session.getEditedXML().getRootElement().getChildren("category");
         assertEquals(3, categories.size());
         assertEquals("", categories.get(0).getText());
         assertEquals("", categories.get(1).getText());
         assertEquals("", categories.get(2).getText());
 
-        step.mark2checkResubmission(new MCRBinding("/document/category", step.getRootBinding()));
-        step.setSubmittedValues("/document/category", new String[] { "c", "d" });
-        step.emptyNotResubmittedNodes();
+        session.getSubmission().mark2checkResubmission(new MCRBinding("/document/category", session.getRootBinding()));
+        session.getSubmission().setSubmittedValues("/document/category", new String[] { "c", "d" });
+        session.getSubmission().emptyNotResubmittedNodes();
 
-        categories = step.getDocument().getRootElement().getChildren("category");
+        categories = session.getEditedXML().getRootElement().getChildren("category");
         assertEquals(3, categories.size());
         assertEquals("c", categories.get(0).getText());
         assertEquals("d", categories.get(1).getText());
         assertEquals("", categories.get(2).getText());
-        
-        step.mark2checkResubmission(new MCRBinding("/document/category", step.getRootBinding()));
-        step.setSubmittedValues("/document/category", new String[] { "a", "b", "c", "d" });
-        step.emptyNotResubmittedNodes();
 
-        categories = step.getDocument().getRootElement().getChildren("category");
+        session.getSubmission().mark2checkResubmission(new MCRBinding("/document/category", session.getRootBinding()));
+        session.getSubmission().setSubmittedValues("/document/category", new String[] { "a", "b", "c", "d" });
+        session.getSubmission().emptyNotResubmittedNodes();
+
+        categories = session.getEditedXML().getRootElement().getChildren("category");
         assertEquals(4, categories.size());
         assertEquals("a", categories.get(0).getText());
         assertEquals("b", categories.get(1).getText());

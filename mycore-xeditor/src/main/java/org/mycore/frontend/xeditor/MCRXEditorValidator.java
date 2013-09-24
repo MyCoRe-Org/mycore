@@ -64,7 +64,7 @@ public class MCRXEditorValidator {
         validationRules.clear();
     }
 
-    public void validate(Document editedXML) throws JDOMException, JaxenException {
+    public boolean isValid(Document editedXML) throws JDOMException, JaxenException {
         xPathsOfInvalidFields.clear();
 
         MCRBinding root = new MCRBinding(editedXML);
@@ -78,6 +78,8 @@ public class MCRXEditorValidator {
             if (!rule.isValid(value))
                 xPathsOfInvalidFields.add(xPath);
         }
+
+        return xPathsOfInvalidFields.isEmpty();
     }
 
     public boolean failed() {

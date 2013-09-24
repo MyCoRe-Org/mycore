@@ -6,7 +6,7 @@
       <label>The switch is on.</label>
       <label>The value is less than 3.</label>
       <label>The value is 2.</label>
-      <input value="1-2" name="_xed_session" type="hidden" />
+      <input value="1-0" name="_xed_session" type="hidden" />
     </form>
   </body>
 </html>

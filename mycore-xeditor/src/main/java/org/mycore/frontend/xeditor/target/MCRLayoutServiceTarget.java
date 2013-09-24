@@ -25,12 +25,13 @@ package org.mycore.frontend.xeditor.target;
 
 import javax.servlet.ServletContext;
 
+import org.jdom2.Document;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
-import org.mycore.frontend.xeditor.MCREditorStep;
+import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -39,20 +40,21 @@ public class MCRLayoutServiceTarget extends MCREditorTarget {
 
     @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String style) throws Exception {
-        MCREditorStep step = session.getCurrentStep();
-        session.getCurrentStep().setSubmittedValues(job.getRequest().getParameterMap());
+        session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
+        Document result = session.getEditedXML();
 
-        if (session.validate().failed()) {
-            redirectToEditorPage(job, session);
+        if (session.getValidator().isValid(result)) {
+            result = MCRChangeTracker.removeChangeTracking(result);
+            result = session.getXMLCleaner().clean(result);
+            result = session.getPostProcessor().process(result);
+
+            if ((style != null) && (!style.isEmpty()))
+                job.getRequest().setAttribute("XSL.Style", style);
+
+            MCRContent editedXML = new MCRJDOMContent(result);
+            MCRLayoutService.instance().doLayout(job.getRequest(), job.getResponse(), editedXML);
             return;
-        }
-
-        session.getXMLCleaner().clean(step.getDocument());
-
-        if ((style != null) && (!style.isEmpty()))
-            job.getRequest().setAttribute("XSL.Style", style);
-
-        MCRContent editedXML = new MCRJDOMContent(session.getPostProcessedXML());
-        MCRLayoutService.instance().doLayout(job.getRequest(), job.getResponse(), editedXML);
+        } else
+            redirectToEditorPage(job, session);
     }
 }

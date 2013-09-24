@@ -26,9 +26,10 @@ package org.mycore.frontend.xeditor.target;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 
+import org.jdom2.Document;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
-import org.mycore.frontend.xeditor.MCREditorStep;
+import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -38,21 +39,21 @@ public class MCRServletTarget extends MCREditorTarget {
     @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String servletNameOrPath)
             throws Exception {
-        MCREditorStep step = session.getCurrentStep();
-        session.getCurrentStep().setSubmittedValues(job.getRequest().getParameterMap());
+        session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
+        Document result = session.getEditedXML();
 
-        if (session.validate().failed()) {
+        if (session.getValidator().isValid(result)) {
+            result = MCRChangeTracker.removeChangeTracking(result);
+            result = session.getXMLCleaner().clean(result);
+            result = session.getPostProcessor().process(result);
+
+            RequestDispatcher dispatcher = context.getNamedDispatcher(servletNameOrPath);
+            if (dispatcher == null)
+                dispatcher = context.getRequestDispatcher(servletNameOrPath);
+
+            job.getRequest().setAttribute("MCRXEditorSubmission", result);
+            dispatcher.forward(job.getRequest(), job.getResponse());
+        } else
             redirectToEditorPage(job, session);
-            return;
-        }
-
-        session.getXMLCleaner().clean(step.getDocument());
-
-        RequestDispatcher dispatcher = context.getNamedDispatcher(servletNameOrPath);
-        if (dispatcher == null)
-            dispatcher = context.getRequestDispatcher(servletNameOrPath);
-
-        job.getRequest().setAttribute("MCRXEditorSubmission", session.getPostProcessedXML());
-        dispatcher.forward(job.getRequest(), job.getResponse());
     }
 }

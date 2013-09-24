@@ -90,7 +90,8 @@ public class MCRXEditorTransformer {
         if (transformer instanceof MCRParameterizedTransformer) {
             String key = MCRXEditorTransformerStore.storeTransformer(this);
             transformationParameters.setParameter("XEditorTransformerKey", key);
-            return ((MCRParameterizedTransformer) transformer).transform(editorSource, transformationParameters);
+            MCRContent result = ((MCRParameterizedTransformer) transformer).transform(editorSource, transformationParameters);
+            return result;
         } else {
             throw new MCRException("Xeditor needs parameterized MCRContentTransformer: " + transformer);
         }
@@ -101,7 +102,8 @@ public class MCRXEditorTransformer {
     }
 
     public String getCombinedSessionStepID() {
-        return editorSession.getCombinedSessionStepID();
+        editorSession.setBreakpoint("After transformation to HTML");
+        return editorSession.getID() + "-" + editorSession.getChangeTracker().getChangeCounter();
     }
 
     public void addNamespace(String prefix, String uri) {
@@ -109,14 +111,13 @@ public class MCRXEditorTransformer {
     }
 
     public void readSourceXML(String uri) throws JDOMException, IOException, SAXException, TransformerException {
-        if ((editorSession.getCurrentStep() != null) || (uri = replaceParameters(uri)).contains("{"))
+        if ((editorSession.getEditedXML() != null) || (uri = replaceParameters(uri)).contains("{"))
             return;
 
         LOGGER.info("Reading edited XML from " + uri);
         Document xml = MCRSourceContent.getInstance(uri).asXML();
-        MCREditorStep step = new MCREditorStep(xml);
-        step.setLabel("Loading XML from " + uri);
-        editorSession.setInitialStep(step);
+        editorSession.setEditedXML(xml);
+        editorSession.setBreakpoint("Reading XML from " + uri);
     }
 
     public void setCancelURL(String url) throws JDOMException, IOException, SAXException, TransformerException {
@@ -126,26 +127,23 @@ public class MCRXEditorTransformer {
     }
 
     public void setPostProcessorXSL(String stylesheet) {
-        editorSession.setPostProcessorXSL(stylesheet);
+        editorSession.getPostProcessor().setStylesheet(stylesheet);
     }
 
     public void bind(String xPath, String defaultValue, String name) throws JDOMException, JaxenException {
-        if (editorSession.getCurrentStep() == null)
-            createInitialStepFromXPath(xPath);
+        if (editorSession.getEditedXML() == null)
+            createEmptyDocumentFromXPath(xPath);
 
-        if (currentBinding == null) {
-            editorSession.startNextStep().setLabel("After transformation to HTML form");
-            currentBinding = editorSession.getCurrentStep().getRootBinding();
-        }
+        if (currentBinding == null)
+            currentBinding = editorSession.getRootBinding();
 
         currentBinding = new MCRBinding(xPath, defaultValue, name, currentBinding);
     }
 
-    private void createInitialStepFromXPath(String xPath) throws JaxenException {
+    private void createEmptyDocumentFromXPath(String xPath) throws JaxenException, JDOMException {
         Element root = createRootElement(xPath);
-        MCREditorStep step = new MCREditorStep(new Document(root));
-        step.setLabel("Starting with empty XML document");
-        editorSession.setInitialStep(step);
+        editorSession.setEditedXML(new Document(root));
+        editorSession.setBreakpoint("Starting with empty XML document");
     }
 
     private Element createRootElement(String xPath) throws JaxenException {
@@ -170,7 +168,7 @@ public class MCRXEditorTransformer {
     }
 
     public boolean hasValue(String value) {
-        editorSession.getCurrentStep().mark2checkResubmission(currentBinding);
+        editorSession.getSubmission().mark2checkResubmission(currentBinding);
         return currentBinding.hasValue(value);
     }
 
@@ -298,12 +296,11 @@ public class MCRXEditorTransformer {
         org.w3c.dom.Document doc = builder.newDocument();
         NodeSet ns = new NodeSet();
 
-        if (editorSession.getCurrentStep() != null)
-            for (String xPath : editorSession.getCurrentStep().getXPaths2CheckResubmission()) {
-                org.w3c.dom.Element element = doc.createElement("resubmit");
-                element.setTextContent(xPath);
-                ns.addNode(element);
-            }
+        for (String xPath : editorSession.getSubmission().getXPaths2CheckResubmission()) {
+            org.w3c.dom.Element element = doc.createElement("resubmit");
+            element.setTextContent(xPath);
+            ns.addNode(element);
+        }
         return new XNodeSetForDOM((NodeList) ns, context.getXPathContext());
     }
 

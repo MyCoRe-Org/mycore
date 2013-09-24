@@ -6,42 +6,16 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jaxen.JaxenException;
-import org.jdom2.Document;
 import org.jdom2.JDOMException;
 
-public class MCREditorStep implements Cloneable {
-
-    private String label;
-
-    private Document editedXML;
-
-    private MCRChangeTracker tracker = new MCRChangeTracker();
+public class MCREditorSubmission {
 
     private Set<String> xPaths2CheckResubmission = new HashSet<String>();
 
-    public MCREditorStep(Document editedXML) {
-        this.editedXML = editedXML;
-        MCRUsedNamespaces.addNamespacesFrom(editedXML.getRootElement());
-    }
+    private MCREditorSession session;
 
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public Document getDocument() {
-        return editedXML;
-    }
-
-    public MCRBinding getRootBinding() throws JDOMException {
-        return new MCRBinding(editedXML, tracker);
-    }
-
-    public MCRBinding bind(String xPath) throws JaxenException, JDOMException {
-        return new MCRBinding(xPath, getRootBinding());
+    public MCREditorSubmission(MCREditorSession session) {
+        this.session = session;
     }
 
     public void mark2checkResubmission(MCRBinding binding) {
@@ -65,8 +39,11 @@ public class MCREditorStep implements Cloneable {
     }
 
     public void emptyNotResubmittedNodes() throws JDOMException, JaxenException {
-        for (String xPath : xPaths2CheckResubmission)
-            new MCRBinding(xPath, getRootBinding()).setValue("");
+        for (String xPath : xPaths2CheckResubmission) {
+            MCRBinding binding = new MCRBinding(xPath, session.getRootBinding());
+            binding.setValue("");
+            binding.detach();
+        }
     }
 
     public void setSubmittedValues(Map<String, String[]> values) throws JaxenException, JDOMException {
@@ -77,10 +54,12 @@ public class MCREditorStep implements Cloneable {
                 setSubmittedValues(xPath, values.get(xPath));
 
         emptyNotResubmittedNodes();
+        session.setBreakpoint("After setting submitted values");
+
     }
 
     public void setSubmittedValues(String xPath, String[] values) throws JDOMException, JaxenException {
-        MCRBinding binding = bind(xPath);
+        MCRBinding binding = new MCRBinding(xPath, session.getRootBinding());
         List<Object> boundNodes = binding.getBoundNodes();
 
         while (boundNodes.size() < values.length)
@@ -92,12 +71,7 @@ public class MCREditorStep implements Cloneable {
         }
 
         removeXPaths2CheckResubmission(binding);
+        binding.detach();
     }
 
-    @Override
-    public MCREditorStep clone() {
-        Document xml = editedXML.getDocument().clone();
-        MCRChangeTracker.removeChangeTracking(xml);
-        return new MCREditorStep(xml);
-    }
 }
