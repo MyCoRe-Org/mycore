@@ -64,8 +64,8 @@ public class MCRSolrSearchServlet extends MCRServlet {
 
     static {
         String[] parameter = new String[] { "q", "sort", "start", "rows", "pageDoc", "pageScore", "fq", "cache", "fl",
-                "glob", "debug", "explainOther", "defType", "timeAllowed", "omitHeader", "sortOrder", "sortBy", "wt",
-                "qf", "q.alt", "mm", "pf", "ps", "qs", "tie", "bq", "bf", PHRASE_QUERY_PARAM };
+            "glob", "debug", "explainOther", "defType", "timeAllowed", "omitHeader", "sortOrder", "sortBy", "wt", "qf",
+            "q.alt", "mm", "pf", "ps", "qs", "tie", "bq", "bf", PHRASE_QUERY_PARAM };
         RESERVED_PARAMETER_KEYS = Collections.unmodifiableList(Arrays.asList(parameter));
     }
 
@@ -105,7 +105,8 @@ public class MCRSolrSearchServlet extends MCRServlet {
      * @throws ServletException 
      */
     protected Map<String, String[]> buildSelectParameterMap(Map<String, String[]> queryParameters,
-        Map<String, String[]> typeParameters, Map<String, String[]> sortParameters, Set<String> phraseQuery) throws ServletException {
+        Map<String, String[]> typeParameters, Map<String, String[]> sortParameters, Set<String> phraseQuery)
+        throws ServletException {
         HashMap<String, String[]> queryParameterMap = new HashMap<String, String[]>();
 
         HashMap<String, String> fieldTypeMap = createFieldTypeMap(typeParameters);
@@ -217,7 +218,10 @@ public class MCRSolrSearchServlet extends MCRServlet {
         Map<String, String[]> typeParameters = new HashMap<>();
         Map<String, String[]> sortParameters = new HashMap<>();
         Set<String> phraseQuery = new HashSet<>();
-        phraseQuery.addAll(Arrays.asList(job.getRequest().getParameterValues(PHRASE_QUERY_PARAM)));
+        String[] phraseFields = job.getRequest().getParameterValues(PHRASE_QUERY_PARAM);
+        if (phraseFields != null) {
+            phraseQuery.addAll(Arrays.asList(phraseFields));
+        }
 
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
