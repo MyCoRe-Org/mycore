@@ -265,21 +265,37 @@ public class MCRSession implements Cloneable {
     /** Set the ip to the given IP */
     public final void setCurrentIP(String newip) {
         java.util.StringTokenizer st = new java.util.StringTokenizer(newip, ".");
-        if (st.countTokens() != 4) {
-            return;
-        }
-        try {
-            while (st.hasMoreTokens()) {
-                int i = Integer.parseInt(st.nextToken());
-                if (i < 0 || i > 255) {
-                    return;
+        if (st.countTokens() == 4) {
+            try {
+                while (st.hasMoreTokens()) {
+                    int i = Integer.parseInt(st.nextToken());
+                    if (i < 0 || i > 255) {
+                        return;
+                    }
                 }
+            } catch (Exception e) {
+                LOGGER.debug("Exception while parsing new ip " + newip + " using old value.", e);
+                return;
             }
-        } catch (Exception e) {
-            LOGGER.debug("Exception while parsing new ip " + newip + " using old value.", e);
-            return;
+            ip = newip;
         }
-        ip = newip;
+        
+        //IPV6,z.B: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
+        st = new java.util.StringTokenizer(newip, ":");
+        if (st.countTokens() == 8) {
+            try {
+                while (st.hasMoreTokens()) {
+                    long l = Long.parseLong(st.nextToken(), 16);
+                    if (l < 0 || l > 65535) {
+                        return;
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.debug("Exception while parsing new ip " + newip + " using old value.", e);
+                return;
+            }
+            ip = newip;
+        }
     }
 
     public final long getLoginTime() {
@@ -327,7 +343,8 @@ public class MCRSession implements Cloneable {
             lastActivatedStackTrace.set(new RuntimeException("This is for debugging purposes only"));
             fireSessionEvent(activated, concurrentAccess.incrementAndGet());
         } else {
-            MCRException e = new MCRException("Cannot activate a Session more than once per thread: " + currentThreadCount.get().get());
+            MCRException e = new MCRException("Cannot activate a Session more than once per thread: "
+                    + currentThreadCount.get().get());
             LOGGER.warn("Too many activate() calls stacktrace:", e);
             LOGGER.warn("First activate() call stacktrace:", lastActivatedStackTrace.get());
         }
