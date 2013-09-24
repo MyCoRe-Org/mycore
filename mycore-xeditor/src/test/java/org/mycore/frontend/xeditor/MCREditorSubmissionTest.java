@@ -35,6 +35,7 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -55,7 +56,7 @@ public class MCREditorSubmissionTest {
         template = "document[title='Title'][author[@firstName='Jim'][@lastName='']]";
         Document expected = new Document(new MCRNodeBuilder().buildElement(template, null, null));
         Document result = session.getEditedXML();
-        result = session.getChangeTracker().removeChangeTracking(result);
+        result = MCRChangeTracker.removeChangeTracking(result);
         assertTrue(MCRXMLHelper.deepEqual(expected, result));
     }
 

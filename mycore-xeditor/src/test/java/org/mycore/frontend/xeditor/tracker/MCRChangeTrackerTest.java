@@ -162,7 +162,7 @@ public class MCRChangeTrackerTest extends MCRTestCase {
         Element author = (Element) (new MCRBinding("document/authors/author", new MCRBinding(doc)).getBoundNode());
         tracker.track(MCRRemoveElement.remove(author));
 
-        doc = tracker.removeChangeTracking(doc);
+        doc = MCRChangeTracker.removeChangeTracking(doc);
         assertFalse(doc.getDescendants(Filters.processinginstruction()).iterator().hasNext());
     }
 
