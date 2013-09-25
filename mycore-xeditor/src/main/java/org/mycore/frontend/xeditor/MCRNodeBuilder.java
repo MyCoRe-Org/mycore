@@ -244,7 +244,8 @@ public class MCRNodeBuilder {
 
     private Element buildElement(Namespace ns, String name, String value, Element parent) {
         Element element = new Element(name, ns);
-        element.setText(value == null ? "" : value);
+        if ((value != null) && !value.isEmpty())
+            element.setText(value);
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("building new element " + element.getName());
         if (parent != null)
