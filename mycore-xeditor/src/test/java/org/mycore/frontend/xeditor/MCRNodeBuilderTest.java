@@ -117,6 +117,41 @@ public class MCRNodeBuilderTest {
     }
 
     @Test
+    public void testFirstNodeBuilt() throws JaxenException, JDOMException {
+        MCRNodeBuilder builder = new MCRNodeBuilder();
+        builder.buildElement("element", null, null);
+        assertEquals("element", ((Element) (builder.getFirstNodeBuilt())).getName());
+
+        builder = new MCRNodeBuilder();
+        builder.buildAttribute("@attribute", null, null);
+        assertEquals("attribute", ((Attribute) (builder.getFirstNodeBuilt())).getName());
+
+        builder = new MCRNodeBuilder();
+        builder.buildElement("element", "value", null);
+        assertEquals("element", ((Element) (builder.getFirstNodeBuilt())).getName());
+
+        builder = new MCRNodeBuilder();
+        builder.buildAttribute("@attribute", "value", null);
+        assertEquals("attribute", ((Attribute) (builder.getFirstNodeBuilt())).getName());
+
+        builder = new MCRNodeBuilder();
+        Element parent = builder.buildElement("root/parent", null, null);
+        assertEquals("root", ((Element) (builder.getFirstNodeBuilt())).getName());
+
+        builder = new MCRNodeBuilder();
+        builder.buildElement("parent/child/grandchild", null, parent.getParent());
+        assertEquals("child", ((Element) (builder.getFirstNodeBuilt())).getName());
+
+        builder = new MCRNodeBuilder();
+        builder.buildElement("parent/child/grandchild", null, parent.getParent());
+        assertNull(builder.getFirstNodeBuilt());
+
+        builder = new MCRNodeBuilder();
+        builder.buildElement("parent/child[2]/grandchild", null, parent.getParent());
+        assertEquals("child", ((Element) (builder.getFirstNodeBuilt())).getName());
+    }
+
+    @Test
     public void testSimplePredicates() throws JaxenException, JDOMException {
         Element built = new MCRNodeBuilder().buildElement("element[child]", null, null);
         assertNotNull(built);

@@ -56,11 +56,17 @@ public class MCRNodeBuilder {
 
     private Map<String, Object> variables;
 
+    private Object firstNodeBuilt = null;
+
     public MCRNodeBuilder() {
     }
 
     public MCRNodeBuilder(Map<String, Object> variables) {
         this.variables = variables;
+    }
+
+    public Object getFirstNodeBuilt() {
+        return firstNodeBuilt;
     }
 
     public Element buildElement(String xPath, String value, Parent parent) throws JaxenException {
@@ -140,6 +146,9 @@ public class MCRNodeBuilder {
             built = buildStep(step, iterator.hasNext() ? null : value, parent);
             if (built == null)
                 return parent;
+            else if (firstNodeBuilt == null)
+                firstNodeBuilt = built;
+
             if (built instanceof Parent)
                 parent = (Parent) built;
         }
@@ -179,7 +188,7 @@ public class MCRNodeBuilder {
 
     private Element buildPredicates(List<Predicate> predicates, Element parent) throws JaxenException {
         for (Predicate predicate : predicates)
-            buildExpression(predicate.getExpr(), null, parent);
+            new MCRNodeBuilder(variables).buildExpression(predicate.getExpr(), null, parent);
         return parent;
     }
 

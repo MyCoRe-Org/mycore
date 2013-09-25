@@ -99,19 +99,12 @@ public class MCRBinding {
         LOGGER.debug("Bind to " + xPath + " selected " + boundNodes.size() + " node(s)");
 
         if (boundNodes.isEmpty()) {
-            Object built = new MCRNodeBuilder(variables).buildNode(xPath, defaultValue, (Parent) (parent.getBoundNode()));
+            MCRNodeBuilder builder = new MCRNodeBuilder(variables);
+            Object built = builder.buildNode(xPath, defaultValue, (Parent) (parent.getBoundNode()));
             LOGGER.debug("Bind to " + xPath + " generated node " + MCRXPathBuilder.buildXPath(built));
             boundNodes.add(built);
-            trackNodeCreated(findFirstBuilt(built, (Parent) (parent.getBoundNode())));
+            trackNodeCreated(builder.getFirstNodeBuilt());
         }
-    }
-
-    public Object findFirstBuilt(Object built, Parent root) {
-        Parent parent = built instanceof Element ? ((Element) built).getParent() : ((Attribute) built).getParent();
-        if ((parent == root) || (parent == null))
-            return built;
-        else
-            return findFirstBuilt(parent, root);
     }
 
     public MCRBinding(int pos, MCRBinding parent) {
