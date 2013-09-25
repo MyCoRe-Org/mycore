@@ -259,4 +259,24 @@ public class MCRChangeTrackerTest extends MCRTestCase {
         assertNull(root.getAttribute("href"));
         assertEquals(1, tracker.getChangeCounter());
     }
+
+    @Test
+    public void testSwapElements() throws JaxenException {
+        Element root = new MCRNodeBuilder().buildElement("parent[name='a'][note][foo][name[2]='b'][note[2]]", null, null);
+        Document doc = new Document(root);
+
+        assertEquals("a", root.getChildren().get(0).getText());
+        assertEquals("b", root.getChildren().get(3).getText());
+
+        MCRChangeTracker tracker = new MCRChangeTracker();
+        tracker.track(MCRSwapElements.swap(root, 0, 3));
+
+        assertEquals("b", root.getChildren().get(0).getText());
+        assertEquals("a", root.getChildren().get(3).getText());
+
+        tracker.undoChanges(doc);
+
+        assertEquals("a", root.getChildren().get(0).getText());
+        assertEquals("b", root.getChildren().get(3).getText());
+    }
 }

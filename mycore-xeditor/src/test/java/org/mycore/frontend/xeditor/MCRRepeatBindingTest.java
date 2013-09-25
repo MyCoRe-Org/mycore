@@ -84,4 +84,24 @@ public class MCRRepeatBindingTest extends MCRTestCase {
         assertEquals("c", ((Element) (repeat.getBoundNodes().get(1))).getAttributeValue("value"));
         assertEquals("a", ((Element) (repeat.getBoundNodes().get(2))).getAttributeValue("value"));
     }
+
+    @Test
+    public void testUpDownWithMixedElements() throws JaxenException, JDOMException {
+        Element template = new MCRNodeBuilder().buildElement("parent[name='a'][note][foo][name[2]='b'][note[2]]", null, null);
+        Document doc = new Document(template);
+        MCRBinding root = new MCRBinding(doc);
+
+        MCRRepeatBinding repeat = new MCRRepeatBinding("parent/name", root, 2, 0);
+        assertEquals(2, repeat.getBoundNodes().size());
+
+        assertEquals("a", ((Element) (repeat.getBoundNodes().get(0))).getText());
+        assertEquals("b", ((Element) (repeat.getBoundNodes().get(1))).getText());
+        assertEquals("a", doc.getRootElement().getChildren().get(0).getText());
+        assertEquals("b", doc.getRootElement().getChildren().get(3).getText());
+        repeat.up(2);
+        assertEquals("b", ((Element) (repeat.getBoundNodes().get(0))).getText());
+        assertEquals("a", ((Element) (repeat.getBoundNodes().get(1))).getText());
+        assertEquals("b", doc.getRootElement().getChildren().get(0).getText());
+        assertEquals("a", doc.getRootElement().getChildren().get(3).getText());
+    }
 }

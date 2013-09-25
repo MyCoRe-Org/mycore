@@ -6,6 +6,7 @@ import org.jaxen.JaxenException;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.frontend.xeditor.tracker.MCRRemoveElement;
+import org.mycore.frontend.xeditor.tracker.MCRSwapElements;
 
 public class MCRRepeatBinding extends MCRBinding {
 
@@ -50,13 +51,16 @@ public class MCRRepeatBinding extends MCRBinding {
     }
 
     public void up(int pos) {
-        Element element = (Element) (boundNodes.remove(pos - 1));
-        boundNodes.add(pos - 2, element);
+        // Swap positions in boundNodes
+        Element a = (Element) (boundNodes.get(pos - 2));
+        Element b = (Element) (boundNodes.remove(pos - 1));
+        boundNodes.add(pos - 2, b);
 
-        Element parent = element.getParentElement();
-        int posInParent = parent.indexOf(element);
-        element.detach();
-        parent.addContent(posInParent - 1, element);
+        // Swap positions in parent element, assume same parent
+        Element parent = a.getParentElement();
+        int posA = parent.indexOf(a);
+        int posB = parent.indexOf(b);
+        track(MCRSwapElements.swap(parent, posA, posB));
     }
 
     public void down(int pos) {
