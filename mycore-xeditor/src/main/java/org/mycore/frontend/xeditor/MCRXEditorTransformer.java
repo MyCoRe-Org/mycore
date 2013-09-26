@@ -25,8 +25,10 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,6 +52,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
+import org.jdom2.Verifier;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
@@ -81,6 +84,18 @@ public class MCRXEditorTransformer {
     public MCRXEditorTransformer(MCREditorSession editorSession, MCRParameterCollector transformationParameters) {
         this.editorSession = editorSession;
         this.transformationParameters = transformationParameters;
+        removeIllegalVariables(transformationParameters.getParameterMap());
+    }
+
+    private void removeIllegalVariables(Map<String, Object> xPathVariables) {
+        for (Iterator<Entry<String, Object>> entries = xPathVariables.entrySet().iterator(); entries.hasNext();) {
+            String name = entries.next().getKey();
+            String result = Verifier.checkXMLName(name);
+            if (result != null) {
+                LOGGER.warn("Illegally named transformation parameter, removing " + name);
+                entries.remove();
+            }
+        }
     }
 
     public MCRContent transform(MCRContent editorSource) throws IOException, JDOMException, SAXException {
@@ -260,11 +275,12 @@ public class MCRXEditorTransformer {
     public String evaluateXPath(String xPathExpression) {
         xPathExpression = "string(" + xPathExpression + ")";
         try {
-            Map<String, Object> xPathVariables = currentBinding.buildXPathVariables();
-            xPathVariables.putAll(transformationParameters.getParameterMap());
-            XPathFactory factory = XPathFactory.instance();
+            Map<String, Object> variables = currentBinding.buildXPathVariables();
+            variables.putAll(transformationParameters.getParameterMap());
+
             List<Namespace> namespaces = MCRUsedNamespaces.getNamespaces();
-            XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), xPathVariables, namespaces);
+            XPathFactory factory = XPathFactory.instance();
+            XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), variables, namespaces);
             return xPath.evaluateFirst(currentBinding.getBoundNodes()).toString();
         } catch (Exception ex) {
             LOGGER.warn("unable to evaluate XPath: " + xPathExpression);
