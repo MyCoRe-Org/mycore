@@ -10,12 +10,12 @@ var ACLEditor = function(){
 	return {
 		init: function(ruleSelect, accessTable, ruleList){
 			$("body").on("change", "select", function() {
-				if($(this).children("option:selected").attr("title") == ""){
+				if($(this).children("option:selected").val() == "new"){
 					$('#lightbox-new-rule').modal('show');
 				}
 			});
 			
-			$("body").on("change", ".access-rule", function() {
+			$("body").on("change", ".access-rule-parent > .access-rule", function() {
 				var access = $(this).parents(".table-access-entry");
 				var json = {
 							"accessIDOld": access.find(".access-id").text(),
@@ -29,10 +29,10 @@ var ACLEditor = function(){
 			});
 			
 			$("body").on("click", "#button-new-access", function() {
-				$("#table-new-access > .control-group.error").removeClass("control-group error");
+				$("#table-new-access > .form-group.has-error").removeClass("form-group has-error");
 				var accessID = $("#new-access-id").val();
 				var accessPool = $("#new-access-pool").val();
-				var accessRule = $("#new-access-rule").val();
+				var accessRule = $(".new-access-rule > select").val();
 				
 				if(accessID != "" &&  accessPool != "" && accessRule != "" && accessRule != "new"){
 					addAccess(accessID, accessPool , accessRule); 
@@ -40,13 +40,13 @@ var ACLEditor = function(){
 				else{
 					showAlert(i18nKeys["ACLE.alert.access.fields"]);
 					if (accessID == ""){
-						$("#new-access-id").parent().addClass("control-group error");
+						$("#new-access-id").parent().addClass("form-group has-error");
 					}
 					if (accessPool == ""){
-						$("#new-access-pool").parent().addClass("control-group error");
+						$("#new-access-pool").parent().addClass("form-group has-error");
 					}
 					if (accessRule == "" || accessRule == "new"){
-						$("#new-access-rule").parent().addClass("control-group error");
+						$(".new-access-rule").addClass("form-group has-error");
 					}
 				}
 			});
@@ -63,6 +63,16 @@ var ACLEditor = function(){
 			});
 						
 			$("body").on("click", "#button-remove-multi-access", function() {
+				$(".table-access-entry .icon-check").each(function() {						
+					var access = $(this).parents(".table-access-entry");
+					var p = $("<p></p>");
+					p.html(access.find(".access-id").text() + " : " + access.find(".access-pool").text() + " : " + access.find(".access-rule:not(.select2-container)").val()); 
+					$("#lightbox-multi-delete-list").append(p);
+				});
+				$('#lightbox-multi-delete').modal('show');
+			});
+					
+			$("body").on("click", "#lightbox-multi-delete-delete", function() {
 				var json = {
 						  "access": [],
 						};
@@ -71,28 +81,35 @@ var ACLEditor = function(){
 					access.addClass("delete");
 					json.access.push({"accessID": access.find(".access-id").text(), "accessPool": access.find(".access-pool").text()});
 				});
-				removeAccess(json); 
+				removeAccess(json);
+				$("#lightbox-multi-delete-list").html("");
+				$('#lightbox-multi-delete').modal('hide');
+			});
+			
+			$("body").on("click", ".lightbox-multi-delete-cancel", function() {
+				$("#lightbox-multi-delete-list").html("");
+				$('#lightbox-multi-delete').modal('hide');
 			});
 						
 			$("body").on("click", "#new-rule-add", function() {
-				$("#lightbox-alert-area").removeClass("in");
-				$("#rule-detail-table > .control-group.error").removeClass("control-group error");
-				if ($(".new-rule-text").attr("value") != ""){
+				$("#lightbox-new-rule-alert-area").removeClass("in");
+				$("#lightbox-rule-detail-table > .form-group.has-error").removeClass("form-group has-error");
+				if ($(".new-rule-text").val() != ""){
 					addRule($("#new-rule-desc").val(), $(".new-rule-text").val())
 					$('#lightbox-new-rule').modal('hide');
 					$("#new-rule-desc").val("");
 					$(".new-rule-text").val("");
 				}
 				else{
-					$("#lightbox-alert-area").addClass("in");
-					$(".new-rule-text").parent().addClass("control-group error");
+					$("#lightbox-new-rule-alert-area").addClass("in");
+					$(".new-rule-text").parent().addClass("form-group has-error");
 				}
 			});
 			
 			$("body").on("click", ".new-rule-cancel", function() {
-				$("#new-access-rule").select2("val", "");
-				$("#lightbox-alert-area").removeClass("in");
-				$("#rule-detail-table > .control-group.error").removeClass("control-group error");
+				$(".new-access-rule > select").select2("val", "");
+				$("#lightbox-new-rule-alert-area").removeClass("in");
+				$("#lightbox-rule-detail-table > .form-group.has-error").removeClass("form-group has-error");
 				$("#new-rule-desc").val("");
 				$(".new-rule-text").val("");
 			});
@@ -106,9 +123,9 @@ var ACLEditor = function(){
 			});
 			
 			$("body").on("click", "#button-delete-rule", function() {
-				var rule = $(this).parents("#rule-detail-table");
-				if (canDelete(rule.find("#rule-detail-ruleID").html())){
-					removeRule(rule.find("#rule-detail-ruleID").html());
+				var ruleID = $(this).parents("#rule-detail-table").find("#rule-detail-ruleID").html();
+				if ($("#rule-list .rule-selected[ruleid=" + ruleID + "]").hasClass("canDelete")){
+					removeRule(ruleID);
 				}
 				else{
 					showAlert(i18nKeys["ACLE.alert.rule.inUse"], false);
@@ -116,17 +133,17 @@ var ACLEditor = function(){
 			});
 			
 			$("body").on("click", "#button-save-rule", function() {
-				$("#rule-detail-table > .control-group.error").removeClass("control-group error");
-				if ($(".rule-detail-ruleText").attr("value") != ""){
+				$("#rule-detail-table > .form-group.has-error").removeClass("form-group has-error");
+				if ($(".rule-detail-ruleText").val() != ""){
 					if ($("#rule-detail-ruleID").html() == ""){
-						addRule($("#rule-detail-ruleDesc").val(), $(".rule-detail-ruleText").attr("value"));
+						addRule($("#rule-detail-ruleDesc").val(), $(".rule-detail-ruleText").val());
 					}
 					else{
-						editRule($("#rule-detail-ruleID").html(), $("#rule-detail-ruleDesc").val(), $(".rule-detail-ruleText").attr("value"));
+						editRule($("#rule-detail-ruleID").html(), $("#rule-detail-ruleDesc").val(), $(".rule-detail-ruleText").val());
 					}
 				}
 				else{
-					$(".rule-detail-ruleText").parent().addClass("control-group error");
+					$(".rule-detail-ruleText").parent().addClass("form-group has-error");
 					showAlert(i18nKeys["ACLE.alert.rule.noRule"])	
 				}
 			});
@@ -156,7 +173,7 @@ var ACLEditor = function(){
 			
 			$("body").on("click", ".table-access-entry-td", function() {
 				if(!$(this).hasClass("show-input")){
-					var input = $('<input type="text" class="input-xlarge table-access-entry-input" value="' + $(this).attr("title") + '"></input>');
+					var input = $('<input type="text" class="input-sm form-control table-access-entry-input" value="' + $(this).attr("title") + '"></input>');
 					$(this).html(input);
 					input.focus();
 					$(this).addClass("show-input");
@@ -165,7 +182,7 @@ var ACLEditor = function(){
 			
 			$("body").on("keydown", ".table-access-entry-input", function(key) {
 				if(key.which == 13) {
-					$(".edit").find(".show-input").removeClass("control-group error");
+					$(".edit").find(".show-input").removeClass("form-group has-error");
 					var parent = $(this).parent();
 					var entry = parent.parent();
 					if($(this).val() != parent.attr("title")){
@@ -192,7 +209,7 @@ var ACLEditor = function(){
 					}
 				}
 				if(key.which == 27) {
-					$(".edit").find(".show-input").removeClass("control-group error");
+					$(".edit").find(".show-input").removeClass("form-group has-error");
 					var parent = $(this).parent();
 					var entry = parent.parent();
 					accessTableInstance.edit(entry, entry.find(".access-id").attr("title"), entry.find(".access-pool").attr("title"), entry.find(".access-rule:not(.select2-container)").val());
@@ -218,10 +235,78 @@ var ACLEditor = function(){
 				}
 			});
 			
+			$("body").on("click", "#button-filter-rule", function() {
+				$("#access-filter-input-rule").val($(this).parents("#rule-detail-table").find("#rule-detail-ruleID").html());
+				filterTable();
+				$("#ruleAllocation-tab").tab("show");
+			});
+						
+			$("body").on("click", "#button-edit-multi-access", function() {
+				var elm = $(".table-access-entry .icon-check").length;
+				if (elm > 0){
+					$('#lightbox-multi-edit').modal('show');
+					ruleSelectorInstance.append("", $("#lightbox-multi-edit-select"));
+					$("#lightbox-multi-edit-select select").addClass("input-xxlarge");
+					$("#lightbox-multi-edit-select select").removeClass("input-xlarge");
+					$("#lightbox-multi-edit-select .new-access-rule-option").remove();
+					$("#lightbox-multi-edit-text").html("Zugriffsrechte für " + elm + " Elemente bearbeiten.")
+				}
+				else{
+					showAlert(i18nKeys["ACLE.alert.access.edit.select.error"]);
+				}				
+			});
+			
+			$("body").on("click", "#lightbox-multi-edit-edit", function() {
+				$("#lightbox-multi-edit-alert-area").removeClass("in");
+				$("#lightbox-multi-edit-select").removeClass("form-group has-error");
+				if ($("#lightbox-multi-edit-select select").val() != ""){
+					var json = {
+							  "access": [],
+							};
+					$(".table-access-entry .icon-check").each(function() {
+						var access = $(this).parents(".table-access-entry");
+						access.addClass("multi-edit");
+						json.access.push({"accessID": access.find(".access-id").text(), "accessPool": access.find(".access-pool").text(), "accessRule": $("#lightbox-multi-edit-select select").val()});
+					});
+					editMultiAccess(json);
+					hideMultiEdit();
+				}
+				else{
+					$("#lightbox-multi-edit-alert-area").addClass("in");
+					$("#lightbox-multi-edit-select").addClass("form-group has-error");
+				}
+			});
+			
+			$("body").on("click", "#lightbox-multi-edit-plus", function() {
+				if ($("#lightbox-multi-edit-list:visible").length == 0){
+					$(".table-access-entry .icon-check").each(function() {						
+						var access = $(this).parents(".table-access-entry");
+						var p = $("<p></p>");
+						p.html(access.find(".access-id").text() + " : " + access.find(".access-pool").text() + " : " + access.find(".access-rule:not(.select2-container)").val()); 
+						$("#lightbox-multi-edit-list").append(p);
+					});
+					$("#lightbox-multi-edit-list").show();
+					$("#lightbox-multi-edit-plus").addClass("glyphicon-minus");
+					$("#lightbox-multi-edit-plus").removeClass("glyphicon-plus");
+				}
+				else{
+					$("#lightbox-multi-edit-list").html("");
+					$("#lightbox-multi-edit-list").hide();
+					$("#lightbox-multi-edit-plus").addClass("glyphicon-plus");
+					$("#lightbox-multi-edit-plus").removeClass("glyphicon-minus");
+				}
+			});
+			
+			$("body").on("click", ".lightbox-multi-edit-cancel", function() {
+				$("#lightbox-multi-edit-alert-area").removeClass("in");
+				$("#lightbox-multi-edit-select").removeClass("form-group has-error");
+				hideMultiEdit();
+			});
+			
 			ruleSelectorInstance = ruleSelect;
 			accessTableInstance = accessTable;
 			ruleListInstance = ruleList;
-			var lang = $("#jportal_acl_editor_module").attr("lang");
+			var lang = $("#mycore-acl-editor2").attr("lang");
 			jQuery.getJSON("/servlets/MCRLocaleServlet/" + lang + "/ACLE.*", function(data) { 
 				i18nKeys = data;
 				getAccess();
@@ -263,7 +348,8 @@ var ACLEditor = function(){
 					splitTable();
 					$("#new-access-id").val("");
 					$("#new-access-pool").val("");
-					$("#new-access-rule").select2("val", "");
+					$(".new-access-rule > select").select2("val", "");
+					ruleListInstance.updateCanDelete();
 					showAlert(i18nKeys["ACLE.alert.access.add.success.1"] + accessID + i18nKeys["ACLE.alert.access.add.success.2"], true);
 				},
 				409: function() {
@@ -286,11 +372,35 @@ var ACLEditor = function(){
 			statusCode: {
 				200: function() {
 					accessTableInstance.edit($(".edit"), json.accessIDNew, json.accessPoolNew, json.accessRuleNew);
+					ruleListInstance.updateCanDelete();
 					showAlert(i18nKeys["ACLE.alert.access.edit.success"], true);
 				},
 				409: function() {
-					$(".edit").find(".show-input").addClass("control-group error");
+					$(".edit").find(".show-input").addClass("form-group has-error");
 					showAlert(i18nKeys["ACLE.alert.access.add.exist"]);
+				},
+				500: function(error) {
+					showAlert(i18nKeys["ACLE.alert.access.edit.error"]);
+				}
+			}
+		});
+	}
+	
+	function editMultiAccess(json){
+		$.ajax({
+			url: "/rsc/ACLE/multi",
+			type: "PUT",
+			contentType: 'application/json',
+			dataType: "json",
+			data: JSON.stringify(json),
+			statusCode: {
+				200: function(data) {
+					accessTableInstance.editMulti(data);
+					ruleListInstance.updateCanDelete();
+					$(".icon-check").addClass("icon-check-empty");
+					$(".icon-check").prop("checked", false);
+					$(".icon-check").removeClass("icon-check");
+					showAlert(i18nKeys["ACLE.alert.access.edit.success"], true);
 				},
 				500: function(error) {
 					showAlert(i18nKeys["ACLE.alert.access.edit.error"]);
@@ -310,6 +420,7 @@ var ACLEditor = function(){
 				200: function(data) {
 					accessTableInstance.remove(data);
 					splitTable();
+					ruleListInstance.updateCanDelete();
 					showAlert(i18nKeys["ACLE.alert.access.remove.success"], true);
 				},
 				500: function(error) {
@@ -328,16 +439,25 @@ var ACLEditor = function(){
 			data: JSON.stringify({ruleDesc: ruleDesc, ruleText: ruleText}),
 			statusCode: {
 				200: function(ruleID) {
-					ruleSelectorInstance.add(ruleID, ruleDesc, ruleText);
-					ruleSelectorInstance.update();
-					$("#new-access-rule").select2("val", ruleID);
-					ruleListInstance.add(ruleID, ruleDesc, ruleText);
-					ruleListInstance.select(ruleID);
-					$('#rule-list').animate({scrollTop : $('#rule-list').height()},'fast');
-					showAlert(i18nKeys["ACLE.alert.rule.add.success.1"] + ruleDesc + i18nKeys["ACLE.alert.rule.add.success.2"] + ruleID + i18nKeys["ACLE.alert.rule.add.success.3"], true);	
+					if(ruleID != ""){
+						ruleSelectorInstance.add(ruleID, ruleDesc, ruleText);
+						ruleSelectorInstance.update();
+						$(".new-access-rule > select").select2("val", ruleID);
+						ruleListInstance.add(ruleID, ruleDesc, ruleText);
+						ruleListInstance.select(ruleID);
+						$('#rule-list').animate({scrollTop : $('#rule-list').height()},'fast');
+						showAlert(i18nKeys["ACLE.alert.rule.add.success.1"] + ruleDesc + i18nKeys["ACLE.alert.rule.add.success.2"] + ruleID + i18nKeys["ACLE.alert.rule.add.success.3"], true);
+					}
+					else{
+						showAlert(i18nKeys["ACLE.alert.rule.add.error"]);
+						$(".new-access-rule > select").select2("val", "");
+						$("#rule-detail-ruleDesc").val("");
+						$(".rule-detail-ruleText").val("");
+					}
 				},
 				500: function(error) {
 					showAlert(i18nKeys["ACLE.alert.rule.add.error"]);
+					$(".new-access-rule > select").select2("val", "");
 				}
 			}
 		});
@@ -389,34 +509,7 @@ var ACLEditor = function(){
 			}
 		});
 	}
-		
-	function canDelete(ruleID){
-		result = true;
-		$(".access-rule option:selected").each(function() {
-			if ($(this).attr("value") == ruleID){
-				result = false;
-			}
-		});
-		return result;
-	}
-	
-	function updateRuleSelector() {
-		$(".access-rule").each(function() {
-			var rule = $(this).children("option:selected").attr("value");
-			$(this).replaceWith(ruleSelector.clone().val(rule));
-		});
-		$("#new-access-rule").html(ruleSelector.html());
-		$("#new-access-rule").prepend("<option value='' selected>" + i18nKeys["ACLE.select.select"] + "</option>");
-		$("#new-access-rule").append("<option id='new-access-rule-option' value='new' title=''>" + i18nKeys["ACLE.select.newRule"] + "</option>");
-		$(".access-rule").select2({
-			matcher: function(term, text, opt) {
-					return text.toUpperCase().indexOf(term.toUpperCase())>=0
-						|| opt.attr("title").toUpperCase().indexOf(term.toUpperCase())>=0;
-				},
-			formatResult: formatSelect
-		});
-	}
-	
+
 	function filterTable() {
 		$(".table-access-entry").addClass("filter-hide");
 		var filterID = $("#access-filter-input-id").val();
@@ -456,7 +549,7 @@ var ACLEditor = function(){
 	    if(filterRule != ""){
 			$(".table-access-entry")
 		    .filter(function() {
-		        return $(this).find(".access-rule option:selected").attr("value").match(new RegExp("^" + filterRule, "i"));
+		        return $(this).find(".access-rule option:selected").val().match(new RegExp("^" + filterRule, "i"));
 		    })
 		    .removeClass("filter-hide");
 			
@@ -476,7 +569,7 @@ var ACLEditor = function(){
 	function showAlert(text, success) {
 		$('#alert-area').removeClass("in");
 		$("#alert-area").removeClass("alert-success");
-		$("#alert-area").removeClass("alert-error");
+		$("#alert-area").removeClass("alert-danger");
 		if (timeOutID != null){
 			window.clearTimeout(timeOutID);
 		}
@@ -487,13 +580,13 @@ var ACLEditor = function(){
 			$("#alert-area").addClass("in");
 		}
 		else{
-			$("#alert-area").addClass("alert-error");
+			$("#alert-area").addClass("alert-danger");
 			$("#alert-area").addClass("in");
 		}
 		timeOutID = window.setTimeout(function() {
 				$('#alert-area').removeClass("in")
 				$("#alert-area").removeClass("alert-success");
-				$("#alert-area").removeClass("alert-error");
+				$("#alert-area").removeClass("alert-danger");
 			}, 5000);
 	}
 	
@@ -504,7 +597,10 @@ var ACLEditor = function(){
 				ids.push($(this).attr("title"));
 			}
 		});
-		$("#access-filter-input-id").typeahead({source: ids});
+		$("#access-filter-input-id").typeahead({
+			  name: 'access-ids',
+			  local: ids
+			});
 		
 		var pools = new Array();
 		$.each($(".access-pool"), function() {
@@ -512,18 +608,24 @@ var ACLEditor = function(){
 				pools.push($(this).attr("title"));
 			}
 		});
-		$("#access-filter-input-pool").typeahead({source: pools});
+		$("#access-filter-input-pool").typeahead({
+			  name: 'access-pools',
+			  local: pools
+			});
 		
 		var rules = new Array();
 		$.each($(".access-rule option:selected"), function() {
-			if($.inArray($(this).attr("value"), rules) == -1){
-				rules.push($(this).attr("value"));
+			if($.inArray($(this).val(), rules) == -1){
+				rules.push($(this).val());
 			}
 			if($.inArray($(this).html(), rules) == -1){
 				rules.push($(this).html());
 			}
 		});
-		$("#access-filter-input-rule").typeahead({source: rules});
+		$("#access-filter-input-rule").typeahead({
+			  name: 'access-rules',
+			  local: rules
+			});
 	}
 	
 	function splitTable() {
@@ -538,7 +640,7 @@ var ACLEditor = function(){
 	}
 	
 	function buildPaginator(page) {
-		$(".pagination ul").html("");
+		$(".pagination").html("");
 		pagecount = Math.ceil($("#access-table tbody tr:not(.filter-hide)").size() / $("#elem-per-page-input").val());
 		if(pagecount > 3){
 			if(page > 2){
@@ -612,7 +714,7 @@ var ACLEditor = function(){
 		else{
 			var pageButton = $('<span>' + name + '</span>');
 		}
-		$("<li></li>").append(pageButton).addClass(state).appendTo(".pagination ul");
+		$("<li></li>").append(pageButton).addClass(state).appendTo(".pagination");
 	}
 	
 	function refreshPageNumbers() {
@@ -641,20 +743,27 @@ var ACLEditor = function(){
 		span.attr("title", $(item.element).attr("title"));
 		return span;
 	}
+	
+	function hideMultiEdit() {
+		$('#lightbox-multi-edit').modal('hide');
+		$("#lightbox-multi-edit-list").html("");
+		$("#lightbox-multi-edit-list").hide();
+		$("#lightbox-multi-edit-plus").addClass("icon-plus");
+		$("#lightbox-multi-edit-plus").removeClass("icon-minus");		
+		$("#lightbox-multi-edit-select").find("select").select2("destroy");
+		$("#lightbox-multi-edit-select").find("select").remove();
+	}
 }
 
 $(document).ready(function() {
 	var aclEditorInstance = new ACLEditor();
-    if (!$.isFunction(jQuery.fn.typeahead)){
+    if (!$.isFunction(jQuery.fn.tab)){
     	$.getScript('/rsc/ACLE/gui/js/bootstrap.min.js')
     		.done(function() {
-    			console.log("bootstrap.min.js loaded");
     			aclEditorInstance.init(new RuleSelector(), new AccessTable(), new RuleList());
     		});
     }
     else{
     	aclEditorInstance.init(new RuleSelector(), new AccessTable(), new RuleList());
     }
-	
-    
 });

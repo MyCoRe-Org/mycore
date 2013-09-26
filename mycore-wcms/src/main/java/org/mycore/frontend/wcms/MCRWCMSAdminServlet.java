@@ -154,7 +154,10 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
         for (MCRUser user : users) {
             Element userEl = new Element("user");
             userEl.setAttribute("ID", user.getUserID());
-            userEl.setAttribute("realName", user.getRealName());
+            String realName = user.getRealName();
+            if(realName != null) {
+                userEl.setAttribute("realName", realName);
+            }
             root.addContent(userEl);
         }
         return root;

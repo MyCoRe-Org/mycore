@@ -1,11 +1,6 @@
 @CHARSET "UTF-8";
-body{
-	margin: 0 auto;
-	background-color: transparent;
-}
-
-#jportal_acl_editor_module{
-	width: 966px;
+#mycore-acl-editor2{
+	margin-bottom: 10px;
 }
 
 #header{
@@ -13,7 +8,7 @@ body{
 	padding-bottom: 0px;
 }
 
-.jp-layout-maintitle label{
+#header label{
     font-size: 13pt;
 }
 
@@ -29,7 +24,7 @@ body{
     font-weight: bold;
 }
 
-#rule-detail-table label{
+.rule-detail-table label{
 	font-weight: bold;
 	line-height: 20px;
 }
@@ -50,6 +45,7 @@ label{
 
 .icon{
 	cursor: pointer;
+	font-size: 14px;
 }
 .nav {
 	margin-bottom: 0px;
@@ -74,20 +70,20 @@ label{
 }
 
 #access-filter{
-	margin-left: 35px;
+	margin-left: 10px;
 	margin-bottom: 15px;
+	width: 945px;
 }
 
-#access-filter input{
-	margin-right: 10px;
+#access-filter > div{
+	margin-right: -20px;
 }
 
 #access-table {
     table-layout: fixed;
-	width: 966px;
+	width: 941px;
 	margin-top: 5px;
 	margin-bottom: 10px;
-/* 	border: 1px solid #DDDDDD; */
 }
 
 #access-table td {
@@ -110,6 +106,14 @@ label{
 	width: 30px;
 }
 
+.table-access-entry > td.table-access-entry-td{
+	padding-left: 8px;
+}
+
+.sort-table-head{
+	width: 280px;
+}
+
 select, textarea, input[type="text"]{
 	margin-bottom: 0px;
 }
@@ -125,8 +129,16 @@ div.input-xlarge{
 
 #bottom-buttons{
 	margin-left: 5px;
-	width: 961px;
+	width: 936px;
 	height: 150px;
+}
+
+#button-remove-multi-access{
+	margin-left: 10px;
+}
+
+#rules{
+	width: 941px;
 }
 
 #rule-list{
@@ -135,7 +147,6 @@ div.input-xlarge{
 	height: 500px;
 	margin-top: 0px;
 	overflow: auto;
-/*     font-size: medium; */
     list-style: none outside none;
     padding-left: 0;
     padding-top: 5px;
@@ -147,6 +158,14 @@ div.input-xlarge{
 	overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+#rule-list .rule-list-entry{
+	color: #000;
+}
+
+#rule-list .canDelete{
+	color: #bbb;
 }
 
 #rule-list li:nth-child(odd) {
@@ -161,37 +180,34 @@ div.input-xlarge{
 	background-color: #47c2ff;
 }
 
-#rule-detail-table{
+.rule-detail-table{
 	display: inline-block;
 	vertical-align: top;
 }
 
-#rule-detail-table dd{
+.rule-detail-table dd{
 	margin-bottom: 10px;
 }
 
-#rule-detail-table dt{
-	width: 120px;
+.rule-detail-table dt{
+	width: 110px;
 }
 
-#rule-detail-table dd{
-	margin-left: 140px;
+.rule-detail-table dd{
+	margin-left: 120px;
+	width: 364px;
 }
 
-#rule-detail-table .input-xlarge{
-	width: 350px;
-}
-
-#rule-detail-table textarea{
+.rule-detail-table textarea{
 	height: 135px;
 }
 
-#rule-detail-table .icon{
+.rule-detail-table .icon{
 	float: right;
 	margin-left: 10px;
 }
 
-#lightbox-alert-area{
+.lightbox-alert-area{
 	margin-bottom: 0px;
 	text-align: center;
 }
@@ -204,36 +220,152 @@ div.input-xlarge{
 	display: none;
 }
 
-#elem-per-page{
-	float: right;
-}
-
-#access-input{
-	margin-left: 35px;
-	margin-bottom: 15px;
-}
-
-#access-input input{
-	margin-right: 10px;
-}
-
-.control-group.error .select2-container .select2-choice{
+.form-group.has-error .select2-container .select2-choice{
 	color: #B94A48;
 	border-color: #B94A48;
 }
 
-input.control-group.error{
-	color: #B94A48;
-	border-color: #b94a48;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+#loading .icon-spinner{
+	margin-left: 420px;
 }
 
-#contentArea .pagination ul > li {
+.faded{
+	opacity: 0.3;
+}
+
+#lightbox-multi-edit-plus{
+	margin-top: -2px;
+}
+
+#lightbox-multi-edit-text{
+	display: inline-block;
+	font-size: 16px;
+}
+
+#lightbox-multi-edit-select{
+	border-top: 1px solid #DDDDDD;
+	padding-top: 10px;
+}
+
+#lightbox-multi-delete-main > div > h4 > label{
+    font-size: 17.5px;
+    font-weight: bold;
+    line-height: 20px;
+    margin-bottom: 5px;
+}
+#lightbox-multi-delete-list{
+	margin-top: 10px;
+}
+
+#contentArea .pagination > li {
     display: inline;
 }
 
-#loading .icon-spinner{
-	margin-left: 420px;
+#paginator{
+	margin-left: 640px;
+}
+
+#elem-per-page-input{
+	display: inline;
+    margin-left: 5px;
+    width: 60px;
+}
+
+#button-access-filter{
+    margin-left: 15px;
+    margin-top: 5px
+}
+
+.input-xxlarge {
+  width: 530px;
+}
+
+.delete-warning{
+	border-left: 5px solid #F1E7BC;
+	margin-bottom: 0px;
+}
+
+/*typeahead.js-bootstrap.css */
+.twitter-typeahead {
+    width: 100%;
+    position: relative;
+}
+
+.twitter-typeahead .tt-query,
+.twitter-typeahead .tt-hint {
+    margin-bottom: 0;
+    width: 100%;
+    height: 30px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    line-height: 1.5;
+    padding: 5px 10px;
+}
+
+.twitter-typeahead .tt-hint {
+    color: #a1a1a1;
+    z-index: 1;
+    padding: 5px 10px;
+    border: 1px solid transparent;
+}
+
+.twitter-typeahead .tt-query {
+    z-index: 2;
+    border-radius: 3px 3px 3px 3px;;
+}
+
+.input-group-addon + .twitter-typeahead > .tt-query {
+    border-top-left-radius: 0!important;
+    border-bottom-left-radius: 0!important;
+}
+
+.input-group-appended > .twitter-typeahead > .tt-query {
+    border-top-right-radius: 0!important;
+    border-bottom-right-radius: 0!important;
+}
+
+.tt-dropdown-menu {
+    min-width: 160px;
+    margin-top: 2px;
+    padding: 5px 0;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border: 1px solid rgba(0, 0, 0, .2);
+    *border-right-width: 2px;
+    *border-bottom-width: 2px;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+    -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding;
+    background-clip: padding-box;
+}
+
+.tt-suggestion {
+    display: block;
+    padding: 3px 20px;
+}
+
+.tt-suggestion.tt-is-under-cursor {
+    color: #fff;
+    background-color: #0081c2;
+    background-image: -moz-linear-gradient(top, #0088cc, #0077b3);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0077b3));
+    background-image: -webkit-linear-gradient(top, #0088cc, #0077b3);
+    background-image: -o-linear-gradient(top, #0088cc, #0077b3);
+    background-image: linear-gradient(to bottom, #0088cc, #0077b3);
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0077b3', GradientType=0)
+}
+
+.tt-suggestion.tt-is-under-cursor a {
+    color: #fff;
+}
+
+.tt-suggestion p {
+    margin: 0;
 }

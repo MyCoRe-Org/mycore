@@ -3,7 +3,7 @@ var RuleSelector = function(){
 	var selector = $('<select/>',
 		    {
 		        size: 	'1',
-		        class:	'access-rule input-xlarge'
+		        class:	'input-xlarge access-rule'
 		    });
 	
 	function formatSelect(item) {
@@ -20,7 +20,6 @@ var RuleSelector = function(){
 			$.each(rules, function(i, l) {
 				cla.add(l.ruleID, l.desc, l.ruleSt)
 			});
-			this.update();
 		},
 		add: 	function(ruleID, ruleDesc, rule){
 			selector.append("<option title='" + rule + "' value='" + ruleID + "'>" + ruleDesc + " (" + ruleID + ")</option>");
@@ -39,19 +38,13 @@ var RuleSelector = function(){
 				cla.append(ruleID, $(this).parent());
 				$(this).remove();
 			});
-			$("#new-access-rule").html(selector.html());
-			$("#new-access-rule").prepend("<option value='' title='' selected>" + i18nKeys["ACLE.select.select"] + "</option>");
-			$("#new-access-rule").append("<option id='new-access-rule-option' value='new' title=''>" + i18nKeys["ACLE.select.newRule"] + "</option>");
-			$("#new-access-rule").select2({
-				matcher: function(term, text, opt) {
-					return text.toUpperCase().indexOf(term.toUpperCase())>=0
-						|| opt.attr("title").toUpperCase().indexOf(term.toUpperCase())>=0;
-				},
-				formatResult: formatSelect
-			});
 		},
-		append: 	function(ruleID, elem) {
+		append: function(ruleID, elem) {
 			var newSelector = selector.clone();
+			if (ruleID == "" || elem.hasClass("new-access-rule")){
+				newSelector.prepend("<option value='' title='' selected>" + i18nKeys["ACLE.select.select"] + "</option>");
+				newSelector.append("<option class='new-access-rule-option' value='new' title=''>" + i18nKeys["ACLE.select.newRule"] + "</option>");
+			}
 			newSelector.val(ruleID);
 			newSelector.appendTo(elem);
 			newSelector.select2({

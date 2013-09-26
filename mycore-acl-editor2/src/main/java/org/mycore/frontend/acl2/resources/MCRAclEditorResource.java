@@ -1,8 +1,6 @@
 package org.mycore.frontend.acl2.resources;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Collection;
 import java.util.Date;
 
@@ -21,7 +19,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
@@ -35,13 +32,11 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.common.xsl.MCRParameterCollector;
-import org.mycore.services.i18n.MCRTranslation;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -65,27 +60,12 @@ public class MCRAclEditorResource {
     @Path("start")
     public byte[] start() throws Exception {
         if (!MCRAccessManager.getAccessImpl().checkPermission("use-aclEditor")) {
-            throw new WebApplicationException(Response.status(HttpServletResponse.SC_UNAUTHORIZED)
-                    .entity(MCRTranslation.translate("component.session-listing.page.text")).build());
+            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
         }
-        return doLayout(request, "/META-INF/resources/modules/acl-editor2/gui/xml/webpage.xml");
-    }
-
-    @GET
-    @Path("objectid")
-    public byte[] objectid() throws Exception {
-        if (!MCRAccessManager.getAccessImpl().checkPermission("use-aclEditor")) {
-            throw new WebApplicationException(Response.status(HttpServletResponse.SC_UNAUTHORIZED)
-                    .entity(MCRTranslation.translate("component.session-listing.page.text")).build());
-        }
-        return doLayout(request, "/META-INF/resources/modules/acl-editor2/gui/xml/objectid.xml");
-    }
-    
-    protected byte[] doLayout(HttpServletRequest request, String xmlPath) throws Exception{
-        InputStream guiXML = getClass().getResourceAsStream(xmlPath);
+        InputStream guiXML = getClass().getResourceAsStream("/META-INF/resources/modules/acl-editor2/gui/xml/webpage.xml");
         SAXBuilder saxBuilder = new SAXBuilder();
         Document webPage = saxBuilder.build(guiXML);
-        XPathExpression<Object> xpath = XPathFactory.instance().compile("/MyCoReWebPage/section/div[@id='jportal_acl_editor_module']");
+        XPathExpression<Object> xpath = XPathFactory.instance().compile("/MyCoReWebPage/section/div[@id='mycore-acl-editor2']");
         Object node = xpath.evaluateFirst(webPage);
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         String lang = mcrSession.getCurrentLanguage();
@@ -103,6 +83,33 @@ public class MCRAclEditorResource {
         return transform(request, "MyCoReWebPage", source);
     }
 
+    @GET
+    @Path("objectid")
+    public byte[] objectid() throws Exception {
+        if (!MCRAccessManager.getAccessImpl().checkPermission("use-aclEditor")) {
+            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+        }
+        InputStream guiXML = getClass().getResourceAsStream("/META-INF/resources/modules/acl-editor2/gui/xml/objectid.xml");
+        SAXBuilder saxBuilder = new SAXBuilder();
+        Document webPage = saxBuilder.build(guiXML);
+        XPathExpression<Object> xpath = XPathFactory.instance().compile("/MyCoReWebPage/section/div[@id='mycore-acl-editor2']");
+        Object node = xpath.evaluateFirst(webPage);
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        String lang = mcrSession.getCurrentLanguage();
+        if (node != null) {
+            Element mainDiv = (Element) node;
+            mainDiv.setAttribute("lang", lang);
+            String bsPath = CONFIG.getString("MCR.bootstrap.path", "");
+            if (!bsPath.equals("")) {
+                bsPath = MCRServlet.getBaseURL() + bsPath;
+                Element item = new Element("link").setAttribute("href", bsPath).setAttribute("rel", "stylesheet").setAttribute("type", "text/css");
+                mainDiv.addContent(0,item);
+            }
+        }
+        MCRJDOMContent source = new MCRJDOMContent(webPage);
+        return transform(request, "MyCoReWebPage", source);
+    }
+    
     protected byte[] transform(HttpServletRequest request, String docType, MCRContent source) throws Exception {
         MCRParameterCollector parameter = new MCRParameterCollector(request);
         MCRContentTransformer transformer = MCRLayoutService.getContentTransformer(docType, parameter);
@@ -235,11 +242,14 @@ public class MCRAclEditorResource {
         JsonObject jsonObject = jsonParser.parse(data).getAsJsonObject();
         String ruleDesc = jsonObject.get("ruleDesc").getAsString();
         String ruleText = jsonObject.get("ruleText").getAsString();
-
+        MCRAccessRule accessRule;
         MCRRuleStore ruleStore = MCRRuleStore.getInstance();
-        MCRAccessRule accessRule = createAccessRule(ruleDesc, ruleText);
+        try {
+            accessRule = createAccessRule(ruleDesc, ruleText);
+        } catch (Exception e) {
+           return "";
+        }
         ruleStore.createRule(accessRule);
-
         return accessRule.getId();
     }
 
@@ -290,7 +300,6 @@ public class MCRAclEditorResource {
         String accessRuleID = accessStore.getRuleID(accessID, accessPool);
 
         JsonObject jsonObj = new JsonObject();
-        if (accessRuleID != null) {
             jsonObj.addProperty("accessRuleID", accessRuleID);
             MCRRuleStore ruleStore = MCRRuleStore.getInstance();
             Collection<String> ruleIDs = ruleStore.retrieveAllIDs();
@@ -304,11 +313,37 @@ public class MCRAclEditorResource {
                 jsonARules.add(jsonO);
             }
             jsonObj.add("rules", jsonARules);
-        } else {
-            jsonObj.addProperty("accessRuleID", "null");
-        }
-
         return jsonObj.toString();
+    }
+    
+    @PUT
+    @Path("multi")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public String editMulti(String data) {
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jsonObject = jsonParser.parse(data).getAsJsonObject();
+        JsonArray jsonArray = jsonObject.getAsJsonArray("access");
+        for (int i = 0; i < jsonArray.size(); i++) {
+            JsonObject accessAsJsonObject = jsonArray.get(i).getAsJsonObject();
+            String accessID = accessAsJsonObject.get("accessID").getAsString();
+            String accessPool = accessAsJsonObject.get("accessPool").getAsString();
+            String accessRule = accessAsJsonObject.get("accessRule").getAsString();
+
+            MCRAccessStore accessStore = MCRAccessStore.getInstance();
+
+            MCRRuleMapping newAccessRule = createRuleMap(accessID, accessPool, accessRule);
+            MCRRuleMapping oldAccessRule = accessStore.getAccessDefinition(accessPool, accessID);
+
+            if (oldAccessRule != null && !oldAccessRule.getObjId().equals("")) {
+                accessStore.updateAccessDefinition(newAccessRule);
+                accessAsJsonObject.addProperty("success", "1");
+            }
+            else {
+                accessStore.createAccessDefinition(newAccessRule);
+                accessAsJsonObject.addProperty("success", "1");
+            }
+        }
+        return jsonObject.toString();
     }
 
     private MCRRuleMapping createRuleMap(String accessID, String accessPool, String rule) {

@@ -13,6 +13,7 @@ var AccessTable = function(){
 			$.each(accessAndRules.access, function(i, l) {
 				cla.add(l.accessID, l.accessPool, l.rule, false);
 			});
+			ruleSelectorInstance.append("", $(".new-access-rule"));
 			this.zebra();
 			$("#access-table").stupidtable();
 			$("#access-table").bind('aftertablesort', function () {
@@ -27,7 +28,7 @@ var AccessTable = function(){
 			tr.append("<td><input type='checkbox' class='icon-check-empty icon-large icon access-select'/></td>");
 			tr.append("<td class='access-id table-access-entry-td' title='" +  accessID + "'>" + accessID + "</td>");
 			tr.append("<td class='access-pool table-access-entry-td' title='" +  accessPool + "'>" + accessPool + "</td>");
-			var td = $("<td></td>");
+			var td = $("<td class='access-rule-parent'></td>");
 			ruleSelectorInstance.append(rule, td);
 			tr.append(td);
 			tr.append("<td></td>");
@@ -72,6 +73,27 @@ var AccessTable = function(){
 			entry.find(".access-pool").attr("title",accessPool);
 			entry.find(".access-pool").removeClass("show-input");
 			entry.find(".access-rule").select2("val", rule);
+		},
+		editMulti: function(data) {
+			$(".multi-edit").each(function() {
+				var id = $(this).find(".access-id").text();
+				var pool = $(this).find(".access-pool").text();
+				var parent = $(this);
+				$.each(data.access, function(i, l) {
+					if(id == l.accessID && pool == l.accessPool){
+						if(l.success == 1){
+							parent.find(".access-rule").select2("val", l.accessRule);
+							return;
+						}
+						else{
+							showAlert(i18nKeys["ACLE.alert.access.edit.multi.error.1"] + id + " : " + pool + i18nKeys["ACLE.alert.access.edit.multi.error.2"]);
+							parent.removeClass("multi-edit");
+							return;
+						}
+					}
+				});
+				parent.removeClass("multi-edit");
+			});
 		},
 		zebra:	function() {
 			$("#access-table tr:not(.filter-hide)").each(function(i, row){
