@@ -29,8 +29,9 @@ public class MCREditorSubmission {
 
     public void setXPaths2CheckResubmission(String[] xPaths) {
         xPaths2CheckResubmission.clear();
-        for (String xPath : xPaths)
-            xPaths2CheckResubmission.add(xPath);
+        if (xPaths != null)
+            for (String xPath : xPaths)
+                xPaths2CheckResubmission.add(xPath);
     }
 
     private void removeXPaths2CheckResubmission(MCRBinding binding) {
