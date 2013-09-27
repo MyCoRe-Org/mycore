@@ -2,6 +2,7 @@ package org.mycore.frontend.xeditor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -22,10 +23,14 @@ public class MCRIncludeHandler {
 
     private final static Logger LOGGER = Logger.getLogger(MCRIncludeHandler.class);
 
-    public Map<String, Node> includes = new HashMap<String, Node>();
+    private Map<String, Node> includesPerApplication = new ConcurrentHashMap<String, Node>();
 
-    public XNodeSet resolve(ExpressionContext context, String uri) throws TransformerException {
-        LOGGER.debug("Including " + uri + ", is already cached? " + includes.containsKey(uri));
+    private Map<String, Node> includesPerTransformation = new HashMap<String, Node>();
+
+    public XNodeSet resolve(ExpressionContext context, String uri, String bStatic) throws TransformerException {
+        Map<String, Node> includes = "true".equals(bStatic) ? includesPerApplication : includesPerTransformation;
+
+        LOGGER.info("Including " + uri + " static=" + bStatic + " cached=" + includes.containsKey(uri));
 
         Node node = includes.get(uri);
         if (node == null) {

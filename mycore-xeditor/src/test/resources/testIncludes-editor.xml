@@ -9,7 +9,7 @@
       <xed:include ref="a" />
     </i1>
     <i2>
-      <xed:include uri="resource:testIncludes-includes.xml" />
+      <xed:include uri="resource:testIncludes-includes.xml" static="true" />
     </i2>
     <i3>
       <xed:include uri="resource:testIncludes-includes.xml" ref="b" />

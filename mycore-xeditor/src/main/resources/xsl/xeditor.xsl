@@ -80,17 +80,17 @@
     <xsl:value-of select="transformer:setPostProcessorXSL($transformer,@xsl)" />
   </xsl:template>
 
-  <!-- ========== <xed:include uri="" ref="" /> ========== -->
+  <!-- ========== <xed:include uri="" ref="" static="true|false" /> ========== -->
 
   <xsl:template match="xed:include[@uri and @ref]" mode="xeditor">
     <xsl:variable name="uri" select="transformer:replaceParameters($transformer,@uri)" />
     <xsl:variable name="ref" select="transformer:replaceParameters($transformer,@ref)" />
-    <xsl:apply-templates select="includer:resolve($includer,@uri)/descendant::*[@id=$ref]" mode="included" />
+    <xsl:apply-templates select="includer:resolve($includer,@uri,@static)/descendant::*[@id=$ref]" mode="included" />
   </xsl:template>
 
   <xsl:template match="xed:include[@uri and not(@ref)]" mode="xeditor">
     <xsl:variable name="uri" select="transformer:replaceParameters($transformer,@uri)" />
-    <xsl:apply-templates select="includer:resolve($includer,@uri)" mode="included" />
+    <xsl:apply-templates select="includer:resolve($includer,@uri,@static)" mode="included" />
   </xsl:template>
 
   <xsl:template match="xed:include[@ref and not(@uri)]" mode="xeditor">
