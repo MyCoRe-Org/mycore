@@ -540,7 +540,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
 
     private static void checkEmptyLabels(String classID, List<String> log) {
         Session session = MCRHIBConnection.instance().getSession();
-        String sqlQuery = "select cat.categid from mcrcategory cat left outer join mcrcategorylabels label on cat.internalid = label.category where cat.classid='"
+        String sqlQuery = "select cat.categid from MCRCategory cat left outer join MCRCategoryLabels label on cat.internalid = label.category where cat.classid='"
                 + classID + "' and label.text is null";
         @SuppressWarnings("unchecked")
         List<String> list = session.createSQLQuery(sqlQuery).list();
