@@ -63,7 +63,7 @@ public class MCRXEditorServlet extends MCRServlet {
                 if (name.endsWith(".x") || name.endsWith(".y")) // input type="image"
                     name = name.substring(0, name.length() - 2);
 
-                targetID = name.split("_")[3].toLowerCase();
+                targetID = name.split("[_\\:]")[3].toLowerCase(); 
                 parameter = name.substring(TARGET_PATTERN.length() + targetID.length());
                 if (!parameter.isEmpty())
                     parameter = parameter.substring(1);

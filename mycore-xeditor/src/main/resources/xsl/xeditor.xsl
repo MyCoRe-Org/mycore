@@ -145,6 +145,10 @@
     <xsl:attribute name="name">
       <xsl:text>_xed_submit_</xsl:text>
       <xsl:value-of select="@xed:target" />
+      <xsl:for-each select="@xed:href">
+        <xsl:text>:</xsl:text>
+        <xsl:value-of select="." />
+      </xsl:for-each>
     </xsl:attribute>
     <xsl:call-template name="set.class.if.validation.failed" />
   </xsl:template>
@@ -229,21 +233,24 @@
         <xsl:when test="(. = 'down') and ($pos = $num)" />
         <xsl:when test="(. = 'insert') and ($max = $num)" />
         <xsl:when test="(. = 'append') and ($max = $num)" />
-        <xsl:when test="(. = 'remove') or (. = 'append') or (. = 'insert')">
+        <xsl:otherwise>
           <xsl:apply-templates select="." mode="xed.control">
-            <xsl:with-param name="name" select="concat('_xed_submit_',.,'_',transformer:getAbsoluteXPath($transformer))" />
+            <xsl:with-param name="name">
+              <xsl:value-of select="concat('_xed_submit_',.,':')" />
+              <xsl:choose>
+                <xsl:when test="(. = 'remove') or (. = 'append') or (. = 'insert')">
+                  <xsl:value-of select="transformer:getAbsoluteXPath($transformer)" />
+                </xsl:when>
+                <xsl:when test="(. = 'up')">
+                  <xsl:value-of select="transformer:getSwapParameter($transformer,$pos,$pos - 1)" />
+                </xsl:when>
+                <xsl:when test="(. = 'down')">
+                  <xsl:value-of select="transformer:getSwapParameter($transformer,$pos,$pos + 1)" />
+                </xsl:when>
+              </xsl:choose>
+            </xsl:with-param>
           </xsl:apply-templates>
-        </xsl:when>
-        <xsl:when test="(. = 'up')">
-          <xsl:apply-templates select="." mode="xed.control">
-            <xsl:with-param name="name" select="concat('_xed_submit_',.,'_',transformer:getSwapParameter($transformer,$pos,$pos -1))" />
-          </xsl:apply-templates>
-        </xsl:when>
-        <xsl:when test="(. = 'down')">
-          <xsl:apply-templates select="." mode="xed.control">
-            <xsl:with-param name="name" select="concat('_xed_submit_',.,'_',transformer:getSwapParameter($transformer,$pos,$pos + 1))" />
-          </xsl:apply-templates>
-        </xsl:when>
+        </xsl:otherwise>
       </xsl:choose>
     </xsl:for-each>
   </xsl:template>
