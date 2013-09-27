@@ -31,7 +31,6 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -113,11 +112,6 @@ public class MCRXEditorTransformer {
 
     public static MCRXEditorTransformer getTransformer(String key) {
         return MCRXEditorTransformerStore.getAndRemoveTransformer(key);
-    }
-
-    public String getCombinedSessionStepID() {
-        editorSession.setBreakpoint("After transformation to HTML");
-        return editorSession.getID() + "-" + editorSession.getChangeTracker().getChangeCounter();
     }
 
     public void addNamespace(String prefix, String uri) {
@@ -288,35 +282,34 @@ public class MCRXEditorTransformer {
         }
     }
 
-    public XNodeSet getRequestParameters(ExpressionContext context) throws ParserConfigurationException, TransformerException {
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        org.w3c.dom.Document doc = builder.newDocument();
-        NodeSet ns = new NodeSet();
+    public XNodeSet getAdditionalParameters(ExpressionContext context) throws ParserConfigurationException, TransformerException {
+        org.w3c.dom.Document dom = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        NodeSet nodeSet = new NodeSet();
+
         Map<String, String[]> parameters = editorSession.getRequestParameters();
-        for (String name : parameters.keySet()) {
-            for (String value : parameters.get(name)) {
-                if ((value != null) && !value.isEmpty()) {
-                    org.w3c.dom.Element element = doc.createElement("param");
-                    element.setAttribute("name", name);
-                    element.setTextContent(value);
-                    ns.addNode(element);
-                }
-            }
-        }
-        return new XNodeSetForDOM((NodeList) ns, context.getXPathContext());
+        for (String name : parameters.keySet())
+            for (String value : parameters.get(name))
+                if ((value != null) && !value.isEmpty())
+                    nodeSet.addNode(buildAdditionalParameterElement(dom, name, value));
+
+        for (String xPath : editorSession.getSubmission().getXPaths2CheckResubmission())
+            nodeSet.addNode(buildAdditionalParameterElement(dom, "_xed_check", xPath));
+
+        nodeSet.addNode(buildAdditionalParameterElement(dom, "_xed_session", getCombinedSessionStepID()));
+
+        return new XNodeSetForDOM((NodeList) nodeSet, context.getXPathContext());
     }
 
-    public XNodeSet getXPaths2CheckResubmission(ExpressionContext context) throws ParserConfigurationException, TransformerException {
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        org.w3c.dom.Document doc = builder.newDocument();
-        NodeSet ns = new NodeSet();
+    private org.w3c.dom.Element buildAdditionalParameterElement(org.w3c.dom.Document doc, String name, String value) {
+        org.w3c.dom.Element element = doc.createElement("param");
+        element.setAttribute("name", name);
+        element.setTextContent(value);
+        return element;
+    }
 
-        for (String xPath : editorSession.getSubmission().getXPaths2CheckResubmission()) {
-            org.w3c.dom.Element element = doc.createElement("resubmit");
-            element.setTextContent(xPath);
-            ns.addNode(element);
-        }
-        return new XNodeSetForDOM((NodeList) ns, context.getXPathContext());
+    private String getCombinedSessionStepID() {
+        editorSession.setBreakpoint("After transformation to HTML");
+        return editorSession.getID() + "-" + editorSession.getChangeTracker().getChangeCounter();
     }
 
     public void addCleanupRule(String xPath, String relevantIf) {
