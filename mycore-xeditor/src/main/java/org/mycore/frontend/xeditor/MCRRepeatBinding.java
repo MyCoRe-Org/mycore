@@ -5,7 +5,6 @@ import java.io.UnsupportedEncodingException;
 import org.jaxen.JaxenException;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.mycore.frontend.xeditor.tracker.MCRRemoveElement;
 import org.mycore.frontend.xeditor.tracker.MCRSwapElements;
 
 public class MCRRepeatBinding extends MCRBinding {
@@ -43,11 +42,6 @@ public class MCRRepeatBinding extends MCRBinding {
 
     public int getMaxRepeats() {
         return maxRepeats;
-    }
-
-    public void remove(int pos) {
-        Element node = (Element) (boundNodes.remove(pos - 1));
-        track(MCRRemoveElement.remove(node));
     }
 
     public void up(int pos) {

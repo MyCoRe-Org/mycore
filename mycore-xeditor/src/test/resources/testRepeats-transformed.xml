@@ -21,7 +21,7 @@
       <input name="/document/name[3]" value="" type="text" />
     </div>
     <input name="_xed_submit_up_/document_6e616d655b40747970653d27706572736f6e616c275d_3" value="&#8657;" type="submit" />
-    <input name="_xed_submit_append_/document_6e616d655b40747970653d27706572736f6e616c275d_3" value="+" type="submit" />
+    <input name="_xed_submit_append_/document/name[3]" value="+" type="submit" />
     <input value="testBasicInputComponents-source.xml" name="input" type="hidden" />
     <input value="1-3" name="_xed_session" type="hidden" />
   </form>

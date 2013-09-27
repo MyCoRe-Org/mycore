@@ -23,15 +23,23 @@
 
 package org.mycore.frontend.xeditor.target;
 
-import org.mycore.frontend.xeditor.MCRRepeatBinding;
+import javax.servlet.ServletContext;
+
+import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.frontend.xeditor.MCRBinding;
+import org.mycore.frontend.xeditor.MCREditorSession;
 
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRInsertTarget extends MCRControlTarget {
+public class MCRCloneTarget extends MCREditorTarget {
 
-    @Override
-    protected void handleControl(MCRRepeatBinding repeatBinding, int pos) throws Exception {
-        repeatBinding.cloneBoundElement(pos - 1);
+    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String xPath) throws Exception {
+        session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
+        session.getValidator().forgetInvalidFields();
+        MCRBinding binding = new MCRBinding(xPath, session.getRootBinding());
+        binding.cloneBoundElement(0);
+        binding.detach();
+        redirectToEditorPage(job, session);
     }
 }

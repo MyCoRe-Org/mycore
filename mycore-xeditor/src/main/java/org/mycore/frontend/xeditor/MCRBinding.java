@@ -42,6 +42,8 @@ import org.mycore.frontend.xeditor.tracker.MCRAddedAttribute;
 import org.mycore.frontend.xeditor.tracker.MCRAddedElement;
 import org.mycore.frontend.xeditor.tracker.MCRChangeData;
 import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
+import org.mycore.frontend.xeditor.tracker.MCRRemoveAttribute;
+import org.mycore.frontend.xeditor.tracker.MCRRemoveElement;
 import org.mycore.frontend.xeditor.tracker.MCRSetAttributeValue;
 import org.mycore.frontend.xeditor.tracker.MCRSetElementText;
 
@@ -119,6 +121,14 @@ public class MCRBinding {
 
     public Object getBoundNode() {
         return boundNodes.get(0);
+    }
+
+    public void removeBoundNode(int index) {
+        Object node = boundNodes.remove(index);
+        if (node instanceof Element)
+            track(MCRRemoveElement.remove((Element) node));
+        else
+            track(MCRRemoveAttribute.remove((Attribute) node));
     }
 
     public Element cloneBoundElement(int index) {

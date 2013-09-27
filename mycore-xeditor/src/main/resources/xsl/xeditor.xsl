@@ -216,12 +216,12 @@
     <xsl:variable name="pos" select="transformer:getRepeatPosition($transformer)" />
     <xsl:variable name="num" select="transformer:getNumRepeats($transformer)" />
     <xsl:variable name="max" select="transformer:getMaxRepeats($transformer)" />
-    
+
     <xsl:variable name="controls">
       <xsl:if test="string-length(.) = 0">insert remove up down</xsl:if>
       <xsl:value-of select="." />
     </xsl:variable>
-    
+
     <xsl:for-each select="xalan:tokenize($controls)">
       <xsl:choose>
         <xsl:when test="(. = 'append') and ($pos &lt; $num)" />
@@ -229,6 +229,11 @@
         <xsl:when test="(. = 'down') and ($pos = $num)" />
         <xsl:when test="(. = 'insert') and ($max = $num)" />
         <xsl:when test="(. = 'append') and ($max = $num)" />
+        <xsl:when test="(. = 'remove') or (. = 'append') or (. = 'insert')">
+          <xsl:apply-templates select="." mode="xed.control">
+            <xsl:with-param name="name" select="concat('_xed_submit_',.,'_',transformer:getAbsoluteXPath($transformer))" />
+          </xsl:apply-templates>
+        </xsl:when>
         <xsl:otherwise>
           <xsl:apply-templates select="." mode="xed.control">
             <xsl:with-param name="name" select="concat('_xed_submit_',.,'_',transformer:getControlsParameter($transformer))" />
@@ -239,13 +244,13 @@
   </xsl:template>
 
   <!-- ========== <xed:validate /> ========== -->
-  
+
   <xsl:template match="xed:validate" mode="xeditor">
     <xsl:value-of select="transformer:addValidationRule($transformer,@*)" />
   </xsl:template>
 
   <!-- ========== <xed:if-validation-failed /> ========== -->
-  
+
   <xsl:template match="xed:if-validation-failed" mode="xeditor">
     <xsl:if test="transformer:validationFailed($transformer)">
       <xsl:apply-templates select="node()" mode="xeditor" />
@@ -253,7 +258,7 @@
   </xsl:template>
 
   <!-- ========== mark input controls where validation failed ========== -->
-  
+
   <xsl:template match="input/@class|textarea/@class|select/@class" mode="xeditor">
     <xsl:attribute name="class">
       <xsl:value-of select="." />
@@ -262,7 +267,7 @@
       </xsl:if>
     </xsl:attribute>
   </xsl:template>
-  
+
   <xsl:template name="set.class.if.validation.failed">
     <xsl:if test="not(@class) and transformer:currentIsInvalid($transformer)">
       <xsl:attribute name="class">
@@ -293,7 +298,7 @@
   </xsl:template>
   
   <!-- ========== <xed:output i18n="" value="" /> ========== -->
-  
+
   <xsl:template match="xed:output[not(@value) and not(@i18n)]" mode="xeditor">
     <xsl:value-of select="transformer:getValue($transformer)" />
   </xsl:template>
@@ -327,7 +332,7 @@
   </xsl:template>
 
   <!-- ========== <xed:cleanup-rule xpath="" relevant-if="" ========== -->
-  
+
   <xsl:template match="xed:cleanup-rule" mode="xeditor">
     <xsl:value-of select="transformer:addCleanupRule($transformer,@xpath,@relevant-if)" />
   </xsl:template>

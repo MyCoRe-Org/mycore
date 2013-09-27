@@ -64,21 +64,21 @@ public class MCRRepeatBindingTest extends MCRTestCase {
         assertEquals("/conditions/condition[5]", binding.getAbsoluteXPath());
         ((Element) (binding.getBoundNode())).setAttribute("value", "c");
 
-        repeat.up(2);
+        repeat.up(2); // a b c -> b a c 
         assertEquals("b", ((Element) (repeat.getBoundNodes().get(0))).getAttributeValue("value"));
         assertEquals("b", doc.getRootElement().getChildren().get(2).getAttributeValue("value"));
 
-        repeat.down(2);
+        repeat.down(2); // b a c -> b c a
         assertEquals("a", ((Element) (repeat.getBoundNodes().get(2))).getAttributeValue("value"));
         assertEquals("a", doc.getRootElement().getChildren().get(4).getAttributeValue("value"));
 
-        repeat.remove(1);
+        repeat.removeBoundNode(0); // c a
         assertEquals(2, repeat.getBoundNodes().size());
         assertEquals("c", ((Element) (repeat.getBoundNodes().get(0))).getAttributeValue("value"));
         assertEquals("a", ((Element) (repeat.getBoundNodes().get(1))).getAttributeValue("value"));
         assertEquals(4, doc.getRootElement().getChildren().size());
 
-        repeat.cloneBoundElement(0);
+        repeat.cloneBoundElement(0); 
         assertEquals(5, doc.getRootElement().getChildren().size());
         assertEquals("c", ((Element) (repeat.getBoundNodes().get(0))).getAttributeValue("value"));
         assertEquals("c", ((Element) (repeat.getBoundNodes().get(1))).getAttributeValue("value"));
