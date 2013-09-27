@@ -23,7 +23,7 @@ public class MCRIncludeHandler {
 
     private final static Logger LOGGER = Logger.getLogger(MCRIncludeHandler.class);
 
-    private Map<String, Node> includesPerApplication = new ConcurrentHashMap<String, Node>();
+    private final static Map<String, Node> includesPerApplication = new ConcurrentHashMap<String, Node>();
 
     private Map<String, Node> includesPerTransformation = new HashMap<String, Node>();
 
