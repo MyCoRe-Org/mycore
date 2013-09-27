@@ -699,7 +699,7 @@ public class MCRIFSCommands {
                     }
                 }
                 if (file_counter == 0) {
-                    LOGGER.error("   !!!! Can't find file entries in MCRFSNODES");
+                    LOGGER.error("   !!!! Can't find file entries in MCRFSNODES for " + derid);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
