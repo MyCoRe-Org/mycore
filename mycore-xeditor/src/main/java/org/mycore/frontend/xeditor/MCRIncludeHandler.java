@@ -27,10 +27,11 @@ public class MCRIncludeHandler {
 
     private Map<String, Node> includesPerTransformation = new HashMap<String, Node>();
 
-    public XNodeSet resolve(ExpressionContext context, String uri, String bStatic) throws TransformerException {
-        Map<String, Node> includes = "true".equals(bStatic) ? includesPerApplication : includesPerTransformation;
+    public XNodeSet resolve(ExpressionContext context, String uri, String sStatic) throws TransformerException {
+        boolean bStatic = "true".equals(sStatic) || includesPerApplication.containsKey(uri);
+        Map<String, Node> includes = bStatic ? includesPerApplication : includesPerTransformation;
 
-        LOGGER.info("Including " + uri + " static=" + bStatic + " cached=" + includes.containsKey(uri));
+        LOGGER.debug("Including " + uri + " static=" + bStatic + " cached=" + includes.containsKey(uri));
 
         Node node = includes.get(uri);
         if (node == null) {
