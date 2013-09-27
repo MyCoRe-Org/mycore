@@ -24,7 +24,6 @@
 package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -216,8 +215,8 @@ public class MCRXEditorTransformer {
         currentBinding = getCurrentRepeat().bindRepeatPosition();
     }
 
-    public String getControlsParameter() throws UnsupportedEncodingException {
-        return getCurrentRepeat().getControlsParameter();
+    public String getSwapParameter(int posA, int posB) {
+        return getCurrentRepeat().getSwapParameter(posA, posB);
     }
 
     public void addValidationRule(NodeIterator attributes) {

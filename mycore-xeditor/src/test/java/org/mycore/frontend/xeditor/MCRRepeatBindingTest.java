@@ -64,43 +64,54 @@ public class MCRRepeatBindingTest extends MCRTestCase {
         assertEquals("/conditions/condition[5]", binding.getAbsoluteXPath());
         ((Element) (binding.getBoundNode())).setAttribute("value", "c");
 
-        repeat.up(2); // a b c -> b a c 
-        assertEquals("b", ((Element) (repeat.getBoundNodes().get(0))).getAttributeValue("value"));
-        assertEquals("b", doc.getRootElement().getChildren().get(2).getAttributeValue("value"));
-
-        repeat.down(2); // b a c -> b c a
-        assertEquals("a", ((Element) (repeat.getBoundNodes().get(2))).getAttributeValue("value"));
-        assertEquals("a", doc.getRootElement().getChildren().get(4).getAttributeValue("value"));
-
-        repeat.removeBoundNode(0); // c a
-        assertEquals(2, repeat.getBoundNodes().size());
-        assertEquals("c", ((Element) (repeat.getBoundNodes().get(0))).getAttributeValue("value"));
-        assertEquals("a", ((Element) (repeat.getBoundNodes().get(1))).getAttributeValue("value"));
+        repeat.removeBoundNode(0); 
         assertEquals(4, doc.getRootElement().getChildren().size());
-
-        repeat.cloneBoundElement(0); 
-        assertEquals(5, doc.getRootElement().getChildren().size());
-        assertEquals("c", ((Element) (repeat.getBoundNodes().get(0))).getAttributeValue("value"));
+        assertEquals(2, repeat.getBoundNodes().size());
+        assertEquals("b", ((Element) (repeat.getBoundNodes().get(0))).getAttributeValue("value"));
         assertEquals("c", ((Element) (repeat.getBoundNodes().get(1))).getAttributeValue("value"));
-        assertEquals("a", ((Element) (repeat.getBoundNodes().get(2))).getAttributeValue("value"));
+
+        repeat.cloneBoundElement(0);
+        assertEquals(5, doc.getRootElement().getChildren().size());
+        assertEquals(3, repeat.getBoundNodes().size());
+        assertEquals("b", ((Element) (repeat.getBoundNodes().get(0))).getAttributeValue("value"));
+        assertEquals("b", ((Element) (repeat.getBoundNodes().get(1))).getAttributeValue("value"));
+        assertEquals("c", ((Element) (repeat.getBoundNodes().get(2))).getAttributeValue("value"));
     }
 
     @Test
-    public void testUpDownWithMixedElements() throws JaxenException, JDOMException {
-        Element template = new MCRNodeBuilder().buildElement("parent[name='a'][note][foo][name[2]='b'][note[2]]", null, null);
+    public void testSwapParameter() throws JaxenException, JDOMException {
+        Element template = new MCRNodeBuilder().buildElement("parent[name='aa'][name='ab'][name='bc'][name='ac']", null, null);
+        Document doc = new Document(template);
+        MCRBinding root = new MCRBinding(doc);
+
+        MCRRepeatBinding repeat = new MCRRepeatBinding("parent/name[contains(text(),'a')]", root, 0, 0);
+        assertEquals(3, repeat.getBoundNodes().size());
+
+        System.out.println(repeat.getSwapParameter(1, 2));
+        System.out.println(repeat.getSwapParameter(2, 3));
+        
+        assertEquals("/parent|0|1", repeat.getSwapParameter(1, 2));
+        assertEquals("/parent|1|3", repeat.getSwapParameter(2, 3));
+    }
+
+    @Test
+    public void testSwap() throws JaxenException, JDOMException {
+        Element template = new MCRNodeBuilder().buildElement("parent[name='a'][note][foo][name='b'][note[2]]", null, null);
         Document doc = new Document(template);
         MCRBinding root = new MCRBinding(doc);
 
         MCRRepeatBinding repeat = new MCRRepeatBinding("parent/name", root, 2, 0);
         assertEquals(2, repeat.getBoundNodes().size());
 
-        assertEquals("a", ((Element) (repeat.getBoundNodes().get(0))).getText());
-        assertEquals("b", ((Element) (repeat.getBoundNodes().get(1))).getText());
         assertEquals("a", doc.getRootElement().getChildren().get(0).getText());
         assertEquals("b", doc.getRootElement().getChildren().get(3).getText());
-        repeat.up(2);
-        assertEquals("b", ((Element) (repeat.getBoundNodes().get(0))).getText());
-        assertEquals("a", ((Element) (repeat.getBoundNodes().get(1))).getText());
+        
+        assertEquals("a", ((Element) (repeat.getBoundNodes().get(0))).getText());
+        assertEquals("b", ((Element) (repeat.getBoundNodes().get(1))).getText());
+
+        String swapParameter = repeat.getSwapParameter(1,2);
+        repeat.swap(swapParameter);
+        
         assertEquals("b", doc.getRootElement().getChildren().get(0).getText());
         assertEquals("a", doc.getRootElement().getChildren().get(3).getText());
     }

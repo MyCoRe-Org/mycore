@@ -234,11 +234,16 @@
             <xsl:with-param name="name" select="concat('_xed_submit_',.,'_',transformer:getAbsoluteXPath($transformer))" />
           </xsl:apply-templates>
         </xsl:when>
-        <xsl:otherwise>
+        <xsl:when test="(. = 'up')">
           <xsl:apply-templates select="." mode="xed.control">
-            <xsl:with-param name="name" select="concat('_xed_submit_',.,'_',transformer:getControlsParameter($transformer))" />
+            <xsl:with-param name="name" select="concat('_xed_submit_',.,'_',transformer:getSwapParameter($transformer,$pos,$pos -1))" />
           </xsl:apply-templates>
-        </xsl:otherwise>
+        </xsl:when>
+        <xsl:when test="(. = 'down')">
+          <xsl:apply-templates select="." mode="xed.control">
+            <xsl:with-param name="name" select="concat('_xed_submit_',.,'_',transformer:getSwapParameter($transformer,$pos,$pos + 1))" />
+          </xsl:apply-templates>
+        </xsl:when>
       </xsl:choose>
     </xsl:for-each>
   </xsl:template>

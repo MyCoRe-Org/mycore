@@ -1,6 +1,6 @@
 /*
- * $Revision$ 
- * $Date$
+ * $Revision: 27994 $ 
+ * $Date: 2013-09-27 09:00:49 +0200 (Fr, 27 Sep 2013) $
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -23,15 +23,20 @@
 
 package org.mycore.frontend.xeditor.target;
 
-import org.mycore.frontend.xeditor.MCRRepeatBinding;
+import javax.servlet.ServletContext;
+
+import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.frontend.xeditor.MCREditorSession;
 
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRDownTarget extends MCRControlTarget {
+public class MCRSwapTarget extends MCREditorTarget {
 
-    @Override
-    protected void handleControl(MCRRepeatBinding repeatBinding, int pos) throws Exception {
-        repeatBinding.down(pos);
+    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String swapParam) throws Exception {
+        session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
+        session.getValidator().forgetInvalidFields();
+        session.getRootBinding().swap(swapParam);
+        redirectToEditorPage(job, session);
     }
 }
