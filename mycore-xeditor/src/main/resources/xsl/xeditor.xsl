@@ -6,7 +6,8 @@
   xmlns:xalan="http://xml.apache.org/xalan"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
   xmlns:transformer="xalan://org.mycore.frontend.xeditor.MCRXEditorTransformer"
-  exclude-result-prefixes="xsl xed xalan transformer i18n">
+  xmlns:includer="xalan://org.mycore.frontend.xeditor.MCRIncludeHandler"
+  exclude-result-prefixes="xsl xed xalan transformer includer i18n">
 
   <xsl:strip-space elements="xed:*" />
 
@@ -19,6 +20,7 @@
   <xsl:param name="DefaultLang" />
 
   <xsl:variable name="transformer" select="transformer:getTransformer($XEditorTransformerKey)" />
+  <xsl:variable name="includer" select="includer:new()" />
 
   <!-- ========== <xed:form /> ========== -->
 
@@ -83,12 +85,12 @@
   <xsl:template match="xed:include[@uri and @ref]" mode="xeditor">
     <xsl:variable name="uri" select="transformer:replaceParameters($transformer,@uri)" />
     <xsl:variable name="ref" select="transformer:replaceParameters($transformer,@ref)" />
-    <xsl:apply-templates select="document($uri)/*/descendant::*[@id=$ref]" mode="included" />
+    <xsl:apply-templates select="includer:resolve($includer,@uri)/descendant::*[@id=$ref]" mode="included" />
   </xsl:template>
 
   <xsl:template match="xed:include[@uri and not(@ref)]" mode="xeditor">
     <xsl:variable name="uri" select="transformer:replaceParameters($transformer,@uri)" />
-    <xsl:apply-templates select="document($uri)/*" mode="included" />
+    <xsl:apply-templates select="includer:resolve($includer,@uri)" mode="included" />
   </xsl:template>
 
   <xsl:template match="xed:include[@ref and not(@uri)]" mode="xeditor">
