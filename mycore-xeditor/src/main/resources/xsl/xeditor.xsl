@@ -131,19 +131,24 @@
 
   <xsl:template match="*" mode="add-content" />
 
-  <!-- ========== <input /> ========== -->
+  <!-- ========== <input|button xed:target="" xed:href="" /> ========== -->
 
-  <xsl:template match="input[contains('submit image',@type)]|button[@type='submit']" mode="add-attributes">
+  <xsl:template match="input[contains('submit image',@type)][@xed:target]|button[@type='submit'][@xed:target]" mode="add-attributes">
     <xsl:attribute name="name">
-      <xsl:text>_xed_submit_</xsl:text>
-      <xsl:value-of select="@xed:target" />
-      <xsl:for-each select="@xed:href">
-        <xsl:text>:</xsl:text>
-        <xsl:value-of select="." />
-      </xsl:for-each>
+      <xsl:value-of select="concat('_xed_submit_',@xed:target)" />
+      <xsl:choose>
+        <xsl:when test="@xed:target='subselect'">
+          <xsl:value-of select="concat(':',transformer:getSubselectParam($transformer,@xed:href))" />
+        </xsl:when>
+        <xsl:when test="@xed:href">
+          <xsl:value-of select="concat(':',@xed:href)" />
+        </xsl:when>
+      </xsl:choose>
     </xsl:attribute>
     <xsl:call-template name="set.class.if.validation.failed" />
   </xsl:template>
+  
+  <!-- ========== <input /> ========== -->
 
   <xsl:template
     match="input[contains('text,password,hidden,file,color,date,datetime,datetime-local,email,month,number,range,search,tel,time,url,week',@type)]"

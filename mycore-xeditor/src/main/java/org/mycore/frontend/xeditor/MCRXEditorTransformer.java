@@ -24,8 +24,6 @@
 package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -52,7 +50,6 @@ import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
-import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.traversal.NodeIterator;
 import org.xml.sax.SAXException;
@@ -209,11 +206,8 @@ public class MCRXEditorTransformer {
         return editorSession.getValidator().failed(currentBinding.getAbsoluteXPath());
     }
 
-    private List<String> subSelectHRefs = new ArrayList<String>();
-
-    public String saveSubSelectHRef(String href) {
-        subSelectHRefs.add(href);
-        return currentBinding.getAbsoluteXPath() + ":" + subSelectHRefs.size();
+    public String getSubselectParam(String href) {
+        return currentBinding.getAbsoluteXPath() + ":" + MCRSubselect.encode(href);
     }
 
     public XNodeSet getAdditionalParameters(ExpressionContext context) throws ParserConfigurationException, TransformerException {
@@ -228,10 +222,6 @@ public class MCRXEditorTransformer {
 
         for (String xPath : editorSession.getSubmission().getXPaths2CheckResubmission())
             nodeSet.addNode(buildAdditionalParameterElement(dom, "_xed_check", xPath));
-
-        int i = 1;
-        for (String href : subSelectHRefs)
-            nodeSet.addNode(buildAdditionalParameterElement(dom, MCRSubselectTarget.PARAM_SUBSELECT_HREF + i++, href));
 
         nodeSet.addNode(buildAdditionalParameterElement(dom, "_xed_session", editorSession.getCombinedSessionStepID()));
 
