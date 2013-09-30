@@ -23,7 +23,6 @@
 
 package org.mycore.frontend.xeditor.target;
 
-
 import javax.servlet.ServletContext;
 
 import org.apache.log4j.Logger;
@@ -44,6 +43,7 @@ public class MCRSubselectTarget extends MCREditorTarget {
 
         MCRSubselect subselect = new MCRSubselect(session, parameter);
         String url = subselect.getRedirectURL();
+
         LOGGER.info("Redirecting to subselect " + url);
         job.getResponse().sendRedirect(url);
     }

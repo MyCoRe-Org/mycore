@@ -150,7 +150,7 @@ public class MCRXEditorTransformer {
     }
 
     public String replaceXPaths(String text) {
-        return currentBinding.replaceXPaths(text);
+        return currentBinding.replaceXPaths(text, false);
     }
 
     public String replaceXPathOrI18n(String expression) {

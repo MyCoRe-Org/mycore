@@ -24,6 +24,9 @@
 package org.mycore.frontend.xeditor;
 
 import org.jaxen.JaxenException;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -255,11 +258,20 @@ public class MCRBinding {
 
     private final static Pattern PATTERN_XPATH = Pattern.compile("\\{([^\\}]+)\\}");
 
-    public String replaceXPaths(String text) {
+    public String replaceXPaths(String text, boolean urlEncode) {
         Matcher m = PATTERN_XPATH.matcher(text);
         StringBuffer sb = new StringBuffer();
-        while (m.find())
-            m.appendReplacement(sb, replaceXPathOrI18n(m.group(1)));
+        while (m.find()) {
+            String replacement = replaceXPathOrI18n(m.group(1));
+            if (urlEncode) {
+                try {
+                    replacement = URLEncoder.encode(replacement, "UTF-8");
+                } catch (UnsupportedEncodingException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+            m.appendReplacement(sb, replacement);
+        }
         m.appendTail(sb);
         return sb.toString();
     }
