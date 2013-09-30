@@ -28,6 +28,7 @@ public class MCRSubselect {
 
         int pos = parameter.lastIndexOf(":");
         this.xPath = parameter.substring(0, pos);
+        this.href = decode(parameter.substring(pos + 1));
 
         LOGGER.info("Start subselect for " + xPath + " using pattern " + href);
 
@@ -36,7 +37,6 @@ public class MCRSubselect {
         Element element = node instanceof Element ? (Element) node : ((Attribute) node).getParent();
         binding.track(MCRSubselectStart.startSubselect(element, xPath));
 
-        this.href = decode(parameter.substring(pos + 1));
         this.href = binding.replaceXPaths(href);
 
         binding.detach();
