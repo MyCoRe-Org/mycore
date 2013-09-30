@@ -25,6 +25,9 @@ package org.mycore.frontend.xeditor;
 
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jaxen.JaxenException;
 
 import org.jdom2.Document;
@@ -121,7 +124,19 @@ public class MCRBindingTest extends MCRTestCase {
     }
 
     @Test
-    public void testVariables() throws JDOMException, JaxenException {
+    public void testCollectorVariables() throws JDOMException, JaxenException {
+        Map<String, Object> variables = new HashMap<String, Object>();
+        variables.put("type", "main");
+
+        binding = new MCRBinding("document", binding);
+        binding.setVariables(variables);
+        binding = new MCRBinding("title[@type=$type]", binding);
+        assertTrue(binding.hasValue("title1"));
+        assertEquals(1, binding.getBoundNodes().size());
+    }
+
+    @Test
+    public void testDefiningVariables() throws JDOMException, JaxenException {
         binding = new MCRBinding("document", binding);
         new MCRBinding("title[1]", null, "inheritMe", binding);
         new MCRBinding("title[2]", null, "overwriteMe", binding);

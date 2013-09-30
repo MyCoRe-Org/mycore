@@ -25,15 +25,19 @@ package org.mycore.frontend.xeditor;
 
 import org.jaxen.JaxenException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.jdom2.Namespace;
 import org.jdom2.Parent;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
@@ -47,6 +51,7 @@ import org.mycore.frontend.xeditor.tracker.MCRRemoveElement;
 import org.mycore.frontend.xeditor.tracker.MCRSetAttributeValue;
 import org.mycore.frontend.xeditor.tracker.MCRSetElementText;
 import org.mycore.frontend.xeditor.tracker.MCRSwapElements;
+import org.mycore.services.i18n.MCRTranslation;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -219,8 +224,25 @@ public class MCRBinding {
         return children;
     }
 
+    private Map<String, Object> staticVariables = null;
+
+    private Map<String, Object> getVariables() {
+        if (staticVariables != null)
+            return staticVariables;
+        else if (parent != null)
+            return parent.getVariables();
+        else
+            return Collections.<String, Object> emptyMap();
+    }
+
+    public void setVariables(Map<String, Object> variables) {
+        this.staticVariables = variables;
+    }
+
     public Map<String, Object> buildXPathVariables() {
         Map<String, Object> variables = new HashMap<String, Object>();
+        variables.putAll(getVariables());
+
         for (MCRBinding ancestor : getAncestorsAndSelf()) {
             for (MCRBinding child : ancestor.getChildren()) {
                 String childName = child.getName();
@@ -231,10 +253,51 @@ public class MCRBinding {
         return variables;
     }
 
+    private final static Pattern PATTERN_XPATH = Pattern.compile("\\{([^\\}]+)\\}");
+
+    public String replaceXPaths(String text) {
+        Matcher m = PATTERN_XPATH.matcher(text);
+        StringBuffer sb = new StringBuffer();
+        while (m.find())
+            m.appendReplacement(sb, replaceXPathOrI18n(m.group(1)));
+        m.appendTail(sb);
+        return sb.toString();
+    }
+
+    public String replaceXPathOrI18n(String expression) {
+        if (expression.startsWith("i18n:")) {
+            String key = expression.substring(5);
+            int pos = key.indexOf(",");
+            if (pos != -1) {
+                String xPath = key.substring(pos + 1);
+                String value = evaluateXPath(xPath);
+                key = key.substring(0, pos);
+                return MCRTranslation.translate(key, value);
+            } else
+                return MCRTranslation.translate(key);
+        } else
+            return evaluateXPath(expression);
+    }
+
+    public String evaluateXPath(String xPathExpression) {
+        xPathExpression = "string(" + xPathExpression + ")";
+        try {
+            Map<String, Object> variables = buildXPathVariables();
+
+            List<Namespace> namespaces = MCRUsedNamespaces.getNamespaces();
+            XPathFactory factory = XPathFactory.instance();
+            XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), variables, namespaces);
+            return xPath.evaluateFirst(boundNodes).toString();
+        } catch (Exception ex) {
+            LOGGER.warn("unable to evaluate XPath: " + xPathExpression);
+            LOGGER.debug(ex);
+            return "";
+        }
+    }
+
     public String getAbsoluteXPath() {
         return MCRXPathBuilder.buildXPath(getBoundNode());
     }
-
 
     public void swap(String swapParameter) throws JaxenException, JDOMException {
         String[] tokens = swapParameter.split("\\|");

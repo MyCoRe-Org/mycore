@@ -23,14 +23,25 @@
 
 package org.mycore.frontend.xeditor;
 
-import java.util.HashMap;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
+import org.jdom2.Verifier;
+import org.mycore.common.content.MCRSourceContent;
+import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.xeditor.tracker.MCRBreakpoint;
 import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
+import org.xml.sax.SAXException;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -42,6 +53,8 @@ public class MCREditorSession {
     private String id;
 
     private Map<String, String[]> requestParameters;
+
+    private Map<String, Object> variables;
 
     private String cancelURL;
 
@@ -57,12 +70,25 @@ public class MCREditorSession {
 
     private MCRXEditorPostProcessor postProcessor = new MCRXEditorPostProcessor();
 
-    public MCREditorSession(Map<String, String[]> requestParameters) {
+    public MCREditorSession(Map<String, String[]> requestParameters, MCRParameterCollector collector) {
         this.requestParameters = requestParameters;
+        this.variables = collector.getParameterMap();
+        removeIllegalVariables();
     }
 
     public MCREditorSession() {
-        this(new HashMap<String, String[]>());
+        this(Collections.<String, String[]> emptyMap(), new MCRParameterCollector());
+    }
+
+    private void removeIllegalVariables() {
+        for (Iterator<Entry<String, Object>> entries = variables.entrySet().iterator(); entries.hasNext();) {
+            String name = entries.next().getKey();
+            String result = Verifier.checkXMLName(name);
+            if (result != null) {
+                LOGGER.warn("Illegally named transformation parameter, removing " + name);
+                entries.remove();
+            }
+        }
     }
 
     public void setID(String id) {
@@ -71,6 +97,11 @@ public class MCREditorSession {
 
     public String getID() {
         return id;
+    }
+
+    public String getCombinedSessionStepID() {
+        setBreakpoint("After transformation to HTML");
+        return id + "-" + tracker.getChangeCounter();
     }
 
     public Map<String, String[]> getRequestParameters() {
@@ -82,10 +113,28 @@ public class MCREditorSession {
     }
 
     public void setCancelURL(String cancelURL) {
-        if (cancelURL == null) {
+        if (this.cancelURL != null)
+            return;
+
+        cancelURL = replaceParameters(cancelURL);
+        if (!cancelURL.contains("{")) {
             LOGGER.debug(id + " set cancel URL to " + cancelURL);
             this.cancelURL = cancelURL;
         }
+    }
+
+    private final static Pattern PATTERN_URI = Pattern.compile("\\{\\$(.+)\\}");
+
+    public String replaceParameters(String uri) {
+        Matcher m = PATTERN_URI.matcher(uri);
+        StringBuffer sb = new StringBuffer();
+        while (m.find()) {
+            String token = m.group(1);
+            Object value = variables.get(token);
+            m.appendReplacement(sb, value == null ? m.group().replace("$", "\\$") : value.toString());
+        }
+        m.appendTail(sb);
+        return sb.toString();
     }
 
     public Document getEditedXML() {
@@ -97,8 +146,20 @@ public class MCREditorSession {
         MCRUsedNamespaces.addNamespacesFrom(editedXML.getRootElement());
     }
 
+    public void setEditedXML(String uri) throws JDOMException, IOException, SAXException, TransformerException {
+        if ((editedXML != null) || (uri = replaceParameters(uri)).contains("{"))
+            return;
+
+        LOGGER.info("Reading edited XML from " + uri);
+        Document xml = MCRSourceContent.getInstance(uri).asXML();
+        setEditedXML(xml);
+        setBreakpoint("Reading XML from " + uri);
+    }
+
     public MCRBinding getRootBinding() throws JDOMException {
-        return new MCRBinding(editedXML, tracker);
+        MCRBinding binding = new MCRBinding(editedXML, tracker);
+        binding.setVariables(variables);
+        return binding;
     }
 
     public void setBreakpoint(String msg) {

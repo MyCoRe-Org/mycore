@@ -52,7 +52,9 @@ public class MCRXEditorTransformerTest {
         if (editedXMLFile != null) {
             parameters.put("input", new String[] { editedXMLFile });
         }
-        MCREditorSession editorSession = new MCREditorSession(parameters);
+        MCRParameterCollector collector = new MCRParameterCollector(false);
+        collector.setParameter("input", editedXMLFile);
+        MCREditorSession editorSession = new MCREditorSession(parameters, collector);
         editorSession.setID("1");
         return editorSession;
     }

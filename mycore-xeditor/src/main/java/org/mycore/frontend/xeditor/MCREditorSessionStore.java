@@ -23,10 +23,8 @@
 
 package org.mycore.frontend.xeditor;
 
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.Logger;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 
@@ -38,8 +36,6 @@ public class MCREditorSessionStore {
     private MCRCache<String, MCREditorSession> cachedSessions;
 
     private AtomicInteger idGenerator = new AtomicInteger(0);
-
-    private final static Logger LOGGER = Logger.getLogger(MCREditorSessionStore.class);
 
     MCREditorSessionStore() {
         int maxEditorsInSession = MCRConfiguration.instance().getInt("MCR.XEditor.MaxEditorsInSession", 50);
@@ -57,19 +53,4 @@ public class MCREditorSessionStore {
     }
 
     public final static String XEDITOR_SESSION_PARAM = "_xed_session";
-
-    public MCREditorSession getOrCreateAndStoreSession(Map<String,String[]> requestParameters, String sessionID) {
-        MCREditorSession session = null;
-        if (sessionID != null) {
-            session = getSession(sessionID);
-            if (session == null) {
-                LOGGER.warn("editor session " + sessionID + " is not stored any more, will create a new session");
-                return null;
-            }
-        } else {
-            session = new MCREditorSession(requestParameters);
-            storeSession(session);
-        }
-        return session;
-    }
 }

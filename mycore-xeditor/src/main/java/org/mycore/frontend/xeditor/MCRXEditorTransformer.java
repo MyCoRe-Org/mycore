@@ -24,19 +24,15 @@
 package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.apache.xalan.extensions.ExpressionContext;
 import org.apache.xpath.NodeSet;
 import org.apache.xpath.objects.XNodeSet;
@@ -50,18 +46,13 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
-import org.jdom2.Verifier;
-import org.jdom2.filter.Filters;
-import org.jdom2.xpath.XPathExpression;
-import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
-import org.mycore.services.i18n.MCRTranslation;
+import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.traversal.NodeIterator;
 import org.xml.sax.SAXException;
@@ -71,29 +62,15 @@ import org.xml.sax.SAXException;
  */
 public class MCRXEditorTransformer {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRXEditorTransformer.class);
-
     private MCREditorSession editorSession;
 
-    private MCRParameterCollector transformationParameters;
-
     private MCRBinding currentBinding;
+
+    private MCRParameterCollector transformationParameters;
 
     public MCRXEditorTransformer(MCREditorSession editorSession, MCRParameterCollector transformationParameters) {
         this.editorSession = editorSession;
         this.transformationParameters = transformationParameters;
-        removeIllegalVariables(transformationParameters.getParameterMap());
-    }
-
-    private void removeIllegalVariables(Map<String, Object> xPathVariables) {
-        for (Iterator<Entry<String, Object>> entries = xPathVariables.entrySet().iterator(); entries.hasNext();) {
-            String name = entries.next().getKey();
-            String result = Verifier.checkXMLName(name);
-            if (result != null) {
-                LOGGER.warn("Illegally named transformation parameter, removing " + name);
-                entries.remove();
-            }
-        }
     }
 
     public MCRContent transform(MCRContent editorSource) throws IOException, JDOMException, SAXException {
@@ -103,8 +80,7 @@ public class MCRXEditorTransformer {
         if (transformer instanceof MCRParameterizedTransformer) {
             String key = MCRXEditorTransformerStore.storeTransformer(this);
             transformationParameters.setParameter("XEditorTransformerKey", key);
-            MCRContent result = ((MCRParameterizedTransformer) transformer).transform(editorSource, transformationParameters);
-            return result;
+            return ((MCRParameterizedTransformer) transformer).transform(editorSource, transformationParameters);
         } else {
             throw new MCRException("Xeditor needs parameterized MCRContentTransformer: " + transformer);
         }
@@ -119,23 +95,19 @@ public class MCRXEditorTransformer {
     }
 
     public void readSourceXML(String uri) throws JDOMException, IOException, SAXException, TransformerException {
-        if ((editorSession.getEditedXML() != null) || (uri = replaceParameters(uri)).contains("{"))
-            return;
-
-        LOGGER.info("Reading edited XML from " + uri);
-        Document xml = MCRSourceContent.getInstance(uri).asXML();
-        editorSession.setEditedXML(xml);
-        editorSession.setBreakpoint("Reading XML from " + uri);
+        editorSession.setEditedXML(uri);
     }
 
-    public void setCancelURL(String url) throws JDOMException, IOException, SAXException, TransformerException {
-        url = replaceParameters(url);
-        if (!url.contains("{"))
-            editorSession.setCancelURL(url);
+    public void setCancelURL(String cancelURL) {
+        editorSession.setCancelURL(cancelURL);
     }
 
     public void setPostProcessorXSL(String stylesheet) {
         editorSession.getPostProcessor().setStylesheet(stylesheet);
+    }
+
+    public String replaceParameters(String uri) {
+        return editorSession.replaceParameters(uri);
     }
 
     public void bind(String xPath, String defaultValue, String name) throws JDOMException, JaxenException {
@@ -178,6 +150,18 @@ public class MCRXEditorTransformer {
     public boolean hasValue(String value) {
         editorSession.getSubmission().mark2checkResubmission(currentBinding);
         return currentBinding.hasValue(value);
+    }
+
+    public String replaceXPaths(String text) {
+        return currentBinding.replaceXPaths(text);
+    }
+
+    public String replaceXPathOrI18n(String expression) {
+        return currentBinding.replaceXPathOrI18n(expression);
+    }
+
+    public String evaluateXPath(String xPathExpression) {
+        return currentBinding.evaluateXPath(xPathExpression);
     }
 
     public String repeat(String xPath, int minRepeats, int maxRepeats) throws JDOMException, JaxenException {
@@ -225,61 +209,11 @@ public class MCRXEditorTransformer {
         return editorSession.getValidator().failed(currentBinding.getAbsoluteXPath());
     }
 
-    private final static Pattern PATTERN_URI = Pattern.compile("\\{\\$(.+)\\}");
+    private List<String> subSelectHRefs = new ArrayList<String>();
 
-    public String replaceParameters(String uri) {
-        Matcher m = PATTERN_URI.matcher(uri);
-        StringBuffer sb = new StringBuffer();
-        while (m.find()) {
-            String token = m.group(1);
-            String value = transformationParameters.getParameter(token, null);
-            m.appendReplacement(sb, value == null ? m.group().replace("$", "\\$") : value);
-        }
-        m.appendTail(sb);
-        return sb.toString();
-    }
-
-    private final static Pattern PATTERN_XPATH = Pattern.compile("\\{([^\\}]+)\\}");
-
-    public String replaceXPaths(String text) {
-        Matcher m = PATTERN_XPATH.matcher(text);
-        StringBuffer sb = new StringBuffer();
-        while (m.find())
-            m.appendReplacement(sb, replaceXPathOrI18n(m.group(1)));
-        m.appendTail(sb);
-        return sb.toString();
-    }
-
-    public String replaceXPathOrI18n(String expression) {
-        if (expression.startsWith("i18n:")) {
-            String key = expression.substring(5);
-            int pos = key.indexOf(",");
-            if (pos != -1) {
-                String xPath = key.substring(pos + 1);
-                String value = evaluateXPath(xPath);
-                key = key.substring(0, pos);
-                return MCRTranslation.translate(key, value);
-            } else
-                return MCRTranslation.translate(key);
-        } else
-            return evaluateXPath(expression);
-    }
-
-    public String evaluateXPath(String xPathExpression) {
-        xPathExpression = "string(" + xPathExpression + ")";
-        try {
-            Map<String, Object> variables = currentBinding.buildXPathVariables();
-            variables.putAll(transformationParameters.getParameterMap());
-
-            List<Namespace> namespaces = MCRUsedNamespaces.getNamespaces();
-            XPathFactory factory = XPathFactory.instance();
-            XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), variables, namespaces);
-            return xPath.evaluateFirst(currentBinding.getBoundNodes()).toString();
-        } catch (Exception ex) {
-            LOGGER.warn("unable to evaluate XPath: " + xPathExpression);
-            LOGGER.debug(ex);
-            return "";
-        }
+    public String saveSubSelectHRef(String href) {
+        subSelectHRefs.add(href);
+        return currentBinding.getAbsoluteXPath() + ":" + subSelectHRefs.size();
     }
 
     public XNodeSet getAdditionalParameters(ExpressionContext context) throws ParserConfigurationException, TransformerException {
@@ -295,7 +229,11 @@ public class MCRXEditorTransformer {
         for (String xPath : editorSession.getSubmission().getXPaths2CheckResubmission())
             nodeSet.addNode(buildAdditionalParameterElement(dom, "_xed_check", xPath));
 
-        nodeSet.addNode(buildAdditionalParameterElement(dom, "_xed_session", getCombinedSessionStepID()));
+        int i = 1;
+        for (String href : subSelectHRefs)
+            nodeSet.addNode(buildAdditionalParameterElement(dom, MCRSubselectTarget.PARAM_SUBSELECT_HREF + i++, href));
+
+        nodeSet.addNode(buildAdditionalParameterElement(dom, "_xed_session", editorSession.getCombinedSessionStepID()));
 
         return new XNodeSetForDOM((NodeList) nodeSet, context.getXPathContext());
     }
@@ -305,11 +243,6 @@ public class MCRXEditorTransformer {
         element.setAttribute("name", name);
         element.setTextContent(value);
         return element;
-    }
-
-    private String getCombinedSessionStepID() {
-        editorSession.setBreakpoint("After transformation to HTML");
-        return editorSession.getID() + "-" + editorSession.getChangeTracker().getChangeCounter();
     }
 
     public void addCleanupRule(String xPath, String relevantIf) {
