@@ -6,6 +6,12 @@
   </properties>
   <body>
     <release version="2013.06.0.2" date="TBA" description="2013.06.0 maintenance release 2">
+      <action dev="mcrtchef" type="add" date="2013-09-24">
+        allow phrase queries (merged revision 27966 and 27969 from trunk)
+      </action>
+      <action dev="mcrsteph" type="add" date="2013-09-24">
+        allow IPv6 addresses in MCRSession
+      </action>
       <action dev="mcrtchef" type="fix" date="2013-09-18">
         bugfix: load resources via https if needed (merged revision 27892 from trunk)
       </action>

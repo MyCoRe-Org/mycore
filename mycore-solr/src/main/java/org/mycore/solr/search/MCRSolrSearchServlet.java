@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.solr.MCRSolrUtils;
+import org.mycore.solr.legacy.MCRConditionTransformer;
 import org.mycore.solr.proxy.MCRSolrProxyServlet;
 
 /**
@@ -39,9 +40,14 @@ import org.mycore.solr.proxy.MCRSolrProxyServlet;
  * 
  * @author mcrshofm
  */
+
 public class MCRSolrSearchServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
+
+    private enum QueryType {
+        phrase, term
+    }
 
     private enum SolrParameterGroup {
         QueryParameter, SolrParameter, SortParameter, TypeParameter
@@ -51,13 +57,15 @@ public class MCRSolrSearchServlet extends MCRServlet {
 
     private static final String JOIN_PATTERN = "{!join from=returnId to=id}";
 
+    private static final String PHRASE_QUERY_PARAM = "phrase";
+
     /** Parameters that can be used within a select request to solr*/
     static final List<String> RESERVED_PARAMETER_KEYS;
 
     static {
         String[] parameter = new String[] { "q", "sort", "start", "rows", "pageDoc", "pageScore", "fq", "cache", "fl",
-                "glob", "debug", "explainOther", "defType", "timeAllowed", "omitHeader", "sortOrder", "sortBy", "wt",
-                "qf", "q.alt", "mm", "pf", "ps", "qs", "tie", "bq", "bf" };
+            "glob", "debug", "explainOther", "defType", "timeAllowed", "omitHeader", "sortOrder", "sortBy", "wt", "qf",
+            "q.alt", "mm", "pf", "ps", "qs", "tie", "bq", "bf", PHRASE_QUERY_PARAM };
         RESERVED_PARAMETER_KEYS = Collections.unmodifiableList(Arrays.asList(parameter));
     }
 
@@ -67,33 +75,38 @@ public class MCRSolrSearchServlet extends MCRServlet {
      * @param query represents a solr query
      * @param fieldValues containing all the values for the field
      * @param fieldName the name of the field
+     * @throws ServletException 
      */
-    private void addFieldToQuery(StringBuilder query, String[] fieldValues, String fieldName) {
+    private void addFieldToQuery(StringBuilder query, String[] fieldValues, String fieldName, QueryType queryType)
+        throws ServletException {
         for (String fieldValue : fieldValues) {
             if (fieldValue.length() == 0) {
                 continue;
             }
-            query.append(buildQueryPart(fieldName, fieldValue));
+            switch (queryType) {
+                case term:
+                    query.append(MCRConditionTransformer.getTermQuery(fieldName, fieldValue));
+                    break;
+                case phrase:
+                    query.append(MCRConditionTransformer.getPhraseQuery(fieldName, fieldValue));
+                    break;
+                default:
+                    throw new ServletException("Query type is unsupported: " + queryType);
+            }
+            query.append(' ');
         }
-    }
-
-    private String buildQueryPart(String fieldName, String value) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("+");
-        sb.append(fieldName);
-        sb.append(":(");
-        sb.append(MCRSolrUtils.escapeSearchValue(value));
-        sb.append(") ");
-        return sb.toString();
     }
 
     /**
      * @param queryParameters all parameter where <code>getParameterGroup.equals(QueryParameter)</code> 
      * @param typeParameters all parameter where <code>getParameterGroup.equals(TypeParameter)</code>
+     * @param phraseQuery 
      * @return a map wich can be forwarded to {@link MCRSolrProxyServlet}
+     * @throws ServletException 
      */
     protected Map<String, String[]> buildSelectParameterMap(Map<String, String[]> queryParameters,
-        Map<String, String[]> typeParameters, Map<String, String[]> sortParameters) {
+        Map<String, String[]> typeParameters, Map<String, String[]> sortParameters, Set<String> phraseQuery)
+        throws ServletException {
         HashMap<String, String[]> queryParameterMap = new HashMap<String, String[]>();
 
         HashMap<String, String> fieldTypeMap = createFieldTypeMap(typeParameters);
@@ -103,14 +116,15 @@ public class MCRSolrSearchServlet extends MCRServlet {
         for (Entry<String, String[]> queryParameter : queryParameters.entrySet()) {
             String fieldName = queryParameter.getKey();
             String[] fieldValues = queryParameter.getValue();
+            QueryType queryType = phraseQuery.contains(fieldName) ? QueryType.phrase : QueryType.term;
             // Build the q parameter without solr.type.fields
             if (!fieldTypeMap.containsKey(fieldName)) {
-                addFieldToQuery(query, fieldValues, fieldName);
+                addFieldToQuery(query, fieldValues, fieldName, queryType);
 
             } else {
                 String fieldType = fieldTypeMap.get(fieldName);
                 StringBuilder filterQueryBuilder = getFilterQueryBuilder(filterQueryMap, fieldType);
-                addFieldToQuery(filterQueryBuilder, fieldValues, fieldName);
+                addFieldToQuery(filterQueryBuilder, fieldValues, fieldName, queryType);
             }
         }
 
@@ -197,20 +211,24 @@ public class MCRSolrSearchServlet extends MCRServlet {
         return fieldTypeMap;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
-        Map<String, String[]> solrParameters = new HashMap<String, String[]>();
-        Map<String, String[]> queryParameters = new HashMap<String, String[]>();
-        Map<String, String[]> typeParameters = new HashMap<String, String[]>();
-        Map<String, String[]> sortParameters = new HashMap<String, String[]>();
+        Map<String, String[]> solrParameters = new HashMap<>();
+        Map<String, String[]> queryParameters = new HashMap<>();
+        Map<String, String[]> typeParameters = new HashMap<>();
+        Map<String, String[]> sortParameters = new HashMap<>();
+        Set<String> phraseQuery = new HashSet<>();
+        String[] phraseFields = job.getRequest().getParameterValues(PHRASE_QUERY_PARAM);
+        if (phraseFields != null) {
+            phraseQuery.addAll(Arrays.asList(phraseFields));
+        }
 
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
 
         extractParameterList(request.getParameterMap(), queryParameters, solrParameters, typeParameters, sortParameters);
         Map<String, String[]> buildedSolrParameters = buildSelectParameterMap(queryParameters, typeParameters,
-            sortParameters);
+            sortParameters, phraseQuery);
         buildedSolrParameters.putAll(solrParameters);
 
         request.setAttribute(MCRSolrProxyServlet.MAP_KEY, buildedSolrParameters);
@@ -235,6 +253,9 @@ public class MCRSolrSearchServlet extends MCRServlet {
         Map<String, String[]> solrParameter, Map<String, String[]> typeParameter, Map<String, String[]> sortParameter) {
         for (Entry<String, String[]> currentEntry : requestParameter.entrySet()) {
             String parameterName = currentEntry.getKey();
+            if (PHRASE_QUERY_PARAM.equals(parameterName)) {
+                continue;
+            }
             SolrParameterGroup parameterGroup = getParameterType(parameterName);
 
             switch (parameterGroup) {
