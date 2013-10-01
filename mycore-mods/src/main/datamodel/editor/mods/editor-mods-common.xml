@@ -1074,13 +1074,21 @@
                 <label xml:lang="de">ISSN</label>
                 <label xml:lang="en">ISSN</label>
               </item>
-              <item value="doi">
-                <label xml:lang="de">DOI</label>
-                <label xml:lang="en">DOI</label>
+              <item value="urn">
+                <label xml:lang="de">URN</label>
+                <label xml:lang="en">URN</label>
               </item>
               <item value="uri">
                 <label xml:lang="de">URI</label>
                 <label xml:lang="en">URI</label>
+              </item>
+              <item value="handle">
+                <label xml:lang="de">Handle</label>
+                <label xml:lang="en">Handle</label>
+              </item>
+              <item value="doi">
+                <label xml:lang="de">DOI</label>
+                <label xml:lang="en">DOI</label>
               </item>
               <item value="project">
                 <label xml:lang="de">Projekt-Nr.</label>
