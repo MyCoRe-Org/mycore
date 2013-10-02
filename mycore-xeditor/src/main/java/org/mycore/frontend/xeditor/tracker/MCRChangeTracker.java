@@ -7,6 +7,7 @@ import org.jdom2.Element;
 import org.jdom2.ProcessingInstruction;
 import org.jdom2.filter.Filters;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 
 public class MCRChangeTracker implements Cloneable {
 
@@ -65,7 +66,7 @@ public class MCRChangeTracker implements Cloneable {
                 return instruction;
             }
         }
-        throw new RuntimeException("Lost processing instruction for undo, not found: " + typePrefix);
+        throw new MCRException("Lost processing instruction for undo, not found: " + typePrefix);
     }
 
     public static Document removeChangeTracking(Document doc) {

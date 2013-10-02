@@ -9,6 +9,7 @@ import org.jaxen.JaxenException;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.mycore.common.MCRException;
 import org.mycore.frontend.xeditor.tracker.MCRSubselectStart;
 
 public class MCRSubselect {
@@ -51,7 +52,7 @@ public class MCRSubselect {
         try {
             return Hex.encodeHexString(href.getBytes("UTF-8"));
         } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException(ex);
+            throw new MCRException(ex);
         }
     }
 
@@ -59,7 +60,7 @@ public class MCRSubselect {
         try {
             return new String(Hex.decodeHex(href.toCharArray()));
         } catch (DecoderException ex) {
-            throw new RuntimeException(ex);
+            throw new MCRException(ex);
         }
     }
 }

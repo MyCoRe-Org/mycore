@@ -11,6 +11,7 @@ import org.jdom2.Text;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.mycore.common.MCRException;
 
 public class MCRChangeData {
 
@@ -85,7 +86,7 @@ public class MCRChangeData {
         try {
             return new SAXBuilder().build(new StringReader(text)).detachRootElement();
         } catch (JDOMException | IOException ex) {
-            throw new RuntimeException(ex);
+            throw new MCRException("Exception in text2element: " + text, ex);
         }
     }
 

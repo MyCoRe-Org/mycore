@@ -45,6 +45,7 @@ import org.jdom2.Parent;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.mycore.common.MCRException;
 import org.mycore.frontend.xeditor.tracker.MCRAddedAttribute;
 import org.mycore.frontend.xeditor.tracker.MCRAddedElement;
 import org.mycore.frontend.xeditor.tracker.MCRChangeData;
@@ -267,7 +268,7 @@ public class MCRBinding {
                 try {
                     replacement = URLEncoder.encode(replacement, "UTF-8");
                 } catch (UnsupportedEncodingException ex) {
-                    throw new RuntimeException(ex);
+                    throw new MCRException(ex);
                 }
             }
             m.appendReplacement(sb, replacement);
