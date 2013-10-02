@@ -198,7 +198,7 @@
     <xsl:value-of select="transformer:getValue($transformer)" />
   </xsl:template>
 
-  <!-- ========== <xed:repeat min="" max="" /> ========== -->
+  <!-- ========== <xed:repeat xpath="" min="" max="" /> ========== -->
 
   <xsl:template match="xed:repeat" mode="xeditor">
     <xsl:variable name="xed_repeat" select="." />
