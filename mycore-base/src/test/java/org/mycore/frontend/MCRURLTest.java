@@ -14,9 +14,12 @@ public class MCRURLTest extends MCRTestCase {
 
     @Test
     public void getParameter() throws Exception {
-        MCRURL url = new MCRURL("http://localhost:8080/test?a=hallo&b=mycore");
+        MCRURL url = new MCRURL("http://localhost:8080/test?a=hallo&b=mycore&c=münchen");
         assertEquals("hallo", url.getParameter("a"));
         assertEquals("mycore", url.getParameter("b"));
+        assertEquals("münchen", url.getParameter("c"));
+        MCRURL url2 = new MCRURL("http://localhost:8080/test?a=m%C3%BCnchen");
+        assertEquals("m%C3%BCnchen", url2.getParameter("a"));
     }
 
     @Test
@@ -42,6 +45,9 @@ public class MCRURLTest extends MCRTestCase {
         List<String> aValues = url.getParameterValues("a");
         assertTrue(aValues.contains("hallo"));
         assertTrue(aValues.contains("repository"));
+        MCRURL url2 = new MCRURL("http://localhost:8080/test?a=hinz%20%26%20kunz");
+        url2.addParameter("b", "b%C3%A4r");
+        assertEquals("http://localhost:8080/test?a=hinz%20%26%20kunz&b=b%C3%A4r", url2.getURL().toString());
     }
 
     @Test
@@ -52,6 +58,9 @@ public class MCRURLTest extends MCRTestCase {
         assertEquals("mycore", url.getParameter("b"));
         url.removeParameter("b");
         assertNull(url.getParameter("b"));
+        MCRURL url2 = new MCRURL("http://localhost:8080/test?a=hinz%20%26%20kunz&b=removeme");
+        url2.removeParameter("b");
+        assertEquals("http://localhost:8080/test?a=hinz%20%26%20kunz", url2.getURL().toString());
     }
 
     @Test

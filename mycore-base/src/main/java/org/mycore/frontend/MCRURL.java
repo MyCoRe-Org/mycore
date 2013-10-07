@@ -68,8 +68,16 @@ public class MCRURL {
         String query = buildQueryString(this.parameterMap);
         try {
             URI uri = this.url.toURI();
-            this.url = new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), query, uri.getFragment())
-                    .toURL();
+            StringBuffer urlBuffer = new StringBuffer();
+            urlBuffer.append(new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), null, null)
+                    .toString());
+            if (query != null) {
+                urlBuffer.append("?").append(query);
+            }
+            if (uri.getFragment() != null) {
+                urlBuffer.append("#").append(uri.getFragment());
+            }
+            this.url = new URL(urlBuffer.toString());
             if (this.parameterMap != null) {
                 // rebuild parameter map
                 this.parameterMap = buildParameterMap(this.url);
@@ -118,7 +126,7 @@ public class MCRURL {
             while (values.remove(value)) {
                 removed = true;
             }
-            if(removed) {
+            if (removed) {
                 rebuild();
             }
         }
