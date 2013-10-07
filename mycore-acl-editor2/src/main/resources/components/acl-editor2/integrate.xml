@@ -1,4 +1,4 @@
-<project name="mods" xmlns:mcr="antlib:org.mycore.buildtools">
+<project name="acl-editor2" xmlns:mcr="antlib:org.mycore.buildtools">
   <import file="../../integrate.xml" />
   <!-- - - - - - - - - - - - - - - - - - 
 	          target: config                      
