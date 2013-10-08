@@ -48,6 +48,7 @@ public class MCRChangeTracker implements Cloneable {
     public MCRChangeData undoLastChange(Document doc) {
         MCRChangeData data = findLastChange(doc);
         data.getProcessingInstruction().detach();
+        counter--;
 
         String property = CONFIG_PREFIX + data.getType() + ".Class";
         MCRChange change = (MCRChange) (MCRConfiguration.instance().getSingleInstanceOf(property));
@@ -56,7 +57,7 @@ public class MCRChangeTracker implements Cloneable {
     }
 
     public MCRChangeData findLastChange(Document doc) {
-        String typePrefix = PREFIX + (counter--) + "-";
+        String typePrefix = PREFIX + counter + "-";
         for (ProcessingInstruction instruction : doc.getDescendants(Filters.processinginstruction())) {
             String target = instruction.getTarget();
 
