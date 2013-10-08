@@ -102,7 +102,6 @@ public class MCREditorSession {
     }
 
     public String getCombinedSessionStepID() {
-        setBreakpoint("After transformation to HTML");
         return id + "-" + tracker.getChangeCounter();
     }
 

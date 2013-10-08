@@ -235,6 +235,7 @@ public class MCRXEditorTransformer {
         for (String xPath : editorSession.getSubmission().getXPaths2CheckResubmission())
             nodeSet.addNode(buildAdditionalParameterElement(dom, "_xed_check", xPath));
 
+        editorSession.setBreakpoint("After transformation to HTML");
         nodeSet.addNode(buildAdditionalParameterElement(dom, "_xed_session", editorSession.getCombinedSessionStepID()));
 
         return new XNodeSetForDOM((NodeList) nodeSet, context.getXPathContext());
