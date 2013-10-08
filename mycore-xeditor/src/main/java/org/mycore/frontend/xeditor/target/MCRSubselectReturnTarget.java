@@ -2,6 +2,7 @@ package org.mycore.frontend.xeditor.target;
 
 import javax.servlet.ServletContext;
 
+import org.apache.log4j.Logger;
 import org.jaxen.JaxenException;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
@@ -11,9 +12,12 @@ import org.mycore.frontend.xeditor.tracker.MCRChangeData;
 
 public class MCRSubselectReturnTarget implements MCREditorTarget {
 
+    private final static Logger LOGGER = Logger.getLogger(MCRSubselectReturnTarget.class);
+
     @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter) throws Exception {
         String baseXPath = getBaseXPathForSubselect(session);
+        LOGGER.info("Returning from subselect for " + baseXPath);
 
         if ("cancel".equals(parameter)) {
             session.setBreakpoint("After canceling subselect for " + baseXPath);
@@ -21,7 +25,7 @@ public class MCRSubselectReturnTarget implements MCREditorTarget {
             setSubmittedValues(job, session, baseXPath);
             session.setBreakpoint("After returning from subselect for " + baseXPath);
         }
-        
+
         job.getResponse().sendRedirect(session.getRedirectURL());
     }
 
