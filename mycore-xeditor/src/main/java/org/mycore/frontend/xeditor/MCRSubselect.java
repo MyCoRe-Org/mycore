@@ -6,15 +6,12 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
 import org.jaxen.JaxenException;
-import org.jdom2.Attribute;
-import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRException;
-import org.mycore.frontend.xeditor.tracker.MCRSubselectStart;
 
 public class MCRSubselect {
 
-    private static final String PARAM_SUBSELECT_SESSION = "xed_subselect_session=";
+    public static final String PARAM_SUBSELECT_SESSION = "_xed_subselect_session";
 
     private final static Logger LOGGER = Logger.getLogger(MCRSubselect.class);
 
@@ -31,21 +28,24 @@ public class MCRSubselect {
         this.xPath = parameter.substring(0, pos);
         this.href = decode(parameter.substring(pos + 1));
 
-        LOGGER.info("Start subselect for " + xPath + " using pattern " + href);
+        LOGGER.info("New subselect for " + xPath + " using pattern " + href);
 
         MCRBinding binding = new MCRBinding(xPath, session.getRootBinding());
-        Object node = binding.getBoundNode();
-        Element element = node instanceof Element ? (Element) node : ((Attribute) node).getParent();
-        binding.track(MCRSubselectStart.startSubselect(element, xPath));
-
         this.href = new MCRXPathEvaluator(binding).replaceXPaths(href, true);
 
         binding.detach();
     }
 
+    public String getXPath() {
+        return xPath;
+    }
+
+    public String getSessionParam() {
+        return PARAM_SUBSELECT_SESSION + "=" + session.getCombinedSessionStepID();
+    }
+
     public String getRedirectURL() {
-        String param = PARAM_SUBSELECT_SESSION + session.getCombinedSessionStepID();
-        return href + (href.contains("?") ? "&" : "?") + param;
+        return href + (href.contains("?") ? "&" : "?") + getSessionParam();
     }
 
     public static String encode(String href) {

@@ -18,7 +18,7 @@ public class MCRChangeTracker implements Cloneable {
     private int counter = 0;
 
     public void track(MCRChangeData data) {
-        ProcessingInstruction pi = data.buildProcessingInstruction();
+        ProcessingInstruction pi = data.getProcessingInstruction();
         pi.setTarget(PREFIX + (++counter) + "-" + pi.getTarget());
         data.getContext().addContent(data.getPosition(), pi);
     }
@@ -46,9 +46,8 @@ public class MCRChangeTracker implements Cloneable {
     }
 
     public MCRChangeData undoLastChange(Document doc) {
-        ProcessingInstruction pi = findNextProcessingInstruction(doc);
-        MCRChangeData data = new MCRChangeData(pi);
-        pi.detach();
+        MCRChangeData data = findLastChange(doc);
+        data.getProcessingInstruction().detach();
 
         String property = CONFIG_PREFIX + data.getType() + ".Class";
         MCRChange change = (MCRChange) (MCRConfiguration.instance().getSingleInstanceOf(property));
@@ -56,14 +55,14 @@ public class MCRChangeTracker implements Cloneable {
         return data;
     }
 
-    private ProcessingInstruction findNextProcessingInstruction(Document doc) {
+    public MCRChangeData findLastChange(Document doc) {
         String typePrefix = PREFIX + (counter--) + "-";
         for (ProcessingInstruction instruction : doc.getDescendants(Filters.processinginstruction())) {
             String target = instruction.getTarget();
 
             if (target.startsWith(typePrefix)) {
                 instruction.setTarget(target.substring(typePrefix.length()));
-                return instruction;
+                return new MCRChangeData(instruction);
             }
         }
         throw new MCRException("Lost processing instruction for undo, not found: " + typePrefix);

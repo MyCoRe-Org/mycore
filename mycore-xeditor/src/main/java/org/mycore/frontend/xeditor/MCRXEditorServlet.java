@@ -45,6 +45,9 @@ public class MCRXEditorServlet extends MCRServlet {
         String sessionID = xEditorStepID.split("-")[0];
         MCREditorSession session = MCREditorSessionStoreFactory.getSessionStore().getSession(sessionID);
 
+        String referrer = job.getRequest().getHeader("referer");
+        session.setPageURL(referrer);
+
         int stepNr = Integer.parseInt(xEditorStepID.split("-")[1]);
         session.getChangeTracker().undoChanges(session.getEditedXML(), stepNr);
 
@@ -63,7 +66,7 @@ public class MCRXEditorServlet extends MCRServlet {
                 if (name.endsWith(".x") || name.endsWith(".y")) // input type="image"
                     name = name.substring(0, name.length() - 2);
 
-                targetID = name.split("[_\\:]")[3].toLowerCase(); 
+                targetID = name.split("[_\\:]")[3].toLowerCase();
                 parameter = name.substring(TARGET_PATTERN.length() + targetID.length());
                 if (!parameter.isEmpty())
                     parameter = parameter.substring(1);
@@ -73,7 +76,6 @@ public class MCRXEditorServlet extends MCRServlet {
         }
         LOGGER.info("sending submission to target " + targetID + " " + parameter);
         getTarget(targetID).handleSubmission(getServletContext(), job, session, parameter);
-        session.setBreakpoint("After handling target " + targetID + " " + parameter);
     }
 
     private MCREditorTarget getTarget(String targetID) {

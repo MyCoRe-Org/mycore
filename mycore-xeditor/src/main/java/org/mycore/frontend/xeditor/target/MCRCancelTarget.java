@@ -35,7 +35,7 @@ import org.mycore.frontend.xeditor.MCREditorSession;
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRCancelTarget extends MCREditorTarget {
+public class MCRCancelTarget implements MCREditorTarget {
 
     @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter) throws IOException,

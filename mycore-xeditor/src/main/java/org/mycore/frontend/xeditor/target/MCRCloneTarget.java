@@ -32,7 +32,7 @@ import org.mycore.frontend.xeditor.MCREditorSession;
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRCloneTarget extends MCREditorTarget {
+public class MCRCloneTarget implements MCREditorTarget {
 
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String xPath) throws Exception {
         session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
@@ -40,6 +40,7 @@ public class MCRCloneTarget extends MCREditorTarget {
         MCRBinding binding = new MCRBinding(xPath, session.getRootBinding());
         binding.cloneBoundElement(0);
         binding.detach();
-        redirectToEditorPage(job, session);
+        session.setBreakpoint("After handling target clone " + xPath);
+        job.getResponse().sendRedirect(session.getRedirectURL());
     }
 }

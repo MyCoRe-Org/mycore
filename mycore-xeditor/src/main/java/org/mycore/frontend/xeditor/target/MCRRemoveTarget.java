@@ -32,7 +32,7 @@ import org.mycore.frontend.xeditor.MCREditorSession;
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRRemoveTarget extends MCREditorTarget {
+public class MCRRemoveTarget implements MCREditorTarget {
 
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String xPath) throws Exception {
         session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
@@ -41,7 +41,9 @@ public class MCRRemoveTarget extends MCREditorTarget {
         MCRBinding binding = new MCRBinding(xPath, session.getRootBinding());
         binding.removeBoundNode(0);
         binding.detach();
+        
+        session.setBreakpoint("After handling target remove " + xPath);
 
-        redirectToEditorPage(job, session);
+        job.getResponse().sendRedirect(session.getRedirectURL());
     }
 }

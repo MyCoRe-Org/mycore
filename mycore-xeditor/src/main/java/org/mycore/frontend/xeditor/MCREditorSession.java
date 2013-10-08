@@ -52,6 +52,8 @@ public class MCREditorSession {
 
     private String id;
 
+    private String url;
+
     private Map<String, String[]> requestParameters;
 
     private Map<String, Object> variables;
@@ -102,6 +104,15 @@ public class MCREditorSession {
     public String getCombinedSessionStepID() {
         setBreakpoint("After transformation to HTML");
         return id + "-" + tracker.getChangeCounter();
+    }
+
+    public void setPageURL(String pageURL) {
+        if (url == null)
+            this.url = pageURL.contains("?") ? pageURL.substring(0, pageURL.indexOf("?")) : pageURL;
+    }
+
+    public String getRedirectURL() {
+        return url + "?" + MCREditorSessionStore.XEDITOR_SESSION_PARAM + "=" + id;
     }
 
     public Map<String, String[]> getRequestParameters() {

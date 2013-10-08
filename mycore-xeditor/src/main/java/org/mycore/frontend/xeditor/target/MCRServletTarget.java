@@ -34,7 +34,7 @@ import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRServletTarget extends MCREditorTarget {
+public class MCRServletTarget implements MCREditorTarget {
 
     @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String servletNameOrPath)
@@ -52,8 +52,13 @@ public class MCRServletTarget extends MCREditorTarget {
                 dispatcher = context.getRequestDispatcher(servletNameOrPath);
 
             job.getRequest().setAttribute("MCRXEditorSubmission", result);
+
+            session.setBreakpoint("After handling target servlet " + servletNameOrPath);
+
             dispatcher.forward(job.getRequest(), job.getResponse());
-        } else
-            redirectToEditorPage(job, session);
+        } else {
+            session.setBreakpoint("After validation failed, target servlet " + servletNameOrPath);
+            job.getResponse().sendRedirect(session.getRedirectURL());
+        }
     }
 }

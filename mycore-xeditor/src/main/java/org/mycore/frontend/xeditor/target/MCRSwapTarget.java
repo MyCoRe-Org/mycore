@@ -31,12 +31,15 @@ import org.mycore.frontend.xeditor.MCREditorSession;
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRSwapTarget extends MCREditorTarget {
+public class MCRSwapTarget implements MCREditorTarget {
 
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String swapParam) throws Exception {
         session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
         session.getValidator().forgetInvalidFields();
         session.getRootBinding().swap(swapParam);
-        redirectToEditorPage(job, session);
+
+        session.setBreakpoint("After handling target swap " + swapParam);
+
+        job.getResponse().sendRedirect(session.getRedirectURL());
     }
 }

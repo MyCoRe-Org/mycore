@@ -36,7 +36,7 @@ import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRLayoutServiceTarget extends MCREditorTarget {
+public class MCRLayoutServiceTarget implements MCREditorTarget {
 
     @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String style) throws Exception {
@@ -53,8 +53,10 @@ public class MCRLayoutServiceTarget extends MCREditorTarget {
 
             MCRContent editedXML = new MCRJDOMContent(result);
             MCRLayoutService.instance().doLayout(job.getRequest(), job.getResponse(), editedXML);
-            return;
-        } else
-            redirectToEditorPage(job, session);
+            session.setBreakpoint("After handling target layout " + style);
+        } else {
+            session.setBreakpoint("After validation failed, target layout " + style);
+            job.getResponse().sendRedirect(session.getRedirectURL());
+        }
     }
 }

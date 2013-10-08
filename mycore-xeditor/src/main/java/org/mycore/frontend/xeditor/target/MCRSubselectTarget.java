@@ -33,7 +33,7 @@ import org.mycore.frontend.xeditor.MCRSubselect;
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRSubselectTarget extends MCREditorTarget {
+public class MCRSubselectTarget implements MCREditorTarget {
 
     private final static Logger LOGGER = Logger.getLogger(MCRSubselectTarget.class);
 
@@ -43,6 +43,9 @@ public class MCRSubselectTarget extends MCREditorTarget {
 
         MCRSubselect subselect = new MCRSubselect(session, parameter);
         String url = subselect.getRedirectURL();
+        String xPath = subselect.getXPath();
+
+        session.setBreakpoint("After starting subselect at " + url + " for " + xPath);
 
         LOGGER.info("Redirecting to subselect " + url);
         job.getResponse().sendRedirect(url);

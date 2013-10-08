@@ -23,6 +23,8 @@ public class MCRChangeData {
 
     protected String text;
 
+    protected ProcessingInstruction pi;
+
     public MCRChangeData(String type, String text, int pos, Element context) {
         this.type = type;
         this.text = text;
@@ -38,12 +40,16 @@ public class MCRChangeData {
         this(type, element2text(data), pos, context);
     }
 
-    public ProcessingInstruction buildProcessingInstruction() {
-        String data = RAW_OUTPUTTER.outputString(new Text(text));
-        return new ProcessingInstruction(type, data);
+    public ProcessingInstruction getProcessingInstruction() {
+        if (pi == null) {
+            String data = RAW_OUTPUTTER.outputString(new Text(text));
+            this.pi = new ProcessingInstruction(type, data);
+        }
+        return pi;
     }
 
     public MCRChangeData(ProcessingInstruction pi) {
+        this.pi = pi;
         this.context = pi.getParentElement();
         this.pos = context.indexOf(pi);
         this.type = pi.getTarget();

@@ -43,7 +43,7 @@ import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRDebugTarget extends MCREditorTarget {
+public class MCRDebugTarget implements MCREditorTarget {
 
     @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter) throws Exception {
