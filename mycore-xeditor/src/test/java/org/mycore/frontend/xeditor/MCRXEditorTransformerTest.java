@@ -122,7 +122,7 @@ public class MCRXEditorTransformerTest {
     public void testConditions() throws IOException, URISyntaxException, TransformerException, JDOMException, SAXException, JaxenException {
         MCRSessionMgr.getCurrentSession().put("switch", "on");
         MCRSessionMgr.getCurrentSession().put("case", "2");
-        testTransformation("testConditions-editor.xml", null, "testConditions-transformed.xml");
+        testTransformation("testConditions-editor.xml", "testBasicInputComponents-source.xml", "testConditions-transformed.xml");
     }
 
     @Test

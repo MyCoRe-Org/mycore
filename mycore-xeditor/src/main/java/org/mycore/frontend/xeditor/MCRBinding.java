@@ -294,17 +294,31 @@ public class MCRBinding {
 
     public String evaluateXPath(String xPathExpression) {
         xPathExpression = "string(" + xPathExpression + ")";
+        Object result = evaluateFirst(xPathExpression);
+        return result == null ? "" : (String) result;
+    }
+
+    public boolean test(String xPathExpression) {
+        Object result = evaluateFirst(xPathExpression);
+        if (result == null)
+            return false;
+        else if (result instanceof Boolean)
+            return ((Boolean) result).booleanValue();
+        else
+            return true;
+    }
+
+    private Object evaluateFirst(String xPathExpression) {
         try {
             Map<String, Object> variables = buildXPathVariables();
-
             List<Namespace> namespaces = MCRUsedNamespaces.getNamespaces();
             XPathFactory factory = XPathFactory.instance();
             XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), variables, namespaces);
-            return xPath.evaluateFirst(boundNodes).toString();
+            return xPath.evaluateFirst(boundNodes);
         } catch (Exception ex) {
             LOGGER.warn("unable to evaluate XPath: " + xPathExpression);
             LOGGER.debug(ex);
-            return "";
+            return null;
         }
     }
 

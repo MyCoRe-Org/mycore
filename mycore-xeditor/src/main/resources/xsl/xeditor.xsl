@@ -288,7 +288,7 @@
   <!-- ========== <xed:if test="" /> ========== -->
 
   <xsl:template match="xed:if" mode="xeditor">
-    <xsl:if test="transformer:evaluateXPath($transformer,@test)='true'">
+    <xsl:if test="transformer:test($transformer,@test)">
       <xsl:apply-templates select="node()" mode="xeditor" />
     </xsl:if>
   </xsl:template>
@@ -297,8 +297,8 @@
 
   <xsl:template match="xed:choose" mode="xeditor">
     <xsl:choose>
-      <xsl:when test="xed:when[transformer:evaluateXPath($transformer,@test)='true']">
-        <xsl:apply-templates select="xed:when[transformer:evaluateXPath($transformer,@test)='true'][1]/node()" mode="xeditor" />
+      <xsl:when test="xed:when[transformer:test($transformer,@test)]">
+        <xsl:apply-templates select="xed:when[transformer:test($transformer,@test)][1]/node()" mode="xeditor" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:apply-templates select="xed:otherwise/node()" mode="xeditor" />

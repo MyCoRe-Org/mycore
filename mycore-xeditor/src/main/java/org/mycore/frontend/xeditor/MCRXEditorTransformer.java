@@ -161,6 +161,10 @@ public class MCRXEditorTransformer {
         return currentBinding.evaluateXPath(xPathExpression);
     }
 
+    public boolean test(String xPathExpression) {
+        return currentBinding.test(xPathExpression);
+    }
+
     public String repeat(String xPath, int minRepeats, int maxRepeats) throws JDOMException, JaxenException {
         MCRRepeatBinding repeat = new MCRRepeatBinding(xPath, currentBinding, minRepeats, maxRepeats);
         currentBinding = repeat;
