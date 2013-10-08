@@ -38,7 +38,7 @@ public class MCRSubselect {
         Element element = node instanceof Element ? (Element) node : ((Attribute) node).getParent();
         binding.track(MCRSubselectStart.startSubselect(element, xPath));
 
-        this.href = binding.replaceXPaths(href, true);
+        this.href = new MCRXPathEvaluator(binding).replaceXPaths(href, true);
 
         binding.detach();
     }

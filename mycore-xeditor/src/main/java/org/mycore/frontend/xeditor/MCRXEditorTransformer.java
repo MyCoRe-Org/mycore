@@ -150,19 +150,26 @@ public class MCRXEditorTransformer {
     }
 
     public String replaceXPaths(String text) {
-        return currentBinding.replaceXPaths(text, false);
+        return getXPathEvaluator().replaceXPaths(text, false);
     }
 
     public String replaceXPathOrI18n(String expression) {
-        return currentBinding.replaceXPathOrI18n(expression);
+        return getXPathEvaluator().replaceXPathOrI18n(expression);
     }
 
     public String evaluateXPath(String xPathExpression) {
-        return currentBinding.evaluateXPath(xPathExpression);
+        return getXPathEvaluator().evaluateXPath(xPathExpression);
     }
 
     public boolean test(String xPathExpression) {
-        return currentBinding.test(xPathExpression);
+        return getXPathEvaluator().test(xPathExpression);
+    }
+
+    public MCRXPathEvaluator getXPathEvaluator() {
+        if (currentBinding != null)
+            return new MCRXPathEvaluator(currentBinding);
+        else
+            return new MCRXPathEvaluator(transformationParameters.getParameterMap(), null);
     }
 
     public String repeat(String xPath, int minRepeats, int maxRepeats) throws JDOMException, JaxenException {

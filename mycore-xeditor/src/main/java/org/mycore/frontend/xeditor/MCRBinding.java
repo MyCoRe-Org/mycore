@@ -25,27 +25,21 @@ package org.mycore.frontend.xeditor;
 
 import org.jaxen.JaxenException;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.jdom2.Namespace;
 import org.jdom2.Parent;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-import org.mycore.common.MCRException;
 import org.mycore.frontend.xeditor.tracker.MCRAddedAttribute;
 import org.mycore.frontend.xeditor.tracker.MCRAddedElement;
 import org.mycore.frontend.xeditor.tracker.MCRChangeData;
@@ -55,7 +49,6 @@ import org.mycore.frontend.xeditor.tracker.MCRRemoveElement;
 import org.mycore.frontend.xeditor.tracker.MCRSetAttributeValue;
 import org.mycore.frontend.xeditor.tracker.MCRSetElementText;
 import org.mycore.frontend.xeditor.tracker.MCRSwapElements;
-import org.mycore.services.i18n.MCRTranslation;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -255,71 +248,6 @@ public class MCRBinding {
             }
         }
         return variables;
-    }
-
-    private final static Pattern PATTERN_XPATH = Pattern.compile("\\{([^\\}]+)\\}");
-
-    public String replaceXPaths(String text, boolean urlEncode) {
-        Matcher m = PATTERN_XPATH.matcher(text);
-        StringBuffer sb = new StringBuffer();
-        while (m.find()) {
-            String replacement = replaceXPathOrI18n(m.group(1));
-            if (urlEncode) {
-                try {
-                    replacement = URLEncoder.encode(replacement, "UTF-8");
-                } catch (UnsupportedEncodingException ex) {
-                    throw new MCRException(ex);
-                }
-            }
-            m.appendReplacement(sb, replacement);
-        }
-        m.appendTail(sb);
-        return sb.toString();
-    }
-
-    public String replaceXPathOrI18n(String expression) {
-        if (expression.startsWith("i18n:")) {
-            String key = expression.substring(5);
-            int pos = key.indexOf(",");
-            if (pos != -1) {
-                String xPath = key.substring(pos + 1);
-                String value = evaluateXPath(xPath);
-                key = key.substring(0, pos);
-                return MCRTranslation.translate(key, value);
-            } else
-                return MCRTranslation.translate(key);
-        } else
-            return evaluateXPath(expression);
-    }
-
-    public String evaluateXPath(String xPathExpression) {
-        xPathExpression = "string(" + xPathExpression + ")";
-        Object result = evaluateFirst(xPathExpression);
-        return result == null ? "" : (String) result;
-    }
-
-    public boolean test(String xPathExpression) {
-        Object result = evaluateFirst(xPathExpression);
-        if (result == null)
-            return false;
-        else if (result instanceof Boolean)
-            return ((Boolean) result).booleanValue();
-        else
-            return true;
-    }
-
-    private Object evaluateFirst(String xPathExpression) {
-        try {
-            Map<String, Object> variables = buildXPathVariables();
-            List<Namespace> namespaces = MCRUsedNamespaces.getNamespaces();
-            XPathFactory factory = XPathFactory.instance();
-            XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), variables, namespaces);
-            return xPath.evaluateFirst(boundNodes);
-        } catch (Exception ex) {
-            LOGGER.warn("unable to evaluate XPath: " + xPathExpression);
-            LOGGER.debug(ex);
-            return null;
-        }
     }
 
     public String getAbsoluteXPath() {

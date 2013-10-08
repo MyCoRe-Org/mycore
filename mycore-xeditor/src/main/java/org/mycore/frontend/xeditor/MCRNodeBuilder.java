@@ -44,8 +44,6 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.Parent;
-import org.jdom2.filter.Filters;
-import org.jdom2.xpath.XPathFactory;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -123,11 +121,7 @@ public class MCRNodeBuilder {
     }
 
     private Object evaluateFirst(String xPath, Parent parent) {
-        XPathFactory factory = XPathFactory.instance();
-        Object result = factory.compile(xPath, Filters.fpassthrough(), variables, MCRUsedNamespaces.getNamespaces()).evaluateFirst(parent);
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("evaluating " + xPath + " returns " + result);
-        return result;
+        return new MCRXPathEvaluator(variables, parent).evaluateFirst(xPath);
     }
 
     private String buildXPath(List<Step> steps) {
