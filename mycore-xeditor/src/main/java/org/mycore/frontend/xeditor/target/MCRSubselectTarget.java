@@ -23,17 +23,25 @@
 
 package org.mycore.frontend.xeditor.target;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.servlet.ServletContext;
 
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
+import org.mycore.common.MCRException;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
-import org.mycore.frontend.xeditor.MCRSubselect;
+import org.mycore.frontend.xeditor.MCRXPathEvaluator;
 
 /**
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRSubselectTarget implements MCREditorTarget {
+
+    public static final String PARAM_SUBSELECT_SESSION = "_xed_subselect_session";
 
     private final static Logger LOGGER = Logger.getLogger(MCRSubselectTarget.class);
 
@@ -41,13 +49,37 @@ public class MCRSubselectTarget implements MCREditorTarget {
         session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
         session.getValidator().forgetInvalidFields();
 
-        MCRSubselect subselect = new MCRSubselect(session, parameter);
-        String url = subselect.getRedirectURL();
-        String xPath = subselect.getXPath();
+        int pos = parameter.lastIndexOf(":");
+        String xPath = parameter.substring(0, pos);
+        String href = decode(parameter.substring(pos + 1));
 
-        session.setBreakpoint("After starting subselect at " + url + " for " + xPath);
+        LOGGER.info("New subselect for " + xPath + " using pattern " + href);
 
-        LOGGER.info("Redirecting to subselect " + url);
-        job.getResponse().sendRedirect(url);
+        MCRBinding binding = new MCRBinding(xPath, session.getRootBinding());
+        href = new MCRXPathEvaluator(binding).replaceXPaths(href, true);
+        binding.detach();
+
+        href += (href.contains("?") ? "&" : "?") + PARAM_SUBSELECT_SESSION + "=" + session.getCombinedSessionStepID();
+
+        session.setBreakpoint("After starting subselect at " + href + " for " + xPath);
+
+        LOGGER.info("Redirecting to subselect " + href);
+        job.getResponse().sendRedirect(href);
+    }
+
+    public static String encode(String href) {
+        try {
+            return Hex.encodeHexString(href.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException ex) {
+            throw new MCRException(ex);
+        }
+    }
+
+    public static String decode(String href) {
+        try {
+            return new String(Hex.decodeHex(href.toCharArray()));
+        } catch (DecoderException ex) {
+            throw new MCRException(ex);
+        }
     }
 }

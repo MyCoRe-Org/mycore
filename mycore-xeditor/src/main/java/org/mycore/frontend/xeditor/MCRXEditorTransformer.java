@@ -50,6 +50,7 @@ import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
+import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.traversal.NodeIterator;
 import org.xml.sax.SAXException;
@@ -218,7 +219,7 @@ public class MCRXEditorTransformer {
     }
 
     public String getSubselectParam(String href) {
-        return currentBinding.getAbsoluteXPath() + ":" + MCRSubselect.encode(href);
+        return currentBinding.getAbsoluteXPath() + ":" + MCRSubselectTarget.encode(href);
     }
 
     public XNodeSet getAdditionalParameters(ExpressionContext context) throws ParserConfigurationException, TransformerException {
