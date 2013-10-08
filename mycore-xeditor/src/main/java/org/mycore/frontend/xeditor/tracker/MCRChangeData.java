@@ -48,11 +48,11 @@ public class MCRChangeData {
         return pi;
     }
 
-    public MCRChangeData(ProcessingInstruction pi) {
+    public MCRChangeData(ProcessingInstruction pi, String prefix) {
         this.pi = pi;
         this.context = pi.getParentElement();
         this.pos = context.indexOf(pi);
-        this.type = pi.getTarget();
+        this.type = pi.getTarget().substring(prefix.length());
 
         String xml = "<x>" + pi.getData() + "</x>";
         this.text = text2element(xml).getText();

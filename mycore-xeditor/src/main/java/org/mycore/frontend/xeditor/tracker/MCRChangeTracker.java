@@ -61,10 +61,8 @@ public class MCRChangeTracker implements Cloneable {
         for (ProcessingInstruction instruction : doc.getDescendants(Filters.processinginstruction())) {
             String target = instruction.getTarget();
 
-            if (target.startsWith(typePrefix)) {
-                instruction.setTarget(target.substring(typePrefix.length()));
-                return new MCRChangeData(instruction);
-            }
+            if (target.startsWith(typePrefix))
+                return new MCRChangeData(instruction, typePrefix);
         }
         throw new MCRException("Lost processing instruction for undo, not found: " + typePrefix);
     }
