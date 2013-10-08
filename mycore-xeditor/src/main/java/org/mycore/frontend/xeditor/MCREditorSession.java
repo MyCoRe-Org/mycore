@@ -123,7 +123,7 @@ public class MCREditorSession {
         }
     }
 
-    private final static Pattern PATTERN_URI = Pattern.compile("\\{\\$(.+)\\}");
+    private final static Pattern PATTERN_URI = Pattern.compile("\\{\\$([^\\}]+)\\}");
 
     public String replaceParameters(String uri) {
         Matcher m = PATTERN_URI.matcher(uri);
