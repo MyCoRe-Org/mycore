@@ -164,7 +164,8 @@ public class MCRUserServlet extends MCRServlet {
         boolean allowed = MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION)
             || currentUser.equals(user) || currentUser.equals(user.getOwner());
         if (!allowed) {
-            res.sendError(HttpServletResponse.SC_FORBIDDEN);
+            String msg = MCRTranslation.translate("component.user2.UserServlet.noAdminPermission");
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
             return;
         }
 
@@ -228,7 +229,8 @@ public class MCRUserServlet extends MCRServlet {
         boolean allowed = hasAdminPermission
             || MCRAccessManager.checkPermission(MCRUser2Constants.USER_CREATE_PERMISSION);
         if (!allowed) {
-            res.sendError(HttpServletResponse.SC_FORBIDDEN);
+            String msg = MCRTranslation.translate("component.user2.UserServlet.noCreatePermission");
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
             return;
         }
 
@@ -361,7 +363,8 @@ public class MCRUserServlet extends MCRServlet {
         boolean allowed = MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION)
             || currentUser.equals(user.getOwner()) || (currentUser.equals(user) && currentUser.hasNoOwner());
         if (!allowed) {
-            res.sendError(HttpServletResponse.SC_FORBIDDEN);
+            String msg = MCRTranslation.translate("component.user2.UserServlet.noAdminPermission");
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
             return;
         }
 
@@ -386,7 +389,8 @@ public class MCRUserServlet extends MCRServlet {
         boolean allowed = MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION)
             || currentUser.equals(user.getOwner());
         if (!allowed) {
-            res.sendError(HttpServletResponse.SC_FORBIDDEN);
+            String msg = MCRTranslation.translate("component.user2.UserServlet.noAdminPermission");
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
             return;
         }
 
@@ -416,7 +420,8 @@ public class MCRUserServlet extends MCRServlet {
         boolean allowed = hasAdminPermission
             || MCRAccessManager.checkPermission(MCRUser2Constants.USER_CREATE_PERMISSION);
         if (!allowed) {
-            res.sendError(HttpServletResponse.SC_FORBIDDEN);
+            String msg = MCRTranslation.translate("component.user2.UserServlet.noCreatePermission");
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
             return;
         }
 
