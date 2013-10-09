@@ -82,6 +82,10 @@ public class MCREditorSession {
         this(Collections.<String, String[]> emptyMap(), new MCRParameterCollector());
     }
 
+    public Map<String, Object> getVariables() {
+        return variables;
+    }
+
     private void removeIllegalVariables() {
         for (Iterator<Entry<String, Object>> entries = variables.entrySet().iterator(); entries.hasNext();) {
             String name = entries.next().getKey();

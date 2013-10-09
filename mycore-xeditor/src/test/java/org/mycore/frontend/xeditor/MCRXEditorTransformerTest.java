@@ -134,6 +134,13 @@ public class MCRXEditorTransformerTest {
     }
 
     @Test
+    public void testLoadResources() throws IOException, URISyntaxException, TransformerException, JDOMException, SAXException, JaxenException {
+        MCRSessionMgr.getCurrentSession().put("genre","article");
+        MCRSessionMgr.getCurrentSession().put("host","journal");
+        testTransformation("testLoadResources-editor.xml", null, "testLoadResources-transformed.xml");
+    }
+
+    @Test
     public void testValidation() throws IOException, URISyntaxException, TransformerException, JDOMException, SAXException, JaxenException {
         MCREditorSession session = testTransformation("testValidation-editor.xml", "testBasicInputComponents-source.xml",
                 "testValidation-transformed1.xml");

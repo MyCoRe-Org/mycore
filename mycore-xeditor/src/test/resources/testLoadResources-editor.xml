@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<div xmlns:xed="http://www.mycore.de/xeditor">
+  <xed:form>
+    <xed:load-resource name="genres" uri="resource:testLoadResources-editor.xml" />
+    
+    <xed:bind xpath="mods:mods">
+      <h1>
+        <xed:output value="$genres//category[@ID=$genre]/label[lang($CurrentLang)]" />
+        in
+        <xed:output value="$genres//category[@ID=$host]/label[lang($CurrentLang)]" />
+      </h1>
+    </xed:bind>
+    
+    <xed:template>
+      <category ID="article">
+        <label xml:lang="en">article</label>
+        <label xml:lang="de">Artikel</label>
+      </category>
+      <category ID="journal">
+        <label xml:lang="en">journal</label>
+        <label xml:lang="de">Zeitschrift</label>
+      </category>
+    </xed:template>
+    
+  </xed:form>
+</div>

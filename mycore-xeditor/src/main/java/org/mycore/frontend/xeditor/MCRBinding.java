@@ -239,7 +239,7 @@ public class MCRBinding {
     public Map<String, Object> buildXPathVariables() {
         Map<String, Object> variables = new HashMap<String, Object>();
         variables.putAll(getVariables());
-
+        
         for (MCRBinding ancestor : getAncestorsAndSelf()) {
             for (MCRBinding child : ancestor.getChildren()) {
                 String childName = child.getName();

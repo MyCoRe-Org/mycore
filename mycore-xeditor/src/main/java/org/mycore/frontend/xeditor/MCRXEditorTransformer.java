@@ -49,6 +49,7 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
 import org.w3c.dom.NodeList;
@@ -204,6 +205,11 @@ public class MCRXEditorTransformer {
 
     public String getSwapParameter(int posA, int posB) {
         return getCurrentRepeat().getSwapParameter(posA, posB);
+    }
+
+    public void loadResource(String uri, String name) {
+        Element resource = MCRURIResolver.instance().resolve(uri);
+        editorSession.getVariables().put(name, resource);
     }
 
     public void addValidationRule(NodeIterator attributes) {
