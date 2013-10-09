@@ -116,7 +116,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @see MCRCategoryDAO#addCategory(MCRCategoryID, MCRCategory)
      */
     @MCRCommand(syntax = "load classification from file {0}",
-            help = "The command add a new classification form file {0} to the system.", order = 10)
+            help = "The command adds a new classification from file {0} to the system.", order = 10)
     public static void loadFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException,
             IOException {
         Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRFileContent(filename));
@@ -135,7 +135,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @see MCRCategoryDAO#replaceCategory(MCRCategory)
      */
     @MCRCommand(syntax = "update classification from file {0}",
-            help = "The command add a new classification form file {0} to the system.", order = 20)
+            help = "The command updates a classification from file {0} to the system.", order = 20)
     public static void updateFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException,
             IOException {
         Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRFileContent(filename));
