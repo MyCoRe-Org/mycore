@@ -373,6 +373,7 @@ var ACLEditor = function(){
 				200: function() {
 					accessTableInstance.edit($(".edit"), json.accessIDNew, json.accessPoolNew, json.accessRuleNew);
 					ruleListInstance.updateCanDelete();
+					ruleListInstance.select($(".rule-selected").attr("ruleid"));
 					showAlert(i18nKeys["ACLE.alert.access.edit.success"], true);
 				},
 				409: function() {
