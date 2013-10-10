@@ -85,7 +85,7 @@
         <cell row="20" col="1" anchor="NORTHEAST">
           <text i18n="component.mods.metaData.dictionary.volume.article" />
         </cell>
-        <cell row="20" col="2" colspan="2" var="mods:detail[@type='volume']/mods:number" anchor="NORTHWEST" ref="TFzeile10" />
+        <cell row="20" col="2" colspan="2" var="mods:detail[@type='volume']/mods:number" anchor="NORTHWEST" ref="TFzeile32" />
         <cell row="30" col="1" anchor="NORTHEAST">
           <text i18n="component.mods.metaData.dictionary.year" />
         </cell>
