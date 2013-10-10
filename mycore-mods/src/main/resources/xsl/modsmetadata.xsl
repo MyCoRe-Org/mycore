@@ -1023,6 +1023,7 @@
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:language) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:publisher) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:edition) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateOther) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:place/mods:placeTerm) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier) or
@@ -1050,6 +1051,11 @@
             </xsl:call-template>
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:edition" />
+            </xsl:call-template>
+            <xsl:call-template name="printMetaDate.mods">
+              <xsl:with-param name="label" select="i18n:translate('component.mods.metaData.dictionary.volume.article')" />
+              <xsl:with-param name="nodes"
+                select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']/mods:part/mods:detail[@type='volume']" />
             </xsl:call-template>
             <xsl:apply-templates mode="present"
               select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:physicalDescription/mods:extent" />
@@ -1438,8 +1444,10 @@
                   </xsl:choose>
                   <xsl:text disable-output-escaping="yes">&lt;br /></xsl:text>
                   <!-- Issue -->
-                  <xsl:value-of
-                    select="concat(mods:part/mods:detail[@type='issue']/mods:caption,' ',mods:part/mods:detail[@type='issue']/mods:number)" />
+                  <xsl:if test="mods:part/mods:detail[@type='issue']/mods:number">
+                    <xsl:value-of
+                      select="concat(mods:part/mods:detail[@type='issue']/mods:caption,' ',mods:part/mods:detail[@type='issue']/mods:number)" />
+                  </xsl:if>
                   <xsl:if test="mods:part/mods:detail[@type='issue']/mods:number and mods:part/mods:date">
                     <xsl:text>/</xsl:text>
                   </xsl:if>
