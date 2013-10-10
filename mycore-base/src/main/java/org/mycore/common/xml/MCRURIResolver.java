@@ -23,16 +23,11 @@
 
 package org.mycore.common.xml;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -53,7 +48,6 @@ import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -106,7 +100,6 @@ import org.mycore.tools.MCRObjectFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.ext.EntityResolver2;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
@@ -122,7 +115,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @author Frank L\u00FCtzenkirchen
  * @author Thomas Scheffler (yagee)
  */
-public final class MCRURIResolver implements URIResolver, EntityResolver2 {
+public final class MCRURIResolver implements URIResolver {
     private static final Logger LOGGER = Logger.getLogger(MCRURIResolver.class);
 
     private static Map<String, URIResolver> SUPPORTED_SCHEMES;
@@ -324,85 +317,6 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
     }
 
     /**
-     * Implements the SAX EntityResolver interface. This resolver type is used
-     * to read DTDs and XML Schema files when parsing XML documents. This
-     * resolver searches such files in the CLASSPATH of the current application.
-     * 
-     * @see org.xml.sax.EntityResolver
-     */
-    public InputSource resolveEntity(String publicId, String systemId) throws IOException {
-        LOGGER.debug("Resolving " + publicId + " :: " + systemId);
-        try {
-            return resolveEntity(null, publicId, null, getFileName(systemId));
-        } catch (SAXException e) {
-            throw new IOException(e);
-        }
-    }
-
-    @Override
-    public InputSource getExternalSubset(String name, String baseURI) throws SAXException, IOException {
-        return resolveEntity(name, null, baseURI, null);
-    }
-
-    @Override
-    public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId)
-        throws SAXException, IOException {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(MessageFormat.format("Resolving: \nname: {0}\npublicId: {1}\nbaseURI: {2}\nsystemId: {3}",
-                name, publicId, baseURI, systemId));
-        }
-        if (systemId == null) {
-            return null; // Use default resolver
-        }
-
-        if (systemId.length() == 0) {
-            // if you overwrite SYSTEM by empty String in XSL
-            return new InputSource(new StringReader(""));
-        }
-        InputStream is = getCachedResource("/" + systemId);
-        if (is == null) {
-            return null;
-        }
-        return new InputSource(is);
-    }
-
-    /**
-     * Returns the filename part of a path if path is absolute URI
-     * 
-     * @param path
-     *            the path of a file
-     * @return the part after the last / or \\
-     * @throws URISyntaxException 
-     */
-    private String getFileName(String path) {
-        int posA = path.lastIndexOf("/");
-        int posB = path.lastIndexOf("\\");
-        int pos = posA == -1 ? posB : posA;
-
-        return pos == -1 ? path : path.substring(pos + 1);
-    }
-
-    private InputStream getCachedResource(String classResource) throws IOException {
-        byte[] bytes = bytesCache.get(classResource);
-
-        if (bytes == null) {
-            LOGGER.debug("Resolving resource " + classResource);
-            try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                InputStream in = this.getClass().getResourceAsStream(classResource)) {
-                if (in == null) {
-                    LOGGER.debug(classResource + " not found");
-                    return null;
-                }
-                IOUtils.copy(in, baos);
-                bytes = baos.toByteArray();
-            }
-            bytesCache.put(classResource, bytes);
-        }
-
-        return new ByteArrayInputStream(bytes);
-    }
-
-    /**
      * Reads XML from URIs of various type.
      * 
      * @param uri
@@ -457,7 +371,7 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
      */
     protected Element parseStream(InputStream in) throws JDOMException, IOException {
         SAXBuilder builder = new SAXBuilder(XMLReaders.NONVALIDATING);
-        builder.setEntityResolver(this);
+        builder.setEntityResolver(MCREntityResolver.instance());
 
         return builder.build(in).getRootElement();
     }
@@ -826,7 +740,7 @@ public final class MCRURIResolver implements URIResolver, EntityResolver2 {
                     } catch (SAXException e) {
                         throw new TransformerException(e);
                     }
-                    reader.setEntityResolver(MCRURIResolver.instance());
+                    reader.setEntityResolver(MCREntityResolver.instance());
                     InputSource input = new InputSource(resource.toString());
                     return new SAXSource(reader, input);
                 }

@@ -50,6 +50,7 @@ import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.streams.MCRByteArrayOutputStream;
+import org.mycore.common.xml.MCREntityResolver;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xsl.MCRErrorListener;
 import org.mycore.common.xsl.MCRParameterCollector;
@@ -72,6 +73,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     private static final int INITIAL_BUFFER_SIZE = 32 * 1024;
 
     private static final MCRURIResolver URI_RESOLVER = MCRURIResolver.instance();
+
+    private static final MCREntityResolver ENTITY_RESOLVER = MCREntityResolver.instance();
 
     private static Logger LOGGER = Logger.getLogger(MCRXSLTransformer.class);
 
@@ -258,7 +261,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
      */
     protected XMLReader getXMLReader(LinkedList<TransformerHandler> transformHandlerList) throws SAXException {
         XMLReader reader = XMLReaderFactory.createXMLReader();
-        reader.setEntityResolver(URI_RESOLVER);
+        reader.setEntityResolver(ENTITY_RESOLVER);
         reader.setContentHandler(transformHandlerList.getFirst());
         return reader;
     }

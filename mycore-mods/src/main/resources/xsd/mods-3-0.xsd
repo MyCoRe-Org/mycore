@@ -1,68 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XML Spy v4.4 U (http://www.xmlspy.com) by Ray Denenberg  (Library of Congress) -->
-<xsd:schema xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.loc.gov/mods/v3" targetNamespace="http://www.loc.gov/mods/v3" elementFormDefault="qualified" attributeFormDefault="unqualified">
-	<xsd:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml-2001.xsd"/>
-	<xsd:import namespace="http://www.w3.org/1999/xlink" schemaLocation="xlink-2008-06.xsd"/>
+<xsd:schema targetNamespace="http://www.loc.gov/mods/v3" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.loc.gov/mods/v3" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/xml.xsd"/>
+	<xsd:import namespace="http://www.w3.org/1999/xlink" schemaLocation="http://www.w3.org/XML/2008/06/xlink.xsd"/>
 	<!-- 
+	
+MODS Version 3.0  December 5, 2003  
 
-MODS 3.2
-June 1, 2006	
+********************************************************
+Change History:
+No changes yet.
+********************************************************
 
-***************************  List of changes from 3.1:
-
-1. <location><url>
-1.1. Added attribute "note" to allow for notes associated with the link.  
-    Tentative plan for 4.0 is to make it an element instead of an attribute, 
-    and  wrap <url> and <urlNote> together. Can't do that in 3.2 
-    because it would not be compatible with 3.1. 
-1.2. Added attribute "access",  enumerated list with values:
-preview
-raw object
-object in context
-1.3  Add attribute 'usage' under <url> with one enumerated value: "primary display".
-
-2. <physicalDescription><digitalOrigin>
-Added enumerated values: 
-digitized microfilm 
-digitized other analog 
-
-3. <part>
-3.1. Added attributes ID, type, order 
-3.2. <part> may now be empty (minOccurs 0 on choice)
-
-4. ID attribute added.
-4.1 to relatedItem
-4.2 to note.
-
-5. The following  elements have been globalized:
-5.1 <dateCaptured>  (under <originInfo>)  dateCapturedType defined
-5.2 <edition> (under <originInfo> editionType defined
-5.3 <physicalLocation> (under <location>) physicalLocationType defined
-
-6. Elements whose type had been assumed to be "string",
-    but had not been explicitly typed, are now typed. 
-
-7.  Add  subelement <genre> under <subject>.
-
-8. The schema location reference for xlink is changed to 
-    http://www.loc.gov/standards/xlink.xsd. 
-   (It was previously http://www.loc.gov/standards/mods/xlink.xsd. 
-   The schema now resides in both places so that earlier versions 
-    will not be affected, but it is now intended that the new copy 
-    be referenced, outside of the mods directory, 
-   so that other projects, e.g. mets, may reference it.)
-
-
-********************** end list of changes from 3.1
-
-
-*****  An instance of this schema is 
+*****  An instance of this schema is a single MODS record,
+ a collection of MODS records,  or a MODS element 
+ (to be imported by another schema). 
+ 
+ Thus,  one of the following:
 
  (1) a single MODS record:  
 	 -->
 	<xsd:element name="mods" type="modsType"/>
 	<!--  
-or 
 
 (2) a collection of MODS records:  -->
 	<xsd:element name="modsCollection">
@@ -73,141 +32,192 @@ or
 		</xsd:complexType>
 	</xsd:element>
 	<!--  
-
+(3) one of the following individual top-level MODS elements: -->
+	<xsd:element name="titleInfo" type="titleInfoType"/>
+	<xsd:element name="name" type="nameType"/>
+	<xsd:element name="typeOfResource" type="typeOfResourceType"/>
+	<xsd:element name="genre" type="genreType"/>
+	<xsd:element name="originInfo" type="originInfoType"/>
+	<xsd:element name="language" type="languageType"/>
+	<xsd:element name="physicalDescription" type="physicalDescriptionType"/>
+	<xsd:element name="abstract" type="unstructuredText"/>
+	<xsd:element name="tableOfContents" type="unstructuredText"/>
+	<xsd:element name="targetAudience" type="targetAudienceType"/>
+	<xsd:element name="note" type="unstructuredText"/>
+	<xsd:element name="subject" type="subjectType"/>
+	<xsd:element name="classification" type="classificationType"/>
+	<xsd:element name="relatedItem" type="relatedItemType"/>
+	<xsd:element name="identifier" type="identifierType"/>
+	<xsd:element name="location" type="locationType"/>
+	<xsd:element name="accessCondition" type="unstructuredText"/>
+	<xsd:element name="recordInfo" type="recordInfoType"/>
+	<!--
 *****  End of "instance" definition
-
-******* Group definition. Forms the basis of the mods 
-     record definintion, and also relatedItem. 
-   Difference is that mods requires at least one element 
-   and relatedItem does not.
-
 -->
-	<xsd:group name="modsGroup">
-		<xsd:choice>
-			<xsd:element name="titleInfo" type="titleInfoType"/>
-			<xsd:element name="name" type="nameType"/>
-			<xsd:element name="typeOfResource" type="typeOfResourceType"/>
-			<xsd:element name="genre" type="genreType"/>
-			<xsd:element name="originInfo" type="originInfoType"/>
-			<xsd:element name="language" type="languageType"/>
-			<xsd:element name="physicalDescription" type="physicalDescriptionType"/>
-			<xsd:element name="abstract" type="abstractType"/>
-			<xsd:element name="tableOfContents" type="tableOfContentsType"/>
-			<xsd:element name="targetAudience" type="targetAudienceType"/>
-			<xsd:element name="note" type="noteType"/>
-			<xsd:element name="subject" type="subjectType"/>
-			<xsd:element name="classification" type="classificationType"/>
-			<xsd:element name="relatedItem" type="relatedItemType"/>
-			<xsd:element name="identifier" type="identifierType"/>
-			<xsd:element name="location" type="locationType"/>
-			<xsd:element name="accessCondition" type="accessConditionType"/>
-			<xsd:element name="part" type="partType"/>
-			<xsd:element name="extension" type="extensionType"/>
-			<xsd:element name="recordInfo" type="recordInfoType"/>
-		</xsd:choice>
-	</xsd:group>
 	<!--
 *****  Definition of a single MODS record
 -->
 	<xsd:complexType name="modsType">
-		<xsd:group ref="modsGroup" maxOccurs="unbounded"/>
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element ref="titleInfo"/>
+			<xsd:element ref="name"/>
+			<xsd:element ref="typeOfResource"/>
+			<xsd:element ref="genre"/>
+			<xsd:element ref="originInfo"/>
+			<xsd:element ref="language"/>
+			<xsd:element ref="physicalDescription"/>
+			<xsd:element ref="abstract">
+				<xsd:annotation>
+					<xsd:documentation>520</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="tableOfContents">
+				<xsd:annotation>
+					<xsd:documentation>505</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="targetAudience"/>
+			<xsd:element ref="note"/>
+			<xsd:element ref="subject"/>
+			<xsd:element ref="classification"/>
+			<xsd:element ref="relatedItem"/>
+			<xsd:element ref="identifier"/>
+			<xsd:element ref="location">
+				<xsd:annotation>
+					<xsd:documentation>852 $a $b $j $e</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="accessCondition">
+				<xsd:annotation>
+					<xsd:documentation>506, 540</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="extension" type="extensionType"/>
+			<xsd:element ref="recordInfo"/>
+		</xsd:choice>
 		<xsd:attribute name="ID" type="xsd:ID" use="optional"/>
-		<xsd:attribute name="version" type="versionType"/>
+		<xsd:attribute name="version">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="3.0"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
 	</xsd:complexType>
 	<!--
 *****  End of definition of a MODS record.
- 
+ -->
+	<!--
 ***** Data type definitions for top level elements follow
-
+-->
+	<!--
  ********** titleInfoType definition **********
  -->
 	<xsd:complexType name="titleInfoType">
-		<xsd:complexContent>
-			<xsd:extension base="baseTitleInfoType">
-				<xsd:attribute name="type" use="optional">
-					<xsd:simpleType>
-						<xsd:annotation>
-							<xsd:documentation>if this attribute is omitted, then title relates to 245$a  $b  $n  and $p</xsd:documentation>
-						</xsd:annotation>
-						<xsd:restriction base="xsd:string">
-							<xsd:enumeration value="abbreviated">
-								<xsd:annotation>
-									<xsd:documentation>210</xsd:documentation>
-								</xsd:annotation>
-							</xsd:enumeration>
-							<xsd:enumeration value="translated">
-								<xsd:annotation>
-									<xsd:documentation>242</xsd:documentation>
-								</xsd:annotation>
-							</xsd:enumeration>
-							<xsd:enumeration value="alternative">
-								<xsd:annotation>
-									<xsd:documentation>246</xsd:documentation>
-								</xsd:annotation>
-							</xsd:enumeration>
-							<xsd:enumeration value="uniform">
-								<xsd:annotation>
-									<xsd:documentation>240, 130</xsd:documentation>
-								</xsd:annotation>
-							</xsd:enumeration>
-						</xsd:restriction>
-					</xsd:simpleType>
-				</xsd:attribute>
-			</xsd:extension>
-		</xsd:complexContent>
-	</xsd:complexType>
-	<xsd:complexType name="baseTitleInfoType">
-		<xsd:choice minOccurs="0" maxOccurs="unbounded">
-			<xsd:element name="title" type="xsd:string"/>
-			<xsd:element name="subTitle" type="xsd:string"/>
-			<xsd:element name="partNumber" type="xsd:string"/>
-			<xsd:element name="partName" type="xsd:string"/>
-			<xsd:element name="nonSort" type="xsd:string">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element name="title"/>
+			<xsd:element name="subTitle"/>
+			<xsd:element name="partNumber"/>
+			<xsd:element name="partName"/>
+			<xsd:element name="nonSort">
 				<xsd:annotation>
 					<xsd:documentation>All characters, including space, up to the first sort character.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:choice>
 		<xsd:attribute name="ID" type="xsd:ID" use="optional"/>
+		<xsd:attribute name="type" use="optional">
+			<xsd:simpleType>
+				<xsd:annotation>
+					<xsd:documentation>if this attribute is omitted, then title relates to 245$a  $b  $n  and $p</xsd:documentation>
+				</xsd:annotation>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="abbreviated">
+						<xsd:annotation>
+							<xsd:documentation>210</xsd:documentation>
+						</xsd:annotation>
+					</xsd:enumeration>
+					<xsd:enumeration value="translated">
+						<xsd:annotation>
+							<xsd:documentation>242</xsd:documentation>
+						</xsd:annotation>
+					</xsd:enumeration>
+					<xsd:enumeration value="alternative">
+						<xsd:annotation>
+							<xsd:documentation>246</xsd:documentation>
+						</xsd:annotation>
+					</xsd:enumeration>
+					<xsd:enumeration value="uniform">
+						<xsd:annotation>
+							<xsd:documentation>240, 130</xsd:documentation>
+						</xsd:annotation>
+					</xsd:enumeration>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="authority" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Value is from the list at 
+				http:/www.loc.gov/marc/sourcecode/authorityfile/authorityfilesource.html</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="displayLabel" type="xsd:string" use="optional"/>
 		<xsd:attributeGroup ref="xlink:simpleAttrs"/>
 		<xsd:attributeGroup ref="language"/>
-		<xsd:attribute name="authority" type="xsd:string" use="optional"/>
-		<xsd:attribute name="displayLabel" use="optional" type="xsd:string"/>
 	</xsd:complexType>
 	<!-- 
  **********  nameType definition  **********   		
 -->
 	<xsd:complexType name="nameType">
-		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+		<xsd:choice maxOccurs="unbounded">
 			<xsd:element name="namePart" type="namePartType"/>
 			<xsd:element name="displayForm">
 				<xsd:annotation>
 					<xsd:documentation>245$c</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="affiliation" type="xsd:string">
+			<xsd:element name="affiliation">
 				<xsd:annotation>
 					<xsd:documentation>100, 700 $u</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="role" type="roleType"/>
-			<xsd:element name="description" type="xsd:string"/>
+			<xsd:element name="description"/>
 		</xsd:choice>
 		<xsd:attribute name="ID" type="xsd:ID" use="optional"/>
-		<xsd:attribute name="type" type="nameTypeAttribute" use="optional"/>
-		<xsd:attribute name="authority" use="optional" type="xsd:string">
+		<xsd:attribute name="type" use="optional">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="personal">
+						<xsd:annotation>
+							<xsd:documentation>100, 700</xsd:documentation>
+						</xsd:annotation>
+					</xsd:enumeration>
+					<xsd:enumeration value="corporate">
+						<xsd:annotation>
+							<xsd:documentation>110, 710.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:enumeration>
+					<xsd:enumeration value="conference">
+						<xsd:annotation>
+							<xsd:documentation>111, 711</xsd:documentation>
+						</xsd:annotation>
+					</xsd:enumeration>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="authority" use="optional">
 			<xsd:annotation>
 				<xsd:documentation>Value is from the list at  
-				http:/www.loc.gov/marc/sourcecode/authorityfile/authorityfilesource.html
-				</xsd:documentation>
+				http:/www.loc.gov/marc/sourcecode/authorityfile/authorityfilesource.html</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 		<xsd:attributeGroup ref="xlink:simpleAttrs"/>
 		<xsd:attributeGroup ref="language"/>
 		<!--
-***** End declaration of elements for nameType.  
-
-***** Begin declaration of attributes for nameType.
+***** End definition of elements for nameType.  -->
+		<!--
+***** Begin definition of attributes for nameType.
 -->
 	</xsd:complexType>
 	<!--  
@@ -240,7 +250,7 @@ or
 					</xsd:annotation>
 					<xsd:simpleContent>
 						<xsd:extension base="xsd:string">
-							<xsd:attribute name="authority" use="optional" type="xsd:string">
+							<xsd:attribute name="authority" use="optional">
 								<xsd:annotation>
 									<xsd:documentation>The value of this attribute is from list at http://www.loc.gov/marc/sourcecode/relator/relatorsource.html.  If the value is "marcrelator" the content is from list at http://www.loc.gov/marc/sourcecode/relator/relatorlist.html
  </xsd:documentation>
@@ -311,8 +321,7 @@ or
 		</xsd:annotation>
 		<xsd:simpleContent>
 			<xsd:extension base="xsd:string">
-				<xsd:attribute name="type" use="optional" type="xsd:string"/>
-				<xsd:attribute name="authority" use="optional" type="xsd:string">
+				<xsd:attribute name="authority" use="optional">
 					<xsd:annotation>
 						<xsd:documentation> Value of this attribute may be from the list at:http://www.loc.gov/marc/sourcecode/genre/genresource.html.  If so, and if  the value is 'marcgt' then the content is from list at http://www.loc.gov/marc/sourcecode/genre/genrelist.html.  The value may instead be a uri. </xsd:documentation>
 					</xsd:annotation>
@@ -327,7 +336,7 @@ or
 	<xsd:complexType name="originInfoType">
 		<xsd:choice maxOccurs="unbounded">
 			<xsd:element name="place" type="placeType"/>
-			<xsd:element name="publisher" type="xsd:string">
+			<xsd:element name="publisher">
 				<xsd:annotation>
 					<xsd:documentation>260 $b</xsd:documentation>
 				</xsd:annotation>
@@ -338,7 +347,7 @@ or
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="dateCreated" type="dateType"/>
-			<xsd:element name="dateCaptured" type="dateCapturedType">
+			<xsd:element name="dateCaptured" type="dateType">
 				<xsd:annotation>
 					<xsd:documentation>033</xsd:documentation>
 				</xsd:annotation>
@@ -350,8 +359,8 @@ or
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="copyrightDate" type="dateType"/>
-			<xsd:element name="dateOther" type="dateOtherType"/>
-			<xsd:element name="edition" type="editionType">
+			<xsd:element name="dateOther" type="dateType"/>
+			<xsd:element name="edition">
 				<xsd:annotation>
 					<xsd:documentation>250</xsd:documentation>
 				</xsd:annotation>
@@ -367,7 +376,7 @@ or
 					</xsd:restriction>
 				</xsd:simpleType>
 			</xsd:element>
-			<xsd:element name="frequency" type="xsd:string">
+			<xsd:element name="frequency">
 				<xsd:annotation>
 					<xsd:documentation>310</xsd:documentation>
 				</xsd:annotation>
@@ -376,8 +385,10 @@ or
 		<xsd:attributeGroup ref="language"/>
 	</xsd:complexType>
 	<!-- 
-
-*****   Subordinate datatype for originInfo
+ ***** End of elements for originInfo.  
+-->
+	<!--
+***** Begin defintion of subordinate datatype for originInfo
 -->
 	<xsd:complexType name="placeType">
 		<xsd:sequence>
@@ -395,18 +406,10 @@ or
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:complexType name="dateCapturedType">
-		<xsd:simpleContent>
-			<xsd:extension base="dateType"/>
-		</xsd:simpleContent>
-	</xsd:complexType>
-	<xsd:simpleType name="editionType">
-		<xsd:restriction base="xsd:string"/>
-	</xsd:simpleType>
 	<!--   	 
-
 ***** End definition of originInfo.
-
+-->
+	<!--	
 ********** languageType definition  **********  	                      	
 -->
 	<xsd:complexType name="languageType">
@@ -432,7 +435,6 @@ or
 				</xsd:complexType>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="objectPart"  type="xsd:string" use="optional"/>
 	</xsd:complexType>
 	<!-- 
 ********** physicalDescriptionType definition **********  		 		
@@ -446,8 +448,7 @@ or
 				<xsd:complexType>
 					<xsd:simpleContent>
 						<xsd:extension base="xsd:string">
-							<xsd:attribute name="type" use="optional"  type="xsd:string"/>
-							<xsd:attribute name="authority" use="optional"  type="xsd:string">
+							<xsd:attribute name="authority" use="optional">
 								<xsd:annotation>
 									<xsd:documentation>The value of this attribute is from the list at http://www.loc.gov/marc/sourcecode/form/formsource.html. If the value is "marcform" the content is from list at:
 http://www.loc.gov/marc/sourcecode/form/formlist.html
@@ -472,12 +473,12 @@ http://www.loc.gov/marc/sourcecode/form/formlist.html
 					</xsd:restriction>
 				</xsd:simpleType>
 			</xsd:element>
-			<xsd:element name="internetMediaType" type="xsd:string">
+			<xsd:element name="internetMediaType">
 				<xsd:annotation>
 					<xsd:documentation>856 $q</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="extent" type="xsd:string">
+			<xsd:element name="extent">
 				<xsd:annotation>
 					<xsd:documentation>300 $a and $c, and 306 $a</xsd:documentation>
 				</xsd:annotation>
@@ -486,53 +487,13 @@ http://www.loc.gov/marc/sourcecode/form/formlist.html
 				<xsd:simpleType>
 					<xsd:restriction base="xsd:string">
 						<xsd:enumeration value="born digital"/>
-						<xsd:enumeration value="reformatted digital">
-							<xsd:annotation>
-					<xsd:documentation>007ER code a</xsd:documentation>
-				</xsd:annotation>
-				</xsd:enumeration>
-						<xsd:enumeration value="digitized microfilm">
-							<xsd:annotation>
-								<xsd:documentation>
-						007/11ER MARC code b
-						</xsd:documentation>
-							</xsd:annotation>
-						</xsd:enumeration>
-						<xsd:enumeration value="digitized other analog">
-							<xsd:annotation>
-								<xsd:documentation>
-					007/11ER MARC code d
-						</xsd:documentation>
-							</xsd:annotation>
-						</xsd:enumeration>
+						<xsd:enumeration value="reformatted digital"/>
 					</xsd:restriction>
 				</xsd:simpleType>
 			</xsd:element>
-			<xsd:element name="note" type="noteType"/>
+			<xsd:element name="note" type="unstructuredText"/>
 		</xsd:choice>
 		<xsd:attributeGroup ref="language"/>
-	</xsd:complexType>
-	<!--   
-********** abstractType definition  **********              
- -->
-	<xsd:complexType name="abstractType">
-		<xsd:annotation>
-			<xsd:documentation>520</xsd:documentation>
-		</xsd:annotation>
-		<xsd:simpleContent>
-			<xsd:extension base="unstructuredText"/>
-		</xsd:simpleContent>
-	</xsd:complexType>
-	<!--   
-********** tableOfContentsType definition  **********              
- -->
-	<xsd:complexType name="tableOfContentsType">
-		<xsd:annotation>
-			<xsd:documentation>505</xsd:documentation>
-		</xsd:annotation>
-		<xsd:simpleContent>
-			<xsd:extension base="unstructuredText"/>
-		</xsd:simpleContent>
 	</xsd:complexType>
 	<!--   
 ********** targetAudienceType definition  **********              
@@ -543,7 +504,7 @@ http://www.loc.gov/marc/sourcecode/form/formlist.html
 		</xsd:annotation>
 		<xsd:simpleContent>
 			<xsd:extension base="xsd:string">
-				<xsd:attribute name="authority" use="optional"  type="xsd:string">
+				<xsd:attribute name="authority" use="optional">
 					<xsd:annotation>
 						<xsd:documentation>The value of this attribute is from the list at http://www.loc.gov/marc/sourcecode/target/targetsource.html. 
 						If the value of this attribute is "marctarget", the content from the list at http://www.loc.gov/marc/sourcecode/target/targetlist.html
@@ -554,27 +515,17 @@ http://www.loc.gov/marc/sourcecode/form/formlist.html
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<!--   
-********** noteType definition  **********              
- -->
-	<xsd:complexType name="noteType">
-		<xsd:simpleContent>
-			<xsd:extension base="unstructuredText">
-				<xsd:attribute name="ID" type="xsd:ID" use="optional"/>
-				</xsd:extension>
-		</xsd:simpleContent>
-	</xsd:complexType>
 	<!--  
  ********** subjectType definition  **********  	 	
 -->
 	<xsd:complexType name="subjectType">
-		<xsd:choice minOccurs="0" maxOccurs="unbounded">
-			<xsd:element name="topic" type="xsd:string">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element name="topic">
 				<xsd:annotation>
 					<xsd:documentation>650, 6xx $x</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="geographic" type="xsd:string">
+			<xsd:element name="geographic">
 				<xsd:annotation>
 					<xsd:documentation>651, 6xx $z</xsd:documentation>
 				</xsd:annotation>
@@ -606,29 +557,46 @@ http://www.loc.gov/marc/sourcecode/form/formlist.html
 					</xsd:simpleContent>
 				</xsd:complexType>
 			</xsd:element>
-			<xsd:element name="hierarchicalGeographic" type="hierarchicalGeographicType"/>
+			<xsd:element name="hierarchicalGeographic">
+				<xsd:complexType>
+					<xsd:annotation>
+						<xsd:documentation>752</xsd:documentation>
+					</xsd:annotation>
+					<xsd:choice maxOccurs="unbounded">
+						<xsd:element name="continent"/>
+						<xsd:element name="country"/>
+						<xsd:element name="province"/>
+						<xsd:element name="region"/>
+						<xsd:element name="state"/>
+						<xsd:element name="territory"/>
+						<xsd:element name="county"/>
+						<xsd:element name="city"/>
+						<xsd:element name="island"/>
+						<xsd:element name="area"/>
+					</xsd:choice>
+				</xsd:complexType>
+			</xsd:element>
 			<xsd:element name="cartographics">
 				<xsd:complexType>
 					<xsd:annotation>
 						<xsd:documentation>255</xsd:documentation>
 					</xsd:annotation>
 					<xsd:sequence>
-						<xsd:element name="scale" minOccurs="0" type="xsd:string"/>
-						<xsd:element name="projection" minOccurs="0" type="xsd:string"/>
-						<xsd:element name="coordinates" minOccurs="0" maxOccurs="unbounded" type="xsd:string"/>
+						<xsd:element name="scale" minOccurs="0"/>
+						<xsd:element name="projection" minOccurs="0"/>
+						<xsd:element name="coordinates" maxOccurs="unbounded"/>
 					</xsd:sequence>
 				</xsd:complexType>
 			</xsd:element>
-			<xsd:element name="occupation" type="xsd:string">
+			<xsd:element name="occupation">
 				<xsd:annotation>
 					<xsd:documentation> 656 </xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="genre" type="xsd:string"/>
 		</xsd:choice>
 		<xsd:attribute name="ID" type="xsd:ID" use="optional"/>
 		<xsd:attributeGroup ref="xlink:simpleAttrs"/>
-		<xsd:attribute name="authority" use="optional"  type="xsd:string">
+		<xsd:attribute name="authority" use="optional">
 			<xsd:annotation>
 				<xsd:documentation>Value is from the list at  http:/www.loc.gov/marc/sourcecode/subject/subjectsource.html</xsd:documentation>
 			</xsd:annotation>
@@ -636,26 +604,6 @@ http://www.loc.gov/marc/sourcecode/form/formlist.html
 		<xsd:attributeGroup ref="language"/>
 	</xsd:complexType>
 	<!--   
-
--->
-	<xsd:complexType name="hierarchicalGeographicType">
-		<xsd:annotation>
-			<xsd:documentation>752</xsd:documentation>
-		</xsd:annotation>
-		<xsd:choice maxOccurs="unbounded">
-			<xsd:element name="continent" type="xsd:string"/>
-			<xsd:element name="country" type="xsd:string"/>
-			<xsd:element name="province" type="xsd:string"/>
-			<xsd:element name="region" type="xsd:string"/>
-			<xsd:element name="state" type="xsd:string"/>
-			<xsd:element name="territory" type="xsd:string"/>
-			<xsd:element name="county" type="xsd:string"/>
-			<xsd:element name="city" type="xsd:string"/>
-			<xsd:element name="island" type="xsd:string"/>
-			<xsd:element name="area" type="xsd:string"/>
-		</xsd:choice>
-	</xsd:complexType>
-	<!--
 **********   classificationType definition **********  	 
 -->
 	<xsd:complexType name="classificationType">
@@ -664,18 +612,17 @@ http://www.loc.gov/marc/sourcecode/form/formlist.html
 		</xsd:annotation>
 		<xsd:simpleContent>
 			<xsd:extension base="xsd:string">
-				<xsd:attribute name="authority" use="optional" type="xsd:string">
+				<xsd:attribute name="authority" use="optional">
 					<xsd:annotation>
 						<xsd:documentation>Value of this attribute is from the list at  http:/www.loc.gov/marc/sourcecode/classification/classificationsource.html</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="edition" use="optional"  type="xsd:string">
+				<xsd:attribute name="edition" use="optional">
 					<xsd:annotation>
 						<xsd:documentation>edition qualifies authority, for authorities that have editions, e.g. DDC.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 				<xsd:attributeGroup ref="language"/>
-				<xsd:attribute name="displayLabel" use="optional"  type="xsd:string"/>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -683,67 +630,150 @@ http://www.loc.gov/marc/sourcecode/form/formlist.html
 **********   relatedItemType definition **********  
 -->
 	<xsd:complexType name="relatedItemType">
-		<xsd:group ref="modsGroup" minOccurs="0" maxOccurs="unbounded"/>
+		<xsd:complexContent>
+			<xsd:extension base="modsType">
+				<xsd:sequence>
+					<xsd:element name="part" type="partType" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation>To be used to give full citation information about the location within a host item; use with relatedItem type="host".
+</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+				<xsd:attribute name="type" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>if 787; or 700, 710, 711, 730 with $t and ind2 = blank; then omit type.</xsd:documentation>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="preceding">
+								<xsd:annotation>
+									<xsd:documentation>780</xsd:documentation>
+								</xsd:annotation>
+							</xsd:enumeration>
+							<xsd:enumeration value="succeeding">
+								<xsd:annotation>
+									<xsd:documentation>785</xsd:documentation>
+								</xsd:annotation>
+							</xsd:enumeration>
+							<xsd:enumeration value="original">
+								<xsd:annotation>
+									<xsd:documentation>534, 786</xsd:documentation>
+								</xsd:annotation>
+							</xsd:enumeration>
+							<xsd:enumeration value="host">
+								<xsd:annotation>
+									<xsd:documentation>772, 773</xsd:documentation>
+								</xsd:annotation>
+							</xsd:enumeration>
+							<xsd:enumeration value="constituent">
+								<xsd:annotation>
+									<xsd:documentation>770, 774, 700, 710, 711 with $t and ind2 = 2</xsd:documentation>
+								</xsd:annotation>
+							</xsd:enumeration>
+							<xsd:enumeration value="series">
+								<xsd:annotation>
+									<xsd:documentation>490, 440, 760, 800, 810, 811, 830</xsd:documentation>
+								</xsd:annotation>
+							</xsd:enumeration>
+							<xsd:enumeration value="otherVersion">
+								<xsd:annotation>
+									<xsd:documentation>775</xsd:documentation>
+								</xsd:annotation>
+							</xsd:enumeration>
+							<xsd:enumeration value="otherFormat">
+								<xsd:annotation>
+									<xsd:documentation>776</xsd:documentation>
+								</xsd:annotation>
+							</xsd:enumeration>
+							<xsd:enumeration value="isReferencedBy">
+								<xsd:annotation>
+									<xsd:documentation>510</xsd:documentation>
+								</xsd:annotation>
+							</xsd:enumeration>
+
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+				<xsd:attribute name="displayLabel" type="xsd:string" use="optional"/>
+				<xsd:attributeGroup ref="xlink:simpleAttrs"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- 
+***** Definition of partType (relatedItem subordinate)
+-->
+	<xsd:complexType name="partType">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element name="detail" type="detailType"/>
+			<xsd:element name="extent" type="extentType"/>
+			<xsd:element name="date" type="baseDateType">
+				<xsd:annotation>
+					<xsd:documentation>Use only if different from date of resource being described in 'originInfo'</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="text" type="unstructuredText"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="detailType">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element name="number"/>
+			<xsd:element name="caption"/>
+			<xsd:element name="title">
+				<xsd:annotation>
+					<xsd:documentation>Use only if different than main title of resource being described</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:choice>
 		<xsd:attribute name="type" use="optional">
 			<xsd:annotation>
-				<xsd:documentation>if 787; or 700, 710, 711, 730 with $t and ind2 = blank; then omit type.</xsd:documentation>
+				<xsd:documentation>Suggested values: part, volume, issue, chapter, section, paragraph, track. These values are used regardless of linguistic term)</xsd:documentation>
 			</xsd:annotation>
-			<xsd:simpleType>
-				<xsd:restriction base="xsd:string">
-					<xsd:enumeration value="preceding">
-						<xsd:annotation>
-							<xsd:documentation>780</xsd:documentation>
-						</xsd:annotation>
-					</xsd:enumeration>
-					<xsd:enumeration value="succeeding">
-						<xsd:annotation>
-							<xsd:documentation>785</xsd:documentation>
-						</xsd:annotation>
-					</xsd:enumeration>
-					<xsd:enumeration value="original">
-						<xsd:annotation>
-							<xsd:documentation>534, 786</xsd:documentation>
-						</xsd:annotation>
-					</xsd:enumeration>
-					<xsd:enumeration value="host">
-						<xsd:annotation>
-							<xsd:documentation>772, 773</xsd:documentation>
-						</xsd:annotation>
-					</xsd:enumeration>
-					<xsd:enumeration value="constituent">
-						<xsd:annotation>
-							<xsd:documentation>770, 774, 700, 710, 711 with $t and ind2 = 2</xsd:documentation>
-						</xsd:annotation>
-					</xsd:enumeration>
-					<xsd:enumeration value="series">
-						<xsd:annotation>
-							<xsd:documentation>490, 440, 760, 800, 810, 811, 830</xsd:documentation>
-						</xsd:annotation>
-					</xsd:enumeration>
-					<xsd:enumeration value="otherVersion">
-						<xsd:annotation>
-							<xsd:documentation>775</xsd:documentation>
-						</xsd:annotation>
-					</xsd:enumeration>
-					<xsd:enumeration value="otherFormat">
-						<xsd:annotation>
-							<xsd:documentation>776</xsd:documentation>
-						</xsd:annotation>
-					</xsd:enumeration>
-					<xsd:enumeration value="isReferencedBy">
-						<xsd:annotation>
-							<xsd:documentation>510</xsd:documentation>
-						</xsd:annotation>
-					</xsd:enumeration>
-				</xsd:restriction>
-			</xsd:simpleType>
 		</xsd:attribute>
-		<xsd:attribute name="displayLabel" use="optional" type="xsd:string"/>
-		<xsd:attribute name="ID" type="xsd:ID" use="optional"/>
-		<xsd:attributeGroup ref="xlink:simpleAttrs"/>
+		<xsd:attribute name="level" type="xsd:positiveInteger" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Hierarchical level (level of enumeration) of a given detail element when there are multiple detail elements;  top level is 1. For example assume two details, volume and  issue; for volume (which is at a higher level hierarchically):  type="volume" level="1"; for issue:  type="issue" level="2".
+</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
 	</xsd:complexType>
-	<!--
-********** identifierType definition  **********  	                     	
+	<xsd:complexType name="extentType">
+		<xsd:sequence>
+			<xsd:annotation>
+				<xsd:documentation> If 'start' but not 'end'  is supplied, it should be assumed that the end page is unknown. A single page is indicated by presence of both 'start' and 'end' with same value. </xsd:documentation>
+			</xsd:annotation>
+			<xsd:element name="start" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>  Use for first page or begin minute</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="end" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation> Use for last page, end minutes, or (together with start element) single page</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="total" type="xsd:positiveInteger" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation> A cardinal rather than ordinal number. Use for a total number of pages or minutes. 
+</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="list" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation> Use for an unparsed statement, e.g. p. 5-12. </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="unit">
+			<xsd:annotation>
+				<xsd:documentation>  suggested values: pages, minutes</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<!-- 
+***** End definition of partType 
+	-->
+	<!--********** identifierType definition  **********  	                     	
 -->
 	<xsd:complexType name="identifierType">
 		<xsd:annotation>
@@ -756,7 +786,7 @@ http://www.loc.gov/marc/sourcecode/form/formlist.html
 						<xsd:documentation>Suggested values include (but are not limited to):  "hdl","doi","isbn", "isrc",  "ismn" "issn", "issue number", "istc",  "lccn",  "local", "matrix number", "music publisher", "music plate", "sici", "uri", "upc", "videorecording identifier", "stock number"</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="displayLabel" use="optional" type="xsd:string">
+				<xsd:attribute name="displayLabel" use="optional">
 					<xsd:annotation>
 						<xsd:documentation>856$3</xsd:documentation>
 					</xsd:annotation>
@@ -780,156 +810,46 @@ http://www.loc.gov/marc/sourcecode/form/formlist.html
 -->
 	<xsd:complexType name="locationType">
 		<xsd:sequence>
-			<xsd:element name="physicalLocation" type="physicalLocationType" minOccurs="0" maxOccurs="unbounded"/>
-			<xsd:element name="url" type="urlType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="physicalLocation" minOccurs="0" maxOccurs="unbounded">
+				<xsd:complexType>
+					<xsd:annotation>
+						<xsd:documentation>852 $a $b $j $e</xsd:documentation>
+					</xsd:annotation>
+					<xsd:simpleContent>
+						<xsd:extension base="sourceType">
+							<xsd:attribute name="displayLabel" use="optional">
+								<xsd:annotation>
+									<xsd:documentation>852$3</xsd:documentation>
+								</xsd:annotation>
+							</xsd:attribute>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="url" minOccurs="0" maxOccurs="unbounded">
+				<xsd:complexType>
+					<xsd:annotation>
+						<xsd:documentation>856$u</xsd:documentation>
+					</xsd:annotation>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attribute name="dateLastAccessed" use="optional"/>
+							<xsd:attribute name="displayLabel" use="optional">
+								<xsd:annotation>
+									<xsd:documentation>856$3</xsd:documentation>
+								</xsd:annotation>
+							</xsd:attribute>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	<!--  
-********** urlType definition  (subordinate to locationType) **********              
- -->
-	<xsd:complexType name="urlType">
-		<xsd:annotation>
-			<xsd:documentation>856$u</xsd:documentation>
-		</xsd:annotation>
-		<xsd:simpleContent>
-			<xsd:extension base="xsd:anyURI">
-				<xsd:attribute name="dateLastAccessed" use="optional"/>
-				<xsd:attribute name="displayLabel" use="optional" type="xsd:string">
-					<xsd:annotation>
-						<xsd:documentation>856$3</xsd:documentation>
-					</xsd:annotation>
-				</xsd:attribute>
-				<xsd:attribute name="note" use="optional" type="xsd:string">
-					<xsd:annotation>
-						<xsd:documentation>856$z</xsd:documentation>
-					</xsd:annotation>
-				</xsd:attribute>
-				<xsd:attribute name="access" use="optional">
-					<xsd:simpleType>
-						<xsd:restriction base="xsd:string">
-							<xsd:enumeration value="preview"/>
-							<xsd:enumeration value="raw object"/>
-							<xsd:enumeration value="object in context"/>
-						</xsd:restriction>
-					</xsd:simpleType>
-				</xsd:attribute>
-				<xsd:attribute name="usage" use="optional">
-					<xsd:simpleType>
-						<xsd:restriction base="xsd:string">
-							<xsd:enumeration value="primary display"/>
-													</xsd:restriction>
-					</xsd:simpleType>
-				</xsd:attribute>
-			</xsd:extension>
-		</xsd:simpleContent>
-	</xsd:complexType>
-	<!--  
-  
-********** physicalLocationType definition  (subordinate to locationType) **********              
- -->
-	<xsd:complexType name="physicalLocationType">
-		<xsd:annotation>
-			<xsd:documentation>852 $a $b $j $e</xsd:documentation>
-		</xsd:annotation>
-		<xsd:simpleContent>
-			<xsd:extension base="sourceType">
-				<xsd:attribute name="type" use="optional" type="xsd:string"/>
-				<xsd:attribute name="displayLabel" use="optional" type="xsd:string">
-					<xsd:annotation>
-						<xsd:documentation>852$3</xsd:documentation>
-					</xsd:annotation>
-				</xsd:attribute>
-			</xsd:extension>
-		</xsd:simpleContent>
-	</xsd:complexType>
-	<!--
-********** accessConditionType definition  **********              
- -->
-	<xsd:complexType name="accessConditionType">
-		<xsd:annotation>
-			<xsd:documentation>506, 540</xsd:documentation>
-		</xsd:annotation>
-		<xsd:simpleContent>
-			<xsd:extension base="unstructuredText"/>
-		</xsd:simpleContent>
-	</xsd:complexType>
-	<!-- 
-********** partType definition **********  
--->
-	<xsd:complexType name="partType">
-		<xsd:choice minOccurs="0" maxOccurs="unbounded">
-			<!--minOccurs="0" allows <part> to be optionally empty,   when the ID and type attribute values contain all the information needed about the part. -->
-			<xsd:element name="detail" type="detailType"/>
-			<xsd:element name="extent" type="extentType"/>
-			<xsd:element name="date" type="baseDateType">
-				<xsd:annotation>
-					<xsd:documentation>Use only if different from date of resource being described in 'originInfo'</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="text" type="unstructuredText"/>
-		</xsd:choice>
-		<xsd:attribute name="ID" type="xsd:ID" use="optional"/>
-		<xsd:attribute name="type" type="xsd:string" use="optional"/>
-		<xsd:attribute name="order" type="xsd:integer" use="optional"/>
-	</xsd:complexType>
-	<xsd:complexType name="detailType">
-		<xsd:choice maxOccurs="unbounded">
-			<xsd:element name="number" type="xsd:string"/>
-			<xsd:element name="caption" type="xsd:string"/>
-			<xsd:element name="title" type="xsd:string">
-				<xsd:annotation>
-					<xsd:documentation>Use only if different than main title of resource being described</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-		</xsd:choice>
-		<xsd:attribute name="type" use="optional" type="xsd:string">
-			<xsd:annotation>
-				<xsd:documentation>Suggested values: part, volume, issue, chapter, section, paragraph, track. These values are used regardless of linguistic term)</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="level" type="xsd:positiveInteger" use="optional">
-			<xsd:annotation>
-				<xsd:documentation>Hierarchical level (level of enumeration) of a given detail element when there are multiple detail elements;  top level is 1. For example assume two details, volume and  issue; for volume (which is at a higher level hierarchically):  type="volume" level="1"; for issue:  type="issue" level="2".
-</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-	</xsd:complexType>
-	<xsd:complexType name="extentType">
-		<xsd:sequence>
-			<xsd:annotation>
-				<xsd:documentation> If 'start' but not 'end'  is supplied, it should be assumed that the end page is unknown. A single page is indicated by presence of both 'start' and 'end' with same value. </xsd:documentation>
-			</xsd:annotation>
-			<xsd:element name="start" minOccurs="0" type="xsd:string">
-				<xsd:annotation>
-					<xsd:documentation>  Use for first page or begin minute</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="end" minOccurs="0" type="xsd:string">
-				<xsd:annotation>
-					<xsd:documentation> Use for last page, end minutes, or (together with start element) single page</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="total" type="xsd:positiveInteger" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation> A cardinal rather than ordinal number. Use for a total number of pages or minutes. 
-</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="list" minOccurs="0" type="xsd:string">
-				<xsd:annotation>
-					<xsd:documentation> Use for an unparsed statement, e.g. p. 5-12. </xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-		</xsd:sequence>
-		<xsd:attribute name="unit"  type="xsd:string">
-			<xsd:annotation>
-				<xsd:documentation>  suggested values: pages, minutes</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-		
-	</xsd:complexType>
-	<!-- 
-
+	
+	
+	
+	
 ********** extensionType definition **********  
 -->
 	<xsd:complexType name="extensionType" mixed="true">
@@ -937,7 +857,7 @@ http://www.loc.gov/marc/sourcecode/form/formlist.html
 			<xsd:documentation>use for local extensions or for extensions from other XML schemas</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:any processContents="lax" maxOccurs="unbounded"/>
+			<xsd:any processContents="skip" maxOccurs="unbounded"/>
 		</xsd:sequence>
 	</xsd:complexType>
 	<!--  
@@ -967,7 +887,7 @@ http://www.loc.gov/marc/sourcecode/form/formlist.html
 				<xsd:complexType>
 					<xsd:simpleContent>
 						<xsd:extension base="xsd:string">
-							<xsd:attribute name="source" use="optional" type="xsd:string">
+							<xsd:attribute name="source" use="optional">
 								<xsd:annotation>
 									<xsd:documentation>Who supplied the identifier. From 003</xsd:documentation>
 								</xsd:annotation>
@@ -982,14 +902,15 @@ http://www.loc.gov/marc/sourcecode/form/formlist.html
 				</xsd:annotation>
 				<!-- This applies to the record at large. Any top level element can indicate a language, which overides this value for that element. -->
 			</xsd:element>
-			<xsd:element name="recordOrigin" type="xsd:string"/>
+			<xsd:element name="recordOrigin"/>
 		</xsd:choice>
 		<xsd:attributeGroup ref="language"/>
 		<!-- This applies to the language of RecordInfo only. I.e. for recordContentSource and for source of identifier. -->
 	</xsd:complexType>
 	<!--  
 ***** End  data type definitions for top level elements.  
-
+-->
+	<!--
 ***** Begin global definitions. 
 -->
 	<!--
@@ -1003,7 +924,7 @@ http://www.loc.gov/marc/sourcecode/form/formlist.html
 			<xsd:extension base="xsd:string">
 				<xsd:attributeGroup ref="xlink:simpleAttrs"/>
 				<xsd:attributeGroup ref="language"/>
-				<xsd:attribute name="displayLabel" use="optional" type="xsd:string"/>
+				<xsd:attribute name="displayLabel" type="xsd:string" use="optional"/>
 				<xsd:attribute name="type" type="xsd:string" use="optional"/>
 			</xsd:extension>
 		</xsd:simpleContent>
@@ -1062,20 +983,13 @@ http://www.loc.gov/marc/sourcecode/form/formlist.html
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:complexType name="dateOtherType">
-		<xsd:simpleContent>
-			<xsd:extension base="dateType">
-				<xsd:attribute name="type" use="optional" type="xsd:string"/>
-			</xsd:extension>
-		</xsd:simpleContent>
-	</xsd:complexType>
 	<!--  
 ********** sourceType definition  **********  	                       	  
 -->
 	<xsd:complexType name="sourceType">
 		<xsd:simpleContent>
 			<xsd:extension base="xsd:string">
-				<xsd:attribute name="authority" use="optional" type="xsd:string">
+				<xsd:attribute name="authority" use="optional">
 					<xsd:annotation>
 						<xsd:documentation>Value of this attribute is from list at: http://www.loc.gov/marc/sourcecode/organization/organizationsource.html.  If the value is "marcorg", see: http://www.loc.gov/marc/organizations</xsd:documentation>
 					</xsd:annotation>
@@ -1088,14 +1002,14 @@ http://www.loc.gov/marc/sourcecode/form/formlist.html
  ********** language attribute group definition  **********  	                       	  
 -->
 	<xsd:attributeGroup name="language">
-		<xsd:attribute name="lang" use="optional" type="xsd:string">
+		<xsd:attribute name="lang" use="optional">
 			<xsd:annotation>
 				<xsd:documentation>ISO 639-2b</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 		<xsd:attribute ref="xml:lang" use="optional"/>
-		<xsd:attribute name="script" use="optional" type="xsd:string"/>
-		<xsd:attribute name="transliteration" use="optional" type="xsd:string"/>
+		<xsd:attribute name="script" use="optional"/>
+		<xsd:attribute name="transliteration" use="optional"/>
 	</xsd:attributeGroup>
 	<!--  
    ********** definition of codeOrText type used by type attribute 
@@ -1116,34 +1030,6 @@ http://www.loc.gov/marc/sourcecode/form/formlist.html
 			<xsd:enumeration value="marcgac"/>
 			<xsd:enumeration value="marccountry"/>
 			<xsd:enumeration value="iso3166"/>
-		</xsd:restriction>
-	</xsd:simpleType>
-	<!--  
-    ********** definition of nameTypeAttribute used by name attribute
-      "type"  **********  	                       	  
- -->
-	<xsd:simpleType name="nameTypeAttribute">
-		<xsd:restriction base="xsd:string">
-			<xsd:enumeration value="personal">
-				<xsd:annotation>
-					<xsd:documentation>100, 700</xsd:documentation>
-				</xsd:annotation>
-			</xsd:enumeration>
-			<xsd:enumeration value="corporate">
-				<xsd:annotation>
-					<xsd:documentation>110, 710.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:enumeration>
-			<xsd:enumeration value="conference">
-				<xsd:annotation>
-					<xsd:documentation>111, 711</xsd:documentation>
-				</xsd:annotation>
-			</xsd:enumeration>
-		</xsd:restriction>
-	</xsd:simpleType>
-	<xsd:simpleType name="versionType">
-		<xsd:restriction base="xsd:string">
-			<xsd:enumeration value="3.2"/>
 		</xsd:restriction>
 	</xsd:simpleType>
 </xsd:schema>

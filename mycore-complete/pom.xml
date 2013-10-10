@@ -90,6 +90,12 @@
                   <ignoreDtd>false</ignoreDtd>
                   -->
                 </transformer>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
+                  <resource>catalog.xml</resource>
+                  <!-- Add this to enable loading of DTDs
+                  <ignoreDtd>false</ignoreDtd>
+                  -->
+                </transformer>
               </transformers>
               <artifactSet>
                 <includes>

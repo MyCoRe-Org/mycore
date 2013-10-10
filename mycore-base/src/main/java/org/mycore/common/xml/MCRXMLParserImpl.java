@@ -64,7 +64,7 @@ public class MCRXMLParserImpl implements MCRXMLParser {
         builder.setFeature(FEATURE_SCHEMA_SUPPORT, validate);
         builder.setFeature(FEATURE_FULL_SCHEMA_SUPPORT, false);
         builder.setErrorHandler(new MCRXMLParserErrorHandler());
-        builder.setEntityResolver(new XercesBugFixResolver(MCRURIResolver.instance()));
+        builder.setEntityResolver(new XercesBugFixResolver(MCREntityResolver.instance()));
     }
 
     public boolean isValidating() {

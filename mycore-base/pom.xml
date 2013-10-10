@@ -362,5 +362,10 @@
       <groupId>javax.annotation</groupId>
       <artifactId>jsr250-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>xml-resolver</groupId>
+      <artifactId>xml-resolver</artifactId>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>
