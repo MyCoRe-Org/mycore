@@ -344,7 +344,8 @@
   <!-- ========== <xed:load-resource name="" uri="" ========== -->
 
   <xsl:template match="xed:load-resource" mode="xeditor">
-    <xsl:value-of select="transformer:loadResource($transformer,@uri,@name)" />
+    <xsl:variable name="uri" select="transformer:replaceXPaths($transformer,@uri)" />
+    <xsl:value-of select="transformer:loadResource($transformer,$uri,@name)" />
   </xsl:template>
 
   <!-- ========== <xed:cleanup-rule xpath="" relevant-if="" ========== -->
