@@ -216,15 +216,15 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @param ID
      *            the ID of the MCRClassification to be save.
      * @param dirname
-     *            the filename to store the classification
+     *            the directory to export the classification to
      * @param style
      *            the name part of the stylesheet like <em>style</em>
      *            -classification.xsl
      * @return false if an error was occured, else true
      */
     @MCRCommand(
-            syntax = "export classification {0} to file {1} with {2}",
-            help = "The command store the classification with MCRObjectID {0} to the file named {1} with the stylesheet {2}-object.xsl. For {2} save is the default..",
+            syntax = "export classification {0} to directory {1} with {2}",
+            help = "The command exports the classification with MCRObjectID {0} as xml file named {1} using the stylesheet {2}-object.xsl. For {2} save is the default..",
             order = 60)
     public static boolean export(String ID, String dirname, String style) throws Exception {
         String dname = "";
