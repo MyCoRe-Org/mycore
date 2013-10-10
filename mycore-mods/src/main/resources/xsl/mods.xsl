@@ -417,7 +417,7 @@
                         </xsl:if>
                         <xsl:if test="acl:checkPermission(./@xlink:href,'deletedb') and $derivateWithURN=false()">
                           <li class="last">
-                            <a href="{$ServletsBaseURL}derivate/delete{$HttpSession}?id={@xlink:href}">
+                            <a href="{$ServletsBaseURL}derivate/delete{$HttpSession}?id={@xlink:href}" class="confirm_derivate_deletion">
                               <xsl:value-of select="i18n:translate('component.swf.derivate.delDerivate')" />
                             </a>
                           </li>
