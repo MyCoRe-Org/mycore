@@ -770,7 +770,7 @@
 </xsl:template>
 
 <!-- ======== textfield and textarea ======== -->
-<xsl:template match="textfield | textarea">
+<xsl:template match="textfield | textarea[ancestor::editor]">
   <xsl:param name="var" />
 
   <!-- ======== get the value of this field from xml source ======== -->

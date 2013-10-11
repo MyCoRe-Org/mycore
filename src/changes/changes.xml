@@ -12,6 +12,9 @@
       <action dev="mcrfluet" type="fix" date="2013-10-10">
         Fixed command syntax: export classification ... to directory .... (merged revision 28093)
       </action>
+      <action dev="mcrfluet" type="fix" date="2013-10-01">
+        Avoid conflicts with ordinary html textarea (merged revision 28019)
+      </action>
       <action dev="mcrkrebs" type="fix" date="2013-10-01">
         fixed identifier options in mods editors
       </action>
