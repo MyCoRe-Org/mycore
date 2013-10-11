@@ -6,6 +6,15 @@
   </properties>
   <body>
     <release version="2013.06.0.2" date="TBA" description="2013.06.0 maintenance release 2">
+      <action dev="mcrkrebs" type="fix" date="2013-10-10">
+        mods: fixed volume and issue presentation and editor fields (merged revision 28097-28099)
+      </action>
+      <action dev="mcrkrebs" type="fix" date="2013-10-01">
+        fixed identifier options in mods editors
+      </action>
+      <action dev="mcrtchef" type="add" date="2013-09-26">
+        inherit mods data from parent for indexing (merged revision 27984 from trunk)
+      </action>
       <action dev="mcrtchef" type="add" date="2013-09-24">
         allow phrase queries (merged revision 27966 and 27969 from trunk)
       </action>
