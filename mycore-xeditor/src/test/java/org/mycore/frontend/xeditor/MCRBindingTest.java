@@ -59,26 +59,26 @@ public class MCRBindingTest extends MCRTestCase {
 
     @Test
     public void testSimpleBindings() throws JDOMException, JaxenException {
-        binding = new MCRBinding("document", binding);
-        binding = new MCRBinding("title", binding);
+        binding = new MCRBinding("document", true, binding);
+        binding = new MCRBinding("title", true, binding);
         assertEquals("title1", binding.getValue());
         binding = binding.getParent();
         binding = binding.getParent();
 
-        binding = new MCRBinding("document/title[2]", binding);
+        binding = new MCRBinding("document/title[2]", true, binding);
         assertEquals("title2", binding.getValue());
         binding = binding.getParent();
 
-        binding = new MCRBinding("document/title[@type='main']", binding);
+        binding = new MCRBinding("document/title[@type='main']", true, binding);
         assertEquals("title1", binding.getValue());
         binding = binding.getParent();
 
-        binding = new MCRBinding("document/title[@type='alternative']", binding);
+        binding = new MCRBinding("document/title[@type='alternative']", true, binding);
         assertEquals("title2", binding.getValue());
         binding = binding.getParent();
 
-        binding = new MCRBinding("document/author", binding);
-        binding = new MCRBinding("firstName", binding);
+        binding = new MCRBinding("document/author", true, binding);
+        binding = new MCRBinding("firstName", true, binding);
         assertEquals("John", binding.getValue());
         binding = binding.getParent();
         binding = binding.getParent();
@@ -86,24 +86,24 @@ public class MCRBindingTest extends MCRTestCase {
 
     @Test
     public void testComplexBindings() throws JDOMException, JaxenException {
-        binding = new MCRBinding("document/title[contains(text(),'1')]", binding);
+        binding = new MCRBinding("document/title[contains(text(),'1')]", true, binding);
         assertEquals("title1", binding.getValue());
         binding = binding.getParent();
 
-        binding = new MCRBinding("//title[@type]", binding);
+        binding = new MCRBinding("//title[@type]", true, binding);
         assertEquals("title1", binding.getValue());
         binding = binding.getParent();
 
-        binding = new MCRBinding("//title[not(@type='main')]", binding);
+        binding = new MCRBinding("//title[not(@type='main')]", true, binding);
         assertEquals("title2", binding.getValue());
         binding = binding.getParent();
 
-        binding = new MCRBinding("/document/title[../author/lastName='Doe'][2]", binding);
+        binding = new MCRBinding("/document/title[../author/lastName='Doe'][2]", true, binding);
         assertEquals("title2", binding.getValue());
         binding = binding.getParent();
 
-        binding = new MCRBinding("//*", binding);
-        binding = new MCRBinding("*[name()='title'][2]", binding);
+        binding = new MCRBinding("//*", true, binding);
+        binding = new MCRBinding("*[name()='title'][2]", true, binding);
         assertEquals("title2", binding.getValue());
         binding = binding.getParent();
         binding = binding.getParent();
@@ -111,13 +111,13 @@ public class MCRBindingTest extends MCRTestCase {
 
     @Test
     public void testHasValue() throws JDOMException, JaxenException {
-        binding = new MCRBinding("document/title", binding);
+        binding = new MCRBinding("document/title", true, binding);
         assertTrue(binding.hasValue("title1"));
         assertTrue(binding.hasValue("title2"));
         assertFalse(binding.hasValue("other"));
         binding = binding.getParent();
 
-        binding = new MCRBinding("document/author/*", binding);
+        binding = new MCRBinding("document/author/*", true, binding);
         assertTrue(binding.hasValue("John"));
         assertTrue(binding.hasValue("Doe"));
         assertFalse(binding.hasValue("other"));
@@ -128,24 +128,24 @@ public class MCRBindingTest extends MCRTestCase {
         Map<String, Object> variables = new HashMap<String, Object>();
         variables.put("type", "main");
 
-        binding = new MCRBinding("document", binding);
+        binding = new MCRBinding("document", true, binding);
         binding.setVariables(variables);
-        binding = new MCRBinding("title[@type=$type]", binding);
+        binding = new MCRBinding("title[@type=$type]", true, binding);
         assertTrue(binding.hasValue("title1"));
         assertEquals(1, binding.getBoundNodes().size());
     }
 
     @Test
     public void testDefiningVariables() throws JDOMException, JaxenException {
-        binding = new MCRBinding("document", binding);
+        binding = new MCRBinding("document", true, binding);
         new MCRBinding("title[1]", null, "inheritMe", binding);
         new MCRBinding("title[2]", null, "overwriteMe", binding);
-        assertEquals("title1", new MCRBinding("$inheritMe", binding).getValue());
-        assertEquals("title2", new MCRBinding("$overwriteMe", binding).getValue());
-        binding = new MCRBinding("author", binding);
+        assertEquals("title1", new MCRBinding("$inheritMe", true, binding).getValue());
+        assertEquals("title2", new MCRBinding("$overwriteMe", true, binding).getValue());
+        binding = new MCRBinding("author", true, binding);
         new MCRBinding("firstName", null, "overwriteMe", binding);
-        assertEquals("title1", new MCRBinding("$inheritMe", binding).getValue());
-        assertEquals("John", new MCRBinding("$overwriteMe", binding).getValue());
+        assertEquals("title1", new MCRBinding("$inheritMe", true, binding).getValue());
+        assertEquals("John", new MCRBinding("$overwriteMe", true, binding).getValue());
     }
 
     @Test
@@ -153,16 +153,16 @@ public class MCRBindingTest extends MCRTestCase {
         String builder = "document[name/@id='n1'][note/@href='#n1'][location/@href='#n1'][name[@id='n2']][location[@href='#n2']]";
         Element document = new MCRNodeBuilder().buildElement(builder, null, null);
         MCRBinding rootBinding = new MCRBinding(new Document(document));
-        MCRBinding documentBinding = new MCRBinding("document", rootBinding);
+        MCRBinding documentBinding = new MCRBinding("document", true, rootBinding);
 
         MCRBinding id = new MCRBinding("name[@id][1]/@id", null, "id", documentBinding);
         assertEquals("/document/name/@id", id.getAbsoluteXPath());
         assertEquals("n1", id.getValue());
-        binding = new MCRBinding("note[@href=concat('#',$id)]", documentBinding);
+        binding = new MCRBinding("note[@href=concat('#',$id)]", true, documentBinding);
         Element note = (Element) (binding.getBoundNode());
         assertEquals("note", note.getName());
         assertEquals("#n1", note.getAttributeValue("href"));
-        binding = new MCRBinding("location[@href=concat('#',$id)]", documentBinding);
+        binding = new MCRBinding("location[@href=concat('#',$id)]", true, documentBinding);
         Element location = (Element) (binding.getBoundNode());
         assertEquals("location", location.getName());
         assertEquals("#n1", location.getAttributeValue("href"));
@@ -171,12 +171,12 @@ public class MCRBindingTest extends MCRTestCase {
         assertEquals("/document/name[2]/@id", id.getAbsoluteXPath());
         assertEquals("n2", id.getValue());
 
-        binding = new MCRBinding("note[@href=concat('#',$id)]", documentBinding);
+        binding = new MCRBinding("note[@href=concat('#',$id)]", true, documentBinding);
         note = (Element) (binding.getBoundNode());
         assertEquals("note", note.getName());
         assertEquals("#n2", note.getAttributeValue("href"));
 
-        binding = new MCRBinding("location[@href=concat('#',$id)]", documentBinding);
+        binding = new MCRBinding("location[@href=concat('#',$id)]", true, documentBinding);
         location = (Element) (binding.getBoundNode());
         assertEquals("location", location.getName());
         assertEquals("#n2", location.getAttributeValue("href"));

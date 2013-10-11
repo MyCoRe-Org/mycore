@@ -84,7 +84,7 @@ public class MCREditorSubmissionTest {
         MCREditorSession session = new MCREditorSession();
         session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
 
-        session.getSubmission().mark2checkResubmission(new MCRBinding("/document/category", session.getRootBinding()));
+        session.getSubmission().mark2checkResubmission(new MCRBinding("/document/category", true, session.getRootBinding()));
         session.getSubmission().emptyNotResubmittedNodes();
 
         List<Element> categories = session.getEditedXML().getRootElement().getChildren("category");
@@ -93,7 +93,7 @@ public class MCREditorSubmissionTest {
         assertEquals("", categories.get(1).getText());
         assertEquals("", categories.get(2).getText());
 
-        session.getSubmission().mark2checkResubmission(new MCRBinding("/document/category", session.getRootBinding()));
+        session.getSubmission().mark2checkResubmission(new MCRBinding("/document/category", true, session.getRootBinding()));
         session.getSubmission().setSubmittedValues("/document/category", new String[] { "c", "d" });
         session.getSubmission().emptyNotResubmittedNodes();
 
@@ -103,7 +103,7 @@ public class MCREditorSubmissionTest {
         assertEquals("d", categories.get(1).getText());
         assertEquals("", categories.get(2).getText());
 
-        session.getSubmission().mark2checkResubmission(new MCRBinding("/document/category", session.getRootBinding()));
+        session.getSubmission().mark2checkResubmission(new MCRBinding("/document/category", true, session.getRootBinding()));
         session.getSubmission().setSubmittedValues("/document/category", new String[] { "a", "b", "c", "d" });
         session.getSubmission().emptyNotResubmittedNodes();
 

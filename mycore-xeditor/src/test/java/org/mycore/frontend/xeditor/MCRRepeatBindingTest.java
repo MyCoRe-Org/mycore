@@ -44,7 +44,7 @@ public class MCRRepeatBindingTest extends MCRTestCase {
         Element template = new MCRNodeBuilder().buildElement("conditions[condition/@type='bingo'][condition[2]/@type='bongo']", null, null);
         Document doc = new Document(template);
         MCRBinding root = new MCRBinding(doc);
-        MCRBinding conditions = new MCRBinding("conditions", root);
+        MCRBinding conditions = new MCRBinding("conditions", true, root);
 
         MCRRepeatBinding repeat = new MCRRepeatBinding("condition[contains(' foo bar ',concat(' ',@type,' '))]", conditions, 3, 5);
         assertEquals(3, repeat.getBoundNodes().size());

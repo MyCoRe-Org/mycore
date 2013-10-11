@@ -22,7 +22,7 @@ public class MCRRepeatBinding extends MCRBinding {
     }
 
     public MCRRepeatBinding(String xPath, MCRBinding parent) throws JaxenException, JDOMException {
-        super(xPath, parent);
+        super(xPath, true, parent);
         this.maxRepeats = Integer.MAX_VALUE;
     }
 

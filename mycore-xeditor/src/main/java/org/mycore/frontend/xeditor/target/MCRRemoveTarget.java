@@ -37,7 +37,7 @@ public class MCRRemoveTarget implements MCREditorTarget {
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String xPath) throws Exception {
         session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
 
-        MCRBinding binding = new MCRBinding(xPath, session.getRootBinding());
+        MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
         binding.removeBoundNode(0);
         binding.detach();
         

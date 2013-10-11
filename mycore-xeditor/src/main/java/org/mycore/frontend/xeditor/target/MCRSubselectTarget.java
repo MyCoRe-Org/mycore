@@ -54,7 +54,7 @@ public class MCRSubselectTarget implements MCREditorTarget {
 
         LOGGER.info("New subselect for " + xPath + " using pattern " + href);
 
-        MCRBinding binding = new MCRBinding(xPath, session.getRootBinding());
+        MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
         href = new MCRXPathEvaluator(binding).replaceXPaths(href, true);
         binding.detach();
 

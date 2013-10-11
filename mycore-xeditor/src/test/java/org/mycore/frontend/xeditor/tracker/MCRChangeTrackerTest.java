@@ -126,7 +126,7 @@ public class MCRChangeTrackerTest extends MCRTestCase {
 
         MCRChangeTracker tracker = new MCRChangeTracker();
 
-        Element titles = (Element) (new MCRBinding("document/titles", new MCRBinding(doc)).getBoundNode());
+        Element titles = (Element) (new MCRBinding("document/titles", true, new MCRBinding(doc)).getBoundNode());
         Element title = new Element("title").setAttribute("type", "alternative");
         titles.addContent(2, title);
         tracker.track(MCRAddedElement.added(title));
@@ -135,7 +135,7 @@ public class MCRChangeTrackerTest extends MCRTestCase {
         doc.getRootElement().setAttribute(lang);
         tracker.track(MCRAddedAttribute.added(lang));
 
-        Element author = (Element) (new MCRBinding("document/authors/author", new MCRBinding(doc)).getBoundNode());
+        Element author = (Element) (new MCRBinding("document/authors/author", true, new MCRBinding(doc)).getBoundNode());
         tracker.track(MCRRemoveElement.remove(author));
 
         tracker.undoChanges(doc);
@@ -150,7 +150,7 @@ public class MCRChangeTrackerTest extends MCRTestCase {
 
         MCRChangeTracker tracker = new MCRChangeTracker();
 
-        Element titles = (Element) (new MCRBinding("document/titles", new MCRBinding(doc)).getBoundNode());
+        Element titles = (Element) (new MCRBinding("document/titles", true, new MCRBinding(doc)).getBoundNode());
         Element title = new Element("title").setAttribute("type", "alternative");
         titles.addContent(2, title);
         tracker.track(MCRAddedElement.added(title));
@@ -159,7 +159,7 @@ public class MCRChangeTrackerTest extends MCRTestCase {
         doc.getRootElement().setAttribute(lang);
         tracker.track(MCRAddedAttribute.added(lang));
 
-        Element author = (Element) (new MCRBinding("document/authors/author", new MCRBinding(doc)).getBoundNode());
+        Element author = (Element) (new MCRBinding("document/authors/author", true, new MCRBinding(doc)).getBoundNode());
         tracker.track(MCRRemoveElement.remove(author));
 
         doc = MCRChangeTracker.removeChangeTracking(doc);

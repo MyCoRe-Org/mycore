@@ -41,6 +41,7 @@ import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.xeditor.tracker.MCRBreakpoint;
 import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
+import org.mycore.frontend.xeditor.validation.MCRXEditorValidator;
 import org.xml.sax.SAXException;
 
 /**

@@ -82,18 +82,18 @@ public class MCRBinding {
         parent.children.add(this);
     }
 
-    public MCRBinding(String xPath, MCRBinding parent) throws JDOMException, JaxenException {
+    public MCRBinding(String xPath, boolean buildIfNotExists, MCRBinding parent) throws JDOMException, JaxenException {
         this(parent);
-        bind(xPath, null);
+        bind(xPath, buildIfNotExists, null);
     }
 
     public MCRBinding(String xPath, String defaultValue, String name, MCRBinding parent) throws JDOMException, JaxenException {
         this(parent);
         this.name = (name != null) && !name.isEmpty() ? name : null;
-        bind(xPath, defaultValue);
+        bind(xPath, true, defaultValue);
     }
 
-    private void bind(String xPath, String defaultValue) throws JaxenException {
+    private void bind(String xPath, boolean buildIfNotExists, String defaultValue) throws JaxenException {
         Map<String, Object> variables = buildXPathVariables();
 
         XPathExpression<Object> xPathExpr = XPathFactory.instance().compile(xPath, Filters.fpassthrough(), variables,
@@ -103,7 +103,7 @@ public class MCRBinding {
 
         LOGGER.debug("Bind to " + xPath + " selected " + boundNodes.size() + " node(s)");
 
-        if (boundNodes.isEmpty()) {
+        if (boundNodes.isEmpty() && buildIfNotExists ) {
             MCRNodeBuilder builder = new MCRNodeBuilder(variables);
             Object built = builder.buildNode(xPath, defaultValue, (Parent) (parent.getBoundNode()));
             LOGGER.debug("Bind to " + xPath + " generated node " + MCRXPathBuilder.buildXPath(built));
@@ -181,7 +181,7 @@ public class MCRBinding {
         return getValue(getBoundNode());
     }
 
-    private String getValue(Object node) {
+    public static String getValue(Object node) {
         if (node instanceof Element)
             return ((Element) node).getTextTrim();
         else
@@ -239,7 +239,7 @@ public class MCRBinding {
     public Map<String, Object> buildXPathVariables() {
         Map<String, Object> variables = new HashMap<String, Object>();
         variables.putAll(getVariables());
-        
+
         for (MCRBinding ancestor : getAncestorsAndSelf()) {
             for (MCRBinding child : ancestor.getChildren()) {
                 String childName = child.getName();
@@ -260,7 +260,7 @@ public class MCRBinding {
         int posA = Integer.parseInt(tokens[1]);
         int posB = Integer.parseInt(tokens[2]);
 
-        MCRBinding binding = new MCRBinding(xPath, this);
+        MCRBinding binding = new MCRBinding(xPath, false, this);
         Element parent = (Element) (binding.getBoundNode());
         binding.track(MCRSwapElements.swap(parent, posA, posB));
         binding.detach();

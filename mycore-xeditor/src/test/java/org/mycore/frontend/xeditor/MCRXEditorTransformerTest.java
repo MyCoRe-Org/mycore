@@ -77,7 +77,7 @@ public class MCRXEditorTransformerTest {
         MCRContent transformed = new MCRXEditorTransformer(session, pc).transform(input);
 
         Document expected = MCRSourceContent.getInstance("resource:" + expectedOutputFile).asXML();
-        MCRBinding binding = new MCRBinding("//input[@type='hidden'][@name='_xed_session']/@value", new MCRBinding(expected));
+        MCRBinding binding = new MCRBinding("//input[@type='hidden'][@name='_xed_session']/@value", true, new MCRBinding(expected));
         binding.setValue(session.getID() + "-" + session.getChangeTracker().getChangeCounter());
 
         String msg = "Transformed output is different to " + expectedOutputFile;
