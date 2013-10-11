@@ -3,9 +3,9 @@
 <html>
   <body>
     <form action="/servlets/XEditor">
-      <p xmlns:xed="http://www.mycore.de/xeditor">Fehlerhafte Eingabe!</p>
+      <p>Fehlerhafte Eingabe!</p>
       <div class="form-group has-error">
-        <input xmlns:xed="http://www.mycore.de/xeditor" name="/document/title" value="" type="text" />
+        <input name="/document/title" value="" type="text" />
       </div>
       <div class="form-group has-success">
         <input name="/document/year" value="" type="text" />

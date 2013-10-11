@@ -6,7 +6,7 @@
       <div class="form-group ">
         <input name="/document/title" value="Der neue XEditor - Utopie oder Wahnsinn?" type="text" />
       </div>
-      <div xmlns:xed="http://www.mycore.de/xeditor" class="form-group ">
+      <div class="form-group ">
         <input name="/document/year" value="" type="text" />
       </div>
       <input value="testBasicInputComponents-source.xml" name="input" type="hidden" />
