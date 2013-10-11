@@ -36,7 +36,6 @@ public class MCRCloneTarget implements MCREditorTarget {
 
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String xPath) throws Exception {
         session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
-        session.getValidator().forgetInvalidFields();
         MCRBinding binding = new MCRBinding(xPath, session.getRootBinding());
         binding.cloneBoundElement(0);
         binding.detach();

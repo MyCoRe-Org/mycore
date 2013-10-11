@@ -35,7 +35,6 @@ public class MCRSwapTarget implements MCREditorTarget {
 
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String swapParam) throws Exception {
         session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
-        session.getValidator().forgetInvalidFields();
         session.getRootBinding().swap(swapParam);
 
         session.setBreakpoint("After handling target swap " + swapParam);

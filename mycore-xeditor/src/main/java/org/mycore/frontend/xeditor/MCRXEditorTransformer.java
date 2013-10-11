@@ -79,7 +79,9 @@ public class MCRXEditorTransformer {
         if (transformer instanceof MCRParameterizedTransformer) {
             String key = MCRXEditorTransformerStore.storeTransformer(this);
             transformationParameters.setParameter("XEditorTransformerKey", key);
-            return ((MCRParameterizedTransformer) transformer).transform(editorSource, transformationParameters);
+            MCRContent result = ((MCRParameterizedTransformer) transformer).transform(editorSource, transformationParameters);
+            editorSession.getValidator().forgetInvalidFields();
+            return result;
         } else {
             throw new MCRException("Xeditor needs parameterized MCRContentTransformer: " + transformer);
         }
