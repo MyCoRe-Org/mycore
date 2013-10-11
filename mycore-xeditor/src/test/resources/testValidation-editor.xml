@@ -6,11 +6,19 @@
       <xed:source uri="resource:{$input}" />
       <xed:bind xpath="document">
         <xed:if test="$xed-validation-failed">
-          <p>Fehlerhafte Eingabe!</p> 
+          <p>Fehlerhafte Eingabe!</p>
         </xed:if>
         <xed:bind xpath="title">
-          <input type="text" class="text" />
-          <xed:validate required="true" xsl="contains(.,'Utopie')" />
+          <div class="form-group {$xed-validation-marker}">
+            <input type="text" />
+            <xed:validate required="true" xsl="contains(.,'Utopie')" />
+          </div>
+        </xed:bind>
+        <xed:bind xpath="year">
+          <div class="form-group {$xed-validation-marker}">
+            <input type="text" />
+            <xed:validate xsl="string-length(.) = 4" /> <!-- since not required, will only check if input exists -->
+          </div>
         </xed:bind>
       </xed:bind>
     </xed:form>

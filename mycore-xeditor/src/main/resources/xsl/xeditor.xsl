@@ -146,7 +146,6 @@
         </xsl:when>
       </xsl:choose>
     </xsl:attribute>
-    <xsl:call-template name="set.class.if.validation.failed" />
   </xsl:template>
   
   <!-- ========== <input /> ========== -->
@@ -160,7 +159,6 @@
     <xsl:attribute name="value">
       <xsl:value-of select="transformer:getValue($transformer)" />
     </xsl:attribute>
-    <xsl:call-template name="set.class.if.validation.failed" />
   </xsl:template>
 
   <xsl:template match="input[contains('checkbox,radio',@type)]" mode="add-attributes">
@@ -170,7 +168,6 @@
     <xsl:if test="transformer:hasValue($transformer,@value)">
       <xsl:attribute name="checked">checked</xsl:attribute>
     </xsl:if>
-    <xsl:call-template name="set.class.if.validation.failed" />
   </xsl:template>
 
   <xsl:template match="option[ancestor::select]" mode="add-attributes">
@@ -192,7 +189,6 @@
     <xsl:attribute name="name">
       <xsl:value-of select="transformer:getAbsoluteXPath($transformer)" />
     </xsl:attribute>
-    <xsl:call-template name="set.class.if.validation.failed" />
   </xsl:template>
 
   <xsl:template match="textarea" mode="add-content">
@@ -257,25 +253,6 @@
 
   <xsl:template match="xed:validate" mode="xeditor">
     <xsl:value-of select="transformer:addValidationRule($transformer,@*)" />
-  </xsl:template>
-
-  <!-- ========== mark input controls where validation failed ========== -->
-
-  <xsl:template match="input/@class|textarea/@class|select/@class" mode="xeditor">
-    <xsl:attribute name="class">
-      <xsl:value-of select="." />
-      <xsl:if test="transformer:currentIsInvalid($transformer)">
-        <xsl:text> xed-validation-failed</xsl:text>
-      </xsl:if>
-    </xsl:attribute>
-  </xsl:template>
-
-  <xsl:template name="set.class.if.validation.failed">
-    <xsl:if test="not(@class) and transformer:currentIsInvalid($transformer)">
-      <xsl:attribute name="class">
-        <xsl:text>xed-validation-failed</xsl:text>
-      </xsl:attribute>
-    </xsl:if>
   </xsl:template>
 
   <!-- ========== <xed:if test="" /> ========== -->

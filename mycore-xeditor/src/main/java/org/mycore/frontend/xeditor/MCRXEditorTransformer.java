@@ -73,14 +73,14 @@ public class MCRXEditorTransformer {
     }
 
     public MCRContent transform(MCRContent editorSource) throws IOException, JDOMException, SAXException {
-        editorSession.getValidator().removeValidationRules();
+        editorSession.getValidator().clearRules();
 
         MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("xeditor");
         if (transformer instanceof MCRParameterizedTransformer) {
             String key = MCRXEditorTransformerStore.storeTransformer(this);
             transformationParameters.setParameter("XEditorTransformerKey", key);
             MCRContent result = ((MCRParameterizedTransformer) transformer).transform(editorSource, transformationParameters);
-            editorSession.getValidator().forgetInvalidFields();
+            editorSession.getValidator().clearValidationResults();
             return result;
         } else {
             throw new MCRException("Xeditor needs parameterized MCRContentTransformer: " + transformer);
@@ -118,7 +118,12 @@ public class MCRXEditorTransformer {
         if (currentBinding == null)
             currentBinding = editorSession.getRootBinding();
 
-        currentBinding = new MCRBinding(xPath, defaultValue, name, currentBinding);
+        setCurrentBinding(new MCRBinding(xPath, defaultValue, name, currentBinding));
+    }
+
+    private void setCurrentBinding(MCRBinding binding) {
+        this.currentBinding = binding;
+        editorSession.getValidator().setValidationMarker(currentBinding);
     }
 
     private void createEmptyDocumentFromXPath(String xPath) throws JaxenException, JDOMException {
@@ -137,7 +142,7 @@ public class MCRXEditorTransformer {
     }
 
     public void unbind() {
-        currentBinding = currentBinding.getParent();
+        setCurrentBinding(currentBinding.getParent());
     }
 
     public String getAbsoluteXPath() {
@@ -178,7 +183,7 @@ public class MCRXEditorTransformer {
 
     public String repeat(String xPath, int minRepeats, int maxRepeats) throws JDOMException, JaxenException {
         MCRRepeatBinding repeat = new MCRRepeatBinding(xPath, currentBinding, minRepeats, maxRepeats);
-        currentBinding = repeat;
+        setCurrentBinding(repeat);
         return StringUtils.repeat("a ", repeat.getBoundNodes().size());
     }
 
@@ -202,7 +207,8 @@ public class MCRXEditorTransformer {
     }
 
     public void bindRepeatPosition() throws JDOMException, JaxenException {
-        currentBinding = getCurrentRepeat().bindRepeatPosition();
+        setCurrentBinding(getCurrentRepeat().bindRepeatPosition());
+        editorSession.getValidator().setValidationMarker(currentBinding);
     }
 
     public String getSwapParameter(int posA, int posB) {
@@ -215,11 +221,7 @@ public class MCRXEditorTransformer {
     }
 
     public void addValidationRule(NodeIterator attributes) {
-        editorSession.getValidator().addValidationRule(currentBinding.getAbsoluteXPath(), attributes);
-    }
-
-    public boolean currentIsInvalid() {
-        return editorSession.getValidator().failed(currentBinding.getAbsoluteXPath());
+        editorSession.getValidator().addRule(currentBinding.getAbsoluteXPath(), attributes);
     }
 
     public String getSubselectParam(String href) {

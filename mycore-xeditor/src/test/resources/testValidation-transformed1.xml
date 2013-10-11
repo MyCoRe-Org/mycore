@@ -3,7 +3,12 @@
 <html>
   <body>
     <form action="/servlets/XEditor">
-      <input xmlns:xed="http://www.mycore.de/xeditor" name="/document/title" value="Der neue XEditor - Utopie oder Wahnsinn?" type="text" class="text" />
+      <div class="form-group ">
+        <input name="/document/title" value="Der neue XEditor - Utopie oder Wahnsinn?" type="text" />
+      </div>
+      <div xmlns:xed="http://www.mycore.de/xeditor" class="form-group ">
+        <input name="/document/year" value="" type="text" />
+      </div>
       <input value="testBasicInputComponents-source.xml" name="input" type="hidden" />
       <input value="1-0" name="_xed_session" type="hidden" />
     </form>
