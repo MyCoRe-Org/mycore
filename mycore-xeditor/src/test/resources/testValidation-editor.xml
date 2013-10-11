@@ -5,9 +5,9 @@
     <xed:form xmlns:xed="http://www.mycore.de/xeditor">
       <xed:source uri="resource:{$input}" />
       <xed:bind xpath="document">
-        <xed:if-validation-failed>
+        <xed:if test="$xed-validation-failed">
           <p>Fehlerhafte Eingabe!</p> 
-        </xed:if-validation-failed>
+        </xed:if>
         <xed:bind xpath="title">
           <input type="text" class="text" />
           <xed:validate required="true" xsl="contains(.,'Utopie')" />

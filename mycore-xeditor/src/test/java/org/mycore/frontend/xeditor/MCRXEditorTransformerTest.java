@@ -144,9 +144,9 @@ public class MCRXEditorTransformerTest {
     public void testValidation() throws IOException, URISyntaxException, TransformerException, JDOMException, SAXException, JaxenException {
         MCREditorSession session = testTransformation("testValidation-editor.xml", "testBasicInputComponents-source.xml",
                 "testValidation-transformed1.xml");
-        assertTrue(session.getValidator().isValid(session.getEditedXML()));
+        assertTrue(session.getValidator().isValid());
         session = testTransformation("testValidation-editor.xml", null, "testValidation-transformed2.xml");
-        assertFalse(session.getValidator().isValid(session.getEditedXML()));
+        assertFalse(session.getValidator().isValid());
         testTransformation("testValidation-editor.xml", null, session, "testValidation-transformed3.xml");
     }
 }

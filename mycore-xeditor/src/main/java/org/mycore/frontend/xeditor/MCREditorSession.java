@@ -66,7 +66,7 @@ public class MCREditorSession {
 
     private MCREditorSubmission submission = new MCREditorSubmission(this);
 
-    private MCRXEditorValidator validator = new MCRXEditorValidator();
+    private MCRXEditorValidator validator = new MCRXEditorValidator(this);
 
     private MCRXMLCleaner cleaner = new MCRXMLCleaner();
 

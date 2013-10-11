@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.frontend.editor.validation.MCRValidator;
 import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
@@ -42,9 +41,17 @@ import org.w3c.dom.traversal.NodeIterator;
  */
 public class MCRXEditorValidator {
 
+    private static final String XED_VALIDATION_FAILED = "xed-validation-failed";
+
     private List<MCRValidationRule> validationRules = new ArrayList<MCRValidationRule>();
 
     private Set<String> xPathsOfInvalidFields = new HashSet<String>();
+
+    private MCREditorSession session;
+
+    public MCRXEditorValidator(MCREditorSession session) {
+        this.session = session;
+    }
 
     public void addValidationRule(String xPath, NodeIterator attributes) {
         MCRValidator validator = MCRValidatorBuilder.buildPredefinedCombinedValidator();
@@ -64,26 +71,25 @@ public class MCRXEditorValidator {
         validationRules.clear();
     }
 
-    public boolean isValid(Document editedXML) throws JDOMException, JaxenException {
-        xPathsOfInvalidFields.clear();
-
-        MCRBinding root = new MCRBinding(editedXML);
+    public boolean isValid() throws JDOMException, JaxenException {
+        MCRBinding root = session.getRootBinding();
         for (MCRValidationRule rule : validationRules) {
             String xPath = rule.getXPath();
 
             if (failed(xPath))
                 continue;
 
-            String value = new MCRBinding(xPath, root).getValue();
+            MCRBinding binding = new MCRBinding(xPath, root);
+            String value = binding.getValue();
+            binding.detach();
+
             if (!rule.isValid(value))
                 xPathsOfInvalidFields.add(xPath);
         }
 
-        return xPathsOfInvalidFields.isEmpty();
-    }
-
-    public boolean failed() {
-        return !xPathsOfInvalidFields.isEmpty();
+        boolean isValid = xPathsOfInvalidFields.isEmpty();
+        session.getVariables().put(XED_VALIDATION_FAILED, String.valueOf(!isValid));
+        return isValid;
     }
 
     public boolean failed(String xPath) {
@@ -92,6 +98,7 @@ public class MCRXEditorValidator {
 
     public void forgetInvalidFields() {
         xPathsOfInvalidFields.clear();
+        session.getVariables().remove(XED_VALIDATION_FAILED);
     }
 }
 

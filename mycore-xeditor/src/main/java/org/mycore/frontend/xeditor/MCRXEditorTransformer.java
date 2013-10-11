@@ -218,10 +218,6 @@ public class MCRXEditorTransformer {
         editorSession.getValidator().addValidationRule(currentBinding.getAbsoluteXPath(), attributes);
     }
 
-    public boolean validationFailed() {
-        return editorSession.getValidator().failed();
-    }
-
     public boolean currentIsInvalid() {
         return editorSession.getValidator().failed(currentBinding.getAbsoluteXPath());
     }

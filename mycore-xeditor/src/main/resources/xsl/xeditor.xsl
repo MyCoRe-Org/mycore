@@ -259,14 +259,6 @@
     <xsl:value-of select="transformer:addValidationRule($transformer,@*)" />
   </xsl:template>
 
-  <!-- ========== <xed:if-validation-failed /> ========== -->
-
-  <xsl:template match="xed:if-validation-failed" mode="xeditor">
-    <xsl:if test="transformer:validationFailed($transformer)">
-      <xsl:apply-templates select="node()" mode="xeditor" />
-    </xsl:if>
-  </xsl:template>
-
   <!-- ========== mark input controls where validation failed ========== -->
 
   <xsl:template match="input/@class|textarea/@class|select/@class" mode="xeditor">

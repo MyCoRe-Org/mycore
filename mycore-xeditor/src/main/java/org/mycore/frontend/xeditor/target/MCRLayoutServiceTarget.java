@@ -43,7 +43,7 @@ public class MCRLayoutServiceTarget implements MCREditorTarget {
         session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
         Document result = session.getEditedXML();
 
-        if (session.getValidator().isValid(result)) {
+        if (session.getValidator().isValid()) {
             result = MCRChangeTracker.removeChangeTracking(result);
             result = session.getXMLCleaner().clean(result);
             result = session.getPostProcessor().process(result);
