@@ -224,7 +224,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      */
     @MCRCommand(
             syntax = "export classification {0} to directory {1} with {2}",
-            help = "The command exports the classification with MCRObjectID {0} as xml file named {1} using the stylesheet {2}-object.xsl. For {2} save is the default..",
+            help = "The command exports the classification with MCRObjectID {0} as xml file to directory named {1} using the stylesheet {2}-object.xsl. For {2} save is the default.",
             order = 60)
     public static boolean export(String ID, String dirname, String style) throws Exception {
         String dname = "";
