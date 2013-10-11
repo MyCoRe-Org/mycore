@@ -9,6 +9,9 @@
       <action dev="mcrkrebs" type="fix" date="2013-10-10">
         mods: fixed volume and issue presentation and editor fields (merged revision 28097-28099)
       </action>
+      <action dev="mcrfluet" type="fix" date="2013-10-10">
+        Fixed command syntax: export classification ... to directory .... (merged revision 28093)
+      </action>
       <action dev="mcrkrebs" type="fix" date="2013-10-01">
         fixed identifier options in mods editors
       </action>

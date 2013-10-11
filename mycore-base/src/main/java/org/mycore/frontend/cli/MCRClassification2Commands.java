@@ -90,9 +90,9 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             "org.mycore.frontend.cli.MCRClassification2Commands.updateFromDirectory String",
             "The command update all classifications in the directory {0} to the system."));
         addCommand(new MCRCommand(
-            "export classification {0} to file {1} with {2}",
+            "export classification {0} to directory {1} with {2}",
             "org.mycore.frontend.cli.MCRClassification2Commands.export String String String",
-            "The command store the classification with MCRObjectID {0} to the file named {1} with the stylesheet {2}-object.xsl. For {2} save is the default.."));
+            "The command exports the classification with MCRObjectID {0} as xml file to directory {1} using the stylesheet {2}-object.xsl. For {2} save is the default."));
         addCommand(new MCRCommand("export all classifications to directory {0} with {1}",
             "org.mycore.frontend.cli.MCRClassification2Commands.exportAll String String",
             "The command store all classifications to the directory with name {0} with the stylesheet {1}-object.xsl. For {1} save is the default."));
@@ -244,7 +244,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @param ID
      *            the ID of the MCRClassification to be save.
      * @param dirname
-     *            the filename to store the classification
+     *            the directory to export the classification to
      * @param style
      *            the name part of the stylesheet like <em>style</em>
      *            -classification.xsl
