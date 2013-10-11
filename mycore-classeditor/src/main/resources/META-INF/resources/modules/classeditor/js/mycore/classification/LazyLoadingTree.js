@@ -298,12 +298,12 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 		return this.tree != null ? this.tree.selectedItems : null;
 	},
 
-	showId: function() {
+	showID: function() {
 		this.showIdInLabel = true;
 		this.updateLabels();
 	},
 
-	hideId: function() {
+	hideID: function() {
 		this.showIdInLabel = false;
 		this.updateLabels();
 	},
@@ -322,12 +322,21 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 		}
 	},
 
+	/**
+	 * Updates the id of a node. False is returned if a node couldn't
+	 * be updated cause another node has the same id.
+	 */
 	updateIdOfNode: function(item, oldID) {
 		var newIdentity = this.tree.model.getIdentity(item);
-		var oldIdentity = this.tree.model.getIdentity(oldID);
 		// well we have to use the internal array _itemNodesMap cause there is no alternative
+		if(this.tree._itemNodesMap[newIdentity] != null) {
+			// a node with the same id already exists
+			return false;
+		}
+		var oldIdentity = this.tree.model.getIdentity(oldID);
 		this.tree._itemNodesMap[newIdentity] = this.tree._itemNodesMap[oldIdentity];
 		delete this.tree._itemNodesMap[oldIdentity];
+		return true;
 	}
 
 });

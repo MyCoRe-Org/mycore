@@ -131,7 +131,12 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 
 	onCategoryEditorIdChanged: function(args) {
 		var item = args.item;
-		this.treePane.tree.updateIdOfNode(item, args.oldID);
+		if(!this.treePane.tree.updateIdOfNode(item, args.oldID)) {
+			// id is invalid -> reset item id
+			item.id.rootid = args.oldID.rootid;
+			item.id.categid = args.oldID.categid;
+			// TODO: we should mark the category text field as invalid
+		}
 		this._updateItem(item);
 	},
 
@@ -173,11 +178,11 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 		// show Id's?
 		var showIds = this.settingsDialog.showIdCheckBox.get("value");
 		if(showIds) {
-			this.treePane.showId();
-			this.categoryEditorPane.showId();
+			this.treePane.showID();
+			this.categoryEditorPane.showID();
 		} else {
-			this.treePane.hideId();
-			this.categoryEditorPane.hideId();
+			this.treePane.hideID();
+			this.categoryEditorPane.hideID();
 		}
 		// if a new classification was successfully imported
 		if(this.settingsDialog.classificationImported) {

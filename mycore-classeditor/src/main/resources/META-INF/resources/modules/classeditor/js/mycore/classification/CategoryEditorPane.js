@@ -51,9 +51,9 @@ return declare("mycore.classification.CategoryEditorPane", [_Widget, Evented, _T
 		domConstruct.place(this.labelEditor.domNode, this.labelEditorCell);
 		// show id
 		if(this.settings.showId) {
-			this.showId();
+			this.showID();
 		} else {
-			this.hideId();
+			this.hideID();
 		}
 		// events
 		on(this.labelEditor, "change", lang.hitch(this, function() {
@@ -110,7 +110,7 @@ return declare("mycore.classification.CategoryEditorPane", [_Widget, Evented, _T
 		this.categIdEditor.set("disabled", disabled);
     },
 
-	showId: function() {
+	showID: function() {
 		domStyle.set(this.classIdRow, "display", "table-row");
 		domStyle.set(this.categIdRow, "display", "table-row");
 		if(this.currentItem != null) {
@@ -118,7 +118,7 @@ return declare("mycore.classification.CategoryEditorPane", [_Widget, Evented, _T
 		}
 	},
 
-    hideId: function() {
+    hideID: function() {
 		domStyle.set(this.classIdRow, "display", "none");
 		domStyle.set(this.categIdRow, "display", "none");
 	},

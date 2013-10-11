@@ -88,12 +88,12 @@ return declare("mycore.classification.TreePane", [ContentPane, _Templated, _Sett
 		this.exportDialog.show(classUtil.getClassificationId(selectedItems[0]));
 	},
 
-	showId: function() {
-		this.tree.showId();
+	showID: function() {
+		this.tree.showID();
 	},
 
-	hideId: function() {
-		this.tree.hideId();
+	hideID: function() {
+		this.tree.hideID();
 	},
 
 	_setDisabledAttr: function(/*boolean*/ disabled) {
