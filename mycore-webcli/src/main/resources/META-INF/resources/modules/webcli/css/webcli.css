@@ -1,5 +1,5 @@
-@import "http://ajax.googleapis.com/ajax/libs/dojo/1.8/dijit/themes/claro/claro.css";
-@import "http://ajax.googleapis.com/ajax/libs/dojo/1.8/dojo/resources/dojo.css"
+@import "//ajax.googleapis.com/ajax/libs/dojo/1.8/dijit/themes/claro/claro.css";
+@import "//ajax.googleapis.com/ajax/libs/dojo/1.8/dojo/resources/dojo.css"
 html, body {
 	width: 100%;
 	height: 100%;
