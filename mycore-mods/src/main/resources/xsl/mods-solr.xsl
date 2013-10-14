@@ -15,8 +15,8 @@
       <xsl:apply-templates select="." mode="mods" />
     </xsl:variable>
     <xsl:variable name="fullyResolved" select="xalan:nodeset($resolved)" />
-    
-    <!-- fields from mycore-mods -->
+
+    <!-- classification fields from mycore-mods -->
     <xsl:for-each select="metadata//mods:*[@authority or @authorityURI]">
       <xsl:variable name="uri" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport" select="mcrmods:getClassCategParentLink(.)" />
       <xsl:if test="string-length($uri) &gt; 0">
@@ -109,7 +109,7 @@
     <!-- add allMeta from parent -->
     <xsl:for-each select="mods:relatedItem[@type=host]">
       <xsl:for-each select="mods:titleInfo/descendant-or-self::*[text()]">
-        <field name="mods.parentTitle">
+        <field name="mods.hostTitle">
           <xsl:value-of select="text()" />
         </field>
       </xsl:for-each>
@@ -122,6 +122,18 @@
             </field>
           </xsl:if>
         </xsl:for-each>
+      </xsl:for-each>
+      <xsl:for-each select="mods:name">
+        <field name="mods.hostName">
+          <xsl:for-each select="mods:displayForm | mods:namePart | text()">
+            <xsl:value-of select="concat(' ',.)" />
+          </xsl:for-each>
+        </field>
+      </xsl:for-each>
+      <xsl:for-each select="mods:identifier">
+        <field name="mods.hostIdentifier">
+          <xsl:value-of select="text()" />
+        </field>
       </xsl:for-each>
     </xsl:for-each>
   </xsl:template>
