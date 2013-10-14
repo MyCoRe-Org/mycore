@@ -40,9 +40,9 @@ import org.w3c.dom.traversal.NodeIterator;
  */
 public class MCRXEditorValidator {
 
-    private static final String XED_VALIDATION_FAILED = "xed-validation-failed";
+    public static final String XED_VALIDATION_FAILED = "xed-validation-failed";
 
-    private static final String XED_VALIDATION_MARKER = "xed-validation-marker";
+    public static final String XED_VALIDATION_MARKER = "xed-validation-marker";
 
     private List<MCRValidationRule> validationRules = new ArrayList<MCRValidationRule>();
 
