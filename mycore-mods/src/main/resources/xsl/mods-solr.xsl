@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:mods="http://www.loc.gov/mods/v3"
-  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xalan="http://xml.apache.org/xalan" exclude-result-prefixes="xalan xlink mods mcrxsl">
+  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xalan="http://xml.apache.org/xalan"
+  exclude-result-prefixes="xalan xlink mods mcrxsl">
   <xsl:import href="xslImport:solr-document:mods-solr.xsl" />
   <xsl:include href="mods-utils.xsl" />
   <xsl:include href="mods2mods.xsl" />
   <xsl:include href="xslInclude:mods" />
-  
-  <xsl:strip-space elements="mods:*"/>
+
+  <xsl:strip-space elements="mods:*" />
 
   <xsl:template match="mycoreobject[contains(@ID,'_mods_')]">
     <xsl:apply-imports />
@@ -16,6 +17,18 @@
     <xsl:variable name="fullyResolved" select="xalan:nodeset($resolved)" />
     
     <!-- fields from mycore-mods -->
+    <xsl:for-each select="metadata//mods:*[@authority or @authorityURI]">
+      <xsl:variable name="uri" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport" select="mcrmods:getClassCategParentLink(.)" />
+      <xsl:if test="string-length($uri) &gt; 0">
+        <xsl:variable name="classdoc" select="document($uri)" />
+        <xsl:variable name="classid" select="$classdoc/mycoreclass/@ID" />
+        <xsl:apply-templates select="$classdoc//category" mode="category">
+          <xsl:with-param name="classid" select="$classid" />
+          <!-- TODO: Currently we do not have to think of releatedItem[@type='host'] here -->
+          <xsl:with-param name="withTopField" select="true()" />
+        </xsl:apply-templates>
+      </xsl:if>
+    </xsl:for-each>
     <xsl:apply-templates select="$fullyResolved/mods:mods" />
     <field name="mods.type">
       <xsl:apply-templates select="." mode="mods-type" />
@@ -92,6 +105,24 @@
           <xsl:value-of select="." />
         </field>
       </xsl:if>
+    </xsl:for-each>
+    <!-- add allMeta from parent -->
+    <xsl:for-each select="mods:relatedItem[@type=host]">
+      <xsl:for-each select="mods:titleInfo/descendant-or-self::*[text()]">
+        <field name="mods.parentTitle">
+          <xsl:value-of select="text()" />
+        </field>
+      </xsl:for-each>
+      <xsl:for-each select=".//*[@xlink:title|text()]">
+        <xsl:for-each select="text()|@xlink:title">
+          <xsl:variable name="trimmed" select="normalize-space(.)" />
+          <xsl:if test="string-length($trimmed) &gt; 0">
+            <field name="allMeta">
+              <xsl:value-of select="$trimmed" />
+            </field>
+          </xsl:if>
+        </xsl:for-each>
+      </xsl:for-each>
     </xsl:for-each>
   </xsl:template>
 </xsl:stylesheet>

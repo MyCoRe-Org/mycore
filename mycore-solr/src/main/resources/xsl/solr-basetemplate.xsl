@@ -31,18 +31,6 @@
         <xsl:with-param name="withTopField" select="@inherited = '0'" />
       </xsl:apply-templates>
     </xsl:for-each>
-    <xsl:for-each select="metadata//mods:*[@authority or @authorityURI]">
-      <xsl:variable name="uri" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport" select="mcrmods:getClassCategParentLink(.)" />
-      <xsl:if test="string-length($uri) &gt; 0">
-        <xsl:variable name="classdoc" select="document($uri)" />
-        <xsl:variable name="classid" select="$classdoc/mycoreclass/@ID" />
-        <xsl:apply-templates select="$classdoc//category" mode="category">
-          <xsl:with-param name="classid" select="$classid" />
-          <!-- TODO: Currently we do not have to think of releatedItem[@type='host'] here -->
-          <xsl:with-param name="withTopField" select="true()" />
-        </xsl:apply-templates>
-      </xsl:if>
-    </xsl:for-each>
     <xsl:for-each select="metadata/*//*[@xlink:title|text()]">
       <xsl:for-each select="text()|@xlink:title">
         <xsl:variable name="trimmed" select="normalize-space(.)" />
