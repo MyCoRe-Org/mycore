@@ -1139,6 +1139,17 @@
       </roles>
     </developer>
     <developer>
+      <id>mcrsroeh</id>
+      <name>Sebastian Röher</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <email>sebastian.roeher (at) thulb.uni-jena.de</email>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>programmer</role>
+      </roles>
+    </developer>
+    <developer>
       <id>mcrtchef</id>
       <name>Thomas Scheffler</name>
       <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
