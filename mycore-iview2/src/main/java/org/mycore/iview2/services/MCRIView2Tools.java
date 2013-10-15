@@ -285,7 +285,7 @@ public class MCRIView2Tools {
      * @return null or property value
      */
     static String getIView2Property(String propName) {
-        return MCRConfiguration.instance().getString("MCR.Module-iview2." + propName, null);
+        return MCRConfiguration.instance().getString(CONFIG_PREFIX + propName, null);
     }
 
     /**
