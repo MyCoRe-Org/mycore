@@ -48,6 +48,11 @@
     </xsl:choose>
   </xsl:variable>
   <xsl:variable name="rowTemp">
+    <xsl:if test="xalan:nodeset($params)/arr[@name='rows']">
+      <xsl:message terminate="yes">
+        <xsl:value-of select="'Too many rows parameter!'" />
+      </xsl:message>
+    </xsl:if>
     <xsl:choose>
       <xsl:when test="xalan:nodeset($params)/str[@name='rows']">
         <xsl:value-of select="number(xalan:nodeset($params)/str[@name='rows'])" />
