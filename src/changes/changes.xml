@@ -5,6 +5,137 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
+    <release version="2013.10" date="2013-10-00" descitption="Codenamed &apos;Between the Sheets&apos;">
+      <action dev="mcrmeich" type="fix" due-to="Thomas Scheffler" date="2013-10-11">
+        mycore-classeditor: fixed broken tree if new CategoryID starts with an old CategoryID
+      </action>    
+      <action dev="mcrtchef" type="add">
+        added MCREntityResolver that uses XML Catalogs to resolve schema documents
+      </action>
+      <action dev="mcrfluet" type="add">
+        mycore-xeditor: added functionality to load xml from any URI, store it under a variable, and use it in xed:output. See testLoadResources-editor.xml for example.
+      </action>
+      <action dev="mcrmeich" type="fix" date="2013-10-07">
+        MCRURL: parameter removing causes invalid url if containing special signs
+      </action>
+      <action dev="mcrfluet" type="fix" date="2013-10-01">
+        editor framework: avoid conflicts with ordinary html textarea
+      </action>
+      <action dev="mcrfluet" type="add">
+        mycore-xeditor: Added support for subselects
+      </action>
+      <action dev="mcrfluet" type="add">
+        mycore-xeditor: Enable usage of request parameters, configuration properties and session variables within XPath of xed:bind
+      </action>
+      <action dev="mcrfluet" type="update">
+        mycore-xeditor: xed:include is resolved once per transformation process and once per application lifetime with @static=true
+      </action>
+      <action dev="mcrfluet" type="update">
+        mycore-xeditor: Use @xed:href to specify target servlet for @xed:target="servlet". Use ":" as delimiter between target type and target href in general.
+      </action>
+      <action dev="mcrjkupf" type="fix" date="2013-09-27">
+        fixed "check classification {0}" when running against MySQL
+      </action>
+      <action dev="mcrmibue" type="update">
+        mycore-acl-editor2: update to Bootstrap 3, WCMS uses new ACL editor and many more
+      </action>
+      <action dev="mcrtchef" type="add">
+        mycore-solr: use "solr.phrase=fielName[,fieldName2]" to handle phrase queries (instead of single words)
+      </action>
+      <action dev="mcrsteph" type="fix" date="2013-09-24">
+        fixed handling of IPv6 adresses in MCRSession
+      </action>
+      <action dev="mcrfluet" type="fix" date="2013-09-23">
+        mycore-xeditor: Use hidden fields to mark controls that may not resubmit a value (unchecked checkboxes, select boxes without any selected options).
+      </action>
+      <action dev="mcrtchef" type="update">
+        reversed import chain of "xslImport:" URIResolver to make importing simpler and more powerful
+      </action>
+      <action dev="mcrjkupf" type="add">
+        added "check derivates of mcrfsnodes with project id {0}", "check mcrfsnodes of derivates with project id {0}",
+        "check derivate entries in objects for base {0}", "check object entries in derivates for base {0}"
+        commands to check IFS and metadata for a specific Project ID
+      </action>
+      <action dev="mcrtchef" type="update">
+        mycore-xeditor: allow to configure XSL process to support transformation chaining
+      </action>
+      <action dev="mcrtchef" type="update">
+        support https throughout the web application
+      </action>
+      <action dev="mcrfluet" type="fix" date="2013-09-18" due-to="Thomas Scheffler">
+        track changes to be able to go back in time when user goes back in browser history and resubmits old state of a form
+      </action>
+      <action dev="mcrsherm" type="update">
+        mycore-mets: display message on successful save
+      </action>
+      <action dev="mcrfluet" type="add">
+        mycore-xeditor: added xed:template element to wrap and ignore included code
+      </action>
+      <action dev="mcrfluet" type="update">
+        mycore-xeditor: replaced custom XPath parser with JAXEN
+      </action>
+      <action dev="mcrsroeh" type="update">
+        for every file added to solr use cache for field derivateModified
+      </action>
+      <action dev="mcrfluet" type="fix" date="2013-09-13">
+        mycore-xeditor: fixed repeater if XPath contains predicate that can not be build automatically 
+      </action>
+      <action dev="mcrtchef" type="update">
+        mycore-xeditor: allow to overwrite xed controls
+      </action>
+      <action dev="mcrfluet" type="add">
+        mycore-xeditor: added MCRXMLCleaner to remove logically empty elements and attributes
+      </action>
+      <action dev="mcrtchef" type="update">
+        MCRSearchServlet support mycore-xeditor submissions 
+      </action>
+      <action dev="mcrtchef" type="update">
+        Refactored XSL exception handling to give better error messages
+      </action>
+      <action dev="mcrfluet" type="add">
+        mycore-xeditor: added support for button[@type='submit'] (required for Bootstrap 3)
+      </action>
+      <action dev="mcrfluet" type="fix" date="2013-09-10" due-to="Thomas Scheffler">
+        mycore-xeditor: fails to start if root element has children defined
+        <fixes issue="653" />
+      </action>
+      <action dev="mcrtchef" type="update">
+        mycore-xeditor: add mapping to handle "*.xed" files as XEditor files
+      </action>
+      <action dev="mcrtchef" type="add">
+        mycore-xeditor: added items2option.xsl to transform list items from old editor framework to xeditor options
+      </action>
+      <action dev="mcrkrebs" type="fix" date="2013-08-26">
+        mycore-solr: get mods:dateIssued from parent for metadata view
+      </action>
+      <action dev="mcrtchef" type="update">
+        mycore-solr: adapted pagination to Bootstrap 3
+      </action>
+      <action dev="mcrtchef" type="fix" date="2013-08-19">
+        mycore-user2: fixed admin permission checking
+      </action>
+      <action dev="mcrtchef" type="add">
+        added support for servlet 3 programmatic login
+      </action>
+      <action dev="mcrmeich" type="update">
+        mycore-oai: make earliest date stamp field configurable (MCR.OAIDataProvider.*.EarliestDatestamp.fieldName)
+      </action>
+      <action dev="mcrshofm" type="fix" date="2013-08-14">
+        mycore-iview2: Fixed Prototyping in canvas.js
+      </action>
+      <action dev="mcrtchef" type="update">
+        mycore-solr: add MCRUserAgentFilter to SOLR Servlets to close sessions after robot requests
+      </action>
+      <action dev="mcrtchef" type="fix" date="2013-08-14">
+        mycore-solr: release MCRSession in MCRSolrIndexTask
+      </action>
+      <action dev="mcrtchef" type="update">
+        update dependencies
+      </action>
+      <action dev="mcrmeich" type="update">
+        mycore-classeditor: use font-awesome (instead of modern-pictograms) and css-sprites to reduce requests
+      </action>
+    </release>
     <release version="2013.08" date="2013-08-09" description="Codenamed &apos;Old Pascas&apos;">
       <action dev="mcrkrebs" type="fix" date="2013-08-27">
         mycore-mods: index and show dateIssued from book also in its corresponding chapters (merged from branch revision 27747-49)
