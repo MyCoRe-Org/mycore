@@ -32,10 +32,14 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * Eventhandler for linking MODS_OBJECTTYPE document to MyCoRe classifications.
@@ -56,7 +60,8 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
         }
         final Element metadata = obj.getMetadata().createXML();
         final HashSet<MCRCategoryID> categories = new HashSet<MCRCategoryID>();
-        final XPathExpression<Element> categoryPath = XPATH_FACTORY.compile(".//*[@authority or @authorityURI]", Filters.element());
+        final XPathExpression<Element> categoryPath = XPATH_FACTORY.compile(".//*[@authority or @authorityURI]",
+            Filters.element());
         final List<Element> nodes = categoryPath.evaluate(metadata);
         for (Element node : nodes) {
             final MCRCategoryID categoryID = MCRMODSClassificationSupport.getCategoryID(node);
@@ -79,7 +84,17 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected void handleObjectUpdated(final MCREvent evt, final MCRObject obj) {
+        if (!getSupportedObjectType().equals(obj.getId().getTypeId())) {
+            return;
+        }
         handleObjectCreated(evt, obj);
+        //may have to reindex children, if they inherit any information
+        for (MCRMetaLinkID childLinkID : obj.getStructure().getChildren()) {
+            MCRObjectID childID = childLinkID.getXLinkHrefID();
+            MCREvent childEvent = new MCREvent(childID.getTypeId(), MCREvent.INDEX_EVENT);
+            childEvent.put("object", MCRMetadataManager.retrieve(childID));
+            MCREventManager.instance().handleEvent(childEvent);
+        }
     }
 
     /* (non-Javadoc)
