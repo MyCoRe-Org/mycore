@@ -201,10 +201,12 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     @Override
     public void transform(MCRContent source, OutputStream out, MCRParameterCollector parameter) throws IOException {
+        MCRErrorListener el = null;
         try {
             LinkedList<TransformerHandler> transformHandlerList = getTransformHandlerList(parameter);
             XMLReader reader = getXMLReader(transformHandlerList);
             TransformerHandler lastTransformerHandler = transformHandlerList.getLast();
+            el = (MCRErrorListener) lastTransformerHandler.getTransformer().getErrorListener();
             StreamResult result = new StreamResult(out);
             lastTransformerHandler.setResult(result);
             reader.parse(source.getInputSource());
@@ -214,6 +216,12 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             throw new IOException(e);
         } catch (SAXException e) {
             throw new IOException(e);
+        } catch (RuntimeException e) {
+            if (el != null && e.getCause() == null && el.getExceptionThrown() != null) {
+                //typically if a RuntimeException has no cause, we can get the "real cause" from MCRErrorListener, yeah!!!
+                throw new IOException(el.getExceptionThrown());
+            }
+            throw e;
         }
     }
 
@@ -232,10 +240,12 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         throws TransformerConfigurationException, SAXException {
         checkTemplateUptodate();
         LinkedList<TransformerHandler> xslSteps = new LinkedList<TransformerHandler>();
+        //every transformhandler shares the same ErrorListener instance
+        MCRErrorListener errorListener = MCRErrorListener.getInstance();
         for (Templates template : templates) {
             TransformerHandler handler = tFactory.newTransformerHandler(template);
             parameterCollector.setParametersTo(handler.getTransformer());
-            handler.getTransformer().setErrorListener(MCRErrorListener.getInstance());
+            handler.getTransformer().setErrorListener(errorListener);
             if (TRACE_LISTENER_ENABLED) {
                 TransformerImpl transformer = (TransformerImpl) handler.getTransformer();
                 TraceManager traceManager = transformer.getTraceManager();

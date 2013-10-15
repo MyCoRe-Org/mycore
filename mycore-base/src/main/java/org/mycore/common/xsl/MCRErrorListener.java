@@ -37,10 +37,29 @@ import org.apache.xml.utils.WrappedRuntimeException;
 public class MCRErrorListener implements ErrorListener {
     private static Logger LOGGER = Logger.getLogger(MCRErrorListener.class);
 
-    private static MCRErrorListener instance = new MCRErrorListener();
+    private TransformerException exceptionThrown;
+
+    private String lastMessage;
 
     public static MCRErrorListener getInstance() {
-        return instance;
+        return new MCRErrorListener();
+    }
+
+    private MCRErrorListener() {
+        this.exceptionThrown = null;
+    }
+
+    public TransformerException getExceptionThrown() {
+        return exceptionThrown;
+    }
+
+    private boolean triggerException(TransformerException e) {
+        if (exceptionThrown != null) {
+            return false;
+        } else {
+            exceptionThrown = e;
+            return true;
+        }
     }
 
     /* (non-Javadoc)
@@ -52,7 +71,9 @@ public class MCRErrorListener implements ErrorListener {
         StackTraceElement[] stackTrace = exception.getStackTrace();
         if (stackTrace.length > 0 && stackTrace[0].getMethodName().equals("message")) {
             //org.apache.xalan.transformer.MsgMgr.message to print a message
-            LOGGER.info(getMyMessageAndLocation(exception));
+            String messageAndLocation = getMyMessageAndLocation(exception);
+            this.lastMessage = messageAndLocation;
+            LOGGER.info(messageAndLocation);
         } else {
             LOGGER.warn("Exception while XSL transformation:" + exception.getMessageAndLocation());
         }
@@ -64,7 +85,9 @@ public class MCRErrorListener implements ErrorListener {
     @Override
     public void error(TransformerException exception) throws TransformerException {
         exception = unwrapException(exception);
-        LOGGER.error("Exception while XSL transformation:" + exception.getMessageAndLocation());
+        if (triggerException(exception)) {
+            LOGGER.error("Exception while XSL transformation:" + exception.getMessageAndLocation());
+        }
         throw exception;
     }
 
@@ -74,7 +97,15 @@ public class MCRErrorListener implements ErrorListener {
     @Override
     public void fatalError(TransformerException exception) throws TransformerException {
         exception = unwrapException(exception);
-        LOGGER.fatal("Exception while XSL transformation.", exception);
+        StackTraceElement[] stackTrace = exception.getStackTrace();
+        if (stackTrace.length > 0 && stackTrace[0].getMethodName().equals("execute")
+            && stackTrace[0].getClassName().endsWith("ElemMessage")) {
+            LOGGER.debug("Original exception: ", exception);
+            exception = new TransformerException(lastMessage);
+        }
+        if (triggerException(exception)) {
+            LOGGER.fatal("Exception while XSL transformation.", exception);
+        }
         throw exception;
     }
 
