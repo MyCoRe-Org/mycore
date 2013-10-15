@@ -57,7 +57,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
 
     private static final String JOIN_PATTERN = "{!join from=returnId to=id}";
 
-    private static final String PHRASE_QUERY_PARAM = "phrase";
+    private static final String PHRASE_QUERY_PARAM = "solr.phrase";
 
     /** Parameters that can be used within a select request to solr*/
     static final List<String> RESERVED_PARAMETER_KEYS;
