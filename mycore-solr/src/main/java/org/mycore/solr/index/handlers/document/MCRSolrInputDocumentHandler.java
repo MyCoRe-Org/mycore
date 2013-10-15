@@ -28,7 +28,9 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.common.SolrInputDocument;
+import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
@@ -59,8 +61,9 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
     @Override
     public void index() throws IOException, SolrServerException {
         LOGGER.info("Sending " + document.getFieldValue("id") + " to SOLR...");
-        SolrServer server = getSolrServer();
-        server.add(document, getCommitWithin());
+        UpdateRequest updateRequest = getUpdateRequest(MCRSolrConstants.UPDATE_PATH);
+        updateRequest.add(document);
+        updateRequest.process(getSolrServer());
     }
 
     /* (non-Javadoc)

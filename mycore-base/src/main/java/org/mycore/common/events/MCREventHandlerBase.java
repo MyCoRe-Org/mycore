@@ -60,6 +60,8 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                     handleObjectDeleted(evt, obj);
                 } else if (evt.getEventType().equals(MCREvent.REPAIR_EVENT)) {
                     handleObjectRepaired(evt, obj);
+                } else if (evt.getEventType().equals(MCREvent.INDEX_EVENT)) {
+                    handleObjectIndex(evt, obj);
                 } else {
                     logger.warn("Can't find method for an object data handler for event type " + evt.getEventType());
                 }
@@ -339,6 +341,10 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
+        doNothing(evt, obj);
+    }
+
+    protected void handleObjectIndex(MCREvent evt, MCRObject obj) {
         doNothing(evt, obj);
     }
 

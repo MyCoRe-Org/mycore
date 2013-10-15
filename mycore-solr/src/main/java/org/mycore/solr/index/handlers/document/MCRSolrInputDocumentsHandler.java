@@ -32,8 +32,10 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
+import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
+import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.MCRSolrServerFactory;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
@@ -92,7 +94,9 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
         }
         UpdateResponse updateResponse;
         try {
-            updateResponse = server.add(documents, getCommitWithin());
+            UpdateRequest updateRequest = getUpdateRequest(MCRSolrConstants.UPDATE_PATH);
+            updateRequest.add(documents);
+            updateResponse = updateRequest.process(getSolrServer());
         } catch (Throwable e) {
             LOGGER.warn("Error while indexing document collection. Split and retry.");
             splitDocuments();
@@ -102,7 +106,8 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
             LOGGER.error("Error while indexing document collection. Split and retry: " + updateResponse.getResponse());
             splitDocuments();
         } else {
-            LOGGER.info("Sending " + totalCount + " documents was successful in " + updateResponse.getElapsedTime() + " ms.");
+            LOGGER.info("Sending " + totalCount + " documents was successful in " + updateResponse.getElapsedTime()
+                + " ms.");
         }
     }
 
