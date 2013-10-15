@@ -25,6 +25,8 @@
     <xalan.version>2.7.1</xalan.version>
     <jersey.version>1.17.1</jersey.version>
     <changelog.since>2013-08-09</changelog.since>
+    <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
+    <changes.version>2013.10</changes.version>
   </properties>
   <issueManagement>
     <system>sourceforge</system>
