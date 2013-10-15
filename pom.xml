@@ -1045,6 +1045,17 @@
       </roles>
     </developer>
     <developer>
+      <id>mcrmibue</id>
+      <name>Michel Büchner</name>
+      <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+      <email>michel.buechner (at) uni-weimar.de</email>
+      <organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>programmer</role>
+      </roles>
+    </developer>
+    <developer>
       <id>mcrmeich</id>
       <name>Matthias Eichner</name>
       <organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
