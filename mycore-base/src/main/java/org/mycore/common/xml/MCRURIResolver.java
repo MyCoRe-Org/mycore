@@ -130,15 +130,10 @@ public final class MCRURIResolver implements URIResolver {
 
     final static String SESSION_OBJECT_NAME = "URI_RESOLVER_DEBUG";
 
-    private MCRCache<String, byte[]> bytesCache;
-
     /**
      * Creates a new MCRURIResolver
      */
     private MCRURIResolver() {
-        MCRConfiguration config = MCRConfiguration.instance();
-        int cacheSize = config.getInt(CONFIG_PREFIX + "StaticFiles.CacheSize", 100);
-        bytesCache = new MCRCache<String, byte[]>(cacheSize, "URIResolver Resources");
         SUPPORTED_SCHEMES = Collections.unmodifiableMap(getResolverMapping());
     }
 
@@ -283,17 +278,17 @@ public final class MCRURIResolver implements URIResolver {
             }
         }
         if (!href.contains(":")) {
-            return tryResolveXSL(href);
+            return tryResolveXSL(href, base);
         }
 
-        String scheme = getScheme(href);
+        String scheme = getScheme(href, base);
 
         URIResolver uriResolver = SUPPORTED_SCHEMES.get(scheme);
         if (uriResolver != null) {
             return uriResolver.resolve(href, base);
         } else { // try to handle as URL, use default resolver for file:// and
             // http://
-            if (href.endsWith("/") && href.startsWith("file:")) {
+            if (href.endsWith("/") && scheme.equals("file")) {
                 //cannot stream directories
                 return null;
             }
@@ -303,11 +298,11 @@ public final class MCRURIResolver implements URIResolver {
         }
     }
 
-    private Source tryResolveXSL(String href) throws TransformerException {
+    private Source tryResolveXSL(String href, String base) throws TransformerException {
         if (href.endsWith(".xsl")) {
             final String uri = "resource:xsl/" + href;
             LOGGER.debug("Trying to resolve " + href + " from uri " + uri);
-            return SUPPORTED_SCHEMES.get("resource").resolve(uri, null);
+            return SUPPORTED_SCHEMES.get("resource").resolve(uri, base);
         }
         return null;
     }
@@ -346,10 +341,22 @@ public final class MCRURIResolver implements URIResolver {
      * 
      * @param uri
      *            the URI to parse
+     * @param base
+     *            if uri is relative, resolve scheme from base parameter
      * @return the protocol/scheme part before the ":"
      */
-    public String getScheme(String uri) {
-        return new StringTokenizer(uri, ":").nextToken();
+    public String getScheme(String uri, String base) {
+        StringTokenizer uriTokenizer = new StringTokenizer(uri, ":");
+        if (uriTokenizer.hasMoreTokens()) {
+            return uriTokenizer.nextToken();
+        }
+        if (base != null) {
+            uriTokenizer = new StringTokenizer(base, ":");
+            if (uriTokenizer.hasMoreTokens()) {
+                return uriTokenizer.nextToken();
+            }
+        }
+        return null;
     }
 
     URIResolver getResolver(String scheme) {
