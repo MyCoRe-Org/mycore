@@ -178,7 +178,7 @@ public class MCRXEditorTransformer {
         if (currentBinding != null)
             return new MCRXPathEvaluator(currentBinding);
         else
-            return new MCRXPathEvaluator(transformationParameters.getParameterMap(), null);
+            return new MCRXPathEvaluator(editorSession.getVariables(), null);
     }
 
     public String repeat(String xPath, int minRepeats, int maxRepeats) throws JDOMException, JaxenException {
