@@ -82,6 +82,7 @@ return declare("mycore.classification.Store", [Evented, _SettingsMixin], {
 					var index = this.restStore.indexAt(saveObject.item, saveObject.parent);
 					cleanedSaveObject.depthLevel = level;
 					cleanedSaveObject.index = index;
+					cleanedSaveObject.added = saveObject.item.added;
 				} else {
 					cleanedSaveObject.state = "delete";
 				}
@@ -91,8 +92,8 @@ return declare("mycore.classification.Store", [Evented, _SettingsMixin], {
 		xhr(this.settings.resourceURL + "save", {
 			method: "POST",
 			data : json.toJson(finalArray),
-			handleAs : "xml", // a possible error is returned as xml 
-			headers: {"Content-Type": "application/json; charset=utf-8"}
+			headers: {"Content-Type": "application/json; charset=utf-8"},
+			handleAs: "json"
 		}).then(lang.hitch(this, function() {
 			console.log("saving done");
 			this.saveArray = [];

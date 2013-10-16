@@ -227,9 +227,15 @@ public class MCRClassificationEditorResource {
             Collections.sort(saveList, new IndexComperator());
             for (JsonObject jsonObject : saveList) {
                 String status = getStatus(jsonObject);
+                boolean isAdded = isAdded(jsonObject);
                 SaveElement categ = getCateg(jsonObject);
                 MCRJSONCategory parsedCateg = parseJson(categ.getJson());
                 if ("update".equals(status)) {
+                    MCRCategoryID mcrCategoryID = parsedCateg.getId();
+                    if (isAdded && MCRCategoryDAOFactory.getInstance().exist(mcrCategoryID)) {
+                        // an added category already exist -> throw conflict error
+                        return Response.status(Status.CONFLICT).entity(buildJsonError("duplicateID", mcrCategoryID)).build();
+                    }
                     updateCateg(parsedCateg);
                 } else if ("delete".equals(status)) {
                     deleteCateg(categ.getJson());
@@ -249,7 +255,7 @@ public class MCRClassificationEditorResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_HTML)
     public Response importClassification(@FormDataParam("classificationFile") InputStream uploadedInputStream,
-        @FormDataParam("classificationFile") FormDataContentDisposition fileDetail) {
+            @FormDataParam("classificationFile") FormDataContentDisposition fileDetail) {
         MCRCategory classification;
         try {
             Document jdom = MCRXMLParserFactory.getParser().parseXML(new MCRStreamContent(uploadedInputStream));
@@ -263,7 +269,7 @@ public class MCRClassificationEditorResource {
             }
             CATEGORY_DAO.replaceCategory(classification);
         } else {
-            if (!MCRAccessManager.checkPermission(MCRNewClassificationPermission.PERMISSION)){
+            if (!MCRAccessManager.checkPermission(MCRNewClassificationPermission.PERMISSION)) {
                 return Response.status(Status.UNAUTHORIZED).build();
             }
             CATEGORY_DAO.addCategory(null, classification);
@@ -322,6 +328,11 @@ public class MCRClassificationEditorResource {
         return jsonElement.getAsJsonObject().get("state").getAsString();
     }
 
+    private boolean isAdded(JsonElement jsonElement) {
+        JsonElement added = jsonElement.getAsJsonObject().get("added");
+        return added == null ? false : jsonElement.getAsJsonObject().get("added").getAsBoolean();
+    }
+
     private MCRJSONCategory parseJson(String json) {
         Gson gson = MCRJSONManager.instance().createGson();
         MCRJSONCategory category = gson.fromJson(json, MCRJSONCategory.class);
@@ -345,6 +356,15 @@ public class MCRClassificationEditorResource {
         } else {
             CATEGORY_DAO.addCategory(newParentID, categ.asMCRImpl());
         }
+    }
+
+    protected String buildJsonError(String errorType, MCRCategoryID mcrCategoryID) {
+        Gson gson = MCRJSONManager.instance().createGson();
+        JsonObject error = new JsonObject();
+        error.addProperty("type", errorType);
+        error.addProperty("rootid", mcrCategoryID.getRootID());
+        error.addProperty("categid", mcrCategoryID.getID());
+        return gson.toJson(error);
     }
 
     private static class SaveElement {

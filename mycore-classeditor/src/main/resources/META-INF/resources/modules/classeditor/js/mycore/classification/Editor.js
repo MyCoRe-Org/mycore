@@ -10,6 +10,7 @@ define([
 	"dojo/query",
 	"dojo/_base/lang", // hitch, clone
 	"dojo/dom-construct",
+	"dojo/_base/json",
 	"mycore/common/I18nManager",
 	"dijit/Toolbar",
 	"dijit/layout/ContentPane",
@@ -21,7 +22,7 @@ define([
 	"mycore/classification/TreePane",
 	"mycore/common/I18nStore",
 	"mycore/classification/SettingsDialog"
-], function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _SettingsMixin, template, on, dom, query, lang, domConstruct, i18n) {
+], function(declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, _SettingsMixin, template, on, dom, query, lang, domConstruct, json, i18n) {
 
 /**
  * Create a new instance of the classification editor.
@@ -203,16 +204,25 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 	},
 
 	onStoreSaveError: function(error) {
+		var xhr = error.response.xhr;
+		var status = xhr.status;
+		var responseText = xhr.responseText;
+		if(status == 401) {
+	        alert(i18n.getFromCache("component.classeditor.save.nopermission"));
+	    } else if(status == 409) {
+	    	var responseAsJSON = json.fromJson(responseText);
+	    	if(responseAsJSON.type == "duplicateID") {
+	    		var msg = i18n.getFromCache("component.classeditor.save.duplicateID");
+	    		alert(msg + ": ClassificationID: " + responseAsJSON.rootid + "; CategoryID: " + responseAsJSON.categid);
+	    	}
+	    } else {
+	    	alert(i18n.getFromCache("component.classeditor.save.generalerror") + ": " + xhr.statusText);
+	    }
 		console.log(error);
 	},
 
 	onStoreSaveEvent: function(evt) {
-		var xhr = evt.xhr;
-		if(xhr.status == 401) {
-	        alert(i18n.getFromCache("component.classeditor.save.nopermission"));
-	    } else{
-	        alert(i18n.getFromCache("component.classeditor.save.generalerror") + ": " + xhr.statusText);
-	    }
+		// nothing todo
 	},
 
 	onRootLoadError: function(error) {
