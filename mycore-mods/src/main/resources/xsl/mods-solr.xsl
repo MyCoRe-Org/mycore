@@ -107,7 +107,7 @@
       </xsl:if>
     </xsl:for-each>
     <!-- add allMeta from parent -->
-    <xsl:for-each select="mods:relatedItem[@type=host]">
+    <xsl:for-each select="mods:relatedItem[@type='host']">
       <xsl:for-each select="mods:titleInfo/descendant-or-self::*[text()]">
         <field name="mods.hostTitle">
           <xsl:value-of select="text()" />
