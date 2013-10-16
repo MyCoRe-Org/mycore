@@ -412,7 +412,6 @@
               <hidden var="@authority" default="marcrelator" />
               <cell>
                 <list type="dropdown" default="aut" id="mods.person.list" style="width:120px;">
-                  <include ref="pleaseSelect" />
                   <include uri="classification:editor:-1:children:marcrelator" cacheable="false" />
                   <condition id="mods.person.cond" required="true">
                     <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
@@ -437,7 +436,6 @@
               <hidden var="@authority" default="marcrelator" />
               <cell>
                 <list type="dropdown" default="pbl" id="mods.person.publisher.list" style="width:140px;">
-                  <include ref="pleaseSelect" />
                   <include uri="classification:editor:-1:children:marcrelator" cacheable="false" />
                 </list>
               </cell>
@@ -501,8 +499,7 @@
             <panel>
               <hidden var="@authority" default="marcrelator" />
               <cell>
-                <list type="dropdown" default="aut" id="mods.corporation.list" style="width:140px;">
-                  <include ref="pleaseSelect" />
+                <list type="dropdown" default="aut" id="mods.corporation.list" style="width:120px;">
                   <include uri="classification:editor:-1:children:marcrelator" cacheable="false" />
                 </list>
               </cell>
