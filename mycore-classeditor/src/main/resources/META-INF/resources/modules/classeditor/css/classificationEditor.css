@@ -19,6 +19,16 @@
 	height: 22px;
 	background-position: -21px center;
 }
+
+/****************************************
+* Overwrite some bootstrap css
+****************************************/
+.classeditor *, *:before, *:after {
+	-webkit-box-sizing: content-box;
+	-moz-box-sizing: content-box;
+	box-sizing: content-box;
+}
+
 /****************************************
 * general settings
 ****************************************/
