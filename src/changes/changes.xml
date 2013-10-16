@@ -5,7 +5,10 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2013.10" date="2013-10-00" descitption="Codenamed &apos;Between the Sheets&apos;">
+    <release version="2013.10" date="2013-10-00" description="Codenamed &apos;Between the Sheets&apos;">
+      <action dev="mcrtchef" type="update">
+        MCRURIResolver resolves scheme from 'base' if 'uri' is relative 
+      </action>
       <action dev="mcrmeich" type="fix" due-to="Thomas Scheffler" date="2013-10-11">
         mycore-classeditor: fixed broken tree if new CategoryID starts with an old CategoryID
       </action>    
