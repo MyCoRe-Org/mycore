@@ -123,13 +123,6 @@
           </xsl:if>
         </xsl:for-each>
       </xsl:for-each>
-      <xsl:for-each select="mods:name">
-        <field name="mods.hostName">
-          <xsl:for-each select="mods:displayForm | mods:namePart | text()">
-            <xsl:value-of select="concat(' ',.)" />
-          </xsl:for-each>
-        </field>
-      </xsl:for-each>
       <xsl:for-each select="mods:identifier">
         <field name="mods.hostIdentifier">
           <xsl:value-of select="text()" />
