@@ -158,6 +158,16 @@ public class MCRXEditorTransformer {
         return currentBinding.hasValue(value);
     }
 
+    private boolean withinSelectElement = false;
+
+    public void toggleWithinSelectElement() {
+        withinSelectElement = !withinSelectElement;
+    }
+
+    public boolean isWithinSelectElement() {
+        return withinSelectElement;
+    }
+
     public String replaceXPaths(String text) {
         return getXPathEvaluator().replaceXPaths(text, false);
     }

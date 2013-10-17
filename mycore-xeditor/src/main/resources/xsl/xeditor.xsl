@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<xsl:stylesheet version="1.0" 
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:xed="http://www.mycore.de/xeditor"
-  xmlns:xalan="http://xml.apache.org/xalan"
-  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
-  xmlns:transformer="xalan://org.mycore.frontend.xeditor.MCRXEditorTransformer"
-  xmlns:includer="xalan://org.mycore.frontend.xeditor.MCRIncludeHandler"
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xed="http://www.mycore.de/xeditor"
+  xmlns:xalan="http://xml.apache.org/xalan" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
+  xmlns:transformer="xalan://org.mycore.frontend.xeditor.MCRXEditorTransformer" xmlns:includer="xalan://org.mycore.frontend.xeditor.MCRIncludeHandler"
   exclude-result-prefixes="xsl xed xalan transformer includer i18n">
 
   <xsl:strip-space elements="xed:*" />
@@ -37,7 +33,7 @@
   </xsl:template>
 
   <!-- ========== register additional namespaces ========== -->
-  
+
   <xsl:template name="registerAdditionalNamespaces">
     <xsl:for-each select="namespace::*">
       <xsl:value-of select="transformer:addNamespace($transformer,name(),.)" />
@@ -65,7 +61,7 @@
   </xsl:template>
 
   <!-- ========== <xed:post-processor xsl="" /> ========== -->
-  
+
   <xsl:template match="xed:post-processor" mode="xeditor">
     <xsl:value-of select="transformer:setPostProcessorXSL($transformer,@xsl)" />
   </xsl:template>
@@ -75,7 +71,8 @@
   <xsl:template match="xed:include[@uri and @ref]" mode="xeditor">
     <xsl:variable name="uri" select="transformer:replaceParameters($transformer,@uri)" />
     <xsl:variable name="ref" select="transformer:replaceParameters($transformer,@ref)" />
-    <xsl:apply-templates select="includer:resolve($includer,@uri,@static)/descendant::*[@id=$ref]" mode="included" />
+    <xsl:apply-templates select="includer:resolve($includer,@uri,@static)/descendant::*[@id=$ref]"
+      mode="included" />
   </xsl:template>
 
   <xsl:template match="xed:include[@uri and not(@ref)]" mode="xeditor">
@@ -134,7 +131,8 @@
 
   <!-- ========== <input|button xed:target="" xed:href="" /> ========== -->
 
-  <xsl:template match="input[contains('submit image',@type)][@xed:target]|button[@type='submit'][@xed:target]" mode="add-attributes">
+  <xsl:template match="input[contains('submit image',@type)][@xed:target]|button[@type='submit'][@xed:target]"
+    mode="add-attributes">
     <xsl:attribute name="name">
       <xsl:value-of select="concat('_xed_submit_',@xed:target)" />
       <xsl:choose>
@@ -170,7 +168,16 @@
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="option[ancestor::select]" mode="add-attributes">
+  <xsl:template match="select" mode="xeditor">
+    <xsl:value-of select="transformer:toggleWithinSelectElement($transformer)" />
+    <xsl:copy>
+      <xsl:apply-templates select="." mode="add-attributes" />
+      <xsl:apply-templates select="@*|text()|*" mode="xeditor" />
+    </xsl:copy>
+    <xsl:value-of select="transformer:toggleWithinSelectElement($transformer)" />
+  </xsl:template>
+
+  <xsl:template match="option[transformer:isWithinSelectElement($transformer)]" mode="add-attributes">
     <xsl:choose>
       <xsl:when test="@value and (string-length(@value) &gt; 0)">
         <xsl:if test="transformer:hasValue($transformer,@value)">
@@ -205,7 +212,7 @@
       <xsl:apply-templates select="$xed_repeat/node()" mode="xeditor" />
       <xsl:value-of select="transformer:unbind($transformer)" />
     </xsl:for-each>
-    <xsl:value-of select="transformer:unbind($transformer)" />  
+    <xsl:value-of select="transformer:unbind($transformer)" />
   </xsl:template>
 
   <!-- ========== <xed:controls /> ========== -->
@@ -216,7 +223,9 @@
     <xsl:variable name="max" select="transformer:getMaxRepeats($transformer)" />
 
     <xsl:variable name="controls">
-      <xsl:if test="string-length(.) = 0">insert remove up down</xsl:if>
+      <xsl:if test="string-length(.) = 0">
+        insert remove up down
+      </xsl:if>
       <xsl:value-of select="." />
     </xsl:variable>
 
