@@ -8,8 +8,8 @@
   <xsl:template match="/">
     <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       elementFormDefault="qualified" xmlns:xlink="http://www.w3.org/1999/xlink">
-      <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="xlink-2008-06.xsd" />
-      <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml-2001.xsd" />
+      <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="http://www.w3.org/XML/2008/06/xlink.xsd" />
+      <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/xml.xsd" />
       <xs:include schemaLocation="mcrcommon-datamodel.xsd" />
       <xsl:apply-templates select="objecttype/xsd" />
       <xsl:apply-templates mode="structure" />

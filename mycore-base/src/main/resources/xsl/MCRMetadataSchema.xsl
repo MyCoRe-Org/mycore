@@ -26,8 +26,8 @@
     <xsd:schema xmlns:xsd='http://www.w3.org/2001/XMLSchema' xmlns:xml='http://www.w3.org/XML/1998/namespace' xmlns:xlink='http://www.w3.org/1999/xlink'
       elementFormDefault="qualified">
 
-      <xsd:import namespace='http://www.w3.org/XML/1998/namespace' schemaLocation='xml-2001.xsd' />
-      <xsd:import namespace="http://www.w3.org/1999/xlink" schemaLocation="xlink-2008-06.xsd" />
+      <xsd:import namespace='http://www.w3.org/XML/1998/namespace' schemaLocation='http://www.w3.org/2001/xml.xsd' />
+      <xsd:import namespace="http://www.w3.org/1999/xlink" schemaLocation="http://www.w3.org/XML/2008/06/xlink.xsd" />
 
       <xsl:call-template name="mcrtypedefinitioncore" />
       <xsl:call-template name="mcrtypedefinition" />
