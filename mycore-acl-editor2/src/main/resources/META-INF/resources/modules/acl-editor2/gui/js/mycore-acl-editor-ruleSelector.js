@@ -3,7 +3,7 @@ var RuleSelector = function(){
 	var selector = $('<select/>',
 		    {
 		        size: 	'1',
-		        class:	'input-xlarge access-rule'
+		        class:	'input-xlarge acle2-access-rule'
 		    });
 	
 	function formatSelect(item) {
@@ -32,7 +32,7 @@ var RuleSelector = function(){
 		},
 		update:	function() {
 			var cla = this;
-			$(".access-rule:not(.select2-container)").each(function() {
+			$(".acle2-access-rule:not(.select2-container)").each(function() {
 				var ruleID = $(this).select2("val") ;
 				$(this).select2("destroy");
 				cla.append(ruleID, $(this).parent());
@@ -41,9 +41,9 @@ var RuleSelector = function(){
 		},
 		append: function(ruleID, elem) {
 			var newSelector = selector.clone();
-			if (ruleID == "" || elem.hasClass("new-access-rule")){
+			if (ruleID == "" || elem.hasClass("acle2-new-access-rule")){
 				newSelector.prepend("<option value='' title='' selected>" + i18nKeys["ACLE.select.select"] + "</option>");
-				newSelector.append("<option class='new-access-rule-option' value='new' title=''>" + i18nKeys["ACLE.select.newRule"] + "</option>");
+				newSelector.append("<option class='acle2-new-access-rule-option' value='new' title=''>" + i18nKeys["ACLE.select.newRule"] + "</option>");
 			}
 			newSelector.val(ruleID);
 			newSelector.appendTo(elem);

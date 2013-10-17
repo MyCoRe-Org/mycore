@@ -6,38 +6,38 @@ var ACLEditorObjectID = function(){
 	return {
 		init: function(i18n){
 			i18nKeys = i18n;
-			$("body").on("change", "#access-input-rule", function() {
+			$("body").on("change", "#acle2-access-input-rule", function() {
 				if($(this).children("option:selected").val() == "new"){
-					$('#lightbox-new-rule').modal('show');
+					$('#acle2-lightbox-new-rule').modal('show');
 				}
 			});
-			$("body").on("click", "#new-rule-add", function() {
-				$("#lightbox-new-rule-alert-area").removeClass("in");
-				$("#lightbox-rule-detail-table > .form-group.has-error").removeClass("form-group has-error");
-				if ($(".new-rule-text").val() != ""){
-					addRule($("#new-rule-desc").val(), $(".new-rule-text").val())
-					$('#lightbox-new-rule').modal('hide');
-					$("#new-rule-desc").val("");
-					$(".new-rule-text").val("");
+			$("body").on("click", "#acle2-new-rule-add", function() {
+				$("#acle2-lightbox-new-rule-alert-area").removeClass("in");
+				$("#acle2-lightbox-rule-detail-table > .form-group.has-error").removeClass("form-group has-error");
+				if ($(".acle2-new-rule-text").val() != ""){
+					addRule($("#acle2-new-rule-desc").val(), $(".acle2-new-rule-text").val())
+					$('#acle2-lightbox-new-rule').modal('hide');
+					$("#acle2-new-rule-desc").val("");
+					$(".acle2-new-rule-text").val("");
 				}
 				else{
-					$("#lightbox-new-rule-alert-area").addClass("in");
-					$(".new-rule-text").parent().addClass("form-group has-error");
+					$("#acle2-lightbox-new-rule-alert-area").addClass("in");
+					$(".acle2-new-rule-text").parent().addClass("form-group has-error");
 				}
 			});
 			
-			$("body").on("click", ".new-rule-cancel", function() {
-				$("#new-access-rule").select2("val", "");
-				$("#lightbox-new-rule-alert-area").removeClass("in");
-				$("#lightbox-rule-detail-table > .form-group.has-error").removeClass("form-group has-error");
-				$("#new-rule-desc").val("");
-				$(".new-rule-text").val("");
-				$("#access-input-rule").select2("val", "");
+			$("body").on("click", ".acle2-new-rule-cancel", function() {
+				$("#acle2-new-access-rule").select2("val", "");
+				$("#acle2-lightbox-new-rule-alert-area").removeClass("in");
+				$("#acle2-lightbox-rule-detail-table > .form-group.has-error").removeClass("form-group has-error");
+				$("#acle2-new-rule-desc").val("");
+				$(".acle2-new-rule-text").val("");
+				$("#acle2-access-input-rule").select2("val", "");
 			});
 			
-			$("body").on("click", "#objectid-save", function() {
-				$("#table-new-access > .form-group.has-error").removeClass("form-group has-error");
-				var accessRule = $("#access-input-rule").val();
+			$("body").on("click", "#acle2-objectid-save", function() {
+				$("#acle2-table-new-access > .form-group.has-error").removeClass("form-group has-error");
+				var accessRule = $("#acle2-access-input-rule").val();
 				
 				if(accessRule != "" && accessRule != "new"){
 					if(qpara["cmd"] == "add"){
@@ -59,12 +59,12 @@ var ACLEditorObjectID = function(){
 				else{
 					showAlert(i18nKeys["ACLE.alert.access.fields"]);
 					if (accessRule == "" || accessRule == "new"){
-						$("#new-access-rule").parent().addClass("form-group has-error");
+						$("#acle2-new-access-rule").parent().addClass("form-group has-error");
 					}
 				}
 			});
 			
-			$("body").on("click", "#objectid-delete", function() {
+			$("body").on("click", "#acle2-objectid-delete", function() {
 				var json = {
 						  "access": [],
 						};
@@ -72,25 +72,24 @@ var ACLEditorObjectID = function(){
 				removeAccess(json); 
 			});
 			
-			$("body").on("click", "#objectid-cancel", function() {
+			$("body").on("click", "#acle2-objectid-cancel", function() {
 				window.location.replace(decodeURIComponent(qpara["redir"]));
 			});									
 			
 			readQueryParameter();
 			
 			if (qpara["cmd"] == "add" || qpara["cmd"] == "edit" ){
-				console.log("add/edit");
-				$("#access-id-text").html(decodeURIComponent(qpara["objId"]));
-				$("#access-pool-text").html(qpara["perm"]);
-				$("#objectid-save").show();
+				$("#acle2-access-id-text").html(decodeURIComponent(qpara["objId"]));
+				$("#acle2-access-pool-text").html(qpara["perm"]);
+				$("#acle2-objectid-save").show();
 				getObjectID(decodeURIComponent(qpara["objId"]), qpara["perm"]);
-				$("#loading").show();
+				$("#acle2-loading").show();
 			}
 			else{
 				if(qpara["cmd"] == "delete"){
-					$("#access-delete").append('<pre>'+ i18nKeys["ACLE.labels.access.delete.1"] + decodeURIComponent(qpara["objId"]) + i18nKeys["ACLE.labels.access.delete.2"] + qpara["perm"] + i18nKeys["ACLE.labels.access.delete.3"] + '</pre>');
-					$("#access-delete").show();
-					$("#objectid-delete").show();
+					$("#acle2-access-delete").append('<pre>'+ i18nKeys["ACLE.labels.access.delete.1"] + decodeURIComponent(qpara["objId"]) + i18nKeys["ACLE.labels.access.delete.2"] + qpara["perm"] + i18nKeys["ACLE.labels.access.delete.3"] + '</pre>');
+					$("#acle2-access-delete").show();
+					$("#acle2-objectid-delete").show();
 				}
 			}
 		}
@@ -106,18 +105,18 @@ var ACLEditorObjectID = function(){
 			success: function(data) {
 				if(data.accessRuleID != "null"){
 					buildRuleSelector(data, data.accessRuleID);
-					$("#loading").hide();
-					$("#access-text").show();
+					$("#acle2-loading").hide();
+					$("#acle2-access-text").show();
 				}
 				else{
 					buildRuleSelector(data, "");
-					$("#loading").hide();
-					$("#access-text").show();
+					$("#acle2-loading").hide();
+					$("#acle2-access-text").show();
 				}
 			},
 			error: function(error) {
 				showAlert(i18nKeys["ACLE.alert.access.edit.error"]);
-				$("#loading").hide();
+				$("#acle2-loading").hide();
 			}
 		});
 	}
@@ -133,11 +132,11 @@ var ACLEditorObjectID = function(){
 				200: function(ruleID) {
 					if(ruleID != ""){
 						$(".select2-container").select2("destroy");
-						$("#access-input-rule-option").remove();
-						$("#access-input-rule").append("<option class='access-rule-option' title='" + ruleText + "' value='" + ruleID + "'>" +  ruleDesc + " (" + ruleID + ")</option>");
-						$("#access-input-rule").append("<option id='new-access-rule-option' value='new' title=''>" + i18nKeys["ACLE.select.newRule"] + "</option>");
-						$("#access-input-rule").val(ruleID);
-						$("#access-input-rule").select2({
+						$("#acle2-access-input-rule-option").remove();
+						$("#acle2-access-input-rule").append("<option class='acle2-access-rule-option' title='" + ruleText + "' value='" + ruleID + "'>" +  ruleDesc + " (" + ruleID + ")</option>");
+						$("#acle2-access-input-rule").append("<option value='new' title=''>" + i18nKeys["ACLE.select.newRule"] + "</option>");
+						$("#acle2-access-input-rule").val(ruleID);
+						$("#acle2-access-input-rule").select2({
 							matcher: function(term, text, opt) {
 								return text.toUpperCase().indexOf(term.toUpperCase())>=0
 									|| opt.attr("title").toUpperCase().indexOf(term.toUpperCase())>=0;
@@ -148,21 +147,18 @@ var ACLEditorObjectID = function(){
 					}
 					else{
 						showAlert(i18nKeys["ACLE.alert.rule.add.error"]);
-						$("#access-input-rule").select2("val", "");
+						$("#acle2-access-input-rule").select2("val", "");
 					}
 				},
 				500: function(error) {
 					showAlert(i18nKeys["ACLE.alert.rule.add.error"]);
-					$("#access-input-rule").select2("val", "");
+					$("#acle2-access-input-rule").select2("val", "");
 				}
 			}
 		});
 	}
 		
 	function addAccess(accessID, accessPool, rule){
-		console.log(accessID);
-		console.log(accessPool);
-		console.log(rule);
 		$.ajax({
 			url: "/rsc/ACLE",
 			type: "POST",
@@ -220,12 +216,12 @@ var ACLEditorObjectID = function(){
 	}
 	
 	function buildRuleSelector(data, select) {
-		var ruleSelector = $("#access-input-rule");
+		var ruleSelector = $("#acle2-access-input-rule");
 		$.each(data.rules, function(i, l) {
-			ruleSelector.append("<option class='access-rule-option' title='" + l.ruleSt + "' value='" + l.ruleID + "'>" +  l.desc + " (" + l.ruleID + ")</option>");
+			ruleSelector.append("<option class='acle2-access-rule-option' title='" + l.ruleSt + "' value='" + l.ruleID + "'>" +  l.desc + " (" + l.ruleID + ")</option>");
 		});
 		ruleSelector.prepend("<option value='' title='' selected>" + i18nKeys["ACLE.select.select"] + "</option>");
-		ruleSelector.append("<option id='access-input-rule-option' value='new' title=''>" + i18nKeys["ACLE.select.newRule"] + "</option>");
+		ruleSelector.append("<option id='acle2-access-input-rule-option' value='new' title=''>" + i18nKeys["ACLE.select.newRule"] + "</option>");
 		ruleSelector.val(select);
 		ruleSelector.select2({
 			matcher: function(term, text, opt) {
@@ -257,25 +253,25 @@ var ACLEditorObjectID = function(){
 	}
 				
 	function showAlert(text, success) {
-		$('#alert-area').removeClass("in");
-		$("#alert-area").removeClass("alert-success");
-		$("#alert-area").removeClass("alert-danger");
+		$('#acle2-alert-area').removeClass("in");
+		$("#acle2-alert-area").removeClass("alert-success");
+		$("#acle2-alert-area").removeClass("alert-danger");
 		if (timeOutID != null){
 			window.clearTimeout(timeOutID);
 		}
-		$("#alert-area").html(text);
+		$("#acle2-alert-area").html(text);
 		if (success){
-			$("#alert-area").addClass("alert-success");
-			$("#alert-area").addClass("in");
+			$("#acle2-alert-area").addClass("alert-success");
+			$("#acle2-alert-area").addClass("in");
 		}
 		else{
-			$("#alert-area").addClass("alert-danger");
-			$("#alert-area").addClass("in");
+			$("#acle2-alert-area").addClass("alert-danger");
+			$("#acle2-alert-area").addClass("in");
 		}
 		timeOutID = window.setTimeout(function() {
-				$('#alert-area').removeClass("in")
-				$("#alert-area").removeClass("alert-success");
-				$("#alert-area").removeClass("alert-danger");
+				$('#acle2-alert-area').removeClass("in")
+				$("#acle2-alert-area").removeClass("alert-success");
+				$("#acle2-alert-area").removeClass("alert-danger");
 			}, 5000);
 	}
 }
@@ -286,7 +282,6 @@ $(document).ready(function() {
 	if (!$.isFunction(jQuery.fn.modal)){
     	$.getScript('/rsc/ACLE/gui/js/bootstrap.min.js')
     		.done(function() {
-    			console.log("bootstrap.min.js loaded");
     			jQuery.getJSON("/servlets/MCRLocaleServlet/" + lang + "/ACLE.*", function(data) { 
     				aclEditorObjectIDInstance.init(data);
     			});

@@ -3,7 +3,7 @@ var RuleList = function(){
 	
 	function canDelete(ruleID){
 		var result = true;
-		$(".access-rule-parent > .access-rule option:selected").each(function() {
+		$(".acle2-access-rule-parent > .acle2-access-rule option:selected").each(function() {
 			if ($(this).attr("value") == ruleID){
 				result = false;
 				return false;
@@ -19,70 +19,70 @@ var RuleList = function(){
 			$.each(rules, function(i, l) {
 				cla.add(l.ruleID, l.desc, l.ruleSt);
 			});
-			var li = $("<li class='rule-list-entry rule-selected'></li>");
+			var li = $("<li class='acle2-rule-list-entry acle2-rule-selected'></li>");
 			li.attr("ruleID", "");
 			li.attr("ruleDesc", "");
 			li.attr("ruleText", "");
 			li.text(i18nKeys["ACLE.list.rule.newRule"]);
-			li.prependTo("#rule-list");
-			$("#rule-detail-ruleID").hide();
-			$("#rule-detail-ruleID").prev().hide();
-			$("#button-delete-rule").hide();
-			$("#button-filter-rule").hide();
+			li.prependTo("#acle2-rule-list");
+			$("#acle2-rule-detail-ruleID").hide();
+			$("#acle2-rule-detail-ruleID").prev().hide();
+			$("#acle2-button-delete-rule").hide();
+			$("#acle2-button-filter-rule").hide();
 		},
 		add: 	function(ruleID, ruleDesc, ruleText){
-			var li = $("<li class='rule-list-entry'></li>");
+			var li = $("<li class='acle2-rule-list-entry'></li>");
 			li.attr("ruleID", ruleID);
 			li.attr("ruleDesc", ruleDesc);
 			li.attr("ruleText", ruleText);
 			li.text(ruleDesc + " (" + ruleID + ")");
 			if(canDelete(ruleID)){
-				li.addClass("canDelete");
+				li.addClass("acle2-canDelete");
 			}
-			li.appendTo("#rule-list");
+			li.appendTo("#acle2-rule-list");
 		},
 		remove:	function(ruleID) {
-			$('#rule-list li[ruleid="' + ruleID + '"]').remove();
+			$('#acle2-rule-list li[ruleid="' + ruleID + '"]').remove();
 		},
 		edit: function(ruleID, ruleDesc, ruleText) {			
-			$('.rule-list-entry[ruleid="' + ruleID + '"]').attr("ruledesc", ruleDesc);
-			$('.rule-list-entry[ruleid="' + ruleID + '"]').attr("ruletext", ruleText);
-			$('.rule-list-entry[ruleid="' + ruleID + '"]').html(ruleDesc + " (" + ruleID + ")");
+			$('.acle2-rule-list-entry[ruleid="' + ruleID + '"]').attr("ruledesc", ruleDesc);
+			$('.acle2-rule-list-entry[ruleid="' + ruleID + '"]').attr("ruletext", ruleText);
+			$('.acle2-rule-list-entry[ruleid="' + ruleID + '"]').html(ruleDesc + " (" + ruleID + ")");
 		},
 		select: function(ruleID) {
-			$("#rule-detail-table > .control-group.error").removeClass("control-group error");
-			$(".faded").removeClass("faded");
-			var entry = $('#rule-list li[ruleid="' + ruleID + '"]')
+			$("#acle2-rule-detail-table > .control-group.error").removeClass("control-group error");
+			$(".acle2-faded").removeClass("acle2-faded");
+			var entry = $('#acle2-rule-list li[ruleid="' + ruleID + '"]')
 			if (ruleID != ""){
-				$("#rule-detail-ruleID").show();
-				$("#rule-detail-ruleID").prev().show();
+				$("#acle2-rule-detail-ruleID").show();
+				$("#acle2-rule-detail-ruleID").prev().show();
 				if (canDelete(ruleID)){
-					$("#button-filter-rule").addClass("faded");
+					$("#acle2-button-filter-rule").addClass("acle2-faded");
 				}
 				else{
-					$("#button-delete-rule").addClass("faded");
+					$("#acle2-button-delete-rule").addClass("acle2-faded");
 				}
-				$("#button-delete-rule").show();
-				$("#button-filter-rule").show();
+				$("#acle2-button-delete-rule").show();
+				$("#acle2-button-filter-rule").show();
 			}
 			else{
-				$("#rule-detail-ruleID").hide();
-				$("#rule-detail-ruleID").prev().hide();
-				$("#button-delete-rule").hide();
-				$("#button-filter-rule").hide();
+				$("#acle2-rule-detail-ruleID").hide();
+				$("#acle2-rule-detail-ruleID").prev().hide();
+				$("#acle2-button-delete-rule").hide();
+				$("#acle2-button-filter-rule").hide();
 			}
-			$("#rule-detail-ruleID").html(ruleID);
-			$("#rule-detail-ruleDesc").val(entry.attr("ruledesc"));
-			$(".rule-detail-ruleText").val(entry.attr("ruletext"));
-			$(".rule-selected").removeClass("rule-selected");
-			entry.addClass("rule-selected");
+			$("#acle2-rule-detail-ruleID").html(ruleID);
+			$("#acle2-rule-detail-ruleDesc").val(entry.attr("ruledesc"));
+			$(".acle2-rule-detail-ruleText").val(entry.attr("ruletext"));
+			$(".acle2-rule-selected").removeClass("acle2-rule-selected");
+			entry.addClass("acle2-rule-selected");
 		},
 		updateCanDelete: function() {
-			$(".rule-list-entry").removeClass("canDelete");
-			$(".rule-list-entry").each(function(i) {
+			$(".acle2-rule-list-entry").removeClass("acle2-canDelete");
+			$(".acle2-rule-list-entry").each(function(i) {
 				var ruleID = $(this).attr("ruleID");
 				if (canDelete(ruleID) && ruleID != ""){
-					$(this).addClass("canDelete");
+					$(this).addClass("acle2-canDelete");
 				}
 			});
 		}
