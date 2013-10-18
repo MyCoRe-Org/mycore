@@ -38,6 +38,7 @@ import org.mycore.common.content.MCRStreamContent;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRContentStore;
 import org.mycore.datamodel.ifs.MCRFileReader;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * Implements the MCRContentStore interface to store the content of
@@ -119,22 +120,20 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         LOGGER.info("Configured " + property + "=" + value);
     }
 
-    private int getSlotID(MCRFileReader fr) {
-        String ownerID = fr.getOwnerID();
+    private int getSlotID(String ownerID) {
         int pos = ownerID.lastIndexOf("_") + 1;
         return Integer.parseInt(ownerID.substring(pos));
     }
 
-    private String getBase(MCRFileReader fr) {
-        String ownerID = fr.getOwnerID();
+    private String getBase(String ownerID) {
         int pos = ownerID.lastIndexOf("_");
         return ownerID.substring(0, pos);
     }
 
     @Override
     protected boolean exists(MCRFileReader fr) {
-        int slotID = getSlotID(fr);
-        String base = getBase(fr);
+        int slotID = getSlotID(fr.getOwnerID());
+        String base = getBase(fr.getOwnerID());
         MCRFileStore store = getStore(base);
 
         try {
@@ -151,10 +150,23 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         }
     }
 
+    /**
+     * For the given derivateID, repair metadata in the underlying IFS2 store
+     */
+    public void repairIFS2Metadata(MCRObjectID derivateID) throws IOException {
+        String oid = derivateID.toString();
+        String base = getBase(oid);
+        MCRFileStore store = getStore(base);
+
+        int slotID = getSlotID(oid);
+        MCRFileCollection slot = store.retrieve(slotID);
+        slot.repairMetadata();
+    }
+
     @Override
     protected String doStoreContent(MCRFileReader fr, MCRContentInputStream source) throws Exception {
-        int slotID = getSlotID(fr);
-        String base = getBase(fr);
+        int slotID = getSlotID(fr.getOwnerID());
+        String base = getBase(fr.getOwnerID());
         MCRFileStore store = getStore(base);
 
         MCRFileCollection slot = store.retrieve(slotID);
