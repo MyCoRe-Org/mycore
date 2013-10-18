@@ -24,6 +24,7 @@
 package org.mycore.frontend.xeditor.validation;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.jaxen.JaxenException;
@@ -60,7 +61,7 @@ public class MCRXEditorValidator {
             validationRules.add(new MCRRequiredRule(baseXPath, ruleElement));
 
         if ((attributes.getLength() > 1) || (requiredAttribute == null))
-            validationRules.add(new MCRComplexRule(baseXPath, ruleElement));
+            validationRules.add(new MCRLegacyRule(baseXPath, ruleElement));
     }
 
     public void clearRules() {
@@ -88,6 +89,10 @@ public class MCRXEditorValidator {
         String xPath = binding.getAbsoluteXPath();
         String marker = results.getValidationMarker(xPath);
         session.getVariables().put(XED_VALIDATION_MARKER, marker);
+    }
+
+    public Collection<MCRValidationRule> getFailedRules() {
+        return results.getFailedRules();
     }
 
     public void clearValidationResults() {

@@ -7,11 +7,11 @@ import org.mycore.frontend.xeditor.MCRXPathBuilder;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-public class MCRComplexRule extends MCRValidationRule {
+public class MCRLegacyRule extends MCRValidationRule {
 
     private MCRValidator validator = MCRValidatorBuilder.buildPredefinedCombinedValidator();
 
-    public MCRComplexRule(String baseXPath, Node ruleElement) {
+    public MCRLegacyRule(String baseXPath, Node ruleElement) {
         super(baseXPath, ruleElement);
 
         NamedNodeMap attributes = ruleElement.getAttributes();
