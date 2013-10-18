@@ -1,17 +1,19 @@
 package org.mycore.frontend.xeditor.validation;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.mycore.common.MCRConfiguration;
 
 public class MCRValidationResults {
 
-    private static final String MARKER_DEFAULT;
+    static final String MARKER_DEFAULT;
 
-    private static final String MARKER_SUCCESS;
+    static final String MARKER_SUCCESS;
 
-    private static final String MARKER_ERROR;
+    static final String MARKER_ERROR;
 
     static {
         String prefix = "MCR.XEditor.Validation.Marker.";
@@ -22,7 +24,7 @@ public class MCRValidationResults {
 
     private Map<String, String> xPath2Marker = new HashMap<String, String>();
 
-    private Map<String, MCRValidationRule> xPath2FailedRule = new HashMap<String, MCRValidationRule>();
+    private LinkedHashMap<String, MCRValidationRule> xPath2FailedRule = new LinkedHashMap<String, MCRValidationRule>();
 
     private boolean isValid = true;
 
@@ -49,6 +51,10 @@ public class MCRValidationResults {
 
     public MCRValidationRule getFailedRule(String xPath) {
         return xPath2FailedRule.get(xPath);
+    }
+
+    public Collection<MCRValidationRule> getFailedRules() {
+        return xPath2FailedRule.values();
     }
 
     public boolean isValid() {

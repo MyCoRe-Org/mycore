@@ -31,10 +31,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.xalan.extensions.ExpressionContext;
 import org.apache.xpath.NodeSet;
-import org.apache.xpath.objects.XNodeSet;
-import org.apache.xpath.objects.XNodeSetForDOM;
 import org.jaxen.BaseXPath;
 import org.jaxen.JaxenException;
 import org.jaxen.dom.DocumentNavigator;
@@ -52,8 +49,8 @@ import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
+import org.mycore.frontend.xeditor.validation.MCRValidationRule;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -242,11 +239,18 @@ public class MCRXEditorTransformer {
         return editorSession.getValidator().getFailedRule(currentBinding).getRuleElement();
     }
 
+    public NodeSet getFailedValidationRules() {
+        NodeSet nodeSet = new NodeSet();
+        for (MCRValidationRule failedRule : editorSession.getValidator().getFailedRules())
+            nodeSet.addNode(failedRule.getRuleElement());
+        return nodeSet;
+    }
+
     public String getSubselectParam(String href) {
         return currentBinding.getAbsoluteXPath() + ":" + MCRSubselectTarget.encode(href);
     }
 
-    public XNodeSet getAdditionalParameters(ExpressionContext context) throws ParserConfigurationException, TransformerException {
+    public NodeSet getAdditionalParameters() throws ParserConfigurationException, TransformerException {
         org.w3c.dom.Document dom = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         NodeSet nodeSet = new NodeSet();
 
@@ -262,7 +266,7 @@ public class MCRXEditorTransformer {
         editorSession.setBreakpoint("After transformation to HTML");
         nodeSet.addNode(buildAdditionalParameterElement(dom, "_xed_session", editorSession.getCombinedSessionStepID()));
 
-        return new XNodeSetForDOM((NodeList) nodeSet, context.getXPathContext());
+        return nodeSet;
     }
 
     private org.w3c.dom.Element buildAdditionalParameterElement(org.w3c.dom.Document doc, String name, String value) {

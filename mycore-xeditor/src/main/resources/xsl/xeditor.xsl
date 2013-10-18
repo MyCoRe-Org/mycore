@@ -89,7 +89,7 @@
     <xsl:apply-templates mode="xeditor" />
   </xsl:template>
 
-  <!-- ========== <xed:template /> ========== -->
+  <!-- ========== Ignore <xed:template /> ========== -->
 
   <xsl:template match="xed:template" mode="xeditor" />
   <xsl:template match="xed:template" />
@@ -120,7 +120,7 @@
   <xsl:template match="*" mode="xeditor">
     <xsl:copy>
       <xsl:apply-templates select="." mode="add-attributes" />
-      <xsl:apply-templates select="@*|text()|*" mode="xeditor" />
+      <xsl:apply-templates select="@*|node()" mode="xeditor" />
       <xsl:apply-templates select="." mode="add-content" />
     </xsl:copy>
   </xsl:template>
@@ -258,7 +258,7 @@
     </xsl:for-each>
   </xsl:template>
 
-  <!-- ========== <xed:validate xpath="..." display="here|local" i18n="" required="true" ... /> ========== -->
+  <!-- ========== <xed:validate xpath="" display="here|local|global" i18n="" required="true" ... /> ========== -->
 
   <xsl:template match="xed:validate" mode="xeditor">
     <xsl:value-of select="transformer:addValidationRule($transformer,.)" />
@@ -275,15 +275,7 @@
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="xed:validate[@i18n]" mode="message">
-    <xsl:value-of select="i18n:translate(@i18n)" />
-  </xsl:template>
-
-  <xsl:template match="xed:validate" mode="message">
-    <xsl:apply-templates select="node()" mode="xeditor" />
-  </xsl:template>
-
-  <!-- ========== <xed:display-validation-message /> ========== -->
+  <!-- ========== <xed:display-validation-message /> (local) ========== -->
 
   <xsl:template match="xed:display-validation-message" mode="xeditor">
     <xsl:if test="transformer:hasValidationError($transformer)">
@@ -293,6 +285,22 @@
         </xsl:if>
       </xsl:for-each>
     </xsl:if>
+  </xsl:template>
+
+  <!-- ========== <xed:display-validation-messages /> (global) ========== -->
+
+  <xsl:template match="xed:display-validation-messages" mode="xeditor">
+    <xsl:for-each select="transformer:getFailedValidationRules($transformer)">
+      <xsl:if test="contains(@display,'global')">
+        <xsl:if test="@xpath">
+          <xsl:value-of select="transformer:bind($transformer,@xpath,@null,@null)" />
+        </xsl:if>
+        <xsl:apply-templates select="." mode="message" />
+        <xsl:if test="@xpath">
+          <xsl:value-of select="transformer:unbind($transformer)" />
+        </xsl:if>
+      </xsl:if>
+    </xsl:for-each>
   </xsl:template>
 
   <!-- ========== <xed:if test="" /> ========== -->
