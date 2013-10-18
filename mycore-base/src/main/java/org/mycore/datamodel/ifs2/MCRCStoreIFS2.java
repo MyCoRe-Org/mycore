@@ -151,16 +151,15 @@ public class MCRCStoreIFS2 extends MCRContentStore {
     }
 
     /**
-     * For the given derivateID, repair metadata in the underlying IFS2 store
+     * For the given derivateID, returns the underlying IFS2 file collection storing the files of the derivate 
      */
-    public void repairIFS2Metadata(MCRObjectID derivateID) throws IOException {
+    public MCRFileCollection getIFS2FileCollection(MCRObjectID derivateID) throws IOException {
         String oid = derivateID.toString();
         String base = getBase(oid);
         MCRFileStore store = getStore(base);
 
         int slotID = getSlotID(oid);
-        MCRFileCollection slot = store.retrieve(slotID);
-        slot.repairMetadata();
+        return store.retrieve(slotID);
     }
 
     @Override
