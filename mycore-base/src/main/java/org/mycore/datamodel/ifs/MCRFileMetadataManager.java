@@ -133,7 +133,7 @@ public class MCRFileMetadataManager {
     /**
      * Creates a new, unique ID for each MCRFilesystemNode
      */
-    synchronized String createNodeID() {
+    public synchronized String createNodeID() {
         String time = "0000000000" + Long.toString(last_number++, 36);
 
         StringBuilder sb = new StringBuilder(getIDPrefix());
