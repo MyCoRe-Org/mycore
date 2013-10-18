@@ -80,6 +80,10 @@ public class MCRXEditorValidator {
         return results.hasError(binding.getAbsoluteXPath());
     }
 
+    public MCRValidationRule getFailedRule(MCRBinding binding) {
+        return results.getFailedRule(binding.getAbsoluteXPath());
+    }
+
     public void setValidationMarker(MCRBinding binding) {
         String xPath = binding.getAbsoluteXPath();
         String marker = results.getValidationMarker(xPath);

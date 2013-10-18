@@ -5,6 +5,7 @@
     <form action="/servlets/XEditor">
       <p>Fehlerhafte Eingabe!</p>
       <div class="form-group has-error">
+        <strong>Titel erforderlich, muss utopisch sein!</strong>
         <input name="/document/title" value="" type="text" />
         <strong>Titel erforderlich, muss utopisch sein!</strong>
       </div>

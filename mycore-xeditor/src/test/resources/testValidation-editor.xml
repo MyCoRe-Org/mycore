@@ -10,8 +10,9 @@
         </xed:if>
         <xed:bind xpath="title">
           <div class="form-group {$xed-validation-marker}">
+            <xed:display-validation-message />
             <input type="text" />
-            <xed:validate display="here" required="true" xsl="contains(.,'Utopie')">
+            <xed:validate display="here local" required="true" xsl="contains(.,'Utopie')">
               <strong>Titel erforderlich, muss utopisch sein!</strong>
             </xed:validate>
           </div>

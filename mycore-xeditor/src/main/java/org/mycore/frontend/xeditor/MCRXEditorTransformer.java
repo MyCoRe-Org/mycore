@@ -238,6 +238,10 @@ public class MCRXEditorTransformer {
         return editorSession.getValidator().hasError(currentBinding);
     }
 
+    public Node getFailedValidationRule() {
+        return editorSession.getValidator().getFailedRule(currentBinding).getRuleElement();
+    }
+
     public String getSubselectParam(String href) {
         return currentBinding.getAbsoluteXPath() + ":" + MCRSubselectTarget.encode(href);
     }

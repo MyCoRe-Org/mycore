@@ -17,6 +17,10 @@ public abstract class MCRValidationRule {
         this.ruleElement = ruleElement;
     }
 
+    public Node getRuleElement() {
+        return ruleElement;
+    }
+
     public boolean validate(MCRValidationResults results, MCRBinding root) throws JaxenException, JDOMException {
         MCRBinding binding = new MCRBinding(xPath, false, root);
         boolean isValid = validateBinding(results, binding);

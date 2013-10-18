@@ -47,6 +47,10 @@ public class MCRValidationResults {
         return xPath2Marker.containsKey(xPath) ? xPath2Marker.get(xPath) : MARKER_DEFAULT;
     }
 
+    public MCRValidationRule getFailedRule(String xPath) {
+        return xPath2FailedRule.get(xPath);
+    }
+
     public boolean isValid() {
         return isValid;
     }

@@ -258,7 +258,7 @@
     </xsl:for-each>
   </xsl:template>
 
-  <!-- ========== <xed:validate xpath="..." i18n="" required="true" ... /> ========== -->
+  <!-- ========== <xed:validate xpath="..." display="here|local" i18n="" required="true" ... /> ========== -->
 
   <xsl:template match="xed:validate" mode="xeditor">
     <xsl:value-of select="transformer:addValidationRule($transformer,.)" />
@@ -267,14 +267,7 @@
         <xsl:value-of select="transformer:bind($transformer,@xpath,@null,@null)" />
       </xsl:if>
       <xsl:if test="transformer:hasValidationError($transformer)">
-        <xsl:choose>
-          <xsl:when test="@i18n">
-            <xsl:value-of select="i18n:translate(@i18n)" />
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:apply-templates select="node()" mode="xeditor" />
-          </xsl:otherwise>
-        </xsl:choose>
+        <xsl:apply-templates select="." mode="message" />
       </xsl:if>
       <xsl:if test="@xpath">
         <xsl:value-of select="transformer:unbind($transformer)" />
@@ -282,9 +275,25 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- ========== <xed:show-validation-message /> ========== -->
+  <xsl:template match="xed:validate[@i18n]" mode="message">
+    <xsl:value-of select="i18n:translate(@i18n)" />
+  </xsl:template>
 
-  <xsl:template match="xed:show-validation-message" mode="xeditor" />
+  <xsl:template match="xed:validate" mode="message">
+    <xsl:apply-templates select="node()" mode="xeditor" />
+  </xsl:template>
+
+  <!-- ========== <xed:display-validation-message /> ========== -->
+
+  <xsl:template match="xed:display-validation-message" mode="xeditor">
+    <xsl:if test="transformer:hasValidationError($transformer)">
+      <xsl:for-each select="transformer:getFailedValidationRule($transformer)">
+        <xsl:if test="contains(@display,'local')">
+          <xsl:apply-templates select="." mode="message" />
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:if>
+  </xsl:template>
 
   <!-- ========== <xed:if test="" /> ========== -->
 
