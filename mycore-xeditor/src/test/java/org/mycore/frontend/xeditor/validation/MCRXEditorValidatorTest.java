@@ -25,13 +25,12 @@ package org.mycore.frontend.xeditor.validation;
 
 import static org.junit.Assert.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.jaxen.JaxenException;
 
 import org.jdom2.Document;
+import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.jdom2.output.DOMOutputter;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.frontend.xeditor.MCRBinding;
@@ -50,11 +49,13 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
         return session;
     }
 
-    private void addRule(MCREditorSession session, String xPath, String... attributes) {
-        Map<String, String> map = new HashMap<String, String>();
+    private void addRule(MCREditorSession session, String baseXPath, String... attributes) throws JDOMException {
+        Element rule = new Element("validation-rule");
         for (int i = 0; i < attributes.length;)
-            map.put(attributes[i++], attributes[i++]);
-        session.getValidator().addRule(xPath, map);
+            rule.setAttribute(attributes[i++], attributes[i++]);
+        new Document(rule);
+        org.w3c.dom.Element ruleAsDOMElement = new DOMOutputter().output(rule);
+        session.getValidator().addRule(baseXPath, ruleAsDOMElement);
     }
 
     @Test

@@ -22,18 +22,25 @@ public class MCRValidationResults {
 
     private Map<String, String> xPath2Marker = new HashMap<String, String>();
 
+    private Map<String, MCRValidationRule> xPath2FailedRule = new HashMap<String, MCRValidationRule>();
+
     private boolean isValid = true;
 
     public boolean hasError(String xPath) {
         return MARKER_ERROR.equals(xPath2Marker.get(xPath));
     }
 
-    public void mark(String xPath, boolean isValid) {
+    public void mark(String xPath, boolean isValid, MCRValidationRule failedRule) {
         if (hasError(xPath))
             return;
 
-        xPath2Marker.put(xPath, isValid ? MARKER_SUCCESS : MARKER_ERROR);
-        this.isValid = this.isValid && isValid;
+        if (isValid)
+            xPath2Marker.put(xPath, MARKER_SUCCESS);
+        else {
+            xPath2Marker.put(xPath, MARKER_ERROR);
+            xPath2FailedRule.put(xPath, failedRule);
+            this.isValid = false;
+        }
     }
 
     public String getValidationMarker(String xPath) {

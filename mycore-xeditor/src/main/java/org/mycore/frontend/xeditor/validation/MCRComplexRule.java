@@ -1,21 +1,24 @@
 package org.mycore.frontend.xeditor.validation;
 
-import java.util.Map;
-
 import org.mycore.frontend.editor.validation.MCRValidator;
 import org.mycore.frontend.editor.validation.MCRValidatorBuilder;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCRXPathBuilder;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 public class MCRComplexRule extends MCRValidationRule {
 
     private MCRValidator validator = MCRValidatorBuilder.buildPredefinedCombinedValidator();
 
-    public MCRComplexRule(String baseXPath, String relativeXPath, Map<String, String> attributes) {
-        super(baseXPath, relativeXPath);
+    public MCRComplexRule(String baseXPath, Node ruleElement) {
+        super(baseXPath, ruleElement);
 
-        for (String name : attributes.keySet())
-            validator.setProperty(name, attributes.get(name));
+        NamedNodeMap attributes = ruleElement.getAttributes();
+        for (int i = 0; i < attributes.getLength(); i++) {
+            Node attribute = attributes.item(i);
+            validator.setProperty(attribute.getNodeName(), attribute.getNodeValue());
+        }
     }
 
     public boolean validateBinding(MCRValidationResults results, MCRBinding binding) {
@@ -30,7 +33,7 @@ public class MCRComplexRule extends MCRValidationRule {
                 continue;
 
             boolean result = validator.isValid(value);
-            results.mark(absPath, result);
+            results.mark(absPath, result, this);
             isValid = isValid && result;
         }
         return isValid;

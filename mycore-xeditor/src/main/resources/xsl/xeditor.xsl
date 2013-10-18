@@ -258,11 +258,25 @@
     </xsl:for-each>
   </xsl:template>
 
-  <!-- ========== <xed:validate /> ========== -->
+  <!-- ========== <xed:validate xpath="..." i18n="" required="true" ... /> ========== -->
 
   <xsl:template match="xed:validate" mode="xeditor">
-    <xsl:value-of select="transformer:addValidationRule($transformer,@*)" />
+    <xsl:value-of select="transformer:addValidationRule($transformer,.)" />
+    <xsl:if test="transformer:hasValidationError($transformer)">
+      <xsl:choose>
+        <xsl:when test="@i18n">
+          <xsl:value-of select="i18n:translate(@i18n)" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:apply-templates select="node()" mode="xeditor" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
   </xsl:template>
+
+  <!-- ========== <xed:show-validation-message /> ========== -->
+
+  <xsl:template match="xed:show-validation-message" mode="xeditor" />
 
   <!-- ========== <xed:if test="" /> ========== -->
 

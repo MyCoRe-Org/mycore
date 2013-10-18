@@ -1,11 +1,12 @@
 package org.mycore.frontend.xeditor.validation;
 
 import org.mycore.frontend.xeditor.MCRBinding;
+import org.w3c.dom.Node;
 
 public class MCRRequiredRule extends MCRValidationRule {
 
-    public MCRRequiredRule(String baseXPath, String relativeXPath) {
-        super(baseXPath, relativeXPath);
+    public MCRRequiredRule(String baseXPath, Node ruleElement) {
+        super(baseXPath, ruleElement);
     }
 
     public boolean validateBinding(MCRValidationResults results, MCRBinding binding) {
@@ -20,7 +21,7 @@ public class MCRRequiredRule extends MCRValidationRule {
             if (!MCRBinding.getValue(node).isEmpty())
                 isValid = true;
 
-        results.mark(absPath, isValid);
+        results.mark(absPath, isValid, this);
         return isValid;
     }
 }

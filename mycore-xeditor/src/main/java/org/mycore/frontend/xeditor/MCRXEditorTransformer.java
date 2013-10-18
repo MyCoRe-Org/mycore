@@ -52,8 +52,8 @@ import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.traversal.NodeIterator;
 import org.xml.sax.SAXException;
 
 /**
@@ -230,8 +230,12 @@ public class MCRXEditorTransformer {
         editorSession.getVariables().put(name, resource);
     }
 
-    public void addValidationRule(NodeIterator attributes) {
-        editorSession.getValidator().addRule(currentBinding.getAbsoluteXPath(), attributes);
+    public void addValidationRule(Node ruleElement) {
+        editorSession.getValidator().addRule(currentBinding.getAbsoluteXPath(), ruleElement);
+    }
+
+    public boolean hasValidationError() {
+        return editorSession.getValidator().hasError(currentBinding);
     }
 
     public String getSubselectParam(String href) {

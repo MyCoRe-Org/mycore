@@ -6,6 +6,7 @@
       <p>Fehlerhafte Eingabe!</p>
       <div class="form-group has-error">
         <input name="/document/title" value="" type="text" />
+        <strong>Titel erforderlich, muss utopisch sein!</strong>
       </div>
       <div class="form-group ">
         <input name="/document/year" value="" type="text" />
