@@ -58,6 +58,12 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
         session.getValidator().addRule(baseXPath, ruleAsDOMElement);
     }
 
+    private void checkResult(MCREditorSession session, String xPath, String marker) throws JaxenException, JDOMException {
+        MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
+        session.getValidator().setValidationMarker(binding);
+        assertEquals(marker, session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_MARKER));
+    }
+
     @Test
     public void testNoValidationRules() throws JDOMException, JaxenException {
         MCREditorSession session = buildSession("document");
@@ -67,16 +73,14 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
     }
 
     @Test
-    public void testRequired() throws JDOMException, JaxenException {
+    public void testRequiredRule() throws JDOMException, JaxenException {
         MCREditorSession session = buildSession("document[title]");
         addRule(session, "/document/title", "required", "true");
 
         assertFalse(session.getValidator().isValid());
         assertEquals("true", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
 
-        MCRBinding binding = new MCRBinding("/document/title", false, session.getRootBinding());
-        session.getValidator().setValidationMarker(binding);
-        assertEquals("has-error", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_MARKER));
+        checkResult(session, "/document/title", MCRValidationResults.MARKER_ERROR);
 
         session = buildSession("document[title='foo']");
         addRule(session, "/document/title", "required", "true");
@@ -84,9 +88,7 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
         assertTrue(session.getValidator().isValid());
         assertEquals("false", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
 
-        binding = new MCRBinding("/document/title", false, session.getRootBinding());
-        session.getValidator().setValidationMarker(binding);
-        assertEquals("has-success", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_MARKER));
+        checkResult(session, "/document/title", MCRValidationResults.MARKER_SUCCESS);
 
         session = buildSession("document[title][title[2]='foo']");
         addRule(session, "/document/title", "required", "true");
@@ -94,8 +96,19 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
         assertTrue(session.getValidator().isValid());
         assertEquals("false", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
 
-        binding = new MCRBinding("/document/title", false, session.getRootBinding());
-        session.getValidator().setValidationMarker(binding);
-        assertEquals("has-success", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_MARKER));
+        checkResult(session, "/document/title", MCRValidationResults.MARKER_SUCCESS);
+    }
+
+    @Test
+    public void testLegacyRule() throws JaxenException, JDOMException {
+        MCREditorSession session = buildSession("document[year='1899'][year='2013'][year[3]]");
+        addRule(session, "/document/year", "min", "2000", "type", "integer");
+
+        assertFalse(session.getValidator().isValid());
+        assertEquals("true", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
+
+        checkResult(session, "/document/year", MCRValidationResults.MARKER_ERROR);
+        checkResult(session, "/document/year[2]", MCRValidationResults.MARKER_SUCCESS);
+        checkResult(session, "/document/year[3]", MCRValidationResults.MARKER_DEFAULT);
     }
 }
