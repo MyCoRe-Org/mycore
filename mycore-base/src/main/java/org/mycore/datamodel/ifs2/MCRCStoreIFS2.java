@@ -161,6 +161,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         int slotID = getSlotID(oid);
         MCRFileCollection slot = store.retrieve(slotID);
         slot.repairMetadata();
+        slot.fo
     }
 
     @Override

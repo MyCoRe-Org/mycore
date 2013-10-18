@@ -130,20 +130,6 @@ public class MCRFile extends MCRStoredNode {
     }
 
     /**
-     * Returns the local java.io.File representing this stored file. Be careful
-     * to use this only for reading data, do never modify directly!
-     * 
-     * @return the file in the local filesystem representing this file
-     */
-    public File getLocalFile() throws IOException {
-        if (fo instanceof LocalFile) {
-            return new File(fo.getURL().getPath());
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * Repairs additional metadata of this file and all its children
      */
     @Override
