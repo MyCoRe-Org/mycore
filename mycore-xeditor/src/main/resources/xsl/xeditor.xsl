@@ -262,15 +262,23 @@
 
   <xsl:template match="xed:validate" mode="xeditor">
     <xsl:value-of select="transformer:addValidationRule($transformer,.)" />
-    <xsl:if test="transformer:hasValidationError($transformer)">
-      <xsl:choose>
-        <xsl:when test="@i18n">
-          <xsl:value-of select="i18n:translate(@i18n)" />
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:apply-templates select="node()" mode="xeditor" />
-        </xsl:otherwise>
-      </xsl:choose>
+    <xsl:if test="contains(@display,'here')">
+      <xsl:if test="@xpath">
+        <xsl:value-of select="transformer:bind($transformer,@xpath,@null,@null)" />
+      </xsl:if>
+      <xsl:if test="transformer:hasValidationError($transformer)">
+        <xsl:choose>
+          <xsl:when test="@i18n">
+            <xsl:value-of select="i18n:translate(@i18n)" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="node()" mode="xeditor" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
+      <xsl:if test="@xpath">
+        <xsl:value-of select="transformer:unbind($transformer)" />
+      </xsl:if>
     </xsl:if>
   </xsl:template>
 
