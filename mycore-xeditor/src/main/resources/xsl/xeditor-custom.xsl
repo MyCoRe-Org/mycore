@@ -41,15 +41,15 @@
   <!-- ========== Validation error messages: <xed:validate /> ========== -->
 
   <xsl:template match="xed:validate[@i18n]" mode="message">
-    <div class="xed-validation-error">
+    <span class="help-inline">
       <xsl:value-of select="i18n:translate(@i18n)" />
-    </div>
+    </span>
   </xsl:template>
 
   <xsl:template match="xed:validate" mode="message">
-    <div class="xed-validation-error">
+    <span class="help-inline">
       <xsl:apply-templates select="node()" mode="xeditor" />
-    </div>
+    </span>
   </xsl:template>
 
 </xsl:stylesheet>
