@@ -5,8 +5,10 @@ import javax.servlet.ServletContext;
 import org.apache.log4j.Logger;
 import org.jaxen.JaxenException;
 import org.jdom2.Document;
+import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
 import org.mycore.frontend.xeditor.tracker.MCRChangeData;
 
@@ -29,11 +31,19 @@ public class MCRSubselectReturnTarget implements MCREditorTarget {
         job.getResponse().sendRedirect(session.getRedirectURL());
     }
 
-    private String getBaseXPathForSubselect(MCREditorSession session) {
+    private String getBaseXPathForSubselect(MCREditorSession session) throws JaxenException, JDOMException {
         Document doc = session.getEditedXML();
         MCRChangeData change = session.getChangeTracker().findLastChange(doc);
         String text = change.getText();
-        return text.substring(text.lastIndexOf(" ") + 1).trim();
+        String xPath = text.substring(text.lastIndexOf(" ") + 1).trim();
+        return bindsFirstOrMoreThanOneElement(xPath, session) ? xPath + "[1]" : xPath;
+    }
+
+    private boolean bindsFirstOrMoreThanOneElement(String xPath, MCREditorSession session) throws JaxenException, JDOMException {
+        MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
+        boolean result = (binding.getBoundNode() instanceof Element) && !xPath.endsWith("]");
+        binding.detach();
+        return result;
     }
 
     private void setSubmittedValues(MCRServletJob job, MCREditorSession session, String baseXPath) throws JDOMException, JaxenException {
