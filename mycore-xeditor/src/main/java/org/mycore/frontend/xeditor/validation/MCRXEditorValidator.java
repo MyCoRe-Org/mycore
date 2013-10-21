@@ -60,6 +60,9 @@ public class MCRXEditorValidator {
         if ((requiredAttribute != null) && "true".equals(requiredAttribute.getNodeValue()))
             validationRules.add(new MCRRequiredRule(baseXPath, ruleElement));
 
+        if (attributes.getNamedItem("matches") != null)
+            validationRules.add(new MCRMatchesRule(baseXPath, ruleElement));
+
         if ((attributes.getLength() > 1) || (requiredAttribute == null))
             validationRules.add(new MCRLegacyRule(baseXPath, ruleElement));
     }

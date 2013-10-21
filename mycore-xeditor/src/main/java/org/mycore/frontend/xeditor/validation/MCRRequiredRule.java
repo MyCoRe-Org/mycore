@@ -9,6 +9,7 @@ public class MCRRequiredRule extends MCRValidationRule {
         super(baseXPath, ruleElement);
     }
 
+    @Override
     public boolean validateBinding(MCRValidationResults results, MCRBinding binding) {
         String absPath = binding.getAbsoluteXPath();
         if (results.hasError(absPath)) // do not validate already invalid nodes

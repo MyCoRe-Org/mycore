@@ -79,7 +79,6 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
 
         assertFalse(session.getValidator().isValid());
         assertEquals("true", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
-
         checkResult(session, "/document/title", MCRValidationResults.MARKER_ERROR);
 
         session = buildSession("document[title='foo']");
@@ -87,7 +86,6 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
 
         assertTrue(session.getValidator().isValid());
         assertEquals("false", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
-
         checkResult(session, "/document/title", MCRValidationResults.MARKER_SUCCESS);
 
         session = buildSession("document[title][title[2]='foo']");
@@ -95,7 +93,6 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
 
         assertTrue(session.getValidator().isValid());
         assertEquals("false", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
-
         checkResult(session, "/document/title", MCRValidationResults.MARKER_SUCCESS);
     }
 
@@ -110,5 +107,45 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
         checkResult(session, "/document/year", MCRValidationResults.MARKER_ERROR);
         checkResult(session, "/document/year[2]", MCRValidationResults.MARKER_SUCCESS);
         checkResult(session, "/document/year[3]", MCRValidationResults.MARKER_DEFAULT);
+    }
+
+    @Test
+    public void testInvalidation() throws JaxenException, JDOMException {
+        MCREditorSession session = buildSession("document[year='1899']");
+        addRule(session, "/document/year", "min", "2000", "type", "integer");
+        addRule(session, "/document/*", "max", "2010", "type", "integer");
+        assertFalse(session.getValidator().isValid());
+        checkResult(session, "/document/year", MCRValidationResults.MARKER_ERROR);
+
+    }
+
+    @Test
+    public void testGlobalRules() throws JaxenException, JDOMException {
+        MCREditorSession session = buildSession("document[year='1899']");
+        addRule(session, "/", "xpath", "//year", "min", "2000", "type", "integer");
+        assertFalse(session.getValidator().isValid());
+        assertEquals("true", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
+        checkResult(session, "/document/year", MCRValidationResults.MARKER_ERROR);
+    }
+
+    @Test
+    public void testMatchesRules() throws JaxenException, JDOMException {
+        MCREditorSession session = buildSession("document[isbn]");
+        addRule(session, "/document", "xpath", "//isbn", "matches", "^(97(8|9))?\\d{9}(\\d|X)$");
+        assertTrue(session.getValidator().isValid());
+        assertEquals("false", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
+        checkResult(session, "/document/isbn", MCRValidationResults.MARKER_DEFAULT);
+
+        session = buildSession("document[isbn='9780672317248']");
+        addRule(session, "/document", "xpath", "//isbn", "matches", "^(97(8|9))?\\d{9}(\\d|X)$");
+        assertTrue(session.getValidator().isValid());
+        assertEquals("false", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
+        checkResult(session, "/document/isbn", MCRValidationResults.MARKER_SUCCESS);
+
+        session = buildSession("document[isbn='0-672-31724-9']");
+        addRule(session, "/document", "xpath", "//isbn", "matches", "^(97(8|9))?\\d{9}(\\d|X)$");
+        assertFalse(session.getValidator().isValid());
+        assertEquals("true", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
+        checkResult(session, "/document/isbn", MCRValidationResults.MARKER_ERROR);
     }
 }

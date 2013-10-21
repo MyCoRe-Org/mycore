@@ -258,7 +258,7 @@
     </xsl:for-each>
   </xsl:template>
 
-  <!-- ========== <xed:validate xpath="" display="here|local|global" i18n="" required="true" ... /> ========== -->
+  <!-- ========== <xed:validate xpath="" display="here|local|global" i18n="key" required="true" matches="regExp" ... /> ========== -->
 
   <xsl:template match="xed:validate" mode="xeditor">
     <xsl:value-of select="transformer:addValidationRule($transformer,.)" />
