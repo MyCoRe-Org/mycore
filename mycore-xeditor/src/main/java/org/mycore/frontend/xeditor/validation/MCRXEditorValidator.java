@@ -63,8 +63,18 @@ public class MCRXEditorValidator {
         if (attributes.getNamedItem("matches") != null)
             validationRules.add(new MCRMatchesRule(baseXPath, ruleElement));
 
-        if ((attributes.getLength() > 1) || (requiredAttribute == null))
+        if (attributes.getNamedItem("test") != null)
+            validationRules.add(new MCRXPathTestRule(baseXPath, ruleElement));
+
+        if (hasLegacyAttributes(attributes))
             validationRules.add(new MCRLegacyRule(baseXPath, ruleElement));
+    }
+
+    private boolean hasLegacyAttributes(NamedNodeMap attributes) {
+        for (int i = 0; i < attributes.getLength(); i++)
+            if ("maxLength minLenght min max type class method format".contains(attributes.item(i).getNodeName()))
+                return true;
+        return false;
     }
 
     public void clearRules() {

@@ -129,7 +129,7 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
     }
 
     @Test
-    public void testMatchesRules() throws JaxenException, JDOMException {
+    public void testMatchesRule() throws JaxenException, JDOMException {
         MCREditorSession session = buildSession("document[isbn]");
         addRule(session, "/document", "xpath", "//isbn", "matches", "^(97(8|9))?\\d{9}(\\d|X)$");
         assertTrue(session.getValidator().isValid());
@@ -147,5 +147,47 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
         assertFalse(session.getValidator().isValid());
         assertEquals("true", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
         checkResult(session, "/document/isbn", MCRValidationResults.MARKER_ERROR);
+    }
+
+    @Test
+    public void testXPathTestRule() throws JaxenException, JDOMException {
+        MCREditorSession session = buildSession("document[author='Jim'][author='Charles'][author='John']");
+        addRule(session, "/document/author", "test", "contains(.,'J')");
+        assertFalse(session.getValidator().isValid());
+        assertEquals("true", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
+
+        checkResult(session, "/document/author[1]", MCRValidationResults.MARKER_SUCCESS);
+        checkResult(session, "/document/author[2]", MCRValidationResults.MARKER_ERROR);
+        checkResult(session, "/document/author[3]", MCRValidationResults.MARKER_SUCCESS);
+
+        session = buildSession("document[validFrom='2011'][validTo='2009']");
+        addRule(session, "/document/validTo", "test", "(string-length(.) = 0) or (number(.) >= number(../validFrom))");
+        assertFalse(session.getValidator().isValid());
+        checkResult(session, "/document/validFrom", MCRValidationResults.MARKER_DEFAULT);
+        checkResult(session, "/document/validTo", MCRValidationResults.MARKER_ERROR);
+
+        session = buildSession("document[validFrom='2011'][validTo]");
+        addRule(session, "/document/validTo", "test", "(string-length(.) = 0) or (number(.) >= number(../validFrom))");
+        assertTrue(session.getValidator().isValid());
+
+        session = buildSession("document[password='secret'][passwordRepeated='sacred']");
+        addRule(session, "/document", "test", "password = passwordRepeated");
+        assertFalse(session.getValidator().isValid());
+
+        session = buildSession("document[password='secret'][passwordRepeated='secret']");
+        addRule(session, "/document", "test", "password = passwordRepeated");
+        assertTrue(session.getValidator().isValid());
+
+        session = buildSession("document[service='printOnDemand']");
+        session.getVariables().put("allowedServices", "oai rss");
+        addRule(session, "/document/service", "test", "contains($allowedServices,.)");
+        assertFalse(session.getValidator().isValid());
+        checkResult(session, "/document/service", MCRValidationResults.MARKER_ERROR);
+
+        session = buildSession("document[service='oai']");
+        session.getVariables().put("allowedServices", "oai rss");
+        addRule(session, "/document/service", "test", "contains($allowedServices,.)");
+        assertTrue(session.getValidator().isValid());
+        checkResult(session, "/document/service", MCRValidationResults.MARKER_SUCCESS);
     }
 }
