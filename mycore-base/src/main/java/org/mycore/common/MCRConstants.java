@@ -105,7 +105,8 @@ public final class MCRConstants {
 
     public final static Namespace MCR_NAMESPACE = Namespace.getNamespace("mcr", MCR_URL);
 
-    public final static String SUPER_USER_ID = MCRConfiguration.instance().getString("MCR.Users.Superuser.UserName", "mcradmin");
+    @Deprecated
+    public final static String SUPER_USER_ID = MCRSystemUserInformation.getSuperUserInstance().getUserID();
 
     private final static List<Namespace> namespaces;
 
