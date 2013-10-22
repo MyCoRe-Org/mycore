@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2013.10" date="2013-10-00" description="Codenamed &apos;Between the Sheets&apos;">
+      <action dev="mcrtchef" type="fix" date="2013-10-22">
+        MCRURIResolverFilter could send incomplete data as Content-Length header was set to late.
+      </action>
       <action dev="mcrtchef" type="update">
         MCRURIResolver resolves scheme from 'base' if 'uri' is relative 
       </action>
