@@ -7,6 +7,9 @@
   <body>
     <release version="2013.10" date="2013-10-00" description="Codenamed &apos;Between the Sheets&apos;">
       <action dev="mcrtchef" type="fix" date="2013-10-22">
+        mycore-solr: "lang" parameter should not be handled as search field in MCRSolrSearchServlet
+      </action>
+      <action dev="mcrtchef" type="fix" date="2013-10-22">
         MCRURIResolverFilter should handle redirect correctly (do not write to ServletOutputStream).
       </action>
       <action dev="mcrtchef" type="fix" date="2013-10-22">

@@ -65,7 +65,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
     static {
         String[] parameter = new String[] { "q", "sort", "start", "rows", "pageDoc", "pageScore", "fq", "cache", "fl",
             "glob", "debug", "explainOther", "defType", "timeAllowed", "omitHeader", "sortOrder", "sortBy", "wt", "qf",
-            "q.alt", "mm", "pf", "ps", "qs", "tie", "bq", "bf", PHRASE_QUERY_PARAM };
+            "q.alt", "mm", "pf", "ps", "qs", "tie", "bq", "bf", "lang", PHRASE_QUERY_PARAM };
         RESERVED_PARAMETER_KEYS = Collections.unmodifiableList(Arrays.asList(parameter));
     }
 
