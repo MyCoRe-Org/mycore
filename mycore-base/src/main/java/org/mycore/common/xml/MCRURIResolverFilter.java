@@ -80,33 +80,37 @@ public class MCRURIResolverFilter implements Filter {
             //do not filter...
             filterChain.doFilter(request, response);
         } else {
-            try (ServletOutputStream out = response.getOutputStream()) {
-                MyResponseWrapper wrapper = new MyResponseWrapper((HttpServletResponse) response);
-                // process request
-                filterChain.doFilter(request, wrapper);
-                final String origOutput = wrapper.toString();
-                final String characterEncoding = wrapper.getCharacterEncoding();
-                /**
-                 * NOTE: jetty doesn't correctly implement
-                 * ServletOutputStream.print(String). So we must encode it ourself
-                 * to byte arrays.
-                 */
-                if (!uriList.get().isEmpty()
-                    && origOutput.length() > 0
-                    && (response.getContentType().contains("text/html") || response.getContentType().contains(
-                        "text/xml"))) {
-                    final String insertString = "\n<!-- \n" + uriList.get().toString() + "\n-->";
-                    final byte[] insertBytes = insertString.getBytes(characterEncoding);
-                    response.setContentLength(origOutput.getBytes(characterEncoding).length + insertBytes.length);
-                    int pos = getInsertPosition(origOutput);
+            MyResponseWrapper wrapper = new MyResponseWrapper((HttpServletResponse) response);
+            // process request
+            filterChain.doFilter(request, wrapper);
+            final String origOutput = wrapper.toString();
+            final String characterEncoding = wrapper.getCharacterEncoding();
+            /**
+             * NOTE: jetty doesn't correctly implement
+             * ServletOutputStream.print(String). So we must encode it ourself
+             * to byte arrays.
+             */
+            if (!uriList.get().isEmpty() && origOutput.length() > 0
+                && (response.getContentType().contains("text/html") || response.getContentType().contains("text/xml"))) {
+                final String insertString = "\n<!-- \n" + uriList.get().toString() + "\n-->";
+                final byte[] insertBytes = insertString.getBytes(characterEncoding);
+                response.setContentLength(origOutput.getBytes(characterEncoding).length + insertBytes.length);
+                int pos = getInsertPosition(origOutput);
+                try (ServletOutputStream out = response.getOutputStream()) {
                     out.write(origOutput.substring(0, pos).getBytes(characterEncoding));
                     out.write(insertBytes);
                     out.write(origOutput.substring(pos, origOutput.length()).getBytes(characterEncoding));
                     // delete debuglist
                     uriList.remove();
                     LOGGER.debug("end filter: " + origOutput.substring(origOutput.length() - 10, origOutput.length()));
-                } else {
-                    out.write(origOutput.getBytes(characterEncoding));
+                }
+            } else {
+                LOGGER.debug("Sending original response");
+                byte[] byteArray = wrapper.output.toByteArray();
+                if (byteArray.length > 0) {
+                    try (ServletOutputStream out = response.getOutputStream()) {
+                        out.write(byteArray);
+                    }
                 }
             }
         }
