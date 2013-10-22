@@ -204,8 +204,14 @@ public class MCRBinding {
         setValue(getBoundNode(), value);
     }
 
+    public void setDefault(String value) {
+        if (getValue().isEmpty())
+            setValue(getBoundNode(), value);
+    }
+
     public void setValues(String value) {
-        for( int i = 0; i < boundNodes.size(); i++ ) setValue( i, value );
+        for (int i = 0; i < boundNodes.size(); i++)
+            setValue(i, value);
     }
 
     public void setValue(int index, String value) {

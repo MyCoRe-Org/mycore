@@ -141,7 +141,11 @@ public class MCRXEditorTransformer {
     public void setValues(String value) {
         currentBinding.setValues(value);
     }
-    
+
+    public void setDefault(String value) {
+        currentBinding.setDefault(value);
+    }
+
     public void unbind() {
         setCurrentBinding(currentBinding.getParent());
     }

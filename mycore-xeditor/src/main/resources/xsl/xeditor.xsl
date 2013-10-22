@@ -109,15 +109,19 @@
   <!-- ========== <xed:bind xpath="" initially="value"|default="value"|set="value" name="" /> ========== -->
 
   <xsl:template match="xed:bind" mode="xeditor">
-    <xsl:variable name="initialValue" select="@initially|@default" />
-    <xsl:value-of select="transformer:bind($transformer,@xpath,transformer:replaceXPaths($transformer,$initialValue),@name)" />
-    <xsl:apply-templates select="@set" mode="xeditor" />
+    <xsl:variable name="initialValue" select="transformer:replaceXPaths($transformer,@initially)" />
+    <xsl:value-of select="transformer:bind($transformer,@xpath,$initialValue,@name)" />
+    <xsl:apply-templates select="@set|@default" mode="xeditor" />
     <xsl:apply-templates select="*" mode="xeditor" />
     <xsl:value-of select="transformer:unbind($transformer)" />
   </xsl:template>
-  
+
   <xsl:template match="xed:bind/@set" mode="xeditor">
-    <xsl:value-of select="transformer:setValues($transformer,@set)" />
+    <xsl:value-of select="transformer:setValues($transformer,.)" />
+  </xsl:template>
+
+  <xsl:template match="xed:bind/@default" mode="xeditor">
+    <xsl:value-of select="transformer:setDefault($transformer,.)" />
   </xsl:template>
 
   <!-- ========== Default templates ========== -->
