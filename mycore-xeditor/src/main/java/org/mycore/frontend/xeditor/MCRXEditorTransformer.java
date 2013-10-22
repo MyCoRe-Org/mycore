@@ -108,14 +108,14 @@ public class MCRXEditorTransformer {
         return editorSession.replaceParameters(uri);
     }
 
-    public void bind(String xPath, String defaultValue, String name) throws JDOMException, JaxenException {
+    public void bind(String xPath, String initialValue, String name) throws JDOMException, JaxenException {
         if (editorSession.getEditedXML() == null)
             createEmptyDocumentFromXPath(xPath);
 
         if (currentBinding == null)
             currentBinding = editorSession.getRootBinding();
 
-        setCurrentBinding(new MCRBinding(xPath, defaultValue, name, currentBinding));
+        setCurrentBinding(new MCRBinding(xPath, initialValue, name, currentBinding));
     }
 
     private void setCurrentBinding(MCRBinding binding) {
@@ -138,6 +138,10 @@ public class MCRXEditorTransformer {
         return new Element(nameStep.getLocalName(), ns);
     }
 
+    public void setValue(String value) {
+        currentBinding.setValues(value);
+    }
+    
     public void unbind() {
         setCurrentBinding(currentBinding.getParent());
     }

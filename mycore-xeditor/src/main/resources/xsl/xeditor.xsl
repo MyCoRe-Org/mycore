@@ -106,14 +106,21 @@
     <xsl:value-of select="." />
   </xsl:template>
 
-  <!-- ========== <xed:bind xpath="" default="" name="" /> ========== -->
+  <!-- ========== <xed:bind xpath="" initially="value"|default="value"|set="value" name="" /> ========== -->
 
   <xsl:template match="xed:bind" mode="xeditor">
-    <xsl:variable name="default" select="transformer:replaceXPaths($transformer,@default)" />
-    <xsl:value-of select="transformer:bind($transformer,@xpath,$default,@name)" />
+    <xsl:variable name="initialValue" select="@initially|@default" />
+    <xsl:value-of select="transformer:bind($transformer,@xpath,transformer:replaceXPaths($transformer,$initialValue),@name)" />
+    <xsl:apply-templates select="@set" mode="xeditor" />
     <xsl:apply-templates select="*" mode="xeditor" />
     <xsl:value-of select="transformer:unbind($transformer)" />
   </xsl:template>
+  
+  <xsl:template match="xed:bind/@set" mode="xeditor">
+    <xsl:value-of select="transformer:setValue($transformer,@set)" />
+  </xsl:template>
+
+  <!-- ========== Default templates ========== -->
 
   <xsl:template match="@xed:*|xed:*" mode="xeditor" />
 
@@ -128,7 +135,7 @@
   <xsl:template match="*" mode="add-attributes" />
 
   <xsl:template match="*" mode="add-content" />
-
+       
   <!-- ========== <input|button xed:target="" xed:href="" /> ========== -->
 
   <xsl:template match="input[contains('submit image',@type)][@xed:target]|button[@type='submit'][@xed:target]"

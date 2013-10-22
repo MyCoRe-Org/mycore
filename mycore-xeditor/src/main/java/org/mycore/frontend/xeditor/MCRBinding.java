@@ -87,13 +87,13 @@ public class MCRBinding {
         bind(xPath, buildIfNotExists, null);
     }
 
-    public MCRBinding(String xPath, String defaultValue, String name, MCRBinding parent) throws JDOMException, JaxenException {
+    public MCRBinding(String xPath, String initialValue, String name, MCRBinding parent) throws JDOMException, JaxenException {
         this(parent);
         this.name = (name != null) && !name.isEmpty() ? name : null;
-        bind(xPath, true, defaultValue);
+        bind(xPath, true, initialValue);
     }
 
-    private void bind(String xPath, boolean buildIfNotExists, String defaultValue) throws JaxenException {
+    private void bind(String xPath, boolean buildIfNotExists, String initialValue) throws JaxenException {
         Map<String, Object> variables = buildXPathVariables();
 
         XPathExpression<Object> xPathExpr = XPathFactory.instance().compile(xPath, Filters.fpassthrough(), variables,
@@ -109,7 +109,7 @@ public class MCRBinding {
 
         if (boundNodes.isEmpty() && buildIfNotExists) {
             MCRNodeBuilder builder = new MCRNodeBuilder(variables);
-            Object built = builder.buildNode(xPath, defaultValue, (Parent) (parent.getBoundNode()));
+            Object built = builder.buildNode(xPath, initialValue, (Parent) (parent.getBoundNode()));
             LOGGER.debug("Bind to " + xPath + " generated node " + MCRXPathBuilder.buildXPath(built));
             boundNodes.add(built);
             trackNodeCreated(builder.getFirstNodeBuilt());
@@ -202,6 +202,10 @@ public class MCRBinding {
 
     public void setValue(String value) {
         setValue(getBoundNode(), value);
+    }
+
+    public void setValues(String value) {
+        for( int i = 0; i < boundNodes.size(); i++ ) setValue( i, value );
     }
 
     public void setValue(int index, String value) {
