@@ -138,7 +138,7 @@ public class MCRXEditorTransformer {
         return new Element(nameStep.getLocalName(), ns);
     }
 
-    public void setValue(String value) {
+    public void setValues(String value) {
         currentBinding.setValues(value);
     }
     

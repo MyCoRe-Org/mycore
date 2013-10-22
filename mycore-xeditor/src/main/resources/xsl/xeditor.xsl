@@ -117,7 +117,7 @@
   </xsl:template>
   
   <xsl:template match="xed:bind/@set" mode="xeditor">
-    <xsl:value-of select="transformer:setValue($transformer,@set)" />
+    <xsl:value-of select="transformer:setValues($transformer,@set)" />
   </xsl:template>
 
   <!-- ========== Default templates ========== -->
