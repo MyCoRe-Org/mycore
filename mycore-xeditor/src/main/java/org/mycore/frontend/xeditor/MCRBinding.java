@@ -101,9 +101,13 @@ public class MCRBinding {
 
         boundNodes.addAll(xPathExpr.evaluate(parent.getBoundNodes()));
 
+        for (Object boundNode : boundNodes)
+            if (!(boundNode instanceof Element || boundNode instanceof Attribute || boundNode instanceof Document))
+                throw new RuntimeException("XPath MUST only bind either element, attribute or document nodes: " + xPath);
+
         LOGGER.debug("Bind to " + xPath + " selected " + boundNodes.size() + " node(s)");
 
-        if (boundNodes.isEmpty() && buildIfNotExists ) {
+        if (boundNodes.isEmpty() && buildIfNotExists) {
             MCRNodeBuilder builder = new MCRNodeBuilder(variables);
             Object built = builder.buildNode(xPath, defaultValue, (Parent) (parent.getBoundNode()));
             LOGGER.debug("Bind to " + xPath + " generated node " + MCRXPathBuilder.buildXPath(built));
