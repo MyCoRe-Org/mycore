@@ -27,7 +27,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.text.MessageFormat;
 import java.util.Iterator;
 
@@ -36,7 +35,6 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.Environment;
 import org.hibernate.jmx.StatisticsService;
 import org.hibernate.mapping.Table;
 import org.hibernate.service.ServiceRegistry;
@@ -225,18 +223,6 @@ public class MCRHIBConnection implements Closeable {
             return;
         }
         LOGGER.debug("Closing hibernate sessions.");
-//        Statistics stats = sessionFactory.getStatistics();
-//        if (stats.isStatisticsEnabled()) {
-//            try {
-//                handleStatistics(stats);
-//            } catch (FileNotFoundException e) {
-//                // TODO Auto-generated catch block
-//                e.printStackTrace();
-//            } catch (IOException e) {
-//                // TODO Auto-generated catch block
-//                e.printStackTrace();
-//            }
-//        }
         sessionFactory.close();
         sessionFactory = null;
         SINGLETON = null;
