@@ -134,9 +134,10 @@ public class MCRXEditorTransformerTest {
     }
 
     @Test
-    public void testLoadResources() throws IOException, URISyntaxException, TransformerException, JDOMException, SAXException, JaxenException {
-        MCRSessionMgr.getCurrentSession().put("genre","article");
-        MCRSessionMgr.getCurrentSession().put("host","journal");
+    public void testLoadResources() throws IOException, URISyntaxException, TransformerException, JDOMException, SAXException,
+            JaxenException {
+        MCRSessionMgr.getCurrentSession().put("genre", "article");
+        MCRSessionMgr.getCurrentSession().put("host", "journal");
         testTransformation("testLoadResources-editor.xml", null, "testLoadResources-transformed.xml");
     }
 
@@ -148,5 +149,14 @@ public class MCRXEditorTransformerTest {
         session = testTransformation("testValidation-editor.xml", null, "testValidation-transformed2.xml");
         assertFalse(session.getValidator().isValid());
         testTransformation("testValidation-editor.xml", null, session, "testValidation-transformed3.xml");
+    }
+
+    @Test
+    public void testDefaultValue() throws IOException, URISyntaxException, TransformerException, JDOMException, SAXException,
+            JaxenException {
+        MCREditorSession session = testTransformation("testDefaultValue-editor.xml", null, "testDefaultValue-transformed1.xml");
+        assertEquals("true", session.getEditedXML().getRootElement().getAttributeValue("publish"));
+        session = testTransformation("testDefaultValue-editor.xml", "testDefaultValue-input.xml", "testDefaultValue-transformed2.xml");
+        assertEquals("false", session.getEditedXML().getRootElement().getAttributeValue("publish"));
     }
 }

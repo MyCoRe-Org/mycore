@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<html>
+  <body>
+    <form action="/servlets/XEditor">
+      <input name="/document/@publish" checked="checked" id="publish" type="checkbox" value="true" />
+      <label for="publish">Dokument publizieren</label>
+      <input value="@publish" name="_xed_check" type="hidden" />
+      <input value="false" name="_xed_default_/document/@publish" type="hidden" />
+      <input value="1-3" name="_xed_session" type="hidden" />
+    </form>
+  </body>
+</html>

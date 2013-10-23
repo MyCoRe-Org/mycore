@@ -66,12 +66,12 @@ public class MCREditorSubmissionTest {
         MCREditorSession session = new MCREditorSession();
         session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
 
-        session.getSubmission().setXPaths2CheckResubmission(new String[] { "/document/@archive" });
+        session.getSubmission().setXPaths2CheckResubmission("@archive");
         session.getSubmission().emptyNotResubmittedNodes();
 
         assertEquals("", session.getEditedXML().getRootElement().getAttributeValue("archive"));
 
-        session.getSubmission().setXPaths2CheckResubmission(new String[] { "/document/@archive" });
+        session.getSubmission().setXPaths2CheckResubmission("@archive");
         session.getSubmission().setSubmittedValues("/document/@archive", new String[] { "true" });
         session.getSubmission().emptyNotResubmittedNodes();
 

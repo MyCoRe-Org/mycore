@@ -144,6 +144,7 @@ public class MCRXEditorTransformer {
 
     public void setDefault(String value) {
         currentBinding.setDefault(value);
+        editorSession.getSubmission().markDefaultValue(currentBinding.getAbsoluteXPath(), value);
     }
 
     public void unbind() {
@@ -268,11 +269,18 @@ public class MCRXEditorTransformer {
                 if ((value != null) && !value.isEmpty())
                     nodeSet.addNode(buildAdditionalParameterElement(dom, name, value));
 
-        for (String xPath : editorSession.getSubmission().getXPaths2CheckResubmission())
-            nodeSet.addNode(buildAdditionalParameterElement(dom, "_xed_check", xPath));
+        String xPaths2CheckResubmission = editorSession.getSubmission().getXPaths2CheckResubmission();
+        if (!xPaths2CheckResubmission.isEmpty())
+            nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSubmission.PREFIX_CHECK_RESUBMISSION, xPaths2CheckResubmission));
+
+        Map<String, String> defaultValues = editorSession.getSubmission().getDefaultValues();
+        for (String xPath : defaultValues.keySet())
+            nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSubmission.PREFIX_DEFAULT_VALUE + xPath,
+                    defaultValues.get(xPath)));
 
         editorSession.setBreakpoint("After transformation to HTML");
-        nodeSet.addNode(buildAdditionalParameterElement(dom, "_xed_session", editorSession.getCombinedSessionStepID()));
+        nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSessionStore.XEDITOR_SESSION_PARAM,
+                editorSession.getCombinedSessionStepID()));
 
         return nodeSet;
     }

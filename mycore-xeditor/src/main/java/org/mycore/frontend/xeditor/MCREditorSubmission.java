@@ -1,6 +1,7 @@
 package org.mycore.frontend.xeditor;
 
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,7 +11,13 @@ import org.jdom2.JDOMException;
 
 public class MCREditorSubmission {
 
-    private Set<String> xPaths2CheckResubmission = new HashSet<String>();
+    public static final String PREFIX_DEFAULT_VALUE = "_xed_default_";
+
+    public static final String PREFIX_CHECK_RESUBMISSION = "_xed_check";
+
+    private Set<String> xPaths2CheckResubmission = new LinkedHashSet<String>();
+
+    private Map<String, String> xPath2DefaultValue = new LinkedHashMap<String, String>();
 
     private MCREditorSession session;
 
@@ -23,15 +30,21 @@ public class MCREditorSubmission {
             xPaths2CheckResubmission.add(MCRXPathBuilder.buildXPath(node));
     }
 
-    public Set<String> getXPaths2CheckResubmission() {
-        return xPaths2CheckResubmission;
+    public String getXPaths2CheckResubmission() {
+        StringBuilder sb = new StringBuilder();
+        for (String xPath : xPaths2CheckResubmission) {
+            xPath = xPath.substring(xPath.indexOf("/", 1) + 1);
+            sb.append(xPath).append(" ");
+        }
+        return sb.toString().trim();
     }
 
-    public void setXPaths2CheckResubmission(String[] xPaths) {
+    public void setXPaths2CheckResubmission(String xPaths) throws JDOMException {
         xPaths2CheckResubmission.clear();
+        String rootXPath = MCRXPathBuilder.buildXPath(session.getEditedXML().getRootElement()) + "/";
         if (xPaths != null)
-            for (String xPath : xPaths)
-                xPaths2CheckResubmission.add(xPath);
+            for (String xPath : xPaths.split(" "))
+                xPaths2CheckResubmission.add(rootXPath + xPath);
     }
 
     private void removeXPaths2CheckResubmission(MCRBinding binding) {
@@ -47,14 +60,32 @@ public class MCREditorSubmission {
         }
     }
 
-    public void setSubmittedValues(Map<String, String[]> values) throws JaxenException, JDOMException {
-        setXPaths2CheckResubmission(values.get("_xed_check"));
+    public void markDefaultValue(String xPath, String defaultValue) {
+        xPath2DefaultValue.put(xPath, defaultValue);
+    }
 
-        for (String xPath : values.keySet())
-            if (xPath.startsWith("/"))
-                setSubmittedValues(xPath, values.get(xPath));
+    public Map<String, String> getDefaultValues() {
+        return xPath2DefaultValue;
+    }
+
+    public void setSubmittedValues(Map<String, String[]> values) throws JaxenException, JDOMException {
+        String[] xPaths2Check = values.get(PREFIX_CHECK_RESUBMISSION);
+        if ((xPaths2Check != null) && (xPaths2Check.length > 0))
+            setXPaths2CheckResubmission(xPaths2Check[0]);
+
+        xPath2DefaultValue.clear();
+        for (String paramName : values.keySet())
+            if (paramName.startsWith("/"))
+                setSubmittedValues(paramName, values.get(paramName));
+            else if (paramName.startsWith(PREFIX_DEFAULT_VALUE)) {
+                String xPath = paramName.substring(PREFIX_DEFAULT_VALUE.length());
+                String defaultValue = values.get(paramName)[0];
+                markDefaultValue(xPath, defaultValue);
+            }
 
         emptyNotResubmittedNodes();
+        setDefaultValues();
+
         session.setBreakpoint("After setting submitted values");
 
     }
@@ -75,4 +106,13 @@ public class MCREditorSubmission {
         binding.detach();
     }
 
+    public void setDefaultValues() throws JDOMException, JaxenException {
+        MCRBinding rootBinding = session.getRootBinding();
+        for (String xPath : xPath2DefaultValue.keySet()) {
+            String defaultValue = xPath2DefaultValue.get(xPath);
+            MCRBinding binding = new MCRBinding(xPath, false, rootBinding);
+            binding.setDefault(defaultValue);
+            binding.detach();
+        }
+    }
 }
