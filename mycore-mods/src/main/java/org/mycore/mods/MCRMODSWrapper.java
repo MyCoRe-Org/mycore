@@ -250,6 +250,11 @@ public class MCRMODSWrapper {
             element.detach();
         }
     }
+    
+    public void removeInheritedMetadata() {
+        String xPath="mods:relatedItem[@type='host']/*[local-name()!='part']";
+        removeElements(xPath);;
+    }
 
     public String getServiceFlag(String type) {
         MCRObjectService os = object.getService();
