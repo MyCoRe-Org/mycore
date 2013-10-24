@@ -253,7 +253,7 @@ public class MCRIFS2Commands {
             boolean check_only) {
         LOGGER.debug("fixFileEntry : name = " + node.getName());
         String storageid = node.getAbsolutePath().substring(storage_base.length());
-        LOGGER.debug("fixFileEntry : storageid = " + node.getName());
+        LOGGER.debug("fixFileEntry : storageid = " + storageid);
         int counter = 0;
         String id = "";
         String md5_old = "";
@@ -301,7 +301,6 @@ public class MCRIFS2Commands {
             MCRContentInputStream cis = new MCRContentInputStream(new FileInputStream(node));
             byte[] header = cis.getHeader();
             fctid = MCRFileContentTypeFactory.detectType(node.getName(), header).getID();
-            System.out.println(fctid);
             cis.close();
             md5 = Files.hash(node, Hashing.md5()).toString();
         } catch (MCRException | IOException e1) {
@@ -309,6 +308,8 @@ public class MCRIFS2Commands {
             return;
         }
         long size = node.length();
+        LOGGER.debug("size old : " + Long.toString(size_old) + " <--> size : " + Long.toString(size));
+        LOGGER.debug("MD5 old : " + md5_old + " <--> MD5 : " + md5);
         if (size_old == size && md5_old.equals(md5)) {
             return;
         }
@@ -364,7 +365,6 @@ public class MCRIFS2Commands {
     private static String getParentID(File node, String derivate_id) {
         Session session = MCRHIBConnection.instance().getSession();
         File parent_node = node.getParentFile();
-        System.out.println(parent_node.getName() + "  " + derivate_id);
         Criteria criteria_file = session.createCriteria(MCRFSNODES.class);
         criteria_file.add(Restrictions.eq("name", parent_node.getName()));
         criteria_file.add(Restrictions.eq("owner", derivate_id));
