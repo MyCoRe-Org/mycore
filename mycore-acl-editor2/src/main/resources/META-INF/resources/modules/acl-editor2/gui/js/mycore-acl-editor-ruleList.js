@@ -23,7 +23,7 @@ var RuleList = function(){
 			li.attr("ruleID", "");
 			li.attr("ruleDesc", "");
 			li.attr("ruleText", "");
-			li.text(i18nKeys["ACLE.list.rule.newRule"]);
+			li.text(geti18n("ACLE.list.rule.newRule"));
 			li.prependTo("#acle2-rule-list");
 			$("#acle2-rule-detail-ruleID").hide();
 			$("#acle2-rule-detail-ruleID").prev().hide();
@@ -87,4 +87,16 @@ var RuleList = function(){
 			});
 		}
 	};
+	function geti18n(key) {
+		var string = i18nKeys[key];
+		if (string != undefined){
+			for (i = 0; i < arguments.length-1; i++){
+				string = string.replace(new RegExp('\\{' + i + '\\}', "g"), arguments[i+1]);
+			}
+			return string;
+		}
+		else{
+			return "";
+		}
+	}
 }

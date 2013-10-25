@@ -38,7 +38,7 @@ var ACLEditor = function(){
 					addAccess(accessID, accessPool , accessRule); 
 				}
 				else{
-					showAlert(i18nKeys["ACLE.alert.access.fields"]);
+					showAlert(geti18n("ACLE.alert.access.fields"));
 					if (accessID == ""){
 						$("#acle2-new-access-id").parent().addClass("form-group has-error");
 					}
@@ -74,7 +74,7 @@ var ACLEditor = function(){
 					$('#acle2-lightbox-multi-delete').modal('show');
 				}
 				else{
-					showAlert(i18nKeys["ACLE.alert.access.edit.select.error"]);
+					showAlert(geti18n("ACLE.alert.access.edit.select.error"));
 				}
 			});
 					
@@ -134,7 +134,7 @@ var ACLEditor = function(){
 					removeRule(ruleID);
 				}
 				else{
-					showAlert(i18nKeys["ACLE.alert.rule.inUse"], false);
+					showAlert(geti18n("ACLE.alert.rule.inUse"), false);
 				}
 			});
 			
@@ -150,7 +150,7 @@ var ACLEditor = function(){
 				}
 				else{
 					$(".acle2-rule-detail-ruleText").parent().addClass("form-group has-error");
-					showAlert(i18nKeys["ACLE.alert.rule.noRule"])	
+					showAlert(geti18n("ACLE.alert.rule.noRule"))	
 				}
 			});
 			
@@ -255,10 +255,10 @@ var ACLEditor = function(){
 					$("#acle2-lightbox-multi-edit-select select").addClass("input-xxlarge");
 					$("#acle2-lightbox-multi-edit-select select").removeClass("input-xlarge");
 					$("#acle2-lightbox-multi-edit-select .acle2-new-access-rule-option").remove();
-					$("#acle2-lightbox-multi-edit-text").html(i18nKeys["ACLE.labels.access.multiEdit.1"] + elm + i18nKeys["ACLE.labels.access.multiEdit.2"])
+					$("#acle2-lightbox-multi-edit-text").html(geti18n("ACLE.labels.access.multiEditElm", elm));
 				}
 				else{
-					showAlert(i18nKeys["ACLE.alert.access.edit.select.error"]);
+					showAlert(geti18n("ACLE.alert.access.edit.select.error"));
 				}				
 			});
 			
@@ -356,13 +356,13 @@ var ACLEditor = function(){
 					$("#acle2-new-access-pool").val("");
 					$(".acle2-new-access-rule > select").select2("val", "");
 					ruleListInstance.updateCanDelete();
-					showAlert(i18nKeys["ACLE.alert.access.add.success.1"] + accessID + i18nKeys["ACLE.alert.access.add.success.2"], true);
+					showAlert(geti18n("ACLE.alert.access.add.success", accessID), true);
 				},
 				409: function() {
-					showAlert(i18nKeys["ACLE.alert.access.add.exist"]);
+					showAlert(geti18n("ACLE.alert.access.add.exist"));
 				},					
 				500: function(error) {
-					showAlert(i18nKeys["ACLE.alert.access.add.error"]);
+					showAlert(geti18n("ACLE.alert.access.add.error"));
 				}
 			}
 		});
@@ -380,14 +380,14 @@ var ACLEditor = function(){
 					accessTableInstance.edit($(".acle2-edit"), json.accessIDNew, json.accessPoolNew, json.accessRuleNew);
 					ruleListInstance.updateCanDelete();
 					ruleListInstance.select($(".acle2-rule-selected").attr("ruleid"));
-					showAlert(i18nKeys["ACLE.alert.access.edit.success"], true);
+					showAlert(geti18n("ACLE.alert.access.edit.success"), true);
 				},
 				409: function() {
 					$(".acle2-edit").find(".acle2-show-input").addClass("form-group has-error");
-					showAlert(i18nKeys["ACLE.alert.access.add.exist"]);
+					showAlert(geti18n("ACLE.alert.access.add.exist"));
 				},
 				500: function(error) {
-					showAlert(i18nKeys["ACLE.alert.access.edit.error"]);
+					showAlert(geti18n("ACLE.alert.access.edit.error"));
 				}
 			}
 		});
@@ -407,10 +407,10 @@ var ACLEditor = function(){
 					$(".icon-check").addClass("icon-check-empty");
 					$(".icon-check").prop("checked", false);
 					$(".icon-check").removeClass("icon-check");
-					showAlert(i18nKeys["ACLE.alert.access.edit.success"], true);
+					showAlert(geti18n("ACLE.alert.access.edit.success"), true);
 				},
 				500: function(error) {
-					showAlert(i18nKeys["ACLE.alert.access.edit.error"]);
+					showAlert(geti18n("ACLE.alert.access.edit.error"));
 				}
 			}
 		});
@@ -428,10 +428,10 @@ var ACLEditor = function(){
 					accessTableInstance.remove(data);
 					splitTable();
 					ruleListInstance.updateCanDelete();
-					showAlert(i18nKeys["ACLE.alert.access.remove.success"], true);
+					showAlert(geti18n("ACLE.alert.access.remove.success"), true);
 				},
 				500: function(error) {
-					showAlert(i18nKeys["ACLE.alert.access.remove.error"]);					
+					showAlert(geti18n("ACLE.alert.access.remove.error"));					
 				}
 			}
 		});
@@ -453,17 +453,17 @@ var ACLEditor = function(){
 						ruleListInstance.add(ruleID, ruleDesc, ruleText);
 						ruleListInstance.select(ruleID);
 						$('#acle2-rule-list').animate({scrollTop : $('#acle2-rule-list').height()},'fast');
-						showAlert(i18nKeys["ACLE.alert.rule.add.success.1"] + ruleDesc + i18nKeys["ACLE.alert.rule.add.success.2"] + ruleID + i18nKeys["ACLE.alert.rule.add.success.3"], true);
+						showAlert(geti18n("ACLE.alert.rule.add.success", ruleDesc, ruleID), true);
 					}
 					else{
-						showAlert(i18nKeys["ACLE.alert.rule.add.error"]);
+						showAlert(geti18n("ACLE.alert.rule.add.error"));
 						$(".acle2-new-access-rule > select").select2("val", "");
 						$("#acle2-rule-detail-ruleDesc").val("");
 						$(".acle2-rule-detail-ruleText").val("");
 					}
 				},
 				500: function(error) {
-					showAlert(i18nKeys["ACLE.alert.rule.add.error"]);
+					showAlert(geti18n("ACLE.alert.rule.add.error"));
 					$(".acle2-new-access-rule > select").select2("val", "");
 				}
 			}
@@ -484,13 +484,13 @@ var ACLEditor = function(){
 					ruleListInstance.remove(ruleID);
 					ruleListInstance.select("");
 					$('#acle2-rule-list').animate({scrollTop : 0},'fast');
-					showAlert(i18nKeys["ACLE.alert.rule.remove.success.1"] + ruleID + i18nKeys["ACLE.alert.rule.remove.success.2"], true);
+					showAlert(geti18n("ACLE.alert.rule.remove.success", ruleID), true);
 				},
 				409: function(ruleID) {
-					showAlert(i18nKeys["ACLE.alert.rule.remove.notExist"]);
+					showAlert(geti18n("ACLE.alert.rule.remove.notExist"));
 				},
 				500: function(error) {
-					showAlert(i18nKeys["ACLE.alert.rule.remove.error"]);
+					showAlert(geti18n("ACLE.alert.rule.remove.error"));
 				}
 			}
 		});
@@ -508,10 +508,10 @@ var ACLEditor = function(){
 					ruleSelectorInstance.edit(ruleID, ruleDesc, ruleText);
 					ruleSelectorInstance.update();
 					ruleListInstance.edit(ruleID, ruleDesc, ruleText);
-					showAlert(i18nKeys["ACLE.alert.rule.edit.success.1"] + ruleDesc + i18nKeys["ACLE.alert.rule.edit.success.2"], true);
+					showAlert(geti18n("ACLE.alert.rule.edit.success", ruleDesc), true);
 				},
 				500: function(error) {
-					showAlert(i18nKeys["ACLE.alert.rule.edit.error"]);
+					showAlert(geti18n("ACLE.alert.rule.edit.error"));
 				}
 			}
 		});
@@ -759,6 +759,19 @@ var ACLEditor = function(){
 		$("#acle2-lightbox-multi-edit-plus").removeClass("icon-minus");		
 		$("#acle2-lightbox-multi-edit-select").find("select").select2("destroy");
 		$("#acle2-lightbox-multi-edit-select").find("select").remove();
+	}
+	
+	function geti18n(key) {
+		var string = i18nKeys[key];
+		if (string != undefined){
+			for (i = 0; i < arguments.length-1; i++){
+				string = string.replace(new RegExp('\\{' + i + '\\}', "g"), arguments[i+1]);
+			}
+			return string;
+		}
+		else{
+			return "";
+		}
 	}
 }
 

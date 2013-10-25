@@ -42,8 +42,8 @@ var RuleSelector = function(){
 		append: function(ruleID, elem) {
 			var newSelector = selector.clone();
 			if (ruleID == "" || elem.hasClass("acle2-new-access-rule")){
-				newSelector.prepend("<option value='' title='' selected>" + i18nKeys["ACLE.select.select"] + "</option>");
-				newSelector.append("<option class='acle2-new-access-rule-option' value='new' title=''>" + i18nKeys["ACLE.select.newRule"] + "</option>");
+				newSelector.prepend("<option value='' title='' selected>" + geti18n("ACLE.select.select") + "</option>");
+				newSelector.append("<option class='acle2-new-access-rule-option' value='new' title=''>" + geti18n("ACLE.select.newRule") + "</option>");
 			}
 			newSelector.val(ruleID);
 			newSelector.appendTo(elem);
@@ -55,5 +55,17 @@ var RuleSelector = function(){
 				formatResult: formatSelect
 			});
 		}
-	};
+	};	
+	function geti18n(key) {
+		var string = i18nKeys[key];
+		if (string != undefined){
+			for (i = 0; i < arguments.length-1; i++){
+				string = string.replace(new RegExp('\\{' + i + '\\}', "g"), arguments[i+1]);
+			}
+			return string;
+		}
+		else{
+			return "";
+		}
+	}
 }

@@ -55,7 +55,7 @@ var AccessTable = function(){
 							return;
 						}
 						else{
-							showAlert(i18nKeys["ACLE.alert.access.remove.error.1"] + id + " : " + pool + i18nKeys["ACLE.alert.access.remove.error.2"]);
+							showAlert(geti18n("ACLE.alert.access.remove.errorElm", id , pool));
 							parent.removeClass("acle2-delete");
 							return;
 						}
@@ -86,7 +86,7 @@ var AccessTable = function(){
 							return;
 						}
 						else{
-							showAlert(i18nKeys["ACLE.alert.access.edit.multi.error.1"] + id + " : " + pool + i18nKeys["ACLE.alert.access.edit.multi.error.2"]);
+							showAlert(geti18n("ACLE.alert.access.edit.multi.error", id , pool));
 							parent.removeClass("acle2-multi-edit");
 							return;
 						}
@@ -104,4 +104,16 @@ var AccessTable = function(){
 			});
 		}
 	};
+	function geti18n(key) {
+		var string = i18nKeys[key];
+		if (string != undefined){
+			for (i = 0; i < arguments.length-1; i++){
+				string = string.replace(new RegExp('\\{' + i + '\\}', "g"), arguments[i+1]);
+			}
+			return string;
+		}
+		else{
+			return "";
+		}
+	}
 }

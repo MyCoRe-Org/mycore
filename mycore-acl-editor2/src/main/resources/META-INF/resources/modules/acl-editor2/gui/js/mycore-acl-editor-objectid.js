@@ -57,7 +57,7 @@ var ACLEditorObjectID = function(){
 					}
 				}
 				else{
-					showAlert(i18nKeys["ACLE.alert.access.fields"]);
+					showAlert(geti18n("ACLE.alert.access.fields"));
 					if (accessRule == "" || accessRule == "new"){
 						$("#acle2-new-access-rule").parent().addClass("form-group has-error");
 					}
@@ -87,7 +87,7 @@ var ACLEditorObjectID = function(){
 			}
 			else{
 				if(qpara["cmd"] == "delete"){
-					$("#acle2-access-delete").append('<pre>'+ i18nKeys["ACLE.labels.access.delete.1"] + decodeURIComponent(qpara["objId"]) + i18nKeys["ACLE.labels.access.delete.2"] + qpara["perm"] + i18nKeys["ACLE.labels.access.delete.3"] + '</pre>');
+					$("#acle2-access-delete").append('<pre>'+ geti18n("ACLE.labels.access.deleteAll", decodeURIComponent(qpara["objId"]), qpara["perm"]) + '</pre>');
 					$("#acle2-access-delete").show();
 					$("#acle2-objectid-delete").show();
 				}
@@ -115,7 +115,7 @@ var ACLEditorObjectID = function(){
 				}
 			},
 			error: function(error) {
-				showAlert(i18nKeys["ACLE.alert.access.edit.error"]);
+				showAlert(geti18n("ACLE.alert.access.edit.error"));
 				$("#acle2-loading").hide();
 			}
 		});
@@ -134,7 +134,7 @@ var ACLEditorObjectID = function(){
 						$(".select2-container").select2("destroy");
 						$("#acle2-access-input-rule-option").remove();
 						$("#acle2-access-input-rule").append("<option class='acle2-access-rule-option' title='" + ruleText + "' value='" + ruleID + "'>" +  ruleDesc + " (" + ruleID + ")</option>");
-						$("#acle2-access-input-rule").append("<option value='new' title=''>" + i18nKeys["ACLE.select.newRule"] + "</option>");
+						$("#acle2-access-input-rule").append("<option value='new' title=''>" + geti18n("ACLE.select.newRule") + "</option>");
 						$("#acle2-access-input-rule").val(ruleID);
 						$("#acle2-access-input-rule").select2({
 							matcher: function(term, text, opt) {
@@ -143,15 +143,15 @@ var ACLEditorObjectID = function(){
 							},
 							formatResult: formatSelect
 						});
-						showAlert(i18neys["ACLE.alert.rule.add.success.1"] + ruleDesc + i18nKeys["ACLE.alert.rule.add.success.2"] + ruleID + i18nKeys["ACLE.alert.rule.add.success.3"], true);
+						showAlert(geti18n("ACLE.alert.rule.add.success", ruleDesc, ruleID), true);
 					}
 					else{
-						showAlert(i18nKeys["ACLE.alert.rule.add.error"]);
+						showAlert(geti18n("ACLE.alert.rule.add.error"));
 						$("#acle2-access-input-rule").select2("val", "");
 					}
 				},
 				500: function(error) {
-					showAlert(i18nKeys["ACLE.alert.rule.add.error"]);
+					showAlert(geti18n("ACLE.alert.rule.add.error"));
 					$("#acle2-access-input-rule").select2("val", "");
 				}
 			}
@@ -170,10 +170,10 @@ var ACLEditorObjectID = function(){
 					window.location.replace(decodeURIComponent(qpara["redir"]));
 				},
 				409: function() {
-					showAlert(i18nKeys["ACLE.alert.access.add.exist"]);
+					showAlert(geti18n("ACLE.alert.access.add.exist"));
 				},					
 				500: function(error) {
-					showAlert(i18nKeys["ACLE.alert.access.add.error"]);
+					showAlert(geti18n("ACLE.alert.access.add.error"));
 				}
 			}
 		});
@@ -191,7 +191,7 @@ var ACLEditorObjectID = function(){
 					window.location.replace(decodeURIComponent(qpara["redir"]));
 				},
 				500: function(error) {
-					showAlert(i18nKeys["ACLE.alert.access.edit.error"]);
+					showAlert(geti18n("ACLE.alert.access.edit.error"));
 				}
 			}
 		});
@@ -209,7 +209,7 @@ var ACLEditorObjectID = function(){
 					window.location.replace(decodeURIComponent(qpara["redir"]));
 				},
 				500: function(error) {
-					showAlert(i18nKeys["ACLE.alert.access.remove.error"]);					
+					showAlert(geti18n("ACLE.alert.access.remove.error"));					
 				}
 			}
 		});
@@ -220,8 +220,8 @@ var ACLEditorObjectID = function(){
 		$.each(data.rules, function(i, l) {
 			ruleSelector.append("<option class='acle2-access-rule-option' title='" + l.ruleSt + "' value='" + l.ruleID + "'>" +  l.desc + " (" + l.ruleID + ")</option>");
 		});
-		ruleSelector.prepend("<option value='' title='' selected>" + i18nKeys["ACLE.select.select"] + "</option>");
-		ruleSelector.append("<option id='acle2-access-input-rule-option' value='new' title=''>" + i18nKeys["ACLE.select.newRule"] + "</option>");
+		ruleSelector.prepend("<option value='' title='' selected>" + geti18n("ACLE.select.select") + "</option>");
+		ruleSelector.append("<option id='acle2-access-input-rule-option' value='new' title=''>" + geti18n("ACLE.select.newRule") + "</option>");
 		ruleSelector.val(select);
 		ruleSelector.select2({
 			matcher: function(term, text, opt) {
@@ -273,6 +273,19 @@ var ACLEditorObjectID = function(){
 				$("#acle2-alert-area").removeClass("alert-success");
 				$("#acle2-alert-area").removeClass("alert-danger");
 			}, 5000);
+	}
+	
+	function geti18n(key) {
+		var string = i18nKeys[key];
+		if (string != undefined){
+			for (i = 0; i < arguments.length-1; i++){
+				string = string.replace(new RegExp('\\{' + i + '\\}', "g"), arguments[i+1]);
+			}
+			return string;
+		}
+		else{
+			return "";
+		}
 	}
 }
 
