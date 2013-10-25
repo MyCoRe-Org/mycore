@@ -23,10 +23,15 @@
 
 package org.mycore.frontend.indexbrowser;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.jdom2.output.Format;
 import org.jdom2.Document;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRUtils;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
@@ -68,7 +73,7 @@ public final class MCRGoogleSitemapCommands extends MCRAbstractCommands {
         if (number == 1) {
             String fn = common.getFileName(1,true);
             File xml = new File(fn);
-            Document jdom = common.buildSitemap();
+            Document jdom = common.buildSingleSitemap();
             LOGGER.info("Write Google sitemap file " + fn + ".");
             MCRUtils.writeJDOMToFile(jdom, xml);
         } else {
@@ -80,7 +85,7 @@ public final class MCRGoogleSitemapCommands extends MCRAbstractCommands {
             for (int i = 0; i < number; i++) {
                 fn = common.getFileName(i+2,true);
                 xml = new File(fn);
-                jdom = common.buildSitemap(i);
+                jdom = common.buildPartSitemap(i);
                 LOGGER.info("Write Google sitemap file " + fn + ".");
                 MCRUtils.writeJDOMToFile(jdom, xml);
             }

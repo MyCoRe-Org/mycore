@@ -71,7 +71,7 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
             jdom = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(fi));
             if (jdom == null) {
                 if (number == 1) {
-                    jdom = common.buildSitemap();
+                    jdom = common.buildSingleSitemap();
                 } else {
                     jdom = common.buildSitemapIndex(number);
                 }
@@ -84,12 +84,12 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
         common.removeSitemapFiles();
         // build new return and URL files
         if (number == 1) {
-            jdom = common.buildSitemap();
+            jdom = common.buildSingleSitemap();
         } else {
             for (int i = 0; i < number; i++) {
                 String fn = common.getFileName(i + 2, true);
                 File xml = new File(fn);
-                jdom = common.buildSitemap(i);
+                jdom = common.buildPartSitemap(i);
                 LOGGER.info("Write Google sitemap file " + fn + ".");
                 MCRUtils.writeJDOMToFile(jdom, xml);
             }
