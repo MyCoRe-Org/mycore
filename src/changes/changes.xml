@@ -5,7 +5,13 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2013.10" date="2013-10-00" description="Codenamed &apos;Between the Sheets&apos;">
+    <release version="2013.11" date="2013-11-00" description="Codenamed &apos;Between the Sheets&apos;">
+      <action dev="mcrtchef" type="update">
+        mycore-mods: inherit metadata to children (better index and export)
+      </action>
+      <action dev="mcrtchef" type="update">
+        make MCRObject inheritance configurable (see org.mycore.datamodel.metadata.inheritance.MCRInheritanceManagerFactory)
+      </action>
       <action dev="mcrtchef" type="fix" date="2013-10-22">
         mycore-solr: "lang" parameter should not be handled as search field in MCRSolrSearchServlet
       </action>
