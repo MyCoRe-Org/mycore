@@ -572,9 +572,16 @@
                 </xsl:if>
                 <xsl:if test="$CurrentUser=$MCR.Users.Superuser.UserName">
                   <li class="last">
-                    <a href="{$editURL_allMods}">
-                      <xsl:value-of select="i18n:translate('component.mods.object.editAllModsXML')" />
-                    </a>
+                    <xsl:choose>
+                      <xsl:when test="string-length($editURL_allMods) &gt; 0">
+                        <a href="{$editURL_allMods}">
+                          <xsl:value-of select="i18n:translate('component.mods.object.editAllModsXML')" />
+                        </a>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="i18n:translate('object.locked')" />
+                      </xsl:otherwise>
+                    </xsl:choose>
                   </li>
                 </xsl:if>
               </ul>
