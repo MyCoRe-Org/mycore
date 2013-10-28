@@ -9,6 +9,7 @@
   <xsl:include href="mods2html.xsl" />
   <xsl:include href="modsmetadata.xsl" />
   <xsl:include href="mods-highwire.xsl" />
+  <xsl:include href="mods-dc-meta.xsl" />
 
   <xsl:include href="basket.xsl" />
 
@@ -87,7 +88,6 @@
           <xsl:variable name="date">
             <xsl:call-template name="formatISODate">
               <xsl:with-param select="$mcrobj/service/servdates/servdate[@type='modifydate']" name="date" />
-              <xsl:with-param select="i18n:translate('metaData.date')" name="format" />
             </xsl:call-template>
           </xsl:variable>
           <xsl:value-of select="i18n:translate('results.lastChanged',$date)" />
@@ -572,9 +572,16 @@
                 </xsl:if>
                 <xsl:if test="$CurrentUser=$MCR.Users.Superuser.UserName">
                   <li class="last">
-                    <a href="{$editURL_allMods}">
-                      <xsl:value-of select="i18n:translate('component.mods.object.editAllModsXML')" />
-                    </a>
+                    <xsl:choose>
+                      <xsl:when test="string-length($editURL_allMods) &gt; 0">
+                        <a href="{$editURL_allMods}">
+                          <xsl:value-of select="i18n:translate('component.mods.object.editAllModsXML')" />
+                        </a>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="i18n:translate('object.locked')" />
+                      </xsl:otherwise>
+                    </xsl:choose>
                   </li>
                 </xsl:if>
               </ul>
