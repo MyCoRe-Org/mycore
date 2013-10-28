@@ -9,7 +9,6 @@
   <xsl:include href="mods2html.xsl" />
   <xsl:include href="modsmetadata.xsl" />
   <xsl:include href="mods-highwire.xsl" />
-  <xsl:include href="mods-dc-meta.xsl" />
 
   <xsl:include href="basket.xsl" />
 
