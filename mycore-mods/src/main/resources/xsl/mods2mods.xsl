@@ -41,17 +41,6 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="mods:relatedItem[@type='host']" mode="mods2mods">
-    <xsl:copy>
-      <xsl:copy-of select="@*" />
-      <xsl:if test="ancestor::mycoreobject/structure/parents/parent">
-        <xsl:variable name="parentObject" select="document(concat('mcrobject:',ancestor::mycoreobject/structure/parents/parent/@xlink:href))" />
-        <xsl:apply-templates select="$parentObject/mycoreobject/metadata/def.modsContainer/modsContainer/mods:mods/*"
-          mode="mods2mods" />
-      </xsl:if>
-      <xsl:apply-templates mode="mods2mods" />
-    </xsl:copy>
-  </xsl:template>
   <xsl:template match="mods:genre[@type='intern']" mode="mods2mods">
     <xsl:message>
       found intern mods genre

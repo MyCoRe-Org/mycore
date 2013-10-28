@@ -11,25 +11,20 @@
 
   <xsl:template match="mycoreobject[contains(@ID,'_mods_')]">
     <xsl:apply-imports />
-    <xsl:variable name="resolved">
-      <xsl:apply-templates select="." mode="mods" />
-    </xsl:variable>
-    <xsl:variable name="fullyResolved" select="xalan:nodeset($resolved)" />
-
     <!-- classification fields from mycore-mods -->
     <xsl:for-each select="metadata//mods:*[@authority or @authorityURI]">
       <xsl:variable name="uri" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport" select="mcrmods:getClassCategParentLink(.)" />
       <xsl:if test="string-length($uri) &gt; 0">
+        <xsl:variable name="topField" select="not(ancestor::mods:relatedItem[@type='host'])"/>
         <xsl:variable name="classdoc" select="document($uri)" />
         <xsl:variable name="classid" select="$classdoc/mycoreclass/@ID" />
         <xsl:apply-templates select="$classdoc//category" mode="category">
           <xsl:with-param name="classid" select="$classid" />
-          <!-- TODO: Currently we do not have to think of releatedItem[@type='host'] here -->
-          <xsl:with-param name="withTopField" select="true()" />
+          <xsl:with-param name="withTopField" select="$topField" />
         </xsl:apply-templates>
       </xsl:if>
     </xsl:for-each>
-    <xsl:apply-templates select="$fullyResolved/mods:mods" />
+    <xsl:apply-templates select="metadata/def.modsContainer/modsContainer/mods:mods" />
     <field name="mods.type">
       <xsl:apply-templates select="." mode="mods-type" />
     </field>
