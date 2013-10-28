@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
@@ -43,12 +42,13 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
-import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
+import org.mycore.datamodel.metadata.inheritance.MCRInheritanceManager;
+import org.mycore.datamodel.metadata.inheritance.MCRInheritanceManagerFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -62,9 +62,11 @@ public final class MCRMetadataManager {
 
     private static final Logger LOGGER = Logger.getLogger(MCRMetadataManager.class);
 
-    private static final MCRCache<MCRObjectID, MCRObjectID> derivateObjectMap = new MCRCache<>(10000, "derivate objectid cache");
+    private static final MCRCache<MCRObjectID, MCRObjectID> derivateObjectMap = new MCRCache<>(10000,
+        "derivate objectid cache");
 
-    private static final MCRCache<MCRObjectID, List<MCRObjectID>> objectDerivateMap = new MCRCache<>(10000, "derivate objectid cache");
+    private static final MCRCache<MCRObjectID, List<MCRObjectID>> objectDerivateMap = new MCRCache<>(10000,
+        "derivate objectid cache");
 
     private static MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.instance();
 
@@ -91,7 +93,8 @@ public final class MCRMetadataManager {
             return mcrObjectID;
         }
         //one cheap db query
-        Collection<String> list = MCRLinkTableManager.instance().getSourceOf(derivateID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE);
+        Collection<String> list = MCRLinkTableManager.instance().getSourceOf(derivateID,
+            MCRLinkTableManager.ENTRY_TYPE_DERIVATE);
         if (!(list == null || list.isEmpty())) {
             mcrObjectID = MCRObjectID.getInstance(list.iterator().next());
         } else {
@@ -127,7 +130,7 @@ public final class MCRMetadataManager {
             return derivateIds;
         }
         Collection<String> destinationOf = MCRLinkTableManager.instance().getDestinationOf(objectId,
-                MCRLinkTableManager.ENTRY_TYPE_DERIVATE);
+            MCRLinkTableManager.ENTRY_TYPE_DERIVATE);
         if (!(destinationOf == null || destinationOf.isEmpty())) {
             derivateIds = new ArrayList<>(destinationOf.size());
             for (String strId : destinationOf) {
@@ -168,11 +171,12 @@ public final class MCRMetadataManager {
         try {
             objectBackup = MCRXMLMetadataManager.instance().retrieveBLOB(objid);
             if (objectBackup == null) {
-                throw new MCRPersistenceException("Cannot find " + objid + " to attach derivate " + mcrDerivate.getId() + " to it.");
+                throw new MCRPersistenceException("Cannot find " + objid + " to attach derivate " + mcrDerivate.getId()
+                    + " to it.");
             }
         } catch (IOException e) {
-            throw new MCRPersistenceException("The derivate " + mcrDerivate.getId() + " can't find metadata object " + objid
-                    + ", nothing done.");
+            throw new MCRPersistenceException("The derivate " + mcrDerivate.getId() + " can't find metadata object "
+                + objid + ", nothing done.");
         }
 
         // prepare the derivate metadata and store under the XML table
@@ -254,18 +258,15 @@ public final class MCRMetadataManager {
 
         // prepare this object with parent metadata
         final MCRObjectID parent_id = mcrObject.getStructure().getParentID();
-        MCRObject parent = null;
+        MCRObject parent = inheritMetadata(mcrObject, parent_id);
 
         if (parent_id != null) {
             LOGGER.debug("Parent ID = " + parent_id.toString());
 
             try {
                 parent = MCRMetadataManager.retrieveMCRObject(parent_id);
-                mcrObject.getMetadata().appendMetadata(parent.getMetadata().getHeritableMetadata());
             } catch (final Exception e) {
-                LOGGER.error(MCRException.getStackTraceAsString(e));
-                LOGGER.error("Error while merging metadata in this object.");
-
+                LOGGER.error("Error while merging metadata in this object.", e);
                 return;
             }
         }
@@ -277,8 +278,8 @@ public final class MCRMetadataManager {
         if (parent_id != null) {
             try {
                 parent.getStructure().addChild(
-                        new MCRMetaLinkID("child", mcrObject.getId(), mcrObject.getStructure().getParent().getXLinkLabel(), mcrObject
-                                .getLabel()));
+                    new MCRMetaLinkID("child", mcrObject.getId(), mcrObject.getStructure().getParent().getXLinkLabel(),
+                        mcrObject.getLabel()));
                 MCRMetadataManager.fireUpdateEvent(parent);
             } catch (final Exception e) {
                 LOGGER.error("Error while store child ID in parent object.", e);
@@ -304,13 +305,15 @@ public final class MCRMetadataManager {
         try {
             metaId = mcrDerivate.getDerivate().getMetaLink().getXLinkHrefID();
             if (MCRMetadataManager.removeDerivateFromObject(metaId, mcrDerivate.getId())) {
-                LOGGER.info(MessageFormat.format("Link in MCRObject {0} to MCRDerivate {1} is deleted.", metaId, mcrDerivate.getId()));
+                LOGGER.info(MessageFormat.format("Link in MCRObject {0} to MCRDerivate {1} is deleted.", metaId,
+                    mcrDerivate.getId()));
             } else {
-                LOGGER.warn(MessageFormat.format("Link in MCRObject {0} to MCRDerivate {1} could not be deleted.", metaId,
-                        mcrDerivate.getId()));
+                LOGGER.warn(MessageFormat.format("Link in MCRObject {0} to MCRDerivate {1} could not be deleted.",
+                    metaId, mcrDerivate.getId()));
             }
         } catch (final Exception e) {
-            LOGGER.warn("Can't delete link for MCRDerivate " + mcrDerivate.getId() + " from MCRObject " + metaId + ". Error ignored.");
+            LOGGER.warn("Can't delete link for MCRDerivate " + mcrDerivate.getId() + " from MCRObject " + metaId
+                + ". Error ignored.");
         }
 
         // delete data from IFS
@@ -324,7 +327,7 @@ public final class MCRMetadataManager {
                     e.printStackTrace();
                 }
                 LOGGER.warn("Error while delete for ID " + mcrDerivate.getId().toString() + " from IFS with ID "
-                        + mcrDerivate.getDerivate().getInternals().getIFSID());
+                    + mcrDerivate.getDerivate().getInternals().getIFSID());
             }
         }
 
@@ -352,7 +355,8 @@ public final class MCRMetadataManager {
         final Collection<String> sources = MCRLinkTableManager.instance().getSourceOf(mcrObject.mcr_id);
         LOGGER.debug("Sources size:" + sources.size());
         if (sources.size() > 0) {
-            final MCRActiveLinkException activeLinks = new MCRActiveLinkException("Error while deleting object "
+            final MCRActiveLinkException activeLinks = new MCRActiveLinkException(
+                "Error while deleting object "
                     + mcrObject.mcr_id.toString()
                     + ". This object is still referenced by other objects and can not be removed until all links are released.");
             for (final String curSource : sources) {
@@ -389,7 +393,8 @@ public final class MCRMetadataManager {
                 parent.getStructure().removeChild(mcrObject.getId());
                 MCRMetadataManager.fireUpdateEvent(parent);
             } catch (final Exception e) {
-                LOGGER.error("Error while removing child ID in parent object. The parent " + parent_id + "is now inconsistent.", e);
+                LOGGER.error("Error while removing child ID in parent object. The parent " + parent_id
+                    + "is now inconsistent.", e);
             }
         }
 
@@ -565,7 +570,8 @@ public final class MCRMetadataManager {
             throw new MCRPersistenceException("You do not have the permission to update: " + mcrDerivate.getId());
         }
         File fileSourceDirectory = null;
-        if (mcrDerivate.getDerivate().getInternals() != null && mcrDerivate.getDerivate().getInternals().getSourcePath() != null) {
+        if (mcrDerivate.getDerivate().getInternals() != null
+            && mcrDerivate.getDerivate().getInternals().getSourcePath() != null) {
             fileSourceDirectory = new File(mcrDerivate.getDerivate().getInternals().getSourcePath());
 
             if (!fileSourceDirectory.exists()) {
@@ -658,22 +664,7 @@ public final class MCRMetadataManager {
         mcrObject.getStructure().getChildren().addAll(old.getStructure().getChildren());
 
         // import all herited matadata from the parent
-
-        if (newParentID != null) {
-            LOGGER.debug("Parent ID = " + newParentID);
-
-            try {
-                final MCRObject parent = MCRMetadataManager.retrieveMCRObject(newParentID);
-                // remove already embedded inherited tags
-                mcrObject.getMetadata().removeInheritedMetadata();
-                // insert heritable tags
-                mcrObject.getMetadata().appendMetadata(parent.getMetadata().getHeritableMetadata());
-
-            } catch (final Exception e) {
-                LOGGER.error(MCRException.getStackTraceAsString(e));
-                LOGGER.error("Error while merging metadata in this object.");
-            }
-        }
+        MCRObject newParent = inheritMetadata(mcrObject, newParentID);
 
         // if not imported via cli, createdate remains unchanged
         if (!mcrObject.isImportMode() || mcrObject.getService().getDate("createdate") == null) {
@@ -686,9 +677,9 @@ public final class MCRMetadataManager {
         // check if the parent was new set and set them
         if (setparent) {
             try {
-                final MCRObject parent = MCRMetadataManager.retrieveMCRObject(newParentID);
-                parent.getStructure().addChild(new MCRMetaLinkID("child", mcrObject.getId(), null, mcrObject.getLabel()));
-                MCRMetadataManager.fireUpdateEvent(parent);
+                newParent.getStructure().addChild(
+                    new MCRMetaLinkID("child", mcrObject.getId(), null, mcrObject.getLabel()));
+                MCRMetadataManager.fireUpdateEvent(newParent);
             } catch (final Exception e) {
                 LOGGER.error("Error while store child ID in parent object.", e);
                 throw new RuntimeException(e);
@@ -696,44 +687,32 @@ public final class MCRMetadataManager {
         }
 
         // update all children
-        boolean updatechildren = false;
-        final MCRObjectMetadata md = mcrObject.getMetadata();
-        final MCRObjectMetadata mdold = old.getMetadata();
-        int numheritablemd = 0;
-        int numheritablemdold = 0;
-        for (int i = 0; i < md.size(); i++) {
-            final MCRMetaElement melm = md.getMetadataElement(i);
-            if (melm.isHeritable()) {
-                numheritablemd++;
-                try {
-                    final MCRMetaElement melmold = mdold.getMetadataElement(melm.getTag());
-                    final Element jelm = melm.createXML(true);
-                    final Element jelmold = melmold.createXML(true);
-                    if (!MCRXMLHelper.deepEqual(jelmold, jelm)) {
-                        updatechildren = true;
-                        break;
-                    }
-                } catch (final RuntimeException e) {
-                    updatechildren = true;
-                }
-            }
-        }
-        if (!updatechildren) {
-            for (int i = 0; i < mdold.size(); i++) {
-                final MCRMetaElement melmold = mdold.getMetadataElement(i);
-                if (melmold.isHeritable()) {
-                    numheritablemdold++;
-                }
-            }
-        }
-        if (numheritablemd != numheritablemdold) {
-            updatechildren = true;
-        }
+        boolean updatechildren = inheritableMetadataChanged(mcrObject, old);
         if (updatechildren) {
-            for (MCRMetaLinkID child : mcrObject.getStructure().getChildren()) {
-                MCRMetadataManager.updateInheritedMetadata(child.getXLinkHrefID());
+            MCRInheritanceManager inheritanceManager = MCRInheritanceManagerFactory.getManager(mcrObject.getId());
+            inheritanceManager.inheritMetadata(mcrObject);
+        }
+    }
+
+    private static boolean inheritableMetadataChanged(final MCRObject mcrObject, MCRObject old) {
+        MCRInheritanceManager inheritanceManager = MCRInheritanceManagerFactory.getManager(mcrObject.getId());
+        return inheritanceManager.inheritableMetadataChanged(old, mcrObject);
+    }
+
+    private static MCRObject inheritMetadata(final MCRObject mcrObject, final MCRObjectID parentID) {
+        //TODO: handle inheritance of mycore-mods in that component
+        MCRObject parent = null;
+        if (parentID != null) {
+            LOGGER.debug("Parent ID = " + parentID);
+            try {
+                parent = MCRMetadataManager.retrieveMCRObject(parentID);
+                MCRInheritanceManager inheritanceManager = MCRInheritanceManagerFactory.getManager(parentID);
+                inheritanceManager.inheritMetadata(parent, mcrObject);
+            } catch (final Exception e) {
+                LOGGER.error("Error while merging metadata in this object.", e);
             }
         }
+        return parent;
     }
 
     /**
@@ -761,7 +740,8 @@ public final class MCRMetadataManager {
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
      */
-    public static void addDerivateToObject(final MCRObjectID id, final MCRMetaLinkID link) throws MCRPersistenceException {
+    public static void addDerivateToObject(final MCRObjectID id, final MCRMetaLinkID link)
+        throws MCRPersistenceException {
         final MCRObject object = MCRMetadataManager.retrieveMCRObject(id);
         // don't put the same derivates twice in an object!
         if (!object.getStructure().addDerivate(link))
@@ -774,7 +754,8 @@ public final class MCRMetadataManager {
         MCRMetadataManager.fireUpdateEvent(object);
     }
 
-    public static boolean removeDerivateFromObject(final MCRObjectID objectID, final MCRObjectID derivateID) throws MCRPersistenceException {
+    public static boolean removeDerivateFromObject(final MCRObjectID objectID, final MCRObjectID derivateID)
+        throws MCRPersistenceException {
         final MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
         if (object.getStructure().removeDerivate(derivateID)) {
             object.getService().setDate("modifydate");
@@ -796,26 +777,6 @@ public final class MCRMetadataManager {
             // delete from the XML table
             // handle events
             fireEvent(mcrDerivate, MCREvent.DELETE_EVENT);
-        }
-    }
-
-    /**
-     * Updates the metadata of the stored dataset and replace the inherited data
-     * from the parent.
-     * 
-     * @param childId
-     *            the MCRObjectID of the parent as string
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occurred
-     */
-    private static void updateInheritedMetadata(final MCRObjectID childId) throws MCRPersistenceException {
-        LOGGER.debug("Update metadata from Child " + childId);
-        final MCRObject child = MCRMetadataManager.retrieveMCRObject(childId);
-        try {
-            update(child);
-        } catch (MCRActiveLinkException e) {
-            // should never happen, as the object is unchanged
-            throw new MCRPersistenceException("Error while updating inherited metadata", e);
         }
     }
 
