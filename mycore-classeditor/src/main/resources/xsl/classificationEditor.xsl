@@ -22,7 +22,7 @@
             ready(function() {
               domUtil.updateBodyTheme();
               var preloadCSS = [
-                domUtil.loadCSS("http://ajax.googleapis.com/ajax/libs/dojo/"+classeditor.dojoVersion +"/dijit/themes/claro/claro.css"),
+                domUtil.loadCSS("///ajax.googleapis.com/ajax/libs/dojo/"+classeditor.dojoVersion +"/dijit/themes/claro/claro.css"),
                 domUtil.loadCSS(classeditor.settings.cssURL + "/classificationEditor.css"),
                 domUtil.loadCSS(classeditor.settings.cssURL + "/mycore.dojo.css")
               ];
