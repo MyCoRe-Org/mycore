@@ -1,6 +1,6 @@
 <project name="MyCoRe Components integration" xmlns:mcr="antlib:org.mycore.buildtools">
   <property name="components.order"
-    value="acl-editor,acl-editor2,broadcasting,buildtools,classbrowser,classeditor,classhandler,doubletfinder,indexing,iview2,migration21-22,session-listing,swf,mets,mods,user2,wcms,webcli,webservices,z3950,oai,solr"/>
+    value="acl-editor,acl-editor2,broadcasting,buildtools,classbrowser,classeditor,classhandler,doubletfinder,indexing,iview2,migration-2014,session-listing,swf,mets,mods,user2,wcms,webcli,webservices,z3950,oai,solr"/>
   
   <import file="${integration.dir}/helper.xml"/>
   <taskdef resource="org/mycore/buildtools/antlib.xml" uri="antlib:org.mycore.buildtools" classpathref="integration.classpath" onerror="fail"/>

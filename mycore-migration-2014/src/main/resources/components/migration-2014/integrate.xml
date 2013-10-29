@@ -1,0 +1,13 @@
+<project name="migration-2014" xmlns:mcr="antlib:org.mycore.buildtools">
+  <import file="../../integrate.xml" />
+  <!-- - - - - - - - - - - - - - - - - - 
+          target: config                      
+         - - - - - - - - - - - - - - - - -
+-->
+  <target name="config">
+    <mcr:config action="addInclude"
+                propertyfile="${build.config}/mycore.properties"
+    			key="MCR.CLI.Classes.Internal"
+                value="org.mycore.migration2014.cli.MCRMigrationCommands" />
+  </target>
+</project>

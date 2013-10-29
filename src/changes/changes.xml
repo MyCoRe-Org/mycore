@@ -6,6 +6,12 @@
   </properties>
   <body>
     <release version="2013.11" date="2013-11-00" description="Codenamed &apos;Between the Sheets&apos;">
+      <action dev="mcrtchef" type="add">
+        added mycore-migration-2014 component 
+      </action>
+      <action dev="mcrtchef" type="remove">
+        removed mycore-migration21-22
+      </action>
       <action dev="mcrtchef" type="update">
         add "parent" relation to MCRLINKHREF table (update with "repair metadata search of type {0}")
       </action>

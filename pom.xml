@@ -1306,7 +1306,7 @@
     <module>mycore-iview2</module>
     <module>mycore-media</module>
     <module>mycore-mets</module>
-    <module>mycore-migration21-22</module>
+    <module>mycore-migration-2014</module>
     <module>mycore-mods</module>
     <module>mycore-oai</module>
     <module>mycore-session-listing</module>

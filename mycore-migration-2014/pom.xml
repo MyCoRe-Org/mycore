@@ -7,8 +7,8 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>mycore-migration21-22</artifactId>
-  <name>MyCoRe migration 2.1 --&gt; 2.2 tools</name>
+  <artifactId>mycore-migration-2014</artifactId>
+  <name>MyCoRe migration 2013.06 --&gt; 2014.0x tools</name>
   <dependencies>
     <dependency>
       <groupId>org.mycore</groupId>
@@ -17,7 +17,7 @@
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
-      <artifactId>mycore-user2</artifactId>
+      <artifactId>mycore-mods</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
