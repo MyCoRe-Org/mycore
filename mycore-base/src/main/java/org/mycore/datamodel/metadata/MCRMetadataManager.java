@@ -352,7 +352,7 @@ public final class MCRMetadataManager {
         }
 
         // check for active links
-        final Collection<String> sources = MCRLinkTableManager.instance().getSourceOf(mcrObject.mcr_id);
+        final Collection<String> sources = MCRLinkTableManager.instance().getSourceOf(mcrObject.mcr_id, MCRLinkTableManager.ENTRY_TYPE_REFERENCE);
         LOGGER.debug("Sources size:" + sources.size());
         if (sources.size() > 0) {
             final MCRActiveLinkException activeLinks = new MCRActiveLinkException(

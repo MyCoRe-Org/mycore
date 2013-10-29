@@ -7,6 +7,9 @@
   <body>
     <release version="2013.11" date="2013-11-00" description="Codenamed &apos;Between the Sheets&apos;">
       <action dev="mcrtchef" type="update">
+        add "parent" relation to MCRLINKHREF table (update with "repair metadata search of type {0}")
+      </action>
+      <action dev="mcrtchef" type="update">
         mycore-mods: inherit metadata to children (better index and export)
       </action>
       <action dev="mcrtchef" type="update">

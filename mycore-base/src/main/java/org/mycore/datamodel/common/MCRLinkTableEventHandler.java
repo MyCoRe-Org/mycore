@@ -95,7 +95,10 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
             MCRMetaLinkID lid = struct.getDerivate(i);
             mcr_linktable.addReferenceLink(obj.getId(), lid.getXLinkHrefID(), MCRLinkTableManager.ENTRY_TYPE_DERIVATE, "");
         }
-
+        // add parent reference
+        if (struct.getParentID()!=null){
+            mcr_linktable.addReferenceLink(mcr_id, struct.getParentID(), MCRLinkTableManager.ENTRY_TYPE_PARENT, "");
+        }
     }
 
     private void deleteOldLinks(final MCRObjectID objectId) {
