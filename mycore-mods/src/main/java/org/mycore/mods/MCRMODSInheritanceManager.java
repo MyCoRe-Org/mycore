@@ -43,6 +43,7 @@ import org.mycore.datamodel.metadata.inheritance.MCRInheritanceManager;
  */
 public class MCRMODSInheritanceManager implements MCRInheritanceManager {
     private static Logger LOGGER = Logger.getLogger(MCRMODSInheritanceManager.class);
+
     private static final String HOST_SECTION_XPATH = "mods:relatedItem[@type='host']";
 
     /* (non-Javadoc)
@@ -53,7 +54,11 @@ public class MCRMODSInheritanceManager implements MCRInheritanceManager {
         final MCRObjectMetadata md = newVersion.getMetadata();
         final MCRObjectMetadata mdold = oldVersion.getMetadata();
         //if any metadata changed we need to update children
-        return !MCRXMLHelper.deepEqual(md.createXML(), mdold.createXML());
+        boolean metadataChanged = !MCRXMLHelper.deepEqual(md.createXML(), mdold.createXML());
+        if (!metadataChanged) {
+            LOGGER.info("Metadata did not change on update of " + newVersion.getId());
+        }
+        return metadataChanged;
     }
 
     /* (non-Javadoc)
