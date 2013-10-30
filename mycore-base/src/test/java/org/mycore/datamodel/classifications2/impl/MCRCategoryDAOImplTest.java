@@ -148,6 +148,23 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
 				.getChildren().isEmpty());
 	}
 
+	/**
+     * Test case for https://sourceforge.net/p/mycore/bugs/664/
+     */
+    @Test
+    public void addCategoryToPosition() {
+        addWorldClassification();
+        MCRCategoryImpl america = new MCRCategoryImpl();
+        america.setId(new MCRCategoryID(category.getId().getRootID(), "America"));
+        america.setLabels(new HashSet<MCRLabel>());
+        america.getLabels().add(new MCRLabel("de", "Amerika", null));
+        america.getLabels().add(new MCRLabel("en", "America", null));
+        america.setPositionInParent(1); // should be between europe and asia
+        DAO.addCategory(category.getId(), america);
+        startNewTransaction();
+        assertEquals("invalid position in parent", 1, america.getPositionInParent());
+    }
+
 	@Test
 	public void deleteCategory() {
 		addWorldClassification();
