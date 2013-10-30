@@ -354,7 +354,7 @@ public class MCRClassificationEditorResource {
                 CATEGORY_DAO.moveCategory(categ.getId(), newParentID, categ.getPositionInParent());
             }
         } else {
-            CATEGORY_DAO.addCategory(newParentID, categ.asMCRImpl());
+            CATEGORY_DAO.addCategory(newParentID, categ.asMCRImpl(), categ.getPositionInParent());
         }
     }
 

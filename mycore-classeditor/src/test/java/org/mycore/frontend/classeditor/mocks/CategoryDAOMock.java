@@ -69,6 +69,11 @@ public class CategoryDAOMock implements MCRCategoryDAO {
     }
 
     @Override
+    public void addCategory(MCRCategoryID parentID, MCRCategory category, int position) {
+        categMap.put(category.getId(), category);
+    }
+
+    @Override
     public void deleteCategory(MCRCategoryID id) {
         MCRCategory mcrCategory = categMap.get(id);
         for (MCRCategory child : mcrCategory.getChildren()) {
