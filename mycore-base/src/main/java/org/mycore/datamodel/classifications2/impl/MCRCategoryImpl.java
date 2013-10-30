@@ -49,7 +49,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
 
     private static Logger LOGGER = Logger.getLogger(MCRCategoryImpl.class);
 
-    private int left, right, positionInParent, internalID;
+    private int left, right, positionInParent = -1, internalID;
 
     int level;
 
@@ -172,7 +172,8 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
      *            the positionInParent to set
      */
     public void setPositionInParent(int positionInParent) {
-        LOGGER.debug("Set position called for " + getId() + " with: " + positionInParent + " was: " + this.positionInParent);
+        LOGGER.debug("Set position called for " + getId() + " with: " + positionInParent + " was: "
+            + this.positionInParent);
         this.positionInParent = positionInParent;
     }
 
@@ -193,7 +194,8 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
         this.root = root;
     }
 
-    static Collection<MCRCategoryImpl> wrapCategories(Collection<? extends MCRCategory> categories, MCRCategory parent, MCRCategory root) {
+    static Collection<MCRCategoryImpl> wrapCategories(Collection<? extends MCRCategory> categories, MCRCategory parent,
+        MCRCategory root) {
         List<MCRCategoryImpl> list = new ArrayList<MCRCategoryImpl>(categories.size());
         for (MCRCategory category : categories) {
             list.add(wrapCategory(category, parent, root));
@@ -217,7 +219,8 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
             if (parent != null) {
                 catImpl.level = parent.getLevel() + 1;
             } else if (category.isCategory()) {
-                LOGGER.warn("Something went wrong here, category has no parent and is no root category: " + category.getId());
+                LOGGER.warn("Something went wrong here, category has no parent and is no root category: "
+                    + category.getId());
             }
             // copy children to temporary list
             List<MCRCategory> children = new ArrayList<MCRCategory>(catImpl.getChildren().size());

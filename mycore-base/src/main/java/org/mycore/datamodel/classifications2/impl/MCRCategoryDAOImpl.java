@@ -65,6 +65,14 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     private static HashMap<String, Long> LAST_MODIFIED_MAP = new HashMap<String, Long>();
 
     public void addCategory(MCRCategoryID parentID, MCRCategory category) {
+        int position = -1;
+        if (category instanceof MCRCategoryImpl) {
+            position = ((MCRCategoryImpl) category).getPositionInParent();
+        }
+        addCategory(parentID, category, position);
+    }
+
+    public void addCategory(MCRCategoryID parentID, MCRCategory category, int position) {
         if (exist(category.getId())) {
             throw new MCRException("Cannot add category. A category with ID " + category.getId() + " allready exists");
         }
@@ -79,6 +87,10 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             parent = getByNaturalID(session, parentID);
             levelStart = parent.getLevel() + 1;
             leftStart = parent.getRight();
+            if (position > parent.getChildren().size()) {
+                throw new IndexOutOfBoundsException("Cannot add category as child #" + position
+                    + ", when there are only " + parent.getChildren().size() + " children.");
+            }
         }
         LOGGER.debug("Calculating LEFT,RIGHT and LEVEL attributes...");
         final MCRCategoryImpl wrapCategory = MCRCategoryImpl.wrapCategory(category, parent,
@@ -89,8 +101,13 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         LOGGER.debug("Calculating LEFT,RIGHT and LEVEL attributes. Done! Nodes: " + nodes);
         if (parentID != null) {
             final int increment = nodes * 2;
-            updateLeftRightValue(getHibConnection(), parentID.getRootID(), leftStart, increment);
-            parent.getChildren().add(category);
+            if (position < 0) {
+                updateLeftRightValue(getHibConnection(), parentID.getRootID(), leftStart, increment);
+                parent.getChildren().add(category);
+            } else {
+                parent.getChildren().add(position, category);
+                parent.calculateLeftRightAndLevel(parent.getLeft(), parent.getLevel());
+            }
         }
         session.save(category);
         LOGGER.info("Category " + category.getId() + " saved.");

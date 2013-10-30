@@ -47,6 +47,19 @@ public interface MCRCategoryDAO {
     public abstract void addCategory(MCRCategoryID parentID, MCRCategory category);
 
     /**
+     * Adds a category as child of another category.
+     * When parentID is null a root category will be created.
+     * 
+     * @param parentID
+     *            ID of the parent category
+     * @param category
+     *            Category (with children) to be added
+     * @param position
+     *            insert position
+     */
+    public abstract void addCategory(MCRCategoryID parentID, MCRCategory category, int position);
+
+    /**
      * Deletes a category with all child categories.
      * 
      * @param id
