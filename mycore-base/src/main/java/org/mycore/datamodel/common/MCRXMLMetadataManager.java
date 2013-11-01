@@ -675,9 +675,17 @@ public class MCRXMLMetadataManager {
      */
     public List<String> listIDsOfType(String type) {
         List<String> list = new ArrayList<String>();
-        for (File fProject : baseDir.listFiles()) {
+        File[] projectDirectories = baseDir.listFiles();
+        if (projectDirectories == null) {
+            throw new MCRException("unable to list files of IFS2 metadata directory " + baseDir.getAbsolutePath());
+        }
+        for (File fProject : projectDirectories) {
             String project = fProject.getName();
-            for (File fType : fProject.listFiles()) {
+            File[] objectTypeDirectories = fProject.listFiles();
+            if (objectTypeDirectories == null) {
+                throw new MCRException("unable to list files of IFS2 metadata directory " + fProject.getAbsolutePath());
+            }
+            for (File fType : objectTypeDirectories) {
                 if (!type.equals(fType.getName())) {
                     continue;
                 }
