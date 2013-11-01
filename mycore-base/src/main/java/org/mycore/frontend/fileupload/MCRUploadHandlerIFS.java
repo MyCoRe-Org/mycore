@@ -174,7 +174,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
      * 
      */
     @Override
-    public void finishUpload() throws Exception {
+    public synchronized void finishUpload() throws Exception {
         // existing files
         if (!rootDir.hasChildren()) {
             MCRMetadataManager.deleteMCRDerivate(derivate.getId());
