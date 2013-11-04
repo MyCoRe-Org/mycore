@@ -23,15 +23,10 @@
 
 package org.mycore.frontend.indexbrowser;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.jdom2.output.Format;
 import org.jdom2.Document;
-import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRUtils;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;

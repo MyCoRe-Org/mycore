@@ -50,12 +50,12 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * <ul>
  * <li>MCR.baseurl - the application base URL</li>
  * <li>MCR.WebApplication.basedir - the directory where the web application is stored</li>
- * <li>MCR.GoogleSitemap.Directory - the directory where the sitemap should be stored (mostly MCR.WebApplication.basedir</li>
+ * <li>MCR.GoogleSitemap.Directory - the directory where the sitemap should be stored relative to MCR.WebApplication.basedir (it could be empty)</li>
  * <li>MCR.GoogleSitemap.Types - a list of MCRObject types, they should be included</li>
  * <li>MCR.GoogleSitemap.Freq - the frequency of harvesting, 'monthly' is default<li>
  * <li>MCR.GoogleSitemap.Style - a style extension for the URL in form of ?XSL.Style={style}, default is empty</li>
  * <li>MCR.GoogleSitemap.ObjectPath - the path to get the MCRObject in the sitemap URL, 'receive/' is default</li>
- * <li>MCR.GoogleSitemap.NumberOfURLs - the number of URLs in one sitmap file, 50000 is default</li>
+ * <li>MCR.GoogleSitemap.NumberOfURLs - the number of URLs in one sitemap file, 10000 is default</li>
  * </ul>
  * 
  * see http://www.sitemaps.org/de/protocol.html
@@ -81,10 +81,11 @@ public final class MCRGoogleSitemapCommon {
     /** The base URL */
     private String baseurl = MCRConfiguration.instance().getString("MCR.baseurl", "");
 
+    /** The webapps directory path from configuration */
     private static final String webappBaseDir = MCRConfiguration.instance().getString("MCR.WebApplication.basedir");
 
-    /** The webapps directory path from configuration */
-    private static final String cdir = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Directory", webappBaseDir);
+    /** The directory path to store sitemaps relative to MCR.WebApplication.basedir */
+    private static final String cdir = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Directory", "");
 
     /** The types to build sitemaps */
     private static final String[] types = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Types", "document").split(",");
@@ -99,7 +100,7 @@ public final class MCRGoogleSitemapCommon {
     private static final String objectPath = MCRConfiguration.instance().getString("MCR.GoogleSitemap.ObjectPath", "receive/");
 
     /** Number of URLs in one sitemap */
-    private static int numberOfURLs = MCRConfiguration.instance().getInt("MCR.GoogleSitemap.NumberOfURLs", 50000);
+    private static int numberOfURLs = MCRConfiguration.instance().getInt("MCR.GoogleSitemap.NumberOfURLs", 10000);
 
     /** The XML table API */
     private static final MCRXMLMetadataManager tm = MCRXMLMetadataManager.instance();
@@ -118,6 +119,12 @@ public final class MCRGoogleSitemapCommon {
         objidlist = new ArrayList<MCRObjectIDDate>();
         if ((numberOfURLs < 1) || (numberOfURLs > 50000))
             numberOfURLs = 50000;
+        if (cdir.length() != 0) {
+            File sitemap_directory = new File(webappBaseDir + File.separator + cdir);
+            if (!sitemap_directory.exists()) {
+                sitemap_directory.mkdirs();
+            }
+        }
     }
 
     public MCRGoogleSitemapCommon(String baseURL) {
@@ -165,10 +172,13 @@ public final class MCRGoogleSitemapCommon {
         if (number > 1) {
             fn = "sitemap_google_" + number_format.format(number - 1) + ".xml";
         }
-        if (!withpath)
-            return fn;
-
-        return new File(cdir, fn).getAbsolutePath();
+        String local_path = fn;
+        if (cdir.length() != 0) {
+            local_path = cdir + File.separator + fn;
+        }
+        if (withpath)
+            return webappBaseDir + File.separator + local_path;
+        return local_path;
     }
 
     /**
@@ -266,7 +276,7 @@ public final class MCRGoogleSitemapCommon {
      * This method remove all sitemap files from the webapps directory.
      */
     protected final void removeSitemapFiles() {
-        File dir = new File(cdir);
+        File dir = new File(webappBaseDir,cdir);
         File[] li = dir.listFiles();
         if (li != null) {
             for (File fi : li) {
