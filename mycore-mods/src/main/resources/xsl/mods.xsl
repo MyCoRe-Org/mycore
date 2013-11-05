@@ -437,7 +437,7 @@
     <xsl:param name="accessedit" select="acl:checkPermission($id,'writedb')" />
     <xsl:param name="accessdelete" select="acl:checkPermission($id,'deletedb')" />
     <xsl:param name="hasURN" select="'false'" />
-    <xsl:param name="displayAddDerivate" select="'true'" />
+    <xsl:param name="displayAddDerivate" select="acl:checkPermission($id,'create-mods')" />
     <xsl:param name="layout" select="'$'" />
     <xsl:param name="mods-type" select="'report'" />
     <xsl:variable name="layoutparam">
