@@ -50,7 +50,7 @@
   </xsl:template>
 
   <xsl:template match="login" mode="userAction">
-    <form action="{$FormTarget}{$HttpSession}" method="post" class="form-login">
+    <form action="{$FormTarget}{$HttpSession}" method="post" role="form" class="form-login">
       <h2 class="form-login-heading">
         <xsl:value-of select="i18n:translate('component.user2.login.heading')" />
       </h2>
@@ -67,7 +67,7 @@
             <xsl:value-of select="concat($userNameText,' :')" />
           </label>
           <div class="controls">
-            <input type="text" name="uid" class="controls input-large" placeholder="{$userNameText}" title="{$userNameText}" />
+            <input type="text" name="uid" class="form-control input-large" placeholder="{$userNameText}" title="{$userNameText}" />
           </div>
         </div>
         <div>
@@ -76,14 +76,14 @@
             <xsl:value-of select="concat($passwordText,' :')" />
           </label>
           <div class="controls">
-            <input type="password" name="pwd" class="controls input-large" placeholder="{$passwordText}" title="{$passwordText}" />
+            <input type="password" name="pwd" class="form-control input-large" placeholder="{$passwordText}" title="{$passwordText}" />
           </div>
         </div>
       </fieldset>
       <div class="form-actions">
         <xsl:choose>
           <xsl:when test="$direction = 'rtl' ">
-            <button class="btn" onClick="self.location.href='{$ServletsBaseURL}MCRLoginServlet{$HttpSession}?action=cancel'"
+            <button class="btn btn-default" onClick="self.location.href='{$ServletsBaseURL}MCRLoginServlet{$HttpSession}?action=cancel'"
               tabindex="999">
               <xsl:value-of select="i18n:translate('component.user2.button.cancel')" />
             </button>
@@ -97,7 +97,7 @@
               <xsl:value-of select="i18n:translate('component.user2.button.login')" />
             </button>
             <xsl:value-of select="' '" />
-            <button class="btn" onClick="self.location.href='{$ServletsBaseURL}MCRLoginServlet{$HttpSession}?action=cancel'"
+            <button class="btn btn-default" onClick="self.location.href='{$ServletsBaseURL}MCRLoginServlet{$HttpSession}?action=cancel'"
               tabindex="999">
               <xsl:value-of select="i18n:translate('component.user2.button.cancel')" />
             </button>
@@ -119,9 +119,9 @@
   </xsl:template>
   <xsl:template match="login" mode="controlGroupClass">
     <xsl:attribute name="class">
-      <xsl:value-of select="'control-group'" />
+      <xsl:value-of select="'form-group'" />
       <xsl:if test="@loginFailed='true'">
-        <xsl:value-of select="' error'" />
+        <xsl:value-of select="' has-error'" />
       </xsl:if>
     </xsl:attribute>
   </xsl:template>
