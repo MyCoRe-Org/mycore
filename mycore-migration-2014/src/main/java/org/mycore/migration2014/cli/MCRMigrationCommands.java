@@ -10,7 +10,6 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.jdom2.Comment;
 import org.jdom2.Element;
-import org.jdom2.filter.Filter;
 import org.jdom2.filter.Filters;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRLINKHREF;
@@ -21,6 +20,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.MCRAbstractCommands;
+import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.mods.MCRMODSWrapper;
@@ -77,5 +77,40 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
         }
         mods.addContent(0, new Comment(MODS_COMMENT));
         MCRMetadataManager.update(parent);
+    }
+
+    @MCRCommand(help = "Migrate MODS metadata (dateIssued) from relatedItem[@type='host'] one level up.", syntax = "migrate mods dateIssued selected", order = 10)
+    public static List<String> migrateDateIssued() {
+        List<String> objectIDs = MCRObjectCommands.getSelectedObjectIDs();
+        List<String> commands = new ArrayList<>(objectIDs.size());
+        for (String objectID : objectIDs) {
+            commands.add("migrate mods dateIssued for " + objectID);
+        }
+        return commands;
+    }
+
+    @MCRCommand(help = "Migrate MODS metadata (dateIssued) from relatedItem[@type='host'] one level up.", syntax = "migrate mods dateIssued for {0}")
+    public static void migrateDateIssued(String objectId) throws MCRPersistenceException, MCRActiveLinkException {
+        MCRObjectID mcrObjectId = MCRObjectID.getInstance(objectId);
+        if (!mcrObjectId.getTypeId().equals("mods")) {
+            LOGGER.error("Migration command does not support migration of " + mcrObjectId);
+            return;
+        }
+        MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(mcrObjectId);
+        MCRMODSWrapper wrapper = new MCRMODSWrapper(mcrObject);
+        //pre checks
+        Element hostDateIssued = wrapper.getElement("mods:relatedItem[@type='host']/mods:originInfo[mods:dateIssued]");
+        if (hostDateIssued == null) {
+            LOGGER.error(mcrObjectId + " has no dataIssued defined in host item.");
+            return;
+        }
+        if (wrapper.getElement("mods:originInfo[mods:dateIssued]") != null) {
+            LOGGER.error(mcrObjectId + " has dataIssued already defined.");
+            return;
+        }
+        LOGGER.info("Moving mods:dateIssued in " + mcrObjectId + ".");
+        Element mods = wrapper.getMODS();
+        mods.addContent(hostDateIssued.detach());
+        MCRMetadataManager.update(mcrObject);
     }
 }
