@@ -1102,7 +1102,7 @@
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[not(@ID)]) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:language) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification) or
-                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:titleInfo[@type='isReferencedBy']/mods:title) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='isReferencedBy']/mods:titleInfo/mods:title) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition) or
@@ -1136,7 +1136,7 @@
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification" />
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes"
-                select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:titleInfo[@type='isReferencedBy']/mods:title" />
+                select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='isReferencedBy']/mods:titleInfo/mods:title" />
               <xsl:with-param name="label" select="i18n:translate('component.mods.metaData.dictionary.authority')" />
             </xsl:call-template>
             <xsl:call-template name="printMetaDate.mods">
@@ -1255,7 +1255,7 @@
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[not(@ID)]) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:language) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification) or
-                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:titleInfo[@type='isReferencedBy']/mods:title) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='isReferencedBy']/mods:titleInfo/mods:title) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition) or
@@ -1291,7 +1291,7 @@
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification" />
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes"
-                select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:titleInfo[@type='isReferencedBy']/mods:title" />
+                select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='isReferencedBy']/mods:titleInfo/mods:title" />
               <xsl:with-param name="label" select="i18n:translate('component.mods.metaData.dictionary.authority')" />
             </xsl:call-template>
             <xsl:call-template name="printMetaDate.mods">
@@ -1409,12 +1409,12 @@
 
     <xsl:if
       test="(./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']) or
-                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:originInfo/mods:dateIssued) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:language) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject) or
-                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:titleInfo/mods:title) or
+                  (./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='isReferencedBy']/mods:titleInfo/mods:title) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition) or
                   (./metadata/def.modsContainer/modsContainer/mods:mods/mods:name[@ID])">
@@ -1475,13 +1475,13 @@
             <xsl:call-template name="printMetaDate.mods.permalink" />
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes"
-                select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:originInfo/mods:dateIssued" />
+                select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" />
             </xsl:call-template>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification" />
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes"
-                select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:titleInfo/mods:title" />
+                select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='isReferencedBy']/mods:titleInfo/mods:title" />
               <xsl:with-param name="label" select="i18n:translate('component.mods.metaData.dictionary.2ndSource')" />
             </xsl:call-template>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url" />
