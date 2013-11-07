@@ -8,7 +8,7 @@
   <xsl:param name="MCR.Users.Guestuser.UserName" />
   <xsl:param name="ServletsBaseURL" />
 
-  <xsl:key use="mods:role/mods:roleTerm" name="name-by-role" match="mods:name" />
+  <xsl:key use="mods:role/mods:roleTerm" name="name-by-role" match="mods:mods/mods:name" />
 
   <xsl:template name="printMetaDate.mods">
     <!-- prints a table row for a given nodeset -->
