@@ -149,7 +149,6 @@ div.input-xlarge{
 	overflow: auto;
     list-style: none outside none;
     padding-left: 0;
-    padding-top: 5px;
 }
 
 #acle2-rule-list li{
@@ -283,6 +282,15 @@ div.input-xlarge{
 .acle2-delete-warning{
 	border-left: 5px solid #F1E7BC;
 	margin-bottom: 0px;
+}
+
+.acle2-button-filter-access{
+	opacity: 0;
+	padding-top: 5px;
+}
+
+.acle2-table-access-entry:hover .acle2-button-filter-access{
+	opacity: 1;
 }
 
 /*typeahead.js-bootstrap.css */

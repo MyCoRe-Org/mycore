@@ -38,6 +38,9 @@ var RuleSelector = function(){
 				cla.append(ruleID, $(this).parent());
 				$(this).remove();
 			});
+			$("select.acle2-access-rule").each(function() {
+				$(this).siblings("div.acle2-access-rule").attr("title", $(this).children("option:selected").attr("title"));
+			});
 		},
 		append: function(ruleID, elem) {
 			var newSelector = selector.clone();

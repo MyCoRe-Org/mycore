@@ -22,6 +22,9 @@ var AccessTable = function(){
 			$("#acle2-loading").hide();
 			$("#acle2-ruleAllocation").show();
 			$("a.tab").attr("data-toggle", "tab");
+			$("select.acle2-access-rule").each(function() {
+				$(this).siblings("div.acle2-access-rule").attr("title", $(this).children("option:selected").attr("title"));
+			});
 		},
 		add: 	function(accessID, accessPool, rule, prepend){
 			var tr = $("<tr class='acle2-table-access-entry'></tr>");
@@ -31,7 +34,7 @@ var AccessTable = function(){
 			var td = $("<td class='acle2-access-rule-parent'></td>");
 			ruleSelectorInstance.append(rule, td);
 			tr.append(td);
-			tr.append("<td></td>");
+			tr.append('<td><i class="glyphicon glyphicon-filter icon-filter icon-large acle2-icon acle2-button-filter-access" title="' + geti18n("ACLE.title.filter") + '"></i></td>');
 			if(prepend == true){
 				tr.prependTo("#acle2-access-table > tbody");
 				$("#acle2-access-table").find("th").data("sort-dir", null);

@@ -13,6 +13,7 @@ var ACLEditor = function(){
 				if($(this).children("option:selected").val() == "new"){
 					$('#acle2-lightbox-new-rule').modal('show');
 				}
+				$(this).siblings("div.acle2-access-rule").attr("title", $(this).children("option:selected").attr("title"));
 			});
 			
 			$("body").on("change", ".acle2-access-rule-parent > .acle2-access-rule", function() {
@@ -26,6 +27,7 @@ var ACLEditor = function(){
 							"accessRuleNew": access.find(".acle2-access-rule:not(.select2-container)").val()						
 						};
 				editAccess(json); 
+				$(this).siblings("div.acle2-access-rule").attr("title", $(this).children("option:selected").attr("title"));
 			});
 			
 			$("body").on("click", "#acle2-button-new-access", function() {
@@ -309,6 +311,12 @@ var ACLEditor = function(){
 				hideMultiEdit();
 			});
 			
+			$("body").on("click", ".acle2-button-filter-access", function() {
+				ruleListInstance.select($(this).parents(".acle2-table-access-entry").find("select.acle2-access-rule").val());
+				$("#acle2-rules-tab").tab("show");
+				$('#acle2-rule-list').animate({scrollTop: $('#acle2-rule-list > .acle2-rule-selected').index() * $('#acle2-rule-list > .acle2-rule-selected').outerHeight()});
+			});
+			
 			ruleSelectorInstance = ruleSelect;
 			accessTableInstance = accessTable;
 			ruleListInstance = ruleList;
@@ -450,9 +458,10 @@ var ACLEditor = function(){
 						ruleSelectorInstance.add(ruleID, ruleDesc, ruleText);
 						ruleSelectorInstance.update();
 						$(".acle2-new-access-rule > select").select2("val", ruleID);
+						$(".acle2-new-access-rule > select").siblings("div.acle2-access-rule").attr("title", $(".acle2-new-access-rule > select").children("option:selected").attr("title"));
 						ruleListInstance.add(ruleID, ruleDesc, ruleText);
 						ruleListInstance.select(ruleID);
-						$('#acle2-rule-list').animate({scrollTop : $('#acle2-rule-list').height()},'fast');
+						$('#acle2-rule-list').animate({scrollTop : $('#acle2-rule-list').height()});
 						showAlert(geti18n("ACLE.alert.rule.add.success", ruleDesc, ruleID), true);
 					}
 					else{
