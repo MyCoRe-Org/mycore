@@ -45,7 +45,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
  * @version $Revision$ $Date$
  */
 public class MCRObjectTypeStrategy implements MCRAccessCheckStrategy {
-    private static final Pattern TYPE_PATTERN = Pattern.compile("[^_]*_([^_]*)_*");
+    private static final Pattern TYPE_PATTERN = Pattern.compile("[^_]*_([^_]*)_[0-9]*");
 
     private static final Logger LOGGER = Logger.getLogger(MCRObjectIDStrategy.class);
 
