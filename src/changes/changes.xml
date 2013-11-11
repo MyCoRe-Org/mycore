@@ -5,7 +5,36 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2013.11" date="2013-11-00" description="Codenamed &apos;Between the Sheets&apos;">
+    <release version="2013.11" date="2013-11-11" description="Codenamed &apos;Leila – Helau!&apos;">
+      <action dev="mcrvuchi" type="fix" date="2013-11-08">
+        MCRObjectTypeStrategy: fixed regular expression to get object type
+      </action>
+      <action dev="mcrkrebs" type="add">
+        added new strategy which allows submitter to change objects while status is submitted
+      </action>
+      <action dev="mcrmibue" type="add">
+        mycore-acl-editor2: add button to go to selected rule in rule view
+      </action>
+      <action dev="mcrtchef" type="remove">
+        properties for MCRHibCStore (class was removed rev. 27108 - 2013.06)
+      </action>
+      <action dev="mcrtchef" type="update">
+        migrated login form to Bootstrap 3
+      </action>
+      <action dev="mcrkrebs" type="update">
+        mycore-mods: moved originInfo/dateIssued directly to mods (is no longer part of relatedItem)
+      </action>
+      <action dev="mcrjkupf" type="fix" date="2013-11-04" due-to="Kathleen Neumann">
+        using MCR.GoogleSitemap.Directory causes errors
+        <fixes issue="663"/>
+      </action>
+      <action dev="mcrvuchi" type="fix" date="2013-11-01">
+        synchronizing upload and finish upload
+      </action>
+      <action dev="mcrtchef" type="fix" date="2013-10-30" due-to="Kathleen Keller">
+        Adding a new category with positionInParent is not working
+        <fixes issue="644"/>
+      </action>
       <action dev="mcrtchef" type="add">
         added mycore-migration-2014 component 
       </action>
