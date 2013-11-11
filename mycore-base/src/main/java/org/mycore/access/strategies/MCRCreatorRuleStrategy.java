@@ -24,10 +24,12 @@
 package org.mycore.access.strategies;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
@@ -37,6 +39,10 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.metadata.MCRObjectID;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 /**
  *
@@ -57,11 +63,31 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 public class MCRCreatorRuleStrategy implements MCRAccessCheckStrategy {
     private static final Logger LOGGER = Logger.getLogger(MCRCreatorRuleStrategy.class);
 
-    private static final String SUBMITTED_CATEGORY = MCRConfiguration.instance().getString(
-            "MCR.Access.Strategy.SubmittedCategory", "status:submitted");
+    private static final MCRCategoryID SUBMITTED_CATEGORY = MCRCategoryID.fromString(MCRConfiguration.instance()
+        .getString("MCR.Access.Strategy.SubmittedCategory", "status:submitted"));
 
     private static final MCRCategLinkService LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
 
+    private static LoadingCache<MCRObjectID, String> CREATOR_CACHE = CacheBuilder.newBuilder().weakKeys()
+        .maximumSize(5000).build(new CacheLoader<MCRObjectID, String>() {
+
+            @Override
+            public String load(MCRObjectID mcrObjectID) throws Exception {
+                MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.instance();
+                List<MCRMetadataVersion> versions = metadataManager.listRevisions(mcrObjectID);
+                if (versions != null && !versions.isEmpty()) {
+                    for (MCRMetadataVersion version : versions) {
+                        if (version.getType() == MCRMetadataVersion.CREATED) {
+                            LOGGER.info("Found creator " + version.getUser() + " in revision " + version.getRevision()
+                                + " of " + mcrObjectID);
+                            return version.getUser();
+                        }
+                    }
+                }
+                LOGGER.info("Could not get creator information.");
+                return null;
+            }
+        });
 
     /*
      * (non-Javadoc)
@@ -77,42 +103,35 @@ public class MCRCreatorRuleStrategy implements MCRAccessCheckStrategy {
             LOGGER.debug("using access rule defined for object.");
             return MCRAccessManager.getAccessImpl().checkPermission(id, permission);
         }
-        MCRUserInformation currentUser = MCRSessionMgr.getCurrentSession().getUserInformation();
-        if (currentUser.isUserInRole("submitter") && objectStatusIsSubmitted(id)) {
-            return isCurrentUserCreator(id, currentUser);
+        MCRObjectID mcrObjectId = null;
+        try {
+            mcrObjectId = MCRObjectID.getInstance(id);
+        } catch (MCRException e) {
+            LOGGER.debug("id is not a valid object ID", e);
+        }
+        if (mcrObjectId != null && permission.equals(MCRAccessManager.PERMISSION_WRITE)) {
+            MCRUserInformation currentUser = MCRSessionMgr.getCurrentSession().getUserInformation();
+            if (currentUser.isUserInRole("submitter") && objectStatusIsSubmitted(mcrObjectId)) {
+                if (isCurrentUserCreator(mcrObjectId, currentUser)){
+                    return true;
+                }
+            }
         }
         return MCRObjectTypeStrategy.checkObjectTypePermission(id, permission);
     }
 
-    private static boolean objectStatusIsSubmitted(String id) {
-        MCRObjectID mcrObjectID = MCRObjectID.getInstance(id);
+    private static boolean objectStatusIsSubmitted(MCRObjectID mcrObjectID) {
         MCRCategLinkReference reference = new MCRCategLinkReference(mcrObjectID);
-        MCRCategoryID submittedID;
-        try {
-            submittedID = MCRCategoryID.fromString(SUBMITTED_CATEGORY);
-        } catch (Exception e) {
-            LOGGER.debug("Category '" + SUBMITTED_CATEGORY + "' is not a valid category id.");
-            return false;
-        }
-        return LINK_SERVICE.isInCategory(reference, submittedID);
+        return LINK_SERVICE.isInCategory(reference, SUBMITTED_CATEGORY);
     }
 
-    private static boolean isCurrentUserCreator(String id, MCRUserInformation currentUser) {
-        MCRObjectID mcrObjectID = MCRObjectID.getInstance(id);
-        MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.instance();
+    private static boolean isCurrentUserCreator(MCRObjectID mcrObjectID, MCRUserInformation currentUser) {
         try {
-            List<MCRMetadataVersion> versions = metadataManager.listRevisions(mcrObjectID);
-            if (versions != null && !versions.isEmpty()) {
-                LOGGER.debug("check if current user " + currentUser.getUserID() + " is equals " + versions.get(0).getUser());
-                return currentUser.getUserID().equals(versions.get(0).getUser());
-            } else {
-                LOGGER.debug("Could not get creator information.");
-                return false;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+            String creator = CREATOR_CACHE.get(mcrObjectID);
+            return currentUser.getUserID().equals(creator);
+        } catch (ExecutionException e) {
+            LOGGER.error("Error while getting creator information.", e);
+            return false;
         }
-
-        return false;
     }
 }
