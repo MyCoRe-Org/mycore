@@ -23,13 +23,13 @@
 
 package org.mycore.access.strategies;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
@@ -66,7 +66,12 @@ public class MCRCreatorRuleStrategy implements MCRAccessCheckStrategy {
     private static final MCRCategoryID SUBMITTED_CATEGORY = MCRCategoryID.fromString(MCRConfiguration.instance()
         .getString("MCR.Access.Strategy.SubmittedCategory", "status:submitted"));
 
+    private static final String CREATOR_ROLE = MCRConfiguration.instance().getString("MCR.Access.Strategy.CreatorRole",
+        "submitter");
+
     private static final MCRCategLinkService LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
+
+    private static final MCRObjectTypeStrategy BASE_STRATEGY = new MCRObjectTypeStrategy();
 
     private static LoadingCache<MCRObjectID, String> CREATOR_CACHE = CacheBuilder.newBuilder().weakKeys()
         .maximumSize(5000).build(new CacheLoader<MCRObjectID, String>() {
@@ -76,7 +81,9 @@ public class MCRCreatorRuleStrategy implements MCRAccessCheckStrategy {
                 MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.instance();
                 List<MCRMetadataVersion> versions = metadataManager.listRevisions(mcrObjectID);
                 if (versions != null && !versions.isEmpty()) {
+                    Collections.reverse(versions); //newest revision first
                     for (MCRMetadataVersion version : versions) {
+                        //time machine: go back in history
                         if (version.getType() == MCRMetadataVersion.CREATED) {
                             LOGGER.info("Found creator " + version.getUser() + " in revision " + version.getRevision()
                                 + " of " + mcrObjectID);
@@ -97,27 +104,34 @@ public class MCRCreatorRuleStrategy implements MCRAccessCheckStrategy {
      */
     public boolean checkPermission(String id, String permission) {
         LOGGER.debug("check permission " + permission + " for MCRBaseID " + id);
-        if (id == null || id.length() == 0 || permission == null || permission.length() == 0)
+        if (id == null || id.length() == 0 || permission == null || permission.length() == 0) {
             return false;
-        if (MCRAccessManager.getAccessImpl().hasRule(id, permission)) {
-            LOGGER.debug("using access rule defined for object.");
-            return MCRAccessManager.getAccessImpl().checkPermission(id, permission);
+        }
+        if (!MCRAccessManager.PERMISSION_WRITE.equals(permission)) {
+            //if not checking for write permission, use base strategy
+            return BASE_STRATEGY.checkPermission(id, permission);
+        }
+        //our decoration for write permission
+        if (BASE_STRATEGY.checkPermission(id, permission)) {
+            return true;
         }
         MCRObjectID mcrObjectId = null;
         try {
             mcrObjectId = MCRObjectID.getInstance(id);
-        } catch (MCRException e) {
-            LOGGER.debug("id is not a valid object ID", e);
-        }
-        if (mcrObjectId != null && permission.equals(MCRAccessManager.PERMISSION_WRITE)) {
             MCRUserInformation currentUser = MCRSessionMgr.getCurrentSession().getUserInformation();
-            if (currentUser.isUserInRole("submitter") && objectStatusIsSubmitted(mcrObjectId)) {
-                if (isCurrentUserCreator(mcrObjectId, currentUser)){
+            if (currentUser.isUserInRole(CREATOR_ROLE) && objectStatusIsSubmitted(mcrObjectId)) {
+                if (isCurrentUserCreator(mcrObjectId, currentUser)) {
                     return true;
                 }
             }
+        } catch (RuntimeException e) {
+            if (mcrObjectId == null) {
+                LOGGER.debug("id is not a valid object ID", e);
+            } else {
+                LOGGER.warn("Eror while checking permission.", e);
+            }
         }
-        return MCRObjectTypeStrategy.checkObjectTypePermission(id, permission);
+        return false;
     }
 
     private static boolean objectStatusIsSubmitted(MCRObjectID mcrObjectID) {
