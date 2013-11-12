@@ -179,4 +179,11 @@ public class MCRURN {
     public void setRegistered(boolean registered) {
         this.registered = registered;
     }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        return this.key.getMcrurn();
+    }
 }
