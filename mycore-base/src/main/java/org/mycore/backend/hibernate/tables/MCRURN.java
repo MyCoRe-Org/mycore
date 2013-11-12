@@ -37,6 +37,8 @@ public class MCRURN {
 
     private String filename;
 
+    private boolean registered;
+
     /**
      * The constructor of the class MCRURN
      */
@@ -162,5 +164,19 @@ public class MCRURN {
      */
     public void setFilename(String filename) {
         this.filename = filename;
+    }
+
+    /**
+     * @return the registered
+     */
+    public boolean isRegistered() {
+        return registered;
+    }
+
+    /**
+     * @param registered the registered to set
+     */
+    public void setRegistered(boolean registered) {
+        this.registered = registered;
     }
 }
