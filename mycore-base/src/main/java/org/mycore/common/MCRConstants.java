@@ -102,6 +102,8 @@ public final class MCRConstants {
 
     public static final Namespace DIAG_NAMESPACE = Namespace.getNamespace("diag", "http://www.loc.gov/zing/srw/diagnostic");
 
+    public static final Namespace EPICURLITE_NAMESPACE = Namespace.getNamespace("epicurlite", "http://nbn-resolving.org/epicurlite");
+
     /** The URL of the MCR */
     private final static String MCR_URL = "http://www.mycore.org/";
 
