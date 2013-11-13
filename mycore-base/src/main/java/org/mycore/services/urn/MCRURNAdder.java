@@ -334,7 +334,7 @@ public class MCRURNAdder {
              */
             try {
                 LOGGER.info("Assigning urn " + parentURN.toString() + " to " + derivate.getId().toString());
-                MCRURNManager.assignURN(parentURN.toString(), derivate.getId().toString(), " ", " ");
+                MCRURNManager.assignURN(parentURN.toString(), derivate.getId().toString(), "", "");
             } catch (Exception ex) {
                 LOGGER.error("Assigning base urn " + parentURN.toString() + parentURN.checksum() + " to derivate " + derivate.getId().toString() + " failed.",
                     ex);
