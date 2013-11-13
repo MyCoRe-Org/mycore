@@ -23,9 +23,20 @@
  **/
 package org.mycore.services.urn;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 
@@ -60,6 +71,8 @@ import org.mycore.common.MCRConfigurationException;
  * @author Frank Lützenkirchen
  */
 public class MCRURNManager {
+
+    private static final Logger LOGGER = Logger.getLogger(MCRURNManager.class);
 
     /** The MCRURNStore implementation to use */
     private static MCRURNStore store;
@@ -328,5 +341,56 @@ public class MCRURNManager {
 
         assignURN(urn, documentID);
         return urn;
+    }
+
+    public static long getCount(boolean registered) {
+        Session session = MCRHIBConnection.instance().getSession();
+        Transaction tx = session.beginTransaction();
+        try {
+            Criteria q = session.createCriteria(MCRURN.class);
+            q.add(Restrictions.eq("registered", Boolean.valueOf(registered)));
+            q.setProjection(Projections.rowCount());
+
+            long hits = (long) q.uniqueResult();
+
+            return hits;
+        } catch (Exception ex) {
+            LOGGER.error("Could not execute query", ex);
+            tx.rollback();
+        } finally {
+            tx.commit();
+            session.disconnect();
+        }
+        return 0;
+    }
+
+    /**
+     * @param registered
+     * @param start
+     * @param rows
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public static List<MCRURN> get(boolean registered, int start, int rows) {
+        Session session = MCRHIBConnection.instance().getSession();
+        Transaction tx = session.beginTransaction();
+        try {
+            Criteria q = session.createCriteria(MCRURN.class);
+            q.add(Restrictions.eq("registered", Boolean.valueOf(registered)));
+            q.addOrder(Order.asc("key"));
+            q.setFirstResult(start);
+            q.setMaxResults(rows);
+            List<MCRURN> list = (List<MCRURN>) q.list();
+
+            return list;
+        } catch (Exception ex) {
+            LOGGER.error("Could not execute query", ex);
+            tx.rollback();
+        } finally {
+            tx.commit();
+            session.disconnect();
+        }
+        // return an empty list
+        return new ArrayList<MCRURN>();
     }
 }
