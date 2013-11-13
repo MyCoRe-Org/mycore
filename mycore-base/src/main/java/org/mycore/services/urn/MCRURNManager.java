@@ -393,4 +393,12 @@ public class MCRURNManager {
         // return an empty list
         return new ArrayList<MCRURN>();
     }
+
+    /**
+     * @param urn
+     */
+    public static void update(MCRURN urn) {
+        Session session = MCRHIBConnection.instance().getSession();
+        session.saveOrUpdate(urn);
+    }
 }
