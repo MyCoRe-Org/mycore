@@ -301,6 +301,11 @@ public class MCRHIBConnection implements Closeable {
     }
 
     public SessionFactory getSessionFactory() {
+        if(sessionFactory.isClosed()){
+            sessionFactory = null;
+            buildSessionFactory();
+        }
+        
         return sessionFactory;
     }
 
