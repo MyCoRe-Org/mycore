@@ -137,7 +137,7 @@ ToolbarController.prototype.addView = function(view) {
             linkToFront : false
           },
           onChoose : function(item) {
-            args.view.button("option", "label", jQuery(item).text());
+            args.view.jquibutton("option", "label", jQuery(item).text());
             var content = (jQuery(item).text());
             var page = content.substring(content.lastIndexOf('[') +1, content.lastIndexOf(']'));
             that.getViewer().PhysicalModel.setPosition(page);
@@ -365,7 +365,7 @@ ToolbarController.prototype.checkZoom = function(zoom) {
  */
 ToolbarController.prototype.updateDropDown = function(content) {
 	// TODO: sollte eventuell nochmal überdacht werden (vieleicht direkter Wechsel auf Seite)
-	jQuery('.navigateHandles .pageBox').button('option', 'label', content);
+	jQuery('.navigateHandles .pageBox').jquibutton('option', 'label', content);
 };
 
 /**

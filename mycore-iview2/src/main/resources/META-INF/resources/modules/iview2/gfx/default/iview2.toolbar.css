@@ -1,6 +1,10 @@
 /* Toolbar
 ----------------------------------*/
 
+.viewerContainer * {
+box-sizing: content-box;
+}
+
 /* properbly .max */
 .viewerContainer .toolbars {
 	width: 100%;

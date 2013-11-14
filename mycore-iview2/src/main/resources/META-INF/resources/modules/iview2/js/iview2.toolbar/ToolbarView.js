@@ -171,10 +171,10 @@ ToolbarView.prototype = {
     getButtonUi : function (args) {
     	var button = this._getButton(args.button);
     	return {
-    		'icons' : button.button( "option", "icons" ),
-    		'text' : button.button( "option", "text" ),
-    		'label' : button.button( "option", "label" ),
-    		'disabled' : button.button( "option", "disabled" )
+    		'icons' : button.jquibutton( "option", "icons" ),
+    		'text' : button.jquibutton( "option", "text" ),
+    		'label' : button.jquibutton( "option", "label" ),
+    		'disabled' : button.jquibutton( "option", "disabled" )
     	};
     },
     
@@ -192,11 +192,11 @@ ToolbarView.prototype = {
 	 */
     setButtonUi : function (args) {
     	var button = this._getButton(args.button);
-    	if (args.icons) button.button( "option", "icons", args.icons );
-    	if (args.text != undefined) button.button( "option", "text", args.text );
-    	if (args.label) button.button( "option", "label", args.label );
+    	if (args.icons) button.jquibutton( "option", "icons", args.icons );
+    	if (args.text != undefined) button.jquibutton( "option", "text", args.text );
+    	if (args.label) button.jquibutton( "option", "label", args.label );
     	if (args.disabled != undefined) {
-    		button.button( "option", "disabled", args.disabled );
+    		button.jquibutton( "option", "disabled", args.disabled );
     		// buttons won't be un-hovered by simply disable them
     		if (args.disabled) button.removeClass("ui-state-hover");
     	}
@@ -262,10 +262,10 @@ ToolbarView.prototype = {
     	}
 
     	// must appear after append (for checkbox-function)
-    	newButton = jQuery("."+this.id+" ."+args.parentName+" ."+args.elementName).button(args.ui);
+    	newButton = jQuery("."+this.id+" ."+args.parentName+" ."+args.elementName).jquibutton(args.ui);
 
     	if (!args.active) {
-    		newButton.button( "option", "disabled", true )
+    		newButton.jquibutton( "option", "disabled", true )
     	}
 
     	this._checkButtonStyle({'buttonset' : myButtonset, 'buttonIndex' : curIndex, 'reason' : "add"});

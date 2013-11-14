@@ -398,10 +398,10 @@
 
 			// Load Page
 			if (this.properties.useParam && URL.getParam("page") != "") {
-				startFile = decodeURI(URL.getCleanUrl(URL.getParam("page")));
+				startFile = decodeURIComponent(URL.getCleanUrl(URL.getParam("page")));
 			}
 			// remove leading '/'
-			startFile = encodeURI(startFile.replace(/^\/*/, ""));
+			startFile = encodeURIComponent(startFile.replace(/^\/*/, ""));
 			this.loading(startFile);
 		};
 
