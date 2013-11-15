@@ -39,6 +39,7 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * Provides methods to create URNs (urn:nbn:de) and assign them to documents. A
@@ -400,5 +401,20 @@ public class MCRURNManager {
     public static void update(MCRURN urn) {
         Session session = MCRHIBConnection.instance().getSession();
         session.saveOrUpdate(urn);
+    }
+
+    /**
+     * Get all URN for the given object id.
+     * 
+     * @param id
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public static List<MCRURN> get(MCRObjectID id) {
+        Session session = MCRHIBConnection.instance().getSession();
+        Criteria q = session.createCriteria(MCRURN.class);
+        q.add(Restrictions.eq("key.mcrid", id.toString()));
+
+        return (List<MCRURN>) q.list();
     }
 }
