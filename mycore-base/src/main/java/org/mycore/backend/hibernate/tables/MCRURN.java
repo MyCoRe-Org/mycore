@@ -37,7 +37,7 @@ public class MCRURN {
 
     private String filename;
 
-    private boolean registered;
+    private boolean registered, dfg;
 
     /**
      * The constructor of the class MCRURN
@@ -178,6 +178,20 @@ public class MCRURN {
      */
     public void setRegistered(boolean registered) {
         this.registered = registered;
+    }
+
+    /**
+     * @return the dfg
+     */
+    public boolean isDfg() {
+        return dfg;
+    }
+
+    /**
+     * @param dfg the dfg to set
+     */
+    public void setDfg(boolean dfg) {
+        this.dfg = dfg;
     }
 
     /* (non-Javadoc)

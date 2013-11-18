@@ -10,5 +10,6 @@
     <property name="path" />
     <property name="filename" />
     <property name="registered" type="boolean" />
+    <property name="dfg" type="boolean" />
   </class>
 </hibernate-mapping>
