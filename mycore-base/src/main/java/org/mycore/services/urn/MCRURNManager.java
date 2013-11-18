@@ -430,9 +430,20 @@ public class MCRURNManager {
     @SuppressWarnings("unchecked")
     public static List<MCRURN> getBaseURN(boolean registered, int start, int rows) {
         Session session = MCRHIBConnection.instance().getSession();
-        Criteria q = session.createCriteria(MCRURN.class);
-        q.add(Restrictions.and(Restrictions.isNull("path"), Restrictions.isNull("filename")));
+        Transaction tx = session.beginTransaction();
+        try {
+            Criteria q = session.createCriteria(MCRURN.class);
+            q.add(Restrictions.and(Restrictions.isNull("path"), Restrictions.isNull("filename")));
 
-        return (List<MCRURN>) q.list();
+            return (List<MCRURN>) q.list();
+        } catch (Exception ex) {
+            LOGGER.error("Could not execute query", ex);
+            tx.rollback();
+        } finally {
+            tx.commit();
+            session.disconnect();
+        }
+        // return an empty list
+        return new ArrayList<MCRURN>();
     }
 }
