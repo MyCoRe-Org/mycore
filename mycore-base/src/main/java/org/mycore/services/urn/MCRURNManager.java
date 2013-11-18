@@ -424,16 +424,23 @@ public class MCRURNManager {
 
     /**
      * @param registered
+     * @param dfg
+     * @param start
+     * @param rows
      * 
      * @return a {@link List<MCRURN>} of {@link MCRURN} where path and file name are just blanks or null;
      */
     @SuppressWarnings("unchecked")
-    public static List<MCRURN> getBaseURN(boolean registered, int start, int rows) {
+    public static List<MCRURN> getBaseURN(boolean registered, boolean dfg, int start, int rows) {
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
         try {
             Criteria q = session.createCriteria(MCRURN.class);
             q.add(Restrictions.and(Restrictions.isNull("path"), Restrictions.isNull("filename")));
+            q.add(Restrictions.eq("registered", Boolean.valueOf(registered)));
+            q.add(Restrictions.eq("dfg", Boolean.valueOf(dfg)));
+            q.setFirstResult(start);
+            q.setMaxResults(rows);
 
             return (List<MCRURN>) q.list();
         } catch (Exception ex) {
