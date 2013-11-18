@@ -3,20 +3,21 @@ package org.mycore.common;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
 /**
  * <p>
- * This class parses and resolve strings which contains variables and
- * MyCoRe properties. To add variables call <code>addVariable</code>.
- * To disable MyCoRe property resolving call <code>setUseMCRProperties(false)</code>.
+ * This class parses and resolve strings which contains variables.
+ * To add a variable call <code>addVariable</code>.
  * </p><p>
- * The algorithm has been optimized so that each character is touched only once.
+ * The algorithm is optimized that each character is touched only once.
  * </p><p>
  * To resolve a string a valid syntax is required:
  * </p><p>
@@ -42,21 +43,44 @@ public class MCRTextResolver {
 
     private static final Logger LOGGER = Logger.getLogger(MCRTextResolver.class);
 
-    private static Map<String, Class<? extends Term>> termList;
+    protected TermContainer termContainer;
+
+    /**
+     * This map contains all variables that can be resolved.
+     */
+    protected Map<String, String> variablesMap;
+
+    /**
+     * Retains the text if a variable couldn't be resolved.
+     * Example if {Variable} could not be resolved:
+     * true: "Hello {Variable}" -> "Hello {Variable}"
+     * false: "Hello "
+     * <p>By default retainText is true</p>
+     */
+    protected boolean retainText;
+
+    /**
+     * Defines how deep the text is resolved.
+     * <li><b>Deep</b> - everything is resolved</li>
+     * <li><b>NoVariables</b> - the value of variables is not being resolved</li>
+     */
+    protected ResolveDepth resolveDepth;
+
+    protected CircularDependencyTracker tracker;
 
     /**
      * Creates the term list for the text resolver and adds
      * the default terms.
+     * @throws InstantiationException 
+     * @throws IllegalAccessException 
+     * @throws InvocationTargetException 
+     * @throws NoSuchMethodException 
      */
-    static {
-        termList = new Hashtable<String, Class<? extends Term>>();
-        try {
-            registerTerm(Variable.class);
-            registerTerm(Condition.class);
-            registerTerm(EscapeCharacter.class);
-        } catch(Exception exc) {
-            LOGGER.error(exc);
-        }
+    protected void registerDefaultTerms() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException,
+            InstantiationException {
+        registerTerm(Variable.class);
+        registerTerm(Condition.class);
+        registerTerm(EscapeCharacter.class);
     }
 
     /**
@@ -68,10 +92,9 @@ public class MCRTextResolver {
      * @throws IllegalAccessException
      * @throws InstantiationException
      */
-    public static void registerTerm(Class<? extends Term> termClass) throws NoSuchMethodException, InvocationTargetException,
+    public void registerTerm(Class<? extends Term> termClass) throws NoSuchMethodException, InvocationTargetException,
             IllegalAccessException, InstantiationException {
-        Constructor<? extends Term> c = termClass.getConstructor(MCRTextResolver.class);
-        termList.put(c.newInstance(new MCRTextResolver()).getStartEnclosingString(), termClass);
+        this.termContainer.add(termClass);
     }
 
     /**
@@ -83,10 +106,9 @@ public class MCRTextResolver {
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
-    public static void unregisterTerm(Class<? extends Term> termClass) throws NoSuchMethodException, InvocationTargetException,
+    public void unregisterTerm(Class<? extends Term> termClass) throws NoSuchMethodException, InvocationTargetException,
             InstantiationException, IllegalAccessException {
-        Constructor<? extends Term> c = termClass.getConstructor(MCRTextResolver.class);
-        termList.remove(c.newInstance(new MCRTextResolver()).getStartEnclosingString());
+        this.termContainer.remove(termClass);
     }
 
     /**
@@ -99,79 +121,87 @@ public class MCRTextResolver {
     }
 
     /**
-     * If MyCoRe properties are resolved. For example {MCR.basedir}.
-     * By default this is true.
-     */
-    private static boolean useMCRProperties = true;
-
-    /**
-     * This map contains all variables that can be resolved.
-     */
-    protected Map<String, String> variablesTable;
-
-    protected Map<String, String> resolvedVariables;
-
-    protected List<String> unresolvedVariables;
-
-    protected ResolveDepth resolveDepth;
-
-    /**
-     * Retains the text if a variable couldn't be resolved.
-     * Example if {Variable} could not be resolved:
-     * true: "Hello {Variable}" -> "Hello {Variable}"
-     * false: "Hello "
-     * <p>By default retainText is true</p>
-     */
-    protected boolean retainText;
-
-    /**
      * Creates a new text resolver. To add variables call
      * <code>addVariable</code>, otherwise only MyCoRe property
      * resolving is possible.
      */
     public MCRTextResolver() {
-        this(new Hashtable<String, String>(), ResolveDepth.Deep);
+        this(new HashMap<String, String>());
     }
 
-    public MCRTextResolver(Map<String, String> variablesTable) {
-        this(variablesTable, ResolveDepth.Deep);
-    }
-
-    public MCRTextResolver(ResolveDepth depth) {
-        this(new Hashtable<String, String>(), depth);
+    /**
+     * 
+     * 
+     * @param properties
+     */
+    public MCRTextResolver(Properties properties) {
+        this(new HashMap<String, String>());
+        mixin(properties);
     }
 
     /**
      * Creates a new text resolver with a map of variables.
      * 
-     * @param variablesTable a hash table of variables
+     * @param variablesMap a hash map of variables
      * @param depth how deep the text is resolved
+     * @param retainText if the original text is retained if a variable coulnd't be resolved
      */
-    public MCRTextResolver(Map<String, String> variablesTable, ResolveDepth depth) {
-        this(variablesTable, depth, true);
+    public MCRTextResolver(Map<String, String> variablesMap) {
+        this.variablesMap = variablesMap;
+        this.setResolveDepth(ResolveDepth.Deep);
+        this.setRetainText(true);
+        this.tracker = new CircularDependencyTracker(this);
+        try {
+            this.termContainer = new TermContainer(this);
+            this.registerDefaultTerms();
+        } catch (Exception exc) {
+            throw new MCRException("Unable to register default terms", exc);
+        }
+    }
+
+    protected TermContainer getTermContainer() {
+        return this.termContainer;
+    }
+
+    protected CircularDependencyTracker getTracker() {
+        return this.tracker;
+    }
+
+    public void mixin(Map<String, String> variables) {
+        for (Entry<String, String> entrySet : variables.entrySet()) {
+            String key = entrySet.getKey();
+            String value = entrySet.getValue();
+            this.addVariable(key, value);
+        }
+    }
+
+    public void mixin(Properties properties) {
+        for (Entry<Object, Object> entrySet : properties.entrySet()) {
+            String key = entrySet.getKey().toString();
+            String value = entrySet.getValue().toString();
+            this.addVariable(key, value);
+        }
     }
 
     /**
-     * Creates a new text resolver with a map of variables.
-     * 
-     * @param variablesTable a hash table of variables
-     * @param depth how deep the text is resolved
-     * @param retainText if the original text is retaind if a variable coulnd't be resolved
+     * Sets if the text should be retained if a variable couldn't be resolved.
+     * <p>
+     * Example:<br />
+     * true: "Hello {Variable}" -> "Hello {Variable}"<br />
+     * false: "Hello "
+     * </p>
+     * <p>By default retainText is true</p>
      */
-    public MCRTextResolver(Map<String, String> variablesTable, ResolveDepth depth, boolean retainText) {
-        this.variablesTable = variablesTable;
-        this.resolveDepth = depth;
-        this.retainText = retainText;
-        this.resolvedVariables = new Hashtable<String, String>();
-        this.unresolvedVariables = new ArrayList<String>();
-    }
-
     public void setRetainText(boolean retainText) {
         this.retainText = retainText;
     }
 
+    /**
+     * Checks if the text should be retained if a variable couldn't be resolved.
+     * <p>By default retainText is true</p>
+     */
     public boolean isRetainText() {
-        return retainText;
+        return this.retainText;
     }
 
     /**
@@ -184,7 +214,7 @@ public class MCRTextResolver {
      * if it did not have one
      */
     public String addVariable(String name, String value) {
-        return variablesTable.put(name, value);
+        return variablesMap.put(name, value);
     }
 
     /**
@@ -195,7 +225,7 @@ public class MCRTextResolver {
      * no variable with the name exists
      */
     public String removeVariable(String name) {
-        return variablesTable.remove(name);
+        return variablesMap.remove(name);
     }
 
     /**
@@ -204,7 +234,7 @@ public class MCRTextResolver {
      * @return true if a variable exists, otherwise false
      */
     public boolean containsVariable(String name) {
-        return variablesTable.containsKey(name);
+        return variablesMap.containsKey(name);
     }
 
     /**
@@ -222,7 +252,7 @@ public class MCRTextResolver {
      * @return resolve depth enumeration
      */
     public ResolveDepth getResolveDepth() {
-        return resolveDepth;
+        return this.resolveDepth;
     }
 
     /**
@@ -234,54 +264,10 @@ public class MCRTextResolver {
      * @return the resolved string
      */
     public String resolve(String text) {
-        resolvedVariables = new Hashtable<String, String>();
-        unresolvedVariables = new ArrayList<String>();
-        return resolveText(text).getValue();
-    }
-
-    /**
-     * This method resolves all variables in the text. In difference to the
-     * <code>resolve(String text)</code> the <i>resolvedVariables</i>- and
-     * the <i>unresolvedVariables</i> lists are not cleared.
-     * 
-     * @param text the text to resolve
-     * @return the resolved string
-     */
-    public String resolveNext(String text) {
-        return resolveText(text).getValue();
-    }
-
-    /**
-     * Resolves a text and returns it as <code>Text</code> object.
-     * 
-     * @param text the text to resolve
-     * @return an instance of <code>Text</code>
-     */
-    private Text resolveText(String text) {
-        Text textResolver = new Text();
+        this.getTracker().clear();
+        Text textResolver = new Text(this);
         textResolver.resolve(text, 0);
-        return textResolver;
-    }
-
-    /**
-     * Returns a new term in dependence of the current character (position of the text).
-     * If no term is defined null is returned.
-     * 
-     * @param c character to check the dependency
-     * @return a term or null if no one found
-     */
-    private Term getTerm(String text, int pos) {
-        for(Entry<String, Class<? extends Term>> termEntry : termList.entrySet()) {
-            if(text.startsWith(termEntry.getKey(), pos)) {
-                try {
-                    Constructor<? extends Term> c = termEntry.getValue().getConstructor(MCRTextResolver.class);
-                    return  c.newInstance(this);
-                } catch(Exception exc) {
-                    LOGGER.error(exc);
-                }
-            }
-        }
-        return null;
+        return textResolver.getValue();
     }
 
     /**
@@ -291,7 +277,7 @@ public class MCRTextResolver {
      * @return the value
      */
     public String getValue(String varName) {
-        return variablesTable.get(varName);
+        return variablesMap.get(varName);
     }
 
     /**
@@ -300,92 +286,7 @@ public class MCRTextResolver {
      * @return a <code>Map</code> of all variables.
      */
     public Map<String, String> getVariables() {
-        return variablesTable;
-    }
-
-    /**
-     * Returns a <code>List</code> of all variables which couldn't be resolved.
-     * 
-     * @return a <code>List</code> of unresolved variables
-     */
-    public List<String> getUnresolvedVariables() {
-        return unresolvedVariables;
-    }
-
-    /**
-     * Returns a <code>Map</code> of all variables which are successfully
-     * resolved. This includes only variables the incoming string
-     * contains.
-     * 
-     * @return a <code>Map</code> of resolved variables.
-     */
-    public Map<String, String> getResolvedVariables() {
-        return resolvedVariables;
-    }
-
-    /**
-     * Returns a hash table of variables that are used in the last <code>
-     * resolve</code> and all last <code>resolveNext</code> calls.
-     * This contains also variables that are not in the original
-     * variables table. The value string of these variables is empty ("").
-     * 
-     * @return a hash table of all variables that are used
-     */
-    public Hashtable<String, String> getUsedVariables() {
-        Hashtable<String, String> usedVars = new Hashtable<String, String>();
-        usedVars.putAll(resolvedVariables);
-        for (String varName : unresolvedVariables) {
-            usedVars.put(varName, "");
-        }
-        return usedVars;
-    }
-
-    /**
-     * Returns a hash table of variables which are not used. Not used means
-     * that in the last <code>resolve</code> and <code>resolveNext</code>
-     * calls the variable doesn't occur.
-     * 
-     * @return a hash table of not used fields
-     */
-    public Hashtable<String, String> getNotUsedVariables() {
-        Hashtable<String, String> usedVariables = getUsedVariables();
-        Hashtable<String, String> notUsedVariables = new Hashtable<String, String>();
-        for (Map.Entry<String, String> entry : variablesTable.entrySet()) {
-            if (!usedVariables.containsKey(entry.getKey())) {
-                notUsedVariables.put(entry.getKey(), entry.getValue());
-            }
-        }
-        return notUsedVariables;
-    }
-
-    /**
-     * Checks if the resolved text contains unresolved
-     * variables.
-     * 
-     * @return true if the text doesn't contains unresolved
-     * variables, otherwise false
-     */
-    public boolean isCompletelyResolved() {
-        return unresolvedVariables.size() == 0;
-    }
-
-    /**
-     * Checks if MyCoRe properties are resolved if they found. For example
-     * {MCR.basedir}.
-     * 
-     * @return true if MyCoRe properties are resolved, otherwise false
-     */
-    public static boolean useMCRProperties() {
-        return useMCRProperties;
-    }
-
-    /**
-     * Enable or disable MyCoRe property resolving.
-     * 
-     * @param value
-     */
-    public static void setUseMCRProperties(boolean value) {
-        useMCRProperties = value;
+        return variablesMap;
     }
 
     /**
@@ -402,7 +303,7 @@ public class MCRTextResolver {
      * 
      * @author Matthias Eichner
      */
-    public abstract class Term {
+    protected static abstract class Term {
         /**
          * The string buffer within the term. For example: {<b>var</b>}. 
          */
@@ -419,10 +320,13 @@ public class MCRTextResolver {
          */
         protected int position;
 
-        public Term() {
-            termBuffer = new StringBuffer();
-            resolved = true;
-            position = 0;
+        protected MCRTextResolver textResolver;
+
+        public Term(MCRTextResolver textResolver) {
+            this.textResolver = textResolver;
+            this.termBuffer = new StringBuffer();
+            this.resolved = true;
+            this.position = 0;
         }
 
         /**
@@ -456,6 +360,28 @@ public class MCRTextResolver {
                 }
             }
             return getValue();
+        }
+
+        /**
+         * Returns a new term in dependence of the current character (position of the text).
+         * If no term is defined null is returned.
+         * 
+         * @param c character to check the dependency
+         * @return a term or null if no one found
+         */
+        private Term getTerm(String text, int pos) {
+            TermContainer termContainer = this.getTextResolver().getTermContainer();
+            for (Entry<String, Class<? extends Term>> termEntry : termContainer.getTermSet()) {
+                String startEnclosingStringOfTerm = termEntry.getKey();
+                if (text.startsWith(startEnclosingStringOfTerm, pos) && !startEnclosingStringOfTerm.equals(this.getEndEnclosingString())) {
+                    try {
+                        return termContainer.instantiate(termEntry.getValue());
+                    } catch (Exception exc) {
+                        LOGGER.error(exc);
+                    }
+                }
+            }
+            return null;
         }
 
         /**
@@ -495,6 +421,11 @@ public class MCRTextResolver {
          * @return the end enclosing string
          */
         public abstract String getEndEnclosingString();
+
+        public MCRTextResolver getTextResolver() {
+            return textResolver;
+        }
+
     }
 
     /**
@@ -503,10 +434,7 @@ public class MCRTextResolver {
      * is set by the termBuffer and the value is equal the content of the
      * valueBuffer.
      */
-    private class Variable extends Term {
-        public static final String START_ENCLOSING_STRING = "{";
-
-        public static final String END_ENCLOSING_STRING = "}";
+    protected static class Variable extends Term {
 
         /**
          * A variable doesn't return the termBuffer, but
@@ -514,41 +442,35 @@ public class MCRTextResolver {
          */
         private StringBuffer valueBuffer;
 
-        public Variable() {
-            super();
-            valueBuffer = new StringBuffer();
+        public Variable(MCRTextResolver textResolver) {
+            super(textResolver);
+            this.valueBuffer = new StringBuffer();
         }
 
         @Override
         public boolean resolveInternal(String text, int pos) {
-            if (text.startsWith(END_ENCLOSING_STRING, pos)) {
+            if (text.startsWith(getEndEnclosingString(), pos)) {
+                this.track();
                 // get the value from the variables table
-                String value = variablesTable.get(termBuffer.toString());
+                String value = getTextResolver().getValue(termBuffer.toString());
                 if (value == null) {
-                    // variable is not in the list but maybe its a mycore property
-                    if (useMCRProperties) {
-                        value = MCRConfiguration.instance().getString(termBuffer.toString(), null);
+                    resolved = false;
+                    if (getTextResolver().isRetainText()) {
+                        this.valueBuffer.append(getStartEnclosingString()).append(termBuffer.toString()).append(getEndEnclosingString());
                     }
-                    if (value == null) {
-                        unresolvedVariables.add(termBuffer.toString());
-                        resolved = false;
-                        if(isRetainText()) {
-                            this.valueBuffer.append(START_ENCLOSING_STRING).append(termBuffer.toString())
-                                    .append(END_ENCLOSING_STRING);
-                        }
-                        return true;
-                    }
+                    this.untrack();
+                    return true;
                 }
                 // resolve the content of the variable recursive
                 // to resolve all other internal variables, condition etc.
-                if(resolveDepth != ResolveDepth.NoVariables) {
+                if (getTextResolver().getResolveDepth() != ResolveDepth.NoVariables) {
                     Text recursiveResolvedText = resolveText(value);
                     resolved = recursiveResolvedText.resolved;
                     value = recursiveResolvedText.getValue();
                 }
                 // set the value of the variable
                 valueBuffer.append(value);
-                resolvedVariables.put(termBuffer.toString(), valueBuffer.toString());
+                this.untrack();
                 return true;
             }
             termBuffer.append(text.charAt(pos));
@@ -562,13 +484,43 @@ public class MCRTextResolver {
 
         @Override
         public String getStartEnclosingString() {
-            return START_ENCLOSING_STRING;
+            return "{";
         }
 
         @Override
         public String getEndEnclosingString() {
-            return END_ENCLOSING_STRING;
+            return "}";
         }
+
+        /**
+         * Tracks the variable to check for circular dependency.
+         */
+        protected void track() {
+            this.getTextResolver().getTracker().track("var", getTrackID());
+        }
+
+        protected void untrack() {
+            this.getTextResolver().getTracker().untrack("var", getTrackID());
+        }
+
+        protected String getTrackID() {
+            return new StringBuffer(getStartEnclosingString()).append(termBuffer.toString()).append(getEndEnclosingString()).toString();
+        }
+
+        /**
+         * This method resolves all variables in the text.
+         * The syntax is described at the head of the class.
+         * 
+         * @param text the string where the variables have to be
+         * resolved
+         * @return the resolved string
+         */
+        public Text resolveText(String text) {
+            Text textResolver = new Text(getTextResolver());
+            textResolver.resolve(text, 0);
+            return textResolver;
+        }
+
     }
 
     /**
@@ -578,10 +530,10 @@ public class MCRTextResolver {
      * if the value of "lastName" is not null and not empty. Otherwise the whole
      * content in the squared brackets are ignored.
      */
-    private class Condition extends Term {
+    protected static class Condition extends Term {
 
-        public Condition() {
-            super();
+        public Condition(MCRTextResolver textResolver) {
+            super(textResolver);
         }
 
         @Override
@@ -616,11 +568,12 @@ public class MCRTextResolver {
      * As escape character the backslashed is used. Only the
      * first character after the escape char is add to the term.
      */
-    private class EscapeCharacter extends Term {
+    protected static class EscapeCharacter extends Term {
 
-        public EscapeCharacter() {
-            super();
+        public EscapeCharacter(MCRTextResolver textResolver) {
+            super(textResolver);
         }
+
         @Override
         public boolean resolveInternal(String text, int pos) {
             return true;
@@ -649,10 +602,11 @@ public class MCRTextResolver {
      * A simple text, every character is added to the term (except its
      * a special one).
      */
-    private class Text extends Term {
-        public Text() {
-            super();
+    protected static class Text extends Term {
+        public Text(MCRTextResolver textResolver) {
+            super(textResolver);
         }
+
         @Override
         public boolean resolveInternal(String text, int pos) {
             termBuffer.append(text.charAt(pos));
@@ -669,4 +623,105 @@ public class MCRTextResolver {
             return "";
         }
     }
+
+    /**
+     * Simple class to hold terms and instantiate them.
+     */
+    protected static class TermContainer {
+
+        protected Map<String, Class<? extends Term>> termMap = new HashMap<String, Class<? extends Term>>();
+
+        protected MCRTextResolver textResolver;
+
+        public TermContainer(MCRTextResolver textResolver) {
+            this.textResolver = textResolver;
+        }
+
+        public Term instantiate(Class<? extends Term> termClass) throws InvocationTargetException, NoSuchMethodException,
+                InstantiationException, IllegalAccessException {
+            Constructor<? extends Term> c = termClass.getConstructor(MCRTextResolver.class);
+            return c.newInstance(this.textResolver);
+        }
+
+        public void add(Class<? extends Term> termClass) throws InvocationTargetException, NoSuchMethodException, InstantiationException,
+                IllegalAccessException {
+            Term term = instantiate(termClass);
+            this.termMap.put(term.getStartEnclosingString(), termClass);
+        }
+
+        public void remove(Class<? extends Term> termClass) throws InvocationTargetException, NoSuchMethodException,
+                InstantiationException, IllegalAccessException {
+            Term term = instantiate(termClass);
+            this.termMap.remove(term.getStartEnclosingString());
+        }
+
+        public Set<Entry<String, Class<? extends Term>>> getTermSet() {
+            return this.termMap.entrySet();
+        }
+
+    }
+
+    protected static class CircularDependencyTracker {
+        protected MCRTextResolver textResolver;
+
+        protected Map<String, List<String>> trackMap;
+
+        public CircularDependencyTracker(MCRTextResolver textResolver) {
+            this.textResolver = textResolver;
+            this.trackMap = new HashMap<>();
+        }
+
+        public void track(String type, String id) {
+            List<String> idList = trackMap.get(type);
+            if (idList == null) {
+                idList = new ArrayList<>();
+                trackMap.put(type, idList);
+            }
+            if (idList.contains(id)) {
+                throw new CircularDependencyExecption(idList, id);
+            }
+            idList.add(id);
+        }
+
+        public void untrack(String type, String id) {
+            List<String> idList = trackMap.get(type);
+            if (idList == null) {
+                // this should not happen, maybe print WARN?
+                return;
+            }
+            idList.remove(id);
+        }
+
+        public void clear() {
+            this.trackMap.clear();
+        }
+
+    }
+
+    protected static class CircularDependencyExecption extends RuntimeException {
+
+        private static final long serialVersionUID = -2448797538275144448L;
+
+        private List<String> dependencyList;
+
+        private String id;
+
+        public CircularDependencyExecption(List<String> dependencyList, String id) {
+            this.dependencyList = dependencyList;
+            this.id = id;
+        }
+
+        @Override
+        public String getMessage() {
+            StringBuffer msg = new StringBuffer("A circular dependency exception occurred");
+            msg.append("\n").append("circular path: ");
+            for (String dep : dependencyList) {
+                msg.append(dep).append(" > ");
+            }
+            msg.append(id);
+            return msg.toString();
+        }
+
+    }
+
 }
