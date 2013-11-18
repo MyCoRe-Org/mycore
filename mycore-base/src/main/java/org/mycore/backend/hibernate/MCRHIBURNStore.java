@@ -99,9 +99,6 @@ public class MCRHIBURNStore implements MCRURNStore {
         if (id == null || id.length() == 0) {
             throw new MCRPersistenceException("The MCRObjectID is null.");
         }
-        if (path == null || path.length() == 0) {
-            throw new MCRPersistenceException("The Path is null.");
-        }
 
         Session session = getSession();
         MCRURN tab = new MCRURN(id, urn, path, filename);
