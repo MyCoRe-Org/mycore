@@ -3,7 +3,6 @@
  */
 package org.mycore.services.urn;
 
-
 /**
  * @author shermann
  *
@@ -45,4 +44,9 @@ public interface MCRIURNProvider {
      *         null or amount &lt;1 or the setID &lt;0
      */
     public MCRURN[] generateURN(int amount, MCRURN base, String setId);
+
+    /**
+     * @return the Namespace Specific String (NISS)
+     */
+    public String getNISS();
 }
