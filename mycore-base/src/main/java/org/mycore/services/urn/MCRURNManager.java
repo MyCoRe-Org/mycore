@@ -344,6 +344,10 @@ public class MCRURNManager {
         return urn;
     }
 
+    /**
+     * @param registered
+     * @return the count of urn matching the given 'registered' attribute
+     */
     public static long getCount(boolean registered) {
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
@@ -414,6 +418,20 @@ public class MCRURNManager {
         Session session = MCRHIBConnection.instance().getSession();
         Criteria q = session.createCriteria(MCRURN.class);
         q.add(Restrictions.eq("key.mcrid", id.toString()));
+
+        return (List<MCRURN>) q.list();
+    }
+
+    /**
+     * @param registered
+     * 
+     * @return a {@link List<MCRURN>} of {@link MCRURN} where path and file name are just blanks or null;
+     */
+    @SuppressWarnings("unchecked")
+    public static List<MCRURN> getBaseURN(boolean registered, int start, int rows) {
+        Session session = MCRHIBConnection.instance().getSession();
+        Criteria q = session.createCriteria(MCRURN.class);
+        q.add(Restrictions.and(Restrictions.isNull("path"), Restrictions.isNull("filename")));
 
         return (List<MCRURN>) q.list();
     }
