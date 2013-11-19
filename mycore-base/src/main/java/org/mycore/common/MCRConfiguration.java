@@ -34,6 +34,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -42,6 +43,8 @@ import org.apache.log4j.PropertyConfigurator;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRURLContent;
+
+import com.google.common.base.Splitter;
 
 /**
  * Provides methods to manage and read all configuration properties from the
@@ -117,6 +120,8 @@ public class MCRConfiguration {
 
     private File lastModifiedFile;
 
+    private static Splitter PROPERTY_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
+
     static {
         createSingleton();
     }
@@ -166,7 +171,8 @@ public class MCRConfiguration {
             try {
                 createLastModifiedFile();
             } catch (IOException ioException) {
-                throw new MCRException("Could not change modify date of file " + lastModifiedFile.getAbsolutePath(), ioException);
+                throw new MCRException("Could not change modify date of file " + lastModifiedFile.getAbsolutePath(),
+                    ioException);
             }
         } else if (!lastModifiedFile.setLastModified(System.currentTimeMillis())) {
             // a problem occurs, when a linux user other than the file owner
@@ -517,7 +523,8 @@ public class MCRConfiguration {
                 Method[] querymethods = cl.getMethods();
 
                 for (Method querymethod : querymethods) {
-                    if (querymethod.getName().toLowerCase().equals("instance") || querymethod.getName().toLowerCase().equals("getinstance")) {
+                    if (querymethod.getName().toLowerCase().equals("instance")
+                        || querymethod.getName().toLowerCase().equals("getinstance")) {
                         Object[] ob = new Object[0];
                         o = (T) querymethod.invoke(cl, ob);
                         break;
@@ -684,6 +691,39 @@ public class MCRConfiguration {
         }
 
         return value.trim();
+    }
+
+    /**
+     * Returns the configuration property with the specified name as a list of strings.
+     * 
+     * Values should be delimited by ','
+     * 
+     * @param name the non-null and non-empty name of the configuration property
+     * @return the value of the configuration property as a unmodifiable list of strings.
+     * @throws MCRConfigurationException
+     *             if the property with this name is not set
+     */
+    public List<String> getStrings(String name) {
+        String value = getString(name);
+        return splitString(value);
+    }
+
+    private List<String> splitString(String value) {
+        return PROPERTY_SPLITTER.splitToList(value);
+    }
+
+    /**
+     * Returns the configuration property with the specified name as a list of strings.
+     * 
+     * Values should be delimited by ','
+     * 
+     * @param name the non-null and non-empty name of the configuration property
+     * @param defaultValue the value to return if the configuration property is not set
+     * @return the value of the configuration property as a unmodifiable list of strings or <code>defaultValue</code>.
+     */
+    public List<String> getStrings(String name, List<String> defaultValue) {
+        String value = getString(name, null);
+        return value == null ? defaultValue : splitString(value);
     }
 
     /**

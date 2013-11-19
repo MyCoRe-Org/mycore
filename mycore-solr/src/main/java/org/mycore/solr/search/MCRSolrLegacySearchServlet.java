@@ -21,7 +21,6 @@ import org.mycore.common.MCRException;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRSetCondition;
-import org.mycore.services.fieldquery.MCRDefaultQueryEngine;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRSearchServlet;
 import org.mycore.solr.proxy.MCRSolrProxyServlet;
@@ -31,6 +30,8 @@ public class MCRSolrLegacySearchServlet extends MCRSearchServlet {
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = Logger.getLogger(MCRSolrLegacySearchServlet.class);
+
+    private static MCRSolrQueryEngine queryEngine = new MCRSolrQueryEngine();
 
     @Override
     protected void showResults(HttpServletRequest request, HttpServletResponse response, MCRQuery query, Document input)
@@ -48,7 +49,7 @@ public class MCRSolrLegacySearchServlet extends MCRSearchServlet {
         HashMap<String, List<MCRCondition>> table;
 
         if (condition instanceof MCRSetCondition) {
-            table = MCRDefaultQueryEngine.groupConditionsByIndex((MCRSetCondition) condition);
+            table = queryEngine.groupConditionsByIndex((MCRSetCondition) condition);
         } else {
             // if there is only one condition its no set condition. we dont need to group
             LOGGER.warn("Condition is not SetCondition.");
@@ -75,7 +76,6 @@ public class MCRSolrLegacySearchServlet extends MCRSearchServlet {
     protected void sendRedirect(HttpServletRequest req, HttpServletResponse res, MCRQuery query, Document input)
         throws IOException {
         SolrQuery mergedSolrQuery = getSolrQuery(query, input, req);
-        @SuppressWarnings("unchecked")
         String selectProxyURL = MCRServlet.getServletBaseURL() + "SolrSelectProxy?" + mergedSolrQuery.toString()
             + getReservedParameterString(req.getParameterMap());
         res.sendRedirect(res.encodeRedirectURL(selectProxyURL));

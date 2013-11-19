@@ -142,10 +142,11 @@ public class MCRDefaultQueryEngine extends MCRBaseClass implements MCRQueryEngin
      * Returns the ID of the index of all fields referenced in this condition.
      * If the fields come from multiple indexes, the constant mixed is returned.
      */
-    protected static String getIndex(MCRCondition cond) {
+    protected String getIndex(MCRCondition cond) {
         if (cond instanceof MCRQueryCondition) {
             MCRQueryCondition queryCondition = ((MCRQueryCondition) cond);
-            return MCRFieldDef.getDef(queryCondition.getFieldName()).getIndex();
+            String fieldName = queryCondition.getFieldName();
+            return getIndex(fieldName);
         } else if (cond instanceof MCRNotCondition) {
             return getIndex(((MCRNotCondition) cond).getChild());
         }
@@ -160,6 +161,10 @@ public class MCRDefaultQueryEngine extends MCRBaseClass implements MCRQueryEngin
             }
         }
         return index;
+    }
+
+    protected String getIndex(String fieldName) {
+        return MCRFieldDef.getDef(fieldName).getIndex();
     }
 
     /** Executes query, if necessary splits into subqueries for each index */
@@ -236,7 +241,7 @@ public class MCRDefaultQueryEngine extends MCRBaseClass implements MCRQueryEngin
      * Build a table from index ID to a List of conditions referencing this
      * index
      */
-    public static HashMap<String, List<MCRCondition>> groupConditionsByIndex(MCRSetCondition cond) {
+    public HashMap<String, List<MCRCondition>> groupConditionsByIndex(MCRSetCondition cond) {
         HashMap<String, List<MCRCondition>> table = new HashMap<String, List<MCRCondition>>();
         List<MCRCondition> children = cond.getChildren();
 

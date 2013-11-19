@@ -2,6 +2,7 @@ package org.mycore.solr.search;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
@@ -26,9 +28,12 @@ public class MCRSolrQueryEngine extends MCRDefaultQueryEngine {
 
     private static MCRSolrAdapter ADAPTER = new MCRSolrAdapter();
 
+    private HashSet<String> joinFields;
+
     public MCRSolrQueryEngine() {
         super();
         LOGGER.info(MessageFormat.format("Using {0} as QueryEngine", this.getClass().getCanonicalName()));
+        joinFields = new HashSet<>(MCRConfiguration.instance().getStrings("MCR.Module-solr.JoinQueryFields"));
     }
 
     @Override
@@ -66,6 +71,17 @@ public class MCRSolrQueryEngine extends MCRDefaultQueryEngine {
         }
     }
 
+    /**
+     * Builds SOLR query.
+     * 
+     * Automatically builds JOIN-Query if content search fields are used in query.
+     * @param sortBy sort criteria
+     * @param not true, if all conditions should be negated
+     * @param and AND or OR connective between conditions  
+     * @param table conditions per "content" or "metadata"
+     * @param maxHits maximum hits
+     * @return
+     */
     @SuppressWarnings("rawtypes")
     public static SolrQuery buildMergedSolrQuery(List<MCRSortBy> sortBy, boolean not, boolean and,
         HashMap<String, List<MCRCondition>> table, int maxHits) {
@@ -81,6 +97,11 @@ public class MCRSolrQueryEngine extends MCRDefaultQueryEngine {
             }
         }
         return solrRequestQuery;
+    }
+
+    @Override
+    protected String getIndex(String fieldName) {
+        return joinFields.contains(fieldName) ? "content" : "metadata";
     }
 
 }
