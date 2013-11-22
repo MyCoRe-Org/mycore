@@ -73,9 +73,9 @@ return declare("mycore.classification.CategoryEditorPane", [_Widget, Evented, _T
 		on(this.categIdEditor, "change", lang.hitch(this, this._handleIdChanged));
     },
 
-    update: function(treeItem) {
-		if(treeItem != null) {
-			this.currentItem = treeItem;
+    update: function(item) {
+		if(item != null) {
+			this.currentItem = item;
 		}
 		// label editor
 		this.labelEditor.set("value", this.currentItem.labels, false);

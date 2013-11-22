@@ -277,14 +277,7 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 		};
 		var languages = i18n.getLanguages();
 		for(var i = 0; i < languages.length; i++) {
-			var label = {lang: languages[i]};
-			if(languages[i] == "de") {
-				label.text = "neuer Eintrag";
-			}
-			if(languages[i] == "en") {
-				label.text = "new entry";
-			}
-			newItem.labels.push(label);
+			newItem.labels.push({lang: languages[i], text: ""});
 		}
 		this.tree.model.insert(newItem, parent);
 		on.emit(this, "itemAdded", {item: newItem, parent: parent});
