@@ -55,7 +55,7 @@
 					<input type='checkbox' id="acle2-button-select-multi-access" class="icon-check-empty icon-large acle2-icon"/>
 		     		<button type="button" id="acle2-button-remove-multi-access" class="btn btn-danger"><text i18n="ACLE.buttons.access.delete"/></button>
 		     		<button type="button" id="acle2-button-edit-multi-access" class="btn btn-primary"><text i18n="ACLE.buttons.access.editMulti"/></button>
-		     		<div id="acle2-paginator" class="col-md-4">
+		     		<div id="acle2-paginator" class="pull-right">
 					    <ul class="pagination pull-right">
 					    </ul>
 					</div>

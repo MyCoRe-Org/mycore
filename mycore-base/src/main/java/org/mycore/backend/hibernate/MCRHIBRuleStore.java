@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.access.mcrimpl.MCRAccessRule;
@@ -178,6 +179,20 @@ public class MCRHIBRuleStore extends MCRRuleStore {
         Session session = MCRHIBConnection.instance().getSession();
         List<MCRACCESSRULE> l = session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).list();
         return l.size() == 1;
+    }
+    
+    /**
+     * Checks if a rule mappings uses the rule.
+     * 
+     * @param ruleid the rule id to check
+     * @return true if the rule exists and is used, otherwise false
+     */
+    @Override
+    public boolean isRuleInUse(String ruleid) {
+        
+        Session session = MCRHIBConnection.instance().getSession();
+        Query query = session.createQuery("from MCRACCESS as accdef where accdef.rule.rid = '" + ruleid + "'");
+        return !query.list().isEmpty();
     }
 
     @Override

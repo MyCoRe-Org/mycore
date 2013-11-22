@@ -1,13 +1,11 @@
 var AccessTable = function(){
 	var i18nKeys =[];
 	var ruleSelectorInstance;
-	var aclEditorInstance;
 	
 	return {
 		init: 	function(accessAndRules, i18n, ruleSelector, aclEditor){
 			i18nKeys = i18n;
 			ruleSelectorInstance = ruleSelector;
-			aclEditorInstance = aclEditor;
 			
 			var cla = this;
 			$.each(accessAndRules.access, function(i, l) {
@@ -47,26 +45,26 @@ var AccessTable = function(){
 			}
 		},
 		remove:	function(data) {
+			var successAll = true;
 			$(".acle2-delete").each(function() {
 				var id = $(this).find(".acle2-access-id").text();
 				var pool = $(this).find(".acle2-access-pool").text();
 				var parent = $(this);
 				$.each(data.access, function(i, l) {
-					if(id == l.accessID && pool == l.accessPool){
-						if(l.success == 1){
+					if(l.success == 1){
+						if(id == l.accessID && pool == l.accessPool){
 							parent.remove();
 							return;
 						}
-						else{
-							showAlert(geti18n("ACLE.alert.access.remove.errorElm", id , pool));
-							parent.removeClass("acle2-delete");
-							return;
-						}
+					}
+					else{
+						successAll = false;
 					}
 				});
 				parent.removeClass("acle2-delete");
 			});
 			this.zebra();
+			return successAll;
 		},
 		edit: function(entry, accessID, accessPool, rule) {
 			entry.find(".acle2-access-id").html(accessID);
@@ -78,25 +76,25 @@ var AccessTable = function(){
 			entry.find(".acle2-access-rule").select2("val", rule);
 		},
 		editMulti: function(data) {
+			var successAll = true;
 			$(".acle2-multi-edit").each(function() {
 				var id = $(this).find(".acle2-access-id").text();
 				var pool = $(this).find(".acle2-access-pool").text();
 				var parent = $(this);
 				$.each(data.access, function(i, l) {
-					if(id == l.accessID && pool == l.accessPool){
-						if(l.success == 1){
+					if(l.success == 1){
+						if(id == l.accessID && pool == l.accessPool){
 							parent.find(".acle2-access-rule").select2("val", l.accessRule);
 							return;
 						}
-						else{
-							showAlert(geti18n("ACLE.alert.access.edit.multi.error", id , pool));
-							parent.removeClass("acle2-multi-edit");
-							return;
-						}
+					}
+					else{
+						successAll = false;
 					}
 				});
 				parent.removeClass("acle2-multi-edit");
 			});
+			return successAll;
 		},
 		zebra:	function() {
 			$("#acle2-access-table tr:not(.acle2-filter-hide)").each(function(i, row){

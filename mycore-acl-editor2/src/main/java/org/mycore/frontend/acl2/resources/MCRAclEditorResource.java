@@ -17,6 +17,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
@@ -46,7 +47,11 @@ import com.google.gson.JsonParser;
 public class MCRAclEditorResource {
 
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
-     
+    
+    private static final MCRRuleStore RULE_STORE = MCRRuleStore.getInstance();
+    
+    private static final MCRAccessStore ACCESS_STORE = MCRAccessStore.getInstance();
+
     @Context
     HttpServletRequest request;
 
@@ -124,12 +129,11 @@ public class MCRAclEditorResource {
 
     @GET
     public String list() {
-        MCRRuleStore ruleStore = MCRRuleStore.getInstance();
-        Collection<String> ruleIDs = ruleStore.retrieveAllIDs();
+        Collection<String> ruleIDs = RULE_STORE.retrieveAllIDs();
         JsonArray jsonARules = new JsonArray();
         JsonObject jsonObj = new JsonObject();
         for (String id : ruleIDs) {
-            MCRAccessRule rule = ruleStore.getRule(id);
+            MCRAccessRule rule = RULE_STORE.getRule(id);
             JsonObject jsonO = new JsonObject();
             jsonO.addProperty("ruleID", id);
             jsonO.addProperty("desc", rule.getDescription());
@@ -138,15 +142,14 @@ public class MCRAclEditorResource {
         }
         jsonObj.add("rules", jsonARules);
         JsonArray jsonAAccess = new JsonArray();
-        MCRAccessStore accessStore = MCRAccessStore.getInstance();
-        Collection<String> ids = accessStore.getDistinctStringIDs();
+        Collection<String> ids = ACCESS_STORE.getDistinctStringIDs();
         for (String id : ids) {
-            Collection<String> pools = accessStore.getPoolsForObject(id);
+            Collection<String> pools = ACCESS_STORE.getPoolsForObject(id);
             for (String pool : pools) {
                 JsonObject jsonO = new JsonObject();
                 jsonO.addProperty("accessID", id);
                 jsonO.addProperty("accessPool", pool);
-                jsonO.addProperty("rule", accessStore.getRuleID(id, pool));
+                jsonO.addProperty("rule", ACCESS_STORE.getRuleID(id, pool));
                 jsonAAccess.add(jsonO);
             }
         }
@@ -162,16 +165,19 @@ public class MCRAclEditorResource {
         String accessID = jsonObject.get("accessID").getAsString();
         String accessPool = jsonObject.get("accessPool").getAsString();
         String rule = jsonObject.get("rule").getAsString();
+       
+        if (RULE_STORE.existsRule(rule)){
+            MCRRuleMapping accessRule = createRuleMap(accessID, accessPool, rule);
 
-        MCRRuleMapping accessRule = createRuleMap(accessID, accessPool, rule);
-
-        MCRAccessStore accessStore = MCRAccessStore.getInstance();
-
-        if (!accessStore.existsRule(accessID, accessPool)) {
-            accessStore.createAccessDefinition(accessRule);
-            return Response.ok().build();
-        } else {
-            return Response.status(409).build();
+            if (!ACCESS_STORE.existsRule(accessID, accessPool)) {
+                ACCESS_STORE.createAccessDefinition(accessRule);
+                return Response.ok().build();
+            } else {
+                return Response.status(Status.CONFLICT).build();
+            }
+        }
+        else{
+            return Response.status(Status.CONFLICT).build();
         }
     }
 
@@ -186,13 +192,17 @@ public class MCRAclEditorResource {
             String accessID = accessAsJsonObject.get("accessID").getAsString();
             String accessPool = accessAsJsonObject.get("accessPool").getAsString();
 
-            MCRAccessStore accessStore = MCRAccessStore.getInstance();
-            MCRRuleMapping accessRule = accessStore.getAccessDefinition(accessPool, accessID);
+            if (ACCESS_STORE.existsRule(accessID, accessPool)){
+                MCRRuleMapping accessRule = ACCESS_STORE.getAccessDefinition(accessPool, accessID);
 
-            if (!accessRule.getObjId().equals("")) {
-                accessStore.deleteAccessDefinition(accessRule);
-                accessAsJsonObject.addProperty("success", "1");
-            } else {
+                if (!accessRule.getObjId().equals("")) {
+                    ACCESS_STORE.deleteAccessDefinition(accessRule);
+                    accessAsJsonObject.addProperty("success", "1");
+                } else {
+                    accessAsJsonObject.addProperty("success", "0");
+                }
+            }
+            else{
                 accessAsJsonObject.addProperty("success", "0");
             }
         }
@@ -211,26 +221,28 @@ public class MCRAclEditorResource {
         String accessPoolNew = jsonObject.get("accessPoolNew").getAsString();
         String accessRuleNew = jsonObject.get("accessRuleNew").getAsString();
 
-        MCRAccessStore accessStore = MCRAccessStore.getInstance();
+        if (!ACCESS_STORE.existsRule(accessIDNew, accessPoolNew) || mode.equals("rule")) {
+            if (ACCESS_STORE.existsRule(accessIDOld, accessPoolOld) && RULE_STORE.existsRule(accessRuleNew)){
+                MCRRuleMapping accessRule = createRuleMap(accessIDNew, accessPoolNew, accessRuleNew);
+                MCRRuleMapping oldAccessRule = ACCESS_STORE.getAccessDefinition(accessPoolOld, accessIDOld);
 
-        if (!accessStore.existsRule(accessIDNew, accessPoolNew) || mode.equals("rule")) {
-
-            MCRRuleMapping accessRule = createRuleMap(accessIDNew, accessPoolNew, accessRuleNew);
-            MCRRuleMapping oldAccessRule = accessStore.getAccessDefinition(accessPoolOld, accessIDOld);
-
-            if (oldAccessRule != null && !oldAccessRule.getObjId().equals("")) {
-                if (mode.equals("rule")) {
-                    accessStore.updateAccessDefinition(accessRule);
+                if (oldAccessRule != null && !oldAccessRule.getObjId().equals("")) {
+                    if (mode.equals("rule")) {
+                        ACCESS_STORE.updateAccessDefinition(accessRule);
+                    } else {
+                        ACCESS_STORE.deleteAccessDefinition(oldAccessRule);
+                        ACCESS_STORE.createAccessDefinition(accessRule);
+                    }
                 } else {
-                    accessStore.deleteAccessDefinition(oldAccessRule);
-                    accessStore.createAccessDefinition(accessRule);
+                    ACCESS_STORE.createAccessDefinition(accessRule);
                 }
-            } else {
-                accessStore.createAccessDefinition(accessRule);
+                return Response.ok().build();
             }
-            return Response.ok().build();
+            else{
+                return Response.status(Status.CONFLICT).build();
+            }
         } else {
-            return Response.status(409).build();
+            return Response.status(Status.CONFLICT).build();
         }
     }
 
@@ -243,13 +255,13 @@ public class MCRAclEditorResource {
         String ruleDesc = jsonObject.get("ruleDesc").getAsString();
         String ruleText = jsonObject.get("ruleText").getAsString();
         MCRAccessRule accessRule;
-        MCRRuleStore ruleStore = MCRRuleStore.getInstance();
+        
         try {
             accessRule = createAccessRule(ruleDesc, ruleText);
         } catch (Exception e) {
            return "";
         }
-        ruleStore.createRule(accessRule);
+        RULE_STORE.createRule(accessRule);
         return accessRule.getId();
     }
 
@@ -261,12 +273,11 @@ public class MCRAclEditorResource {
         JsonObject jsonObject = jsonParser.parse(data).getAsJsonObject();
         String ruleID = jsonObject.get("ruleID").getAsString();
 
-        MCRRuleStore ruleStore = MCRRuleStore.getInstance();
-        if (ruleStore.existsRule(ruleID)) {
-            ruleStore.deleteRule(ruleID);
+        if (!RULE_STORE.isRuleInUse(ruleID)) {
+            RULE_STORE.deleteRule(ruleID);
             return Response.ok().build();
         } else {
-            return Response.status(409).build();
+            return Response.status(Status.CONFLICT).build();
         }
     }
 
@@ -281,11 +292,19 @@ public class MCRAclEditorResource {
         String ruleText = jsonObject.get("ruleText").getAsString();
         String uid = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
 
-        MCRRuleStore ruleStore = MCRRuleStore.getInstance();
-        MCRAccessRule accessRule = new MCRAccessRule(ruleID, uid, new Date(), ruleText, ruleDesc);
-        ruleStore.updateRule(accessRule);
-
-        return Response.ok().build();
+        if (RULE_STORE.existsRule(ruleID)){
+            try{
+                MCRAccessRule accessRule = new MCRAccessRule(ruleID, uid, new Date(), ruleText, ruleDesc);
+                RULE_STORE.updateRule(accessRule);
+                return Response.ok().build();
+            }
+            catch (Exception e) {
+                return Response.status(Status.CONFLICT).build();
+            }
+        }
+        else{
+            return Response.status(Status.CONFLICT).build();
+        }   
     }
 
     @POST
@@ -296,16 +315,14 @@ public class MCRAclEditorResource {
         JsonObject jsonObject = jsonParser.parse(data).getAsJsonObject();
         String accessID = jsonObject.get("accessID").getAsString();
         String accessPool = jsonObject.get("accessPool").getAsString();
-        MCRAccessStore accessStore = MCRAccessStore.getInstance();
-        String accessRuleID = accessStore.getRuleID(accessID, accessPool);
+        String accessRuleID = ACCESS_STORE.getRuleID(accessID, accessPool);
 
         JsonObject jsonObj = new JsonObject();
             jsonObj.addProperty("accessRuleID", accessRuleID);
-            MCRRuleStore ruleStore = MCRRuleStore.getInstance();
-            Collection<String> ruleIDs = ruleStore.retrieveAllIDs();
+            Collection<String> ruleIDs = RULE_STORE.retrieveAllIDs();
             JsonArray jsonARules = new JsonArray();
             for (String id : ruleIDs) {
-                MCRAccessRule rule = ruleStore.getRule(id);
+                MCRAccessRule rule = RULE_STORE.getRule(id);
                 JsonObject jsonO = new JsonObject();
                 jsonO.addProperty("ruleID", id);
                 jsonO.addProperty("desc", rule.getDescription());
@@ -329,18 +346,21 @@ public class MCRAclEditorResource {
             String accessPool = accessAsJsonObject.get("accessPool").getAsString();
             String accessRule = accessAsJsonObject.get("accessRule").getAsString();
 
-            MCRAccessStore accessStore = MCRAccessStore.getInstance();
+            if (ACCESS_STORE.existsRule(accessID, accessPool) && RULE_STORE.existsRule(accessRule)){
+                MCRRuleMapping newAccessRule = createRuleMap(accessID, accessPool, accessRule);
+                MCRRuleMapping oldAccessRule = ACCESS_STORE.getAccessDefinition(accessPool, accessID);
 
-            MCRRuleMapping newAccessRule = createRuleMap(accessID, accessPool, accessRule);
-            MCRRuleMapping oldAccessRule = accessStore.getAccessDefinition(accessPool, accessID);
-
-            if (oldAccessRule != null && !oldAccessRule.getObjId().equals("")) {
-                accessStore.updateAccessDefinition(newAccessRule);
-                accessAsJsonObject.addProperty("success", "1");
+                if (oldAccessRule != null && !oldAccessRule.getObjId().equals("")) {
+                    ACCESS_STORE.updateAccessDefinition(newAccessRule);
+                    accessAsJsonObject.addProperty("success", "1");
+                }
+                else {
+                    ACCESS_STORE.createAccessDefinition(newAccessRule);
+                    accessAsJsonObject.addProperty("success", "1");
+                }
             }
-            else {
-                accessStore.createAccessDefinition(newAccessRule);
-                accessAsJsonObject.addProperty("success", "1");
+            else{
+                accessAsJsonObject.addProperty("success", "0");
             }
         }
         return jsonObject.toString();
@@ -358,8 +378,7 @@ public class MCRAclEditorResource {
     }
 
     private MCRAccessRule createAccessRule(String ruleDesc, String ruleText) {
-        MCRRuleStore ruleStore = MCRRuleStore.getInstance();
-        int freeRuleID = ruleStore.getNextFreeRuleID("SYSTEMRULE");
+        int freeRuleID = RULE_STORE.getNextFreeRuleID("SYSTEMRULE");
         String ruleID = "0000000000" + String.valueOf(freeRuleID);
         ruleID = ruleID.substring(ruleID.length() - "0000000000".length());
         String newRuleID = "SYSTEMRULE" + ruleID;

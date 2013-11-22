@@ -190,6 +190,9 @@ var ACLEditorObjectID = function(){
 				200: function() {
 					window.location.replace(decodeURIComponent(qpara["redir"]));
 				},
+				409: function(error) {
+					showAlert(geti18n("ACLE.alert.access.edit.error"));
+				},
 				500: function(error) {
 					showAlert(geti18n("ACLE.alert.access.edit.error"));
 				}
@@ -206,7 +209,12 @@ var ACLEditorObjectID = function(){
 			data: JSON.stringify(json),
 			statusCode: {
 				200: function(data) {
-					window.location.replace(decodeURIComponent(qpara["redir"]));
+					if (data.access[0].success == 1){
+						window.location.replace(decodeURIComponent(qpara["redir"]));
+					}
+					else{
+						showAlert(geti18n("ACLE.alert.access.remove.error"));
+					}
 				},
 				500: function(error) {
 					showAlert(geti18n("ACLE.alert.access.remove.error"));					

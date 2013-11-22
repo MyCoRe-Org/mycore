@@ -24,7 +24,7 @@ var ACLEditor = function(){
 							"mode": "rule",
 							"accessIDNew": access.find(".acle2-access-id").text(),
 							"accessPoolNew": access.find(".acle2-access-pool").text(),
-							"accessRuleNew": access.find(".acle2-access-rule:not(.select2-container)").val()						
+							"accessRuleNew": access.find(".acle2-access-rule:not(.select2-container)").val()
 						};
 				editAccess(json); 
 				$(this).siblings("div.acle2-access-rule").attr("title", $(this).children("option:selected").attr("title"));
@@ -103,7 +103,7 @@ var ACLEditor = function(){
 				$("#acle2-lightbox-new-rule-alert-area").removeClass("in");
 				$("#acle2-lightbox-rule-detail-table > .form-group.has-error").removeClass("form-group has-error");
 				if ($(".acle2-new-rule-text").val() != ""){
-					addRule($("#acle2-new-rule-desc").val(), $(".acle2-new-rule-text").val())
+					addRule($("#acle2-new-rule-desc").val(), $(".acle2-new-rule-text").val());
 					$('#acle2-lightbox-new-rule').modal('hide');
 					$("#acle2-new-rule-desc").val("");
 					$(".acle2-new-rule-text").val("");
@@ -335,7 +335,7 @@ var ACLEditor = function(){
 			dataType: "json",
 			success: function(data) {
 						ruleSelectorInstance.init(data.rules, i18nKeys);
-						accessTableInstance.init(data, i18nKeys, ruleSelectorInstance, $this);
+						accessTableInstance.init(data, i18nKeys, ruleSelectorInstance);
 						ruleListInstance.init(data.rules, i18nKeys);
 						$("#acle2-access-table").bind('aftertablesort', function () {
 							refreshPageNumbers();
@@ -368,7 +368,7 @@ var ACLEditor = function(){
 				},
 				409: function() {
 					showAlert(geti18n("ACLE.alert.access.add.exist"));
-				},					
+				},
 				500: function(error) {
 					showAlert(geti18n("ACLE.alert.access.add.error"));
 				}
@@ -410,12 +410,16 @@ var ACLEditor = function(){
 			data: JSON.stringify(json),
 			statusCode: {
 				200: function(data) {
-					accessTableInstance.editMulti(data);
+					if(accessTableInstance.editMulti(data)){
+						showAlert(geti18n("ACLE.alert.access.edit.success"), true);
+					}
+					else{
+						showAlert(geti18n("ACLE.alert.access.edit.multi.error"));
+					}
 					ruleListInstance.updateCanDelete();
 					$(".icon-check").addClass("icon-check-empty");
 					$(".icon-check").prop("checked", false);
 					$(".icon-check").removeClass("icon-check");
-					showAlert(geti18n("ACLE.alert.access.edit.success"), true);
 				},
 				500: function(error) {
 					showAlert(geti18n("ACLE.alert.access.edit.error"));
@@ -433,10 +437,17 @@ var ACLEditor = function(){
 			data: JSON.stringify(json),
 			statusCode: {
 				200: function(data) {
-					accessTableInstance.remove(data);
+					if(accessTableInstance.remove(data)){
+						showAlert(geti18n("ACLE.alert.access.remove.success"), true);
+					}
+					else{
+						showAlert(geti18n("ACLE.alert.access.remove.errorElm"));
+						$(".icon-check").addClass("icon-check-empty");
+						$(".icon-check").prop("checked", false);
+						$(".icon-check").removeClass("icon-check");
+					}
 					splitTable();
 					ruleListInstance.updateCanDelete();
-					showAlert(geti18n("ACLE.alert.access.remove.success"), true);
 				},
 				500: function(error) {
 					showAlert(geti18n("ACLE.alert.access.remove.error"));					
@@ -467,8 +478,6 @@ var ACLEditor = function(){
 					else{
 						showAlert(geti18n("ACLE.alert.rule.add.error"));
 						$(".acle2-new-access-rule > select").select2("val", "");
-						$("#acle2-rule-detail-ruleDesc").val("");
-						$(".acle2-rule-detail-ruleText").val("");
 					}
 				},
 				500: function(error) {
@@ -488,6 +497,9 @@ var ACLEditor = function(){
 			data: JSON.stringify({ruleID: ruleID}),
 			statusCode: {
 				200: function(data) {
+					if ($(".acle2-new-access-rule > select").val() == ruleID){
+						$(".acle2-new-access-rule > select").select2("val", "");
+					}
 					ruleSelectorInstance.remove(ruleID);
 					ruleSelectorInstance.update();
 					ruleListInstance.remove(ruleID);
@@ -518,6 +530,9 @@ var ACLEditor = function(){
 					ruleSelectorInstance.update();
 					ruleListInstance.edit(ruleID, ruleDesc, ruleText);
 					showAlert(geti18n("ACLE.alert.rule.edit.success", ruleDesc), true);
+				},
+				409: function(error) {
+					showAlert(geti18n("ACLE.alert.rule.edit.error"));
 				},
 				500: function(error) {
 					showAlert(geti18n("ACLE.alert.rule.edit.error"));

@@ -1,4 +1,8 @@
 @CHARSET "UTF-8";
+#contentArea{
+	min-width: 1000px;
+}
+
 #mycore-acl-editor2{
 	margin-bottom: 10px;
 }
@@ -77,11 +81,14 @@ label{
 
 #acle2-access-filter > div{
 	margin-right: -20px;
+	width: 315px;
+	float: left;
 }
 
 #acle2-access-table {
     table-layout: fixed;
 	width: 941px;
+	min-width: 941px;
 	margin-top: 5px;
 	margin-bottom: 10px;
 }
@@ -190,6 +197,8 @@ div.input-xlarge{
 
 .acle2-rule-detail-table > dt{
 	width: 110px;
+	float: left;
+	text-align: right;
 }
 
 .acle2-rule-detail-table > dd{
