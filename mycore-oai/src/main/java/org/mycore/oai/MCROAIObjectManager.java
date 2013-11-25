@@ -36,7 +36,6 @@ import org.jdom2.output.XMLOutputter;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRDELETEDITEMS;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
@@ -96,11 +95,18 @@ public class MCROAIObjectManager {
         return "oai:" + this.repositoryIdentifier + ":" + mcrId;
     }
 
-    public Record getRecord(String mcrId, MetadataFormat format) {
-        Element recordElement = getJDOMRecord(mcrId, format);
+    public Record getRecord(String mcrID, MetadataFormat format) {
+        Element recordElement;
+        try {
+            recordElement = getJDOMRecord(mcrID, format);
+        } catch (Exception exc) {
+            LOGGER.error("unable to get record " + mcrID + " (" + format.getPrefix() + ")");
+            return null;
+        }
         Element headerElement = recordElement.getChild("header", OAIConstants.NS_OAI);
-        if(headerElement == null) {
-            throw new NullPointerException("Header element of record " + mcrId + " ("+ format.getPrefix() + ") is null!");
+        if (headerElement == null) {
+            LOGGER.error("Header element of record " + mcrID + " (" + format.getPrefix() + ") is null!");
+            return null;
         }
         Header header = headerToHeader(headerElement);
         Element metadataElement = recordElement.getChild("metadata", OAIConstants.NS_OAI);
@@ -130,8 +136,8 @@ public class MCROAIObjectManager {
             Criterion idCriterion = Restrictions.eq("id.identifier", mcrId);
             criteria.add(idCriterion);
             List resultList = criteria.list();
-            if(resultList.size() > 0) {
-                Timestamp timestamp = (Timestamp)resultList.get(0);
+            if (resultList.size() > 0) {
+                Timestamp timestamp = (Timestamp) resultList.get(0);
                 Header header = new Header(getOAIId(mcrId), new Date(timestamp.getTime()), Status.deleted);
                 Record record = new Record(header);
                 return record;
@@ -143,11 +149,13 @@ public class MCROAIObjectManager {
     }
 
     public Header getHeader(String mcrId, MetadataFormat format) {
-        Element headerElement = getJDOMHeader(mcrId, format);
-        if(headerElement == null) {
-            throw new NullPointerException("Header element of record " + mcrId + " ("+ format.getPrefix() + ") is null!");
+        try {
+            Element headerElement = getJDOMHeader(mcrId, format);
+            return headerElement != null ? headerToHeader(headerElement) : null;
+        } catch (Exception exc) {
+            LOGGER.error("unable to get header element of record " + mcrId + " (" + format.getPrefix() + ")", exc);
+            return null;
         }
-        return headerToHeader(headerElement);
     }
 
     protected Element getJDOMRecord(String mcrId, MetadataFormat format) {
@@ -161,8 +169,8 @@ public class MCROAIObjectManager {
     }
 
     protected Element getURI(String uri) {
-        Element e = (Element) (MCRURIResolver.instance().resolve(uri).detach());
-        if(LOGGER.isDebugEnabled()) {
+        Element e = MCRURIResolver.instance().resolve(uri).detach();
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("get " + uri);
             XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
             LOGGER.debug(out.outputString(e));
@@ -174,12 +182,12 @@ public class MCROAIObjectManager {
         MCRObjectID mcrID = null;
         try {
             mcrID = MCRObjectID.getInstance(id);
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             // just check if its a valid mcr id
         }
         boolean exists;
         String objectType;
-        if(mcrID != null) {
+        if (mcrID != null) {
             exists = MCRMetadataManager.exists(mcrID);
             objectType = mcrID.getTypeId();
         } else {
