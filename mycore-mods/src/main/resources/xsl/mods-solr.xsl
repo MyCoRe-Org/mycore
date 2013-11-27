@@ -50,6 +50,11 @@
         <xsl:value-of select="substring-after(@valueURI,'http://d-nb.info/gnd/')" />
       </field>
     </xsl:for-each>
+    <xsl:for-each select="mods:name/descendant-or-self::*[contains(@valueURI,'http://d-nb.info/gnd/')]">
+      <field name="mods.gnd.top">
+        <xsl:value-of select="substring-after(@valueURI,'http://d-nb.info/gnd/')" />
+      </field>
+    </xsl:for-each>
     <xsl:for-each select=".//mods:name">
       <field name="mods.name">
         <xsl:for-each select="mods:displayForm | mods:namePart | text()">
@@ -104,7 +109,7 @@
     <!-- add allMeta from parent -->
     <xsl:for-each select="mods:relatedItem[@type='host']">
       <xsl:for-each select="mods:titleInfo/descendant-or-self::*[text()]">
-        <field name="mods.hostTitle">
+        <field name="mods.title.host">
           <xsl:value-of select="text()" />
         </field>
       </xsl:for-each>
@@ -119,7 +124,7 @@
         </xsl:for-each>
       </xsl:for-each>
       <xsl:for-each select="mods:identifier">
-        <field name="mods.hostIdentifier">
+        <field name="mods.identifier.host">
           <xsl:value-of select="text()" />
         </field>
       </xsl:for-each>
