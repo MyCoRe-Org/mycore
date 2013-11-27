@@ -3,8 +3,8 @@
 <MyCoReWebPage>
   <section xml:lang="all" title="ACL Editor">
     <div id="mycore-acl-editor2">
-      	<link href="/rsc/ACLE/gui/css/webpage.css" rel="stylesheet" type="text/css" />
-      	<link href="/rsc/ACLE/gui/select2/select2.css" rel="stylesheet" type="text/css" />      
+      	<link href="gui/css/webpage.css" rel="stylesheet" type="text/css" />
+      	<link href="gui/select2/select2.css" rel="stylesheet" type="text/css" />      
       	<div id="acle2-header">
         	<span>          		
           		<text i18n="ACLE.labels.header"/>
@@ -155,13 +155,13 @@
 				</dl>
 			</div>
 		</div>
-      	<script type="text/javascript" src="/rsc/ACLE/gui/js/mycore-acl-editor.js" />
-      	<script type="text/javascript" src="/rsc/ACLE/gui/js/mycore-acl-editor-ruleSelector.js" />
-      	<script type="text/javascript" src="/rsc/ACLE/gui/js/mycore-acl-editor-accessTable.js" />
-      	<script type="text/javascript" src="/rsc/ACLE/gui/js/mycore-acl-editor-ruleList.js" />
-    	<script type="text/javascript" src="/rsc/ACLE/gui/select2/select2.js" />
-    	<script type="text/javascript" src="/rsc/ACLE/gui/js/stupidtable.js" />
-    	<script type="text/javascript" src="/rsc/ACLE/gui/js/typeahead.min.js" />
+      	<script type="text/javascript" src="gui/js/mycore-acl-editor.js" />
+      	<script type="text/javascript" src="gui/js/mycore-acl-editor-ruleSelector.js" />
+      	<script type="text/javascript" src="gui/js/mycore-acl-editor-accessTable.js" />
+      	<script type="text/javascript" src="gui/js/mycore-acl-editor-ruleList.js" />
+    	<script type="text/javascript" src="gui/select2/select2.js" />
+    	<script type="text/javascript" src="gui/js/stupidtable.js" />
+    	<script type="text/javascript" src="gui/js/typeahead.min.js" />
     </div>
   </section>
 </MyCoReWebPage>

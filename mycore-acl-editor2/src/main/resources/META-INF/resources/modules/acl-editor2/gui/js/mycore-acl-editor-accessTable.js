@@ -27,8 +27,8 @@ var AccessTable = function(){
 		add: 	function(accessID, accessPool, rule, prepend){
 			var tr = $("<tr class='acle2-table-access-entry'></tr>");
 			tr.append("<td><input type='checkbox' class='icon-check-empty icon-large acle2-icon acle2-access-select'/></td>");
-			tr.append("<td class='acle2-access-id acle2-table-access-entry-td' title='" +  accessID + "'>" + accessID + "</td>");
-			tr.append("<td class='acle2-access-pool acle2-table-access-entry-td' title='" +  accessPool + "'>" + accessPool + "</td>");
+			tr.append("<td class='acle2-access-id acle2-table-access-entry-td' title='" +  accessID + "'>" + accessID + "<i class='glyphicon glyphicon-pencil icon-plus icon-large acle2-icon acle2-button-edit' title='" + geti18n("ACLE.title.edit") + "'></i>" + "</td>");
+			tr.append("<td class='acle2-access-pool acle2-table-access-entry-td' title='" +  accessPool + "'>" + accessPool  + "<i class='glyphicon glyphicon-pencil icon-plus icon-large acle2-icon acle2-button-edit' title='" + geti18n("ACLE.title.edit") + "'></i>" + "</td>");
 			var td = $("<td class='acle2-access-rule-parent'></td>");
 			ruleSelectorInstance.append(rule, td);
 			tr.append(td);
@@ -67,10 +67,10 @@ var AccessTable = function(){
 			return successAll;
 		},
 		edit: function(entry, accessID, accessPool, rule) {
-			entry.find(".acle2-access-id").html(accessID);
+			entry.find(".acle2-access-id").html(accessID + "<i class='glyphicon glyphicon-pencil icon-plus icon-large acle2-icon acle2-button-edit' title='" + geti18n("ACLE.title.edit") + "'></i>");
 			entry.find(".acle2-access-id").attr("title",accessID);
 			entry.find(".acle2-access-id").removeClass("acle2-show-input");
-			entry.find(".acle2-access-pool").html(accessPool);
+			entry.find(".acle2-access-pool").html(accessPool + "<i class='glyphicon glyphicon-pencil icon-plus icon-large acle2-icon acle2-button-edit' title='" + geti18n("ACLE.title.edit") + "'></i>");
 			entry.find(".acle2-access-pool").attr("title",accessPool);
 			entry.find(".acle2-access-pool").removeClass("acle2-show-input");
 			entry.find(".acle2-access-rule").select2("val", rule);

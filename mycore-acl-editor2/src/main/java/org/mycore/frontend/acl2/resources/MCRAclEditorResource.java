@@ -166,7 +166,7 @@ public class MCRAclEditorResource {
         String accessPool = jsonObject.get("accessPool").getAsString();
         String rule = jsonObject.get("rule").getAsString();
        
-        if (RULE_STORE.existsRule(rule)){
+        if (RULE_STORE.existsRule(rule) && !accessID.equals("") && !accessPool.equals("")){
             MCRRuleMapping accessRule = createRuleMap(accessID, accessPool, rule);
 
             if (!ACCESS_STORE.existsRule(accessID, accessPool)) {
@@ -222,7 +222,7 @@ public class MCRAclEditorResource {
         String accessRuleNew = jsonObject.get("accessRuleNew").getAsString();
 
         if (!ACCESS_STORE.existsRule(accessIDNew, accessPoolNew) || mode.equals("rule")) {
-            if (ACCESS_STORE.existsRule(accessIDOld, accessPoolOld) && RULE_STORE.existsRule(accessRuleNew)){
+            if (ACCESS_STORE.existsRule(accessIDOld, accessPoolOld) && RULE_STORE.existsRule(accessRuleNew) && !accessIDNew.equals("") && !accessPoolNew.equals("")){
                 MCRRuleMapping accessRule = createRuleMap(accessIDNew, accessPoolNew, accessRuleNew);
                 MCRRuleMapping oldAccessRule = ACCESS_STORE.getAccessDefinition(accessPoolOld, accessIDOld);
 

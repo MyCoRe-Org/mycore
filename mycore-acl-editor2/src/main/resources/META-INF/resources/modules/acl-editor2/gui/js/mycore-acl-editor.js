@@ -179,12 +179,14 @@ var ACLEditor = function(){
 				}
 			});
 			
-			$("body").on("click", ".acle2-table-access-entry-td", function() {
-				if(!$(this).hasClass("acle2-show-input")){
-					var input = $('<input type="text" class="input-sm form-control acle2-table-access-entry-input" value="' + $(this).attr("title") + '"></input>');
-					$(this).html(input);
+			$("body").on("click", ".acle2-button-edit", function() {
+				var elm = $(this).parent();
+				if(!elm.hasClass("acle2-show-input")){
+					var input = $('<input type="text" class="input-sm form-control acle2-table-access-entry-input" value=""></input>');
+					elm.html(input);
 					input.focus();
-					$(this).addClass("acle2-show-input");
+					input.val(elm.attr("title"));
+					elm.addClass("acle2-show-input");
 				}
 			});
 			
@@ -210,7 +212,7 @@ var ACLEditor = function(){
 						editAccess(json);
 					}
 					else{
-						parent.html($(this).val());
+						parent.html($(this).val( )+ "<i class='glyphicon glyphicon-pencil icon-plus icon-large acle2-icon acle2-button-edit' title='" + geti18n("ACLE.title.edit") + "'></i>");
 						parent.attr("title", $(this).val());
 						parent.removeClass("acle2-show-input");
 						$(this).remove();
@@ -321,7 +323,7 @@ var ACLEditor = function(){
 			accessTableInstance = accessTable;
 			ruleListInstance = ruleList;
 			var lang = $("#mycore-acl-editor2").attr("lang");
-			jQuery.getJSON("/servlets/MCRLocaleServlet/" + lang + "/ACLE.*", function(data) { 
+			jQuery.getJSON("../../servlets/MCRLocaleServlet/" + lang + "/ACLE.*", function(data) { 
 				i18nKeys = data;
 				getAccess();
 			});
@@ -330,7 +332,7 @@ var ACLEditor = function(){
 	
 	function getAccess(){
 		$.ajax({
-			url: "/rsc/ACLE/",
+			url: ".",
 			type: "GET",
 			dataType: "json",
 			success: function(data) {
@@ -351,7 +353,7 @@ var ACLEditor = function(){
 	
 	function addAccess(accessID, accessPool, rule){
 		$.ajax({
-			url: "/rsc/ACLE",
+			url: ".",
 			type: "POST",
 			contentType: 'application/json',
 			dataType: "json",
@@ -378,7 +380,7 @@ var ACLEditor = function(){
 	
 	function editAccess(json){
 		$.ajax({
-			url: "/rsc/ACLE/",
+			url: ".",
 			type: "PUT",
 			contentType: 'application/json',
 			dataType: "json",
@@ -403,7 +405,7 @@ var ACLEditor = function(){
 	
 	function editMultiAccess(json){
 		$.ajax({
-			url: "/rsc/ACLE/multi",
+			url: "multi",
 			type: "PUT",
 			contentType: 'application/json',
 			dataType: "json",
@@ -430,7 +432,7 @@ var ACLEditor = function(){
 	
 	function removeAccess(json){
 		$.ajax({
-			url: "/rsc/ACLE/",
+			url: ".",
 			type: "DELETE",
 			contentType: 'application/json',
 			dataType: "json",
@@ -458,7 +460,7 @@ var ACLEditor = function(){
 	
 	function addRule(ruleDesc, ruleText){
 		$.ajax({
-			url: "/rsc/ACLE/rule",
+			url: "rule",
 			type: "POST",
 			contentType: 'application/json',
 			dataType: "text",
@@ -490,7 +492,7 @@ var ACLEditor = function(){
 	
 	function removeRule(ruleID){
 		$.ajax({
-			url: "/rsc/ACLE/rule",
+			url: "rule",
 			type: "DELETE",
 			contentType: 'application/json',
 			dataType: "text",
@@ -519,7 +521,7 @@ var ACLEditor = function(){
 	
 	function editRule(ruleID, ruleDesc, ruleText){
 		$.ajax({
-			url: "/rsc/ACLE/rule",
+			url: "rule",
 			type: "PUT",
 			contentType: 'application/json',
 			dataType: "text",
@@ -802,7 +804,7 @@ var ACLEditor = function(){
 $(document).ready(function() {
 	var aclEditorInstance = new ACLEditor();
     if (!$.isFunction(jQuery.fn.tab)){
-    	$.getScript('/rsc/ACLE/gui/js/bootstrap.min.js')
+    	$.getScript('gui/js/bootstrap.min.js')
     		.done(function() {
     			aclEditorInstance.init(new RuleSelector(), new AccessTable(), new RuleList());
     		});

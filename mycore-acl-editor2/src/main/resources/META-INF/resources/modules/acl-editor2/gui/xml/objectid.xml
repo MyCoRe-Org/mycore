@@ -3,10 +3,10 @@
 <MyCoReWebPage>
   <section xml:lang="all" title="ACL Editor">
     <div id="mycore-acl-editor2">
-    	<link href="/rsc/ACLE/gui/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"/>
-      	<link href="/rsc/ACLE/gui/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
-      	<link href="/rsc/ACLE/gui/css/webpage.css" rel="stylesheet" type="text/css" />
-      	<link href="/rsc/ACLE/gui/select2/select2.css" rel="stylesheet" type="text/css" />      
+    	<link href="gui/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"/>
+      	<link href="gui/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+      	<link href="gui/css/webpage.css" rel="stylesheet" type="text/css" />
+      	<link href="gui/select2/select2.css" rel="stylesheet" type="text/css" />      
       	<div id="acle2-header">
         	<span>
           		<text i18n="ACLE.labels.header"/>
@@ -52,8 +52,8 @@
 			</div>
 		</div>
       	<div id="acle2-loading" style="display:none"><i class="icon-spinner icon-spin icon-4x offset5"></i></div>
-      	<script type="text/javascript" src="/rsc/ACLE/gui/js/mycore-acl-editor-objectid.js" />
-    	<script type="text/javascript" src="/rsc/ACLE/gui/select2/select2.js" />
+      	<script type="text/javascript" src="gui/js/mycore-acl-editor-objectid.js" />
+    	<script type="text/javascript" src="gui/select2/select2.js" />
     </div>
   </section>
 </MyCoReWebPage>

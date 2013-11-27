@@ -302,6 +302,16 @@ div.input-xlarge{
 	opacity: 1;
 }
 
+.acle2-button-edit{
+	opacity: 0;
+	float: right;
+	margin-top: -15px;
+}
+
+.acle2-table-access-entry-td:hover .acle2-button-edit{
+	opacity: 1;
+}
+
 /*typeahead.js-bootstrap.css */
 .twitter-typeahead {
     width: 100%;

@@ -97,7 +97,7 @@ var ACLEditorObjectID = function(){
 	
 	function getObjectID(accessID, accessPool){
 		$.ajax({
-			url: "/rsc/ACLE/objectid",
+			url: "objectid",
 			type: "POST",
 			contentType: 'application/json',
 			dataType: "json",
@@ -123,7 +123,7 @@ var ACLEditorObjectID = function(){
 		
 	function addRule(ruleDesc, ruleText){
 		$.ajax({
-			url: "/rsc/ACLE/rule",
+			url: "rule",
 			type: "POST",
 			contentType: 'application/json',
 			dataType: "text",
@@ -160,7 +160,7 @@ var ACLEditorObjectID = function(){
 		
 	function addAccess(accessID, accessPool, rule){
 		$.ajax({
-			url: "/rsc/ACLE",
+			url: ".",
 			type: "POST",
 			contentType: 'application/json',
 			dataType: "json",
@@ -181,7 +181,7 @@ var ACLEditorObjectID = function(){
 	
 	function editAccess(json){
 		$.ajax({
-			url: "/rsc/ACLE/",
+			url: ".",
 			type: "PUT",
 			contentType: 'application/json',
 			dataType: "json",
@@ -202,7 +202,7 @@ var ACLEditorObjectID = function(){
 	
 	function removeAccess(json){
 		$.ajax({
-			url: "/rsc/ACLE/",
+			url: ".",
 			type: "DELETE",
 			contentType: 'application/json',
 			dataType: "json",
@@ -301,15 +301,15 @@ $(document).ready(function() {
     var aclEditorObjectIDInstance = new ACLEditorObjectID();
     var lang = $("#mycore-acl-editor2").attr("lang");
 	if (!$.isFunction(jQuery.fn.modal)){
-    	$.getScript('/rsc/ACLE/gui/js/bootstrap.min.js')
+    	$.getScript('gui/js/bootstrap.min.js')
     		.done(function() {
-    			jQuery.getJSON("/servlets/MCRLocaleServlet/" + lang + "/ACLE.*", function(data) { 
+    			jQuery.getJSON("../../servlets/MCRLocaleServlet/" + lang + "/ACLE.*", function(data) { 
     				aclEditorObjectIDInstance.init(data);
     			});
     		});
     }
     else{
-    	jQuery.getJSON("/servlets/MCRLocaleServlet/" + lang + "/ACLE.*", function(data) { 
+    	jQuery.getJSON("../../servlets/MCRLocaleServlet/" + lang + "/ACLE.*", function(data) { 
     		aclEditorObjectIDInstance.init(data);
     	});
     }
