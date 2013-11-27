@@ -1354,16 +1354,13 @@ public final class MCRURIResolver implements URIResolver {
             root.setAttribute("version", "1.0");
 
             // get the parameters from mycore.properties
-            String propValue = MCRConfiguration.instance().getString("MCR.URIResolver.xslIncludes." + includePart, "")
-                .trim();
-            if (!propValue.isEmpty()) {
-                String[] includes = propValue.split(",");
-                for (String include : includes) {
-                    // create a new include element
-                    Element includeElement = new Element("include", xslNamespace);
-                    includeElement.setAttribute("href", include);
-                    root.addContent(includeElement);
-                }
+            List<String> propValue = Collections.emptyList();
+            propValue = MCRConfiguration.instance().getStrings("MCR.URIResolver.xslIncludes." + includePart, propValue);
+            for (String include : propValue) {
+                // create a new include element
+                Element includeElement = new Element("include", xslNamespace);
+                includeElement.setAttribute("href", include);
+                root.addContent(includeElement);
             }
             return new JDOMSource(root);
         }

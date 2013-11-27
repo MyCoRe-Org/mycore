@@ -33,8 +33,10 @@ import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -777,35 +779,32 @@ public class MCRXMLFunctions {
         }
 
         // get the parameters from mycore.properties
-        String propValue = MCRConfiguration.instance().getString("MCR.URIResolver.xslImports." + includePart, "")
-            .trim();
-        if (!propValue.isEmpty()) {
-            String[] includes = propValue.split(",");
+        List<String> importList = Collections.emptyList();
+        importList = MCRConfiguration.instance().getStrings("MCR.URIResolver.xslImports." + includePart, importList);
+        if (importList.isEmpty()) {
+            LOGGER.info("MCR.URIResolver.xslImports." + includePart + " has no Stylesheets defined");
+        } else {
+            ListIterator<String> listIterator = importList.listIterator(importList.size());
             String importXSL = null;
-            int pos = includes.length;
-            if (selfName == null) {
-                importXSL = includes[includes.length - 1];
-            } else {
-                for (int i = includes.length - 1; i >= 0; i--) {
-                    if (includes[i].equals(selfName)) {
-                        pos = i - 1;
-                        break;
+            if (selfName == null && listIterator.hasPrevious()) {
+                importXSL = listIterator.previous();
+            }
+            while (listIterator.hasPrevious() && importXSL == null) {
+                String currentStylesheet = listIterator.previous();
+                if (currentStylesheet.equals(selfName)) {
+                    if (listIterator.hasPrevious()) {
+                        importXSL = listIterator.previous();
+                    } else {
+                        LOGGER.debug("xslImport reached end of chain:" + importList);
                     }
+                    break;
                 }
-                if (pos < includes.length && pos >= 0) {
-                    importXSL = includes[pos];
-                }
+                //continue;
             }
             if (importXSL != null) {
                 return importXSL;
             }
-            if (pos == -1) {
-                LOGGER.debug("xslImport reached end of chain:" + propValue);
-            } else {
-                LOGGER.warn("xslImport could not find " + selfName + " in " + propValue);
-            }
-        } else {
-            LOGGER.info("MCR.URIResolver.xslImports." + includePart + " has no Stylesheets defined");
+            LOGGER.warn("xslImport could not find " + selfName + " in " + importList);
         }
         return "";
     }
