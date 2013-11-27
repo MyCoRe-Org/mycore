@@ -134,7 +134,6 @@ public class MCRLockServlet extends MCRServlet {
     private String addQueryParameter(String url, HttpServletRequest req) {
         boolean hasQueryParameter = url.indexOf('?') != -1;
         StringBuilder sb = new StringBuilder(url);
-        @SuppressWarnings("unchecked")
         Set<Map.Entry<String, String[]>> entrySet = req.getParameterMap().entrySet();
         for (Map.Entry<String, String[]> parameter : entrySet) {
             if (!(parameter.getKey().equals(PARAM_REDIRECT) || parameter.getKey().equals(PARAM_ACTION) || url
