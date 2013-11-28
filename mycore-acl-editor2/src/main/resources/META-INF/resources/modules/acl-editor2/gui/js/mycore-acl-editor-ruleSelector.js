@@ -3,7 +3,7 @@ var RuleSelector = function(){
 	var selector = $('<select/>',
 		    {
 		        size: 	'1',
-		        class:	'input-xlarge acle2-access-rule'
+		        class:	'acle2-access-rule'
 		    });
 	
 	function formatSelect(item) {

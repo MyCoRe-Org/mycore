@@ -94,9 +94,8 @@ var ACLEditor = function(){
 				$('#acle2-lightbox-multi-delete').modal('hide');
 			});
 			
-			$("body").on("click", ".acle2-lightbox-multi-delete-cancel", function() {
+			$("body").on("hidden.bs.modal", "#acle2-lightbox-multi-delete", function() {
 				$("#acle2-lightbox-multi-delete-list").html("");
-				$('#acle2-lightbox-multi-delete').modal('hide');
 			});
 						
 			$("body").on("click", "#acle2-new-rule-add", function() {
@@ -114,7 +113,7 @@ var ACLEditor = function(){
 				}
 			});
 			
-			$("body").on("click", ".acle2-new-rule-cancel", function() {
+			$("body").on("hidden.bs.modal", "#acle2-lightbox-new-rule", function() {
 				$(".acle2-new-access-rule > select").select2("val", "");
 				$("#acle2-lightbox-new-rule-alert-area").removeClass("in");
 				$("#acle2-lightbox-rule-detail-table > .form-group.has-error").removeClass("form-group has-error");
@@ -256,8 +255,6 @@ var ACLEditor = function(){
 				if (elm > 0){
 					$('#acle2-lightbox-multi-edit').modal('show');
 					ruleSelectorInstance.append("", $("#acle2-lightbox-multi-edit-select"));
-					$("#acle2-lightbox-multi-edit-select select").addClass("input-xxlarge");
-					$("#acle2-lightbox-multi-edit-select select").removeClass("input-xlarge");
 					$("#acle2-lightbox-multi-edit-select .acle2-new-access-rule-option").remove();
 					$("#acle2-lightbox-multi-edit-text").html(geti18n("ACLE.labels.access.multiEditElm", elm));
 				}
@@ -307,9 +304,7 @@ var ACLEditor = function(){
 				}
 			});
 			
-			$("body").on("click", ".acle2-lightbox-multi-edit-cancel", function() {
-				$("#acle2-lightbox-multi-edit-alert-area").removeClass("in");
-				$("#acle2-lightbox-multi-edit-select").removeClass("form-group has-error");
+			$("body").on("hidden.bs.modal", "#acle2-lightbox-multi-edit", function() {
 				hideMultiEdit();
 			});
 			
@@ -327,6 +322,8 @@ var ACLEditor = function(){
 				i18nKeys = data;
 				getAccess();
 			});
+			//Fix: Select2 doesn't work when embedded in a bootstrap modal
+			$.fn.modal.Constructor.prototype.enforceFocus = function() {};
 		}
 	}
 	
@@ -778,13 +775,16 @@ var ACLEditor = function(){
 	}
 	
 	function hideMultiEdit() {
-		$('#acle2-lightbox-multi-edit').modal('hide');
+		$("#acle2-lightbox-multi-edit-alert-area").removeClass("in");
+		$("#acle2-lightbox-multi-edit-select").removeClass("form-group has-error");
 		$("#acle2-lightbox-multi-edit-list").html("");
 		$("#acle2-lightbox-multi-edit-list").hide();
 		$("#acle2-lightbox-multi-edit-plus").addClass("icon-plus");
 		$("#acle2-lightbox-multi-edit-plus").removeClass("icon-minus");		
 		$("#acle2-lightbox-multi-edit-select").find("select").select2("destroy");
 		$("#acle2-lightbox-multi-edit-select").find("select").remove();
+		$("#acle2-lightbox-multi-edit-plus").addClass("glyphicon-plus");
+		$("#acle2-lightbox-multi-edit-plus").removeClass("glyphicon-minus");
 	}
 	
 	function geti18n(key) {
