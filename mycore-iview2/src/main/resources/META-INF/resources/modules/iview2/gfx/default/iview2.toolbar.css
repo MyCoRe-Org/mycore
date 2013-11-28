@@ -3,6 +3,7 @@
 
 .viewerContainer * {
 box-sizing: content-box;
+-moz-box-sizing: content-box;
 }
 
 /* properbly .max */
