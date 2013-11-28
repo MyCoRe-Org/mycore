@@ -30,7 +30,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.text.MessageFormat;
@@ -61,7 +60,6 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRLayoutService;
-import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.common.xsl.MCRErrorListener;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -157,7 +155,6 @@ public class MCRServlet extends HttpServlet {
         String baseURLofRequest = requestURL.substring(0, pos) + contextPath;
 
         prepareBaseURLs(baseURLofRequest);
-        MCRURIResolver.init(context, getBaseURL());
     }
 
     private static synchronized void prepareBaseURLs(String baseURL) {

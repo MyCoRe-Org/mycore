@@ -220,10 +220,8 @@ public final class MCRURIResolver implements URIResolver {
      * @param webAppBase
      *            the base URL of this web application
      */
-    public static synchronized void init(ServletContext ctx, String webAppBase) {
+    public static synchronized void init(ServletContext ctx) {
         context = ctx;
-        LOGGER.debug("parameter webAppBase (" + webAppBase + ") will not be used");
-        // FIXME: use webAppBase or remove it
     }
 
     /**

@@ -59,7 +59,7 @@ public class MCRServletContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         //Make sure logging is configured
         //initialize MCRURIResolver
-        MCRURIResolver.init(sce.getServletContext(), MCRConfiguration.instance().getString("MCR.baseurl"));
+        MCRURIResolver.init(sce.getServletContext());
         // register to MCRShutdownHandler
         LOGGER.info("Register ServletContextListener to MCRShutdownHandler");
         try {
