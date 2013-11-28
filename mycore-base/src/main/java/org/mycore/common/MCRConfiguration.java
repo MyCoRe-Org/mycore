@@ -229,8 +229,14 @@ public class MCRConfiguration {
     protected void createLastModifiedFile() throws IOException {
         final String dataDirKey = "MCR.datadir";
         if (properties.containsKey(dataDirKey)) {
-            lastModifiedFile = new File(getString(dataDirKey), ".systemTime");
-        } else {
+            File dataDir = new File(getString(dataDirKey));
+            if (dataDir.exists() && dataDir.isDirectory()) {
+                lastModifiedFile = new File(getString(dataDirKey), ".systemTime");
+            } else {
+                System.err.println("WARNING: MCR.dataDir does not exist: " + dataDir.getAbsolutePath());
+            }
+        }
+        if (lastModifiedFile == null) {
             try {
                 lastModifiedFile = File.createTempFile("MyCoRe", ".systemTime");
                 lastModifiedFile.deleteOnExit();
