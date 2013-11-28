@@ -26,8 +26,10 @@
                 this.damagedArea = new Array();
                 this.notLoadedTile = new Array();
                 this.loadingTile = new Array();
+                this._loadedTiles = new Array();
+                
                 var that = this;
-
+                
                 if(!PanoJS.prototype.getMaxDimViewerOrig) {
                 	PanoJS.prototype.getMaxDimViewerOrig = PanoJS.prototype.getMaxDimViewer;
                 	PanoJS.prototype.getMaxDimViewer = function cv_getMaxDimViewerOrig(screen) {
@@ -95,14 +97,14 @@
         constructor.prototype = Object.create(iview.IViewObject.prototype);
 
         /**
-         * prepare tiles is no needed anymore
-         */
+		 * prepare tiles is no needed anymore
+		 */
         constructor.prototype.prepareTiles = function cv_prepareTiles() {
         };
 
         /**
-         * Requests a Screen Update and calls _updateScreen
-         */
+		 * Requests a Screen Update and calls _updateScreen
+		 */
         constructor.prototype.updateScreen = function cv_updateScreen() {
             var scope = this;
             if (this.updateCanvasCount++ == 0) {
@@ -113,12 +115,12 @@
         };
 
         /**
-         * Updates the Canvas.
-         */
+		 * Updates the Canvas.
+		 */
         constructor.prototype._updateScreen = function cv__updateScreen() {
             if(!this.activateCanvas){
                 this._activateCanvas();
-                //return;
+                // return;
             }
             var scope = this;
             var viewerBean = this.getViewer().viewerBean;
@@ -143,7 +145,8 @@
                 this.clearDamagedArea();
                 this.drawArea(this.getFullScreenArea());
             } else {
-                // the viewer only moves, so we need only to draw the border Tiles 
+                // the viewer only moves, so we need only to draw the border
+				// Tiles
                 this.moveCanvas(moveVector);
                 jQuery(scope).trigger(iview.Canvas.BEFORE_DRAW_EVENT);
                 var moveDamagedArea = this.calculateDamagedArea(moveVector);
@@ -151,6 +154,11 @@
                 this.clearDamagedArea();
 
                 var currentArea;
+                var currentTile;
+                
+                while(currentTile = this._loadedTiles.pop()){
+                	this.drawTileImage(currentTile.tileX, currentTile.tileY, currentTile.tileImg)
+                }
 
                 while (currentArea = damagedAreas.pop()) {
                     this.drawArea(currentArea);
@@ -162,8 +170,8 @@
         };
 
         /**
-         * Calculates a Damaged Area for the whole viewer Bean
-         */
+		 * Calculates a Damaged Area for the whole viewer Bean
+		 */
         constructor.prototype.getFullScreenArea = function cv_getFullScreenArea() {
             var viewerBean = this.getViewer().viewerBean;
             return {
@@ -175,10 +183,11 @@
         };
 
         /**
-         * Checks the zoom-level of the picture has changed
-         * @param lastZoomLevel 
-         * The last zoom-level to compare with 
-         */
+		 * Checks the zoom-level of the picture has changed
+		 * 
+		 * @param lastZoomLevel
+		 *            The last zoom-level to compare with
+		 */
         constructor.prototype.zoomLevelChanged = function cv_zoomLevelChanged(lastZoomLevel) {
             var zoomLevel = this.getViewer().viewerBean.zoomLevel;
             var hasChanged = lastZoomLevel != zoomLevel;
@@ -186,10 +195,11 @@
         };
 
         /**
-         * Checks the scale of the picture has changed
-         * @param lastScale 
-         * The last Scale to compare with 
-         */
+		 * Checks the scale of the picture has changed
+		 * 
+		 * @param lastScale
+		 *            The last Scale to compare with
+		 */
         constructor.prototype.scaleChanged = function cv_scaleChanged(lastScale) {
             var scale = this.getViewer().currentImage.zoomInfo.scale;
             var hasChanged = lastScale != scale;
@@ -197,12 +207,12 @@
         };
 
         /**
-         * Checks a move vector move complete out of the current screen
-         * 
-         * @param moveVector
-         *            the vector to check
-         * @returns {Boolean} moves out of screen
-         */
+		 * Checks a move vector move complete out of the current screen
+		 * 
+		 * @param moveVector
+		 *            the vector to check
+		 * @returns {Boolean} moves out of screen
+		 */
         constructor.prototype.isMoveOutOfScreen = function cv_isMoveOutOfScreen(moveVector) {
             var viewerBean = this.getViewer().viewerBean;
             return (moveVector.xOff > 0 && moveVector.xOff > viewerBean.width)
@@ -212,8 +222,9 @@
         }
 
         /**
-         * @returns the difference between this and last position of ViewerBean {xOff, yOff}
-         */
+		 * @returns the difference between this and last position of ViewerBean
+		 *          {xOff, yOff}
+		 */
         constructor.prototype.calculateMoveVector = function cv_calculateMoveVector() {
             var viewerBean = this.getViewer().viewerBean;
             var posX = viewerBean.x;
@@ -226,30 +237,30 @@
         };
 
         /**
-         * Moves content of Canvas by {moveVec}
-         * 
-         * @param moveVec
-         */
+		 * Moves content of Canvas by {moveVec}
+		 * 
+		 * @param moveVec
+		 */
         constructor.prototype.moveCanvas = function cv_moveCanvas(moveVec) {
             var ctx = this.context2D;
             ctx.drawImage(ctx.canvas, -(moveVec.xOff), -(moveVec.yOff));
         };
 
         /**
-         * Remove all Childs from DamagedArea
-         */
+		 * Remove all Childs from DamagedArea
+		 */
         constructor.prototype.clearDamagedArea = function cv_clearDamagedArea() {
             while (this.damagedArea.pop());
                 
         };
 
         /**
-         * Calculates the damaged area for a move vector
-         * 
-         * @param moveVec
-         *            the move vector {x,y}
-         * @returns {Array} the calculated damaged Areas
-         */
+		 * Calculates the damaged area for a move vector
+		 * 
+		 * @param moveVec
+		 *            the move vector {x,y}
+		 * @returns {Array} the calculated damaged Areas
+		 */
         constructor.prototype.calculateDamagedArea = function cv_calculateDamagedArea(moveVec) {
             var viewerBean = this.getViewer().viewerBean;
             var cvn = this.context2D.canvas;
@@ -302,11 +313,12 @@
         };
 
         /**
-         * Draws a specific area to the Canvas
-         * 
-         * @param area
-         *            {x,y,w,h} the area that should be drawn. X and y are global(whole picture, not only bean)
-         */
+		 * Draws a specific area to the Canvas
+		 * 
+		 * @param area
+		 *            {x,y,w,h} the area that should be drawn. X and y are
+		 *            global(whole picture, not only bean)
+		 */
         constructor.prototype.drawArea = function cv_drawArea(area) {
             var viewerBean = this.getViewer().viewerBean;
             var currentImage = this.getViewer().currentImage;
@@ -451,16 +463,23 @@
             var that = this;
             var zoomLevelOnLoad = this.getViewer().viewerBean.zoomLevel;
             tileImg.onload = function cv_tileOnLoad() {
-                var imgScope = this;
-                imgScope.loaded = true;
+                var imgScope = this; 
                 
-                if (that.zoomLevelChanged(zoomLevelOnLoad)) {
-                    return;
-                }
+                //window.setTimeout(function(){
+                	imgScope.loaded = true;
+                    if (that.zoomLevelChanged(zoomLevelOnLoad)) {
+                        return;
+                    }
+                    
+                   // jQuery(that).trigger(iview.Canvas.BEFORE_DRAW_EVENT);
+                   // that.drawTileImage(tx, ty, tileImg);
+                   // jQuery(that).trigger(iview.Canvas.AFTER_DRAW_EVENT)
+                    
+                    that._loadedTiles.push({ tx: tx, ty: ty, tileImg:tileImg});
+                    that.updateScreen();
+                //},Math.random() * 3000);
                 
-                jQuery(that).trigger(iview.Canvas.BEFORE_DRAW_EVENT);
-                that.drawTileImage(tx, ty, tileImg);
-                jQuery(that).trigger(iview.Canvas.AFTER_DRAW_EVENT);
+
             };
             this.loadingTile.push(tileImg);
             tileImg.src = tileImgId;
@@ -511,22 +530,22 @@
         };
 
         /**
-         * Gets the right x coordinate for the preview picture
-         */
+		 * Gets the right x coordinate for the preview picture
+		 */
         constructor.prototype.getPreviewX = function cv_getPreviewX() {
             return -this.getViewer().viewerBean.x;
         };
 
         /**
-         * Gets the right y coordinate for the preview picture
-         */
+		 * Gets the right y coordinate for the preview picture
+		 */
         constructor.prototype.getPreviewY = function cv_getPreviewY() {
             return -this.getViewer().viewerBean.y;
         };
 
         /**
-         * Draws the Preview Image to the right Position.
-         */
+		 * Draws the Preview Image to the right Position.
+		 */
         constructor.prototype.drawPreview = function cv_drawPreview() {
             if (!this.preView.loaded)
                 return;
@@ -554,7 +573,8 @@
                 this.context2D.canvas.y = this.context2D.canvas.x = 0;
                 this.appendCanvas();
 
-                //make sure that the preview image is already loaded before drawing on canvas
+                // make sure that the preview image is already loaded before
+				// drawing on canvas
                 var that = this;
                 that.preView.onload = function() {
                     that.preView.loaded = true;
@@ -585,23 +605,23 @@
         };
         
         /**
-         * Resets the canvas
-         */
+		 * Resets the canvas
+		 */
         constructor.prototype.clearCanvas = function cv_clearCanvas() {
             this.context2D.canvas.width = this.context2D.canvas.width;
         };
 
         /**
-         * Ads the canvas to the viewer Container
-         */
+		 * Ads the canvas to the viewer Container
+		 */
         constructor.prototype.appendCanvas = function cv_appendCanvas() {
-            this.getViewer().context.container.find(".iview_well").prepend(this.context2D.canvas);//before,prepend,append
+            this.getViewer().context.container.find(".iview_well").prepend(this.context2D.canvas);// before,prepend,append
             this.getViewer().context.container.find(".iview_well").prepend(this.redrawPreview);
         };
 
         /**
-         * Updates the width and height of the CurrentImage
-         */
+		 * Updates the width and height of the CurrentImage
+		 */
         constructor.prototype.refreshImageDimensions = function cv_refreshImageDimensions() {
             var viewerBean = this.getViewer().viewerBean;
             var currentImage = this.getViewer().currentImage;
