@@ -447,6 +447,9 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             String delims = "\"!\" / \"$\" / \"&\" / \"'\" / \"(\" / \")\" / \"*\" / \"+\" / \",\" / \";\" / \"=\" \"%\"";
             throw new MCRException("Path name " + path + " contains reserved characters from sub-delims: " + delims);
         }
+        if (path.contains("..")) {
+            throw new MCRException("Path name " + path + " may not contain \"..\".");
+        }
     }
 
     protected String getFileName(String path) {
