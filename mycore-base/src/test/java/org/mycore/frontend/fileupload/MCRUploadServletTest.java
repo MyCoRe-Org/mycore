@@ -43,7 +43,7 @@ public class MCRUploadServletTest extends MCRTestCase {
     @Test
     public void checkPathName() {
         String prefix = "junit";
-        String suffix = "test.file";
+        String suffix = "test..file";
         String[] genDelims = new String[] { ":", "?", "#", "[", "]", "@" };
         String[] subDelims = new String[] { "!", "$", "&", "'", "(", ")", "*", "+", ",", ";", "=" };
         List<String> genDelimTestNames = new ArrayList<String>(genDelims.length);
