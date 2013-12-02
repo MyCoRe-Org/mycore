@@ -33,6 +33,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -98,7 +99,7 @@ public class MCRTranslation {
         Locale currentLocale = getCurrentLocale();
         return translate(label, currentLocale);
     }
-    
+
     /**
      * provides translation for the given label (property key).
      * 
@@ -109,12 +110,12 @@ public class MCRTranslation {
      * @param baseName a fully qualified class name 
      * @return translated String
      */
-    
+
     public static String translateWithBaseName(String label, String baseName) {
         Locale currentLocale = getCurrentLocale();
         return translate(label, currentLocale, baseName);
     }
-    
+
     /**
      * provides translation for the given label (property key).
      * 
@@ -125,7 +126,7 @@ public class MCRTranslation {
     public static String translate(String label, Locale locale) {
         return translate(label, locale, MESSAGES_BUNDLE);
     }
-    
+
     /**
      * provides translation for the given label (property key).
      * 
@@ -136,15 +137,23 @@ public class MCRTranslation {
      */
     public static String translate(String label, Locale locale, String baseName) {
         LOGGER.debug("Translation for current locale: " + locale.getLanguage());
-        ResourceBundle message = ResourceBundle.getBundle(baseName, locale);
+        ResourceBundle message;
+        try {
+            message = ResourceBundle.getBundle(baseName, locale);
+        } catch (MissingResourceException mre) {
+            //no messages.properties at all
+            LOGGER.debug(mre.getMessage());
+            return "???" + label + "???";
+        }
         String result = null;
         try {
             result = message.getString(label);
             LOGGER.debug("Translation for " + label + "=" + result);
-        } catch (java.util.MissingResourceException mre) {
+        } catch (MissingResourceException mre) {
             // try to get new key if 'label' is deprecated
             if (!DEPRECATED_MESSAGES_PRESENT) {
-                LOGGER.warn("Could not load resource '" + DEPRECATED_MESSAGES_PROPERTIES + "' to check for depreacted I18N keys.");
+                LOGGER.warn("Could not load resource '" + DEPRECATED_MESSAGES_PROPERTIES
+                    + "' to check for depreacted I18N keys.");
             } else if (DEPRECATED_MAPPING.keySet().contains(label)) {
                 String newLabel = DEPRECATED_MAPPING.getProperty(label);
                 try {
@@ -283,26 +292,26 @@ public class MCRTranslation {
         } else {
             for (int i = 0; i < masked.length(); i++) {
                 switch (masked.charAt(i)) {
-                case ';':
-                    if (mask) {
-                        buf.append(';');
-                        mask = false;
-                    } else {
-                        a.add(buf.toString());
-                        buf.setLength(0);
-                    }
-                    break;
-                case '\\':
-                    if (mask) {
-                        buf.append('\\');
-                        mask = false;
-                    } else {
-                        mask = true;
-                    }
-                    break;
-                default:
-                    buf.append(masked.charAt(i));
-                    break;
+                    case ';':
+                        if (mask) {
+                            buf.append(';');
+                            mask = false;
+                        } else {
+                            a.add(buf.toString());
+                            buf.setLength(0);
+                        }
+                        break;
+                    case '\\':
+                        if (mask) {
+                            buf.append('\\');
+                            mask = false;
+                        } else {
+                            mask = true;
+                        }
+                        break;
+                    default:
+                        buf.append(masked.charAt(i));
+                        break;
                 }
             }
             a.add(buf.toString());
@@ -332,7 +341,8 @@ public class MCRTranslation {
     static Properties loadProperties() {
         Properties deprecatedMapping = new Properties();
         try {
-            final InputStream propertiesStream = MCRTranslation.class.getResourceAsStream(DEPRECATED_MESSAGES_PROPERTIES);
+            final InputStream propertiesStream = MCRTranslation.class
+                .getResourceAsStream(DEPRECATED_MESSAGES_PROPERTIES);
             if (propertiesStream == null) {
                 LOGGER.warn("Could not find resource '" + DEPRECATED_MESSAGES_PROPERTIES + "'.");
                 return deprecatedMapping;
@@ -348,8 +358,12 @@ public class MCRTranslation {
     static Set<String> loadAvailableLanguages() {
         Set<String> languages = new HashSet<String>();
         for (Locale locale : Locale.getAvailableLocales()) {
-            ResourceBundle bundle = ResourceBundle.getBundle(MESSAGES_BUNDLE, locale);
-            languages.add(bundle.getLocale().toString());
+            try {
+                ResourceBundle bundle = ResourceBundle.getBundle(MESSAGES_BUNDLE, locale);
+                languages.add(bundle.getLocale().toString());
+            } catch (MissingResourceException e) {
+                LOGGER.debug("Could not load " + MESSAGES_BUNDLE + " for locale: " + locale);
+            }
         }
         return languages;
     }
