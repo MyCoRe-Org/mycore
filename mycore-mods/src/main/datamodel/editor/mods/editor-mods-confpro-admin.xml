@@ -165,7 +165,7 @@
         <cell row="10" col="1" anchor="NORTHEAST" ref="mods.languageTerm.label" />
         <cell row="10" col="2" anchor="NORTHWEST" ref="mods.languageTerm.optional" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
         <cell row="10" col="3" anchor="NORTHWEST" ref="mods.languageTerm.help" />
-        <condition id="mods.languageTerm.confpro.cond" xsl="count(metadata/def.modsContainer/modsContainer/mods:mods/mods:language/mods:languageTerm/text())=count(metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title/text())">
+        <condition id="mods.languageTerm.confpro.cond" xsl="count(metadata/def.modsContainer/modsContainer/mods:mods/mods:language/mods:languageTerm/@mcr:categId)=count(metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo/mods:title/text())">
           <label xml:lang="de">Bitte geben Sie die Sprache des Konferenzbandes an!</label>
           <label xml:lang="en">Please select one entry!</label>
         </condition>
