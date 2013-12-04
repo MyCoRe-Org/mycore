@@ -35,7 +35,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRRuntimeComponentDetector;
 import org.mycore.common.xml.MCRURIResolver;
 
 /**
@@ -73,6 +73,9 @@ public class MCRServletContextListener implements ServletContextListener {
         }
         MCRShutdownHandler.getInstance().isWebAppRunning = true;
         LOGGER.info("This class is here: " + getSource(this.getClass()));
+        LOGGER.info("I have these components for you: " + MCRRuntimeComponentDetector.getAllComponents());
+        LOGGER.info("I have these mycore components for you: " + MCRRuntimeComponentDetector.getMyCoReComponents());
+        LOGGER.info("I have these app modules for you: " + MCRRuntimeComponentDetector.getApplicationModules());
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
