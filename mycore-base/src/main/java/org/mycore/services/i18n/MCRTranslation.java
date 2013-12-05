@@ -139,7 +139,7 @@ public class MCRTranslation {
         LOGGER.debug("Translation for current locale: " + locale.getLanguage());
         ResourceBundle message;
         try {
-            message = ResourceBundle.getBundle(baseName, locale);
+            message = MCRStackedResourceBundle.getResourceBundle(baseName, locale);
         } catch (MissingResourceException mre) {
             //no messages.properties at all
             LOGGER.debug(mre.getMessage());
@@ -359,7 +359,7 @@ public class MCRTranslation {
         Set<String> languages = new HashSet<String>();
         for (Locale locale : Locale.getAvailableLocales()) {
             try {
-                ResourceBundle bundle = ResourceBundle.getBundle(MESSAGES_BUNDLE, locale);
+                ResourceBundle bundle = MCRStackedResourceBundle.getBundle(MESSAGES_BUNDLE, locale);
                 languages.add(bundle.getLocale().toString());
             } catch (MissingResourceException e) {
                 LOGGER.debug("Could not load " + MESSAGES_BUNDLE + " for locale: " + locale);
