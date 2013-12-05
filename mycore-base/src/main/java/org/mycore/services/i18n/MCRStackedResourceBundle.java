@@ -23,20 +23,13 @@
 
 package org.mycore.services.i18n;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Locale;
-import java.util.MissingResourceException;
 import java.util.NoSuchElementException;
 import java.util.ResourceBundle;
-import java.util.SortedSet;
 
-import org.apache.log4j.Logger;
-import org.mycore.common.config.MCRComponent;
 import org.mycore.common.config.MCRRuntimeComponentDetector;
-
-import com.google.common.collect.Lists;
 
 /**
  * A {@link ResourceBundle} that automatically includes mycore and application specific <strong>messages*.properties</strong> files.
@@ -50,8 +43,6 @@ import com.google.common.collect.Lists;
 public class MCRStackedResourceBundle extends ResourceBundle {
 
     private static final MCRStackedResourceBundleControl CONTROL = new MCRStackedResourceBundleControl();
-
-    private static Logger LOGGER = Logger.getLogger(MCRStackedResourceBundle.class);
 
     private ResourceBundle[] bundles;
 
