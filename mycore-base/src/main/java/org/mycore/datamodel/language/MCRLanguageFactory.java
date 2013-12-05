@@ -23,6 +23,7 @@
 package org.mycore.datamodel.language;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -188,6 +189,27 @@ public class MCRLanguageFactory {
         if (termCode != null) {
             addCode(language, MCRLanguageCodeType.termCode, termCode);
             addCode(language, MCRLanguageCodeType.biblCode, biblCode == null ? termCode : biblCode);
+        }
+        for (Locale l : Locale.getAvailableLocales()) {
+            if (l.toString().equals(xmlCode)) {
+                language.setLocale(l);
+                break;
+            }
+        }
+        if (language.getLocale() == null) {
+            Locale l;
+            String[] codeParts = xmlCode.split("_");
+            switch (codeParts.length) {
+                case 1:
+                    l = new Locale(codeParts[0]);
+                    break;
+                case 2:
+                    l = new Locale(codeParts[0], codeParts[1]);
+                    break;
+                default:
+                    l = new Locale(codeParts[0], codeParts[1], codeParts[2]);
+            }
+            language.setLocale(l);
         }
         return language;
     }
