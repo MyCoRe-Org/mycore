@@ -126,7 +126,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
             return null;
         }
         String bundleName = resourceBase + CONTROL_HELPER.toBundleName("messages", locale) + ".properties";
-        System.err.println("Bundle: " + bundleName);
+        LOGGER.info("Loading bundle: " + bundleName);
         return this.getClass().getClassLoader().getResourceAsStream(bundleName);
     }
 
