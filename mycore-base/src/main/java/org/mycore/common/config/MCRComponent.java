@@ -125,8 +125,9 @@ public class MCRComponent implements Comparable<MCRComponent> {
         if (resourceBase == null) {
             return null;
         }
-        String bundleName = CONTROL_HELPER.toBundleName("messages", locale) + ".properties";
-        return this.getClass().getClassLoader().getResourceAsStream(resourceBase + bundleName);
+        String bundleName = resourceBase + CONTROL_HELPER.toBundleName("messages", locale) + ".properties";
+        System.err.println("Bundle: " + bundleName);
+        return this.getClass().getClassLoader().getResourceAsStream(bundleName);
     }
 
     /**
@@ -135,11 +136,11 @@ public class MCRComponent implements Comparable<MCRComponent> {
     public String getResourceBase() {
         switch (type) {
             case base:
-                return "/config/";
+                return "config/";
             case component:
-                return "/components/" + getName() + "/config/";
+                return "components/" + getName() + "/config/";
             case module:
-                return "/config/" + getName() + "/";
+                return "config/" + getName() + "/";
             default:
                 LOGGER.debug(getName() + ": there is no resource base for type " + type);
                 break;
