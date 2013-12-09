@@ -244,6 +244,34 @@
     </xsl:apply-templates>
   </xsl:template>
 
+  <xsl:template match="element[@type='historydate']" mode="metadata">
+    <xsl:apply-templates select="." mode="enclosing">
+      <xsl:with-param name="class" select="'MCRMetaHistoryDate'" />
+    </xsl:apply-templates>
+    <xsl:variable name="innerSchema">
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" minOccurs="1" name="text">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attribute use="optional" ref="xml:lang" />
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element maxOccurs="1" minOccurs="0" type="xs:string" name="calendar" />
+        <xs:element maxOccurs="1" minOccurs="0" type="xs:integer" name="ivon" />
+        <xs:element maxOccurs="1" minOccurs="0" type="xs:string" name="von" />
+        <xs:element maxOccurs="1" minOccurs="0" type="xs:integer" name="ibis" />
+        <xs:element maxOccurs="1" minOccurs="0" type="xs:string" name="bis" />
+      </xs:sequence>
+    </xsl:variable>
+    <xsl:apply-templates select="." mode="inner">
+      <xsl:with-param name="class" select="'MCRMetaHistoryDate'" />
+      <xsl:with-param name="complexType" select="xalan:nodeset($innerSchema)/*" />
+    </xsl:apply-templates>
+  </xsl:template>
+
   <xsl:template match="element" mode="types">
     <xsl:choose>
       <xsl:when test="type">
