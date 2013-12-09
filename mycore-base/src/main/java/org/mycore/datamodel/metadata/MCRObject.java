@@ -172,7 +172,11 @@ final public class MCRObject extends MCRBase {
      * The method print all informations about this MCRObject.
      */
     public final void debug() {
-        LOGGER.debug("MCRObject ID : " + mcr_id.toString());
+        if (mcr_id == null) {
+            LOGGER.debug("MCRObject ID : missing");
+        } else {
+            LOGGER.debug("MCRObject ID : " + mcr_id.toString());
+        }
         LOGGER.debug("MCRObject Label : " + mcr_label);
         LOGGER.debug("MCRObject Schema : " + mcr_schema);
         LOGGER.debug("");
