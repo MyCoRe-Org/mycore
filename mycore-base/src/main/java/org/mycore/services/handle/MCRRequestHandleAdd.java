@@ -22,12 +22,11 @@ import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileNodeServlet;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRServlet;
-import org.mycore.iview2.services.MCRIView2Tools;
+//import org.mycore.iview2.services.MCRIView2Tools;
 import org.mycore.services.handle.hibernate.tables.MCRHandle;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
 
 /**
  * Class responsible for storing object signatures in a remote system. 
@@ -135,7 +134,8 @@ public class MCRRequestHandleAdd extends TimerTask {
      * @return
      */
     private String getHandleURL(MCRFile file) throws URISyntaxException {
-        String url = MCRIView2Tools.getViewerURL(file);
+        //String url = MCRIView2Tools.getViewerURL(file);
+        String url = null;
         if (url == null) {
             url = MCRServlet.getServletBaseURL() + MCRFileNodeServlet.class.getSimpleName() + file.getAbsolutePath();
             return url;
