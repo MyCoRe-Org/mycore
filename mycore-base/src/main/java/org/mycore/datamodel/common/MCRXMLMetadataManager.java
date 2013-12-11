@@ -30,6 +30,7 @@ import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -49,6 +50,7 @@ import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRObjectIDFileSystemDate;
 import org.mycore.datamodel.ifs2.MCRStore;
+import org.mycore.datamodel.ifs2.MCRStoreCenter;
 import org.mycore.datamodel.ifs2.MCRStoreManager;
 import org.mycore.datamodel.ifs2.MCRStoredMetadata;
 import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
@@ -117,6 +119,8 @@ public class MCRXMLMetadataManager {
     /** The singleton */
     private static MCRXMLMetadataManager SINGLETON;
 
+    private HashSet<String> createdStores;
+
     /** Returns the singleton */
     public static synchronized MCRXMLMetadataManager instance() {
         if (SINGLETON == null) {
@@ -126,13 +130,14 @@ public class MCRXMLMetadataManager {
     }
 
     protected MCRXMLMetadataManager() {
+        this.createdStores = new HashSet<>();
         reload();
     }
 
     /**
      * Reads configuration properties, checks and creates base directories and builds the singleton
      */
-    public void reload() {
+    public synchronized void reload() {
         MCRConfiguration config = MCRConfiguration.instance();
 
         String pattern = config.getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000");
@@ -142,7 +147,8 @@ public class MCRXMLMetadataManager {
         baseDir = new File(base);
         checkDir(baseDir, "base");
 
-        defaultClass = config.getString("MCR.Metadata.Store.DefaultClass", "org.mycore.datamodel.ifs2.MCRVersioningMetadataStore");
+        defaultClass = config.getString("MCR.Metadata.Store.DefaultClass",
+            "org.mycore.datamodel.ifs2.MCRVersioningMetadataStore");
         Class<?> impl;
         try {
             impl = Class.forName(defaultClass);
@@ -150,17 +156,32 @@ public class MCRXMLMetadataManager {
             throw new MCRException("Could not load default class " + defaultClass);
         }
         if (MCRVersioningMetadataStore.class.isAssignableFrom(impl)) {
-            svnBase = config.getString("MCR.Metadata.Store.SVNBase");
-            if (svnBase.startsWith("file:///")) {
-                try {
-                    svnDir = new File(new URI(svnBase));
-                } catch (URISyntaxException ex) {
-                    String msg = "Syntax error in MCR.Metadata.Store.SVNBase property: " + svnBase;
-                    throw new MCRConfigurationException(msg, ex);
+            try {
+                svnBase = new URI(config.getString("MCR.Metadata.Store.SVNBase"));
+                if (svnBase.getScheme() == null) {
+                    URI root = new File(MCRConfiguration.instance().getString("MCR.datadir",
+                        (new File(".")).getAbsolutePath())).toURI();
+                    URI resolved = root.resolve(svnBase);
+                    Logger.getLogger(getClass()).warn("Resolved " + svnBase + " to " + resolved);
+                    svnBase = resolved;
                 }
+            } catch (URISyntaxException ex) {
+                String msg = "Syntax error in MCR.Metadata.Store.SVNBase property: " + svnBase;
+                throw new MCRConfigurationException(msg, ex);
+            }
+            if (svnBase.getScheme().equals("file")) {
+                svnDir = new File(svnBase);
                 checkDir(svnDir, "svn");
             }
         }
+        closeCreatedStores();
+    }
+
+    private synchronized void closeCreatedStores() {
+        for (String storeId : createdStores) {
+            MCRStoreCenter.instance().removeStore(storeId);
+        }
+        createdStores.clear();
     }
 
     /**
@@ -220,7 +241,7 @@ public class MCRXMLMetadataManager {
     /**
      * The local file:// uri of all SVN versioned metadata, set URI by MCR.Metadata.Store.SVNBase
      */
-    private String svnBase;
+    private URI svnBase;
 
     public static final int REV_LATEST = -1;
 
@@ -235,7 +256,7 @@ public class MCRXMLMetadataManager {
      * @throws InstantiationException 
      */
     public MCRMetadataStore getStore(String project, String type) {
-        String projectType = project + "_" + type;
+        String projectType = getStoryKey(project, type);
         String prefix = "MCR.IFS2.Store." + projectType + ".";
         String forceXML = MCRConfiguration.instance().getString(prefix + "ForceXML", null);
         if (forceXML == null) {
@@ -244,9 +265,9 @@ public class MCRXMLMetadataManager {
                 if (forceXML == null) {
                     try {
                         setupStore(project, type, prefix);
-                    } catch (Exception e) {
+                    } catch (IllegalAccessException | InstantiationException e) {
                         throw new MCRPersistenceException(MessageFormat.format(
-                                "Could not instantiate store for project {0} and object type {1}.", project, type), e);
+                            "Could not instantiate store for project {0} and object type {1}.", project, type), e);
                     }
                 }
             }
@@ -254,16 +275,17 @@ public class MCRXMLMetadataManager {
 
         MCRMetadataStore store = MCRStoreManager.getStore(projectType, MCRMetadataStore.class);
         if (store == null) {
-            throw new MCRPersistenceException(MessageFormat.format("Metadata store for project {0} and object type {1} is unconfigured.",
-                    project, type));
+            throw new MCRPersistenceException(MessageFormat.format(
+                "Metadata store for project {0} and object type {1} is unconfigured.", project, type));
         }
         return store;
     }
 
     @SuppressWarnings("unchecked")
-    private void setupStore(String project, String objectType, String configPrefix) throws InstantiationException, IllegalAccessException {
+    private void setupStore(String project, String objectType, String configPrefix) throws InstantiationException,
+        IllegalAccessException {
         MCRConfiguration config = MCRConfiguration.instance();
-        String baseID = project + "_" + objectType;
+        String baseID = getStoryKey(project, objectType);
         String clazz = config.getString(configPrefix + "Class", null);
         if (clazz == null) {
             config.set(configPrefix + "Class", defaultClass);
@@ -278,8 +300,8 @@ public class MCRXMLMetadataManager {
         if (MCRVersioningMetadataStore.class.isAssignableFrom(impl)) {
             String svnURL = config.getString(configPrefix + "SVNRepositoryURL", null);
             if (svnURL == null) {
-                config.set(configPrefix + "SVNRepositoryURL", svnBase + "/" + project + "/" + objectType);
-
+                config.set(configPrefix + "SVNRepositoryURL", svnBase.resolve(project + "/" + objectType)
+                    .toASCIIString());
                 File projectDir = new File(svnDir, project);
                 if (!projectDir.exists()) {
                     projectDir.mkdirs();
@@ -305,8 +327,12 @@ public class MCRXMLMetadataManager {
         config.set(configPrefix + "BaseDir", typeDir.getAbsolutePath());
         config.set(configPrefix + "ForceXML", true);
         config.set(configPrefix + "ForceDocType", objectType.equals("derivate") ? "mycorederivate" : "mycoreobject");
-
+        createdStores.add(baseID);
         MCRStoreManager.createStore(baseID, impl);
+    }
+
+    private String getStoryKey(String project, String objectType) {
+        return project + "_" + objectType;
     }
 
     /**
@@ -689,7 +715,7 @@ public class MCRXMLMetadataManager {
                 if (!type.equals(fType.getName())) {
                     continue;
                 }
-                String base = project + "_" + type;
+                String base = getStoryKey(project, type);
                 list.addAll(listIDsForBase(base));
             }
         }
@@ -713,7 +739,7 @@ public class MCRXMLMetadataManager {
             }
             for (File fType : objectTypeDirectories) {
                 String type = fType.getName();
-                String base = project + "_" + type;
+                String base = getStoryKey(project, type);
                 list.addAll(listIDsForBase(base));
             }
         }
