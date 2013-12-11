@@ -95,9 +95,5 @@
       <artifactId>mycore-iview2</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
-    </dependency>
   </dependencies>
 </project>
