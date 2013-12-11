@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="org.mycore.services.handle.hibernate.tables">
+  <class name="MCRHandle" table="mcrhandle">
+
+    <id name="id" type="long">
+      <generator class="identity" />
+    </id>
+    <natural-id>
+      <property name="mcrid" type="string" column="mcrid" length="64" />
+      <property name="path" type="string" length="255" />
+    </natural-id>
+
+    <property name="schema" type="string" column="schema" length="64" />
+    <property name="namingAuthority" type="string" column="naming_authority" length="255" />
+    <property name="namingAuthoritySegment" type="string" column="naming_authority_segment" length="255" />
+    <property name="localName" type="string" column="local_name" length="255" />
+    <property name="checksum" type="int" column="checksum" length="16" />
+    <property name="objectSignature" type="string" column="object_signature" length="255" index="mcrhandle_objectSignature_idx" />
+    <property name="messageSignature" type="string" column="message_signature" length="255" index="mcrhandle_messageSignature_idx" />
+  </class>
+</hibernate-mapping>
