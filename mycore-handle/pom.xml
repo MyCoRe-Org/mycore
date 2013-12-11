@@ -91,6 +91,11 @@
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-iview2</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
     </dependency>
