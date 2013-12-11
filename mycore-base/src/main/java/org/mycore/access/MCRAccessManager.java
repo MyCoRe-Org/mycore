@@ -41,11 +41,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRAccessManager {
 
-    private static final MCRAccessInterface ACCESS_IMPL = (MCRAccessInterface) MCRConfiguration.instance().getSingleInstanceOf("MCR.Access.Class",
-        MCRAccessBaseImpl.class.getName());
-
-    private static final MCRAccessCheckStrategy ACCESS_STRATEGY = (MCRAccessCheckStrategy) MCRConfiguration.instance().getInstanceOf(
-        "MCR.Access.Strategy.Class", MCRDerivateIDStrategy.class.getName());
+    private static final MCRAccessCheckStrategy ACCESS_STRATEGY = (MCRAccessCheckStrategy) MCRConfiguration.instance()
+        .getInstanceOf("MCR.Access.Strategy.Class", MCRDerivateIDStrategy.class.getName());
 
     private static final MCRAccessCacheManager ACCESS_CACHE = new MCRAccessCacheManager();
 
@@ -58,7 +55,8 @@ public class MCRAccessManager {
     public static final String PERMISSION_DELETE = "deletedb";
 
     public static MCRAccessInterface getAccessImpl() {
-        return ACCESS_IMPL;
+        return MCRConfiguration.instance().getSingleInstanceOf("MCR.Access.Class", MCRAccessBaseImpl.class.getName(),
+            MCRAccessInterface.class);
     }
 
     /**
@@ -76,7 +74,8 @@ public class MCRAccessManager {
      *             if an errow was occured
      * @see MCRAccessInterface#addRule(String, String, org.jdom2.Element, String)
      */
-    public static void addRule(MCRObjectID id, String permission, org.jdom2.Element rule, String description) throws MCRException {
+    public static void addRule(MCRObjectID id, String permission, org.jdom2.Element rule, String description)
+        throws MCRException {
         getAccessImpl().addRule(id.toString(), permission, rule, description);
     }
 
@@ -95,7 +94,8 @@ public class MCRAccessManager {
      *             if an errow was occured
      * @see MCRAccessInterface#addRule(String, String, org.jdom2.Element, String)
      */
-    public static void addRule(String id, String permission, org.jdom2.Element rule, String description) throws MCRException {
+    public static void addRule(String id, String permission, org.jdom2.Element rule, String description)
+        throws MCRException {
         getAccessImpl().addRule(id, permission, rule, description);
     }
 
@@ -157,7 +157,8 @@ public class MCRAccessManager {
      *             if an errow was occured
      * @see MCRAccessInterface#updateRule(String, String, Element, String)
      */
-    public static void updateRule(MCRObjectID id, String permission, org.jdom2.Element rule, String description) throws MCRException {
+    public static void updateRule(MCRObjectID id, String permission, org.jdom2.Element rule, String description)
+        throws MCRException {
         getAccessImpl().updateRule(id.toString(), permission, rule, description);
     }
 
@@ -176,7 +177,8 @@ public class MCRAccessManager {
      *             if an errow was occured
      * @see MCRAccessInterface#updateRule(String, String, Element, String)
      */
-    public static void updateRule(String id, String permission, org.jdom2.Element rule, String description) throws MCRException {
+    public static void updateRule(String id, String permission, org.jdom2.Element rule, String description)
+        throws MCRException {
         getAccessImpl().updateRule(id, permission, rule, description);
     }
 
@@ -245,7 +247,8 @@ public class MCRAccessManager {
         boolean accessAllowed = false;
         Collection<String> l = MCRLinkTableManager.instance().getSourceOf(derID, "derivate");
         if (l != null && !l.isEmpty()) {
-            accessAllowed = checkPermission(l.iterator().next(), PERMISSION_READ) && checkPermission(derID, PERMISSION_READ);
+            accessAllowed = checkPermission(l.iterator().next(), PERMISSION_READ)
+                && checkPermission(derID, PERMISSION_READ);
         } else {
             accessAllowed = checkPermission(derID, PERMISSION_READ);
             Logger.getLogger("MCRAccessManager.class").warn("no mcrobject could be found for derivate: " + derID);
@@ -314,7 +317,7 @@ public class MCRAccessManager {
      *            the access permission for the rule
      */
     public static boolean hasRule(String id, String permission) {
-        return ACCESS_IMPL.hasRule(id, permission);
+        return getAccessImpl().hasRule(id, permission);
     }
 
 }
