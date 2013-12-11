@@ -25,6 +25,8 @@ package org.mycore.datamodel.ifs2;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Iterator;
 
 import org.apache.commons.vfs2.FileObject;
@@ -67,7 +69,7 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
         super.init(type);
         setupSVN(type);
     }
-    
+
     @Override
     protected void init(MCRStoreConfig config) {
         super.init(config);
@@ -75,18 +77,28 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
     }
 
     private void setupSVN(String type) {
-        String repositoryURL = MCRConfiguration.instance().getString("MCR.IFS2.Store." + type + ".SVNRepositoryURL");
+        URI repositoryURI;
+        String repositoryURIString = MCRConfiguration.instance().getString(
+            "MCR.IFS2.Store." + type + ".SVNRepositoryURL");
         try {
-            LOGGER.info("Versioning metadata store " + type + " repository URL: " + repositoryURL);
-            repURL = SVNURL.parseURIDecoded(repositoryURL);
+            repositoryURI = new URI(repositoryURIString);
+        } catch (URISyntaxException e) {
+            String msg = "Syntax error in MCR.IFS2.Store." + type + ".SVNRepositoryURL property: "
+                + repositoryURIString;
+            throw new MCRConfigurationException(msg, e);
+        }
+        try {
+            LOGGER.info("Versioning metadata store " + type + " repository URL: " + repositoryURI);
+            repURL = SVNURL.create(repositoryURI.getScheme(), repositoryURI.getUserInfo(), repositoryURI.getHost(),
+                repositoryURI.getPort(), repositoryURI.getPath(), true);
             LOGGER.info("repURL: " + repURL);
             File dir = new File(repURL.getPath());
             if (!dir.exists()) {
-                LOGGER.info("Repository does not exist, creating new SVN repository at " + repositoryURL);
+                LOGGER.info("Repository does not exist, creating new SVN repository at " + repositoryURI);
                 repURL = SVNRepositoryFactory.createLocalRepository(dir, true, false);
             }
         } catch (SVNException ex) {
-            String msg = "Error initializing SVN repository at URL " + repositoryURL;
+            String msg = "Error initializing SVN repository at URL " + repositoryURI;
             throw new MCRConfigurationException(msg, ex);
         }
     }
@@ -102,7 +114,7 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
     SVNRepository getRepository() throws SVNException {
         SVNRepository repository = SVNRepositoryFactory.create(repURL);
         String user = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
-        SVNAuthentication[] auth = new SVNAuthentication[] { new SVNUserNameAuthentication(user, false) };
+        SVNAuthentication[] auth = new SVNAuthentication[] { new SVNUserNameAuthentication(user, false, repURL, false) };
         BasicAuthenticationManager authManager = new BasicAuthenticationManager(auth);
         repository.setAuthenticationManager(authManager);
         return repository;
