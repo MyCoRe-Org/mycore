@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.common.MCRXMLMetadataEventHandler;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -15,18 +16,25 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 public class MCRObjectUtilsTest extends MCRStoreTestCase {
 
     private MCRObject root;
+
     private MCRObject l11;
+
     private MCRObject l12;
+
     private MCRObject l13;
+
     private MCRObject l21;
+
     private MCRObject l22;
+
     private MCRObject l31;
 
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        MCRConfiguration.instance().set("MCR.Persistence.LinkTable.Store.Class", "org.mycore.backend.hibernate.MCRHIBLinkTableStore");
+        setProperty("MCR.Persistence.LinkTable.Store.Class", "org.mycore.backend.hibernate.MCRHIBLinkTableStore", true);
+        setProperty("MCR.Access.Class", MCRAccessBaseImpl.class.getName(), true);
         MCREventManager.instance().clear().addEventHandler("MCRObject", new MCRXMLMetadataEventHandler());
         MCRConfiguration.instance().set("MCR.Metadata.Type.document", true);
         root = new MCRObject();
