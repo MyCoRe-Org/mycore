@@ -89,7 +89,8 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     public void setLinks() {
         addTestLinks();
         startNewTransaction();
-        assertEquals("Link count does not match.", testLinks.size(), SESSION_FACTORY.getCurrentSession().createCriteria(MCRCategoryLink.class).list().size());
+        assertEquals("Link count does not match.", testLinks.size(),
+            sessionFactory.getCurrentSession().createCriteria(MCRCategoryLink.class).list().size());
     }
 
     /**
@@ -100,11 +101,8 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         addTestLinks();
         startNewTransaction();
         SERVICE.deleteLink(LONDON_REFERENCE);
-        assertEquals("Link count does not match.", testLinks.size() - 1, SESSION_FACTORY
-            .getCurrentSession()
-            .createCriteria(MCRCategoryLink.class)
-            .list()
-            .size());
+        assertEquals("Link count does not match.", testLinks.size() - 1, sessionFactory.getCurrentSession()
+            .createCriteria(MCRCategoryLink.class).list().size());
     }
 
     /**
@@ -115,11 +113,8 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         addTestLinks();
         startNewTransaction();
         SERVICE.deleteLinks(Arrays.asList(LONDON_REFERENCE, ENGLAND_REFERENCE));
-        assertEquals("Link count does not match.", testLinks.size() - 2, SESSION_FACTORY
-            .getCurrentSession()
-            .createCriteria(MCRCategoryLink.class)
-            .list()
-            .size());
+        assertEquals("Link count does not match.", testLinks.size() - 2, sessionFactory.getCurrentSession()
+            .createCriteria(MCRCategoryLink.class).list().size());
     }
 
     /**
@@ -185,10 +180,13 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         LOGGER.debug("****List of returned map");
         LOGGER.debug(map);
         assertEquals("Returned amount of MCRCategoryIDs does not match.", getAllCategIDs(category).size(), map.size());
-        assertEquals("Count of Europe links does not match.", 8, map.get(category.getChildren().get(0).getId()).intValue());
-        assertEquals("Count of Germany links does not match.", 5, map.get(category.getChildren().get(0).getChildren().get(0).getId()).intValue());
+        assertEquals("Count of Europe links does not match.", 8, map.get(category.getChildren().get(0).getId())
+            .intValue());
+        assertEquals("Count of Germany links does not match.", 5,
+            map.get(category.getChildren().get(0).getChildren().get(0).getId()).intValue());
         map = SERVICE.countLinks(category, true);
-        assertEquals("Count of Europe links does not match.", 8, map.get(category.getChildren().get(0).getId()).intValue());
+        assertEquals("Count of Europe links does not match.", 8, map.get(category.getChildren().get(0).getId())
+            .intValue());
     }
 
     /**
@@ -202,7 +200,8 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         LOGGER.debug("****List of returned map");
         LOGGER.debug(map);
         assertEquals("Returned amount of MCRCategoryIDs does not match.", getAllCategIDs(category).size(), map.size());
-        assertEquals("Count of Europe links does not match.", 2, map.get(category.getChildren().get(0).getId()).intValue());
+        assertEquals("Count of Europe links does not match.", 2, map.get(category.getChildren().get(0).getId())
+            .intValue());
     }
 
     @Test

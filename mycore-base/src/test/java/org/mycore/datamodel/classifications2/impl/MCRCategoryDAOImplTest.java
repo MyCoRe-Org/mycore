@@ -108,7 +108,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         MCRCategoryImpl rootCategory = getRootCategoryFromSession();
         assertEquals("Child category count does not match.", category.getChildren().size(), rootCategory.getChildren()
             .size());
-        long allNodes = ((Number) SESSION_FACTORY.getCurrentSession().createCriteria(MCRCategoryImpl.class)
+        long allNodes = ((Number) sessionFactory.getCurrentSession().createCriteria(MCRCategoryImpl.class)
             .setProjection(Projections.rowCount()).uniqueResult()).longValue();
         // category + india
         assertEquals("Complete category count does not match.", countNodes(category) + 1, allNodes);
@@ -524,7 +524,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
     }
 
     private MCRCategoryImpl getRootCategoryFromSession() {
-        return (MCRCategoryImpl) SESSION_FACTORY.getCurrentSession().get(MCRCategoryImpl.class,
+        return (MCRCategoryImpl) sessionFactory.getCurrentSession().get(MCRCategoryImpl.class,
             ((MCRCategoryImpl) category).getInternalID());
     }
 
@@ -575,7 +575,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
     }
 
     private void printCategoryTable() {
-        Session session = SESSION_FACTORY.getCurrentSession();
+        Session session = sessionFactory.getCurrentSession();
         session.doWork(new Work() {
 
             @Override

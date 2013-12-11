@@ -49,44 +49,17 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mycore.common.MCRHibTestCase;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
-import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImplTest;
 import org.mycore.user2.MCRUser;
-import org.mycore.user2.MCRUserManagerTest;
+import org.mycore.user2.MCRUserTestCase;
 
 /**
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRUserTransformerTest extends MCRHibTestCase {
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        MCRUserManagerTest.addMapping();
-    }
-
-    /* (non-Javadoc)
-     * @see org.mycore.common.MCRHibTestCase#setUp()
-     */
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        MCRCategory groupsCategory = MCRCategoryDAOImplTest.loadClassificationResource("/mcr-roles.xml");
-        MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
-        DAO.addCategory(null, groupsCategory);
-        setProperty(MCRUserManagerTest.REALMS_URI_CFG_KEY, MCRUserManagerTest.RESOURCE_REALMS_URI, true);
-    }
+public class MCRUserTransformerTest extends MCRUserTestCase {
 
     /**
      * Test method for {@link org.mycore.user2.utils.MCRUserTransformer#buildMCRUser(org.jdom2.Element)}.

@@ -36,9 +36,7 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 
 /**
@@ -49,11 +47,11 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
  */
 public abstract class MCRHibTestCase extends MCRTestCase {
 
-    protected static SessionFactory SESSION_FACTORY;
+    protected SessionFactory sessionFactory;
 
     protected Transaction tx;
 
-    protected final static MCRHIBConnection CONNECTION = MCRHIBConnection.instance();
+    protected MCRHIBConnection hibConnection;
 
     protected static void printResultSet(ResultSet resultSet, PrintStream out) throws SQLException {
         ResultSetMetaData metaData = resultSet.getMetaData();
@@ -71,31 +69,26 @@ public abstract class MCRHibTestCase extends MCRTestCase {
         t.print(out);
     }
 
-    @BeforeClass
-    public static void setUpHibernate() {
-        Logger.getLogger(MCRHibTestCase.class).debug("Setup hibernate");
-        SESSION_FACTORY = CONNECTION.getSessionFactory();
-        SchemaExport export = new SchemaExport(MCRHIBConnection.instance().getConfiguration());
-        export.execute(false, true, false, true);
-    }
-
-    @Before
+    @Before()
     @Override
     public void setUp() throws Exception {
         // Configure logging etc.
         super.setUp();
+        Logger.getLogger(MCRHibTestCase.class).debug("Setup hibernate");
+        hibConnection = MCRHIBConnection.instance();
+        sessionFactory = hibConnection.getSessionFactory();
         boolean setProperty = false;
         setProperty = setProperty("log4j.logger.org.hibernate", "WARN", false) || setProperty;
         setProperty = setProperty("log4j.logger.org.hsqldb", "WARN", false) || setProperty;
         if (setProperty) {
-            CONFIG.configureLogging();
+            config.configureLogging();
         }
         try {
-            Logger.getLogger(MCRHibTestCase.class).debug("Prepare hibernate test");
+            Logger.getLogger(MCRHibTestCase.class).debug("Prepare hibernate test", new RuntimeException());
             SchemaExport export = new SchemaExport(getHibernateConfiguration());
             export.create(false, true);
             beginTransaction();
-            SESSION_FACTORY.getCurrentSession().clear();
+            sessionFactory.getCurrentSession().clear();
         } catch (RuntimeException e) {
             Logger.getLogger(MCRHibTestCase.class).error("Error while setting up hibernate JUnit test.", e);
             throw e;
@@ -110,17 +103,13 @@ public abstract class MCRHibTestCase extends MCRTestCase {
     public void tearDown() throws Exception {
         super.tearDown();
         endTransaction();
-        SESSION_FACTORY.getCurrentSession().close();
-    }
-
-    @AfterClass
-    public static void shutdownHibernate() {
-        SESSION_FACTORY.close();
-        SESSION_FACTORY = null;
+        sessionFactory.getCurrentSession().close();
+        hibConnection = null;
+        sessionFactory = null;
     }
 
     protected void beginTransaction() {
-        Session currentSession = SESSION_FACTORY.getCurrentSession();
+        Session currentSession = sessionFactory.getCurrentSession();
         tx = currentSession.beginTransaction();
     }
 
@@ -143,7 +132,7 @@ public abstract class MCRHibTestCase extends MCRTestCase {
         endTransaction();
         beginTransaction();
         // clear from cache
-        SESSION_FACTORY.getCurrentSession().clear();
+        sessionFactory.getCurrentSession().clear();
     }
 
 }

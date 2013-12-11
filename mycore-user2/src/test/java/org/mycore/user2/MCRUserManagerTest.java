@@ -23,51 +23,31 @@
 
 package org.mycore.user2;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.cfg.Configuration;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.common.MCRHibTestCase;
 import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
-import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImplTest;
 import org.mycore.user2.utils.MCRUserTransformer;
 
 /**
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRUserManagerTest extends MCRHibTestCase {
-    public static final String RESOURCE_REALMS_URI = MCRRealmFactory.RESOURCE_REALMS_URI;
-
-    public static final String REALMS_URI_CFG_KEY = MCRRealmFactory.REALMS_URI_CFG_KEY;
-
+public class MCRUserManagerTest extends MCRUserTestCase {
     MCRUser user;
-
-    @BeforeClass
-    public static void addMapping() {
-        MCRHIBConnection connection = MCRHIBConnection.instance();
-        Configuration configuration = connection.getConfiguration();
-        if (!connection.containsMapping("MCRUser")) {
-            configuration.addResource("org/mycore/user2/MCRUser.hbm.xml");
-        }
-        MCRHIBConnection.instance().buildSessionFactory(configuration);
-        SESSION_FACTORY = MCRHIBConnection.instance().getSessionFactory();
-    }
 
     /* (non-Javadoc)
      * @see org.mycore.common.MCRHibTestCase#setUp()
@@ -75,22 +55,10 @@ public class MCRUserManagerTest extends MCRHibTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        MCRCategory groupsCategory = MCRCategoryDAOImplTest.loadClassificationResource("/mcr-roles.xml");
-        MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
-        DAO.addCategory(null, groupsCategory);
         user = new MCRUser("junit");
         user.setRealName("Test Case");
         user.setPassword("test");
         MCRUserManager.createUser(user);
-        setProperty(REALMS_URI_CFG_KEY, RESOURCE_REALMS_URI, true);
-    }
-
-    /* (non-Javadoc)
-     * @see org.mycore.common.MCRHibTestCase#tearDown()
-     */
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
     }
 
     /**

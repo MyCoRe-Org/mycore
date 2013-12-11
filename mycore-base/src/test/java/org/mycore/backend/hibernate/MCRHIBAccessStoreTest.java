@@ -66,8 +66,8 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
         if (ACCESS_STORE == null) {
             ACCESS_STORE = new MCRHIBAccessStore();
         }
-        SESSION_FACTORY.getCurrentSession().save(TRUE_RULE);
-        SESSION_FACTORY.getCurrentSession().save(FALSE_RULE);
+        sessionFactory.getCurrentSession().save(TRUE_RULE);
+        sessionFactory.getCurrentSession().save(FALSE_RULE);
         startNewTransaction();
 
     }
@@ -102,7 +102,7 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
         final String permission = "maytest";
         addRuleMapping(objID, permission, TRUE_RULE.getRid());
         startNewTransaction();
-        assertNotNull(SESSION_FACTORY.getCurrentSession().get(MCRACCESS.class, new MCRACCESSPK(permission, objID)));
+        assertNotNull(sessionFactory.getCurrentSession().get(MCRACCESS.class, new MCRACCESSPK(permission, objID)));
     }
 
     private MCRRuleMapping addRuleMapping(final String objID, final String permission, final String rid) {
@@ -144,7 +144,7 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
         startNewTransaction();
         ACCESS_STORE.deleteAccessDefinition(ruleMapping);
         startNewTransaction();
-        assertNull(SESSION_FACTORY.getCurrentSession().get(MCRACCESS.class, new MCRACCESSPK(permission, objID)));
+        assertNull(sessionFactory.getCurrentSession().get(MCRACCESS.class, new MCRACCESSPK(permission, objID)));
     }
 
     /**
@@ -160,7 +160,8 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
         ruleMapping.setRuleId(FALSE_RULE.getRid());
         ACCESS_STORE.updateAccessDefinition(ruleMapping);
         startNewTransaction();
-        MCRACCESS access = (MCRACCESS) SESSION_FACTORY.getCurrentSession().get(MCRACCESS.class, new MCRACCESSPK(permission, objID));
+        MCRACCESS access = (MCRACCESS) sessionFactory.getCurrentSession().get(MCRACCESS.class,
+            new MCRACCESSPK(permission, objID));
         assertEquals(FALSE_RULE, access.getRule());
     }
 
@@ -176,7 +177,8 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
         startNewTransaction();
         MCRRuleMapping ruleMapping2 = ACCESS_STORE.getAccessDefinition(permission, objID);
         // We will remove milliseconds as they don't need to be saved
-        assertEquals((long) Math.floor(ruleMapping.getCreationdate().getTime() / 1000), ruleMapping2.getCreationdate().getTime() / 1000);
+        assertEquals((long) Math.floor(ruleMapping.getCreationdate().getTime() / 1000), ruleMapping2.getCreationdate()
+            .getTime() / 1000);
         assertEquals(ruleMapping.getCreator(), ruleMapping2.getCreator());
         assertEquals(ruleMapping.getObjId(), ruleMapping2.getObjId());
         assertEquals(ruleMapping.getPool(), ruleMapping2.getPool());
@@ -246,7 +248,6 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
      * Test method for
      * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#getDistinctStringIDs()}.
      */
-    @SuppressWarnings("unchecked")
     @Test
     public void getDistinctStringIDs() {
         final String objID = "test";

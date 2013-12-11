@@ -30,18 +30,28 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
 
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.SimpleLayout;
+import org.mycore.common.config.MCRConfigurationInputStream;
+import org.mycore.common.config.MCRProperties;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRFileContent;
+import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.MCRURLContent;
 
 import com.google.common.base.Splitter;
@@ -203,7 +213,7 @@ public class MCRConfiguration {
      * The properties instance that stores the values that have been read from
      * every configuration file
      */
-    protected Properties properties;
+    protected MCRProperties properties;
 
     /**
      * List of deprecated properties with their new name
@@ -215,7 +225,7 @@ public class MCRConfiguration {
      * @throws IOException 
      */
     protected MCRConfiguration() throws IOException {
-        properties = new Properties();
+        properties = new MCRProperties();
         depr = new Properties();
         reload(true);
         createLastModifiedFile();
@@ -280,8 +290,11 @@ public class MCRConfiguration {
             depr.clear();
         }
 
-        String fn = System.getProperty("MCR.Configuration.File", "mycore.properties");
-        loadFromFile(fn);
+        try (MCRConfigurationInputStream in = new MCRConfigurationInputStream()) {
+            loadFromContent(new MCRStreamContent(in));
+        } catch (IOException e) {
+            throw new MCRConfigurationException("Could not load MyCoRe properties.", e);
+        }
 
         @SuppressWarnings("unchecked")
         Enumeration<String> names = (Enumeration<String>) System.getProperties().propertyNames();
@@ -300,6 +313,34 @@ public class MCRConfiguration {
 
         if (clear) {
             configureLogging();
+        }
+        debug();
+    }
+
+    private void debug() {
+        if (!isLog4JEnabled()) {
+            logWarn("Please initialize the log4j system properly.", new RuntimeException());
+            return;
+        }
+        Logger logger = Logger.getLogger(getClass());
+        if (logger.isDebugEnabled()) {
+            try (StringWriter sw = new StringWriter(); PrintWriter out = new PrintWriter(sw)) {
+                @SuppressWarnings("serial")
+                Properties tmp = new Properties() {
+                    @Override
+                    public synchronized Enumeration<Object> keys() {
+                        return Collections.enumeration(new TreeSet<Object>(super.keySet()));
+                    }
+
+                };
+                tmp.putAll(properties);
+                tmp.store(out, "Active mycore properties");
+                out.flush();
+                sw.flush();
+                logger.debug(sw.toString());
+            } catch (IOException e) {
+                logger.debug("Error while debugging mycore properties.", e);
+            }
         }
     }
 
@@ -361,7 +402,7 @@ public class MCRConfiguration {
             if (properties.containsKey(deprecatedName)) {
                 String newName = depr.getProperty(deprecatedName);
                 String msg = "DEPRECATED: User should rename property " + deprecatedName + " to " + newName;
-                Logger.getLogger(this.getClass()).warn(msg);
+                logWarn(msg, null);
                 if (!properties.containsKey(newName)) {
                     properties.put(newName, properties.get(deprecatedName));
                 }
@@ -392,7 +433,7 @@ public class MCRConfiguration {
             } else {
                 URL url = this.getClass().getResource("/" + filename);
                 if (url == null) {
-                    throw new MCRConfigurationException("Could not found file or resource:" + filename);
+                    throw new MCRConfigurationException("Could not find file or resource:" + filename);
                 }
                 input = new MCRURLContent(url);
             }
@@ -480,11 +521,17 @@ public class MCRConfiguration {
 
         if (reconfigure) {
             System.out.println("MCRConfiguration reconfiguring Log4J logging...");
-            org.apache.log4j.LogManager.resetConfiguration();
+            LogManager.resetConfiguration();
             PropertyConfigurator.configure(prop);
+            if (!isLog4JEnabled()) {
+                logWarn("Please initialize the log4j system properly. Logging to stdout.", null);
+                ConsoleAppender consoleAppender = new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT);
+                Logger rootLogger = LogManager.getRootLogger();
+                rootLogger.addAppender(consoleAppender);
+                rootLogger.setLevel(Level.INFO);
+            }
             for (String name : warn) {
-                Logger logger = Logger.getLogger(this.getClass());
-                logger.warn("DEPRECATED: User should rename property " + name + " to " + name.substring(4));
+                logWarn("DEPRECATED: User should rename property " + name + " to " + name.substring(4), null);
             }
         }
     }
@@ -511,7 +558,7 @@ public class MCRConfiguration {
             throw new MCRConfigurationException("Configuration property missing: " + name);
         }
 
-        Logger.getLogger(this.getClass()).debug("Loading Class: " + classname);
+        logDebug("Loading Class: " + classname);
 
         T o = null;
         Class<? extends T> cl;
@@ -565,8 +612,9 @@ public class MCRConfiguration {
      *             if the property is not set or the class can not be loaded or
      *             instantiated
      */
-    public Object getInstanceOf(String name, String defaultname) throws MCRConfigurationException {
-        return getInstanceOf(name, defaultname, Object.class);
+    @SuppressWarnings("unchecked")
+    public <T> T getInstanceOf(String name, String defaultname) throws MCRConfigurationException {
+        return (T)getInstanceOf(name, defaultname, Object.class);
     }
 
     /**
@@ -597,7 +645,7 @@ public class MCRConfiguration {
      *             if the property is not set or the class can not be loaded or
      *             instantiated
      */
-    public Object getInstanceOf(String name) throws MCRConfigurationException {
+    public <T> T getInstanceOf(String name) throws MCRConfigurationException {
         return getInstanceOf(name, (String) null);
     }
 
@@ -614,8 +662,9 @@ public class MCRConfiguration {
      *             if the property is not set or the class can not be loaded or
      *             instantiated
      */
-    public Object getSingleInstanceOf(String name, String defaultname) throws MCRConfigurationException {
-        return getSingleInstanceOf(name, defaultname, Object.class);
+    @SuppressWarnings("unchecked")
+    public <T> T getSingleInstanceOf(String name, String defaultname) throws MCRConfigurationException {
+        return (T)getSingleInstanceOf(name, defaultname, Object.class);
     }
 
     /**
@@ -636,13 +685,14 @@ public class MCRConfiguration {
      *             instantiated
      */
     public <T> T getSingleInstanceOf(String name, String defaultname, Class<T> type) throws MCRConfigurationException {
+        String className = defaultname == null ? getString(name) : getString(name, defaultname);
         @SuppressWarnings("unchecked")
-        T inst = (T) instanceHolder.get(name);
+        T inst = (T) instanceHolder.get(className);
         if (inst != null) {
             return inst;
         }
         inst = getInstanceOf(name, defaultname, type); // we need a new instance, get it
-        instanceHolder.put(name, inst); // save the instance in the hashtable
+        instanceHolder.put(className, inst); // save the instance in the hashtable
         return inst;
     }
 
@@ -659,7 +709,7 @@ public class MCRConfiguration {
      *             if the property is not set or the class can not be loaded or
      *             instantiated
      */
-    public Object getSingleInstanceOf(String name) {
+    public <T> T getSingleInstanceOf(String name) {
         return getSingleInstanceOf(name, (String) null);
     }
 
@@ -745,7 +795,7 @@ public class MCRConfiguration {
     public String getString(String name, String defaultValue) {
         if (depr.containsKey(name)) {
             String msg = "DEPRECATED: Developer should rename property " + name + " to " + depr.getProperty(name);
-            Logger.getLogger(this.getClass()).warn(msg);
+            logWarn(msg, null);
         }
 
         String value = properties.getProperty(name);
@@ -1095,5 +1145,28 @@ public class MCRConfiguration {
     @Override
     public String toString() {
         return properties.toString();
+    }
+
+    private void logWarn(String msg, Throwable throwable) {
+        if (isLog4JEnabled()) {
+            Logger.getLogger(getClass()).warn(msg, throwable);
+        } else {
+            System.err.printf("WARN: %s\n", msg);
+            if (throwable != null) {
+                throwable.printStackTrace(System.err);
+            }
+        }
+    }
+
+    private boolean isLog4JEnabled() {
+        return Logger.getRootLogger() != null && Logger.getRootLogger().getAllAppenders().hasMoreElements();
+    }
+
+    private void logDebug(String msg) {
+        if (isLog4JEnabled()) {
+            Logger.getLogger(getClass()).debug(msg);
+        } else {
+            System.out.printf("DEBUG: %s\n", msg);
+        }
     }
 }
