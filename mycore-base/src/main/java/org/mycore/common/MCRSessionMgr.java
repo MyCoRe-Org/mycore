@@ -29,6 +29,7 @@ import static org.mycore.common.events.MCRSessionEvent.Type.destroyed;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.events.MCRSessionListener;
 
 /**
@@ -69,8 +70,8 @@ public class MCRSessionMgr {
             return new MCRSession();
         }
     };
-    
-    private static ThreadLocal<Boolean> isSessionAttached=new ThreadLocal<Boolean>(){
+
+    private static ThreadLocal<Boolean> isSessionAttached = new ThreadLocal<Boolean>() {
         @Override
         protected Boolean initialValue() {
             return Boolean.FALSE;
@@ -119,12 +120,12 @@ public class MCRSessionMgr {
         theThreadLocalSession.remove();
         isSessionAttached.remove();
     }
-    
+
     /**
      *  Returns a boolean indicating if a {@link MCRSession} is bound to the current thread.
      *  @return true if a session is bound to the current thread
      */
-    public static boolean hasCurrentSession(){
+    public static boolean hasCurrentSession() {
         return isSessionAttached.get();
     }
 
@@ -134,8 +135,8 @@ public class MCRSessionMgr {
      *  This method does not spawn a new session as {@link #getCurrentSession()} would do.
      *  @return current session ID or <code>null</code> if current thread has no session attached.
      */
-    public static String getCurrentSessionID(){
-        if (hasCurrentSession()){
+    public static String getCurrentSessionID() {
+        if (hasCurrentSession()) {
             return getCurrentSession().getID();
         }
         return null;
@@ -229,6 +230,10 @@ public class MCRSessionMgr {
         for (MCRSession session : var.toArray(new MCRSession[var.size()])) {
             session.close();
         }
+        Logger.getLogger(MCRSessionMgr.class).info("Removing thread locals...");
+        isSessionAttached = null;
+        theThreadLocalSession = null;
+        Logger.getLogger(MCRSessionMgr.class).info("...done.");
         listenersLock.writeLock().unlock();
     }
 
