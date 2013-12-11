@@ -77,11 +77,11 @@ public class MCRShutdownHandler {
 
     private static MCRShutdownHandler SINGLETON = new MCRShutdownHandler();
 
-    private static Logger LOGGER = Logger.getLogger(MCRShutdownHandler.class);
-
     private static final Set<Closeable> requests = Collections.synchronizedSet(new HashSet<Closeable>());
 
-    private static final String system = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName", "MyCoRe") + ":";
+    private static final String system = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName",
+        "MyCoRe")
+        + ":";
 
     private static boolean shuttingDown = false;
 
@@ -114,25 +114,26 @@ public class MCRShutdownHandler {
 
     void shutDown() {
         System.out.println(system + " Shutting down system, please wait...\n");
-        LOGGER.debug("requests: " + requests.toString());
+        Logger logger = Logger.getLogger(MCRShutdownHandler.class);
+        logger.debug("requests: " + requests.toString());
         synchronized (requests) {
             shuttingDown = true;
             Closeable[] closeables = requests.toArray(new Closeable[requests.size()]);
             Arrays.sort(closeables, new MCRCloseableComparator());
             for (Closeable c : closeables) {
-                LOGGER.debug("Prepare Closing: " + c.toString());
+                logger.debug("Prepare Closing: " + c.toString());
                 c.prepareClose();
             }
 
             for (Closeable c : closeables) {
-                LOGGER.debug("Closing: " + c.toString());
+                logger.debug("Closing: " + c.toString());
                 c.close();
                 requests.remove(c);
             }
         }
-        LOGGER.info(system + " closing any remaining MCRSession instances, please wait...\n");
+        System.out.println(system + " closing any remaining MCRSession instances, please wait...\n");
         MCRSessionMgr.close();
-        LOGGER.info(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
+        System.out.println(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
         LogManager.shutdown();
         // may be needed in webapp to release file handles correctly.
         Introspector.flushCaches();
