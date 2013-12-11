@@ -23,6 +23,8 @@ import com.ibm.icu.util.TimeZone;
  */
 public class MCRISO8601Date {
 
+    public static final String PROPERTY_STRICT_PARSING = "MCR.Metadata.SimpleDateFormat.StrictParsing";
+
     private static final Logger LOGGER = Logger.getLogger(MCRISO8601Date.class);
 
     private DateTimeFormatter dateTimeFormatter = MCRISO8601FormatChooser.getFormatter(null, null);
@@ -132,7 +134,7 @@ public class MCRISO8601Date {
         try {
             dt = getDateTime(MCRISO8601FormatChooser.cropSecondFractions(isoString));
         } catch (final RuntimeException e) {
-            final boolean strictParsingEnabled = MCRConfiguration.instance().getBoolean("MCR.Metadata.SimpleDateFormat.StrictParsing", true);
+            final boolean strictParsingEnabled = MCRConfiguration.instance().getBoolean(PROPERTY_STRICT_PARSING, true);
             if (!strictParsingEnabled) {
                 /*
                  * Last line of defence against the worst dates of the universe ;o)
