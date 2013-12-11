@@ -1328,5 +1328,6 @@
     <module>mycore-complete</module>
     <module>iview2-addons</module>
     <module>mycore-acl-editor2</module>
+    <module>mycore-handle</module>
   </modules>
 </project>

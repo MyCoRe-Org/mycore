@@ -1,0 +1,9 @@
+<project name="iview2" xmlns:mcr="antlib:org.mycore.buildtools">
+	<import file="../../integrate.xml" />
+	<!-- - - - - - - - - - - - - - - - - - 
+	          target: config                      
+	         - - - - - - - - - - - - - - - - - -->
+	<target name="config">
+		<AddHibernateMapping class="org.mycore.services.handle.hibernate.tables" />
+	</target>
+</project>
