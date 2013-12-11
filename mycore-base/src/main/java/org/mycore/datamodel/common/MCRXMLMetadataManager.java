@@ -67,7 +67,7 @@ import org.xml.sax.SAXException;
  * For configuration, at least the following properties must be set:
  * 
  * MCR.Metadata.Store.BaseDir=/path/to/metadata/dir 
- * MCR.Metadata.Store.SVNBase=file:///path/to/local/svndir
+ * MCR.Metadata.Store.SVNBase=file:///path/to/local/svndir/
  * 
  * Both directories will be created if they do not exist yet.
  * For each project and type, a subdirectory will be created,
@@ -84,7 +84,7 @@ import org.xml.sax.SAXException;
  * and overwrite the defaults, for example
  * 
  * MCR.IFS2.Store.Class=org.mycore.datamodel.ifs2.MCRVersioningMetadataStore
- * MCR.IFS2.Store.SVNRepositoryURL=file:///use/other/location/for/document/versions
+ * MCR.IFS2.Store.SVNRepositoryURL=file:///use/other/location/for/document/versions/
  * MCR.IFS2.Store.SlotLayout=2-2-2-2
  * 
  * See documentation of MCRStore and MCRMetadataStore for details.
@@ -157,12 +157,17 @@ public class MCRXMLMetadataManager {
         }
         if (MCRVersioningMetadataStore.class.isAssignableFrom(impl)) {
             try {
-                svnBase = new URI(config.getString("MCR.Metadata.Store.SVNBase"));
+                String svnBaseValue = config.getString("MCR.Metadata.Store.SVNBase");
+                if (!svnBaseValue.endsWith("/")) {
+                    svnBaseValue += '/';
+                }
+                svnBase = new URI(svnBaseValue);
+                LOGGER.info("SVN Base: " + svnBase);
                 if (svnBase.getScheme() == null) {
-                    URI root = new File(MCRConfiguration.instance().getString("MCR.datadir",
-                        (new File(".")).getAbsolutePath())).toURI();
+                    String workingDirectory = (new File(".")).getAbsolutePath();
+                    URI root = new File(MCRConfiguration.instance().getString("MCR.datadir", workingDirectory)).toURI();
                     URI resolved = root.resolve(svnBase);
-                    Logger.getLogger(getClass()).warn("Resolved " + svnBase + " to " + resolved);
+                    LOGGER.warn("Resolved " + svnBase + " to " + resolved);
                     svnBase = resolved;
                 }
             } catch (URISyntaxException ex) {
@@ -298,10 +303,13 @@ public class MCRXMLMetadataManager {
             throw new MCRException("Could not load class " + clazz + " for " + baseID);
         }
         if (MCRVersioningMetadataStore.class.isAssignableFrom(impl)) {
-            String svnURL = config.getString(configPrefix + "SVNRepositoryURL", null);
+            String property = configPrefix + "SVNRepositoryURL";
+            String svnURL = config.getString(property, null);
             if (svnURL == null) {
-                config.set(configPrefix + "SVNRepositoryURL", svnBase.resolve(project + "/" + objectType)
-                    .toASCIIString());
+                String relativeURI = MessageFormat.format("{0}/{1}/", project, objectType);
+                URI repURI = svnBase.resolve(relativeURI);
+                LOGGER.info("Resolved " + relativeURI + " to " + repURI.toASCIIString() + " for " + property);
+                config.set(property, repURI.toASCIIString());
                 File projectDir = new File(svnDir, project);
                 if (!projectDir.exists()) {
                     projectDir.mkdirs();
