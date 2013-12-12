@@ -23,17 +23,22 @@
 
 package org.mycore.backend.hibernate;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.urn.MCRURNStore;
 
 /**
@@ -168,17 +173,16 @@ public class MCRHIBURNStore implements MCRURNStore {
      * @exception MCRPersistenceException
      *                the method argument is not correct
      */
-    public synchronized final void deleteByObjectID(String objID) throws MCRPersistenceException {
+    public synchronized final void deleteByObjectID(String objID) {
         if (objID == null || objID.length() == 0) {
-            throw new MCRPersistenceException("The object id is null.");
+            logger.warn("Do not provide a null value as object id");
+            return;
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("delete from ").append(classname).append(" where MCRID = '").append(objID).append("'");
-
-        Session session = getSession();
-        int deleted = session.createQuery(sb.toString()).executeUpdate();
-        logger.debug(deleted + " references deleted.");
+        Query q = getSession().createQuery("delete from " + classname + " where MCRID = :theObjectId");
+        q.setParameter("theObjectId", objID);
+        int rowCount = q.executeUpdate();
+        logger.info(rowCount + " entries where deleted for object " + objID);
     }
 
     /**
@@ -368,5 +372,115 @@ public class MCRHIBURNStore implements MCRURNStore {
         String urn = returns.get(0);
 
         return urn;
+    }
+
+    /**
+     * @param registered
+     * @return the count of urn matching the given 'registered' attribute
+     */
+    public long getCount(boolean registered) {
+        Session session = MCRHIBConnection.instance().getSession();
+        Transaction tx = session.beginTransaction();
+        try {
+            Criteria q = session.createCriteria(MCRURN.class);
+            q.add(Restrictions.eq("registered", Boolean.valueOf(registered)));
+            q.setProjection(Projections.rowCount());
+
+            long hits = (long) q.uniqueResult();
+
+            return hits;
+        } catch (Exception ex) {
+            logger.error("Could not execute query", ex);
+            tx.rollback();
+        } finally {
+            tx.commit();
+            session.disconnect();
+        }
+        return 0;
+    }
+
+    /**
+     * @param registered
+     * @param start
+     * @param rows
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public List<MCRURN> get(boolean registered, int start, int rows) {
+        Session session = MCRHIBConnection.instance().getSession();
+        Transaction tx = session.beginTransaction();
+        try {
+            Criteria q = session.createCriteria(MCRURN.class);
+            q.add(Restrictions.eq("registered", Boolean.valueOf(registered)));
+            q.addOrder(Order.asc("key"));
+            q.setFirstResult(start);
+            q.setMaxResults(rows);
+            List<MCRURN> list = (List<MCRURN>) q.list();
+
+            return list;
+        } catch (Exception ex) {
+            logger.error("Could not execute query", ex);
+            tx.rollback();
+        } finally {
+            tx.commit();
+            session.disconnect();
+        }
+        // return an empty list
+        return new ArrayList<MCRURN>();
+    }
+
+    /**
+     * @param urn
+     */
+    public void update(MCRURN urn) {
+        Session session = MCRHIBConnection.instance().getSession();
+        session.saveOrUpdate(urn);
+    }
+
+    /**
+     * Get all URN for the given object id.
+     * 
+     * @param id
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public List<MCRURN> get(MCRObjectID id) {
+        Session session = MCRHIBConnection.instance().getSession();
+        Criteria q = session.createCriteria(MCRURN.class);
+        q.add(Restrictions.eq("key.mcrid", id.toString()));
+
+        return (List<MCRURN>) q.list();
+    }
+
+    /**
+     * @param registered
+     * @param dfg
+     * @param start
+     * @param rows
+     * 
+     * @return a {@link List<MCRURN>} of {@link MCRURN} where path and file name are just blanks or null;
+     */
+    @SuppressWarnings("unchecked")
+    public List<MCRURN> getBaseURN(boolean registered, boolean dfg, int start, int rows) {
+        Session session = MCRHIBConnection.instance().getSession();
+        Transaction tx = session.beginTransaction();
+        try {
+            Criteria q = session.createCriteria(MCRURN.class);
+            q.add(Restrictions.and(Restrictions.isNull("path"), Restrictions.isNull("filename")));
+            q.add(Restrictions.eq("registered", Boolean.valueOf(registered)));
+            q.add(Restrictions.eq("dfg", Boolean.valueOf(dfg)));
+            q.setFirstResult(start);
+            q.setMaxResults(rows);
+
+            return (List<MCRURN>) q.list();
+        } catch (Exception ex) {
+            logger.error("Could not execute query", ex);
+            tx.rollback();
+        } finally {
+            tx.commit();
+            session.disconnect();
+        }
+        // return an empty list
+        return new ArrayList<MCRURN>();
     }
 }
