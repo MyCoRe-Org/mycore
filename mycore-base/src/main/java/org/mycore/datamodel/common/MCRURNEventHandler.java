@@ -211,11 +211,10 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected void handleFileDeleted(MCREvent evt, MCRFile file) {
-        String path = file.getPath();
-        String fileName = file.getName();
-        String urn = MCRURNManager.getURNForFile(file.getOwnerID(), path, fileName);
+        String path = file.getAbsolutePath();
+        String urn = MCRURNManager.getURNForFile(file.getOwnerID(), path);
         if (urn != null) {
-            LOGGER.info(MessageFormat.format("Removing urn {0} for file {1} from database", urn, fileName));
+            LOGGER.info(MessageFormat.format("Removing urn {0} for file {1} from database", urn, path));
             MCRURNManager.removeURN(urn);
         }
     }
