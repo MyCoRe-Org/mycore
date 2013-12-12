@@ -182,7 +182,7 @@ public class MCRHIBURNStore implements MCRURNStore {
         Query q = getSession().createQuery("delete from " + classname + " where MCRID = :theObjectId");
         q.setParameter("theObjectId", objID);
         int rowCount = q.executeUpdate();
-        logger.info(rowCount + " entries where deleted for object " + objID);
+        logger.info(rowCount + " entries where deleted for object " + objID + " from " + MCRURN.class.getSimpleName());
     }
 
     /**
