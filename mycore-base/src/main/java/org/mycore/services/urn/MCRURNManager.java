@@ -349,24 +349,7 @@ public class MCRURNManager {
      * @return the count of urn matching the given 'registered' attribute
      */
     public static long getCount(boolean registered) {
-        Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
-        try {
-            Criteria q = session.createCriteria(MCRURN.class);
-            q.add(Restrictions.eq("registered", Boolean.valueOf(registered)));
-            q.setProjection(Projections.rowCount());
-
-            long hits = (long) q.uniqueResult();
-
-            return hits;
-        } catch (Exception ex) {
-            LOGGER.error("Could not execute query", ex);
-            tx.rollback();
-        } finally {
-            tx.commit();
-            session.disconnect();
-        }
-        return 0;
+        return store.getCount(registered);
     }
 
     /**
@@ -375,36 +358,15 @@ public class MCRURNManager {
      * @param rows
      * @return
      */
-    @SuppressWarnings("unchecked")
     public static List<MCRURN> get(boolean registered, int start, int rows) {
-        Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
-        try {
-            Criteria q = session.createCriteria(MCRURN.class);
-            q.add(Restrictions.eq("registered", Boolean.valueOf(registered)));
-            q.addOrder(Order.asc("key"));
-            q.setFirstResult(start);
-            q.setMaxResults(rows);
-            List<MCRURN> list = (List<MCRURN>) q.list();
-
-            return list;
-        } catch (Exception ex) {
-            LOGGER.error("Could not execute query", ex);
-            tx.rollback();
-        } finally {
-            tx.commit();
-            session.disconnect();
-        }
-        // return an empty list
-        return new ArrayList<MCRURN>();
+        return store.get(registered, start, rows);
     }
 
     /**
      * @param urn
      */
     public static void update(MCRURN urn) {
-        Session session = MCRHIBConnection.instance().getSession();
-        session.saveOrUpdate(urn);
+        store.update(urn);
     }
 
     /**
@@ -413,13 +375,8 @@ public class MCRURNManager {
      * @param id
      * @return
      */
-    @SuppressWarnings("unchecked")
     public static List<MCRURN> get(MCRObjectID id) {
-        Session session = MCRHIBConnection.instance().getSession();
-        Criteria q = session.createCriteria(MCRURN.class);
-        q.add(Restrictions.eq("key.mcrid", id.toString()));
-
-        return (List<MCRURN>) q.list();
+        return store.get(id);
     }
 
     /**
@@ -430,27 +387,7 @@ public class MCRURNManager {
      * 
      * @return a {@link List<MCRURN>} of {@link MCRURN} where path and file name are just blanks or null;
      */
-    @SuppressWarnings("unchecked")
     public static List<MCRURN> getBaseURN(boolean registered, boolean dfg, int start, int rows) {
-        Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
-        try {
-            Criteria q = session.createCriteria(MCRURN.class);
-            q.add(Restrictions.and(Restrictions.isNull("path"), Restrictions.isNull("filename")));
-            q.add(Restrictions.eq("registered", Boolean.valueOf(registered)));
-            q.add(Restrictions.eq("dfg", Boolean.valueOf(dfg)));
-            q.setFirstResult(start);
-            q.setMaxResults(rows);
-
-            return (List<MCRURN>) q.list();
-        } catch (Exception ex) {
-            LOGGER.error("Could not execute query", ex);
-            tx.rollback();
-        } finally {
-            tx.commit();
-            session.disconnect();
-        }
-        // return an empty list
-        return new ArrayList<MCRURN>();
+        return store.getBaseURN(registered, dfg, start, rows);
     }
 }

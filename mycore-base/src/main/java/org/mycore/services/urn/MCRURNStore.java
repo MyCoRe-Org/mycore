@@ -23,6 +23,11 @@
  **/
 package org.mycore.services.urn;
 
+import java.util.List;
+
+import org.mycore.backend.hibernate.tables.MCRURN;
+import org.mycore.datamodel.metadata.MCRObjectID;
+
 /**
  * Stores the data of URNs and the document IDs assigned to them.
  * 
@@ -82,4 +87,41 @@ public interface MCRURNStore {
      * @return
      */
     public String getURNForFile(String derivateId, String path, String fileName);
+
+    /**
+     * @param registered
+     * @return the count of urn matching the given 'registered' attribute
+     */
+    public long getCount(boolean registered);
+
+    /**
+     * @param registered
+     * @param start
+     * @param rows
+     * @return
+     */
+    public List<MCRURN> get(boolean registered, int start, int rows);
+
+    /**
+     * @param urn
+     */
+    public void update(MCRURN urn);
+
+    /**
+     * Get all URN for the given object id.
+     * 
+     * @param id
+     * @return
+     */
+    public List<MCRURN> get(MCRObjectID id);
+
+    /**
+     * @param registered
+     * @param dfg
+     * @param start
+     * @param rows
+     * 
+     * @return a {@link List<MCRURN>} of {@link MCRURN} where path and file name are just blanks or null;
+     */
+    public List<MCRURN> getBaseURN(boolean registered, boolean dfg, int start, int rows);
 }
