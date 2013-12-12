@@ -32,7 +32,7 @@ import com.google.gson.JsonParser;
 /**
  * Class responsible for retrieving and storing the remotely created handle. 
  * 
- * @see MCRDigicultHandleProvider#EDA_REPOS_URL
+ * @see MCRGbvHandleProvider#EDA_REPOS_URL
  * @author shermann
  */
 public class MCRGetRemoteCreatedHandle extends TimerTask {
@@ -68,7 +68,7 @@ public class MCRGetRemoteCreatedHandle extends TimerTask {
     public void run() {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
-        MCRDigicultHandleChecksumProvider checksumProvider = new MCRDigicultHandleChecksumProvider();
+        MCRGbvHandleChecksumProvider checksumProvider = new MCRGbvHandleChecksumProvider();
 
         LOGGER.debug("Storing pending handles...");
         Session session = MCRHIBConnection.instance().getSession();
@@ -82,8 +82,8 @@ public class MCRGetRemoteCreatedHandle extends TimerTask {
             for (MCRHandle handle : list) {
                 JsonObject message = getMessage(handle.getMessageSignature());
 
-                if (MCRDigicultHandleProvider.STATUS_CANCEL.equals(getStatus(message))) {
-                    LOGGER.warn("Status is " + MCRDigicultHandleProvider.STATUS_CANCEL + "...deleting handle request in database");
+                if (MCRGbvHandleProvider.STATUS_CANCEL.equals(getStatus(message))) {
+                    LOGGER.warn("Status is " + MCRGbvHandleProvider.STATUS_CANCEL + "...deleting handle request in database");
                     try {
                         MCRHandleManager.delete(handle);
                     } catch (Throwable e) {
@@ -107,8 +107,8 @@ public class MCRGetRemoteCreatedHandle extends TimerTask {
                 String localName = parts[1].substring(0, parts[1].length() - 1);
 
                 int checksum = Integer.valueOf(parts[1].substring(parts[1].length() - 1));
-                handle.setNamingAuthority(MCRDigicultHandleProvider.NAMING_AUTHORITY);
-                handle.setNamingAuthoritySegment(MCRDigicultHandleProvider.NAMING_AUTHORITY_SEGMENT);
+                handle.setNamingAuthority(MCRGbvHandleProvider.NAMING_AUTHORITY);
+                handle.setNamingAuthoritySegment(MCRGbvHandleProvider.NAMING_AUTHORITY_SEGMENT);
                 handle.setLocalName(localName);
                 handle.setChecksum(checksum);
 
@@ -172,7 +172,7 @@ public class MCRGetRemoteCreatedHandle extends TimerTask {
             return false;
         }
 
-        if (MCRDigicultHandleProvider.STATUS_DONE.equals(status)) {
+        if (MCRGbvHandleProvider.STATUS_DONE.equals(status)) {
             return true;
         }
         return false;
@@ -198,7 +198,7 @@ public class MCRGetRemoteCreatedHandle extends TimerTask {
      * @return the handle if any or null
      */
     private String getHandle(String objectSignature) {
-        GetMethod get = new GetMethod(MCRHandleCommons.DIGICULT_OBJECT_REPOS_URL + objectSignature);
+        GetMethod get = new GetMethod(MCRHandleCommons.GBV_OBJECT_REPOS_URL + objectSignature);
         try {
             LOGGER.info(MessageFormat.format("Sending request to {0} (getting handle for object signature {1})", get.getURI(), objectSignature));
             MCRHandleCommons.HTTP_CLIENT.executeMethod(get);

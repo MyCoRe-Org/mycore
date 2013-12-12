@@ -23,7 +23,7 @@ import com.google.gson.JsonObject;
 
 /**
  * Class contains convenience functions for handling handles.
- * 
+ *
  * @author shermann
  */
 public class MCRHandleManager {
@@ -32,7 +32,7 @@ public class MCRHandleManager {
 
     /**
      * Convenience function to use in xslt stylesheets.
-     * 
+     *
      * @see {@link MCRHandleManager#isHandleRequested(MCRBase)}
      * @param base
      * @return
@@ -47,7 +47,7 @@ public class MCRHandleManager {
 
     /**
      * Checks whether the are handles or handle requests for a given {@link MCRBase}
-     *  
+     *
      * @param base
      * @return true if a handle request has been issued already
      */
@@ -65,7 +65,7 @@ public class MCRHandleManager {
 
     /**
      * When a object signature has been created this method will always return true.
-     *  
+     *
      * @param base
      * @param path
      * @return true if a handle request has been issued already
@@ -86,7 +86,7 @@ public class MCRHandleManager {
 
     /**
      * Deletes a certain handle from the database.
-     * 
+     *
      * @param handle the handle to delete
      */
     synchronized public static void delete(MCRHandle handle) throws Throwable {
@@ -100,7 +100,7 @@ public class MCRHandleManager {
 
     /**
      * Deletes all handles registered for the given {@link MCRBase}.
-     * 
+     *
      * @param handle
      */
     @SuppressWarnings("unchecked")
@@ -116,7 +116,7 @@ public class MCRHandleManager {
 
     /**
      * Deletes the handle for the given file both from the local database and from the remote system.
-     * 
+     *
      * @param file
      */
     synchronized public static void delete(MCRFile file) throws Throwable {
@@ -179,11 +179,11 @@ public class MCRHandleManager {
 
     /**
      * Retrieves the handle for a given object id and its path
-     * 
+     *
      * @param base
      * @param path
      * @return
-     * 
+     *
      * @deprecated please use {@link MCRHandleManager#getHandle(MCRBase base)}
      */
     public static List<MCRHandle> getHandle(MCRBase base, String path) throws Throwable {
@@ -192,10 +192,10 @@ public class MCRHandleManager {
 
     /**
      * Retrieves all handle for a given object id.
-     * 
+     *
      * @param base
      * @param path
-     * @return 
+     * @return
      */
     @SuppressWarnings("unchecked")
     public static List<MCRHandle> getHandle(MCRBase base) throws Throwable {
@@ -213,8 +213,8 @@ public class MCRHandleManager {
     }
 
     /**
-     * Method requests a handle for the given file at {@link MCRDigicultHandleProvider#EDA_REPOS_URL}.
-     * 
+     * Method requests a handle for the given file at {@link MCRGbvHandleProvider#EDA_REPOS_URL}.
+     *
      * @param handle the handle to store in the database
      * @param derivateObject the derivate to update (handle is stored in the derivate's xml as well)
      * @param file the file this handle is assigned to
@@ -237,28 +237,28 @@ public class MCRHandleManager {
      * @throws ClassNotFoundException
      * @throws InstantiationException
      * @throws IllegalAccessException
-     * 
+     *
      * TODO handle provider to be set by property
      */
     @SuppressWarnings("unchecked")
     private static MCRIHandleProvider getHandleProvider() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        Class<MCRIHandleProvider> c = (Class<MCRIHandleProvider>) Class.forName(MCRDigicultHandleProvider.class.getName());
+        Class<MCRIHandleProvider> c = (Class<MCRIHandleProvider>) Class.forName(MCRGbvHandleProvider.class.getName());
         MCRIHandleProvider provider = c.newInstance();
         return provider;
     }
 
     /**
-     * Creates the json that will be send to {@link MCRDigicultHandleProvider#EDA_REPOS_URL}.
-     * 
-     * @param digicultObjectUUID
-     * @param messageSignature 
+     * Creates the json that will be send to {@link MCRGbvHandleProvider#EDA_REPOS_URL}.
+     *
+     * @param gbvObjectUUID
+     * @param messageSignature
      * @return
      */
-    private static JsonObject createJson(String digicultObjectUUID, String messageSignature, MCRFile file) {
+    private static JsonObject createJson(String gbvObjectUUID, String messageSignature, MCRFile file) {
         JsonObject handleProps = new JsonObject();
         handleProps.addProperty("handle-url", "");
         handleProps.addProperty("handle-email", "");
-        handleProps.addProperty("signature", digicultObjectUUID);
+        handleProps.addProperty("signature", gbvObjectUUID);
 
         JsonArray args = new JsonArray();
         args.add(handleProps);

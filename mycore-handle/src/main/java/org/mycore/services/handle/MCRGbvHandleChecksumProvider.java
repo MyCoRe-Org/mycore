@@ -15,7 +15,7 @@ import org.mycore.services.urn.MCRIConcordanceTable;
  * 
  * @author shermann
  */
-public class MCRDigicultHandleChecksumProvider {
+public class MCRGbvHandleChecksumProvider {
 
     /**
      * Calculates the checksum of the given handle. 
@@ -24,7 +24,7 @@ public class MCRDigicultHandleChecksumProvider {
      * @return
      */
     public int checksum(MCRHandle handle) {
-        String combine = MCRDigicultHandleProvider.URN_PREFIX + handle.getLocalName();
+        String combine = MCRGbvHandleProvider.URN_PREFIX + handle.getLocalName();
 
         byte[] bytes = combine.getBytes();
 
@@ -41,7 +41,7 @@ public class MCRDigicultHandleChecksumProvider {
      * @return the single digit checksum for this handle
      */
     public int checksum2(MCRHandle handle) {
-        String handleAsURN = MCRDigicultHandleProvider.URN_PREFIX + handle.getLocalName();
+        String handleAsURN = MCRGbvHandleProvider.URN_PREFIX + handle.getLocalName();
 
         /*
          * get the String representation of this urn and split it. Every single

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.mycore.services.handle;
 
@@ -24,7 +24,7 @@ import com.google.gson.JsonObject;
  * @author shermann
  *
  */
-public class MCRDigicultHandleProvider implements MCRIHandleProvider {
+public class MCRGbvHandleProvider implements MCRIHandleProvider {
 
     public static final String NAMING_AUTHORITY = "428894";
 
@@ -32,7 +32,7 @@ public class MCRDigicultHandleProvider implements MCRIHandleProvider {
 
     public static final String NAMING_AUTHORITY_SEGMENT = "vzg";
 
-    private static final Logger LOGGER = Logger.getLogger(MCRDigicultHandleProvider.class);
+    private static final Logger LOGGER = Logger.getLogger(MCRGbvHandleProvider.class);
 
     /** done status */
     static final String STATUS_DONE = "done";
@@ -76,12 +76,12 @@ public class MCRDigicultHandleProvider implements MCRIHandleProvider {
      * @throws HttpException
      */
     private int registerObject(String objectSignature) {
-        /* post to digicult namespace */
-        PostMethod post = new PostMethod(MCRHandleCommons.DIGICULT_OBJECT_REPOS_URL + objectSignature);
+        /* post to gbv namespace */
+        PostMethod post = new PostMethod(MCRHandleCommons.GBV_OBJECT_REPOS_URL + objectSignature);
         int status = -1;
         try {
-            JsonObject digicultJSON = createDigicultSimple(objectSignature);
-            post.setRequestEntity(new StringRequestEntity(digicultJSON.toString(), "application/json", "UTF-8"));
+            JsonObject gbvJSON = createGbvSimple(objectSignature);
+            post.setRequestEntity(new StringRequestEntity(gbvJSON.toString(), "application/json", "UTF-8"));
             LOGGER.info("Sending request to " + post.getURI() + " (register object)");
             status = HTTP_CLIENT.executeMethod(post);
 
@@ -116,11 +116,11 @@ public class MCRDigicultHandleProvider implements MCRIHandleProvider {
      * @param uuid
      * @return
      */
-    private JsonObject createDigicultSimple(String signature) {
+    private JsonObject createGbvSimple(String signature) {
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("cmodel", "digicult:simple");
-        /* digicult context, fixed */
-        jsonObject.addProperty("context", MCRHandleCommons.DIGICULT_CONTEXT_UUID);
+        jsonObject.addProperty("cmodel", "digicult:simple"); // TODO make a property
+        /* gbv context, fixed */
+        jsonObject.addProperty("context", MCRHandleCommons.GBV_CONTEXT_UUID);
         jsonObject.addProperty("ctime", MCRHandleCommons.DATE_FORMAT.format(new Date()));
         jsonObject.addProperty("mtime", MCRHandleCommons.DATE_FORMAT.format(new Date()));
         jsonObject.addProperty("owner", MCRHandleCommons.DEFAULT_OWNER);

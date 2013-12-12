@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.mycore.services.handle;
 
@@ -10,7 +10,7 @@ import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 
 /**
  * Class contains constants useful within the handle context.
- * 
+ *
  * @author shermann
  *
  */
@@ -29,7 +29,7 @@ public class MCRHandleCommons {
 
     /**
      * The default contact e-mail.
-     * 
+     *
      * TODO make a property
      */
     static final String HANDLE_MAIL = "thulb_handle@listserv.uni-jena.de";
@@ -38,9 +38,9 @@ public class MCRHandleCommons {
     static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
 
     /**
-     * The url to the digicult object repository.
+     * The url to the gbv object repository.
      */
-    static final String DIGICULT_OBJECT_REPOS_URL = "https://ws.gbv.de/riak/digicult/";
+    static final String GBV_OBJECT_REPOS_URL = "https://ws.gbv.de/riak/digicult/";
 
     /**
      * The context uuid for the eda bucket.
@@ -48,9 +48,9 @@ public class MCRHandleCommons {
     static final String EDA_REPOS_URL = "https://ws.gbv.de/riak/eda/";
 
     /**
-     * The context uuid for the digicult bucket.
+     * The context uuid for the gbv bucket.
      */
-    static final String DIGICULT_CONTEXT_UUID = "fa1fb1d38a5241a797bb343c8ac1ad98";
+    static final String GBV_CONTEXT_UUID = "fa1fb1d38a5241a797bb343c8ac1ad98";
 
     /**
      * The context uuid for the eda message bucket.
@@ -59,7 +59,7 @@ public class MCRHandleCommons {
 
     /**
      * The default owner.
-     * 
+     *
      * TODO make a property
      */
     static final String DEFAULT_OWNER = "thulb_test";

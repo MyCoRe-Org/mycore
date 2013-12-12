@@ -29,9 +29,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 /**
- * Class responsible for storing object signatures in a remote system. 
- * 
- * @see MCRDigicultHandleProvider#DIGICULT_OBJECT_REPOS_URL
+ * Class responsible for storing object signatures in a remote system.
+ *
+ * @see MCRGbvHandleProvider#GBV_OBJECT_REPOS_URL
  * @author shermann
  */
 public class MCRRequestHandleAdd extends TimerTask {
@@ -55,9 +55,9 @@ public class MCRRequestHandleAdd extends TimerTask {
     }
 
     /**
-     * Method reads from the mcrhandle table to get pending handle requests 
-     * (handles with an object signature but with no message signature). A request for each object 
-     * given by its signature is then send to {@link MCRDigicultHandleProvider#EDA_REPOS_URL}
+     * Method reads from the mcrhandle table to get pending handle requests
+     * (handles with an object signature but with no message signature). A request for each object
+     * given by its signature is then send to {@link MCRGbvHandleProvider#EDA_REPOS_URL}
      * */
     @SuppressWarnings("unchecked")
     public void run() {
@@ -93,16 +93,16 @@ public class MCRRequestHandleAdd extends TimerTask {
 
     /**
      * Creates the json that will be send to {@link MCRHandleCommons#EDA_REPOS_URL}.
-     * 
-     * @param digicultObjectUUID
-     * @param messageSignature 
+     *
+     * @param gbvObjectUUID
+     * @param messageSignature
      * @return
      */
-    private JsonObject createJson(String digicultObjectUUID, String messageSignature, MCRFile file) throws URISyntaxException {
+    private JsonObject createJson(String gbvObjectUUID, String messageSignature, MCRFile file) throws URISyntaxException {
         JsonObject handleProps = new JsonObject();
         handleProps.addProperty("handle-url", getHandleURL(file));
         handleProps.addProperty("handle-email", MCRHandleCommons.HANDLE_MAIL);
-        handleProps.addProperty("signature", digicultObjectUUID);
+        handleProps.addProperty("signature", gbvObjectUUID);
 
         JsonArray args = new JsonArray();
         args.add(handleProps);
@@ -143,10 +143,10 @@ public class MCRRequestHandleAdd extends TimerTask {
     }
 
     /**
-     * Actually sends the request to {@link MCRDigicultHandleProvider#EDA_REPOS_URL}.
-     * 
+     * Actually sends the request to {@link MCRGbvHandleProvider#EDA_REPOS_URL}.
+     *
      * @param file the file the handle is requested for
-     * @param objectSignature the signature of the object at {@link MCRHandleCommons#DIGICULT_OBJECT_REPOS_URL}
+     * @param objectSignature the signature of the object at {@link MCRHandleCommons#GBV_OBJECT_REPOS_URL}
 
      * @return the http status, a status of -1 indicates the request was not send at all
      * @throws UnsupportedEncodingException
