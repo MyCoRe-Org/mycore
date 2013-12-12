@@ -38,6 +38,7 @@ import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.common.events.MCREventManager;
+import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRFileMetadata;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -203,5 +204,19 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
         MCREvent indexEvent = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.INDEX_EVENT);
         indexEvent.put("derivate", der);
         MCREventManager.instance().handleEvent(indexEvent);
+    }
+
+    /* (non-Javadoc)
+     * @see org.mycore.common.events.MCREventHandlerBase#handleFileDeleted(org.mycore.common.events.MCREvent, org.mycore.datamodel.ifs.MCRFile)
+     */
+    @Override
+    protected void handleFileDeleted(MCREvent evt, MCRFile file) {
+        String path = file.getPath();
+        String fileName = file.getName();
+        String urn = MCRURNManager.getURNForFile(file.getOwnerID(), path, fileName);
+        if (urn != null) {
+            LOGGER.info(MessageFormat.format("Removing urn {0} for file {1} from database", urn, fileName));
+            MCRURNManager.removeURN(urn);
+        }
     }
 }
