@@ -24,7 +24,7 @@
 package org.mycore.backend.hibernate.tables;
 
 /**
- * This class implement the data sructure of the MCRURN table.
+ * This class implements the data structure of the MCRURN table.
  * 
  * @author Heiko Helmbrecht
  * @author Jens Kupferschmidt
