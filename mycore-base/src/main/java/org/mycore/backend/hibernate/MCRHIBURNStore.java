@@ -138,24 +138,26 @@ public class MCRHIBURNStore implements MCRURNStore {
     }
 
     /**
-     * The method remove a item for the URN from the datastore.
+     * The method removes an entry for the given URN from the datastore.
      * 
      * @param urn
      *            a URN
-     * @exception MCRPersistenceException
-     *                the method argument is not correct
      */
-    public synchronized final void delete(String urn) throws MCRPersistenceException {
+    public synchronized final void delete(String urn) {
         if (urn == null || urn.length() == 0) {
-            throw new MCRPersistenceException("The URN is null.");
+            logger.warn("Cannot delete for urn " + urn);
+            return;
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("delete from ").append(classname).append(" where MCRURN = '").append(urn).append("'");
+        Criteria q = getSession().createCriteria(MCRURN.class);
+        q.add(Restrictions.eq("key.mcrurn", urn));
 
-        Session session = getSession();
-        int deleted = session.createQuery(sb.toString()).executeUpdate();
-        logger.debug(deleted + " references deleted.");
+        MCRURN entry = (MCRURN) q.uniqueResult();
+        if (entry != null) {
+            getSession().delete(entry);
+        } else {
+            logger.warn("URN " + urn + " is unknown and cannot be deleted");
+        }
     }
 
     /**
@@ -308,6 +310,7 @@ public class MCRHIBURNStore implements MCRURNStore {
      * @see org.mycore.services.urn.MCRURNStore#getURNForFile(java.lang.String,
      * java.lang.String)
      */
+    @SuppressWarnings("unchecked")
     public String getURNForFile(String derivateId, String fileName) {
         if (derivateId == null || fileName == null) {
             return null;
