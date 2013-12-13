@@ -29,10 +29,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -709,16 +711,10 @@ public class MCRXMLMetadataManager {
      */
     public List<String> listIDsOfType(String type) {
         List<String> list = new ArrayList<String>();
-        File[] projectDirectories = baseDir.listFiles();
-        if (projectDirectories == null) {
-            throw new MCRException("unable to list files of IFS2 metadata directory " + baseDir.getAbsolutePath());
-        }
-        for (File fProject : projectDirectories) {
-            String project = fProject.getName();
-            File[] objectTypeDirectories = fProject.listFiles();
-            if (objectTypeDirectories == null) {
-                throw new MCRException("unable to list files of IFS2 metadata directory " + fProject.getAbsolutePath());
-            }
+        File[] projectDirectories = getProjectDirectories();
+        for (File projectDirectory : projectDirectories) {
+            String project = projectDirectory.getName();
+            File[] objectTypeDirectories = getObjectTypeDirectories(projectDirectory);
             for (File fType : objectTypeDirectories) {
                 if (!type.equals(fType.getName())) {
                     continue;
@@ -735,23 +731,63 @@ public class MCRXMLMetadataManager {
      */
     public List<String> listIDs() {
         List<String> list = new ArrayList<String>();
-        File[] projectDirectories = baseDir.listFiles();
-        if (projectDirectories == null) {
-            throw new MCRException("unable to list files of IFS2 metadata directory " + baseDir.getAbsolutePath());
-        }
-        for (File fProject : projectDirectories) {
-            String project = fProject.getName();
-            File[] objectTypeDirectories = fProject.listFiles();
-            if (objectTypeDirectories == null) {
-                throw new MCRException("unable to list files of IFS2 metadata directory " + fProject.getAbsolutePath());
-            }
-            for (File fType : objectTypeDirectories) {
-                String type = fType.getName();
+        File[] projectDirectories = getProjectDirectories();
+        for (File projectDirectory : projectDirectories) {
+            String project = projectDirectory.getName();
+            File[] objectTypeDirectories = getObjectTypeDirectories(projectDirectory);
+            for (File objectTypeDirectory : objectTypeDirectories) {
+                String type = objectTypeDirectory.getName();
                 String base = getStoryKey(project, type);
                 list.addAll(listIDsForBase(base));
             }
         }
         return list;
+    }
+
+    /**
+     * Lists all types of MCRObjects. The type is middle part of a MCRObjectID (project_TYPE_id).
+     * 
+     * @return collection of object types
+     */
+    public Collection<String> listObjectTypes() {
+        Set<String> set = new java.util.HashSet<>();
+        File[] projectDirectories = getProjectDirectories();
+        for (File projectDirectory : projectDirectories) {
+            File[] objectTypeDirectories = getObjectTypeDirectories(projectDirectory);
+            for (File objectTypeDirectory : objectTypeDirectories) {
+                set.add(objectTypeDirectory.getName());
+            }
+        }
+        return set;
+    }
+
+    /**
+     * Returns an array of project directories. Throws a MCRException
+     * if an I/O-Exceptions occur.
+     * 
+     * @return list of project directories
+     */
+    private File[] getProjectDirectories() {
+        File[] projectDirectories = baseDir.listFiles();
+        if (projectDirectories == null) {
+            throw new MCRException("unable to list files of IFS2 metadata directory " + baseDir.getAbsolutePath());
+        }
+        return projectDirectories;
+    }
+
+    /**
+     * Returns an array of object type directories based on the project directory. You
+     * should call {@link #getProjectDirectories()} first in order to get the available
+     * projects. Throws a MCRException if an I/O-Exceptions occur.
+     * 
+     * @return list of object type directories
+     */
+    private File[] getObjectTypeDirectories(File projectDirectory) {
+        File[] objectTypeDirectories = projectDirectory.listFiles();
+        if (objectTypeDirectories == null) {
+            throw new MCRException("unable to list files of IFS2 metadata directory " + projectDirectory.getAbsolutePath());
+        }
+        return objectTypeDirectories;
     }
 
     /**
