@@ -7,6 +7,8 @@ import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -19,7 +21,11 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCRShutdownHandler;
@@ -59,22 +65,22 @@ public class MCRSolrIndexer {
     static {
         int poolSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Indexer.ThreadCount", 4);
         final MCRListeningPriorityExecutorService executorService = new MCRListeningPriorityExecutorService(new ThreadPoolExecutor(
-            poolSize, poolSize, 0L, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>()));
+                poolSize, poolSize, 0L, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>()));
         Runnable onShutdown = new Runnable() {
 
             @Override
             public void run() {
                 executorService.shutdown();
                 String documentStats = MessageFormat.format("Solr documents: {0}, each: {1} ms.",
-                    MCRSolrIndexStatisticCollector.documents.getDocuments(), MCRSolrIndexStatisticCollector.documents.reset());
+                        MCRSolrIndexStatisticCollector.documents.getDocuments(), MCRSolrIndexStatisticCollector.documents.reset());
                 String metadataStats = MessageFormat.format("XML documents: {0}, each: {1} ms.",
-                    MCRSolrIndexStatisticCollector.xml.getDocuments(), MCRSolrIndexStatisticCollector.xml.reset());
+                        MCRSolrIndexStatisticCollector.xml.getDocuments(), MCRSolrIndexStatisticCollector.xml.reset());
                 String fileStats = MessageFormat.format("File transfers: {0}, each: {1} ms.",
-                    MCRSolrIndexStatisticCollector.fileTransfer.getDocuments(), MCRSolrIndexStatisticCollector.fileTransfer.reset());
+                        MCRSolrIndexStatisticCollector.fileTransfer.getDocuments(), MCRSolrIndexStatisticCollector.fileTransfer.reset());
                 String operationsStats = MessageFormat.format("Other index operations: {0}, each: {1} ms.",
-                    MCRSolrIndexStatisticCollector.operations.getDocuments(), MCRSolrIndexStatisticCollector.operations.reset());
+                        MCRSolrIndexStatisticCollector.operations.getDocuments(), MCRSolrIndexStatisticCollector.operations.reset());
                 String msg = MessageFormat.format("\nFinal statistics:\n{0}\n{1}\n{2}\n{3}", documentStats, metadataStats, fileStats,
-                    operationsStats);
+                        operationsStats);
                 LOGGER.info(msg);
                 try {
                     MCRSolrServerFactory.getSolrServer().commit();
@@ -296,6 +302,73 @@ public class MCRSolrIndexer {
         } catch (Exception ex) {
             LOGGER.error("Could not optimize solr index", ex);
         }
+    }
+
+    /**
+     * Synchronizes the solr server with the database. As a result the
+     * solr server contains the same documents as the database. All solr
+     * zombie documents will be removed, and all not indexed mycore
+     * objects will be indexed.
+     * 
+     * @throws IOException
+     * @throws SolrServerException
+     */
+    public static void synchronizeMetadataIndex() throws IOException, SolrServerException {
+        Collection<String> objectTypes = MCRXMLMetadataManager.instance().listObjectTypes();
+        for (String objectType : objectTypes) {
+            synchronizeMetadataIndex(objectType);
+        }
+    }
+
+    /**
+     * Synchronizes the solr server with the database for a given object type.
+     * As a result the solr server contains the same documents as the database.
+     * All solr zombie documents will be removed, and all not indexed mycore
+     * objects will be indexed.
+     * 
+     * @throws IOException
+     * @throws SolrServerException
+     */
+    public static void synchronizeMetadataIndex(String objectType) throws IOException, SolrServerException {
+        // get ids from db
+        List<String> dbList = MCRXMLMetadataManager.instance().listIDsOfType(objectType);
+        // get ids from solr
+        SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
+        List<String> solrList = listIDsOfSolrServer(solrServer, objectType);
+
+        // documents to remove
+        List<String> toRemove = new ArrayList<>(solrList);
+        toRemove.removeAll(dbList);
+        if (!toRemove.isEmpty()) {
+            solrServer.deleteById(toRemove, 5000);
+        }
+        // documents to add
+        dbList.removeAll(solrList);
+        if (!dbList.isEmpty()) {
+            rebuildMetadataIndex(dbList);
+        }
+    }
+
+    protected static List<String> listIDsOfSolrServer(SolrServer server, String objectType) throws SolrServerException {
+        int numPerRequest = 10000;
+        List<String> idList = new ArrayList<>();
+        ModifiableSolrParams p = new ModifiableSolrParams();
+        p.set("q", "objectType:" + objectType);
+        p.set("rows", String.valueOf(numPerRequest));
+        p.set("fl", "id");
+        int start = 0;
+        long numFound = Integer.MAX_VALUE;
+        while (start < numFound) {
+            p.set("start", start);
+            QueryResponse response = server.query(p);
+            numFound = response.getResults().getNumFound();
+            SolrDocumentList results = response.getResults();
+            for (SolrDocument doc : results) {
+                idList.add(doc.get("id").toString());
+            }
+            start += response.getResults().size();
+        }
+        return idList;
     }
 
     /**
