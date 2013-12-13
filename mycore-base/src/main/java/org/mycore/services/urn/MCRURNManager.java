@@ -23,19 +23,11 @@
  **/
 package org.mycore.services.urn;
 
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -72,8 +64,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * @author Frank Lützenkirchen
  */
 public class MCRURNManager {
-
-    private static final Logger LOGGER = Logger.getLogger(MCRURNManager.class);
 
     /** The MCRURNStore implementation to use */
     private static MCRURNStore store;
