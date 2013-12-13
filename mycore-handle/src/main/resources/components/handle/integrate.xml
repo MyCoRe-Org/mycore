@@ -4,6 +4,6 @@
 	          target: config                      
 	         - - - - - - - - - - - - - - - - - -->
 	<target name="config">
-		<AddHibernateMapping class="org.mycore.services.handle.hibernate.tables" />
+		<AddHibernateMapping class="org.mycore.services.handle.hibernate.tables.MCRHandle" />
 	</target>
 </project>
