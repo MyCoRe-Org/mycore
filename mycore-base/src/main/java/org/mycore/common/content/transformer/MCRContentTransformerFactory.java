@@ -57,9 +57,13 @@ public class MCRContentTransformerFactory {
         MCRConfiguration config = MCRConfiguration.instance();
 
         if (config.getString(property, null) == null) {
-            return null;
+            //check for reasonable default:
+            String stylesheets = config.getString("MCR.ContentTransformer." + id + ".Stylesheet", null);
+            if (stylesheets == null) {
+                return null;
+            }
         }
-        MCRContentTransformer transformer = config.getInstanceOf(property);
+        MCRContentTransformer transformer = config.getInstanceOf(property, MCRXSLTransformer.class.getCanonicalName());
         transformer.init(id);
         transformers.put(id, transformer);
         return transformer;
