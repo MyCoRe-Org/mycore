@@ -76,19 +76,19 @@
   <title step="editor" type="mods" layout="confpub-admin" xml:lang="de">Konferenzbeitrag bearbeiten (Admin)</title>
   <title step="editor" type="mods" layout="confpub-admin" xml:lang="en">Edit Conference Publication (Admin)</title>
 
-  <title step="author" type="mods" layout="book-chapter" xml:lang="de">Buchkapitel erstellen</title>
-  <title step="author" type="mods" layout="book-chapter" xml:lang="en">Create Book Chapter</title>
-  <title step="commit" type="mods" layout="book-chapter" xml:lang="de">Buchkapitel bearbeiten</title>
-  <title step="commit" type="mods" layout="book-chapter" xml:lang="en">Edit Book Chapter</title>
-  <title step="editor" type="mods" layout="book-chapter" xml:lang="de">Buchkapitel bearbeiten</title>
-  <title step="editor" type="mods" layout="book-chapter" xml:lang="en">Edit Book Chapter</title>
+  <title step="author" type="mods" layout="chapter" xml:lang="de">Buchkapitel erstellen</title>
+  <title step="author" type="mods" layout="chapter" xml:lang="en">Create Book Chapter</title>
+  <title step="commit" type="mods" layout="chapter" xml:lang="de">Buchkapitel bearbeiten</title>
+  <title step="commit" type="mods" layout="chapter" xml:lang="en">Edit Book Chapter</title>
+  <title step="editor" type="mods" layout="chapter" xml:lang="de">Buchkapitel bearbeiten</title>
+  <title step="editor" type="mods" layout="chapter" xml:lang="en">Edit Book Chapter</title>
 
-  <title step="author" type="mods" layout="book-chapter-admin" xml:lang="de">Buchkapitel erstellen (Admin)</title>
-  <title step="author" type="mods" layout="book-chapter-admin" xml:lang="en">Create Book Chapter (Admin)</title>
-  <title step="commit" type="mods" layout="book-chapter-admin" xml:lang="de">Buchkapitel bearbeiten (Admin)</title>
-  <title step="commit" type="mods" layout="book-chapter-admin" xml:lang="en">Edit Book Chapter (Admin)</title>
-  <title step="editor" type="mods" layout="book-chapter-admin" xml:lang="de">Buchkapitel bearbeiten (Admin)</title>
-  <title step="editor" type="mods" layout="book-chapter-admin" xml:lang="en">Edit Book Chapter (Admin)</title>
+  <title step="author" type="mods" layout="chapter-admin" xml:lang="de">Buchkapitel erstellen (Admin)</title>
+  <title step="author" type="mods" layout="chapter-admin" xml:lang="en">Create Book Chapter (Admin)</title>
+  <title step="commit" type="mods" layout="chapter-admin" xml:lang="de">Buchkapitel bearbeiten (Admin)</title>
+  <title step="commit" type="mods" layout="chapter-admin" xml:lang="en">Edit Book Chapter (Admin)</title>
+  <title step="editor" type="mods" layout="chapter-admin" xml:lang="de">Buchkapitel bearbeiten (Admin)</title>
+  <title step="editor" type="mods" layout="chapter-admin" xml:lang="en">Edit Book Chapter (Admin)</title>
 
   <title step="author" type="mods" layout="book" xml:lang="de">Buch erstellen</title>
   <title step="author" type="mods" layout="book" xml:lang="en">Create Book</title>
