@@ -24,6 +24,7 @@
 package org.mycore.services.fieldquery;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -47,19 +48,17 @@ public class MCRQueryClient {
     private final static Logger LOGGER = Logger.getLogger(MCRQueryClient.class);
 
     /** A list containing the aliases of all hosts */
-    public final static List<String> ALL_HOSTS;
+    public final static List<String> ALL_HOSTS = new ArrayList<String>();
 
     /** A map from host alias to classes for access types */
     private static Properties accessclass = new Properties();
 
     static {
         // Read hosts.xml configuration file
-        Element hosts = MCRURIResolver.instance().resolve("resource:hosts.xml");
+        Element hostsXML = MCRURIResolver.instance().resolve("resource:hosts.xml");
 
-        ALL_HOSTS = new ArrayList<String>();
-        List children = hosts.getChildren();
-        for (Object aChildren : children) {
-            Element host = (Element) aChildren;
+        List<Element> hosts = ( hostsXML == null ? Collections.<Element> emptyList() : hostsXML.getChildren() );
+        for (Element host : hosts) {
             String classname = host.getAttributeValue("class");
             if (classname == null || (classname = classname.trim()).length() == 0) {
                 classname = "org.mycore.services.fieldquery.MCRQueryClientWebService";
