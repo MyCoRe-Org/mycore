@@ -81,7 +81,7 @@
 
     <!-- pub_genre -->
     <cell row="110" col="1" anchor="NORTHEAST" class="mandatory" ref="mods.genre.kindOfReport.label" style="padding-top:5px;" />
-    <cell row="110" col="2" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre" ref="mods.genre.kindOfPublication.confpub" style="padding-top:5px;" />
+    <cell row="110" col="2" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:genre[@type='kindof']" ref="mods.genre.kindOfPublication.confpub" style="padding-top:5px;" />
     <cell row="110" col="3" anchor="NORTHEAST" style="padding-top:5px;" ref="mods.genre.kindOfPublication.help" />
   <!-- pub_genre END -->
 
