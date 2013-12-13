@@ -126,7 +126,7 @@ public class MCRConfiguration {
      */
     private static MCRConfiguration singleton;
 
-    private Hashtable<String, Object> instanceHolder = new Hashtable<String, Object>();
+    private Hashtable<SingletonKey, Object> instanceHolder = new Hashtable<SingletonKey, Object>();
 
     private File lastModifiedFile;
 
@@ -614,7 +614,7 @@ public class MCRConfiguration {
      */
     @SuppressWarnings("unchecked")
     public <T> T getInstanceOf(String name, String defaultname) throws MCRConfigurationException {
-        return (T)getInstanceOf(name, defaultname, Object.class);
+        return (T) getInstanceOf(name, defaultname, Object.class);
     }
 
     /**
@@ -664,7 +664,7 @@ public class MCRConfiguration {
      */
     @SuppressWarnings("unchecked")
     public <T> T getSingleInstanceOf(String name, String defaultname) throws MCRConfigurationException {
-        return (T)getSingleInstanceOf(name, defaultname, Object.class);
+        return (T) getSingleInstanceOf(name, defaultname, Object.class);
     }
 
     /**
@@ -686,13 +686,14 @@ public class MCRConfiguration {
      */
     public <T> T getSingleInstanceOf(String name, String defaultname, Class<T> type) throws MCRConfigurationException {
         String className = defaultname == null ? getString(name) : getString(name, defaultname);
+        SingletonKey key = new SingletonKey(name, className);
         @SuppressWarnings("unchecked")
-        T inst = (T) instanceHolder.get(className);
+        T inst = (T) instanceHolder.get(key);
         if (inst != null) {
             return inst;
         }
         inst = getInstanceOf(name, defaultname, type); // we need a new instance, get it
-        instanceHolder.put(className, inst); // save the instance in the hashtable
+        instanceHolder.put(key, inst); // save the instance in the hashtable
         return inst;
     }
 
@@ -1167,6 +1168,54 @@ public class MCRConfiguration {
             Logger.getLogger(getClass()).debug(msg);
         } else {
             System.out.printf("DEBUG: %s\n", msg);
+        }
+    }
+
+    private static class SingletonKey {
+        private String property, className;
+
+        public SingletonKey(String property, String className) {
+            super();
+            this.property = property;
+            this.className = className;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((className == null) ? 0 : className.hashCode());
+            result = prime * result + ((property == null) ? 0 : property.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            SingletonKey other = (SingletonKey) obj;
+            if (className == null) {
+                if (other.className != null) {
+                    return false;
+                }
+            } else if (!className.equals(other.className)) {
+                return false;
+            }
+            if (property == null) {
+                if (other.property != null) {
+                    return false;
+                }
+            } else if (!property.equals(other.property)) {
+                return false;
+            }
+            return true;
         }
     }
 }
