@@ -29,7 +29,7 @@ import java.util.Properties;
 
 import org.codehaus.cargo.module.merge.MergeException;
 import org.codehaus.cargo.module.merge.MergeProcessor;
-import org.mycore.buildtools.common.SortedProperties;
+import org.mycore.buildtools.common.MCRSortedProperties;
 
 /**
  * This class implements a merger for property files The properties in the base
@@ -75,7 +75,7 @@ public class PropertiesMerger implements MergeProcessor {
 			return null;
 		}
 		try {
-			SortedProperties baseProps = new SortedProperties();
+			MCRSortedProperties baseProps = new MCRSortedProperties();
 			baseProps.load(propsList.get(0));
 
 			for (int i = 1; i < this.propsList.size(); i++) {

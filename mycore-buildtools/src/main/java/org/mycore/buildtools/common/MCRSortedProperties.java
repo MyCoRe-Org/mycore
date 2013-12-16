@@ -25,29 +25,34 @@ package org.mycore.buildtools.common;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Properties;
-import java.util.Vector;
+import java.util.TreeSet;
+
 /**
  * This class enhances the Java Properties class.
  * If the properties are stored, they will be sorted by key names.
+ * Additionally if properties are in this form:
+ * <code>key=%key%,value</code>
+ * old values will NOT be overwritten but the new value will be appended.
  * 
- * @see java.util.Properties
- * 
+ * @author Thomas Scheffler (yagee)
  * @author R. Adler
  */
-public class SortedProperties extends Properties {
- 	private static final long serialVersionUID = 1L;
+public class MCRSortedProperties extends Properties {
+    private static final long serialVersionUID = 1L;
 
-	/**
-     * Overrides, called by the store method.
-     */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public synchronized Enumeration keys() {
-       Enumeration keysEnum = super.keys();
-       Vector keyList = new Vector();
-       while(keysEnum.hasMoreElements()){
-         keyList.add(keysEnum.nextElement());
-       }
-       Collections.sort(keyList);
-       return keyList.elements();
+    @Override
+    public synchronized Object put(Object key, Object value) {
+        return putString((String) key, (String) value);
+    }
+
+    private Object putString(String key, String value) {
+        String oldValue = (String) super.getProperty(key);
+        String newValue = oldValue == null ? value : value.replaceAll('%' + key + '%', oldValue);
+        return super.put(key, newValue);
+    }
+
+    @Override
+    public synchronized Enumeration<Object> keys() {
+        return Collections.enumeration(new TreeSet<Object>(super.keySet()));
     }
 }
