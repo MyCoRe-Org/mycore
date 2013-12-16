@@ -24,9 +24,12 @@
 package org.mycore.common.xml;
 
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
@@ -34,6 +37,8 @@ import org.mycore.common.content.transformer.MCRFopper;
 import org.mycore.common.content.transformer.MCRIdentityTransformer;
 import org.mycore.common.content.transformer.MCRTransformerPipe;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
+
+import com.google.common.collect.Lists;
 
 /**
  * This class acts as a {@link MCRContentTransformer} factory for {@link MCRLayoutService}.
@@ -71,21 +76,43 @@ public class MCRLayoutTransformerFactory {
 
     private static MCRContentTransformer buildLayoutTransformer(String id) throws Exception {
         String idStripped = id.replaceAll("-default$", "");
-        LOGGER.info("Configure property MCR.ContentTransformer." + idStripped + ".Class if you do not want to use default behaviour.");
+        LOGGER.info("Configure property MCR.ContentTransformer." + idStripped
+            + ".Class if you do not want to use default behaviour.");
         String stylesheet = getResourceName(id);
         if (stylesheet == null) {
             LOGGER.info("Using noop transformer for " + idStripped);
             return NOOP_TRANSFORMER;
         }
-        MCRContentTransformer transformer = MCRXSLTransformer.getInstance(stylesheet);
+        String[] stylesheets = getStylesheets(id, stylesheet);
+        MCRContentTransformer transformer = MCRXSLTransformer.getInstance(stylesheets);
         if ("application/pdf".equals(transformer.getMimeType())) {
             transformer = new MCRTransformerPipe(transformer, fopper);
-            LOGGER.info("Using styleshet '" + stylesheet + "' for " + idStripped + " and MCRFopper for PDF output.");
+            LOGGER.info("Using stylesheet '" + Lists.newArrayList(stylesheets) + "' for " + idStripped
+                + " and MCRFopper for PDF output.");
         } else {
-            LOGGER.info("Using styleshet '" + stylesheet + "' for " + idStripped);
+            LOGGER.info("Using stylesheet '" + Lists.newArrayList(stylesheets) + "' for " + idStripped);
         }
         transformers.put(id, transformer);
         return transformer;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static String[] getStylesheets(String id, String stylesheet) {
+        List<String> ignore = MCRConfiguration.instance().getStrings("MCR.LayoutTransformerFactory.Default.Ignore",
+            (List<String>) Collections.EMPTY_LIST);
+        List<String> defaults;
+        if (ignore.contains(id)) {
+            defaults = Collections.emptyList();
+        } else {
+            defaults = MCRConfiguration.instance().getStrings("MCR.LayoutTransformerFactory.Default.Stylesheets",
+                (List<String>) Collections.EMPTY_LIST);
+        }
+        String[] stylesheets = new String[1 + defaults.size()];
+        stylesheets[0] = stylesheet;
+        for (int i = 0; i < defaults.size(); i++) {
+            stylesheets[i + 1] = defaults.get(i);
+        }
+        return stylesheets;
     }
 
     /**
