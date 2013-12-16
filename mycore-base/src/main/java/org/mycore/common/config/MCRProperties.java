@@ -63,6 +63,10 @@ public class MCRProperties extends Properties {
         }
         String oldValue = (String) super.get(key);
         String newValue = oldValue == null ? value : value.replaceAll('%' + key + '%', oldValue);
+        if (!newValue.equals(value) && newValue.startsWith(",")) {
+            //replacement took place, but starts with 'empty' value
+            newValue = newValue.substring(1);
+        }
         return super.put(key, newValue);
     }
 

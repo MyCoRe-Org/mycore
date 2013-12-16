@@ -48,6 +48,10 @@ public class MCRSortedProperties extends Properties {
     private Object putString(String key, String value) {
         String oldValue = (String) super.getProperty(key);
         String newValue = oldValue == null ? value : value.replaceAll('%' + key + '%', oldValue);
+        if (!newValue.equals(value) && newValue.startsWith(",")) {
+            //replacement took place, but starts with 'empty' value
+            newValue = newValue.substring(1);
+        }
         return super.put(key, newValue);
     }
 
