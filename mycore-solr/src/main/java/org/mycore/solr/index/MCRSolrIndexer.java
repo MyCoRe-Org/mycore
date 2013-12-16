@@ -321,8 +321,8 @@ public class MCRSolrIndexer {
     }
 
     /**
-     * Synchronizes the solr server with the database for a given object type.
-     * As a result the solr server contains the same documents as the database.
+     * Synchronizes the solr server with the mycore store for a given object type.
+     * As a result the solr server contains the same documents as the store.
      * All solr zombie documents will be removed, and all not indexed mycore
      * objects will be indexed.
      * 
@@ -330,22 +330,29 @@ public class MCRSolrIndexer {
      * @throws SolrServerException
      */
     public static void synchronizeMetadataIndex(String objectType) throws IOException, SolrServerException {
-        // get ids from db
-        List<String> dbList = MCRXMLMetadataManager.instance().listIDsOfType(objectType);
+        LOGGER.info("synchronize " + objectType);
+        // get ids from store
+        LOGGER.info("fetching mycore store...");
+        List<String> storeList = MCRXMLMetadataManager.instance().listIDsOfType(objectType);
+        LOGGER.info("there are " + storeList.size() + " mycore objects");
         // get ids from solr
+        LOGGER.info("fetching solr...");
         SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
         List<String> solrList = listIDsOfSolrServer(solrServer, objectType);
+        LOGGER.info("there are " + solrList.size() + " solr objects");
 
         // documents to remove
         List<String> toRemove = new ArrayList<>(solrList);
-        toRemove.removeAll(dbList);
+        toRemove.removeAll(storeList);
         if (!toRemove.isEmpty()) {
+            LOGGER.info("remove " + toRemove.size() + " zombie objects from solr");
             solrServer.deleteById(toRemove, 5000);
         }
         // documents to add
-        dbList.removeAll(solrList);
-        if (!dbList.isEmpty()) {
-            rebuildMetadataIndex(dbList);
+        storeList.removeAll(solrList);
+        if (!storeList.isEmpty()) {
+            LOGGER.info("index " + storeList.size() + " mycore objects");
+            rebuildMetadataIndex(storeList);
         }
     }
 
