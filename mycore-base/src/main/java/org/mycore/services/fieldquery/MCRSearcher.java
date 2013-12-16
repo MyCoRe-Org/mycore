@@ -15,11 +15,13 @@
 
 package org.mycore.services.fieldquery;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCREvent;
@@ -199,12 +201,22 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
     protected MCRIndexEntry getEntry(MCRBase base, MCRContent content) {
         MCRIndexEntry entry = null;
         if (content != null) {
-            LOGGER.info("Using event stored content to index: " + base.getId());
+            LOGGER.info("Using event stored content to index: " + base.getId() + " index: " + index);
+            try {
+                content.sendTo(System.out);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             entry = new MCRData2FieldsContent(index, content, base.getId()).buildIndexEntry();
         } else if (base instanceof MCRObject) {
             entry = new MCRData2FieldsObject(index, (MCRObject) base).buildIndexEntry();
         } else if (base instanceof MCRDerivate) {
             entry = new MCRData2FieldsDerivate(index, (MCRDerivate) base).buildIndexEntry();
+        }
+        if (entry.getFieldValues().isEmpty()) {
+            LOGGER.error("Could not generate fields for: " + base.getId());
+            //            throw new MCRConfigurationException("Could not generate fields for: " + base.getId());
         }
         return entry;
     }
@@ -270,7 +282,8 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
      *            later
      * @return the query results
      */
-    public abstract MCRResults search(MCRCondition condition, int maxResults, List<MCRSortBy> sortBy, boolean addSortData);
+    public abstract MCRResults search(MCRCondition condition, int maxResults, List<MCRSortBy> sortBy,
+        boolean addSortData);
 
     /**
      * Adds field values needed for sorting for those hits that do not have sort

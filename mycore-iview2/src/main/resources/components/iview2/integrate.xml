@@ -4,14 +4,6 @@
 	          target: config                      
 	         - - - - - - - - - - - - - - - - - -->
   <target name="config">
-    <mcr:config action="addInclude"
-                propertyfile="${build.config}/mycore.properties"
-                key="MCR.CLI.Classes.Internal"
-                value="org.mycore.iview2.frontend.MCRIView2Commands" />
-    <mcr:config action="addInclude"
-                propertyfile="${build.config}/mycore.properties"
-                key="MCR.URIResolver.xslIncludes.components"
-                value="mcr-module-startIview2.xsl" />
     <AddHibernateMapping class="org.mycore.iview2.services.MCRTileJob" />
   </target>
 </project>

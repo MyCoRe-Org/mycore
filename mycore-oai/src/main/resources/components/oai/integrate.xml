@@ -1,8 +1,0 @@
-<project name="user" xmlns:mcr="antlib:org.mycore.buildtools">
-  <import file="../../integrate.xml" />
-  <!-- - - - - - - - - - - - - - - - - - 
-            target: config                      
-           - - - - - - - - - - - - - - - - - -->
-  <target name="config">
-  </target>
-</project>
