@@ -186,4 +186,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         return null;
     }
 
+    public String toString() {
+        return id.toString();
+    }
 }
