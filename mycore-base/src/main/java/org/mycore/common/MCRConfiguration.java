@@ -33,6 +33,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -364,14 +365,22 @@ public class MCRConfiguration {
                     }
 
                     String ref = value.substring(pos1 + 1, pos2);
-                    String refValue = properties.getProperty(ref, null);
-                    if (refValue == null) {
+                    if (key.equals(ref)) {
+                        String newValue = value.replaceAll(",?\\s*%" + key + "%\\s*,?", "");
+                        String msg = MessageFormat.format("Self refering property found: {0}={1}\nSetting {2}={3}",
+                            key, value, key, newValue);
+                        logWarn(msg, null);
+                        properties.setProperty(key, newValue);
                         continue;
+                    } else {
+                        String refValue = properties.getProperty(ref, null);
+                        if (refValue == null) {
+                            continue;
+                        }
+                        found = true;
+                        value = value.substring(0, pos1) + refValue + value.substring(pos2 + 1);
+                        properties.setProperty(key, value);
                     }
-
-                    found = true;
-                    value = value.substring(0, pos1) + refValue + value.substring(pos2 + 1);
-                    properties.setProperty(key, value);
                 }
             }
         } while (found);
