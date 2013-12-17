@@ -1,9 +1,0 @@
-<project name="user2" xmlns:mcr="antlib:org.mycore.buildtools">
-  <import file="../../integrate.xml" />
-  <!-- - - - - - - - - - - - - - - - - - 
-            target: config                      
-           - - - - - - - - - - - - - - - - - -->
-  <target name="config">
-    <AddHibernateMapping class="org.mycore.user2.MCRUser" />
-  </target>
-</project>
