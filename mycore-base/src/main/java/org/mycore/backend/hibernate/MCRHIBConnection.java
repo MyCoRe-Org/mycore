@@ -29,6 +29,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
@@ -119,8 +120,18 @@ public class MCRHIBConnection implements Closeable {
         } else {
             DIALECT = null;
         }
+        List<String> mappings = MCRConfiguration.instance().getStrings("MCR.Hibernate.Mappings");
+        for (String className : mappings) {
+            String resourceName = getResourceName(className);
+            LOGGER.info("Add mapping: " + resourceName);
+            HIBCFG.addResource(resourceName);
+        }
         serviceRegistry = new ServiceRegistryBuilder().applySettings(HIBCFG.getProperties()).buildServiceRegistry();
         LOGGER.info("Hibernate configured");
+    }
+
+    private String getResourceName(String className) {
+        return className.replaceAll("\\.", "/") + ".hbm.xml";
     }
 
     /**
@@ -301,11 +312,11 @@ public class MCRHIBConnection implements Closeable {
     }
 
     public SessionFactory getSessionFactory() {
-        if(sessionFactory.isClosed()){
+        if (sessionFactory.isClosed()) {
             sessionFactory = null;
             buildSessionFactory();
         }
-        
+
         return sessionFactory;
     }
 

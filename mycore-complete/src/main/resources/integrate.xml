@@ -59,19 +59,14 @@
       </for>
     </sequential>
   </macrodef>
-  <xmlcatalog id="hibernateDTD" classpathref="integration.classpath">
-    <dtd publicid="-//Hibernate/Hibernate Configuration DTD 3.0//EN" location="hibernate-configuration-3.0.dtd"/>
-  </xmlcatalog>
   <macrodef name="AddHibernateMapping">
     <attribute name="class"/>
     <sequential>
       <echo level="info">Adding @{class} to hibernate-configuration</echo>
-      <propertyregex property="@{class}.resource" input="@{class}" regexp="\." replace="/"/>
-      <xmltask source="${build.config}/hibernate.cfg.xml" dest="${build.config}/hibernate.cfg.xml" public="-//Hibernate/Hibernate Configuration DTD 3.0//EN"
-        system="http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
-        <xmlcatalog refid="hibernateDTD"/>
-        <insert path="/hibernate-configuration/session-factory" xml="&lt;mapping resource=&#x22;${@{class}.resource}.hbm.xml&#x22; /&gt;"/>
-      </xmltask>
+      <mcr:config action="addInclude"
+                  propertyfile="${build.config}/mycore.properties"
+                  key="MCR.Hibernate.Mappings"
+                  value="@{class}" />
     </sequential>
   </macrodef>
   
@@ -130,14 +125,6 @@
       </sequential>
     </for>
     <replace file="${build.config}/searchfields.xml" token='xmlns=""' />
-    <for param="table.class"
-      list="MCRACCESS,MCRACCESSRULE,MCRFSNODES,MCRLINKHREF,MCRURN,MCRDELETEDITEMS,MCRDNBTRANSFERRESULTS">
-      <sequential>
-        <AddHibernateMapping class="org.mycore.backend.hibernate.tables.@{table.class}"/>
-      </sequential>
-    </for>
-    <AddHibernateMapping class="org.mycore.datamodel.classifications2.impl.MCRCategoryImpl"/>
-    <AddHibernateMapping class="org.mycore.datamodel.classifications2.impl.MCRCategoryLink"/>
     <componentHook target="config"/>
   </target>
   
