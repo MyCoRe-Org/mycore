@@ -72,6 +72,7 @@ public class MCRServletContextListener implements ServletContextListener {
             e.printStackTrace();
         }
         MCRShutdownHandler.getInstance().isWebAppRunning = true;
+        MCRStartupHandler.startUp();
         LOGGER.info("This class is here: " + getSource(this.getClass()));
         LOGGER.info("I have these components for you: " + MCRRuntimeComponentDetector.getAllComponents());
         LOGGER.info("I have these mycore components for you: " + MCRRuntimeComponentDetector.getMyCoReComponents());

@@ -37,6 +37,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.events.MCRStartupHandler;
 import org.mycore.common.xml.MCRURIResolver;
 
 /**
@@ -81,6 +82,8 @@ public class MCRCommandLineInterface {
         system = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName", "MyCoRe") + ":";
 
         initSession();
+        
+        MCRStartupHandler.startUp();
 
         output("");
         output("Command Line Interface.");
