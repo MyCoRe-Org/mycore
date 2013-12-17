@@ -23,6 +23,7 @@
 
 package org.mycore.backend.hibernate;
 
+import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
 
 /**
@@ -52,7 +53,7 @@ public class MCRHibernateSchemaUpdater implements AutoExecutable {
      */
     @Override
     public void startUp() {
-        MCRHIBCtrlCommands.createTables();
+        new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(false, true);
     }
 
 }
