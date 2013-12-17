@@ -59,16 +59,6 @@
       </for>
     </sequential>
   </macrodef>
-  <macrodef name="AddHibernateMapping">
-    <attribute name="class"/>
-    <sequential>
-      <echo level="info">Adding @{class} to hibernate-configuration</echo>
-      <mcr:config action="addInclude"
-                  propertyfile="${build.config}/mycore.properties"
-                  key="MCR.Hibernate.Mappings"
-                  value="@{class}" />
-    </sequential>
-  </macrodef>
   
   <!-- ================================= 
   target: invoke.cli             
