@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping package="org.mycore.services.handle.hibernate.tables">
-  <class name="MCRHandle" table="mcrhandle">
+  <class name="MCRHandle">
 
     <id name="id" type="long">
       <generator class="identity" />
