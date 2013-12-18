@@ -27,6 +27,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
+import javax.servlet.ServletContext;
+
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 
@@ -55,8 +57,9 @@ public class MCRStartupHandler {
 
         /**
          * This method get executed by {@link MCRStartupHandler#startUp()}
+         * @param servletContext 
          */
-        public void startUp();
+        public void startUp(ServletContext servletContext);
     }
 
     private static class AutoExecutableComparator implements Comparator<AutoExecutable> {
@@ -69,7 +72,7 @@ public class MCRStartupHandler {
 
     }
 
-    public static void startUp() {
+    public static void startUp(ServletContext servletContext) {
         List<String> startupClasses = MCRConfiguration.instance().getStrings("MCR.Startup.Class", null);
         if (startupClasses == null) {
             return;
@@ -85,7 +88,7 @@ public class MCRStartupHandler {
         }
         for (AutoExecutable autoExecutable : autoExecutables) {
             LOGGER.info(autoExecutable.getPriority() + ": Starting " + autoExecutable.getName());
-            autoExecutable.startUp();
+            autoExecutable.startUp(servletContext);
         }
     }
 }

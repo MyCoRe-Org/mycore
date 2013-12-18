@@ -57,6 +57,7 @@ public class MCRServletContextListener implements ServletContextListener {
     private static final Logger LOGGER = Logger.getLogger(MCRServletContextListener.class);
 
     public void contextInitialized(ServletContextEvent sce) {
+        MCRStartupHandler.startUp(sce.getServletContext());
         //Make sure logging is configured
         //initialize MCRURIResolver
         MCRURIResolver.init(sce.getServletContext());
@@ -72,7 +73,6 @@ public class MCRServletContextListener implements ServletContextListener {
             e.printStackTrace();
         }
         MCRShutdownHandler.getInstance().isWebAppRunning = true;
-        MCRStartupHandler.startUp();
         LOGGER.info("This class is here: " + getSource(this.getClass()));
         LOGGER.info("I have these components for you: " + MCRRuntimeComponentDetector.getAllComponents());
         LOGGER.info("I have these mycore components for you: " + MCRRuntimeComponentDetector.getMyCoReComponents());

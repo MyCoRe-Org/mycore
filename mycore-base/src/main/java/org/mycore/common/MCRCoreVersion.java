@@ -29,6 +29,7 @@ import java.net.URL;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.config.MCRConfigurationDir;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -73,6 +74,7 @@ public class MCRCoreVersion {
 
     public static void main(String arg[]) {
         System.out.printf("MyCoRe\tver: %s\trev: %d\n", VERSION, REVISION);
+        System.out.printf("Config directory: %s\n", MCRConfigurationDir.getConfigurationDirectory());
     }
 
     private static int getRevisionFromProperty() {

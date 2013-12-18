@@ -82,8 +82,8 @@ public class MCRCommandLineInterface {
         system = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName", "MyCoRe") + ":";
 
         initSession();
-        
-        MCRStartupHandler.startUp();
+
+        MCRStartupHandler.startUp(null/*no servlet context here*/);
 
         output("");
         output("Command Line Interface.");
@@ -105,7 +105,8 @@ public class MCRCommandLineInterface {
             if (commandQueue.isEmpty()) {
                 if (interactiveMode) {
                     command = prompt.readCommand();
-                } else if (MCRConfiguration.instance().getString("MCR.CommandLineInterface.unitTest", "false").equals("true")) {
+                } else if (MCRConfiguration.instance().getString("MCR.CommandLineInterface.unitTest", "false")
+                    .equals("true")) {
                     break;
                 } else {
                     exit();

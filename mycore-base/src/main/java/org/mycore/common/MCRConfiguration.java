@@ -48,6 +48,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.SimpleLayout;
+import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.config.MCRConfigurationInputStream;
 import org.mycore.common.config.MCRProperties;
 import org.mycore.common.content.MCRContent;
@@ -290,7 +291,7 @@ public class MCRConfiguration {
             properties.clear();
             depr.clear();
         }
-
+        logInfo("Current configuration directory: " + MCRConfigurationDir.getConfigurationDirectory().getAbsolutePath());
         try (MCRConfigurationInputStream in = new MCRConfigurationInputStream()) {
             loadFromContent(new MCRStreamContent(in));
         } catch (IOException e) {
@@ -1177,6 +1178,14 @@ public class MCRConfiguration {
             Logger.getLogger(getClass()).debug(msg);
         } else {
             System.out.printf("DEBUG: %s\n", msg);
+        }
+    }
+
+    private void logInfo(String msg) {
+        if (isLog4JEnabled()) {
+            Logger.getLogger(getClass()).info(msg);
+        } else {
+            System.out.printf("INFO: %s\n", msg);
         }
     }
 

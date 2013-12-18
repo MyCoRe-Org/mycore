@@ -1,6 +1,6 @@
 /*
  * $Id$
- * $Revision: 5697 $ $Date: Dec 17, 2013 $
+ * $Revision: 5697 $ $Date: Dec 18, 2013 $
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -21,25 +21,25 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.backend.hibernate;
+package org.mycore.common.config;
 
 import javax.servlet.ServletContext;
 
-import org.hibernate.tool.hbm2ddl.SchemaUpdate;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
 
 /**
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRHibernateSchemaUpdater implements AutoExecutable {
+public class MCRConfigurationDirSetup implements AutoExecutable {
 
     /* (non-Javadoc)
      * @see org.mycore.common.events.MCRStartupHandler.AutoExecutable#getName()
      */
     @Override
     public String getName() {
-        return "Hibernate schema updater";
+        return "Setup of MCRConfigurationDir";
     }
 
     /* (non-Javadoc)
@@ -47,15 +47,17 @@ public class MCRHibernateSchemaUpdater implements AutoExecutable {
      */
     @Override
     public int getPriority() {
-        return 1000;
+        return Integer.MAX_VALUE - 100;
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.common.events.MCRStartupHandler.AutoExecutable#startUp()
+     * @see org.mycore.common.events.MCRStartupHandler.AutoExecutable#startUp(javax.servlet.ServletContext)
      */
     @Override
     public void startUp(ServletContext servletContext) {
-        new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(false, true);
+        MCRConfigurationDir.setServletContext(servletContext);
+        //TODO: Configure MCRConfiguration here the first time.
+        MCRConfiguration.instance().reload(true);
     }
 
 }
