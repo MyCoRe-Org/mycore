@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
@@ -56,21 +55,21 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyResourceTest {
     public static void setup() {
         System.out.println("\n\n\n");
         System.setProperty("MCR.Configuration.File", "config/test.properties");
-        Properties mcrProperties = MCRConfiguration.instance().getProperties();
-        mcrProperties.setProperty("MCR.Metadata.Type.jpclassi", "true");
-        mcrProperties.setProperty("MCR.Metadata.Store.BaseDir", "/tmp");
-        mcrProperties.setProperty("MCR.Metadata.Store.SVNBase", "/tmp/versions");
-        mcrProperties.setProperty("MCR.IFS2.Store.jportal_jpclassi.ForceXML", "true");
-        mcrProperties.setProperty("MCR.IFS2.Store.jportal_jpclassi.BaseDir", "ram:///tmp");
-        mcrProperties.setProperty("MCR.IFS2.Store.jportal_jpclassi.SlotLayout", "4-2-2");
-        mcrProperties.setProperty("MCR.IFS2.Store.jportal_jpclassi.SVNRepositoryURL", "ram:///tmp");
-        mcrProperties.setProperty("MCR.EventHandler.MCRObject.2.Class",
+        MCRConfiguration mcrProperties = MCRConfiguration.instance();
+        mcrProperties.set("MCR.Metadata.Type.jpclassi", "true");
+        mcrProperties.set("MCR.Metadata.Store.BaseDir", "/tmp");
+        mcrProperties.set("MCR.Metadata.Store.SVNBase", "/tmp/versions");
+        mcrProperties.set("MCR.IFS2.Store.jportal_jpclassi.ForceXML", "true");
+        mcrProperties.set("MCR.IFS2.Store.jportal_jpclassi.BaseDir", "ram:///tmp");
+        mcrProperties.set("MCR.IFS2.Store.jportal_jpclassi.SlotLayout", "4-2-2");
+        mcrProperties.set("MCR.IFS2.Store.jportal_jpclassi.SVNRepositoryURL", "ram:///tmp");
+        mcrProperties.set("MCR.EventHandler.MCRObject.2.Class",
             "org.mycore.datamodel.common.MCRXMLMetadataEventHandler");
-        mcrProperties.setProperty("MCR.Persistence.LinkTable.Store.Class", LinkTableStoreMock.class.getName());
-        mcrProperties.setProperty("MCR.Category.DAO", CategoryDAOMock.class.getName());
-        mcrProperties.setProperty("ClassificationResouce.useSession", "false");
-        mcrProperties.setProperty("MCR.Category.LinkService", CategoryLinkServiceMock.class.getName());
-        mcrProperties.setProperty("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
+        mcrProperties.set("MCR.Persistence.LinkTable.Store.Class", LinkTableStoreMock.class.getName());
+        mcrProperties.set("MCR.Category.DAO", CategoryDAOMock.class.getName());
+        mcrProperties.set("ClassificationResouce.useSession", "false");
+        mcrProperties.set("MCR.Category.LinkService", CategoryLinkServiceMock.class.getName());
+        mcrProperties.set("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
     }
 
     @Before

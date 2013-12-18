@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -48,9 +47,9 @@ public class MCRResourceSecurityTest extends MCRJerseyResourceTest {
 
     @BeforeClass
     public static void init() {
-        Properties mcrProperties = MCRConfiguration.instance().getProperties();
-        mcrProperties.setProperty("McrSessionSecurityFilter.MCRAccessManager.Connector", MyAccessManagerConnector.class.getName());
-        mcrProperties.setProperty("MCR.Persistence.Database.Enable", "false");
+        MCRConfiguration mcrProperties = MCRConfiguration.instance();
+        mcrProperties.set("McrSessionSecurityFilter.MCRAccessManager.Connector", MyAccessManagerConnector.class.getName());
+        mcrProperties.set("MCR.Persistence.Database.Enable", "false");
     }
 
     @Test

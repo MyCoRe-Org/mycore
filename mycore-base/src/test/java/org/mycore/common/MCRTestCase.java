@@ -39,9 +39,9 @@ public class MCRTestCase {
      * 
      * This can be used to test MyCoRe classes without any propties set, using
      * default. You may want to set Properties per TestCase with the
-     * getProperties() method of <code>MCRConfiguration</code>
+     * set() method of <code>MCRConfiguration</code>
      * 
-     * @see MCRConfiguration#getProperties()
+     * @see MCRConfiguration#set(String, String)
      */
     @Before
     public void setUp() throws Exception {
@@ -108,7 +108,7 @@ public class MCRTestCase {
     protected boolean setProperty(String key, String value, boolean overwrite) {
         String propValue = config.getProperties().getProperty(key);
         if (propValue == null || overwrite) {
-            config.getProperties().setProperty(key, value);
+            config.set(key, value);
             return true;
         }
         return false;
