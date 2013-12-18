@@ -342,8 +342,12 @@ public class MCRSolrIndexer {
         LOGGER.info("there are " + solrList.size() + " solr objects");
 
         // documents to remove
-        List<String> toRemove = new ArrayList<>(solrList);
-        toRemove.removeAll(storeList);
+        List<String> toRemove = new ArrayList<>(1000);
+        for (String id : solrList) {
+            if (!storeList.contains(id)) {
+                toRemove.add(id);
+            }
+        }
         if (!toRemove.isEmpty()) {
             LOGGER.info("remove " + toRemove.size() + " zombie objects from solr");
             solrServer.deleteById(toRemove, 5000);
