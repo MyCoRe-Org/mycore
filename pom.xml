@@ -317,7 +317,7 @@
                   <Implementation-Version>${BUILD_TAG}</Implementation-Version>
                   <Implementation-Build>${BUILD_NUMBER}</Implementation-Build>
                   <Implementation-Revision>${SVN_REVISION}</Implementation-Revision>
-                  <POM>META-INF/maven/${groupId}/${artifactId}/pom.properties</POM>
+                  <POM>META-INF/maven/${project.groupId}/${project.artifactId}/pom.properties</POM>
                 </manifestEntries>
               </archive>
             </configuration>
