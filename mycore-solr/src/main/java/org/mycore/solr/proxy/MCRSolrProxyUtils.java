@@ -23,6 +23,7 @@ import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.util.NamedList;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.MCRSolrServerFactory;
@@ -47,7 +48,7 @@ class MCRSolrProxyUtils {
         DefaultHttpClient defaultHttpClient = new DefaultHttpClient(connectionManager);
         defaultHttpClient.setHttpRequestRetryHandler(new MCRSolrRetryHandler(maxConnections));
         String userAgent = MessageFormat.format("MyCoRe/{0} ({1}; java {2})", MCRCoreVersion.getCompleteVersion(),
-            MCRConfiguration.instance().getString("MCR.NameOfProject"), System.getProperty("java.version"));
+            MCRConfiguration.instance().getString("MCR.NameOfProject", "undefined"), System.getProperty("java.version"));
         defaultHttpClient.getParams().setParameter(CoreProtocolPNames.HTTP_CONTENT_CHARSET, "UTF-8")
             .setParameter(CoreProtocolPNames.USER_AGENT, userAgent)
             .setBooleanParameter(CoreConnectionPNames.TCP_NODELAY, true)
