@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.solr.common.util.NamedList;
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.solr.MCRSolrConstants;
 
 /**

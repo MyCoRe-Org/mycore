@@ -30,7 +30,7 @@ import java.util.TreeSet;
 import javax.servlet.ServletContext;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 
 /**
  * Initializes classes that implement {@link AutoExecutable} interface that are defined via <code>MCR.Startup.Class</code> property.

@@ -35,6 +35,7 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.jdom2.Namespace;
 import org.jdom2.xpath.XPathFactory;
+import org.mycore.common.config.MCRConfiguration;
 
 /**
  * This class replaces the deprecated MCRDefaults interface and provides some

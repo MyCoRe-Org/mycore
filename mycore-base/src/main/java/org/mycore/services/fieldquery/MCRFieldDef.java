@@ -34,9 +34,9 @@ import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.services.fieldquery.data2fields.MCRFieldsSelector;
 

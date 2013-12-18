@@ -1,9 +1,9 @@
 package org.mycore.frontend.editor;
 
 import org.mycore.common.MCRCache;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRSessionListener;
 

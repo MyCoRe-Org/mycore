@@ -31,7 +31,7 @@ import org.jdom2.Element;
 import org.jdom2.ProcessingInstruction;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.oai.pmh.dataprovider.OAIAdapter;

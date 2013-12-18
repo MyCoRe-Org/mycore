@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
-import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.xml.sax.SAXException;

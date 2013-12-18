@@ -4,7 +4,7 @@ import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
 
 import java.util.regex.Pattern;
 
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.ifs.MCRFile;
 

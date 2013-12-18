@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $Revision: 5697 $ $Date: Dec 18, 2013 $
+ * 
+ * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -21,28 +21,42 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.common;
+package org.mycore.common.config;
 
+import org.mycore.common.MCRException;
 
 /**
- * @author Thomas Scheffler (yagee)
- * @deprecated use {@link org.mycore.common.config.MCRConfigurationException} instead
+ * Instances of this class represent an exception thrown because of an error in
+ * the MyCoRe configuration. Normally this will be the case when a configuration
+ * property that is required is not set or has an illegal value.
+ * 
+ * @author Jens Kupferschmidt
+ * @author Frank Lützenkirchen
+ * @version $Revision$ $Date$
  */
-@Deprecated
-public class MCRConfigurationException extends org.mycore.common.config.MCRConfigurationException {
+public class MCRConfigurationException extends MCRException {
+    private static final long serialVersionUID = 1L;
 
+    /**
+     * Creates a new MCRConfigurationException with an error message
+     * 
+     * @param message
+     *            the error message for this exception
+     */
     public MCRConfigurationException(String message) {
         super(message);
-        // TODO Auto-generated constructor stub
     }
 
     /**
+     * Creates a new MCRConfigurationException with an error message and a
+     * reference to an exception thrown by an underlying system.
+     * 
      * @param message
-     * @param cause
+     *            the error message for this exception
+     * @param exception
+     *            the exception that was thrown by an underlying system
      */
     public MCRConfigurationException(String message, Throwable cause) {
         super(message, cause);
-        // TODO Auto-generated constructor stub
     }
-
 }

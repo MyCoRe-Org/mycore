@@ -1,6 +1,6 @@
 package org.mycore.datamodel.ifs2;
 
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.ifs2.MCRStore.MCRStoreConfig;
 
 class MCRStoreDefaultConfig implements MCRStoreConfig {

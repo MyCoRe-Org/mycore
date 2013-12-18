@@ -22,9 +22,9 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.util.NamedList;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRCoreVersion;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.MCRSolrServerFactory;
 

@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;

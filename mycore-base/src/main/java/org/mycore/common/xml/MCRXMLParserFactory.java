@@ -26,7 +26,7 @@ package org.mycore.common.xml;
 import org.apache.xerces.parsers.SAXParser;
 import org.jdom2.input.sax.XMLReaderJDOMFactory;
 import org.jdom2.input.sax.XMLReaderSAX2Factory;
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 
 /**
  * Returns validating or non-validating XML parsers.

@@ -29,9 +29,9 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;

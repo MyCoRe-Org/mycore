@@ -26,7 +26,7 @@ package org.mycore.frontend.xeditor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.mycore.common.MCRCache;
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 
 /**
  * @author Frank L\u00FCtzenkirchen

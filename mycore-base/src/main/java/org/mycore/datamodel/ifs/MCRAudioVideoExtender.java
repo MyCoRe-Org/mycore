@@ -32,11 +32,11 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.DecimalFormat;
 
-import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 
 /**
  * For MCRFiles that contain streaming audio/video, instances of this class

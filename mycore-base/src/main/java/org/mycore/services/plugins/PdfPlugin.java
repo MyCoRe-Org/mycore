@@ -37,7 +37,7 @@ import java.util.HashSet;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.ifs.MCRFileContentType;
 import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
 

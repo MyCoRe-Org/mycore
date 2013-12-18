@@ -10,10 +10,10 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRJSONUtils;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.cli.MCRExternalCommandInterface;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;

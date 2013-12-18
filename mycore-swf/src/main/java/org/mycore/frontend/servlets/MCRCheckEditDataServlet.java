@@ -27,8 +27,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRMailer;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 

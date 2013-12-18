@@ -25,7 +25,7 @@ package org.mycore.frontend.servlets;
 
 import java.util.List;
 
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;

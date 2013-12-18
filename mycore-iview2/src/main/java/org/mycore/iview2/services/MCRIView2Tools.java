@@ -40,9 +40,9 @@ import javax.imageio.stream.ImageInputStream;
 
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;

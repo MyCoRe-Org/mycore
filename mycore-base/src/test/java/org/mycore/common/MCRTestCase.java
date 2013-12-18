@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
+import org.mycore.common.config.MCRConfiguration;
 
 public class MCRTestCase {
     protected static final String MCR_CONFIGURATION_FILE = "MCR.Configuration.File";

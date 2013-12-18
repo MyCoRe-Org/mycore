@@ -29,9 +29,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
-import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 
 /**
  * This class implements all methode for handling one object metadata part. This

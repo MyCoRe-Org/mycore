@@ -30,9 +30,9 @@ import java.io.OutputStream;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.datamodel.ifs.MCRContentInputStream;

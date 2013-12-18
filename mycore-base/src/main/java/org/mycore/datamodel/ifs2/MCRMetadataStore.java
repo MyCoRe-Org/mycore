@@ -28,8 +28,8 @@ import java.io.IOException;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
 
 /**

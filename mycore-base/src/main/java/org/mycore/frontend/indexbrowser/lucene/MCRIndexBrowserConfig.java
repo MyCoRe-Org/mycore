@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 
 /**
  * Contains all data of a specified index. The configuration data will be

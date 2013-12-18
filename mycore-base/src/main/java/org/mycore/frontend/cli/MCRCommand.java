@@ -35,7 +35,7 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.lang.ClassUtils;
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.config.MCRConfigurationException;
 
 /**
  * Represents a command understood by the command line interface. A command has

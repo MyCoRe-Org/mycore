@@ -34,8 +34,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.streams.MCRHeaderInputStream;
 import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;

@@ -27,6 +27,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.config.MCRConfiguration;
 
 import com.ibm.icu.text.Normalizer;
 

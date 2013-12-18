@@ -30,8 +30,8 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.streams.MCRBlockingInputStream;
 
 /**

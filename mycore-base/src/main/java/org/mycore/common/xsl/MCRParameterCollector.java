@@ -31,10 +31,10 @@ import javax.servlet.http.HttpSession;
 import javax.xml.transform.Transformer;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 

@@ -23,6 +23,8 @@
 
 package org.mycore.common;
 
+import org.mycore.common.config.MCRConfiguration;
+
 /**
  * A {@link MCRUserInformation} implementation with no roles attached.
  * @author Thomas Scheffler (yagee)

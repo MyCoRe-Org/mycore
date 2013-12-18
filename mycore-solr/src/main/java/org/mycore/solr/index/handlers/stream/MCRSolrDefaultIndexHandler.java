@@ -2,6 +2,7 @@ package org.mycore.solr.index.handlers.stream;
 
 import static org.mycore.solr.MCRSolrConstants.UPDATE_PATH;
 import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -10,7 +11,7 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.common.util.NamedList;
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.solr.index.cs.MCRSolrAbstractContentStream;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;

@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.access.MCRAccessBaseImpl;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.common.MCRXMLMetadataEventHandler;
 import org.mycore.datamodel.metadata.MCRMetadataManager;

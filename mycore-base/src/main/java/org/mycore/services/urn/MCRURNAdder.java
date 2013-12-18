@@ -1,6 +1,7 @@
 package org.mycore.services.urn;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,9 +19,9 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;

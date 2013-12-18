@@ -36,9 +36,9 @@ import org.apache.commons.vfs2.VFS;
 import org.apache.commons.vfs2.provider.local.LocalFile;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.config.MCRConfiguration;
 
 /**
  * A file or directory really stored by importing it from outside the system.

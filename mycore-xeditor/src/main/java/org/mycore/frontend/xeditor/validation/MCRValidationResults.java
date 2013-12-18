@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 
 public class MCRValidationResults {
 

@@ -28,7 +28,7 @@ import java.net.InetAddress;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.config.MCRConfigurationException;
 
 /**
  * This class simply is a container for objects needed during a Servlet session

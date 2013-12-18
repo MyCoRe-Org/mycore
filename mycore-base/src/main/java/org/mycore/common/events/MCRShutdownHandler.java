@@ -22,8 +22,8 @@ import java.util.Set;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.config.MCRConfiguration;
 
 /**
  * is a wrapper for shutdown hooks. When used inside a web application this

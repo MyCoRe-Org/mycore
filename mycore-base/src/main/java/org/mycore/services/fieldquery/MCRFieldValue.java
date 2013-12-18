@@ -24,10 +24,10 @@
 package org.mycore.services.fieldquery;
 
 import org.jdom2.Element;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRNormalizer;
+import org.mycore.common.config.MCRConfigurationException;
 
 /**
  * Represents the value of a field in a query. This can be a value that is part

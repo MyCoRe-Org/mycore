@@ -26,7 +26,7 @@ package org.mycore.common.content.transformer;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
 
 /**

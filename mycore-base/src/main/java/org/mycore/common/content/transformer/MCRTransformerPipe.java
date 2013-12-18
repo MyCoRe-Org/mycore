@@ -29,8 +29,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.xsl.MCRParameterCollector;
 

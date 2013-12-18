@@ -34,7 +34,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 
 /**
  * Resets jobs that took to long to perform action.

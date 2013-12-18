@@ -23,7 +23,7 @@
 
 package org.mycore.services.fieldquery;
 
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 
 /**
  * Executes queries on all configured searchers and returns query results.

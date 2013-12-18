@@ -30,7 +30,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRFileReader;
 import org.mycore.datamodel.ifs.MCROldFile;
 

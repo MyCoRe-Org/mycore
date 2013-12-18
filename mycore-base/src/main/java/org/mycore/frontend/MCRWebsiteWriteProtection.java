@@ -13,8 +13,8 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.DOMOutputter;
 import org.jdom2.output.XMLOutputter;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.config.MCRConfiguration;
 
 public final class MCRWebsiteWriteProtection {
     static final private String FS = System.getProperty("file.separator");

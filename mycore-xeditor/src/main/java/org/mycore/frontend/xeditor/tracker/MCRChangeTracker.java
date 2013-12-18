@@ -6,8 +6,8 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.ProcessingInstruction;
 import org.jdom2.filter.Filters;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration;
 
 public class MCRChangeTracker implements Cloneable {
 

@@ -26,8 +26,8 @@ package org.mycore.wfc;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.wfc.actionmapping.MCRAction;
 import org.mycore.wfc.actionmapping.MCRActionMappings;

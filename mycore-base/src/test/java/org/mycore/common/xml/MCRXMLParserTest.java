@@ -32,8 +32,8 @@ import java.net.URL;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRVFSContent;
 import org.xml.sax.SAXParseException;
 

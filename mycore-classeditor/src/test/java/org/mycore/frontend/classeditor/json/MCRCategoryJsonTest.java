@@ -5,8 +5,8 @@ import java.util.Properties;
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRJSONManager;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 import org.mycore.frontend.classeditor.mocks.CategoryDAOMock;
 

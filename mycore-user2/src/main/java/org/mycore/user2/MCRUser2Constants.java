@@ -23,7 +23,7 @@
 
 package org.mycore.user2;
 
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 /**

@@ -37,7 +37,7 @@ import org.jdom2.JDOMFactory;
 import org.jdom2.Text;
 import org.jdom2.transform.JDOMResult;
 import org.mycore.common.MCRCache;
-import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRXMLContent;

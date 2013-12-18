@@ -29,9 +29,9 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRURIResolver;
 
 /**

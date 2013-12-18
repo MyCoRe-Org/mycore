@@ -29,11 +29,11 @@ import java.util.Collections;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.config.MCRConfiguration;
 
 /**
  * This class is a base implementation of the <code>MCRAccessInterface</code>.

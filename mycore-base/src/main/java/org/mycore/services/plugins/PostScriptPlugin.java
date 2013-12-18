@@ -34,8 +34,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.HashSet;
 
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.ifs.MCRFileContentType;
 import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
 

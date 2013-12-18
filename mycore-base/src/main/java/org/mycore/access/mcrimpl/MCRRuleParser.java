@@ -27,8 +27,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.jdom2.Element;
-import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.parsers.bool.MCRBooleanClauseParser;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRFalseCondition;

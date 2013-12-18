@@ -27,8 +27,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.mycore.common.MCRCache;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.config.MCRConfiguration;
 
 /**
  * The single instance of this class is used by the other IFS classes to create,

@@ -7,7 +7,7 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.oai.pmh.BadResumptionTokenException;
 import org.mycore.oai.pmh.DefaultResumptionToken;
 import org.mycore.oai.pmh.Header;

@@ -25,7 +25,7 @@ package org.mycore.services.fieldquery.data2fields;
 
 import java.io.IOException;
 
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.ifs.MCRFile;
 

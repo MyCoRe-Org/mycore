@@ -35,8 +35,8 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import org.apache.log4j.Logger;
 import org.apache.xalan.trace.TraceManager;
 import org.apache.xml.utils.WrappedRuntimeException;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRExceptionCauseFinder;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xml.MCRURIResolver;
 
 /**

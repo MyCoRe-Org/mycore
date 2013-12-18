@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;

@@ -28,8 +28,8 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfigurationException;
 
 /**
  * Builds an MD5 checksum String while content goes through this input stream.

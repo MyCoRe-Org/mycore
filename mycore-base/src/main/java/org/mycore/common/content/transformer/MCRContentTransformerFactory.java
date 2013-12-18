@@ -25,7 +25,7 @@ package org.mycore.common.content.transformer;
 
 import java.util.HashMap;
 
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 
 /**
  * Creates and returns MCRContentTransformer instances by their ID.

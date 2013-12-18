@@ -33,7 +33,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 import org.purl.sword.base.ChecksumUtils;
 
 /**

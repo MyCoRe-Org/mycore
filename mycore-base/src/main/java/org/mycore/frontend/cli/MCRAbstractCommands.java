@@ -25,7 +25,7 @@ package org.mycore.frontend.cli;
 
 import java.util.ArrayList;
 
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 
 /**
  * This class is an abstract for the implementation of command classes for the

@@ -36,9 +36,9 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.xml.MCRXMLResource;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -55,7 +55,6 @@ import org.mycore.services.fieldquery.data2fields.MCRIndexEntry;
 import org.mycore.services.fieldquery.data2fields.MCRIndexEntryBuilder;
 import org.mycore.services.fieldquery.data2fields.MCRXSLBuilder;
 import org.xml.sax.SAXException;
-
 import org.mycore.frontend.cli.annotation.MCRCommand;
 /**
  * provides static methods to manipulate MCRSearcher indexes.

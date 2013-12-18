@@ -22,7 +22,7 @@
 
 package org.mycore.common.fo;
 
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 
 /**
  * Returns the XSL-FO formatter instance configured via property, for example

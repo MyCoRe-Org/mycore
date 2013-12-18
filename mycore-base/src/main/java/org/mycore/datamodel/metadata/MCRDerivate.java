@@ -35,9 +35,9 @@ import org.jdom2.Element;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.xml.sax.SAXParseException;
 

@@ -24,12 +24,13 @@
 package org.mycore.solr.index.document;
 
 import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.solr.common.SolrInputDocument;
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;

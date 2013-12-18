@@ -11,8 +11,8 @@ import javax.ws.rs.core.Response.Status;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.jersey.MCRJerseyResourceTest;
 import org.mycore.frontend.jersey.filter.MCRAccessManagerConnector;
 import org.mycore.frontend.jersey.filter.MCRSecurityFilterFactory;

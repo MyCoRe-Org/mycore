@@ -23,7 +23,7 @@
 
 package org.mycore.datamodel.metadata.inheritance;
 
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**

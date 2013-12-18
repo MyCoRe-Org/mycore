@@ -25,7 +25,6 @@ package org.mycore.common.config;
 
 import javax.servlet.ServletContext;
 
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
 
 /**

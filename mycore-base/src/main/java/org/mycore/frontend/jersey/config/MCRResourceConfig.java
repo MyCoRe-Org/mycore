@@ -1,6 +1,6 @@
 package org.mycore.frontend.jersey.config;
 
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 
 import com.sun.jersey.api.core.ScanningResourceConfig;
 import com.sun.jersey.core.spi.scanning.PackageNamesScanner;

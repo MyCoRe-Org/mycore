@@ -32,8 +32,8 @@ import javax.xml.bind.util.JAXBResult;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.sax.TransformerHandler;
 
-import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.common.xsl.MCRParameterCollector;

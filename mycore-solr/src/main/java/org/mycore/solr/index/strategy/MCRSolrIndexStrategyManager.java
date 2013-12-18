@@ -2,7 +2,7 @@ package org.mycore.solr.index.strategy;
 
 import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
 
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRFile;
 
 /**

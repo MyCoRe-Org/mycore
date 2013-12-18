@@ -25,8 +25,8 @@ package org.mycore.services.fieldquery;
 
 import org.jdom2.Document;
 import org.mycore.common.MCRCache;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.config.MCRConfiguration;
 
 /**
  * Manages a cache that contains the data of the most recently used queries.

@@ -29,8 +29,8 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.mycore.backend.hibernate.tables.MCRURN;
-import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**

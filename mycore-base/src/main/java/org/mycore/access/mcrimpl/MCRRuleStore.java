@@ -26,7 +26,7 @@ package org.mycore.access.mcrimpl;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 
 /**
  * The purpose of this interface is to make the choice of the persistence layer

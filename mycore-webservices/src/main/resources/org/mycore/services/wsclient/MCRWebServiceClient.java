@@ -32,7 +32,7 @@ import javax.xml.namespace.QName;
 
 import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.parsers.bool.MCRCondition;

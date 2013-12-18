@@ -38,8 +38,8 @@ import java.util.Vector;
 
 import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRNotCondition;

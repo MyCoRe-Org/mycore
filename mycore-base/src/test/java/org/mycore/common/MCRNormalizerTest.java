@@ -27,6 +27,7 @@ package org.mycore.common;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.mycore.common.config.MCRConfiguration;
 
 /**
  * This class is a JUnit test case for org.mycore.common.MCRNormalizer.

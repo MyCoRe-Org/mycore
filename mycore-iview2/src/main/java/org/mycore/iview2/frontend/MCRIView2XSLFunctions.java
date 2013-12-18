@@ -27,7 +27,7 @@ import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 
 import java.util.List;
 
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;

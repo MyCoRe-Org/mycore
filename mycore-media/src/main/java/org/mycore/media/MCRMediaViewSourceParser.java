@@ -34,10 +34,10 @@ import java.net.URLConnection;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.ifs.MCRFileReader;
 import org.mycore.datamodel.ifs.MCROldFile;
 

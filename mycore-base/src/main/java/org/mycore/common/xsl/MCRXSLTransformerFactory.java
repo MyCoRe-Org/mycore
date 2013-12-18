@@ -29,7 +29,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 
 import org.mycore.common.MCRCache;
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 
 /**
  * Returns a Transformer for a given XSL source, providing caching of

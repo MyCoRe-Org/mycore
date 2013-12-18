@@ -30,7 +30,7 @@ import javax.xml.transform.TransformerConfigurationException;
 import org.apache.log4j.Logger;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRCache;
-import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.services.fieldquery.MCRFieldDef;
 
 public class MCRTemplatesFactory {

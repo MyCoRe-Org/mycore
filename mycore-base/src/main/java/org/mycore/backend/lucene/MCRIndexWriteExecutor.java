@@ -42,7 +42,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
-import org.mycore.common.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration;
 
 class MCRIndexWriteExecutor extends ThreadPoolExecutor {
     boolean modifierClosed, firstJob, closeModifierEarly;
