@@ -115,7 +115,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         MCRSolrIndexer.synchronizeMetadataIndex();
     }
 
-    @MCRCommand(syntax = "synchronize metadata index for objecttype {0}", help = "synchronizes the database and solr server", order = 160)
+    @MCRCommand(syntax = "restricted synchronize metadata index for objecttype {0}", help = "synchronizes the mycore store and solr server", order = 160)
     public static void synchronizeMetadataIndex(String objectType) throws Exception {
         MCRSolrIndexer.synchronizeMetadataIndex(objectType);
     }
