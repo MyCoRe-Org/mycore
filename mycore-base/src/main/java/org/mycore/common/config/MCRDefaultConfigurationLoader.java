@@ -47,7 +47,6 @@ public class MCRDefaultConfigurationLoader implements MCRConfigurationLoader {
 
     public MCRDefaultConfigurationLoader() {
         properties = new MCRProperties();
-        logInfo("Current configuration directory: " + MCRConfigurationDir.getConfigurationDirectory().getAbsolutePath());
         try (MCRConfigurationInputStream in = new MCRConfigurationInputStream()) {
             loadFromContent(new MCRStreamContent(in));
         } catch (IOException e) {
@@ -106,14 +105,6 @@ public class MCRDefaultConfigurationLoader implements MCRConfigurationLoader {
             while (st.hasMoreTokens()) {
                 loadFromFile(st.nextToken());
             }
-        }
-    }
-
-    private void logInfo(String msg) {
-        if (MCRConfiguration.isLog4JEnabled()) {
-            Logger.getLogger(getClass()).info(msg);
-        } else {
-            System.out.printf("INFO: %s\n", msg);
         }
     }
 

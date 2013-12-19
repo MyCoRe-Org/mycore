@@ -66,6 +66,8 @@ import javax.servlet.ServletContext;
  */
 public class MCRConfigurationDir {
 
+    public static final String DISABLE_CONFIG_DIR_PROPERTY = "MCR.DisableConfigDir";
+
     private static ServletContext SERVLET_CONTEXT = null;
 
     private static String APP_NAME = null;
@@ -152,6 +154,9 @@ public class MCRConfigurationDir {
     }
 
     public static File getConfigurationDirectory() {
-        return new File(getMyCoReDirectory(), getPrefix() + getAppName());
+        if (!System.getProperties().keySet().contains(DISABLE_CONFIG_DIR_PROPERTY)) {
+            return new File(getMyCoReDirectory(), getPrefix() + getAppName());
+        }
+        return null;
     }
 }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.config.MCRConfigurationLoader;
 import org.mycore.common.config.MCRConfigurationLoaderFactory;
 
@@ -69,6 +71,8 @@ public class MCRTestCase {
         } else {
             System.setProperty(MCR_CONFIGURATION_FILE, oldProperties);
         }
+        MCRConfiguration.instance().initialize(Collections.<String, String> emptyMap(), true);
+        System.getProperties().remove(MCRConfigurationDir.DISABLE_CONFIG_DIR_PROPERTY);
     }
 
     protected Map<String, String> getTestProperties() {
@@ -104,6 +108,7 @@ public class MCRTestCase {
                 throw new FileNotFoundException("File does not exist: " + properties.getAbsolutePath());
             }
         }
+        System.setProperty(MCRConfigurationDir.DISABLE_CONFIG_DIR_PROPERTY, null);
     }
 
     private File getPropertiesFile() throws IOException {

@@ -68,6 +68,10 @@ public class MCRConfigurationInputStream extends SequenceInputStream {
         if (propertyStream != null) {
             cList.add(propertyStream);
         }
+        File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
+        if (configurationDirectory != null) {
+            logInfo("Current configuration directory: " + configurationDirectory.getAbsolutePath());
+        }
         if (cList.isEmpty()) {
             cList.add(new NullInputStream(0));
         }
@@ -95,6 +99,14 @@ public class MCRConfigurationInputStream extends SequenceInputStream {
             }
         }
         return input == null ? null : input.getInputStream();
+    }
+
+    private static void logInfo(String msg) {
+        if (MCRConfiguration.isLog4JEnabled()) {
+            Logger.getLogger(MCRConfigurationInputStream.class).info(msg);
+        } else {
+            System.out.printf("INFO: %s\n", msg);
+        }
     }
 
 }
