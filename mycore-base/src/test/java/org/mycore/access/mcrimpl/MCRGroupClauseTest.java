@@ -6,14 +6,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRTestCase;
 import org.mycore.common.MCRUserInformation;
 
-public class MCRGroupClauseTest {
+public class MCRGroupClauseTest extends MCRTestCase {
 
     private static final String INGROUP_NAME = "ingroup";
 
     @Before
     public void setUp() throws Exception {
+        super.setUp();
         MCRUserInformation userInfo = new MCRUserInformation() {
 
             @Override
@@ -41,7 +43,7 @@ public class MCRGroupClauseTest {
 
     @Test
     public final void testEvaluate() {
-        String outGroup="outgroup";
+        String outGroup = "outgroup";
         MCRGroupClause groupClause = new MCRGroupClause(INGROUP_NAME, false);
         assertTrue("Did not accept " + INGROUP_NAME, groupClause.evaluate(null));
         groupClause = new MCRGroupClause(outGroup, true);

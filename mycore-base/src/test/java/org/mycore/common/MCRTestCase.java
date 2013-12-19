@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
@@ -11,6 +13,8 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationLoader;
+import org.mycore.common.config.MCRConfigurationLoaderFactory;
 
 public class MCRTestCase {
     protected static final String MCR_CONFIGURATION_FILE = "MCR.Configuration.File";
@@ -48,21 +52,10 @@ public class MCRTestCase {
     public void setUp() throws Exception {
         initProperties();
         config = MCRConfiguration.instance();
-        config.reload(true);
-        boolean setProperty = false;
-        if (isDebugEnabled()) {
-            setProperty = setProperty("log4j.rootLogger", "DEBUG, stdout", false) || setProperty;
-        } else {
-            setProperty = setProperty("log4j.rootLogger", "INFO, stdout", false) || setProperty;
-        }
-        setProperty = setProperty("log4j.appender.stdout", "org.apache.log4j.ConsoleAppender", false) || setProperty;
-        setProperty = setProperty("log4j.appender.stdout.layout", "org.apache.log4j.PatternLayout", false)
-            || setProperty;
-        setProperty = setProperty("log4j.appender.stdout.layout.ConversionPattern", "%-5p %c{1} %m%n", true)
-            || setProperty;
-        if (setProperty) {
-            config.configureLogging();
-        }
+        MCRConfigurationLoader configurationLoader = MCRConfigurationLoaderFactory.getConfigurationLoader();
+        HashMap<String, String> testProperties = new HashMap<>(configurationLoader.load());
+        testProperties.putAll(getTestProperties());
+        config.initialize(testProperties, true);
     }
 
     @After
@@ -76,6 +69,19 @@ public class MCRTestCase {
         } else {
             System.setProperty(MCR_CONFIGURATION_FILE, oldProperties);
         }
+    }
+
+    protected Map<String, String> getTestProperties() {
+        HashMap<String, String> props = new HashMap<>();
+        if (isDebugEnabled()) {
+            props.put("log4j.rootLogger", "DEBUG, stdout");
+        } else {
+            props.put("log4j.rootLogger", "INFO, stdout");
+        }
+        props.put("log4j.appender.stdout", "org.apache.log4j.ConsoleAppender");
+        props.put("log4j.appender.stdout.layout", "org.apache.log4j.PatternLayout");
+        props.put("log4j.appender.stdout.layout.ConversionPattern", "%-5p %c{1} %m%n");
+        return props;
     }
 
     /**
@@ -104,15 +110,6 @@ public class MCRTestCase {
         File newFile = junitFolder.newFile("mycore.properties");
         System.out.println("Create new file: " + newFile);
         return newFile;
-    }
-
-    protected boolean setProperty(String key, String value, boolean overwrite) {
-        String propValue = config.getString(key, null);
-        if (propValue == null || overwrite) {
-            config.set(key, value);
-            return true;
-        }
-        return false;
     }
 
     protected boolean isDebugEnabled() {

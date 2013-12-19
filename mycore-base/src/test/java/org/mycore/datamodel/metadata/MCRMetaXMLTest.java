@@ -28,6 +28,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
@@ -39,7 +40,6 @@ import org.jdom2.output.XMLOutputter;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRXMLHelper;
 
 /**
@@ -56,10 +56,6 @@ public class MCRMetaXMLTest extends MCRTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();//org.mycore.datamodel.metadata.MCRMetaXML
-        if (setProperty("log4j.logger.org.mycore.datamodel.metadata", "INFO", false)) {
-            //DEBUG will print a Stacktrace if we test for errors, but that's O.K.
-            MCRConfiguration.instance().configureLogging();
-        }
         if (LOGGER == null) {
             LOGGER = Logger.getLogger(MCRMetaXMLTest.class);
         }
@@ -93,11 +89,18 @@ public class MCRMetaXMLTest extends MCRTestCase {
         try {
             assertTrue(MCRXMLHelper.deepEqual(new Document(imported), new Document(exported)));
         } catch (AssertionError e) {
-            XMLOutputter out=new XMLOutputter(Format.getPrettyFormat());
+            XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
             out.output(imported, System.err);
             out.output(exported, System.err);
             throw e;
         }
+    }
+
+    @Override
+    protected Map<String, String> getTestProperties() {
+        Map<String, String> testProperties = super.getTestProperties();
+        testProperties.put("log4j.logger.org.mycore.datamodel.metadata", "INFO");
+        return testProperties;
     }
 
 }

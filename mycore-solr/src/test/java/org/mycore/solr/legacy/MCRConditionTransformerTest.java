@@ -1,11 +1,10 @@
 package org.mycore.solr.legacy;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.parsers.bool.MCRAndCondition;
@@ -14,14 +13,6 @@ import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.services.fieldquery.MCRQueryCondition;
 
 public class MCRConditionTransformerTest extends MCRTestCase {
-
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
 
     @Test
     public final void testToSolrQueryString() {

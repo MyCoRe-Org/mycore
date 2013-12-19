@@ -79,12 +79,10 @@ public class MCRCommandLineInterface {
      * reads a file containing a list of commands to be processed
      */
     public static void main(String[] args) {
+        MCRStartupHandler.startUp(null/*no servlet context here*/);
         system = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName", "MyCoRe") + ":";
 
         initSession();
-
-        MCRStartupHandler.startUp(null/*no servlet context here*/);
-
         output("");
         output("Command Line Interface.");
         output("");

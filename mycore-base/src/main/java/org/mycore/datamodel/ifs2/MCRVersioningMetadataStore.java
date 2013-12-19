@@ -93,7 +93,7 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
                 repositoryURI.getPort(), repositoryURI.getPath(), true);
             LOGGER.info("repURL: " + repURL);
             File dir = new File(repURL.getPath());
-            if (!dir.exists()) {
+            if (!dir.exists() || (dir.isDirectory() && dir.list().length == 0)) {
                 LOGGER.info("Repository does not exist, creating new SVN repository at " + repositoryURI);
                 repURL = SVNRepositoryFactory.createLocalRepository(dir, true, false);
             }

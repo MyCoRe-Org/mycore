@@ -10,7 +10,9 @@ import org.mycore.frontend.editor.validation.value.MCRXSLConditionValueValidator
 public class MCRXSLConditionValueValidatorTest extends MCRValidatorTest {
 
     @Before
-    public void setup() {
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
         validator = new MCRXSLConditionValueValidator();
     }
 

@@ -15,7 +15,9 @@ import org.mycore.frontend.editor.validation.value.MCRMinLengthValidator;
 public class MCRCombinedElementValidatorTest extends MCRValidatorTest {
 
     @Before
-    public void setup() {
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
         validator = MCRValidatorBuilder.buildPredefinedCombinedElementValidator();
     }
 

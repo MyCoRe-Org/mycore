@@ -31,6 +31,7 @@ import javax.servlet.ServletContext;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationDirSetup;
 
 /**
  * Initializes classes that implement {@link AutoExecutable} interface that are defined via <code>MCR.Startup.Class</code> property.
@@ -73,6 +74,9 @@ public class MCRStartupHandler {
     }
 
     public static void startUp(ServletContext servletContext) {
+        //setup configuration
+        MCRConfigurationDirSetup dirSetup = new MCRConfigurationDirSetup();
+        dirSetup.startUp(servletContext);
         List<String> startupClasses = MCRConfiguration.instance().getStrings("MCR.Startup.Class", null);
         if (startupClasses == null) {
             return;

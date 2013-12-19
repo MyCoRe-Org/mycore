@@ -1,8 +1,8 @@
 package org.mycore.common;
 
 import java.nio.file.Path;
+import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
@@ -21,9 +21,6 @@ public abstract class MCRStoreTestCase extends MCRHibTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        setProperty("MCR.Metadata.Store.BaseDir", storeBaseDir.getRoot().getAbsolutePath(), true);
-        Logger.getLogger(getClass()).info("SVN URI:" + svnBaseDir.getRoot().toURI().toString());
-        setProperty("MCR.Metadata.Store.SVNBase", svnBaseDir.getRoot().toURI().toString(), true);
         store = MCRXMLMetadataManager.instance();
         store.reload();
     }
@@ -38,6 +35,14 @@ public abstract class MCRStoreTestCase extends MCRHibTestCase {
 
     public static MCRXMLMetadataManager getStore() {
         return store;
+    }
+
+    @Override
+    protected Map<String, String> getTestProperties() {
+        Map<String, String> testProperties = super.getTestProperties();
+        testProperties.put("MCR.Metadata.Store.BaseDir", storeBaseDir.getRoot().getAbsolutePath());
+        testProperties.put("MCR.Metadata.Store.SVNBase", svnBaseDir.getRoot().toURI().toString());
+        return testProperties;
     }
 
 }

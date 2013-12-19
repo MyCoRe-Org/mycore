@@ -23,6 +23,8 @@
 
 package org.mycore.user2;
 
+import java.util.Map;
+
 import org.hibernate.cfg.Configuration;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -47,7 +49,6 @@ public class MCRUserTestCase extends MCRHibTestCase {
         MCRCategory groupsCategory = MCRCategoryDAOImplTest.loadClassificationResource("/mcr-roles.xml");
         MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
         DAO.addCategory(null, groupsCategory);
-        setProperty(MCRRealmFactory.REALMS_URI_CFG_KEY, MCRRealmFactory.RESOURCE_REALMS_URI, true);
     }
 
     /* (non-Javadoc)
@@ -63,6 +64,13 @@ public class MCRUserTestCase extends MCRHibTestCase {
             sessionFactory = MCRHIBConnection.instance().getSessionFactory();
         }
         return configuration;
+    }
+
+    @Override
+    protected Map<String, String> getTestProperties() {
+        Map<String, String> testProperties = super.getTestProperties();
+        testProperties.put(MCRRealmFactory.REALMS_URI_CFG_KEY, MCRRealmFactory.RESOURCE_REALMS_URI);
+        return testProperties;
     }
 
 }

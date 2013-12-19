@@ -31,6 +31,7 @@ import static org.junit.Assert.assertNull;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Date;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
@@ -59,11 +60,6 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();//org.mycore.datamodel.metadata.MCRMetaISO8601Date
-        setProperty(MCRISO8601Date.PROPERTY_STRICT_PARSING, "true", true);
-        if (setProperty("log4j.logger.org.mycore.datamodel.metadata.MCRMetaISO8601Date", "INFO", false)) {
-            //DEBUG will print a Stacktrace if we test for errors, but that's O.K.
-            MCRConfiguration.instance().configureLogging();
-        }
         if (LOGGER == null) {
             LOGGER = Logger.getLogger(MCRMetaISO8601DateTest.class);
         }
@@ -155,8 +151,8 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         ts.setFormat((String) null);
         ts.setDate(timeString);
         assertNull("Date is not null", ts.getDate());
-        setProperty("MCR.Metadata.SimpleDateFormat.StrictParsing", "false", true);
-        setProperty("MCR.Metadata.SimpleDateFormat.Locales", "de_DE,en_US", true);
+        MCRConfiguration.instance().set("MCR.Metadata.SimpleDateFormat.StrictParsing", "false");
+        MCRConfiguration.instance().set("MCR.Metadata.SimpleDateFormat.Locales", "de_DE,en_US");
         ts.setFormat((String) null);
         ts.setDate(timeString);
         LOGGER.debug(ts.getISOString());
@@ -164,7 +160,6 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         ts.setDate(timeString);
         LOGGER.debug(ts.getISOString());
         //assertNotNull("Date is null", ts.getDate());
-        setProperty("MCR.Metadata.SimpleDateFormat.StrictParsing", "true", true);
     }
 
     /*
@@ -250,6 +245,15 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         } else {
             return MCRISO8601Format.COMPLETE_HH_MM_SS_SSS.toString();
         }
+    }
+
+    @Override
+    protected Map<String, String> getTestProperties() {
+        Map<String, String> testProperties = super.getTestProperties();
+        testProperties.put(MCRISO8601Date.PROPERTY_STRICT_PARSING, "true");
+        testProperties.put("log4j.logger.org.mycore.datamodel.metadata.MCRMetaISO8601Date", "INFO");
+
+        return testProperties;
     }
 
 }

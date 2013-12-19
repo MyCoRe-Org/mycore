@@ -32,21 +32,20 @@ import org.mycore.common.config.MCRConfiguration;
  */
 public class MCRSystemUserInformation implements MCRUserInformation {
 
-    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
+    private static MCRSystemUserInformation systemInstance = new MCRSystemUserInformation(new UserIdResolver("SYSTEM",
+        null), false);
 
-    private static MCRSystemUserInformation systemInstance = new MCRSystemUserInformation("SYSTEM", false);
+    private static MCRSystemUserInformation guestInstance = new MCRSystemUserInformation(new UserIdResolver("guest",
+        "MCR.Users.Guestuser.UserName"), false);
 
-    private static MCRSystemUserInformation guestInstance = new MCRSystemUserInformation(CONFIG.getString("MCR.Users.Guestuser.UserName",
-        "guest"), false);
-
-    private static MCRSystemUserInformation superUserInstance = new MCRSystemUserInformation(CONFIG.getString(
-        "MCR.Users.Superuser.UserName", "administrator"), true);
+    private static MCRSystemUserInformation superUserInstance = new MCRSystemUserInformation(new UserIdResolver(
+        "administrator", "MCR.Users.Superuser.UserName"), true);
 
     private boolean roleReturn;
 
-    private String userID;
+    private UserIdResolver userID;
 
-    private MCRSystemUserInformation(String userID, boolean roleReturn) {
+    private MCRSystemUserInformation(UserIdResolver userID, boolean roleReturn) {
         this.userID = userID;
         this.roleReturn = roleReturn;
     }
@@ -56,7 +55,7 @@ public class MCRSystemUserInformation implements MCRUserInformation {
      */
     @Override
     public String getUserID() {
-        return userID;
+        return userID.getUserId();
     }
 
     /**
@@ -91,6 +90,24 @@ public class MCRSystemUserInformation implements MCRUserInformation {
      */
     public static MCRSystemUserInformation getSuperUserInstance() {
         return superUserInstance;
+    }
+
+    private static class UserIdResolver {
+        private String userId;
+
+        private String property;
+
+        public UserIdResolver(String userId, String property) {
+            this.userId = userId;
+            this.property = property;
+        }
+
+        public String getUserId() {
+            if (property == null) {
+                return userId;
+            }
+            return MCRConfiguration.instance().getString(property, userId);
+        }
     }
 
 }

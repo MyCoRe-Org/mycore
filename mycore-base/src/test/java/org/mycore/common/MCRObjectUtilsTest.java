@@ -3,11 +3,11 @@ package org.mycore.common;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.access.MCRAccessBaseImpl;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.common.MCRXMLMetadataEventHandler;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -34,10 +34,7 @@ public class MCRObjectUtilsTest extends MCRStoreTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        setProperty("MCR.Persistence.LinkTable.Store.Class", "org.mycore.backend.hibernate.MCRHIBLinkTableStore", true);
-        setProperty("MCR.Access.Class", MCRAccessBaseImpl.class.getName(), true);
         MCREventManager.instance().clear().addEventHandler("MCRObject", new MCRXMLMetadataEventHandler());
-        MCRConfiguration.instance().set("MCR.Metadata.Type.document", true);
         root = new MCRObject();
         root.setId(MCRObjectID.getInstance("test_document_00000001"));
         root.setSchema("noSchema");
@@ -133,6 +130,16 @@ public class MCRObjectUtilsTest extends MCRStoreTestCase {
         MCRMetadataManager.delete(l11);
         MCRMetadataManager.delete(root);
         super.tearDown();
+    }
+
+    @Override
+    protected Map<String, String> getTestProperties() {
+        Map<String, String> testProperties = super.getTestProperties();
+        testProperties
+            .put("MCR.Persistence.LinkTable.Store.Class", "org.mycore.backend.hibernate.MCRHIBLinkTableStore");
+        testProperties.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
+        testProperties.put("MCR.Metadata.Type.document", "true");
+        return testProperties;
     }
 
 }

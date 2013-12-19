@@ -23,18 +23,18 @@
 package org.mycore.mods;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Map;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.xpath.XPath;
-import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
@@ -47,15 +47,6 @@ import org.xml.sax.SAXParseException;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRMODSWrapperTest extends MCRTestCase {
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        setProperty("MCR.Metadata.Type.mods", "true", false);
-    }
 
     /**
      * Test method for {@link org.mycore.mods.MCRMODSWrapper#wrapMODSDocument(org.jdom2.Element, java.lang.String)}.
@@ -101,5 +92,12 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         assertNull(wrapper.getServiceFlag("name"));
         wrapper.setServiceFlag("name", "value");
         assertEquals("value", wrapper.getServiceFlag("name"));
+    }
+
+    @Override
+    protected Map<String, String> getTestProperties() {
+        Map<String, String> testProperties = super.getTestProperties();
+        testProperties.put("MCR.Metadata.Type.mods", "true");
+        return testProperties;
     }
 }

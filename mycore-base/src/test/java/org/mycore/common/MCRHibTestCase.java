@@ -27,6 +27,7 @@ import java.io.PrintStream;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
@@ -77,12 +78,6 @@ public abstract class MCRHibTestCase extends MCRTestCase {
         Logger.getLogger(MCRHibTestCase.class).debug("Setup hibernate");
         hibConnection = MCRHIBConnection.instance();
         sessionFactory = hibConnection.getSessionFactory();
-        boolean setProperty = false;
-        setProperty = setProperty("log4j.logger.org.hibernate", "WARN", false) || setProperty;
-        setProperty = setProperty("log4j.logger.org.hsqldb", "WARN", false) || setProperty;
-        if (setProperty) {
-            config.configureLogging();
-        }
         try {
             Logger.getLogger(MCRHibTestCase.class).debug("Prepare hibernate test", new RuntimeException());
             SchemaExport export = new SchemaExport(getHibernateConfiguration());
@@ -133,6 +128,14 @@ public abstract class MCRHibTestCase extends MCRTestCase {
         beginTransaction();
         // clear from cache
         sessionFactory.getCurrentSession().clear();
+    }
+
+    @Override
+    protected Map<String, String> getTestProperties() {
+        Map<String, String> testProperties = super.getTestProperties();
+        testProperties.put("log4j.logger.org.hibernate", "WARN");
+        testProperties.put("log4j.logger.org.hsqldb", "WARN");
+        return testProperties;
     }
 
 }

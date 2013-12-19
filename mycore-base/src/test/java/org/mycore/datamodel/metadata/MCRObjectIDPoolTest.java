@@ -26,6 +26,8 @@ package org.mycore.datamodel.metadata;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
@@ -42,7 +44,6 @@ public class MCRObjectIDPoolTest extends MCRTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        setProperty("MCR.Metadata.Type.test", Boolean.TRUE.toString(), true);
     }
 
     @Test
@@ -59,5 +60,12 @@ public class MCRObjectIDPoolTest extends MCRTestCase {
         System.runFinalization();
         assertNull("ObjectIDPool should not contain ID anymore.", MCRObjectIDPool.getIfPresent(id));
         assertEquals("ObjectIDPool size is different", before, MCRObjectIDPool.getSize());
+    }
+
+    @Override
+    protected Map<String, String> getTestProperties() {
+        Map<String, String> testProperties = super.getTestProperties();
+        testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
+        return testProperties;
     }
 }

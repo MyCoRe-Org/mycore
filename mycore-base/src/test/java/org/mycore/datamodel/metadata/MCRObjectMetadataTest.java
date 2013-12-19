@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
+import java.util.Map;
 
 import org.jdom2.Document;
 import org.junit.Before;
@@ -56,7 +57,6 @@ public class MCRObjectMetadataTest extends MCRTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        setProperty("MCR.Metadata.DefaultLang", "de", true);
         Document testObjectDocument = loadResourceDocument(TEST_OBJECT_RESOURCE_NAME);
         testMetadata = new MCRObjectMetadata();
         testMetadata.setFromDOM(testObjectDocument.getRootElement().getChild("metadata"));
@@ -75,7 +75,8 @@ public class MCRObjectMetadataTest extends MCRTestCase {
      */
     @Test
     public void getMetadataTagName() {
-        assertEquals("Metadata tag is not 'def.textfield'", "def.textfield", testMetadata.getMetadataElement(0).getTag());
+        assertEquals("Metadata tag is not 'def.textfield'", "def.textfield", testMetadata.getMetadataElement(0)
+            .getTag());
     }
 
     /**
@@ -147,7 +148,8 @@ public class MCRObjectMetadataTest extends MCRTestCase {
      */
     @Test
     public void getMetadataElementString() {
-        assertEquals("did not get correct MCRMetaElement instance", testMetadata.getMetadataElement(0), testMetadata.getMetadataElement("def.textfield"));
+        assertEquals("did not get correct MCRMetaElement instance", testMetadata.getMetadataElement(0),
+            testMetadata.getMetadataElement("def.textfield"));
     }
 
     /**
@@ -155,7 +157,8 @@ public class MCRObjectMetadataTest extends MCRTestCase {
      */
     @Test
     public void getMetadataElementInt() {
-        assertEquals("did not get correct MCRMetaElement instance", testMetadata.getMetadataElement("def.textfield"), testMetadata.getMetadataElement(0));
+        assertEquals("did not get correct MCRMetaElement instance", testMetadata.getMetadataElement("def.textfield"),
+            testMetadata.getMetadataElement(0));
     }
 
     /**
@@ -203,9 +206,17 @@ public class MCRObjectMetadataTest extends MCRTestCase {
         fail("Not yet implemented"); // TODO
     }
 
-    private static Document loadResourceDocument(String resource) throws URISyntaxException, MCRException, SAXParseException, IOException {
+    private static Document loadResourceDocument(String resource) throws URISyntaxException, MCRException,
+        SAXParseException, IOException {
         URL mcrTestUrl = MCRObjectMetadataTest.class.getResource(resource);
         Document xml = MCRXMLParserFactory.getValidatingParser().parseXML(new MCRVFSContent(mcrTestUrl));
         return xml;
+    }
+
+    @Override
+    protected Map<String, String> getTestProperties() {
+        Map<String, String> testProperties = super.getTestProperties();
+        testProperties.put("MCR.Metadata.DefaultLang", "de");
+        return testProperties;
     }
 }

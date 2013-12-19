@@ -25,7 +25,9 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+
 import org.jaxen.JaxenException;
+
 import java.util.HashMap;
 
 import javax.xml.transform.TransformerException;
@@ -33,9 +35,11 @@ import javax.xml.transform.TransformerException;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRTestCase;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -45,7 +49,7 @@ import org.xml.sax.SAXException;
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRXEditorTransformerTest {
+public class MCRXEditorTransformerTest extends MCRTestCase{
 
     private MCREditorSession buildEditorSession(String editedXMLFile) {
         HashMap<String, String[]> parameters = new HashMap<String, String[]>();

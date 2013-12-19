@@ -58,6 +58,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationDirSetup;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.common.xml.MCRXMLFunctions;
@@ -307,7 +308,8 @@ public class MCRServlet extends HttpServlet {
         }
 
         if ("true".equals(req.getParameter("reload.properties"))) {
-            MCRConfiguration.instance().reload(true);
+            MCRConfigurationDirSetup setup = new MCRConfigurationDirSetup();
+            setup.startUp(getServletContext());
         }
 
         if (BASE_URL == null) {

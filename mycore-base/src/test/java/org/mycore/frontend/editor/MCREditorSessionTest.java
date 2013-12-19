@@ -6,8 +6,9 @@ import static org.junit.Assert.*;
 import org.jdom2.Element;
 import org.junit.Test;
 import org.junit.Before;
+import org.mycore.common.MCRTestCase;
 
-public class MCREditorSessionTest {
+public class MCREditorSessionTest extends MCRTestCase{
 
     private static String defaultURL = "http://www.test.de";
 
@@ -16,7 +17,8 @@ public class MCREditorSessionTest {
     private MCRParameters parameters;
 
     @Before
-    public void setup() {
+    public void setUp() throws Exception {
+        super.setUp();
         xml = new Element("editor");
         xml.addContent(new Element("source").setAttribute("uri", "mcrobject:{id}"));
         xml.addContent(new Element("cancel").setAttribute("url", defaultURL));

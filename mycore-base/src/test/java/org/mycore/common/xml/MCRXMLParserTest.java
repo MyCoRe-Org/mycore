@@ -29,11 +29,11 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRVFSContent;
 import org.xml.sax.SAXParseException;
 
@@ -50,13 +50,8 @@ public class MCRXMLParserTest extends MCRTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        super.setProperty("MCR.XMLParser.ValidateSchema", "true", false);
-        boolean setProperty = super.setProperty("log4j.logger.org.mycore.common.xml.MCRParserXerces", "FATAL", false);
         xmlResource = MCRXMLParserTest.class.getResource("/MCRParserXercesTest-valid.xml");
         xmlResourceInvalid = MCRXMLParserTest.class.getResource("/MCRParserXercesTest-invalid.xml");
-        if (setProperty) {
-            MCRConfiguration.instance().configureLogging();
-        }
     }
 
     @Test
@@ -72,5 +67,13 @@ public class MCRXMLParserTest extends MCRTestCase {
     @Test
     public void testValidXML() throws SAXParseException, IOException {
         MCRXMLParserFactory.getValidatingParser().parseXML(new MCRVFSContent(xmlResource));
+    }
+
+    @Override
+    protected Map<String, String> getTestProperties() {
+        Map<String, String> testProperties = super.getTestProperties();
+        testProperties.put("MCR.XMLParser.ValidateSchema", "true");
+        testProperties.put("log4j.logger.org.mycore.common.xml.MCRParserXerces", "FATAL");
+        return testProperties;
     }
 }

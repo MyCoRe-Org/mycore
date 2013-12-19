@@ -23,6 +23,8 @@
 
 package org.mycore.common.config;
 
+import java.util.Map;
+
 import javax.servlet.ServletContext;
 
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
@@ -55,8 +57,9 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
     @Override
     public void startUp(ServletContext servletContext) {
         MCRConfigurationDir.setServletContext(servletContext);
-        //TODO: Configure MCRConfiguration here the first time.
-        MCRConfiguration.instance().reload(true);
+        MCRConfigurationLoader configurationLoader = MCRConfigurationLoaderFactory.getConfigurationLoader();
+        Map<String, String> properties = configurationLoader.load();
+        MCRConfiguration.instance().initialize(properties, true);
     }
 
 }

@@ -3,6 +3,7 @@ package org.mycore.datamodel.metadata;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
+import java.util.Map;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -18,7 +19,6 @@ public class MCRObjectIDTest extends MCRStoreTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        setProperty("MCR.Metadata.Type.test", Boolean.TRUE.toString(), true);
     }
 
     @Test
@@ -30,6 +30,13 @@ public class MCRObjectIDTest extends MCRStoreTestCase {
         getStore().create(id2, new Document(new Element("test")), new Date());
         MCRObjectID id3 = MCRObjectID.getNextFreeId(BASE_ID);
         assertEquals("Second id should be int 3", 3, id3.getNumberAsInteger());
+    }
+
+    @Override
+    protected Map<String, String> getTestProperties() {
+        Map<String, String> testProperties = super.getTestProperties();
+        testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
+        return testProperties;
     }
 
 }

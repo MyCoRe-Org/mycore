@@ -87,6 +87,7 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
 
     @Test
     public void delete() throws Exception {
+        System.out.println("TEST DELETE");
         Document xml1 = new Document(new Element("root"));
         int id = getVersStore().create(new MCRJDOMContent(xml1)).getID();
         assertTrue(getVersStore().exists(id));

@@ -32,15 +32,15 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 import org.apache.log4j.ConsoleAppender;
@@ -50,12 +50,9 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.SimpleLayout;
 import org.mycore.common.MCRException;
-import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRFileContent;
-import org.mycore.common.content.MCRStreamContent;
-import org.mycore.common.content.MCRURLContent;
 
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 
@@ -159,13 +156,13 @@ public class MCRConfiguration {
     public static MCRConfiguration instance() {
         return singleton;
     }
-    
+
     /**
      * Use this method as a default value for {@link #getStrings(String, List)}.
      * @return an empty list of Strings
      * @see Collections#emptyList()
      */
-    public static List<String> emptyList(){
+    public static List<String> emptyList() {
         return Collections.emptyList();
     }
 
@@ -239,7 +236,7 @@ public class MCRConfiguration {
     protected MCRConfiguration() throws IOException {
         properties = new MCRProperties();
         depr = new Properties();
-        reload(true);
+        substituteDeprecatedProperties();
         createLastModifiedFile();
     }
 
@@ -279,54 +276,6 @@ public class MCRConfiguration {
             //allow other users to change this file
             lastModifiedFile.setWritable(true, false);
         }
-    }
-
-    /**
-     * Reloads all properties from the configuration files. If the system
-     * property <CODE>MCR.Configuration.File</CODE> is set, the file specified
-     * in this property will be used as main configuration file, otherwise the
-     * default file <CODE>mycore.properties</CODE> will be read. If the
-     * parameter <CODE>clear</CODE> is <CODE>true</CODE>, all properties
-     * currently set will be deleted first, otherwise the properties read from
-     * the configuration files will be added to the properties currently set and
-     * they will overwrite existing properties with the same name.
-     * 
-     * @param clear
-     *            if true, properties currently set will be deleted first
-     * @throws MCRConfigurationException
-     *             if the config files can not be loaded
-     */
-    public void reload(boolean clear) {
-        if (clear) {
-            properties.clear();
-            depr.clear();
-        }
-        logInfo("Current configuration directory: " + MCRConfigurationDir.getConfigurationDirectory().getAbsolutePath());
-        try (MCRConfigurationInputStream in = new MCRConfigurationInputStream()) {
-            loadFromContent(new MCRStreamContent(in));
-        } catch (IOException e) {
-            throw new MCRConfigurationException("Could not load MyCoRe properties.", e);
-        }
-
-        @SuppressWarnings("unchecked")
-        Enumeration<String> names = (Enumeration<String>) System.getProperties().propertyNames();
-        while (names.hasMoreElements()) {
-            String name = (String) names.nextElement();
-            if (name.startsWith("MCR.")) {
-                String value = System.getProperty(name);
-                if (value != null) {
-                    set(name, value);
-                }
-            }
-        }
-
-        substituteReferences();
-        substituteDeprecatedProperties();
-
-        if (clear) {
-            configureLogging();
-        }
-        debug();
     }
 
     private void debug() {
@@ -426,55 +375,6 @@ public class MCRConfiguration {
                 if (!properties.containsKey(newName)) {
                     properties.put(newName, properties.get(deprecatedName));
                 }
-            }
-        }
-    }
-
-    /**
-     * Loads configuration properties from a specified properties file and adds
-     * them to the properties currently set. This method scans the <CODE>
-     * CLASSPATH</CODE> for the properties file, it may be a plain file, but
-     * may also be located in a zip or jar file. If the properties file contains
-     * a property called <CODE>MCR.Configuration.Include</CODE>, the files
-     * specified in that property will also be read. Multiple include files have
-     * to be separated by spaces or colons.
-     * 
-     * @param filename
-     *            the properties file to be loaded
-     * @throws MCRConfigurationException
-     *             if the file can not be loaded
-     */
-    private void loadFromFile(String filename) {
-        File mycoreProperties = new File(filename);
-        MCRContent input = null;
-        try {
-            if (mycoreProperties.canRead()) {
-                input = new MCRFileContent(mycoreProperties);
-            } else {
-                URL url = this.getClass().getResource("/" + filename);
-                if (url == null) {
-                    throw new MCRConfigurationException("Could not find file or resource:" + filename);
-                }
-                input = new MCRURLContent(url);
-            }
-            loadFromContent(input);
-        } catch (IOException e) {
-            String name = input == null ? filename : input.getSystemId();
-            throw new MCRConfigurationException("Could not load configuration from: " + name, e);
-        }
-    }
-
-    private void loadFromContent(MCRContent input) throws IOException {
-        try (InputStream in = input.getInputStream()) {
-            properties.load(in);
-        }
-        String include = getString("MCR.Configuration.Include", null);
-
-        if (include != null) {
-            StringTokenizer st = new StringTokenizer(include, ", ");
-            set("MCR.Configuration.Include", null);
-            while (st.hasMoreTokens()) {
-                loadFromFile(st.nextToken());
             }
         }
     }
@@ -801,6 +701,7 @@ public class MCRConfiguration {
      * @return the value of the configuration property as a String
      */
     public String getString(String name, String defaultValue) {
+        checkInitialized();
         if (depr.containsKey(name)) {
             String msg = "DEPRECATED: Developer should rename property " + name + " to " + depr.getProperty(name);
             logWarn(msg, null);
@@ -1028,6 +929,28 @@ public class MCRConfiguration {
         }
     }
 
+    public synchronized void initialize(Map<String, String> props, boolean clear) {
+        HashMap<String, String> copy = new HashMap<>(props);
+        copy.remove(null);
+        if (clear) {
+            properties.clear();
+        } else {
+            Map<String, String> nullValues = Maps.filterValues(copy, Predicates.<String> isNull());
+            for (String key : nullValues.keySet()) {
+                properties.remove(key);
+            }
+        }
+        Map<String, String> notNullValues = Maps.filterValues(copy, Predicates.notNull());
+        for (Entry<String, String> entry : notNullValues.entrySet()) {
+            properties.setProperty(entry.getKey(), entry.getValue());
+        }
+        substituteReferences();
+        if (clear) {
+            configureLogging();
+        }
+        debug();
+    }
+
     /**
      * Sets the configuration property with the specified name to a new <CODE>
      * int</CODE> value.
@@ -1166,7 +1089,7 @@ public class MCRConfiguration {
         }
     }
 
-    private boolean isLog4JEnabled() {
+    static boolean isLog4JEnabled() {
         return Logger.getRootLogger() != null && Logger.getRootLogger().getAllAppenders().hasMoreElements();
     }
 
@@ -1178,11 +1101,9 @@ public class MCRConfiguration {
         }
     }
 
-    private void logInfo(String msg) {
-        if (isLog4JEnabled()) {
-            Logger.getLogger(getClass()).info(msg);
-        } else {
-            System.out.printf("INFO: %s\n", msg);
+    private void checkInitialized() {
+        if (properties.isEmpty()) {
+            throw new MCRConfigurationException("MCRConfiguration is still not initialized");
         }
     }
 
