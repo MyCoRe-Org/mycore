@@ -1,4 +1,4 @@
-package org.mycore.services.handle;
+package org.mycore.handle;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -23,7 +23,6 @@ import org.mycore.datamodel.ifs.MCRFileNodeServlet;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.iview2.services.MCRIView2Tools;
-import org.mycore.services.handle.hibernate.tables.MCRHandle;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

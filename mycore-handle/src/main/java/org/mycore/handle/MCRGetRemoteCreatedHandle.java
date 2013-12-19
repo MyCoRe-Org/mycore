@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.mycore.services.handle;
+package org.mycore.handle;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -22,7 +22,6 @@ import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.services.handle.hibernate.tables.MCRHandle;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

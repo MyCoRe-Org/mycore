@@ -1,12 +1,11 @@
 /**
  * 
  */
-package org.mycore.services.handle;
+package org.mycore.handle;
 
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
-import org.mycore.services.handle.hibernate.tables.MCRHandle;
 import org.mycore.services.urn.MCRIConcordanceTable;
 
 

@@ -1,10 +1,9 @@
 /**
  * 
  */
-package org.mycore.services.handle;
+package org.mycore.handle;
 
 import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.services.handle.hibernate.tables.MCRHandle;
 
 
 /**

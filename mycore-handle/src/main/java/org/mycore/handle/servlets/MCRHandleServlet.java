@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.mycore.services.handle.servlets;
+package org.mycore.handle.servlets;
 
 import java.text.MessageFormat;
 
@@ -16,7 +16,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.services.handle.MCRHandleManager;
+import org.mycore.handle.MCRHandleManager;
 
 
 /**

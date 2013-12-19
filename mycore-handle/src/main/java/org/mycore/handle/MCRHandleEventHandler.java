@@ -1,4 +1,4 @@
-package org.mycore.services.handle;
+package org.mycore.handle;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.events.MCREvent;

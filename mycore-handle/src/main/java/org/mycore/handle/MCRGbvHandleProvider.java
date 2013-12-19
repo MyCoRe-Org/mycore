@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.mycore.services.handle;
+package org.mycore.handle;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -15,7 +15,6 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.log4j.Logger;
 import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.services.handle.hibernate.tables.MCRHandle;
 
 import com.google.gson.JsonObject;
 

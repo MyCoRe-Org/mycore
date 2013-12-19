@@ -3,12 +3,12 @@
   metadata-complete="true">
   
   <listener>
-    <listener-class>org.mycore.services.handle.servlets.MCRHandleContextListener</listener-class>
+    <listener-class>org.mycore.handle.servlets.MCRHandleContextListener</listener-class>
   </listener>
 
   <servlet>
     <servlet-name>MCRHandleServlet</servlet-name>
-    <servlet-class>org.mycore.services.handle.servlets.MCRHandleServlet</servlet-class>
+    <servlet-class>org.mycore.handle.servlets.MCRHandleServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>

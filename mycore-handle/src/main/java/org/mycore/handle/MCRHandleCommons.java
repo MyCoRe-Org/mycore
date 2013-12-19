@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.mycore.services.handle;
+package org.mycore.handle;
 
 import java.text.SimpleDateFormat;
 

@@ -1,9 +1,8 @@
 /**
  * 
  */
-package org.mycore.services.handle.hibernate.tables;
+package org.mycore.handle;
 
-import org.mycore.services.handle.MCRIHandleProvider;
 
 /**
  * Class wraps a handle. 

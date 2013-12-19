@@ -1,4 +1,4 @@
-package org.mycore.services.handle;
+package org.mycore.handle;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -15,7 +15,6 @@ import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.services.handle.hibernate.tables.MCRHandle;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
