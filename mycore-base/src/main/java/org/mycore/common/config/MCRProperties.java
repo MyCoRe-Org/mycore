@@ -23,6 +23,7 @@
 
 package org.mycore.common.config;
 
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -30,7 +31,7 @@ import org.apache.log4j.Logger;
 /**
  * Like {@link Properties} but with in-place replacement of properties that want to append a value.
  * 
- * Properties for System.getProperties() have always precedence for Proerties defined here.
+ * Properties for System.getProperties() have always precedence for Properties defined here.
  * 
  * <pre>
  * key=value1
@@ -74,5 +75,13 @@ public class MCRProperties extends Properties {
     public synchronized Object get(Object key) {
         String systemProperty = System.getProperties().getProperty((String) key);
         return systemProperty != null ? systemProperty : super.get(key);
+    }
+
+    Map<String, String> getAsMap() {
+        @SuppressWarnings("rawtypes")
+        Map compileFix = this;
+        @SuppressWarnings("unchecked")
+        Map<String, String> returns = compileFix;
+        return returns;
     }
 }

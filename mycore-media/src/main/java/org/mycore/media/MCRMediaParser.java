@@ -26,8 +26,7 @@ package org.mycore.media;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
@@ -51,16 +50,16 @@ public class MCRMediaParser {
     public MCRMediaParser() {
         if (parsers == null) {
             parsers = new ArrayList<MCRMediaParser>();
-            
-            Properties supportedParsers = config.getProperties("MCR.Media.Parser.");
-            Set<Object> names = supportedParsers.keySet();
-            for (Object name : names) {
+
+            Map<String, String> supportedParsers = config.getPropertiesMap("MCR.Media.Parser.");
+            for (String name : supportedParsers.keySet()) {
                 try {
-                    LOGGER.info("instantiate Parser \"" + config.getString((String) name) + "\"...");
-                    MCRMediaParser parser = config.getInstanceOf((String) name, null, MCRMediaParser.class);
+                    LOGGER.info("instantiate Parser \"" + config.getString(name) + "\"...");
+                    MCRMediaParser parser = config.getInstanceOf(name, (String) null);
                     parsers.add(parser);
                 } catch (Throwable ex) {
-                    LOGGER.warn("Couldn't instantiate Parser \"" + config.getString((String) name) + "\" because " + ex.getMessage() + ".");
+                    LOGGER.warn("Couldn't instantiate Parser \"" + config.getString(name) + "\" because "
+                        + ex.getMessage() + ".");
                 }
             }
         }
@@ -272,8 +271,8 @@ public class MCRMediaParser {
      *              the snapshot
      * @throws Exception
      */
-    public synchronized static byte[] getThumbnail(MCRMediaObject media, long seek, int maxWidth, int maxHeight, boolean keepAspect)
-            throws Exception {
+    public synchronized static byte[] getThumbnail(MCRMediaObject media, long seek, int maxWidth, int maxHeight,
+        boolean keepAspect) throws Exception {
         if (media.hasThumbnailSupport()) {
             byte[] thumb = media.getThumbnail(media, seek, maxWidth, maxHeight, keepAspect);
 

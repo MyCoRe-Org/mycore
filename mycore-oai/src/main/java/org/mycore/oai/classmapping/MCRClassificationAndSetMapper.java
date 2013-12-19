@@ -22,11 +22,11 @@
 
 package org.mycore.oai.classmapping;
 
-import java.util.Properties;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
-
 
 /**
  * This class maps MyCoRe classification names to set names and vice versa
@@ -41,6 +41,7 @@ import org.mycore.common.config.MCRConfigurationException;
  */
 public class MCRClassificationAndSetMapper {
     private static MCRConfiguration config = MCRConfiguration.instance();
+
     private static String PROP_SUFFIX = "MapSetToClassification.";
 
     /**
@@ -49,34 +50,28 @@ public class MCRClassificationAndSetMapper {
      * @param classid - the classification name
      * @return
      */
-    public static String mapClassificationToSet(String prefix, String classid){
-        Properties props = config.getProperties(prefix+PROP_SUFFIX);
-        String result = classid;
-        for(Object key: props.keySet()){
-            if(props.get(key).equals(classid)){
-                String s = key.toString();
-                result = s.substring(s.lastIndexOf(".")+1);
-                break;
+    public static String mapClassificationToSet(String prefix, String classid) {
+        Map<String, String> props = config.getPropertiesMap(prefix + PROP_SUFFIX);
+        for (Entry<String, String> entry : props.entrySet()) {
+            if (entry.getValue().equals(classid)) {
+                return entry.getKey().substring(entry.getKey().lastIndexOf(".") + 1);
             }
         }
-        return result;
+        return classid;
     }
 
-    
     /**
      * maps an OAI set name to a classification name
      * @param prefix - the property prefix for the OAIAdapter
      * @param setid - the set name
      * @return
      */
-    public static String mapSetToClassification(String prefix, String setid){
-        try{
-            return config.getString(prefix+PROP_SUFFIX+setid);
-        }
-        catch(MCRConfigurationException mce){
+    public static String mapSetToClassification(String prefix, String setid) {
+        try {
+            return config.getString(prefix + PROP_SUFFIX + setid);
+        } catch (MCRConfigurationException mce) {
             // use the given value of setid
             return setid;
-
         }
     }
 }

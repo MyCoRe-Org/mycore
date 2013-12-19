@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -142,7 +142,7 @@ public class MCROAISetManager {
                 } finally {
                     try {
                         transaction.commit();
-                    } catch(Exception exc) {
+                    } catch (Exception exc) {
                         LOGGER.error("Error occured while retrieving oai set list", exc);
                         transaction.rollback();
                     }
@@ -157,9 +157,8 @@ public class MCROAISetManager {
     protected void updateURIs() {
         this.setURIs = new ArrayList<String>();
         MCRConfiguration config = MCRConfiguration.instance();
-        Properties setProperties = config.getProperties(this.configPrefix + "Sets.");
-        for (Object o : setProperties.values()) {
-            String value = (String) o;
+        Map<String, String> setProperties = config.getPropertiesMap(this.configPrefix + "Sets.");
+        for (String value : setProperties.values()) {
             if (value.trim().length() > 0) {
                 this.setURIs.add(value);
             }

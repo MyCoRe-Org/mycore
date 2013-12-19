@@ -36,7 +36,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
@@ -110,11 +109,13 @@ public class MCREditorOutValidator {
         input = jdom_in;
         this.id = id;
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("XML before validation:\n" + new String(MCRUtils.getByteArray(input, Format.getPrettyFormat())));
+            LOGGER.debug("XML before validation:\n"
+                + new String(MCRUtils.getByteArray(input, Format.getPrettyFormat())));
         }
         checkObject();
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("XML after validation:\n" + new String(MCRUtils.getByteArray(input, Format.getPrettyFormat())));
+            LOGGER
+                .debug("XML after validation:\n" + new String(MCRUtils.getByteArray(input, Format.getPrettyFormat())));
         }
     }
 
@@ -163,30 +164,34 @@ public class MCREditorOutValidator {
         Map<String, MCREditorMetadataValidator> map = new HashMap<String, MCREditorMetadataValidator>();
         map.put(MCRMetaBoolean.class.getSimpleName(), getObjectCheckInstance(MCRMetaBoolean.class));
         map.put(MCRMetaPersonName.class.getSimpleName(), getObjectCheckWithLangInstance(MCRMetaPersonName.class));
-        map.put(MCRMetaInstitutionName.class.getSimpleName(), getObjectCheckWithLangInstance(MCRMetaInstitutionName.class));
+        map.put(MCRMetaInstitutionName.class.getSimpleName(),
+            getObjectCheckWithLangInstance(MCRMetaInstitutionName.class));
         map.put(MCRMetaAddress.class.getSimpleName(), new MCRMetaAdressCheck());
         map.put(MCRMetaNumber.class.getSimpleName(), getObjectCheckWithLangNotEmptyInstance(MCRMetaNumber.class));
         map.put(MCRMetaLinkID.class.getSimpleName(), getObjectCheckWithLinksInstance(MCRMetaLinkID.class));
         map.put(MCRMetaDerivateLink.class.getSimpleName(), getObjectCheckWithLinksInstance(MCRMetaDerivateLink.class));
         map.put(MCRMetaLink.class.getSimpleName(), getObjectCheckWithLinksInstance(MCRMetaLink.class));
-        map.put(MCRMetaISO8601Date.class.getSimpleName(), getObjectCheckWithLangNotEmptyInstance(MCRMetaISO8601Date.class));
+        map.put(MCRMetaISO8601Date.class.getSimpleName(),
+            getObjectCheckWithLangNotEmptyInstance(MCRMetaISO8601Date.class));
         map.put(MCRMetaLangText.class.getSimpleName(), getObjectCheckWithLangNotEmptyInstance(MCRMetaLangText.class));
         map.put(MCRMetaAccessRule.class.getSimpleName(), getObjectCheckInstance(MCRMetaAccessRule.class));
         map.put(MCRMetaNBN.class.getSimpleName(), getObjectCheckInstance(MCRMetaNBN.class));
         map.put(MCRMetaISBN.class.getSimpleName(), getObjectCheckInstance(MCRMetaISBN.class));
         map.put(MCRMetaClassification.class.getSimpleName(), new MCRMetaClassificationCheck());
         map.put(MCRMetaHistoryDate.class.getSimpleName(), new MCRMetaHistoryDateCheck());
-        Properties props = MCRConfiguration.instance().getProperties(CONFIG_PREFIX + "class.");
-        for (Entry<Object, Object> entry : props.entrySet()) {
+        Map<String, String> props = MCRConfiguration.instance().getPropertiesMap(CONFIG_PREFIX + "class.");
+        for (Entry<String, String> entry : props.entrySet()) {
             try {
-                String className = entry.getKey().toString();
+                String className = entry.getKey();
                 className = className.substring(className.lastIndexOf('.') + 1);
-                LOGGER.info("Adding Validator " + entry.getValue().toString() + " for class " + className);
+                LOGGER.info("Adding Validator " + entry.getValue() + " for class " + className);
                 @SuppressWarnings("unchecked")
-                Class<? extends MCREditorMetadataValidator> cl = (Class<? extends MCREditorMetadataValidator>) Class.forName(entry.getValue().toString());
+                Class<? extends MCREditorMetadataValidator> cl = (Class<? extends MCREditorMetadataValidator>) Class
+                    .forName(entry.getValue());
                 map.put(className, cl.newInstance());
             } catch (Exception e) {
-                final String msg = "Cannot instantiate " + entry.getValue() + " as validator for class " + entry.getKey();
+                final String msg = "Cannot instantiate " + entry.getValue() + " as validator for class "
+                    + entry.getKey();
                 LOGGER.error(msg);
                 throw new MCRException(msg, e);
             }
@@ -204,7 +209,8 @@ public class MCREditorOutValidator {
         return clazz;
     }
 
-    public static String checkMetaObject(Element datasubtag, Class<? extends MCRMetaInterface> metaClass, boolean keepLang) {
+    public static String checkMetaObject(Element datasubtag, Class<? extends MCRMetaInterface> metaClass,
+        boolean keepLang) {
         if (!keepLang) {
             datasubtag.removeAttribute("lang", XML_NAMESPACE);
         }
@@ -239,7 +245,8 @@ public class MCREditorOutValidator {
     }
 
     public static String checkMetaObjectWithLinks(Element datasubtag, Class<? extends MCRMetaInterface> metaClass) {
-        if (datasubtag.getAttributeValue("href") == null && datasubtag.getAttributeValue("href", XLINK_NAMESPACE) == null) {
+        if (datasubtag.getAttributeValue("href") == null
+            && datasubtag.getAttributeValue("href", XLINK_NAMESPACE) == null) {
             return datasubtag.getName() + " has no href attribute defined";
         }
         if (datasubtag.getAttribute("xtype") != null) {
@@ -281,7 +288,8 @@ public class MCREditorOutValidator {
         };
     }
 
-    static MCREditorMetadataValidator getObjectCheckWithLangNotEmptyInstance(final Class<? extends MCRMetaInterface> clazz) {
+    static MCREditorMetadataValidator getObjectCheckWithLangNotEmptyInstance(
+        final Class<? extends MCRMetaInterface> clazz) {
         return new MCREditorMetadataValidator() {
             public String checkDataSubTag(Element datasubtag) {
                 return MCREditorOutValidator.checkMetaObjectWithLangNotEmpty(datasubtag, clazz);
@@ -391,7 +399,8 @@ public class MCREditorOutValidator {
             if (validator != null) {
                 returns = validator.checkDataSubTag(datasubtag);
             } else {
-                LOGGER.warn("Tag <" + datatag.getName() + "> of type " + mcrclass + " has no validator defined, fallback to default behaviour");
+                LOGGER.warn("Tag <" + datatag.getName() + "> of type " + mcrclass
+                    + " has no validator defined, fallback to default behaviour");
                 // try to create MCRMetaInterface instance
                 try {
                     Class<? extends MCRMetaInterface> metaClass = getClass(mcrclass);
@@ -454,7 +463,8 @@ public class MCREditorOutValidator {
         if (aclxml == null) {
             aclxml = MCREditorOutValidator.class.getResourceAsStream(resourcetype);
             if (aclxml == null) {
-                LOGGER.warn("Can't find default object ACL file " + resourcebase.substring(1) + " or " + resourcetype.substring(1));
+                LOGGER.warn("Can't find default object ACL file " + resourcebase.substring(1) + " or "
+                    + resourcetype.substring(1));
                 String resource = "/editor_default_acls.xml"; // fallback
                 aclxml = MCREditorOutValidator.class.getResourceAsStream(resource);
                 if (aclxml == null) {
@@ -496,7 +506,8 @@ public class MCREditorOutValidator {
                         if (thisgroup != null) {
                             firstcond.setAttribute("value", thisgroup);
                         } else {
-                            throw new MCRException("Could not aquire primary group for user " + userInformation.getUserID());
+                            throw new MCRException("Could not aquire primary group for user "
+                                + userInformation.getUserID());
                         }
                         continue;
                     }

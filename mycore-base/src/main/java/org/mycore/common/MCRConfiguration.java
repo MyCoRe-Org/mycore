@@ -24,6 +24,8 @@
 package org.mycore.common;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.Properties;
 
 import org.mycore.common.config.MCRConfigurationException;
 
@@ -58,5 +60,19 @@ public class MCRConfiguration extends org.mycore.common.config.MCRConfiguration 
             throw new MCRConfigurationException("Could not instantiate MCRConfiguration.", e);
         }
         singleton.systemModified();
+    }
+
+    public Properties getProperties() {
+        return toProperties(getPropertiesMap());
+    }
+
+    private Properties toProperties(Map<String, String> propertiesMap) {
+        Properties props = new Properties();
+        props.putAll(propertiesMap);
+        return props;
+    }
+
+    public Properties getProperties(String startsWith) {
+        return toProperties(getPropertiesMap(startsWith));
     }
 }

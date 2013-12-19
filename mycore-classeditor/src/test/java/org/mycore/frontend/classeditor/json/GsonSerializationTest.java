@@ -1,7 +1,6 @@
 package org.mycore.frontend.classeditor.json;
 
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 
 import org.junit.Before;
@@ -16,8 +15,8 @@ public class GsonSerializationTest {
     @Before
     public void init() {
         System.setProperty("MCR.Configuration.File", "config/test.properties");
-        Properties mcrProperties = MCRConfiguration.instance().getProperties();
-        mcrProperties.setProperty("MCR.Category.DAO", CategoryDAOMock.class.getName());
+        MCRConfiguration mcrProperties = MCRConfiguration.instance();
+        mcrProperties.set("MCR.Category.DAO", CategoryDAOMock.class.getName());
     }
 
     protected MCRCategoryImpl createCateg(String rootID, String id2, String text) {

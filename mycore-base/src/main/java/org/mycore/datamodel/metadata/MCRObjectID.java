@@ -27,9 +27,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
@@ -71,15 +71,12 @@ public final class MCRObjectID {
     private static HashSet<String> VALID_TYPE_LIST;
     static {
         VALID_TYPE_LIST = new HashSet<String>();
-        Properties properties = CONFIG.getProperties("MCR.Metadata.Type");
-        Iterator<Object> iterator = properties.keySet().iterator();
-        while (iterator.hasNext()) {
-            String key = iterator.next().toString();
-            String property = properties.getProperty(key);
-            if (property == null || !("true".equalsIgnoreCase(property))) {
+        Map<String, String> properties = CONFIG.getPropertiesMap("MCR.Metadata.Type");
+        for (Entry<String, String> prop : properties.entrySet()) {
+            if (!prop.getValue().equalsIgnoreCase("true")) {
                 continue;
             }
-            VALID_TYPE_LIST.add(key.substring(key.lastIndexOf(".") + 1).trim());
+            VALID_TYPE_LIST.add(prop.getKey().substring(prop.getKey().lastIndexOf('.') + 1).trim());
         }
     }
 
@@ -110,7 +107,8 @@ public final class MCRObjectID {
 
         @Override
         public DecimalFormat numberFormat() {
-            String numberPattern = MCRConfiguration.instance().getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000");
+            String numberPattern = MCRConfiguration.instance().getString("MCR.Metadata.ObjectID.NumberPattern",
+                "0000000000");
             return new DecimalFormat(numberPattern);
         }
 
@@ -124,7 +122,8 @@ public final class MCRObjectID {
      */
     MCRObjectID(String id) throws MCRException {
         if (!setID(id)) {
-            throw new MCRException("The ID is not valid: " + id + " , it should match the pattern String_String_Integer");
+            throw new MCRException("The ID is not valid: " + id
+                + " , it should match the pattern String_String_Integer");
         }
     }
 
@@ -368,7 +367,8 @@ public final class MCRObjectID {
         objectType = idParts[1].toLowerCase().intern();
 
         if (!CONFIG.getBoolean("MCR.Metadata.Type." + objectType, false)) {
-            LOGGER.warn("Property MCR.Metadata.Type." + objectType + " is not set. Thus " + id + " cannot be a valid id");
+            LOGGER.warn("Property MCR.Metadata.Type." + objectType + " is not set. Thus " + id
+                + " cannot be a valid id");
             return false;
         }
 

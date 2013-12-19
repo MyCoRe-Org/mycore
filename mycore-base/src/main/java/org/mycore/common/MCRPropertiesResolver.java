@@ -1,6 +1,8 @@
 package org.mycore.common;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
@@ -22,9 +24,13 @@ public class MCRPropertiesResolver extends MCRTextResolver {
         super(properties);
     }
 
+    public MCRPropertiesResolver(Map<String, String> variablesMap) {
+        super(variablesMap);
+    }
+
     @Override
-    protected void registerDefaultTerms() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException,
-            InstantiationException {
+    protected void registerDefaultTerms() throws NoSuchMethodException, InvocationTargetException,
+        IllegalAccessException, InstantiationException {
         registerTerm(Property.class);
     }
 
@@ -62,4 +68,20 @@ public class MCRPropertiesResolver extends MCRTextResolver {
         return resolvedProperties;
     }
 
+    /**
+     * Substitute all %references% of the given <code>Map</code> and
+     * return a new <code>Map</code> object.
+     * 
+     * @param toResolve properties to resolve
+     * @return resolved properties
+     */
+    public Map<String,String> resolveAll(Map<String, String> toResolve){
+        Map<String, String> resolvedMap=new HashMap<>();
+        for (Entry<String, String> entrySet : toResolve.entrySet()) {
+            String key = entrySet.getKey();
+            String value = entrySet.getValue();
+            resolvedMap.put(key, this.resolve(value));
+        }
+        return resolvedMap;
+    }
 }

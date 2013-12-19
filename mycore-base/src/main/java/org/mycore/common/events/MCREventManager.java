@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
@@ -117,7 +117,7 @@ public class MCREventManager {
 
         String prefix = "MCR.EventHandler.";
 
-        Properties props = config.getProperties(prefix);
+        Map<String, String> props = config.getPropertiesMap(prefix);
 
         if (props == null) {
             return;

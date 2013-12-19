@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -72,9 +72,9 @@ public class MCRCommandManager {
     /** Read internal and/or external commands */
     protected void initConfiguredCommands(String type) {
         String prefix = "MCR.CLI.Classes." + type;
-        Properties p = MCRConfiguration.instance().getProperties(prefix);
-        for (Object propertyName : p.keySet()) {
-            String[] classNames = MCRConfiguration.instance().getString((String) propertyName, "").split(",");
+        Map<String, String> p = MCRConfiguration.instance().getPropertiesMap(prefix);
+        for (String propertyName : p.keySet()) {
+            List<String> classNames = MCRConfiguration.instance().getStrings(propertyName, MCRConfiguration.emptyList());
 
             for (String className : classNames) {
                 className = className.trim();

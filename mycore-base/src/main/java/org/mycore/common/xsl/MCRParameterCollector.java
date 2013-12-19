@@ -184,8 +184,8 @@ public class MCRParameterCollector {
      * Copies all MCRConfiguration properties as XSL parameters.
      */
     private void setFromConfiguration() {
-        for (Map.Entry<Object, Object> property : MCRConfiguration.instance().getProperties().entrySet()) {
-            parameters.put(property.getKey().toString(), property.getValue().toString());
+        for (Map.Entry<String, String> property : MCRConfiguration.instance().getPropertiesMap().entrySet()) {
+            parameters.put(property.getKey(), property.getValue());
         }
     }
 
@@ -194,8 +194,7 @@ public class MCRParameterCollector {
      * others will be ignored. The "XSL." prefix is cut off from the name.
      */
     private void setFromSession(HttpSession session) {
-        for (@SuppressWarnings("unchecked")
-        Enumeration<String> e = session.getAttributeNames(); e.hasMoreElements();) {
+        for (Enumeration<String> e = session.getAttributeNames(); e.hasMoreElements();) {
             String name = e.nextElement();
             setXSLParameter(name, session.getAttribute(name).toString());
         }
@@ -219,8 +218,7 @@ public class MCRParameterCollector {
      * others will be ignored. The "XSL." prefix is cut off from the name.
      */
     private void setFromRequestParameters(HttpServletRequest request) {
-        for (@SuppressWarnings("unchecked")
-        Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
+        for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
             String name = e.nextElement();
             if (!(name.endsWith(".SESSION")))
                 setXSLParameter(name, request.getParameter(name));
@@ -232,8 +230,7 @@ public class MCRParameterCollector {
      * others will be ignored. The "XSL." prefix is cut off from the name.
      */
     private void setFromRequestAttributes(HttpServletRequest request) {
-        for (@SuppressWarnings("unchecked")
-        Enumeration<String> e = request.getAttributeNames(); e.hasMoreElements();) {
+        for (Enumeration<String> e = request.getAttributeNames(); e.hasMoreElements();) {
             String name = e.nextElement();
             if (!(name.endsWith(".SESSION"))) {
                 final Object attributeValue = request.getAttribute(name);
@@ -266,7 +263,8 @@ public class MCRParameterCollector {
         parameters.put("WebApplicationBaseURL", MCRServlet.getBaseURL());
         parameters.put("ServletsBaseURL", MCRServlet.getServletBaseURL());
 
-        String defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
+        String defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang",
+            MCRConstants.DEFAULT_LANG);
         parameters.put("DefaultLang", defaultLang);
     }
 

@@ -20,8 +20,8 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.hibernate.CacheMode;
@@ -45,6 +45,7 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRSearcher;
@@ -55,7 +56,6 @@ import org.mycore.services.fieldquery.data2fields.MCRIndexEntry;
 import org.mycore.services.fieldquery.data2fields.MCRIndexEntryBuilder;
 import org.mycore.services.fieldquery.data2fields.MCRXSLBuilder;
 import org.xml.sax.SAXException;
-import org.mycore.frontend.cli.annotation.MCRCommand;
 /**
  * provides static methods to manipulate MCRSearcher indexes.
  * 
@@ -123,11 +123,11 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
         }
 
         private List<String> getIndexes() {
-            Properties searcherProps = MCRConfiguration.instance().getProperties(SEARCHER_PROPERTY_START);
+            Map<String, String> searcherProps = MCRConfiguration.instance().getPropertiesMap(SEARCHER_PROPERTY_START);
             List<String> luceneIndexes = new ArrayList<String>(2);
-            for (Entry<Object, Object> property : searcherProps.entrySet()) {
-                if (property.getKey().toString().endsWith(SEARCHER_CLASS_SUFFIX)) {
-                    luceneIndexes.add(property.getKey().toString().split("\\.")[2]);
+            for (Entry<String, String> property : searcherProps.entrySet()) {
+                if (property.getKey().endsWith(SEARCHER_CLASS_SUFFIX)) {
+                    luceneIndexes.add(property.getKey().split("\\.")[2]);
                 }
             }
             LOGGER.info("Found MCRSearcher indexes: " + luceneIndexes);

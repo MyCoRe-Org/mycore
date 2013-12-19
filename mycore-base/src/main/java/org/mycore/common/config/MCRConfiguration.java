@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
@@ -54,7 +55,9 @@ import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.MCRURLContent;
 
+import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
+import com.google.common.collect.Maps;
 
 /**
  * Provides methods to manage and read all configuration properties from the
@@ -132,6 +135,17 @@ public class MCRConfiguration {
 
     private static Splitter PROPERTY_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
 
+    /**
+     * The properties instance that stores the values that have been read from
+     * every configuration file
+     */
+    protected MCRProperties properties;
+
+    /**
+     * List of deprecated properties with their new name
+     */
+    protected Properties depr;
+
     static {
         createSingleton();
     }
@@ -144,6 +158,15 @@ public class MCRConfiguration {
      */
     public static MCRConfiguration instance() {
         return singleton;
+    }
+    
+    /**
+     * Use this method as a default value for {@link #getStrings(String, List)}.
+     * @return an empty list of Strings
+     * @see Collections#emptyList()
+     */
+    public static List<String> emptyList(){
+        return Collections.emptyList();
     }
 
     /**
@@ -208,17 +231,6 @@ public class MCRConfiguration {
             }
         }
     }
-
-    /**
-     * The properties instance that stores the values that have been read from
-     * every configuration file
-     */
-    protected MCRProperties properties;
-
-    /**
-     * List of deprecated properties with their new name
-     */
-    protected Properties depr;
 
     /**
      * Protected constructor to create the singleton instance
@@ -467,13 +479,8 @@ public class MCRConfiguration {
         }
     }
 
-    /**
-     * Returns all the properties
-     * 
-     * @return the list of properties
-     */
-    public Properties getProperties() {
-        return properties;
+    public Map<String, String> getPropertiesMap() {
+        return Collections.unmodifiableMap(properties.getAsMap());
     }
 
     /**
@@ -483,22 +490,14 @@ public class MCRConfiguration {
      *            the string all the returned properties start with
      * @return the list of properties
      */
-    public Properties getProperties(String startsWith) {
-        Properties properties = new Properties();
-
-        @SuppressWarnings("unchecked")
-        Enumeration<String> names = (Enumeration<String>) this.properties.propertyNames();
-
-        while (names.hasMoreElements()) {
-            String name = (String) names.nextElement();
-
-            if (name.startsWith(startsWith)) {
-                String value = this.properties.getProperty(name);
-                properties.setProperty(name, value);
+    public Map<String, String> getPropertiesMap(final String startsWith) {
+        Predicate<String> keyPredicate = new Predicate<String>() {
+            @Override
+            public boolean apply(String key) {
+                return key.startsWith(startsWith);
             }
-        }
-
-        return properties;
+        };
+        return Maps.filterKeys(getPropertiesMap(), keyPredicate);
     }
 
     /**

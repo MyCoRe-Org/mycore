@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Properties;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Namespace;
@@ -101,9 +101,11 @@ public final class MCRConstants {
 
     public static final Namespace INFO_SRW_NAMESPACE = Namespace.getNamespace("info", "info:srw/schema/5/picaXML-v1.0");
 
-    public static final Namespace DIAG_NAMESPACE = Namespace.getNamespace("diag", "http://www.loc.gov/zing/srw/diagnostic");
+    public static final Namespace DIAG_NAMESPACE = Namespace.getNamespace("diag",
+        "http://www.loc.gov/zing/srw/diagnostic");
 
-    public static final Namespace EPICURLITE_NAMESPACE = Namespace.getNamespace("epicurlite", "http://nbn-resolving.org/epicurlite");
+    public static final Namespace EPICURLITE_NAMESPACE = Namespace.getNamespace("epicurlite",
+        "http://nbn-resolving.org/epicurlite");
 
     /** The URL of the MCR */
     private final static String MCR_URL = "http://www.mycore.org/";
@@ -129,15 +131,15 @@ public final class MCRConstants {
                     namespaces.add(namespace);
                     namespacesByPrefix.put(namespace.getPrefix(), namespace);
                 } catch (Exception e) {
-                    Logger.getLogger(MCRConstants.class).error("Error while initialising Namespace list and HashMap", e);
+                    Logger.getLogger(MCRConstants.class)
+                        .error("Error while initialising Namespace list and HashMap", e);
                 }
             }
         }
 
-        Properties p = MCRConfiguration.instance().getProperties("MCR.Namespace");
-        for (Object element : p.keySet()) {
-            String prefix = (String) element;
-            String uri = p.getProperty(prefix);
+        Map<String, String> p = MCRConfiguration.instance().getPropertiesMap("MCR.Namespace");
+        for (String prefix : p.keySet()) {
+            String uri = p.get(prefix);
             prefix = prefix.substring(prefix.lastIndexOf(".") + 1);
             Namespace ns = Namespace.getNamespace(prefix, uri);
             namespacesByPrefix.put(prefix, ns);

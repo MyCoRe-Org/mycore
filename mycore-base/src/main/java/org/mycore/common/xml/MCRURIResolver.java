@@ -35,7 +35,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -436,17 +435,17 @@ public final class MCRURIResolver implements URIResolver {
         }
 
         public Map<String, URIResolver> getURIResolverMapping() {
-            Properties props = MCRConfiguration.instance().getProperties(CONFIG_PREFIX + "ModuleResolver.");
+            Map<String, String> props = MCRConfiguration.instance().getPropertiesMap(CONFIG_PREFIX + "ModuleResolver.");
             if (props.isEmpty()) {
                 return new HashMap<String, URIResolver>();
             }
             Map<String, URIResolver> map = new HashMap<String, URIResolver>();
-            for (Entry<Object, Object> entry : props.entrySet()) {
+            for (Entry<String, String> entry : props.entrySet()) {
                 try {
-                    String scheme = entry.getKey().toString();
+                    String scheme = entry.getKey();
                     scheme = scheme.substring(scheme.lastIndexOf('.') + 1);
-                    LOGGER.debug("Adding Resolver " + entry.getValue().toString() + " for URI scheme " + scheme);
-                    Object newInstance = MCRConfiguration.instance().getInstanceOf(entry.getKey().toString());
+                    LOGGER.debug("Adding Resolver " + entry.getValue() + " for URI scheme " + scheme);
+                    Object newInstance = MCRConfiguration.instance().getInstanceOf(entry.getKey());
                     if (newInstance instanceof URIResolver) {
                         map.put(scheme, (URIResolver) newInstance);
                     } else {

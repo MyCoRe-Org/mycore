@@ -23,9 +23,9 @@
 
 package org.mycore.services.fieldquery;
 
-import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Properties;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
@@ -91,12 +91,10 @@ public class MCRSearcherFactory {
         String prefix = "MCR.Searcher.";
         String suffix = ".Index";
 
-        Properties props = MCRConfiguration.instance().getProperties(prefix);
-        Enumeration names = props.keys();
-        while (names.hasMoreElements()) {
-            String name = (String) names.nextElement();
-            if (name.endsWith(suffix) && MCRConfiguration.instance().getString(name).equals(indexID)) {
-                String searcherID = name.substring(prefix.length(), name.indexOf(suffix));
+        Map<String, String> props = MCRConfiguration.instance().getPropertiesMap(prefix);
+        for (Entry<String, String> entry : props.entrySet()) {
+            if (entry.getKey().endsWith(suffix) && entry.getValue().equals(indexID)) {
+                String searcherID = entry.getKey().substring(prefix.length(), entry.getKey().indexOf(suffix));
                 return getSearcher(searcherID);
             }
         }

@@ -22,9 +22,7 @@
 package org.mycore.oai;
 
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -32,21 +30,12 @@ import org.hibernate.criterion.Projections;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRDELETEDITEMS;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.oai.pmh.DateUtils;
 import org.mycore.oai.pmh.FriendsDescription;
 import org.mycore.oai.pmh.Granularity;
 import org.mycore.oai.pmh.Identify;
 import org.mycore.oai.pmh.OAIIdentifierDescription;
 import org.mycore.oai.pmh.SimpleIdentify;
-import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.services.fieldquery.MCRQuery;
-import org.mycore.services.fieldquery.MCRQueryManager;
-import org.mycore.services.fieldquery.MCRResults;
-import org.mycore.services.fieldquery.MCRSortBy;
 
 /**
  * Simple MyCoRe implementation of a OAI-PMH {@link Identify} class. Uses the {@link MCRConfiguration} to retrieve all important settings. Earliest date stamp
@@ -72,7 +61,8 @@ public class MCROAIIdentify extends SimpleIdentify {
         String sDelRecPol = this.config.getString(configPrefix + "DeletedRecord", "transient");
         this.setDeletedRecordPolicy(DeletedRecordPolicy.get(sDelRecPol));
         this.setGranularity(Granularity.YYYY_MM_DD);
-        String adminMail = this.config.getString(configPrefix + "AdminEmail", config.getString("MCR.Mail.Address", "no_mail_defined@oai_provider.com"));
+        String adminMail = this.config.getString(configPrefix + "AdminEmail",
+            config.getString("MCR.Mail.Address", "no_mail_defined@oai_provider.com"));
 
         this.setEarliestDatestamp(calculateEarliestTimestamp());
         this.getAdminEmailList().add(adminMail);
@@ -88,11 +78,8 @@ public class MCROAIIdentify extends SimpleIdentify {
 
     public FriendsDescription getFriendsDescription() {
         FriendsDescription desc = new FriendsDescription();
-        Properties friends = this.config.getProperties(this.configPrefix + "Friends.");
-        for (Object o : friends.values()) {
-            String friend = (String) (o);
-            desc.getFriendsList().add(friend);
-        }
+        Map<String, String> friends = this.config.getPropertiesMap(this.configPrefix + "Friends.");
+        desc.getFriendsList().addAll(friends.values());
         return desc;
     }
 
@@ -112,12 +99,12 @@ public class MCROAIIdentify extends SimpleIdentify {
             // existing items
             datestamp = MCROAISearchManager.getSearcher(this.configPrefix, null, null, 1).getEarliestTimestamp();
             // deleted items
-            if(DeletedRecordPolicy.Persistent.equals(this.getDeletedRecordPolicy())) {
+            if (DeletedRecordPolicy.Persistent.equals(this.getDeletedRecordPolicy())) {
                 MCRHIBConnection conn = MCRHIBConnection.instance();
                 Criteria criteria = conn.getSession().createCriteria(MCRDELETEDITEMS.class);
                 criteria.setProjection(Projections.min("id.dateDeleted"));
-                Date earliestDeletedDate = (Date)criteria.uniqueResult();
-                if(earliestDeletedDate != null && earliestDeletedDate.compareTo(datestamp) < 0) {
+                Date earliestDeletedDate = (Date) criteria.uniqueResult();
+                if (earliestDeletedDate != null && earliestDeletedDate.compareTo(datestamp) < 0) {
                     datestamp = earliestDeletedDate;
                 }
             }

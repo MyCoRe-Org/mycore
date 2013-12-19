@@ -33,7 +33,7 @@ package org.mycore.services.z3950;
 
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.Properties;
+import java.util.Map;
 import java.util.Vector;
 
 import org.hibernate.Transaction;
@@ -53,11 +53,11 @@ public class MCRZ3950PrefixQueryParser {
 
     private MCRZ3950PrefixQueryLexer p;
 
-    private static Properties default_conversion_rules = null;
+    private static Map<String, String> default_conversion_rules = null;
 
-    public static Properties getDefaultConversionRules() {
+    public static Map<String, String> getDefaultConversionRules() {
         if (default_conversion_rules == null) {
-            default_conversion_rules = MCRConfiguration.instance().getProperties("MCR.z3950");
+            default_conversion_rules = MCRConfiguration.instance().getPropertiesMap("MCR.z3950");
         }
 
         return default_conversion_rules;
@@ -96,46 +96,46 @@ public class MCRZ3950PrefixQueryParser {
         MCRCondition qn = null;
 
         switch (token) {
-        case MCRZ3950PrefixQueryLexer.AND:
-            token = p.nextToken();
-            MCRAndCondition andc = new MCRAndCondition();
-            MCRCondition anda = visitPrefixQuery(currentAttrset);
-            if (null != anda)
-                andc.addChild(anda);
-            anda = visitPrefixQuery(currentAttrset);
-            if (null != anda)
-                andc.addChild(anda);
-            return andc;
+            case MCRZ3950PrefixQueryLexer.AND:
+                token = p.nextToken();
+                MCRAndCondition andc = new MCRAndCondition();
+                MCRCondition anda = visitPrefixQuery(currentAttrset);
+                if (null != anda)
+                    andc.addChild(anda);
+                anda = visitPrefixQuery(currentAttrset);
+                if (null != anda)
+                    andc.addChild(anda);
+                return andc;
 
-        case MCRZ3950PrefixQueryLexer.OR:
-            token = p.nextToken();
-            MCROrCondition orc = new MCROrCondition();
-            MCRCondition ora = visitPrefixQuery(currentAttrset);
-            if (null != ora)
-                orc.addChild(ora);
-            ora = visitPrefixQuery(currentAttrset);
-            if (null != ora)
-                orc.addChild(ora);
-            return orc;
+            case MCRZ3950PrefixQueryLexer.OR:
+                token = p.nextToken();
+                MCROrCondition orc = new MCROrCondition();
+                MCRCondition ora = visitPrefixQuery(currentAttrset);
+                if (null != ora)
+                    orc.addChild(ora);
+                ora = visitPrefixQuery(currentAttrset);
+                if (null != ora)
+                    orc.addChild(ora);
+                return orc;
 
-        case MCRZ3950PrefixQueryLexer.NOT:
-            token = p.nextToken();
-            MCRAndCondition notc = new MCRAndCondition();
-            MCRCondition nota = visitPrefixQuery(currentAttrset);
-            if (null != nota)
-                notc.addChild(nota);
-            nota = visitPrefixQuery(currentAttrset);
-            if (null != nota)
-                notc.addChild(new MCRNotCondition(nota));
-            return notc;
+            case MCRZ3950PrefixQueryLexer.NOT:
+                token = p.nextToken();
+                MCRAndCondition notc = new MCRAndCondition();
+                MCRCondition nota = visitPrefixQuery(currentAttrset);
+                if (null != nota)
+                    notc.addChild(nota);
+                nota = visitPrefixQuery(currentAttrset);
+                if (null != nota)
+                    notc.addChild(new MCRNotCondition(nota));
+                return notc;
 
-        case MCRZ3950PrefixQueryLexer.TERM:
-            qn = visitQueryNode(currentAttrset);
-            break;
+            case MCRZ3950PrefixQueryLexer.TERM:
+                qn = visitQueryNode(currentAttrset);
+                break;
 
-        case MCRZ3950PrefixQueryLexer.ATTR:
-            qn = visitQueryNode(currentAttrset);
-            break;
+            case MCRZ3950PrefixQueryLexer.ATTR:
+                qn = visitQueryNode(currentAttrset);
+                break;
         }
 
         return qn;
@@ -201,30 +201,30 @@ public class MCRZ3950PrefixQueryParser {
             else
                 lookupStr = currentAttrset + "." + attrType;
 
-            String internalAttrType = getDefaultConversionRules().getProperty(lookupStr);
+            String internalAttrType = getDefaultConversionRules().get(lookupStr);
 
             if (internalAttrType == null)
                 throw new MCRException("Query attribute not found in properties: " + lookupStr);
 
             //      System.err.println("++attrType_str="+attrType_str + " attrValue="+attrVal);
             lookupStr = localAttrset + "." + attrType_str + "." + attrVal;
-            String mcr = getDefaultConversionRules().getProperty(lookupStr);
+            String mcr = getDefaultConversionRules().get(lookupStr);
             if (null == mcr)
                 throw new MCRException("Query attribute not found in properties: " + lookupStr);
 
             switch (attrType) {
-            case 1:
-                use = mcr;
-                break;
-            case 2:
-                relation = mcr;
-                break;
-            case 4:
-                structure = mcr;
-                break;
-            case 5:
-                truncation = mcr;
-                break;
+                case 1:
+                    use = mcr;
+                    break;
+                case 2:
+                    relation = mcr;
+                    break;
+                case 4:
+                    structure = mcr;
+                    break;
+                case 5:
+                    truncation = mcr;
+                    break;
             }
         }
 

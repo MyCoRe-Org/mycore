@@ -74,10 +74,10 @@ public abstract class MCRACLHIBAccess {
      * @param filterPrefix selects the code>MCRAclCriterionFilter</code> classes
      */
     public static void filterQuery(Criteria query, Properties filterProperties, String filterPrefix) {
-        Properties filters = MCRConfiguration.instance().getProperties(filterPrefix);
-        for(Object filterClass : filters.values()) {
+        Map<String, String> filters = MCRConfiguration.instance().getPropertiesMap(filterPrefix);
+        for(String filterClass : filters.values()) {
             try {
-                Class<?> c = Class.forName(filterClass.toString());
+                Class<?> c = Class.forName(filterClass);
                 Object o = c.newInstance();
                 if(o instanceof MCRAclCriterionFilter) {
                     Criterion criterion = ((MCRAclCriterionFilter)o).filter(filterProperties);

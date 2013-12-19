@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -437,7 +437,8 @@ public class MCRSimpleWorkflowManager {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    public final boolean commitMetadataObject(MCRObjectID ID) throws MCRActiveLinkException, MCRException, SAXParseException, IOException {
+    public final boolean commitMetadataObject(MCRObjectID ID) throws MCRActiveLinkException, MCRException,
+        SAXParseException, IOException {
         // commit metadata
         String fn = getDirectoryPath(ID.getBase()) + File.separator + ID + ".xml";
 
@@ -523,9 +524,9 @@ public class MCRSimpleWorkflowManager {
         final String myproject = base_id;
         Set<File> workdirs = new HashSet<File>();
         workdirs.add(getDirectoryPath(base_id));
-        Properties propsWD = config.getProperties("MCR.SWF.Directory.");
-        for (Object key : propsWD.keySet()) {
-            File dir = new File(propsWD.getProperty((String) key));
+        Map<String, String> propsWD = config.getPropertiesMap("MCR.SWF.Directory.");
+        for (String key : propsWD.keySet()) {
+            File dir = new File(propsWD.get(key));
             if (!dir.exists()) {
                 dir.mkdirs();
             }
@@ -603,8 +604,8 @@ public class MCRSimpleWorkflowManager {
             File fi = new File(fn);
             if (fi.isFile() && fi.canRead()) {
                 Document wfDoc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(fi));
-                XPathExpression<Element> path = XPathFactory.instance().compile("/*/service/servacls/servacl[@permission='" + permission + "']/condition",
-                    Filters.element());
+                XPathExpression<Element> path = XPathFactory.instance().compile(
+                    "/*/service/servacls/servacl[@permission='" + permission + "']/condition", Filters.element());
                 List<Element> results = path.evaluate(wfDoc);
                 if (results.size() > 0) {
                     return (Element) ((Element) results.get(0)).detach();

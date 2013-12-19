@@ -25,7 +25,6 @@ package org.mycore.datamodel.ifs;
 
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
@@ -60,9 +59,9 @@ public class MCRContentStoreFactory {
     private static final Logger LOGGER = Logger.getLogger(MCRContentStoreFactory.class);
 
     public static Map<String, MCRContentStore> getAvailableStores() {
-        Properties properties = MCRConfiguration.instance().getProperties(CONFIG_PREFIX);
-        for (Map.Entry<Object, Object> prop : properties.entrySet()) {
-            String key = prop.getKey().toString();
+        Map<String, String> properties = MCRConfiguration.instance().getPropertiesMap(CONFIG_PREFIX);
+        for (Map.Entry<String, String> prop : properties.entrySet()) {
+            String key = prop.getKey();
             if (key.endsWith(CLASS_SUFFIX)) {
                 String storeID = key.replace(CONFIG_PREFIX, "").replace(CLASS_SUFFIX, "");
                 initStore(storeID);
