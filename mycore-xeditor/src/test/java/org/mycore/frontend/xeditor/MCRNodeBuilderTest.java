@@ -26,18 +26,18 @@ package org.mycore.frontend.xeditor;
 import static org.junit.Assert.*;
 
 import org.jaxen.JaxenException;
-
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRTestCase;
 
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRNodeBuilderTest {
+public class MCRNodeBuilderTest extends MCRTestCase{
 
     @Test
     public void testBuildingElements() throws JaxenException, JDOMException {

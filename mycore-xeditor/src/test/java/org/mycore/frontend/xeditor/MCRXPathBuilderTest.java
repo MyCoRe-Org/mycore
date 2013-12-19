@@ -30,11 +30,12 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.junit.Test;
+import org.mycore.common.MCRTestCase;
 
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRXPathBuilderTest {
+public class MCRXPathBuilderTest extends MCRTestCase {
 
     @Test
     public void testXPath() {
@@ -57,7 +58,7 @@ public class MCRXPathBuilderTest {
         assertEquals("/root/title[2]", MCRXPathBuilder.buildXPath(title2));
         assertEquals("/root/contributor/@role", MCRXPathBuilder.buildXPath(role));
         assertEquals("/root/contributor/@xml:lang", MCRXPathBuilder.buildXPath(lang));
-        
+
         root.detach();
         assertEquals("root", MCRXPathBuilder.buildXPath(root));
         assertEquals("root/contributor", MCRXPathBuilder.buildXPath(author));

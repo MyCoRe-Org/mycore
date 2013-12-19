@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jaxen.JaxenException;
-
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -46,7 +45,9 @@ public class MCRBindingTest extends MCRTestCase {
     private MCRBinding binding;
 
     @Before
-    public void setUp() throws JDOMException {
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
         Element root = new Element("document");
         root.addContent(new Element("title").setAttribute("type", "main").setText("title1"));
         root.addContent(new Element("title").setAttribute("type", "alternative").setText("title2"));
