@@ -63,6 +63,7 @@ import javax.servlet.ServletContext;
  * 
  * @author Thomas Scheffler (yagee)
  * @see System#getProperties()
+ * @since 2013.12
  */
 public class MCRConfigurationDir {
 
@@ -153,6 +154,10 @@ public class MCRConfigurationDir {
         APP_NAME = null;
     }
 
+    /**
+     * Returns the configuration directory for this MyCoRe instance.
+     * @return null if System property {@value #DISABLE_CONFIG_DIR_PROPERTY} is set.
+     */
     public static File getConfigurationDirectory() {
         if (!System.getProperties().keySet().contains(DISABLE_CONFIG_DIR_PROPERTY)) {
             return new File(getMyCoReDirectory(), getPrefix() + getAppName());
@@ -160,12 +165,17 @@ public class MCRConfigurationDir {
         return null;
     }
 
+    /**
+     * Returns a File object, if {@link #getConfigurationDirectory()} does not return <code>null</code> and directory exists.
+     * @param relativePath relative path to file or directory with configuration directory as base.
+     * @return null if configuration directory does not exist or is disabled.
+     */
     public static File getConfigFile(String relativePath) {
         File configurationDirectory = getConfigurationDirectory();
-        if (configurationDirectory == null) {
+        if (configurationDirectory == null || !configurationDirectory.isDirectory()) {
             return null;
         }
         return new File(configurationDirectory, relativePath);
     }
-    
+
 }

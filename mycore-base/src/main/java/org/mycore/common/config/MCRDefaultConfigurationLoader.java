@@ -57,10 +57,9 @@ public class MCRDefaultConfigurationLoader implements MCRConfigurationLoader {
 
     private InputStream getConfigInputStream() throws IOException {
         MCRConfigurationInputStream configurationInputStream = new MCRConfigurationInputStream();
-        File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
-        if (configurationDirectory != null && configurationDirectory.isDirectory()) {
-            File outFile = new File(configurationDirectory, "mycore.active.properties");
-            FileOutputStream fout = new FileOutputStream(outFile);
+        File configFile = MCRConfigurationDir.getConfigFile("mycore.active.properties");
+        if (configFile != null) {
+            FileOutputStream fout = new FileOutputStream(configFile);
             TeeInputStream tin = new TeeInputStream(configurationInputStream, fout, true);
             return tin;
         }

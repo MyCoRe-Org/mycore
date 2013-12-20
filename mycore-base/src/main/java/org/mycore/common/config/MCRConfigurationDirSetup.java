@@ -34,11 +34,13 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.events.MCRStartupHandler;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
 
 /**
+ * Called by {@link MCRStartupHandler} on start up to setup {@link MCRConfiguration}.
  * @author Thomas Scheffler (yagee)
- *
+ * @since 2013.12
  */
 public class MCRConfigurationDirSetup implements AutoExecutable {
 
