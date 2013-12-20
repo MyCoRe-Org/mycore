@@ -63,6 +63,7 @@ public class MCRConfigurationInputStream extends SequenceInputStream {
         LinkedList<InputStream> cList = new LinkedList<>();
         File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
         if (configurationDirectory != null && configurationDirectory.isDirectory()) {
+            logInfo("Current configuration directory: " + configurationDirectory.getAbsolutePath());
             //set MCR.basedir, is normally overwritten later
             cList.add(getBaseDirInputStream(configurationDirectory));
         }
@@ -79,14 +80,11 @@ public class MCRConfigurationInputStream extends SequenceInputStream {
             cList.add(propertyStream);
             cList.add(new ByteArrayInputStream(lbr));
         }
-        if (configurationDirectory != null) {
-            logInfo("Current configuration directory: " + configurationDirectory.getAbsolutePath());
-            File localProperties = new File(configurationDirectory, MYCORE_PROPERTIES);
-            if (localProperties.exists()) {
-                logInfo("Loading additional properties from " + localProperties.getAbsolutePath());
-                cList.add(new FileInputStream(localProperties));
-                cList.add(new ByteArrayInputStream(lbr));
-            }
+        File localProperties = MCRConfigurationDir.getConfigFile(MYCORE_PROPERTIES);
+        if (localProperties != null && localProperties.canRead()) {
+            logInfo("Loading additional properties from " + localProperties.getAbsolutePath());
+            cList.add(new FileInputStream(localProperties));
+            cList.add(new ByteArrayInputStream(lbr));
         }
         if (cList.isEmpty()) {
             cList.add(new NullInputStream(0));

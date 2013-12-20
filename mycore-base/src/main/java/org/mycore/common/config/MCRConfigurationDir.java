@@ -159,4 +159,13 @@ public class MCRConfigurationDir {
         }
         return null;
     }
+
+    public static File getConfigFile(String relativePath) {
+        File configurationDirectory = getConfigurationDirectory();
+        if (configurationDirectory == null) {
+            return null;
+        }
+        return new File(configurationDirectory, relativePath);
+    }
+    
 }

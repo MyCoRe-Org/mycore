@@ -54,6 +54,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.services.mbeans.MCRJMXBridge;
@@ -113,7 +114,13 @@ public class MCRHIBConnection implements Closeable {
      */
     private void buildConfiguration() {
         String resource = System.getProperty("MCR.Hibernate.Configuration", "hibernate.cfg.xml");
-        HIBCFG = new Configuration().configure(resource);
+        File localConfig = MCRConfigurationDir.getConfigFile("hibernate.cfg.xml");
+        if (localConfig != null && localConfig.canRead()) {
+            LOGGER.info("Reading Hibernate from file: " + localConfig.getAbsolutePath());
+            HIBCFG = new Configuration().configure(localConfig);
+        } else {
+            HIBCFG = new Configuration().configure(resource);
+        }
         if (MCRConfiguration.instance().getBoolean("MCR.Hibernate.DialectQueries", false)) {
             String dialect = HIBCFG.getProperty("hibernate.dialect");
             DIALECT = dialect.substring(dialect.lastIndexOf('.') + 1);
