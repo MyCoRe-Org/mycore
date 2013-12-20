@@ -302,8 +302,13 @@ public class MCRParameterCollector {
     }
 
     private StringBuilder getBaseURLUpToHostName() {
-        StringBuilder buffer = new StringBuilder(MCRServlet.getBaseURL());
-        int pos = buffer.indexOf("/", "https://".length());
+        int schemeLength = "https://".length();
+        String baseURL = MCRServlet.getBaseURL();
+        StringBuilder buffer = new StringBuilder(baseURL);
+        if (baseURL.length() < schemeLength) {
+            return buffer;
+        }
+        int pos = buffer.indexOf("/", schemeLength);
         buffer.delete(pos, buffer.length());
         return buffer;
     }
