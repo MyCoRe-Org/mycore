@@ -24,7 +24,9 @@
 package org.mycore.common.config;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
@@ -32,6 +34,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedList;
+import java.util.Properties;
 
 import org.apache.commons.io.input.NullInputStream;
 import org.apache.log4j.Logger;
@@ -48,6 +51,8 @@ import org.mycore.common.content.MCRURLContent;
  */
 public class MCRConfigurationInputStream extends SequenceInputStream {
 
+    private static final String MYCORE_PROPERTIES = "mycore.properties";
+
     private static final byte[] lbr = "\n".getBytes();
 
     public MCRConfigurationInputStream() throws IOException {
@@ -56,6 +61,11 @@ public class MCRConfigurationInputStream extends SequenceInputStream {
 
     private static Enumeration<? extends InputStream> getInputStreams() throws IOException {
         LinkedList<InputStream> cList = new LinkedList<>();
+        File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
+        if (configurationDirectory != null && configurationDirectory.isDirectory()) {
+            //set MCR.basedir, is normally overwritten later
+            cList.add(getBaseDirInputStream(configurationDirectory));
+        }
         for (MCRComponent component : MCRRuntimeComponentDetector.getAllComponents()) {
             InputStream is = component.getPropertyStream();
             if (is != null) {
@@ -67,10 +77,16 @@ public class MCRConfigurationInputStream extends SequenceInputStream {
         InputStream propertyStream = getPropertyStream();
         if (propertyStream != null) {
             cList.add(propertyStream);
+            cList.add(new ByteArrayInputStream(lbr));
         }
-        File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
         if (configurationDirectory != null) {
             logInfo("Current configuration directory: " + configurationDirectory.getAbsolutePath());
+            File localProperties = new File(configurationDirectory, MYCORE_PROPERTIES);
+            if (localProperties.exists()) {
+                logInfo("Loading additional properties from " + localProperties.getAbsolutePath());
+                cList.add(new FileInputStream(localProperties));
+                cList.add(new ByteArrayInputStream(lbr));
+            }
         }
         if (cList.isEmpty()) {
             cList.add(new NullInputStream(0));
@@ -78,8 +94,17 @@ public class MCRConfigurationInputStream extends SequenceInputStream {
         return Collections.enumeration(cList);
     }
 
+    private static ByteArrayInputStream getBaseDirInputStream(File configurationDirectory) throws IOException {
+        Properties dataProp = new Properties();
+        dataProp.setProperty("MCR.basedir", configurationDirectory.getAbsolutePath());
+        ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
+        dataProp.store(out, null);
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(out.toByteArray());
+        return inputStream;
+    }
+
     private static InputStream getPropertyStream() throws IOException {
-        String filename = System.getProperty("MCR.Configuration.File", "mycore.properties");
+        String filename = System.getProperty("MCR.Configuration.File", MYCORE_PROPERTIES);
         File mycoreProperties = new File(filename);
         MCRContent input = null;
         if (mycoreProperties.canRead()) {

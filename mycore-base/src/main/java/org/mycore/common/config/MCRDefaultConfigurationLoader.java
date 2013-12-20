@@ -24,12 +24,13 @@
 package org.mycore.common.config;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.io.input.TeeInputStream;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRStreamContent;
@@ -47,11 +48,23 @@ public class MCRDefaultConfigurationLoader implements MCRConfigurationLoader {
 
     public MCRDefaultConfigurationLoader() {
         properties = new MCRProperties();
-        try (MCRConfigurationInputStream in = new MCRConfigurationInputStream()) {
+        try (InputStream in = getConfigInputStream()) {
             loadFromContent(new MCRStreamContent(in));
         } catch (IOException e) {
             throw new MCRConfigurationException("Could not load MyCoRe properties.", e);
         }
+    }
+
+    private InputStream getConfigInputStream() throws IOException {
+        MCRConfigurationInputStream configurationInputStream = new MCRConfigurationInputStream();
+        File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
+        if (configurationDirectory != null) {
+            File outFile = new File(configurationDirectory, "mycore.active.properties");
+            FileOutputStream fout = new FileOutputStream(outFile);
+            TeeInputStream tin = new TeeInputStream(configurationInputStream, fout, true);
+            return tin;
+        }
+        return configurationInputStream;
     }
 
     @Override
