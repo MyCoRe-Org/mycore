@@ -26,6 +26,7 @@ package org.mycore.backend.hibernate;
 import javax.servlet.ServletContext;
 
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
 
 /**
@@ -55,7 +56,9 @@ public class MCRHibernateSchemaUpdater implements AutoExecutable {
      */
     @Override
     public void startUp(ServletContext servletContext) {
-        new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(false, true);
+        if (MCRConfiguration.instance().getBoolean("MCR.Persistence.Database.Enable", true)) {
+            new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(false, true);
+        }
     }
 
 }
