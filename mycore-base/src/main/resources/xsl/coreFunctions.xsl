@@ -258,6 +258,18 @@
   </xsl:template>
 
     <!--
+        Template: shortenPersonLabel
+        synopsis: removes all Chrakters behind a '(' in lebael of persons (also works with al otrher Strings)
+        param:
+        
+        text: the text to be shorten
+    -->
+  <xsl:template name="shortenPersonLabel">
+    <xsl:param name="text" />
+    <xsl:value-of select="mcrxml:shortenPersonLabel($text)" />
+  </xsl:template>
+  
+    <!--
         Template: ClassCategLink
         synopsis: Generates a link to get a classification
         param:

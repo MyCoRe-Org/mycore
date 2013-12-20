@@ -121,8 +121,7 @@ public class MCRXMLFunctions {
 
     private static final Logger LOGGER = Logger.getLogger(MCRXMLFunctions.class);
 
-    private static MCRCache<String, Boolean> DISPLAY_DERIVATE_CACHE = new MCRCache<>(10000,
-        "Derivate display value cache");
+    private static MCRCache<String, Boolean> DISPLAY_DERIVATE_CACHE = new MCRCache<>(10000, "Derivate display value cache");
 
     private static final DocumentBuilder DOC_BUILDER;
     static {
@@ -172,7 +171,7 @@ public class MCRXMLFunctions {
     public static StringBuffer getBaseLink(String hostAlias) {
         StringBuffer returns = new StringBuffer();
         returns.append(CONFIG.getString(HOST_PREFIX + hostAlias + PROTOCOLL_SUFFIX, "http")).append("://")
-            .append(CONFIG.getString(HOST_PREFIX + hostAlias + HOST_SUFFIX));
+                .append(CONFIG.getString(HOST_PREFIX + hostAlias + HOST_SUFFIX));
         String port = CONFIG.getString(HOST_PREFIX + hostAlias + PORT_SUFFIX, DEFAULT_PORT);
         if (!port.equals(DEFAULT_PORT)) {
             returns.append(":").append(port);
@@ -180,17 +179,15 @@ public class MCRXMLFunctions {
         return returns;
     }
 
-    public static String formatISODate(String isoDate, String simpleFormat, String iso639Language)
-        throws ParseException {
+    public static String formatISODate(String isoDate, String simpleFormat, String iso639Language) throws ParseException {
         return formatISODate(isoDate, null, simpleFormat, iso639Language);
     }
 
-    public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language)
-        throws ParseException {
+    public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language) throws ParseException {
         if (LOGGER.isDebugEnabled()) {
             StringBuilder sb = new StringBuilder("isoDate=");
             sb.append(isoDate).append(", simpleFormat=").append(simpleFormat).append(", isoFormat=").append(isoFormat)
-                .append(", iso649Language=").append(iso639Language);
+                    .append(", iso649Language=").append(iso639Language);
             LOGGER.debug(sb.toString());
         }
         Locale locale = new Locale(iso639Language);
@@ -225,6 +222,16 @@ public class MCRXMLFunctions {
 
     public static String getISODate(String simpleDate, String simpleFormat) throws ParseException {
         return getISODate(simpleDate, simpleFormat, null);
+    }
+
+    public static String getISODateFromMCRHistoryDate(String simpleDate) throws ParseException {
+        String[] dates = simpleDate.split("\\.");
+        if (dates[2].endsWith("BC"))
+            dates[2] = dates[2].replace(" BC", "");
+        else
+            dates[2] = dates[2].replace(" AD", "");
+        String Date = dates[2] + "-" + dates[1] + "-" + dates[0] + "T00:00:00.000Z";
+        return Date;
     }
 
     /**
@@ -454,8 +461,8 @@ public class MCRXMLFunctions {
             return new URI(url).toASCIIString();
         } catch (Exception e) {
             URL testURL = new URL(url);
-            URI uri = new URI(testURL.getProtocol(), testURL.getUserInfo(), testURL.getHost(), testURL.getPort(),
-                testURL.getPath(), testURL.getQuery(), testURL.getRef());
+            URI uri = new URI(testURL.getProtocol(), testURL.getUserInfo(), testURL.getHost(), testURL.getPort(), testURL.getPath(),
+                    testURL.getQuery(), testURL.getRef());
             return uri.toASCIIString();
         }
     }
@@ -486,8 +493,7 @@ public class MCRXMLFunctions {
 
     public static boolean isDisplayedEnabledDerivate(String derivateId) {
         MCRObjectID derId = MCRObjectID.getInstance(derivateId);
-        ModifiedHandle modifiedHandle = MCRXMLMetaDataManagerHolder.instance.getLastModifiedHandle(derId, 30,
-            TimeUnit.SECONDS);
+        ModifiedHandle modifiedHandle = MCRXMLMetaDataManagerHolder.instance.getLastModifiedHandle(derId, 30, TimeUnit.SECONDS);
         Boolean result;
         try {
             result = DISPLAY_DERIVATE_CACHE.getIfUpToDate(derivateId, modifiedHandle);
@@ -560,8 +566,8 @@ public class MCRXMLFunctions {
                 return true;
             }
         }
-        LOGGER.info("URN assignment disabled as the object type " + givenType
-            + " is not in the list of allowed objects. See property \"" + propertyName + "\"");
+        LOGGER.info("URN assignment disabled as the object type " + givenType + " is not in the list of allowed objects. See property \""
+                + propertyName + "\"");
         return false;
     }
 
@@ -687,13 +693,11 @@ public class MCRXMLFunctions {
     }
 
     public static boolean isCurrentUserSuperUser() {
-        return MCRSessionMgr.getCurrentSession().getUserInformation()
-            .equals(MCRSystemUserInformation.getSuperUserInstance());
+        return MCRSessionMgr.getCurrentSession().getUserInformation().equals(MCRSystemUserInformation.getSuperUserInstance());
     }
 
     public static boolean isCurrentUserGuestUser() {
-        return MCRSessionMgr.getCurrentSession().getUserInformation()
-            .equals(MCRSystemUserInformation.getGuestInstance());
+        return MCRSessionMgr.getCurrentSession().getUserInformation().equals(MCRSystemUserInformation.getGuestInstance());
     }
 
     /**
@@ -750,8 +754,7 @@ public class MCRXMLFunctions {
      * Same as {@link MCRMetadataManager#getObjectId(MCRObjectID, long)} with String representation.
      */
     public static String getMCRObjectID(final String derivateID, final long expire) {
-        return MCRMetadataManager.getObjectId(MCRObjectID.getInstance(derivateID), expire, TimeUnit.MILLISECONDS)
-            .toString();
+        return MCRMetadataManager.getObjectId(MCRObjectID.getInstance(derivateID), expire, TimeUnit.MILLISECONDS).toString();
     }
 
     /**
@@ -824,6 +827,11 @@ public class MCRXMLFunctions {
             return text;
         }
         return text.substring(0, i) + "...";
+    }
+
+    public static String shortenPersonLabel(String text) {
+        int pos = text.indexOf("(");
+        return text.substring(0, pos - 1);
     }
 
 }
