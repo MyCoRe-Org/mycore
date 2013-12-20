@@ -83,7 +83,7 @@ public class MCRLayoutTransformerFactory {
             LOGGER.info("Using noop transformer for " + idStripped);
             return NOOP_TRANSFORMER;
         }
-        String[] stylesheets = getStylesheets(id, stylesheet);
+        String[] stylesheets = getStylesheets(idStripped, stylesheet);
         MCRContentTransformer transformer = MCRXSLTransformer.getInstance(stylesheets);
         if ("application/pdf".equals(transformer.getMimeType())) {
             transformer = new MCRTransformerPipe(transformer, fopper);
@@ -99,7 +99,7 @@ public class MCRLayoutTransformerFactory {
     @SuppressWarnings("unchecked")
     private static String[] getStylesheets(String id, String stylesheet) {
         List<String> ignore = MCRConfiguration.instance().getStrings("MCR.LayoutTransformerFactory.Default.Ignore",
-            (List<String>) Collections.EMPTY_LIST);
+            Collections.<String>emptyList());
         List<String> defaults;
         if (ignore.contains(id)) {
             defaults = Collections.emptyList();
