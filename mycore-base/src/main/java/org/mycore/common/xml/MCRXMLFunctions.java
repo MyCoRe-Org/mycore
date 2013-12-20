@@ -226,10 +226,12 @@ public class MCRXMLFunctions {
 
     public static String getISODateFromMCRHistoryDate(String simpleDate) throws ParseException {
         String[] dates = simpleDate.split("\\.");
-        if (dates[2].endsWith("BC"))
+        if (dates[2].endsWith("BC")) {
             dates[2] = dates[2].replace(" BC", "");
-        else
+            dates[2] = "-" + dates[2];
+        } else {
             dates[2] = dates[2].replace(" AD", "");
+        }
         String Date = dates[2] + "-" + dates[1] + "-" + dates[0] + "T00:00:00.000Z";
         return Date;
     }

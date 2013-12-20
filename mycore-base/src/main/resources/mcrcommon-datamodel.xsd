@@ -76,6 +76,17 @@
       </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
+  <xs:attributeGroup name="MCRMetaHistoryDate">
+    <xs:attribute name="format">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="YYYY" />
+          <xs:enumeration value="YYYY-MM" />
+          <xs:enumeration value="YYYY-MM-DD" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
 
   <!-- this is how a mycore object looks like: <structure> has to be defined elsewhere <metadata> has to be defined elsewhere <service> is defined 
     below -->
