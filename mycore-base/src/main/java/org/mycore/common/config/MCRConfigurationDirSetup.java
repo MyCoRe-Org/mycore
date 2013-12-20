@@ -23,10 +23,17 @@
 
 package org.mycore.common.config;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
 
 /**
@@ -57,9 +64,38 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
     @Override
     public void startUp(ServletContext servletContext) {
         MCRConfigurationDir.setServletContext(servletContext);
+        File libDir = MCRConfigurationDir.getConfigFile("libs");
         MCRConfigurationLoader configurationLoader = MCRConfigurationLoaderFactory.getConfigurationLoader();
         Map<String, String> properties = configurationLoader.load();
         MCRConfiguration.instance().initialize(properties, true);
+        if (libDir != null && libDir.isDirectory()) {
+            File[] listFiles = libDir.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.toLowerCase().endsWith(".jar");
+                }
+            });
+            if (listFiles.length > 0) {
+                Logger logger = Logger.getLogger(getClass());
+                ClassLoader classLoader = this.getClass().getClassLoader();
+                Class<? extends ClassLoader> classLoaderClass = classLoader.getClass();
+                try {
+                    Method addUrlMethod = classLoaderClass.getDeclaredMethod("addURL", URL.class);
+                    addUrlMethod.setAccessible(true);
+                    for (File jarFile : listFiles) {
+                        logger.info("Adding to CLASSPATH: " + jarFile);
+                        try {
+                            addUrlMethod.invoke(classLoader, jarFile.toURI().toURL());
+                        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
+                            | MalformedURLException e) {
+                            logger.error("Could not add " + jarFile + " to current classloader.", e);
+                            return;
+                        }
+                    }
+                } catch (NoSuchMethodException | SecurityException e) {
+                    logger.warn(classLoaderClass + " does not support adding additional JARs at runtime");
+                }
+            }
+        }
     }
-
 }
