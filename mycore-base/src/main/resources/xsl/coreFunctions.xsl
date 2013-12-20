@@ -259,7 +259,7 @@
 
     <!--
         Template: shortenPersonLabel
-        synopsis: removes all Chrakters behind a '(' in lebael of persons (also works with al otrher Strings)
+        synopsis: removes all Chrakters behind a '(' in label of persons (also works with al otrher Strings)
         param:
         
         text: the text to be shorten
