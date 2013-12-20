@@ -95,6 +95,7 @@ public class MCRTestCase {
      * @author Marcel Heusinger <marcel.heusinger[at]uni-due.de>
      */
     protected void initProperties() throws IOException {
+        System.setProperty(MCRConfigurationDir.DISABLE_CONFIG_DIR_PROPERTY, "");
         oldProperties = System.getProperties().getProperty(MCR_CONFIGURATION_FILE);
         if (oldProperties == null && getClass().getClassLoader().getResource("mycore.properties") != null) {
             return;
@@ -108,7 +109,6 @@ public class MCRTestCase {
                 throw new FileNotFoundException("File does not exist: " + properties.getAbsolutePath());
             }
         }
-        System.setProperty(MCRConfigurationDir.DISABLE_CONFIG_DIR_PROPERTY, null);
     }
 
     private File getPropertiesFile() throws IOException {
