@@ -18,6 +18,7 @@ import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.solr.MCRSolrServerFactory;
 import org.mycore.solr.index.MCRSolrIndexer;
+import org.mycore.solr.search.MCRSolrSearchUtils;
 
 /**
  * Class provides useful solr related commands.
@@ -118,6 +119,13 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     @MCRCommand(syntax = "restricted synchronize metadata index for objecttype {0}", help = "synchronizes the mycore store and solr server", order = 160)
     public static void synchronizeMetadataIndex(String objectType) throws Exception {
         MCRSolrIndexer.synchronizeMetadataIndex(objectType);
+    }
+
+    @MCRCommand(syntax = "select objects with solr query {0}", help = "selects mcr objects with a solr query", order = 180)
+    public static void selectObjectsWithSolrQuery(String query) throws Exception {
+        SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
+        List<String> ids = MCRSolrSearchUtils.listIDs(solrServer, query);
+        MCRObjectCommands.setSelectedObjectIDs(ids);
     }
 
 }

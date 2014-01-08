@@ -21,11 +21,7 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCRShutdownHandler;
@@ -38,6 +34,7 @@ import org.mycore.solr.index.handlers.MCRSolrOptimizeIndexHandler;
 import org.mycore.solr.index.handlers.stream.MCRSolrFilesIndexHandler;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
+import org.mycore.solr.search.MCRSolrSearchUtils;
 import org.mycore.util.concurrent.MCRListeningPriorityExecutorService;
 
 import com.google.common.util.concurrent.FutureCallback;
@@ -338,7 +335,7 @@ public class MCRSolrIndexer {
         // get ids from solr
         LOGGER.info("fetching solr...");
         SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
-        List<String> solrList = listIDsOfSolrServer(solrServer, objectType);
+        List<String> solrList = MCRSolrSearchUtils.listIDs(solrServer, "objectType:" + objectType);
         LOGGER.info("there are " + solrList.size() + " solr objects");
 
         // documents to remove
@@ -358,28 +355,6 @@ public class MCRSolrIndexer {
             LOGGER.info("index " + storeList.size() + " mycore objects");
             rebuildMetadataIndex(storeList);
         }
-    }
-
-    protected static List<String> listIDsOfSolrServer(SolrServer server, String objectType) throws SolrServerException {
-        int numPerRequest = 10000;
-        List<String> idList = new ArrayList<>();
-        ModifiableSolrParams p = new ModifiableSolrParams();
-        p.set("q", "objectType:" + objectType);
-        p.set("rows", String.valueOf(numPerRequest));
-        p.set("fl", "id");
-        int start = 0;
-        long numFound = Integer.MAX_VALUE;
-        while (start < numFound) {
-            p.set("start", start);
-            QueryResponse response = server.query(p);
-            numFound = response.getResults().getNumFound();
-            SolrDocumentList results = response.getResults();
-            for (SolrDocument doc : results) {
-                idList.add(doc.get("id").toString());
-            }
-            start += response.getResults().size();
-        }
-        return idList;
     }
 
     /**
