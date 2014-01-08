@@ -2,7 +2,7 @@ package org.mycore.solr.proxy;
 
 import java.util.concurrent.TimeUnit;
 
-import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.HttpClientConnectionManager;
 
 /**
  * Monitors a {@link ClientConnectionManager} for expired or idle connections.
@@ -11,11 +11,11 @@ import org.apache.http.conn.ClientConnectionManager;
  * @author Thomas Scheffler (yagee)
  */
 class MCRIdleConnectionMonitorThread extends Thread {
-    private final ClientConnectionManager connMgr;
+    private final HttpClientConnectionManager connMgr;
 
     private volatile boolean shutdown;
 
-    public MCRIdleConnectionMonitorThread(ClientConnectionManager connMgr) {
+    public MCRIdleConnectionMonitorThread(HttpClientConnectionManager connMgr) {
         super();
         this.connMgr = connMgr;
     }

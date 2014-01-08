@@ -2,18 +2,22 @@ package org.mycore.solr.proxy;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.http.HttpHost;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIUtils;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
-import org.apache.http.params.CoreConnectionPNames;
-import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.config.ConnectionConfig;
+import org.apache.http.config.SocketConfig;
+import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
@@ -22,7 +26,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.util.NamedList;
-import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.solr.MCRSolrConstants;
@@ -38,22 +41,32 @@ class MCRSolrProxyUtils {
     private MCRSolrProxyUtils() {
     }
 
-    static DefaultHttpClient getHttpClient(int maxConnections) {
+    static CloseableHttpClient getHttpClient(HttpClientConnectionManager connectionManager, int maxConnections) {
+
+        RequestConfig requestConfig = RequestConfig.custom().setStaleConnectionCheckEnabled(false)
+            .setConnectTimeout(30000).setSocketTimeout(30000).build();
+
+        ConnectionConfig connectionConfig = ConnectionConfig.custom().setCharset(Charset.forName("UTF-8")).build();
+        SocketConfig socketConfig = SocketConfig.custom().setTcpNoDelay(true).setSoKeepAlive(true)
+            .setSoReuseAddress(true).build();
+
+        String userAgent = MessageFormat
+            .format("MyCoRe/{0} ({1}; java {2})", MCRCoreVersion.getCompleteVersion(), MCRConfiguration.instance()
+                .getString("MCR.NameOfProject", "undefined"), System.getProperty("java.version"));
+        //setup http client
+        CloseableHttpClient httpClient = HttpClients.custom().setConnectionManager(connectionManager)
+            .setUserAgent(userAgent).setRetryHandler(new MCRSolrRetryHandler(maxConnections))
+            .setDefaultRequestConfig(requestConfig).setDefaultConnectionConfig(connectionConfig)
+            .setDefaultSocketConfig(socketConfig).build();
+        return httpClient;
+    }
+
+    static PoolingHttpClientConnectionManager getConnectionManager(int maxConnections) {
         //configure connection manager
-        PoolingClientConnectionManager connectionManager = new PoolingClientConnectionManager();
+        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setDefaultMaxPerRoute(maxConnections);
         connectionManager.setMaxTotal(maxConnections);
-
-        //setup http client
-        DefaultHttpClient defaultHttpClient = new DefaultHttpClient(connectionManager);
-        defaultHttpClient.setHttpRequestRetryHandler(new MCRSolrRetryHandler(maxConnections));
-        String userAgent = MessageFormat.format("MyCoRe/{0} ({1}; java {2})", MCRCoreVersion.getCompleteVersion(),
-            MCRConfiguration.instance().getString("MCR.NameOfProject", "undefined"), System.getProperty("java.version"));
-        defaultHttpClient.getParams().setParameter(CoreProtocolPNames.HTTP_CONTENT_CHARSET, "UTF-8")
-            .setParameter(CoreProtocolPNames.USER_AGENT, userAgent)
-            .setBooleanParameter(CoreConnectionPNames.TCP_NODELAY, true)
-            .setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false);
-        return defaultHttpClient;
+        return connectionManager;
     }
 
     static HttpHost getHttpHost(String serverUrl) {
