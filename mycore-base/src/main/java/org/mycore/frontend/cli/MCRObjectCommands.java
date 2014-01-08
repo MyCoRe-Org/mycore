@@ -1244,4 +1244,20 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
         LOGGER.info("Check done for " + Integer.toString(counter) + " entries");
     }
+
+    @MCRCommand(syntax = "execute for selected {0}",
+            help = "Calls the given command multiple times for all selected objects. The replacement is defined by an {x}. E.g. 'execute for selected set parent of {x} to myapp_container_00000001'",
+            order = 450)
+    public static List<String> executeForSelected(String command) throws Exception {
+        List<String> commandList = new ArrayList<>();
+        if (!command.contains("{x}")) {
+            LOGGER.info("No replacement defined. Use the {x} variable in order to execute your command with all selected objects.");
+            return commandList;
+        }
+        for (String objID : getSelectedObjectIDs()) {
+            commandList.add(command.replaceAll("\\{x\\}", objID));
+        }
+        return commandList;
+    }
+
 }
