@@ -772,73 +772,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
-     * Delete all selected MCRObjects from the datastore.
-     */
-    @MCRCommand(syntax="delete selected",
-    		help="Removes selected MCRObjects.", order=200)
-    public static void deleteSelected() throws MCRActiveLinkException {
-        LOGGER.info("Start removing selected MCRObjects");
-        if (getSelectedObjectIDs().isEmpty()) {
-            LOGGER.info("No Resultset to work with, use command \"select objects with query {0}\" to build one");
-            return;
-        }
-        for (String id : getSelectedObjectIDs()) {
-            delete(id);
-        }
-        LOGGER.info("Selected MCRObjects deleted");
-    }
-
-    /**
-     * Does a xsl transform with selected MCRObjects.
-     * 
-     * @param xslFilePath file to transform the objects
-     * @return a list of transform commands
-     * @throws MCRActiveLinkException
-     * @see {@link #xslt(String, String)}
-     */
-    @MCRCommand(syntax="transform selected with file {0}",
-    		help="xsl transforms selected MCRObjects", order=290)
-    public static List<String> transformSelected(String xslFilePath) {
-        LOGGER.info("Start transforming selected MCRObjects");
-        File xslFile = new File(xslFilePath);
-        if (!xslFile.exists()) {
-            LOGGER.error("XSLT file not found " + xslFilePath);
-            return new ArrayList<String>();
-        }
-        if (getSelectedObjectIDs().isEmpty()) {
-            LOGGER.info("No Resultset to work with, use command \"select objects with query {0}\" to build one");
-            return new ArrayList<String>();
-        }
-        List<String> commandList = new ArrayList<String>();
-        for (String mcrId : getSelectedObjectIDs()) {
-            commandList.add("xslt " + mcrId + " with file " + xslFilePath);
-        }
-        return commandList;
-    }
-
-    /*
-     * Export selected MCRObjects to a file named <em>MCRObjectID</em> .xml in a directory. The method use the converter stylesheet
-     * mcr_<em>style</em>_object.xsl.
-     * @param dirname the dirname to store the object @param style the type of the stylesheet
-     */
-    @MCRCommand(syntax="export selected to directory {0} with {1}",
-    		help="Stores selected MCRObjects to the directory {0} with the stylesheet {1}-object.xsl. For {1} save is the default.", order=210)
-     
-    public static List<String> exportSelected(String dirname, String style) {
-        LOGGER.info("Start exporting selected MCRObjects");
-
-        if (null == getSelectedObjectIDs()) {
-            LOGGER.info("No Resultset to work with, use command \"select objects with query {0}\" to build one");
-            return Collections.emptyList();
-        }
-        List<String> cmds = new ArrayList<String>(getSelectedObjectIDs().size());
-        for (String id : getSelectedObjectIDs()) {
-            cmds.add("export object from " + id + " to " + id + " to directory " + dirname + " with " + style);
-        }
-        return cmds;
-    }
-
-    /**
      * The method removes all selected entries from search index.
      * 
      * @param index
@@ -1116,6 +1049,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * <p>
      * To use this command create a new xsl file and copy following xslt code into it.
      * </p>
+     * <pre>{@code
      * <?xml version="1.0" encoding="utf-8"?>
      * <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
      *
@@ -1127,11 +1061,13 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *   </xsl:template>
      *
      * </xsl:stylesheet>
-     * 
+     * }</pre>
      * <p>Insert a new template match, for example:</p>
+     * <pre>{@code
      * <xsl:template match="metadata/mainTitle/@heritable">
      *   <xsl:attribute name="heritable"><xsl:value-of select="'true'"/></xsl:attribute>
      * </xsl:template>
+     * }</pre>
      * 
      * @param objectId object to transform
      * @param xslFilePath path to xsl file
