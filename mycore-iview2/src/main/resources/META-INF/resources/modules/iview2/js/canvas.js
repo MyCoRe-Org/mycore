@@ -589,7 +589,9 @@
                 	while(current = that.loadingTile.pop()){
                 		// the image changes and the tiles shouldnt be drawn.
                 		// replace the onload with dummy function.
-                		current.onload=function(){}; 
+                		current.onload=function(){
+                			this.loaded = true;
+                		}; 
                 	}
                 });
                 jQuery(this.getViewer().currentImage).bind(iview.CurrentImage.CHANGE_EVENT, function() {
