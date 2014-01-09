@@ -2,10 +2,6 @@
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd" version="3.0"
   metadata-complete="true">
   
-  <listener>
-    <listener-class>org.mycore.handle.servlets.MCRHandleContextListener</listener-class>
-  </listener>
-
   <servlet>
     <servlet-name>MCRHandleServlet</servlet-name>
     <servlet-class>org.mycore.handle.servlets.MCRHandleServlet</servlet-class>
