@@ -18,24 +18,27 @@
     <xsl:variable name="symbol">
       <xsl:choose>
         <xsl:when test=".='append'">
-          <xsl:value-of select="'+'" />
+          <xsl:value-of select="'chevron-down'" />
         </xsl:when>
         <xsl:when test=".='insert'">
-          <xsl:value-of select="'+'" />
+          <xsl:value-of select="'plus'" />
         </xsl:when>
         <xsl:when test=".='remove'">
-          <xsl:value-of select="'-'" />
+          <xsl:value-of select="'minus'" />
         </xsl:when>
         <xsl:when test=".='up'">
-          <xsl:value-of select="'&#8657;'" />
+          <xsl:value-of select="'arrow-up'" />
         </xsl:when>
         <xsl:when test=".='down'">
-          <xsl:value-of select="'&#8659;'" />
+          <xsl:value-of select="'arrow-down'" />
         </xsl:when>
       </xsl:choose>
     </xsl:variable>
 
-    <input type="submit" value="{$symbol}" name="{$name}" />
+    <button type="submit" class="btn btn-default" name="{$name}">
+      <i class="glyphicon glyphicon-{$symbol}">
+      </i>
+    </button>
   </xsl:template>
 
   <!-- ========== Validation error messages: <xed:validate /> ========== -->

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <div xmlns:xed="http://www.mycore.de/xeditor">
   <form action="/servlets/XEditor">
     <div>
@@ -11,17 +10,27 @@
     <div>
       <input name="/document/name" value="" type="text" />
     </div>
-    <input name="_xed_submit_down:/document|14|15" value="⇓" type="submit" />
+    <button name="_xed_submit_down:/document|14|15" class="btn btn-default" type="submit">
+      <i class="glyphicon glyphicon-arrow-down" />
+    </button>
     <div>
       <input name="/document/name[2]" value="" type="text" />
     </div>
-    <input name="_xed_submit_up:/document|15|14" value="⇑" type="submit" />
-    <input name="_xed_submit_down:/document|15|16" value="⇓" type="submit" />
+    <button name="_xed_submit_up:/document|15|14" class="btn btn-default" type="submit">
+      <i class="glyphicon glyphicon-arrow-up" />
+    </button>
+    <button name="_xed_submit_down:/document|15|16" class="btn btn-default" type="submit">
+      <i class="glyphicon glyphicon-arrow-down" />
+    </button>
     <div>
       <input name="/document/name[3]" value="" type="text" />
     </div>
-    <input name="_xed_submit_up:/document|16|15" value="⇑" type="submit" />
-    <input name="_xed_submit_append:/document/name[3]" value="+" type="submit" />
+    <button name="_xed_submit_up:/document|16|15" class="btn btn-default" type="submit">
+      <i class="glyphicon glyphicon-arrow-up" />
+    </button>
+    <button name="_xed_submit_append:/document/name[3]" class="btn btn-default" type="submit">
+      <i class="glyphicon glyphicon-chevron-down" />
+    </button>
     <input value="testBasicInputComponents-source.xml" name="input" type="hidden" />
     <input value="1-5" name="_xed_session" type="hidden" />
   </form>
