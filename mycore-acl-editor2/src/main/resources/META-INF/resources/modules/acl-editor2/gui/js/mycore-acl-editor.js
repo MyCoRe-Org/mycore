@@ -730,6 +730,9 @@ var ACLEditor = function(){
 					
 				}
 			}
+			else{
+				addPageToPaginator(1, 1, "active");
+			}
 		}
 	}
 	
