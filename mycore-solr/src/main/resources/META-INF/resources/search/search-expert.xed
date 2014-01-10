@@ -90,10 +90,10 @@ form .optional.expanded .fieldset{
         <xed:form class="form-horizontal" role="form">
           <xed:cleanup-rule xpath="/solr-query/*" relevant-if="string-length(.)&gt;0" />
           <xed:bind xpath="solr-query">
-            <xed:bind name="label-width" xpath="@labelWidth" default="4">
+            <xed:bind name="label-width" xpath="@labelWidth" default="3">
               <xed:cleanup-rule xpath="/solr-query/@labelWidth" relevant-if="false()" />
             </xed:bind>
-            <xed:bind name="input-width" xpath="@inputWidth" default="8">
+            <xed:bind name="input-width" xpath="@inputWidth" default="9">
               <xed:cleanup-rule xpath="/solr-query/@inputWidth" relevant-if="false()" />
             </xed:bind>
 
