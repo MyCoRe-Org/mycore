@@ -25,6 +25,7 @@ package org.mycore.datamodel.ifs2;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.provider.local.LocalFile;
@@ -122,7 +123,7 @@ public class MCRFile extends MCRStoredNode {
      */
     public String setContent(MCRContent source) throws IOException {
         MCRContentInputStream cis = source.getContentInputStream();
-        new MCRStreamContent(cis).sendTo(fo);
+        source.sendTo(fo);
         String md5 = cis.getMD5String();
         data.setAttribute("md5", md5);
         getRoot().saveAdditionalData();
