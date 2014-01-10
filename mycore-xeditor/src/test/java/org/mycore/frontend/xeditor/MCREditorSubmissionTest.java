@@ -27,7 +27,9 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jaxen.JaxenException;
 import org.jdom2.Document;
@@ -41,7 +43,7 @@ import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCREditorSubmissionTest extends MCRTestCase{
+public class MCREditorSubmissionTest extends MCRTestCase {
 
     @Test
     public void testSubmitTextfields() throws JaxenException, JDOMException, UnsupportedEncodingException, IOException {
@@ -49,9 +51,11 @@ public class MCREditorSubmissionTest extends MCRTestCase{
         MCREditorSession session = new MCREditorSession();
         session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
 
-        session.getSubmission().setSubmittedValues("/document/title", new String[] { "Title" });
-        session.getSubmission().setSubmittedValues("/document/author/@firstName", new String[] { "Jim" });
-        session.getSubmission().setSubmittedValues("/document/author/@lastName", new String[] { "" });
+        Map<String, String[]> submittedValues = new HashMap<String, String[]>();
+        submittedValues.put("/document/title", new String[] { "Title" });
+        submittedValues.put("/document/author/@firstName", new String[] { "Jim" });
+        submittedValues.put("/document/author/@lastName", new String[] { "" });
+        session.getSubmission().setSubmittedValues(submittedValues);
         session.getSubmission().emptyNotResubmittedNodes();
 
         template = "document[title='Title'][author[@firstName='Jim'][@lastName='']]";
@@ -73,7 +77,11 @@ public class MCREditorSubmissionTest extends MCRTestCase{
         assertEquals("", session.getEditedXML().getRootElement().getAttributeValue("archive"));
 
         session.getSubmission().setXPaths2CheckResubmission("@archive");
-        session.getSubmission().setSubmittedValues("/document/@archive", new String[] { "true" });
+
+        Map<String, String[]> submittedValues = new HashMap<String, String[]>();
+        submittedValues.put("/document/@archive", new String[] { "true" });
+        session.getSubmission().setSubmittedValues(submittedValues);
+
         session.getSubmission().emptyNotResubmittedNodes();
 
         assertEquals("true", session.getEditedXML().getRootElement().getAttributeValue("archive"));
@@ -95,7 +103,11 @@ public class MCREditorSubmissionTest extends MCRTestCase{
         assertEquals("", categories.get(2).getText());
 
         session.getSubmission().mark2checkResubmission(new MCRBinding("/document/category", true, session.getRootBinding()));
-        session.getSubmission().setSubmittedValues("/document/category", new String[] { "c", "d" });
+
+        Map<String, String[]> submittedValues = new HashMap<String, String[]>();
+        submittedValues.put("/document/category", new String[] { "c", "d" });
+        session.getSubmission().setSubmittedValues(submittedValues);
+
         session.getSubmission().emptyNotResubmittedNodes();
 
         categories = session.getEditedXML().getRootElement().getChildren("category");
@@ -105,7 +117,11 @@ public class MCREditorSubmissionTest extends MCRTestCase{
         assertEquals("", categories.get(2).getText());
 
         session.getSubmission().mark2checkResubmission(new MCRBinding("/document/category", true, session.getRootBinding()));
-        session.getSubmission().setSubmittedValues("/document/category", new String[] { "a", "b", "c", "d" });
+
+        submittedValues.clear();
+        submittedValues.put("/document/category", new String[] { "a", "b", "c", "d" });
+        session.getSubmission().setSubmittedValues(submittedValues);
+
         session.getSubmission().emptyNotResubmittedNodes();
 
         categories = session.getEditedXML().getRootElement().getChildren("category");

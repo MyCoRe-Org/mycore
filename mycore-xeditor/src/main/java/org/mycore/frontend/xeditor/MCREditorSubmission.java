@@ -1,5 +1,6 @@
 package org.mycore.frontend.xeditor;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -74,14 +75,22 @@ public class MCREditorSubmission {
             setXPaths2CheckResubmission(xPaths2Check[0]);
 
         xPath2DefaultValue.clear();
+
+        Map<MCRBinding, String[]> valuesToSet = new HashMap<MCRBinding, String[]>();
+
         for (String paramName : values.keySet())
-            if (paramName.startsWith("/"))
-                setSubmittedValues(paramName, values.get(paramName));
-            else if (paramName.startsWith(PREFIX_DEFAULT_VALUE)) {
+            if (paramName.startsWith("/")) {
+                MCRBinding binding = new MCRBinding(paramName, true, session.getRootBinding());
+                valuesToSet.put(binding, values.get(paramName));
+            } else {
                 String xPath = paramName.substring(PREFIX_DEFAULT_VALUE.length());
                 String defaultValue = values.get(paramName)[0];
                 markDefaultValue(xPath, defaultValue);
             }
+
+        for (MCRBinding binding : valuesToSet.keySet()) {
+            setSubmittedValues(binding, valuesToSet.get(binding));
+        }
 
         emptyNotResubmittedNodes();
         setDefaultValues();
@@ -90,8 +99,7 @@ public class MCREditorSubmission {
 
     }
 
-    public void setSubmittedValues(String xPath, String[] values) throws JDOMException, JaxenException {
-        MCRBinding binding = new MCRBinding(xPath, true, session.getRootBinding());
+    private void setSubmittedValues(MCRBinding binding, String[] values) throws JDOMException, JaxenException {
         List<Object> boundNodes = binding.getBoundNodes();
 
         while (boundNodes.size() < values.length)
