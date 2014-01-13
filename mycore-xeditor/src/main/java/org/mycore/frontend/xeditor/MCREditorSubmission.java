@@ -82,7 +82,7 @@ public class MCREditorSubmission {
             if (paramName.startsWith("/")) {
                 MCRBinding binding = new MCRBinding(paramName, true, session.getRootBinding());
                 valuesToSet.put(binding, values.get(paramName));
-            } else {
+            } else if (paramName.startsWith(PREFIX_DEFAULT_VALUE)) {
                 String xPath = paramName.substring(PREFIX_DEFAULT_VALUE.length());
                 String defaultValue = values.get(paramName)[0];
                 markDefaultValue(xPath, defaultValue);
@@ -96,7 +96,6 @@ public class MCREditorSubmission {
         setDefaultValues();
 
         session.setBreakpoint("After setting submitted values");
-
     }
 
     private void setSubmittedValues(MCRBinding binding, String[] values) throws JDOMException, JaxenException {
