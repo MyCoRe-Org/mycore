@@ -10,6 +10,23 @@
 "use strict";
 (function($) {
   $(document).ready(function(){
+    $.fn.cloneForm = function(val1, val2){
+      var ret, cur;
+      ret = $(this).clone(val1, val2);
+      cur = $(this);
+      //due to: http://bugs.jquery.com/ticket/3016
+      ret.find('textarea').each(function() {
+          var value;
+          value = cur.find('[name="$name"]'.replace('$name', $(this).attr('name'))).val();
+          $(this).val(value);
+      });
+      //due to: http://bugs.jquery.com/ticket/1294
+      cur.find('select').each(function(i){
+        var select = this;
+        ret.find('select[name="$name"]'.replace('$name', $(this).attr('name'))).val($(select).val());
+      });
+      return ret;
+    };
     var updateFieldsets=function(){
       var fieldset = $(this).parents('fieldset');
       if (this.checked) {
@@ -29,11 +46,11 @@
     })
     .parents('form').on('submit', function(event){
       event.preventDefault();
-      var form=$(this).clone();
+      var form=$(this).cloneForm(true, true);
+      form.off('submit');
       var origButtonName = $(this).data('button') || form.find('*[type="submit"]').get(0).name;
       $('#formSpace').empty().append(form);
       form.find(':disabled').val("").prop('disabled',false);
-      form.find('#wt').val($(this).find('#wt').val());
       form[0][origButtonName].click();
     })
     .find('*[type="submit"]').on('click', function(){
