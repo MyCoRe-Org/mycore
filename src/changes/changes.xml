@@ -15,6 +15,12 @@
       <action dev="mcrkrebs" type="add" date="2013-12-04">
         mods: added condition for conference title (merged revision 28542 and 28555)
       </action>
+      <action dev="mcrkrebs" type="fix" date="2013-11-07">
+        mods: check only roleTerm for mods:mods/mods:name (merged revision 28332)
+      </action>
+      <action dev="mcrkrebs" type="fix" date="2013-11-06">
+        mods: fixed presentation of dateIssued and relatedItem[@type='isReferencedBy'] (merged revision 28317)
+      </action>
       <action dev="mcrkrebs" type="fix" date="2013-11-06">
         mods: moved originInfo/dateIssued directly to mods, is no longer part of relatedItem (merged revision 28316)
       </action>
