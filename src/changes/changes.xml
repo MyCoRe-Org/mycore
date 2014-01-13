@@ -7,6 +7,9 @@
   <body>
     <release version="2013.06.0.2" date="TBA" description="2013.06.0 maintenance release 2">
       <action dev="mcrkrebs" type="fix" date="2013-12-13">
+        mods: fixed title layout for chapter (merged revision 28646)
+      </action>
+      <action dev="mcrkrebs" type="fix" date="2013-12-13">
         mods: fixed genre xpath for kindOf (merged revision 28645)
       </action>
       <action dev="mcrkrebs" type="add" date="2013-12-04">
