@@ -2,8 +2,8 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xed="http://www.mycore.de/xeditor"
   xmlns:mcrsolr="http://www.mycore.de/components/solr" xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions">
   <xsl:param name="MCR.Module-solr.ServerURL" />
-  <xsl:variable name="label-width" select="4" />
-  <xsl:variable name="input-width" select="12 - $label-width" />
+  <xsl:variable name="mcrsolr:label-width" select="3" />
+  <xsl:variable name="mcrsolr:input-width" select="12 - $mcrsolr:label-width" />
 
   <xsl:template match="mcrsolr:fieldset">
     <xsl:variable name="paraname">
@@ -57,10 +57,10 @@
     <xsl:choose>
       <xsl:when test="@repeatable='true'">
         <div class="form-group">
-          <label class="col-md-{$label-width} control-label" for="{id}">
+          <label class="col-md-{$mcrsolr:label-width} control-label" for="{id}">
             <xsl:value-of select="@name" />
           </label>
-          <div class="col-md-{$input-width}">
+          <div class="col-md-{$mcrsolr:input-width}">
             <div class="multiple">
               <div class="row clearfix">
                 <xed:repeat xpath="param[@name='{@name}']">
@@ -90,10 +90,10 @@
           <xsl:copy-of select="@initially" />
           <xsl:copy-of select="@default" />
           <div class="form-group">
-            <label class="col-md-{$label-width} control-label" for="{$id}">
+            <label class="col-md-{$mcrsolr:label-width} control-label" for="{$id}">
               <xsl:value-of select="@name" />
             </label>
-            <div class="col-md-{$input-width}">
+            <div class="col-md-{$mcrsolr:input-width}">
               <input class="form-control" type="text" id="{$id}">
                 <xsl:copy-of select="@title" />
                 <xsl:copy-of select="@placeholder" />
@@ -143,7 +143,7 @@
       <xsl:copy-of select="@initially" />
       <xsl:copy-of select="@default" />
       <div class="form-group">
-        <div class="col-md-offset-{$label-width} col-md-{$input-width}">
+        <div class="col-md-offset-{$mcrsolr:label-width} col-md-{$mcrsolr:input-width}">
           <div class="checkbox">
             <label for="{$id}">
               <input type="checkbox" value="{$value}" id="{$id}">
@@ -165,10 +165,10 @@
       <xsl:copy-of select="@initially" />
       <xsl:copy-of select="@default" />
       <div class="form-group">
-        <label class="col-md-{$label-width} control-label" for="{$id}">
+        <label class="col-md-{$mcrsolr:label-width} control-label" for="{$id}">
           <xsl:value-of select="@name" />
         </label>
-        <div class="col-md-{$input-width}">
+        <div class="col-md-{$mcrsolr:input-width}">
           <textarea class="form-control" id="{$id}">
             <xsl:copy-of select="@title" />
             <xsl:copy-of select="@placeholder" />
