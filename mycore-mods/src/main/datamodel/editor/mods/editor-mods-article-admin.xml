@@ -85,7 +85,7 @@
         <cell row="20" col="1" anchor="NORTHEAST">
           <text i18n="component.mods.metaData.dictionary.volume.article" />
         </cell>
-        <cell row="20" col="2" colspan="2" var="mods:detail[@type='volume']/mods:number" anchor="NORTHWEST" ref="TFzeile10" />
+        <cell row="20" col="2" colspan="2" var="mods:detail[@type='volume']/mods:number" anchor="NORTHWEST" ref="TFzeile32" />
         <cell row="30" col="1" anchor="NORTHEAST">
           <text i18n="component.mods.metaData.dictionary.year" />
         </cell>
@@ -112,7 +112,7 @@
 
     <!-- Datum der Veröffentlichung [text] -->
     <cell row="70" col="1" anchor="NORTHEAST" class="mandatory" ref="mods.dateIssued.label" />
-    <cell row="70" col="2" anchor="NORTHWEST" ref="mods.dateIssued" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']/mods:originInfo" />
+    <cell row="70" col="2" anchor="NORTHWEST" ref="mods.dateIssued" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
     <cell row="70" col="3" anchor="NORTHWEST" ref="mods.dateIssued.help" />
     <!-- Datum der Veröffentlichung END -->
 

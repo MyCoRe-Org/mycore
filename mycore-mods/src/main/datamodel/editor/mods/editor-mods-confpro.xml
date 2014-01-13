@@ -124,7 +124,7 @@
     </cell>
     <cell row="38" col="2"
       var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']/mods:part/mods:detail[@type='volume']/mods:number"
-      anchor="NORTHWEST" ref="TFzeile10" />
+      anchor="NORTHWEST" ref="TFzeile32" />
     <cell row="38" col="3" anchor="NORTHWEST" ref="mods.volume.help" />
     <!-- Volume END -->
 

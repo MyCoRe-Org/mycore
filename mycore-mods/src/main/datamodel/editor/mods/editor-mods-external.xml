@@ -37,7 +37,6 @@
 
   <!-- object type specific genre.kindOf specification -->
     <panel id="mods.genre.kindOfPublication.confpub">
-      <hidden var="@type" default="kindof" />
       <hidden var="@displayLabel" default="Kind of Publication" />
       <cell var="@mcr:categId">
         <list width="30" type="dropdown" id="mods.genre.kindOfPublication.list">
@@ -52,8 +51,7 @@
     </panel>
 
     <panel id="mods.genre.kindOfReport">
-      <cell anchor="NORTHWEST" var="mods:genre">
-        <hidden var="@type" default="kindof" />
+      <cell anchor="NORTHWEST" var="mods:genre[@type='kindof']">
         <hidden var="@displayLabel" default="Kind of Report" />
         <panel>
           <cell var="@mcr:categId">
@@ -71,8 +69,7 @@
     </panel>
 
     <panel id="mods.genre.kindOfAVMedia">
-      <cell anchor="NORTHWEST" var="mods:genre">
-        <hidden var="@type" default="kindof" />
+      <cell anchor="NORTHWEST" var="mods:genre[@type='kindof']">
         <hidden var="@displayLabel" default="Kind of AV Media" />
         <panel>
           <cell var="@mcr:categId">
@@ -90,8 +87,7 @@
     </panel>
 
     <panel id="mods.genre.kindOfThesis">
-      <cell anchor="NORTHWEST" var="mods:genre">
-        <hidden var="@type" default="kindof" />
+      <cell anchor="NORTHWEST" var="mods:genre[@type='kindof']">
         <hidden var="@displayLabel" default="Kind of Thesis" />
         <panel>
           <cell var="@mcr:categId">
@@ -109,8 +105,7 @@
     </panel>
 
     <panel id="mods.genre.journal">
-      <cell anchor="NORTHWEST" var="mods:genre">
-        <hidden var="@type" default="intern" />
+      <cell anchor="NORTHWEST" var="mods:genre[@type='intern']">
         <panel>
           <cell var="@mcr:categId">
             <list type="radio" id="mods.genre.journal.list" default="marc_genres:journal">

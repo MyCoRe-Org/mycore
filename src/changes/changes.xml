@@ -6,6 +6,18 @@
   </properties>
   <body>
     <release version="2013.06.0.2" date="TBA" description="2013.06.0 maintenance release 2">
+      <action dev="mcrkrebs" type="fix" date="2013-12-13">
+        mods: fixed genre xpath for kindOf (merged revision 28645)
+      </action>
+      <action dev="mcrkrebs" type="add" date="2013-12-04">
+        mods: added condition for conference title (merged revision 28542 and 28555)
+      </action>
+      <action dev="mcrkrebs" type="fix" date="2013-11-06">
+        mods: moved originInfo/dateIssued directly to mods, is no longer part of relatedItem (merged revision 28316)
+      </action>
+      <action dev="mcrkrebs" type="remove" date="2013-10-16">
+        mods: removed 'please select' option for role, default is given (merged revision 28154)
+      </action>
       <action dev="mcrkrebs" type="fix" date="2013-10-10">
         mods: fixed volume and issue presentation and editor fields (merged revision 28097-28099)
       </action>

@@ -77,7 +77,7 @@
 
     <!-- Volume -->
     <cell row="65" col="1" anchor="NORTHEAST"><text i18n="component.mods.metaData.dictionary.volume.article" /></cell>
-    <cell row="65" col="2" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']/mods:part/mods:detail[@type='volume']/mods:number" anchor="NORTHWEST" ref="TFzeile10" />
+    <cell row="65" col="2" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']/mods:part/mods:detail[@type='volume']/mods:number" anchor="NORTHWEST" ref="TFzeile32" />
     <cell row="65" col="3" anchor="NORTHWEST" ref="mods.volume.help" />
     <!-- Volume END -->
 
