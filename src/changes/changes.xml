@@ -5,6 +5,8 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
+    <release version="2014.01" date="2014-01-15" description="Tất Niên">
+    </release>
     <release version="2013.11" date="2013-11-11" description="Codenamed &apos;Leila – Helau!&apos;">
       <action dev="mcrvuchi" type="fix" date="2013-11-08">
         MCRObjectTypeStrategy: fixed regular expression to get object type
