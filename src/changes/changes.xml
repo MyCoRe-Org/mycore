@@ -30,6 +30,9 @@
       <action dev="mcrkrebs" type="fix" date="2013-11-06">
         mods: moved originInfo/dateIssued directly to mods, is no longer part of relatedItem (merged revision 28316)
       </action>
+      <action dev="mcrjkupf" type="fix" date="2013-11-04">
+        googlesitemap: fix bug ** [bugs:#663] using MCR.GoogleSitemap.Directory causes errors** (merged revision 28258 and 28303)
+      </action>
       <action dev="mcrkrebs" type="remove" date="2013-10-16">
         mods: removed 'please select' option for role, default is given (merged revision 28154)
       </action>
