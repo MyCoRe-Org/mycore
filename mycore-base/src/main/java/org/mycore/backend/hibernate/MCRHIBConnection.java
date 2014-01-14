@@ -35,11 +35,10 @@ import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.jmx.StatisticsService;
 import org.hibernate.mapping.Table;
 import org.hibernate.service.ServiceRegistry;
-import org.hibernate.service.ServiceRegistryBuilder;
 import org.hibernate.stat.Statistics;
 import org.hibernate.type.BooleanType;
 import org.hibernate.type.DateType;
@@ -77,6 +76,10 @@ public class MCRHIBConnection implements Closeable {
     private static Logger LOGGER = Logger.getLogger(MCRHIBConnection.class);
 
     private static String DIALECT;
+
+    private String JMX_TYPE = "Hibernate";
+
+    private String JMX_COMPONENT_STATISTICS = "Statistics";
 
     @Override
     protected void finalize() throws Throwable {
@@ -133,7 +136,7 @@ public class MCRHIBConnection implements Closeable {
             LOGGER.info("Add mapping: " + resourceName);
             HIBCFG.addResource(resourceName);
         }
-        serviceRegistry = new ServiceRegistryBuilder().applySettings(HIBCFG.getProperties()).buildServiceRegistry();
+        serviceRegistry = new StandardServiceRegistryBuilder().applySettings(HIBCFG.getProperties()).build();
         LOGGER.info("Hibernate configured");
     }
 
@@ -152,18 +155,23 @@ public class MCRHIBConnection implements Closeable {
 
     public synchronized void buildSessionFactory(Configuration config) {
         sessionFactory.close();
-        ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(HIBCFG.getProperties())
-            .buildServiceRegistry();
+        ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(HIBCFG.getProperties())
+            .build();
+        unregisterStatisticsService();
         sessionFactory = config.buildSessionFactory(serviceRegistry);
+        registerStatisticsService();
         HIBCFG = config;
         this.serviceRegistry = serviceRegistry;
     }
 
     private void registerStatisticsService() {
-        StatisticsService stats = new StatisticsService();
-        stats.setSessionFactory(getSessionFactory());
-        final String hibernateBaseName = "Hibernate";
-        MCRJMXBridge.register(stats, hibernateBaseName, "Statistics");
+        //TODO: Get this work again with hibernate 4.3
+        Statistics stats = getSessionFactory().getStatistics();
+        //MCRJMXBridge.register(stats, JMX_TYPE, JMX_COMPONENT_STATISTICS);
+    }
+
+    private void unregisterStatisticsService() {
+        //MCRJMXBridge.unregister(JMX_TYPE, JMX_COMPONENT_STATISTICS);
     }
 
     /**
@@ -321,7 +329,9 @@ public class MCRHIBConnection implements Closeable {
     public SessionFactory getSessionFactory() {
         if (sessionFactory.isClosed()) {
             sessionFactory = null;
+            unregisterStatisticsService();
             buildSessionFactory();
+            registerStatisticsService();
         }
 
         return sessionFactory;

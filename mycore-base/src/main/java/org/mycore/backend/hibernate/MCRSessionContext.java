@@ -114,8 +114,8 @@ public class MCRSessionContext extends ThreadLocalSessionContext implements MCRS
     }
 
     @Override
-    protected CleanupSynch buildCleanupSynch() {
-        return new CleanupSynch(factory) {
+    protected ThreadLocalSessionContext.CleanupSync buildCleanupSynch() {
+        return new ThreadLocalSessionContext.CleanupSync(factory) {
             private static final long serialVersionUID = -7894370437708819993L;
 
             @Override
