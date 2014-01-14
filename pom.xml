@@ -23,9 +23,9 @@
     <lucene.version>3.6.2</lucene.version>
     <xalan.version>2.7.1</xalan.version>
     <jersey.version>1.17.1</jersey.version>
-    <changelog.since>2013-11-11</changelog.since>
+    <changelog.since>2014-01-14</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
-    <changes.version>2014.01</changes.version>
+    <changes.version>2014.02</changes.version>
   </properties>
   <issueManagement>
     <system>sourceforge</system>

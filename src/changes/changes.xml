@@ -5,7 +5,9 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2014.01" date="2014-01-15" description="Tất Niên">
+    <release version="2014.02" date="2014-02-00" description="TBA">
+    </release>
+    <release version="2014.01" date="2014-01-14" description="Tất Niên">
       <action dev="mcrfluet" date="2014-01-10" type="fix" due-to="Thomas Scheffler">
         XPath binding does not work with automatic element duplication
         <fixes issue="671" />
