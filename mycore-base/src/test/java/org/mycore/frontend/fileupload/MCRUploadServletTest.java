@@ -43,7 +43,7 @@ public class MCRUploadServletTest extends MCRTestCase {
     @Test
     public void checkPathName() {
         String prefix = "junit";
-        String suffix = "test.file";
+        String suffix = "test..file";
         String[] genDelims = new String[] { ":", "?", "#", "[", "]", "@" };
         String[] subDelims = new String[] { "!", "$", "&", "'", "(", ")", "*", "+", ",", ";", "=" };
         List<String> genDelimTestNames = new ArrayList<String>(genDelims.length);
@@ -83,6 +83,16 @@ public class MCRUploadServletTest extends MCRTestCase {
             failed = true;
         }
         assertFalse("Path " + testPath + " did fail non reserved character test.", failed);
+        //http://sourceforge.net/p/mycore/bugs/668/
+        failed = false;
+        testPath = "../../" + prefix + suffix;
+        try {
+            MCRUploadServlet.checkPathName(testPath);
+        } catch (MCRException e) {
+            Logger.getLogger(MCRUploadServletTest.class).debug("Test successfully failed", e);
+            failed = true;
+        }
+        assertTrue("Path " + testPath + " did not fail jail break test #668.", failed);
     }
 
 }

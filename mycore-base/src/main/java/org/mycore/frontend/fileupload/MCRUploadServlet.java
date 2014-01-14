@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -67,7 +67,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * This servlet implements the server side of communication with the upload
  * applet. The content of the uploaded files are handled by a MCRUploadHandler
  * subclass.
- * 
+ *
  * @author Frank Lützenkirchen
  * @author Harald Richter
  * @author Thomas Scheffler (yagee)
@@ -357,7 +357,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     /**
      * Extracts all filenames and fileitems of target
      * {@link MCREditorSubmission}.
-     * 
+     *
      * @param sub
      *            editor submission where are file <code>path</code> elements
      *            are submitted
@@ -377,7 +377,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     /**
      * Extracts all filenames and fileitems of target
      * {@link MCRRequestParameters}.
-     * 
+     *
      * @param params
      *            request parameters where file <code>path</code> elements are
      *            submitted
@@ -427,10 +427,10 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
     /**
      * checks if path contains reserved URI characters.
-     * 
+     *
      * There are some characters that are maybe allowed in file names but are
      * reserved in URIs.
-     * 
+     *
      * @see <a href="http://tools.ietf.org/html/rfc3986#section-2.2">RFC3986,
      *      Section 2.2</a>
      * @param path
@@ -446,6 +446,9 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
         if (!subDelims.matcher(path).matches()) {
             String delims = "\"!\" / \"$\" / \"&\" / \"'\" / \"(\" / \")\" / \"*\" / \"+\" / \",\" / \";\" / \"=\" \"%\"";
             throw new MCRException("Path name " + path + " contains reserved characters from sub-delims: " + delims);
+        }
+        if (path.contains("../") || path.contains("..\\")) {
+            throw new MCRException("Path name " + path + " may not contain \"../\".");
         }
     }
 
