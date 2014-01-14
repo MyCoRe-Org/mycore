@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2013.06.0.2" date="TBA" description="2013.06.0 maintenance release 2">
+      <action dev="mcrfluet" type="fix" date="2014-01-10">
+        ifs: Fixed bug #666 (MD5 error in MCRFSNODES for IFS2). MessageDigest.digest() must be called only once. (merged revision 28764)
+      </action>
       <action dev="mcrkrebs" type="fix" date="2013-12-13">
         mods: fixed title layout for chapter (merged revision 28646)
       </action>

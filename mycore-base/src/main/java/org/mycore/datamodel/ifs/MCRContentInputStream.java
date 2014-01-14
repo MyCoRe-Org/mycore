@@ -49,6 +49,9 @@ public class MCRContentInputStream extends FilterInputStream {
     protected final static int headerSize = 65536;
 
     /** The MD5 checksum of all bytes read through this stream */
+    protected byte[] md5 = null;
+    
+    /** The message digest to build the MD5 checksum */
     protected MessageDigest digest = null;
 
     /** The total number of bytes read so far */
@@ -164,7 +167,9 @@ public class MCRContentInputStream extends FilterInputStream {
      * @return the MD5 message digest checksum of all bytes that have been read
      */
     public byte[] getMD5() {
-        return digest.digest();
+        if (md5 == null)
+            md5 = digest.digest();
+        return md5;
     }
 
     /**
