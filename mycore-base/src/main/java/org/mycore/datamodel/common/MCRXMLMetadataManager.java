@@ -745,11 +745,12 @@ public class MCRXMLMetadataManager {
     }
 
     /**
-     * Lists all types of MCRObjects. The type is middle part of a MCRObjectID (project_TYPE_id).
+     * Returns all stored object types of MCRObjects.
      * 
      * @return collection of object types
+     * @see MCRObjectID#getTypeId();
      */
-    public Collection<String> listObjectTypes() {
+    public Collection<String> getObjectTypes() {
         Set<String> set = new java.util.HashSet<>();
         File[] projectDirectories = getProjectDirectories();
         for (File projectDirectory : projectDirectories) {

@@ -311,7 +311,7 @@ public class MCRSolrIndexer {
      * @throws SolrServerException
      */
     public static void synchronizeMetadataIndex() throws IOException, SolrServerException {
-        Collection<String> objectTypes = MCRXMLMetadataManager.instance().listObjectTypes();
+        Collection<String> objectTypes = MCRXMLMetadataManager.instance().getObjectTypes();
         for (String objectType : objectTypes) {
             synchronizeMetadataIndex(objectType);
         }
