@@ -756,9 +756,18 @@
             </td>
             <td class="metavalue">
               <p>
-                <a href="{$ServletsBaseURL}MCRSearchServlet?parent={$context/@ID}">
-                  <xsl:value-of select="i18n:translate('component.mods.metaData.displayAll')" />
-                </a>
+                <xsl:choose>
+                  <xsl:when test="$CurrentUser!=$MCR.Users.Guestuser.UserName">
+                    <a href="{$ServletsBaseURL}solr/parent?q={$context/@ID}&amp;fq=">
+                      <xsl:value-of select="i18n:translate('component.mods.metaData.displayAll')" />
+                    </a>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <a href="{$ServletsBaseURL}solr/parent?q={$context/@ID}">
+                      <xsl:value-of select="i18n:translate('component.mods.metaData.displayAll')" />
+                    </a>
+                  </xsl:otherwise>
+                </xsl:choose>
               </p>
               <xsl:for-each select="$children[position() &gt;= $positionMin]">
                 <xsl:call-template name="objectLink">
