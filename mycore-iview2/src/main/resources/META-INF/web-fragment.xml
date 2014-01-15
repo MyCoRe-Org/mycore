@@ -3,10 +3,6 @@
 <!-- **************************************************************** -->
 <!-- Servlets and mappings of iview2                                  -->
 <!-- **************************************************************** -->
-  <listener>
-    <listener-class>org.mycore.iview2.events.MCRIView2ServletContextListener</listener-class>
-  </listener>
-
   <servlet>
     <servlet-name>MCRTileServlet</servlet-name>
     <servlet-class>org.mycore.iview2.frontend.MCRTileServlet</servlet-class>

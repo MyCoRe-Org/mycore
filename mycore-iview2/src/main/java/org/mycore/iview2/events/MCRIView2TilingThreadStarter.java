@@ -23,33 +23,33 @@
 
 package org.mycore.iview2.events;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import javax.servlet.ServletContext;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.events.MCRStartupHandler;
 import org.mycore.iview2.services.MCRImageTiler;
-import org.mycore.iview2.services.MCRTilingQueue;
 
 /**
  * Handles tiling process in a web application.
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRIView2ServletContextListener implements ServletContextListener {
-    private static Logger LOGGER = Logger.getLogger(MCRIView2ServletContextListener.class);
+public class MCRIView2TilingThreadStarter implements MCRStartupHandler.AutoExecutable {
+    private static Logger LOGGER = Logger.getLogger(MCRIView2TilingThreadStarter.class);
 
-    /**
-     * Shuts down {@link MCRImageTiler} and {@link MCRTilingQueue}
-     * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
-     */
-    public void contextDestroyed(ServletContextEvent sce) {
+    @Override
+    public String getName() {
+        return "Image Viewer Tiling Thread";
     }
 
-    /** Starts new {@link MCRImageTiler} thread if not currently running
-     * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
-     */
-    public void contextInitialized(ServletContextEvent sce) {
-        if (!MCRImageTiler.isRunning()) {
+    @Override
+    public int getPriority() {
+        return 0;
+    }
+
+    @Override
+    public void startUp(ServletContext servletContext) {
+        if (servletContext != null && !MCRImageTiler.isRunning()) {
             LOGGER.info("Starting Tiling thread.");
             System.setProperty("java.awt.headless", "true");
             Thread tilingThread = new Thread(MCRImageTiler.getInstance());
