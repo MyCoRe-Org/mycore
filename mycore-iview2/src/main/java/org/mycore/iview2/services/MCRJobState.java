@@ -17,7 +17,11 @@ public enum MCRJobState {
     /**
      * image tiling process is complete
      */
-    FINISHED('f');
+    FINISHED('f'),
+    /**
+     * image tiling process is complete
+     */
+    ERROR('e');
 
     private char status;
 
@@ -40,6 +44,10 @@ public enum MCRJobState {
      *  <tr>
      *   <th>{@link #FINISHED}</th>
      *   <td>'f'</td>
+     *  </tr>
+     *  <tr>
+     *   <th>{@link #ERROR}</th>
+     *   <td>'e'</td>
      *  </tr>
      * </table>
      */

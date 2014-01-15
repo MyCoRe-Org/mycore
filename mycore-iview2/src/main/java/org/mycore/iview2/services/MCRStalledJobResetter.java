@@ -1,19 +1,21 @@
 package org.mycore.iview2.services;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+
 import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.Query;
-
-import java.util.Iterator;
-import java.util.Date;
-import org.hibernate.HibernateException;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 
 /**
  * Resets jobs that took to long to tile.
  * Set property <code>MCR.Module-iview2.TimeTillReset</code> to alter grace period.
+ * Set property <code>MCR.Module-iview2.MaxResetCount</code> to alter maximum tries per job.
  * @author Thomas Scheffler (yagee)
  */
 public class MCRStalledJobResetter implements Runnable {
@@ -25,7 +27,12 @@ public class MCRStalledJobResetter implements Runnable {
 
     private static Logger LOGGER = Logger.getLogger(MCRStalledJobResetter.class);
 
+    private static int maxResetCount = Integer.parseInt(MCRIView2Tools.getIView2Property("MaxResetCount"));
+
+    private HashMap<Long, Integer> jobCounter;
+
     private MCRStalledJobResetter() {
+        jobCounter = new HashMap<>();
     }
 
     public static MCRStalledJobResetter getInstance() {
@@ -41,7 +48,8 @@ public class MCRStalledJobResetter implements Runnable {
         Transaction executorTransaction = session.beginTransaction();
         LOGGER.info("MCRTileJob is Checked for dead Entries");
 
-        Query query = session.createQuery("FROM MCRTileJob WHERE status='" + MCRJobState.PROCESSING.toChar() + "' ORDER BY id ASC");
+        Query query = session.createQuery("FROM MCRTileJob WHERE status='" + MCRJobState.PROCESSING.toChar()
+            + "' ORDER BY id ASC");
         long start = 0;
         long current = new Date(System.currentTimeMillis()).getTime() / 60000;
 
@@ -52,12 +60,17 @@ public class MCRStalledJobResetter implements Runnable {
             start = job.getStart().getTime() / 60000;
             LOGGER.debug("checking " + job.getDerivate() + " " + job.getPath() + " ...");
             if (current - start >= maxTimeDiff) {
-                LOGGER.debug("->Resetting too long in queue");
-
-                job.setStatus(MCRJobState.NEW);
-                job.setStart(null);
+                if (hasPermanentError(job)) {
+                    LOGGER.warn("Job has permanent errors: " + job);
+                    job.setStatus(MCRJobState.ERROR);
+                    jobCounter.remove(job.getId());
+                } else {
+                    LOGGER.debug("->Resetting too long in queue");
+                    job.setStatus(MCRJobState.NEW);
+                    job.setStart(null);
+                    reset = true;
+                }
                 session.update(job);
-                reset = true;
             } else {
                 LOGGER.debug("->ok");
             }
@@ -79,5 +92,17 @@ public class MCRStalledJobResetter implements Runnable {
         }
         session.close();
         LOGGER.info("MCRTileJob checking is done");
+    }
+
+    private boolean hasPermanentError(MCRTileJob job) {
+        int runs = 0;
+        if (jobCounter.containsKey(job.getId())) {
+            runs = jobCounter.get(job.getId());
+        }
+        if (++runs >= maxResetCount) {
+            return true;
+        }
+        jobCounter.put(job.getId(), runs);
+        return false;
     }
 }
