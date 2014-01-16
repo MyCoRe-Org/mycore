@@ -130,8 +130,9 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         for (MCRCategory child : category.getChildren()) {
             String childID = child.getId().getID();
             long numResults = 0;
+            
+            queryAdapter.setCategory(addClassId ? child.getId().toString() : childID);
             if (countResults) {
-                queryAdapter.setCategory(addClassId ? child.getId().toString() : childID);
                 numResults = queryAdapter.getResultCount();
                 if ((!emptyLeaves) && (numResults < 1))
                     continue;
