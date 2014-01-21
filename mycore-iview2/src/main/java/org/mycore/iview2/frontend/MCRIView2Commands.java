@@ -102,6 +102,35 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     }
 
     /**
+     * meta command to tile all images of derivates of a project.
+     * @return list of commands to execute.
+     */
+    @MCRCommand(syntax="tile images of derivates of project {0}", help="tiles all images of derivates of a project with a supported image type as main document", order=41)
+    public static List<String> tileAllOfProject(String project) {
+        return forAllDerivatesOfProject(TILE_DERIVATE_TILES_COMMAND_SYNTAX, project);
+    }
+
+    /**
+     * meta command to check (and repair) tiles of all images of derivates of a project.
+     * @return list of commands to execute.
+     */
+    @MCRCommand(syntax="check tiles of derivates of project {0}", help="checks if all images have valid iview2 files and start tiling if not", order=11)
+    public static List<String> checkAllOfProject(String project) {
+        return forAllDerivatesOfProject(CHECK_TILES_OF_DERIVATE_COMMAND_SYNTAX, project);
+    }
+
+    private static List<String> forAllDerivatesOfProject(String batchCommandSyntax, String project) {
+        List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
+        List<String> cmds = new ArrayList<String>(ids.size());
+        for (String id : ids) {
+            if (id.startsWith(project)) {
+                cmds.add(MessageFormat.format(batchCommandSyntax, id));
+            }
+        }
+        return cmds;
+    }
+
+    /**
      * meta command to tile all images of derivates of an object .
      * @param objectID a object ID
      * @return list of commands to execute.
