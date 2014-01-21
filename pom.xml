@@ -26,7 +26,15 @@
     <changelog.since>2014-01-14</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
     <changes.version>2014.02</changes.version>
+    <site.suffix />
   </properties>
+  <distributionManagement>
+    <site>
+      <id>MyCoRe HQ</id>
+      <name>MyCoRe HQ-sites</name>
+      <url>scp://server.mycore.de/mcr/mycore.de/generated/mycore${site.suffix}</url>
+    </site>
+  </distributionManagement>
   <issueManagement>
     <system>sourceforge</system>
     <url>http://sourceforge.net/p/mycore/bugs/</url>
@@ -53,6 +61,12 @@
     <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/trunk</url>
   </scm>
   <profiles>
+    <profile>
+      <id>release-profile</id>
+      <properties>
+        <site.suffix>-${project.version}</site.suffix>
+      </properties>
+    </profile>
     <profile>
       <id>development</id>
       <activation>
