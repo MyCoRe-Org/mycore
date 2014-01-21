@@ -84,6 +84,8 @@ public class MCRConfigurationTask extends Task {
     @Override
     public void execute() throws BuildException {
         checkPreConditions();
+        if (action == null || action.length() == 0)
+            action = "mergeFile";
         switch (action) {
             case "addInclude":
             case "removeInclude":
