@@ -401,9 +401,25 @@
 				startFile = decodeURIComponent(URL.getCleanUrl(URL.getParam("page")));
 			}
 			// remove leading '/'
-			startFile = encodeURIComponent(startFile.replace(/^\/*/, ""));
+			startFile = this.encodeURI(startFile.replace(/^\/*/, ""));
 			this.loading(startFile);
 		};
+
+		/**
+		 * @description Encodes the URI using encodeURIComponent() but splits on
+		 *            slashes before.
+		 * @param {String}
+		 *            uri
+		 */
+		constructor.prototype.encodeURI = function(uri) {
+			var returnURI = "";
+			var uriSplitted = uri.split("/");
+			for(var i = 0; i < uriSplitted.length; i++) {
+				returnURI += encodeURIComponent(uriSplitted[i]);
+				returnURI += (i + 1 < uriSplitted.length) ? "/" : "";
+			}
+			return returnURI;
+		},
 
 		/**
 		 * @description Initialise the TileUrlProvider Initialise the ViewerBean
