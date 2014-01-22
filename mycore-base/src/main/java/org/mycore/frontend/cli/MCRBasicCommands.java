@@ -17,10 +17,13 @@
 
 package org.mycore.frontend.cli;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 
@@ -73,7 +76,7 @@ public class MCRBasicCommands {
             MCRCommandLineInterface.output("Unknown command:" + pattern);
         }
     }
-    
+
     @MCRCommand(syntax = "process {0}", help = "Execute the commands listed in the text file {0}.", order = 30)
     public static List<String> readCommandsFile(String file) throws IOException, FileNotFoundException {
         return MCRCommandLineInterface.readCommandsFile(file);
@@ -89,8 +92,7 @@ public class MCRBasicCommands {
         MCRCommandLineInterface.exit();
     }
 
-    @MCRCommand(syntax = "! {0}", help = "Execute the shell command {0}, for example '! ls' or '! cmd /c dir'",
-            order = 60)
+    @MCRCommand(syntax = "! {0}", help = "Execute the shell command {0}, for example '! ls' or '! cmd /c dir'", order = 60)
     public static void executeShellCommand(String command) throws Exception {
         MCRCommandLineInterface.executeShellCommand(command);
     }
@@ -105,8 +107,7 @@ public class MCRBasicCommands {
         MCRCommandLineInterface.whoami();
     }
 
-    @MCRCommand(syntax = "show command statistics",
-            help = "Show statistics on number of commands processed and execution time needed per command", order = 90)
+    @MCRCommand(syntax = "show command statistics", help = "Show statistics on number of commands processed and execution time needed per command", order = 90)
     public static void showCommandStatistics() {
         MCRCommandStatistics.showCommandStatistics();
     }
@@ -121,9 +122,24 @@ public class MCRBasicCommands {
         MCRCommandLineInterface.skipOnError();
     }
 
-    @MCRCommand(syntax = "get uri {0} to file {1}",
-            help = "Get XML content from URI {0} and save it to a local file {1}", order = 120)
+    @MCRCommand(syntax = "get uri {0} to file {1}", help = "Get XML content from URI {0} and save it to a local file {1}", order = 120)
     public static void getURI(String uri, String file) throws Exception {
         MCRCommandLineInterface.getURI(uri, file);
+    }
+
+    @MCRCommand(syntax = "create configuration directory", help = "Creates the MCRConfiguration directory if it does not exist.", order = 130)
+    public static void createConfigurationDirectory() {
+        Logger logger = Logger.getLogger(MCRBasicCommands.class);
+        File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
+        if (configurationDirectory.exists()) {
+            logger.warn("Directory " + configurationDirectory.getAbsolutePath() + " already exists.");
+            return;
+        }
+        if (configurationDirectory.mkdirs()) {
+            logger.info("Successfully created directory: " + configurationDirectory.getAbsolutePath());
+        } else {
+            logger.warn("Due to unknown error the directory could not be created: "
+                + configurationDirectory.getAbsolutePath());
+        }
     }
 }
