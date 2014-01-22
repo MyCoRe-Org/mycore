@@ -2,21 +2,36 @@ package org.mycore.frontend;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
+
+import javax.servlet.ServletContext;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
-import org.jdom2.xpath.XPath;
+import org.jdom2.input.sax.XMLReaders;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.xml.MCRURIResolver;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.cache.RemovalCause;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
 
 /**
  * 
@@ -24,6 +39,10 @@ import org.mycore.common.config.MCRConfiguration;
  *
  */
 public class MCRLayoutUtilities {
+    private static final int STANDARD_CACHE_SECONDS = 10;
+
+    private static final XPathFactory XPATH_FACTORY = XPathFactory.instance();
+
     final static String OBJIDPREFIX_WEBPAGE = "webpage:";
 
     // strategies for access verification
@@ -37,19 +56,61 @@ public class MCRLayoutUtilities {
 
     private static HashMap<String, Element> itemStore = new HashMap<String, Element>();
 
-    private static long CACHE_INITTIME = 0;
+    private static final String NAV_RESOURCE = MCRConfiguration.instance().getString("MCR.NavigationFile",
+        "/config/navigation.xml");
 
-    private static Document NAVI;
+    private static final ServletContext SERVLET_CONTEXT = MCRURIResolver.getServletContext();
 
-    private static final String NAV_LOC_DEFAULT = MCRConfiguration.instance().getString("MCR.basedir")
-        + "build/webapps/config/navigation.xml".replace('/', File.separatorChar);
+    private static LoadingCache<String, URL> NAV_URL_CACHE = CacheBuilder.newBuilder().maximumSize(1)
+        .expireAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS).build(new CacheLoader<String, URL>() {
 
-    private static final File NAVFILE = new File(MCRConfiguration
-        .instance()
-        .getString("MCR.navigationFile", NAV_LOC_DEFAULT)
-        .replace('/', File.separatorChar));
+            @Override
+            public URL load(String key) throws Exception {
+                return SERVLET_CONTEXT.getResource(NAV_RESOURCE);
+            }
+        });
 
-    private static final boolean ACCESS_CONTROLL_ON = MCRConfiguration.instance().getBoolean("MCR.Website.ReadAccessVerification", true);
+    private static final LoadingCache<URL, Long> NAV_MODIFIED_CACHE = CacheBuilder.newBuilder().maximumSize(1)
+        .expireAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS).build(new CacheLoader<URL, Long>() {
+
+            @Override
+            public Long load(URL key) throws Exception {
+                URLConnection urlConnection = key.openConnection();
+                return urlConnection.getLastModified();
+            }
+        });
+
+    private static final LoadingCache<String, Document> NAV_DOCUMENT_CACHE = CacheBuilder.newBuilder()
+        .expireAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS)
+        .removalListener(new RemovalListener<String, Document>() {
+            @Override
+            public void onRemoval(RemovalNotification<String, Document> notification) {
+                if (notification.getCause() == RemovalCause.EXPIRED) {
+                    URL url = NAV_URL_CACHE.getUnchecked(notification.getKey());
+                    long lastModified = NAV_MODIFIED_CACHE.getUnchecked(url);
+                    long diff = System.currentTimeMillis() - lastModified;
+                    if (TimeUnit.SECONDS.convert(diff, TimeUnit.MILLISECONDS) > STANDARD_CACHE_SECONDS) {
+                        LOGGER.info("Keeping " + url + " in cache");
+                        notification.setValue(notification.getValue());
+                    } else {
+                        LOGGER.info("Removing modified " + notification.getKey());
+                    }
+                }
+            }
+        }).build(new CacheLoader<String, Document>() {
+            @Override
+            public Document load(String key) throws Exception {
+                URL url = NAV_URL_CACHE.get(key);
+                try {
+                    return new SAXBuilder(XMLReaders.NONVALIDATING).build(url);
+                } finally {
+                    itemStore.clear();
+                }
+            }
+        });
+
+    private static final boolean ACCESS_CONTROLL_ON = MCRConfiguration.instance().getBoolean(
+        "MCR.Website.ReadAccessVerification", true);
 
     /**
      * Verifies a given $webpage-ID (//item/@href) from navigation.xml on read
@@ -69,8 +130,8 @@ public class MCRLayoutUtilities {
         if (ACCESS_CONTROLL_ON) {
             long startTime = System.currentTimeMillis();
             boolean access = getAccess(webpageID, PERMISSION_READ, ALL2BLOCKER_TRUE, blockerWebpageID);
-            LOGGER.debug("checked read access for webpageID= " + webpageID + " (with blockerWebpageID =" + blockerWebpageID + ") => "
-                + access + ": took " + getDuration(startTime) + " msec.");
+            LOGGER.debug("checked read access for webpageID= " + webpageID + " (with blockerWebpageID ="
+                + blockerWebpageID + ") => " + access + ": took " + getDuration(startTime) + " msec.");
             return access;
         } else {
             return true;
@@ -90,8 +151,8 @@ public class MCRLayoutUtilities {
         if (ACCESS_CONTROLL_ON) {
             long startTime = System.currentTimeMillis();
             boolean access = getAccess(webpageID, PERMISSION_READ, ALLTRUE);
-            LOGGER.debug("checked read access for webpageID= " + webpageID + " => " + access + ": took " + getDuration(startTime)
-                + " msec.");
+            LOGGER.debug("checked read access for webpageID= " + webpageID + " => " + access + ": took "
+                + getDuration(startTime) + " msec.");
             return access;
         } else {
             return true;
@@ -111,24 +172,17 @@ public class MCRLayoutUtilities {
     public static String getAncestorLabels(Element item) {
         String label = "";
         String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage().trim();
-        XPath xpath;
+        XPathExpression<Element> xpath;
         Element ic = null;
-        try {
-            xpath = XPath.newInstance("//.[@href='" + getWebpageID(item) + "']");
-            ic = (Element) xpath.selectSingleNode(getNavi());
-        } catch (JDOMException e) {
-            e.printStackTrace();
-        }
+        xpath = XPATH_FACTORY.compile("//.[@href='" + getWebpageID(item) + "']", Filters.element());
+        ic = xpath.evaluateFirst(getNavi());
         while (ic.getName().equals("item")) {
             ic = ic.getParentElement();
             String webpageID = getWebpageID(ic);
             Element labelEl = null;
-            try {
-                xpath = XPath.newInstance("//.[@href='" + webpageID + "']/label[@xml:lang='" + lang + "']");
-                labelEl = (Element) xpath.selectSingleNode(getNavi());
-            } catch (JDOMException e) {
-                e.printStackTrace();
-            }
+            xpath = XPATH_FACTORY.compile("//.[@href='" + webpageID + "']/label[@xml:lang='" + lang + "']",
+                Filters.element());
+            labelEl = xpath.evaluateFirst(getNavi());
             if (labelEl != null) {
                 if (label.equals("")) {
                     label = labelEl.getTextTrim();
@@ -207,18 +261,10 @@ public class MCRLayoutUtilities {
      * @return Element
      */
     private static Element getItem(String webpageID) {
-        if (!naviCacheValid()) {
-            itemStore.clear();
-        }
         Element item = itemStore.get(webpageID);
         if (item == null) {
-            XPath xpath;
-            try {
-                xpath = XPath.newInstance("//.[@href='" + webpageID + "']");
-                item = (Element) xpath.selectSingleNode(getNavi());
-            } catch (JDOMException e) {
-                e.printStackTrace();
-            }
+            XPathExpression<Element> xpath = XPATH_FACTORY.compile("//.[@href='" + webpageID + "']", Filters.element());
+            item = xpath.evaluateFirst(getNavi());
             itemStore.put(webpageID, item);
         }
         return item;
@@ -260,15 +306,6 @@ public class MCRLayoutUtilities {
         return access;
     }
 
-    /**
-     * Verifies if the cache of navigation.xml is valid.
-     * 
-     * @return true if valid, false if note
-     */
-    private static boolean naviCacheValid() {
-        return CACHE_INITTIME >= NAVFILE.lastModified();
-    }
-
     private static String getWebpageACLID(Element item) {
         return OBJIDPREFIX_WEBPAGE + getWebpageID(item);
     }
@@ -288,17 +325,7 @@ public class MCRLayoutUtilities {
      * @return navigation.xml as org.jdom2.document
      */
     public static Document getNavi() {
-        if (!naviCacheValid()) {
-            try {
-                NAVI = new SAXBuilder().build(NAVFILE);
-            } catch (JDOMException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            CACHE_INITTIME = System.currentTimeMillis();
-        }
-        return NAVI;
+        return NAV_DOCUMENT_CACHE.getUnchecked(NAV_RESOURCE);
     }
 
     public static long getDuration(long startTime) {
@@ -337,4 +364,5 @@ public class MCRLayoutUtilities {
     public static String getPermission2ReadWebpage() {
         return PERMISSION_READ;
     }
+
 }

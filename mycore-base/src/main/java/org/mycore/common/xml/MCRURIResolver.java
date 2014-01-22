@@ -746,7 +746,9 @@ public final class MCRURIResolver implements URIResolver {
                     }
                     reader.setEntityResolver(MCREntityResolver.instance());
                     InputSource input = new InputSource(resource.toString());
-                    return new SAXSource(reader, input);
+                    SAXSource saxSource = new SAXSource(reader, input);
+                    LOGGER.debug("include stylesheet: " + saxSource.getSystemId());
+                    return saxSource;
                 }
                 return MCRURIResolver.instance().resolve(resource.toString(), base);
             }
@@ -1616,5 +1618,9 @@ public final class MCRURIResolver implements URIResolver {
             MCRFileMetadata fileMetadata = objectDerivate.getOrCreateFileMetadata("/" + pathParts[1]);
             return new JDOMSource(fileMetadata.createXML());
         }
+    }
+
+    public static ServletContext getServletContext() {
+        return context;
     }
 }
