@@ -28,6 +28,7 @@
     <changes.version>2014.02</changes.version>
     <site.suffix />
   </properties>
+  <url>http://www.mycore.de/generated/mycore${site.suffix}</url>
   <distributionManagement>
     <site>
       <id>MyCoRe HQ</id>
