@@ -20,6 +20,7 @@ package org.mycore.frontend.cli;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -129,17 +130,30 @@ public class MCRBasicCommands {
 
     @MCRCommand(syntax = "create configuration directory", help = "Creates the MCRConfiguration directory if it does not exist.", order = 130)
     public static void createConfigurationDirectory() {
-        Logger logger = Logger.getLogger(MCRBasicCommands.class);
         File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
-        if (configurationDirectory.exists()) {
-            logger.warn("Directory " + configurationDirectory.getAbsolutePath() + " already exists.");
-            return;
+        ArrayList<File> directories = new ArrayList<>(3);
+        directories.add(configurationDirectory);
+        directories.add(new File(configurationDirectory, "libs"));
+        directories.add(new File(configurationDirectory, "resources"));
+        for (File directory : directories) {
+            if (!createDirectory(directory)) {
+                break;
+            }
         }
-        if (configurationDirectory.mkdirs()) {
-            logger.info("Successfully created directory: " + configurationDirectory.getAbsolutePath());
+    }
+
+    private static boolean createDirectory(File directory) {
+        Logger logger = Logger.getLogger(MCRBasicCommands.class);
+        if (directory.exists()) {
+            logger.warn("Directory " + directory.getAbsolutePath() + " already exists.");
+            return true;
+        }
+        if (directory.mkdirs()) {
+            logger.info("Successfully created directory: " + directory.getAbsolutePath());
+            return true;
         } else {
-            logger.warn("Due to unknown error the directory could not be created: "
-                + configurationDirectory.getAbsolutePath());
+            logger.warn("Due to unknown error the directory could not be created: " + directory.getAbsolutePath());
+            return false;
         }
     }
 }
