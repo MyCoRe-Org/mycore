@@ -13,8 +13,6 @@
             if (iview.isCanvasAvailable) {
 
                 this.context2D = document.createElement('canvas').getContext('2d');
-                this.redrawPreview = document.createElement('canvas');
-                jQuery(this.redrawPreview).css("position", "fixed");
                 this.activateCanvas = false;
                 this.lastFrame = new Date();
                 this.updateCanvasCount = 0;
@@ -135,8 +133,6 @@
             this.lastPosX = viewerBean.x;
             this.lastPosY = viewerBean.y;
             this.refreshImageDimensions();
-            this.redrawPreview.width = this.context2D.canvas.width;
-            this.redrawPreview.height = this.context2D.canvas.height;
             if (zoomLevelChanged || moveOutOfScreen || scaleChanged || (moveVector.xOff == 0 && moveVector.yOff==0)) {
                 // something happened that needs to redraw all tiles
                 this.clearCanvas();
@@ -618,7 +614,6 @@
 		 */
         constructor.prototype.appendCanvas = function cv_appendCanvas() {
             this.getViewer().context.container.find(".iview_well").prepend(this.context2D.canvas);// before,prepend,append
-            this.getViewer().context.container.find(".iview_well").prepend(this.redrawPreview);
         };
 
         /**
