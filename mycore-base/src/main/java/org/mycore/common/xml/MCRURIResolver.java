@@ -65,6 +65,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
@@ -734,7 +735,7 @@ public final class MCRURIResolver implements URIResolver {
         @Override
         public Source resolve(String href, String base) throws TransformerException {
             String path = href.substring(href.indexOf(":") + 1);
-            URL resource = this.getClass().getClassLoader().getResource(path);
+            URL resource = MCRConfigurationDir.getConfigResource(path);
             if (resource != null) {
                 //have to use SAX here to resolve entities
                 if (path.endsWith(".xsl")) {

@@ -24,11 +24,14 @@
 package org.mycore.common.config;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
 
 import javax.servlet.ServletContext;
+
+import org.apache.log4j.Logger;
 
 /**
  * This helper class determines in which directory to look for addition configuration files.
@@ -176,6 +179,25 @@ public class MCRConfigurationDir {
             return null;
         }
         return new File(configurationDirectory, relativePath);
+    }
+
+    /**
+     * Returns URL of a config resource.
+     * If {@link #getConfigFile(String)} returns an existing file for "resources"+{relativePath}, its URL is returned.
+     * In any other case this method returns the same as {@link ClassLoader#getResource(String)} 
+     * @param relativePath as defined in {@link #getConfigFile(String)}
+     */
+    public static URL getConfigResource(String relativePath) {
+        File resolvedFile = getConfigFile("resources/" + relativePath);
+        if (resolvedFile != null && resolvedFile.exists()) {
+            try {
+                return resolvedFile.toURI().toURL();
+            } catch (MalformedURLException e) {
+                Logger.getLogger(MCRConfigurationDir.class).warn(
+                    "Exception while returning URL for file: " + resolvedFile, e);
+            }
+        }
+        return MCRConfigurationDir.class.getClassLoader().getResource(relativePath);
     }
 
 }
