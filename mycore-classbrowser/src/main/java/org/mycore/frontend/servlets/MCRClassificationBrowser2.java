@@ -130,8 +130,9 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         for (MCRCategory child : category.getChildren()) {
             String childID = child.getId().getID();
             long numResults = 0;
-            
-            queryAdapter.setCategory(addClassId ? child.getId().toString() : childID);
+            if (queryAdapter != null) {
+                queryAdapter.setCategory(addClassId ? child.getId().toString() : childID);
+            }
             if (countResults) {
                 numResults = queryAdapter.getResultCount();
                 if ((!emptyLeaves) && (numResults < 1))
@@ -216,7 +217,8 @@ public class MCRClassificationBrowser2 extends MCRServlet {
     /** Sends output to client browser 
      * @throws SAXException 
      * @throws TransformerException */
-    private void renderToHTML(MCRServletJob job, HttpServletRequest req, Element xml) throws IOException, TransformerException, SAXException {
+    private void renderToHTML(MCRServletJob job, HttpServletRequest req, Element xml) throws IOException, TransformerException,
+            SAXException {
         String style = req.getParameter("style"); // XSL.Style, optional
         if ((style != null) && (style.length() > 0))
             req.setAttribute("XSL.Style", style);
