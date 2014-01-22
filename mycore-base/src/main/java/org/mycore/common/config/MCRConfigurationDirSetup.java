@@ -29,6 +29,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -82,7 +83,7 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
                 ClassLoader classLoader = this.getClass().getClassLoader();
                 Class<? extends ClassLoader> classLoaderClass = classLoader.getClass();
                 try {
-                    Method addUrlMethod = classLoaderClass.getDeclaredMethod("addURL", URL.class);
+                    Method addUrlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
                     addUrlMethod.setAccessible(true);
                     for (File jarFile : listFiles) {
                         logger.info("Adding to CLASSPATH: " + jarFile);
@@ -95,7 +96,7 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
                         }
                     }
                 } catch (NoSuchMethodException | SecurityException e) {
-                    logger.warn(classLoaderClass + " does not support adding additional JARs at runtime");
+                    logger.warn(classLoaderClass + " does not support adding additional JARs at runtime", e);
                 }
             }
         }
