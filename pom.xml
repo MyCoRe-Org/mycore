@@ -8,7 +8,7 @@
   </parent>
   <artifactId>mycore</artifactId>
   <packaging>pom</packaging>
-  <version>2013.06.0.2-SNAPSHOT</version>
+  <version>2013.06.0.2</version>
   <name>MyCoRe</name>
 
   <!-- Keep the description on a single line. Otherwise Maven might generate a corrupted MANIFEST.MF (see http://jira.codehaus.org/browse/MJAR-4) -->
@@ -46,9 +46,9 @@
     </notifiers>
   </ciManagement>
   <scm>
-    <connection>scm:svn:http://server.mycore.de/svn/mycore/branches/mycore-2013.06.0.x</connection>
-    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/branches/mycore-2013.06.0.x</developerConnection>
-    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/branches/mycore-2013.06.0.x</url>
+    <connection>scm:svn:http://server.mycore.de/svn/mycore/tags/mycore-2013.06.0.2</connection>
+    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/tags/mycore-2013.06.0.2</developerConnection>
+    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/tags/mycore-2013.06.0.2</url>
   </scm>
   <profiles>
     <profile>
