@@ -5,7 +5,9 @@
     <author email="kathleen.neumann(at)gbv.de">Kathleen Neumann</author>
   </properties>
   <body>
-    <release version="2013.06.0.2" date="TBA" description="2013.06.0 maintenance release 2">
+    <release version="2013.06.0.3" date="TBA" description="2013.06.0 maintenance release 3">
+    </release>
+    <release version="2013.06.0.2" date="2014-01-22" description="2013.06.0 maintenance release 2">
       <action dev="mcrkrebs" type="fix" date="2014-01-13">
         mods: show guests only published objects
       </action>
