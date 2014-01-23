@@ -2,7 +2,7 @@
 <xsl:stylesheet xmlns:mcr="http://www.mycore.org/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xalan="http://xml.apache.org/xalan" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport"
   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:gnd="http://d-nb.info/standards/elementset/gnd#" xmlns:java="http://xml.apache.org/xalan/java"
-  exclude-result-prefixes="gnd rdf mcrmods mcr xalan java" version="1.0" xmlns:ex="http://exslt.org/dates-and-times" 
+  exclude-result-prefixes="gnd rdf mcrmods mcr xalan java" version="1.0" xmlns:ex="http://exslt.org/dates-and-times"
     extension-element-prefixes="ex">
 
   <xsl:include href="copynodes.xsl" />
@@ -17,7 +17,7 @@
       <xsl:apply-templates select='node()' />
     </xsl:copy>
   </xsl:template>
-  
+
   <xsl:template match="mods:mods" mode="typeOfResource">
     <mods:typeOfResource>
       <xsl:value-of select="'text'"/>
@@ -63,6 +63,15 @@
     </xsl:if>
   </xsl:template>
 
+  <xsl:template match="mods:language">
+    <!-- only copy mods:language where a language is given -->
+    <xsl:if test="mods:languageTerm/@mcr:categId">
+      <xsl:copy>
+        <xsl:apply-templates select='@*|node()' />
+      </xsl:copy>
+    </xsl:if>
+  </xsl:template>
+
   <xsl:template match="@editor.output" />
   <xsl:template match="@editor.parentName" />
   <!-- ignore @classId and @categId but transform it to @authority|@authorityURI and @valueURI -->
@@ -87,6 +96,7 @@
     </xsl:copy>
   </xsl:template>
 
+  <!-- BMELV specific - move to externals -->
   <xsl:template match="noteLocationCorp">
     <xsl:variable name="repeaterId" select="generate-id(.)" />
     <xsl:apply-templates select="mods:name">
@@ -117,7 +127,7 @@
   <xsl:template match="*[nameOrPND]">
     <xsl:copy>
       <xsl:apply-templates select="@*[not(name()='type')]" />
-      
+
       <!-- get name from PND or from editor input -->
       <xsl:variable name="trimmedValue" select="java:trim(string(nameOrPND))" />
       <xsl:choose>
