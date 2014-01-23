@@ -861,7 +861,7 @@ public class MCRUtils {
     }
 
     /**
-     * Transforms the given Document into a String
+     * Transforms the given {@link Document} into a String
      * 
      * @return the xml document as {@link String} or null if an
      *         {@link Exception} occurs
@@ -877,6 +877,27 @@ public class MCRUtils {
             os.close();
         } catch (Exception e) {
             LOGGER.error("Could not convert Document to String", e);
+        }
+        return value;
+    }
+
+    /**
+     * Transforms the given {@link Element} into a String
+     * 
+     * @return the element as {@link String} or null if an
+     *         {@link Exception} occurs
+     */
+    public static String elementAsString(Element element) {
+        String value = null;
+        try {
+            XMLOutputter op = new XMLOutputter(Format.getPrettyFormat());
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            op.output(element, os);
+            os.flush();
+            value = new String(os.toByteArray());
+            os.close();
+        } catch (Exception e) {
+            return null;
         }
         return value;
     }
