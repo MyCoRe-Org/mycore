@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.backend.hibernate.MCRHIBConnection;
@@ -166,7 +167,7 @@ public class MCRCommandLineInterface {
 
         try {
             session.beginTransaction();
-            List<String> commandsReturned = knownCommands.invokeCommand(command);
+            List<String> commandsReturned = knownCommands.invokeCommand(expandCommand(command));
             session.commitTransaction();
             addCommandsToQueue(commandsReturned);
         } catch (Exception ex) {
@@ -184,6 +185,22 @@ public class MCRCommandLineInterface {
         } finally {
             clearSession(session);
         }
+    }
+
+    /**
+     * Expands variables in a command.
+     * Replaces any variables in form ${propertyName} to the value defined by {@link MCRConfiguration#getString(String)}.
+     * If the property is not defined not variable replacement takes place.
+     * @param command a CLI command that should be expanded
+     * @return expanded command
+     */
+    public static String expandCommand(final String command) {
+        StrSubstitutor strSubstitutor = new StrSubstitutor(MCRConfiguration.instance().getPropertiesMap());
+        String expandedCommand = strSubstitutor.replace(command);
+        if (!expandedCommand.equals(command)) {
+            logger.info(command + " --> " + expandedCommand);
+        }
+        return expandedCommand;
     }
 
     private static void clearSession(MCRSession session) {
@@ -375,4 +392,5 @@ public class MCRCommandLineInterface {
     static void output(String message) {
         System.out.println(system + " " + message);
     }
+
 }
