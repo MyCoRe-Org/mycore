@@ -38,7 +38,7 @@ public final class MCRWebsiteWriteProtection {
      */
     public static boolean isActive() {
         // if superuser is online, return false
-        String superUser = MCR_CONFIG.getString("MCR.Users.Superuser.UserName");
+        String superUser = MCR_CONFIG.getString("MCR.Users.Superuser.UserName","administrator");
         if (MCRSessionMgr.getCurrentSession().getUserInformation().getUserID().equals(superUser)) {
             return false;
         }
