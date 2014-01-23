@@ -14,31 +14,37 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.DOMOutputter;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration;
 
 public final class MCRWebsiteWriteProtection {
-    static final private String FS = System.getProperty("file.separator");
+    private static final String FS = System.getProperty("file.separator");
 
-    static MCRConfiguration MCR_CONFIG = MCRConfiguration.instance();
+    private static final String CONFIG_FOLDER_PATH = MCRConfiguration.instance().getString("MCR.datadir") + FS
+        + "config";
 
-    static final private String CONFIG_FOLDER_PATH = MCR_CONFIG.getString("MCR.datadir") + FS + "config";
+    private static final String CONFIG_FILE_PATH = new String(CONFIG_FOLDER_PATH + FS
+        + "config-writeProtectionWebsite.xml");
 
-    static final private String CONFIG_FILE_PATH = new String(CONFIG_FOLDER_PATH + FS + "config-writeProtectionWebsite.xml");
+    private static final File CONFIG_FILE = new File(CONFIG_FILE_PATH);
 
-    static final private File CONFIG_FILE = new File(CONFIG_FILE_PATH);
+    private static long cacheInitTime = 0;
 
-    static private long CONFIG_CACHE_INITTIME = 0;
+    private static Element configCache = null;
 
-    static private Element CONFIG_CACHE = null;
+    private MCRWebsiteWriteProtection() {
+        //do not allow instantiation
+    }
 
     /**
-     * speed up the check
+     * Checks if website protection is currently active.
+     * If current user is super user this method always returns false.
      * 
      * @return true if write access is currently active, false if not
      */
     public static boolean isActive() {
         // if superuser is online, return false
-        String superUser = MCR_CONFIG.getString("MCR.Users.Superuser.UserName","administrator");
+        String superUser = MCRSystemUserInformation.getSuperUserInstance().getUserID();
         if (MCRSessionMgr.getCurrentSession().getUserInformation().getUserID().equals(superUser)) {
             return false;
         }
@@ -74,7 +80,7 @@ public final class MCRWebsiteWriteProtection {
             Element config = null;
             // try to get from cache
             if (cacheValid()) {
-                config = CONFIG_CACHE;
+                config = configCache;
             } else {
                 SAXBuilder builder = new SAXBuilder();
                 try {
@@ -116,8 +122,8 @@ public final class MCRWebsiteWriteProtection {
      * @param configXML
      */
     private static void updateCache(Element configXML) {
-        CONFIG_CACHE = configXML;
-        CONFIG_CACHE_INITTIME = System.currentTimeMillis();
+        configCache = configXML;
+        cacheInitTime = System.currentTimeMillis();
     }
 
     private static Element configToJDOM(boolean protection, String message) {
@@ -152,11 +158,11 @@ public final class MCRWebsiteWriteProtection {
         setConfiguration(config);
     }
 
-    public static boolean printInfoPageIfNoAccess(HttpServletRequest request, HttpServletResponse response, String baseURL)
-            throws IOException {
+    public static boolean printInfoPageIfNoAccess(HttpServletRequest request, HttpServletResponse response,
+        String baseURL) throws IOException {
         if (MCRWebsiteWriteProtection.isActive()) {
             response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
-            String pageURL = baseURL + MCR_CONFIG.getString("MCR.WriteProtectionWebsite.ErrorPage");
+            String pageURL = baseURL + MCRConfiguration.instance().getString("MCR.WriteProtectionWebsite.ErrorPage");
             response.sendRedirect(response.encodeRedirectURL(pageURL));
             return true;
         }
@@ -169,7 +175,7 @@ public final class MCRWebsiteWriteProtection {
      * @return true if valid, false if note
      */
     private static boolean cacheValid() {
-        return !(CONFIG_CACHE == null || CONFIG_CACHE_INITTIME < CONFIG_FILE.lastModified());
+        return !(configCache == null || cacheInitTime < CONFIG_FILE.lastModified());
     }
 
 }
