@@ -73,44 +73,6 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>compile</id>
-            <phase>compile</phase>
-            <configuration>
-              <target>
-                <path id="compile.classpath" refid="maven.compile.classpath" />
-                <property name="target.applet.classes" location="${project.build.directory}/applet-classes" />
-                <path id="sources.path">
-                  <dirset dir="${basedir}" includes="src/main/java" />
-                </path>
-                <echo message="compile classpath: ${compile.classpath}" />
-                <echo message="target directory: ${target.applet.classes}" />
-                <mkdir dir="${target.applet.classes}" />
-                <javac destdir="${target.applet.classes}" includes="org/mycore/frontend/fileupload/**" excludes="org/mycore/frontend/fileupload/*Handler* org/mycore/frontend/fileupload/*Servlet*" classpathref="compile.classpath" debug="true" optimize="true" target="1.5" source="1.5" encoding="UTF-8" fork="yes" deprecation="off">
-                  <src>
-                    <path refid="sources.path" />
-                  </src>
-                </javac>
-                <copy todir="${target.applet.classes}">
-                  <fileset dir="${basedir}/src/main/applet-resources">
-                    <include name="**/*" />
-                  </fileset>
-                </copy>
-                <jar jarfile="${project.build.outputDirectory}/uploadApplet-unsigned.jar">
-                  <fileset dir="${target.applet.classes}" />
-                </jar>
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>buildnumber-maven-plugin</artifactId>
         <executions>
