@@ -111,6 +111,11 @@ public class MCRRuntimeComponentDetector {
             return null;
         }
         try (InputStream pi = MCRRuntimeComponentDetector.class.getClassLoader().getResourceAsStream(pomPropertiesPath)) {
+            if (pi == null) {
+                LOGGER.warn("Manifest entry " + ATT_POM + " set to \"" + pomPropertiesPath
+                    + "\", but resource could not be loaded.");
+                return null;
+            }
             Properties pomProperties = new Properties();
             pomProperties.load(pi);
             String artifactId = (String) pomProperties.get("artifactId");
