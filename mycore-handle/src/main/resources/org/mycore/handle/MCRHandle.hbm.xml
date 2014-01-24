@@ -12,7 +12,7 @@
       <property name="path" type="string" length="255" />
     </natural-id>
 
-    <property name="schema" type="string" column="schema" length="64" />
+    <property name="schema" type="string" column="schema_attr" length="64" />
     <property name="namingAuthority" type="string" column="naming_authority" length="255" />
     <property name="namingAuthoritySegment" type="string" column="naming_authority_segment" length="255" />
     <property name="localName" type="string" column="local_name" length="255" />
