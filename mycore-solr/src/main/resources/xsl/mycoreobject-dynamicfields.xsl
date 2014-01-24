@@ -18,7 +18,7 @@
         <xsl:variable name="element" select="local-name(.)" />
 
         <xsl:choose>
-          <xsl:when test="(($element =  'von') or ($element = 'bis'))">
+          <xsl:when test="(($element = 'von') or ($element = 'bis'))">
             <field name="{$element}">
               <xsl:value-of select="mcrxsl:getISODateFromMCRHistoryDate(.)" />
             </field>
