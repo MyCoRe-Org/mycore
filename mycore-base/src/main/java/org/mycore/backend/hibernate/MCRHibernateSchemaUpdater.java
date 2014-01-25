@@ -25,8 +25,8 @@ package org.mycore.backend.hibernate;
 
 import javax.servlet.ServletContext;
 
+import org.apache.log4j.Logger;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
 
 /**
@@ -56,8 +56,10 @@ public class MCRHibernateSchemaUpdater implements AutoExecutable {
      */
     @Override
     public void startUp(ServletContext servletContext) {
-        if (MCRConfiguration.instance().getBoolean("MCR.Persistence.Database.Enable", true)) {
+        if (MCRHIBConnection.isEnabled()) {
             new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(false, true);
+        } else {
+            Logger.getLogger(getClass()).warn("Hibernate is disabled or unconfigured.");
         }
     }
 

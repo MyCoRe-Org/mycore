@@ -94,6 +94,11 @@ public class MCRHIBConnection implements Closeable {
         return SINGLETON;
     }
 
+    public static boolean isEnabled() {
+        return MCRConfiguration.instance().getBoolean("MCR.Persistence.Database.Enable", true)
+            && MCRConfigurationDir.getConfigFile("hibernate.cfg.xml") != null;
+    }
+
     /**
      * This method initializes the connection to the database
      * 
