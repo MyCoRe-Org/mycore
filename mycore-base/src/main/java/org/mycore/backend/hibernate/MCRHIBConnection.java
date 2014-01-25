@@ -27,6 +27,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.List;
@@ -56,7 +58,6 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
-import org.mycore.services.mbeans.MCRJMXBridge;
 
 /**
  * Class for hibernate connection to selected database
@@ -96,7 +97,20 @@ public class MCRHIBConnection implements Closeable {
 
     public static boolean isEnabled() {
         return MCRConfiguration.instance().getBoolean("MCR.Persistence.Database.Enable", true)
-            && MCRConfigurationDir.getConfigFile("hibernate.cfg.xml") != null;
+            && getHibernateConfig() != null;
+    }
+
+    private static URL getHibernateConfig() {
+        File configFile = MCRConfigurationDir.getConfigFile("hibernate.cfg.xml");
+        if (configFile != null && configFile.canRead()) {
+            try {
+                return configFile.toURI().toURL();
+            } catch (MalformedURLException e) {
+                LOGGER.warn("Error while looking for: " + configFile, e);
+            }
+        }
+        String resource = MCRConfiguration.instance().getString("MCR.Hibernate.Configuration", "hibernate.cfg.xml");
+        return MCRHIBConnection.class.getClassLoader().getResource(resource);
     }
 
     /**
@@ -121,14 +135,11 @@ public class MCRHIBConnection implements Closeable {
      * This method creates the configuration needed by hibernate
      */
     private void buildConfiguration() {
-        String resource = System.getProperty("MCR.Hibernate.Configuration", "hibernate.cfg.xml");
-        File localConfig = MCRConfigurationDir.getConfigFile("hibernate.cfg.xml");
-        if (localConfig != null && localConfig.canRead()) {
-            LOGGER.info("Reading Hibernate from file: " + localConfig.getAbsolutePath());
-            HIBCFG = new Configuration().configure(localConfig);
-        } else {
-            HIBCFG = new Configuration().configure(resource);
+        URL hibernateConfig = getHibernateConfig();
+        if (hibernateConfig == null) {
+            throw new MCRPersistenceException("Could not find hibernate.cfg.xml");
         }
+        HIBCFG = new Configuration().configure(hibernateConfig);
         if (MCRConfiguration.instance().getBoolean("MCR.Hibernate.DialectQueries", false)) {
             String dialect = HIBCFG.getProperty("hibernate.dialect");
             DIALECT = dialect.substring(dialect.lastIndexOf('.') + 1);
