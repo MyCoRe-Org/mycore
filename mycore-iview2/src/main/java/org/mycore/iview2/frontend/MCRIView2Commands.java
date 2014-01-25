@@ -67,8 +67,6 @@ import org.mycore.iview2.services.webservice.MCRIView2RemoteFunctions;
 
 @MCRCommandGroup(name="MCR IView2 Tile Commands")
 public class MCRIView2Commands extends MCRAbstractCommands {
-    private static final MCRTilingQueue TILE_QUEUE = MCRTilingQueue.getInstance();
-
     private static final Logger LOGGER = Logger.getLogger(MCRIView2Commands.class);
 
     private static Endpoint tileService;
@@ -287,7 +285,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         MCRTileJob job = new MCRTileJob();
         job.setDerivate(derivate);
         job.setPath(absoluteImagePath);
-        TILE_QUEUE.offer(job);
+        MCRTilingQueue.getInstance().offer(job);
         startMasterTilingThread();
     }
 
@@ -300,7 +298,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
             MCRTileJob job = new MCRTileJob();
             job.setDerivate(file.getOwnerID());
             job.setPath(file.getAbsolutePath());
-            TILE_QUEUE.offer(job);
+            MCRTilingQueue.getInstance().offer(job);
             LOGGER.info("Added to TilingQueue: " + file.getID() + " " + file.getAbsolutePath());
             startMasterTilingThread();
         }
@@ -326,7 +324,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
             else
                 deleteDirectory(sub);
         }
-        TILE_QUEUE.clear();
+        MCRTilingQueue.getInstance().clear();
     }
 
     /**
@@ -366,7 +364,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     public static void deleteDerivateTiles(String derivateID) {
         File derivateDir = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivateID, null);
         deleteDirectory(derivateDir);
-        TILE_QUEUE.remove(derivateID);
+        MCRTilingQueue.getInstance().remove(derivateID);
     }
 
     /**
@@ -378,7 +376,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     public static void deleteImageTiles(String derivate, String absoluteImagePath) {
         File tileFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, absoluteImagePath);
         deleteFileAndEmptyDirectories(tileFile);
-        int removed = TILE_QUEUE.remove(derivate, absoluteImagePath);
+        int removed = MCRTilingQueue.getInstance().remove(derivate, absoluteImagePath);
         LOGGER.info("removed tiles from " + removed + " images");
     }
 
