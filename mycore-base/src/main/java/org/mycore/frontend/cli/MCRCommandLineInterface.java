@@ -204,7 +204,7 @@ public class MCRCommandLineInterface {
     }
 
     private static void clearSession(MCRSession session) {
-        if (!session.isTransactionActive()) {
+        if (MCRHIBConnection.isEnabled() && !session.isTransactionActive()) {
             session.beginTransaction();
             MCRHIBConnection.instance().getSession().clear();
             session.commitTransaction();
