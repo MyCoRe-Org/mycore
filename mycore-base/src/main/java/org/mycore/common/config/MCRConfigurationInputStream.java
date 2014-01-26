@@ -62,10 +62,12 @@ public class MCRConfigurationInputStream extends SequenceInputStream {
     private static Enumeration<? extends InputStream> getInputStreams() throws IOException {
         LinkedList<InputStream> cList = new LinkedList<>();
         File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
-        if (configurationDirectory != null && configurationDirectory.isDirectory()) {
+        if (configurationDirectory != null) {
             logInfo("Current configuration directory: " + configurationDirectory.getAbsolutePath());
             //set MCR.basedir, is normally overwritten later
-            cList.add(getBaseDirInputStream(configurationDirectory));
+            if (configurationDirectory.isDirectory()) {
+                cList.add(getBaseDirInputStream(configurationDirectory));
+            }
         }
         for (MCRComponent component : MCRRuntimeComponentDetector.getAllComponents()) {
             InputStream is = component.getPropertyStream();
@@ -110,18 +112,20 @@ public class MCRConfigurationInputStream extends SequenceInputStream {
         } else {
             URL url = MCRConfigurationInputStream.class.getClassLoader().getResource(filename);
             if (url == null) {
-                String errorMsg = "Could not load: " + filename;
-                if (Logger.getRootLogger() != null) {
-                    Logger logger = Logger.getLogger(MCRConfigurationInputStream.class);
-                    logger.warn(errorMsg);
-                } else {
-                    System.err.printf("WARN: %s\n", errorMsg);
-                }
+                logWarn("Could not load: " + filename);
             } else {
                 input = new MCRURLContent(url);
             }
         }
         return input == null ? null : input.getInputStream();
+    }
+
+    private static void logWarn(String msg) {
+        if (MCRConfiguration.isLog4JEnabled()) {
+            Logger.getLogger(MCRConfigurationInputStream.class).warn(msg);
+        } else {
+            System.err.printf("WARN: %s\n", msg);
+        }
     }
 
     private static void logInfo(String msg) {

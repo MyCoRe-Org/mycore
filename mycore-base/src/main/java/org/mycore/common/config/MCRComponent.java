@@ -61,8 +61,6 @@ public class MCRComponent implements Comparable<MCRComponent> {
 
     private String artifactId;
 
-    private static Logger LOGGER = Logger.getLogger(MCRComponent.class);
-
     public MCRComponent(String artifactId) {
         this(artifactId, null);
     }
@@ -101,7 +99,21 @@ public class MCRComponent implements Comparable<MCRComponent> {
                 throw new MCRException("Do not support MCRComponenty of type: " + type);
         }
         this.artifactId = artifactId;
-        LOGGER.debug(artifactId + " is of type " + type + " and named " + getName() + ": " + jarFile);
+        logdebug(artifactId + " is of type " + type + " and named " + getName() + ": " + jarFile);
+    }
+
+    private static void logdebug(String msg) {
+        if (MCRConfiguration.isLog4JEnabled()) {
+            Logger.getLogger(MCRComponent.class).debug(msg);
+        }
+    }
+
+    private static void loginfo(String msg) {
+        if (MCRConfiguration.isLog4JEnabled()) {
+            Logger.getLogger(MCRComponent.class).info(msg);
+        } else {
+            System.out.printf("INFO: %s\n", msg);
+        }
     }
 
     /**
@@ -126,7 +138,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
             return null;
         }
         String bundleName = resourceBase + CONTROL_HELPER.toBundleName("messages", locale) + ".properties";
-        LOGGER.info("Loading bundle: " + bundleName);
+        loginfo("Loading bundle: " + bundleName);
         return this.getClass().getClassLoader().getResourceAsStream(bundleName);
     }
 
@@ -142,7 +154,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
             case module:
                 return "config/" + getName() + "/";
             default:
-                LOGGER.debug(getName() + ": there is no resource base for type " + type);
+                logdebug(getName() + ": there is no resource base for type " + type);
                 break;
         }
         return null;
