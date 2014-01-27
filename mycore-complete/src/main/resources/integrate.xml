@@ -1,29 +1,39 @@
 <project name="MyCoRe Components integration" xmlns:mcr="antlib:org.mycore.buildtools">
   <property name="components.order"
-    value="acl-editor,acl-editor2,broadcasting,buildtools,classbrowser,classeditor,classhandler,doubletfinder,indexing,iview2,migration-2014,session-listing,swf,mets,mods,user2,wcms,webcli,webservices,z3950,oai,solr,handle"/>
-  
-  <import file="${integration.dir}/helper.xml"/>
-  <taskdef resource="org/mycore/buildtools/antlib.xml" uri="antlib:org.mycore.buildtools" classpathref="integration.classpath" onerror="fail"/>
-  <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="integration.classpath"/>
+            value="acl-editor,acl-editor2,broadcasting,buildtools,classbrowser,classeditor,classhandler,doubletfinder,indexing,iview2,migration-2014,session-listing,swf,mets,mods,user2,wcms,webcli,webservices,z3950,oai,solr,handle" />
+
+  <import file="${integration.dir}/helper.xml" />
+  <taskdef resource="org/mycore/buildtools/antlib.xml"
+           uri="antlib:org.mycore.buildtools"
+           classpathref="integration.classpath"
+           onerror="fail" />
+  <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="integration.classpath" />
   <!-- for task is not included in antcontrib.properties by default -->
-  <taskdef name="for" classname="net.sf.antcontrib.logic.ForTask" classpathref="integration.classpath"/>
-  <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpathref="integration.classpath"/>
-  
+  <taskdef name="for" classname="net.sf.antcontrib.logic.ForTask" classpathref="integration.classpath" />
+  <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpathref="integration.classpath" />
+  <condition property="MCR.I18N.Languages" value="de,en">
+    <not>
+      <isset property="MCR.I18N.Languages" />
+    </not>
+  </condition>
+
   <macrodef name="componentPreHook">
-    <attribute name="target"/>
+    <attribute name="target" />
     <sequential>
       <for list="${components.order}" param="component" parallel="false">
         <sequential>
           <if>
             <resourcecount when="greater" count="0">
-              <fileset dir="${integration.dir}" includes="components/@{component}/integrate.xml" id="integrate.pre.@{target}">
-                <containsregexp expression="\u003ctarget.*name=\u0022pre.@{target}\u0022"/>
+              <fileset dir="${integration.dir}"
+                       includes="components/@{component}/integrate.xml"
+                       id="integrate.pre.@{target}">
+                <containsregexp expression="\u003ctarget.*name=\u0022pre.@{target}\u0022" />
               </fileset>
             </resourcecount>
             <then>
               <subant target="pre.@{target}" inheritall="true" inheritrefs="true">
-                <property name="basedir" value="${integration.dir}/components/@{component}"/>
-                <fileset refid="integrate.pre.@{target}"/>
+                <property name="basedir" value="${integration.dir}/components/@{component}" />
+                <fileset refid="integrate.pre.@{target}" />
               </subant>
             </then>
             <else>
@@ -35,20 +45,22 @@
     </sequential>
   </macrodef>
   <macrodef name="componentHook">
-    <attribute name="target"/>
+    <attribute name="target" />
     <sequential>
       <for list="${components.order}" param="component" parallel="false">
         <sequential>
           <if>
             <resourcecount when="greater" count="0">
-              <fileset dir="${integration.dir}" includes="components/@{component}/integrate.xml" id="integrate.@{target}">
-                <containsregexp expression="\u003ctarget.*name=\u0022@{target}\u0022"/>
+              <fileset dir="${integration.dir}"
+                       includes="components/@{component}/integrate.xml"
+                       id="integrate.@{target}">
+                <containsregexp expression="\u003ctarget.*name=\u0022@{target}\u0022" />
               </fileset>
             </resourcecount>
             <then>
               <subant target="@{target}" inheritall="true" inheritrefs="true">
-                <property name="basedir" value="${integration.dir}/components/@{component}"/>
-                <fileset refid="integrate.@{target}"/>
+                <property name="basedir" value="${integration.dir}/components/@{component}" />
+                <fileset refid="integrate.@{target}" />
               </subant>
             </then>
             <else>
@@ -59,38 +71,42 @@
       </for>
     </sequential>
   </macrodef>
-  
+
   <!-- ================================= 
   target: invoke.cli             
   ================================= -->
   <target name="invoke.cli">
     <path id="cli.classpath">
-      <pathelement location="${build.config}"/>
-      <pathelement location="${build.classes}"/>
-      <pathelement location="${build.schema}"/>
-      <path refid="integration.classpath"/>
+      <pathelement location="${build.config}" />
+      <pathelement location="${build.classes}" />
+      <pathelement location="${build.schema}" />
+      <path refid="integration.classpath" />
     </path>
-    <java classname="org.mycore.frontend.cli.MCRCommandLineInterface" dir="${cli.directory}" fork="yes" maxmemory="${java.maxmemory}" classpathref="cli.classpath"
-      failonerror="true">
-      <arg line="${cli.command}"/>
-      <env key="LIBPATH" value="${env.LIBPATH}"/>
-      <env key="LD_LIBRARY_PATH" value="${env.LD_LIBRARY_PATH}"/>
+    <java classname="org.mycore.frontend.cli.MCRCommandLineInterface"
+          dir="${cli.directory}"
+          fork="yes"
+          maxmemory="${java.maxmemory}"
+          classpathref="cli.classpath"
+          failonerror="true">
+      <arg line="${cli.command}" />
+      <env key="LIBPATH" value="${env.LIBPATH}" />
+      <env key="LD_LIBRARY_PATH" value="${env.LD_LIBRARY_PATH}" />
     </java>
   </target>
   <!-- ================================= 
   target: config              
   ================================= -->
   <target name="config" description="--> generates mycore.properties file">
-    <property name="mycore.properties.target" location="${build.config}/mycore.properties"/>
-    <copy todir="${build.config}" overwrite="true" file="${integration.dir}/config/mycore.properties"/>
-    <copy todir="${build.config}" overwrite="true" file="${integration.dir}/config/searchfields.xml"/>
-    <componentPreHook target="config"/>
+    <property name="mycore.properties.target" location="${build.config}/mycore.properties" />
+    <copy todir="${build.config}" overwrite="true" file="${integration.dir}/config/mycore.properties" />
+    <copy todir="${build.config}" overwrite="true" file="${integration.dir}/config/searchfields.xml" />
+    <componentPreHook target="config" />
     <for param="component.property" trim="true">
       <fileset id="mycore.components.properties" dir="${integration.dir}/components">
-        <include name="*/config/mycore.properties"/>
+        <include name="*/config/mycore.properties" />
       </fileset>
       <sequential>
-        <mcr:config propertyfile="${build.config}/mycore.properties" mergeFile="@{component.property}"/>
+        <mcr:config propertyfile="${build.config}/mycore.properties" mergeFile="@{component.property}" />
       </sequential>
     </for>
     <!-- searchfields -->
@@ -115,90 +131,89 @@
       </sequential>
     </for>
     <replace file="${build.config}/searchfields.xml" token='xmlns=""' />
-    <componentHook target="config"/>
+    <componentHook target="config" />
   </target>
-  
+
   <!-- ================================= 
   target: info              
   ================================= -->
   <target name="info" description="--> prints some information about the integration">
-    <echoproperties/>
+    <echoproperties />
   </target>
-  
+
   <!-- ================================= 
   target: webapp              
   ================================= -->
   <target name="webapp" description="--> integrates component in web application">
-    <componentPreHook target="webapp"/>
-    <componentHook target="webapp"/>
+    <componentPreHook target="webapp" />
+    <componentHook target="webapp" />
   </target>
-  
+
   <!-- ================================= 
   target: i18n              
   ================================= -->
   <target name="i18n" description="--> adds i18n keys to the web application">
-    <componentPreHook target="i18n"/>
-    <concat destfile="${build.config}/messages_en.properties" append="false">
-      <fileset file="${integration.dir}/config/messages_en.properties"/>
-      <fileset id="mycore.components.properties" dir="${integration.dir}/components">
-        <include name="*/config/messages_en.properties"/>
-      </fileset>
-    </concat>
-    <concat destfile="${build.config}/messages_de.properties" append="false">
-      <fileset file="${integration.dir}/config/messages_de.properties"/>
-      <fileset id="mycore.components.properties" dir="${integration.dir}/components">
-        <include name="*/config/messages_de.properties"/>
-      </fileset>
-    </concat>
-    <componentHook target="i18n"/>
+    <componentPreHook target="i18n" />
+    <for list="${MCR.I18N.Languages}" param="lang" parallel="true">
+      <sequential>
+        <echo level="info">Building ${build.config}/messages_@{lang}.properties</echo>
+        <concat destfile="${build.config}/messages_@{lang}.properties" append="false">
+          <fileset file="${integration.dir}/config/messages_@{lang}.properties" />
+          <fileset id="mycore.components.properties" dir="${integration.dir}/components">
+            <include name="*/config/messages_@{lang}.properties" />
+          </fileset>
+        </concat>
+      </sequential>
+    </for>
+    <componentHook target="i18n" />
   </target>
-  
+
   <!-- ================================= 
   target: compile              
   ================================= -->
   <target name="compile" description="--> compiles component code for the application">
-    <componentPreHook target="compile"/>
-    <componentHook target="compile"/>
+    <componentPreHook target="compile" />
+    <componentHook target="compile" />
   </target>
-  
+
   <!-- ================================= 
   target: create.default-rules              
   ================================= -->
   <target name="create.default-rules" description="--> adds some default ACL rules to the application">
-    <componentPreHook target="create.default-rules"/>
-    <componentHook target="create.default-rules"/>
+    <componentPreHook target="create.default-rules" />
+    <componentHook target="create.default-rules" />
   </target>
-  
+
   <!-- ================================= 
   target: create.scripts              
   ================================= -->
   <target name="create.scripts" description="--> adds component scripts to the application">
-    <componentPreHook target="create.scripts"/>
-    <componentHook target="create.scripts"/>
+    <componentPreHook target="create.scripts" />
+    <componentHook target="create.scripts" />
   </target>
-  
+
   <!-- ================================= 
   target: create.users              
   ================================= -->
   <target name="create.users" description="--> adds user to the application">
-    <componentPreHook target="create.users"/>
-    <componentHook target="create.users"/>
+    <componentPreHook target="create.users" />
+    <componentHook target="create.users" />
   </target>
-  
+
   <!-- ================================= 
   target: deploy              
   ================================= -->
   <target name="webservice.deploy" description="--> deploys components to the web application">
-    <componentPreHook target="webservice.deploy"/>
-    <componentHook target="webservice.deploy"/>
+    <componentPreHook target="webservice.deploy" />
+    <componentHook target="webservice.deploy" />
   </target>
-  
+
   <!-- ================================= 
   target: undeply              
   ================================= -->
   <target name="webservice.undeploy" description="--> undeploys components from the web application">
-    <componentPreHook target="webservice.undeploy"/>
-    <componentHook target="webservice.undeploy"/>
+    <componentPreHook target="webservice.undeploy" />
+    <componentHook target="webservice.undeploy" />
   </target>
-  
+
 </project>
