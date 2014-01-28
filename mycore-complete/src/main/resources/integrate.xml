@@ -1,6 +1,6 @@
 <project name="MyCoRe Components integration" xmlns:mcr="antlib:org.mycore.buildtools">
   <property name="components.order"
-            value="acl-editor,acl-editor2,broadcasting,buildtools,classbrowser,classeditor,classhandler,doubletfinder,indexing,iview2,migration-2014,session-listing,swf,mets,mods,user2,wcms,webcli,webservices,z3950,oai,solr,handle" />
+            value="acl-editor,acl-editor2,broadcasting,buildtools,classbrowser,classeditor,classhandler,doubletfinder,indexing,iview2,migration-2014,session-listing,swf,mets,solr,mods,user2,wcms,webcli,webservices,z3950,oai,handle" />
 
   <import file="${integration.dir}/helper.xml" />
   <taskdef resource="org/mycore/buildtools/antlib.xml"
@@ -101,12 +101,16 @@
     <copy todir="${build.config}" overwrite="true" file="${integration.dir}/config/mycore.properties" />
     <copy todir="${build.config}" overwrite="true" file="${integration.dir}/config/searchfields.xml" />
     <componentPreHook target="config" />
-    <for param="component.property" trim="true">
-      <fileset id="mycore.components.properties" dir="${integration.dir}/components">
-        <include name="*/config/mycore.properties" />
-      </fileset>
+    <for param="component.name" list="${components.order}">
       <sequential>
-        <mcr:config propertyfile="${build.config}/mycore.properties" mergeFile="@{component.property}" />
+        <for param="component.property" trim="true">
+          <fileset id="mycore.components.properties" dir="${integration.dir}/components">
+            <include name="@{component.name}/config/mycore.properties" />
+          </fileset>
+          <sequential>
+            <mcr:config propertyfile="${build.config}/mycore.properties" mergeFile="@{component.property}" />
+          </sequential>
+        </for>
       </sequential>
     </for>
     <!-- searchfields -->
