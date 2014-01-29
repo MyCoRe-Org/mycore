@@ -23,9 +23,10 @@
 
 package org.mycore.common.events;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.TreeSet;
 
 import javax.servlet.ServletContext;
 
@@ -64,28 +65,31 @@ public class MCRStartupHandler {
     }
 
     private static class AutoExecutableComparator implements Comparator<AutoExecutable> {
-
         @Override
         public int compare(AutoExecutable o1, AutoExecutable o2) {
             //reverse ordering: highest priority first
             return Integer.compare(o2.getPriority(), o1.getPriority());
         }
-
     }
 
     public static void startUp(ServletContext servletContext) {
         //setup configuration
         MCRConfigurationDirSetup dirSetup = new MCRConfigurationDirSetup();
         dirSetup.startUp(servletContext);
+
         List<String> startupClasses = MCRConfiguration.instance().getStrings("MCR.Startup.Class", null);
         if (startupClasses == null) {
             return;
         }
-        TreeSet<AutoExecutable> autoExecutables = new TreeSet<>(new AutoExecutableComparator());
+
+        List<AutoExecutable> autoExecutables = new ArrayList<AutoExecutable>(startupClasses.size());
+        Collections.sort(autoExecutables, new AutoExecutableComparator());
+
         for (String className : startupClasses) {
             try {
                 AutoExecutable autoExecutable = (AutoExecutable) Class.forName(className).newInstance();
-                autoExecutables.add(autoExecutable);
+                boolean added = autoExecutables.add(autoExecutable);
+                System.out.println(added);
             } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
                 LOGGER.error("Error while starting startup class: " + className, e);
             }
