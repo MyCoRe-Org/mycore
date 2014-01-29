@@ -38,6 +38,12 @@ import org.apache.log4j.Logger;
  * 
  * The directory path is build this way:
  * <ol>
+ *  <li>System property <code>MCR.Home</code> defined
+ *      <ol>
+ *          <li><code>System.getProperty("MCR.Home")</code></li>
+ *          <li><code>{prefix+'-'}{appName}</code></li>
+ *      </ol>
+ *  </li>
  *  <li>Windows:
  *      <ol>
  *          <li><code>%LOCALAPPDATA%</code></li>
@@ -77,6 +83,10 @@ public class MCRConfigurationDir {
     private static String APP_NAME = null;
 
     private static File getMyCoReDirectory() {
+        String mcrHome = System.getProperty("MCR.Home");
+        if (mcrHome != null) {
+            return new File(mcrHome);
+        }
         //Windows Vista onwards:
         String localAppData = isWindows() ? System.getenv("LOCALAPPDATA") : null;
         //on every other platform
