@@ -89,7 +89,6 @@ public class MCRStartupHandler {
             try {
                 AutoExecutable autoExecutable = (AutoExecutable) Class.forName(className).newInstance();
                 boolean added = autoExecutables.add(autoExecutable);
-                System.out.println(added);
             } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
                 LOGGER.error("Error while starting startup class: " + className, e);
             }
