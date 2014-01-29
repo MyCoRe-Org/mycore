@@ -94,7 +94,7 @@ public class MCRConfiguration {
     }
 
     public <T> T getInstanceOf(String name, String defaultname, Class<T> type) {
-        return backend.getInstanceOf(name, defaultname, type);
+        return backend.<T>getInstanceOf(name, defaultname);
     }
 
     public <T> T getInstanceOf(String name, String defaultname) throws MCRConfigurationException {
@@ -102,7 +102,7 @@ public class MCRConfiguration {
     }
 
     public <T> T getInstanceOf(String name, Class<T> type) throws MCRConfigurationException {
-        return backend.getInstanceOf(name, type);
+        return backend.<T>getInstanceOf(name);
     }
 
     public <T> T getInstanceOf(String name) throws MCRConfigurationException {
@@ -114,7 +114,7 @@ public class MCRConfiguration {
     }
 
     public <T> T getSingleInstanceOf(String name, String defaultname, Class<T> type) throws MCRConfigurationException {
-        return backend.getSingleInstanceOf(name, defaultname, type);
+        return backend.<T>getSingleInstanceOf(name, defaultname);
     }
 
     public <T> T getSingleInstanceOf(String name) {
@@ -122,7 +122,7 @@ public class MCRConfiguration {
     }
 
     public <T> T getSingleInstanceOf(String name, Class<T> type) {
-        return backend.getSingleInstanceOf(name, type);
+        return backend.<T>getSingleInstanceOf(name);
     }
 
     public String getString(String name) {
