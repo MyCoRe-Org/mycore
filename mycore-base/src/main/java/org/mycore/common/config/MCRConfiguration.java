@@ -460,6 +460,38 @@ public class MCRConfiguration {
     }
 
     /**
+     * @see #getInstanceOf(String, String)
+     */
+    @Deprecated
+    public <T> T getInstanceOf(String name, String defaultname, Class<T> type) {
+        return this.<T> getInstanceOf(name, defaultname);
+    }
+
+    /**
+     * @see #getInstanceOf(String)
+     */
+    @Deprecated
+    public <T> T getInstanceOf(String name, Class<T> type) throws MCRConfigurationException {
+        return this.<T> getInstanceOf(name, (String) null);
+    }
+
+    /**
+     * @see #getSingleInstanceOf(String, String)
+     */
+    @Deprecated
+    public <T> T getSingleInstanceOf(String name, String defaultname, Class<T> type) throws MCRConfigurationException {
+        return this.<T> getInstanceOf(name, defaultname);
+    }
+
+    /**
+     * @see #getSingleInstanceOf(String)
+     */
+    @Deprecated
+    public <T> T getSingleInstanceOf(String name, Class<T> type) {
+        return this.<T> getSingleInstanceOf(name, (String) null);
+    }
+
+    /**
      * Returns a new instance of the class specified in the configuration
      * property with the given name.
      * 
@@ -467,15 +499,12 @@ public class MCRConfiguration {
      *            the non-null and non-empty qualified name of the configuration property
      * @param defaultname
      *            the qualified class name
-     * @param type
-     *            return type of this method
      * @return Instance of the value of the configuration property
      * @throws MCRConfigurationException
      *             if the property is not set or the class can not be loaded or
      *             instantiated
      */
-    @SuppressWarnings("unchecked")
-    public <T> T getInstanceOf(String name, String defaultname, Class<T> type) {
+    public <T> T getInstanceOf(String name, String defaultname) throws MCRConfigurationException {
         String classname = getString(name, defaultname);
         if (classname == null) {
             throw new MCRConfigurationException("Configuration property missing: " + name);
@@ -486,7 +515,9 @@ public class MCRConfiguration {
         T o = null;
         Class<? extends T> cl;
         try {
-            cl = (Class<? extends T>) Class.forName(classname);
+            @SuppressWarnings("unchecked")
+            Class<? extends T> forName = (Class<? extends T>) Class.forName(classname);
+            cl = forName;
         } catch (ClassNotFoundException ex) {
             throw new MCRConfigurationException("Could not load class " + classname, ex);
         }
@@ -502,7 +533,9 @@ public class MCRConfiguration {
                     if (querymethod.getName().toLowerCase().equals("instance")
                         || querymethod.getName().toLowerCase().equals("getinstance")) {
                         Object[] ob = new Object[0];
-                        o = (T) querymethod.invoke(cl, ob);
+                        @SuppressWarnings("unchecked")
+                        T invoke = (T) querymethod.invoke(cl, ob);
+                        o = invoke;
                         break;
                     }
                 }
@@ -520,41 +553,6 @@ public class MCRConfiguration {
             }
         }
         return o;
-    }
-
-    /**
-     * Returns a new instance of the class specified in the configuration
-     * property with the given name.
-     * 
-     * @param name
-     *            the non-null and non-empty qualified name of the configuration property
-     * @param defaultname
-     *            the qualified class name
-     * @return Instance of the value of the configuration property
-     * @throws MCRConfigurationException
-     *             if the property is not set or the class can not be loaded or
-     *             instantiated
-     */
-    @SuppressWarnings("unchecked")
-    public <T> T getInstanceOf(String name, String defaultname) throws MCRConfigurationException {
-        return (T) getInstanceOf(name, defaultname, Object.class);
-    }
-
-    /**
-     * Returns a new instance of the class specified in the configuration
-     * property with the given name.
-     * 
-     * @param name
-     *            the non-null and non-empty qualified name of the configuration property
-     * @param type
-     *            return type of this method
-     * @return Instance of the value of the configuration property
-     * @throws MCRConfigurationException
-     *             if the property is not set or the class can not be loaded or
-     *             instantiated
-     */
-    public <T> T getInstanceOf(String name, Class<T> type) throws MCRConfigurationException {
-        return getInstanceOf(name, null, type);
     }
 
     /**
@@ -585,29 +583,7 @@ public class MCRConfiguration {
      *             if the property is not set or the class can not be loaded or
      *             instantiated
      */
-    @SuppressWarnings("unchecked")
     public <T> T getSingleInstanceOf(String name, String defaultname) throws MCRConfigurationException {
-        return (T) getSingleInstanceOf(name, defaultname, Object.class);
-    }
-
-    /**
-     * Returns a instance of the class specified in the configuration property
-     * with the given name. If the class was previously instantiated by this
-     * method this instance is returned.
-     * 
-     * @param name
-     *            the non-null and non-empty name of the configuration property
-     * @param defaultName
-     *            qualified class name as default value for property - maybe null
-     * @param type
-     *            return type of this method
-     * @return the instance of the class named by the value of the configuration
-     *         property
-     * @throws MCRConfigurationException
-     *             if the property is not set or the class can not be loaded or
-     *             instantiated
-     */
-    public <T> T getSingleInstanceOf(String name, String defaultname, Class<T> type) throws MCRConfigurationException {
         String className = defaultname == null ? getString(name) : getString(name, defaultname);
         SingletonKey key = new SingletonKey(name, className);
         @SuppressWarnings("unchecked")
@@ -615,7 +591,7 @@ public class MCRConfiguration {
         if (inst != null) {
             return inst;
         }
-        inst = getInstanceOf(name, defaultname, type); // we need a new instance, get it
+        inst = this.<T> getInstanceOf(name, defaultname); // we need a new instance, get it
         instanceHolder.put(key, inst); // save the instance in the hashtable
         return inst;
     }
@@ -635,23 +611,6 @@ public class MCRConfiguration {
      */
     public <T> T getSingleInstanceOf(String name) {
         return getSingleInstanceOf(name, (String) null);
-    }
-
-    /**
-     * Returns a instance of the class specified in the configuration property
-     * with the given name. If the class was prevously instantiated by this
-     * method this instance is returned.
-     * 
-     * @param name
-     *            non-null and non-empty name of the configuration property
-     * @return the instance of the class named by the value of the configuration
-     *         property
-     * @throws MCRConfigurationException
-     *             if the property is not set or the class can not be loaded or
-     *             instantiated
-     */
-    public <T> T getSingleInstanceOf(String name, Class<T> type) {
-        return getSingleInstanceOf(name, null, type);
     }
 
     /**
