@@ -45,8 +45,7 @@ public class MCRInheritanceManagerFactory {
         String propertyValue = MCRConfiguration.instance().getString(propertyName, null);
         if (propertyValue != null) {
             //we will not get undefined problems here
-            MCRInheritanceManager inheritanceManager = MCRConfiguration.instance().getSingleInstanceOf(propertyName,
-                MCRInheritanceManager.class);
+            MCRInheritanceManager inheritanceManager = MCRConfiguration.instance().<MCRInheritanceManager> getSingleInstanceOf(propertyName, (String) null);
             return inheritanceManager;
         }
         return getDefaultManager();

@@ -36,8 +36,7 @@ public class MCRCategoryDAOFactory {
 
     private static final String STANDARD_DAO = MCRCategoryDAOImpl.class.getCanonicalName();
 
-    private static MCRCategoryDAO instance = MCRConfiguration.instance().getInstanceOf("MCR.Category.DAO", STANDARD_DAO,
-        MCRCategoryDAO.class);
+    private static MCRCategoryDAO instance = MCRConfiguration.instance().<MCRCategoryDAO> getInstanceOf("MCR.Category.DAO", STANDARD_DAO);
 
     /**
      * Returns an instance of a MCRCategoryDAO implementator.

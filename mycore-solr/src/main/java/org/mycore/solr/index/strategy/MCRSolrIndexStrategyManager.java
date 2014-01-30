@@ -13,7 +13,7 @@ public class MCRSolrIndexStrategyManager {
     private static final MCRSolrFileStrategy FILE_STRATEGY;
 
     static {
-        FILE_STRATEGY = MCRConfiguration.instance().getInstanceOf(CONFIG_PREFIX + "FileIndexStrategy", MCRSolrFileStrategy.class);
+        FILE_STRATEGY = MCRConfiguration.instance().<MCRSolrFileStrategy> getInstanceOf(CONFIG_PREFIX + "FileIndexStrategy", (String) null);
     }
 
     public static boolean checkFile(MCRFile file) {

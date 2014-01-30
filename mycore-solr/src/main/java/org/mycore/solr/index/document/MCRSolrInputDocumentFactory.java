@@ -44,8 +44,7 @@ import org.xml.sax.SAXException;
  */
 public abstract class MCRSolrInputDocumentFactory {
 
-    private static MCRSolrInputDocumentFactory instance = MCRConfiguration.instance().getInstanceOf(
-        CONFIG_PREFIX + "SolrInputDocument.Factory", MCRSolrInputDocumentFactory.class);
+    private static MCRSolrInputDocumentFactory instance = MCRConfiguration.instance().<MCRSolrInputDocumentFactory> getInstanceOf(CONFIG_PREFIX + "SolrInputDocument.Factory", (String) null);
 
     public static MCRSolrInputDocumentFactory getInstance() {
         return instance;

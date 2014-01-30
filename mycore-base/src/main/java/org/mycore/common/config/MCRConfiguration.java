@@ -460,38 +460,6 @@ public class MCRConfiguration {
     }
 
     /**
-     * @see #getInstanceOf(String, String)
-     */
-    @Deprecated
-    public <T> T getInstanceOf(String name, String defaultname, Class<T> type) {
-        return this.<T> getInstanceOf(name, defaultname);
-    }
-
-    /**
-     * @see #getInstanceOf(String)
-     */
-    @Deprecated
-    public <T> T getInstanceOf(String name, Class<T> type) throws MCRConfigurationException {
-        return this.<T> getInstanceOf(name, (String) null);
-    }
-
-    /**
-     * @see #getSingleInstanceOf(String, String)
-     */
-    @Deprecated
-    public <T> T getSingleInstanceOf(String name, String defaultname, Class<T> type) throws MCRConfigurationException {
-        return this.<T> getInstanceOf(name, defaultname);
-    }
-
-    /**
-     * @see #getSingleInstanceOf(String)
-     */
-    @Deprecated
-    public <T> T getSingleInstanceOf(String name, Class<T> type) {
-        return this.<T> getSingleInstanceOf(name, (String) null);
-    }
-
-    /**
      * Returns a new instance of the class specified in the configuration
      * property with the given name.
      * 

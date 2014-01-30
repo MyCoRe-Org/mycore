@@ -174,8 +174,7 @@ public class MCROAISearchManager {
     }
 
     public static MCROAISearcher getSearcher(String configPrefix, MetadataFormat format, DeletedRecordPolicy deletedRecordPolicy, int partitionSize) {
-        MCROAISearcher searcher = getConfig().getInstanceOf(configPrefix + "Searcher", "org.mycore.oai.MCROAILuceneSearcher",
-                MCROAISearcher.class);
+        MCROAISearcher searcher = getConfig().<MCROAISearcher> getInstanceOf(configPrefix + "Searcher", "org.mycore.oai.MCROAILuceneSearcher");
         searcher.init(configPrefix, format, new Date(System.currentTimeMillis() + MAX_AGE), deletedRecordPolicy, partitionSize);
         return searcher;
     }

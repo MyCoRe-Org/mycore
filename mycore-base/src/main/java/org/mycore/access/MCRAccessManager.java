@@ -55,8 +55,7 @@ public class MCRAccessManager {
     public static final String PERMISSION_DELETE = "deletedb";
 
     public static MCRAccessInterface getAccessImpl() {
-        return MCRConfiguration.instance().getSingleInstanceOf("MCR.Access.Class", MCRAccessBaseImpl.class.getName(),
-            MCRAccessInterface.class);
+        return MCRConfiguration.instance().<MCRAccessInterface> getSingleInstanceOf("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
     }
 
     /**

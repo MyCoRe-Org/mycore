@@ -68,8 +68,7 @@ public class MCRSolrMCRFileDocumentFactory {
 
     private static Logger LOGGER = Logger.getLogger(MCRSolrMCRFileDocumentFactory.class);
 
-    private static MCRSolrMCRFileDocumentFactory instance = MCRConfiguration.instance().getInstanceOf(
-            CONFIG_PREFIX + "SolrInputDocument.MCRFile.Factory", MCRSolrMCRFileDocumentFactory.class);
+    private static MCRSolrMCRFileDocumentFactory instance = MCRConfiguration.instance().<MCRSolrMCRFileDocumentFactory> getInstanceOf(CONFIG_PREFIX + "SolrInputDocument.MCRFile.Factory", (String) null);
 
     private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
 
