@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:mcr="http://www.mycore.org/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xalan="http://xml.apache.org/xalan" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport"
-  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:gnd="http://d-nb.info/standards/elementset/gnd#" xmlns:java="http://xml.apache.org/xalan/java"
-  exclude-result-prefixes="gnd rdf mcrmods mcr xalan java" version="1.0" xmlns:ex="http://exslt.org/dates-and-times"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:gndo="http://d-nb.info/standards/elementset/gnd#" xmlns:java="http://xml.apache.org/xalan/java"
+  exclude-result-prefixes="gndo rdf mcrmods mcr xalan java" version="1.0" xmlns:ex="http://exslt.org/dates-and-times"
     extension-element-prefixes="ex">
 
   <xsl:include href="copynodes.xsl" />
@@ -126,7 +126,7 @@
 
   <xsl:template match="*[nameOrPND]">
     <xsl:copy>
-      <xsl:apply-templates select="@*[not(name()='type')]" />
+      <xsl:apply-templates select="@*" />
 
       <!-- get name from PND or from editor input -->
       <xsl:variable name="trimmedValue" select="java:trim(string(nameOrPND))" />
@@ -142,16 +142,7 @@
             <xsl:value-of select="ex:date-time()"/>
             <xsl:value-of select="count($gndEntry/*)"/>
           </xsl:message>
-          <xsl:attribute name="type">
-            <xsl:choose>
-              <xsl:when test="$gndEntry//gnd:preferredNameForTheCorporateBody">
-                <xsl:value-of select="'corporate'"/>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="'personal'"/>
-              </xsl:otherwise>
-            </xsl:choose>
-          </xsl:attribute>
+          <xsl:variable name="gndType"  select="substring-after($gndEntry//rdf:type/@rdf:resource, '#')" />
           <xsl:attribute name="authorityURI">
             <xsl:value-of select="'http://d-nb.info/'" />
           </xsl:attribute>
@@ -159,12 +150,17 @@
             <xsl:value-of select="concat('http://d-nb.info/gnd/',$trimmedValue)" />
           </xsl:attribute>
           <mods:displayForm>
-            <xsl:value-of select="$gndEntry//gnd:preferredNameForThePerson[not(@rdf:parseType)]"/>
-            <xsl:value-of select="$gndEntry//gnd:preferredNameForTheCorporateBody" />
+            <xsl:choose>
+              <xsl:when test="$gndType='CorporateBody'">
+                <xsl:value-of select="$gndEntry//gndo:preferredNameForTheCorporateBody" />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$gndEntry//gndo:preferredNameForThePerson[not(@rdf:parseType)]"/>
+              </xsl:otherwise>
+            </xsl:choose>
           </mods:displayForm>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:apply-templates select="@type"/>
           <mods:displayForm>
             <xsl:value-of select="$trimmedValue" />
           </mods:displayForm>
