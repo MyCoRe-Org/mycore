@@ -34,15 +34,23 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.Reference;
 
-public class MCRGetMyCoReJarTask extends Task {
+/**
+ * A subclass to call a given target of the integrate.xml inside a jar file.
+ * 
+ * @author Thomas Scheffler (yagee)
+ * @author Jens Kupferschmidt
+ */
+public class MCRGetJarTask extends Task {
 
     private Path classPath;
 
     private boolean scanEveryJarFile = false;
 
-    private File mycoreJarFile;
+    private File jarFile;
     
     private String property;
+    
+    private String jarStartsWith;
 
     @Override
     public void init() throws BuildException {
@@ -56,6 +64,14 @@ public class MCRGetMyCoReJarTask extends Task {
         classPath.createPath().setRefid(ref);
     }
 
+    public void setJarStartWith(String startwith) {
+        if (startwith == null || startwith.length() == 0) {
+            jarStartsWith = "mycore";
+        } else {
+            jarStartsWith = startwith;
+        }
+    }
+
     @Override
     public void execute() throws BuildException {
         if (property==null){
@@ -63,45 +79,50 @@ public class MCRGetMyCoReJarTask extends Task {
         }
         Exception ex = null;
         try {
-            findMycoreJarInPath(classPath);
+            findJarInPath(classPath);
         } catch (IOException e) {
             ex = e;
         }
-        if (mycoreJarFile == null) {
-            throw new BuildException("Could not find a valid mycore.jar in classPath.", ex);
+        if (jarFile == null) {
+            throw new BuildException("Could not find a valid " + jarStartsWith + ".jar in classPath.", ex);
         }
-        getProject().setProperty(property, mycoreJarFile.getAbsolutePath());
+        getProject().setProperty(property, jarFile.getAbsolutePath());
     }
 
-    private void findMycoreJarInPath(Path path) throws IOException {
+    private void findJarInPath(Path path) throws IOException {
         log("Checking path:" + path, Project.MSG_DEBUG);
         for (String part : path.list()) {
             log("Checking pathElement:" + part, Project.MSG_DEBUG);
             File candidate = new File(part);
-            if (scanEveryJarFile || candidate.getName().startsWith("mycore")) {
-                if (isMyCoReJAR(candidate)) {
-                    log("Found mycore in " + candidate.getAbsolutePath());
+            if (scanEveryJarFile || candidate.getName().startsWith(jarStartsWith)) {
+                System.out.println("======="+candidate.getName()+" "+jarStartsWith);
+                if (isJAR(candidate)) {
+                    log("Found " + jarStartsWith + " in " + candidate.getAbsolutePath());
                     break;
                 }
             }
         }
-        if (this.mycoreJarFile == null && !scanEveryJarFile) {
-            log("Did not found a mycore jar file starting with 'mycore' in classPath. Now scanning every jar file for a MyCoRe manifest.");
+        if (this.jarFile == null && !scanEveryJarFile) {
+            log("Did not found a jar file starting with '" + jarStartsWith + "' in classPath. Now scanning every jar file for a manifest.");
             scanEveryJarFile = true;
-            findMycoreJarInPath(path);
+            findJarInPath(path);
         }
     }
 
-    private boolean isMyCoReJAR(File candidate) throws IOException {
-        JarFile mycoreJar = new JarFile(candidate);
-        Manifest manifest = mycoreJar.getManifest();
+    private boolean isJAR(File candidate) throws IOException {
+        if (!candidate.isFile()) {
+            return false;
+        }
+        JarFile jar = new JarFile(candidate);
+        Manifest manifest = jar.getManifest();
+        jar.close();
         if (manifest == null || manifest.getMainAttributes() == null)
             return false;
         // Assume it's a mycore jar file if 'MCR-Version' attribute is present
         // in jar file
         final String mcrVersion = manifest.getMainAttributes().getValue("MCR-Version");
         if (mcrVersion != null) {
-            this.mycoreJarFile = candidate;
+            this.jarFile = candidate;
             return true;
         }
         return false;

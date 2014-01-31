@@ -2,7 +2,7 @@
 <antlib>
   <!-- Tasks -->
   <taskdef name="config" classname="org.mycore.buildtools.anttasks.MCRConfigurationTask" />
-  <taskdef name="getJar" classname="org.mycore.buildtools.anttasks.MCRGetMyCoReJarTask" />
+  <taskdef name="getJar" classname="org.mycore.buildtools.anttasks.MCRGetJarTask" />
   <taskdef name="integrate" classname="org.mycore.buildtools.anttasks.MCRIntegrateTask" />
   <taskdef name="execute" classname="org.mycore.buildtools.anttasks.MCRExecuteCommandTask" />
   <taskdef name="mergeSearchfields" classname="org.mycore.buildtools.anttasks.MCRMergeSearchfieldsXMLTask" />

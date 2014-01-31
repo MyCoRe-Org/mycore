@@ -40,19 +40,20 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Calls a given target of the integrate.xml inside a MyCoRe jar file.
+ * Calls a given target of the integrate.xml inside a jar file.
  * 
  * @author Thomas Scheffler (yagee)
+ * @author Jens Kupferschmidt
  */
 public class MCRIntegrateTask extends Task {
-
-    private static final String MYCORE_JAR_PROPERTY = "mcr.integrate.mycore.jar";
 
     private Path classPath;
 
     private String target;
 
-    private File buildDir, mycoreJarFile = null;
+    private String jarStartsWith;
+
+    private File buildDir, jarFile = null;
 
     private JarFile mycoreJar;
 
@@ -78,9 +79,9 @@ public class MCRIntegrateTask extends Task {
     public void execute() {
         log("classPath:" + classPath, Project.MSG_DEBUG);
         try {
-            getMyCoReJar();
+            getJar();
         } catch (IOException e) {
-            throw new BuildException("Cannot find a MyCoRe JAR file in classpath.", e);
+            throw new BuildException("Cannot find a JAR file in classpath.", e);
         }
         extractComponents();
         try {
@@ -104,40 +105,56 @@ public class MCRIntegrateTask extends Task {
         this.target = target;
     }
 
+    public void setJarStartsWith(String jarStartsWith) {
+        if (jarStartsWith == null || jarStartsWith.length() == 0) {
+            this.jarStartsWith = "mycore";
+        } else {
+            this.jarStartsWith = jarStartsWith;
+        }
+    }
+
     public void setBuildDir(String buildDir) {
         this.buildDir = new File(getProject().getBaseDir(), buildDir);
     }
 
-    private void getMyCoReJar() throws IOException {
-        if (mycoreJarFile == null) {
+    private void getJar() throws IOException {
+        if (jarFile == null) {
             Exception ex = null;
             try {
-                String pathName = getProject().getProperty(MYCORE_JAR_PROPERTY);
-                if (pathName == null) {
-                    MCRGetMyCoReJarTask findTask = new MCRGetMyCoReJarTask();
-                    findTask.bindToOwner(this);
-                    findTask.setProperty(MYCORE_JAR_PROPERTY);
-                    findTask.setClassPathRef(classPathRef);
-                    findTask.execute();
-                    pathName = getProject().getProperty(MYCORE_JAR_PROPERTY);
+                String JAR_PROPERTY;
+                if (jarStartsWith == null || jarStartsWith.length() == 0) {
+                    JAR_PROPERTY = "mcr.integrate.mycore.jar";
+                } else {
+                    JAR_PROPERTY = "mcr.integrate." + jarStartsWith + ".jar";
                 }
-                log("Found MyCoRe in " + pathName, Project.MSG_DEBUG);
-                mycoreJarFile = new File(pathName);
+                String pathName = getProject().getProperty(JAR_PROPERTY);
+                if (pathName == null) {
+                    MCRGetJarTask findTask = new MCRGetJarTask();
+                    findTask.bindToOwner(this);
+                    findTask.setProperty(JAR_PROPERTY);
+                    findTask.setClassPathRef(classPathRef);
+                    findTask.setJarStartWith(jarStartsWith);
+                    findTask.execute();
+                    pathName = getProject().getProperty(JAR_PROPERTY);
+                }
+                log("Found in " + pathName, Project.MSG_DEBUG);
+                jarFile = new File(pathName);
             } catch (RuntimeException e) {
+                e.printStackTrace();
                 ex = e;
             }
-            if (mycoreJarFile == null) {
-                throw new BuildException("Could not find a valid mycore.jar in classPath.", ex);
+            if (jarFile == null) {
+                throw new BuildException("Could not find a valid " + jarStartsWith + ".jar in classPath.", ex);
             }
         }
         if (mycoreJar == null) {
-            mycoreJar = new JarFile(mycoreJarFile);
+            mycoreJar = new JarFile(jarFile);
         }
     }
 
     private void callSubAnt() {
         if (target == null)
-            throw new BuildException("Cannot integrate MyCoRe components. No 'target' definied.");
+            throw new BuildException("Cannot integrate components. No 'target' definied.");
         SubAnt subAnt = new SubAnt();
         subAnt.bindToOwner(this);
         subAnt.setBuildpath(new Path(getProject(), buildDir.getAbsolutePath()));
@@ -164,7 +181,7 @@ public class MCRIntegrateTask extends Task {
             }
         }
         expandTask.setDest(buildDir);
-        expandTask.setSrc(mycoreJarFile);
+        expandTask.setSrc(jarFile);
         PatternSet expandSet = new PatternSet();
         expandSet.setProject(getProject());
         expandSet.setIncludes("integrate.xml config/** components/** web/**");
@@ -215,8 +232,8 @@ public class MCRIntegrateTask extends Task {
         project.appendChild(path);
         // add property mycore.jar as a hint to mycore.jar file
         Element mycoreProperty = doc.createElement("property");
-        mycoreProperty.setAttribute("name", "mycore.jar");
-        mycoreProperty.setAttribute("location", mycoreJarFile.getAbsolutePath());
+        mycoreProperty.setAttribute("name", jarStartsWith + ".jar");
+        mycoreProperty.setAttribute("location", jarFile.getAbsolutePath());
         project.appendChild(mycoreProperty);
         FileOutputStream out = null;
         try {
