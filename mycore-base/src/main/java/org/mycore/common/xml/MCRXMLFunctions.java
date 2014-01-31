@@ -186,8 +186,8 @@ public class MCRXMLFunctions {
     public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language) throws ParseException {
         if (LOGGER.isDebugEnabled()) {
             StringBuilder sb = new StringBuilder("isoDate=");
-            sb.append(isoDate).append(", simpleFormat=").append(simpleFormat).append(", isoFormat=").append(isoFormat)
-                    .append(", iso649Language=").append(iso639Language);
+            sb.append(isoDate).append(", simpleFormat=").append(simpleFormat).append(", isoFormat=").append(isoFormat).append(", iso649Language=")
+                    .append(iso639Language);
             LOGGER.debug(sb.toString());
         }
         Locale locale = new Locale(iso639Language);
@@ -463,8 +463,8 @@ public class MCRXMLFunctions {
             return new URI(url).toASCIIString();
         } catch (Exception e) {
             URL testURL = new URL(url);
-            URI uri = new URI(testURL.getProtocol(), testURL.getUserInfo(), testURL.getHost(), testURL.getPort(), testURL.getPath(),
-                    testURL.getQuery(), testURL.getRef());
+            URI uri = new URI(testURL.getProtocol(), testURL.getUserInfo(), testURL.getHost(), testURL.getPort(), testURL.getPath(), testURL.getQuery(),
+                    testURL.getRef());
             return uri.toASCIIString();
         }
     }
@@ -568,8 +568,7 @@ public class MCRXMLFunctions {
                 return true;
             }
         }
-        LOGGER.info("URN assignment disabled as the object type " + givenType + " is not in the list of allowed objects. See property \""
-                + propertyName + "\"");
+        LOGGER.info("URN assignment disabled as the object type " + givenType + " is not in the list of allowed objects. See property \"" + propertyName + "\"");
         return false;
     }
 
@@ -833,6 +832,9 @@ public class MCRXMLFunctions {
 
     public static String shortenPersonLabel(String text) {
         int pos = text.indexOf("(");
+        if (pos == -1) {
+            return text;
+        }
         return text.substring(0, pos - 1);
     }
 
