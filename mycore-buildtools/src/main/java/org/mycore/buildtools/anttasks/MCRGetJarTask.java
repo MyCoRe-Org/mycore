@@ -47,9 +47,9 @@ public class MCRGetJarTask extends Task {
     private boolean scanEveryJarFile = false;
 
     private File jarFile;
-    
+
     private String property;
-    
+
     private String jarStartsWith;
 
     @Override
@@ -64,17 +64,17 @@ public class MCRGetJarTask extends Task {
         classPath.createPath().setRefid(ref);
     }
 
-    public void setJarStartWith(String startwith) {
-        if (startwith == null || startwith.length() == 0) {
-            jarStartsWith = "mycore";
-        } else {
-            jarStartsWith = startwith;
-        }
+    public String getJarStartsWith() {
+        return jarStartsWith == null ? "mycore" : jarStartsWith;
+    }
+
+    public void setJarStartsWith(String jarStartsWith) {
+        this.jarStartsWith = jarStartsWith;
     }
 
     @Override
     public void execute() throws BuildException {
-        if (property==null){
+        if (property == null) {
             throw new BuildException("No property attribute specified");
         }
         Exception ex = null;
@@ -84,7 +84,7 @@ public class MCRGetJarTask extends Task {
             ex = e;
         }
         if (jarFile == null) {
-            throw new BuildException("Could not find a valid " + jarStartsWith + ".jar in classPath.", ex);
+            throw new BuildException("Could not find a valid " + getJarStartsWith() + "*.jar in classPath.", ex);
         }
         getProject().setProperty(property, jarFile.getAbsolutePath());
     }
@@ -94,16 +94,17 @@ public class MCRGetJarTask extends Task {
         for (String part : path.list()) {
             log("Checking pathElement:" + part, Project.MSG_DEBUG);
             File candidate = new File(part);
-            if (scanEveryJarFile || candidate.getName().startsWith(jarStartsWith)) {
-                System.out.println("======="+candidate.getName()+" "+jarStartsWith);
+            if (scanEveryJarFile || candidate.getName().startsWith(getJarStartsWith())) {
+                log("Checking candidate:" + candidate, Project.MSG_DEBUG);
                 if (isJAR(candidate)) {
-                    log("Found " + jarStartsWith + " in " + candidate.getAbsolutePath());
+                    log("Found " + getJarStartsWith() + " in " + candidate.getAbsolutePath());
                     break;
                 }
             }
         }
         if (this.jarFile == null && !scanEveryJarFile) {
-            log("Did not found a jar file starting with '" + jarStartsWith + "' in classPath. Now scanning every jar file for a manifest.");
+            log("Did not found a jar file starting with '" + getJarStartsWith()
+                + "' in classPath. Now scanning every jar file for a manifest.");
             scanEveryJarFile = true;
             findJarInPath(path);
         }

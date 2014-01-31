@@ -105,35 +105,30 @@ public class MCRIntegrateTask extends Task {
         this.target = target;
     }
 
-    public void setJarStartsWith(String jarStartsWith) {
-        if (jarStartsWith == null || jarStartsWith.length() == 0) {
-            this.jarStartsWith = "mycore";
-        } else {
-            this.jarStartsWith = jarStartsWith;
-        }
-    }
-
     public void setBuildDir(String buildDir) {
         this.buildDir = new File(getProject().getBaseDir(), buildDir);
+    }
+
+    public String getJarStartsWith() {
+        return jarStartsWith == null ? "mycore" : jarStartsWith;
+    }
+
+    public void setJarStartsWith(String jarStartsWith) {
+        this.jarStartsWith = jarStartsWith;
     }
 
     private void getJar() throws IOException {
         if (jarFile == null) {
             Exception ex = null;
             try {
-                String JAR_PROPERTY;
-                if (jarStartsWith == null || jarStartsWith.length() == 0) {
-                    JAR_PROPERTY = "mcr.integrate.mycore.jar";
-                } else {
-                    JAR_PROPERTY = "mcr.integrate." + jarStartsWith + ".jar";
-                }
+                String JAR_PROPERTY = "mcr.integrate." + getJarStartsWith() + ".jar";
                 String pathName = getProject().getProperty(JAR_PROPERTY);
                 if (pathName == null) {
                     MCRGetJarTask findTask = new MCRGetJarTask();
                     findTask.bindToOwner(this);
                     findTask.setProperty(JAR_PROPERTY);
                     findTask.setClassPathRef(classPathRef);
-                    findTask.setJarStartWith(jarStartsWith);
+                    findTask.setJarStartsWith(getJarStartsWith());
                     findTask.execute();
                     pathName = getProject().getProperty(JAR_PROPERTY);
                 }
@@ -144,7 +139,7 @@ public class MCRIntegrateTask extends Task {
                 ex = e;
             }
             if (jarFile == null) {
-                throw new BuildException("Could not find a valid " + jarStartsWith + ".jar in classPath.", ex);
+                throw new BuildException("Could not find a valid " + getJarStartsWith() + ".jar in classPath.", ex);
             }
         }
         if (mycoreJar == null) {
@@ -215,7 +210,8 @@ public class MCRIntegrateTask extends Task {
         return excludedComponents;
     }
 
-    private void writeIntegrationHelperFile() throws IOException, TransformerConfigurationException, TransformerException {
+    private void writeIntegrationHelperFile() throws IOException, TransformerConfigurationException,
+        TransformerException {
         Document doc = docBuilder.newDocument();
         // create ant project file
         Element project = doc.createElement("project");
@@ -232,7 +228,7 @@ public class MCRIntegrateTask extends Task {
         project.appendChild(path);
         // add property mycore.jar as a hint to mycore.jar file
         Element mycoreProperty = doc.createElement("property");
-        mycoreProperty.setAttribute("name", jarStartsWith + ".jar");
+        mycoreProperty.setAttribute("name", getJarStartsWith() + ".jar");
         mycoreProperty.setAttribute("location", jarFile.getAbsolutePath());
         project.appendChild(mycoreProperty);
         FileOutputStream out = null;
