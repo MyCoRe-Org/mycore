@@ -3,7 +3,7 @@
 <MyCoReWebPage title="MyCoRe WebCLI launch pad">
   <section title="MyCoRe WebCLI launch pad" xml:lang="all">
     <h1>MyCoRe WebCLI launch pad</h1>
-    <input type="button" value="Start"
+    <input id="launchButton" type="button" value="Start"
       onclick="window.open('start.xml','','width=1200,height=900,resizable,locationbar=false,menubar=false,personalbar=false,toolbar=false');" />
   </section>
 </MyCoReWebPage>
