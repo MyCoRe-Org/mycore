@@ -68,6 +68,15 @@ public class MCRObjectService {
 	 * constant for modify date
 	 */
 	public static final String DATE_TYPE_MODIFYDATE = "modifydate";
+    /**
+     * constant for create user
+     */
+    public static final String FLAG_TYPE_CREATEDBY = "createdby";
+    /**
+     * constant for modify user
+     */
+    public static final String FLAG_TYPE_MODIFIEDBY = "modifiedby";
+    
     private final ArrayList<MCRMetaISO8601Date> dates;
 
     private final ArrayList<MCRMetaAccessRule> rules;

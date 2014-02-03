@@ -559,7 +559,8 @@ public final class MCRMetadataManager {
             fileSourceDirectory = new File(mcrDerivate.getDerivate().getInternals().getSourcePath());
 
             if (!fileSourceDirectory.exists()) {
-                throw new MCRPersistenceException("The directory " + fileSourceDirectory + " was not found.");
+                LOGGER.warn(mcrDerivate.getId()+": the directory " + fileSourceDirectory + " was not found.");
+                fileSourceDirectory=null;
             }
         }
         // get the old Item

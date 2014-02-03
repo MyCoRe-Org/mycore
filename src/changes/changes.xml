@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2013.06.0.3" date="TBA" description="2013.06.0 maintenance release 3">
+      <action dev="mcrsteph" type="add" date="2014-02-03">
+        servflag: added service flag event handler to set createdby and modifiedby flags (merged revisions 29001-29003)
+      </action>
       <action dev="mcrkrebs" type="fix" date="2014-01-30">
         mods: updated nameOrPND to current rdf-version, DN-B v2014-01-15 (merged revision 28980)
       </action>

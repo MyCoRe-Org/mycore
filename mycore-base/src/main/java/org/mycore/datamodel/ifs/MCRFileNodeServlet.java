@@ -186,7 +186,7 @@ public class MCRFileNodeServlet extends MCRServlet {
      *  retrieves the derivate ID of the owning derivate from request path.
      *  @param request - the http request object
      */
-    protected static String getOwnerID(HttpServletRequest request) {
+    protected String getOwnerID(HttpServletRequest request) {
         String pI = request.getPathInfo();
         StringBuilder ownerID = new StringBuilder(request.getPathInfo().length());
         boolean running = true;
@@ -207,7 +207,7 @@ public class MCRFileNodeServlet extends MCRServlet {
      *  Retrieves the path of the file to display from request path.
      *  @param request - the http request object
      */
-    protected static String getPath(HttpServletRequest request) {
+    protected String getPath(HttpServletRequest request) {
         String ownerID = getOwnerID(request);
         int pos = ownerID.length() + 1;
         StringBuilder path = new StringBuilder(request.getPathInfo().substring(pos));
