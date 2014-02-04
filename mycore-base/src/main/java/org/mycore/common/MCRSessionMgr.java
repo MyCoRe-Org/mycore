@@ -114,11 +114,14 @@ public class MCRSessionMgr {
      * @see org.mycore.common.events.MCRSessionEvent.Type#passivated
      */
     public static void releaseCurrentSession() {
-        MCRSession session = theThreadLocalSession.get();
-        session.passivate();
-        MCRSession.LOGGER.debug("MCRSession released " + session.getID());
-        theThreadLocalSession.remove();
-        isSessionAttached.remove();
+        //theThreadLocalSession maybe null if called after close()
+        if (theThreadLocalSession != null) {
+            MCRSession session = theThreadLocalSession.get();
+            session.passivate();
+            MCRSession.LOGGER.debug("MCRSession released " + session.getID());
+            theThreadLocalSession.remove();
+            isSessionAttached.remove();
+        }
     }
 
     /**
