@@ -92,9 +92,9 @@
         MCRContentTransformer: if content transformer class is not specified but *.Stylesheet property,
         *.Class is set default to MCRXSLTransformer
       </action>
-      <actiom dev="mcrfluet" date="2013-12-13" type="fix">
+      <action dev="mcrfluet" date="2013-12-13" type="fix">
         MCRQueryClient: Tolerate missing hosts.xml file.
-      </actiom>
+      </action>
       <action dev="mcrtchef" date="2013-12-13" type="fix">
         MCRConfiguration: added SingletonKey class to store single instances of classes
         per property name
