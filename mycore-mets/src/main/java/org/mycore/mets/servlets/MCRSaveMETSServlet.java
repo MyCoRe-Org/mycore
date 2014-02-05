@@ -17,17 +17,21 @@
  * Mets-Editor. If not, see http://www.gnu.org/licenses/.
  */
 package org.mycore.mets.servlets;
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.events.MCREvent;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.mets.events.MCRUpdateMetsOnDerivateChangeEventHandler;
 import org.mycore.mets.model.Mets;
 import org.mycore.mets.tools.MCRMetsProvider;
 import org.mycore.mets.tools.MCRMetsSave;
@@ -71,7 +75,7 @@ public class MCRSaveMETSServlet extends MCRServlet {
             String notCompleteErrorMsg = "It appears not all files owned by derivate " + derivateId + " are referenced within the mets.xml.";
 
             job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST,
-                "The METS document provided is not valid. See server log for details. " + (!isComplete ? notCompleteErrorMsg : ""));
+                    "The METS document provided is not valid. See server log for details. " + (!isComplete ? notCompleteErrorMsg : ""));
             return;
         }
         LOGGER.info("Validating METS document was successful");
@@ -79,6 +83,12 @@ public class MCRSaveMETSServlet extends MCRServlet {
         LOGGER.info("Saving mets file ...");
         Document metsDoc = mets.asDocument();
         MCRMetsSave.saveMets(metsDoc, derivateId);
+
+        LOGGER.info("Writing urn as contentids to mets file (if any)");
+        MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.UPDATE_EVENT);
+        evt.put("derivate", MCRMetadataManager.retrieveMCRDerivate(derivateId));
+        new MCRUpdateMetsOnDerivateChangeEventHandler().doHandleEvent(evt);
+
         return;
     }
 
