@@ -117,9 +117,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
             help = "Initializes the user system. This command runs only if the user database does not exist.",
             order = 30)
     public static List<String> initSuperuser() {
-        final String suser = CONFIG.getString("MCR.Users.Superuser.UserName", "administrator");
-        final String spasswd = CONFIG.getString("MCR.Users.Superuser.UserPasswd", "alleswirdgut");
-        final String srole = CONFIG.getString("MCR.Users.Superuser.GroupName", "admin");
+        final String suser = CONFIG.getString("MCR.Users.Superuser.UserName");
+        final String spasswd = CONFIG.getString("MCR.Users.Superuser.UserPasswd");
+        final String srole = CONFIG.getString("MCR.Users.Superuser.GroupName");
 
         if (MCRUserManager.exists(suser)) {
             LOGGER.error("The superuser already exists!");
