@@ -6,6 +6,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
@@ -29,9 +33,9 @@ import org.mycore.common.xml.MCRURIResolver;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.cache.RemovalCause;
-import com.google.common.cache.RemovalListener;
-import com.google.common.cache.RemovalNotification;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListenableFutureTask;
 
 /**
  * 
@@ -81,23 +85,14 @@ public class MCRLayoutUtilities {
         });
 
     private static final LoadingCache<String, Document> NAV_DOCUMENT_CACHE = CacheBuilder.newBuilder()
-        .expireAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS)
-        .removalListener(new RemovalListener<String, Document>() {
-            @Override
-            public void onRemoval(RemovalNotification<String, Document> notification) {
-                if (notification.getCause() == RemovalCause.EXPIRED) {
-                    URL url = NAV_URL_CACHE.getUnchecked(notification.getKey());
-                    long lastModified = NAV_MODIFIED_CACHE.getUnchecked(url);
-                    long diff = System.currentTimeMillis() - lastModified;
-                    if (TimeUnit.SECONDS.convert(diff, TimeUnit.MILLISECONDS) > STANDARD_CACHE_SECONDS) {
-                        LOGGER.info("Keeping " + url + " in cache");
-                        notification.setValue(notification.getValue());
-                    } else {
-                        LOGGER.info("Removing modified " + notification.getKey());
-                    }
+        .refreshAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS).build(new CacheLoader<String, Document>() {
+            Executor executor = Executors.newSingleThreadExecutor(new ThreadFactory() {
+                @Override
+                public Thread newThread(Runnable r) {
+                    return new Thread("navigation.xml refresh");
                 }
-            }
-        }).build(new CacheLoader<String, Document>() {
+            });
+
             @Override
             public Document load(String key) throws Exception {
                 URL url = NAV_URL_CACHE.get(key);
@@ -105,6 +100,27 @@ public class MCRLayoutUtilities {
                     return new SAXBuilder(XMLReaders.NONVALIDATING).build(url);
                 } finally {
                     itemStore.clear();
+                }
+
+            }
+
+            @Override
+            public ListenableFuture<Document> reload(final String key, Document oldValue) throws Exception {
+                URL url = NAV_URL_CACHE.getUnchecked(key);
+                long lastModified = NAV_MODIFIED_CACHE.getUnchecked(url);
+                long diff = System.currentTimeMillis() - lastModified;
+                if (TimeUnit.SECONDS.convert(diff, TimeUnit.MILLISECONDS) > STANDARD_CACHE_SECONDS) {
+                    LOGGER.info("Keeping " + url + " in cache");
+                    return Futures.immediateFuture(oldValue);
+                } else {
+                    ListenableFutureTask<Document> task = ListenableFutureTask.create(new Callable<Document>() {
+                        @Override
+                        public Document call() throws Exception {
+                            return load(key);
+                        }
+                    });
+                    executor.execute(task);
+                    return task;
                 }
             }
         });
