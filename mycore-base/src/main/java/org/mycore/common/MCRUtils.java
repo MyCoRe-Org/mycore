@@ -137,8 +137,20 @@ public class MCRUtils {
             return null;
         }
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        int form = indate.split("-").length;
+        String format = "";
+        switch (form) {
+        case 1:
+            format = "yyyy";
+            break;
+        case 2:
+            format = "yyyy-MM";
+            break;
+        default:
+            format = "yyyy-MM-dd";
+        }
 
+        SimpleDateFormat formatter = new SimpleDateFormat(format);
         Date d = null;
         try {
             d = formatter.parse(indate);
