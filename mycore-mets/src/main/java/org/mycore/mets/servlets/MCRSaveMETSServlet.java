@@ -20,13 +20,15 @@ package org.mycore.mets.servlets;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.events.MCREvent;
-import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -85,10 +87,11 @@ public class MCRSaveMETSServlet extends MCRServlet {
         MCRMetsSave.saveMets(metsDoc, derivateId);
 
         LOGGER.info("Writing urn as contentids to mets file (if any)");
-        MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.UPDATE_EVENT);
-        evt.put("derivate", MCRMetadataManager.retrieveMCRDerivate(derivateId));
-        new MCRUpdateMetsOnDerivateChangeEventHandler().doHandleEvent(evt);
-
+        MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(derivateId);
+        Map<String, String> urns = der.getUrnMap();
+        if (urns.size() > 0) {
+            MCRMetsSave.updateMetsOnUrnGenerate(der.getId(), urns);
+        }
         return;
     }
 
