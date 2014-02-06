@@ -1,0 +1,62 @@
+.dojo-treetable .folder-collapsed {
+    background: url(../images/plus.gif)  no-repeat 3px 3px;
+    cursor: pointer;
+}
+
+.dojo-treetable .folder-expanded {
+    background: url(../images/minus.gif)  no-repeat  3px 3px;
+    cursor: pointer;
+}
+
+.dojo-treetable .doc {
+    background: url(../images/bullet.gif) no-repeat;
+}
+
+.dojo-treetable .node-icon {
+    width: 20px;
+    height: 15px;
+    padding-right: 3px !important;
+    float: left;
+}
+
+.dojo-treetable .node-hidden {
+    display: none;
+}
+
+.dojo-treetable .node-visible {
+    display: table-row;
+}
+
+.dojo-treetable td {
+    padding: 1px 2px;
+}
+
+table.dojo-treetable  {
+    background-color: #F2F5FA;
+    border-collapse: collapse;
+    border: 1px solid #7A92BC;
+}
+
+.dojo-treetable th, .dojo-treetable td {
+    font-size: 12px;
+    font-family: Verdana;
+    border-right: 1px solid #D1DAEA;
+    white-space: nowrap;
+}
+
+.dojo-treetable thead th {
+    border-bottom: 1px solid #7A92BC;
+    padding: 2px;
+}
+.dojo-treetable thead tr {
+    background-color: #E9E9E9;
+}
+
+.dojo-treetable tbody tr td {
+	vertical-align: center;
+	height: 24px;
+}
+
+.dojo-treetable .dojoxGridRowOdd {
+    background-color: #E9EEF7;
+}

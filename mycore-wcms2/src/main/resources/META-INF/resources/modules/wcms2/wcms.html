@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr">
+    <head>
+    	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    	<!-- do includes -->
+	    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/dojo/1.4.3/dojo/dojo.xd.js"
+	    djConfig="parseOnLoad: true, isDebug: true"></script>
+	    
+	    <script type="text/javascript" src="js/dojoInclude.js"></script>
+
+		<!-- util -->
+		<script type="text/javascript" src="js/util/WCMSUtils.js"></script>
+	    <script type="text/javascript" src="js/util/MenuBuilder.js"></script>
+		<script type="text/javascript" src="js/util/EventHandler.js"></script>
+		<script type="text/javascript" src="js/util/SimpleDialog.js"></script>
+	    <!--
+	   	<script type="text/javascript" src="js/util/Hashtable.js"></script> 
+	    <script type="text/javascript" src="js/TreeActionManager.js"></script>
+		<script type="text/javascript" src="js/TreeCustom.js"></script>
+		-->
+		<!-- access -->
+		<script type="text/javascript" src="js/access/AccessMain.js"></script>
+		<script type="text/javascript" src="js/access/AccessTreeTable.js"></script>
+		<script type="text/javascript" src="js/access/RuleDialog.js"></script>
+		<!-- navigation -->
+		<script type="text/javascript" src="js/navigation/Item.js"></script>
+		<script type="text/javascript" src="js/navigation/NavigationMain.js"></script>
+		<script type="text/javascript" src="js/navigation/Tree.js"></script>
+		<script type="text/javascript" src="js/navigation/ItemEditor.js"></script>
+		<script type="text/javascript" src="js/navigation/I18nEditor.js"></script>
+		<script type="text/javascript" src="js/navigation/TypeEditor.js"></script>
+		<script type="text/javascript" src="js/navigation/EditContentDialog.js"></script>
+	
+<!-- 		<script type="text/javascript" src="ckeditor/ckeditor.js"></script> -->
+    	
+    	<title>Tree test</title>
+        <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.4/dijit/themes/tundra/tundra.css">
+        <link rel="stylesheet" type="text/css" href="css/style.css">
+        <link rel="stylesheet" type="text/css" href="css/dojo.treetable.css">
+    </head>
+
+	<body class="tundra ">
+
+		<div dojoType="dijit.layout.BorderContainer" gutters="false" splitter="false" id="mainContainer">
+			<!-- TOP -->
+			<div dojoType="dijit.layout.ContentPane" region="top" splitter="false" id="header" style="position: absolute 0 0; height: 36px; border: none;">
+				<div style="width: 45%; float: left">&nbsp;</div>
+				<div id="headerText">MyCoRe WCMS</div>
+				<div style="float: right;padding-top: 8px;">
+					<span id="flags"></span>
+					<img style="border-left: 1px solid #CCCCCC; padding-left: 8px" src="images/close.png"></img>
+				</div>
+			</div>
+
+			<!-- CENTER -->
+			<div dojoType="dijit.layout.TabContainer" region="center" tabStrip="true" splitter="false" id="content" gutters="false">
+	            <!-- Navigation -->
+	            <div dojoType="dijit.layout.ContentPane" title="Navigation" selected="true" id="navigation">
+	              <div dojoType="dijit.layout.BorderContainer" gutters="true" id="navigationContainer">
+	                <div id="navigationToolbar" dojoType="dijit.Toolbar" splitter="false" region="top">
+	                  <div dojoType="dijit.form.Button" id="navigationSave" showLabel="false" disabled="true" iconClass="icon16 saveDisabledIcon">Änderungen speichern</div>
+	                </div>
+	                <div dojoType="dijit.layout.ContentPane" gutters="false" region="left" splitter="true" style="width:250px">
+	                  <div dojoType="dijit.layout.BorderContainer" gutters="false" splitter="false" id="navigationTreeContainer" >
+	                    <div dojoType="dijit.layout.ContentPane" gutters="true" region="center" splitter="false" id="navigationTreePane">
+	                      <!-- Tree.js is added here -->
+	                    </div>
+	                    <div dojoType="dijit.Toolbar" region="bottom" splitter="false" id="navigationTreeToolbar">
+	                      <div dojoType="dijit.form.Button" id="navigationTreeAdd" showLabel="false" iconClass="icon16 addIcon16">Eintrag hinzufügen</div>
+	                      <div dojoType="dijit.form.Button" id="navigationTreeRemove" showLabel="false" disabled="true" iconClass="icon16 removeDisabledIcon16">Eintrag löschen</div>
+	                      <span dojoType="dijit.ToolbarSeparator"></span>
+	                      <div dojoType="dijit.form.Button" id="navigationTreeRestore" showLabel="false" disabled="true" iconClass="icon16 restoreDisabledIcon16">Eintrag zurücksetzen</div>
+	                    </div>
+	                  </div>
+	                </div>
+	                <div dojoType="dijit.layout.ContentPane" gutters="true" region="center" splitter="true" id="navigationItemEditorPane">
+	                  
+	                </div>
+	              </div>
+	            </div>
+	            <div dojoType="dijit.layout.ContentPane" title="Lese-/Schreibzugriff" selected="true" id="access">
+	              <!--          <div class="loading"></div>-->
+	            </div>
+          </div>
+		</div>
+
+	</body>
+
+	<script type="text/javascript">
+        var langArr = new Array("de", "en");
+        var lang = "de";
+        var navigationMain;
+		var accessMain;
+        
+        var activeTab = "navigation";
+
+		function preloadWidgets() {
+			
+			// top
+			loadFlags();
+
+			dojo.connect(dijit.byId("content"), "onClick", function(evt) {
+				var selectedTab = dijit.byId("content").selectedChildWidget.id;
+				if(activeTab == selectedTab)
+					return;
+				activeTab = selectedTab;
+				if(activeTab == "access") {
+					console.log("load");
+					if(accessMain == null) {
+						accessMain = new wcms.access.AccessMain();
+						accessMain.create();
+					}
+					console.log("finished");
+				}
+			});
+
+			// navigation
+			navigationMain = new wcms.navigation.NavigationMain();
+			navigationMain.create();
+ 		}
+
+ 		function loadFlags() {
+ 	 		var langNode = dojo.byId("flags");
+			for(var i in lang) {
+				var langButton = dojo.create("a", {
+					name: langArr[i],
+					style: "cursor: pointer;padding-right: 6px",
+					innerHTML: "<img src='images/flags/lang-" + langArr[i] + ".png'>"
+				});
+			    dojo.connect(langButton, "onclick", function(evt) {
+					changeLang(evt.currentTarget.name);
+				});
+				langNode.appendChild(langButton);
+			}
+ 		}
+
+ 		function changeLang(/*String*/ newLang) {
+			lang = newLang;
+			navigationMain.updateLang(lang);
+ 		}
+
+		dojo.addOnLoad(preloadWidgets);
+
+    </script>
+
+</html>
