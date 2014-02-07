@@ -252,7 +252,7 @@ public class MCRUserServlet extends MCRServlet {
             // For new local users, set password
             String pwd = u.getChildText("password");
             if ((pwd != null) && (pwd.trim().length() > 0) && user.getRealm().equals(MCRRealmFactory.getLocalRealm())) {
-                MCRUserManager.updatePasswordHashToSHA1(user, pwd);
+                MCRUserManager.updatePasswordHashToSHA256(user, pwd);
             }
         } else {
             user = MCRUserManager.getUser(userName, realmID);
@@ -372,7 +372,7 @@ public class MCRUserServlet extends MCRServlet {
 
         MCREditorSubmission sub = (MCREditorSubmission) (req.getAttribute("MCREditorSubmission"));
         String password = sub.getXML().getRootElement().getChildText("password");
-        MCRUserManager.updatePasswordHashToSHA1(user, password);
+        MCRUserManager.updatePasswordHashToSHA256(user, password);
         MCRUserManager.updateUser(user);
 
         res.sendRedirect(res.encodeRedirectURL("MCRUserServlet?action=show&XSL.step=changedPassword&id="

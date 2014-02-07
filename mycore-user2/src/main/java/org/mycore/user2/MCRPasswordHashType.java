@@ -31,7 +31,8 @@ import javax.xml.bind.annotation.XmlEnum;
  * <ul>
  * <li>{@link #crypt} is used in the old MyCoRe user system
  * <li>{@link #md5} is used in the old miless user system
- * <li>{@link #sha1} is the default hash type of mycore-user2
+ * <li>{@link #sha1} was the default hash type of mycore-user2
+ * <li>{@link #sha256} is the default hash type of mycore-user2
  * </ul>
  * @author Thomas Scheffler (yagee)
  *
@@ -39,6 +40,6 @@ import javax.xml.bind.annotation.XmlEnum;
 @XmlEnum
 public enum MCRPasswordHashType {
     
-    crypt,md5,sha1
+    crypt,md5,sha1,sha256
 
 }

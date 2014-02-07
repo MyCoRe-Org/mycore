@@ -156,7 +156,7 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         Date curTime = new Date();
         MCRUser user = MCRUserManager.login(this.user.getUserName(), clearPasswd);
         assertNull("Should not login user", user);
-        MCRUserManager.updatePasswordHashToSHA1(this.user, clearPasswd);
+        MCRUserManager.updatePasswordHashToSHA256(this.user, clearPasswd);
         MCRUserManager.updateUser(this.user);
         startNewTransaction();
         user = MCRUserManager.login(this.user.getUserName(), clearPasswd);
@@ -173,7 +173,7 @@ public class MCRUserManagerTest extends MCRUserTestCase {
 
     @Test
     public final void toXML() throws IOException {
-        MCRUserManager.updatePasswordHashToSHA1(this.user, this.user.getPassword());
+        MCRUserManager.updatePasswordHashToSHA256(this.user, this.user.getPassword());
         this.user.setEMail("info@mycore.de");
         this.user.setHint("JUnit Test");
         this.user.getSystemRoleIDs().add("admin");

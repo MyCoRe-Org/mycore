@@ -381,8 +381,8 @@ public class MCRUserManager {
     /**
      * Returns a {@link MCRUser} instance if the login succeeds.
      * This method will return <code>null</code> if the user does not exist or the login is disabled.
-     * If the {@link MCRUser#getHashType()} is {@link MCRPasswordHashType#crypt} or {@link MCRPasswordHashType#md5}
-     * the hash value is automatically upgraded to {@link MCRPasswordHashType#sha1}.
+     * If the {@link MCRUser#getHashType()} is {@link MCRPasswordHashType#crypt}, {@link MCRPasswordHashType#md5} or {@link MCRPasswordHashType#sha1}
+     * the hash value is automatically upgraded to {@link MCRPasswordHashType#sha256}.
      * @param userName Name of the user to login.
      * @param password clear text password.
      * @return authenticated {@link MCRUser} instance or <code>null</code>.
@@ -409,19 +409,27 @@ public class MCRUserManager {
                     waitLoginPanalty();
                     return null;
                 }
-                //update to SHA-1
-                updatePasswordHashToSHA1(user, password);
+                //update to SHA-256
+                updatePasswordHashToSHA256(user, password);
                 break;
             case md5:
                 if (!MCRUtils.asMD5String(1, null, password).equals(user.getPassword())) {
                     waitLoginPanalty();
                     return null;
                 }
-                //update to SHA-1
-                updatePasswordHashToSHA1(user, password);
+                //update to SHA-256
+                updatePasswordHashToSHA256(user, password);
                 break;
             case sha1:
                 if (!MCRUtils.asSHA1String(HASH_ITERATIONS, MCRUtils.fromBase64String(user.getSalt()), password).equals(user.getPassword())) {
+                    waitLoginPanalty();
+                    return null;
+                }
+                //update to SHA-256
+                updatePasswordHashToSHA256(user, password);
+                break;
+            case sha256:
+                if (!MCRUtils.asSHA256String(HASH_ITERATIONS, MCRUtils.fromBase64String(user.getSalt()), password).equals(user.getPassword())) {
                     waitLoginPanalty();
                     return null;
                 }
@@ -442,16 +450,16 @@ public class MCRUserManager {
         }
     }
 
-    static void updatePasswordHashToSHA1(MCRUser user, String password) {
+    static void updatePasswordHashToSHA256(MCRUser user, String password) {
         String newHash;
         byte[] salt = generateSalt();
         try {
-            newHash = MCRUtils.asSHA1String(HASH_ITERATIONS, salt, password);
+            newHash = MCRUtils.asSHA256String(HASH_ITERATIONS, salt, password);
         } catch (Exception e) {
-            throw new MCRException("Could not update user password hash to SHA-1.", e);
+            throw new MCRException("Could not update user password hash to SHA-256.", e);
         }
         user.setSalt(MCRUtils.toBase64String(salt));
-        user.setHashType(MCRPasswordHashType.sha1);
+        user.setHashType(MCRPasswordHashType.sha256);
         user.setPassword(newHash);
     }
 
