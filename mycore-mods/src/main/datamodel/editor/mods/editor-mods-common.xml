@@ -405,7 +405,7 @@
   <text id="mods.person.label" i18n="component.mods.metaData.dictionary.persons" />
   <panel id="mods.person">
     <cell anchor="NORTHWEST" var="mods:name[@type='personal']">
-      <repeater min="1" max="20" pos="right">
+      <repeater min="1" max="40" pos="right">
         <panel>
           <cell col="1" row="1" anchor="NORTHEAST" var="mods:role/mods:roleTerm[@type='code']">
             <panel>
@@ -429,7 +429,7 @@
 
   <panel id="mods.person.publisher">
     <cell anchor="NORTHWEST" var="mods:name[@type='personal']">
-      <repeater min="1" max="20" pos="right">
+      <repeater min="1" max="40" pos="right">
         <panel>
           <cell col="1" row="1" anchor="NORTHEAST" var="mods:role/mods:roleTerm[@type='code']">
             <panel>
@@ -548,18 +548,16 @@
   <!-- Ort der Konferenz [text] -->
   <text id="mods.conferencePlace.label" i18n="component.mods.metaData.dictionary.conference.place" />
   <panel id="mods.conferencePlace">
-    <cell anchor="NORTHWEST" var="mods:place/mods:placeTerm[@type='text']">
-      <panel>
-        <cell anchor="NORTHWEST">
-          <textfield id="mods.conferencePlace.text" width="60" maxlength="512">
-            <condition id="mods.conferencePlace.cond" required="true">
-              <label xml:lang="de">Tragen Sie hier den Ort ein, an dem die Konferenz stattfand.</label>
-              <label xml:lang="en">Enter place of conference here.</label>
-            </condition>
-          </textfield>
-        </cell>
-      </panel>
-    </cell>
+    <repeater min="1" max="5">
+      <cell anchor="NORTHWEST">
+        <textfield id="mods.conferencePlace.text" width="60" maxlength="512">
+          <condition id="mods.conferencePlace.cond" required="true">
+            <label xml:lang="de">Tragen Sie hier den Ort ein, an dem die Konferenz stattfand.</label>
+            <label xml:lang="en">Enter place of conference here.</label>
+          </condition>
+        </textfield>
+      </cell>
+    </repeater>
   </panel>
 
   <helpPopup id="mods.conferencePlace.help" width="400px" height="250px">
@@ -917,7 +915,7 @@
   <text id="mods.identifier.label" i18n="component.mods.metaData.dictionary.identifier" />
   <panel id="mods.identifier">
     <cell anchor="NORTHWEST" var="mods:identifier">
-      <repeater min="1" max="5" pos="right">
+      <repeater min="1" max="10" pos="right">
         <panel>
           <cell anchor="NORTHWEST" ref="TFzeile44" />
           <cell row="1" col="2" anchor="NORTHWEST" var="@type">
@@ -965,7 +963,7 @@
   <!-- Identifier with issn-->
   <panel id="mods.identifier.journals">
     <cell anchor="NORTHWEST" var="mods:identifier">
-      <repeater min="1" max="5" pos="right">
+      <repeater min="1" max="10" pos="right">
         <panel>
           <cell anchor="NORTHWEST" ref="TFzeile44" />
           <cell row="1" col="2" anchor="NORTHWEST" var="@type">
@@ -1016,7 +1014,7 @@
 
   <panel id="mods.identifier.optional">
     <cell anchor="NORTHWEST" var="mods:identifier">
-      <repeater min="1" max="5" pos="right">
+      <repeater min="1" max="10" pos="right">
         <panel>
           <cell anchor="NORTHWEST" ref="TFzeile44" />
           <cell row="1" col="2" anchor="NORTHWEST" var="@type">
@@ -1058,7 +1056,7 @@
 
   <panel id="mods.identifier.cproceedings">
     <cell anchor="NORTHWEST" var="mods:identifier">
-      <repeater min="1" max="5" pos="right">
+      <repeater min="1" max="10" pos="right">
         <panel>
           <cell anchor="NORTHWEST" ref="TFzeile44" />
           <cell row="1" col="2" anchor="NORTHWEST" var="@type">
