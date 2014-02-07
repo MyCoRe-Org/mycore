@@ -86,6 +86,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         }
         SAXBuilder s = new SAXBuilder(XMLReaders.NONVALIDATING, null, null);
         Document modsDoc = s.build(modsFile);
+        //force validation against MODS XSD
         MCRXMLHelper.validate(modsDoc, MODS_V3_XSD_URI);
         Element modsRoot = modsDoc.getRootElement();
         if (!modsRoot.getNamespace().equals(MCRConstants.MODS_NAMESPACE)) {

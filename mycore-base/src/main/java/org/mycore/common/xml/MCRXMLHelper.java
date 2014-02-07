@@ -56,6 +56,7 @@ import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.content.MCRVFSContent;
 import org.mycore.common.content.streams.MCRByteArrayOutputStream;
+import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -236,6 +237,7 @@ public class MCRXMLHelper {
             throw new IOException(e);
         }
         Validator validator = schema.newValidator();
+        validator.setResourceResolver(MCREntityResolver.instance());
         validator.validate(new JDOMSource(doc));
     }
 
@@ -291,7 +293,8 @@ public class MCRXMLHelper {
         } else {
             xout.output((Document) e, bout);
         }
-        Document xml = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRByteContent(bout.getBuffer(), 0, bout.size()));
+        Document xml = MCRXMLParserFactory.getNonValidatingParser().parseXML(
+            new MCRByteContent(bout.getBuffer(), 0, bout.size()));
         return xml.getRootElement();
     }
 
@@ -301,7 +304,8 @@ public class MCRXMLHelper {
         }
 
         public static boolean equivalent(Element e1, Element e2) {
-            return equivalentName(e1, e2) && equivalentAttributes(e1, e2) && equivalentContent(e1.getContent(), e2.getContent());
+            return equivalentName(e1, e2) && equivalentAttributes(e1, e2)
+                && equivalentContent(e1.getContent(), e2.getContent());
         }
 
         public static boolean equivalent(Text t1, Text t2) {
@@ -349,7 +353,8 @@ public class MCRXMLHelper {
             List<Attribute> aList1 = e1.getAttributes();
             List<Attribute> aList2 = e2.getAttributes();
             if (aList1.size() != aList2.size()) {
-                LOGGER.info("Number of attributes differ \"" + aList1 + "\"!=\"" + aList2 + "\" for element " + e1.getName());
+                LOGGER.info("Number of attributes differ \"" + aList1 + "\"!=\"" + aList2 + "\" for element "
+                    + e1.getName());
                 return false;
             }
             HashSet<String> orig = new HashSet<String>(aList1.size());
@@ -367,7 +372,8 @@ public class MCRXMLHelper {
 
         public static boolean equivalentContent(List<Content> l1, List<Content> l2) {
             if (l1.size() != l2.size()) {
-                LOGGER.debug("Number of content list elements differ " + l1.size() + "!=" + l2.size() + "", new RuntimeException());
+                LOGGER.debug("Number of content list elements differ " + l1.size() + "!=" + l2.size() + "",
+                    new RuntimeException());
                 return false;
             }
             boolean result = true;

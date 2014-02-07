@@ -39,6 +39,8 @@ import org.apache.log4j.Logger;
 import org.apache.xerces.util.XMLCatalogResolver;
 import org.mycore.common.MCRCache;
 import org.mycore.common.config.MCRConfiguration;
+import org.w3c.dom.ls.LSInput;
+import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.EntityResolver2;
@@ -48,7 +50,7 @@ import org.xml.sax.ext.EntityResolver2;
  * @author Thomas Scheffler (yagee)
  * @since 2013.10
  */
-public class MCREntityResolver implements EntityResolver2 {
+public class MCREntityResolver implements EntityResolver2, LSResourceResolver {
 
     public static final Logger LOGGER = Logger.getLogger(MCREntityResolver.class);
 
@@ -142,6 +144,16 @@ public class MCREntityResolver implements EntityResolver2 {
             return null;
         }
         return new InputSource(is);
+    }
+
+    @Override
+    public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseURI) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(MessageFormat.format(
+                "Resolving resource: \ntype: {0}\nnamespaceURI: {1}\npublicId: {2}\nsystemId: {3}\nbaseURI: {4}", type,
+                namespaceURI, publicId, systemId, baseURI));
+        }
+        return catalogResolver.resolveResource(type, namespaceURI, publicId, systemId, baseURI);
     }
 
     private InputSource resolvedEntity(InputSource entity) {
