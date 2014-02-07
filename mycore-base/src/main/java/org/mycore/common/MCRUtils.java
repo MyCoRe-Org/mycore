@@ -931,6 +931,10 @@ public class MCRUtils {
         return getHash(iterations, salt, text, "SHA-1");
     }
 
+    public static String asSHA256String(int iterations, byte[] salt, String text) throws NoSuchAlgorithmException {
+        return getHash(iterations, salt, text, "SHA-256");
+    }
+
     public static String asMD5String(int iterations, byte[] salt, String text) throws NoSuchAlgorithmException {
         return getHash(iterations, salt, text, "MD5");
     }
