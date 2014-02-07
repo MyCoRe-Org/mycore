@@ -50,11 +50,7 @@
 
         <!-- Ort -->
           <cell row="30" col="1" anchor="NORTHEAST" ref="mods.conferencePlace.label" />
-          <cell row="30" col="2" anchor="NORTHWEST" var="mods:affiliation">
-            <repeater min="1" max="5">
-              <textfield width="60" maxlength="512" />
-            </repeater>
-          </cell>
+          <cell row="30" col="2" anchor="NORTHWEST" var="mods:affiliation" ref="mods.conferencePlace" />
           <cell row="30" col="3" anchor="NORTHWEST" ref="mods.conferencePlace.help" />
         <!-- Ort END -->
         </panel>
