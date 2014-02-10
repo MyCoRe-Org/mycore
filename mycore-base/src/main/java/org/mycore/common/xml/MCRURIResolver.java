@@ -78,12 +78,9 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs.MCRContentStore;
-import org.mycore.datamodel.ifs.MCRContentStoreFactory;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRDirectoryXML;
 import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRStoredMetadata;
@@ -289,6 +286,20 @@ public final class MCRURIResolver implements URIResolver {
         if (uriResolver != null) {
             return uriResolver.resolve(href, base);
         } else { // try to handle as URL, use default resolver for file:// and
+            try {
+                InputSource entity = MCREntityResolver.instance().resolveEntity(null, href);
+                if (entity != null) {
+                    LOGGER.debug("Resolved via EntityResolver: " + entity.getSystemId());
+                    if (entity.getByteStream() != null) {
+                        StreamSource streamSource = new StreamSource(entity.getByteStream());
+                        streamSource.setSystemId(entity.getSystemId());
+                        return streamSource;
+                    }
+                    return new StreamSource(entity.getSystemId());
+                }
+            } catch (SAXException | IOException e) {
+                LOGGER.debug("Error while resolving uri: " + href);
+            }
             // http://
             if (href.endsWith("/") && scheme.equals("file")) {
                 //cannot stream directories

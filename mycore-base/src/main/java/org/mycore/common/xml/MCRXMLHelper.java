@@ -56,7 +56,6 @@ import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.content.MCRVFSContent;
 import org.mycore.common.content.streams.MCRByteArrayOutputStream;
-import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -220,6 +219,7 @@ public class MCRXMLHelper {
      */
     public static void validate(Document doc, String schemaURI) throws SAXException, IOException {
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        sf.setResourceResolver(MCREntityResolver.instance());
         Schema schema;
         try {
             schema = sf.newSchema(MCRURIResolver.instance().resolve(schemaURI, null));
