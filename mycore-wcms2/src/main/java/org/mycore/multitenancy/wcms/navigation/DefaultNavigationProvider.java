@@ -64,7 +64,7 @@ public class DefaultNavigationProvider implements NavigationProvider {
         jsonItem.addProperty(JSON_WCMS_ID, id);
         jsonItem.remove(JSON_CHILDREN);
         WCMSType type = null;
-        String href = "";
+        String href = null;
         if(item instanceof Navigation) {
             type = WCMSType.root;
             href = ((Navigation) item).getHrefStartingPage();
@@ -80,7 +80,7 @@ public class DefaultNavigationProvider implements NavigationProvider {
             LOGGER.warn("Unable to set type for item " + id);
         }
         jsonItem.addProperty(JSON_WCMS_TYPE, type.name());
-        if (!href.equals("")){
+        if (href != null){
             jsonItem.add("access", getAccess(href));
         }
         items.add(jsonItem);
