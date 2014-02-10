@@ -130,7 +130,7 @@
         <cell row="10" col="1" anchor="NORTHEAST" ref="mods.dateIssued.book.label" style="width:153px;" />
         <cell row="10" col="2" anchor="NORTHWEST" ref="mods.dateIssued.optional" var="mods:originInfo" style="width:560px;" />
         <cell row="10" col="3" anchor="NORTHWEST" ref="mods.dateIssued.help" />
-        <condition id="mods.dateIssued.confpro.cond" xsl="count(mods:originInfo/mods:dateIssued/text())>=count(mods:titleInfo[not(@type='translated')]/mods:title/text())">
+        <condition id="mods.dateIssued.confpro.cond" xsl="count(mods:originInfo/mods:dateIssued/text())>=count(mods:titleInfo[@type!='translated' or @transliteration!='text/html']/mods:title/text())">
           <label xml:lang="de">Bitte geben Sie das Veröffentlichungsdatum des Konferenzbandes an!</label>
           <label xml:lang="en">Please select one entry!</label>
         </condition>
@@ -161,7 +161,7 @@
         <cell row="10" col="1" anchor="NORTHEAST" ref="mods.languageTerm.label" />
         <cell row="10" col="2" anchor="NORTHWEST" ref="mods.languageTerm.optional" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
         <cell row="10" col="3" anchor="NORTHWEST" ref="mods.languageTerm.help" />
-        <condition id="mods.languageTerm.confpro.cond" xsl="count(metadata/def.modsContainer/modsContainer/mods:mods/mods:language/mods:languageTerm/@mcr:categId)>=count(metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo[not(@type='translated')]/mods:title/text())">
+        <condition id="mods.languageTerm.confpro.cond" xsl="count(metadata/def.modsContainer/modsContainer/mods:mods/mods:language/mods:languageTerm/@mcr:categId)>=count(metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo[@type!='translated' or @transliteration!='text/html']/mods:title/text())">
           <label xml:lang="de">Bitte geben Sie die Sprache des Konferenzbandes an!</label>
           <label xml:lang="en">Please select one entry!</label>
         </condition>

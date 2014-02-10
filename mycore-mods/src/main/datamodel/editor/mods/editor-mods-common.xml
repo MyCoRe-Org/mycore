@@ -547,18 +547,14 @@
 
   <!-- Ort der Konferenz [text] -->
   <text id="mods.conferencePlace.label" i18n="component.mods.metaData.dictionary.conference.place" />
-  <panel id="mods.conferencePlace">
-    <repeater min="1" max="5">
-      <cell anchor="NORTHWEST">
-        <textfield id="mods.conferencePlace.text" width="60" maxlength="512">
-          <condition id="mods.conferencePlace.cond" required="true">
-            <label xml:lang="de">Tragen Sie hier den Ort ein, an dem die Konferenz stattfand.</label>
-            <label xml:lang="en">Enter place of conference here.</label>
-          </condition>
-        </textfield>
-      </cell>
-    </repeater>
-  </panel>
+  <repeater min="1" max="5" id="mods.conferencePlace">
+    <textfield width="60" maxlength="512" id="mods.conferencePlace.text">
+      <condition id="mods.conferencePlace.cond" required="true">
+        <label xml:lang="de">Tragen Sie hier den Ort ein, an dem die Konferenz stattfand.</label>
+        <label xml:lang="en">Enter place of conference here.</label>
+      </condition>
+    </textfield>
+  </repeater>
 
   <helpPopup id="mods.conferencePlace.help" width="400px" height="250px">
     <label xml:lang="de">
