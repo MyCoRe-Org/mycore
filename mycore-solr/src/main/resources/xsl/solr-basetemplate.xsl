@@ -105,6 +105,16 @@
         <xsl:value-of select="." />
       </field>
     </xsl:for-each>
+    <xsl:for-each select="service/servflags/servflag[@type='modifiedby']">
+      <field name="modifiedby">
+        <xsl:value-of select="." />
+      </field>
+    </xsl:for-each>
+    <xsl:for-each select="service/servflags/servflag[@type='createdby']">
+      <field name="createdby">
+        <xsl:value-of select="." />
+      </field>
+    </xsl:for-each>
   </xsl:template>
 
   <xsl:template match="category" mode="category">
