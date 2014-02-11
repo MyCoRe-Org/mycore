@@ -47,6 +47,7 @@ import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -86,7 +87,7 @@ public class MCRSearchServlet extends MCRServlet {
     private int maxPerPage;
 
     private static HashSet<String> SEARCH_PARAMETER = new HashSet<>(Arrays.asList(new String[] { "search", "query",
-            "maxResults", "numPerPage", "page", "mask", "mode", "redirect" }));;
+        "maxResults", "numPerPage", "page", "mask", "mode", "redirect" }));;
 
     @Override
     public void init() throws ServletException {
@@ -177,9 +178,16 @@ public class MCRSearchServlet extends MCRServlet {
             element.setName("condition");
 
             String field = new StringTokenizer(element.getAttributeValue("field"), " -,").nextToken();
-            MCRFieldDef fd = MCRFieldDef.getDef(field);
-            String defaultOperator = MCRFieldType.getDefaultOperator(fd.getDataType());
-            String operator = element.getAttributeValue("operator", defaultOperator);
+            String operator = element.getAttributeValue("operator");
+            if (operator == null) {
+                try {
+                    MCRFieldDef fd = MCRFieldDef.getDef(field);
+                    operator = MCRFieldType.getDefaultOperator(fd.getDataType());
+                } catch (MCRConfigurationException e) {
+                    LOGGER.warn(e.getMessage());
+                    operator = "=";
+                }
+            }
             element.setAttribute("operator", operator);
 
             List<Element> values = element.getChildren("value");
