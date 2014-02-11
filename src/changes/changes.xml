@@ -5,7 +5,144 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2014.02" date="2014-02-00" description="TBA">
+    <release version="2014.03" date="2014-03-00" description="TBA">
+    </release>
+    <release version="2014.02" date="2014-02-11" description="TBA">
+      <action dev="mcrkrebs" type="add">
+        solr: add createdby and modifiedby to solrindex
+      </action>
+      <action dev="mcrtchef" type="update">
+        user2: update password hash to SHA-256
+      </action>
+      <action dev="mcrmibue" type="add">
+        added first version of wcms2
+      </action>
+      <action dev="mcrsherm" type="update">
+        mets: write urn as contentids to mets file (if any)
+      </action>
+      <action dev="mcrtchef" type="update">
+        user2: added default values for MCR.Users.Superuser.* to mycore.properties
+      </action>
+      <action dev="mcrsroeh" type="update">
+        base: added support for date format yyyy and yyyy-MM
+      </action>
+      <action dev="mcrtchef" type="fix">
+        base: fixed NPE on shutdown
+      </action>
+      <action dev="mcrsteph" type="add">
+        base: added service flag event handler to set createdby and modifiedby flags
+      </action>
+      <action dev="mcrtchef" date="2014-02-10" type="fix">
+        mods: validate mods documents against catalog.xml defined schema
+        <fixes issue="678" />
+      </action>
+      <action dev="mcrmeich" type="update">
+        base: improve mcrfile uri resolver to handle derivates and paths
+      </action>
+      <action dev="mcrjkupf" type="add">
+        buildtools: make the build tool for integration generic; with the jarstartswith attribute
+        in the buildintegration call you can use the integrate functionality in your own jar archives;
+        the jar archive must have a Manifest the MCR-Version entry to use for integration process
+      </action>
+      <action dev="mcrkrebs" date="2014-01-28" type="fix">
+        mods: updated nameOrPND to current rdf-version (DN-B v2014-01-15)
+        <fixes issue="680" />
+        <fixes issue="681" />
+      </action>
+      <action dev="mcrtchef" type="add">
+        base: introduce system property MCR.Home
+      </action>
+      <action dev="mcrjkupf" type="add">
+        add message-properties for ar, fr and id
+      </action>
+      <action dev="mcrtchef" date="2014-01-28" type="fix">
+        fixed merging of properties (keep in order of ${components.order})
+        <fixes issue="683" />
+      </action>
+      <action dev="mcrtchef" type="add">
+        add multi-language support using new property MCR.I18N.Languages; messages_*.properties will only be generated for selected languages default (de,en)
+      </action>
+      <action dev="mcrtchef" type="add">
+        wfc: added MCRActionMappingServlet to manage static web pages via action mapping
+      </action>
+      <action dev="mcrtchef" type="update">
+        base: disable database if hibernate is not configured
+      </action>
+      <action dev="mcrtchef" type="remove">
+        fileupload-applet excluded from mycore to seperate project
+      </action>
+      <action dev="mcrsherm" date="2014-01-24" type="fix">
+        handle: changed actual column name for schema attribute to schema_attr
+        <fixes issue="682" />
+      </action>
+      <action dev="mcrkrebs" type="fix">
+        mods: fixed empty language output in conference proceeding
+      </action>
+      <action dev="mcrtchef" type="add">
+        base: added support to use variables in command
+      </action>
+      <action dev="mcrtchef" type="update">
+        base: use MCRSystemUserInformation to detect if current user is super user
+      </action>
+      <action dev="mcrjkupf" type="add">
+        base: add IFS2 support with defined default properties for derivates
+      </action>
+      <action dev="mcrtchef" type="remove">
+        removed &lt;distributionManagement> section in 'deployment' profile
+      </action>
+      <action dev="mcrtchef" type="add">
+        base: added command to create configuration directory
+      </action>
+      <action dev="mcrtchef" date="2014-01-22" type="fix">
+        base: navigation.xml may not lay in build/webapps/config directory
+      </action>
+      <action dev="mcrmeich" type="fix">
+        classbrowser: fix npe - check queryAdapter not null
+      </action>
+      <action dev="mcrshofm" type="remove">
+        iview2: Removed second canvas
+      </action>
+      <action dev="mcrtchef" date="2014-01-22" type="add">
+        base: add support to load additional jar files in CLI
+      </action>
+      <action dev="mcrmeich" date="2014-01-21" type="fix">
+        iview2: fix: don't encode slashes
+      </action>
+      <action dev="mcrjkupf" date="2014-01-21" type="add">
+        iview2: add commands to handle image tiles based on  MCR project ID
+      </action>
+      <action dev="mcrjkupf" date="2014-01-21" type="fix">
+        Fix bug with merge mycore.properties in ant build process
+      </action>
+      <action dev="mcrtchef" date="2014-01-21" type="fix">
+        fixed self call of property in iview2; action="substituteVariables" is removed from mcr:config task
+        <fixes issue="676" />
+      </action>
+      <action dev="mcrsroeh" type="add">
+        solr: added indexing support for MCRHistorydate-fields "from" and "to"
+      </action>
+      <action dev="mcrkrebs" type="fix">
+        mods: condition in conference proceeding checks now only for main title
+      </action>
+      <action dev="mcrsherm" type="fix">
+        classbrowser: show category also when countResults is set to false
+      </action>
+      <action dev="mcrtchef" type="update">
+        iview2: use MCRStartupHandler and not ServletContextListener to start image tiling thread
+      </action>
+      <action dev="mcrjkupf" type="add">
+        base: add classification output format "text"
+      </action>
+      <action dev="mcrtchef" date="2014-01-15" type="fix">
+        iview2: fixes Tiling-jobs in infinite loop if tiling not possible for a file; use MCR.Module-iview2.MaxResetCount to configure maximum tries
+        <fixes issue="673" />
+      </action>
+      <action dev="mcrjkupf" type="add">
+        add a default configuration for IFS2
+      </action>
+      <action dev="mcrtchef" type="update">
+        update dependencies (jetty, solr, jaxws-tools)
+      </action>
     </release>
     <release version="2014.01" date="2014-01-14" description="Tất Niên">
       <action dev="mcrfluet" date="2014-01-10" type="fix" due-to="Thomas Scheffler">
@@ -17,7 +154,7 @@
         <fixes issue="666" />
       </action>
       <action dev="mcrtchef" type="update">
-        mycore-xeditor: use Bootstrap styled repeater buttons by default. 
+        mycore-xeditor: use Bootstrap styled repeater buttons by default.
       </action>
       <action dev="mcrtchef" type="add">
         mycore-solr: added '/search/search-expert.xed' XEditor form
@@ -32,7 +169,7 @@
         mycore-iview2: fixed tile loading when browsing fast through images
       </action>
       <action dev="mcrtchef" type="add">
-        mycore-xeditor: added XSL template support via 
+        mycore-xeditor: added XSL template support via
       </action>
       <action dev="mcrtchef" type="update">
         Set MIME type to "text/xml" for MCRToPrettyXML ContentTransformer
