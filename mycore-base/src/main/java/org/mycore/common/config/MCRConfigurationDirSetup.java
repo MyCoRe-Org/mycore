@@ -25,6 +25,9 @@ package org.mycore.common.config;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -67,10 +70,14 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
     @Override
     public void startUp(ServletContext servletContext) {
         MCRConfigurationDir.setServletContext(servletContext);
-        File libDir = MCRConfigurationDir.getConfigFile("libs");
+        loadExternalLibs();
         MCRConfigurationLoader configurationLoader = MCRConfigurationLoaderFactory.getConfigurationLoader();
         Map<String, String> properties = configurationLoader.load();
         MCRConfiguration.instance().initialize(properties, true);
+    }
+
+    private void loadExternalLibs() {
+        File libDir = MCRConfigurationDir.getConfigFile("libs");
         if (libDir != null && libDir.isDirectory()) {
             File[] listFiles = libDir.listFiles(new FilenameFilter() {
                 @Override
@@ -79,26 +86,61 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
                 }
             });
             if (listFiles.length > 0) {
-                Logger logger = Logger.getLogger(getClass());
                 ClassLoader classLoader = this.getClass().getClassLoader();
                 Class<? extends ClassLoader> classLoaderClass = classLoader.getClass();
                 try {
                     Method addUrlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
                     addUrlMethod.setAccessible(true);
                     for (File jarFile : listFiles) {
-                        logger.info("Adding to CLASSPATH: " + jarFile);
+                        logInfo("Adding to CLASSPATH: " + jarFile);
                         try {
                             addUrlMethod.invoke(classLoader, jarFile.toURI().toURL());
                         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
                             | MalformedURLException e) {
-                            logger.error("Could not add " + jarFile + " to current classloader.", e);
+                            logError("Could not add " + jarFile + " to current classloader.", e);
                             return;
                         }
                     }
                 } catch (NoSuchMethodException | SecurityException e) {
-                    logger.warn(classLoaderClass + " does not support adding additional JARs at runtime", e);
+                    logWarn(classLoaderClass + " does not support adding additional JARs at runtime", e);
                 }
             }
+        }
+    }
+
+    private static void logError(String msg, Throwable e) {
+        if (MCRConfiguration.isLog4JEnabled()) {
+            Logger.getLogger(MCRConfigurationInputStream.class).error(msg, e);
+        } else {
+            System.out.printf("ERROR: %s\n", msg + toString(e));
+        }
+    }
+
+    private static String toString(Throwable e) {
+        try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw)) {
+            pw.println();
+            e.printStackTrace(pw);
+            pw.flush();
+            return sw.toString();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+            return "";
+        }
+    }
+
+    private static void logWarn(String msg, Throwable e) {
+        if (MCRConfiguration.isLog4JEnabled()) {
+            Logger.getLogger(MCRConfigurationInputStream.class).warn(msg, e);
+        } else {
+            System.err.printf("WARN: %s\n", msg + toString(e));
+        }
+    }
+
+    private static void logInfo(String msg) {
+        if (MCRConfiguration.isLog4JEnabled()) {
+            Logger.getLogger(MCRConfigurationInputStream.class).info(msg);
+        } else {
+            System.out.printf("INFO: %s\n", msg);
         }
     }
 }
