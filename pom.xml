@@ -5,7 +5,7 @@
   <parent>
     <artifactId>mycore-parent</artifactId>
     <groupId>org.mycore</groupId>
-    <version>19-SNAPSHOT</version>
+    <version>20-SNAPSHOT</version>
   </parent>
   <artifactId>mycore</artifactId>
   <packaging>pom</packaging>
