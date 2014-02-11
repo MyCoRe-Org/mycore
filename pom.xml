@@ -1325,11 +1325,12 @@
   </developers>
   <modules>
     <module>mycore-base</module>
-    <module>mycore-acl-editor</module>
+    <module>mycore-acl-editor2</module>
     <module>mycore-broadcasting</module>
     <module>mycore-buildtools</module>
     <module>mycore-classbrowser</module>
     <module>mycore-classeditor</module>
+    <module>mycore-handle</module>
     <module>mycore-indexing</module>
     <module>mycore-iview2</module>
     <module>mycore-media</module>
@@ -1339,6 +1340,7 @@
     <module>mycore-mods</module>
     <module>mycore-oai</module>
     <module>mycore-session-listing</module>
+    <module>mycore-solr</module>
     <module>mycore-swf</module>
     <module>mycore-sword</module>
     <module>mycore-user2</module>
@@ -1348,11 +1350,8 @@
     <module>mycore-webservices</module>
     <module>mycore-wfc</module>
     <module>mycore-z3950</module>
-    <module>mycore-solr</module>
     <module>mycore-xeditor</module>
     <module>mycore-complete</module>
     <module>iview2-addons</module>
-    <module>mycore-acl-editor2</module>
-    <module>mycore-handle</module>
   </modules>
 </project>
