@@ -335,12 +335,11 @@ public final class MCRURIResolver implements URIResolver {
         if (LOGGER.isDebugEnabled()) {
             addDebugInfo(uri, "JAVA method invocation");
         }
-
         MCRSourceContent content;
         try {
             content = MCRSourceContent.getInstance(uri);
             return content == null ? null : content.asXML().getRootElement().detach();
-        } catch (SAXException | TransformerException | JDOMException | IOException e) {
+        } catch (Exception e) {
             /**
              * rethrow Exception as RuntimException TODO: need to refactor this and
              * declare throw in method signature
