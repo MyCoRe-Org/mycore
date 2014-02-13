@@ -72,6 +72,8 @@ public class MCRConfigurationInputStream extends SequenceInputStream {
         for (MCRComponent component : MCRRuntimeComponentDetector.getAllComponents()) {
             InputStream is = component.getPropertyStream();
             if (is != null) {
+                String comment = "\n\n#\n#\n# Component: " + component.getName() + "\n#\n#\n";
+                cList.add(new ByteArrayInputStream(comment.getBytes()));
                 cList.add(is);
                 //workaround if last property is not terminated with line break
                 cList.add(new ByteArrayInputStream(lbr));
