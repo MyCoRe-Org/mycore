@@ -25,6 +25,8 @@ package org.mycore.common.config;
 
 import static org.junit.Assert.*;
 
+import java.util.jar.Manifest;
+
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
@@ -34,15 +36,15 @@ import org.mycore.common.MCRTestCase;
  */
 public class MCRComponentTest extends MCRTestCase {
 
-    private static final MCRComponent MYCORE_COMPLETE = new MCRComponent("mycore-complete", null);
+    private static final MCRComponent MYCORE_COMPLETE = new MCRComponent("mycore-complete", getSimpleManifest());
 
-    private static final MCRComponent TEST = new MCRComponent("test", null);
+    private static final MCRComponent TEST = new MCRComponent("test", getSimpleManifest());
 
-    private static final MCRComponent MIR_MODULE = new MCRComponent("mir-module", null);
+    private static final MCRComponent MIR_MODULE = new MCRComponent("mir-module", getSimpleManifest());
 
-    private static final MCRComponent ACL_EDITOR2 = new MCRComponent("mycore-acl-editor2", null);
+    private static final MCRComponent ACL_EDITOR2 = new MCRComponent("mycore-acl-editor2", getSimpleManifest());
 
-    private static final MCRComponent MYCORE_BASE = new MCRComponent("mycore-base", null);
+    private static final MCRComponent MYCORE_BASE = new MCRComponent("mycore-base", getSimpleManifest());
 
     /**
      * Test method for {@link org.mycore.common.config.MCRComponent#getResourceBase()}.
@@ -103,6 +105,11 @@ public class MCRComponentTest extends MCRTestCase {
         assertEquals("Did not name app module correctly", "mir", MIR_MODULE.getName());
         assertEquals("Did not name app module correctly", "test", TEST.getName());
         assertEquals("Did not name complete package correctly", "mycore", MYCORE_COMPLETE.getName());
+    }
+
+    private static Manifest getSimpleManifest() {
+        Manifest m = new Manifest();
+        return m;
     }
 
 }
