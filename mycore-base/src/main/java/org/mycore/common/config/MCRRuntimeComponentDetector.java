@@ -121,7 +121,7 @@ public class MCRRuntimeComponentDetector {
             String artifactId = (String) pomProperties.get("artifactId");
             if (artifactId != null && artifactId.startsWith("mycore-")
                 || manifest.getMainAttributes().containsKey(ATT_MCR_APPLICATION_MODULE)) {
-                return new MCRComponent(artifactId);
+                return new MCRComponent(artifactId, manifest);
             }
         }
         return null;

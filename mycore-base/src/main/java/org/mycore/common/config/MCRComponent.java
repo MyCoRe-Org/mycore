@@ -25,9 +25,11 @@ package org.mycore.common.config;
 
 import java.io.File;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.jar.Manifest;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
@@ -44,8 +46,14 @@ import org.mycore.common.MCRException;
  */
 public class MCRComponent implements Comparable<MCRComponent> {
 
+    private static final String ATT_PRIORITY = "Priority";
+
+    private static final DecimalFormat PRIORITY_FORMAT = new DecimalFormat("000");
+
     private static final ResourceBundle.Control CONTROL_HELPER = new ResourceBundle.Control() {
     };
+
+    private static final String DEFAULT_PRIORITY = "99";
 
     private enum Type {
         base, complete, component, module
@@ -61,11 +69,13 @@ public class MCRComponent implements Comparable<MCRComponent> {
 
     private String artifactId;
 
-    public MCRComponent(String artifactId) {
-        this(artifactId, null);
+    private Manifest manifest;
+
+    public MCRComponent(String artifactId, Manifest manifest) {
+        this(artifactId, manifest, null);
     }
 
-    public MCRComponent(String artifactId, File jarFile) {
+    public MCRComponent(String artifactId, Manifest manifest, File jarFile) {
         if (artifactId.endsWith("complete")) {
             type = Type.complete;
             setName(artifactId.replaceAll("-?[^-]*complete", ""));
@@ -82,24 +92,37 @@ public class MCRComponent implements Comparable<MCRComponent> {
             setName(artifactId.replaceAll("-?module", ""));
         }
         this.jarFile = jarFile;
+        this.artifactId = artifactId;
+        this.manifest = manifest;
+        buildSortCriteria();
+        logdebug(artifactId + " is of type " + type + " and named " + getName() + ": " + jarFile);
+    }
+
+    private void buildSortCriteria() {
+        String priorityAtt = manifest.getMainAttributes().getValue(ATT_PRIORITY);
+        if (priorityAtt == null) {
+            priorityAtt = DEFAULT_PRIORITY;
+        }
+        int priority = Integer.parseInt(priorityAtt);
+        if (priority > 99 || priority < 0) {
+            throw new MCRException(artifactId + " has unsupported priority: " + priority);
+        }
         switch (type) {
             case complete:
-                this.sortCriteria = 0 + getName();
                 break;
             case base:
-                this.sortCriteria = 1 + getName();
+                priority += 100;
                 break;
             case component:
-                this.sortCriteria = 2 + getName();
+                priority += 200;
                 break;
             case module:
-                this.sortCriteria = 3 + getName();
+                priority += 300;
                 break;
             default:
                 throw new MCRException("Do not support MCRComponenty of type: " + type);
         }
-        this.artifactId = artifactId;
-        logdebug(artifactId + " is of type " + type + " and named " + getName() + ": " + jarFile);
+        this.sortCriteria = PRIORITY_FORMAT.format(priority) + getName();
     }
 
     private static void logdebug(String msg) {

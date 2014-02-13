@@ -27,6 +27,8 @@
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
     <changes.version>2014.02</changes.version>
     <site.suffix />
+    <!-- lowest is 99, highest is 0 -->
+    <manifest.priority>99</manifest.priority>
   </properties>
   <url>http://www.mycore.de/generated/mycore${site.suffix}</url>
   <distributionManagement>
@@ -325,6 +327,7 @@
                   <Implementation-Build>${BUILD_NUMBER}</Implementation-Build>
                   <Implementation-Revision>${SVN_REVISION}</Implementation-Revision>
                   <POM>META-INF/maven/${project.groupId}/${project.artifactId}/pom.properties</POM>
+                  <Priority>${manifest.priority}</Priority>
                 </manifestEntries>
               </archive>
             </configuration>
