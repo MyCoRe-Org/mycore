@@ -55,13 +55,15 @@
 					<input type='checkbox' id="acle2-button-select-multi-access" class="icon-check-empty icon-large acle2-icon"/>
 		     		<button type="button" id="acle2-button-remove-multi-access" class="btn btn-danger"><text i18n="ACLE.buttons.access.delete"/></button>
 		     		<button type="button" id="acle2-button-edit-multi-access" class="btn btn-primary"><text i18n="ACLE.buttons.access.editMulti"/></button>
-		     		<div id="acle2-paginator" class="pull-right">
-					    <ul class="pagination pull-right">
-					    </ul>
-					</div>
-					<div id="acle2-elem-per-page" class="pull-right">
-						<text i18n="ACLE.labels.access.elemPerPage"/>
-						<input class="input-sm form-control" id="acle2-elem-per-page-input" type="text" value="10"></input>
+		     		<div id="acle2-page-buttons" class="pull-right">
+			     		<div id="acle2-paginator" class="">
+						    <ul class="pagination pull-right">
+						    </ul>
+						</div>
+						<div id="acle2-elem-per-page" class="">
+							<text i18n="ACLE.labels.access.elemPerPage"/>
+							<input class="input-sm form-control" id="acle2-elem-per-page-input" type="text" value="10"></input>
+						</div>						
 					</div>
 		      	</div>
 		     	

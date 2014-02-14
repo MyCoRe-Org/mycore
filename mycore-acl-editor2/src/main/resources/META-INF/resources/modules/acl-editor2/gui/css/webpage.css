@@ -1,11 +1,8 @@
 @CHARSET "UTF-8";
-#contentArea{
-	min-width: 1024px;
-}
 
 #mycore-acl-editor2{
 	margin-bottom: 10px;
-	min-width: 973px;
+	width: 100%;
 }
 
 #acle2-header{
@@ -41,10 +38,6 @@
     line-height: 20px;
 }
 
-#acle2-elem-per-page{
-	margin-left: 760px;
-}
-
 #acle2-elem-per-page label{
 	display: inline;
 }
@@ -64,6 +57,7 @@ label{
 #tab-nav{
 	margin: 10px 0 0 0;
 	padding-left: 10px;
+	max-height: 48px;
 }
 
 #tab-nav a{
@@ -79,7 +73,7 @@ label{
 }
 
 .tab-content {
-    margin-left: 30px;
+    margin-left: 10px;
 }
 
 #acle2-alert-area{
@@ -91,19 +85,18 @@ label{
 #acle2-access-filter{
 	margin-left: 10px;
 	margin-bottom: 15px;
-	width: 945px;
+	width: 100%;
+	max-height: 30px;
 }
 
 #acle2-access-filter > div{
 	margin-right: -20px;
-	width: 315px;
 	float: left;
 }
 
 #acle2-access-table {
     table-layout: fixed;
-	width: 941px;
-	min-width: 941px;
+	width: 100%;
 	margin-top: 5px;
 	margin-bottom: 10px;
 }
@@ -133,10 +126,6 @@ label{
 	padding-left: 8px;
 }
 
-.sort-table-head{
-	width: 280px;
-}
-
 select, textarea, input[type="text"]{
 	margin-bottom: 0px;
 }
@@ -152,7 +141,7 @@ select, textarea, input[type="text"]{
 
 #acle2-bottom-buttons{
 	margin-left: 5px;
-	width: 936px;
+	width: 100%;
 	height: 150px;
 }
 
@@ -166,7 +155,7 @@ select, textarea, input[type="text"]{
 
 #acle2-rule-list{
 	display: inline-block;
-	width: 450px;
+	width: 47%;
 	height: 500px;
 	margin-top: 0px;
 	overflow: auto;
@@ -203,9 +192,10 @@ select, textarea, input[type="text"]{
 	color: #fff;
 }
 
-.acle2-rule-detail-table{
+#acle2-rule-detail-table{
 	display: inline-block;
 	vertical-align: top;
+	width: 48%;
 }
 
 .acle2-rule-detail-table > dd{
@@ -220,7 +210,6 @@ select, textarea, input[type="text"]{
 
 .acle2-rule-detail-table > dd{
 	margin-left: 120px;
-	width: 364px;
 }
 
 .acle2-rule-detail-table textarea{
@@ -286,10 +275,10 @@ select, textarea, input[type="text"]{
     display: inline;
 }
 
-#acle2-paginator{
-	margin-left: 640px;
+#acle2-page-buttons{
+	margin-top: 35px;
 }
-
+    
 #acle2-elem-per-page-input{
 	display: inline;
     margin-left: 5px;
