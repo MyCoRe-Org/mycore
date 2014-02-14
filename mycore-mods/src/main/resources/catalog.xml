@@ -6,5 +6,6 @@
   <system systemId="http://www.loc.gov/standards/mods/v3/mods-3-2.xsd" uri="xsd/mods-3-2.xsd" />
   <system systemId="http://www.loc.gov/standards/mods/v3/mods-3-3.xsd" uri="xsd/mods-3-3.xsd" />
   <system systemId="http://www.loc.gov/standards/mods/v3/mods-3-4.xsd" uri="xsd/mods-3-4.xsd" />
+  <system systemId="http://www.loc.gov/standards/mods/v3/mods-3-5.xsd" uri="xsd/mods-3-5.xsd" />
 
 </catalog>

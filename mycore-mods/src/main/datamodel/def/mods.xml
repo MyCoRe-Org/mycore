@@ -1,7 +1,7 @@
 <objecttype name="mods" isChild="true" isParent="true" hasDerivates="true" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:mods="http://www.loc.gov/mods/v3" xsi:noNamespaceSchemaLocation="datamodel.xsd">
   <xsd>
-    <xs:import namespace="http://www.loc.gov/mods/v3" schemaLocation="http://www.loc.gov/standards/mods/v3/mods-3-4.xsd" />
+    <xs:import namespace="http://www.loc.gov/mods/v3" schemaLocation="http://www.loc.gov/standards/mods/v3/mods-3-5.xsd" />
   </xsd>
   <metadata>
     <element name="modsContainer" type="xml" style="dontknow" notinherit="true" heritable="false">
