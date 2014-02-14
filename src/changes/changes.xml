@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2014.03" date="2014-03-00" description="TBA">
+      <action dev="mcrtchef" type="add">
+        mycore-mods: add schema support for MODS 3.5
+      </action>
       <action dev="mcrtchef" type="remove">
         removed mycore-acl-editor (replaced by mycore-acl-editor2)
       </action>
