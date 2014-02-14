@@ -23,9 +23,9 @@
     <lucene.version>3.6.2</lucene.version>
     <xalan.version>2.7.1</xalan.version>
     <jersey.version>1.18</jersey.version>
-    <changelog.since>2014-01-14</changelog.since>
+    <changelog.since>2014-02-11</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
-    <changes.version>2014.02</changes.version>
+    <changes.version>2014.03</changes.version>
     <site.suffix />
     <!-- lowest is 99, highest is 0 -->
     <manifest.priority>99</manifest.priority>
