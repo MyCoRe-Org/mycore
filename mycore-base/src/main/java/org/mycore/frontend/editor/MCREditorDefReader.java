@@ -26,6 +26,7 @@ package org.mycore.frontend.editor;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -50,9 +51,9 @@ public class MCREditorDefReader {
 
     private Element editor;
 
-    HashMap<String, Element> id2component = new HashMap<String, Element>();
+    HashMap<String, Element> id2component = new LinkedHashMap<String, Element>();
 
-    HashMap<Element, String> referencing2ref = new HashMap<Element, String>();
+    HashMap<Element, String> referencing2ref = new LinkedHashMap<Element, String>();
 
     private MCRTokenSubstitutor tokenSubstitutor;
 
