@@ -24,6 +24,7 @@
 package org.mycore.mets.servlets;
 
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.HashSet;
 
 import javax.servlet.ServletException;
@@ -72,9 +73,14 @@ public class MCRMETSServlet extends MCRServlet {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, MessageFormat.format("Derivate {0} does not exist.", derivate));
             return;
         }
-
         request.setAttribute("XSL.derivateID", derivate);
-        request.setAttribute("XSL.objectID", MCRLinkTableManager.instance().getSourceOf(derivate).iterator().next());
+        Collection<String> linkList = MCRLinkTableManager.instance().getSourceOf(derivate);
+        if (linkList.isEmpty()) {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, MessageFormat.format(
+                    "Derivate {0} is not linked with a MCRObject. Please contact an administrator.", derivate));
+            return;
+        }
+        request.setAttribute("XSL.objectID", linkList.iterator().next());
         response.setContentType("text/xml");
 
         long lastModified = dir.getLastModified().getTimeInMillis();
