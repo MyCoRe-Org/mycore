@@ -1,4 +1,4 @@
-package org.mycore.multitenancy.wcms.navigation;
+package org.mycore.wcms2.navigation;
 
 import com.google.gson.JsonElement;
 
@@ -8,7 +8,7 @@ import com.google.gson.JsonElement;
  * @param <O>
  * @param <J>
  */
-public interface JSONProvider<O, J extends JsonElement> {
+public interface MCRWCMSJSONProvider<O, J extends JsonElement> {
 
     public J toJSON(O object);
 

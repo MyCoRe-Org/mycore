@@ -20,11 +20,11 @@ wcms.navigation.MenuItemEditor = function() {
 
 	// i18n text
 	// ie-bug: use var instead of const
-	var mainHeaderText = "component.mt-wcms.navigation.menuItemEditor.mainHeader";
-	var i18nText = "component.mt-wcms.navigation.itemEditor.name";
-	var idText = "component.mt-wcms.navigation.menuItemEditor.id";
-	var dirText = "component.mt-wcms.navigation.rootItemEditor.dir";
-	var idRequiredText = "component.mt-wcms.navigation.menuItemEditor.idRequired";
+	var mainHeaderText = "component.wcms.navigation.menuItemEditor.mainHeader";
+	var i18nText = "component.wcms.navigation.itemEditor.name";
+	var idText = "component.wcms.navigation.menuItemEditor.id";
+	var dirText = "component.wcms.navigation.rootItemEditor.dir";
+	var idRequiredText = "component.wcms.navigation.menuItemEditor.idRequired";
 
 	function create() {
 		// create dijit componets

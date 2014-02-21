@@ -1,14 +1,14 @@
-package org.mycore.multitenancy.wcms.navigation;
+package org.mycore.wcms2.navigation;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.navigation.InsertItem;
-import org.mycore.datamodel.navigation.Item;
-import org.mycore.datamodel.navigation.ItemContainer;
-import org.mycore.datamodel.navigation.MenuItem;
-import org.mycore.datamodel.navigation.Navigation;
-import org.mycore.datamodel.navigation.NavigationItem;
 import org.mycore.frontend.MCRLayoutUtilities;
+import org.mycore.wcms2.datamodel.MCRNavigationInsertItem;
+import org.mycore.wcms2.datamodel.MCRNavigationItem;
+import org.mycore.wcms2.datamodel.MCRNavigationItemContainer;
+import org.mycore.wcms2.datamodel.MCRNavigationMenuItem;
+import org.mycore.wcms2.datamodel.MCRNavigation;
+import org.mycore.wcms2.datamodel.MCRNavigationBaseItem;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -20,8 +20,8 @@ import com.google.gson.JsonObject;
  *
  * @author Matthias Eichner
  */
-public class DefaultNavigationProvider implements NavigationProvider {
-    private static final Logger LOGGER = Logger.getLogger(DefaultSectionProvider.class);
+public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvider {
+    private static final Logger LOGGER = Logger.getLogger(MCRWCMSDefaultSectionProvider.class);
 
     private static Gson gson;
 
@@ -29,12 +29,8 @@ public class DefaultNavigationProvider implements NavigationProvider {
         gson = new Gson();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.mycore.multitenancy.wcms.navigation.NavigationProvider#toJSON(org.mycore.datamodel.navigation.Navigation)
-     */
     @Override
-    public JsonObject toJSON(Navigation navigation) {
+    public JsonObject toJSON(MCRNavigation navigation) {
         JsonObject returnObject = new JsonObject();
         JsonArray hierarchy = new JsonArray();
         JsonArray items = new JsonArray();
@@ -46,11 +42,11 @@ public class DefaultNavigationProvider implements NavigationProvider {
         return returnObject;
     }
 
-    private void create(NavigationItem item, JsonArray hierarchy, JsonArray items) throws MCRException {
+    private void create(MCRNavigationBaseItem item, JsonArray hierarchy, JsonArray items) throws MCRException {
         JsonObject hierarchyObject = add(item, hierarchy, items);
-        if(item instanceof ItemContainer) {
+        if(item instanceof MCRNavigationItemContainer) {
             JsonArray childHierarchyArray = new JsonArray();
-            for(NavigationItem childItem : ((ItemContainer)item).getChildren()) {
+            for(MCRNavigationBaseItem childItem : ((MCRNavigationItemContainer)item).getChildren()) {
                 create(childItem, childHierarchyArray, items);
             }
             if(childHierarchyArray.size() > 0)
@@ -58,23 +54,23 @@ public class DefaultNavigationProvider implements NavigationProvider {
         }
     }
 
-    private JsonObject add(NavigationItem item, JsonArray hierarchy, JsonArray items) {
+    private JsonObject add(MCRNavigationBaseItem item, JsonArray hierarchy, JsonArray items) {
         int id = items.size();
         JsonObject jsonItem = gson.toJsonTree(item).getAsJsonObject();
         jsonItem.addProperty(JSON_WCMS_ID, id);
         jsonItem.remove(JSON_CHILDREN);
         WCMSType type = null;
         String href = null;
-        if(item instanceof Navigation) {
+        if(item instanceof MCRNavigation) {
             type = WCMSType.root;
-            href = ((Navigation) item).getHrefStartingPage();
-        } else if(item instanceof MenuItem) {
+            href = ((MCRNavigation) item).getHrefStartingPage();
+        } else if(item instanceof MCRNavigationMenuItem) {
             type = WCMSType.menu;
-            href = ((MenuItem) item).getDir();
-        } else if(item instanceof Item) {
+            href = ((MCRNavigationMenuItem) item).getDir();
+        } else if(item instanceof MCRNavigationItem) {
             type = WCMSType.item;
-            href = ((Item) item).getHref();
-        } else if(item instanceof InsertItem) {
+            href = ((MCRNavigationItem) item).getHref();
+        } else if(item instanceof MCRNavigationInsertItem) {
             type = WCMSType.insert;
         } else {
             LOGGER.warn("Unable to set type for item " + id);
@@ -91,30 +87,26 @@ public class DefaultNavigationProvider implements NavigationProvider {
         return hierarchyObject;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.mycore.multitenancy.wcms.navigation.NavigationProvider#fromJSON(com.google.gson.JsonObject)
-     */
     @Override
-    public Navigation fromJSON(JsonObject navigationJSON) {
+    public MCRNavigation fromJSON(JsonObject navigationJSON) {
         JsonArray items = navigationJSON.get(JSON_ITEMS).getAsJsonArray();
         JsonArray hierarchy = navigationJSON.get(JSON_HIERARCHY).getAsJsonArray();
         if(hierarchy.size() > 0) {
             JsonObject root = hierarchy.get(0).getAsJsonObject();
-            NavigationItem navigation = createItem(root, items);
-            if(navigation instanceof Navigation) {
-                return (Navigation)navigation;
+            MCRNavigationBaseItem navigation = createItem(root, items);
+            if(navigation instanceof MCRNavigation) {
+                return (MCRNavigation)navigation;
             }
         }
         return null;
     }
 
-    private NavigationItem createItem(JsonObject hierarchyObject, JsonArray items) {
+    private MCRNavigationBaseItem createItem(JsonObject hierarchyObject, JsonArray items) {
         if(!hierarchyObject.has(JSON_WCMS_ID)) {
             LOGGER.warn("While saving navigation.xml. Invalid object in hierarchy.");
             return null;
         }
-        NavigationItem item = getNavigationItem(hierarchyObject.get(JSON_WCMS_ID).getAsString(), items);
+        MCRNavigationBaseItem item = getNavigationItem(hierarchyObject.get(JSON_WCMS_ID).getAsString(), items);
         if(item == null) {
             LOGGER.warn("While saving navigation.xml. Item with id " +
                         hierarchyObject.get(JSON_WCMS_ID) + " is null!");
@@ -122,11 +114,11 @@ public class DefaultNavigationProvider implements NavigationProvider {
         }
 
         JsonElement children = hierarchyObject.get(JSON_CHILDREN);
-        if(children != null && children.isJsonArray() && item instanceof ItemContainer) {
-            ItemContainer itemAsContainer = (ItemContainer)item;
+        if(children != null && children.isJsonArray() && item instanceof MCRNavigationItemContainer) {
+            MCRNavigationItemContainer itemAsContainer = (MCRNavigationItemContainer)item;
             for(JsonElement child : children.getAsJsonArray()) {
                 if(child.isJsonObject()) {
-                    NavigationItem childItem = createItem(child.getAsJsonObject(), items);
+                    MCRNavigationBaseItem childItem = createItem(child.getAsJsonObject(), items);
                     if(childItem != null) {
                         itemAsContainer.getChildren().add(childItem);
                     }
@@ -144,7 +136,7 @@ public class DefaultNavigationProvider implements NavigationProvider {
      * @param items list of items
      * @return instance of <code>NavigationItem</code> or null 
      */
-    private NavigationItem getNavigationItem(String wcmsId, JsonArray items) {
+    private MCRNavigationBaseItem getNavigationItem(String wcmsId, JsonArray items) {
         for(JsonElement e : items) {
             if(e.isJsonObject()) {
                 JsonObject item = e.getAsJsonObject();
@@ -152,13 +144,13 @@ public class DefaultNavigationProvider implements NavigationProvider {
                    wcmsId.equals(item.get(JSON_WCMS_ID).getAsString())) {
                     WCMSType wcmsType = WCMSType.valueOf(item.get(JSON_WCMS_TYPE).getAsString());
                     if(wcmsType.equals(WCMSType.root)) {
-                        return gson.fromJson(item, Navigation.class);
+                        return gson.fromJson(item, MCRNavigation.class);
                     } else if(wcmsType.equals(WCMSType.menu)) {
-                        return gson.fromJson(item, MenuItem.class);
+                        return gson.fromJson(item, MCRNavigationMenuItem.class);
                     } else if(wcmsType.equals(WCMSType.item)) {
-                        return gson.fromJson(item, Item.class);
+                        return gson.fromJson(item, MCRNavigationItem.class);
                     } else if(wcmsType.equals(WCMSType.insert)) {
-                        return gson.fromJson(item, InsertItem.class);
+                        return gson.fromJson(item, MCRNavigationInsertItem.class);
                     }
                 }
             }

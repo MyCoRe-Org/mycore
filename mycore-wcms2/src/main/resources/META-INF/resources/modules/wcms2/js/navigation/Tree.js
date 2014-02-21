@@ -88,11 +88,11 @@ wcms.navigation.Tree = function() {
 		this.treePane.set("content", this.tree.domNode);
 
 		this.deleteItemDialog = new wcms.gui.SimpleDialog("yesNo",
-				"component.mt-wcms.navigation.tree.dialog.removeItemTitle",
-				"component.mt-wcms.navigation.tree.dialog.removeItem");
+				"component.wcms.navigation.tree.dialog.removeItemTitle",
+				"component.wcms.navigation.tree.dialog.removeItem");
 		this.restoreItemDialog = new wcms.gui.SimpleDialog("yesNo",
-				"component.mt-wcms.navigation.tree.dialog.restoreItemTitle",
-				"component.mt-wcms.navigation.tree.dialog.restoreItem");
+				"component.wcms.navigation.tree.dialog.restoreItemTitle",
+				"component.wcms.navigation.tree.dialog.restoreItem");
 
 		// popupmenu
 		var menuStore = new dojo.data.ItemFileReadStore({
@@ -150,9 +150,9 @@ wcms.navigation.Tree = function() {
 		this.restoreTreeItemButton.onClick = dojo.hitch(this, restoreSelectedItem);
 
 		// button i18n
-		this.addTreeItemButton.set("i18n", "component.mt-wcms.navigation.tree.addItem");
-		this.addTreeInsertItemButton.set("i18n", "component.mt-wcms.navigation.tree.addInsertItem");
-		this.addTreeMenuItemButton.set("i18n", "component.mt-wcms.navigation.tree.addMenu");
+		this.addTreeItemButton.set("i18n", "component.wcms.navigation.tree.addItem");
+		this.addTreeInsertItemButton.set("i18n", "component.wcms.navigation.tree.addInsertItem");
+		this.addTreeMenuItemButton.set("i18n", "component.wcms.navigation.tree.addMenu");
 
 		I18nManager.getInstance().updateI18nObject(this.addTreeItemButton);
 		I18nManager.getInstance().updateI18nObject(this.addTreeInsertItemButton);

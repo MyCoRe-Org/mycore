@@ -16,8 +16,8 @@ wcms.navigation.InsertItemEditor = function() {
 
 	// i18n text
 	// ie-bug: use var instead of const
-	var mainHeaderText = "component.mt-wcms.navigation.insertItemEditor.mainHeader";
-	var uriText = "component.mt-wcms.navigation.insertItemEditor.uri";
+	var mainHeaderText = "component.wcms.navigation.insertItemEditor.mainHeader";
+	var uriText = "component.wcms.navigation.insertItemEditor.uri";
 
 	function create() {
 		// create dijit components

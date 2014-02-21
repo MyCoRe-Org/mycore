@@ -16,31 +16,22 @@ wcms.navigation.RootItemEditor = function() {
 	this.mainTitleTextBox = null;
 	this.historyTitleTextBox = null;
 	this.templateSelect = null;
-	// includes
-	this.includeEditor = null;
-	// tenant
-	this.parentTenantTextBox = null;
-	this.parentPageTextBox = null;
 };
 
 ( function() {
 
 	// i18n text
 	// ie-bug: use var instead of const
-	var mainHeaderText = "component.mt-wcms.navigation.rootItemEditor.mainHeader";
-	var titleAndLayoutCaption = "component.mt-wcms.navigation.rootItemEditor.titleAndLayoutCaption";
-	var includeCaption = "component.mt-wcms.navigation.rootItemEditor.includeCaption";
-	var tenantSettingsCaption = "component.mt-wcms.navigation.rootItemEditor.tenantSettingsCaption";
+	var mainHeaderText = "component.wcms.navigation.rootItemEditor.mainHeader";
+	var titleAndLayoutCaption = "component.wcms.navigation.rootItemEditor.titleAndLayoutCaption";
 
-	var hrefText = "component.mt-wcms.navigation.rootItemEditor.href";
-	var hrefStartingPageText = "component.mt-wcms.navigation.rootItemEditor.hrefStartingPage";
-	var dirText = "component.mt-wcms.navigation.rootItemEditor.dir";
-	var mainTitleText = "component.mt-wcms.navigation.rootItemEditor.mainTitle";
-	var historyTitleText = "component.mt-wcms.navigation.rootItemEditor.historyTitle";
-	var templateText = "component.mt-wcms.navigation.itemEditor.template";
-	var templateNoneText = "component.mt-wcms.navigation.itemEditor.template.none";
-	var parentTenantText = "component.mt-wcms.navigation.rootItemEditor.parentTenant";
-	var parentPageText = "component.mt-wcms.navigation.rootItemEditor.parentPage";
+	var hrefText = "component.wcms.navigation.rootItemEditor.href";
+	var hrefStartingPageText = "component.wcms.navigation.rootItemEditor.hrefStartingPage";
+	var dirText = "component.wcms.navigation.rootItemEditor.dir";
+	var mainTitleText = "component.wcms.navigation.rootItemEditor.mainTitle";
+	var historyTitleText = "component.wcms.navigation.rootItemEditor.historyTitle";
+	var templateText = "component.wcms.navigation.itemEditor.template";
+	var templateNoneText = "component.wcms.navigation.itemEditor.template.none";
 
 	function create() {
 		// create dijit components
@@ -54,12 +45,6 @@ wcms.navigation.RootItemEditor = function() {
 		this.templateSelect = new dijit.form.Select({
 			maxHeight: "300",
 		});
-//		dojo.addClass(this.templateSelect.focusNode, "smallComponent");
-		// includes
-		this.includeEditor = new wcms.gui.SimpleArrayEditor();
-		// tenant
-		this.parentTenantTextBox = new dijit.form.TextBox({intermediateChanges: true});
-		this.parentPageTextBox = new dijit.form.TextBox({intermediateChanges: true});
 
 		// layout
 		getTemplateList(dojo.hitch(this, function(data) {
@@ -136,36 +121,6 @@ wcms.navigation.RootItemEditor = function() {
 				this.eventHandler.notify({"type" : "itemUpdated", "item": this.currentItem});
 			}
 		});
-		// -include
-		this.includeEditor.eventHandler.attach(dojo.hitch(this, function(/*SimpleArrayEditor*/ source, /*Json*/ args) {
-			if(this.currentItem == null)
-				return;
-			if(args.type == "rowChanged" || args.type =="rowRemoved") {
-				var newValues = this.includeEditor.getValues();
-				if(!deepEquals(newValues, this.currentItem.includeList)) {
-					this.currentItem.includeList = newValues;
-					this.eventHandler.notify({"type" : "itemUpdated", "item": this.currentItem});
-				}
-			}
-		}));
-		// -parent tenant
-		dojo.connect(this.parentTenantTextBox, "onChange", this, function(/*String*/ value) {
-			if(this.currentItem == null)
-				return;
-			if(!equal(this.currentItem.parentTenant, value)) {
-				this.currentItem.parentTenant = value;
-				this.eventHandler.notify({"type" : "itemUpdated", "item": this.currentItem});
-			}
-		});
-		// -parent page
-		dojo.connect(this.parentPageTextBox, "onChange", this, function(/*String*/ value) {
-			if(this.currentItem == null)
-				return;
-			if(!equal(this.currentItem.parentPage, value)) {
-				this.currentItem.parentPage = value;
-				this.eventHandler.notify({"type" : "itemUpdated", "item": this.currentItem});
-			}
-		});
 	}
 
 	function buildTable() {
@@ -181,17 +136,6 @@ wcms.navigation.RootItemEditor = function() {
 		this.addElement(mainTitleText, this.mainTitleTextBox.domNode);
 		this.addElement(historyTitleText, this.historyTitleTextBox.domNode);
 		this.addElement(templateText, this.templateSelect.domNode);
-
-		if(useMultitenancy) {
-			// includes
-			this.addCaption(includeCaption);
-			this.addElement(includeCaption, this.includeEditor.domNode);
-			// tenant settings
-			this.addCaption(tenantSettingsCaption);
-			this.addElement(parentTenantText, this.parentTenantTextBox.domNode);
-			this.addElement(parentPageText, this.parentPageTextBox.domNode);
-		}
-
 		// update i18n texts
 		this.updateLang();
 	}
@@ -206,11 +150,6 @@ wcms.navigation.RootItemEditor = function() {
 		this.setValue(this.mainTitleTextBox, item.mainTitle);
 		this.setValue(this.historyTitleTextBox, item.historyTitle);
 		this.setValue(this.templateSelect, item.template);
-		// includes
-		this.includeEditor.update(item.include);
-		// tenant settings
-		this.setValue(this.parentTenantTextBox, item.parentTenant);
-		this.setValue(this.parentPageTextBox, item.parentPage);
 	}
 
 	function reset() {
@@ -224,11 +163,6 @@ wcms.navigation.RootItemEditor = function() {
 		this.mainTitleText.set("value", null);
 		this.historyTitleTextBox.set("value", null);
 		this.templateSelect.set("value", null);
-		// includes
-		this.includeEditor.reset();
-		// tenant settings
-		this.parentTenantTextBox("value", null);
-		this.parentPageTextBox("value", null);
 	}
 
 	function setDisabled(/*boolean*/ value) {
@@ -241,11 +175,6 @@ wcms.navigation.RootItemEditor = function() {
 		this.mainTitleTextBox.set("disabled", this.disabled);
 		this.historyTitleTextBox.set("disabled", this.disabled);
 		this.templateSelect.set("disabled", this.disabled);
-		// includes
-		this.includeEditor.setDisabled(this.disabled);
-		// tenant settings
-		this.parentTenantTextBox.set("disabled", this.disabled);
-		this.parentPageTextBox.set("disabled", this.disabled);
 	}
 
 	function updateLang() {

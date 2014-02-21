@@ -138,7 +138,7 @@ function arrayRemoveById(/* Array */array, /*int*/ id) {
  *------------------------------------------------------------------------*/
 function getTemplateList(/*function*/ onSuccess) {
 	var xhrArgs = {
-		url : wcmsServletURL + "?type=getTemplateList",
+		url : wcms.settings.wcmsURL + "/navigation/templates",
 		handleAs : "json",
 		load : function(data) {
 			onSuccess(data);

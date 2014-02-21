@@ -1,11 +1,12 @@
-package org.mycore.multitenancy.wcms.navigation;
+package org.mycore.wcms2;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.mycore.datamodel.navigation.NavigationManager;
+import org.mycore.wcms2.MCRWCMSUtil;
+import org.mycore.wcms2.navigation.MCRWCMSDefaultNavigationProvider;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -20,13 +21,12 @@ import com.google.gson.JsonObject;
 public class DefaultNavigationProviderTest {
 
     @SuppressWarnings("unused")
-    private DefaultNavigationProvider navProv;
+    private MCRWCMSDefaultNavigationProvider navProv;
 
     @Test
     public void toJSON() throws Exception {
-        NavigationManager nm = new NavigationManager();
-        nm.load(new File("src/test/resources/navigation/navigation.xml"));
-        this.navProv = new DefaultNavigationProvider();
+        MCRWCMSUtil.load(new File("src/test/resources/navigation/navigation.xml"));
+        this.navProv = new MCRWCMSDefaultNavigationProvider();
 //        JsonObject jsonNavigation = this.navProv.toJSON(navigation);
 
         // test hierarchy

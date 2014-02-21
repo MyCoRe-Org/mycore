@@ -1,4 +1,6 @@
-package org.mycore.multitenancy.wcms.navigation;
+package org.mycore.wcms2;
+
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.util.HashMap;
@@ -8,11 +10,10 @@ import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.wcms2.navigation.MCRWCMSDefaultSectionProvider;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
-import static org.junit.Assert.assertEquals;
 
 public class JSONSectionProviderTest {
 
@@ -23,7 +24,7 @@ public class JSONSectionProviderTest {
         MCRConfiguration.instance().initialize(properties, true);
         SAXBuilder builder = new SAXBuilder();
         Document doc = builder.build(new File("src/test/resources/navigation/content.xml"));
-        DefaultSectionProvider prov = new DefaultSectionProvider();
+        MCRWCMSDefaultSectionProvider prov = new MCRWCMSDefaultSectionProvider();
         JsonArray sectionArray = prov.toJSON(doc.getRootElement());
         
         assertEquals(2, sectionArray.size());

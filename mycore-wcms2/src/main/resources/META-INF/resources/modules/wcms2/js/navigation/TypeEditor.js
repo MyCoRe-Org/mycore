@@ -6,73 +6,84 @@ var wcms = wcms || {};
 wcms.navigation = wcms.navigation || {};
 
 /**
- * Editor for internal or external webpages. Internal pages could be edited with
- * a content dialog @see wcms.navigation.EditContentDialog.
+ * Editor for internal or external webpages. Internal pages could be edited with a content dialog
+ * 
+ * @see wcms.navigation.EditContentDialog.
  */
 wcms.navigation.TypeEditor = function() {
 	this.domNode = dojo.create("div");
 	this.disabled = false;
 
 	this.Type = {
-		intern:"intern",
-		extern:"extern"
+		intern : "intern",
+		extern : "extern"
 	};
 
-    this.typeSelect = new dijit.form.Select();
-//    dojo.addClass(this.typeSelect.focusNode, "smallComponent");
+	this.typeSelect = new dijit.form.Select();
+	// dojo.addClass(this.typeSelect.focusNode, "smallComponent");
 
-    // components
-    this.extraDiv = dojo.create("div");
-    this.editContent = null;
-    this.reloadContentButton = null;
-    this.editContentDialog = new wcms.navigation.EditContentDialog();
-    this.hrefTextBox = null;
+	// components
+	this.extraDiv = dojo.create("div");
+	this.editContent = null;
+	this.reloadContentButton = null;
+	this.editContentDialog = new wcms.navigation.EditContentDialog();
+	this.hrefTextBox = null;
 
-    // current item
-    this.itemId = null;
+	// current item
+	this.itemId = null;
 
-    // wcms.navigation.NavigationContent
-    this.content = null;
+	// wcms.navigation.NavigationContent
+	this.content = null;
 
-    // events
+	// events
 	this.eventHandler = new wcms.common.EventHandler(this);
 };
 
-( function() {
+(function() {
 
-	var editorContentText = "component.mt-wcms.navigation.typeEditor.editContent";
+	var editorContentText = "component.wcms.navigation.typeEditor.editContent";
 
-	var internText = "component.mt-wcms.navigation.typeEditor.intern";
-	var externText = "component.mt-wcms.navigation.typeEditor.extern";
+	var internText = "component.wcms.navigation.typeEditor.intern";
+	var externText = "component.wcms.navigation.typeEditor.extern";
 
-	function create(/*wcms.navigation.NavigationContent*/ content) {
+	function create(/* wcms.navigation.NavigationContent */content) {
 		this.content = content;
 
 		// href
 		var typeEditorInstance = this;
 		this.hrefTextBox = new dijit.form.ValidationTextBox({
-			required: true,
-			intermediateChanges: true,
-			regExp: "(.+)\.xml",
-			i18nMissingMessage: "component.mt-wcms.navigation.typeEditor.hrefRequired",
-			i18nInvalidMessage: "component.mt-wcms.navigation.typeEditor.invalidFile",
-			validator: function(value, constraints) {
-				if(value == null || value == "")
+			required : true,
+			intermediateChanges : true,
+			regExp : "(.+)\.xml",
+			i18nMissingMessage : "component.wcms.navigation.typeEditor.hrefRequired",
+			i18nInvalidMessage : "component.wcms.navigation.typeEditor.invalidFile",
+			validator : function(value, constraints) {
+				if (value == null || value == "")
 					return false;
-				if(typeEditorInstance.typeSelect.get("value") == typeEditorInstance.Type.extern)
+				if (typeEditorInstance.typeSelect.get("value") == typeEditorInstance.Type.extern)
 					return true;
 				return dijit.form.ValidationTextBox.prototype.validator.call(this, value, constraints);
 			},
-	    });
+		});
 
 		// add options
-	    this.typeSelect.addOption({value: this.Type.intern, i18n: internText});
-	    this.typeSelect.addOption({value: this.Type.extern, i18n: externText});
+		this.typeSelect.addOption({
+			value : this.Type.intern,
+			i18n : internText
+		});
+		this.typeSelect.addOption({
+			value : this.Type.extern,
+			i18n : externText
+		});
 
-	    // content
-	    this.editContent = new dijit.form.Button({i18n: editorContentText});
-	    this.reloadContentButton = new dijit.form.Button({showLabel: false});
-//	    this.updateType(this.Type.intern);
+		// content
+		this.editContent = new dijit.form.Button({
+			i18n : editorContentText
+		});
+		this.reloadContentButton = new dijit.form.Button({
+			showLabel : false
+		});
+		// this.updateType(this.Type.intern);
 
 		// append all childs to the nodes
 		this.domNode.appendChild(this.typeSelect.domNode);
@@ -81,29 +92,32 @@ wcms.navigation.TypeEditor = function() {
 		this.extraDiv.appendChild(this.editContent.domNode);
 		this.extraDiv.appendChild(this.reloadContentButton.domNode);
 
-	    // events
-	    dojo.connect(this.editContent, "onClick", this, onEditContent);
-	    dojo.connect(this.reloadContentButton, "onClick", this, onReloadContent);
-	    dojo.connect(this.hrefTextBox, "onChange", this, function(/*String*/ newValue) {
-			this.eventHandler.notify({"type" : "hrefChanged", "value": newValue});
+		// events
+		dojo.connect(this.editContent, "onClick", this, onEditContent);
+		dojo.connect(this.reloadContentButton, "onClick", this, onReloadContent);
+		dojo.connect(this.hrefTextBox, "onChange", this, function(/* String */newValue) {
+			this.eventHandler.notify({
+				"type" : "hrefChanged",
+				"value" : newValue
+			});
 		});
 		dojo.connect(this.typeSelect, "onChange", this, this.updateType);
 
-		this.editContentDialog.eventHandler.attach(dojo.hitch(this, function(/*EditContentDialog*/ source, /*Json*/ args) {
-			if(args.type == "okButtonClicked" && !deepEquals(source.oldWebpageContent, source.webpageContent)) {
+		this.editContentDialog.eventHandler.attach(dojo.hitch(this, function(/* EditContentDialog */source, /* Json */args) {
+			if (args.type == "okButtonClicked" && !deepEquals(source.oldWebpageContent, source.webpageContent)) {
 				this.eventHandler.notify({
 					"type" : "contentChanged",
-					"webpageContent": source.webpageContent
+					"webpageContent" : source.webpageContent
 				});
 			}
 		}));
 	}
 
-	function update(/*JSON*/ item) {
+	function update(/* JSON */item) {
 		this.itemId = item.wcmsId;
 		this.typeSelect.set("value", item.type);
 		this.hrefTextBox.set("value", item.href);
-		if(item.href == undefined) {
+		if (item.href == undefined) {
 			this.hrefTextBox.set("value", null);
 		}
 		var updateEditContentButtonFunc = dojo.hitch(this, updateEditContentButton);
@@ -116,29 +130,28 @@ wcms.navigation.TypeEditor = function() {
 		this.hrefTextBox.set("value", null);
 	}
 
-	function setDisabled(/*boolean*/ value) {
+	function setDisabled(/* boolean */value) {
 		this.disabled = value;
 		this.typeSelect.set("disabled", this.disabled);
 		this.editContent.set("disabled", this.disabled);
 		this.hrefTextBox.set("disabled", this.disabled);
 	}
 
-	function updateType(/*String*/ type) {
+	function updateType(/* String */type) {
 		var updateEditContentButtonFunc = dojo.hitch(this, updateEditContentButton);
 		updateEditContentButtonFunc();
-		this.eventHandler.notify({"type" : "typeChanged", "value": type});
+		this.eventHandler.notify({
+			"type" : "typeChanged",
+			"value" : type
+		});
 	}
 
 	function updateEditContentButton() {
 		var item = this.content.getItem(this.itemId);
 		var type = this.typeSelect.get("value");
-		var showContentButton = (
-			item != null &&
-			type != this.Type.extern &&
-			this.hrefTextBox.isValid()
-		);
+		var showContentButton = (item != null && type != this.Type.extern && this.hrefTextBox.isValid());
 		this.editContent.set("disabled", !showContentButton);
-		if(showContentButton && item.content != null) {
+		if (showContentButton && item.content != null) {
 			this.reloadContentButton.set("disabled", false);
 			this.reloadContentButton.set("iconClass", "icon16 reloadIcon16");
 		} else {
@@ -157,45 +170,34 @@ wcms.navigation.TypeEditor = function() {
 	function onEditContent() {
 		// get content
 		var href = this.hrefTextBox.get("value");
-		if(href == null || href == "") {
+		if (href == null || href == "") {
 			console.log("Unexpected error: href is null or empty");
 			return;
 		}
-		this.content.getWebpageContent(
-			this.itemId,
-			dojo.hitch(this, function(content, item) {
-				this.editContentDialog.show(content);
-			}),
-			dojo.hitch(this, handleError)
-		);
+		this.content.getWebpageContent(this.itemId, dojo.hitch(this, function(content, item) {
+			this.editContentDialog.show(content);
+		}), dojo.hitch(this, handleError));
 	}
 
 	function onReloadContent() {
-		var reloadContentDialog = new wcms.gui.SimpleDialog(
-			"yesNo",
-			"component.mt-wcms.navigation.typeEditor.reloadContentCaption",
-			"component.mt-wcms.navigation.typeEditor.reloadContentLabel"
-		);
-		reloadContentDialog.eventHandler.attach(dojo.hitch(this, function(/*SimpleDialog*/ source, /*JSON*/ args) {
-			if(args.type == "yesButtonClicked") {
+		var reloadContentDialog = new wcms.gui.SimpleDialog("yesNo", "component.wcms.navigation.typeEditor.reloadContentCaption",
+				"component.wcms.navigation.typeEditor.reloadContentLabel");
+		reloadContentDialog.eventHandler.attach(dojo.hitch(this, function(/* SimpleDialog */source, /* JSON */args) {
+			if (args.type == "yesButtonClicked") {
 				var oldItem = this.content.getItem(this.itemId);
 				// reload content
-				this.content.reloadWebpageContent(
-					this.itemId,
-					dojo.hitch(this, function(content, item) {
-						// fire event
-						if(!deepEquals(oldItem.content, item.content)) {
-							this.eventHandler.notify({
-								"type" : "contentChanged",
-								"webpageContent": item.content
-							});
-						}
-						// change icon
-						this.reloadContentButton.set("iconClass", "icon16 tick16");
-						this.reloadContentButton.set("disabled", true);
-					}),
-					dojo.hitch(this, handleError)
-				);
+				this.content.reloadWebpageContent(this.itemId, dojo.hitch(this, function(content, item) {
+					// fire event
+					if (!deepEquals(oldItem.content, item.content)) {
+						this.eventHandler.notify({
+							"type" : "contentChanged",
+							"webpageContent" : item.content
+						});
+					}
+					// change icon
+					this.reloadContentButton.set("iconClass", "icon16 tick16");
+					this.reloadContentButton.set("disabled", true);
+				}), dojo.hitch(this, handleError));
 			}
 		}));
 		reloadContentDialog.show();
@@ -203,15 +205,22 @@ wcms.navigation.TypeEditor = function() {
 
 	/**
 	 * Handles all error.
-	 * @param error json object looks like:
-	 * {
-	 *   type: "error",
-	 *   errorType: "xxx"
-	 * }
+	 * 
+	 * @param error
+	 *            json object looks like: { type: "error", errorType: "xxx" }
 	 * @param item
 	 */
-	function handleError(/*JSON*/ error, /*JSON*/ item) {
-		wcms.util.ErrorUtils.show(error, item);
+	function handleError(error, xhr, item) {
+		if (xhr.xhr.status == 401) {
+			wcms.util.ErrorUtils.show("unauthorized");
+		} else {
+			var response = dojo.fromJson(xhr.xhr.response);
+			if (response.type != null && response.type != "") {
+				wcms.util.ErrorUtils.show(response.type);
+			} else {
+				wcms.util.ErrorUtils.show(error.errorType);
+			}
+		}
 	}
 
 	wcms.navigation.TypeEditor.prototype.create = create;

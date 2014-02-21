@@ -10,7 +10,7 @@ wcms.gui.LoadingDialog = function(/*Preloader*/ preloader) {
 	this.preloader = preloader;
 	this.type = this.Type.cancel;
 
-	this.i18nTitle = "component.mt-wcms.load";
+	this.i18nTitle = "component.wcms.load";
 
 	this.preloaderFrame = null;
 };

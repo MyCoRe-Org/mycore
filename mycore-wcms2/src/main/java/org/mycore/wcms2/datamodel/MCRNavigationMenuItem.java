@@ -1,4 +1,4 @@
-package org.mycore.datamodel.navigation;
+package org.mycore.wcms2.datamodel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "menu")
 @XmlAccessorType(XmlAccessType.NONE)
-public class MenuItem extends I18nItem implements NavigationItem, ItemContainer {
+public class MCRNavigationMenuItem extends MCRNavigationI18nItem implements MCRNavigationBaseItem, MCRNavigationItemContainer {
 
     @XmlAttribute(required = true)
     private String id;
@@ -20,14 +20,14 @@ public class MenuItem extends I18nItem implements NavigationItem, ItemContainer 
     private String dir;
     // children
     @XmlElementRefs ({
-        @XmlElementRef(type = Item.class),
-        @XmlElementRef(type = InsertItem.class)
+        @XmlElementRef(type = MCRNavigationItem.class),
+        @XmlElementRef(type = MCRNavigationInsertItem.class)
     })
 //    @XmlAnyElement(lax = true)
-    private List<NavigationItem> children;
+    private List<MCRNavigationBaseItem> children;
 
-    public MenuItem() {
-        this.children = new ArrayList<NavigationItem>();
+    public MCRNavigationMenuItem() {
+        this.children = new ArrayList<MCRNavigationBaseItem>();
     }
 
     public String getId() {
@@ -44,13 +44,13 @@ public class MenuItem extends I18nItem implements NavigationItem, ItemContainer 
         this.dir = dir;
     }
 
-    public void addItem(Item item) {
+    public void addItem(MCRNavigationItem item) {
         this.children.add(item);
     }
-    public void addInsertItem(InsertItem insertItem) {
+    public void addInsertItem(MCRNavigationInsertItem insertItem) {
         this.children.add(insertItem);
     }
-    public List<NavigationItem> getChildren() {
+    public List<MCRNavigationBaseItem> getChildren() {
         return this.children;
     }
 

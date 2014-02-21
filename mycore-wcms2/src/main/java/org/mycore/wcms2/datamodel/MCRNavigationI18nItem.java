@@ -1,4 +1,4 @@
-package org.mycore.datamodel.navigation;
+package org.mycore.wcms2.datamodel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,14 +12,14 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlValue;
 
 @XmlAccessorType(XmlAccessType.NONE)
-public abstract class I18nItem implements NavigationItem {
+public abstract class MCRNavigationI18nItem implements MCRNavigationBaseItem {
 
     @XmlAttribute(name = "i18nKey")
     private String i18nKey;
 
     private HashMap<String, String> labelMap;
 
-    public I18nItem() {
+    public MCRNavigationI18nItem() {
         this.labelMap = new HashMap<String, String>();
     }
 

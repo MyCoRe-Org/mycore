@@ -1,4 +1,4 @@
-package org.mycore.multitenancy.wcms.navigation;
+package org.mycore.wcms2.navigation;
 
 import org.jdom2.Element;
 
@@ -8,7 +8,7 @@ import com.google.gson.JsonArray;
  * 
  * @author Matthias Eichner
  */
-public interface SectionProvider extends JSONProvider<Element, JsonArray> {
+public interface MCRWCMSSectionProvider extends MCRWCMSJSONProvider<Element, JsonArray> {
 
     public final static String JSON_TITLE = "title";
     public final static String JSON_LANG = "lang";

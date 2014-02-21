@@ -2,7 +2,7 @@
  * Localisation Manager
  */
 var I18nManager = (function() {
-	var default_lang_package = "component.mt-wcms";
+	var default_lang_package = "component.wcms";
 	
 	var instance = null;
 	var supportedLanguages = undefined;

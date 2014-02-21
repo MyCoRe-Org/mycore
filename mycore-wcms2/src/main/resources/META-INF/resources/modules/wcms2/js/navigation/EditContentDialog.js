@@ -9,7 +9,7 @@ wcms.navigation.EditContentDialog = function() {
 	this.constructor();
 
 	this.type = "okCancel"
-	this.i18nTitle = "component.mt-wcms.navigation.itemEditor.editContent.title";
+	this.i18nTitle = "component.wcms.navigation.itemEditor.editContent.title";
 
 	this.selectedSection = null;
 
@@ -67,12 +67,12 @@ wcms.navigation.EditContentDialog = function() {
 		this.editSection= new dijit.form.Button({iconClass: "icon16 editIcon16",showLabel: false});
 		//  internal dialogs
 		this.removeSectionDialog = new wcms.gui.SimpleDialog("yesNo",
-				"component.mt-wcms.navigation.itemEditor.editContent.deleteSectionTitle",
-				"component.mt-wcms.navigation.itemEditor.editContent.deleteSection");
+				"component.wcms.navigation.itemEditor.editContent.deleteSectionTitle",
+				"component.wcms.navigation.itemEditor.editContent.deleteSection");
 		this.editSectionDialog = new wcms.navigation.EditContentSectionDialog();
 
 		// change ok button text
-		this.okButton.i18n = "component.mt-wcms.navigation.itemEditor.editContent.markChanges";
+		this.okButton.i18n = "component.wcms.navigation.itemEditor.editContent.markChanges";
 
 		// build layout
         var bc = new dijit.layout.BorderContainer({style:"height:600px; width:1000px"});
@@ -83,7 +83,7 @@ wcms.navigation.EditContentDialog = function() {
         	splitter: true,
         	gutters: false
         });
-        var canNotEditLabel = "<p>" + I18nManager.getInstance().getI18nTextAsString("component.mt-wcms.navigation.itemEditor.canNotEdit") + "</p>";
+        var canNotEditLabel = "<p>" + I18nManager.getInstance().getI18nTextAsString("component.wcms.navigation.itemEditor.canNotEdit") + "</p>";
         this.canNotEdit = new dijit.layout.ContentPane({region:"center",style: "border:none;padding:0px; display:none", content: canNotEditLabel});
         
         leftBC.addChild(this.sectionSelect);
@@ -420,11 +420,11 @@ wcms.navigation.EditContentSectionDialog = function() {
 
 ( function() {
 
-	var editSectionText = "component.mt-wcms.navigation.itemEditor.editContent.editSection.dialogTitleEdit";
-	var newSectionText = "component.mt-wcms.navigation.itemEditor.editContent.editSection.dialogTitleNew";
+	var editSectionText = "component.wcms.navigation.itemEditor.editContent.editSection.dialogTitleEdit";
+	var newSectionText = "component.wcms.navigation.itemEditor.editContent.editSection.dialogTitleNew";
 
-	var titleText = "component.mt-wcms.navigation.itemEditor.editContent.editSection.title";
-	var langText = "component.mt-wcms.navigation.itemEditor.editContent.editSection.lang";
+	var titleText = "component.wcms.navigation.itemEditor.editContent.editSection.title";
+	var langText = "component.wcms.navigation.itemEditor.editContent.editSection.lang";
 
 	function createContent() {
 		// create dijit components

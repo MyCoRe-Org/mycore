@@ -1,4 +1,4 @@
-package org.mycore.multitenancy.wcms.navigation.datamodel;
+package org.mycore.wcms2.datamodel;
 
 public class SampleItemTest {
 

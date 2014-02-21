@@ -1,4 +1,4 @@
-package org.mycore.datamodel.navigation;
+package org.mycore.wcms2.datamodel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +11,9 @@ import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-@XmlRootElement
+@XmlRootElement(name="item")
 @XmlAccessorType(XmlAccessType.NONE)
-public class Item extends I18nItem implements NavigationItem, ItemContainer {
+public class MCRNavigationItem extends MCRNavigationI18nItem implements MCRNavigationBaseItem, MCRNavigationItemContainer {
 
     @XmlType(name = "ItemType")
     public enum Type {
@@ -45,14 +45,14 @@ public class Item extends I18nItem implements NavigationItem, ItemContainer {
     protected String template;
     // children
     @XmlElementRefs ({
-        @XmlElementRef(type = Item.class),
-        @XmlElementRef(type = InsertItem.class)
+        @XmlElementRef(type = MCRNavigationItem.class),
+        @XmlElementRef(type = MCRNavigationInsertItem.class)
     })
-    private List<NavigationItem> children;
+    private List<MCRNavigationBaseItem> children;
 
-    public Item() {
+    public MCRNavigationItem() {
         super();
-        this.children = new ArrayList<NavigationItem>();
+        this.children = new ArrayList<MCRNavigationBaseItem>();
     }
 
     public String getHref() {
@@ -99,14 +99,14 @@ public class Item extends I18nItem implements NavigationItem, ItemContainer {
         this.template = template;
     }
 
-    public void addItem(Item item) {
+    public void addItem(MCRNavigationItem item) {
         this.children.add(item);
     }
-    public void addInsertItem(InsertItem insertItem) {
+    public void addInsertItem(MCRNavigationInsertItem insertItem) {
         this.children.add(insertItem);
     }
     @Override
-    public List<NavigationItem> getChildren() {
+    public List<MCRNavigationBaseItem> getChildren() {
         return this.children;
     }
 }

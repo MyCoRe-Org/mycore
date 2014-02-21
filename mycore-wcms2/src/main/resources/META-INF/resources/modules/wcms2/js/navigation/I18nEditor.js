@@ -30,8 +30,8 @@ wcms.navigation.I18nEditor = function() {
 
 ( function() {
 
-	var i18nText = "component.mt-wcms.navigation.i18nEditor.i18n";
-	var labelText = "component.mt-wcms.navigation.i18nEditor.label";
+	var i18nText = "component.wcms.navigation.i18nEditor.i18n";
+	var labelText = "component.wcms.navigation.i18nEditor.label";
 
 	function create() {
 		this.i18nTextBox = new dijit.form.TextBox({

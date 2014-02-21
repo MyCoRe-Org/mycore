@@ -24,19 +24,19 @@ wcms.navigation.ItemEditor = function() {
 
 	// i18n text
 	// ie-bug: use var instead of const
-	var mainHeaderText = "component.mt-wcms.navigation.itemEditor.mainHeader";
-	var nameText = "component.mt-wcms.navigation.itemEditor.name";
-	var typeText = "component.mt-wcms.navigation.itemEditor.type";
-	var navHeaderText = "component.mt-wcms.navigation.itemEditor.navHeader";
-	var targetText = "component.mt-wcms.navigation.itemEditor.target";
-	var targetSelfText = "component.mt-wcms.navigation.itemEditor.target.self";
-	var targetBlankText = "component.mt-wcms.navigation.itemEditor.target.blank";
-	var replaceMenuText = "component.mt-wcms.navigation.itemEditor.replaceMenu";
-	var constrainPopUpText = "component.mt-wcms.navigation.itemEditor.constrainPopUp";
-	var layoutHeaderText = "component.mt-wcms.navigation.itemEditor.layoutHeader";
-	var templateText = "component.mt-wcms.navigation.itemEditor.template";
-	var templateNoneText = "component.mt-wcms.navigation.itemEditor.template.none";
-	var styleText = "component.mt-wcms.navigation.itemEditor.style";
+	var mainHeaderText = "component.wcms.navigation.itemEditor.mainHeader";
+	var nameText = "component.wcms.navigation.itemEditor.name";
+	var typeText = "component.wcms.navigation.itemEditor.type";
+	var navHeaderText = "component.wcms.navigation.itemEditor.navHeader";
+	var targetText = "component.wcms.navigation.itemEditor.target";
+	var targetSelfText = "component.wcms.navigation.itemEditor.target.self";
+	var targetBlankText = "component.wcms.navigation.itemEditor.target.blank";
+	var replaceMenuText = "component.wcms.navigation.itemEditor.replaceMenu";
+	var constrainPopUpText = "component.wcms.navigation.itemEditor.constrainPopUp";
+	var layoutHeaderText = "component.wcms.navigation.itemEditor.layoutHeader";
+	var templateText = "component.wcms.navigation.itemEditor.template";
+	var templateNoneText = "component.wcms.navigation.itemEditor.template.none";
+	var styleText = "component.wcms.navigation.itemEditor.style";
 
 	function create(/*wcms.navigation.NavigationContent*/ content) {
 		// create dijit components

@@ -1,4 +1,4 @@
-package org.mycore.multitenancy.wcms.navigation.datamodel;
+package org.mycore.wcms2.datamodel;
 
 import static org.junit.Assert.assertEquals;
 
@@ -11,10 +11,10 @@ import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMResult;
 import org.junit.Before;
 import org.junit.Test;
-import org.mycore.datamodel.navigation.Item;
-import org.mycore.datamodel.navigation.Item.Style;
-import org.mycore.datamodel.navigation.Item.Target;
-import org.mycore.datamodel.navigation.Item.Type;
+import org.mycore.wcms2.datamodel.MCRNavigationItem;
+import org.mycore.wcms2.datamodel.MCRNavigationItem.Style;
+import org.mycore.wcms2.datamodel.MCRNavigationItem.Target;
+import org.mycore.wcms2.datamodel.MCRNavigationItem.Type;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -22,11 +22,11 @@ import com.google.gson.JsonObject;
 
 public class ItemTest {
 
-    private Item item;
+    private MCRNavigationItem item;
 
     @Before
     public void setup() {
-        this.item = new Item();
+        this.item = new MCRNavigationItem();
         this.item.setHref("/content/main/search.xml");
         this.item.setStyle(Style.bold);
         this.item.setTarget(Target._self);
@@ -42,7 +42,7 @@ public class ItemTest {
 
     @Test
     public void toXML() throws Exception {
-        JAXBContext jc = JAXBContext.newInstance(Item.class);
+        JAXBContext jc = JAXBContext.newInstance(MCRNavigationItem.class);
         Marshaller m = jc.createMarshaller();
         JDOMResult JDOMResult = new JDOMResult();
         m.marshal(this.item, JDOMResult);

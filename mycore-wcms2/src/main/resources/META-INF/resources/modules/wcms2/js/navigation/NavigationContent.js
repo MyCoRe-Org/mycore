@@ -17,8 +17,8 @@ wcms.navigation.NavigationContent = function() {
 ( function() {
 	function preload() {
 		console.log("load nav");
-		this.loadFromUrl(wcmsServletURL + "?type=getNavigation");
-	}	
+		this.loadFromUrl(wcms.settings.wcmsURL + "/navigation");
+	}
 	function getPreloadName() {
 		return "NavigationContent";
 	}
@@ -41,9 +41,16 @@ wcms.navigation.NavigationContent = function() {
 				}
 				this.eventHandler.notify({"type" : "loaded", "navigation" : navigation});
 			}),
-			error : function(error) {
-				console.log("error while retrieving navigation! " + error);
-			}
+			error : dojo.hitch(this, function(error, xhr) {
+				var statusCode = xhr.xhr.status;
+				var errorDialog = null;
+				if (statusCode == 401) {
+					wcms.util.ErrorUtils.show("unauthorized");
+				} else {
+					wcms.util.ErrorUtils.show();
+				}
+				this.eventHandler.notify({"type" : "loadError", "error" : error, "xhr" : xhr});
+			})
 		};
 		dojo.xhrGet(xhrArgs);	
 	}
@@ -199,39 +206,25 @@ wcms.navigation.NavigationContent = function() {
 
 	function getWebpageContentFromServer(/*JSON*/ item, /*function*/ onSuccess, /*function*/ onError, /*boolean*/ initialize) {
 		var xhrArgs = {
-			url : wcmsServletURL + "?type=getContent&webpageId=" + item.href,
+			url : wcms.settings.wcmsURL + "/navigation/content?webpagePath=" + item.href,
 			handleAs : "json",
 			load : dojo.hitch(this, function(returnData) {
-				if(returnData.type == "error" && returnData.errorType == "notExist") {
-					// create new content
-					var content = [
-					    {title: "no title", lang: "all", data: "insert text here"}
-					];
-					// dirty fix to set returnData
-					returnData.type = "content";
-					returnData.content = content;					
+				var content = returnData.content;
+				item.content = clone(content);
+				// set content for curItem and oldItem-> doesn't make them dirty!
+				if(initialize) {
+					var curItem = getItemFromList(item.wcmsId, this.itemList);
+					var oldItem = getItemFromList(item.wcmsId, this.oldItemList);
+					curItem.content = clone(content);
+					oldItem.content = clone(content);
 				}
-				if(returnData.type == "content") {
-					var content = returnData.content;
-					item.content = clone(content);
-					// set content for curItem and oldItem-> doesn't make them dirty!
-					if(initialize) {
-						var curItem = getItemFromList(item.wcmsId, this.itemList);
-						var oldItem = getItemFromList(item.wcmsId, this.oldItemList);
-						curItem.content = clone(content);
-						oldItem.content = clone(content);
-					}
-					// fire event
-					this.eventHandler.notify({type : "contentLoaded", item : item});
-					// callback
-					onSuccess(content, item);			
-				} else {
-					onError(returnData, item);
-				}
+				// fire event
+				this.eventHandler.notify({type : "contentLoaded", item : item});
+				// callback
+				onSuccess(content, item);
 			}),
-			error : function(error) {
-				console.log("Error while retrieving content for webpageId '" + item.href + "'." + error);
-				onError(error, item);
+			error : function(error, xhr) {
+				onError(error, xhr, item);
 			}
 		};
 		dojo.xhrGet(xhrArgs);
@@ -246,23 +239,16 @@ wcms.navigation.NavigationContent = function() {
 			hierarchy: treeHierarchy
 		};
 		var navXhrArgs = {
-			url :  wcmsServletURL + "?type=save",
+			url :  wcms.settings.wcmsURL + "/navigation/save",
 			postData : dojo.toJson(saveObject),
 			handleAs : "json",
 			headers: { "Content-Type": "application/json; charset=utf-8"},
-			error : dojo.hitch(this, function(error) {
-				console.log("error while saving navigation.xml! " + error);
-				this.eventHandler.notify({type : "errorWhileSaving", error : error});
+			error : dojo.hitch(this, function(error, xhr) {
+				wcms.util.ErrorUtils.show("couldNotSave");
 			}),
 			load : dojo.hitch(this, function(data) {
-				if(data.type == "saveDone") {
-					// reset
-					this.reset();
-					// fire event
-					this.eventHandler.notify({type : "saved", data : data});					
-				} else if(data.type == "errorhierarchy") {
-					wcms.util.ErrorUtils.show(data);
-				}
+				this.reset();
+				this.eventHandler.notify({type : "saved", data : data});					
 			})
 		};
 		dojo.xhrPost(navXhrArgs);

@@ -8,7 +8,6 @@
   <xsl:param name="CurrentLang" />
   <xsl:param name="WebApplicationBaseURL" />
   <xsl:param name="returnUrl" select="$WebApplicationBaseURL" />
-  <xsl:param name="useMT" select="'true'" />
 
   <xsl:variable name="dojoV" select="'1.6'" />
 
@@ -24,33 +23,27 @@
         <title>MyCoRe WCMS2</title>
 
         <script>
-          var wcms = wcms || {};
-          var useMultitenancy = <xsl:value-of select='$useMT' />;
+          var wcms = wcms || {
+            settings: {
+              baseURL: "<xsl:value-of select='$WebApplicationBaseURL' />",
+              wcmsURL: "<xsl:value-of select='$WebApplicationBaseURL' />" + "rsc/wcms"
+            }
+          };
           var webApplicationBaseURL = "<xsl:value-of select='$WebApplicationBaseURL' />";
           var imagePath = "<xsl:value-of select='$imgPath' />";
           var resourcesPath = "<xsl:value-of select='$resourcesPath' />";
           var returnUrl = "<xsl:value-of select='$returnUrl' />";
           wcms.startLang= "<xsl:value-of select='$CurrentLang' />";
-          var wcmsServletURL = undefined;
           var langArr = new Array("de", "en");
 
-          console.log("use multitenancy: " +
-          useMultitenancy);
-          if(useMultitenancy) {
-          wcmsServletURL = webApplicationBaseURL +
-          "servlets/MCRTenantWCMSServlet";
-          } else {
-          wcmsServletURL = webApplicationBaseURL + "servlets/MCRWCMSServlet";
-          }
-
           djConfig = {
-          isDebug: true,
-          parseOnLoad: true,
-          baseUrl: webApplicationBaseURL,
-          modulePaths: {
-          "dojoclasses": "modules/wcms2/js/dojoclasses"
-          },
-          xdWaitSeconds: 10
+            isDebug: true,
+            parseOnLoad: true,
+            baseUrl: webApplicationBaseURL,
+            modulePaths: {
+            "dojoclasses": "modules/wcms2/js/dojoclasses"
+            },
+            xdWaitSeconds: 10
           };
         </script>
 

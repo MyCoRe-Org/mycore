@@ -63,10 +63,10 @@ wcms.gui.AbstractDialog = function() {
 	function create() {
 		// create dijit components
 		this.internalDialog = new dijit.Dialog();
-		this.okButton = new dijit.form.Button({i18n: "component.mt-wcms.general.ok"});
-		this.cancelButton = new dijit.form.Button({i18n: "component.mt-wcms.general.cancel"});
-		this.yesButton = new dijit.form.Button({i18n: "component.mt-wcms.general.yes"});
-		this.noButton = new dijit.form.Button({i18n: "component.mt-wcms.general.no"});
+		this.okButton = new dijit.form.Button({i18n: "component.wcms.general.ok"});
+		this.cancelButton = new dijit.form.Button({i18n: "component.wcms.general.cancel"});
+		this.yesButton = new dijit.form.Button({i18n: "component.wcms.general.yes"});
+		this.noButton = new dijit.form.Button({i18n: "component.wcms.general.no"});
 
 		// create dialog
 		var table = dojo.create("table");

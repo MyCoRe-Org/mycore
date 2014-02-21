@@ -3,15 +3,15 @@ wcms.access = wcms.access || {};
 
 wcms.access.RuleDialog = function(rules) {
 	this.internalDialog = new dijit.Dialog({
-		title: I18nManager.getInstance().getI18nTextAsString("component.mt-wcms.access.ruleDialog.header")
+		title: I18nManager.getInstance().getI18nTextAsString("component.wcms.access.ruleDialog.header")
 	});
 	this.ruleSet = rules;
 	this.selectedRule = undefined;
 	this.ruleSelect = undefined;
 	this.parameter = undefined;
 
-	this.okButton = new dijit.form.Button({label: I18nManager.getInstance().getI18nTextAsString("component.mt-wcms.general.ok")});
-	this.cancelButton = new dijit.form.Button({label: I18nManager.getInstance().getI18nTextAsString("component.mt-wcms.general.cancel")});
+	this.okButton = new dijit.form.Button({label: I18nManager.getInstance().getI18nTextAsString("component.wcms.general.ok")});
+	this.cancelButton = new dijit.form.Button({label: I18nManager.getInstance().getI18nTextAsString("component.wcms.general.cancel")});
 
 	this.created = false;
 	this.eventHandler = new wcms.common.EventHandler(this);
@@ -27,7 +27,7 @@ wcms.access.RuleDialog = function(rules) {
 		if (parameter.access == "write"){
 			this.selectedRule = parameter.node.config.writeId;
 		}
-		
+
 		if(!this.created) {			
 			// create dialog
 			var table = dojo.create("table");
@@ -46,7 +46,7 @@ wcms.access.RuleDialog = function(rules) {
 			});
 			var innerTr = dojo.create("tr");
 			var innerTd = dojo.create("td", {
-				innerHTML: I18nManager.getInstance().getI18nTextAsString("component.mt-wcms.access.ruleDialog.rule")
+				innerHTML: I18nManager.getInstance().getI18nTextAsString("component.wcms.access.ruleDialog.rule")
 			});
 			innerTr.appendChild(innerTd);
 			innerTd = dojo.create("td", {
@@ -91,5 +91,10 @@ wcms.access.RuleDialog = function(rules) {
 		this.internalDialog.show();
 	}
 
+	function updateLang() {
+		// TODO
+	}
+
 	wcms.access.RuleDialog.prototype.show = show;
+	wcms.access.RuleDialog.prototype.updateLang = updateLang;
 })();

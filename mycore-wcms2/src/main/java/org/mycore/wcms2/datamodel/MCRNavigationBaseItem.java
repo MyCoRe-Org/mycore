@@ -1,10 +1,10 @@
-package org.mycore.datamodel.navigation;
+package org.mycore.wcms2.datamodel;
 
 /**
  * The super class of all navigation related items.
  *
  * @author Matthias Eichner
  */
-public interface NavigationItem {
+public interface MCRNavigationBaseItem {
 
 }

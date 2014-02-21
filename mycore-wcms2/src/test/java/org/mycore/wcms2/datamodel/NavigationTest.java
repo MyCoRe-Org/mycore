@@ -1,4 +1,4 @@
-package org.mycore.multitenancy.wcms.navigation.datamodel;
+package org.mycore.wcms2.datamodel;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -15,10 +15,10 @@ import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMResult;
 import org.junit.Before;
 import org.junit.Test;
-import org.mycore.datamodel.navigation.InsertItem;
-import org.mycore.datamodel.navigation.Item;
-import org.mycore.datamodel.navigation.MenuItem;
-import org.mycore.datamodel.navigation.Navigation;
+import org.mycore.wcms2.datamodel.MCRNavigationInsertItem;
+import org.mycore.wcms2.datamodel.MCRNavigationItem;
+import org.mycore.wcms2.datamodel.MCRNavigationMenuItem;
+import org.mycore.wcms2.datamodel.MCRNavigation;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -26,26 +26,22 @@ import com.google.gson.JsonObject;
 
 public class NavigationTest {
 
-    private Navigation navigation;
+    private MCRNavigation navigation;
 
     @Before
     public void setup() {
-        this.navigation = new Navigation();
+        this.navigation = new MCRNavigation();
         this.navigation.setTemplate("template_mysample");
         this.navigation.setDir("/content");
         this.navigation.setHistoryTitle("History Title");
         this.navigation.setHrefStartingPage("/content/below/index.xml");
         this.navigation.setMainTitle("Main Title");
-        this.navigation.setParentPage("/docportal/index.xml");
-        this.navigation.setParentTenant("docportal");
-        this.navigation.getInclude().add("uri:a");
-        this.navigation.getInclude().add("uri:b");
 
-        MenuItem menu1 = new MenuItem();
+        MCRNavigationMenuItem menu1 = new MCRNavigationMenuItem();
         menu1.setId("main");
-        MenuItem menu2 = new MenuItem();
+        MCRNavigationMenuItem menu2 = new MCRNavigationMenuItem();
         menu1.setId("below");
-        InsertItem insert1 = new InsertItem();
+        MCRNavigationInsertItem insert1 = new MCRNavigationInsertItem();
         insert1.setURI("myuri:workflow");
 
         this.navigation.addMenu(menu1);
@@ -55,7 +51,7 @@ public class NavigationTest {
 
     @Test
     public void toXML() throws Exception {
-        JAXBContext jc = JAXBContext.newInstance(Navigation.class);
+        JAXBContext jc = JAXBContext.newInstance(MCRNavigation.class);
         Marshaller m = jc.createMarshaller();
         JDOMResult JDOMResult = new JDOMResult();
         m.marshal(this.navigation, JDOMResult);
@@ -70,10 +66,6 @@ public class NavigationTest {
         assertEquals("History Title", navigationElement.getAttributeValue("historyTitle"));
         assertEquals("/content/below/index.xml", navigationElement.getAttributeValue("hrefStartingPage"));
         assertEquals("Main Title", navigationElement.getAttributeValue("mainTitle"));
-        assertEquals("/docportal/index.xml", navigationElement.getAttributeValue("parentPage"));
-        assertEquals("docportal", navigationElement.getAttributeValue("parentTenant"));
-        // test includes
-        assertEquals(2, navigationElement.getChildren("include").size());
         // test children
         assertEquals(2, navigationElement.getChildren("menu").size());
         assertEquals(1, navigationElement.getChildren("insert").size());
@@ -81,11 +73,11 @@ public class NavigationTest {
 
     @Test
     public void fromXML() throws Exception {
-        JAXBContext jc = JAXBContext.newInstance(Navigation.class);
+        JAXBContext jc = JAXBContext.newInstance(MCRNavigation.class);
         Unmarshaller m = jc.createUnmarshaller();
         Object o = m.unmarshal(new File("src/test/resources/navigation/navigation.xml"));
-        assertTrue(o instanceof Navigation);
-        Navigation navigation = (Navigation)o;
+        assertTrue(o instanceof MCRNavigation);
+        MCRNavigation navigation = (MCRNavigation)o;
         
         // test navigation
         assertEquals("template1", navigation.getTemplate());
@@ -93,21 +85,18 @@ public class NavigationTest {
         assertEquals("/content", navigation.getDir());
         assertEquals("main title", navigation.getMainTitle());
         assertEquals("history title", navigation.getHistoryTitle());
-        assertEquals("DocPortal", navigation.getParentTenant());
-        assertEquals("/content/test.xml", navigation.getParentPage());
-        assertEquals("test:sample", navigation.getInclude().get(0));
         // test menu
-        MenuItem menu = (MenuItem)navigation.getChildren().get(0);
+        MCRNavigationMenuItem menu = (MCRNavigationMenuItem)navigation.getChildren().get(0);
         assertEquals("main", menu.getId());
         assertEquals("/content/main", menu.getDir());
         assertEquals("Hauptmenü links", menu.getLabel("de"));
         assertEquals("Main menu left", menu.getLabel("en"));
         // test item
-        Item searchItem = (Item)menu.getChildren().get(0);
+        MCRNavigationItem searchItem = (MCRNavigationItem)menu.getChildren().get(0);
         assertEquals("{tenantPath}/content/main/search.xml", searchItem.getHref());
-        assertEquals(Item.Type.intern, searchItem.getType());
-        assertEquals(Item.Target._self, searchItem.getTarget());
-        assertEquals(Item.Style.normal, searchItem.getStyle());
+        assertEquals(MCRNavigationItem.Type.intern, searchItem.getType());
+        assertEquals(MCRNavigationItem.Target._self, searchItem.getTarget());
+        assertEquals(MCRNavigationItem.Style.normal, searchItem.getStyle());
         assertEquals(false, searchItem.isReplaceMenu());
         assertEquals(true, searchItem.isConstrainPopUp());
         assertEquals("Suche", searchItem.getLabel("de"));
@@ -126,8 +115,5 @@ public class NavigationTest {
         assertEquals("History Title", navigationObject.get("historyTitle").getAsString());
         assertEquals("/content/below/index.xml", navigationObject.get("hrefStartingPage").getAsString());
         assertEquals("Main Title", navigationObject.get("mainTitle").getAsString());
-        assertEquals("/docportal/index.xml", navigationObject.get("parentPage").getAsString());
-        assertEquals("docportal", navigationObject.get("parentTenant").getAsString());
-        assertEquals(2, navigationObject.get("include").getAsJsonArray().size());
     }
 }

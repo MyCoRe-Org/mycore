@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<navigation hrefStartingPage="{tenantPath}/content/below/index.xml" dir="/content" mainTitle="main title" historyTitle="history title"
-  template="template1" parentTenant="DocPortal" parentPage="/content/test.xml">
-
-  <include>test:sample</include>
+<navigation hrefStartingPage="{tenantPath}/content/below/index.xml" dir="/content" mainTitle="main title" historyTitle="history title" template="template1">
 
   <!-- main menu  -->
   <menu id="main" dir="/content/main">

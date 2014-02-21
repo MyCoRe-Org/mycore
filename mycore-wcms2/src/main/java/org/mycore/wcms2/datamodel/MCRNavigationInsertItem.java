@@ -1,4 +1,4 @@
-package org.mycore.datamodel.navigation;
+package org.mycore.wcms2.datamodel;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "insert")
 @XmlAccessorType(XmlAccessType.NONE)
-public class InsertItem implements NavigationItem {
+public class MCRNavigationInsertItem implements MCRNavigationBaseItem {
 
     @XmlAttribute
     private String uri;

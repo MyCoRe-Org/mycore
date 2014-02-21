@@ -1,4 +1,4 @@
-package org.mycore.datamodel.navigation;
+package org.mycore.wcms2.datamodel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +6,6 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -16,61 +15,51 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Matthias Eichner
  */
-@XmlRootElement
+@XmlRootElement(name="navigation")
 @XmlAccessorType(XmlAccessType.NONE)
-public class Navigation implements NavigationItem, ItemContainer {
+public class MCRNavigation implements MCRNavigationBaseItem, MCRNavigationItemContainer {
 
     // general
     @XmlAttribute
     private String hrefStartingPage;
+
     @XmlAttribute
     private String dir;
+
     @XmlAttribute
     private String mainTitle;
+
     @XmlAttribute
     protected String template;
+
     // multitenancy
     @XmlAttribute
     private String historyTitle;
-    @XmlAttribute
-    private String parentTenant;
-    @XmlAttribute
-    private String parentPage;
-    @XmlElement
-    private List<String> include;
-    // children
-    @XmlElementRefs ({
-        @XmlElementRef(type = MenuItem.class),
-        @XmlElementRef(type = InsertItem.class)
-    })
-    private List<NavigationItem> children;
 
-    public Navigation() {
-        this.include = new ArrayList<String>();
-        this.children = new ArrayList<NavigationItem>();
+    // children
+    @XmlElementRefs({ @XmlElementRef(type = MCRNavigationMenuItem.class), @XmlElementRef(type = MCRNavigationInsertItem.class) })
+    private List<MCRNavigationBaseItem> children;
+
+    public MCRNavigation() {
+        this.children = new ArrayList<MCRNavigationBaseItem>();
     }
 
     public String getHrefStartingPage() {
         return hrefStartingPage;
     }
+
     public String getDir() {
         return dir;
     }
+
     public String getMainTitle() {
         return mainTitle;
     }
+
     public String getHistoryTitle() {
         return historyTitle;
     }
-    public String getParentTenant() {
-        return parentTenant;
-    }
-    public String getParentPage() {
-        return parentPage;
-    }
-    public List<String> getInclude() {
-        return include;
-    }
+
     public String getTemplate() {
         return template;
     }
@@ -78,32 +67,32 @@ public class Navigation implements NavigationItem, ItemContainer {
     public void setHrefStartingPage(String hrefStartingPage) {
         this.hrefStartingPage = hrefStartingPage;
     }
+
     public void setDir(String dir) {
         this.dir = dir;
     }
+
     public void setMainTitle(String mainTitle) {
         this.mainTitle = mainTitle;
     }
+
     public void setHistoryTitle(String historyTitle) {
         this.historyTitle = historyTitle;
     }
-    public void setParentTenant(String parentTenant) {
-        this.parentTenant = parentTenant;
-    }
-    public void setParentPage(String parentPage) {
-        this.parentPage = parentPage;
-    }
+
     public void setTemplate(String template) {
         this.template = template;
     }
 
-    public void addMenu(MenuItem menu) {
+    public void addMenu(MCRNavigationMenuItem menu) {
         this.children.add(menu);
     }
-    public void addInsertItem(InsertItem insertItem) {
+
+    public void addInsertItem(MCRNavigationInsertItem insertItem) {
         this.children.add(insertItem);
     }
-    public List<NavigationItem> getChildren() {
+
+    public List<MCRNavigationBaseItem> getChildren() {
         return this.children;
     }
 

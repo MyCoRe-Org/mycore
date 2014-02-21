@@ -1,8 +1,13 @@
-package org.mycore.multitenancy.wcms.navigation;
+package org.mycore.wcms2.navigation;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
@@ -22,13 +27,13 @@ import com.google.gson.JsonObject;
  *
  * @author Matthias Eichner
  */
-public class WCMSContentManager {
+public class MCRWCMSContentManager {
 
-    private static final Logger LOGGER = Logger.getLogger(WCMSContentManager.class);
+    private static final Logger LOGGER = Logger.getLogger(MCRWCMSContentManager.class);
 
     private static File webDir = null;
 
-    private SectionProvider sectionProvider;
+    private MCRWCMSSectionProvider sectionProvider;
 
     public enum ErrorType {
         notExist, invalidFile, notMyCoReWebPage, invalidDirectory, couldNotSave
@@ -43,14 +48,14 @@ public class WCMSContentManager {
         }
     }
 
-    public WCMSContentManager() {
+    public MCRWCMSContentManager() {
         MCRConfiguration conf = MCRConfiguration.instance();
-        Object sectionProvider = conf.getInstanceOf("MCR.WCMS2.sectionProvider", DefaultSectionProvider.class.getName());
-        if(!(sectionProvider instanceof SectionProvider)) {
+        Object sectionProvider = conf.getInstanceOf("MCR.WCMS2.sectionProvider", MCRWCMSDefaultSectionProvider.class.getName());
+        if (!(sectionProvider instanceof MCRWCMSSectionProvider)) {
             LOGGER.error("MCR.WCMS2.sectionProvider is not an instance of SectionProvider");
             return;
         }
-        this.sectionProvider = (SectionProvider)sectionProvider;
+        this.sectionProvider = (MCRWCMSSectionProvider) sectionProvider;
     }
 
     /**
@@ -58,7 +63,7 @@ public class WCMSContentManager {
      * <p>
      * {
      *  type: "content",
-     *  content: @see {@link DefaultSectionProvider}
+     *  content: @see {@link MCRWCMSDefaultSectionProvider}
      * }
      * </p>
      * <p>
@@ -81,19 +86,20 @@ public class WCMSContentManager {
         File xmlFile = new File(webDir, webpageId);
         boolean isXML = xmlFile.getName().endsWith(".xml");
         // file is not in web application directory
-        if (!xmlFile.getCanonicalPath().startsWith(webDir.getCanonicalPath()))
-            return getError(ErrorType.invalidDirectory, webpageId);
-        if (!xmlFile.exists() && isXML)
-            return getError(ErrorType.notExist, webpageId);
-        if (!xmlFile.isFile() || !isXML)
-            return getError(ErrorType.invalidFile, webpageId);
+        if (!xmlFile.getCanonicalPath().startsWith(webDir.getCanonicalPath())) {
+            throwError(ErrorType.invalidDirectory, webpageId);
+        } else if (!xmlFile.exists() && isXML) {
+            throwError(ErrorType.notExist, webpageId);
+        } else if (!xmlFile.isFile() || !isXML) {
+            throwError(ErrorType.invalidFile, webpageId);
+        }
 
         SAXBuilder builder = new SAXBuilder();
         Document doc = builder.build(xmlFile);
         Element rootElement = doc.getRootElement();
-        if (!rootElement.getName().equals("MyCoReWebPage"))
-            return getError(ErrorType.notMyCoReWebPage, webpageId);
-
+        if (!rootElement.getName().equals("MyCoReWebPage")) {
+            throwError(ErrorType.notMyCoReWebPage, webpageId);
+        }
         // return content
         return getContent(rootElement);
     }
@@ -129,25 +135,23 @@ public class WCMSContentManager {
      * 
      * @param items
      */
-    public JsonObject save(JsonArray items) {
+    public void save(JsonArray items) {
         XMLOutputter out = new XMLOutputter(Format.getPrettyFormat().setEncoding("UTF-8"));
-        JsonArray errorArr = new JsonArray();
-
-        for(JsonElement e : items) {
-            if(!e.isJsonObject()) {
+        for (JsonElement e : items) {
+            if (!e.isJsonObject()) {
                 LOGGER.warn("Invalid json element in items " + e);
                 continue;
             }
             JsonObject item = e.getAsJsonObject();
-            if(!item.has("dirty") || !item.get("dirty").getAsBoolean()) {
+            if (!item.has("dirty") || !item.get("dirty").getAsBoolean()) {
                 continue;
             }
-            if(!item.has("href") || !item.get("href").isJsonPrimitive()) {
+            if (!item.has("href") || !item.get("href").isJsonPrimitive()) {
                 continue;
             }
             //TODO wenn man nur den href ändert und nicht den content muss die datei
             // trotzdem umgeschrieben werden -> check auf file exists
-            if(!item.has("content") || !item.get("content").isJsonArray()) {
+            if (!item.has("content") || !item.get("content").isJsonArray()) {
                 continue;
             }
             String webpageId = item.get("href").getAsString();
@@ -160,49 +164,36 @@ public class WCMSContentManager {
                 if (!xmlFile.getCanonicalPath().startsWith(webDir.getCanonicalPath())) {
                     throw new IOException();
                 }
-            } catch(IOException ioExc) {
-                errorArr.add(getError(ErrorType.invalidDirectory, webpageId));
-                continue;
+            } catch (IOException ioExc) {
+                throwError(ErrorType.invalidDirectory, webpageId);
             }
             if (!xmlFile.getName().endsWith(".xml")) {
-                errorArr.add(getError(ErrorType.invalidFile, webpageId));
-                continue;
+                throwError(ErrorType.invalidFile, webpageId);
             }
             // save
-            try {  
+            try {
                 FileOutputStream fout = new FileOutputStream(xmlFile);
                 out.output(new Document(mycoreWebpage), fout);
                 fout.close();
-            } catch(Exception exc) {
-                LOGGER.error("while saving webpage " + xmlFile.getAbsolutePath(), exc);
-                errorArr.add(getError(ErrorType.couldNotSave, webpageId));
+            } catch (Exception exc) {
+                throwError(ErrorType.couldNotSave, webpageId);
             }
         }
-
-        // save webpage content
-        JsonObject returnObj = new JsonObject();
-        if(errorArr.size() > 0) {
-            returnObj.addProperty("type", "error");
-            returnObj.add("errorArray", errorArr);
-        } else {
-            returnObj.addProperty("type", "saveDone");
-        }
-        return returnObj;
     }
 
     /**
-     * Creates an json error object.
+     * Throws a new webapplication exception with given error type.
      * 
      * @param errorType type of the error
      * @param webpageId webpageId where the error occur
      * @return { type: "error", errorType: "typeOfError", webpageId: "abc.xml" }
      */
-    private JsonObject getError(ErrorType errorType, String webpageId) {
+    private void throwError(ErrorType errorType, String webpageId) {
         JsonObject error = new JsonObject();
-        error.addProperty("type", "error");
-        error.addProperty("errorType", errorType.name());
+        error.addProperty("type", errorType.name());
         error.addProperty("webpageId", webpageId);
-        return error;
+        Response response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(error.toString()).type(MediaType.APPLICATION_JSON).build();
+        throw new WebApplicationException(response);
     }
 
 }

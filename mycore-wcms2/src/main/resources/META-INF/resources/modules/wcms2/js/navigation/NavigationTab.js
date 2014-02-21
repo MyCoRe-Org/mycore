@@ -151,7 +151,9 @@ wcms.navigation.NavigationTab = function(navContent) {
 	}
 
 	function handleContentEvents(/*NavigationContent*/ source, /*Json*/ args) {
-		if(args.type == "loaded") {
+		if(args.type == "loadError") {
+			this.updateItemEditor(null);
+		} else if(args.type == "loaded") {
 			if(args.navigation.hierarchy == null) {
 				console.log("Error while loading: navigation.hierarchy is null!");
 			}
@@ -278,7 +280,7 @@ wcms.navigation.NavigationTab = function(navContent) {
 	}
 
 	function isDirty() {
-		return this.tree.treeModel.isDirty() || this.content.dirty;
+		return this.tree.treeModel != null && (this.tree.treeModel.isDirty() || this.content.dirty);
 	}
 
 	function updateLang() {

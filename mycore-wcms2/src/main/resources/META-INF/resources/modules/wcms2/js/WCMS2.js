@@ -4,7 +4,7 @@
 var wcms = wcms || {};
 
 /**
- * Start class to show Multitenancy WMCS.
+ * Start class to show WMCS 2.
  * 
  * @param langArr - array of supported languages 
  */
@@ -71,7 +71,7 @@ wcms.WCMS2 = function() {
 		I18nManager.getInstance().initialize(langArr);
 
 		// create close dialog
-		this.closeDialog = new wcms.gui.SimpleDialog("yesNoCancel", "component.mt-wcms.closeHeader", "component.mt-wcms.closeText");
+		this.closeDialog = new wcms.gui.SimpleDialog("yesNoCancel", "component.wcms.closeHeader", "component.wcms.closeText");
 		this.closeDialog.eventHandler.attach(dojo.hitch(this, function(/*wcms.gui.SimpleDialog*/ source, /*Json*/ args) {
 			if(args.type == "yesButtonClicked") {
 				this.navigationTab.saveChanges();

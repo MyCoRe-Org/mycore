@@ -1,6 +1,6 @@
-package org.mycore.multitenancy.wcms.navigation;
+package org.mycore.wcms2.navigation;
 
-import org.mycore.datamodel.navigation.Navigation;
+import org.mycore.wcms2.datamodel.MCRNavigation;
 
 import com.google.gson.JsonObject;
 
@@ -9,7 +9,7 @@ import com.google.gson.JsonObject;
  *
  * @author Matthias Eichner
  */
-public interface NavigationProvider extends JSONProvider<Navigation, JsonObject> {
+public interface MCRWCMSNavigationProvider extends MCRWCMSJSONProvider<MCRNavigation, JsonObject> {
 
     public final static String JSON_HIERARCHY = "hierarchy";
     public final static String JSON_ITEMS = "items";
@@ -46,7 +46,7 @@ public interface NavigationProvider extends JSONProvider<Navigation, JsonObject>
      * @return the generated json
      */
     @Override
-    public JsonObject toJSON(Navigation navigation);
+    public JsonObject toJSON(MCRNavigation navigation);
 
     /**
      * Converts an WCMS JSON Object to an <code>Navigation</code> object.
@@ -57,6 +57,6 @@ public interface NavigationProvider extends JSONProvider<Navigation, JsonObject>
      * @return
      */
     @Override
-    public Navigation fromJSON(JsonObject jsonNavigation);
+    public MCRNavigation fromJSON(JsonObject jsonNavigation);
 
 }
