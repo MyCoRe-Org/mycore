@@ -9,6 +9,9 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>mycore-migration-2014</artifactId>
   <name>MyCoRe migration 2013.06 --&gt; 2014.0x tools</name>
+  <properties>
+    <manifest.priority>31</manifest.priority>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.mycore</groupId>

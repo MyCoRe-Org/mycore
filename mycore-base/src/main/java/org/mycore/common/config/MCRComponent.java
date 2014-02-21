@@ -102,6 +102,9 @@ public class MCRComponent implements Comparable<MCRComponent> {
         String priorityAtt = manifest.getMainAttributes().getValue(ATT_PRIORITY);
         if (priorityAtt == null) {
             priorityAtt = DEFAULT_PRIORITY;
+            logdebug(artifactId + " has DEFAULT priority " + priorityAtt);
+        } else {
+            logdebug(artifactId + " has priority " + priorityAtt);
         }
         int priority = Integer.parseInt(priorityAtt);
         if (priority > 99 || priority < 0) {

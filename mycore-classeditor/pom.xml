@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <artifactId>mycore</artifactId>
@@ -8,7 +9,9 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>mycore-classeditor</artifactId>
   <name>MyCoRe Classification Editor</name>
-
+  <properties>
+    <manifest.priority>18</manifest.priority>
+  </properties>
   <!-- TODO: build minified version of classeditor -->
   <!--<build>
     <plugins>
@@ -70,7 +73,6 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-server</artifactId>
@@ -108,7 +110,5 @@
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
-
   </dependencies>
-
 </project>

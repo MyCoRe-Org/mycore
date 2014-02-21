@@ -52,6 +52,9 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <properties>
+    <manifest.priority>45</manifest.priority>
+  </properties>
   <build>
     <resources>
       <resource>

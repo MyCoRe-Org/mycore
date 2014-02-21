@@ -9,6 +9,9 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>mycore-oai</artifactId>
   <name>MyCoRe OAI-PMH 2.0 Data Provider</name>
+  <properties>
+    <manifest.priority>81</manifest.priority>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.mycore</groupId>

@@ -9,6 +9,9 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>mycore-webservices</artifactId>
   <name>MyCoRe Webservices</name>
+  <properties>
+    <manifest.priority>72</manifest.priority>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.mycore</groupId>

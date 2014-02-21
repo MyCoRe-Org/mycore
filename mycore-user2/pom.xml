@@ -9,6 +9,9 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>mycore-user2</artifactId>
   <name>MyCoRe New User System</name>
+  <properties>
+    <manifest.priority>58</manifest.priority>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.mycore</groupId>

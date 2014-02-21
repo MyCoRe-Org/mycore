@@ -9,6 +9,9 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>mycore-z3950</artifactId>
   <name>MyCoRe Z3950</name>
+  <properties>
+    <manifest.priority>76</manifest.priority>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.mycore</groupId>

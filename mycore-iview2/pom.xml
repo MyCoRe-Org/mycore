@@ -9,6 +9,9 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>mycore-iview2</artifactId>
   <name>MyCoRe IView2</name>
+  <properties>
+    <manifest.priority>27</manifest.priority>
+  </properties>
   <build>
     <plugins>
       <plugin>
@@ -87,15 +90,11 @@
                 <jsSourceFile>storage.js</jsSourceFile>
                 <!-- Wrapper for html5 storage -->
                 <!-- iview.init END-->
-                
                 <!-- menu -->
                 <jsSourceFile>../lib/fg-menu/fg.menu.js</jsSourceFile>
-                
                 <!--  Model, Controller, View -->
                 <!--  needs Event.js -->
-
                 <jsSourceFile>iview2.toolbar/ToolbarManager.js</jsSourceFile>
-
                 <jsSourceFile>iview2.toolbar/ToolbarModel.js</jsSourceFile>
                 <jsSourceFile>iview2.toolbar/ToolbarButtonsetModel.js</jsSourceFile>
                 <jsSourceFile>iview2.toolbar/ToolbarDividerModel.js</jsSourceFile>
@@ -105,15 +104,12 @@
                 <jsSourceFile>iview2.toolbar/ToolbarImageModel.js</jsSourceFile>
                 <jsSourceFile>iview2.toolbar/ToolbarController.js</jsSourceFile>
                 <jsSourceFile>iview2.toolbar/ToolbarView.js</jsSourceFile>
-                
                 <!--  ModelProvider -->
                 <jsSourceFile>iview2.toolbar/StandardToolbarModelProvider.js</jsSourceFile>
                 <jsSourceFile>iview2.toolbar/PreviewToolbarModelProvider.js</jsSourceFile>
-                
                 <!--  Canvas -->
                 <jsSourceFile>canvas.js</jsSourceFile>
                 <jsSourceFile>canvas.rotate.js</jsSourceFile>
-                
                 <!-- Permalink -->
                 <jsSourceFile>Permalink.js</jsSourceFile>
                 <jsSourceFile>createPdf.js</jsSourceFile>

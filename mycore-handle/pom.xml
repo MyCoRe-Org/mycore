@@ -9,6 +9,9 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>mycore-handle</artifactId>
   <name>MyCoRe Handle Support</name>
+  <properties>
+    <manifest.priority>85</manifest.priority>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.mycore</groupId>

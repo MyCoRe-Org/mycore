@@ -9,6 +9,9 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>mycore-buildtools</artifactId>
   <name>MyCoRe build tools</name>
+  <properties>
+    <manifest.priority>9</manifest.priority>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.mycore</groupId>
