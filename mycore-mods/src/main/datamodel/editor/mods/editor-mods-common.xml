@@ -258,7 +258,7 @@
   <text id="mods.title.translated.label" i18n="component.mods.metaData.dictionary.translatedtitle" />
   <panel id="mods.title.translated">
     <cell anchor="NORTHWEST" var="mods:titleInfo[@type='translated']">
-      <repeater min="1" max="5" pos="right">
+      <repeater min="1" pos="right">
         <panel>
           <cell anchor="NORTHWEST" ref="TFarea1028r" var="mods:title" />
           <cell row="1" col="2" anchor="NORTHWEST" var="@lang" ref="language" />
@@ -316,7 +316,7 @@
   <text id="mods.languageTerm.label" i18n="component.mods.metaData.dictionary.languageTerm" />
   <panel id="mods.languageTerm">
     <cell anchor="NORTHWEST" var="mods:languageTerm">
-      <repeater min="1" max="5" pos="right">
+      <repeater min="1" pos="right">
         <panel>
           <hidden var="@type" default="code" />
           <cell col="1" var="@mcr:categId">
@@ -336,7 +336,7 @@
 
   <panel id="mods.languageTerm.optional">
     <cell anchor="NORTHWEST" var="mods:languageTerm">
-      <repeater min="1" max="5" pos="right">
+      <repeater min="1" pos="right">
         <panel>
           <hidden var="@type" default="code" />
           <cell col="1" var="@mcr:categId">
@@ -405,7 +405,7 @@
   <text id="mods.person.label" i18n="component.mods.metaData.dictionary.persons" />
   <panel id="mods.person">
     <cell anchor="NORTHWEST" var="mods:name[@type='personal']">
-      <repeater min="1" max="40" pos="right">
+      <repeater min="1" pos="right">
         <panel>
           <cell col="1" row="1" anchor="NORTHEAST" var="mods:role/mods:roleTerm[@type='code']">
             <panel>
@@ -429,7 +429,7 @@
 
   <panel id="mods.person.publisher">
     <cell anchor="NORTHWEST" var="mods:name[@type='personal']">
-      <repeater min="1" max="40" pos="right">
+      <repeater min="1" pos="right">
         <panel>
           <cell col="1" row="1" anchor="NORTHEAST" var="mods:role/mods:roleTerm[@type='code']">
             <panel>
@@ -493,7 +493,7 @@
   <text id="mods.corporation.label" i18n="component.mods.metaData.dictionary.corporation" />
   <panel id="mods.corporation">
     <cell anchor="NORTHWEST" var="mods:name[@type='corporate']">
-      <repeater min="1" max="20" pos="right">
+      <repeater min="1" pos="right">
         <panel>
           <cell col="1" row="1" anchor="NORTHEAST" var="mods:role/mods:roleTerm[@type='code']">
             <panel>
@@ -547,7 +547,7 @@
 
   <!-- Ort der Konferenz [text] -->
   <text id="mods.conferencePlace.label" i18n="component.mods.metaData.dictionary.conference.place" />
-  <repeater min="1" max="5" id="mods.conferencePlace">
+  <repeater min="1" id="mods.conferencePlace">
     <textfield width="60" maxlength="512" id="mods.conferencePlace.text">
       <condition id="mods.conferencePlace.cond" required="true">
         <label xml:lang="de">Tragen Sie hier den Ort ein, an dem die Konferenz stattfand.</label>
@@ -801,7 +801,7 @@
   <text id="mods.abstract.label" i18n="component.mods.metaData.dictionary.abstract" />
   <panel id="mods.abstract">
     <cell col="2" row="50" anchor="NORTHWEST" var="mods:abstract">
-      <repeater min="1" max="5" pos="right">
+      <repeater min="1" pos="right">
         <panel>
           <cell anchor="NORTHWEST" ref="TFarea4096" />
           <cell row="1" col="2" anchor="NORTHWEST" var="@lang" ref="language" />
@@ -824,7 +824,7 @@
   <text id="mods.subject.label" i18n="component.mods.metaData.dictionary.subject" />
   <panel id="mods.subject">
     <cell anchor="NORTHWEST" var="mods:subject">
-      <repeater min="1" max="500" pos="right" var="mods:topic">
+      <repeater min="1" pos="right" var="mods:topic">
         <panel>
           <cell anchor="NORTHWEST" ref="TFzeile512" />
         </panel>
@@ -911,7 +911,7 @@
   <text id="mods.identifier.label" i18n="component.mods.metaData.dictionary.identifier" />
   <panel id="mods.identifier">
     <cell anchor="NORTHWEST" var="mods:identifier">
-      <repeater min="1" max="10" pos="right">
+      <repeater min="1" pos="right">
         <panel>
           <cell anchor="NORTHWEST" ref="TFzeile44" />
           <cell row="1" col="2" anchor="NORTHWEST" var="@type">
@@ -959,7 +959,7 @@
   <!-- Identifier with issn-->
   <panel id="mods.identifier.journals">
     <cell anchor="NORTHWEST" var="mods:identifier">
-      <repeater min="1" max="10" pos="right">
+      <repeater min="1" pos="right">
         <panel>
           <cell anchor="NORTHWEST" ref="TFzeile44" />
           <cell row="1" col="2" anchor="NORTHWEST" var="@type">
@@ -1010,7 +1010,7 @@
 
   <panel id="mods.identifier.optional">
     <cell anchor="NORTHWEST" var="mods:identifier">
-      <repeater min="1" max="10" pos="right">
+      <repeater min="1" pos="right">
         <panel>
           <cell anchor="NORTHWEST" ref="TFzeile44" />
           <cell row="1" col="2" anchor="NORTHWEST" var="@type">
@@ -1052,7 +1052,7 @@
 
   <panel id="mods.identifier.cproceedings">
     <cell anchor="NORTHWEST" var="mods:identifier">
-      <repeater min="1" max="10" pos="right">
+      <repeater min="1" pos="right">
         <panel>
           <cell anchor="NORTHWEST" ref="TFzeile44" />
           <cell row="1" col="2" anchor="NORTHWEST" var="@type">
