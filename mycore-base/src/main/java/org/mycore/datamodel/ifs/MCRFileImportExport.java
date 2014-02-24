@@ -148,6 +148,7 @@ public class MCRFileImportExport {
                 IOUtils.copy(cis, new MCRDevNull());
 
                 String local_md5 = cis.getMD5String();
+                cis.close();
 
                 // If file content of local file has not changed, do not load it
                 // again
