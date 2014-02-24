@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2013.06.0.3" date="TBA" description="2013.06.0 maintenance release 3">
+      <action dev="mcrkrebs" type="fix">
+        mods: removed max value from repeater fields (merged revision 29161)
+      </action>
       <action dev="mcrsteph" type="fix">
         ifs: properly close MCRMD5InputStream (merged revision 29154)
       </action>
