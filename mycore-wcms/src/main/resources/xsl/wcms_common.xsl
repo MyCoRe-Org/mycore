@@ -62,13 +62,13 @@
                 </xsl:variable>
                 <xsl:choose>
                     <xsl:when test="$DefaultLang=$CurrentLang">
-                        <img src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/fastwcms/menu.gif" href="" onClick="return clickreturnvalue()"
+                        <img id="wcmsDropdown" src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/fastwcms/menu.gif" href="" onClick="return clickreturnvalue()"
                             onMouseover="dropdownmenu(this, event, menu1, '100px', '{$WebApplicationBaseURL}', '{$template}', '{$browserAddress}', '{$deletepath}', '{$edit}', '{$addIntern_before}', '{$addIntern_sub}', '{$addIntern_after}', '{$addExtern_before}', '{$addExtern_sub}', '{$addExtern_after}', '{$delete}', '{$translate}')"
                             onMouseout="delayhidemenu()" />
                     </xsl:when>
                     <!--translate-->
                     <xsl:otherwise>
-                        <img src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/fastwcms/menu.gif" href="" onClick="return clickreturnvalue()"
+                        <img id="wcmsDropdown" src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/fastwcms/menu.gif" href="" onClick="return clickreturnvalue()"
                             onMouseover="dropdownmenu(this, event, menu2, '100px', '{$WebApplicationBaseURL}', '{$template}', '{$browserAddress}', '{$deletepath}', '{$edit}', '{$addIntern_before}', '{$addIntern_sub}', '{$addIntern_after}', '{$addExtern_before}', '{$addExtern_sub}', '{$addExtern_after}', '{$delete}', '{$translate}')"
                             onMouseout="delayhidemenu()" />
                     </xsl:otherwise>
