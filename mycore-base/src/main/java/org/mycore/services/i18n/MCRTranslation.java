@@ -195,7 +195,7 @@ public class MCRTranslation {
     public static Map<String, String> translatePrefix(String prefix, Locale locale) {
         LOGGER.debug("Translation for locale: " + locale.getLanguage());
         HashMap<String, String> map = new HashMap<String, String>();
-        ResourceBundle message = ResourceBundle.getBundle(MESSAGES_BUNDLE, locale);
+        ResourceBundle message = MCRStackedResourceBundle.getResourceBundle(MESSAGES_BUNDLE, locale);
         Enumeration<String> keys = message.getKeys();
         while (keys.hasMoreElements()) {
             String key = keys.nextElement();

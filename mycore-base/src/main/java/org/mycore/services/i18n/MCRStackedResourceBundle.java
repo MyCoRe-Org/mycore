@@ -81,6 +81,7 @@ public class MCRStackedResourceBundle extends ResourceBundle {
         public BundleEnumeration(ResourceBundle... bundles) {
             pos = -1;
             currentEnumeration = Collections.emptyEnumeration();
+            this.bundles = bundles;
         }
 
         @Override
