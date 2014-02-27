@@ -66,6 +66,9 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
+import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRLinkTableManager;
@@ -725,6 +728,26 @@ public class MCRXMLFunctions {
             LOGGER.error("Error while checking if object is in category", e);
             return false;
         }
+    }
+
+    /**
+     * @param classificationId
+     * @param categoryId
+     * @return
+     */
+    public static boolean hasParentCategory(String classificationId, String categoryId) {
+        MCRCategoryID categID = MCRCategoryID.fromString(classificationId + ":" + categoryId);
+        MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        List<MCRCategory> parents = dao.getParents(categID);
+
+        for (MCRCategory c : parents) {
+            MCRCategory parent = c.getParent();
+            if (parent != null) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
