@@ -54,7 +54,7 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
             return;
         }
         MCRMODSWrapper modsWrapper = new MCRMODSWrapper(obj);
-        final List<Element> categoryNodes = modsWrapper.getElements("mods:typeOfResource or (.//*[(@authority or @authorityURI) and not(ancestor::mods:relatedItem[@type='host'])])");
+        final List<Element> categoryNodes = modsWrapper.getElements("mods:typeOfResource | .//*[(@authority or @authorityURI) and not(ancestor::mods:relatedItem[@type='host'])]");
         final HashSet<MCRCategoryID> categories = new HashSet<MCRCategoryID>();
         for (Element node : categoryNodes) {
             final MCRCategoryID categoryID = MCRMODSClassificationSupport.getCategoryID(node);
