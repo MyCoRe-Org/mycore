@@ -74,6 +74,12 @@ public class MCRCategoryID implements Serializable {
         return new MCRCategoryID(root, null);
     }
 
+    /**
+     * @param categoryId must be in format classificationId:categoryId
+     * @return the {@link MCRCategoryID} if any
+     * 
+     * @throws IllegalArgumentException
+     */
     public static MCRCategoryID fromString(String categoryId) {
         StringTokenizer tok = new StringTokenizer(categoryId, ":");
         String rootId = tok.nextToken();
@@ -156,8 +162,7 @@ public class MCRCategoryID implements Serializable {
                 throw new MCRException("category ID '" + id + "' is invalid and does not match: " + validID);
             }
             if (id.length() > CATEG_ID_LENGTH) {
-                throw new MCRException(MessageFormat.format("category ID ''{0}'' is more than {1} characters long: {2}", id,
-                        CATEG_ID_LENGTH, id.length()));
+                throw new MCRException(MessageFormat.format("category ID ''{0}'' is more than {1} characters long: {2}", id, CATEG_ID_LENGTH, id.length()));
             }
         }
         ID = id;
@@ -179,8 +184,8 @@ public class MCRCategoryID implements Serializable {
             throw new MCRException(MessageFormat.format("classification ID ''{0}'' is invalid and does not match: {1}", rootID, validID));
         }
         if (rootID.length() > ROOT_ID_LENGTH) {
-            throw new MCRException(MessageFormat.format("classification ID ''{0}'' is more than {1} chracters long: {2}", rootID,
-                    ROOT_ID_LENGTH, rootID.length()));
+            throw new MCRException(MessageFormat.format("classification ID ''{0}'' is more than {1} chracters long: {2}", rootID, ROOT_ID_LENGTH,
+                    rootID.length()));
         }
         this.rootID = rootID.intern();
     }
