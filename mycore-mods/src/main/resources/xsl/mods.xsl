@@ -144,7 +144,7 @@
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="$mods-type='confpro'">
-        <xsl:apply-templates select="." mode="title.confpro" />
+        <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods" mode="mods.title.confpro" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>
