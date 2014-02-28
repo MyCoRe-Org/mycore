@@ -151,4 +151,16 @@ public abstract class MCRWrappedContent extends MCRContent {
         return getBaseContent().getReusableCopy();
     }
 
+    public long length() throws IOException {
+        return getBaseContent().length();
+    }
+
+    public long lastModified() throws IOException {
+        return getBaseContent().lastModified();
+    }
+
+    public String getETag() throws IOException {
+        return getBaseContent().getETag();
+    }
+
 }

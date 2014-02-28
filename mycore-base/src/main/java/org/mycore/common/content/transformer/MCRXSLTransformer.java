@@ -25,6 +25,7 @@ package org.mycore.common.content.transformer;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Properties;
@@ -41,14 +42,17 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.apache.xalan.trace.TraceManager;
 import org.apache.xalan.transformer.TransformerImpl;
 import org.mycore.common.MCRCache;
+import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRWrappedContent;
 import org.mycore.common.content.streams.MCRByteArrayOutputStream;
 import org.mycore.common.xml.MCREntityResolver;
 import org.mycore.common.xml.MCRURIResolver;
@@ -186,7 +190,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             LinkedList<TransformerHandler> transformHandlerList = getTransformHandlerList(parameter);
             XMLReader reader = getXMLReader(transformHandlerList);
             TransformerHandler lastTransformerHandler = transformHandlerList.getLast();
-            return transform(source, reader, lastTransformerHandler);
+            return transform(source, reader, lastTransformerHandler, parameter);
         } catch (TransformerConfigurationException e) {
             throw new IOException(e);
         } catch (SAXException e) {
@@ -225,15 +229,20 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         }
     }
 
-    protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler)
-        throws IOException, SAXException {
-        MCRByteArrayOutputStream baos = new MCRByteArrayOutputStream(INITIAL_BUFFER_SIZE);
-        StreamResult serializer = new StreamResult(baos);
-        transformerHandler.setResult(serializer);
-        // Parse the source XML, and send the parse events to the
-        // TransformerHandler.
-        reader.parse(source.getInputSource());
-        return new MCRByteContent(baos.getBuffer(), 0, baos.size());
+    protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler,
+        MCRParameterCollector parameter) throws IOException, SAXException {
+        return new MCRTransformedContent(source, reader, transformerHandler, getLastModified(), parameter);
+    }
+
+    private long getLastModified() {
+        long lastModified = -1;
+        for (long current : modified) {
+            if (current < 0) {
+                return -1;
+            }
+            lastModified = Math.max(lastModified, current);
+        }
+        return lastModified;
     }
 
     protected LinkedList<TransformerHandler> getTransformHandlerList(MCRParameterCollector parameterCollector)
@@ -310,4 +319,71 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         return getDefaultExtension();
     }
 
+    private static class MCRTransformedContent extends MCRWrappedContent {
+        private MCRContent source;
+    
+        private XMLReader reader;
+    
+        private TransformerHandler transformerHandler;
+    
+        private long lastModified;
+    
+        private MCRContent transformed;
+    
+        private String eTag;
+    
+        public MCRTransformedContent(MCRContent source, XMLReader reader, TransformerHandler transformerHandler,
+            long transformerLastModified, MCRParameterCollector parameter) throws IOException {
+            this.source = source;
+            this.reader = reader;
+            this.transformerHandler = transformerHandler;
+            this.lastModified = (transformerLastModified >= 0 && source.lastModified() >= 0) ? Math.max(
+                transformerLastModified, source.lastModified()) : -1;
+            this.eTag = generateETag(source, lastModified, parameter.hashCode());
+        }
+    
+        private String generateETag(MCRContent content, final long lastModified, final int parameterHashCode)
+            throws IOException {
+            String sourceETag = content.getETag();
+            long systemLastModified = MCRConfiguration.instance().getSystemLastModified();
+            StringBuilder b = new StringBuilder(sourceETag);
+            b.deleteCharAt(b.length() - 1);//removes at end "
+            b.append('/');
+            byte[] unencodedETag = ByteBuffer.allocate(Long.SIZE / 4).putLong(lastModified ^ parameterHashCode)
+                .putLong(systemLastModified ^ parameterHashCode).array();
+            b.append(Base64.encodeBase64String(unencodedETag));
+            b.append('"');
+            return b.toString();
+        }
+    
+        @Override
+        public MCRContent getBaseContent() {
+            if (transformed == null) {
+                MCRByteArrayOutputStream baos = new MCRByteArrayOutputStream(INITIAL_BUFFER_SIZE);
+                StreamResult serializer = new StreamResult(baos);
+                transformerHandler.setResult(serializer);
+                // Parse the source XML, and send the parse events to the
+                // TransformerHandler.
+                try {
+                    LOGGER.info("Start transforming: " + source.getSystemId());
+                    reader.parse(source.getInputSource());
+                } catch (IOException | SAXException e) {
+                    throw new MCRException(e);
+                }
+                transformed = new MCRByteContent(baos.getBuffer(), 0, baos.size(), lastModified);
+            }
+            return transformed;
+        }
+    
+        @Override
+        public long lastModified() throws IOException {
+            return lastModified;
+        }
+    
+        @Override
+        public String getETag() throws IOException {
+            return eTag;
+        }
+    
+    }
 }

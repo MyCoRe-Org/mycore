@@ -392,7 +392,7 @@ public class MCRXMLMetadataManager {
      */
     public MCRStoredMetadata create(MCRObjectID mcrid, byte[] xml, Date lastModified) {
         try {
-            return create(mcrid, new MCRByteContent(xml), lastModified);
+            return create(mcrid, new MCRByteContent(xml, lastModified.getTime()), lastModified);
         } catch (Exception ex) {
             if (ex instanceof MCRException) {
                 throw (MCRException) ex;
@@ -490,7 +490,7 @@ public class MCRXMLMetadataManager {
      */
     public MCRStoredMetadata update(MCRObjectID mcrid, byte[] xml, Date lastModified) {
         try {
-            return update(mcrid, new MCRByteContent(xml), lastModified);
+            return update(mcrid, new MCRByteContent(xml, lastModified.getTime()), lastModified);
         } catch (Exception ex) {
             if (ex instanceof MCRException) {
                 throw (MCRException) ex;

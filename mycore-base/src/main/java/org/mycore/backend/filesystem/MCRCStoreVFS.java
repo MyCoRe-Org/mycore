@@ -45,6 +45,7 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
+import org.mycore.common.content.MCRVFSContent;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRContentStore;
 import org.mycore.datamodel.ifs.MCRFileReader;
@@ -135,10 +136,7 @@ public class MCRCStoreVFS extends MCRContentStore {
 
     protected MCRContent doRetrieveMCRContent(MCRFileReader file) throws IOException {
         FileObject targetObject = fsManager.resolveFile(getBase(), file.getStorageID());
-        FileContent targetContent = targetObject.getContent();
-        MCRStreamContent content = new MCRStreamContent(targetContent.getInputStream(), targetObject.getURL()
-            .toString());
-        return content;
+        return new MCRVFSContent(targetObject);
     }
 
     @Override

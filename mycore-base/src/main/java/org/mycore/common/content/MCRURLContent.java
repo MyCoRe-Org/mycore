@@ -26,6 +26,7 @@ package org.mycore.common.content;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -62,6 +63,30 @@ public class MCRURLContent extends MCRContent {
     @Override
     public InputSource getInputSource() throws IOException {
         return new InputSource(getSystemId());
+    }
+
+    @Override
+    public long length() throws IOException {
+        return url.openConnection().getContentLengthLong();
+    }
+
+    @Override
+    public long lastModified() throws IOException {
+        return url.openConnection().getLastModified();
+    }
+
+    @Override
+    public String getETag() throws IOException {
+        URLConnection openConnection = url.openConnection();
+        openConnection.connect();
+        String eTag = openConnection.getHeaderField("ETag");
+        if (eTag != null) {
+            return eTag;
+        }
+        long lastModified = openConnection.getLastModified();
+        long length = openConnection.getContentLengthLong();
+        eTag = getSimpleWeakETag(url.toString(), length, lastModified);
+        return eTag == null ? null : eTag.substring(2);
     }
 
 }

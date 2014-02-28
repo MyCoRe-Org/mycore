@@ -28,8 +28,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
+import org.mycore.common.content.streams.MCRMD5InputStream;
+
 /**
- * Reads MCRContent from a byte[] arrray.
+ * Reads MCRContent from a byte[] array.
  * 
  * @author Frank L\u00FCtzenkichen
  */
@@ -41,14 +43,25 @@ public class MCRByteContent extends MCRContent {
 
     private int length;
 
+    private long lastModified;
+
     public MCRByteContent(byte[] bytes) {
         this(bytes, 0, bytes.length);
     }
 
     public MCRByteContent(byte[] bytes, int offset, int length) {
+        this(bytes, offset, length, System.currentTimeMillis());
+    }
+
+    public MCRByteContent(byte[] bytes, long lastModified) {
+        this(bytes, 0, bytes.length, lastModified);
+    }
+
+    public MCRByteContent(byte[] bytes, int offset, int length, long lastModified) {
         this.bytes = bytes;
         this.offset = offset;
         this.length = length;
+        this.lastModified = lastModified;
     }
 
     @Override
@@ -70,5 +83,22 @@ public class MCRByteContent extends MCRContent {
             length = bytes.length;
         }
         return bytes;
+    }
+
+    @Override
+    public long length() throws IOException {
+        return bytes.length;
+    }
+
+    @Override
+    public long lastModified() throws IOException {
+        return lastModified;
+    }
+
+    @Override
+    public String getETag() throws IOException {
+        byte[] digest = MCRMD5InputStream.buildMD5Digest().digest(bytes);
+        String md5String = MCRMD5InputStream.getMD5String(digest);
+        return '"' + md5String + '"';
     }
 }

@@ -25,6 +25,7 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -75,7 +76,7 @@ public class MCREditorSession {
 
     public MCREditorSession(Map<String, String[]> requestParameters, MCRParameterCollector collector) {
         this.requestParameters = requestParameters;
-        this.variables = collector.getParameterMap();
+        this.variables = new HashMap<>(collector.getParameterMap());
         removeIllegalVariables();
     }
 

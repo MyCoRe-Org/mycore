@@ -79,7 +79,8 @@ public class MCRXSL2JAXBTransformer<T> extends MCRXSLTransformer {
     }
 
     @Override
-    protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler) throws IOException,
+    protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler,
+        MCRParameterCollector parameter) throws IOException,
         SAXException {
         T result;
         try {

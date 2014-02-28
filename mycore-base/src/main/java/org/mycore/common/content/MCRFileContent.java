@@ -50,4 +50,20 @@ public class MCRFileContent extends MCRContent {
     public InputStream getInputStream() throws IOException {
         return new FileInputStream(file);
     }
+
+    @Override
+    public long length() throws IOException {
+        return file.length();
+    }
+
+    @Override
+    public long lastModified() throws IOException {
+        return file.lastModified();
+    }
+
+    @Override
+    public String getETag() throws IOException {
+        String eTag = getSimpleWeakETag(file.toURI().toString(), length(), lastModified());
+        return eTag == null ? null : eTag.substring(2);
+    }
 }

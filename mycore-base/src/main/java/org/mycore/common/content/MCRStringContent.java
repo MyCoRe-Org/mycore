@@ -26,6 +26,7 @@ package org.mycore.common.content;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Reads MCRContent from a String's text.
@@ -42,19 +43,28 @@ public class MCRStringContent extends MCRContent {
      */
     private String encoding = "UTF-8";
 
+    private byte[] bytes;
+
     /**
      * Reads content from the given string, 
      */
     public MCRStringContent(String text) {
         this.text = text;
+        try {
+            this.bytes = asByteArray();
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /** 
      * Sets the character encoding to use when transforming the text to a byte stream.
      * By default, this is UTF-8.
+     * @throws IOException 
      */
-    public void setEncoding(String encoding) {
+    public void setEncoding(String encoding) throws UnsupportedEncodingException {
         this.encoding = encoding;
+        this.bytes = asByteArray();
     }
 
     @Override
@@ -63,11 +73,27 @@ public class MCRStringContent extends MCRContent {
     }
 
     @Override
-    public byte[] asByteArray() throws IOException {
+    public byte[] asByteArray() throws UnsupportedEncodingException {
         return text.getBytes(encoding);
     }
 
     public String asString() {
         return text;
+    }
+
+    @Override
+    public long length() throws IOException {
+        return bytes.length;
+    }
+
+    @Override
+    public long lastModified() throws IOException {
+        return -1;
+    }
+
+    @Override
+    public String getETag() throws IOException {
+        String eTag = getSimpleWeakETag(getSystemId(), length(), lastModified());
+        return eTag == null ? null : eTag.substring(2);
     }
 }

@@ -88,4 +88,44 @@ public class MCRVFSContent extends MCRContent {
             }
         };
     }
+
+    @Override
+    public long length() throws IOException {
+        FileContent content = fo.getContent();
+        try {
+            return content.getLastModifiedTime();
+        } finally {
+            fo.close();
+        }
+    }
+
+    @Override
+    public long lastModified() throws IOException {
+        FileContent content = fo.getContent();
+        try {
+            return content.getLastModifiedTime();
+        } finally {
+            fo.close();
+        }
+    }
+
+    @Override
+    public String getETag() throws IOException {
+        FileContent content = fo.getContent();
+        try {
+            String systemId = getSystemId();
+            if (systemId == null) {
+                systemId = fo.getName().getURI();
+            }
+            long length = content.getSize();
+            long lastModified = content.getLastModifiedTime();
+            String eTag = getSimpleWeakETag(systemId, length, lastModified);
+            if (eTag == null) {
+                return null;
+            }
+            return eTag.substring(2); //remove weak
+        } finally {
+            content.close();
+        }
+    }
 }

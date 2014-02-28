@@ -22,6 +22,7 @@
 
 package org.mycore.common.xsl;
 
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,6 +55,10 @@ public class MCRParameterCollector {
     /** If true (which is default), only those parameters starting with "XSL." are copied from session and request */
     private boolean onlySetXSLParameters = true;
 
+    private boolean modified = true;
+
+    private int hashCode;
+
     /**
      * Collects parameters The collecting of parameters is done in steps,
      * each step may overwrite parameters that already have been set.
@@ -62,7 +67,6 @@ public class MCRParameterCollector {
      * Second, those variables stored in the HTTP session, that start with "XSL." are copied.
      * Next, variables stored in the MCRSession are copied.
      * Next, HTTP request parameters are copied.
-     * Next, HTTP request attributes are copied.
      * 
      * Only those parameters starting with "XSL." are copied from session and request,
      * 
@@ -143,6 +147,7 @@ public class MCRParameterCollector {
      */
     public void setParameter(String name, Object value) {
         parameters.put(name, value);
+        modified = true;
     }
 
     /**
@@ -151,6 +156,7 @@ public class MCRParameterCollector {
      */
     public void setParameters(Map<String, String> param) {
         parameters.putAll(param);
+        modified = true;
     }
 
     /**
@@ -177,7 +183,7 @@ public class MCRParameterCollector {
      * Returns the parameter map.  
      */
     public Map<String, Object> getParameterMap() {
-        return parameters;
+        return Collections.unmodifiableMap(parameters);
     }
 
     /**
@@ -333,5 +339,17 @@ public class MCRParameterCollector {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         MCRServletJob job = (MCRServletJob) mcrSession.get("MCRServletJob");
         return job == null ? new MCRParameterCollector() : new MCRParameterCollector(job.getRequest());
+    }
+
+    public int hashCode() {
+        if (modified) {
+            int result = LOGGER.hashCode();
+            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                result += entry.hashCode();//order of map should not harm result
+            }
+            hashCode = result;
+            modified = false;
+        }
+        return hashCode;
     }
 }

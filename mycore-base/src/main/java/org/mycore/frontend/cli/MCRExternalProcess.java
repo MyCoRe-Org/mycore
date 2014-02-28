@@ -40,8 +40,8 @@ public class MCRExternalProcess {
     public MCRExternalProcess(String... command) {
         this.command = command;
     }
-    
-    public MCRExternalProcess( String command ) {
+
+    public MCRExternalProcess(String command) {
         this.command = command.split("\\s+");
     }
 
@@ -80,7 +80,7 @@ public class MCRExternalProcess {
     }
 
     public MCRContent getOutput() throws IOException {
-        return new MCRByteContent(output.getOutput());
+        return new MCRByteContent(output.getOutput(), System.currentTimeMillis());
     }
 }
 

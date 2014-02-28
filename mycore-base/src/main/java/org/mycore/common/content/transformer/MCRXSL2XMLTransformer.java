@@ -41,6 +41,7 @@ import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRXMLContent;
+import org.mycore.common.xsl.MCRParameterCollector;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -79,7 +80,8 @@ public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
     }
 
     @Override
-    protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler) throws IOException,
+    protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler,
+        MCRParameterCollector parameter) throws IOException,
             SAXException {
         JDOMResult result = new JDOMResult();
         transformerHandler.setResult(result);

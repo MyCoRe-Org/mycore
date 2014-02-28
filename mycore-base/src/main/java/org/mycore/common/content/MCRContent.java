@@ -31,12 +31,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.FileObject;
+import org.apache.fop.datatypes.Length;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRUtils;
@@ -65,6 +68,16 @@ public abstract class MCRContent {
      * Holds the docType of the current content
      */
     protected String docType;
+
+    /**
+     * Size of content in bytes
+     */
+    protected long length = -1;
+
+    /**
+     * Last modified timestamp
+     */
+    protected long lastModified = -1;
 
     /**
      * Sets the systemID of the current content
@@ -274,9 +287,55 @@ public abstract class MCRContent {
         if (isReusable()) {
             return this;
         } else {
-            MCRContent copy = new MCRByteContent(asByteArray());
+            MCRContent copy = new MCRByteContent(asByteArray(), lastModified());
             copy.setSystemId(getSystemId());
             return copy;
         }
+    }
+
+    /**
+     * Return the length of this content.
+     * @return -1 if length is unknown
+     */
+    public long length() throws IOException {
+        return length;
+    }
+
+    /**
+     * Returns the last modified time
+     * @return -1 if last modified time is unknown
+     */
+    public long lastModified() throws IOException {
+        return lastModified;
+    }
+
+    /**
+     * Returns either strong or weak ETag.
+     * @return null, if no ETag could be generated
+     */
+    public String getETag() throws IOException {
+        return getSimpleWeakETag(getSystemId(), length, lastModified);
+    }
+
+    /**
+     * Uses provided parameter to compute simple weak ETag.
+     * 
+     * @param systemId != null, {@link #getSystemId()}
+     * @param length >= 0, {@link #length()}
+     * @param lastModified >= 0, {@link #lastModified()}
+     * @return null if any preconditions are not met.
+     */
+    protected String getSimpleWeakETag(String systemId, long length, long lastModified) {
+        if (systemId == null || length < 0 || lastModified < 0) {
+            return null;
+        }
+        StringBuilder b = new StringBuilder(32);
+        b.append("W/\"");
+        long lhash = systemId.hashCode();
+        byte[] unencodedETag = ByteBuffer.allocate(Long.SIZE / 4).putLong(lastModified ^ lhash).putLong(length ^ lhash)
+            .array();
+        b.append(Base64.encodeBase64String(unencodedETag));
+        b.append('"');
+        return b.toString();
     }
 }

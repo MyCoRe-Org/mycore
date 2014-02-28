@@ -164,7 +164,7 @@ public class MCRMetadataVersion {
             MCRByteArrayOutputStream baos = new MCRByteArrayOutputStream();
             repository.getFile(vm.getStore().getSlotPath(vm.getID()), revision, null, baos);
             baos.close();
-            return new MCRByteContent(baos.getBuffer(), 0, baos.size());
+            return new MCRByteContent(baos.getBuffer(), 0, baos.size(), getDate().getTime());
         } catch (SVNException e) {
             throw new IOException(e);
         }

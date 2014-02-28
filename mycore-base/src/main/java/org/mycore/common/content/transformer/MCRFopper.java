@@ -52,7 +52,7 @@ public class MCRFopper extends MCRContentTransformer {
             throw new IOException(e);
         }
         in.close();
-        return new MCRByteContent(pdf.getBuffer(), 0, pdf.size());
+        return new MCRByteContent(pdf.getBuffer(), 0, pdf.size(), source.lastModified());
     }
 
     @Override

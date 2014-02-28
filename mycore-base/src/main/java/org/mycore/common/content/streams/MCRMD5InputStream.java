@@ -81,7 +81,7 @@ public class MCRMD5InputStream extends DigestInputStream {
      * @throws MCRConfigurationException
      *             if no java classes that support MD5 algorithm could be found
      */
-    private static MessageDigest buildMD5Digest() {
+    public static MessageDigest buildMD5Digest() {
         try {
             return MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException exc) {

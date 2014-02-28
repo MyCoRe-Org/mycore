@@ -86,7 +86,7 @@ public class MCRFileTest extends MCRIFS2TestCase {
         MCRFile file = col.createFile("foo.txt");
         assertEquals(MCRFile.MD5_OF_EMPTY_FILE, file.getMD5());
         byte[] content = "Hello World".getBytes("UTF-8");
-        file.setContent(new MCRByteContent(content));
+        file.setContent(new MCRByteContent(content, System.currentTimeMillis()));
         assertFalse(MCRFile.MD5_OF_EMPTY_FILE.equals(file.getMD5()));
         MCRFileCollection col2 = getStore().retrieve(col.getID());
         MCRFile child = (MCRFile) col2.getChild("foo.txt");
@@ -140,7 +140,7 @@ public class MCRFileTest extends MCRIFS2TestCase {
     public void randomAccessContent() throws Exception {
         MCRFile file = col.createFile("foo.txt");
         byte[] content = "Hello World".getBytes("UTF-8");
-        file.setContent(new MCRByteContent(content));
+        file.setContent(new MCRByteContent(content, System.currentTimeMillis()));
         RandomAccessContent rac = file.getRandomAccessContent();
         rac.skipBytes(6);
         InputStream in = rac.getInputStream();

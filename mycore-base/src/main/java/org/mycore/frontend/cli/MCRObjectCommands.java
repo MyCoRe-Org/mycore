@@ -39,7 +39,6 @@ import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.xml.MCRURIResolver;
@@ -78,7 +77,7 @@ import org.xml.sax.SAXParseException;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
-@MCRCommandGroup(name="MCRObject Commands")
+@MCRCommandGroup(name = "MCRObject Commands")
 public class MCRObjectCommands extends MCRAbstractCommands {
     private static final String EXPORT_OBJECT_TO_DIRECTORY_COMMAND = "export object {0} to directory {1} with {2}";
 
@@ -91,7 +90,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     /** static compiled transformer stylesheets */
     private static Hashtable<String, javax.xml.transform.Transformer> translist = new Hashtable<String, javax.xml.transform.Transformer>();
 
-   public static void setSelectedObjectIDs(List<String> selected) {
+    public static void setSelectedObjectIDs(List<String> selected) {
         MCRSessionMgr.getCurrentSession().put("mcrSelectedObjects", selected);
     }
 
@@ -110,8 +109,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param type
      *            the type of the MCRObjects that should be deleted
      */
-    @MCRCommand(syntax="delete all objects of type {0}",
-    		help="Removes MCRObjects in the number range between the MCRObjectID {0} and {1}.", order=20)
+    @MCRCommand(syntax = "delete all objects of type {0}", help = "Removes MCRObjects in the number range between the MCRObjectID {0} and {1}.", order = 20)
     public static List<String> deleteAllObjects(String type) throws MCRActiveLinkException {
         final List<String> objectIds = MCRXMLMetadataManager.instance().listIDsOfType(type);
         List<String> cmds = new ArrayList<String>(objectIds.size());
@@ -127,8 +125,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param ID
      *            the ID of the MCRObject that should be deleted
      */
-    @MCRCommand(syntax="delete object {0}",
-    		help="Removes a MCRObject with the MCRObjectID {0}", order=40)
+    @MCRCommand(syntax = "delete object {0}", help = "Removes a MCRObject with the MCRObjectID {0}", order = 40)
     public static void delete(String ID) throws MCRActiveLinkException {
         MCRObjectID mcrId = MCRObjectID.getInstance(ID);
 
@@ -150,8 +147,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param IDto
      *            the stop ID for deleting the MCRObjects
      */
-    @MCRCommand(syntax="delete object from {0} to {1}",
-    		help="Removes MCRObjects in the number range between the MCRObjectID {0} and {1}.", order=30)
+    @MCRCommand(syntax = "delete object from {0} to {1}", help = "Removes MCRObjects in the number range between the MCRObjectID {0} and {1}.", order = 30)
     public static void deleteFromTo(String IDfrom, String IDto) throws MCRActiveLinkException {
         int from_i = 0;
         int to_i = 0;
@@ -185,8 +181,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the directory containing the XML files
      * @throws MCRActiveLinkException
      */
-    @MCRCommand(syntax="load all objects from directory {0}",
-    		help="Loads all MCRObjects form the directory {0} to the system.", order=70)
+    @MCRCommand(syntax = "load all objects from directory {0}", help = "Loads all MCRObjects form the directory {0} to the system.", order = 70)
     public static List<String> loadFromDirectory(String directory) throws MCRActiveLinkException {
         return processFromDirectory(directory, false);
     }
@@ -198,8 +193,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the directory containing the XML files
      * @throws MCRActiveLinkException
      */
-    @MCRCommand(syntax="update all objects from directory {0}",
-    		help="Updates all MCRObjects form the directory {0} in the system.", order=90)
+    @MCRCommand(syntax = "update all objects from directory {0}", help = "Updates all MCRObjects form the directory {0} in the system.", order = 90)
     public static List<String> updateFromDirectory(String directory) throws MCRActiveLinkException {
         return processFromDirectory(directory, true);
     }
@@ -247,9 +241,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    @MCRCommand(syntax="load object from file {0}",
-    		help="Adds a MCRObject form the file {0} to the system.", order=60)
-    public static boolean loadFromFile(String file) throws MCRActiveLinkException, MCRException, SAXParseException, IOException {
+    @MCRCommand(syntax = "load object from file {0}", help = "Adds a MCRObject form the file {0} to the system.", order = 60)
+    public static boolean loadFromFile(String file) throws MCRActiveLinkException, MCRException, SAXParseException,
+        IOException {
         return loadFromFile(file, true);
     }
 
@@ -264,8 +258,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    public static boolean loadFromFile(String file, boolean importMode) throws MCRActiveLinkException, MCRException, SAXParseException,
-        IOException {
+    public static boolean loadFromFile(String file, boolean importMode) throws MCRActiveLinkException, MCRException,
+        SAXParseException, IOException {
         return processFromFile(new File(file), false, importMode);
     }
 
@@ -278,9 +272,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    @MCRCommand(syntax="update object from file {0}",
-    		help="Updates a MCRObject form the file {0} in the system.", order=80)
-    public static boolean updateFromFile(String file) throws MCRActiveLinkException, MCRException, SAXParseException, IOException {
+    @MCRCommand(syntax = "update object from file {0}", help = "Updates a MCRObject form the file {0} in the system.", order = 80)
+    public static boolean updateFromFile(String file) throws MCRActiveLinkException, MCRException, SAXParseException,
+        IOException {
         return updateFromFile(file, true);
     }
 
@@ -295,8 +289,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    public static boolean updateFromFile(String file, boolean importMode) throws MCRActiveLinkException, MCRException, SAXParseException,
-        IOException {
+    public static boolean updateFromFile(String file, boolean importMode) throws MCRActiveLinkException, MCRException,
+        SAXParseException, IOException {
         return processFromFile(new File(file), true, importMode);
     }
 
@@ -313,8 +307,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    private static boolean processFromFile(File file, boolean update, boolean importMode) throws MCRActiveLinkException, MCRException,
-        SAXParseException, IOException {
+    private static boolean processFromFile(File file, boolean update, boolean importMode)
+        throws MCRActiveLinkException, MCRException, SAXParseException, IOException {
         if (!file.getName().endsWith(".xml")) {
             LOGGER.warn(file + " ignored, does not end with *.xml");
             return false;
@@ -381,9 +375,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param style
      *            the type of the stylesheet
      */
-    @MCRCommand(syntax=EXPORT_OBJECT_TO_DIRECTORY_COMMAND,
-    		help="Stores the MCRObject with the MCRObjectID {0} to the directory {1} with the stylesheet {2}-object.xsl. For {2} save is the default.", order=110)
-       
+    @MCRCommand(syntax = EXPORT_OBJECT_TO_DIRECTORY_COMMAND, help = "Stores the MCRObject with the MCRObjectID {0} to the directory {1} with the stylesheet {2}-object.xsl. For {2} save is the default.", order = 110)
     public static void export(String ID, String dirname, String style) {
         export(ID, ID, dirname, style);
     }
@@ -401,10 +393,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param style
      *            the type of the stylesheet
      */
-    @MCRCommand(syntax="export object from {0} to {1} to directory {2} with {3}",
-    		help="Stores all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet {3}-object.xsl. For {3} save is the default.",
-            order=100)
-  
+    @MCRCommand(syntax = "export object from {0} to {1} to directory {2} with {3}", help = "Stores all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet {3}-object.xsl. For {3} save is the default.", order = 100)
     public static void export(String fromID, String toID, String dirname, String style) {
         MCRObjectID fid, tid;
 
@@ -455,9 +444,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param style
      *            the type of the stylesheet
      */
-    @MCRCommand(syntax="export all objects of type {0} to directory {1} with {2}",
-    		help="Stores all MCRObjects of type {0} to directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.", order=120)
-      
+    @MCRCommand(syntax = "export all objects of type {0} to directory {1} with {2}", help = "Stores all MCRObjects of type {0} to directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.", order = 120)
     public static List<String> exportAllObjectsOfType(String type, String dirname, String style) {
         List<String> objectIds = MCRXMLMetadataManager.instance().listIDsOfType(type);
         return buildExportCommands(new File(dirname), style, objectIds);
@@ -474,9 +461,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param style
      *            the type of the stylesheet
      */
-    @MCRCommand(syntax="export all objects of base {0} to directory {1} with {2}",
-    		help="Stores all MCRObjects of base {0} to directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.", order=130)
- 
+    @MCRCommand(syntax = "export all objects of base {0} to directory {1} with {2}", help = "Stores all MCRObjects of base {0} to directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.", order = 130)
     public static List<String> exportAllObjectsOfBase(String base, String dirname, String style) {
         List<String> objectIds = MCRXMLMetadataManager.instance().listIDsForBase(base);
         return buildExportCommands(new File(dirname), style, objectIds);
@@ -504,7 +489,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws TransformerFactoryConfigurationError
      * @throws TransformerConfigurationException
      */
-    private static Transformer getTransformer(String style) throws TransformerFactoryConfigurationError, TransformerConfigurationException {
+    private static Transformer getTransformer(String style) throws TransformerFactoryConfigurationError,
+        TransformerConfigurationException {
         String xslfile = DEFAULT_TRANSFORMER;
         if (style != null && style.trim().length() != 0) {
             xslfile = style + "-object.xsl";
@@ -562,17 +548,16 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    private static boolean exportMCRObject(File dir, Transformer trans, String nid) throws FileNotFoundException, TransformerException,
-        IOException, MCRException, SAXParseException {
-        byte[] xml = null;
+    private static boolean exportMCRObject(File dir, Transformer trans, String nid) throws FileNotFoundException,
+        TransformerException, IOException, MCRException, SAXParseException {
+        MCRContent content;
         try {
             // if object do'snt exist - no exception is catched!
-            xml = MCRXMLMetadataManager.instance().retrieveBLOB(MCRObjectID.getInstance(nid));
+            content = MCRXMLMetadataManager.instance().retrieveContent(MCRObjectID.getInstance(nid));
         } catch (MCRException ex) {
             return false;
         }
 
-        MCRContent content = new MCRByteContent(xml);
         File xmlOutput = new File(dir, nid + ".xml");
 
         if (trans != null) {
@@ -593,8 +578,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param base
      *            the MCRObjectID base string
      */
-    @MCRCommand(syntax="get next ID for base {0}",
-    		help="Returns the next free MCRObjectID for the ID base {0}.", order=150)
+    @MCRCommand(syntax = "get next ID for base {0}", help = "Returns the next free MCRObjectID for the ID base {0}.", order = 150)
     public static void getNextID(String base) {
         try {
             LOGGER.info(MCRObjectID.getNextFreeId(base));
@@ -609,9 +593,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param base
      *            the MCRObjectID base string
      */
-    
-    @MCRCommand(syntax="get last ID for base {0}",
-    		help="Returns the last used MCRObjectID for the ID base {0}.", order=140)
+
+    @MCRCommand(syntax = "get last ID for base {0}", help = "Returns the last used MCRObjectID for the ID base {0}.", order = 140)
     public static void getLastID(String base) {
         LOGGER.info(MCRObjectID.getLastID(base));
     }
@@ -624,8 +607,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    @MCRCommand(syntax="check file {0}",
-    		help="Checks the data file {0} against the XML Schema.", order=160)
+    @MCRCommand(syntax = "check file {0}", help = "Checks the data file {0} against the XML Schema.", order = 160)
     public static boolean checkXMLFile(String fileName) throws MCRException, SAXParseException, IOException {
         if (!fileName.endsWith(".xml")) {
             LOGGER.warn(fileName + " ignored, does not end with *.xml");
@@ -656,9 +638,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param type
      *            the MCRObjectID type
      */
-    @MCRCommand(syntax="repair metadata search of type {0}",
-    		help="Scans the metadata store for MCRObjects of type {0} and restore them in the search store.", order=170)
-      
+    @MCRCommand(syntax = "repair metadata search of type {0}", help = "Scans the metadata store for MCRObjects of type {0} and restore them in the search store.", order = 170)
     public static List<String> repairMetadataSearch(String type) {
         LOGGER.info("Start the repair for type " + type);
         String typetest = CONFIG.getString("MCR.Metadata.Type." + type, "");
@@ -689,9 +669,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param id
      *            the MCRObjectID as String
      */
-    @MCRCommand(syntax="repair metadata search of ID {0}",
-    		help="Retrieves the MCRObject with the MCRObjectID {0} and restores it in the search store.", order=180)
-      
+    @MCRCommand(syntax = "repair metadata search of ID {0}", help = "Retrieves the MCRObject with the MCRObjectID {0} and restores it in the search store.", order = 180)
     public static void repairMetadataSearchForID(String id) {
         LOGGER.info("Start the repair for the ID " + id);
 
@@ -734,9 +712,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param querystring
      *            MCRQuery as String
      */
-    
-    @MCRCommand(syntax="select objects with query {0}",
-    		help="Select MCRObjects with MCRQueryString {0}.", order=185)
+
+    @MCRCommand(syntax = "select objects with query {0}", help = "Select MCRObjects with MCRQueryString {0}.", order = 185)
     public static void selectObjectsWithQuery(String querystring) {
         LOGGER.info("Build Resultset with query " + querystring);
 
@@ -755,9 +732,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     /**
      * List all selected MCRObjects.
      */
-    @MCRCommand(syntax="list selected",
-    		help="Prints the id of selected objects", order=190)
-
+    @MCRCommand(syntax = "list selected", help = "Prints the id of selected objects", order = 190)
     public static void listSelected() {
         LOGGER.info("List selected MCRObjects");
         if (getSelectedObjectIDs().isEmpty()) {
@@ -777,9 +752,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param index
      *            index of searcher
      */
-    @MCRCommand(syntax="remove selected from searchindex {0}",
-    		help="Remove selected MCRObjects from searchindex {0}.", order=220)
-        
+    @MCRCommand(syntax = "remove selected from searchindex {0}", help = "Remove selected MCRObjects from searchindex {0}.", order = 220)
     public static void removeFromSearchindex(String index) {
         LOGGER.info("Start removing selected entries from search index " + index);
 
@@ -798,8 +771,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     /**
      * The method checks the existence of selected MCRObjects in Metadata store.
      */
-    @MCRCommand(syntax="check selected in metadata store",
-    		help="Checks existence of selected MCRObjects in metadata store and deletes missing ones from search index.", order=230)
+    @MCRCommand(syntax = "check selected in metadata store", help = "Checks existence of selected MCRObjects in metadata store and deletes missing ones from search index.", order = 230)
     public static void checkSelected() {
         LOGGER.info("Start checking existence of selected MCRObjects in metadata store");
 
@@ -832,9 +804,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param type
      *            the MCRObjectID type
      */
-    @MCRCommand(syntax="check metadata search of type {0}",
-    		help="Checks existence of MCRObjects of type {0} in search index and rapairs missing ones in search index.", order=240)
-   
+    @MCRCommand(syntax = "check metadata search of type {0}", help = "Checks existence of MCRObjects of type {0} in search index and rapairs missing ones in search index.", order = 240)
     public static void checkMetadataSearch(String type) {
         LOGGER.info("Start the check for type " + type);
         String typetest = CONFIG.getString("MCR.Metadata.Type." + type, "");
@@ -868,9 +838,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param index
      *            of searcher
      */
-    @MCRCommand(syntax="set mode {0} of searcher for index {1}",
-    		help="Notify Searcher of Index {1} what is going on {0}.", order=250)
-      
+    @MCRCommand(syntax = "set mode {0} of searcher for index {1}", help = "Notify Searcher of Index {1} what is going on {0}.", order = 250)
     public static void notifySearcher(String mode, String index) {
         MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex(index);
         searcher.notifySearcher(mode);
@@ -882,8 +850,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param id
      *            id of MyCoRe Object
      */
-    @MCRCommand(syntax="list revisions of {0}",
-    		help="List revisions of MCRObject.", order=260)
+    @MCRCommand(syntax = "list revisions of {0}", help = "List revisions of MCRObject.", order = 260)
     public static void listRevisions(String id) {
         MCRObjectID mcrId = MCRObjectID.getInstance(id);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -913,10 +880,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            revision to restore
      * @throws MCRActiveLinkException
      *             if object is created (no real update)
-     */ 
-    @MCRCommand(syntax="restore {0} to revision {1}",
-    		help="Restores the selected MCRObject to the selected revision.", order=270)
-    
+     */
+    @MCRCommand(syntax = "restore {0} to revision {1}", help = "Restores the selected MCRObject to the selected revision.", order = 270)
     public static void restoreToRevision(String id, long revision) throws MCRActiveLinkException {
         LOGGER.info("Try to restore object " + id + " with revision " + revision);
         MCRObjectID mcrId = MCRObjectID.getInstance(id);
@@ -943,8 +908,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.error("While retrieving object " + id + " with revision " + revision, e);
         }
     }
-    
-    
+
     /**
      * This method deletes all MyCoRe Objects which match the given query
      * TODO could be deleted since the select mechanismn can be used 
@@ -955,9 +919,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws MCRActiveLinkException
      *             if object is created (no real update)
      */
-    @MCRCommand(syntax="delete objects matching {0}",
-    		help="Deletes all objects matching the query given in parameter {0}", order=10)
-    
+    @MCRCommand(syntax = "delete objects matching {0}", help = "Deletes all objects matching the query given in parameter {0}", order = 10)
     public static void deleteByQuery(String source) throws Exception {
         LOGGER.info("Given query is \"" + source + "\"");
         if (source == null || source.length() == 0) {
@@ -979,7 +941,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         if (results == null) {
             return;
         }
-        File deletedItems = new File(System.getenv("HOME") + File.separator + System.currentTimeMillis() + "_deleted_objects.txt");
+        File deletedItems = new File(System.getenv("HOME") + File.separator + System.currentTimeMillis()
+            + "_deleted_objects.txt");
         FileWriter fw = new FileWriter(deletedItems);
         try {
             fw.write("query=" + source + "\n\n");
@@ -994,7 +957,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             fw.close();
         }
 
-        LOGGER.info("A list with the identifiers of the deleted items has been saved to " + deletedItems.getAbsolutePath());
+        LOGGER.info("A list with the identifiers of the deleted items has been saved to "
+            + deletedItems.getAbsolutePath());
     }
 
     /**
@@ -1003,8 +967,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param qSource the query to execute
      * @throws Exception
      */
-    @MCRCommand(syntax="list objects matching {0}",
-    		help="Lists all objects matching the query given in parameter {0}", order=50)
+    @MCRCommand(syntax = "list objects matching {0}", help = "Lists all objects matching the query given in parameter {0}", order = 50)
     public static void listIdsMatchingQuery(String qSource) throws Exception {
         LOGGER.info("Given query is \"" + qSource + "\"");
         if (qSource == null || qSource.length() == 0) {
@@ -1026,7 +989,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         if (results == null) {
             return;
         }
-        File matchingItems = new File(System.getenv("HOME") + File.separator + System.currentTimeMillis() + "_matched.txt");
+        File matchingItems = new File(System.getenv("HOME") + File.separator + System.currentTimeMillis()
+            + "_matched.txt");
         FileWriter fw = new FileWriter(matchingItems);
         try {
             fw.write("query=" + qSource + "\n\n");
@@ -1041,7 +1005,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             fw.close();
         }
 
-        LOGGER.info("A list with the identifiers matching query \"" + qSource + "\" has been saved to " + matchingItems.getAbsolutePath());
+        LOGGER.info("A list with the identifiers matching query \"" + qSource + "\" has been saved to "
+            + matchingItems.getAbsolutePath());
     }
 
     /**
@@ -1073,8 +1038,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param xslFilePath path to xsl file
      * @throws Exception
      */
-    @MCRCommand(syntax="xslt {0} with file {1}",
-    		help="transforms a mycore object {0} with the given file {1}", order=280)
+    @MCRCommand(syntax = "xslt {0} with file {1}", help = "transforms a mycore object {0} with the given file {1}", order = 280)
     public static void xslt(String objectId, String xslFilePath) throws Exception {
         File xslFile = new File(xslFilePath);
         if (!xslFile.exists()) {
@@ -1104,9 +1068,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws MCRPersistenceException 
      * @throws MCRActiveLinkException
      */
-    @MCRCommand(syntax="set parent of {0} to {1}",
-    		help="replaces a parent of an object (first parameter) to the given new one (second parameter)", order=300)
-    public static void replaceParent(String sourceId, String newParentId) throws MCRPersistenceException, MCRActiveLinkException {
+    @MCRCommand(syntax = "set parent of {0} to {1}", help = "replaces a parent of an object (first parameter) to the given new one (second parameter)", order = 300)
+    public static void replaceParent(String sourceId, String newParentId) throws MCRPersistenceException,
+        MCRActiveLinkException {
         // child
         MCRObject sourceMCRObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(sourceId));
         // old parent
@@ -1153,15 +1117,14 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param base_id
      *            the base part of a MCRObjectID e.g. DocPortal_document
      */
-    @MCRCommand(syntax="check derivate entries in objects for base {0}",
-            help="check in all objects with MCR base ID {0} for existing linked derivates", order=400)
+    @MCRCommand(syntax = "check derivate entries in objects for base {0}", help = "check in all objects with MCR base ID {0} for existing linked derivates", order = 400)
     public static void checkDerivatesInObjects(String base_id) {
         if (base_id == null || base_id.length() == 0) {
             LOGGER.error("Base ID missed for check derivate entries in objects for base {0}");
             return;
         }
         MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
-        List <String> id_list = mgr.listIDsForBase(base_id);
+        List<String> id_list = mgr.listIDsForBase(base_id);
         int counter = 0;
         int maxresults = id_list.size();
         for (String objid : id_list) {
@@ -1170,10 +1133,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             // get from data
             MCRObjectID mcrobjid = MCRObjectID.getInstance(objid);
             MCRObject obj = MCRMetadataManager.retrieveMCRObject(mcrobjid);
-            List <MCRMetaLinkID> derivate_entries = obj.getStructure().getDerivates();
+            List<MCRMetaLinkID> derivate_entries = obj.getStructure().getDerivates();
             for (MCRMetaLinkID derivate_entry : derivate_entries) {
                 String derid = derivate_entry.getXLinkHref();
-                if (! mgr.exists(MCRObjectID.getInstance(derid))) {
+                if (!mgr.exists(MCRObjectID.getInstance(derid))) {
                     LOGGER.error("   !!! Missing derivate " + derid + " in database for base ID " + base_id);
                 }
             }
@@ -1181,13 +1144,12 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         LOGGER.info("Check done for " + Integer.toString(counter) + " entries");
     }
 
-    @MCRCommand(syntax = "execute for selected {0}",
-            help = "Calls the given command multiple times for all selected objects. The replacement is defined by an {x}. E.g. 'execute for selected set parent of {x} to myapp_container_00000001'",
-            order = 450)
+    @MCRCommand(syntax = "execute for selected {0}", help = "Calls the given command multiple times for all selected objects. The replacement is defined by an {x}. E.g. 'execute for selected set parent of {x} to myapp_container_00000001'", order = 450)
     public static List<String> executeForSelected(String command) throws Exception {
         List<String> commandList = new ArrayList<>();
         if (!command.contains("{x}")) {
-            LOGGER.info("No replacement defined. Use the {x} variable in order to execute your command with all selected objects.");
+            LOGGER
+                .info("No replacement defined. Use the {x} variable in order to execute your command with all selected objects.");
             return commandList;
         }
         for (String objID : getSelectedObjectIDs()) {
