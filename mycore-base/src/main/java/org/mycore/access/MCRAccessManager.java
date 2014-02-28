@@ -55,7 +55,8 @@ public class MCRAccessManager {
     public static final String PERMISSION_DELETE = "deletedb";
 
     public static MCRAccessInterface getAccessImpl() {
-        return MCRConfiguration.instance().<MCRAccessInterface> getSingleInstanceOf("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
+        return MCRConfiguration.instance().<MCRAccessInterface> getSingleInstanceOf("MCR.Access.Class",
+            MCRAccessBaseImpl.class.getName());
     }
 
     /**
@@ -212,6 +213,9 @@ public class MCRAccessManager {
             value = ACCESS_STRATEGY.checkPermission(id, permission);
             ACCESS_CACHE.cachePermission(id, permission, value);
         }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("checkPermission id:" + id + " permission:" + permission + " --> " + value);
+        }
         return value;
     }
 
@@ -228,6 +232,9 @@ public class MCRAccessManager {
         if (value == null) {
             value = getAccessImpl().checkPermission(permission);
             ACCESS_CACHE.cachePermission(null, permission, value);
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("checkPermission permission:" + permission + " --> " + value);
         }
         return value;
     }

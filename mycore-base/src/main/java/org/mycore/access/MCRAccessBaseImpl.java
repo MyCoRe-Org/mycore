@@ -49,7 +49,8 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
 
     private static MCRAccessInterface SINGLETON;
 
-    final protected static String AccessPermissions = MCRConfiguration.instance().getString("MCR.Access.AccessPermissions", "read,write,delete");
+    final protected static String AccessPermissions = MCRConfiguration.instance().getString(
+        "MCR.Access.AccessPermissions", "read,write,delete");
 
     /** the logger */
     private static final Logger LOGGER = Logger.getLogger(MCRAccessBaseImpl.class);
@@ -124,7 +125,8 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see org.mycore.access.MCRAccessInterface#updateRule(java.lang.String,
      *      java.lang.String, org.jdom2.Element)
      */
-    public void updateRule(String id, String permission, org.jdom2.Element rule, String description) throws MCRException {
+    public void updateRule(String id, String permission, org.jdom2.Element rule, String description)
+        throws MCRException {
         LOGGER.debug("Execute MCRAccessBaseImpl updateRule for ID " + id + " for permission " + permission);
     }
 
@@ -150,11 +152,14 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
         try {
             MCRAccessRule rule = getAccessRule(id, permission);
             if (rule == null) {
+                LOGGER.debug("No rule defined. Checking if current user is super user.");
                 MCRSystemUserInformation superUserInstance = MCRSystemUserInformation.getSuperUserInstance();
                 String superUserID = superUserInstance.getUserID();
                 return superUserID.equals(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
             }
-            return rule.validate();
+            boolean validate = rule.validate();
+            LOGGER.debug(validate ? "Current user has permission." : "Current user does not have permission.");
+            return validate;
         } finally {
             LOGGER.debug("Check " + permission + " on " + id + " took:" + (System.currentTimeMillis() - start));
         }
@@ -167,7 +172,8 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      *      java.lang.String, MCRUser)
      */
     public boolean checkPermission(String id, String permission, String userID) {
-        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for ID " + id + " for permission " + permission + " for user" + userID);
+        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for ID " + id + " for permission " + permission
+            + " for user" + userID);
         return true;
     }
 
