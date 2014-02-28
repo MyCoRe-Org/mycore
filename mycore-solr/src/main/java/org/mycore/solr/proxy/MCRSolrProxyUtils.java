@@ -96,13 +96,9 @@ class MCRSolrProxyUtils {
         return queryHandler;
     }
 
-    static Map<String, MCRSolrQueryHandler> getQueryHandlerMap() {
+    static Map<String, MCRSolrQueryHandler> getQueryHandlerMap() throws SolrServerException, IOException {
         NamedList<NamedList<Object>> list = null;
-        try {
-            list = getQueryHandlerList();
-        } catch (SolrServerException | IOException e) {
-            LOGGER.warn("Could not get query handler from SOLR.", e);
-        }
+        list = getQueryHandlerList();
         int initialCapacity = list == null ? 2 : list.size();
         HashMap<String, MCRSolrQueryHandler> map = new HashMap<>(initialCapacity);
         MCRSolrQueryHandler standardHandler = getStandardHandler(list);
