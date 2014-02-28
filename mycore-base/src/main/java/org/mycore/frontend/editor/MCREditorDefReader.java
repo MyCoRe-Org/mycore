@@ -1,5 +1,5 @@
 /*
- * $Revision$ 
+ * $Revision$
  * $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -44,7 +44,7 @@ import org.mycore.common.xml.MCRXMLParserFactory;
 
 /*
  * Reads in definition of editor forms like search mask and data input forms.
- * Resolves includes and prepares editor form for output. 
+ * Resolves includes and prepares editor form for output.
  */
 public class MCREditorDefReader {
     private final static Logger LOGGER = Logger.getLogger(MCREditorDefReader.class);
@@ -59,11 +59,11 @@ public class MCREditorDefReader {
 
     /**
      * Reads the editor definition from the given URI
-     * 
+     *
      * @param validate
      *            if true, validate editor definition against schema
      * @param parameters
-     *            http request parameters           
+     *            http request parameters
      */
     MCREditorDefReader(String uri, String ref, boolean validate, MCRParameters parameters) {
         long time = System.nanoTime();
@@ -128,7 +128,7 @@ public class MCREditorDefReader {
     }
 
     /**
-     * Returns the complete editor with all references resolved 
+     * Returns the complete editor with all references resolved
      */
     Element getEditor() {
         return editor;
@@ -139,7 +139,7 @@ public class MCREditorDefReader {
      * of the given container element and replaces them with the included
      * resource. Includes that may be contained in included resources are
      * recursively resolved, too.
-     * 
+     *
      * @param element
      *            The element where to start resolving includes
      */
@@ -148,7 +148,7 @@ public class MCREditorDefReader {
 
         String ref = element.getAttributeValue("ref", "");
         ref = tokenSubstitutor.substituteTokens(ref);
-        
+
         if (element.getName().equals("include")) {
             String uri = element.getAttributeValue("uri");
             if (uri != null) {
@@ -212,7 +212,7 @@ public class MCREditorDefReader {
     /**
      * Returns that direct or indirect child element of the given element, thats
      * ID attribute has the given value.
-     * 
+     *
      * @param id
      *            the value the ID attribute must have
      * @param candidate
@@ -321,7 +321,7 @@ public class MCREditorDefReader {
         defaultAttributes.put("repeater", new Properties());
         defaultAttributes.get("repeater").setProperty("class", "editorRepeater");
         defaultAttributes.get("repeater").setProperty("min", "1");
-        defaultAttributes.get("repeater").setProperty("max", "10");
+        defaultAttributes.get("repeater").setProperty("max", "100");
         defaultAttributes.put("panel", new Properties());
         defaultAttributes.get("panel").setProperty("class", "editorPanel");
         defaultAttributes.put("editor", new Properties());
@@ -368,10 +368,10 @@ public class MCREditorDefReader {
         }
     }
 
-    /** 
+    /**
      * Transforms @var attribute values that have a condition like
      * title[@type='main'] into escaped internal syntax
-     * title__type__main 
+     * title__type__main
      */
     static void fixConditionedVariables(Element element) {
         String var = element.getAttributeValue("var", "");
