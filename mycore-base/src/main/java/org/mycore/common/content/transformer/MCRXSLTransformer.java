@@ -321,17 +321,17 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     private static class MCRTransformedContent extends MCRWrappedContent {
         private MCRContent source;
-    
+
         private XMLReader reader;
-    
+
         private TransformerHandler transformerHandler;
-    
+
         private long lastModified;
-    
+
         private MCRContent transformed;
-    
+
         private String eTag;
-    
+
         public MCRTransformedContent(MCRContent source, XMLReader reader, TransformerHandler transformerHandler,
             long transformerLastModified, MCRParameterCollector parameter) throws IOException {
             this.source = source;
@@ -341,10 +341,14 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
                 transformerLastModified, source.lastModified()) : -1;
             this.eTag = generateETag(source, lastModified, parameter.hashCode());
         }
-    
+
         private String generateETag(MCRContent content, final long lastModified, final int parameterHashCode)
             throws IOException {
             String sourceETag = content.getETag();
+            if (sourceETag == null) {
+                //please check if returning null here is better;
+                sourceETag = "\"" + content.hashCode() + "\"";
+            }
             long systemLastModified = MCRConfiguration.instance().getSystemLastModified();
             StringBuilder b = new StringBuilder(sourceETag);
             b.deleteCharAt(b.length() - 1);//removes at end "
@@ -355,7 +359,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             b.append('"');
             return b.toString();
         }
-    
+
         @Override
         public MCRContent getBaseContent() {
             if (transformed == null) {
@@ -374,16 +378,16 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             }
             return transformed;
         }
-    
+
         @Override
         public long lastModified() throws IOException {
             return lastModified;
         }
-    
+
         @Override
         public String getETag() throws IOException {
             return eTag;
         }
-    
+
     }
 }
