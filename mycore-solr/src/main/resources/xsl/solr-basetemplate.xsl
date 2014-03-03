@@ -146,36 +146,4 @@
     </xsl:attribute>
   </xsl:template>
 
-  <!-- Allows to dynamically create fields from remote XML e.g. GND -->
-  <xsl:template name="FieldsFromRemoteContent">
-    <xsl:param name="url" />
-    <xsl:if test="$url">
-      <xsl:for-each select="$url//*[not(*)]">
-        <xsl:variable name="element" select="local-name(.)" />
-
-        <xsl:choose>
-          <xsl:when test="string-length(.) &gt; 0">
-            <field name="local-name(.)">
-              <xsl:value-of select="." />
-            </field>
-
-            <xsl:for-each select="./@*">
-              <!-- <elementName>.<attribute.name>.<attrVal> -->
-              <field name="{concat($element, '.', local-name(.), '.', translate(.,'|$?#[]{}&amp; ','__________'))}">
-                <xsl:value-of select="../." />
-              </field>
-            </xsl:for-each>
-          </xsl:when>
-        </xsl:choose>
-
-        <!-- every attribute -->
-        <xsl:for-each select="./@*">
-          <field name="{concat($element, '.', local-name(.))}">
-            <xsl:value-of select="." />
-          </field>
-        </xsl:for-each>
-      </xsl:for-each>
-    </xsl:if>
-  </xsl:template>
-
 </xsl:stylesheet>

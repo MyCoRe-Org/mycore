@@ -79,8 +79,7 @@
       </xsl:for-each>
       <!-- and once again for mods -->
       <xsl:for-each select="metadata//mods:*[@authority or @authorityURI]">
-        <xsl:variable name="uri" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport"
-          select="mcrmods:getClassCategParentLink(.)" />
+        <xsl:variable name="uri" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport" select="mcrmods:getClassCategParentLink(.)" />
         <xsl:if test="string-length($uri) &gt; 0">
           <xsl:variable name="class" select="document($uri)" />
           <xsl:variable name="classid" select="document($uri)/mycoreclass/@ID" />
@@ -105,6 +104,40 @@
             </field>
           </xsl:for-each>
         </xsl:if>
+      </xsl:for-each>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- Allows to dynamically create fields from remote XML e.g. GND -->
+  <xsl:template name="DynamicFieldsFromRemoteXMLContent">
+    <xsl:param name="url" />
+    <xsl:if test="$url">
+      <xsl:variable name="xml" select="document($url)" />
+
+      <xsl:for-each select="$xml//*[not(*)]">
+        <xsl:variable name="element" select="local-name(.)" />
+
+        <xsl:choose>
+          <xsl:when test="string-length(.) &gt; 0">
+            <field name="local-name(.)">
+              <xsl:value-of select="." />
+            </field>
+
+            <xsl:for-each select="./@*">
+              <!-- <elementName>.<attribute.name>.<attrVal> -->
+              <field name="{concat($element, '.', local-name(.), '.', translate(.,'|$?#[]{}&amp; ','__________'))}">
+                <xsl:value-of select="../." />
+              </field>
+            </xsl:for-each>
+          </xsl:when>
+        </xsl:choose>
+
+        <!-- every attribute -->
+        <xsl:for-each select="./@*">
+          <field name="{concat($element, '.', local-name(.))}">
+            <xsl:value-of select="." />
+          </field>
+        </xsl:for-each>
       </xsl:for-each>
     </xsl:if>
   </xsl:template>
