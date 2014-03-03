@@ -119,7 +119,7 @@
 
         <xsl:choose>
           <xsl:when test="string-length(.) &gt; 0">
-            <field name="local-name(.)">
+            <field name="{local-name(.)}">
               <xsl:value-of select="." />
             </field>
 
