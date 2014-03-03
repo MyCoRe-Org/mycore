@@ -149,7 +149,7 @@ public class MCRFileMetadataManager {
      * @param node
      *            the MCRFilesystemNode to store
      */
-    void storeNode(MCRFilesystemNode node) throws MCRPersistenceException {
+    public void storeNode(MCRFilesystemNode node) throws MCRPersistenceException {
         store.storeNode(node);
         cache.put(node.getID(), node);
     }
