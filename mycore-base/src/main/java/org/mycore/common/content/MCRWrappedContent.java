@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.channels.ReadableByteChannel;
 
 import javax.xml.transform.Source;
 
@@ -161,6 +162,30 @@ public abstract class MCRWrappedContent extends MCRContent {
 
     public String getETag() throws IOException {
         return getBaseContent().getETag();
+    }
+
+    public ReadableByteChannel getReadableByteChannel() throws IOException {
+        return getBaseContent().getReadableByteChannel();
+    }
+
+    public void setDocType(String docType) {
+        getBaseContent().setDocType(docType);
+    }
+
+    public String getMimeType() throws IOException {
+        return getBaseContent().getMimeType();
+    }
+
+    public void setMimeType(String mimeType) {
+        getBaseContent().setMimeType(mimeType);
+    }
+
+    public String getName() {
+        return getBaseContent().getName();
+    }
+
+    public void setName(String name) {
+        getBaseContent().setName(name);
     }
 
 }

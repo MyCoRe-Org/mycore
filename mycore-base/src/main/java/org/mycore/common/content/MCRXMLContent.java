@@ -26,6 +26,7 @@ package org.mycore.common.content;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 
 import org.jdom2.output.Format;
 import org.mycore.common.config.MCRConfiguration;
@@ -39,6 +40,7 @@ import org.mycore.common.config.MCRConfiguration;
 public abstract class MCRXMLContent extends MCRContent {
 
     public static final String ENCODING = "UTF-8";
+
     /** 
      * The default format used when outputting XML as a byte stream.
      * By default, content is outputted using UTF-8 encoding.
@@ -72,5 +74,10 @@ public abstract class MCRXMLContent extends MCRContent {
     @Override
     public MCRContent ensureXML() {
         return this;
+    }
+
+    @Override
+    public String getMimeType() throws IOException {
+        return super.getMimeType() == null ? "text/xml" : super.getMimeType();
     }
 }

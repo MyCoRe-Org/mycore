@@ -27,6 +27,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.StandardOpenOption;
+
+import javax.activation.MimeType;
 
 /**
  * Reads MCRContent from a local file.
@@ -65,5 +72,15 @@ public class MCRFileContent extends MCRContent {
     public String getETag() throws IOException {
         String eTag = getSimpleWeakETag(file.toURI().toString(), length(), lastModified());
         return eTag == null ? null : eTag.substring(2);
+    }
+
+    @Override
+    public ReadableByteChannel getReadableByteChannel() throws IOException {
+        return FileChannel.open(file.toPath(), StandardOpenOption.READ);
+    }
+
+    @Override
+    public String getMimeType() throws IOException {
+        return super.getMimeType() == null ? Files.probeContentType(file.toPath()) : super.getMimeType();
     }
 }

@@ -28,8 +28,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
 
 import org.apache.commons.vfs2.FileContent;
+import org.apache.commons.vfs2.FileContentInfoFactory;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.VFS;
 import org.apache.log4j.Logger;
@@ -48,6 +50,7 @@ public class MCRVFSContent extends MCRContent {
 
     public MCRVFSContent(FileObject fo) throws IOException {
         this.fo = fo;
+        setName(fo.getName().getBaseName());
         setSystemId(fo.getURL().toString());
     }
 
@@ -93,7 +96,7 @@ public class MCRVFSContent extends MCRContent {
     public long length() throws IOException {
         FileContent content = fo.getContent();
         try {
-            return content.getLastModifiedTime();
+            return content.getSize();
         } finally {
             fo.close();
         }
@@ -124,6 +127,21 @@ public class MCRVFSContent extends MCRContent {
                 return null;
             }
             return eTag.substring(2); //remove weak
+        } finally {
+            content.close();
+        }
+    }
+
+    @Override
+    public String getMimeType() throws IOException {
+        if (super.getMimeType() != null) {
+            return super.getMimeType();
+        }
+        FileContentInfoFactory fileContentInfoFactory = fo.getFileSystem().getFileSystemManager()
+            .getFileContentInfoFactory();
+        FileContent content = fo.getContent();
+        try {
+            return fileContentInfoFactory.create(content).getContentType();
         } finally {
             content.close();
         }

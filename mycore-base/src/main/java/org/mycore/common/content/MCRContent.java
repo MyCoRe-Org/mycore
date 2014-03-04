@@ -31,17 +31,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.FileObject;
-import org.apache.fop.datatypes.Length;
+import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
@@ -79,11 +87,41 @@ public abstract class MCRContent {
      */
     protected long lastModified = -1;
 
+    protected String mimeType;
+
+    protected String name;
+
     /**
      * Sets the systemID of the current content
      */
     void setSystemId(String systemId) {
         this.systemId = systemId;
+        if (getName() == null && systemId != null) {
+            String fileName = getFilenameFromSystemId();
+            setName(fileName);
+        }
+    }
+
+    private String getFilenameFromSystemId() {
+        String fileName = systemId;
+        String path = null;
+        try {
+            path = new URL(systemId).getPath();
+        } catch (MalformedURLException e) {
+            Logger.getLogger(getClass()).debug("Could not get file name from URL.", e);
+            try {
+                path = new URI(systemId).getPath();
+            } catch (URISyntaxException e2) {
+                Logger.getLogger(getClass()).debug("Could not get file name from URI.", e2);
+            }
+        }
+        if (path != null) {
+            fileName = path;
+        }
+        if (fileName.endsWith("/")) {
+            fileName = FilenameUtils.getPathNoEndSeparator(fileName); //removes final '/';
+        }
+        return FilenameUtils.getName(fileName);
     }
 
     /**
@@ -100,6 +138,15 @@ public abstract class MCRContent {
      * @throws IOException 
      */
     public abstract InputStream getInputStream() throws IOException;
+
+    /**
+     * Returns an readable bytechannel to this content or null if one is not available.
+     * 
+     */
+    public ReadableByteChannel getReadableByteChannel() throws IOException {
+        InputStream inputStream = getInputStream();
+        return inputStream == null ? null : Channels.newChannel(inputStream);
+    }
 
     /**
      * Returns content as content input stream, which provides MD5
@@ -289,6 +336,9 @@ public abstract class MCRContent {
         } else {
             MCRContent copy = new MCRByteContent(asByteArray(), lastModified());
             copy.setSystemId(getSystemId());
+            copy.setName(getName());
+            copy.setDocType(getDocType());
+            copy.setMimeType(getMimeType());
             return copy;
         }
     }
@@ -337,5 +387,25 @@ public abstract class MCRContent {
         b.append(Base64.encodeBase64String(unencodedETag));
         b.append('"');
         return b.toString();
+    }
+
+    public String getMimeType() throws IOException {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setLastModified(long lastModified) {
+        this.lastModified = lastModified;
     }
 }

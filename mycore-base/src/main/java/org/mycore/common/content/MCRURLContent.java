@@ -31,6 +31,7 @@ import java.net.URLConnection;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.io.FilenameUtils;
 import org.xml.sax.InputSource;
 
 /**
@@ -48,6 +49,11 @@ public class MCRURLContent extends MCRContent {
         super();
         this.url = url;
         this.setSystemId(url.toString());
+        String fileName = url.getPath();
+        if (fileName.endsWith("/")) {
+            fileName = FilenameUtils.getPathNoEndSeparator(fileName); //removes final '/';
+        }
+        setName(FilenameUtils.getName(fileName));
     }
 
     @Override
@@ -87,6 +93,11 @@ public class MCRURLContent extends MCRContent {
         long length = openConnection.getContentLengthLong();
         eTag = getSimpleWeakETag(url.toString(), length, lastModified);
         return eTag == null ? null : eTag.substring(2);
+    }
+
+    @Override
+    public String getMimeType() throws IOException {
+        return super.getMimeType() == null ? url.openConnection().getContentType() : super.getMimeType();
     }
 
 }

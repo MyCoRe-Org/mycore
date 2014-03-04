@@ -326,8 +326,6 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
         private TransformerHandler transformerHandler;
 
-        private long lastModified;
-
         private MCRContent transformed;
 
         private String eTag;
@@ -379,7 +377,6 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             return transformed;
         }
 
-        @Override
         public long lastModified() throws IOException {
             return lastModified;
         }

@@ -33,6 +33,7 @@ public class MCRBaseContent extends MCRJDOMContent {
 
     public MCRBaseContent(MCRBase base) {
         super(base.createXML());
+        setName(base.getId() + ".xml");
     }
 
 }
