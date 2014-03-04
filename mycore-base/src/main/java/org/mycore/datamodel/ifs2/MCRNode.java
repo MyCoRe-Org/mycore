@@ -290,7 +290,13 @@ public abstract class MCRNode {
      * @return the content of the file
      */
     public MCRContent getContent() throws IOException {
-        return isFile() ? new MCRVFSContent(fo) : null;
+        return isFile() ? doGetContent() : null;
+    }
+
+    private MCRVFSContent doGetContent() throws IOException {
+        MCRVFSContent content = new MCRVFSContent(fo);
+        content.setName(getName());
+        return content;
     }
 
     /**
