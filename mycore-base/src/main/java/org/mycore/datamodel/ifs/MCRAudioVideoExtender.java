@@ -37,6 +37,7 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.content.MCRContent;
 
 /**
  * For MCRFiles that contain streaming audio/video, instances of this class
@@ -299,7 +300,21 @@ public abstract class MCRAudioVideoExtender {
      * @param stopPos
      *            the optional stop position in the format "hh:mm:ss"
      */
-    public abstract void getPlayerStarterTo(OutputStream out, String startPos, String stopPos) throws MCRPersistenceException;
+    @Deprecated
+    public abstract void getPlayerStarterTo(OutputStream out, String startPos, String stopPos)
+        throws MCRPersistenceException;
+
+    /**
+     * Gets a metafile that starts a streaming player for this asset. The browser then streams the
+     * asset. The client may provide a start and stop position to play only a
+     * certain part of the asset.
+     * 
+     * @param startPos
+     *            the optional start position in the format "hh:mm:ss"
+     * @param stopPos
+     *            the optional stop position in the format "hh:mm:ss"
+     */
+    public abstract MCRContent getPlayerStarter(String startPos, String stopPos) throws IOException;
 
     /**
      * Returns the MIME type a servlet has to set in the HTTP response that

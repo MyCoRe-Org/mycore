@@ -25,13 +25,17 @@ package org.mycore.backend.realhelix;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URL;
 import java.net.URLConnection;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRURLContent;
 import org.mycore.datamodel.ifs.MCRAudioVideoExtender;
+import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileReader;
 
 /**
@@ -164,30 +168,46 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
         }
 
         try {
-            StringBuilder cgi = new StringBuilder(basePlayerStarter);
-            cgi.append(file.getStorageID());
-
-            if (startPos != null || stopPos != null) {
-                cgi.append("?");
-            }
-
-            if (startPos != null) {
-                cgi.append("start=").append(startPos);
-            }
-
-            if (startPos != null && stopPos != null) {
-                cgi.append("&");
-            }
-
-            if (stopPos != null) {
-                cgi.append("end=").append(stopPos);
-            }
-
-            URLConnection connection = getConnection(cgi.toString());
+            String url = getURL(startPos, stopPos);
+            URLConnection connection = getConnection(url);
             forwardData(connection, out);
         } catch (IOException exc) {
             String msg = "Could not send player starter file";
             throw new MCRPersistenceException(msg, exc);
         }
+    }
+
+    private String getURL(String startPos, String stopPos) {
+        StringBuilder cgi = new StringBuilder(basePlayerStarter);
+        cgi.append(file.getStorageID());
+
+        if (startPos != null || stopPos != null) {
+            cgi.append("?");
+        }
+
+        if (startPos != null) {
+            cgi.append("start=").append(startPos);
+        }
+
+        if (startPos != null && stopPos != null) {
+            cgi.append("&");
+        }
+
+        if (stopPos != null) {
+            cgi.append("end=").append(stopPos);
+        }
+
+        String url = cgi.toString();
+        return url;
+    }
+
+    @Override
+    public MCRContent getPlayerStarter(String startPos, String stopPos) throws IOException {
+        MCRURLContent content = new MCRURLContent(new URL(getURL(startPos, stopPos)));
+        content.setMimeType(getPlayerStarterContentType());
+        if (file instanceof MCRFile) {
+            content.setName(((MCRFile) file).getName() + startPos + "-" + stopPos);
+        }
+        return content;
     }
 }
