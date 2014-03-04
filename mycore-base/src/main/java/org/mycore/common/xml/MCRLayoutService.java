@@ -76,7 +76,8 @@ public class MCRLayoutService extends MCRDeprecatedLayoutService {
         res.flushBuffer();
     }
 
-    public void doLayout(HttpServletRequest req, HttpServletResponse res, MCRContent source) throws IOException, TransformerException, SAXException {
+    public void doLayout(HttpServletRequest req, HttpServletResponse res, MCRContent source) throws IOException,
+        TransformerException, SAXException {
         String docType = source.getDocType();
         try {
             MCRParameterCollector parameter = new MCRParameterCollector(req);
@@ -100,7 +101,34 @@ public class MCRLayoutService extends MCRDeprecatedLayoutService {
         }
     }
 
-    public static MCRContentTransformer getContentTransformer(String docType, MCRParameterCollector parameter) throws Exception {
+    public MCRContent getTransformedContent(HttpServletRequest req, HttpServletResponse res, MCRContent source)
+        throws IOException, TransformerException, SAXException {
+        String docType = source.getDocType();
+        try {
+            MCRParameterCollector parameter = new MCRParameterCollector(req);
+            MCRContentTransformer transformer = getContentTransformer(docType, parameter);
+            String filename = getFileName(req, parameter);
+            return transform(transformer, source, parameter, filename);
+        } catch (IOException | TransformerException | SAXException ex) {
+            throw ex;
+        } catch (MCRException ex) {
+            // Check if it is an error page to suppress later recursively
+            // generating an error page when there is an error in the stylesheet
+            if (!"mcr_error".equals(docType)) {
+                throw ex;
+            }
+
+            String msg = "Error while generating error page!";
+            LOGGER.warn(msg, ex);
+            res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
+            return null;
+        } catch (Exception e) {
+            throw new MCRException(e);
+        }
+    }
+
+    public static MCRContentTransformer getContentTransformer(String docType, MCRParameterCollector parameter)
+        throws Exception {
         String transformerId = parameter.getParameter("Transformer", null);
         if (transformerId == null) {
             String style = parameter.getParameter("Style", "default");
@@ -185,4 +213,30 @@ public class MCRLayoutService extends MCRDeprecatedLayoutService {
         }
     }
 
+    private MCRContent transform(MCRContentTransformer transformer, MCRContent source, MCRParameterCollector parameter,
+        String filename) throws IOException, TransformerException, SAXException {
+        LOGGER.debug("MCRLayoutService starts to output " + getMimeType(transformer));
+        long start = System.currentTimeMillis();
+        try {
+            if (transformer instanceof MCRParameterizedTransformer) {
+                MCRParameterizedTransformer paramTransformer = (MCRParameterizedTransformer) transformer;
+                return paramTransformer.transform(source, parameter);
+            } else {
+                return transformer.transform(source);
+            }
+        } finally {
+            LOGGER.debug("MCRContent transformation took " + (System.currentTimeMillis() - start) + " ms.");
+        }
+    }
+
+    private String getMimeType(MCRContentTransformer transformer) throws IOException, TransformerException,
+        SAXException {
+        try {
+            return transformer.getMimeType();
+        } catch (IOException | TransformerException | SAXException | RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            return "application/octet-stream";
+        }
+    }
 }
