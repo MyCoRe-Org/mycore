@@ -149,7 +149,8 @@ public final class MCRMODSClassificationSupport {
         if (category == null) {
             return "";
         }
-        return MessageFormat.format("classification:metadata:0:children:{0}:{1}", category.getRootID(), category.getID());
+        return MessageFormat.format("classification:metadata:0:children:{0}:{1}", category.getRootID(),
+            category.getID());
     }
 
     public static String getClassCategParentLink(final NodeList sources) {
@@ -158,7 +159,8 @@ public final class MCRMODSClassificationSupport {
         if (category == null) {
             return "";
         }
-        return MessageFormat.format("classification:metadata:0:parents:{0}:{1}", category.getRootID(), category.getID());
+        return MessageFormat
+            .format("classification:metadata:0:parents:{0}:{1}", category.getRootID(), category.getID());
     }
 
     private static String getText(final Element element) {
@@ -213,7 +215,8 @@ public final class MCRMODSClassificationSupport {
         }
 
         /** A cache that maps category ID to authority information */
-        public final static MCRCache<String, MCRAuthorityInfo> authorityInfoByCategoryID = new MCRCache<String, MCRAuthorityInfo>(1000, "Authority info by category ID");
+        public final static MCRCache<String, MCRAuthorityInfo> authorityInfoByCategoryID = new MCRCache<String, MCRAuthorityInfo>(
+            1000, "Authority info by category ID");
 
         /**
          * Returns the authority information that represents the category with the given ID.
@@ -241,7 +244,7 @@ public final class MCRMODSClassificationSupport {
             MCRCategory category = DAO.getCategory(categoryID, 0);
             MCRCategory classification = category.getRoot();
 
-            if (classification.getId().getRootID().equals(MCRTypeOfResource.TYPE_OF_RESOURCE)){
+            if (classification.getId().getRootID().equals(MCRTypeOfResource.TYPE_OF_RESOURCE)) {
                 return new MCRTypeOfResource(categoryID.getID());
             }
 
@@ -267,7 +270,8 @@ public final class MCRMODSClassificationSupport {
         /**
          * A cache that maps authority information to the category ID that is represented by that info.
          */
-        private final static MCRCache<String, Object> categoryIDbyAuthorityInfo = new MCRCache<String, Object>(1000, "Category ID by authority info");
+        private final static MCRCache<String, Object> categoryIDbyAuthorityInfo = new MCRCache<String, Object>(1000,
+            "Category ID by authority info");
 
         /**
          * Used in the cache to indicate the case when no category ID maps to the given authority info 
@@ -612,7 +616,7 @@ public final class MCRMODSClassificationSupport {
          * If the given element name is typeOfResource, returns the MCRTypeOfResource mapping.
          */
         private static MCRTypeOfResource getTypeOfResource(String name, String code) {
-            return name.equals(TYPE_OF_RESOURCE) ? new MCRTypeOfResource(code) : null;
+            return (name.equals(TYPE_OF_RESOURCE) && isClassificationPresent()) ? new MCRTypeOfResource(code) : null;
         }
 
         @Override
@@ -634,6 +638,10 @@ public final class MCRMODSClassificationSupport {
         @Override
         public void setInElement(Element element) {
             element.setTextContent(code);
+        }
+
+        public static boolean isClassificationPresent() {
+            return MCRCategoryDAOFactory.getInstance().exist(MCRCategoryID.rootID(TYPE_OF_RESOURCE));
         }
     }
 }
