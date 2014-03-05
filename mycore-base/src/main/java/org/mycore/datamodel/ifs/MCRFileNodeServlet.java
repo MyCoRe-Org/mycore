@@ -23,26 +23,18 @@
 
 package org.mycore.datamodel.ifs;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Transaction;
 import org.jdom2.Document;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.frontend.servlets.MCRServlet;
-import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.frontend.servlets.MCRContentServlet;
 import org.xml.sax.SAXException;
 
 /**
@@ -62,86 +54,19 @@ import org.xml.sax.SAXException;
  * @version $Revision$ $Date: 2008-01-14 11:02:17 +0000 (Mo, 14 Jan
  *          2008) $
  */
-public class MCRFileNodeServlet extends MCRServlet {
+public class MCRFileNodeServlet extends MCRContentServlet {
     private static final long serialVersionUID = 1L;
 
-    // The Log4J logger
-    private static Logger LOGGER = Logger.getLogger(MCRFileNodeServlet.class.getName());
+    private static Logger LOGGER = Logger.getLogger(MCRFileNodeServlet.class);
 
-    // initialize it with an empty string -if propertie is missing,
-    // because in a case of MCRConfigurationException,
-    // no Servlet will be instantiated, and thats more bad then a missing
-    // property!
-    private static String accessErrorPage = MCRConfiguration.instance().getString("MCR.Access.Page.Error", "");
-
-    @Override
-    protected long getLastModified(HttpServletRequest request) {
-        Transaction tx = null;
-        try {
-            String ownerID = getOwnerID(request);
-            tx = MCRHIBConnection.instance().getSession().beginTransaction();
-            MCRFilesystemNode root = MCRFilesystemNode.getRootNode(ownerID);
-            MCRFilesystemNode node = ((MCRDirectory) root).getChildByPath(getPath(request));
-            final long lastModified = node.getLastModified().getTimeInMillis();
-            tx.commit();
-            LOGGER.debug("getLastModified returned: " + lastModified);
-            return lastModified;
-        } catch (RuntimeException e) {
-            if (tx != null && tx.isActive()) {
-                tx.rollback();
-            }
-            // any error would let us return -1 here
-            LOGGER.info("Error while getting last modified date.", e);
-            return -1;
-        } finally {
-            /*
-             * A new MCRSession may be created due to MCRHIBConnection implementation.
-             * As the MCRSession is not bound to a HttpSession that is closed automatically,
-             * we close it here, if no IP address is known.
-             */
-            MCRSession session = MCRSessionMgr.getCurrentSession();
-            if (session.getCurrentIP().length() < 7) {
-                //it's a stalled session close it
-                session.close();
-            }
-        }
-    }
-
-    /**
-     * Handles the HTTP request
+    /* (non-Javadoc)
+     * @see org.mycore.frontend.servlets.MCRContentServlet#getContent(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override
-    public void doGetPost(MCRServletJob job) throws IOException, TransformerException, SAXException {
-        HttpServletRequest request = job.getRequest();
-        HttpServletResponse response = job.getResponse();
+    public MCRContent getContent(HttpServletRequest request, HttpServletResponse response) throws IOException {
         if (!isParametersValid(request, response)) {
-            return;
+            return null;
         }
-        handleLocalRequest(job);
-    }
-
-    private boolean isParametersValid(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String requestPath = request.getPathInfo();
-        LOGGER.info("MCRFileNodeServlet: request path = " + requestPath);
-
-        if (requestPath == null) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error: HTTP request path is null");
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * @param request
-     * @param response
-     * @throws IOException
-     * @throws SAXException 
-     * @throws TransformerException 
-     * @throws ServletException
-     */
-    private void handleLocalRequest(MCRServletJob job) throws IOException, TransformerException, SAXException {
-        HttpServletRequest request = job.getRequest();
-        HttpServletResponse response = job.getResponse();
         String ownerID = getOwnerID(request);
         // local node to be retrieved
         MCRFilesystemNode root;
@@ -150,23 +75,23 @@ public class MCRFileNodeServlet extends MCRServlet {
             root = MCRFilesystemNode.getRootNode(ownerID);
         } catch (org.mycore.common.MCRPersistenceException e) {
             // Could not get value from JDBC result set
-            LOGGER.error("MCRFileNodeServlet: Error while getting root node!", e);
+            LOGGER.error("Error while getting root node!", e);
             root = null;
         }
 
         if (root == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "No root node found for owner ID " + ownerID);
-            return;
+            return null;
         }
 
         if (root instanceof MCRFile) {
             if (request.getPathInfo().length() > ownerID.length() + 1) {
                 // request path is too long
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Error: No such file or directory " + request.getPathInfo());
-                return;
+                response.sendError(HttpServletResponse.SC_NOT_FOUND,
+                    "Error: No such file or directory " + request.getPathInfo());
+                return null;
             }
-            sendFile(job, (MCRFile) root);
-            return;
+            return sendFile(request, response, (MCRFile) root);
         }
 
         // root node is a directory
@@ -176,14 +101,27 @@ public class MCRFileNodeServlet extends MCRServlet {
 
         if (node == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Error: No such file or directory " + path);
-            return;
+            return null;
         } else if (node instanceof MCRFile) {
-            sendFile(job, (MCRFile) node);
-            return;
+            return sendFile(request, response, (MCRFile) node);
         } else {
-            sendDirectory(request, response, (MCRDirectory) node);
-            return;
+            try {
+                return sendDirectory(request, response, (MCRDirectory) node);
+            } catch (TransformerException | SAXException e) {
+                throw new IOException(e);
+            }
         }
+    }
+
+    private boolean isParametersValid(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String requestPath = request.getPathInfo();
+        LOGGER.info("request path = " + requestPath);
+
+        if (requestPath == null) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error: HTTP request path is null");
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -196,12 +134,12 @@ public class MCRFileNodeServlet extends MCRServlet {
         boolean running = true;
         for (int i = pI.charAt(0) == '/' ? 1 : 0; i < pI.length() && running; i++) {
             switch (pI.charAt(i)) {
-            case '/':
-                running = false;
-                break;
-            default:
-                ownerID.append(pI.charAt(i));
-                break;
+                case '/':
+                    running = false;
+                    break;
+                default:
+                    ownerID.append(pI.charAt(i));
+                    break;
             }
         }
         return ownerID.toString();
@@ -232,36 +170,26 @@ public class MCRFileNodeServlet extends MCRServlet {
      * parameters that contain the timecodes where to start and/or stop
      * streaming.
      */
-    private void sendFile(MCRServletJob job, MCRFile file) throws IOException {
-        HttpServletRequest req = job.getRequest();
-        HttpServletResponse res = job.getResponse();
+    private MCRContent sendFile(HttpServletRequest req, HttpServletResponse res, MCRFile file) throws IOException {
         if (!MCRAccessManager.checkPermissionForReadingDerivate(file.getOwnerID())) {
-            LOGGER.info("MCRFileNodeServlet: AccessForbidden to " + file.getName());
-            res.sendRedirect(res.encodeRedirectURL(getBaseURL() + accessErrorPage));
-            return;
+            LOGGER.info("AccessForbidden to " + file.getName());
+            res.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return null;
         }
 
-        LOGGER.info("MCRFileNodeServlet: Sending file " + file.getName());
+        LOGGER.info("Sending file " + file.getName() + ("HEAD".equals(req.getMethod()) ? " (HEAD only)" : ""));
 
-        if (file.hasAudioVideoExtender()) // Start streaming player
-        {
+        if (file.hasAudioVideoExtender()) {
+            // Start streaming player
             MCRAudioVideoExtender ext = file.getAudioVideoExtender();
 
             String startPos = req.getParameter("StartPos");
             String stopPos = req.getParameter("StopPos");
 
-            res.setContentType(ext.getPlayerStarterContentType());
-            ext.getPlayerStarterTo(res.getOutputStream(), startPos, stopPos);
-        } else // Send contents of ordinary file
-        {
-            res.setContentType(file.getContentType().getMimeType());
-            res.setHeader("Content-Length", String.valueOf(file.getSize()));
-            res.addHeader("Accept-Ranges", "none"); // Advice client not to attempt range requests
-            // no transaction needed to copy long streams over slow connections
-            MCRSessionMgr.getCurrentSession().commitTransaction();
-            OutputStream out = new BufferedOutputStream(res.getOutputStream());
-            file.getContentTo(out);
-            out.close();
+            return ext.getPlayerStarter(startPos, stopPos);
+        } else {
+            // Send contents of ordinary file
+            return file.getContent();
         }
     }
 
@@ -270,38 +198,16 @@ public class MCRFileNodeServlet extends MCRServlet {
      * @throws SAXException 
      * @throws TransformerException 
      */
-    private void sendDirectory(HttpServletRequest req, HttpServletResponse res, MCRDirectory dir) throws IOException, TransformerException, SAXException {
-        LOGGER.info("MCRFileNodeServlet: Sending listing of directory " + dir.getName());
+    private MCRContent sendDirectory(HttpServletRequest req, HttpServletResponse res, MCRDirectory dir)
+        throws IOException, TransformerException, SAXException {
+        LOGGER.info("Sending listing of directory " + dir.getName()
+            + ("HEAD".equals(req.getMethod()) ? " (HEAD only)" : ""));
+        res.addHeader("Vary", "Cookie");
         Document jdom = MCRDirectoryXML.getInstance().getDirectoryXML(dir);
-        layoutDirectory(req, res, jdom);
+        MCRJDOMContent source = new MCRJDOMContent(jdom);
+        source.setLastModified(dir.getLastModified().getTimeInMillis());
+        source.setName(dir.getName());
+        return getLayoutService().getTransformedContent(req, res, source);
     }
 
-    /**
-     * Called to layout the directory structure
-     * 
-     * @param req
-     *            the html request
-     * @param res
-     *            the html response
-     * @param jdom
-     *            the jdom document
-     * @throws IOException
-     * see overwritten in JSPDocportal
-     * @throws SAXException 
-     * @throws TransformerException 
-     */
-    protected void layoutDirectory(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException, TransformerException, SAXException {
-        getLayoutService().doLayout(req, res, new MCRJDOMContent(jdom));
-    }
-
-    /**
-     * Forwards the error to generate the output
-     * 
-     * see its overwritten in jspdocportal
-     * @throws SAXException 
-     * @throws TransformerException 
-     */
-    protected void errorPage(HttpServletRequest req, HttpServletResponse res, int error, String msg, Exception ex, boolean xmlstyle) throws IOException, TransformerException, SAXException {
-        generateErrorPage(req, res, error, msg, ex, xmlstyle);
-    }
 }
