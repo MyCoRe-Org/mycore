@@ -26,6 +26,7 @@ package org.mycore.common.content;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.MessageDigest;
 import java.util.Arrays;
 
 import org.mycore.common.content.streams.MCRMD5InputStream;
@@ -87,7 +88,7 @@ public class MCRByteContent extends MCRContent {
 
     @Override
     public long length() throws IOException {
-        return bytes.length;
+        return length;
     }
 
     @Override
@@ -97,7 +98,9 @@ public class MCRByteContent extends MCRContent {
 
     @Override
     public String getETag() throws IOException {
-        byte[] digest = MCRMD5InputStream.buildMD5Digest().digest(bytes);
+        MessageDigest md5Digest = MCRMD5InputStream.buildMD5Digest();
+        md5Digest.update(bytes, offset, length);
+        byte[] digest = md5Digest.digest();
         String md5String = MCRMD5InputStream.getMD5String(digest);
         return '"' + md5String + '"';
     }
