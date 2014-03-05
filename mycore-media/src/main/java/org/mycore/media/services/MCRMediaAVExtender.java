@@ -23,7 +23,6 @@
 
 package org.mycore.media.services;
 
-import java.io.OutputStream;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
@@ -37,7 +36,7 @@ import org.mycore.media.MCRMediaObject;
 import org.mycore.media.MCRMediaParser;
 import org.mycore.media.MCRVideoObject;
 
-public class MCRMediaAVExtender extends MCRAudioVideoExtender {
+public abstract class MCRMediaAVExtender extends MCRAudioVideoExtender {
     /** The logger */
     private final static Logger LOGGER = Logger.getLogger(MCRMediaAVExtender.class);
 
@@ -215,6 +214,4 @@ public class MCRMediaAVExtender extends MCRAudioVideoExtender {
         return cType;
     }
 
-    public void getPlayerStarterTo(OutputStream out, String startPos, String stopPos) throws MCRPersistenceException {
-    }
 }
