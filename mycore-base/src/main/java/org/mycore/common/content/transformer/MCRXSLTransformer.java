@@ -43,6 +43,7 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.apache.xalan.trace.TraceManager;
 import org.apache.xalan.transformer.TransformerImpl;
@@ -191,7 +192,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             XMLReader reader = getXMLReader(transformHandlerList);
             TransformerHandler lastTransformerHandler = transformHandlerList.getLast();
             return transform(source, reader, lastTransformerHandler, parameter);
-        } catch (TransformerConfigurationException e) {
+        } catch (TransformerException e) {
             throw new IOException(e);
         } catch (SAXException e) {
             throw new IOException(e);
@@ -230,8 +231,17 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     }
 
     protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler,
-        MCRParameterCollector parameter) throws IOException, SAXException {
-        return new MCRTransformedContent(source, reader, transformerHandler, getLastModified(), parameter);
+        MCRParameterCollector parameter) throws IOException, SAXException, TransformerException {
+        return new MCRTransformedContent(source, reader, transformerHandler, getLastModified(), parameter,
+            getFileName(source), getMimeType());
+    }
+
+    private String getFileName(MCRContent content) throws TransformerException, SAXException {
+        String fileName = content.getName();
+        if (fileName == null) {
+            return null;
+        }
+        return FilenameUtils.removeExtension(fileName) + "." + getFileExtension();
     }
 
     private long getLastModified() {
@@ -331,13 +341,26 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         private String eTag;
 
         public MCRTransformedContent(MCRContent source, XMLReader reader, TransformerHandler transformerHandler,
-            long transformerLastModified, MCRParameterCollector parameter) throws IOException {
+            long transformerLastModified, MCRParameterCollector parameter, String fileName, String mimeType)
+            throws IOException {
             this.source = source;
             this.reader = reader;
             this.transformerHandler = transformerHandler;
             this.lastModified = (transformerLastModified >= 0 && source.lastModified() >= 0) ? Math.max(
                 transformerLastModified, source.lastModified()) : -1;
             this.eTag = generateETag(source, lastModified, parameter.hashCode());
+            this.name = fileName;
+            this.mimeType = mimeType;
+        }
+
+        @Override
+        public String getMimeType() throws IOException {
+            return mimeType;
+        }
+
+        @Override
+        public String getName() {
+            return name;
         }
 
         private String generateETag(MCRContent content, final long lastModified, final int parameterHashCode)
@@ -368,6 +391,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
                     throw new MCRException(e);
                 }
                 transformed = new MCRByteContent(baos.getBuffer(), 0, baos.size(), lastModified);
+                transformed.setMimeType(mimeType);
+                transformed.setName(name);
             }
             return transformed;
         }
