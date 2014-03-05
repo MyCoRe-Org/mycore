@@ -62,7 +62,18 @@ public class MCRBibUtilsTransformer extends MCRContentTransformer {
         File modsFile = File.createTempFile("mods", ".xml");
         source.sendTo(modsFile);
         try {
-            return export(modsFile);
+            MCRContent export = export(modsFile);
+            export.setLastModified(source.lastModified());
+            export.setMimeType(getMimeType());
+            return export;
+        } catch (Exception e) {
+            if (e instanceof IOException) {
+                throw (IOException) e;
+            }
+            if (e instanceof RuntimeException) {
+                throw (RuntimeException) e;
+            }
+            throw new IOException(e);
         } finally {
             modsFile.delete();
         }

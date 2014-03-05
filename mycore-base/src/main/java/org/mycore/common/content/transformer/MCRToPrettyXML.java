@@ -48,6 +48,10 @@ public class MCRToPrettyXML extends MCRContentTransformer {
         } catch (JDOMException | SAXException e) {
             throw new IOException(e);
         }
+        if (content != source) {
+            content.setName(source.getName());
+            content.setLastModified(source.lastModified());
+        }
         content.setFormat(Format.getPrettyFormat().setEncoding(getEncoding()));
         return content;
     }
