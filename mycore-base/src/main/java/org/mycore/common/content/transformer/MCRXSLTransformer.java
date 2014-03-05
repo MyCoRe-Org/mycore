@@ -342,15 +342,9 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
         private String generateETag(MCRContent content, final long lastModified, final int parameterHashCode)
             throws IOException {
-            String sourceETag = content.getETag();
-            if (sourceETag == null) {
-                //please check if returning null here is better;
-                sourceETag = "\"" + content.hashCode() + "\"";
-            }
+            //parameterHashCode is stable for this session and current request URL 
             long systemLastModified = MCRConfiguration.instance().getSystemLastModified();
-            StringBuilder b = new StringBuilder(sourceETag);
-            b.deleteCharAt(b.length() - 1);//removes at end "
-            b.append('/');
+            StringBuilder b = new StringBuilder('"');
             byte[] unencodedETag = ByteBuffer.allocate(Long.SIZE / 4).putLong(lastModified ^ parameterHashCode)
                 .putLong(systemLastModified ^ parameterHashCode).array();
             b.append(Base64.encodeBase64String(unencodedETag));
@@ -367,7 +361,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
                 // Parse the source XML, and send the parse events to the
                 // TransformerHandler.
                 try {
-                    LOGGER.info("Start transforming: " + source.getSystemId());
+                    LOGGER.info("Start transforming: "
+                        + (source.getSystemId() == null ? source.getName() : source.getSystemId()));
                     reader.parse(source.getInputSource());
                 } catch (IOException | SAXException e) {
                     throw new MCRException(e);
@@ -377,6 +372,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             return transformed;
         }
 
+        @Override
         public long lastModified() throws IOException {
             return lastModified;
         }
