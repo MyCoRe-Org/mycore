@@ -437,6 +437,7 @@
     <xsl:param name="id" select="./@ID" />
     <xsl:param name="accessedit" select="acl:checkPermission($id,'writedb')" />
     <xsl:param name="accessdelete" select="acl:checkPermission($id,'deletedb')" />
+    <xsl:param name="accesscreate" select="acl:checkPermission('create-mods')" />
     <xsl:param name="hasURN" select="'false'" />
     <xsl:param name="displayAddDerivate" select="acl:checkPermission($id,'writedb')" />
     <xsl:param name="layout" select="'$'" />
@@ -468,7 +469,7 @@
 
     <xsl:if test="$objectHost = 'local'">
       <xsl:choose>
-        <xsl:when test="$accessedit or $accessdelete">
+        <xsl:when test="$accessedit or $accessdelete or $accesscreate">
           <xsl:variable name="type" select="substring-before(substring-after($id,'_'),'_')" />
           <xsl:variable name="child-layout">
             <xsl:choose>
@@ -492,12 +493,12 @@
               alt="" title="{i18n:translate('component.mods.metaData.options')}" />
             <div class="options">
               <ul>
-                <xsl:if test="$accessedit">
+                <xsl:if test="$accessedit or $accesscreate">
                   <li>
                     <xsl:if test="not($CurrentUser=$MCR.Users.Superuser.UserName) and
                                   $displayAddDerivate!='true' and
                                   $accessdelete and $hasDerivateWithURN and
-                                  string-length($child-layout)=0 and not(acl:checkPermission(./@ID,'writedb'))">
+                                  string-length($child-layout)=0 and not($accesscreate)">
                       <xsl:attribute name="class">last</xsl:attribute>
                     </xsl:if>
                     <xsl:choose>
@@ -541,7 +542,7 @@
                     </xsl:choose>
                   </li>
                 </xsl:if>
-                <xsl:if test="string-length($child-layout) &gt; 0 and acl:checkPermission(./@ID,'writedb')">
+                <xsl:if test="string-length($child-layout) &gt; 0 and $accesscreate">
                   <xsl:choose>
                     <xsl:when test="$mods-type = 'series'">
                       <li>
