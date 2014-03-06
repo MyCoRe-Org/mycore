@@ -23,10 +23,13 @@
 
 package org.mycore.media.services;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.ifs.MCRAudioVideoExtender;
 import org.mycore.datamodel.ifs.MCRFileContentType;
 import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
@@ -36,7 +39,19 @@ import org.mycore.media.MCRMediaObject;
 import org.mycore.media.MCRMediaParser;
 import org.mycore.media.MCRVideoObject;
 
-public abstract class MCRMediaAVExtender extends MCRAudioVideoExtender {
+/**
+ * This class implements the AudioVideoExtender functions and reads 
+ * technical metadata from stored files. 
+ * Currently only used within MILESS projects.
+ * 
+ * <code>
+ *   MCR.IFS.AVExtender.<StoreID>.Class  set with this class to use
+ * </code>
+ * 
+ * @author Ren\u00E9 Adler (Eagle)
+ * @version $Revision$ $Date$
+ */
+public class MCRMediaAVExtender extends MCRAudioVideoExtender {
     /** The logger */
     private final static Logger LOGGER = Logger.getLogger(MCRMediaAVExtender.class);
 
@@ -212,6 +227,15 @@ public abstract class MCRMediaAVExtender extends MCRAudioVideoExtender {
         }
 
         return cType;
+    }
+
+    @Override
+    public void getPlayerStarterTo(OutputStream out, String startPos, String stopPos) throws MCRPersistenceException {
+    }
+
+    @Override
+    public MCRContent getPlayerStarter(String startPos, String stopPos) throws IOException {
+        return null;
     }
 
 }
