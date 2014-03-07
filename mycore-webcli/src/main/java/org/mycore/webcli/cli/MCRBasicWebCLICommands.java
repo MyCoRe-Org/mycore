@@ -2,6 +2,7 @@ package org.mycore.webcli.cli;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 
 import org.mycore.frontend.cli.MCRCommandLineInterface;
 import org.mycore.frontend.cli.MCRCommandStatistics;
@@ -11,8 +12,8 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 @MCRCommandGroup(name = "Basic commands")
 public class MCRBasicWebCLICommands {
     @MCRCommand(syntax = "process {0}", help = "Execute the commands listed in the text file {0}.")
-    public static void readCommandsFile(String file) throws IOException, FileNotFoundException {
-        MCRCommandLineInterface.readCommandsFile(file);
+    public static List<String> readCommandsFile(String file) throws IOException, FileNotFoundException {
+        return MCRCommandLineInterface.readCommandsFile(file);
     }
 
     @MCRCommand(syntax = "show command statistics", help = "Show statistics on number of commands processed and execution time needed per command")
