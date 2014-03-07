@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2014.03" date="2014-03-07" description="Codenamed &apos;Lenzing&apos;">
+      <action dev="mcrvuchi" type="fix" date="2014-03-07">
+        mycore-webcli: fixed "process {0}"
+      </action>
       <action dev="mcrtchef" type="remove">
         MCRObjectServlet: removed support for browsing in MCRResults 
       </action>
