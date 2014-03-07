@@ -5,16 +5,65 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2014.03" date="2014-03-00" description="TBA">
+    <release version="2014.03" date="2014-03-07" description="Codenamed &apos;Lenzing&apos;">
+      <action dev="mcrtchef" type="remove">
+        MCRObjectServlet: removed support for browsing in MCRResults 
+      </action>
+      <action dev="mcrtchef" type="add">
+        added MCRContentServlet to provide support for reliable browser cache and HTTP range requests
+        currently used by MCRFileNodeServlet and MCRObjectServlet 
+      </action>
+      <action dev="mcrsherm" type="add">
+        mycore-solr: added support to mycoreobject-dynamicfields.xsl to index remote content
+      </action>
+      <action dev="mcrtchef" type="add">
+        added cache info support to MCRContent classes
+      </action>
+      <action dev="mcrsherm" type="add">
+        added MCRXMLFunctions.hasParentCategory(String classificationId, String categoryId)
+      </action>
+      <action dev="mcrkrebs" type="remove">
+        removed MCR.UploadApplet.BackgroundColor property (moved to docportal)
+      </action>
+      <action dev="mcrsteph" type="fix" date="2014-02-21">
+        MCRFileImportExport: properly close MCRMD5InputStream
+      </action>
+      <action dev="mcrmeich" type="update">
+        mycore-wcms2 get support for access checks and fixes in I18N keys
+      </action>
       <action dev="mcrtchef" type="fix" date="2014-02-21">
         MCRConfigurationInputStream should respect dependencies between mycore components
         <fixes issue="684" />
       </action>
+      <action dev="mcrmeich" type="fix" date="2014-02-18">
+        fixed handling of references in editor framework
+      </action>
+      <action dev="mcrsroeh" type="fix" date="2014-02-18">
+        added mycore-xeditor to integration steps of mycore-complete
+      </action>
+      <action dev="mcrmibue" type="fix" date="2014-02-14">
+        mycore-acl-editor2: fixed layout
+      </action>
       <action dev="mcrtchef" type="add">
         mycore-mods: add schema support for MODS 3.5
       </action>
+      <action dev="mcrtchef" type="update">
+        changed order of MCREventHandler
+      </action>
+      <action dev="mcrtchef" type="add">
+        mycore-mods: support classification typeOfResource
+      </action>
+      <action dev="mcrtchef" type="add">
+        When using MCRConfigurationDir comments are added to mycore.active.properties
+      </action>
+      <action dev="mcrtchef" type="fix" date="2014-02-11">
+        fixed missing searchfields.xml exception
+      </action>
       <action dev="mcrtchef" type="remove">
         removed mycore-acl-editor (replaced by mycore-acl-editor2)
+      </action>
+      <action dev="mcrtchef" type="update">
+        Update to SOLRJ 4.7.0
       </action>
     </release>
     <release version="2014.02" date="2014-02-11" description="Codenamed &apos;Kindl&apos;">
