@@ -153,10 +153,6 @@
     <servlet-name>MCRBasketServlet</servlet-name>
     <servlet-class>org.mycore.frontend.basket.MCRBasketServlet</servlet-class>
   </servlet>
-  <servlet id="IndexBrowserServlet">
-    <servlet-name>MCRIndexBrowserServlet</servlet-name>
-    <servlet-class>org.mycore.frontend.indexbrowser.lucene.MCRIndexBrowserServlet</servlet-class>
-  </servlet>
   <servlet id="StoreBrowser">
     <servlet-name>MCRStoreBrowserServlet</servlet-name>
     <servlet-class>org.mycore.datamodel.ifs2.MCRStoreBrowserServlet</servlet-class>
@@ -164,14 +160,6 @@
   <servlet id="MCRObject">
     <servlet-name>MCRObjectServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRObjectServlet</servlet-class>
-  </servlet>
-  <servlet id="MCRSearch">
-    <servlet-name>MCRSearchServlet</servlet-name>
-    <servlet-class>org.mycore.services.fieldquery.MCRSearchServlet</servlet-class>
-  </servlet>
-  <servlet id="MCRLink">
-    <servlet-name>MCRLinkServlet</servlet-name>
-    <servlet-class>org.mycore.frontend.servlets.MCRLinkServlet</servlet-class>
   </servlet>
   <servlet id="MCRDerivateLink">
     <servlet-name>MCRDerivateLinkServlet</servlet-name>
@@ -207,20 +195,9 @@
   </filter-mapping>
   <filter-mapping>
     <filter-name>UriResolverDebugFilter</filter-name>
-    <servlet-name>MCRIndexBrowserServlet</servlet-name>
-    <dispatcher>REQUEST</dispatcher>
-  </filter-mapping>
-  <filter-mapping>
-    <filter-name>UriResolverDebugFilter</filter-name>
     <servlet-name>MCRObjectServlet</servlet-name>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
-  <filter-mapping>
-    <filter-name>UriResolverDebugFilter</filter-name>
-    <servlet-name>MCRSearchServlet</servlet-name>
-    <dispatcher>REQUEST</dispatcher>
-  </filter-mapping>
-
   <filter-mapping>
     <filter-name>UserAgentFilter</filter-name>
     <servlet-name>MCRStaticXMLFileServlet</servlet-name>
@@ -233,20 +210,9 @@
   </filter-mapping>
   <filter-mapping>
     <filter-name>UserAgentFilter</filter-name>
-    <servlet-name>MCRIndexBrowserServlet</servlet-name>
-    <dispatcher>REQUEST</dispatcher>
-  </filter-mapping>
-  <filter-mapping>
-    <filter-name>UserAgentFilter</filter-name>
     <servlet-name>MCRObjectServlet</servlet-name>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
-  <filter-mapping>
-    <filter-name>UserAgentFilter</filter-name>
-    <servlet-name>MCRSearchServlet</servlet-name>
-    <dispatcher>REQUEST</dispatcher>
-  </filter-mapping>
-
   <servlet-mapping>
     <servlet-name>MCRStaticXMLFileServlet</servlet-name>
     <url-pattern>*.xml</url-pattern>
@@ -280,28 +246,12 @@
     <url-pattern>/servlets/MCRBasketServlet</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>MCRIndexBrowserServlet</servlet-name>
-    <url-pattern>/servlets/IndexBrowserServlet</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>MCRIndexBrowserServlet</servlet-name>
-    <url-pattern>/indexpage</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
     <servlet-name>MCRStoreBrowserServlet</servlet-name>
     <url-pattern>/storeBrowser/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>MCRObjectServlet</servlet-name>
     <url-pattern>/receive/*</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>MCRSearchServlet</servlet-name>
-    <url-pattern>/servlets/MCRSearchServlet</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>MCRLinkServlet</servlet-name>
-    <url-pattern>/servlets/MCRLinkServlet</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>MCRDerivateLinkServlet</servlet-name>
