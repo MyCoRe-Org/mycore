@@ -4,11 +4,11 @@
   <parent>
     <artifactId>mycore-parent</artifactId>
     <groupId>org.mycore</groupId>
-    <version>21</version>
+    <version>22-SNAPSHOT</version>
   </parent>
   <artifactId>mycore</artifactId>
   <packaging>pom</packaging>
-  <version>2014.03</version>
+  <version>2014.04-SNAPSHOT</version>
   <name>MyCoRe</name>
   <description>
     MyCoRe is a system for the development of institutional content repositories, publication servers, image collections,
@@ -59,9 +59,9 @@
     </notifiers>
   </ciManagement>
   <scm>
-    <connection>scm:svn:http://server.mycore.de/svn/mycore/tags/mycore-2014.03</connection>
-    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/tags/mycore-2014.03</developerConnection>
-    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/tags/mycore-2014.03</url>
+    <connection>scm:svn:http://server.mycore.de/svn/mycore/trunk</connection>
+    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/trunk</developerConnection>
+    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/trunk</url>
   </scm>
   <profiles>
     <profile>
