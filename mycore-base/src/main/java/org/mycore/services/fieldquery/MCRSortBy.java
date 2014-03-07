@@ -38,10 +38,6 @@ public class MCRSortBy {
     public final static boolean DESCENDING = false;
 
     /** The field to sort by */
-    @Deprecated
-    private MCRFieldDef field;
-
-    /** The field to sort by */
     private String fieldName;
 
     /** Sort order of this field */
@@ -50,31 +46,15 @@ public class MCRSortBy {
     /** 
      * Creates a new sort criteria
      * 
-     * @param field the field to sort by
+     * @param fieldNAme the field to sort by
      * @param order the sort order (ascending or descending)
      * 
      * @see #ASCENDING
      * @see #DESCENDING
      */
-    @Deprecated
-    public MCRSortBy(MCRFieldDef field, boolean order) {
-        this.field = field;
-        this.order = order;
-        this.fieldName = field.getName();
-    }
-    
     public MCRSortBy(String fieldName, boolean order) {
         this.fieldName = fieldName;
         this.order = order;
-        this.field = MCRFieldDef.getDef(fieldName);
-    }
-
-    /** 
-     * Returns the field to sort by 
-     */
-    @Deprecated
-    public MCRFieldDef getField() {
-        return field;
     }
 
     public String getFieldName() {

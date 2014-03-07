@@ -60,9 +60,9 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
@@ -80,11 +80,6 @@ import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.services.fieldquery.MCRQuery;
-import org.mycore.services.fieldquery.MCRQueryManager;
-import org.mycore.services.fieldquery.MCRQueryParser;
-import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.urn.MCRURNManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -280,37 +275,6 @@ public class MCRXMLFunctions {
 
     public static String regexp(String orig, String match, String replace) {
         return orig.replaceAll(match, replace);
-    }
-
-    public static int getQueryHitCount(String query) {
-        MCRResults result = getQueryResult(query);
-        return result.getNumHits();
-    }
-
-    public static Element getResults(String query) {
-        MCRResults result = getQueryResult(query);
-        org.jdom2.Element xml = result.buildXML();
-        DOMOutputter out = new DOMOutputter();
-        try {
-            Document w3cDoc = out.output(new org.jdom2.Document(xml));
-            return w3cDoc.getDocumentElement();
-        } catch (JDOMException exc) {
-            LOGGER.error("Error while converting jdom- to w3c-element", exc);
-        }
-        return null;
-    }
-
-    @SuppressWarnings("rawtypes")
-    private static MCRResults getQueryResult(String query) {
-        MCRCondition condition = new MCRQueryParser().parse(query);
-        MCRQuery q = new MCRQuery(condition);
-        long start = System.currentTimeMillis();
-        MCRResults result = MCRQueryManager.search(q);
-        if (LOGGER.isDebugEnabled()) {
-            long qtime = System.currentTimeMillis() - start;
-            LOGGER.debug("total query time: " + qtime);
-        }
-        return result;
     }
 
     /**

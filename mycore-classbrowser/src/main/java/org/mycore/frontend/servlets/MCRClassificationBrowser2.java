@@ -24,7 +24,6 @@ package org.mycore.frontend.servlets;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,18 +37,13 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
-import org.mycore.parsers.bool.MCRAndCondition;
-import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.services.fieldquery.MCRQuery;
-import org.mycore.services.fieldquery.MCRQueryCondition;
-import org.mycore.services.fieldquery.MCRQueryManager;
-import org.mycore.services.fieldquery.MCRQueryParser;
 import org.xml.sax.SAXException;
 
 /**
@@ -66,18 +60,13 @@ public class MCRClassificationBrowser2 extends MCRServlet {
     private static final Logger LOGGER = Logger.getLogger(MCRClassificationBrowser2.class);
 
     protected MCRQueryAdapter getQueryAdapter(final String fieldName) {
-        return new MCRSearcherQueryAdapter(fieldName);
+        MCRQueryAdapter adapter = MCRConfiguration.instance().getInstanceOf("MCR.Module-classbrowser.QueryAdapter");
+        adapter.setFieldName(fieldName);
+        return adapter;
     }
 
     protected void configureQueryAdapter(MCRQueryAdapter queryAdapter, HttpServletRequest req) {
-        String objectType = req.getParameter("objecttype");
-        if ((objectType != null) && (objectType.trim().length() > 0)) {
-            queryAdapter.setObjectType(objectType);
-        }
-        String restriction = req.getParameter("restriction");
-        if ((restriction != null) && (restriction.trim().length() > 0)) {
-            queryAdapter.setRestriction(restriction);
-        }
+        queryAdapter.configure(req);
     }
 
     public void doGetPost(MCRServletJob job) throws Exception {
@@ -181,13 +170,15 @@ public class MCRClassificationBrowser2 extends MCRServlet {
     }
 
     /** Add link count to each category */
-    private void countLinks(HttpServletRequest req, boolean emptyLeaves, String objectType, MCRCategory category, List<Element> data) {
+    private void countLinks(HttpServletRequest req, boolean emptyLeaves, String objectType, MCRCategory category,
+        List<Element> data) {
         if (!Boolean.valueOf(req.getParameter("countlinks")))
             return;
         if (objectType.trim().length() == 0)
             objectType = null;
         String classifID = category.getId().getRootID();
-        Map<MCRCategoryID, Number> count = MCRCategLinkServiceFactory.getInstance().countLinksForType(category, objectType, true);
+        Map<MCRCategoryID, Number> count = MCRCategLinkServiceFactory.getInstance().countLinksForType(category,
+            objectType, true);
         for (Iterator<Element> it = data.iterator(); it.hasNext();) {
             Element child = it.next();
             MCRCategoryID childID = new MCRCategoryID(classifID, child.getAttributeValue("id"));
@@ -217,8 +208,8 @@ public class MCRClassificationBrowser2 extends MCRServlet {
     /** Sends output to client browser 
      * @throws SAXException 
      * @throws TransformerException */
-    private void renderToHTML(MCRServletJob job, HttpServletRequest req, Element xml) throws IOException, TransformerException,
-            SAXException {
+    private void renderToHTML(MCRServletJob job, HttpServletRequest req, Element xml) throws IOException,
+        TransformerException, SAXException {
         String style = req.getParameter("style"); // XSL.Style, optional
         if ((style != null) && (style.length() > 0))
             req.setAttribute("XSL.Style", style);
@@ -231,7 +222,9 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         return true;
     }
 
-    protected static interface MCRQueryAdapter {
+    public static interface MCRQueryAdapter {
+        public void setFieldName(String fieldname);
+
         public void setRestriction(String text);
 
         public void setCategory(String text);
@@ -243,59 +236,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         public long getResultCount();
 
         public String getQueryAsString() throws UnsupportedEncodingException;
-    }
 
-    protected static final class MCRSearcherQueryAdapter implements MCRQueryAdapter {
-        MCRQueryCondition categCondition;
-
-        MCRQueryCondition objectType = null;
-
-        MCRCondition<Object> restriction = null;
-
-        MCRAndCondition<Object> query = null;
-
-        protected MCRSearcherQueryAdapter(String fieldName) {
-            categCondition = new MCRQueryCondition(fieldName, "=", null);
-        }
-
-        @Override
-        public void setRestriction(String restriction) {
-            this.restriction = new MCRQueryParser().parse(restriction);
-            if (query == null) {
-                query = new MCRAndCondition<>(categCondition, this.restriction);
-            } else {
-                query.getChildren().add(this.restriction);
-            }
-        }
-
-        @Override
-        public void setObjectType(String objectType) {
-            this.objectType = new MCRQueryCondition("objectType", "=", objectType);
-            if (query == null) {
-                query = new MCRAndCondition<>(categCondition, this.objectType);
-            } else {
-                query.getChildren().add(this.objectType);
-            }
-        }
-
-        @Override
-        public String getObjectType() {
-            return this.objectType == null ? null : this.objectType.getValue();
-        }
-
-        @Override
-        public void setCategory(String categId) {
-            categCondition.setValue(categId);
-        }
-
-        @Override
-        public long getResultCount() {
-            return MCRQueryManager.search(new MCRQuery(query == null ? categCondition : query)).getNumHits();
-        }
-
-        @Override
-        public String getQueryAsString() throws UnsupportedEncodingException {
-            return URLEncoder.encode(query == null ? categCondition.toString() : query.toString(), "UTF-8");
-        }
+        public void configure(HttpServletRequest request);
     }
 }

@@ -44,6 +44,8 @@ public class MCRSolrConstants {
 
     public static final String UPDATE_PATH = MCRConfiguration.instance().getString(CONFIG_PREFIX + "UpdatePath");
 
+    public static final String JOIN_PATTERN = "{!join from=returnId to=id}";
+
     static {
         String serverURL = MCRConfiguration.instance().getString(CONFIG_PREFIX + "ServerURL");
         if (serverURL.endsWith("/")) {

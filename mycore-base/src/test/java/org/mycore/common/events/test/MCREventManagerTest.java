@@ -11,8 +11,6 @@ import org.mycore.common.MCRTestCase;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.services.fieldquery.MCRResults;
-import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRSortBy;
 
 public class MCREventManagerTest extends MCRTestCase {
@@ -39,19 +37,7 @@ public class MCREventManagerTest extends MCRTestCase {
         try {
             MCREventManager.instance();
         } catch (MCRConfigurationException e) {
-            assertEquals("Unsupported mode Foo for event handler.", e.getMessage());
-        }
-    }
-
-    public static class FakeLuceneSearcher extends MCRSearcher {
-        @Override
-        public boolean isIndexer() {
-            return true;
-        }
-
-        @Override
-        public MCRResults search(MCRCondition condition, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) {
-            return null;
+            assertEquals("Configuration property MCR.EventHandler.Mode.Foo is not set", e.getMessage());
         }
     }
 }

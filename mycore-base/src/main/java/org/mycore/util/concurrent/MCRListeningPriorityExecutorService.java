@@ -8,7 +8,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import com.drew.lang.annotations.Nullable;
 import com.google.common.util.concurrent.AbstractListeningExecutorService;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
@@ -67,7 +66,7 @@ public class MCRListeningPriorityExecutorService extends AbstractListeningExecut
     }
 
     @Override
-    public <T> ListenableFuture<T> submit(Runnable task, @Nullable T result) {
+    public <T> ListenableFuture<T> submit(Runnable task, T result) {
         ListenableFutureTask<T> ftask = ListenableFutureTask.create(task, result);
         execute(ftask, getPriority(task));
         return ftask;

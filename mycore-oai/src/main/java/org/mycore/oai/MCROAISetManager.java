@@ -24,6 +24,7 @@ package org.mycore.oai;
 import static org.mycore.oai.pmh.OAIConstants.NS_OAI;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -32,9 +33,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.hibernate.Transaction;
 import org.jdom2.Element;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
@@ -48,7 +53,9 @@ import org.mycore.oai.pmh.Set;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRQuery;
-import org.mycore.services.fieldquery.MCRQueryManager;
+import org.mycore.services.fieldquery.MCRSortBy;
+import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.legacy.MCRConditionTransformer;
 
 /**
  * Manager class to handle OAI-PMH set specific behavior. For a data provider instance, set support is optional and must be configured as described below.
@@ -96,22 +103,6 @@ public class MCROAISetManager {
         this.setURIs = new ArrayList<String>();
         this.cachedSetList = new OAIDataList<Set>();
         this.classLastModified = Long.MIN_VALUE;
-    }
-
-    /**
-     * Use {@link #init(String, int, boolean)} instead.
-     * 
-     * @param configPrefix
-     */
-    @Deprecated
-    public void init(String configPrefix) {
-        this.configPrefix = configPrefix;
-        this.cacheMaxAge = MCRConfiguration.instance().getInt(this.configPrefix + "SetCache.MaxAge", 0);
-        this.filterEmptySets = MCRConfiguration.instance().getBoolean(this.configPrefix + "FilterEmptySets", true);
-        updateURIs();
-        if (this.cacheMaxAge != 0) {
-            startTimerTask();
-        }
     }
 
     public void init(String configPrefix, int cacheMaxAge, boolean filterEmptySets) {
@@ -237,7 +228,7 @@ public class MCROAISetManager {
                 if (restriction != null) {
                     query.addChild(restriction);
                 }
-                if (MCRQueryManager.search(new MCRQuery(query)).getNumHits() == 0) {
+                if (hasNoResults(new MCRQuery(query))) {
                     it.remove();
                 }
             }
@@ -278,6 +269,16 @@ public class MCROAISetManager {
 
     protected MCRCondition buildSetCondition(String setSpec) {
         return MCROAIUtils.getDefaultSetCondition(setSpec, this.configPrefix);
+    }
+
+    public boolean hasNoResults(MCRQuery query) {
+        SolrQuery solrQuery = MCRConditionTransformer.getSolrQuery(query.getCondition(), Collections.<MCRSortBy> emptyList(), 1);
+        try {
+            QueryResponse queryResponse = MCRSolrServerFactory.getSolrServer().query(solrQuery);
+            return queryResponse.getResults().isEmpty();
+        } catch (SolrServerException e) {
+            throw new MCRException(e);
+        }
     }
 
 }

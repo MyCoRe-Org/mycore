@@ -23,10 +23,18 @@
 
 package org.mycore.solr.legacy;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrQuery.ORDER;
+import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.mycore.common.MCRException;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
@@ -34,6 +42,8 @@ import org.mycore.parsers.bool.MCRNotCondition;
 import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.parsers.bool.MCRSetCondition;
 import org.mycore.services.fieldquery.MCRQueryCondition;
+import org.mycore.services.fieldquery.MCRSortBy;
+import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.MCRSolrUtils;
 
 /**
@@ -41,6 +51,7 @@ import org.mycore.solr.MCRSolrUtils;
  *
  */
 public class MCRConditionTransformer {
+    private static final Logger LOGGER = Logger.getLogger(MCRConditionTransformer.class);
 
     public static String toSolrQueryString(@SuppressWarnings("rawtypes") MCRCondition condition, Set<String> usedFields) {
         return toSolrQueryString(condition, usedFields, false).toString();
@@ -202,6 +213,78 @@ public class MCRConditionTransformer {
             sb.deleteCharAt(0);
         }
         return sb;
+    }
+
+    public static SolrQuery getSolrQuery(@SuppressWarnings("rawtypes") MCRCondition condition, List<MCRSortBy> sortBy,
+        int maxResults) {
+        String queryString = getQueryString(condition);
+        SolrQuery q = applySortOptions(new SolrQuery(queryString), sortBy);
+        q.setIncludeScore(true);
+        q.setRows(maxResults == 0 ? Integer.MAX_VALUE : maxResults);
+
+        String sort = q.getSortField();
+        LOGGER.info("Legacy Query transformed to: " + q.getQuery() + (sort != null ? " " + sort : ""));
+        return q;
+    }
+
+    protected static String getQueryString(@SuppressWarnings("rawtypes") MCRCondition condition) {
+        Set<String> usedFields = new HashSet<>();
+        String queryString = MCRConditionTransformer.toSolrQueryString(condition, usedFields);
+        return queryString;
+    }
+
+    protected static SolrQuery applySortOptions(SolrQuery q, List<MCRSortBy> sortBy) {
+        for (MCRSortBy option : sortBy) {
+            SortClause sortClause = new SortClause(option.getFieldName(), option.getSortOrder() ? ORDER.asc
+                : ORDER.desc);
+            q.addSort(sortClause);
+        }
+        return q;
+    }
+
+    /**
+     * Builds SOLR query.
+     * 
+     * Automatically builds JOIN-Query if content search fields are used in query.
+     * @param sortBy sort criteria
+     * @param not true, if all conditions should be negated
+     * @param and AND or OR connective between conditions  
+     * @param table conditions per "content" or "metadata"
+     * @param maxHits maximum hits
+     * @return
+     */
+    @SuppressWarnings("rawtypes")
+    public static SolrQuery buildMergedSolrQuery(List<MCRSortBy> sortBy, boolean not, boolean and,
+        HashMap<String, List<MCRCondition>> table, int maxHits) {
+        List<MCRCondition> queryConditions = table.get("metadata");
+        MCRCondition combined = buildSubCondition(queryConditions, and, not);
+        SolrQuery solrRequestQuery = getSolrQuery(combined, sortBy, maxHits);
+
+        for (Map.Entry<String, List<MCRCondition>> mapEntry : table.entrySet()) {
+            if (!mapEntry.getKey().equals("metadata")) {
+                MCRCondition combinedFilterQuery = buildSubCondition(mapEntry.getValue(), and, not);
+                SolrQuery filterQuery = getSolrQuery(combinedFilterQuery, sortBy, maxHits);
+                solrRequestQuery.addFilterQuery(MCRSolrConstants.JOIN_PATTERN + filterQuery.getQuery());
+            }
+        }
+        return solrRequestQuery;
+    }
+
+    /** Builds a new condition for all fields from one single index */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    protected static MCRCondition buildSubCondition(List<MCRCondition> conditions, boolean and, boolean not) {
+        MCRCondition subCond;
+        if (conditions.size() == 1) {
+            subCond = conditions.get(0);
+        } else if (and) {
+            subCond = new MCRAndCondition().addAll(conditions);
+        } else {
+            subCond = new MCROrCondition().addAll(conditions);
+        }
+        if (not) {
+            subCond = new MCRNotCondition(subCond);
+        }
+        return subCond;
     }
 
 }

@@ -235,9 +235,8 @@ public class MCRQuery {
                 String name = sortByChild.getAttributeValue("name");
                 String ad = sortByChild.getAttributeValue("order");
 
-                MCRFieldDef fd = MCRFieldDef.getDef(name);
                 boolean direction = "ascending".equals(ad) ? MCRSortBy.ASCENDING : MCRSortBy.DESCENDING;
-                sortBy.add(new MCRSortBy(fd, direction));
+                sortBy.add(new MCRSortBy(name, direction));
             }
         }
         if (sortBy != null) {
@@ -245,22 +244,10 @@ public class MCRQuery {
         }
 
         // List of remote hosts to query
-        List<String> hostAliases = new ArrayList<String>();
         Element hostsElem = xml.getChild("hosts");
         if (hostsElem != null) {
-            String target = hostsElem.getAttributeValue("target", "local");
-            if ("all".equals(target)) {
-                hostAliases = MCRQueryClient.ALL_HOSTS;
-            } else if ("selected".equals(target)) {
-                List list = hostsElem.getChildren();
-                for (Object aList : list) {
-                    Element host = (Element) aList;
-                    hostAliases.add(host.getTextTrim());
-                }
-            }
-            // default is local = query only local host = empty hosts list
+            throw new UnsupportedOperationException("Distributed queries are not supported");
         }
-        query.setHosts(hostAliases);
 
         return query;
     }

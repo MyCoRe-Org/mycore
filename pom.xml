@@ -20,7 +20,6 @@
     <java.target.version>1.7</java.target.version>
     <uniqueVersion>false</uniqueVersion>
     <hibernate.version>4.3.0.Final</hibernate.version>
-    <lucene.version>3.6.2</lucene.version>
     <xalan.version>2.7.1</xalan.version>
     <jersey.version>1.18</jersey.version>
     <changelog.since>2014-02-11</changelog.since>
@@ -273,7 +272,6 @@
                 <link>http://www.jdom.org/docs/apidocs/</link>
                 <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
                 <link>http://docs.jboss.org/hibernate/core/4.3/javadocs/</link>
-                <link>http://lucene.apache.org/core/3_6_2/api/all/</link>
                 <link>http://lucene.apache.org/solr/4_6_1/solr-solrj/</link>
               </links>
             </configuration>
@@ -495,7 +493,6 @@
               <link>http://www.jdom.org/docs/apidocs/</link>
               <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
               <link>http://docs.jboss.org/hibernate/core/4.3/javadocs/</link>
-              <link>http://lucene.apache.org/core/3_6_2/api/all/</link>
               <link>http://lucene.apache.org/solr/4_6_1/solr-solrj/</link>
             </links>
           </configuration>
@@ -681,21 +678,6 @@
         <version>2.6</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.lucene</groupId>
-        <artifactId>lucene-core</artifactId>
-        <version>${lucene.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.lucene</groupId>
-        <artifactId>lucene-analyzers</artifactId>
-        <version>${lucene.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.lucene</groupId>
-        <artifactId>lucene-queries</artifactId>
-        <version>${lucene.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.apache.solr</groupId>
         <artifactId>solr-solrj</artifactId>
         <version>4.7.0</version>
@@ -759,16 +741,6 @@
         <version>4.3.1</version>
       </dependency>
       <dependency>
-        <groupId>com.drewnoakes</groupId>
-        <artifactId>metadata-extractor</artifactId>
-        <version>2.6.2</version>
-      </dependency>
-      <dependency>
-        <groupId>net.sf.javamusictag</groupId>
-        <artifactId>jid3lib</artifactId>
-        <version>0.5.4</version>
-      </dependency>
-      <dependency>
         <groupId>org.apache.pdfbox</groupId>
         <artifactId>pdfbox</artifactId>
         <version>1.8.3</version>
@@ -817,11 +789,6 @@
             <artifactId>avalon-framework-api</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.textmining</groupId>
-        <artifactId>tm-extractors</artifactId>
-        <version>0.4</version>
       </dependency>
       <dependency>
         <groupId>org.apache.ws.security</groupId>
@@ -1351,9 +1318,9 @@
     <module>mycore-wcms</module>
     <module>mycore-wcms2</module>
     <module>mycore-webcli</module>
-    <module>mycore-webservices</module>
+<!--     <module>mycore-webservices</module> -->
     <module>mycore-wfc</module>
-    <module>mycore-z3950</module>
+<!--     <module>mycore-z3950</module> -->
     <module>mycore-xeditor</module>
     <module>mycore-complete</module>
     <module>iview2-addons</module>

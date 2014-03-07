@@ -22,18 +22,19 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRSetCondition;
 import org.mycore.services.fieldquery.MCRQuery;
-import org.mycore.services.fieldquery.MCRSearchServlet;
+import org.mycore.solr.legacy.MCRConditionTransformer;
+//import org.mycore.services.fieldquery.MCRSearchServlet;
 import org.mycore.solr.proxy.MCRSolrProxyServlet;
 
-public class MCRSolrLegacySearchServlet extends MCRSearchServlet {
+public class MCRSolrLegacySearchServlet extends MCRServlet{//extends MCRSearchServlet {
 
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = Logger.getLogger(MCRSolrLegacySearchServlet.class);
 
-    private static MCRSolrQueryEngine queryEngine = new MCRSolrQueryEngine();
+    //    private static MCRSolrQueryEngine queryEngine = new MCRSolrQueryEngine();
 
-    @Override
+    //    @Override
     protected void showResults(HttpServletRequest request, HttpServletResponse response, MCRQuery query, Document input)
         throws IOException, ServletException {
         SolrQuery mergedSolrQuery = getSolrQuery(query, input, request);
@@ -49,7 +50,7 @@ public class MCRSolrLegacySearchServlet extends MCRSearchServlet {
         HashMap<String, List<MCRCondition>> table;
 
         if (condition instanceof MCRSetCondition) {
-            table = queryEngine.groupConditionsByIndex((MCRSetCondition) condition);
+            table = null;//queryEngine.groupConditionsByIndex((MCRSetCondition) condition);
         } else {
             // if there is only one condition its no set condition. we dont need to group
             LOGGER.warn("Condition is not SetCondition.");
@@ -62,8 +63,8 @@ public class MCRSolrLegacySearchServlet extends MCRSearchServlet {
 
         }
 
-        SolrQuery mergedSolrQuery = MCRSolrQueryEngine
-            .buildMergedSolrQuery(query.getSortBy(), false, true, table, rows);
+        SolrQuery mergedSolrQuery = MCRConditionTransformer.buildMergedSolrQuery(query.getSortBy(), false, true, table,
+            rows);
         String mask = input.getRootElement().getAttributeValue("mask");
         if (mask != null) {
             mergedSolrQuery.setParam("mask", mask);
@@ -72,7 +73,7 @@ public class MCRSolrLegacySearchServlet extends MCRSearchServlet {
         return mergedSolrQuery;
     }
 
-    @Override
+//    @Override
     protected void sendRedirect(HttpServletRequest req, HttpServletResponse res, MCRQuery query, Document input)
         throws IOException {
         SolrQuery mergedSolrQuery = getSolrQuery(query, input, req);
@@ -81,7 +82,7 @@ public class MCRSolrLegacySearchServlet extends MCRSearchServlet {
         res.sendRedirect(res.encodeRedirectURL(selectProxyURL));
     }
 
-    @Override
+//    @Override
     protected void showResults(HttpServletRequest request, HttpServletResponse response) throws IOException,
         ServletException {
         throw new MCRException(new OperationNotSupportedException("showResults(request, response) is not supported by "

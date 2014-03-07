@@ -12,7 +12,6 @@ package org.mycore.frontend.cli;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
@@ -46,22 +45,12 @@ import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
-import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.services.fieldquery.MCRFieldDef;
-import org.mycore.services.fieldquery.MCRHit;
-import org.mycore.services.fieldquery.MCRQuery;
-import org.mycore.services.fieldquery.MCRQueryManager;
-import org.mycore.services.fieldquery.MCRQueryParser;
-import org.mycore.services.fieldquery.MCRResults;
-import org.mycore.services.fieldquery.MCRSearcher;
-import org.mycore.services.fieldquery.MCRSearcherFactory;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -633,103 +622,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
-     * The method start the repair of the metadata search for a given MCRObjectID type.
-     * 
-     * @param type
-     *            the MCRObjectID type
-     */
-    @MCRCommand(syntax = "repair metadata search of type {0}", help = "Scans the metadata store for MCRObjects of type {0} and restore them in the search store.", order = 170)
-    public static List<String> repairMetadataSearch(String type) {
-        LOGGER.info("Start the repair for type " + type);
-        String typetest = CONFIG.getString("MCR.Metadata.Type." + type, "");
-
-        if (typetest.length() == 0) {
-            LOGGER.error("The type " + type + " was not found.");
-            return Collections.emptyList();
-        }
-        List<String> ar = (List<String>) MCRXMLMetadataManager.instance().listIDsOfType(type);
-        if (ar.size() == 0) {
-            LOGGER.warn("No ID's was found for type " + type + ".");
-            return Collections.emptyList();
-        }
-
-        removeFromIndex("objectType", type);
-        List<String> cmds = new ArrayList<String>(ar.size());
-
-        for (String stid : ar) {
-            cmds.add("repair metadata search of ID " + stid);
-        }
-        return cmds;
-
-    }
-
-    /**
-     * The method start the repair of the metadata search for a given MCRObjectID as String.
-     * 
-     * @param id
-     *            the MCRObjectID as String
-     */
-    @MCRCommand(syntax = "repair metadata search of ID {0}", help = "Retrieves the MCRObject with the MCRObjectID {0} and restores it in the search store.", order = 180)
-    public static void repairMetadataSearchForID(String id) {
-        LOGGER.info("Start the repair for the ID " + id);
-
-        MCRObjectID mid = null;
-
-        try {
-            mid = MCRObjectID.getInstance(id);
-        } catch (Exception e) {
-            LOGGER.error("The String " + id + " is not a MCRObjectID.");
-            return;
-        }
-
-        MCRBase obj = MCRMetadataManager.retrieve(mid);
-        MCRMetadataManager.fireRepairEvent(obj);
-        LOGGER.info("Repaired " + mid.toString());
-    }
-
-    /**
-     * The method removes entries from searchindex.
-     * 
-     * @param fieldname
-     *            Name of field used to delete entries
-     * @param value
-     *            Value of the field
-     */
-    private static void removeFromIndex(String fieldname, String value) {
-        MCRSearcher searcher = getSearcherForField(fieldname);
-        searcher.clearIndex(fieldname, value);
-    }
-
-    private static MCRSearcher getSearcherForField(String fieldname) {
-        MCRFieldDef fd = MCRFieldDef.getDef(fieldname);
-        String index = fd.getIndex();
-        return MCRSearcherFactory.getSearcherForIndex(index);
-    }
-
-    /**
-     * Builds a resulset with a query. Used in later command to do work with.
-     * 
-     * @param querystring
-     *            MCRQuery as String
-     */
-
-    @MCRCommand(syntax = "select objects with query {0}", help = "Select MCRObjects with MCRQueryString {0}.", order = 185)
-    public static void selectObjectsWithQuery(String querystring) {
-        LOGGER.info("Build Resultset with query " + querystring);
-
-        MCRCondition<Object> cond = new MCRQueryParser().parse(querystring);
-        MCRQuery query = new MCRQuery(cond);
-        final MCRResults results = MCRQueryManager.search(query);
-        ArrayList<String> ids = new ArrayList<String>(results.getNumHits());
-        for (MCRHit hit : results) {
-            ids.add(hit.getID());
-        }
-        setSelectedObjectIDs(ids);
-
-        LOGGER.info("Resultset built");
-    }
-
-    /**
      * List all selected MCRObjects.
      */
     @MCRCommand(syntax = "list selected", help = "Prints the id of selected objects", order = 190)
@@ -744,104 +636,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             out.append(id).append(" ");
         }
         LOGGER.info(out.toString());
-    }
-
-    /**
-     * The method removes all selected entries from search index.
-     * 
-     * @param index
-     *            index of searcher
-     */
-    @MCRCommand(syntax = "remove selected from searchindex {0}", help = "Remove selected MCRObjects from searchindex {0}.", order = 220)
-    public static void removeFromSearchindex(String index) {
-        LOGGER.info("Start removing selected entries from search index " + index);
-
-        MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex(index);
-
-        if (null == getSelectedObjectIDs()) {
-            LOGGER.info("No Resultset to work with, use command \"select objects with query {0}\" to build one");
-            return;
-        }
-        for (String id : getSelectedObjectIDs()) {
-            searcher.removeFromIndex(id);
-        }
-        LOGGER.info("Selected entries from search index removed");
-    }
-
-    /**
-     * The method checks the existence of selected MCRObjects in Metadata store.
-     */
-    @MCRCommand(syntax = "check selected in metadata store", help = "Checks existence of selected MCRObjects in metadata store and deletes missing ones from search index.", order = 230)
-    public static void checkSelected() {
-        LOGGER.info("Start checking existence of selected MCRObjects in metadata store");
-
-        if (null == getSelectedObjectIDs()) {
-            LOGGER.info("No result set to work with, use command \"select objects with query {0}\" to create one");
-            return;
-        }
-
-        int instore = 0;
-        int notinstore = 0;
-
-        for (String id : getSelectedObjectIDs()) {
-            if (MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
-                instore++;
-            } else {
-                LOGGER.info("is not in store " + id + " delete from search index ...");
-                removeFromIndex("id", id);
-                notinstore++;
-            }
-        }
-
-        LOGGER.info("entries in Resultset    : " + getSelectedObjectIDs().size());
-        LOGGER.info("entries in SQL Store    : " + instore);
-        LOGGER.info("entries NOT in SQL Store: " + notinstore);
-    }
-
-    /**
-     * Checks existence of MCRObjectID type {0} in search index and rapairs missing ones in search index.
-     * 
-     * @param type
-     *            the MCRObjectID type
-     */
-    @MCRCommand(syntax = "check metadata search of type {0}", help = "Checks existence of MCRObjects of type {0} in search index and rapairs missing ones in search index.", order = 240)
-    public static void checkMetadataSearch(String type) {
-        LOGGER.info("Start the check for type " + type);
-        String typetest = CONFIG.getString("MCR.Metadata.Type." + type, "");
-
-        if (typetest.length() == 0) {
-            LOGGER.error("The type " + type + " was not found.");
-            return;
-        }
-        List<String> ar = (List<String>) MCRXMLMetadataManager.instance().listIDsOfType(type);
-        if (ar.size() == 0) {
-            LOGGER.warn("No ID's was found for type " + type + ".");
-            return;
-        }
-
-        for (String stid : ar) {
-            String querystring = "id = " + stid;
-            MCRCondition<Object> cond = new MCRQueryParser().parse(querystring);
-            MCRQuery query = new MCRQuery(cond);
-            MCRResults results = MCRQueryManager.search(query);
-            if (1 != results.getNumHits()) {
-                repairMetadataSearchForID(stid);
-            }
-        }
-    }
-
-    /**
-     * Inform Searcher what is going on.
-     * 
-     * @param mode
-     *            what is going on, for example rebuild insert ... finish
-     * @param index
-     *            of searcher
-     */
-    @MCRCommand(syntax = "set mode {0} of searcher for index {1}", help = "Notify Searcher of Index {1} what is going on {0}.", order = 250)
-    public static void notifySearcher(String mode, String index) {
-        MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex(index);
-        searcher.notifySearcher(mode);
     }
 
     /**
@@ -907,106 +701,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         } catch (Exception e) {
             LOGGER.error("While retrieving object " + id + " with revision " + revision, e);
         }
-    }
-
-    /**
-     * This method deletes all MyCoRe Objects which match the given query
-     * TODO could be deleted since the select mechanismn can be used 
-     * @param id
-     *            id of MyCoRe Object
-     * @param revision
-     *            revision to restore
-     * @throws MCRActiveLinkException
-     *             if object is created (no real update)
-     */
-    @MCRCommand(syntax = "delete objects matching {0}", help = "Deletes all objects matching the query given in parameter {0}", order = 10)
-    public static void deleteByQuery(String source) throws Exception {
-        LOGGER.info("Given query is \"" + source + "\"");
-        if (source == null || source.length() == 0) {
-            LOGGER.error("Given query is invalid");
-            return;
-        }
-
-        MCRCondition<Object> condition = null;
-        try {
-            condition = new MCRQueryParser().parse(source);
-        } catch (Exception ex) {
-            LOGGER.error("Exception occured while parsing the input string", ex);
-            return;
-        }
-
-        MCRQuery q = new MCRQuery(condition);
-        MCRResults results = MCRQueryManager.search(q);
-
-        if (results == null) {
-            return;
-        }
-        File deletedItems = new File(System.getenv("HOME") + File.separator + System.currentTimeMillis()
-            + "_deleted_objects.txt");
-        FileWriter fw = new FileWriter(deletedItems);
-        try {
-            fw.write("query=" + source + "\n\n");
-            for (MCRHit hit : results) {
-                fw.write(hit.getID() + "\n");
-                MCRMetadataManager.deleteMCRObject(MCRObjectID.getInstance(hit.getID()));
-            }
-        } catch (Exception ex) {
-            LOGGER.error(ex);
-        } finally {
-            fw.flush();
-            fw.close();
-        }
-
-        LOGGER.info("A list with the identifiers of the deleted items has been saved to "
-            + deletedItems.getAbsolutePath());
-    }
-
-    /**
-     * Lists all identifiers where the associated objects are matching the given query.
-     * 
-     * @param qSource the query to execute
-     * @throws Exception
-     */
-    @MCRCommand(syntax = "list objects matching {0}", help = "Lists all objects matching the query given in parameter {0}", order = 50)
-    public static void listIdsMatchingQuery(String qSource) throws Exception {
-        LOGGER.info("Given query is \"" + qSource + "\"");
-        if (qSource == null || qSource.length() == 0) {
-            LOGGER.error("Given query is invalid");
-            return;
-        }
-
-        MCRCondition<Object> condition = null;
-        try {
-            condition = new MCRQueryParser().parse(qSource);
-        } catch (Exception ex) {
-            LOGGER.error("Exception occured while parsing the input string", ex);
-            return;
-        }
-
-        MCRQuery q = new MCRQuery(condition);
-        MCRResults results = MCRQueryManager.search(q);
-
-        if (results == null) {
-            return;
-        }
-        File matchingItems = new File(System.getenv("HOME") + File.separator + System.currentTimeMillis()
-            + "_matched.txt");
-        FileWriter fw = new FileWriter(matchingItems);
-        try {
-            fw.write("query=" + qSource + "\n\n");
-            for (MCRHit hit : results) {
-                LOGGER.info(hit.getID());
-                fw.write(hit.getID() + "\n");
-            }
-        } catch (Exception ex) {
-            LOGGER.error(ex);
-        } finally {
-            fw.flush();
-            fw.close();
-        }
-
-        LOGGER.info("A list with the identifiers matching query \"" + qSource + "\" has been saved to "
-            + matchingItems.getAbsolutePath());
     }
 
     /**
