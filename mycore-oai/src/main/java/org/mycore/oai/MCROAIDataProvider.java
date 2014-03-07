@@ -141,7 +141,7 @@ public class MCROAIDataProvider extends MCRServlet {
                 if (oaiAdapter == null) {
                     MCRConfiguration config = MCRConfiguration.instance();
                     String adapter = MCROAIAdapter.PREFIX + oaiAdapterKey + ".Adapter";
-                    oaiAdapter = (MCROAIAdapter) (config.getInstanceOf(adapter, MCROAIAdapter.class.getName()));
+                    oaiAdapter = config.getInstanceOf(adapter, MCROAIAdapter.class.getName());
                     oaiAdapter.init(this.myBaseURL, oaiAdapterKey);
                     mcrOAIAdapterMap.put(oaiAdapterKey, oaiAdapter);
                 }
