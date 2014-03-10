@@ -46,16 +46,6 @@
     <url-pattern>/servlets/MCRQueryServlet</url-pattern>
   </servlet-mapping>
 
-  <servlet>
-    <servlet-name>ClassificationBrowserSolr</servlet-name>
-    <servlet-class>org.mycore.solr.frontend.servlets.MCRClassificationBrowserSolr</servlet-class>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>ClassificationBrowserSolr</servlet-name>
-    <url-pattern>/servlets/ClassificationBrowserSolr</url-pattern>
-  </servlet-mapping>
-
   <filter-mapping>
     <filter-name>UriResolverDebugFilter</filter-name>
     <servlet-name>MCRLegacySearchServlet</servlet-name>
