@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.parsers.bool.MCRCondition;
 
 /** Represents a query with its condition and optional parameters */
@@ -246,7 +247,9 @@ public class MCRQuery {
         // List of remote hosts to query
         Element hostsElem = xml.getChild("hosts");
         if (hostsElem != null) {
-            throw new UnsupportedOperationException("Distributed queries are not supported");
+            MCRQueryHostParser hostParser = MCRConfiguration.instance().getSingleInstanceOf(
+                "MCR.MCRQueryHostParser.Impl", MCRQueryHostParser.class.getName());
+            hostParser.parseElement(hostsElem, query);
         }
 
         return query;
