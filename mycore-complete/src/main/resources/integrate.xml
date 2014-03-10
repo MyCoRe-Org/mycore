@@ -99,7 +99,6 @@
   <target name="config" description="--> generates mycore.properties file">
     <property name="mycore.properties.target" location="${build.config}/mycore.properties" />
     <copy todir="${build.config}" overwrite="true" file="${integration.dir}/config/mycore.properties" />
-    <copy todir="${build.config}" overwrite="true" file="${integration.dir}/config/searchfields.xml" />
     <componentPreHook target="config" />
     <for param="component.name" list="${components.order}">
       <sequential>
@@ -113,28 +112,6 @@
         </for>
       </sequential>
     </for>
-    <!-- searchfields -->
-    <for param="searchfield.xml">
-      <fileset dir="${integration.dir}" includes="**/searchfields-metadata.xml" />
-      <sequential>
-        <xmltask source="${build.config}/searchfields.xml" dest="${build.config}/searchfields.xml">
-          <insert path="/:searchfields/:index[@id='metadata']/:field[position()=last()]"
-                  position="after"
-                  file="@{searchfield.xml}" />
-        </xmltask>
-      </sequential>
-    </for>
-    <for param="searchfield.xml">
-      <fileset dir="${integration.dir}" includes="**/searchfields-content.xml" />
-      <sequential>
-        <xmltask source="${build.config}/searchfields.xml" dest="${build.config}/searchfields.xml">
-          <insert path="/:searchfields/:index[@id='content']/:field[position()=last()]"
-                  position="after"
-                  file="@{searchfield.xml}" />
-        </xmltask>
-      </sequential>
-    </for>
-    <replace file="${build.config}/searchfields.xml" token='xmlns=""' />
     <componentHook target="config" />
   </target>
 
