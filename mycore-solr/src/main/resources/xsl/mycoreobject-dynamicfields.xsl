@@ -57,6 +57,13 @@
         <xsl:variable name="notInherited" select="@inherited = '0'" />
 
         <xsl:for-each select="$classTree">
+          <xsl:if test="position() = 1">
+            <field name="{$classid}.root">
+              <!-- categid as value -->
+              <xsl:value-of select="@ID" />
+            </field>
+          </xsl:if>
+
           <!-- classid as fieldname -->
           <field name="{$classid}">
             <!-- categid as value -->
