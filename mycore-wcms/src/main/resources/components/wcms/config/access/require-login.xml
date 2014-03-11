@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- this rule allways returns true -->
-<condition format="xml"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:noNamespaceSchemaLocation="MCRCondition.xsd">
-  <boolean operator="not">
-    <condition value="gast" operator="=" field="user" />
-  </boolean>
-</condition>

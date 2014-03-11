@@ -1315,7 +1315,6 @@
     <module>mycore-swf</module>
     <module>mycore-sword</module>
     <module>mycore-user2</module>
-    <module>mycore-wcms</module>
     <module>mycore-wcms2</module>
     <module>mycore-webcli</module>
     <module>mycore-webservices</module>
