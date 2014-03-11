@@ -862,7 +862,7 @@
         <artifactId>ant-contrib</artifactId>
         <version>1.0b3</version>
         <optional>true</optional>
-        <scope>runtim</scope>
+        <scope>runtime</scope>
         <exclusions>
           <exclusion>
             <groupId>ant</groupId>
