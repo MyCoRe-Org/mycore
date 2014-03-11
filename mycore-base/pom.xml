@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <artifactId>mycore</artifactId>
     <groupId>org.mycore</groupId>
@@ -27,6 +28,32 @@
       </resource>
     </resources>
     <plugins>
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>analyze</id>
+            <configuration>
+              <usedDependencies>
+                <!-- used by jdom 2.0.5 -->
+                <useDependency>jaxen:jaxen</useDependency>
+                <!-- used by commons-vfs -->
+                <useDependency>com.jcraft:jsch</useDependency>
+                <!-- used by svnkit -->
+                <useDependency>net.java.dev.jna:jna</useDependency>
+                <!-- used in hibernate tests -->
+                <useDependency>org.hsqldb:hsqldb</useDependency>
+                <!-- used by hibernate -->
+                <useDependency>org.slf4j:slf4j-log4j12</useDependency>
+                <!-- used by hibernate -->
+                <useDependency>org.javassist:javassist</useDependency>
+                <!-- used for XML catalog resolving -->
+                <useDependency>xml-resolver:xml-resolver</useDependency>
+              </usedDependencies>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>xml-maven-plugin</artifactId>
@@ -246,8 +273,8 @@
       <artifactId>hibernate-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.ant</groupId>
-      <artifactId>ant</artifactId>
+      <groupId>org.hibernate.javax.persistence</groupId>
+      <artifactId>hibernate-jpa-2.1-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.hsqldb</groupId>
@@ -271,7 +298,17 @@
     </dependency>
     <dependency>
       <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-client</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-servlet</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.sun.jersey.jersey-test-framework</groupId>
@@ -280,6 +317,22 @@
     <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-apache-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-grizzly</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.grizzly</groupId>
+      <artifactId>grizzly-servlet-webserver</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey.jersey-test-framework</groupId>
+      <artifactId>jersey-test-framework-core</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.annotation</groupId>
