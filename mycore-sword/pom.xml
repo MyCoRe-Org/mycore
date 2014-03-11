@@ -15,12 +15,6 @@
       <artifactId>mycore-base</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.mycore</groupId>
-      <artifactId>mycore-mods</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    
     <!-- additional dependencies for the sword-common code -->
     <dependency>
       <groupId>commons-fileupload</groupId>
@@ -33,11 +27,6 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>log4j</groupId>
