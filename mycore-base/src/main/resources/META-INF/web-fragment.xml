@@ -210,6 +210,11 @@
   </filter-mapping>
   <filter-mapping>
     <filter-name>UserAgentFilter</filter-name>
+    <servlet-name>MCRBasketServlet</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>UserAgentFilter</filter-name>
     <servlet-name>MCRObjectServlet</servlet-name>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
