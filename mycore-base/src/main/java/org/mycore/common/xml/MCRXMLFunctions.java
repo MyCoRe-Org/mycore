@@ -721,12 +721,25 @@ public class MCRXMLFunctions {
      * @param categoryId
      * @return
      */
-    public String getDisplayName(String classificationId, String categoryId) {
+    public static String getDisplayName(String classificationId, String categoryId) {
         MCRCategoryID categID = MCRCategoryID.fromString(classificationId + ":" + categoryId);
         MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
         MCRCategory category = dao.getCategory(categID, 0);
 
         return category.getCurrentLabel().getText();
+    }
+
+    /**
+     * @param classificationId
+     * @param categoryId
+     * @return
+     */
+    public static boolean isCategoryID(String classificationId, String categoryId) {
+        MCRCategoryID categID = MCRCategoryID.fromString(classificationId + ":" + categoryId);
+        MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        MCRCategory category = dao.getCategory(categID, 0);
+
+        return category == null ? false : true;
     }
 
     /**
