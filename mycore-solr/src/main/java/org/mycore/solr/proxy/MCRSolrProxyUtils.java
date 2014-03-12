@@ -114,7 +114,7 @@ class MCRSolrProxyUtils {
         return map;
     }
 
-    private static MCRSolrQueryHandler getStandardHandler(NamedList<NamedList<Object>> list) {
+    static MCRSolrQueryHandler getStandardHandler(NamedList<NamedList<Object>> list) {
         MCRSolrQueryHandler standardHandler = null;
         if (list != null) {
             NamedList<Object> byPath = list.get(MCRSolrConstants.QUERY_PATH);
