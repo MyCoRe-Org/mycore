@@ -115,7 +115,7 @@ public class MCRSessionMgr {
      */
     public static void releaseCurrentSession() {
         //theThreadLocalSession maybe null if called after close()
-        if (theThreadLocalSession != null) {
+        if (theThreadLocalSession != null && hasCurrentSession()) {
             MCRSession session = theThreadLocalSession.get();
             session.passivate();
             MCRSession.LOGGER.debug("MCRSession released " + session.getID());
