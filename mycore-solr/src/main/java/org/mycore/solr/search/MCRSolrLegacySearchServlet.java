@@ -55,7 +55,7 @@ public class MCRSolrLegacySearchServlet extends MCRServlet {//extends MCRSearchS
     private String defaultSearchField;
 
     private static HashSet<String> SEARCH_PARAMETER = new HashSet<>(Arrays.asList(new String[] { "search", "query",
-            "maxResults", "numPerPage", "page", "mask", "mode", "redirect" }));
+        "maxResults", "numPerPage", "page", "mask", "mode", "redirect" }));
 
     @Override
     public void init() throws ServletException {
@@ -126,9 +126,9 @@ public class MCRSolrLegacySearchServlet extends MCRServlet {//extends MCRSearchS
         HashMap<String, List<MCRCondition>> table;
 
         if (condition instanceof MCRSetCondition) {
-            table = null;//queryEngine.groupConditionsByIndex((MCRSetCondition) condition);
+            table = MCRConditionTransformer.groupConditionsByIndex((MCRSetCondition) condition);
         } else {
-            // if there is only one condition its no set condition. we dont need to group
+            // if there is only one condition its no set condition. we don't need to group
             LOGGER.warn("Condition is not SetCondition.");
             table = new HashMap<String, List<MCRCondition>>();
 

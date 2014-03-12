@@ -23,12 +23,12 @@
 
 package org.mycore.solr.legacy;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -36,6 +36,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRNotCondition;
@@ -52,6 +53,14 @@ import org.mycore.solr.MCRSolrUtils;
  */
 public class MCRConditionTransformer {
     private static final Logger LOGGER = Logger.getLogger(MCRConditionTransformer.class);
+
+    /**
+     * If a condition references fields from multiple indexes, this constant is
+     * returned
+     */
+    protected static final String mixed = "--mixed--";
+
+    private static HashSet<String> joinFields = null;
 
     public static String toSolrQueryString(@SuppressWarnings("rawtypes") MCRCondition condition, Set<String> usedFields) {
         return toSolrQueryString(condition, usedFields, false).toString();
@@ -285,6 +294,66 @@ public class MCRConditionTransformer {
             subCond = new MCRNotCondition(subCond);
         }
         return subCond;
+    }
+
+    /**
+     * Build a table from index ID to a List of conditions referencing this
+     * index
+     */
+    @SuppressWarnings("rawtypes")
+    public static HashMap<String, List<MCRCondition>> groupConditionsByIndex(MCRSetCondition cond) {
+        HashMap<String, List<MCRCondition>> table = new HashMap<String, List<MCRCondition>>();
+        @SuppressWarnings("unchecked")
+        List<MCRCondition> children = cond.getChildren();
+
+        for (MCRCondition child : children) {
+            String index = getIndex(child);
+            List<MCRCondition> conditions = table.get(index);
+            if (conditions == null) {
+                conditions = new ArrayList<MCRCondition>();
+                table.put(index, conditions);
+            }
+            conditions.add(child);
+        }
+        return table;
+    }
+
+    /**
+     * Returns the ID of the index of all fields referenced in this condition.
+     * If the fields come from multiple indexes, the constant mixed is returned.
+     */
+    @SuppressWarnings("rawtypes")
+    private static String getIndex(MCRCondition cond) {
+        if (cond instanceof MCRQueryCondition) {
+            MCRQueryCondition queryCondition = ((MCRQueryCondition) cond);
+            String fieldName = queryCondition.getFieldName();
+            return getIndex(fieldName);
+        } else if (cond instanceof MCRNotCondition) {
+            return getIndex(((MCRNotCondition) cond).getChild());
+        }
+
+        @SuppressWarnings("unchecked")
+        List<MCRCondition> children = ((MCRSetCondition) cond).getChildren();
+
+        String index = getIndex(children.get(0));
+        for (int i = 1; i < children.size(); i++) {
+            String other = getIndex(children.get(i));
+            if (!index.equals(other)) {
+                return mixed; // mixed indexes here!
+            }
+        }
+        return index;
+    }
+
+    public static String getIndex(String fieldName) {
+        return getJoinFields().contains(fieldName) ? "content" : "metadata";
+    }
+
+    private static HashSet<String> getJoinFields() {
+        if (joinFields == null) {
+            joinFields = new HashSet<>(MCRConfiguration.instance().getStrings("MCR.Module-solr.JoinQueryFields"));
+        }
+        return joinFields;
     }
 
 }
