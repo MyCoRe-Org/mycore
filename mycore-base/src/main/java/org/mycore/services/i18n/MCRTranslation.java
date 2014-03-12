@@ -117,7 +117,8 @@ public class MCRTranslation {
         try {
             result = message.getString(key);
         } catch (MissingResourceException mre) {
-            LOGGER.error(mre);
+            LOGGER.debug(mre);
+            return false;
         }
         return result == null ? false : true;
     }
