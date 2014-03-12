@@ -101,6 +101,28 @@ public class MCRTranslation {
     }
 
     /**
+     * Checks whether there is a value for the given key and current locale. 
+     * 
+     * @param key
+     * @return <code>true</code> if there is a value, <code>false</code> otherwise
+     */
+    public static boolean exists(String key) {
+        ResourceBundle message;
+        try {
+            message = MCRStackedResourceBundle.getResourceBundle(MESSAGES_BUNDLE, getCurrentLocale());
+        } catch (MissingResourceException mre) {
+            return false;
+        }
+        String result = null;
+        try {
+            result = message.getString(key);
+        } catch (MissingResourceException mre) {
+            LOGGER.error(mre);
+        }
+        return result == null ? false : true;
+    }
+
+    /**
      * provides translation for the given label (property key).
      * 
      * The current locale that is needed for translation is gathered by the
@@ -152,8 +174,7 @@ public class MCRTranslation {
         } catch (MissingResourceException mre) {
             // try to get new key if 'label' is deprecated
             if (!DEPRECATED_MESSAGES_PRESENT) {
-                LOGGER.warn("Could not load resource '" + DEPRECATED_MESSAGES_PROPERTIES
-                    + "' to check for depreacted I18N keys.");
+                LOGGER.warn("Could not load resource '" + DEPRECATED_MESSAGES_PROPERTIES + "' to check for depreacted I18N keys.");
             } else if (DEPRECATED_MAPPING.keySet().contains(label)) {
                 String newLabel = DEPRECATED_MAPPING.getProperty(label);
                 try {
@@ -292,26 +313,26 @@ public class MCRTranslation {
         } else {
             for (int i = 0; i < masked.length(); i++) {
                 switch (masked.charAt(i)) {
-                    case ';':
-                        if (mask) {
-                            buf.append(';');
-                            mask = false;
-                        } else {
-                            a.add(buf.toString());
-                            buf.setLength(0);
-                        }
-                        break;
-                    case '\\':
-                        if (mask) {
-                            buf.append('\\');
-                            mask = false;
-                        } else {
-                            mask = true;
-                        }
-                        break;
-                    default:
-                        buf.append(masked.charAt(i));
-                        break;
+                case ';':
+                    if (mask) {
+                        buf.append(';');
+                        mask = false;
+                    } else {
+                        a.add(buf.toString());
+                        buf.setLength(0);
+                    }
+                    break;
+                case '\\':
+                    if (mask) {
+                        buf.append('\\');
+                        mask = false;
+                    } else {
+                        mask = true;
+                    }
+                    break;
+                default:
+                    buf.append(masked.charAt(i));
+                    break;
                 }
             }
             a.add(buf.toString());
@@ -341,8 +362,7 @@ public class MCRTranslation {
     static Properties loadProperties() {
         Properties deprecatedMapping = new Properties();
         try {
-            final InputStream propertiesStream = MCRTranslation.class
-                .getResourceAsStream(DEPRECATED_MESSAGES_PROPERTIES);
+            final InputStream propertiesStream = MCRTranslation.class.getResourceAsStream(DEPRECATED_MESSAGES_PROPERTIES);
             if (propertiesStream == null) {
                 LOGGER.warn("Could not find resource '" + DEPRECATED_MESSAGES_PROPERTIES + "'.");
                 return deprecatedMapping;
