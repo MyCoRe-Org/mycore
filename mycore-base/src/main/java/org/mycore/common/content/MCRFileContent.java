@@ -30,10 +30,7 @@ import java.io.InputStream;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.StandardOpenOption;
-
-import javax.activation.MimeType;
 
 /**
  * Reads MCRContent from a local file.
