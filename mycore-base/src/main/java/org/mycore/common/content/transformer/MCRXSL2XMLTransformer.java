@@ -58,8 +58,8 @@ import org.xml.sax.XMLReader;
  */
 public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
 
-    private static MCRCache<String, MCRXSL2XMLTransformer> INSTANCE_CACHE = new MCRCache<String, MCRXSL2XMLTransformer>(100,
-            "MCRXSLTransformer instance cache");
+    private static MCRCache<String, MCRXSL2XMLTransformer> INSTANCE_CACHE = new MCRCache<String, MCRXSL2XMLTransformer>(
+        100, "MCRXSLTransformer instance cache");
 
     public MCRXSL2XMLTransformer() {
         super();
@@ -80,9 +80,8 @@ public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
     }
 
     @Override
-    protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler,
-        MCRParameterCollector parameter) throws IOException,
-            SAXException {
+    protected MCRContent getTransformedContent(MCRContent source, XMLReader reader,
+        TransformerHandler transformerHandler) throws IOException, SAXException {
         JDOMResult result = new JDOMResult();
         transformerHandler.setResult(result);
         // Parse the source XML, and send the parse events to the
@@ -91,7 +90,7 @@ public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
         Document resultDoc = getDocument(result);
         if (resultDoc == null) {
             throw new MCRConfigurationException("Stylesheets " + Arrays.asList(templateSources).toString()
-                    + " does not return any content for " + source.getSystemId());
+                + " does not return any content for " + source.getSystemId());
         }
         return new MCRJDOMContent(resultDoc);
     }

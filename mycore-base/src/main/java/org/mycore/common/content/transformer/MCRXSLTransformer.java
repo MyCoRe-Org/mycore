@@ -233,7 +233,21 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler,
         MCRParameterCollector parameter) throws IOException, SAXException, TransformerException {
         return new MCRTransformedContent(source, reader, transformerHandler, getLastModified(), parameter,
-            getFileName(source), getMimeType());
+            getFileName(source), getMimeType(), this);
+    }
+
+    protected MCRContent getTransformedContent(MCRContent source, XMLReader reader,
+        TransformerHandler transformerHandler) throws IOException,
+        SAXException {
+        MCRByteArrayOutputStream baos = new MCRByteArrayOutputStream(INITIAL_BUFFER_SIZE);
+        StreamResult serializer = new StreamResult(baos);
+        transformerHandler.setResult(serializer);
+        // Parse the source XML, and send the parse events to the
+        // TransformerHandler.
+        LOGGER.info("Start transforming: " + (source.getSystemId() == null ? source.getName() : source.getSystemId()));
+        reader.parse(source.getInputSource());
+        MCRContent transformedContent = new MCRByteContent(baos.getBuffer(), 0, baos.size());
+        return transformedContent;
     }
 
     private String getFileName(MCRContent content) throws TransformerException, SAXException {
@@ -329,7 +343,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         return getDefaultExtension();
     }
 
-    private static class MCRTransformedContent extends MCRWrappedContent {
+    static class MCRTransformedContent extends MCRWrappedContent {
         private MCRContent source;
 
         private XMLReader reader;
@@ -340,17 +354,22 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
         private String eTag;
 
+        private MCRXSLTransformer instance;
+
         public MCRTransformedContent(MCRContent source, XMLReader reader, TransformerHandler transformerHandler,
-            long transformerLastModified, MCRParameterCollector parameter, String fileName, String mimeType)
-            throws IOException {
+            long transformerLastModified, MCRParameterCollector parameter, String fileName, String mimeType,
+            MCRXSLTransformer instance) throws IOException {
             this.source = source;
             this.reader = reader;
             this.transformerHandler = transformerHandler;
+            LOGGER.info("Transformer lastModified: " + transformerLastModified);
+            LOGGER.info("Source lastModified     : " + source.lastModified());
             this.lastModified = (transformerLastModified >= 0 && source.lastModified() >= 0) ? Math.max(
                 transformerLastModified, source.lastModified()) : -1;
             this.eTag = generateETag(source, lastModified, parameter.hashCode());
             this.name = fileName;
             this.mimeType = mimeType;
+            this.instance = instance;
         }
 
         @Override
@@ -378,21 +397,15 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         @Override
         public MCRContent getBaseContent() {
             if (transformed == null) {
-                MCRByteArrayOutputStream baos = new MCRByteArrayOutputStream(INITIAL_BUFFER_SIZE);
-                StreamResult serializer = new StreamResult(baos);
-                transformerHandler.setResult(serializer);
-                // Parse the source XML, and send the parse events to the
-                // TransformerHandler.
                 try {
-                    LOGGER.info("Start transforming: "
-                        + (source.getSystemId() == null ? source.getName() : source.getSystemId()));
-                    reader.parse(source.getInputSource());
+                    transformed = instance.getTransformedContent(source, reader, transformerHandler);
+                    transformed.setLastModified(lastModified);
+                    transformed.setName(name);
+                    transformed.setMimeType(mimeType);
                 } catch (IOException | SAXException e) {
                     throw new MCRException(e);
                 }
-                transformed = new MCRByteContent(baos.getBuffer(), 0, baos.size(), lastModified);
-                transformed.setMimeType(mimeType);
-                transformed.setName(name);
+
             }
             return transformed;
         }
