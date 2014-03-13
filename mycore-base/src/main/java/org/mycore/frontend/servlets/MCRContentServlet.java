@@ -287,8 +287,9 @@ public abstract class MCRContentServlet extends MCRServlet {
             endCurrentTransaction();
             // Copy the inputBufferSize stream to the outputBufferSize stream
             final long bytesCopied = IOUtils.copyLarge(in, out, new byte[outputBufferSize]);
-            if (content.length() != bytesCopied) {
-                throw new EOFException("Bytes to send: " + content.length() + " actual: " + bytesCopied);
+            long length = content.length();
+            if (length >= 0 && length != bytesCopied) {
+                throw new EOFException("Bytes to send: " + length + " actual: " + bytesCopied);
             }
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Wrote " + bytesCopied + " bytes.");
