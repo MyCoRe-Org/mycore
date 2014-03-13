@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.util.JAXBResult;
 import javax.xml.transform.TransformerConfigurationException;
@@ -99,6 +100,12 @@ public class MCRXSL2JAXBTransformer<T> extends MCRXSLTransformer {
         // Parse the source XML, and send the parse events to the
         // TransformerHandler.
         reader.parse(source.getInputSource());
+        Object parsedResult = result.getResult();
+        if (parsedResult instanceof JAXBElement<?>){
+            @SuppressWarnings("unchecked")
+            JAXBElement<T> jaxbElement = (JAXBElement<T>)parsedResult;
+            return jaxbElement.getValue();
+        }
         @SuppressWarnings("unchecked")
         T jaxbResult = (T) result.getResult();
         return jaxbResult;
