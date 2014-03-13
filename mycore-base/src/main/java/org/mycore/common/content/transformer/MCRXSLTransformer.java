@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.Properties;
 import java.util.TooManyListenersException;
 
+import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Result;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
@@ -237,8 +238,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     }
 
     protected MCRContent getTransformedContent(MCRContent source, XMLReader reader,
-        TransformerHandler transformerHandler) throws IOException,
-        SAXException {
+        TransformerHandler transformerHandler) throws IOException, SAXException {
         MCRByteArrayOutputStream baos = new MCRByteArrayOutputStream(INITIAL_BUFFER_SIZE);
         StreamResult serializer = new StreamResult(baos);
         transformerHandler.setResult(serializer);
@@ -404,6 +404,13 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
                     transformed.setMimeType(mimeType);
                 } catch (IOException | SAXException e) {
                     throw new MCRException(e);
+                } catch (RuntimeException e) {
+                    MCRErrorListener el = (MCRErrorListener) transformerHandler.getTransformer().getErrorListener();
+                    if (el != null && e.getCause() == null && el.getExceptionThrown() != null) {
+                        //typically if a RuntimeException has no cause, we can get the "real cause" from MCRErrorListener, yeah!!!
+                        throw new RuntimeException(e.getMessage(), el.getExceptionThrown());
+                    }
+                    throw e;
                 }
 
             }
