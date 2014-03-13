@@ -793,7 +793,7 @@ public class MCRServlet extends HttpServlet {
         return MCRTranslation.translate(key, args);
     }
 
-    protected static void writeCacheHeaders(HttpServletResponse response, int CACHE_TIME, long lastModified,
+    protected static void writeCacheHeaders(HttpServletResponse response, long CACHE_TIME, long lastModified,
         boolean useExpire) {
         response.setHeader("Cache-Control", "public, max-age=" + CACHE_TIME);
         response.setDateHeader("Last-Modified", lastModified);
