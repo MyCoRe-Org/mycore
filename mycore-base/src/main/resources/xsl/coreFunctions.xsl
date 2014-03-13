@@ -625,6 +625,18 @@
     <xsl:value-of select="mcrxml:formatISODate( string( $date ),string( $formatArg ),string( $locale ) )" />
   </xsl:template>
 
+    <!--
+        Template: formatFileSize
+        synopsis: formates the size in a more human readable form
+        param:
+        
+        size: size in bytes
+    -->
+  <xsl:template name="formatFileSize">
+    <xsl:param name="size" />
+    <xsl:value-of xmlns:ifsnode="xalan://org.mycore.datamodel.ifs.MCRFilesystemNode" select="ifsnode:getSizeFormatted($size)" />
+  </xsl:template>
+
     <!-- ====================================================================================={
         
         section: template name="ersetzen"
