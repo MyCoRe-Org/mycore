@@ -26,10 +26,11 @@ package org.mycore.common.content;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
+import java.security.MessageDigest;
 
 import org.jdom2.output.Format;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.content.streams.MCRMD5InputStream;
 
 /**
  * Reads MCRContent from an XML document.
@@ -79,5 +80,20 @@ public abstract class MCRXMLContent extends MCRContent {
     @Override
     public String getMimeType() throws IOException {
         return super.getMimeType() == null ? "text/xml" : super.getMimeType();
+    }
+
+    @Override
+    public long length() throws IOException {
+        return asByteArray().length;
+    }
+
+    @Override
+    public String getETag() throws IOException {
+        MessageDigest md5Digest = MCRMD5InputStream.buildMD5Digest();
+        byte[] byteArray = asByteArray();
+        md5Digest.update(byteArray, 0, byteArray.length);
+        byte[] digest = md5Digest.digest();
+        String md5String = MCRMD5InputStream.getMD5String(digest);
+        return '"' + md5String + '"';
     }
 }
