@@ -23,12 +23,13 @@
 
 package org.mycore.datamodel.ifs;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xml.MCRURIResolver;
 
 /**
@@ -47,7 +48,7 @@ public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector {
      * store lookup table where keys are file content type IDs, values are
      * content store IDs
      */
-    protected Hashtable table;
+    protected HashMap<String, String> typeStoreMap;
 
     /** list of all storeIDs * */
     protected String[] storeIDs;
@@ -56,10 +57,13 @@ public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector {
         MCRConfiguration config = MCRConfiguration.instance();
         String file = config.getString("MCR.IFS.ContentStoreSelector.ConfigFile");
         Element xml = MCRURIResolver.instance().resolve("resource:" + file);
+        if (xml == null) {
+            throw new MCRConfigurationException("Could not load configuration file from resource:" + file);
+        }
 
-        table = new Hashtable();
+        typeStoreMap = new HashMap<>();
 
-        List stores = xml.getChildren("store");
+        List<Element> stores = xml.getChildren("store");
         storeIDs = new String[stores.size() + 1];
 
         for (int i = 0; i < stores.size(); i++) {
@@ -67,13 +71,13 @@ public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector {
             String storeID = store.getAttributeValue("ID");
             storeIDs[i] = storeID;
 
-            List types = store.getChildren();
+            List<Element> types = store.getChildren();
 
             for (Object type1 : types) {
                 Element type = (Element) type1;
                 String typeID = type.getTextTrim();
 
-                table.put(typeID, storeID);
+                typeStoreMap.put(typeID, storeID);
             }
         }
 
@@ -92,8 +96,8 @@ public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector {
     }
 
     private String getStore(String typeID) {
-        if (table.containsKey(typeID)) {
-            return (String) table.get(typeID);
+        if (typeStoreMap.containsKey(typeID)) {
+            return typeStoreMap.get(typeID);
         }
         return defaultID;
     }
