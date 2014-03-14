@@ -617,7 +617,10 @@ public abstract class MCRContentServlet extends MCRServlet {
 
             response.setHeader("ETag", eTag);
 
-            response.setDateHeader("Last-Modified", content.lastModified());
+            long lastModified = content.lastModified();
+            if (lastModified >= 0) {
+                response.setDateHeader("Last-Modified", lastModified);
+            }
             if (serveContent) {
                 response.setHeader("Content-Disposition", "inline;filename=\"" + filename + "\"");
             }
