@@ -27,13 +27,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.events.MCREvent;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.mets.events.MCRUpdateMetsOnDerivateChangeEventHandler;
 import org.mycore.mets.model.Mets;
 import org.mycore.mets.tools.MCRMetsProvider;
 import org.mycore.mets.tools.MCRMetsSave;
@@ -82,6 +80,11 @@ public class MCRSaveMETSServlet extends MCRServlet {
         }
         LOGGER.info("Validating METS document was successful");
 
+        saveMets(derivateId, mets);
+        return;
+    }
+
+    private synchronized void saveMets(MCRObjectID derivateId, Mets mets) throws Exception {
         LOGGER.info("Saving mets file ...");
         Document metsDoc = mets.asDocument();
         MCRMetsSave.saveMets(metsDoc, derivateId);
@@ -92,7 +95,6 @@ public class MCRSaveMETSServlet extends MCRServlet {
         if (urns.size() > 0) {
             MCRMetsSave.updateMetsOnUrnGenerate(der.getId(), urns);
         }
-        return;
     }
 
 }

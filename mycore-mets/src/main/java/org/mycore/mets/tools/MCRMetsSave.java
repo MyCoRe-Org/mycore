@@ -68,42 +68,14 @@ public class MCRMetsSave {
      * @param document
      * @param derivateId
      */
-    public static void saveMets(Document document, MCRObjectID derivateId) {
-        File tmp = null;
-        /* save temporary file */
-        try {
-            tmp = save(document);
-        } catch (Exception ex) {
-            LOGGER.error("Could not save file on disk.", ex);
-            return;
-        }
+    public static synchronized void saveMets(Document document, MCRObjectID derivateId) {
         // add the file to the existing derivate in ifs
         String fileName = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
-        LOGGER.info("Storing file content from \"" + tmp.getName() + "\" to derivate \"" + derivateId + "\"");
+        LOGGER.info("Storing file content from \"" +fileName + "\" to derivate \"" + derivateId + "\"");
         MCRFile uploadFile = new MCRFile(fileName, MCRMetadataManager.retrieveMCRDerivate(derivateId).receiveDirectoryFromIFS());
-        uploadFile.setContentFrom(tmp);
-
-        // delete temporary file
-        if (!tmp.delete()) {
-            LOGGER.warn("Temporary file \"" + tmp.getName() + "\"could not be deleted ");
-        }
+        uploadFile.setContentFrom(document);
     }
 
-    /**
-     * Saves the given document to disk, pattern is as follows <br/>
-     * <br/>
-     * <code>File.createTempFile("mets", ".xml");</code>
-     * 
-     * @return the reference to the mets file
-     */
-    private static File save(Document mets) throws Exception {
-        File file = File.createTempFile(UUID.randomUUID().toString(), ".xml");
-        FileOutputStream stream = new FileOutputStream(file);
-        XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
-        outputter.output(mets, stream);
-        stream.close();
-        return file;
-    }
 
     /**
      * Updates the mets.xml belonging to the given derivate. Adds the file to

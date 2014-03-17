@@ -23,6 +23,16 @@
     <url-pattern>/servlets/MCRMETSServlet/*</url-pattern>
   </servlet-mapping>
 
+  <servlet id="MCRMETSUnlockServlet">
+    <servlet-name>MCRMETSUnlockServlet</servlet-name>
+    <servlet-class>org.mycore.mets.servlets.MCRMETSUnlockServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>MCRMETSUnlockServlet</servlet-name>
+    <url-pattern>/servlets/MCRMETSUnlockServlet/*</url-pattern>
+  </servlet-mapping>
+
   <filter-mapping>
     <filter-name>UserAgentFilter</filter-name>
     <servlet-name>MCRMETSServlet</servlet-name>
