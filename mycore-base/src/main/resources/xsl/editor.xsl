@@ -1118,7 +1118,9 @@
   <xsl:param name="var"     />
   <xsl:param name="default" />
 
-  <input id="radio-{$var}" tabindex="1" type="radio" name="{$var}" value="{@value}">
+  <xsl:variable name="id" select="concat('radio-',translate($var,'/','__'),'-',position())" />
+
+  <input id="{$id}" tabindex="1" type="radio" name="{$var}" value="{@value}">
     <xsl:choose>
       <xsl:when test="ancestor::editor/input/var[((@name=$var) or starts-with(@name,concat($var,'['))) and (@value=current()/@value)]">
         <xsl:attribute name="checked">checked</xsl:attribute>
@@ -1135,7 +1137,7 @@
     </xsl:for-each>  
     <xsl:call-template name="applyDisabled"/>  
   </input>
-  <label for="radio-{$var}">
+  <label for="{$id}">
     <xsl:for-each select="parent::list">
       <xsl:call-template name="editor.set.css" />
     </xsl:for-each>    
@@ -1147,8 +1149,10 @@
 <xsl:template name="editor.checkbox">
   <xsl:param name="var"     />
   <xsl:param name="default" />
+  
+  <xsl:variable name="id" select="concat('check-',translate($var,'/','__'),'-',position())" />
 
-  <input id="check-{$var}" tabindex="1" type="checkbox" name="{$var}" value="{@value}">
+  <input id="{$id}" tabindex="1" type="checkbox" name="{$var}" value="{@value}">
     <xsl:choose>
       <xsl:when test="ancestor::editor/input/var[((@name=$var) or starts-with(@name,concat($var,'['))) and (@value=current()/@value)]">
         <xsl:attribute name="checked">checked</xsl:attribute>
@@ -1165,7 +1169,7 @@
     </xsl:for-each>    
     <xsl:call-template name="applyDisabled"/>  
   </input>
-  <label for="check-{$var}">
+  <label for="{$id}">
     <xsl:for-each select="parent::list">
       <xsl:call-template name="editor.set.css" />
     </xsl:for-each>    
