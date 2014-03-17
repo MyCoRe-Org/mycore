@@ -1118,7 +1118,7 @@
   <xsl:param name="var"     />
   <xsl:param name="default" />
 
-  <xsl:variable name="id" select="concat('radio-',translate($var,'/','__'),'-',position())" />
+  <xsl:variable name="id" select="concat('radio-',translate($var,'/','__'),'-',generate-id(.))" />
 
   <input id="{$id}" tabindex="1" type="radio" name="{$var}" value="{@value}">
     <xsl:choose>
@@ -1150,7 +1150,7 @@
   <xsl:param name="var"     />
   <xsl:param name="default" />
   
-  <xsl:variable name="id" select="concat('check-',translate($var,'/','__'),'-',position())" />
+  <xsl:variable name="id" select="concat('check-',translate($var,'/','__'),'-',generate-id(.))" />
 
   <input id="{$id}" tabindex="1" type="checkbox" name="{$var}" value="{@value}">
     <xsl:choose>
