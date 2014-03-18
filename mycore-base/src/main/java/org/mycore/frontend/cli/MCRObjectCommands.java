@@ -80,6 +80,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     private static Hashtable<String, javax.xml.transform.Transformer> translist = new Hashtable<String, javax.xml.transform.Transformer>();
 
     public static void setSelectedObjectIDs(List<String> selected) {
+        LOGGER.info(selected.size() + " objects selected");
         MCRSessionMgr.getCurrentSession().put("mcrSelectedObjects", selected);
     }
 
