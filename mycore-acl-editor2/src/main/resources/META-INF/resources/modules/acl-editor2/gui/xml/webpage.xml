@@ -4,7 +4,7 @@
   <section xml:lang="all" title="ACL Editor">
     <div id="mycore-acl-editor2">
       	<link href="gui/css/webpage.css" rel="stylesheet" type="text/css" />
-      	<link href="gui/select2/select2.css" rel="stylesheet" type="text/css" />      
+      	<link href="gui/select2/select2.css" rel="stylesheet" type="text/css" />
       	<div id="acle2-header">
         	<span>          		
           		<text i18n="ACLE.labels.header"/>
@@ -18,7 +18,7 @@
 			<div id="acle2-alert-area" class="alert fade">...</div>
       	</div>
       	
-      	<div id="acle2-loading" ><i class="icon-spinner icon-spin icon-4x"></i></div>
+      	<div id="acle2-loading" ><span class="acl2-spinner glyphicon glyphicon-refresh"></span></div>
       	
       	<div class="tab-content">
 	      	<div class="tab-pane active" id="acle2-ruleAllocation" style="display:none">
@@ -26,15 +26,15 @@
 	      			<div class="col-lg-4"><input id="acle2-access-filter-input-id" type="text" placeholder="i18n:ACLE.placeholder.filter.id" class="input-sm acle2-access-filter-input form-control"></input></div>
 	      			<div class="col-lg-4"><input id="acle2-access-filter-input-pool" type="text" placeholder="i18n:ACLE.placeholder.filter.pool" class="input-sm acle2-access-filter-input form-control"></input></div>
 	      			<div class="col-lg-4"><input id="acle2-access-filter-input-rule" type="text" placeholder="i18n:ACLE.placeholder.filter.rule" class="input-sm acle2-access-filter-input form-control"></input></div>
-	      			<i id="acle2-button-access-filter" class="glyphicon glyphicon-search icon-search icon-large acle2-icon" title="i18n:ACLE.title.filter"></i>
+	      			<i id="acle2-button-access-filter" class="glyphicon glyphicon-search acle2-icon" title="i18n:ACLE.title.filter"></i>
 	      		</div>
 		      	<table id="acle2-access-table" class="table table-hover table-condensed" cellspacing="0">
 		      		<thead>
 				   		<tr id="acle2-table-head">
 				   			<th></th>
-				   			<th class="sort-table-head" data-sort="string-ins" data-resort="true"><text i18n="ACLE.labels.access.table.id"/><i class="icon-large acle2-icon sort-icon"></i></th>
-				   			<th class="sort-table-head" data-sort="string-ins" data-resort="true"><text i18n="ACLE.labels.access.table.pool"/><i class="icon-large acle2-icon sort-icon"></i></th>
-				   			<th class="sort-table-head" data-sort="string-ins" data-resort="true"><text i18n="ACLE.labels.access.table.rule"/><i class="icon-large acle2-icon sort-icon"></i></th>
+				   			<th class="sort-table-head" data-sort="string-ins" data-resort="true"><text i18n="ACLE.labels.access.table.id"/><i class="glyphicon acle2-icon sort-icon"></i></th>
+				   			<th class="sort-table-head" data-sort="string-ins" data-resort="true"><text i18n="ACLE.labels.access.table.pool"/><i class="glyphicon acle2-icon sort-icon"></i></th>
+				   			<th class="sort-table-head" data-sort="string-ins" data-resort="true"><text i18n="ACLE.labels.access.table.rule"/><i class="glyphicon acle2-icon sort-icon"></i></th>
 				   			<th></th>
 				   		</tr>
 			   		
@@ -44,7 +44,7 @@
 				   			<th><input id="acle2-new-access-pool" type="text" class="input-sm form-control"></input></th>
 				   			<th class="acle2-new-access-rule"></th>
 				   			<th>
-				    			<i id="acle2-button-new-access" class="glyphicon glyphicon-save icon-plus icon-large acle2-icon" title="i18n:ACLE.title.save"></i>
+				    			<i id="acle2-button-new-access" class="glyphicon glyphicon-save acle2-icon" title="i18n:ACLE.title.save"></i>
 				   			</th>
 				   		</tr>
 				   	</thead>
@@ -52,7 +52,7 @@
 			   		</tbody>
 		     	</table>
 		     	<div id="acle2-bottom-buttons" class="">
-					<input type='checkbox' id="acle2-button-select-multi-access" class="icon-check-empty icon-large acle2-icon"/>
+					<input type='checkbox' id="acle2-button-select-multi-access" class="acle2-icon"/>
 		     		<button type="button" id="acle2-button-remove-multi-access" class="btn btn-danger"><text i18n="ACLE.buttons.access.delete"/></button>
 		     		<button type="button" id="acle2-button-edit-multi-access" class="btn btn-primary"><text i18n="ACLE.buttons.access.editMulti"/></button>
 		     		<div id="acle2-page-buttons" class="pull-right">
@@ -101,7 +101,7 @@
 							<div class="modal-body">
 								<div id="acle2-lightbox-multi-edit-alert-area" class="acle2-lightbox-alert-area alert fade alert-danger"><text i18n="ACLE.alert.access.edit.multi.noRule"/></div>
 								<div id="acle2-lightbox-multi-edit-main" class="dl-horizontal">
-									<p id="acle2-lightbox-multi-edit-text"></p><i id="acle2-lightbox-multi-edit-plus" class="glyphicon glyphicon-plus icon-plus icon-large acle2-icon"></i>
+									<p id="acle2-lightbox-multi-edit-text"></p><i id="acle2-lightbox-multi-edit-plus" class="glyphicon glyphicon-plus acle2-icon"></i>
 									<div id="acle2-lightbox-multi-edit-list" style="display:none"></div>
 									<div id="acle2-lightbox-multi-edit-select"></div>
 								</div>
@@ -150,9 +150,9 @@
 					<dd><textarea class="acle2-rule-detail-ruleText input-sm form-control" rows="6" tabindex="2"></textarea></dd>
 					<dt></dt>
 					<dd>
-						<i id="acle2-button-save-rule" class="glyphicon glyphicon-save icon-save icon-large acle2-icon" title="i18n:ACLE.title.save"></i>
-		    			<i id="acle2-button-delete-rule" class="glyphicon glyphicon-trash icon-trash icon-large acle2-icon" title="i18n:ACLE.title.delete"></i>
-		    			<i id="acle2-button-filter-rule" class="glyphicon glyphicon-filter icon-filter icon-large acle2-icon" title="i18n:ACLE.title.filter"></i>
+						<i id="acle2-button-save-rule" class="glyphicon glyphicon-save acle2-icon" title="i18n:ACLE.title.save"></i>
+		    			<i id="acle2-button-delete-rule" class="glyphicon glyphicon-trash acle2-icon" title="i18n:ACLE.title.delete"></i>
+		    			<i id="acle2-button-filter-rule" class="glyphicon glyphicon-filter acle2-icon" title="i18n:ACLE.title.filter"></i>
 					</dd>
 				</dl>
 			</div>

@@ -1,5 +1,14 @@
 @CHARSET "UTF-8";
 
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
+}
+
 #mycore-acl-editor2{
 	margin-bottom: 10px;
 	width: 100%;
@@ -128,6 +137,7 @@ label{
 
 select, textarea, input[type="text"]{
 	margin-bottom: 0px;
+	font-weight: normal;
 }
 
 .acle2-access-rule{
@@ -222,7 +232,6 @@ select, textarea, input[type="text"]{
 }
 
 .acle2-lightbox-alert-area{
-	margin-bottom: 0px;
 	text-align: center;
 }
 
@@ -239,8 +248,14 @@ select, textarea, input[type="text"]{
 	border-color: #B94A48;
 }
 
-#acle2-loading .icon-spinner{
-	margin-left: 420px;
+#acle2-loading{
+	text-align: center;
+}
+
+#acle2-loading .acl2-spinner{
+	cursor:	progress;
+	font-size: 64px;
+	animation: 5s linear 0s normal none infinite spin;
 }
 
 .acle2-faded{
@@ -276,9 +291,14 @@ select, textarea, input[type="text"]{
 }
 
 #acle2-page-buttons{
+	display: table;
 	margin-top: 35px;
 }
-    
+
+#acle2-page-buttons > div{
+	display: table-row;
+}
+
 #acle2-elem-per-page-input{
 	display: inline;
     margin-left: 5px;

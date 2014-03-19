@@ -37,8 +37,8 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.xml.MCRLayoutService;
-import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.common.xsl.MCRParameterCollector;
+import org.mycore.frontend.servlets.MCRServlet;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -46,7 +46,7 @@ import com.google.gson.JsonParser;
 
 @Path("ACLE")
 public class MCRAclEditorResource {
-
+    
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
     
     private static final MCRRuleStore RULE_STORE = MCRRuleStore.getInstance();
@@ -66,59 +66,35 @@ public class MCRAclEditorResource {
     @Path("start")
     public byte[] start() throws Exception {
         if (!MCRAccessManager.getAccessImpl().checkPermission("use-aclEditor")) {
-            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+            return transform("/META-INF/resources/modules/acl-editor2/gui/xml/401.xml");
         }
-        InputStream guiXML = getClass().getResourceAsStream("/META-INF/resources/modules/acl-editor2/gui/xml/webpage.xml");
-        SAXBuilder saxBuilder = new SAXBuilder();
-        Document webPage = saxBuilder.build(guiXML);
-        XPathExpression<Object> xpath = XPathFactory.instance().compile("/MyCoReWebPage/section/div[@id='mycore-acl-editor2']");
-        Object node = xpath.evaluateFirst(webPage);
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String lang = mcrSession.getCurrentLanguage();
-        if (node != null) {
-            Element mainDiv = (Element) node;
-            mainDiv.setAttribute("lang", lang);
-            String bsPath = CONFIG.getString("MCR.bootstrap.path", "");
-            if (!bsPath.equals("")) {
-                bsPath = MCRServlet.getBaseURL() + bsPath;
-                Element item = new Element("link").setAttribute("href", bsPath).setAttribute("rel", "stylesheet").setAttribute("type", "text/css");
-                mainDiv.addContent(0,item);
-            }
-        }
-        MCRJDOMContent source = new MCRJDOMContent(webPage);
-        return transform(request, "MyCoReWebPage", source);
-    }
-
-    @GET
-    @Path("objectid")
-    public byte[] objectid() throws Exception {
-        if (!MCRAccessManager.getAccessImpl().checkPermission("use-aclEditor")) {
-            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
-        }
-        InputStream guiXML = getClass().getResourceAsStream("/META-INF/resources/modules/acl-editor2/gui/xml/objectid.xml");
-        SAXBuilder saxBuilder = new SAXBuilder();
-        Document webPage = saxBuilder.build(guiXML);
-        XPathExpression<Object> xpath = XPathFactory.instance().compile("/MyCoReWebPage/section/div[@id='mycore-acl-editor2']");
-        Object node = xpath.evaluateFirst(webPage);
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String lang = mcrSession.getCurrentLanguage();
-        if (node != null) {
-            Element mainDiv = (Element) node;
-            mainDiv.setAttribute("lang", lang);
-            String bsPath = CONFIG.getString("MCR.bootstrap.path", "");
-            if (!bsPath.equals("")) {
-                bsPath = MCRServlet.getBaseURL() + bsPath;
-                Element item = new Element("link").setAttribute("href", bsPath).setAttribute("rel", "stylesheet").setAttribute("type", "text/css");
-                mainDiv.addContent(0,item);
-            }
-        }
-        MCRJDOMContent source = new MCRJDOMContent(webPage);
-        return transform(request, "MyCoReWebPage", source);
+        return transform("/META-INF/resources/modules/acl-editor2/gui/xml/webpage.xml");
     }
     
-    protected byte[] transform(HttpServletRequest request, String docType, MCRContent source) throws Exception {
+    protected byte[] transform(String xmlFile) throws Exception {
+        InputStream guiXML = getClass().getResourceAsStream(xmlFile);
+        if (guiXML == null) {
+            throw new WebApplicationException(Response.status(Status.INTERNAL_SERVER_ERROR).build());
+        }
+        SAXBuilder saxBuilder = new SAXBuilder();
+        Document webPage = saxBuilder.build(guiXML);
+        XPathExpression<Object> xpath = XPathFactory.instance().compile("/MyCoReWebPage/section/div[@id='mycore-acl-editor2']");
+        Object node = xpath.evaluateFirst(webPage);
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        String lang = mcrSession.getCurrentLanguage();
+        if (node != null) {
+            Element mainDiv = (Element) node;
+            mainDiv.setAttribute("lang", lang);
+            String bsPath = CONFIG.getString("MCR.bootstrap.path", "");
+            if (!bsPath.equals("")) {
+                bsPath = MCRServlet.getBaseURL() + bsPath;
+                Element item = new Element("link").setAttribute("href", bsPath).setAttribute("rel", "stylesheet").setAttribute("type", "text/css");
+                mainDiv.addContent(0,item);
+            }
+        }
+        MCRJDOMContent source = new MCRJDOMContent(webPage);
         MCRParameterCollector parameter = new MCRParameterCollector(request);
-        MCRContentTransformer transformer = MCRLayoutService.getContentTransformer(docType, parameter);
+        MCRContentTransformer transformer = MCRLayoutService.getContentTransformer("MyCoReWebPage", parameter);
         MCRContent result;
         if (transformer instanceof MCRParameterizedTransformer) {
             result = ((MCRParameterizedTransformer) transformer).transform(source, parameter);
