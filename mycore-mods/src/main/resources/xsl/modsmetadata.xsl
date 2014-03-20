@@ -668,7 +668,7 @@
     <!-- like cc_by-nc-sa: remove the 'cc_' -->
     <xsl:variable name="licenseString" select="substring-after(normalize-space(.),'cc_')" />
     <a rel="license" href="http://creativecommons.org/licenses/{$licenseString}/{$licenseVersion}/">
-      <img src="http://i.creativecommons.org/l/{$licenseString}/{$licenseVersion}/88x31.png" />
+      <img src="//i.creativecommons.org/l/{$licenseString}/{$licenseVersion}/88x31.png" />
     </a>
   </xsl:template>
 
