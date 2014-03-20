@@ -104,7 +104,7 @@ return declare("mycore.classification.SettingsDialog", [Dialog, _Templated, _Set
 		}).then(lang.hitch(this, function(data) {
 			var status = data.body.children[0].value;
 			if(status == "200") {
-				alert(i18n.getFromCache("component.classeditor.settings.importsuccessfull"));
+				alert(i18n.getFromCache("component.classeditor.settings.importsuccessful"));
 				this.classificationImported = true;
 				this.importInput.set("value", null);
 				this.importStartButton.set("disabled", true);

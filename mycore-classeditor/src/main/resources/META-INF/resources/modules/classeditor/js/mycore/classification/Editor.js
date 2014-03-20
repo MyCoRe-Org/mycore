@@ -200,7 +200,7 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 		this.updateToolbar();
 		this.categoryEditorPane.update();
 		this.treePane.tree.updateLabels();
-		alert(i18n.getFromCache("component.classeditor.save.successfull"));
+		alert(i18n.getFromCache("component.classeditor.save.successful"));
 	},
 
 	onStoreSaveError: function(error) {
