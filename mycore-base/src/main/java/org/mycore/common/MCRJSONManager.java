@@ -13,8 +13,8 @@ public class MCRJSONManager {
         gsonBuilder = new GsonBuilder();
     }
 
-    public void registerAdapter(MCRJSONTypeAdapter<?> categIDAdapter) {
-        gsonBuilder.registerTypeAdapter(categIDAdapter.bindTo(), categIDAdapter);
+    public void registerAdapter(MCRJSONTypeAdapter<?> typeAdapter) {
+        gsonBuilder.registerTypeAdapter(typeAdapter.bindTo(), typeAdapter);
     }
 
     public static MCRJSONManager instance() {
