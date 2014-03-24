@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.ResourceBundle.Control;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -67,6 +68,8 @@ public class MCRTranslation {
     private static final Logger LOGGER = Logger.getLogger(MCRTranslation.class);
 
     private static final Pattern ARRAY_DETECTOR = Pattern.compile(";");
+
+    private static final Control CONTROL = new MCRCombinedResourceBundleControl();
 
     private static boolean DEPRECATED_MESSAGES_PRESENT = false;
 
@@ -109,7 +112,7 @@ public class MCRTranslation {
     public static boolean exists(String key) {
         ResourceBundle message;
         try {
-            message = MCRStackedResourceBundle.getResourceBundle(MESSAGES_BUNDLE, getCurrentLocale());
+            message = getResourceBundle(MESSAGES_BUNDLE, getCurrentLocale());
         } catch (MissingResourceException mre) {
             return false;
         }
@@ -162,7 +165,7 @@ public class MCRTranslation {
         LOGGER.debug("Translation for current locale: " + locale.getLanguage());
         ResourceBundle message;
         try {
-            message = MCRStackedResourceBundle.getResourceBundle(baseName, locale);
+            message = getResourceBundle(baseName, locale);
         } catch (MissingResourceException mre) {
             //no messages.properties at all
             LOGGER.debug(mre.getMessage());
@@ -175,7 +178,8 @@ public class MCRTranslation {
         } catch (MissingResourceException mre) {
             // try to get new key if 'label' is deprecated
             if (!DEPRECATED_MESSAGES_PRESENT) {
-                LOGGER.warn("Could not load resource '" + DEPRECATED_MESSAGES_PROPERTIES + "' to check for depreacted I18N keys.");
+                LOGGER.warn("Could not load resource '" + DEPRECATED_MESSAGES_PROPERTIES
+                    + "' to check for depreacted I18N keys.");
             } else if (DEPRECATED_MAPPING.keySet().contains(label)) {
                 String newLabel = DEPRECATED_MAPPING.getProperty(label);
                 try {
@@ -217,7 +221,7 @@ public class MCRTranslation {
     public static Map<String, String> translatePrefix(String prefix, Locale locale) {
         LOGGER.debug("Translation for locale: " + locale.getLanguage());
         HashMap<String, String> map = new HashMap<String, String>();
-        ResourceBundle message = MCRStackedResourceBundle.getResourceBundle(MESSAGES_BUNDLE, locale);
+        ResourceBundle message = getResourceBundle(MESSAGES_BUNDLE, locale);
         Enumeration<String> keys = message.getKeys();
         while (keys.hasMoreElements()) {
             String key = keys.nextElement();
@@ -314,26 +318,26 @@ public class MCRTranslation {
         } else {
             for (int i = 0; i < masked.length(); i++) {
                 switch (masked.charAt(i)) {
-                case ';':
-                    if (mask) {
-                        buf.append(';');
-                        mask = false;
-                    } else {
-                        a.add(buf.toString());
-                        buf.setLength(0);
-                    }
-                    break;
-                case '\\':
-                    if (mask) {
-                        buf.append('\\');
-                        mask = false;
-                    } else {
-                        mask = true;
-                    }
-                    break;
-                default:
-                    buf.append(masked.charAt(i));
-                    break;
+                    case ';':
+                        if (mask) {
+                            buf.append(';');
+                            mask = false;
+                        } else {
+                            a.add(buf.toString());
+                            buf.setLength(0);
+                        }
+                        break;
+                    case '\\':
+                        if (mask) {
+                            buf.append('\\');
+                            mask = false;
+                        } else {
+                            mask = true;
+                        }
+                        break;
+                    default:
+                        buf.append(masked.charAt(i));
+                        break;
                 }
             }
             a.add(buf.toString());
@@ -363,7 +367,8 @@ public class MCRTranslation {
     static Properties loadProperties() {
         Properties deprecatedMapping = new Properties();
         try {
-            final InputStream propertiesStream = MCRTranslation.class.getResourceAsStream(DEPRECATED_MESSAGES_PROPERTIES);
+            final InputStream propertiesStream = MCRTranslation.class
+                .getResourceAsStream(DEPRECATED_MESSAGES_PROPERTIES);
             if (propertiesStream == null) {
                 LOGGER.warn("Could not find resource '" + DEPRECATED_MESSAGES_PROPERTIES + "'.");
                 return deprecatedMapping;
@@ -380,13 +385,17 @@ public class MCRTranslation {
         Set<String> languages = new HashSet<String>();
         for (Locale locale : Locale.getAvailableLocales()) {
             try {
-                ResourceBundle bundle = MCRStackedResourceBundle.getBundle(MESSAGES_BUNDLE, locale);
+                ResourceBundle bundle = getResourceBundle(MESSAGES_BUNDLE, locale);
                 languages.add(bundle.getLocale().toString());
             } catch (MissingResourceException e) {
                 LOGGER.debug("Could not load " + MESSAGES_BUNDLE + " for locale: " + locale);
             }
         }
         return languages;
+    }
+
+    public static ResourceBundle getResourceBundle(String baseName, Locale locale) {
+        return ResourceBundle.getBundle("stacked:" + baseName, locale, CONTROL);
     }
 
 }

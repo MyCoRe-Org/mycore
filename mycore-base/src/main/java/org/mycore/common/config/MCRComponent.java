@@ -26,9 +26,7 @@ package org.mycore.common.config;
 import java.io.File;
 import java.io.InputStream;
 import java.text.DecimalFormat;
-import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.jar.Manifest;
 
 import org.apache.log4j.Logger;
@@ -49,9 +47,6 @@ public class MCRComponent implements Comparable<MCRComponent> {
     private static final String ATT_PRIORITY = "Priority";
 
     private static final DecimalFormat PRIORITY_FORMAT = new DecimalFormat("000");
-
-    private static final ResourceBundle.Control CONTROL_HELPER = new ResourceBundle.Control() {
-    };
 
     private static final String DEFAULT_PRIORITY = "99";
 
@@ -142,30 +137,17 @@ public class MCRComponent implements Comparable<MCRComponent> {
         }
     }
 
-    /**
-     * returns InputStream of mycore.properties of this component.
-     * @return null if component does not contain mycore.properties
-     */
-    public InputStream getPropertyStream() {
+    public InputStream getConfigFileStream(String filename) {
         String resourceBase = getResourceBase();
         if (resourceBase == null) {
             return null;
         }
-        return this.getClass().getClassLoader().getResourceAsStream(resourceBase + "mycore.properties");
-    }
-
-    /**
-     * returns InputStream of messages*.properties of this component for the specified locale.
-     * @return null if component does not contain specified resource bundle
-     */
-    public InputStream getMessagesInputStream(Locale locale) {
-        String resourceBase = getResourceBase();
-        if (resourceBase == null) {
-            return null;
+        String resourceName = resourceBase + filename;
+        InputStream resourceStream = this.getClass().getClassLoader().getResourceAsStream(resourceName);
+        if (resourceStream != null) {
+            loginfo("Reading config resource: " + resourceName);
         }
-        String bundleName = resourceBase + CONTROL_HELPER.toBundleName("messages", locale) + ".properties";
-        loginfo("Loading bundle: " + bundleName);
-        return this.getClass().getClassLoader().getResourceAsStream(bundleName);
+        return resourceStream;
     }
 
     /**

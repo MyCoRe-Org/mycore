@@ -1,6 +1,6 @@
 /*
  * $Id$
- * $Revision: 5697 $ $Date: Dec 4, 2013 $
+ * $Revision: 5697 $ $Date: Dec 5, 2013 $
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -24,62 +24,49 @@
 package org.mycore.services.i18n;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.SequenceInputStream;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.config.MCRComponent;
+import org.mycore.common.config.MCRConfigurationInputStream;
 import org.mycore.datamodel.language.MCRLanguageFactory;
 
 import com.google.common.collect.Lists;
 
 /**
- * A Control class that merges all bundles of components defined in {@link #MCRComponentResourceBundleControl(Collection)}.
+ * A {@link Control} that stacks ResourceBundles of {@link MCRComponent}.
  * @author Thomas Scheffler (yagee)
- * @since 2013.12
+ * @since 2014.04
  */
-class MCRComponentResourceBundleControl extends Control {
+public class MCRCombinedResourceBundleControl extends Control {
+    private static Logger LOGGER = Logger.getLogger(MCRCombinedResourceBundleControl.class);
 
     private Locale defaultLocale = MCRLanguageFactory.instance().getDefaultLanguage().getLocale();
 
-    private Collection<MCRComponent> components;
-
-    public MCRComponentResourceBundleControl(Collection<MCRComponent> components) {
-        this.components = components;
-    }
+    private static final ResourceBundle.Control CONTROL_HELPER = new ResourceBundle.Control() {
+    };
 
     @Override
     public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload)
         throws IllegalAccessException, InstantiationException, IOException {
-        Logger.getLogger(getClass()).info("New bundle: " + baseName + ", locale " + locale);
-        try (InputStream is = getCombindedInputStream(locale)) {
-            if (is != null) {
-                return new PropertyResourceBundle(is);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("New bundle: " + baseName + ", locale " + locale);
+        }
+        String bundleName = baseName.substring(baseName.indexOf(':') + 1);
+        String filename = CONTROL_HELPER.toBundleName(bundleName, locale) + ".properties";
+        try (MCRConfigurationInputStream propertyStream = new MCRConfigurationInputStream(filename);) {
+            if (propertyStream.isEmpty()) {
+                throw new MissingResourceException(
+                    "Can't find bundle for base name " + baseName + ", locale " + locale, bundleName + "_" + locale, // className
+                    "");
             }
+            return new PropertyResourceBundle(propertyStream);
         }
-        return null;
-    }
-
-    private InputStream getCombindedInputStream(Locale locale) {
-        LinkedList<InputStream> cList = new LinkedList<>();
-        for (MCRComponent component : components) {
-            InputStream is = component.getMessagesInputStream(locale);
-            if (is != null) {
-                cList.add(is);
-            }
-        }
-        if (cList.isEmpty()) {
-            return null;
-        }
-        return new SequenceInputStream(Collections.enumeration(cList));
     }
 
     @Override
@@ -105,33 +92,4 @@ class MCRComponentResourceBundleControl extends Control {
         return false;
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((components == null) ? 0 : components.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof MCRComponentResourceBundleControl)) {
-            return false;
-        }
-        MCRComponentResourceBundleControl other = (MCRComponentResourceBundleControl) obj;
-        if (components == null) {
-            if (other.components != null) {
-                return false;
-            }
-        } else if (!components.equals(other.components)) {
-            return false;
-        }
-        return true;
-    }
 }

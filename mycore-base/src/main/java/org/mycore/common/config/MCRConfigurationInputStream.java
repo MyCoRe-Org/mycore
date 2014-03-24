@@ -29,48 +29,94 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.SequenceInputStream;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.Properties;
 
-import org.apache.commons.io.input.NullInputStream;
 import org.apache.log4j.Logger;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRURLContent;
 
 /**
- * {@link InputStream} that includes all properties from {@link MCRRuntimeComponentDetector#getAllComponents()} and <strong>mycore.properties</strong>.
- * 
- * Use system property <code>MCR.Configuration.File</code> to configure alternative property file.
+ * A InputStream from (preferably) property files.
+ * All available InputStreams are combined in this order:
+ * <ol>
+ *  <li> mycore-base </li>
+ *  <li> other mycore-components </li>
+ *  <li> application modules </li>
+ *  <li> installation specific files </li>
+ * </ol>
  * @author Thomas Scheffler (yagee)
  * @since 2013.12
  */
-public class MCRConfigurationInputStream extends SequenceInputStream {
+public class MCRConfigurationInputStream extends InputStream {
 
     private static final String MYCORE_PROPERTIES = "mycore.properties";
 
     private static final byte[] lbr = "\n".getBytes();
 
-    public MCRConfigurationInputStream() throws IOException {
-        super(getInputStreams());
+    InputStream in;
+
+    private Enumeration<? extends InputStream> e;
+
+    private boolean empty;
+
+    /**
+     * Combined Stream of all config files named <code>filename</code>
+     * available via {@link MCRRuntimeComponentDetector#getAllComponents()}.
+     * @param filename, e.g. mycore.properties or messages_de.properties
+     * @throws IOException
+     */
+    public MCRConfigurationInputStream(String filename) throws IOException {
+        this(filename, null);
     }
 
-    private static Enumeration<? extends InputStream> getInputStreams() throws IOException {
-        LinkedList<InputStream> cList = new LinkedList<>();
+    private MCRConfigurationInputStream(String filename, InputStream initStream) throws IOException {
+        super();
+        this.e = getInputStreams(filename, initStream);
+        if (e.hasMoreElements()) {
+            this.empty = false;
+            nextStream();
+        } else {
+            this.empty = true;
+        }
+    }
+
+    /**
+     * {@link InputStream} that includes all properties from {@link MCRRuntimeComponentDetector#getAllComponents()} and <strong>mycore.properties</strong>.
+     * 
+     * Use system property <code>MCR.Configuration.File</code> to configure alternative property file.
+     * @since 2014.04
+     */
+    public static MCRConfigurationInputStream getMyCoRePropertiesInstance() throws IOException {
+        String filename = System.getProperty("MCR.Configuration.File", MYCORE_PROPERTIES);
         File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
+        InputStream initStream = null;
         if (configurationDirectory != null) {
             logInfo("Current configuration directory: " + configurationDirectory.getAbsolutePath());
             //set MCR.basedir, is normally overwritten later
             if (configurationDirectory.isDirectory()) {
-                cList.add(getBaseDirInputStream(configurationDirectory));
+                initStream = getBaseDirInputStream(configurationDirectory);
             }
         }
+        return new MCRConfigurationInputStream(filename, initStream);
+    }
+
+    public boolean isEmpty() {
+        return empty;
+    }
+
+    private static Enumeration<? extends InputStream> getInputStreams(String filename, InputStream initStream)
+        throws IOException {
+        LinkedList<InputStream> cList = new LinkedList<>();
+        if (initStream != null) {
+            cList.add(initStream);
+        }
         for (MCRComponent component : MCRRuntimeComponentDetector.getAllComponents()) {
-            InputStream is = component.getPropertyStream();
+            InputStream is = component.getConfigFileStream(filename);
             if (is != null) {
                 String comment = "\n\n#\n#\n# Component: " + component.getName() + "\n#\n#\n";
                 cList.add(new ByteArrayInputStream(comment.getBytes()));
@@ -79,19 +125,16 @@ public class MCRConfigurationInputStream extends SequenceInputStream {
                 cList.add(new ByteArrayInputStream(lbr));
             }
         }
-        InputStream propertyStream = getPropertyStream();
+        InputStream propertyStream = getPropertyStream(filename);
         if (propertyStream != null) {
             cList.add(propertyStream);
             cList.add(new ByteArrayInputStream(lbr));
         }
-        File localProperties = MCRConfigurationDir.getConfigFile(MYCORE_PROPERTIES);
+        File localProperties = MCRConfigurationDir.getConfigFile(filename);
         if (localProperties != null && localProperties.canRead()) {
             logInfo("Loading additional properties from " + localProperties.getAbsolutePath());
             cList.add(new FileInputStream(localProperties));
             cList.add(new ByteArrayInputStream(lbr));
-        }
-        if (cList.isEmpty()) {
-            cList.add(new NullInputStream(0));
         }
         return Collections.enumeration(cList);
     }
@@ -105,29 +148,79 @@ public class MCRConfigurationInputStream extends SequenceInputStream {
         return inputStream;
     }
 
-    private static InputStream getPropertyStream() throws IOException {
-        String filename = System.getProperty("MCR.Configuration.File", MYCORE_PROPERTIES);
+    private static InputStream getPropertyStream(String filename) throws IOException {
         File mycoreProperties = new File(filename);
         MCRContent input = null;
         if (mycoreProperties.canRead()) {
             input = new MCRFileContent(mycoreProperties);
         } else {
             URL url = MCRConfigurationInputStream.class.getClassLoader().getResource(filename);
-            if (url == null) {
-                logWarn("Could not load: " + filename);
-            } else {
+            if (url != null) {
                 input = new MCRURLContent(url);
             }
         }
         return input == null ? null : input.getInputStream();
     }
 
-    private static void logWarn(String msg) {
-        if (MCRConfiguration.isLog4JEnabled()) {
-            Logger.getLogger(MCRConfigurationInputStream.class).warn(msg);
-        } else {
-            System.err.printf("WARN: %s\n", msg);
+    /**
+     *  Continues reading in the next stream if an EOF is reached.
+     */
+    final void nextStream() throws IOException {
+        if (in != null) {
+            in.close();
         }
+
+        if (e.hasMoreElements()) {
+            in = e.nextElement();
+            if (in == null) {
+                throw new NullPointerException();
+            }
+        } else {
+            in = null;
+        }
+
+    }
+
+    @Override
+    public int available() throws IOException {
+        if (in == null) {
+            return 0; // no way to signal EOF from available()
+        }
+        return in.available();
+    }
+
+    @Override
+    public int read() throws IOException {
+        if (in == null) {
+            return -1;
+        }
+        int c = in.read();
+        if (c == -1) {
+            nextStream();
+            return read();
+        }
+        return c;
+    }
+
+    @Override
+    public int read(byte b[], int off, int len) throws IOException {
+        if (in == null) {
+            return -1;
+        }
+
+        int n = in.read(b, off, len);
+        if (n <= 0) {
+            nextStream();
+            return read(b, off, len);
+        }
+        return n;
+    }
+
+    @Override
+    public void close() throws IOException {
+        do {
+            nextStream();
+        } while (in != null);
     }
 
     private static void logInfo(String msg) {
