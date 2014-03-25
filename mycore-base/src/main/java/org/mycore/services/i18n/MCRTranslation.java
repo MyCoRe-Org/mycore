@@ -395,7 +395,7 @@ public class MCRTranslation {
     }
 
     public static ResourceBundle getResourceBundle(String baseName, Locale locale) {
-        return ResourceBundle.getBundle("stacked:" + baseName, locale, CONTROL);
+        return baseName.contains(".")?ResourceBundle.getBundle(baseName, locale):ResourceBundle.getBundle("stacked:" + baseName, locale, CONTROL);
     }
 
 }
