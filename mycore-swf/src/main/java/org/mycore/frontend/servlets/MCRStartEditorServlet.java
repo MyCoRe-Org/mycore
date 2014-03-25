@@ -162,12 +162,13 @@ public class MCRStartEditorServlet extends MCRServlet {
      */
     private String checkFileName(String base_name) {
         String file_name = base_name + ".xed";
-        Element xml = URI_RESOLVER.resolve("webapp:" + getBaseURL() + file_name);
-        if (xml == null) {
+        try {
+          URI_RESOLVER.resolve("webapp:" + getBaseURL() + file_name);
+          return file_name;
+        } catch (MCRException e) {
             LOGGER.warn("Can't find " + file_name + ", now we try it with " + base_name + ".xml");
             return base_name + ".xml";
         }
-        return file_name;
     }
 
     /**
