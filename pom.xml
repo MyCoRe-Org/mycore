@@ -8,7 +8,7 @@
   </parent>
   <artifactId>mycore</artifactId>
   <packaging>pom</packaging>
-  <version>2014.03</version>
+  <version>2014.03.1-SNAPSHOT</version>
   <name>MyCoRe</name>
   <description>
     MyCoRe is a system for the development of institutional content repositories, publication servers, image collections,

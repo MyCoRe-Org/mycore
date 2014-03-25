@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.ServletException;
+import javax.xml.transform.Source;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
@@ -51,6 +52,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -98,6 +100,8 @@ public class MCRStartEditorServlet extends MCRServlet {
     protected static String SLASH = System.getProperty("file.separator");
 
     private static final MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
+    
+    private static final MCRURIResolver URI_RESOLVER = MCRURIResolver.instance();
 
     protected static String pagedir = CONFIG.getString("MCR.SWF.PageDir", "");
 
@@ -150,6 +154,21 @@ public class MCRStartEditorServlet extends MCRServlet {
         super.init();
         WFM = MCRSimpleWorkflowManager.instance();
     }
+    
+    /** Check for existing file type *.xed or *.xml
+     * 
+     * @param file name base
+     * @return the complete file name, *.xed is default
+     */
+    private String checkFileName(String base_name) {
+        String file_name = base_name + ".xed";
+        Element xml = URI_RESOLVER.resolve("webapp:" + getBaseURL() + file_name);
+        if (xml == null) {
+            LOGGER.warn("Can't find " + file_name + ", now we try it with " + base_name + ".xml");
+            return base_name + ".xml";
+        }
+        return file_name;
+    }
 
     /**
      * This method overrides doGetPost of MCRServlet. <br />
@@ -171,9 +190,6 @@ public class MCRStartEditorServlet extends MCRServlet {
      * <em>step-type</em> .xml.</li> <br />
      */
     public void doGetPost(MCRServletJob job) throws Exception {
-
-        if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse(), getBaseURL()))
-            return;
 
         // get the MCRSession object for the current thread from the session
         // manager.
@@ -278,7 +294,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         if (mylayout.length() != 0) {
             sb.append('-').append(mylayout);
         }
-        cd.myfile = sb.append(".xml").toString();
+        cd.myfile = checkFileName(sb.toString());
 
         // call method named like todo
         Method meth[] = this.getClass().getMethods();
