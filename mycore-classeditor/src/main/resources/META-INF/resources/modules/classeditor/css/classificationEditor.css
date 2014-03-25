@@ -19,6 +19,15 @@
 	height: 22px;
 	background-position: -21px center;
 }
+.classeditor .dijitReset.fa {
+  display: inline-block;
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
 /****************************************
 * Overwrite some bootstrap css
@@ -176,6 +185,23 @@
 }
 .classeditor.exportDialog .content .exportButton {
 	display: block;
+}
+
+.classeditor.linkDialog .dijitDialogPaneContent {
+	width: 600px;
+	height: 500px;
+}
+.classeditor.linkDialog .dijitBorderContainer {
+	height: 100%;
+}
+.classeditor.linkDialog .dijitDialogTitle:before {
+	height: 0px;
+}
+.classeditor.linkDialog table {
+	width: 100%;
+}
+.classeditor.linkDialog .infoPane {
+	text-align: center;
 }
 
 /*******************************************************

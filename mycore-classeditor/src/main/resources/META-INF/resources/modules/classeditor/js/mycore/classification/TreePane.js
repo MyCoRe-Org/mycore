@@ -15,7 +15,8 @@ define([
 	"dijit/layout/BorderContainer",
 	"dijit/form/Button",
 	"mycore/classification/LazyLoadingTree",
-	"mycore/classification/ExportDialog"
+	"mycore/classification/ExportDialog",
+	"mycore/classification/LinkDialog"
 ], function(declare, ContentPane, _Templated, _SettingsMixin, template, on, lang, domConstruct, dojoUtil, classUtil) {
 
 return declare("mycore.classification.TreePane", [ContentPane, _Templated, _SettingsMixin], {
@@ -26,6 +27,8 @@ return declare("mycore.classification.TreePane", [ContentPane, _Templated, _Sett
 
 	exportDialog: null,
 
+	linkDialog: null,
+
 	disabled: false,
 
     constructor: function(/*Object*/ args) {
@@ -34,12 +37,14 @@ return declare("mycore.classification.TreePane", [ContentPane, _Templated, _Sett
 
     create: function(args) {
     	this.inherited(arguments);
-    	// export dialog
+    	// dialogs
     	this.exportDialog = new mycore.classification.ExportDialog();
+    	this.linkDialog = new mycore.classification.LinkDialog();
     	// toolbar events
     	on(this.addTreeItemButton, "click", lang.hitch(this, this.add));
     	on(this.removeTreeItemButton, "click", lang.hitch(this, this.remove));
     	on(this.exportClassificationButton, "click", lang.hitch(this, this.exportClassification));
+    	on(this.linkDialogButton, "click", lang.hitch(this, this.openLinkDialog));
     	// tree event
     	on(this.tree, "itemSelected", lang.hitch(this, this.updateToolbar));
     },
@@ -65,9 +70,10 @@ return declare("mycore.classification.TreePane", [ContentPane, _Templated, _Sett
 		this.addTreeItemButton.set("iconClass", "icon16 " + (disabled ? "addDisabledIcon" : "addIcon"));
 
 		// export button
-		var exportVisable = selectedItems != null  && selectedItems.length > 0 && classUtil.isClassification(selectedItems[0]);
-		this.exportClassificationButton.set("disabled", !exportVisable);
-		this.exportClassificationButton.set("iconClass", "icon16 " + (exportVisable ? "exportClassIcon" : "exportClassDisabledIcon"));
+		this.exportClassificationButton.set("disabled", !(selectedItems != null  && selectedItems.length > 0 && classUtil.isClassification(selectedItems[0])));
+
+		// link dialog button
+		this.linkDialogButton.set("disabled", !(selectedItems != null  && selectedItems.length > 0 && !selectedItems[0].fakeRoot));
 	},
 
 	add: function() {
@@ -87,6 +93,11 @@ return declare("mycore.classification.TreePane", [ContentPane, _Templated, _Sett
 		var selectedItems = this.tree.getSelectedItems();
 		this.exportDialog.show(classUtil.getClassificationId(selectedItems[0]));
 	},
+	
+	openLinkDialog: function() {
+		var selectedItems = this.tree.getSelectedItems();
+		this.linkDialog.show(selectedItems[0]);
+	},
 
 	showID: function() {
 		this.tree.showID();
@@ -96,7 +107,7 @@ return declare("mycore.classification.TreePane", [ContentPane, _Templated, _Sett
 		this.tree.hideID();
 	},
 
-	_setDisabledAttr: function(/*boolean*/ disabled) {
+	_setDisabledAttr: function(/* boolean */ disabled) {
 		this.disabled = disabled;
 		this.updateToolbar();
 		this.tree.set("disabled", disabled);

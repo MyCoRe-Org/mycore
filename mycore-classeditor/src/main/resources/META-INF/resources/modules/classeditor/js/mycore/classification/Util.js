@@ -21,6 +21,17 @@ define([
 		var id = item.id;
 		return id.categid != null ? id.categid : "";
 	}
+	
+	exports.formatId = function(/*dojo.data.item*/ item) {
+		if(item.fakeRoot || item.id == null) {
+			return "";
+		}
+		var id = item.id.rootid;
+		if(item.id.categid != null && item.id.categid != "") {
+			id += ":" + item.id.categid;
+		}
+		return id;
+	}
 
 	exports.hasChildren = function(/*dojo.data.item*/ item) {
 		return item.haschildren || item.children;

@@ -1,13 +1,19 @@
 <div class="${baseClass}" role="presentation" tabindex="-1">
-	<div data-dojo-type="dijit.layout.BorderContainer" data-dojo-props="gutters: false">
-		<!-- TREE -->
-		<div data-dojo-type="mycore.classification.LazyLoadingTree" data-dojo-attach-point="tree" data-dojo-props="region: 'center'"></div>
-		<!-- TOOLBAR -->
-		<div data-dojo-type="dijit.Toolbar" data-dojo-attach-point="toolbar" data-dojo-props="region: 'bottom'">
-			<div data-dojo-type="dijit.form.Button" data-dojo-attach-point="addTreeItemButton" data-dojo-props="iconClass:'icon16 addIcon', showLabel:false"></div>
-			<div data-dojo-type="dijit.form.Button" data-dojo-attach-point="removeTreeItemButton" data-dojo-props="iconClass:'icon16 removeDisabledIcon', showLabel:false, disabled: true"></div>
-			<span data-dojo-type="dijit/ToolbarSeparator"></span>
-			<div data-dojo-type="dijit.form.Button" data-dojo-attach-point="exportClassificationButton" data-dojo-props="iconClass:'icon16 exportClassDisabledIcon', showLabel:false, disabled: true"></div>
-		</div>
-	</div>
+  <div data-dojo-type="dijit.layout.BorderContainer" data-dojo-props="gutters: false">
+    <!-- TREE -->
+    <div data-dojo-type="mycore.classification.LazyLoadingTree" data-dojo-attach-point="tree" data-dojo-props="region: 'center'"></div>
+    <!-- TOOLBAR -->
+    <div data-dojo-type="dijit.Toolbar" data-dojo-attach-point="toolbar" data-dojo-props="region: 'bottom'">
+      <div data-dojo-type="dijit.form.Button" data-dojo-attach-point="addTreeItemButton"
+        data-dojo-props="iconClass:'icon16 addIcon', showLabel:false"></div>
+      <div data-dojo-type="dijit.form.Button" data-dojo-attach-point="removeTreeItemButton"
+        data-dojo-props="iconClass:'icon16 removeDisabledIcon', showLabel:false, disabled: true"></div>
+      <span data-dojo-type="dijit/ToolbarSeparator"></span>
+      <div data-dojo-type="dijit.form.Button" data-dojo-attach-point="exportClassificationButton"
+        data-dojo-props="iconClass:'fa fa-download', showLabel:false, disabled: true"></div>
+      <div data-dojo-type="dijit.form.Button" data-dojo-attach-point="linkDialogButton"
+        data-dojo-props="iconClass:'fa fa-chain', showLabel:false, disabled: true">
+      </div>
+    </div>
+  </div>
 </div>

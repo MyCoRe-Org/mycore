@@ -5,7 +5,9 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,6 +25,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -31,12 +34,19 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.params.ModifiableSolrParams;
 import org.jdom2.Document;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRJSONManager;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
@@ -54,6 +64,7 @@ import org.mycore.frontend.classeditor.json.MCRJSONCategory;
 import org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName;
 import org.mycore.frontend.classeditor.wrapper.MCRCategoryListWrapper;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
+import org.mycore.solr.MCRSolrServerFactory;
 import org.xml.sax.SAXParseException;
 
 import com.google.gson.Gson;
@@ -281,6 +292,33 @@ public class MCRClassificationEditorResource {
         return Response.ok("<html><body><textarea>200</textarea></body></html>").build();
     }
 
+    @GET
+    @Path("link/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response retrieveLinkedObjects(@PathParam("id") String id, @QueryParam("start") Integer start, @QueryParam("rows") Integer rows) throws SolrServerException, UnsupportedEncodingException {
+        // do solr query
+        SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
+        ModifiableSolrParams params = new ModifiableSolrParams();
+        params.set("start", start != null ? start : 0);
+        params.set("rows", rows != null ? rows : 50);
+        params.set("fl", "id");
+        String configQuery = MCRConfiguration.instance().getString("MCR.Module-solr.linkQuery", "category.top:{0}");
+        String query = MessageFormat.format(configQuery, id.replaceAll(":", "\\\\:"));
+        params.set("q", query);
+        QueryResponse solrResponse = solrServer.query(params);
+        SolrDocumentList solrResults = solrResponse.getResults();
+        // build json response
+        JsonObject response = new JsonObject();
+        response.addProperty("numFound", solrResults.getNumFound());
+        response.addProperty("start", solrResults.getStart());
+        JsonArray docList = new JsonArray();
+        for (SolrDocument doc : solrResults) {
+            docList.add(new JsonPrimitive((String) doc.getFieldValue("id")));
+        }
+        response.add("docs", docList);
+        return Response.ok().entity(response.toString()).build();
+    }
+
     protected MCRCategoryID newRootID() {
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         return MCRCategoryID.rootID(uuid);
@@ -381,6 +419,7 @@ public class MCRClassificationEditorResource {
             this.hasParent = hasParent;
         }
 
+        @SuppressWarnings("unused")
         public boolean hasParent() {
             return hasParent;
         }
