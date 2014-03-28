@@ -197,16 +197,13 @@
         <!-- current printed page number is smaller than current displayed page -->
         <xsl:when test="$i &lt; $currentpage">
           <xsl:choose>
-            <!-- This is to support a bigger PageWindow at the end of page listing and
-                to skip a jump of 2
-            -->
+            <!-- This is to support a bigger PageWindow at the end of page listing and to skip a jump of 2 -->
             <xsl:when
               test="(($totalpage - $PageWindowSize - 1) &lt;= $i) or
                                   (($currentpage - floor(($PageWindowSize -1) div 2) - 1) = 2)">
               <xsl:value-of select="1" />
             </xsl:when>
-                    <!-- This is to support a bigger PageWindow at the begin of page listing
-                    -->
+            <!-- This is to support a bigger PageWindow at the begin of page listing -->
             <xsl:when test="($totalpage - $currentpage) &lt; $PageWindowSize">
               <xsl:value-of select="($totalpage - $PageWindowSize - 1)" />
             </xsl:when>
@@ -220,11 +217,7 @@
         </xsl:when>
         <xsl:when test="$i &gt; $currentpage">
           <xsl:choose>
-            <!-- jump only one if your near currentpage,
-                or at last page 
-                or to support bigger window at beginning
-                or to skip a jump of 2
-            -->
+            <!-- jump only one if your near currentpage, or at last page or to support bigger window at beginning or to skip a jump of 2 -->
             <xsl:when
               test="( (($i - $currentpage) &lt; round(($PageWindowSize -1) div 2)) or ($i = $totalpage) or ($currentpage &lt;=$PageWindowSize and $i &lt;= $PageWindowSize) or ($totalpage - $i = 2))">
               <xsl:value-of select="1" />
@@ -315,13 +308,14 @@
       </xsl:when>
       <xsl:otherwise>
         <a href="{$linkTo}" itemprop="url">
+          <xsl:attribute name="title">
+            <xsl:value-of select="$displayText" />
+          </xsl:attribute>
+
           <xsl:variable name="shorter" select="mcrxsl:shortenText($displayText, 70)" />
           <span itemprop="name">
             <xsl:choose>
               <xsl:when test="string-length($displayText) != string-length($shorter)">
-                <xsl:attribute name="title">
-                <xsl:value-of select="$displayText" />
-              </xsl:attribute>
                 <xsl:value-of select="$shorter" />
               </xsl:when>
               <xsl:otherwise>
@@ -364,7 +358,7 @@
               <xsl:otherwise>
                 <xsl:if test="$isDisplayedEnabled = 'true'">
                   <span>
-                  <!-- Zugriff auf 'Abbildung' gesperrt -->
+                    <!-- Zugriff auf 'Abbildung' gesperrt -->
                     <xsl:value-of select="i18n:translate('metaData.derivateLocked',i18n:translate(concat('metaData.',$objectType,'.[derivates]')))" />
                   </span>
                 </xsl:if>
@@ -378,7 +372,7 @@
 
   <xsl:template match="doc" mode="fileLink">
     <xsl:param name="mcrid" select="str[@name='returnId']" />
-    <xsl:param name="derivateId" select="str[@name='derivateID']"/>
+    <xsl:param name="derivateId" select="str[@name='derivateID']" />
     <xsl:param name="fileNodeServlet" select="concat($ServletsBaseURL,'MCRFileNodeServlet/')" />
     <!-- doc element of 'unmerged' response -->
     <xsl:variable name="filePath" select="str[@name='filePath']" />
