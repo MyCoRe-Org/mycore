@@ -92,5 +92,9 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.mycore.mets</groupId>
+      <artifactId>mets-model</artifactId>
+    </dependency>
   </dependencies>
 </project>
