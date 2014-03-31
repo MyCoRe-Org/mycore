@@ -647,6 +647,7 @@ public class MCRServlet extends HttpServlet {
      * @return 
      */
     private static TreeSet<String> getTrustedProxies() {
+        boolean closeSession = !MCRSessionMgr.hasCurrentSession();
         HashSet<InetAddress> trustedProxies = new HashSet<>();
 
         String sTrustedProxies = MCRConfiguration.instance().getString("MCR.Request.TrustedProxies", "");
@@ -695,8 +696,10 @@ public class MCRServlet extends HttpServlet {
         for (InetAddress address : trustedProxies) {
             sortedAdresses.add(address.getHostAddress());
         }
-        //getBaseURL() creates MCRSession
-        MCRSessionMgr.getCurrentSession().close();
+        if (closeSession) {
+            //getBaseURL() creates MCRSession
+            MCRSessionMgr.getCurrentSession().close();
+        }
         return sortedAdresses;
     }
 
