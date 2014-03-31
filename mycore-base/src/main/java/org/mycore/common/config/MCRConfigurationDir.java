@@ -24,10 +24,13 @@
 package org.mycore.common.config;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
+import java.util.Enumeration;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 
@@ -207,7 +210,48 @@ public class MCRConfigurationDir {
                     "Exception while returning URL for file: " + resolvedFile, e);
             }
         }
-        return MCRConfigurationDir.class.getClassLoader().getResource(relativePath);
+        return getClassPathResource(relativePath);
     }
 
+    private static URL getClassPathResource(String relativePath) {
+        ClassLoader classLoader = MCRConfigurationDir.class.getClassLoader();
+        URL currentUrl = classLoader.getResource(relativePath);
+        if (SERVLET_CONTEXT != null && currentUrl != null) {
+            Enumeration<URL> resources = null;
+            try {
+                resources = classLoader.getResources(relativePath);
+            } catch (IOException e) {
+                Logger.getLogger(MCRConfigurationDir.class)
+                    .error("Error while retrieving resource: " + relativePath, e);
+            }
+            if (resources != null) {
+                File configDir = getConfigurationDirectory();
+                String configDirURL = configDir.toURI().toString();
+                @SuppressWarnings("unchecked")
+                List<String> libsOrder = (List<String>) SERVLET_CONTEXT.getAttribute(ServletContext.ORDERED_LIBS);
+                int pos = Integer.MAX_VALUE;
+                while (resources.hasMoreElements()) {
+                    URL testURL = resources.nextElement();
+                    String testURLStr = testURL.toString();
+                    if (testURLStr.contains(configDirURL)) {
+                        return testURL; //configuration directory always wins
+                    }
+                    if (testURLStr.startsWith("file:")) {
+                        //local files should generally win
+                        pos = -1;
+                        currentUrl = testURL;
+                    }
+                    if (pos > 0) {
+                        for (int i = 0; i < libsOrder.size(); i++) {
+                            if (testURLStr.contains(libsOrder.get(i)) && i < pos) {
+                                currentUrl = testURL;
+                                pos = i;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return currentUrl;
+    }
 }
