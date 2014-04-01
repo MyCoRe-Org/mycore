@@ -71,7 +71,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     private static final String EXPORT_OBJECT_TO_DIRECTORY_COMMAND = "export object {0} to directory {1} with {2}";
 
     /** The logger */
-    static Logger LOGGER = Logger.getLogger(MCRObjectCommands.class.getName());
+    private static Logger LOGGER = Logger.getLogger(MCRObjectCommands.class);
 
     /** Default transformer script */
     public static final String DEFAULT_TRANSFORMER = "save-object.xsl";
