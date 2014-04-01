@@ -74,8 +74,14 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
       */
     public void doGetPost(MCRServletJob job) throws Exception {
         // read the XML data
-        MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
-        org.jdom2.Document indoc = sub.getXML();
+        MCREditorSubmission sub = null;
+        org.jdom2.Document indoc = null;
+        try {
+        	indoc = (org.jdom2.Document)(job.getRequest().getAttribute("MCRXEditorSubmission"));
+        } catch (Exception e) {
+        	sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
+            indoc = sub.getXML();
+        }
 
         // read the parameter
         MCRRequestParameters parms;
