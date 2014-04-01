@@ -39,12 +39,12 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -71,7 +71,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     private static final String EXPORT_OBJECT_TO_DIRECTORY_COMMAND = "export object {0} to directory {1} with {2}";
 
     /** The logger */
-    private static Logger LOGGER = Logger.getLogger(MCRObjectCommands.class.getName());
+    static Logger LOGGER = Logger.getLogger(MCRObjectCommands.class.getName());
 
     /** Default transformer script */
     public static final String DEFAULT_TRANSFORMER = "save-object.xsl";
@@ -99,7 +99,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param type
      *            the type of the MCRObjects that should be deleted
      */
-    @MCRCommand(syntax = "delete all objects of type {0}", help = "Removes MCRObjects in the number range between the MCRObjectID {0} and {1}.", order = 20)
+    @MCRCommand(syntax = "delete all objects of type {0}", help = "Removes MCRObjects of type {0}.", order = 20)
     public static List<String> deleteAllObjects(String type) throws MCRActiveLinkException {
         final List<String> objectIds = MCRXMLMetadataManager.instance().listIDsOfType(type);
         List<String> cmds = new ArrayList<String>(objectIds.size());
@@ -590,39 +590,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
-     * The method parse and check an XML file.
-     * 
-     * @param fileName
-     *            the location of the xml file
-     * @throws SAXParseException 
-     * @throws MCRException 
-     */
-    @MCRCommand(syntax = "check file {0}", help = "Checks the data file {0} against the XML Schema.", order = 160)
-    public static boolean checkXMLFile(String fileName) throws MCRException, SAXParseException, IOException {
-        if (!fileName.endsWith(".xml")) {
-            LOGGER.warn(fileName + " ignored, does not end with *.xml");
-
-            return false;
-        }
-
-        File file = new File(fileName);
-
-        if (!file.isFile()) {
-            LOGGER.warn(fileName + " ignored, is not a file.");
-
-            return false;
-        }
-
-        LOGGER.info("Reading file " + file + " ...");
-        MCRContent content = new MCRFileContent(file);
-
-        MCRXMLParserFactory.getParser().parseXML(content);
-        LOGGER.info("The file has no XML errors.");
-
-        return true;
-    }
-
-    /**
      * List all selected MCRObjects.
      */
     @MCRCommand(syntax = "list selected", help = "Prints the id of selected objects", order = 190)
@@ -851,6 +818,59 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             commandList.add(command.replaceAll("\\{x\\}", objID));
         }
         return commandList;
+    }
+
+    /**
+     * The method start the repair of the metadata search for a given MCRObjectID type.
+     * 
+     * @param type
+     *            the MCRObjectID type
+     */
+    @MCRCommand(syntax = "repair metadata search of type {0}", help = "Scans the metadata store for MCRObjects of type {0} and restore them in the search store.", order = 170)
+    public static List<String> repairMetadataSearch(String type) {
+        LOGGER.info("Start the repair for type " + type);
+        String typetest = CONFIG.getString("MCR.Metadata.Type." + type, "");
+    
+        if (typetest.length() == 0) {
+            LOGGER.error("The type " + type + " was not found.");
+            return Collections.emptyList();
+        }
+        List<String> ar = (List<String>) MCRXMLMetadataManager.instance().listIDsOfType(type);
+        if (ar.size() == 0) {
+            LOGGER.warn("No ID's was found for type " + type + ".");
+            return Collections.emptyList();
+        }
+    
+        List<String> cmds = new ArrayList<String>(ar.size());
+    
+        for (String stid : ar) {
+            cmds.add("repair metadata search of ID " + stid);
+        }
+        return cmds;
+    }
+
+    /**
+     * The method start the repair of the metadata search for a given MCRObjectID as String.
+     * 
+     * @param id
+     *            the MCRObjectID as String
+     */
+    @MCRCommand(syntax = "repair metadata search of ID {0}", help = "Retrieves the MCRObject with the MCRObjectID {0} and restores it in the search store.", order = 180)
+    public static void repairMetadataSearchForID(String id) {
+        LOGGER.info("Start the repair for the ID " + id);
+    
+        MCRObjectID mid = null;
+    
+        try {
+            mid = MCRObjectID.getInstance(id);
+        } catch (Exception e) {
+            LOGGER.error("The String " + id + " is not a MCRObjectID.");
+            return;
+        }
+    
+        MCRBase obj = MCRMetadataManager.retrieve(mid);
+        MCRMetadataManager.fireRepairEvent(obj);
+        LOGGER.info("Repaired " + mid.toString());
     }
 
 }

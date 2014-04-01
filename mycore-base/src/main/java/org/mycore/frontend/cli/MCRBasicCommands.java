@@ -24,9 +24,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfigurationDir;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRFileContent;
+import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
+import org.xml.sax.SAXParseException;
 
 /**
  * This class contains the basic commands for MyCoRe Command Line and WebCLI.
@@ -36,6 +41,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 
 @MCRCommandGroup(name = "Basic Commands")
 public class MCRBasicCommands {
+    private static Logger LOGGER = Logger.getLogger(MCRBasicCommands.class);
 
     /**
      * Shows a list of commands understood by the command line interface and
@@ -155,5 +161,38 @@ public class MCRBasicCommands {
             logger.warn("Due to unknown error the directory could not be created: " + directory.getAbsolutePath());
             return false;
         }
+    }
+
+    /**
+     * The method parse and check an XML file.
+     * 
+     * @param fileName
+     *            the location of the xml file
+     * @throws SAXParseException 
+     * @throws MCRException 
+     */
+    @MCRCommand(syntax = "check file {0}", help = "Checks the data file {0} against the XML Schema.", order = 160)
+    public static boolean checkXMLFile(String fileName) throws MCRException, SAXParseException, IOException {
+        if (!fileName.endsWith(".xml")) {
+            LOGGER.warn(fileName + " ignored, does not end with *.xml");
+
+            return false;
+        }
+
+        File file = new File(fileName);
+
+        if (!file.isFile()) {
+            LOGGER.warn(fileName + " ignored, is not a file.");
+
+            return false;
+        }
+
+        LOGGER.info("Reading file " + file + " ...");
+        MCRContent content = new MCRFileContent(file);
+
+        MCRXMLParserFactory.getParser().parseXML(content);
+        LOGGER.info("The file has no XML errors.");
+
+        return true;
     }
 }
