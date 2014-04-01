@@ -278,7 +278,7 @@ public class MCRIView2Tools {
      * @param propName any suffix
      * @return null or property value
      */
-    static String getIView2Property(String propName) {
+    public static String getIView2Property(String propName) {
         return MCRConfiguration.instance().getString(CONFIG_PREFIX + propName, null);
     }
 

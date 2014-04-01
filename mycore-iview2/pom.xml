@@ -146,6 +146,10 @@
   </build>
   <dependencies>
     <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-base</artifactId>
       <version>${project.version}</version>
@@ -160,9 +164,13 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
+        <dependency>
       <groupId>org.mycore.iview2</groupId>
       <artifactId>image-tiler</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore.iview2</groupId>
+      <artifactId>iview-client</artifactId>
     </dependency>
     <dependency>
       <groupId>log4j</groupId>
