@@ -278,7 +278,6 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
             jdom = new org.jdom2.input.SAXBuilder().build(in);
 
             Element root = jdom.getRootElement();
-            @SuppressWarnings("unchecked")
             List<Element> sectionlist = root.getChildren("section");
 
             for (Element section : sectionlist) {

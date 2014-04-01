@@ -40,7 +40,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.ServletException;
-import javax.xml.transform.Source;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
@@ -63,7 +62,6 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
-import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.fileupload.MCRSWFUploadHandlerIFS;
 import org.mycore.frontend.fileupload.MCRSWFUploadHandlerMyCoRe;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
@@ -612,7 +610,6 @@ public class MCRStartEditorServlet extends MCRServlet {
      * @param ruleelm
      *            The XML access condition from the ACL system
      */
-    @SuppressWarnings("unchecked")
     private org.jdom2.Element normalizeACLforSWF(org.jdom2.Element ruleelm) {
         if (LOGGER.isDebugEnabled()) {
             try {
