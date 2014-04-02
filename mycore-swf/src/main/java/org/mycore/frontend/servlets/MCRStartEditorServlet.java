@@ -51,6 +51,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -61,7 +62,6 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
-import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.fileupload.MCRSWFUploadHandlerIFS;
 import org.mycore.frontend.fileupload.MCRSWFUploadHandlerMyCoRe;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
@@ -98,6 +98,8 @@ public class MCRStartEditorServlet extends MCRServlet {
     protected static String SLASH = System.getProperty("file.separator");
 
     private static final MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
+    
+    private static final MCRURIResolver URI_RESOLVER = MCRURIResolver.instance();
 
     protected static String pagedir = CONFIG.getString("MCR.SWF.PageDir", "");
 
@@ -150,6 +152,22 @@ public class MCRStartEditorServlet extends MCRServlet {
         super.init();
         WFM = MCRSimpleWorkflowManager.instance();
     }
+    
+    /** Check for existing file type *.xed or *.xml
+     * 
+     * @param file name base
+     * @return the complete file name, *.xed is default
+     */
+    private String checkFileName(String base_name) {
+        String file_name = base_name + ".xed";
+        try {
+          URI_RESOLVER.resolve("webapp:" + file_name);
+          return file_name;
+        } catch (MCRException e) {
+            LOGGER.warn("Can't find " + file_name + ", now we try it with " + base_name + ".xml");
+            return base_name + ".xml";
+        }
+    }
 
     /**
      * This method overrides doGetPost of MCRServlet. <br />
@@ -171,9 +189,6 @@ public class MCRStartEditorServlet extends MCRServlet {
      * <em>step-type</em> .xml.</li> <br />
      */
     public void doGetPost(MCRServletJob job) throws Exception {
-
-        if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse(), getBaseURL()))
-            return;
 
         // get the MCRSession object for the current thread from the session
         // manager.
@@ -278,7 +293,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         if (mylayout.length() != 0) {
             sb.append('-').append(mylayout);
         }
-        cd.myfile = sb.append(".xml").toString();
+        cd.myfile = checkFileName(sb.toString());
 
         // call method named like todo
         Method meth[] = this.getClass().getMethods();
@@ -595,7 +610,6 @@ public class MCRStartEditorServlet extends MCRServlet {
      * @param ruleelm
      *            The XML access condition from the ACL system
      */
-    @SuppressWarnings("unchecked")
     private org.jdom2.Element normalizeACLforSWF(org.jdom2.Element ruleelm) {
         if (LOGGER.isDebugEnabled()) {
             try {

@@ -74,8 +74,14 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
       */
     public void doGetPost(MCRServletJob job) throws Exception {
         // read the XML data
-        MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
-        org.jdom2.Document indoc = sub.getXML();
+        MCREditorSubmission sub = null;
+        org.jdom2.Document indoc = null;
+        try {
+        	indoc = (org.jdom2.Document)(job.getRequest().getAttribute("MCRXEditorSubmission"));
+        } catch (Exception e) {
+        	sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
+            indoc = sub.getXML();
+        }
 
         // read the parameter
         MCRRequestParameters parms;
@@ -272,7 +278,6 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
             jdom = new org.jdom2.input.SAXBuilder().build(in);
 
             Element root = jdom.getRootElement();
-            @SuppressWarnings("unchecked")
             List<Element> sectionlist = root.getChildren("section");
 
             for (Element section : sectionlist) {
