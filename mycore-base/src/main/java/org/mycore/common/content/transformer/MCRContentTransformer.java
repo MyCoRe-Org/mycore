@@ -67,7 +67,9 @@ public abstract class MCRContentTransformer {
     public void transform(MCRContent source, OutputStream out) throws IOException {
         MCRContent content = transform(source);
         try {
-            content.setEncoding(getEncoding());
+            if (getEncoding() != null) {
+                content.setEncoding(getEncoding());
+            }
         } catch (RuntimeException | IOException e) {
             throw e;
         } catch (Exception e) {
