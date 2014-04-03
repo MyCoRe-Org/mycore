@@ -2,8 +2,14 @@
 <!DOCTYPE MyCoReWebPage>
 <MyCoReWebPage title="MyCoRe WebCLI launch pad">
   <section title="MyCoRe WebCLI launch pad" xml:lang="all">
-    <h1>MyCoRe WebCLI launch pad</h1>
-    <input id="launchButton" type="button" value="Start"
-      onclick="window.open('start.xml','','width=1200,height=900,resizable,locationbar=false,menubar=false,personalbar=false,toolbar=false');" />
+    <div class="jumbotron">
+      <div class="container text-center">
+        <h1>MyCoRe WebCLI launch pad</h1>
+        <p>
+          <input class="btn btn-primary btn-lg" id="launchButton" type="button" value="Start"
+            onclick="window.open('start.xml','','width=1200,height=900,resizable,locationbar=false,menubar=false,personalbar=false,toolbar=false');" />
+        </p>
+      </div>
+    </div>
   </section>
 </MyCoReWebPage>
