@@ -604,6 +604,10 @@ public abstract class MCRContentServlet extends MCRServlet {
             contentType = getServletContext().getMimeType(filename);
             content.setMimeType(contentType);
         }
+        String enc = content.getEncoding();
+        if (enc != null) {
+            contentType = String.format("%s; charset=%s", contentType, enc);
+        }
 
         String eTag = null;
         ArrayList<Range> ranges = null;
@@ -631,8 +635,8 @@ public abstract class MCRContentServlet extends MCRServlet {
         if (contentLength == 0) {
             serveContent = false;
         }
-        
-        if (content.isUsingSession()){
+
+        if (content.isUsingSession()) {
             response.addHeader("Cache-Control", "private, max-age=0, must-revalidate");
             response.addHeader("Vary", "*");
         }

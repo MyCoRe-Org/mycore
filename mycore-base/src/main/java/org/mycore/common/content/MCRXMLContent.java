@@ -26,9 +26,11 @@ package org.mycore.common.content;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 
 import org.jdom2.output.Format;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.streams.MCRMD5InputStream;
 
@@ -40,11 +42,9 @@ import org.mycore.common.content.streams.MCRMD5InputStream;
  */
 public abstract class MCRXMLContent extends MCRContent {
 
-    public static final String ENCODING = "UTF-8";
-
     /** 
      * The default format used when outputting XML as a byte stream.
-     * By default, content is outputted using UTF-8 encoding.
+     * By default, content is outputted using {@link MCRConstants#DEFAULT_ENCODING}.
      * If MCR.IFS2.PrettyXML=true, a pretty format with indentation is used. 
      */
     protected static Format defaultFormat;
@@ -52,15 +52,23 @@ public abstract class MCRXMLContent extends MCRContent {
     static {
         boolean prettyXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.PrettyXML", true);
         defaultFormat = prettyXML ? Format.getPrettyFormat().setIndent("  ") : Format.getRawFormat();
-        defaultFormat.setEncoding(ENCODING);
+        defaultFormat.setEncoding(MCRConstants.DEFAULT_ENCODING);
     }
 
     /** The default format used when outputting this XML as a byte stream */
     protected Format format = defaultFormat;
 
+    public MCRXMLContent() {
+        try {
+            this.setEncoding(MCRConstants.DEFAULT_ENCODING);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /** 
      * Sets the format used when outputting XML as a byte stream. 
-     * By default, content is outputted using UTF-8 encoding.
+     * By default, content is outputted using {@link MCRConstants#DEFAULT_ENCODING}.
      * If MCR.IFS2.PrettyXML=true, a pretty format with indentation is used. 
      */
     public void setFormat(Format format) {
@@ -95,5 +103,12 @@ public abstract class MCRXMLContent extends MCRContent {
         byte[] digest = md5Digest.digest();
         String md5String = MCRMD5InputStream.getMD5String(digest);
         return '"' + md5String + '"';
+    }
+
+    @Override
+    public void setEncoding(String encoding) throws UnsupportedEncodingException {
+        super.setEncoding(encoding);
+        this.format = format.clone();
+        format.setEncoding(encoding);
     }
 }

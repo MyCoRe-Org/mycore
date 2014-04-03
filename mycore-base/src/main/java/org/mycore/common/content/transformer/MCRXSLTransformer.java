@@ -234,7 +234,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler,
         MCRParameterCollector parameter) throws IOException, SAXException, TransformerException {
         return new MCRTransformedContent(source, reader, transformerHandler, getLastModified(), parameter,
-            getFileName(source), getMimeType(), this);
+            getFileName(source), getMimeType(), getEncoding(), this);
     }
 
     protected MCRContent getTransformedContent(MCRContent source, XMLReader reader,
@@ -358,7 +358,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
         public MCRTransformedContent(MCRContent source, XMLReader reader, TransformerHandler transformerHandler,
             long transformerLastModified, MCRParameterCollector parameter, String fileName, String mimeType,
-            MCRXSLTransformer instance) throws IOException {
+            String encoding, MCRXSLTransformer instance) throws IOException {
             this.source = source;
             this.reader = reader;
             this.transformerHandler = transformerHandler;
@@ -369,6 +369,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             this.eTag = generateETag(source, lastModified, parameter.hashCode());
             this.name = fileName;
             this.mimeType = mimeType;
+            this.encoding = encoding;
             this.instance = instance;
         }
 
@@ -402,6 +403,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
                     transformed.setLastModified(lastModified);
                     transformed.setName(name);
                     transformed.setMimeType(mimeType);
+                    transformed.setEncoding(encoding);
                 } catch (IOException | SAXException e) {
                     throw new MCRException(e);
                 } catch (RuntimeException e) {
@@ -432,5 +434,9 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             return true;
         }
 
+        @Override
+        public String getEncoding() {
+            return transformed == null ? encoding : getBaseContent().getEncoding();
+        }
     }
 }

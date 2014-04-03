@@ -123,11 +123,6 @@ public abstract class MCRWrappedContent extends MCRContent {
     }
 
     @Override
-    public String asString(String encoding) throws IOException, UnsupportedEncodingException {
-        return getBaseContent().asString(encoding);
-    }
-
-    @Override
     public Document asXML() throws JDOMException, IOException, SAXException {
         return getBaseContent().asXML();
     }

@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
+import org.mycore.common.MCRConstants;
+
 /**
  * Reads MCRContent from a String's text.
  * 
@@ -37,11 +39,6 @@ public class MCRStringContent extends MCRContent {
 
     private String text;
 
-    /** 
-     * The character encoding to use when transforming the text to a byte stream.
-     * By default, this is UTF-8.
-     */
-    private String encoding = "UTF-8";
 
     private byte[] bytes;
 
@@ -51,7 +48,7 @@ public class MCRStringContent extends MCRContent {
     public MCRStringContent(String text) {
         this.text = text;
         try {
-            this.bytes = asByteArray();
+            setEncoding(MCRConstants.DEFAULT_ENCODING);
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
@@ -59,11 +56,12 @@ public class MCRStringContent extends MCRContent {
 
     /** 
      * Sets the character encoding to use when transforming the text to a byte stream.
-     * By default, this is UTF-8.
+     * By default, this is {@link MCRConstants#DEFAULT_ENCODING}.
      * @throws IOException 
      */
+    @Override
     public void setEncoding(String encoding) throws UnsupportedEncodingException {
-        this.encoding = encoding;
+        super.setEncoding(encoding);
         this.bytes = asByteArray();
     }
 

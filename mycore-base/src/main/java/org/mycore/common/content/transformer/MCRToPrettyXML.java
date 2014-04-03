@@ -57,7 +57,7 @@ public class MCRToPrettyXML extends MCRContentTransformer {
 
     @Override
     public String getEncoding() {
-        return MCRXMLContent.ENCODING;
+        return "UTF-8";
     }
 
     @Override

@@ -37,6 +37,7 @@ import org.jdom2.JDOMFactory;
 import org.jdom2.Text;
 import org.jdom2.transform.JDOMResult;
 import org.mycore.common.MCRCache;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -131,7 +132,7 @@ public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
 
     @Override
     public String getEncoding() {
-        return MCRXMLContent.ENCODING;
+        return MCRConstants.DEFAULT_ENCODING;
     }
 
 }
