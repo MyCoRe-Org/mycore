@@ -202,7 +202,6 @@ public class MCRFileNodeServlet extends MCRContentServlet {
         throws IOException, TransformerException, SAXException {
         LOGGER.info("Sending listing of directory " + dir.getName()
             + ("HEAD".equals(req.getMethod()) ? " (HEAD only)" : ""));
-        res.addHeader("Vary", "Cookie");
         Document jdom = MCRDirectoryXML.getInstance().getDirectoryXML(dir);
         MCRJDOMContent source = new MCRJDOMContent(jdom);
         source.setLastModified(dir.getLastModified().getTimeInMillis());

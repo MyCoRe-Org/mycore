@@ -427,5 +427,10 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             return eTag;
         }
 
+        @Override
+        public boolean isUsingSession() {
+            return true;
+        }
+
     }
 }

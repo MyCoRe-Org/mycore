@@ -91,6 +91,8 @@ public abstract class MCRContent {
 
     protected String name;
 
+    protected boolean usingSession = false;
+
     /**
      * Sets the systemID of the current content
      */
@@ -407,5 +409,19 @@ public abstract class MCRContent {
 
     public void setLastModified(long lastModified) {
         this.lastModified = lastModified;
+    }
+
+    /**
+     * Tells if this content may contain data from the current MCRSession.
+     * 
+     * Use this information to alter cache behavior.
+     * @return true if it MAY contain session data
+     */
+    public boolean isUsingSession() {
+        return usingSession;
+    }
+
+    public void setUsingSession(boolean usingSession) {
+        this.usingSession = usingSession;
     }
 }

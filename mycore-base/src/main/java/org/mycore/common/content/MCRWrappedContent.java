@@ -160,6 +160,10 @@ public abstract class MCRWrappedContent extends MCRContent {
         return getBaseContent().lastModified();
     }
 
+    public void setLastModified(long lastModified) {
+        getBaseContent().setLastModified(lastModified);
+    }
+
     public String getETag() throws IOException {
         return getBaseContent().getETag();
     }
@@ -186,6 +190,14 @@ public abstract class MCRWrappedContent extends MCRContent {
 
     public void setName(String name) {
         getBaseContent().setName(name);
+    }
+
+    public boolean isUsingSession() {
+        return getBaseContent().isUsingSession();
+    }
+
+    public void setUsingSession(boolean usingSession) {
+        getBaseContent().setUsingSession(usingSession);
     }
 
 }

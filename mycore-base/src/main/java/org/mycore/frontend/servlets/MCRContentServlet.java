@@ -631,6 +631,11 @@ public abstract class MCRContentServlet extends MCRServlet {
         if (contentLength == 0) {
             serveContent = false;
         }
+        
+        if (content.isUsingSession()){
+            response.addHeader("Cache-Control", "private, max-age=0, must-revalidate");
+            response.addHeader("Vary", "*");
+        }
 
         try (ServletOutputStream out = serveContent ? response.getOutputStream() : null) {
             if (serveContent) {
