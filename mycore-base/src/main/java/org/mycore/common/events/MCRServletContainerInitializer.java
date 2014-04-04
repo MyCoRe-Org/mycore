@@ -71,6 +71,7 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
         LOGGER.info("I have these components for you: " + MCRRuntimeComponentDetector.getAllComponents());
         LOGGER.info("I have these mycore components for you: " + MCRRuntimeComponentDetector.getMyCoReComponents());
         LOGGER.info("I have these app modules for you: " + MCRRuntimeComponentDetector.getApplicationModules());
+        LOGGER.info("Library order: " + ctx.getAttribute(ServletContext.ORDERED_LIBS));
     }
 
     private static String getSource(final Class<? extends MCRServletContainerInitializer> clazz) {
