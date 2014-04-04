@@ -25,6 +25,7 @@ package org.mycore.common.content;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
@@ -47,6 +48,7 @@ public class MCRSAXContent extends MCRXMLContent {
     private InputSource inputSource;
 
     public MCRSAXContent(XMLReader xmlReader, InputSource inputSource) {
+        super();
         this.xmlReader = xmlReader;
         this.inputSource = inputSource;
         setSystemId(inputSource.getSystemId());
@@ -76,6 +78,16 @@ public class MCRSAXContent extends MCRXMLContent {
         xmlReader.setContentHandler(jdomContentHandler);
         xmlReader.parse(inputSource);
         return jdomContentHandler.getDocument();
+    }
+
+    @Override
+    public void setEncoding(String encoding) throws UnsupportedEncodingException {
+        //defined by inputSource
+    }
+
+    @Override
+    public String getEncoding() {
+        return inputSource.getEncoding();
     }
 
 }

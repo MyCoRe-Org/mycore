@@ -54,6 +54,7 @@ public class MCRJAXBContent<T> extends MCRXMLContent {
      * @param jaxbObject
      */
     public MCRJAXBContent(JAXBContext ctx, T jaxbObject) {
+        super();
         this.ctx = ctx;
         this.jaxbObject = jaxbObject;
         Class<?> clazz = jaxbObject.getClass();
@@ -71,6 +72,7 @@ public class MCRJAXBContent<T> extends MCRXMLContent {
 
     private Marshaller getMarshaller() throws JAXBException {
         Marshaller marshaller = ctx.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_ENCODING, getSafeEncoding());
         return marshaller;
     }
 
@@ -84,7 +86,9 @@ public class MCRJAXBContent<T> extends MCRXMLContent {
     @Override
     public Source getSource() throws IOException {
         try {
-            return new JAXBSource(ctx, jaxbObject);
+            Marshaller marshaller = getMarshaller();
+            JAXBSource jaxbSource = new JAXBSource(marshaller, jaxbObject);
+            return jaxbSource;
         } catch (JAXBException e) {
             throw new IOException(e);
         }

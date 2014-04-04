@@ -49,6 +49,7 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLParserFactory;
@@ -87,9 +88,9 @@ public abstract class MCRContent {
      */
     protected long lastModified = -1;
 
-    protected String mimeType;
+    protected String mimeType, encoding, name;
 
-    protected String name;
+    protected boolean usingSession = false;
 
     /**
      * Sets the systemID of the current content
@@ -246,23 +247,12 @@ public abstract class MCRContent {
     }
 
     /**
-     * Returns content as String, assuming UTF-8 encoding
+     * Returns content as String, assuming encoding from {@link #getEncoding()} or {@link MCRConstants#DEFAULT_ENCODING}.
      * 
      * @return content as String
      */
     public String asString() throws IOException, UnsupportedEncodingException {
-        return asString("UTF-8");
-    }
-
-    /**
-     * Returns the content as String, assuming the provided encoding
-     * 
-     * @param encoding
-     *            the encoding to use to build the characters
-     * @return content as String
-     */
-    public String asString(String encoding) throws IOException, UnsupportedEncodingException {
-        return new String(asByteArray(), encoding);
+        return new String(asByteArray(), getSafeEncoding());
     }
 
     /**
@@ -407,5 +397,32 @@ public abstract class MCRContent {
 
     public void setLastModified(long lastModified) {
         this.lastModified = lastModified;
+    }
+
+    /**
+     * Tells if this content may contain data from the current MCRSession.
+     * 
+     * Use this information to alter cache behavior.
+     * @return true if it MAY contain session data
+     */
+    public boolean isUsingSession() {
+        return usingSession;
+    }
+
+    public void setUsingSession(boolean usingSession) {
+        this.usingSession = usingSession;
+    }
+
+    public String getEncoding() {
+        return encoding;
+    }
+
+    protected String getSafeEncoding() {
+        String enc = getEncoding();
+        return enc != null ? enc : MCRConstants.DEFAULT_ENCODING;
+    }
+
+    public void setEncoding(String encoding) throws UnsupportedEncodingException {
+        this.encoding = encoding;
     }
 }

@@ -47,6 +47,7 @@ public class MCRDOMContent extends MCRXMLContent {
      * @param dom the W3C DOM XML document to read from 
      */
     public MCRDOMContent(Document dom) {
+        super();
         this.dom = dom;
         super.docType = dom.getDoctype() == null ? dom.getDocumentElement().getLocalName() : dom.getDoctype().getName();
     }

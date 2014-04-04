@@ -64,15 +64,23 @@ public abstract class MCRContentTransformer {
     /** Transforms MCRContent. Subclasses implement different transformation methods */
     public abstract MCRContent transform(MCRContent source) throws IOException;
 
-    public void transform(MCRContent source,OutputStream out) throws IOException {
-        transform(source).sendTo(out);
+    public void transform(MCRContent source, OutputStream out) throws IOException {
+        MCRContent content = transform(source);
+        try {
+            content.setEncoding(getEncoding());
+        } catch (RuntimeException | IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+        content.sendTo(out);
     }
 
     /** Returns the MIME type of the transformed content, may return the default mime type */
     public String getMimeType() throws Exception {
         return mimeType;
     }
-    
+
     /**
      * Returns the encoding of characters in the binary stream.
      * 

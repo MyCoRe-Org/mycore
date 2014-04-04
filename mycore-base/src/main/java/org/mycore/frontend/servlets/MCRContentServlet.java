@@ -287,8 +287,9 @@ public abstract class MCRContentServlet extends MCRServlet {
             endCurrentTransaction();
             // Copy the inputBufferSize stream to the outputBufferSize stream
             final long bytesCopied = IOUtils.copyLarge(in, out, new byte[outputBufferSize]);
-            if (content.length() != bytesCopied) {
-                throw new EOFException("Bytes to send: " + content.length() + " actual: " + bytesCopied);
+            long length = content.length();
+            if (length >= 0 && length != bytesCopied) {
+                throw new EOFException("Bytes to send: " + length + " actual: " + bytesCopied);
             }
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Wrote " + bytesCopied + " bytes.");
@@ -603,6 +604,10 @@ public abstract class MCRContentServlet extends MCRServlet {
             contentType = getServletContext().getMimeType(filename);
             content.setMimeType(contentType);
         }
+        String enc = content.getEncoding();
+        if (enc != null) {
+            contentType = String.format("%s; charset=%s", contentType, enc);
+        }
 
         String eTag = null;
         ArrayList<Range> ranges = null;
@@ -616,7 +621,10 @@ public abstract class MCRContentServlet extends MCRServlet {
 
             response.setHeader("ETag", eTag);
 
-            response.setDateHeader("Last-Modified", content.lastModified());
+            long lastModified = content.lastModified();
+            if (lastModified >= 0) {
+                response.setDateHeader("Last-Modified", lastModified);
+            }
             if (serveContent) {
                 response.setHeader("Content-Disposition", "inline;filename=\"" + filename + "\"");
             }
@@ -626,6 +634,11 @@ public abstract class MCRContentServlet extends MCRServlet {
         //No Content to serve?
         if (contentLength == 0) {
             serveContent = false;
+        }
+
+        if (content.isUsingSession()) {
+            response.addHeader("Cache-Control", "private, max-age=0, must-revalidate");
+            response.addHeader("Vary", "*");
         }
 
         try (ServletOutputStream out = serveContent ? response.getOutputStream() : null) {

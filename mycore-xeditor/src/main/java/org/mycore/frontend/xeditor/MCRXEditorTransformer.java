@@ -43,9 +43,11 @@ import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRWrappedContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
+import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
@@ -76,7 +78,13 @@ public class MCRXEditorTransformer {
         if (transformer instanceof MCRParameterizedTransformer) {
             String key = MCRXEditorTransformerStore.storeTransformer(this);
             transformationParameters.setParameter("XEditorTransformerKey", key);
-            MCRContent result = ((MCRParameterizedTransformer) transformer).transform(editorSource, transformationParameters);
+            MCRContent result = ((MCRParameterizedTransformer) transformer).transform(editorSource,
+                transformationParameters);
+            if (result instanceof MCRWrappedContent
+                && result.getClass().getName().contains(MCRXSLTransformer.class.getName())) {
+                //lazy transformation make JUnit tests fail
+                result = ((MCRWrappedContent) result).getBaseContent();
+            }
             editorSession.getValidator().clearValidationResults();
             return result;
         } else {
@@ -271,16 +279,17 @@ public class MCRXEditorTransformer {
 
         String xPaths2CheckResubmission = editorSession.getSubmission().getXPaths2CheckResubmission();
         if (!xPaths2CheckResubmission.isEmpty())
-            nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSubmission.PREFIX_CHECK_RESUBMISSION, xPaths2CheckResubmission));
+            nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSubmission.PREFIX_CHECK_RESUBMISSION,
+                xPaths2CheckResubmission));
 
         Map<String, String> defaultValues = editorSession.getSubmission().getDefaultValues();
         for (String xPath : defaultValues.keySet())
             nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSubmission.PREFIX_DEFAULT_VALUE + xPath,
-                    defaultValues.get(xPath)));
+                defaultValues.get(xPath)));
 
         editorSession.setBreakpoint("After transformation to HTML");
         nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSessionStore.XEDITOR_SESSION_PARAM,
-                editorSession.getCombinedSessionStepID()));
+            editorSession.getCombinedSessionStepID()));
 
         return nodeSet;
     }
