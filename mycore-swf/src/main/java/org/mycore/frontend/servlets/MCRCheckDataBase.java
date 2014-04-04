@@ -78,6 +78,11 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         org.jdom2.Document indoc = null;
         try {
         	indoc = (org.jdom2.Document)(job.getRequest().getAttribute("MCRXEditorSubmission"));
+        	if (indoc == null) {
+                sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
+                indoc = sub.getXML();        	    
+        	}
+            MCRUtils.writeJDOMToSysout(indoc);
         } catch (Exception e) {
         	sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
             indoc = sub.getXML();
