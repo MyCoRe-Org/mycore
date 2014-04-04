@@ -38,6 +38,7 @@ import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.common.xsl.MCRParameterCollector;
+import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 import org.mycore.frontend.servlets.MCRServlet;
 
 import com.google.gson.JsonArray;
@@ -105,6 +106,7 @@ public class MCRAclEditorResource {
     }
 
     @GET
+    @MCRRestrictedAccess(MCRAclEditorPermission.class)
     public String list() {
         Collection<String> ruleIDs = RULE_STORE.retrieveAllIDs();
         JsonArray jsonARules = new JsonArray();
@@ -136,6 +138,7 @@ public class MCRAclEditorResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
+    @MCRRestrictedAccess(MCRAclEditorPermission.class)
     public Response add(String data) {
         JsonParser jsonParser = new JsonParser();
         JsonObject jsonObject = jsonParser.parse(data).getAsJsonObject();
@@ -160,7 +163,8 @@ public class MCRAclEditorResource {
 
     @DELETE
     @Consumes(MediaType.APPLICATION_JSON)
-    public String remove(String data) {
+    @MCRRestrictedAccess(MCRAclEditorPermission.class)
+    public String remove(String data) {       
         JsonParser jsonParser = new JsonParser();
         JsonObject jsonObject = jsonParser.parse(data).getAsJsonObject();
         JsonArray jsonArray = jsonObject.getAsJsonArray("access");
@@ -168,10 +172,10 @@ public class MCRAclEditorResource {
             JsonObject accessAsJsonObject = jsonArray.get(i).getAsJsonObject();
             String accessID = accessAsJsonObject.get("accessID").getAsString();
             String accessPool = accessAsJsonObject.get("accessPool").getAsString();
-
+    
             if (ACCESS_STORE.existsRule(accessID, accessPool)){
                 MCRRuleMapping accessRule = ACCESS_STORE.getAccessDefinition(accessPool, accessID);
-
+    
                 if (!accessRule.getObjId().equals("")) {
                     ACCESS_STORE.deleteAccessDefinition(accessRule);
                     accessAsJsonObject.addProperty("success", "1");
@@ -188,6 +192,7 @@ public class MCRAclEditorResource {
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
+    @MCRRestrictedAccess(MCRAclEditorPermission.class)
     public Response edit(String data) {
         JsonParser jsonParser = new JsonParser();
         JsonObject jsonObject = jsonParser.parse(data).getAsJsonObject();
@@ -225,6 +230,7 @@ public class MCRAclEditorResource {
 
     @POST
     @Path("rule")
+    @MCRRestrictedAccess(MCRAclEditorPermission.class)
     @Consumes(MediaType.APPLICATION_JSON)
     public String addRule(String data) {
         JsonParser jsonParser = new JsonParser();
@@ -244,6 +250,7 @@ public class MCRAclEditorResource {
 
     @DELETE
     @Path("rule")
+    @MCRRestrictedAccess(MCRAclEditorPermission.class)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response removeRule(String data) {
         JsonParser jsonParser = new JsonParser();
@@ -260,6 +267,7 @@ public class MCRAclEditorResource {
 
     @PUT
     @Path("rule")
+    @MCRRestrictedAccess(MCRAclEditorPermission.class)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response editRule(String data) {
         JsonParser jsonParser = new JsonParser();
@@ -281,37 +289,12 @@ public class MCRAclEditorResource {
         }
         else{
             return Response.status(Status.CONFLICT).build();
-        }   
-    }
-
-    @POST
-    @Path("objectid")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public String getObjectID(String data) {
-        JsonParser jsonParser = new JsonParser();
-        JsonObject jsonObject = jsonParser.parse(data).getAsJsonObject();
-        String accessID = jsonObject.get("accessID").getAsString();
-        String accessPool = jsonObject.get("accessPool").getAsString();
-        String accessRuleID = ACCESS_STORE.getRuleID(accessID, accessPool);
-
-        JsonObject jsonObj = new JsonObject();
-            jsonObj.addProperty("accessRuleID", accessRuleID);
-            Collection<String> ruleIDs = RULE_STORE.retrieveAllIDs();
-            JsonArray jsonARules = new JsonArray();
-            for (String id : ruleIDs) {
-                MCRAccessRule rule = RULE_STORE.getRule(id);
-                JsonObject jsonO = new JsonObject();
-                jsonO.addProperty("ruleID", id);
-                jsonO.addProperty("desc", rule.getDescription());
-                jsonO.addProperty("ruleSt", rule.getRuleString());
-                jsonARules.add(jsonO);
-            }
-            jsonObj.add("rules", jsonARules);
-        return jsonObj.toString();
+        }
     }
     
     @PUT
     @Path("multi")
+    @MCRRestrictedAccess(MCRAclEditorPermission.class)
     @Consumes(MediaType.APPLICATION_JSON)
     public String editMulti(String data) {
         JsonParser jsonParser = new JsonParser();
