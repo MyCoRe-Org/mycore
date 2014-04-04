@@ -376,7 +376,7 @@ public class MCRXMLFunctions {
             long duration = System.currentTimeMillis() - start;
             LOGGER.debug("URN processed in " + duration + " ms");
         }
-        LOGGER.info("Processing all URN took " + (System.currentTimeMillis() - temp) + " ms");
+        LOGGER.debug("Processing all URN took " + (System.currentTimeMillis() - temp) + " ms");
         return rootElement.getChildNodes();
     }
 
