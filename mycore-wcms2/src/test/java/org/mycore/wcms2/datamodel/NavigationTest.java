@@ -77,8 +77,8 @@ public class NavigationTest {
         Unmarshaller m = jc.createUnmarshaller();
         Object o = m.unmarshal(new File("src/test/resources/navigation/navigation.xml"));
         assertTrue(o instanceof MCRNavigation);
-        MCRNavigation navigation = (MCRNavigation)o;
-        
+        MCRNavigation navigation = (MCRNavigation) o;
+
         // test navigation
         assertEquals("template1", navigation.getTemplate());
         assertEquals("{tenantPath}/content/below/index.xml", navigation.getHrefStartingPage());
@@ -86,13 +86,13 @@ public class NavigationTest {
         assertEquals("main title", navigation.getMainTitle());
         assertEquals("history title", navigation.getHistoryTitle());
         // test menu
-        MCRNavigationMenuItem menu = (MCRNavigationMenuItem)navigation.getChildren().get(0);
+        MCRNavigationMenuItem menu = (MCRNavigationMenuItem) navigation.getChildren().get(0);
         assertEquals("main", menu.getId());
         assertEquals("/content/main", menu.getDir());
         assertEquals("Hauptmenü links", menu.getLabel("de"));
         assertEquals("Main menu left", menu.getLabel("en"));
         // test item
-        MCRNavigationItem searchItem = (MCRNavigationItem)menu.getChildren().get(0);
+        MCRNavigationItem searchItem = (MCRNavigationItem) menu.getChildren().get(0);
         assertEquals("{tenantPath}/content/main/search.xml", searchItem.getHref());
         assertEquals(MCRNavigationItem.Type.intern, searchItem.getType());
         assertEquals(MCRNavigationItem.Target._self, searchItem.getTarget());
@@ -102,6 +102,13 @@ public class NavigationTest {
         assertEquals("Suche", searchItem.getLabel("de"));
         assertEquals("Retrieval", searchItem.getLabel("en"));
         assertEquals(2, searchItem.getChildren().size());
+        // test group
+        MCRNavigationGroup group = (MCRNavigationGroup) menu.getChildren().get(2);
+        assertEquals("foo", group.getId());
+        assertEquals("Foo-Gruppe", group.getLabel("de"));
+        MCRNavigationItem foo1 = (MCRNavigationItem) group.getChildren().get(0);
+        assertEquals("{tenantPath}/content/main/foo1.xml", foo1.getHref());
+        assertEquals("Foo1", foo1.getLabel("de"));
     }
 
     @Test
@@ -109,7 +116,7 @@ public class NavigationTest {
         Gson gson = new Gson();
         JsonElement jsonElement = gson.toJsonTree(this.navigation);
         JsonObject navigationObject = jsonElement.getAsJsonObject();
-        
+
         assertEquals("template_mysample", navigationObject.get("template").getAsString());
         assertEquals("/content", navigationObject.get("dir").getAsString());
         assertEquals("History Title", navigationObject.get("historyTitle").getAsString());

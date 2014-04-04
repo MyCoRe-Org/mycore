@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<navigation hrefStartingPage="{tenantPath}/content/below/index.xml" dir="/content" mainTitle="main title" historyTitle="history title" template="template1">
+<navigation hrefStartingPage="{tenantPath}/content/below/index.xml" dir="/content" mainTitle="main title" historyTitle="history title"
+  template="template1">
 
   <!-- main menu  -->
   <menu id="main" dir="/content/main">
@@ -11,15 +12,29 @@
 
       <insert ref="search" />
 
-      <item href="/editor_form_search-expert.xml" type="extern" target="_self" style="bold" replaceMenu="false" constrainPopUp="true" template="template2">
+      <item href="/editor_form_search-expert.xml" type="extern" target="_self" style="bold" replaceMenu="false" constrainPopUp="true"
+        template="template2">
         <label xml:lang="de">Expertensuche</label>
         <label xml:lang="en">Expert Search</label>
       </item>
     </item>
-    <item href="{tenantPath}/content/main/classifications.xml" type="intern" target="_self" style="normal" replaceMenu="false" constrainPopUp="false">
+    <item href="{tenantPath}/content/main/classifications.xml" type="intern" target="_self" style="normal" replaceMenu="false"
+      constrainPopUp="false">
       <label xml:lang="de">Klassifikationsauswahl</label>
       <label xml:lang="en">Classifications</label>
     </item>
+    <group id="foo">
+      <label xml:lang="de">Foo-Gruppe</label>
+      <label xml:lang="en">Foo-Group</label>
+      <item href="{tenantPath}/content/main/foo1.xml" type="intern" target="_self" style="normal" replaceMenu="false"
+        constrainPopUp="false">
+        <label xml:lang="de">Foo1</label>
+      </item>
+      <item href="{tenantPath}/content/main/foo2.xml" type="intern" target="_self" style="normal" replaceMenu="false"
+        constrainPopUp="false">
+        <label xml:lang="de">Foo2</label>
+      </item>
+    </group>
   </menu>
 
   <!-- navi bar below -->

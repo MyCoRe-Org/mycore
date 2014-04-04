@@ -8,51 +8,47 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
+import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "menu")
+@XmlRootElement(name = "group")
 @XmlAccessorType(XmlAccessType.NONE)
-public class MCRNavigationMenuItem extends MCRNavigationI18nItem implements MCRNavigationBaseItem, MCRNavigationItemContainer {
+public class MCRNavigationGroup extends MCRNavigationI18nItem implements MCRNavigationBaseItem,
+    MCRNavigationItemContainer {
 
+    // general
     @XmlAttribute(required = true)
+    @XmlID
     private String id;
-    @XmlAttribute
-    private String dir;
+
     // children
-    @XmlElementRefs ({
-        @XmlElementRef(type = MCRNavigationItem.class),
-        @XmlElementRef(type = MCRNavigationGroup.class),
-        @XmlElementRef(type = MCRNavigationInsertItem.class)
-    })
-//    @XmlAnyElement(lax = true)
+    @XmlElementRefs({ @XmlElementRef(type = MCRNavigationItem.class),
+            @XmlElementRef(type = MCRNavigationInsertItem.class) })
     private List<MCRNavigationBaseItem> children;
 
-    public MCRNavigationMenuItem() {
+    public MCRNavigationGroup() {
+        super();
         this.children = new ArrayList<MCRNavigationBaseItem>();
-    }
-
-    public String getId() {
-        return id;
-    }
-    public String getDir() {
-        return dir;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-    public void setDir(String dir) {
-        this.dir = dir;
     }
 
     public void addItem(MCRNavigationItem item) {
         this.children.add(item);
     }
+
     public void addInsertItem(MCRNavigationInsertItem insertItem) {
         this.children.add(insertItem);
     }
+
+    @Override
     public List<MCRNavigationBaseItem> getChildren() {
         return this.children;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 }
