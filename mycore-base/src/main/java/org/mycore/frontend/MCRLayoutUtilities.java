@@ -2,7 +2,9 @@ package org.mycore.frontend;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
@@ -13,14 +15,31 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.log4j.Logger;
+import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.input.sax.XMLReaders;
+import org.jdom2.output.DOMOutputter;
+import org.jdom2.output.Format;
+import org.jdom2.output.support.AbstractDOMOutputProcessor;
+import org.jdom2.output.support.FormatStack;
+import org.jdom2.util.NamespaceStack;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessInterface;
@@ -29,6 +48,7 @@ import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRURIResolver;
+import org.w3c.dom.NodeList;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -344,6 +364,46 @@ public class MCRLayoutUtilities {
         return NAV_DOCUMENT_CACHE.getUnchecked(NAV_RESOURCE);
     }
 
+    public static org.w3c.dom.Document getPersonalNavigation() throws JDOMException, XPathExpressionException {
+        Document navi = getNavi();
+        DOMOutputter accessCleaner = new DOMOutputter(new AccessCleaningDOMOutputProcessor());
+        org.w3c.dom.Document personalNavi = accessCleaner.output(navi);
+        XPath xpath = javax.xml.xpath.XPathFactory.newInstance().newXPath();
+        NodeList emptyGroups = (NodeList) xpath.evaluate("/navigation/menu/group[not(item)]", personalNavi,
+            XPathConstants.NODESET);
+        for (int i = 0; i < emptyGroups.getLength(); ++i) {
+            org.w3c.dom.Element group = (org.w3c.dom.Element) emptyGroups.item(i);
+            group.getParentNode().removeChild(group);
+        }
+        NodeList emptyMenu = (NodeList) xpath.evaluate("/navigation/menu[not(item or group)]", personalNavi,
+            XPathConstants.NODESET);
+        for (int i = 0; i < emptyMenu.getLength(); ++i) {
+            org.w3c.dom.Element menu = (org.w3c.dom.Element) emptyMenu.item(i);
+            menu.getParentNode().removeChild(menu);
+        }
+        personalNavi.normalizeDocument();
+        if (LOGGER.isDebugEnabled()) {
+            try {
+                String encoding = "UTF-8";
+                TransformerFactory tf = TransformerFactory.newInstance();
+                Transformer transformer = tf.newTransformer();
+                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+                transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
+                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+                ByteArrayOutputStream bout = new ByteArrayOutputStream();
+                transformer.transform(new DOMSource(personalNavi), new StreamResult(bout));
+                LOGGER.debug("personal navigation: " + bout.toString(encoding));
+            } catch (IllegalArgumentException | TransformerFactoryConfigurationError | TransformerException
+                | UnsupportedEncodingException e) {
+                LOGGER.warn("Error while getting debug information.", e);
+            }
+
+        }
+        return personalNavi;
+    }
+
     public static long getDuration(long startTime) {
         return System.currentTimeMillis() - startTime;
     }
@@ -381,4 +441,15 @@ public class MCRLayoutUtilities {
         return PERMISSION_READ;
     }
 
+    private static class AccessCleaningDOMOutputProcessor extends AbstractDOMOutputProcessor {
+
+        @Override
+        protected org.w3c.dom.Element printElement(FormatStack fstack, NamespaceStack nstack,
+            org.w3c.dom.Document basedoc, Element element) {
+            Attribute href = element.getAttribute("href");
+            return (href == null || itemAccess(PERMISSION_READ, element, true)) ? super.printElement(fstack, nstack,
+                basedoc, element) : null;
+        }
+
+    }
 }
