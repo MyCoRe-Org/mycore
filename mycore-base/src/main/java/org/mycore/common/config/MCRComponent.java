@@ -84,7 +84,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
             }
         } else {
             type = Type.module;
-            setName(artifactId.replaceAll("-?module", ""));
+            setName(artifactId.replaceAll("[_-]?module", ""));
         }
         this.jarFile = jarFile;
         this.artifactId = artifactId;
