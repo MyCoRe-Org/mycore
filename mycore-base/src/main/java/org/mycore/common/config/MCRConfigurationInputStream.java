@@ -116,13 +116,15 @@ public class MCRConfigurationInputStream extends InputStream {
             cList.add(initStream);
         }
         for (MCRComponent component : MCRRuntimeComponentDetector.getAllComponents()) {
+            String comment = "\n\n#\n#\n# Component: " + component.getName() + "\n#\n#\n";
+            cList.add(new ByteArrayInputStream(comment.getBytes()));
             InputStream is = component.getConfigFileStream(filename);
             if (is != null) {
-                String comment = "\n\n#\n#\n# Component: " + component.getName() + "\n#\n#\n";
-                cList.add(new ByteArrayInputStream(comment.getBytes()));
                 cList.add(is);
                 //workaround if last property is not terminated with line break
                 cList.add(new ByteArrayInputStream(lbr));
+            } else {
+                cList.add(new ByteArrayInputStream(("# Unable to find " + filename + " in " + component.getResourceBase() + "\n").getBytes()));
             }
         }
         InputStream propertyStream = getPropertyStream(filename);
