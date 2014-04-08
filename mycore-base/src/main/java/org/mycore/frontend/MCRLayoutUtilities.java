@@ -3,8 +3,10 @@ package org.mycore.frontend;
 import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
@@ -17,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 import javax.servlet.ServletContext;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -36,7 +37,6 @@ import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.input.sax.XMLReaders;
 import org.jdom2.output.DOMOutputter;
-import org.jdom2.output.Format;
 import org.jdom2.output.support.AbstractDOMOutputProcessor;
 import org.jdom2.output.support.FormatStack;
 import org.jdom2.util.NamespaceStack;
@@ -45,9 +45,11 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.access.mcrimpl.MCRAccessStore;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRURIResolver;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.google.common.cache.CacheBuilder;
@@ -364,6 +366,34 @@ public class MCRLayoutUtilities {
         return NAV_DOCUMENT_CACHE.getUnchecked(NAV_RESOURCE);
     }
 
+    /**
+     * Returns the navigation.xml as File.
+     * This file may not exist yet as navigation.xml may be served as a web resource.
+     * Use {@link #getNavigationURL()} to get access to the actual web resource.
+     * @return
+     */
+    public static File getNavigationFile() {
+        String realPath = SERVLET_CONTEXT.getRealPath(NAV_RESOURCE);
+        if (realPath == null) {
+            return null;
+        }
+        return new File(realPath);
+    }
+
+    /**
+     * Returns the navigation.xml as URL.
+     * 
+     * Use this method if you need to parse it on your own.
+     * @return
+     */
+    public static URL getNavigationURL() {
+        try {
+            return SERVLET_CONTEXT.getResource(NAV_RESOURCE);
+        } catch (MalformedURLException e) {
+            throw new MCRException("Error while resolving navigation.xml", e);
+        }
+    }
+
     public static org.w3c.dom.Document getPersonalNavigation() throws JDOMException, XPathExpressionException {
         Document navi = getNavi();
         DOMOutputter accessCleaner = new DOMOutputter(new AccessCleaningDOMOutputProcessor());
@@ -380,6 +410,12 @@ public class MCRLayoutUtilities {
         for (int i = 0; i < emptyMenu.getLength(); ++i) {
             org.w3c.dom.Element menu = (org.w3c.dom.Element) emptyMenu.item(i);
             menu.getParentNode().removeChild(menu);
+        }
+        NodeList emptyNodes = (NodeList) xpath.evaluate("//text()[normalize-space(.) = '']", personalNavi,
+            XPathConstants.NODESET);
+        for (int i = 0; i < emptyNodes.getLength(); ++i) {
+            Node emptyTextNode = emptyNodes.item(i);
+            emptyTextNode.getParentNode().removeChild(emptyTextNode);
         }
         personalNavi.normalizeDocument();
         if (LOGGER.isDebugEnabled()) {
