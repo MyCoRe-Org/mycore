@@ -63,7 +63,7 @@ public abstract class MCRWCMSUtil {
         Marshaller m = jc.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         m.marshal(navigation, saveTo);
-        if (MCRConfiguration.instance().getBoolean("MCR.navigationFile.SaveInOldFormat")) {
+        if (saveInOldFormat()) {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             docFactory.setNamespaceAware(true);
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -85,6 +85,10 @@ public abstract class MCRWCMSUtil {
             StreamResult result = new StreamResult(saveTo);
             transformer.transform(source, result);
         }
+    }
+
+    private static boolean saveInOldFormat() {
+        return MCRConfiguration.instance().getBoolean("MCR.NavigationFile.SaveInOldFormat");
     }
 
 }
