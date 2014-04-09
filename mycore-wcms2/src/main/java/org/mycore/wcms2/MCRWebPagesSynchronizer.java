@@ -27,10 +27,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 
 import javax.servlet.ServletContext;
 
+import org.apache.commons.io.output.TeeOutputStream;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
@@ -47,6 +49,8 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
     private static final int FAT_PRECISION = 2000;
 
     private static final long DEFAULT_COPY_BUFFER_SIZE = 16 * 1024 * 1024; // 16 KB
+
+    private static ServletContext SERVLET_CONTEXT = null;
 
     /* (non-Javadoc)
      * @see org.mycore.common.events.MCRStartupHandler.AutoExecutable#getName()
@@ -70,26 +74,62 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
     @Override
     public void startUp(ServletContext servletContext) {
         if (servletContext != null) {
-            //we are running in a servlet container
-            String realPath = servletContext.getRealPath("/");
-            if (realPath == null) {
-                LOGGER.warn("Could not get webapp base path.");
-                return;
-            }
-            File webappBasePath = new File(realPath);
-            LOGGER.info("WebAppBasePath=" + webappBasePath.getAbsolutePath());
-            File wcmsDataDir = new File(MCRConfiguration.instance().getString("MCR.WCMS2.DataDir"));
-            if (!wcmsDataDir.isDirectory()) {
-                LOGGER.info(wcmsDataDir.getAbsolutePath()
-                    + " does not exist or is not a directory. Skipping synchronization.");
-                return;
-            }
+            SERVLET_CONTEXT = servletContext;
+            File wcmsDataDir = null, webappBasePath = null;
             try {
+                //we are running in a servlet container
+                webappBasePath = getWebAppBaseDir();
+                LOGGER.info("WebAppBasePath=" + webappBasePath.getAbsolutePath());
+                wcmsDataDir = getWCMSDataDir();
+                if (!wcmsDataDir.isDirectory()) {
+                    LOGGER.info(wcmsDataDir.getAbsolutePath()
+                        + " does not exist or is not a directory. Skipping synchronization.");
+                    return;
+                }
                 synchronize(wcmsDataDir, webappBasePath);
             } catch (IOException e) {
                 throw new MCRException("Error while synchronizing " + wcmsDataDir + " to " + webappBasePath, e);
             }
         }
+    }
+
+    public static File getWCMSDataDir() {
+        return new File(MCRConfiguration.instance().getString("MCR.WCMS2.DataDir"));
+    }
+
+    /**
+     * @return
+     * @throws IOException 
+     */
+    public static File getWebAppBaseDir() throws IOException {
+        if (SERVLET_CONTEXT == null) {
+            throw new IOException("ServletContext is not initialized.");
+        }
+        String realPath = SERVLET_CONTEXT.getRealPath("/");
+        if (realPath == null) {
+            throw new IOException("Could not get webapp base path.");
+        }
+        File webappBasePath = new File(realPath);
+        return webappBasePath;
+    }
+
+    /**
+     * Returns an OuputStream that writes to local webapp and to file inside <code>MCR.WCMS2.DataDir</code>.
+     * @param path
+     * @return
+     * @throws IOException 
+     */
+    public static OutputStream getOutputStream(String path) throws IOException {
+        String cleanPath = path.startsWith("/") ? path.substring(1) : path;
+        File wcmsDataDir = getWCMSDataDir();
+        File webappBaseDir = getWebAppBaseDir();
+        File webappTarget = new File(webappBaseDir, cleanPath);
+        if (!webappTarget.toPath().startsWith(webappBaseDir.toPath())) {
+            throw new IOException(String.format("Cannot write %s outside the web application: %s", webappTarget,
+                webappBaseDir));
+        }
+        File wcmsDataDirTarget = new File(wcmsDataDir, cleanPath);
+        return new TeeOutputStream(new FileOutputStream(wcmsDataDirTarget), new FileOutputStream(webappTarget));
     }
 
     private static void synchronize(File wcmsDataDir, File webappBasePath) throws IOException {

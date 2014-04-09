@@ -2,6 +2,7 @@ package org.mycore.wcms2;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -17,6 +18,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.frontend.MCRLayoutUtilities;
 import org.mycore.wcms2.datamodel.MCRNavigation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -57,17 +59,17 @@ public abstract class MCRWCMSUtil {
      * @throws ParserConfigurationException 
      * 
      */
-    public static void save(MCRNavigation navigation, File saveTo) throws JAXBException, TransformerException, SAXException, IOException,
+    public static void save(MCRNavigation navigation, OutputStream outputStream) throws JAXBException, TransformerException, SAXException, IOException,
             ParserConfigurationException {
         JAXBContext jc = JAXBContext.newInstance(MCRNavigation.class);
         Marshaller m = jc.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        m.marshal(navigation, saveTo);
+        m.marshal(navigation, outputStream);
         if (saveInOldFormat()) {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             docFactory.setNamespaceAware(true);
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-            Document doc = docBuilder.parse(saveTo);
+            Document doc = docBuilder.parse(MCRLayoutUtilities.getNavigationURL().toString());
             Node node = doc.getFirstChild();
             ((Element) node).setAttribute("href", node.getNodeName());
             NodeList nodeList = node.getChildNodes();
@@ -82,7 +84,7 @@ public abstract class MCRWCMSUtil {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(doc);
-            StreamResult result = new StreamResult(saveTo);
+            StreamResult result = new StreamResult(outputStream);
             transformer.transform(source, result);
         }
     }

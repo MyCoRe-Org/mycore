@@ -25,6 +25,7 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.MCRLayoutUtilities;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 import org.mycore.wcms2.MCRWCMSUtil;
+import org.mycore.wcms2.MCRWebPagesSynchronizer;
 import org.mycore.wcms2.access.MCRWCMSPermission;
 import org.mycore.wcms2.datamodel.MCRNavigation;
 import org.mycore.wcms2.navigation.MCRWCMSContentManager;
@@ -77,7 +78,7 @@ public class MCRWCMSNavigationResource {
         // get navigation
         MCRNavigation newNavigation = getNavigationProvider().fromJSON(saveObject);
         // save navigation
-        MCRWCMSUtil.save(newNavigation, MCRLayoutUtilities.getNavigationFile());
+        MCRWCMSUtil.save(newNavigation, MCRWebPagesSynchronizer.getOutputStream(MCRLayoutUtilities.NAV_RESOURCE));
         // save content
         JsonArray items = saveObject.get(MCRWCMSNavigationProvider.JSON_ITEMS).getAsJsonArray();
         getContentManager().save(items);

@@ -1,8 +1,8 @@
 package org.mycore.wcms2.navigation;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -17,6 +17,7 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.wcms2.MCRWebPagesSynchronizer;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -31,26 +32,16 @@ public class MCRWCMSContentManager {
 
     private static final Logger LOGGER = Logger.getLogger(MCRWCMSContentManager.class);
 
-    private static File webDir = null;
-
     private MCRWCMSSectionProvider sectionProvider;
 
     public enum ErrorType {
         notExist, invalidFile, notMyCoReWebPage, invalidDirectory, couldNotSave
     }
 
-    static {
-        String webpath = MCRConfiguration.instance().getString("MCR.WebApplication.basedir", null);
-        if (webpath == null) {
-            LOGGER.error("Unable to get web application directory! Set MCR.WebApplication.basedir.");
-        } else {
-            webDir = new File(webpath);
-        }
-    }
-
     public MCRWCMSContentManager() {
         MCRConfiguration conf = MCRConfiguration.instance();
-        Object sectionProvider = conf.getInstanceOf("MCR.WCMS2.sectionProvider", MCRWCMSDefaultSectionProvider.class.getName());
+        Object sectionProvider = conf.getInstanceOf("MCR.WCMS2.sectionProvider",
+            MCRWCMSDefaultSectionProvider.class.getName());
         if (!(sectionProvider instanceof MCRWCMSSectionProvider)) {
             LOGGER.error("MCR.WCMS2.sectionProvider is not an instance of SectionProvider");
             return;
@@ -83,6 +74,7 @@ public class MCRWCMSContentManager {
      * @see ErrorType
      */
     public JsonObject getContent(String webpageId) throws IOException, JDOMException {
+        File webDir = MCRWebPagesSynchronizer.getWebAppBaseDir();
         File xmlFile = new File(webDir, webpageId);
         boolean isXML = xmlFile.getName().endsWith(".xml");
         // file is not in web application directory
@@ -158,24 +150,14 @@ public class MCRWCMSContentManager {
             JsonArray content = item.get("content").getAsJsonArray();
 
             Element mycoreWebpage = this.sectionProvider.fromJSON(content);
-            File xmlFile = new File(webDir, webpageId);
-            // file is not in web application directory
-            try {
-                if (!xmlFile.getCanonicalPath().startsWith(webDir.getCanonicalPath())) {
-                    throw new IOException();
-                }
-            } catch (IOException ioExc) {
-                throwError(ErrorType.invalidDirectory, webpageId);
-            }
-            if (!xmlFile.getName().endsWith(".xml")) {
+            if (!webpageId.endsWith(".xml")) {
                 throwError(ErrorType.invalidFile, webpageId);
             }
             // save
-            try {
-                FileOutputStream fout = new FileOutputStream(xmlFile);
+            try (OutputStream fout = MCRWebPagesSynchronizer.getOutputStream(webpageId)) {
                 out.output(new Document(mycoreWebpage), fout);
-                fout.close();
             } catch (Exception exc) {
+                LOGGER.error("Error while saving " + webpageId, exc);
                 throwError(ErrorType.couldNotSave, webpageId);
             }
         }
@@ -192,7 +174,8 @@ public class MCRWCMSContentManager {
         JsonObject error = new JsonObject();
         error.addProperty("type", errorType.name());
         error.addProperty("webpageId", webpageId);
-        Response response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(error.toString()).type(MediaType.APPLICATION_JSON).build();
+        Response response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(error.toString())
+            .type(MediaType.APPLICATION_JSON).build();
         throw new WebApplicationException(response);
     }
 
