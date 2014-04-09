@@ -18,6 +18,7 @@ wcms.navigation.NavigationTab = function(navContent) {
 	this.menuItemEditor = null;
 	this.itemEditor = null;
 	this.insertItemEditor = null;
+	this.groupEditor = null;
 
 	this.currentEditor = null;
 
@@ -39,6 +40,7 @@ wcms.navigation.NavigationTab = function(navContent) {
 		this.menuItemEditor = new wcms.navigation.MenuItemEditor();
 		this.itemEditor = new wcms.navigation.ItemEditor();
 		this.insertItemEditor = new wcms.navigation.InsertItemEditor();
+		this.groupEditor = new wcms.navigation.GroupEditor();
 		this.currentEditor = this.rootItemEditor;
 		
 		// create undo manager
@@ -58,6 +60,8 @@ wcms.navigation.NavigationTab = function(navContent) {
 		this.itemEditor.eventHandler.attach(dojo.hitch(this, handleEditorEvents));
 		this.insertItemEditor.create();
 		this.insertItemEditor.eventHandler.attach(dojo.hitch(this, handleEditorEvents));
+		this.groupEditor.create();
+		this.groupEditor.eventHandler.attach(dojo.hitch(this, handleEditorEvents));
 
 		// button events
 		this.saveChangesButton.onClick = dojo.hitch(this, saveChanges);
@@ -256,8 +260,9 @@ wcms.navigation.NavigationTab = function(navContent) {
 			switchEditorFunc(this.rootItemEditor);
 		} else if(item.wcmsType == "insert" && !(this.currentEditor instanceof wcms.navigation.InsertItemEditor)) {
 			switchEditorFunc(this.insertItemEditor);
+		} else if(item.wcmsType == "group" && !(this.currentEditor instanceof wcms.navigation.GroupEditor)) {
+			switchEditorFunc(this.groupEditor);
 		}
-
 		this.currentEditor.updateEditor(item);
 	}
 

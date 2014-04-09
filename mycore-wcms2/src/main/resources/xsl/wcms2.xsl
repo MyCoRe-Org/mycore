@@ -86,6 +86,7 @@
         <script type="text/javascript" src="{$jsPath}/navigation/editor/RootItemEditor.js"></script>
         <script type="text/javascript" src="{$jsPath}/navigation/editor/MenuItemEditor.js"></script>
         <script type="text/javascript" src="{$jsPath}/navigation/editor/InsertItemEditor.js"></script>
+        <script type="text/javascript" src="{$jsPath}/navigation/editor/GroupEditor.js"></script>
 
         <script type="text/javascript" src="{$jsPath}/navigation/NavigationTab.js"></script>
         <script type="text/javascript" src="{$jsPath}/navigation/Tree.js"></script>

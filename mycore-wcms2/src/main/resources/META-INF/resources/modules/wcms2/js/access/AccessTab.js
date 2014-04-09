@@ -39,22 +39,15 @@ wcms.access.AccessTab = function(navContentEHandler) {
 		var cell = dojo.create("div");
 
 		// text
-		var textString = undefined;
-		if (access == "read" && node.config.readId != null && node.config.readDes != null)
-			if (node.config.readId == "") {
-				textString = "";
-			} else {
-				textString = node.config.readDes + " (" + node.config.readId + ")";
-			}
-		else if (access == "write" && node.config.writeId != null && node.config.writeDes != null)
-			if (node.config.writeId == "") {
-				textString = "";
-			} else {
-				textString = node.config.writeDes + " (" + node.config.writeId + ")";
-			}
+		var textString = null;
+		if (access == "read" && node.config.readId != null && node.config.readDes != null) {
+			textString = node.config.readDes + " (" + node.config.readId + ")";
+		} else if (access == "write" && node.config.writeId != null && node.config.writeDes != null) {
+			textString = node.config.writeDes + " (" + node.config.writeId + ")";
+		}
 		var text = dojo.create("span", {
 			style : "float: left; max-width: 300px; white-space: normal;",
-			innerHTML : textString
+			innerHTML : textString != null ? textString : ""
 		});
 		cell.appendChild(text);
 
@@ -111,16 +104,9 @@ wcms.access.AccessTab = function(navContentEHandler) {
 	}
 
 	function createTree() {
-		this.data.push({
-			'id' : 1,
-			'pid' : 0,
-			title : this.navigation.items[0].mainTitle,
-			readId : this.navigation.items[0].access.read.ruleID,
-			readDes : this.navigation.items[0].access.read.ruleDes,
-			writeId : this.navigation.items[0].access.write.ruleID,
-			writeDes : this.navigation.items[0].access.write.ruleDes,
-			href : this.navigation.items[0].hrefStartingPage,
-		});
+		var item = this.navigation.items[0];
+		var data = dojo.hitch(this, buildDataItem)(item, 1, 0, item.mainTitle, item.hrefStartingPage);
+		this.data.push(data);
 
 		for ( var i = 0; i < this.navigation.hierarchy[0].children.length; i++) {
 			dojo.hitch(this, createData)(this.navigation.items, this.navigation.hierarchy[0].children[i], 1);
@@ -157,27 +143,43 @@ wcms.access.AccessTab = function(navContentEHandler) {
 
 	function createData(itemList, hierarchy, pid) {
 		var tempdata = itemList[hierarchy.wcmsId];
+		if(tempdata == null) {
+			return;
+		}
 		var href = "";
 		if (tempdata.dir != undefined) {
 			href = tempdata.dir;
 		} else {
 			href = tempdata.href;
 		}
-		this.data.push({
-			'id' : tempdata.wcmsId + 1,
-			'pid' : pid,
-			title : eval("tempdata.labelMap." + this.lang),
-			readId : tempdata.access.read.ruleID,
-			readDes : tempdata.access.read.ruleDes,
-			writeId : tempdata.access.write.ruleID,
-			writeDes : tempdata.access.write.ruleDes,
-			href : href,
-		});
+		var data = dojo.hitch(this, buildDataItem)(tempdata, tempdata.wcmsId + 1, pid, eval("tempdata.labelMap." + this.lang), href);
+		this.data.push(data);
+
 		if (hierarchy.children != null) {
 			for ( var i = 0; i < hierarchy.children.length; i++) {
 				dojo.hitch(this, createData)(itemList, hierarchy.children[i], tempdata.wcmsId + 1);
 			}
 		}
+	}
+
+	function buildDataItem(item, id, pid, title, href) {
+		var data = {
+			id : id,
+			pid : pid,
+			title : title,
+			href : href
+		};
+		if(item.access != null) {
+			if(item.access.read != null) {
+				data.readId = item.access.read.ruleID;
+				data.readDes = item.access.read.ruleDes;
+			}
+			if(item.access.write != null) {
+				data.writeId = item.access.write.ruleID;
+				data.writeDes = item.access.write.ruleDes;
+			}
+		}
+		return data;
 	}
 
 	function createDialogs(/* loadRuleList */loadsource, /* RuleList */args) {

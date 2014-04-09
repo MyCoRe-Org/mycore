@@ -20,9 +20,10 @@ wcms.navigation.Tree = function() {
 	this.addTreeItemButton = null;
 	this.addTreeInsertItemButton = null;
 	this.addTreeMenuItemButton = null;
+	this.addTreeGroupItemButton = null;
 	this.removeTreeItemButton = null;
 	this.restoreTreeItemButton = null;
-	
+
 	this.popupMenu = undefined;
 	this.deleteItemDialog = null;
 	this.restoreItemDialog = null;
@@ -146,6 +147,7 @@ wcms.navigation.Tree = function() {
 		this.addTreeItemButton.onClick = dojo.hitch(this, addNewItem);
 		this.addTreeInsertItemButton.onClick = dojo.hitch(this, addNewInsertItem);
 		this.addTreeMenuItemButton.onClick = dojo.hitch(this, addNewMenuItem);
+		this.addTreeGroupItemButton.onClick = dojo.hitch(this, addNewGroupItem);
 		this.removeTreeItemButton.onClick = dojo.hitch(this, removeSelectedItem);
 		this.restoreTreeItemButton.onClick = dojo.hitch(this, restoreSelectedItem);
 
@@ -153,6 +155,7 @@ wcms.navigation.Tree = function() {
 		this.addTreeItemButton.set("i18n", "component.wcms.navigation.tree.addItem");
 		this.addTreeInsertItemButton.set("i18n", "component.wcms.navigation.tree.addInsertItem");
 		this.addTreeMenuItemButton.set("i18n", "component.wcms.navigation.tree.addMenu");
+		this.addTreeGroupItemButton.set("i18n", "component.wcms.navigation.tree.addGroup");
 
 		I18nManager.getInstance().updateI18nObject(this.addTreeItemButton);
 		I18nManager.getInstance().updateI18nObject(this.addTreeInsertItemButton);
@@ -220,6 +223,9 @@ wcms.navigation.Tree = function() {
 		this.addTreeMenuItemButton = new dijit.MenuItem({
 			showLabel: false, iconClass: "icon16 menuItem16"
 		});
+		this.addTreeGroupItemButton = new dijit.MenuItem({
+			showLabel: false, iconClass: "icon16 groupItem16"
+		});
 
 		// hierarchy
 		this.toolbar.addChild(this.addTreeItemPopupButton);
@@ -229,6 +235,7 @@ wcms.navigation.Tree = function() {
 		addMenu.addChild(this.addTreeItemButton);
 		addMenu.addChild(this.addTreeInsertItemButton);
 		addMenu.addChild(this.addTreeMenuItemButton);
+		addMenu.addChild(this.addTreeGroupItemButton);
 	}
 
 	/**
@@ -326,6 +333,19 @@ wcms.navigation.Tree = function() {
 		addTreeItemFunc(item);
 	}
 
+	function addNewGroupItem() {
+		var item = {
+			wcmsType: "group",
+			id: "new-group",
+			labelMap: {
+				de: "neue Gruppe",
+				en: "new group"
+			}
+		};
+		var addTreeItemFunc = dojo.hitch(this, addTreeItem);
+		addTreeItemFunc(item);
+	}
+
 	function addTreeItem(/* JSON */ item) {
 		// set a new id
 		item.wcmsId = "" + this.idCounter++;
@@ -405,24 +425,39 @@ wcms.navigation.Tree = function() {
 			// nothing can be dropped on an insert element
 			if(item.wcmsType == "insert" && position == "over")
 				return false;
-			// item cannot be dropped on root
-			if(item.wcmsType == "root" && draggedItem.wcmsType == "item")
+			// item and group cannot be dropped on root
+			if(item.wcmsType == "root" && (draggedItem.wcmsType == "item" || draggedItem.wcmsType == "group"))
 				return false;
 			// a menu cannot be dropped on another menu
 			if(item.wcmsType == "menu" && draggedItem.wcmsType == "menu" && position == "over")
 				return false;
 			// a menu cannot be dropped on an item
-			if(item.wcmsType == "item" && draggedItem.wcmsType == "menu")
+			if(item.wcmsType == "item" && draggedItem.wcmsType == "menu") {
 				return false;
-			// item cannot be dropped behind or after a menu
-			if((draggedItem.wcmsType == "item") && item.wcmsType == "menu" && position != "over")
+			}
+			// item and group cannot be dropped behind or after a menu
+			if((draggedItem.wcmsType == "item" || draggedItem.wcmsType == "group") && item.wcmsType == "menu" && position != "over") {
 				return false;
+			}
+			// group cannot be dropped on item
+			if(draggedItem.wcmsType == "group" && item.wcmsType == "item" && position == "over") {
+				return false;
+			}
+			// group cannot be dropped before/behind an item which is not in a menu
+			if(draggedItem.wcmsType == "group" && item.wcmsType == "item" && position != "over") {
+				var parent = this.treeModel.getParent(item.wcmsId);
+				var parentItem = this.content.getItem(parent.wcmsId);
+				if(parentItem.wcmsType != "menu") {
+					return false;
+				}
+			}
 			// a menu cannot be dropped behind or after a insert item if its not
 			// a child of the root element
 			if(item.wcmsType == "insert" && draggedItem.wcmsType == "menu") {
 				var isChildOfFunc = dojo.hitch(this, isChildOf);
-				if(!isChildOfFunc(this.getRootTreeItem(), treeItem))
+				if(!isChildOfFunc(this.treeModel.getRoot(), treeItem)) {
 					return false;
+				}
 			}
 		}
 		return true;
@@ -430,14 +465,18 @@ wcms.navigation.Tree = function() {
 
 	function getIconClass(/* TreeItem */ treeItem) {
 		var item = this.content.getItem(treeItem.wcmsId);
-		if(item == null)
+		if(item == null) {
 			return;
-		if(item.wcmsType == "root")
+		}
+		if(item.wcmsType == "root") {
 			return "icon24 navigationItem";
-		else if(item.wcmsType == "menu")
+		} else if(item.wcmsType == "menu") {
 			return "icon24 menuItem";
-		else if(item.wcmsType == "insert")
+		} else if(item.wcmsType == "insert") {
 			return "icon24 insertItem";
+		} else if(item.wcmsType == "group") {
+			return "icon24 groupItem";
+		}
 		return "icon24 item";
 	}
 
@@ -484,6 +523,7 @@ wcms.navigation.Tree = function() {
 		I18nManager.getInstance().updateI18nObject(this.addTreeItemButton);
 		I18nManager.getInstance().updateI18nObject(this.addTreeInsertItemButton);
 		I18nManager.getInstance().updateI18nObject(this.addTreeMenuItemButton);
+		I18nManager.getInstance().updateI18nObject(this.addTreeGroupItemButton);
 		// update dialogs
 		this.deleteItemDialog.updateLang();
 		this.restoreItemDialog.updateLang();
@@ -511,6 +551,9 @@ wcms.navigation.Tree = function() {
 		} else {
 			mainChildren[0].set("disabled", false);
 		}
+		// add group
+		addChildren[3].set("disabled", (item == null || item.wcmsType != "menu"));
+
 		// restore item
 		if(item == null || item.dirty == undefined || item.dirty == false) {
 			mainChildren[3].set("disabled", true);
@@ -555,17 +598,11 @@ wcms.navigation.Tree = function() {
 			dojo.addClass(this.addTreeItemPopupButton.domNode, "dijitUpArrowButton");
 		}
 		// add menu
-		if(item == null || item.wcmsType != "root") {
-			this.addTreeMenuItemButton.set("disabled", true);
-		} else {
-			this.addTreeMenuItemButton.set("disabled", false);
-		}
+		this.addTreeMenuItemButton.set("disabled", (item == null || item.wcmsType != "root"));
 		// add item
-		if(item == null || item.wcmsType == "root") {
-			this.addTreeItemButton.set("disabled", true);
-		} else {
-			this.addTreeItemButton.set("disabled", false);
-		}
+		this.addTreeItemButton.set("disabled", (item == null || item.wcmsType == "root"));
+		// add group
+		this.addTreeGroupItemButton.set("disabled", (item == null || item.wcmsType != "menu"));
 	}
 
 	/**
@@ -611,6 +648,7 @@ wcms.navigation.Tree = function() {
 	wcms.navigation.Tree.prototype.addNewItem = addNewItem;
 	wcms.navigation.Tree.prototype.addNewInsertItem = addNewInsertItem;
 	wcms.navigation.Tree.prototype.addNewMenuItem = addNewMenuItem;
+	wcms.navigation.Tree.prototype.addNewGroupItem = addNewGroupItem;
 	wcms.navigation.Tree.prototype.addTreeItem = addTreeItem;
 	wcms.navigation.Tree.prototype.removeTreeItems = removeTreeItems;
 	wcms.navigation.Tree.prototype.removeSelectedItem = removeSelectedItem;

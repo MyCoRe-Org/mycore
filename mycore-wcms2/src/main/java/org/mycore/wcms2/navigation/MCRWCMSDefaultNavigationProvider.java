@@ -3,6 +3,7 @@ package org.mycore.wcms2.navigation;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.frontend.MCRLayoutUtilities;
+import org.mycore.wcms2.datamodel.MCRNavigationGroup;
 import org.mycore.wcms2.datamodel.MCRNavigationInsertItem;
 import org.mycore.wcms2.datamodel.MCRNavigationItem;
 import org.mycore.wcms2.datamodel.MCRNavigationItemContainer;
@@ -44,12 +45,12 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
 
     private void create(MCRNavigationBaseItem item, JsonArray hierarchy, JsonArray items) throws MCRException {
         JsonObject hierarchyObject = add(item, hierarchy, items);
-        if(item instanceof MCRNavigationItemContainer) {
+        if (item instanceof MCRNavigationItemContainer) {
             JsonArray childHierarchyArray = new JsonArray();
-            for(MCRNavigationBaseItem childItem : ((MCRNavigationItemContainer)item).getChildren()) {
+            for (MCRNavigationBaseItem childItem : ((MCRNavigationItemContainer) item).getChildren()) {
                 create(childItem, childHierarchyArray, items);
             }
-            if(childHierarchyArray.size() > 0)
+            if (childHierarchyArray.size() > 0)
                 hierarchyObject.add(JSON_CHILDREN, childHierarchyArray);
         }
     }
@@ -61,22 +62,24 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
         jsonItem.remove(JSON_CHILDREN);
         WCMSType type = null;
         String href = null;
-        if(item instanceof MCRNavigation) {
+        if (item instanceof MCRNavigation) {
             type = WCMSType.root;
             href = ((MCRNavigation) item).getHrefStartingPage();
-        } else if(item instanceof MCRNavigationMenuItem) {
+        } else if (item instanceof MCRNavigationMenuItem) {
             type = WCMSType.menu;
             href = ((MCRNavigationMenuItem) item).getDir();
-        } else if(item instanceof MCRNavigationItem) {
+        } else if (item instanceof MCRNavigationItem) {
             type = WCMSType.item;
             href = ((MCRNavigationItem) item).getHref();
-        } else if(item instanceof MCRNavigationInsertItem) {
+        } else if (item instanceof MCRNavigationInsertItem) {
             type = WCMSType.insert;
+        } else if (item instanceof MCRNavigationGroup) {
+            type = WCMSType.group;
         } else {
             LOGGER.warn("Unable to set type for item " + id);
         }
         jsonItem.addProperty(JSON_WCMS_TYPE, type.name());
-        if (href != null){
+        if (href != null) {
             jsonItem.add("access", getAccess(href));
         }
         items.add(jsonItem);
@@ -91,35 +94,34 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
     public MCRNavigation fromJSON(JsonObject navigationJSON) {
         JsonArray items = navigationJSON.get(JSON_ITEMS).getAsJsonArray();
         JsonArray hierarchy = navigationJSON.get(JSON_HIERARCHY).getAsJsonArray();
-        if(hierarchy.size() > 0) {
+        if (hierarchy.size() > 0) {
             JsonObject root = hierarchy.get(0).getAsJsonObject();
             MCRNavigationBaseItem navigation = createItem(root, items);
-            if(navigation instanceof MCRNavigation) {
-                return (MCRNavigation)navigation;
+            if (navigation instanceof MCRNavigation) {
+                return (MCRNavigation) navigation;
             }
         }
         return null;
     }
 
     private MCRNavigationBaseItem createItem(JsonObject hierarchyObject, JsonArray items) {
-        if(!hierarchyObject.has(JSON_WCMS_ID)) {
+        if (!hierarchyObject.has(JSON_WCMS_ID)) {
             LOGGER.warn("While saving navigation.xml. Invalid object in hierarchy.");
             return null;
         }
         MCRNavigationBaseItem item = getNavigationItem(hierarchyObject.get(JSON_WCMS_ID).getAsString(), items);
-        if(item == null) {
-            LOGGER.warn("While saving navigation.xml. Item with id " +
-                        hierarchyObject.get(JSON_WCMS_ID) + " is null!");
+        if (item == null) {
+            LOGGER.warn("While saving navigation.xml. Item with id " + hierarchyObject.get(JSON_WCMS_ID) + " is null!");
             return null;
         }
 
         JsonElement children = hierarchyObject.get(JSON_CHILDREN);
-        if(children != null && children.isJsonArray() && item instanceof MCRNavigationItemContainer) {
-            MCRNavigationItemContainer itemAsContainer = (MCRNavigationItemContainer)item;
-            for(JsonElement child : children.getAsJsonArray()) {
-                if(child.isJsonObject()) {
+        if (children != null && children.isJsonArray() && item instanceof MCRNavigationItemContainer) {
+            MCRNavigationItemContainer itemAsContainer = (MCRNavigationItemContainer) item;
+            for (JsonElement child : children.getAsJsonArray()) {
+                if (child.isJsonObject()) {
                     MCRNavigationBaseItem childItem = createItem(child.getAsJsonObject(), items);
-                    if(childItem != null) {
+                    if (childItem != null) {
                         itemAsContainer.getChildren().add(childItem);
                     }
                 }
@@ -137,51 +139,41 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
      * @return instance of <code>NavigationItem</code> or null 
      */
     private MCRNavigationBaseItem getNavigationItem(String wcmsId, JsonArray items) {
-        for(JsonElement e : items) {
-            if(e.isJsonObject()) {
+        for (JsonElement e : items) {
+            if (e.isJsonObject()) {
                 JsonObject item = e.getAsJsonObject();
-                if(item.has(JSON_WCMS_ID) && item.has(JSON_WCMS_TYPE) &&
-                   wcmsId.equals(item.get(JSON_WCMS_ID).getAsString())) {
+                if (item.has(JSON_WCMS_ID) && item.has(JSON_WCMS_TYPE) && wcmsId.equals(item.get(JSON_WCMS_ID).getAsString())) {
                     WCMSType wcmsType = WCMSType.valueOf(item.get(JSON_WCMS_TYPE).getAsString());
-                    if(wcmsType.equals(WCMSType.root)) {
+                    if (wcmsType.equals(WCMSType.root)) {
                         return gson.fromJson(item, MCRNavigation.class);
-                    } else if(wcmsType.equals(WCMSType.menu)) {
+                    } else if (wcmsType.equals(WCMSType.menu)) {
                         return gson.fromJson(item, MCRNavigationMenuItem.class);
-                    } else if(wcmsType.equals(WCMSType.item)) {
+                    } else if (wcmsType.equals(WCMSType.item)) {
                         return gson.fromJson(item, MCRNavigationItem.class);
-                    } else if(wcmsType.equals(WCMSType.insert)) {
+                    } else if (wcmsType.equals(WCMSType.insert)) {
                         return gson.fromJson(item, MCRNavigationInsertItem.class);
+                    } else if (wcmsType.equals(WCMSType.group)) {
+                        return gson.fromJson(item, MCRNavigationGroup.class);
                     }
                 }
             }
         }
         return null;
     }
-    private JsonObject getAccess(String href){
+
+    private JsonObject getAccess(String href) {
         JsonObject accessObject = new JsonObject();
-        if (MCRLayoutUtilities.hasRule("read", href)){
+        if (MCRLayoutUtilities.hasRule("read", href)) {
             JsonObject readObject = new JsonObject();
             accessObject.add("read", readObject);
             readObject.addProperty("ruleID", MCRLayoutUtilities.getRuleID("read", href));
             readObject.addProperty("ruleDes", MCRLayoutUtilities.getRuleDescr("read", href));
         }
-        else{
-            JsonObject readObject = new JsonObject();
-            accessObject.add("read", readObject);
-            readObject.addProperty("ruleID", "");
-            readObject.addProperty("ruleDes", "");
-        }
-        if (MCRLayoutUtilities.hasRule("write", href)){
+        if (MCRLayoutUtilities.hasRule("write", href)) {
             JsonObject writeObject = new JsonObject();
             accessObject.add("write", writeObject);
             writeObject.addProperty("ruleID", MCRLayoutUtilities.getRuleID("write", href));
-            writeObject.addProperty("ruleDes", MCRLayoutUtilities.getRuleDescr("write", href));  
-        }
-        else{
-            JsonObject writeObject = new JsonObject();
-            accessObject.add("write", writeObject);
-            writeObject.addProperty("ruleID", "");
-            writeObject.addProperty("ruleDes", ""); 
+            writeObject.addProperty("ruleDes", MCRLayoutUtilities.getRuleDescr("write", href));
         }
         return accessObject;
     }

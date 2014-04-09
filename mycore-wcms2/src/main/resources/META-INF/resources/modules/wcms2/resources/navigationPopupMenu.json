@@ -5,6 +5,7 @@
 	            {type: "MenuItem",  params: {i18n: "component.wcms.navigation.tree.addItem", iconClass:"icon16 item16", action: "addNewItem"}},
 	            {type: "MenuItem",  params: {i18n: "component.wcms.navigation.tree.addInsertItem", iconClass:"icon16 insertItem16", action: "addNewInsertItem"}},
 	            {type: "MenuItem",  params: {i18n: "component.wcms.navigation.tree.addMenu", iconClass:"icon16 menuItem16", action: "addNewMenuItem"}},
+	            {type: "MenuItem",  params: {i18n: "component.wcms.navigation.tree.addGroup", iconClass:"icon16 groupItem16", action: "addNewGroupItem"}}
 	        ]},
 	        {type: "MenuItem",    params: {i18n: "component.wcms.navigation.tree.removeItem",  iconClass:"icon16 removeIcon16", action: "removeSelectedItem"}},
 	        {type: "MenuSeparator"},

@@ -38,8 +38,6 @@ public class MCRWCMSAccessResource {
         JsonObject doneObject = new JsonObject();
         returnObject.addProperty("type", "editDone");
         returnObject.add("edit", doneObject);
-        doneObject.addProperty("ruleId", "");
-        doneObject.addProperty("ruleDes", "");
         return returnObject.toString();
     }
 

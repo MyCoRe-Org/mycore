@@ -214,7 +214,7 @@ table {
 }
 
 .addDisabledIcon16 {
-	background-image: url(../images/addDisabled_16.png);
+	background-image: url(../images/plusDisabled_16.png);
 }
 
 .removeIcon12 {
@@ -295,6 +295,10 @@ table {
 	background-image: url(../images/navigation_22.png);
 }
 
+.groupItem {
+	background-image: url(../images/group_22.png);
+}
+
 .addItem {
 	background-image: url(../images/addItem_24.png);
 }
@@ -322,6 +326,10 @@ table {
 
 .navigationItem16 {
 	background-image: url(../images/navigation_16.png);
+}
+
+.groupItem16 {
+	background-image: url(../images/group_16.png);
 }
 
 /*******************************************************
