@@ -82,7 +82,7 @@ public class MCRLayoutUtilities {
 
     private static HashMap<String, Element> itemStore = new HashMap<String, Element>();
 
-    private static final String NAV_RESOURCE = MCRConfiguration.instance().getString("MCR.NavigationFile",
+    public static final String NAV_RESOURCE = MCRConfiguration.instance().getString("MCR.NavigationFile",
         "/config/navigation.xml");
 
     private static final ServletContext SERVLET_CONTEXT = MCRURIResolver.getServletContext();
