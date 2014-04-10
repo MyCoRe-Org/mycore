@@ -1,8 +1,9 @@
 package org.mycore.wcms2.navigation;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -13,11 +14,12 @@ import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.content.MCRURLContent;
 import org.mycore.wcms2.MCRWebPagesSynchronizer;
+import org.xml.sax.SAXException;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -70,24 +72,27 @@ public class MCRWCMSContentManager {
      * @param webpageId id of the webpage
      * @return json object
      * @throws IOException
+     * @throws SAXException 
+     * @throws JDOMException 
      * @throws jdomException
      * @see ErrorType
      */
-    public JsonObject getContent(String webpageId) throws IOException, JDOMException {
-        File webDir = MCRWebPagesSynchronizer.getWebAppBaseDir();
-        File xmlFile = new File(webDir, webpageId);
-        boolean isXML = xmlFile.getName().endsWith(".xml");
-        // file is not in web application directory
-        if (!xmlFile.getCanonicalPath().startsWith(webDir.getCanonicalPath())) {
+    public JsonObject getContent(String webpageId) throws IOException, JDOMException, SAXException {
+        boolean isXML = webpageId.endsWith(".xml");
+        URL resourceURL = null;
+        try {
+            resourceURL = MCRWebPagesSynchronizer.getURL(webpageId);
+        } catch (MalformedURLException e) {
             throwError(ErrorType.invalidDirectory, webpageId);
-        } else if (!xmlFile.exists() && isXML) {
+        }
+        // file is not in web application directory
+        if (resourceURL == null) {
             throwError(ErrorType.notExist, webpageId);
-        } else if (!xmlFile.isFile() || !isXML) {
+        } else if (!isXML) {
             throwError(ErrorType.invalidFile, webpageId);
         }
 
-        SAXBuilder builder = new SAXBuilder();
-        Document doc = builder.build(xmlFile);
+        Document doc = new MCRURLContent(resourceURL).asXML();
         Element rootElement = doc.getRootElement();
         if (!rootElement.getName().equals("MyCoReWebPage")) {
             throwError(ErrorType.notMyCoReWebPage, webpageId);

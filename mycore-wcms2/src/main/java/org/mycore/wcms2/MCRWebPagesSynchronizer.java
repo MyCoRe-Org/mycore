@@ -27,7 +27,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.channels.FileChannel;
 
 import javax.servlet.ServletContext;
@@ -130,6 +133,30 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
         }
         File wcmsDataDirTarget = new File(wcmsDataDir, cleanPath);
         return new TeeOutputStream(new FileOutputStream(wcmsDataDirTarget), new FileOutputStream(webappTarget));
+    }
+
+    /**
+     * Returns URL of the given resource.
+     * 
+     * This URL may point to a file inside a JAR file in <code>WEB-INF/lib</code>.
+     * @param path should start with '/'
+     * @return null, if no resource with that path could be found
+     * @throws MalformedURLException
+     */
+    public static URL getURL(String path) throws MalformedURLException {
+        String cleanPath = path.startsWith("/") ? path : String.format("/%s", path);
+        return SERVLET_CONTEXT.getResource(cleanPath);
+    }
+    
+    /**
+     * Returns an InputStream of the given resource.
+     * 
+     * @param path should start with '/'
+     * @return null, if no resource with that path could be found
+     */
+    public InputStream getInputStream(String path){
+        String cleanPath = path.startsWith("/") ? path : String.format("/%s", path);
+        return SERVLET_CONTEXT.getResourceAsStream(cleanPath);
     }
 
     private static void synchronize(File wcmsDataDir, File webappBasePath) throws IOException {
