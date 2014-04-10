@@ -152,10 +152,14 @@ public abstract class MCRNode {
      */
     public Date getLastModified() throws IOException {
         FileContent content = fo.getContent();
-        if (content != null) {
-            return new Date(content.getLastModifiedTime());
-        } else {
-            return null;
+        try {
+            if (content != null) {
+                return new Date(content.getLastModifiedTime());
+            } else {
+                return null;
+            }
+        } finally {
+            content.close();
         }
     }
 

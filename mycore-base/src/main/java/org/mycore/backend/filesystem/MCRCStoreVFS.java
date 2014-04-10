@@ -24,6 +24,7 @@
 package org.mycore.backend.filesystem;
 
 import java.io.File;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -44,7 +45,6 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.MCRVFSContent;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRContentStore;
@@ -102,10 +102,11 @@ public class MCRCStoreVFS extends MCRContentStore {
 
         FileObject targetObject = fsManager.resolveFile(getBase(), storageId.toString());
         FileContent targetContent = targetObject.getContent();
-        OutputStream out = targetContent.getOutputStream();
-        IOUtils.copy(source, out);
-        out.close();
-
+        try (OutputStream out = targetContent.getOutputStream()) {
+            IOUtils.copy(source, out);
+        } finally {
+            targetContent.close();
+        }
         return storageId.toString();
     }
 
@@ -131,14 +132,20 @@ public class MCRCStoreVFS extends MCRContentStore {
     @Deprecated
     protected InputStream doRetrieveContent(MCRFileReader file) throws IOException {
         FileObject targetObject = fsManager.resolveFile(getBase(), file.getStorageID());
-        FileContent targetContent = targetObject.getContent();
-        return targetContent.getInputStream();
+        final FileContent targetContent = targetObject.getContent();
+        return new FilterInputStream(targetContent.getInputStream()) {
+            @Override
+            public void close() throws IOException {
+                super.close();
+                targetContent.close();
+            }
+        };
     }
 
     protected MCRContent doRetrieveMCRContent(MCRFileReader file) throws IOException {
         FileObject targetObject = fsManager.resolveFile(getBase(), file.getStorageID());
         MCRVFSContent content = new MCRVFSContent(targetObject);
-        if (file instanceof MCRFile){
+        if (file instanceof MCRFile) {
             content.setName(((MCRFile) file).getName());
         }
         return content;
