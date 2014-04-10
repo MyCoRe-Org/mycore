@@ -132,7 +132,19 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
                 webappBaseDir));
         }
         File wcmsDataDirTarget = new File(wcmsDataDir, cleanPath);
+        createDirectoryIfNeeded(webappTarget);
+        createDirectoryIfNeeded(wcmsDataDirTarget);
+        LOGGER.info(String.format("Writing content to %s and to %s.", webappTarget, wcmsDataDirTarget));
         return new TeeOutputStream(new FileOutputStream(wcmsDataDirTarget), new FileOutputStream(webappTarget));
+    }
+
+    private static void createDirectoryIfNeeded(File targetFile) throws IOException {
+        File targetDirectory = targetFile.getParentFile();
+        if (!targetDirectory.isDirectory()) {
+            if (!targetDirectory.mkdirs()) {
+                throw new IOException(String.format("Could not create directory: %s", targetDirectory));
+            }
+        }
     }
 
     /**
@@ -147,14 +159,14 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
         String cleanPath = path.startsWith("/") ? path : String.format("/%s", path);
         return SERVLET_CONTEXT.getResource(cleanPath);
     }
-    
+
     /**
      * Returns an InputStream of the given resource.
      * 
      * @param path should start with '/'
      * @return null, if no resource with that path could be found
      */
-    public InputStream getInputStream(String path){
+    public InputStream getInputStream(String path) {
         String cleanPath = path.startsWith("/") ? path : String.format("/%s", path);
         return SERVLET_CONTEXT.getResourceAsStream(cleanPath);
     }
