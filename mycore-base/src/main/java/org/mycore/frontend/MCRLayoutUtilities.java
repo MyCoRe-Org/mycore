@@ -284,10 +284,12 @@ public class MCRLayoutUtilities {
         boolean access = false;
         if (strategy == ALL2BLOCKER_TRUE) {
             access = true;
+            String itemHref;
             do {
                 access = itemAccess(permission, item, access);
                 item = item.getParentElement();
-            } while (item != null && access && !getWebpageID(item).equals(blockerWebpageID));
+                itemHref = getWebpageID(item);
+            } while (item != null && access && !(itemHref != null && itemHref.equals(blockerWebpageID)));
         }
         return access;
     }
