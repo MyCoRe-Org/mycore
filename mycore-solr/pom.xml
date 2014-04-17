@@ -42,6 +42,12 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <!-- currently needed for org.mycore.solr.index.file.MCRSolrMCRFileDocumentFactory -->
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-urn</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-base</artifactId>
       <version>${project.version}</version>

@@ -38,8 +38,8 @@ import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.services.urn.MCRURNManager;
 
 /**
  * Represents a stored file with its metadata and content.
@@ -574,10 +574,6 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         root.setAttribute("contentTypeID", getContentTypeID());
         root.setAttribute("contentType", getContentType().getLabel());
         root.setAttribute("returnId", getMCRObjectID().toString());
-        String urn = MCRURNManager.getURNForFile(getOwnerID(), absolutePath.substring(0, absolutePath.lastIndexOf("/") + 1), name);
-        if (urn != null) {
-            root.setAttribute("urn", urn);
-        }
         Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.getInstance().getLinksFromReference(
                 getCategLinkReference(MCRObjectID.getInstance(getOwnerID()), absolutePath));
         for (MCRCategoryID category : linksFromReference) {

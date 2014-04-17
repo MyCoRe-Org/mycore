@@ -1370,6 +1370,7 @@
     <module>mycore-solr</module>
     <module>mycore-swf</module>
     <module>mycore-sword</module>
+    <module>mycore-urn</module>
     <module>mycore-user2</module>
     <module>mycore-wcms2</module>
     <module>mycore-webcli</module>

@@ -36,7 +36,6 @@ import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.services.urn.MCRURNManager;
 
 /**
  * Handles category links to files
@@ -104,34 +103,6 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
         if (objectDerivate.deleteFileMetaData(file.getAbsolutePath())) {
             MCRMetadataManager.update(derivate);
         }
-    }
-
-    /**
-     * When overriding an existing file with urn, this method ensures the urn remaining in the derivate xml.
-     * @param evt
-     * @param file
-     *
-     * TODO handle directory structures 
-     * */
-    @Override
-    protected void handleFileCreated(MCREvent evt, MCRFile file) {
-        if (file.getParent().getParent() != null) {
-            LOGGER.warn("Sorry, directories are currently not supported.");
-            return;
-        }
-
-        String derivateId = file.getOwnerID();
-        String absolutePath = file.getAbsolutePath();
-        String path = absolutePath.substring(0, absolutePath.lastIndexOf("/") + 1);
-        String urn = MCRURNManager.getURNForFile(derivateId, path, file.getName());
-
-        if (urn == null) {
-            return;
-        }
-
-        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateId));
-        derivate.getDerivate().getOrCreateFileMetadata(file, urn);
-        MCRMetadataManager.update(derivate);
     }
 
 }

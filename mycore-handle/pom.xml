@@ -13,6 +13,24 @@
   <properties>
     <manifest.priority>85</manifest.priority>
   </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>analyze</id>
+            <configuration>
+              <usedDependencies>
+                <!-- used by org.mycore.handle.MCRGbvHandleChecksumProvider -->
+                <useDependency>org.mycore:mycore-urn</useDependency>
+              </usedDependencies>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
   <dependencies>
     <dependency>
       <groupId>org.mycore</groupId>
@@ -26,6 +44,11 @@
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-iview2</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-urn</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

@@ -51,13 +51,9 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.jdom2.JDOMException;
 import org.jdom2.output.DOMOutputter;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
 import org.mycore.common.MCRSessionMgr;
@@ -80,7 +76,6 @@ import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.services.urn.MCRURNManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -272,112 +267,6 @@ public class MCRXMLFunctions {
 
     public static String regexp(String orig, String match, String replace) {
         return orig.replaceAll(match, replace);
-    }
-
-    /**
-     * @return true if the given object has an urn assigned, false otherwise
-     */
-    public static boolean hasURNDefined(String objId) {
-        if (objId == null) {
-            return false;
-        }
-        try {
-            return MCRURNManager.hasURNAssigned(objId);
-        } catch (Exception ex) {
-            LOGGER.error("Error while retrieving urn from database for object " + objId, ex);
-            return false;
-        }
-    }
-
-    /**
-     * Method generates an alternative urn to a given urn by adding additional
-     * text to the namespace specific part. Then a new checksum is calculated
-     * and attached to the new generated urn<br/>
-     * <br/>
-     * Invoking method with
-     * <code>"urn:nbn:de:urmel-37e1f5f1-54df-4a9c-8e54-c576f46c01f73"</code> and
-     * <code>"dfg"</code> leads to
-     * <code>"urn:nbn:de:urmel-dfg-37e1f5f1-54df-4a9c-8e54-c576f46c01f738"</code>
-     * 
-     * @param urn
-     *            the source urn
-     * @param toAppend
-     *            the string to append to the namespace specific part
-     * @return the given urn but to the namespace specific part the value stored
-     *         in the <code>toAppend</code> parameter is attached
-     */
-    public static String createAlternativeURN(String urn, String toAppend) {
-        String[] parts = urn.split("-");
-        StringBuilder b = new StringBuilder(parts[0] + "-" + toAppend);
-        for (int i = 1; i < parts.length; i++) {
-            b.append("-" + parts[i]);
-        }
-
-        org.mycore.services.urn.MCRURN u = org.mycore.services.urn.MCRURN.valueOf(b.toString());
-        try {
-            u.attachChecksum();
-        } catch (Exception ex) {
-            LOGGER.error("Could not attach checksum to urn " + b.toString(), ex);
-            return null;
-        }
-        return u.toString();
-    }
-
-    /**
-     * returns the URN for <code>mcrid</code> and children if <code>mcrid</code>
-     * is a derivate.
-     * 
-     * @param mcrid
-     *            MCRObjectID of object or derivate
-     * @return list of mcrid|file to urn mappings
-     */
-    @SuppressWarnings("unchecked")
-    public static NodeList getURNsForMCRID(String mcrid) {
-        Session session = MCRHIBConnection.instance().getSession();
-        Criteria criteria = session.createCriteria(MCRURN.class);
-        criteria.add(Restrictions.eq("key.mcrid", mcrid));
-        Document document = DOC_BUILDER.newDocument();
-        Element rootElement = document.createElement("urn");
-        document.appendChild(rootElement);
-
-        LOGGER.info("Getting all urns for object " + mcrid);
-        long start = System.currentTimeMillis();
-        long temp = start;
-
-        List<MCRURN> results = criteria.list();
-        LOGGER.debug("This took " + (System.currentTimeMillis() - start) + " ms");
-        LOGGER.debug("Processing the result list");
-
-        for (MCRURN result : results) {
-            LOGGER.debug("Processing urn " + result.getURN());
-            start = System.currentTimeMillis();
-
-            String path = result.getPath();
-            String filename = result.getFilename();
-
-            if (path != null && filename != null) {
-                path = path.trim();
-                if (path.length() > 0 && path.charAt(0) == '/') {
-                    path = path.substring(1);
-                }
-
-                path += filename.trim();
-
-                Element file = document.createElement("file");
-                file.setAttribute("urn", result.getKey().getMcrurn());
-                file.setAttribute("name", path);
-                rootElement.appendChild(file);
-
-            } else {
-                rootElement.setAttribute("mcrid", result.getKey().getMcrid());
-                rootElement.setAttribute("urn", result.getKey().getMcrurn());
-            }
-            session.evict(result);
-            long duration = System.currentTimeMillis() - start;
-            LOGGER.debug("URN processed in " + duration + " ms");
-        }
-        LOGGER.debug("Processing all URN took " + (System.currentTimeMillis() - temp) + " ms");
-        return rootElement.getChildNodes();
     }
 
     public static boolean classAvailable(String className) {
