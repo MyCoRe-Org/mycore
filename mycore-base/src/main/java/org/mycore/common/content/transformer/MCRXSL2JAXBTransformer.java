@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.util.JAXBResult;
 import javax.xml.transform.TransformerConfigurationException;
@@ -79,9 +80,8 @@ public class MCRXSL2JAXBTransformer<T> extends MCRXSLTransformer {
     }
 
     @Override
-    protected MCRContent transform(MCRContent source, XMLReader reader, TransformerHandler transformerHandler,
-        MCRParameterCollector parameter) throws IOException,
-        SAXException {
+    protected MCRContent getTransformedContent(MCRContent source, XMLReader reader,
+        TransformerHandler transformerHandler) throws IOException, SAXException {
         T result;
         try {
             result = getJAXBObject(source, reader, transformerHandler);
@@ -91,21 +91,27 @@ public class MCRXSL2JAXBTransformer<T> extends MCRXSLTransformer {
         return new MCRJAXBContent<T>(context, result);
     }
 
-    private T getJAXBObject(MCRContent source, XMLReader reader, TransformerHandler transformerHandler) throws JAXBException, IOException,
-        SAXException {
+    private T getJAXBObject(MCRContent source, XMLReader reader, TransformerHandler transformerHandler)
+        throws JAXBException, IOException, SAXException {
         checkContext();
         JAXBResult result = new JAXBResult(context);
         transformerHandler.setResult(result);
         // Parse the source XML, and send the parse events to the
         // TransformerHandler.
         reader.parse(source.getInputSource());
+        Object parsedResult = result.getResult();
+        if (parsedResult instanceof JAXBElement<?>) {
+            @SuppressWarnings("unchecked")
+            JAXBElement<T> jaxbElement = (JAXBElement<T>) parsedResult;
+            return jaxbElement.getValue();
+        }
         @SuppressWarnings("unchecked")
         T jaxbResult = (T) result.getResult();
         return jaxbResult;
     }
 
-    public T getJAXBObject(MCRContent source, MCRParameterCollector parameter) throws TransformerConfigurationException, SAXException,
-        JAXBException, IOException {
+    public T getJAXBObject(MCRContent source, MCRParameterCollector parameter)
+        throws TransformerConfigurationException, SAXException, JAXBException, IOException {
         LinkedList<TransformerHandler> transformHandlerList = getTransformHandlerList(parameter);
         XMLReader reader = getXMLReader(transformHandlerList);
         TransformerHandler lastTransformerHandler = transformHandlerList.getLast();
