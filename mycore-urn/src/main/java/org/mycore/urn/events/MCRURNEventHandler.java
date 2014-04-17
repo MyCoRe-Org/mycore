@@ -20,7 +20,7 @@
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
-package org.mycore.datamodel.common;
+package org.mycore.urn.events;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -45,7 +45,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.services.urn.MCRURNManager;
+import org.mycore.urn.services.MCRURNManager;
 
 /**
  * This class is responsible for the urn after an object has been deleted in the

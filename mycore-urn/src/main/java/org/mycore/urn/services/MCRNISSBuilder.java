@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  *
  **/
-package org.mycore.services.urn;
+package org.mycore.urn.services;
 
 /**
  * Implementations of this interface provide different strategies to generate a

@@ -65,7 +65,7 @@ import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.frontend.fileupload.MCRSWFUploadHandlerIFS;
 import org.mycore.frontend.fileupload.MCRSWFUploadHandlerMyCoRe;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
-import org.mycore.services.urn.MCRURNManager;
+import org.mycore.urn.services.MCRURNManager;
 import org.xml.sax.SAXParseException;
 
 /**

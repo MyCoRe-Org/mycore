@@ -1,4 +1,4 @@
-package org.mycore.services.urn;
+package org.mycore.urn.services;
 
 import java.net.URI;
 
@@ -94,7 +94,7 @@ public class MCRURN {
      * Calculates the checksum of this urn. Checksum is calculated for urn with
      * the following structure <code>urn:nbn:de:&lt;your stuff here&gt;</code>.
      * For other schemas the calculated checksum may not be correct. Thus one
-     * should subclass {@link org.mycore.services.urn.MCRURN} and override this
+     * should subclass {@link org.mycore.urn.services.MCRURN} and override this
      * method.
      * 
      * @return the calculated checksum

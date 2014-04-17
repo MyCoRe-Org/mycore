@@ -60,10 +60,10 @@ import org.mycore.mets.model.struct.AbstractLogicalDiv;
 import org.mycore.mets.model.struct.LogicalDiv;
 import org.mycore.mets.model.struct.LogicalStructMap;
 import org.mycore.mets.model.struct.LogicalSubDiv;
-import org.mycore.services.urn.MCRURNManager;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
 import org.mycore.solr.index.handlers.stream.MCRSolrFileIndexHandler;
 import org.mycore.solr.index.handlers.stream.MCRSolrFilesIndexHandler;
+import org.mycore.urn.services.MCRURNManager;
 
 /**
  * @author Thomas Scheffler (yagee)

@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.backend.hibernate;
+package org.mycore.urn.hibernate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,10 +36,10 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.mycore.backend.hibernate.tables.MCRURN;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.services.urn.MCRURNStore;
+import org.mycore.urn.services.MCRURNStore;
 
 /**
  * This class implements the MCRXMLInterface.

@@ -21,12 +21,12 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  *
  **/
-package org.mycore.services.urn;
+package org.mycore.urn.services;
 
 import java.util.List;
 
-import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.urn.hibernate.MCRURN;
 
 /**
  * Stores the data of URNs and the document IDs assigned to them.

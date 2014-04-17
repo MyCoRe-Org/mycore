@@ -1,4 +1,4 @@
-package org.mycore.services.urn;
+package org.mycore.urn.services;
 
 /**
  * This interface holds the constants, needed for calculation of the checksum of

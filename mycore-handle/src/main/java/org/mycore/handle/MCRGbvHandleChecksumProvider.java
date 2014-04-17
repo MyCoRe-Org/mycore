@@ -6,7 +6,7 @@ package org.mycore.handle;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
-import org.mycore.services.urn.MCRIConcordanceTable;
+import org.mycore.urn.services.MCRIConcordanceTable;
 
 
 /**

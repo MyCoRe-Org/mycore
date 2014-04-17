@@ -34,8 +34,8 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.backend.hibernate.tables.MCRURN;
-import org.mycore.services.urn.MCRURNManager;
+import org.mycore.urn.hibernate.MCRURN;
+import org.mycore.urn.services.MCRURNManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -102,7 +102,7 @@ public class MCRXMLFunctions {
             b.append("-" + parts[i]);
         }
 
-        org.mycore.services.urn.MCRURN u = org.mycore.services.urn.MCRURN.valueOf(b.toString());
+        org.mycore.urn.services.MCRURN u = org.mycore.urn.services.MCRURN.valueOf(b.toString());
         try {
             u.attachChecksum();
         } catch (Exception ex) {

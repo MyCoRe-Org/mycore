@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.mycore.frontend.servlets;
+package org.mycore.urn.servlets;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
@@ -12,8 +12,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.services.urn.MCRURNAdder;
-import org.mycore.services.urn.MCRURNManager;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.urn.services.MCRURNAdder;
+import org.mycore.urn.services.MCRURNManager;
 
 /**
  * Class is responsible for adding urns to the metadata of a mycore object

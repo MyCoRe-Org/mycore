@@ -21,17 +21,17 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  *
  **/
-package org.mycore.services.urn;
+package org.mycore.urn.services;
 
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.mycore.backend.hibernate.tables.MCRURN;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.urn.hibernate.MCRURN;
 
 /**
  * Provides methods to create URNs (urn:nbn:de) and assign them to documents. A

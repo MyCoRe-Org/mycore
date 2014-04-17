@@ -4,7 +4,7 @@
 
   <servlet id="MCRAddURNToObjectServlet">
     <servlet-name>MCRAddURNToObjectServlet</servlet-name>
-    <servlet-class>org.mycore.frontend.servlets.MCRAddURNToObjectServlet</servlet-class>
+    <servlet-class>org.mycore.urn.servlets.MCRAddURNToObjectServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>

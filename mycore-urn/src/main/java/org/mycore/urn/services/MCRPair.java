@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.mycore.services.urn;
+package org.mycore.urn.services;
 
 import org.mycore.datamodel.ifs.MCRFile;
 
