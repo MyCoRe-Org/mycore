@@ -3,6 +3,7 @@
   xmlns:xalan="http://xml.apache.org/xalan" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
   xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" exclude-result-prefixes="acl mcrxsl encoder xalan i18n">
   <xsl:param name="RequestURL" />
+  <xsl:variable name="response" select="(/response|/*/response)[1]"/>
   <xsl:variable name="loginURL"
     select="concat( $ServletsBaseURL, 'MCRLoginServlet',$HttpSession,'?url=', encoder:encode( string( $RequestURL ) ) )" />
   <xsl:key name="derivate" match="/response/response[@subresult='derivate']/result/doc" use="str[@name='returnId']" />
@@ -12,18 +13,18 @@
   <xsl:key name="files-by-derivate"
     match="/response/response[@subresult='unmerged']/result/doc|/response/lst[@name='grouped']/lst[@name='returnId']/arr[@name='groups']/lst/result/doc[str[@name='objectType']='data_file']"
     use="str[@name='derivateID']" />
-  <xsl:variable name="params" select="/response/lst[@name='responseHeader']/lst[@name='params']" />
-  <xsl:variable name="result" select="/response/result[@name='response']" />
-  <xsl:variable name="groups" select="/response/lst[@name='grouped']/lst[@name='returnId']/arr[@name='groups']" />
+  <xsl:variable name="params" select="$response/lst[@name='responseHeader']/lst[@name='params']" />
+  <xsl:variable name="result" select="$response/result[@name='response']" />
+  <xsl:variable name="groups" select="$response/lst[@name='grouped']/lst[@name='returnId']/arr[@name='groups']" />
   <xsl:variable name="hits">
     <xsl:choose>
       <xsl:when test="$result/@numFound">
         <xsl:value-of select="number($result/@numFound)" />
       </xsl:when>
-      <xsl:when test="/response/lst[@name='grouped']/lst[@name='returnId']/int[@name='ngroups']">
+      <xsl:when test="$response/lst[@name='grouped']/lst[@name='returnId']/int[@name='ngroups']">
         <xsl:value-of select="number(/response/lst[@name='grouped']/lst[@name='returnId']/int[@name='ngroups'])" />
       </xsl:when>
-      <xsl:when test="/response/lst[@name='grouped']/lst[@name='returnId']/int[@name='matches']">
+      <xsl:when test="$response/lst[@name='grouped']/lst[@name='returnId']/int[@name='matches']">
         <xsl:value-of select="number(/response/lst[@name='grouped']/lst[@name='returnId']/int[@name='matches'])" />
       </xsl:when>
       <xsl:when test="$groups">
