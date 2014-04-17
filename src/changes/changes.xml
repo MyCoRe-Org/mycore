@@ -5,6 +5,16 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
+    <release version="2014.04" date="2014-04-00" description="Codenamed &apos;Ü-Ei&apos;">
+      <action dev="mcrtchef" type="fix" date="2014-03-13">
+        mycore-solr: fixed "mycoreobject-solrdocument" Transformer to work with MCRContentServlet
+        <fixes issue="697"/>
+      </action>
+      <action dev="mcrtchef" type="fix" date="2014-03-12" due-to="Silvio Hermann">
+        mycore-solr: First request to a solr request handler results in a NullPointerException
+        <fixes issue="688"/>
+      </action>
+    </release>
     <release version="2014.03" date="2014-03-07" description="Codenamed &apos;Lenzing&apos;">
       <action dev="mcrvuchi" type="fix" date="2014-03-07">
         mycore-webcli: fixed "process {0}"
