@@ -11,12 +11,10 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -44,14 +42,6 @@ import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.xml.sax.SAXException;
-
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListenableScheduledFuture;
-import com.google.common.util.concurrent.ListeningScheduledExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 public class MCRSolrProxyServlet extends MCRServlet {
 
@@ -231,11 +221,16 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
         LOGGER.info("Initializing SOLR connection to \"" + SERVER_URL + "\"");
 
-        final ListeningScheduledExecutorService service = MoreExecutors.listeningDecorator(Executors
-            .newScheduledThreadPool(1, new ThreadFactoryBuilder().setNameFormat("SOLR QueryHandler Resolver").build()));
-        ListenableFuture<Map<String, MCRSolrQueryHandler>> queryHandlerMapFuture = service
-            .submit(getQueryHandlerMapCallable());
-        Futures.addCallback(queryHandlerMapFuture, getQueryHandlerMapCallBack(service, 0));
+        try {
+            queryHandlerMap = MCRSolrProxyUtils.getQueryHandlerMap();
+        } catch (SolrServerException | IOException e) {
+            LOGGER.error("Error while getting query handler from SOLR.", e);
+            MCRSolrQueryHandler standardHandler = MCRSolrProxyUtils.getStandardHandler(null);
+            LOGGER.info("Adding standard handler: " + standardHandler);
+            queryHandlerMap = new HashMap<String, MCRSolrQueryHandler>();
+            queryHandlerMap.put(standardHandler.getPath(), standardHandler);
+        }
+
         solrHost = MCRSolrProxyUtils.getHttpHost(SERVER_URL);
         if (solrHost == null) {
             throw new ServletException("URI does not specify a valid host name: " + SERVER_URL);
@@ -246,40 +241,6 @@ public class MCRSolrProxyServlet extends MCRServlet {
         //start thread to monitor stalled connections
         idleConnectionMonitorThread = new MCRIdleConnectionMonitorThread(httpClientConnectionManager);
         idleConnectionMonitorThread.start();
-    }
-
-    private FutureCallback<Map<String, MCRSolrQueryHandler>> getQueryHandlerMapCallBack(
-        final ListeningScheduledExecutorService service, final int retries) {
-        return new FutureCallback<Map<String, MCRSolrQueryHandler>>() {
-            int numRetries = retries;
-
-            @Override
-            public void onFailure(Throwable t) {
-                LOGGER.warn("Exception while executing task.", t);
-                numRetries++;
-                LOGGER.info("Getting query handler from SOLR was not successful, resubmitting (num retries: "
-                    + numRetries + ")");
-                ListenableScheduledFuture<Map<String, MCRSolrQueryHandler>> scheduledFuture = service.schedule(
-                    getQueryHandlerMapCallable(), 1, TimeUnit.MINUTES);
-                Futures.addCallback(scheduledFuture, getQueryHandlerMapCallBack(service, numRetries));
-            }
-
-            @Override
-            public void onSuccess(Map<String, MCRSolrQueryHandler> result) {
-                LOGGER.info("Got " + result.size() + " query handler from SOLR.");
-                queryHandlerMap = result;
-                service.shutdown();
-            }
-        };
-    }
-
-    private Callable<Map<String, MCRSolrQueryHandler>> getQueryHandlerMapCallable() {
-        return new Callable<Map<String, MCRSolrQueryHandler>>() {
-            @Override
-            public Map<String, MCRSolrQueryHandler> call() throws Exception {
-                return MCRSolrProxyUtils.getQueryHandlerMap();
-            }
-        };
     }
 
     @Override
