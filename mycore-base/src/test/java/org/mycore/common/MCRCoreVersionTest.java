@@ -38,7 +38,7 @@ public class MCRCoreVersionTest extends MCRTestCase {
      */
     @Test
     public void getVersion() {
-        assertTrue("Length of Version String is zero.", MCRCoreVersion.getVersion().length() > 0);
+        assertTrue("Length of version string is zero.", MCRCoreVersion.getVersion().length() > 0);
     }
 
     /**
@@ -46,7 +46,8 @@ public class MCRCoreVersionTest extends MCRTestCase {
      */
     @Test
     public void getRevision() {
-        assertTrue("Resvision is not a natural number.", MCRCoreVersion.getRevision() > 0);
+        assertTrue("Revision is not a natural number: " + MCRCoreVersion.getRevision(),
+            MCRCoreVersion.getRevision() > 0);
     }
 
 }
