@@ -70,54 +70,60 @@ public class MCRURNManager {
 
     /** The table of character codes for calculating the checksum */
     private static Properties codes;
+    
+    private static final Logger LOGGER = Logger.getLogger(MCRURNManager.class); 
 
     static {
-        codes = new Properties();
-        codes.put("0", "1");
-        codes.put("1", "2");
-        codes.put("2", "3");
-        codes.put("3", "4");
-        codes.put("4", "5");
-        codes.put("5", "6");
-        codes.put("6", "7");
-        codes.put("7", "8");
-        codes.put("8", "9");
-        codes.put("9", "41");
-        codes.put("a", "18");
-        codes.put("b", "14");
-        codes.put("c", "19");
-        codes.put("d", "15");
-        codes.put("e", "16");
-        codes.put("f", "21");
-        codes.put("g", "22");
-        codes.put("h", "23");
-        codes.put("i", "24");
-        codes.put("j", "25");
-        codes.put("k", "42");
-        codes.put("l", "26");
-        codes.put("m", "27");
-        codes.put("n", "13");
-        codes.put("o", "28");
-        codes.put("p", "29");
-        codes.put("q", "31");
-        codes.put("r", "12");
-        codes.put("s", "32");
-        codes.put("t", "33");
-        codes.put("u", "11");
-        codes.put("v", "34");
-        codes.put("w", "35");
-        codes.put("x", "36");
-        codes.put("y", "37");
-        codes.put("z", "38");
-        codes.put("-", "39");
-        codes.put("+", "49");
-        codes.put(":", "17");
-        codes.put("/", "45");
-        codes.put("_", "43");
-        codes.put(".", "47");
-
-        Object obj = MCRConfiguration.instance().getSingleInstanceOf("MCR.Persistence.URN.Store.Class");
-        store = (MCRURNStore) obj;
+        try {
+            codes = new Properties();
+            codes.put("0", "1");
+            codes.put("1", "2");
+            codes.put("2", "3");
+            codes.put("3", "4");
+            codes.put("4", "5");
+            codes.put("5", "6");
+            codes.put("6", "7");
+            codes.put("7", "8");
+            codes.put("8", "9");
+            codes.put("9", "41");
+            codes.put("a", "18");
+            codes.put("b", "14");
+            codes.put("c", "19");
+            codes.put("d", "15");
+            codes.put("e", "16");
+            codes.put("f", "21");
+            codes.put("g", "22");
+            codes.put("h", "23");
+            codes.put("i", "24");
+            codes.put("j", "25");
+            codes.put("k", "42");
+            codes.put("l", "26");
+            codes.put("m", "27");
+            codes.put("n", "13");
+            codes.put("o", "28");
+            codes.put("p", "29");
+            codes.put("q", "31");
+            codes.put("r", "12");
+            codes.put("s", "32");
+            codes.put("t", "33");
+            codes.put("u", "11");
+            codes.put("v", "34");
+            codes.put("w", "35");
+            codes.put("x", "36");
+            codes.put("y", "37");
+            codes.put("z", "38");
+            codes.put("-", "39");
+            codes.put("+", "49");
+            codes.put(":", "17");
+            codes.put("/", "45");
+            codes.put("_", "43");
+            codes.put(".", "47");
+            
+            store = (MCRURNStore)MCRConfiguration.instance().getSingleInstanceOf("MCR.Persistence.URN.Store.Class");
+        } catch (Throwable t) {
+            // TODO: handle exception
+            LOGGER.error("Init error: ", t);
+        }
     }
 
     /**

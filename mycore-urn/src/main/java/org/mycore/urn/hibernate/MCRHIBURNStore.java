@@ -48,7 +48,7 @@ public class MCRHIBURNStore implements MCRURNStore {
     // logger
     static Logger logger = Logger.getLogger(MCRHIBURNStore.class.getName());
 
-    private String classname = "org.mycore.backend.hibernate.tables.MCRURN";
+    private String classname = MCRURN.class.getName();
 
     /**
      * The constructor for the class MCRHIBURLStore.
