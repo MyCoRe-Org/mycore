@@ -60,6 +60,7 @@
         <condition id="mods.typeOfResource.cond" required="true">
           <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
           <label xml:lang="en">Please select one entry!</label>
+          <label xml:lang="it">Scegliere!</label>
         </condition>
       </list>
     </cell>
@@ -235,6 +236,9 @@
     <label xml:lang="en">
       Title of document by which the resource is formally known.
     </label>
+    <label xml:lang="it">
+      Il titolo sotto il quale il documento o l’oggetto è formalmente conosciuto.
+    </label>
   </helpPopup>
   <!-- TITLE END -->
 
@@ -250,6 +254,9 @@
     </label>
     <label xml:lang="en">
       Title of document in html representation.
+    </label>
+    <label xml:lang="it">
+      Il titolo del documento in formato HTML. Questo viene poi preferibilmente visualizzato sul sito.
     </label>
   </helpPopup>
   <!-- TITLE HTML END -->
@@ -275,6 +282,9 @@
     <label xml:lang="en">
       title translated.
     </label>
+    <label xml:lang="it">
+      La traduzione del titolo. Cliccando sul pulsante „+“ è possibile inserire ulteriori traduzioni.
+    </label>
   </helpPopup>
   <!-- TITLE Translated END -->
 
@@ -291,6 +301,9 @@
     </label>
     <label xml:lang="en">
       Short form of the title, which should be used for citation.
+    </label>
+    <label xml:lang="it">
+      Forma abbreviata del titolo, utilizzato per le citazioni.
     </label>
   </helpPopup>
   <!-- SHORT-TITLE END -->
@@ -309,6 +322,9 @@
     <label xml:lang="en">
       Subtitle of document.
     </label>
+    <label xml:lang="it">
+      Il titolo secondario, o meglio il sottotitolo del documento o dell’oggetto.
+    </label>
   </helpPopup>
   <!-- TITLE Nebensachtitel END -->
 
@@ -326,6 +342,7 @@
               <condition id="mods.languageTerm.cond" required="true">
                 <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
                 <label xml:lang="en">Please select one entry!</label>
+                <label xml:lang="it">Scegliere!</label>
               </condition>
             </list>
           </cell>
@@ -356,6 +373,9 @@
     </label>
     <label xml:lang="en">
       language of document text
+    </label>
+    <label xml:lang="it">
+      La lingua nella quale è redatto il documento.
     </label>
   </helpPopup>
   <!-- LANGUAGE END -->
@@ -474,6 +494,11 @@
     <label xml:lang="en">
       Names and roles of persons cooperating .... (ref to gnd)
     </label>
+    <label xml:lang="it">
+      Nome e ruolo delle persone che hanno partecipato alla realizzazione del documento. Collegamento a GND.
+      (Codice identificativo della Biblioteca Nazionale Tedesca grazie al quale personalità, organizzazioni ed
+      altre entità vengono individuate all’interno del sistema bibliotecario tedesco).
+    </label>
   </helpPopup>
 
   <helpPopup id="mods.person.publisher.help" width="400px" height="250px">
@@ -514,6 +539,11 @@
   <helpPopup id="mods.corporation.help" width="400px" height="250px">
     <label xml:lang="de">Geben Sie die Körperschaft (Bezeichnung oder GND-ID) ein. Die Ansetzung erfolgt gemäß RAK-WB.</label>
     <label xml:lang="en">Insert corporate name or GND-ID.</label>
+    <label xml:lang="it">
+      Inserire la denominazione dell’ente o il codice GND-ID (Codice identificativo della Biblioteca Nazionale
+      Tedesca grazie al quale personalità, organizzazioni ed altre entità vengono individuate all’interno del sistema
+      bibliotecario tedesco). L‘inserimento segue le regole tedesche di catalogazione (RAK-WB).
+    </label>
   </helpPopup>
   <!-- Körperschaft END -->
 
@@ -533,6 +563,9 @@
     </label>
     <label xml:lang="en">
       Publisher
+    </label>
+    <label xml:lang="it">
+      Organizzazione che mette a disposizione del pubblico opere di letteratura, arte, musica, intrattenimento o scienza.
     </label>
   </helpPopup>
   <!-- Publisher END -->
@@ -562,6 +595,9 @@
     </label>
     <label xml:lang="en">
       Conference Place
+    </label>
+    <label xml:lang="it">
+      Luogo del convegno
     </label>
   </helpPopup>
   <!-- Ort der Konferenz END -->
@@ -601,6 +637,7 @@
   <helpPopup id="mods.submissionAtInstitute.help" width="400px" height="250px">
     <label xml:lang="de">Die Hochschule, an der das Dokument eingereicht wurde</label>
     <label xml:lang="en">Select an institution from the list.</label>
+    <label xml:lang="it">L’università nella quale il documento è stato presentato.</label>
   </helpPopup>
   <!-- Institution END -->
 
@@ -655,6 +692,17 @@
       video recording date
 
     </label>
+    <label xml:lang="it">
+      In caso di atti di convegno, libri o altri volumi inserire la data di
+      pubblicazione, qualora si tratti di film indicare la data di incisione e in
+      caso di tesi di dottoralo la data della prima pubblicazione online. La data
+      deve essere indicata in formato ISO e tramite l’uso di trattini YYYY-MMDD,
+      YYYY-MM o YYYY.
+      <br />
+      Ad esempio: 2003-01-27 o 2010 o 2009-01
+      <br />
+
+    </label>
   </helpPopup>
 
   <!-- Datum der Veröffentlichung END -->
@@ -687,6 +735,12 @@
     <label xml:lang="en">
       Date of Creation
     </label>
+    <label xml:lang="it">
+      Data di realizzazione. La data deve essere indicata in formato ISO e tramite l’uso di trattini YYYY-MM-DD, YYYY-MM o YYYY.
+      <br />
+      Ad esempio: 2003-01-27 o 2010 o 2009-01
+      <br />
+    </label>
   </helpPopup>
   <!-- Datum der Erstellung END -->
 
@@ -717,6 +771,12 @@
     </label>
     <label xml:lang="en">
       Date of submission
+    </label>
+    <label xml:lang="it">
+      Data di consegna. La data deve essere indicata in formato ISO e tramite l’uso di trattini YYYY-MM-DD, YYYY-MM o YYYY.
+      <br />
+      Ad esempio: 2003-01-27 o 2010 o 2009-01
+      <br />
     </label>
   </helpPopup>
   <!-- Datum der Einreichung END -->
@@ -749,6 +809,13 @@
     </label>
     <label xml:lang="en">
       Date of acceptance
+    </label>
+    <label xml:lang="it">
+      Data della discussione (accettazione del lavoro). La data deve essere indicata in formato ISO e tramite l’uso di
+      trattini YYYY-MM-DD, YYYY-MM o YYYY.
+      <br />
+      Ad esempio: 2003-01-27 o 2010 o 2009-01
+      <br />
     </label>
   </helpPopup>
   <!-- Datum der Promotion END -->
@@ -792,7 +859,12 @@
       with dahes (YYYY-MM-DD).
       Sample: 2003-01-27
       <br />
-
+    </label>
+    <label xml:lang="it">
+      Periodo nel quale si è tenuto il convegno (da, a). La data deve essere
+      inserita nel formato ISO separando le cifre con trattini.
+      <br />
+      Ad esempio: 2003-01-27
     </label>
   </helpPopup>
   <!--Zeit in der die Konferenz stattfand END -->
@@ -816,6 +888,9 @@
     </label>
     <label xml:lang="en">
       abstract (translated also)
+    </label>
+    <label xml:lang="it">
+      Un breve riassunto/abstract del contenuto del documento in diverse lingue.
     </label>
   </helpPopup>
   <!-- Abstract END -->
@@ -841,6 +916,12 @@
     <label xml:lang="en">
       Subject
     </label>
+    <label xml:lang="it">
+      Ogni parola chiave deve essere inserita in una singola casella.
+      Qualora si intenda utilizzare più parole chiave, si prega
+      di utilizzare il pulsante "+" per aggiungere un nuovo
+      campo.
+    </label>
   </helpPopup>
   <!-- Stichworte END -->
 
@@ -852,10 +933,13 @@
 
   <helpPopup id="mods.note.help" width="400px" height="250px">
     <label xml:lang="de">
-      Hier können beliebige Kommentare zum Dokument notiert werden
+      Hier können beliebige Kommentare zum Dokument notiert werden.
     </label>
     <label xml:lang="en">
       Comment
+    </label>
+    <label xml:lang="it">
+      Qui si possono facoltativamente lasciare commenti sul documento.
     </label>
   </helpPopup>
   <!-- Kommentar END -->
@@ -904,6 +988,12 @@
     <label xml:lang="en">
       Source
     </label>
+    <label xml:lang="it">
+      Fonti a stampa o elettroniche di un’ulteriore pubblicazione del documento in questione.
+      <br />
+      Nel caso di un documento retrodigitalizzato si tratterebbe ad esempio della sua versione a stampa.
+      In caso di locandine, abstract, etc. può essere indicato qui la manifestazione/l’opera alla quale si riferiscono.
+    </label>
   </helpPopup>
   <!-- Quelle END -->
 
@@ -919,34 +1009,42 @@
               <item value="isbn">
                 <label xml:lang="de">ISBN13</label>
                 <label xml:lang="en">ISBN13</label>
+                <label xml:lang="it">ISBN13</label>
               </item>
               <item value="urn">
                 <label xml:lang="de">URN</label>
                 <label xml:lang="en">URN</label>
+                <label xml:lang="it">URN</label>
               </item>
               <item value="uri">
                 <label xml:lang="de">URI</label>
                 <label xml:lang="en">URI</label>
+                <label xml:lang="it">URI</label>
               </item>
               <item value="handle">
                 <label xml:lang="de">Handle</label>
                 <label xml:lang="en">Handle</label>
+                <label xml:lang="it">Handle</label>
               </item>
               <item value="doi">
                 <label xml:lang="de">DOI</label>
                 <label xml:lang="en">DOI</label>
+                <label xml:lang="it">DOI</label>
               </item>
               <item value="project">
                 <label xml:lang="de">Projekt-Nr.</label>
                 <label xml:lang="en">project id</label>
+                <label xml:lang="ut">No. del progetto</label>
               </item>
               <item value="intern_old">
                 <label xml:lang="de">intern</label>
                 <label xml:lang="en">intern</label>
+                <label xml:lang="it">Interno</label>
               </item>
               <item value="unknown">
                 <label xml:lang="de">Unbekannt</label>
                 <label xml:lang="en">Unknown</label>
+                <label xml:lang="it">Sconosciuto</label>
               </item>
             </list>
           </cell>
@@ -967,38 +1065,47 @@
               <item value="issn">
                 <label xml:lang="de">ISSN</label>
                 <label xml:lang="en">ISSN</label>
+                <label xml:lang="it">ISSN</label>
               </item>
               <item value="zdbid">
                 <label xml:lang="de">ZDB-ID</label>
                 <label xml:lang="en">ZDB-ID</label>
+                <label xml:lang="it">ZDB-ID</label>
               </item>
               <item value="urn">
                 <label xml:lang="de">URN</label>
                 <label xml:lang="en">URN</label>
+                <label xml:lang="it">URN</label>
               </item>
               <item value="uri">
                 <label xml:lang="de">URI</label>
                 <label xml:lang="en">URI</label>
+                <label xml:lang="it">URI</label>
               </item>
               <item value="handle">
                 <label xml:lang="de">Handle</label>
                 <label xml:lang="en">Handle</label>
+                <label xml:lang="it">Handle</label>
               </item>
               <item value="doi">
                 <label xml:lang="de">DOI</label>
                 <label xml:lang="en">DOI</label>
+                <label xml:lang="it">DOI</label>
               </item>
               <item value="project">
                 <label xml:lang="de">Projekt-Nr.</label>
                 <label xml:lang="en">project id</label>
+                <label xml:lang="it">No. del progetto</label>
               </item>
               <item value="intern_old">
                 <label xml:lang="de">intern</label>
                 <label xml:lang="en">intern</label>
+                <label xml:lang="it">Interno</label>
               </item>
               <item value="unknown">
                 <label xml:lang="de">Unbekannt</label>
                 <label xml:lang="en">Unknown</label>
+                <label xml:lang="it">Sconosciuto</label>
               </item>
             </list>
           </cell>
@@ -1018,30 +1125,37 @@
               <item value="urn">
                 <label xml:lang="de">URN</label>
                 <label xml:lang="en">URN</label>
+                <label xml:lang="it">URN</label>
               </item>
               <item value="uri">
                 <label xml:lang="de">URI</label>
                 <label xml:lang="en">URI</label>
+                <label xml:lang="it">URI</label>
               </item>
               <item value="handle">
                 <label xml:lang="de">Handle</label>
                 <label xml:lang="en">Handle</label>
+                <label xml:lang="it">Handle</label>
               </item>
               <item value="doi">
                 <label xml:lang="de">DOI</label>
                 <label xml:lang="en">DOI</label>
+                <label xml:lang="it">DOI</label>
               </item>
               <item value="project">
                 <label xml:lang="de">Projekt-Nr.</label>
                 <label xml:lang="en">project id</label>
+                <label xml:lang="it">No. del progetto</label>
               </item>
               <item value="intern_old">
                 <label xml:lang="de">intern</label>
                 <label xml:lang="en">intern</label>
+                <label xml:lang="it">Interno</label>
               </item>
               <item value="unknown">
                 <label xml:lang="de">Unbekannt</label>
                 <label xml:lang="en">Unknown</label>
+                <label xml:lang="it">Sconosciuto</label>
               </item>
             </list>
           </cell>
@@ -1060,38 +1174,47 @@
               <item value="isbn">
                 <label xml:lang="de">ISBN13</label>
                 <label xml:lang="en">ISBN13</label>
+                <label xml:lang="it">ISBN13</label>
               </item>
               <item value="issn">
                 <label xml:lang="de">ISSN</label>
                 <label xml:lang="en">ISSN</label>
+                <label xml:lang="it">ISSN</label>
               </item>
               <item value="urn">
                 <label xml:lang="de">URN</label>
                 <label xml:lang="en">URN</label>
+                <label xml:lang="it">URN</label>
               </item>
               <item value="uri">
                 <label xml:lang="de">URI</label>
                 <label xml:lang="en">URI</label>
+                <label xml:lang="it">URI</label>
               </item>
               <item value="handle">
                 <label xml:lang="de">Handle</label>
                 <label xml:lang="en">Handle</label>
+                <label xml:lang="it">Handle</label>
               </item>
               <item value="doi">
                 <label xml:lang="de">DOI</label>
                 <label xml:lang="en">DOI</label>
+                <label xml:lang="it">DOI</label>
               </item>
               <item value="project">
                 <label xml:lang="de">Projekt-Nr.</label>
                 <label xml:lang="en">project id</label>
+                <label xml:lang="it">No. del progetto</label>
               </item>
               <item value="intern_old">
                 <label xml:lang="de">intern</label>
                 <label xml:lang="en">intern</label>
+                <label xml:lang="it">Interno</label>
               </item>
               <item value="unknown">
                 <label xml:lang="de">Unbekannt</label>
                 <label xml:lang="en">Unknown</label>
+                <label xml:lang="it">Sconosciuto</label>
               </item>
             </list>
           </cell>
@@ -1120,6 +1243,23 @@
     </label>
     <label xml:lang="en">
       Identifier (URN, DOI,...)
+    </label>
+    <label xml:lang="it">
+      <p>
+        Un identificatore è un codice univoco e fisso per una risorsa digitale o un’opera fisica. All’interno di questo campo è possibile inserire
+        più identificatori e di tipologie differenti (DOI, URN, URI ...)
+      </p>
+      <p>
+        Il codice ISBN è una sequenza numerica di 13 cifre usata internazionalmente per la ISBN13 classificazione dei libri e deve sempre essere
+        fornita sotto forma di ISBN13 - con trattini! Se si ha a disposizione solamente l'ISBN10, questo deve essere convertito (digitare sempre
+        978 davanti al codice e adattare il numero di controllo). Un esempio di convertitore online si trova a questo link:
+        <a href="http://www.isbn.org/converterpub.asp">http://www.isbn.org/converterpub.asp</a>
+      </p>
+      <p>
+        In caso fosse disponibile un DOI (Digital Object Identifier) della casa editrice, questo deve essere sempre inserito. Qualora venisse
+        specificato il PPN, deve essere inserito come URI.
+      </p>
+
     </label>
   </helpPopup>
   <!-- Identifier END -->
@@ -1154,6 +1294,8 @@
       werden.</label>
     <label xml:lang="en">Entry from the SDNB list. With "+" buttons can be selected additional
       SDNB categories.</label>
+    <label xml:lang="it">L'assegnazione del documento ad una categoria bibliografica. Per
+      aggiungere più categorie utilizzare il tasto “+”.</label>
   </helpPopup>
   <!-- SDNB pub_klassifik END -->
 
@@ -1223,6 +1365,15 @@
       fehlen, wenden Sie sich bitte an Ihren
       Systemadministrator.</label>
     <label xml:lang="en">Select an entry from the list.</label>
+    <label xml:lang="it">Con mezzi audiovisivi (supporti AV) vengono indicati quegli strumenti di
+      comunicazione che attraverso il suono
+      e l'immagine vengono recepiti dai sensi visivi e/o uditivi
+      dell'essere umano.
+      I mezzi AV possono essere analogici (ad esempio un nastro VHS) o digitali
+      (ad esempio un video MPEG codificato).
+      Selezionare quindi il tipo AV multimediale che si desidera catalogare.
+      Qualora manchino altre possibilità, si prega di contattare
+      l'amministratore di sistema.</label>
   </helpPopup>
   <!-- av_medium_genre END -->
 
@@ -1232,6 +1383,7 @@
   <helpPopup id="mods.genre.kindOfThesis.help" width="400px" height="250px">
     <label xml:lang="de">Es gibt verschiedene Arten von Hochschulschriften. Bitte spezifizieren Sie diese an dieser Stelle genauer.</label>
     <label xml:lang="en">Select an entry from the list.</label>
+    <label xml:lang="it">Esistono diverse tipologie di scritti accademici. Specificare esattamente di che tipo si tratta.</label>
   </helpPopup>
   <!-- thesis_genre END -->
 
@@ -1260,8 +1412,9 @@
 
 
   <helpPopup id="mods.nameConference.help" width="400px" height="250px">
-    <label xml:lang="de">Der Name der Konferenz ein.</label>
+    <label xml:lang="de">Tragen Sie hier den Namen der Konferenz ein.</label>
     <label xml:lang="en">Insert Conference Name.</label>
+    <label xml:lang="it">Inserire il titolo del convegno.</label>
   </helpPopup>
   <!-- Konferenztitel END -->
 
@@ -1278,6 +1431,7 @@
   <helpPopup id="mods.edition.help" width="400px" height="250px">
     <label xml:lang="de">Auflage des Buches, Konferenzbandes ...</label>
     <label xml:lang="en">Edition of a book, conference proceeding ...</label>
+    <label xml:lang="it">Edizione del libro, Atti di convegno</label>
   </helpPopup>
   <!-- Edition END -->
 
@@ -1293,10 +1447,11 @@
 
   <helpPopup id="mods.book.place.help" width="400px" height="250px">
     <label xml:lang="de">Bei Druckmedien oder digitalen Dokumenten, die von Verlagen herausgegeben wurden, wird
-      hier der Verlagsort
-      angegeben.
+      hier der Verlagsort angegeben.
     </label>
     <label xml:lang="en">Place</label>
+    <label xml:lang="it">In caso di documenti a stampa o documenti digitali emessi da editori, in
+      questo campo deve essere indicato il luogo di pubblicazione.</label>
   </helpPopup>
   <!-- Place END -->
 
@@ -1304,6 +1459,7 @@
   <helpPopup id="mods.volume.help" width="400px" height="250px">
     <label xml:lang="de">Wenn es sich um einen Teil einer Serie handelt, kann hier Band, Volume bzw. Jahrgang angeben werden.</label>
     <label xml:lang="en">Volume</label>
+    <label xml:lang="it">Qualora si tratti di un volume di una collana in questo campo possono esserene indicati il numero o l’annata di riferimento.</label>
   </helpPopup>
   <!-- Volume END -->
 
@@ -1320,6 +1476,7 @@
   <helpPopup id="mods.countryOfPublication.help" width="400px" height="250px">
     <label xml:lang="de">Erscheinungsland</label>
     <label xml:lang="en">Country of publication</label>
+    <label xml:lang="it">Paese di pubblicazione</label>
   </helpPopup>
   <!-- Country of publication END -->
 
@@ -1353,13 +1510,15 @@
   </panel>
 
   <helpPopup id="mods.book.part.extent.help" width="400px" height="250px">
-    <label xml:lang="de">Seitanangaben des Werkes (letzte bedruckte Seitenzahl angeben)</label>
+    <label xml:lang="de">Seitenanangaben des Werkes (letzte bedruckte Seitenzahl angeben)</label>
     <label xml:lang="en">Extent</label>
+    <label xml:lang="it">Numero di pagine dell’opera (indicare l’ultimo numero di pagina stampato sull’esemplare in questione).</label>
   </helpPopup>
 
   <helpPopup id="mods.av.media.extent.help" width="400px" height="250px">
     <label xml:lang="de">Größenangaben zum Medium.</label>
     <label xml:lang="en">Extent</label>
+    <label xml:lang="it">Dimensioni dell’oggetto.</label>
   </helpPopup>
   <!-- Extent|Part END -->
 
@@ -1455,14 +1614,17 @@
               <item value="">
                 <label xml:lang="de">(bitte wählen)</label>
                 <label xml:lang="en">(please select)</label>
+                <label xml:lang="it">(scegliere)</label>
               </item>
               <item value="yes">
                 <label xml:lang="de">Ja</label>
                 <label xml:lang="en">Yes</label>
+                <label xml:lang="it">Sì</label>
               </item>
               <item value="no">
                 <label xml:lang="de">Nein</label>
                 <label xml:lang="en">No</label>
+                <label xml:lang="it">No</label>
               </item>
             </list>
           </cell>
@@ -1489,6 +1651,18 @@
       oder "nicht referiert" steht dabei nicht in Zusammenhang mit dem "Impact Factor".
     </label>
     <label xml:lang="en">Characteristics: Journal Impact Factor (JIF) and is refereed</label>
+    <label xml:lang="it">
+      Nel caso delle riviste è possibile inserire altri dati di riconoscimento per annata, nello specifico:
+      <ul>
+        <li>Journal impact</li>
+        <li>Peer review</li>
+      </ul>
+      Il Journal Impact Factor (JIF) viene attribuito/assegnato annualmente. Il valore del JIF deve essere indicato
+      con un numero seguito da un punto al quale succedono 3 cifre. Ad esempio: 2.203 o 20.686
+      <br />
+      Un giornale/rivista con peer review garantisce una valutazione indipendente degli articoli da parte di esperti
+      del settore. Il criterio „con peer review“ o „senza peer review“ non ha quindi alcun rapporto con l’Impact Factor.
+    </label>
   </helpPopup>
   <!-- Kenndaten END -->
 
@@ -1533,6 +1707,14 @@
     <label xml:lang="en">
       URL is for an electronic location from which the resource is available.
     </label>
+    <label xml:lang="it">
+      Qui è possibile specificare un URL per il documento in questione, nel caso questo si trovi su siti terzi. Ad esempio
+      "http://www.springerlink.com/content/f7uw40686u422430/".
+      <br />
+      <br />
+      Questo campo non è adatto a ospitare altre eventuali indicazioni riferite al documento. Queste possono essere inserite
+      nel campo commento o nella descrizione.
+    </label>
   </helpPopup>
 
   <helpPopup id="mods.location.url.displayLabel.help" width="400px" height="250px">
@@ -1554,10 +1736,12 @@
         <item value="">
           <label xml:lang="de">(bitte wählen)</label>
           <label xml:lang="en">(please select)</label>
+          <label xml:lang="it">(scegliere)</label>
         </item>
         <item value="rights_reserved">
           <label xml:lang="de">Alle Rechte vorbehalten</label>
           <label xml:lang="en">All rights reserved</label>
+          <label xml:lang="it">Tutti i diritti riservati</label>
         </item>
         <item value="cc_by">
           <label xml:lang="de">CC BY</label>
@@ -1598,6 +1782,10 @@
       Rights/Licenses, e.g. CC. For more information see
       <a href="http://creativecommons.org/licenses/"> http://creativecommons.org/licenses/ </a>
     </label>
+    <label xml:lang="it">
+      Sotto quale licenza si desidera collocare il documento? Per maggiori informazioni, visitare il sito
+      <a href="http://www.creativecommons.it/Licenze"> http://www.creativecommons.it/Licenze </a>
+    </label>
   </helpPopup>
   <!-- Rights END -->
 
@@ -1606,10 +1794,13 @@
 
   <helpPopup id="mods.genre.journal.help" width="400px" height="250px">
     <label xml:lang="de">
-      xxx
+      Spezifizieren Sie hier bitte genauer die Art der unselbstständigen Literatur.
     </label>
     <label xml:lang="en">
-      xxx
+      Please specify type of literature.
+    </label>
+    <label xml:lang="it">
+
     </label>
   </helpPopup>
   <!-- Genre Journal/Series END -->
@@ -1679,6 +1870,7 @@
     <item value="">
       <label xml:lang="de">(bitte wählen)</label>
       <label xml:lang="en">(please select)</label>
+      <label xml:lang="it">(scegliere)</label>
     </item>
   </list>
 
