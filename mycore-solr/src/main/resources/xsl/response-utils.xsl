@@ -3,7 +3,6 @@
   xmlns:xalan="http://xml.apache.org/xalan" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
   xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" exclude-result-prefixes="acl mcrxsl encoder xalan i18n">
   <xsl:param name="RequestURL" />
-  <xsl:variable name="response" select="(/response|/*/response)[1]"/>
   <xsl:variable name="loginURL"
     select="concat( $ServletsBaseURL, 'MCRLoginServlet',$HttpSession,'?url=', encoder:encode( string( $RequestURL ) ) )" />
   <xsl:key name="derivate" match="/response/response[@subresult='derivate']/result/doc" use="str[@name='returnId']" />
@@ -13,18 +12,18 @@
   <xsl:key name="files-by-derivate"
     match="/response/response[@subresult='unmerged']/result/doc|/response/lst[@name='grouped']/lst[@name='returnId']/arr[@name='groups']/lst/result/doc[str[@name='objectType']='data_file']"
     use="str[@name='derivateID']" />
-  <xsl:variable name="params" select="$response/lst[@name='responseHeader']/lst[@name='params']" />
-  <xsl:variable name="result" select="$response/result[@name='response']" />
-  <xsl:variable name="groups" select="$response/lst[@name='grouped']/lst[@name='returnId']/arr[@name='groups']" />
+  <xsl:variable name="params" select="/response/lst[@name='responseHeader']/lst[@name='params']" />
+  <xsl:variable name="result" select="/response/result[@name='response']" />
+  <xsl:variable name="groups" select="/response/lst[@name='grouped']/lst[@name='returnId']/arr[@name='groups']" />
   <xsl:variable name="hits">
     <xsl:choose>
       <xsl:when test="$result/@numFound">
         <xsl:value-of select="number($result/@numFound)" />
       </xsl:when>
-      <xsl:when test="$response/lst[@name='grouped']/lst[@name='returnId']/int[@name='ngroups']">
+      <xsl:when test="/response/lst[@name='grouped']/lst[@name='returnId']/int[@name='ngroups']">
         <xsl:value-of select="number(/response/lst[@name='grouped']/lst[@name='returnId']/int[@name='ngroups'])" />
       </xsl:when>
-      <xsl:when test="$response/lst[@name='grouped']/lst[@name='returnId']/int[@name='matches']">
+      <xsl:when test="/response/lst[@name='grouped']/lst[@name='returnId']/int[@name='matches']">
         <xsl:value-of select="number(/response/lst[@name='grouped']/lst[@name='returnId']/int[@name='matches'])" />
       </xsl:when>
       <xsl:when test="$groups">
@@ -110,17 +109,22 @@
       </xsl:if>
     </xsl:for-each>
   </xsl:variable>
+  
   <xsl:template name="solr.Pagination">
     <xsl:param name="i" select="1" />
     <xsl:param name="href" select="concat($proxyBaseURL,$HttpSession,$solrParams)" />
     <xsl:param name="size" />
     <xsl:param name="currentpage" />
     <xsl:param name="totalpage" />
+    <xsl:param name="class" select="''"/>
     <xsl:variable name="prev" select="'«'" />
     <xsl:variable name="next" select="'»'" />
 
     <div class="text-center">
-      <ul class="pagination">
+      <ul>
+        <xsl:attribute name="class">
+          <xsl:value-of select="concat('pagination ',$class)" />
+        </xsl:attribute>
         <li>
           <xsl:choose>
             <xsl:when test="$currentpage = 1">
@@ -198,13 +202,16 @@
         <!-- current printed page number is smaller than current displayed page -->
         <xsl:when test="$i &lt; $currentpage">
           <xsl:choose>
-            <!-- This is to support a bigger PageWindow at the end of page listing and to skip a jump of 2 -->
+            <!-- This is to support a bigger PageWindow at the end of page listing and
+                to skip a jump of 2
+            -->
             <xsl:when
               test="(($totalpage - $PageWindowSize - 1) &lt;= $i) or
                                   (($currentpage - floor(($PageWindowSize -1) div 2) - 1) = 2)">
               <xsl:value-of select="1" />
             </xsl:when>
-            <!-- This is to support a bigger PageWindow at the begin of page listing -->
+                    <!-- This is to support a bigger PageWindow at the begin of page listing
+                    -->
             <xsl:when test="($totalpage - $currentpage) &lt; $PageWindowSize">
               <xsl:value-of select="($totalpage - $PageWindowSize - 1)" />
             </xsl:when>
@@ -218,7 +225,11 @@
         </xsl:when>
         <xsl:when test="$i &gt; $currentpage">
           <xsl:choose>
-            <!-- jump only one if your near currentpage, or at last page or to support bigger window at beginning or to skip a jump of 2 -->
+            <!-- jump only one if your near currentpage,
+                or at last page 
+                or to support bigger window at beginning
+                or to skip a jump of 2
+            -->
             <xsl:when
               test="( (($i - $currentpage) &lt; round(($PageWindowSize -1) div 2)) or ($i = $totalpage) or ($currentpage &lt;=$PageWindowSize and $i &lt;= $PageWindowSize) or ($totalpage - $i = 2))">
               <xsl:value-of select="1" />
@@ -309,14 +320,13 @@
       </xsl:when>
       <xsl:otherwise>
         <a href="{$linkTo}" itemprop="url">
-          <xsl:attribute name="title">
-            <xsl:value-of select="$displayText" />
-          </xsl:attribute>
-
           <xsl:variable name="shorter" select="mcrxsl:shortenText($displayText, 70)" />
           <span itemprop="name">
             <xsl:choose>
               <xsl:when test="string-length($displayText) != string-length($shorter)">
+                <xsl:attribute name="title">
+                <xsl:value-of select="$displayText" />
+              </xsl:attribute>
                 <xsl:value-of select="$shorter" />
               </xsl:when>
               <xsl:otherwise>
@@ -359,7 +369,7 @@
               <xsl:otherwise>
                 <xsl:if test="$isDisplayedEnabled = 'true'">
                   <span>
-                    <!-- Zugriff auf 'Abbildung' gesperrt -->
+                  <!-- Zugriff auf 'Abbildung' gesperrt -->
                     <xsl:value-of select="i18n:translate('metaData.derivateLocked',i18n:translate(concat('metaData.',$objectType,'.[derivates]')))" />
                   </span>
                 </xsl:if>
@@ -373,7 +383,7 @@
 
   <xsl:template match="doc" mode="fileLink">
     <xsl:param name="mcrid" select="str[@name='returnId']" />
-    <xsl:param name="derivateId" select="str[@name='derivateID']" />
+    <xsl:param name="derivateId" select="str[@name='derivateID']"/>
     <xsl:param name="fileNodeServlet" select="concat($ServletsBaseURL,'MCRFileNodeServlet/')" />
     <!-- doc element of 'unmerged' response -->
     <xsl:variable name="filePath" select="str[@name='filePath']" />
