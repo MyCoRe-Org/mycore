@@ -109,17 +109,22 @@
       </xsl:if>
     </xsl:for-each>
   </xsl:variable>
+  
   <xsl:template name="solr.Pagination">
     <xsl:param name="i" select="1" />
     <xsl:param name="href" select="concat($proxyBaseURL,$HttpSession,$solrParams)" />
     <xsl:param name="size" />
     <xsl:param name="currentpage" />
     <xsl:param name="totalpage" />
+    <xsl:param name="class" select="''"/>
     <xsl:variable name="prev" select="'«'" />
     <xsl:variable name="next" select="'»'" />
 
     <div class="text-center">
-      <ul class="pagination">
+      <ul>
+        <xsl:attribute name="class">
+          <xsl:value-of select="concat('pagination ',$class)" />
+        </xsl:attribute>
         <li>
           <xsl:choose>
             <xsl:when test="$currentpage = 1">
