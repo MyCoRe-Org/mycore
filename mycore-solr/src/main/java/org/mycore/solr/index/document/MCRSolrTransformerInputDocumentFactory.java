@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.transform.TransformerConfigurationException;
 
@@ -71,8 +70,8 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
             if (isJAXBTransformer) {
                 MCRParameterCollector param = new MCRParameterCollector();
                 @SuppressWarnings("unchecked")
-                MCRXSL2JAXBTransformer<JAXBElement<MCRSolrInputDocumentList>> jaxbTransformer = (MCRXSL2JAXBTransformer<JAXBElement<MCRSolrInputDocumentList>>) transformer;
-                MCRSolrInputDocumentList input = jaxbTransformer.getJAXBObject(content, param).getValue();
+                MCRXSL2JAXBTransformer<MCRSolrInputDocumentList> jaxbTransformer = (MCRXSL2JAXBTransformer<MCRSolrInputDocumentList>) transformer;
+                MCRSolrInputDocumentList input = jaxbTransformer.getJAXBObject(content, param);
                 document = MCRSolrInputDocumentGenerator.getSolrInputDocument(input.getDoc().iterator().next());
             } else {
                 MCRContent result = transformer.transform(content);
@@ -93,7 +92,8 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
     }
 
     @Override
-    public Iterator<SolrInputDocument> getDocuments(Map<MCRObjectID, MCRContent> contentMap) throws IOException, SAXException {
+    public Iterator<SolrInputDocument> getDocuments(Map<MCRObjectID, MCRContent> contentMap) throws IOException,
+        SAXException {
         if (contentMap.isEmpty()) {
             return Collections.emptyIterator();
         }
@@ -102,8 +102,8 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
             if (isJAXBTransformer) {
                 MCRParameterCollector param = new MCRParameterCollector();
                 @SuppressWarnings("unchecked")
-                MCRXSL2JAXBTransformer<JAXBElement<MCRSolrInputDocumentList>> jaxbTransformer = (MCRXSL2JAXBTransformer<JAXBElement<MCRSolrInputDocumentList>>) transformer;
-                MCRSolrInputDocumentList input = jaxbTransformer.getJAXBObject(new MCRJDOMContent(doc), param).getValue();
+                MCRXSL2JAXBTransformer<MCRSolrInputDocumentList> jaxbTransformer = (MCRXSL2JAXBTransformer<MCRSolrInputDocumentList>) transformer;
+                MCRSolrInputDocumentList input = jaxbTransformer.getJAXBObject(new MCRJDOMContent(doc), param);
                 return MCRSolrInputDocumentGenerator.getSolrInputDocuments(input.getDoc()).iterator();
             } else {
                 MCRContent result = transformer.transform(new MCRJDOMContent(doc));
@@ -114,7 +114,8 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
         }
     }
 
-    private Iterator<SolrInputDocument> getSolrInputDocuments(MCRContent result) throws IOException, SAXException, JDOMException {
+    private Iterator<SolrInputDocument> getSolrInputDocuments(MCRContent result) throws IOException, SAXException,
+        JDOMException {
         final Iterator<Element> delegate;
         delegate = result.asXML().getRootElement().getChildren("doc").iterator();
         return new Iterator<SolrInputDocument>() {
@@ -126,7 +127,8 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
 
             @Override
             public SolrInputDocument next() {
-                SolrInputDocument solrInputDocument = MCRSolrInputDocumentGenerator.getSolrInputDocument(delegate.next());
+                SolrInputDocument solrInputDocument = MCRSolrInputDocumentGenerator.getSolrInputDocument(delegate
+                    .next());
                 return solrInputDocument;
             }
 
@@ -137,7 +139,8 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
         };
     }
 
-    private Document getMergedDocument(Map<MCRObjectID, MCRContent> contentMap) throws IOException, SAXException, JDOMException {
+    private Document getMergedDocument(Map<MCRObjectID, MCRContent> contentMap) throws IOException, SAXException,
+        JDOMException {
         Element rootElement = new Element("add");
         Document doc = new Document(rootElement);
         for (Map.Entry<MCRObjectID, MCRContent> entry : contentMap.entrySet()) {
