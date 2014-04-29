@@ -66,23 +66,26 @@ public class MCRSolrInputDocumentGenerator {
         if (jaxbDoc.getBoost() != null) {
             doc.setDocumentBoost(jaxbDoc.getBoost().floatValue());
         }
-        for (MCRSolrInputField field : jaxbDoc.getField()) {
-            if (field.getValue().isEmpty() || duplicateFilter.contains(field)) {
-                continue;
+        for (Object o : jaxbDoc.getFieldOrDoc()) {
+            if (o instanceof MCRSolrInputField) {
+                MCRSolrInputField field = (MCRSolrInputField) o;
+                if (field.getValue().isEmpty() || duplicateFilter.contains(field)) {
+                    continue;
+                }
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("adding " + field.getName() + "=" + field.getValue());
+                }
+                duplicateFilter.add(field);
+                if (field.getBoost() != null) {
+                    doc.addField(field.getName(), field.getValue(), field.getBoost().floatValue());
+                } else {
+                    doc.addField(field.getName(), field.getValue());
+                }
+            } else if (o instanceof MCRSolrInputDocument) {
+                MCRSolrInputDocument child = (MCRSolrInputDocument) o;
+                SolrInputDocument solrChild = getSolrInputDocument(child);
+                doc.addChildDocument(solrChild);
             }
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("adding " + field.getName() + "=" + field.getValue());
-            }
-            duplicateFilter.add(field);
-            if (field.getBoost() != null) {
-                doc.addField(field.getName(), field.getValue(), field.getBoost().floatValue());
-            } else {
-                doc.addField(field.getName(), field.getValue());
-            }
-        }
-        for (MCRSolrInputDocument child : jaxbDoc.getDoc()) {
-            SolrInputDocument solrChild = getSolrInputDocument(child);
-            doc.addChildDocument(solrChild);
         }
         return doc;
     }

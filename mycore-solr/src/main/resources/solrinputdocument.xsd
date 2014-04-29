@@ -12,10 +12,10 @@
   </xs:complexType>
 
   <xs:complexType name="MCRSolrInputDocument">
-    <xs:sequence>
-      <xs:element name="field" maxOccurs="unbounded" minOccurs="0" type="MCRSolrInputField" />
-      <xs:element name="doc" maxOccurs="unbounded" minOccurs="0" type="MCRSolrInputDocument" />
-    </xs:sequence>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="field" type="MCRSolrInputField" />
+      <xs:element name="doc" type="MCRSolrInputDocument" />
+    </xs:choice>
     <!-- @id is only used in mycore -->
     <xs:attribute type="xs:ID" name="id" />
     <xs:attribute type="xs:decimal" name="boost" />
