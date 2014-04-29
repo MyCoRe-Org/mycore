@@ -14,6 +14,7 @@
   <xs:complexType name="MCRSolrInputDocument">
     <xs:sequence>
       <xs:element name="field" maxOccurs="unbounded" minOccurs="0" type="MCRSolrInputField" />
+      <xs:element name="doc" maxOccurs="unbounded" minOccurs="0" type="MCRSolrInputDocument" />
     </xs:sequence>
     <!-- @id is only used in mycore -->
     <xs:attribute type="xs:ID" name="id" />

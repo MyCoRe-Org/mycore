@@ -80,6 +80,10 @@ public class MCRSolrInputDocumentGenerator {
                 doc.addField(field.getName(), field.getValue());
             }
         }
+        for (MCRSolrInputDocument child : jaxbDoc.getDoc()) {
+            SolrInputDocument solrChild = getSolrInputDocument(child);
+            doc.addChildDocument(solrChild);
+        }
         return doc;
     }
 
@@ -118,6 +122,11 @@ public class MCRSolrInputDocumentGenerator {
             }
             duplicateFilter.add(field);
             doc.addField(field.getName(), field.getValue());
+        }
+        List<Element> docElements = input.getChildren("doc");
+        for (Element child : docElements) {
+            SolrInputDocument solrChild = getSolrInputDocument(child);
+            doc.addChildDocument(solrChild);
         }
         return doc;
     }
