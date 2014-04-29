@@ -72,8 +72,8 @@
     </sequential>
   </macrodef>
 
-  <!-- ================================= 
-  target: invoke.cli             
+  <!-- =================================
+  target: invoke.cli
   ================================= -->
   <target name="invoke.cli">
     <path id="cli.classpath">
@@ -93,8 +93,8 @@
       <env key="LD_LIBRARY_PATH" value="${env.LD_LIBRARY_PATH}" />
     </java>
   </target>
-  <!-- ================================= 
-  target: config              
+  <!-- =================================
+  target: config
   ================================= -->
   <target name="config" description="--> generates mycore.properties file">
     <property name="mycore.properties.target" location="${build.config}/mycore.properties" />
@@ -115,23 +115,32 @@
     <componentHook target="config" />
   </target>
 
-  <!-- ================================= 
-  target: info              
+  <!-- =================================
+  target: info
   ================================= -->
   <target name="info" description="--> prints some information about the integration">
     <echoproperties />
   </target>
 
-  <!-- ================================= 
-  target: webapp              
+  <!-- =================================
+  target: webapp
   ================================= -->
   <target name="webapp" description="--> integrates component in web application">
     <componentPreHook target="webapp" />
+    <echo level="info">copy ${build.config}/messages_*.properties for ${MCR.I18N.Languages}</echo>
+    <for list="${MCR.I18N.Languages}" param="lang" parallel="true">
+      <sequential>
+        <copy todir="${build.webapps}/WEB-INF/classes/" file="${build.config}/messages_@{lang}.properties" overwrite="true"/>
+      </sequential>
+    </for>
+    <move file="${build.webapps}/WEB-INF/classes/messages_${MCR.Metadata.DefaultLang}.properties" tofile="${build.webapps}/WEB-INF/classes/messages.properties"
+          overwrite="true"/>
+    <echo file="${build.webapps}/WEB-INF/classes/messages_${MCR.Metadata.DefaultLang}.properties" append="false">#look for properties in messages.properties</echo>
     <componentHook target="webapp" />
   </target>
 
-  <!-- ================================= 
-  target: i18n              
+  <!-- =================================
+  target: i18n
   ================================= -->
   <target name="i18n" description="--> adds i18n keys to the web application">
     <componentPreHook target="i18n" />
@@ -149,48 +158,48 @@
     <componentHook target="i18n" />
   </target>
 
-  <!-- ================================= 
-  target: compile              
+  <!-- =================================
+  target: compile
   ================================= -->
   <target name="compile" description="--> compiles component code for the application">
     <componentPreHook target="compile" />
     <componentHook target="compile" />
   </target>
 
-  <!-- ================================= 
-  target: create.default-rules              
+  <!-- =================================
+  target: create.default-rules
   ================================= -->
   <target name="create.default-rules" description="--> adds some default ACL rules to the application">
     <componentPreHook target="create.default-rules" />
     <componentHook target="create.default-rules" />
   </target>
 
-  <!-- ================================= 
-  target: create.scripts              
+  <!-- =================================
+  target: create.scripts
   ================================= -->
   <target name="create.scripts" description="--> adds component scripts to the application">
     <componentPreHook target="create.scripts" />
     <componentHook target="create.scripts" />
   </target>
 
-  <!-- ================================= 
-  target: create.users              
+  <!-- =================================
+  target: create.users
   ================================= -->
   <target name="create.users" description="--> adds user to the application">
     <componentPreHook target="create.users" />
     <componentHook target="create.users" />
   </target>
 
-  <!-- ================================= 
-  target: deploy              
+  <!-- =================================
+  target: deploy
   ================================= -->
   <target name="webservice.deploy" description="--> deploys components to the web application">
     <componentPreHook target="webservice.deploy" />
     <componentHook target="webservice.deploy" />
   </target>
 
-  <!-- ================================= 
-  target: undeply              
+  <!-- =================================
+  target: undeply
   ================================= -->
   <target name="webservice.undeploy" description="--> undeploys components from the web application">
     <componentPreHook target="webservice.undeploy" />
