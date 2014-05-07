@@ -79,7 +79,12 @@ abstract class MCRIViewClientConfiguration {
     }
     
     public static boolean isMobile(HttpServletRequest req){
-        return req.getHeader("User-Agent").indexOf("Mobile") != -1;
+        String mobileParameter = req.getParameter("mobile");
+        if(mobileParameter!= null){
+            return mobileParameter.toLowerCase().equals(Boolean.TRUE.toString());
+        } else {
+            return req.getHeader("User-Agent").indexOf("Mobile") != -1;
+        }
     }
 
 }
