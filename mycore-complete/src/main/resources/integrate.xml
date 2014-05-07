@@ -150,15 +150,6 @@
   ================================= -->
   <target name="webapp" description="--> integrates component in web application">
     <componentPreHook target="webapp" />
-    <echo level="info">copy ${build.config}/messages_*.properties for ${MCR.I18N.Languages}</echo>
-    <for list="${MCR.I18N.Languages}" param="lang" parallel="true">
-      <sequential>
-        <copy todir="${build.webapps}/WEB-INF/classes/" file="${build.config}/messages_@{lang}.properties" overwrite="true"/>
-      </sequential>
-    </for>
-    <move file="${build.webapps}/WEB-INF/classes/messages_${MCR.Metadata.DefaultLang}.properties" tofile="${build.webapps}/WEB-INF/classes/messages.properties"
-          overwrite="true"/>
-    <echo file="${build.webapps}/WEB-INF/classes/messages_${MCR.Metadata.DefaultLang}.properties" append="false">#look for properties in messages.properties</echo>
     <componentHook target="webapp" />
   </target>
 
