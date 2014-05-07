@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <artifactId>mycore</artifactId>
     <groupId>org.mycore</groupId>
@@ -39,7 +38,7 @@
               <jsSourceDir>META-INF/resources/modules/iview2/js</jsSourceDir>
               <jsSourceFiles>
                 <jsSourceFile>Utils.js</jsSourceFile>
-                <!--General Util Funktionen-->
+                <!--General Util Funktionen -->
                 <jsSourceFile>cache.js</jsSourceFile>
                 <!-- JavaScript Caching functionality -->
                 <jsSourceFile>jquery.mousewheel.min.js</jsSourceFile>
@@ -68,9 +67,9 @@
                 <jsSourceFile>chapter.js</jsSourceFile>
                 <!-- Galerie Klasse -->
                 <jsSourceFile>overview.js</jsSourceFile>
-                <!--Übersichtsbild Klasse-->
+                <!--Übersichtsbild Klasse -->
                 <jsSourceFile>METS.js</jsSourceFile>
-                <!--METS Klasse-->
+                <!--METS Klasse -->
                 <jsSourceFile>iview2.METS/ChapterModel.js</jsSourceFile>
                 <jsSourceFile>iview2.METS/ChapterModelProvider.js</jsSourceFile>
                 <jsSourceFile>iview2.METS/PhysicalEntry.js</jsSourceFile>
@@ -83,18 +82,18 @@
                 <jsSourceFile>iview2.scrollbar/scrollbarController.js</jsSourceFile>
                 <jsSourceFile>iview2.scrollbar/scrollbarView.js</jsSourceFile>
                 <jsSourceFile>iview2.scrollbar/scrollbarEvent.js</jsSourceFile>
-                <!--Scrollbar Klassen-->
+                <!--Scrollbar Klassen -->
                 <jsSourceFile>XML.js</jsSourceFile>
-                <!--XML Funktionen-->
+                <!--XML Funktionen -->
                 <jsSourceFile>urnOverlay.js</jsSourceFile>
                 <!-- Urn Toolbar -->
                 <jsSourceFile>storage.js</jsSourceFile>
                 <!-- Wrapper for html5 storage -->
-                <!-- iview.init END-->
+                <!-- iview.init END -->
                 <!-- menu -->
                 <jsSourceFile>../lib/fg-menu/fg.menu.js</jsSourceFile>
-                <!--  Model, Controller, View -->
-                <!--  needs Event.js -->
+                <!-- Model, Controller, View -->
+                <!-- needs Event.js -->
                 <jsSourceFile>iview2.toolbar/ToolbarManager.js</jsSourceFile>
                 <jsSourceFile>iview2.toolbar/ToolbarModel.js</jsSourceFile>
                 <jsSourceFile>iview2.toolbar/ToolbarButtonsetModel.js</jsSourceFile>
@@ -105,10 +104,10 @@
                 <jsSourceFile>iview2.toolbar/ToolbarImageModel.js</jsSourceFile>
                 <jsSourceFile>iview2.toolbar/ToolbarController.js</jsSourceFile>
                 <jsSourceFile>iview2.toolbar/ToolbarView.js</jsSourceFile>
-                <!--  ModelProvider -->
+                <!-- ModelProvider -->
                 <jsSourceFile>iview2.toolbar/StandardToolbarModelProvider.js</jsSourceFile>
                 <jsSourceFile>iview2.toolbar/PreviewToolbarModelProvider.js</jsSourceFile>
-                <!--  Canvas -->
+                <!-- Canvas -->
                 <jsSourceFile>canvas.js</jsSourceFile>
                 <jsSourceFile>canvas.rotate.js</jsSourceFile>
                 <!-- Permalink -->
@@ -164,7 +163,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-        <dependency>
+    <dependency>
       <groupId>org.mycore.iview2</groupId>
       <artifactId>image-tiler</artifactId>
     </dependency>
@@ -195,6 +194,14 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
     </dependency>
   </dependencies>
   <profiles>
