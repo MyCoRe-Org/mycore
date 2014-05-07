@@ -24,14 +24,24 @@
 package org.mycore.datamodel.classifications2.impl;
 
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.CriteriaSpecification;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.Subqueries;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -491,6 +501,16 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             category.getLabels().remove(oldLabel);
         }
         category.getLabels().add(label);
+        session.update(category);
+        updateTimeStamp();
+        updateLastModified(category.getRootID());
+    }
+
+    @Override
+    public void setLabels(MCRCategoryID id, Set<MCRLabel> labels) {
+        Session session = getHibConnection().getSession();
+        MCRCategoryImpl category = getByNaturalID(session, id);
+        category.setLabels(labels);
         session.update(category);
         updateTimeStamp();
         updateLastModified(category.getRootID());
