@@ -16,6 +16,7 @@ import org.mycore.frontend.classeditor.json.MCRJSONCategory;
 
 public class CategoryDAOMock implements MCRCategoryDAO {
     HashMap<MCRCategoryID, MCRCategory> categMap = null;
+
     HashMap<MCRCategoryID, MCRCategory> rootCategMap = null;
 
     private void buildTestCategs() {
@@ -23,12 +24,12 @@ public class CategoryDAOMock implements MCRCategoryDAO {
         MCRJSONCategory root_02 = createCategory("rootID_02", "", null);
         MCRJSONCategory categ_01 = createCategory("rootID_01", "categ_01", null);
         MCRJSONCategory categ_02 = createCategory("rootID_01", "categ_02", null);
-        
+
         List<MCRCategory> children = new ArrayList<MCRCategory>();
         children.add(categ_01);
         children.add(categ_02);
         root_01.setChildren(children);
-        
+
         rootCategMap.put(root_01.getId(), root_01);
         rootCategMap.put(root_02.getId(), root_02);
         categMap.put(root_01.getId(), root_01);
@@ -36,18 +37,18 @@ public class CategoryDAOMock implements MCRCategoryDAO {
         categMap.put(categ_01.getId(), categ_01);
         categMap.put(categ_02.getId(), categ_02);
     }
-    
-    public void init(){
+
+    public void init() {
         categMap = new HashMap<MCRCategoryID, MCRCategory>();
         rootCategMap = new HashMap<MCRCategoryID, MCRCategory>();
         buildTestCategs();
     }
-    
-    public Set<MCRCategoryID> getIds(){
+
+    public Set<MCRCategoryID> getIds() {
         return categMap.keySet();
     }
-    
-    public Collection<MCRCategory> getCategs(){
+
+    public Collection<MCRCategory> getCategs() {
         return categMap.values();
     }
 
@@ -151,7 +152,11 @@ public class CategoryDAOMock implements MCRCategoryDAO {
     @Override
     public void setLabel(MCRCategoryID id, MCRLabel label) {
     }
-    
+
+    @Override
+    public void setLabels(MCRCategoryID id, Set<MCRLabel> labels) {
+    }
+
     @Override
     public void setURI(MCRCategoryID id, URI uri) {
     }
@@ -166,8 +171,8 @@ public class CategoryDAOMock implements MCRCategoryDAO {
         return null;
     }
 
-	@Override
-	public long getLastModified(String root) {
-		return 0;
-	}
+    @Override
+    public long getLastModified(String root) {
+        return 0;
+    }
 }

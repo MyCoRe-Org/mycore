@@ -209,7 +209,8 @@ public class MCRClassificationEditorResource {
         try {
             MCRCategoryID categoryID = category.getId();
             if (CATEGORY_DAO.exist(categoryID)) {
-                if (categoryID.isRootID() && !MCRAccessManager.checkPermission(categoryID.getRootID(), PERMISSION_DELETE)) {
+                if (categoryID.isRootID()
+                    && !MCRAccessManager.checkPermission(categoryID.getRootID(), PERMISSION_DELETE)) {
                     throw new WebApplicationException(Status.UNAUTHORIZED);
                 }
                 CATEGORY_DAO.deleteCategory(categoryID);
@@ -245,7 +246,8 @@ public class MCRClassificationEditorResource {
                     MCRCategoryID mcrCategoryID = parsedCateg.getId();
                     if (isAdded && MCRCategoryDAOFactory.getInstance().exist(mcrCategoryID)) {
                         // an added category already exist -> throw conflict error
-                        return Response.status(Status.CONFLICT).entity(buildJsonError("duplicateID", mcrCategoryID)).build();
+                        return Response.status(Status.CONFLICT).entity(buildJsonError("duplicateID", mcrCategoryID))
+                            .build();
                     }
                     updateCateg(parsedCateg);
                 } else if ("delete".equals(status)) {
@@ -266,7 +268,7 @@ public class MCRClassificationEditorResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_HTML)
     public Response importClassification(@FormDataParam("classificationFile") InputStream uploadedInputStream,
-            @FormDataParam("classificationFile") FormDataContentDisposition fileDetail) {
+        @FormDataParam("classificationFile") FormDataContentDisposition fileDetail) {
         MCRCategory classification;
         try {
             Document jdom = MCRXMLParserFactory.getParser().parseXML(new MCRStreamContent(uploadedInputStream));
@@ -295,7 +297,8 @@ public class MCRClassificationEditorResource {
     @GET
     @Path("link/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response retrieveLinkedObjects(@PathParam("id") String id, @QueryParam("start") Integer start, @QueryParam("rows") Integer rows) throws SolrServerException, UnsupportedEncodingException {
+    public Response retrieveLinkedObjects(@PathParam("id") String id, @QueryParam("start") Integer start,
+        @QueryParam("rows") Integer rows) throws SolrServerException, UnsupportedEncodingException {
         // do solr query
         SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
         ModifiableSolrParams params = new ModifiableSolrParams();
@@ -383,10 +386,7 @@ public class MCRClassificationEditorResource {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
         if (CATEGORY_DAO.exist(categ.getId())) {
-            Set<MCRLabel> labels = categ.getLabels();
-            for (MCRLabel mcrLabel : labels) {
-                CATEGORY_DAO.setLabel(categ.getId(), mcrLabel);
-            }
+            CATEGORY_DAO.setLabels(categ.getId(), categ.getLabels());
             CATEGORY_DAO.setURI(categ.getId(), categ.getURI());
             if (newParentID != null) {
                 CATEGORY_DAO.moveCategory(categ.getId(), newParentID, categ.getPositionInParent());
