@@ -109,7 +109,7 @@ public class MCRParameterCollector {
             setSessionID(session, request.isRequestedSessionIdFromCookie());
         }
 
-        setUnmodifyableParameters(mcrSession);
+        setUnmodifyableParameters(mcrSession, request);
         debugSessionParameters();
     }
 
@@ -138,7 +138,7 @@ public class MCRParameterCollector {
         setFromConfiguration();
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         setFromSession(mcrSession);
-        setUnmodifyableParameters(mcrSession);
+        setUnmodifyableParameters(mcrSession, null);
         debugSessionParameters();
     }
 
@@ -262,16 +262,22 @@ public class MCRParameterCollector {
     /**
      * Sets some parameters that must not be overwritten by the request, for example
      * the user ID and the URL of the web application.
+     * 
+     * @param session
+     * @param request 
      */
-    private void setUnmodifyableParameters(MCRSession session) {
+    private void setUnmodifyableParameters(MCRSession session, HttpServletRequest request) {
         parameters.put("CurrentUser", session.getUserInformation().getUserID());
         parameters.put("CurrentLang", session.getCurrentLanguage());
         parameters.put("WebApplicationBaseURL", MCRServlet.getBaseURL());
         parameters.put("ServletsBaseURL", MCRServlet.getServletBaseURL());
-
-        String defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang",
-            MCRConstants.DEFAULT_LANG);
+        String defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
         parameters.put("DefaultLang", defaultLang);
+
+        if (request != null) {
+            parameters.put("User-Agent", request.getHeader("User-Agent"));
+        }
+
     }
 
     private void debugSessionParameters() {
