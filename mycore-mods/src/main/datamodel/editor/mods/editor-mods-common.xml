@@ -329,7 +329,7 @@
   <!-- TITLE Nebensachtitel END -->
 
   <!-- LANGUAGE -->
-  <text id="mods.languageTerm.label" i18n="component.mods.metaData.dictionary.languageTerm" />
+  <text id="mods.languageTerm.label" i18n="component.mods.metaData.dictionary.language" />
   <panel id="mods.languageTerm">
     <cell anchor="NORTHWEST" var="mods:languageTerm">
       <repeater min="1" pos="right">
