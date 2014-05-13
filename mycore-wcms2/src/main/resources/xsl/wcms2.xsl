@@ -9,7 +9,7 @@
   <xsl:param name="WebApplicationBaseURL" />
   <xsl:param name="returnUrl" select="$WebApplicationBaseURL" />
 
-  <xsl:variable name="dojoV" select="'1.6'" />
+  <xsl:variable name="dojoV" select="'1.6.2'" />
 
   <xsl:template match="/wcms2">
     <xsl:variable name="resourcesPath" select="concat($WebApplicationBaseURL, 'modules/wcms2/resources')" />
@@ -114,8 +114,8 @@
 
         <script type="text/javascript">
           function setup() {
-          var WCMS2 = new wcms.WCMS2();
-          WCMS2.start();
+            var WCMS2 = new wcms.WCMS2();
+            WCMS2.start();
           }
           dojo.ready(setup);
         </script>
