@@ -91,13 +91,19 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         }
 
         MCRFileStore store = MCRStoreManager.getStore(sid, MCRFileStore.class);
-        if (store == null)
-            store = createStore(sid, storeBaseDir);
+        if (store == null) {
+            synchronized (this) {
+                store = MCRStoreManager.getStore(sid, MCRFileStore.class);
+                if (store == null) {
+                    store = createStore(sid, storeBaseDir);
+                }
+            }
+        }
         store.prefix = prefix;
         return store;
     }
 
-    private synchronized MCRFileStore createStore(String sid, String storeBaseDir) {
+    private MCRFileStore createStore(String sid, String storeBaseDir) {
         try {
             configureStore(sid, storeBaseDir);
             return MCRStoreManager.createStore(sid, MCRFileStore.class);
