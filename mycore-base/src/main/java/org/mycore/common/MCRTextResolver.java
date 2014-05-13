@@ -76,8 +76,8 @@ public class MCRTextResolver {
      * @throws InvocationTargetException 
      * @throws NoSuchMethodException 
      */
-    protected void registerDefaultTerms() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException,
-            InstantiationException {
+    protected void registerDefaultTerms() throws NoSuchMethodException, InvocationTargetException,
+        IllegalAccessException, InstantiationException {
         registerTerm(Variable.class);
         registerTerm(Condition.class);
         registerTerm(EscapeCharacter.class);
@@ -93,7 +93,7 @@ public class MCRTextResolver {
      * @throws InstantiationException
      */
     public void registerTerm(Class<? extends Term> termClass) throws NoSuchMethodException, InvocationTargetException,
-            IllegalAccessException, InstantiationException {
+        IllegalAccessException, InstantiationException {
         this.termContainer.add(termClass);
     }
 
@@ -106,8 +106,8 @@ public class MCRTextResolver {
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
-    public void unregisterTerm(Class<? extends Term> termClass) throws NoSuchMethodException, InvocationTargetException,
-            InstantiationException, IllegalAccessException {
+    public void unregisterTerm(Class<? extends Term> termClass) throws NoSuchMethodException,
+        InvocationTargetException, InstantiationException, IllegalAccessException {
         this.termContainer.remove(termClass);
     }
 
@@ -121,33 +121,14 @@ public class MCRTextResolver {
     }
 
     /**
-     * Creates a new text resolver. To add variables call
-     * <code>addVariable</code>, otherwise only MyCoRe property
-     * resolving is possible.
-     */
-    public MCRTextResolver() {
-        this(new HashMap<String, String>());
-    }
-
-    /**
-     * 
-     * 
-     * @param properties
-     */
-    public MCRTextResolver(Properties properties) {
-        this(new HashMap<String, String>());
-        mixin(properties);
-    }
-
-    /**
      * Creates a new text resolver with a map of variables.
      * 
      * @param variablesMap a hash map of variables
      * @param depth how deep the text is resolved
      * @param retainText if the original text is retained if a variable coulnd't be resolved
      */
-    public MCRTextResolver(Map<String, String> variablesMap) {
-        this.variablesMap = variablesMap;
+    public MCRTextResolver() {
+        this.variablesMap = new HashMap<>();
         this.setResolveDepth(ResolveDepth.Deep);
         this.setRetainText(true);
         this.tracker = new CircularDependencyTracker(this);
@@ -157,6 +138,26 @@ public class MCRTextResolver {
         } catch (Exception exc) {
             throw new MCRException("Unable to register default terms", exc);
         }
+    }
+
+    /**
+     * Creates a new text resolver. To add variables call
+     * <code>addVariable</code>, otherwise only MyCoRe property
+     * resolving is possible.
+     */
+    public MCRTextResolver(Map<String, String> variablesMap) {
+        this();
+        mixin(variablesMap);
+    }
+
+    /**
+     * 
+     * 
+     * @param properties
+     */
+    public MCRTextResolver(Properties properties) {
+        this();
+        mixin(properties);
     }
 
     protected TermContainer getTermContainer() {
@@ -373,7 +374,8 @@ public class MCRTextResolver {
             TermContainer termContainer = this.getTextResolver().getTermContainer();
             for (Entry<String, Class<? extends Term>> termEntry : termContainer.getTermSet()) {
                 String startEnclosingStringOfTerm = termEntry.getKey();
-                if (text.startsWith(startEnclosingStringOfTerm, pos) && !startEnclosingStringOfTerm.equals(this.getEndEnclosingString())) {
+                if (text.startsWith(startEnclosingStringOfTerm, pos)
+                    && !startEnclosingStringOfTerm.equals(this.getEndEnclosingString())) {
                     try {
                         return termContainer.instantiate(termEntry.getValue());
                     } catch (Exception exc) {
@@ -442,9 +444,12 @@ public class MCRTextResolver {
          */
         private StringBuffer valueBuffer;
 
+        private boolean complete;
+
         public Variable(MCRTextResolver textResolver) {
             super(textResolver);
-            this.valueBuffer = new StringBuffer();
+            valueBuffer = new StringBuffer();
+            complete = false;
         }
 
         @Override
@@ -456,9 +461,11 @@ public class MCRTextResolver {
                 if (value == null) {
                     resolved = false;
                     if (getTextResolver().isRetainText()) {
-                        this.valueBuffer.append(getStartEnclosingString()).append(termBuffer.toString()).append(getEndEnclosingString());
+                        this.valueBuffer.append(getStartEnclosingString()).append(termBuffer.toString())
+                            .append(getEndEnclosingString());
                     }
                     this.untrack();
+                    complete = true;
                     return true;
                 }
                 // resolve the content of the variable recursive
@@ -471,6 +478,7 @@ public class MCRTextResolver {
                 // set the value of the variable
                 valueBuffer.append(value);
                 this.untrack();
+                complete = true;
                 return true;
             }
             termBuffer.append(text.charAt(pos));
@@ -479,6 +487,12 @@ public class MCRTextResolver {
 
         @Override
         public String getValue() {
+            if (!complete) {
+                // assume that the variable is not complete 
+                StringBuffer buf = new StringBuffer();
+                buf.append(getStartEnclosingString()).append(termBuffer.toString());
+                return buf.toString();
+            }
             return valueBuffer.toString();
         }
 
@@ -504,7 +518,8 @@ public class MCRTextResolver {
         }
 
         protected String getTrackID() {
-            return new StringBuffer(getStartEnclosingString()).append(termBuffer.toString()).append(getEndEnclosingString()).toString();
+            return new StringBuffer(getStartEnclosingString()).append(termBuffer.toString())
+                .append(getEndEnclosingString()).toString();
         }
 
         /**
@@ -637,20 +652,20 @@ public class MCRTextResolver {
             this.textResolver = textResolver;
         }
 
-        public Term instantiate(Class<? extends Term> termClass) throws InvocationTargetException, NoSuchMethodException,
-                InstantiationException, IllegalAccessException {
+        public Term instantiate(Class<? extends Term> termClass) throws InvocationTargetException,
+            NoSuchMethodException, InstantiationException, IllegalAccessException {
             Constructor<? extends Term> c = termClass.getConstructor(MCRTextResolver.class);
             return c.newInstance(this.textResolver);
         }
 
-        public void add(Class<? extends Term> termClass) throws InvocationTargetException, NoSuchMethodException, InstantiationException,
-                IllegalAccessException {
+        public void add(Class<? extends Term> termClass) throws InvocationTargetException, NoSuchMethodException,
+            InstantiationException, IllegalAccessException {
             Term term = instantiate(termClass);
             this.termMap.put(term.getStartEnclosingString(), termClass);
         }
 
         public void remove(Class<? extends Term> termClass) throws InvocationTargetException, NoSuchMethodException,
-                InstantiationException, IllegalAccessException {
+            InstantiationException, IllegalAccessException {
             Term term = instantiate(termClass);
             this.termMap.remove(term.getStartEnclosingString());
         }
@@ -671,7 +686,7 @@ public class MCRTextResolver {
             this.trackMap = new HashMap<>();
         }
 
-        public void track(String type, String id) {
+        public void track(String type, String id) throws CircularDependencyExecption {
             List<String> idList = trackMap.get(type);
             if (idList == null) {
                 idList = new ArrayList<>();
@@ -686,7 +701,7 @@ public class MCRTextResolver {
         public void untrack(String type, String id) {
             List<String> idList = trackMap.get(type);
             if (idList == null) {
-                // this should not happen, maybe print WARN?
+                LOGGER.error("text resolver circular dependency tracking error: cannot get type " + type + " of " + id);
                 return;
             }
             idList.remove(id);
@@ -720,6 +735,14 @@ public class MCRTextResolver {
             }
             msg.append(id);
             return msg.toString();
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public List<String> getDependencyList() {
+            return dependencyList;
         }
 
     }

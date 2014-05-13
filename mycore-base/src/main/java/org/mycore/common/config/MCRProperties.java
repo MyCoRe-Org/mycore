@@ -84,4 +84,20 @@ public class MCRProperties extends Properties {
         Map<String, String> returns = compileFix;
         return returns;
     }
+
+    /**
+     * Creates a new <code>MCRProperties</code> instance with the values
+     * of the given properties.
+     * 
+     * @param properties
+     * @return
+     */
+    public static MCRProperties copy(Properties properties) {
+        MCRProperties p = new MCRProperties();
+        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+            p.put(entry.getKey(), entry.getValue());
+        }
+        return p;
+    }
+
 }

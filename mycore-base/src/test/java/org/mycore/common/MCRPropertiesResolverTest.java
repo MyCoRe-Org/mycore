@@ -32,4 +32,16 @@ public class MCRPropertiesResolverTest {
         assertEquals("/home/user/base/subdir/file.txt", resolvedProperties.get("Sample.file"));
     }
 
+    @Test
+    public void selfReference() {
+        MCRConfiguration.instance().set("a", "%a%,hallo");
+        MCRConfiguration.instance().set("b", "hallo,%b%,welt");
+        MCRConfiguration.instance().set("c", "%b%,%a%");
+        Map<String, String> p = MCRConfiguration.instance().getPropertiesMap();
+        MCRPropertiesResolver resolver = new MCRPropertiesResolver(p);
+        assertEquals("hallo", resolver.resolve("%a%"));
+        assertEquals("hallo,welt", resolver.resolve("%b%"));
+        assertEquals("hallo,welt,hallo", resolver.resolve("%c%"));
+    }
+
 }

@@ -20,12 +20,35 @@ import java.util.Properties;
  */
 public class MCRPropertiesResolver extends MCRTextResolver {
 
+    public MCRPropertiesResolver() {
+        super();
+    }
+
+    public MCRPropertiesResolver(Map<String, String> propertiesMap) {
+        super(propertiesMap);
+    }
+
     public MCRPropertiesResolver(Properties properties) {
         super(properties);
     }
 
-    public MCRPropertiesResolver(Map<String, String> variablesMap) {
-        super(variablesMap);
+    @Override
+    public String addVariable(String name, String value) {
+        return super.addVariable(name, removeSelfReference(name, value));
+    }
+
+    private String removeSelfReference(String name, String value) {
+        int pos1 = value.indexOf("%");
+        if (pos1 != -1) {
+            int pos2 = value.indexOf("%", pos1 + 1);
+            if (pos2 != -1) {
+                String ref = value.substring(pos1 + 1, pos2);
+                if (name.equals(ref)) {
+                    return value.replaceAll("\\s*%" + name + "%\\s*,?", "");
+                }
+            }
+        }
+        return value;
     }
 
     @Override
@@ -61,7 +84,7 @@ public class MCRPropertiesResolver extends MCRTextResolver {
         Properties resolvedProperties = new Properties();
         for (Entry<Object, Object> entrySet : toResolve.entrySet()) {
             String key = entrySet.getKey().toString();
-            String value = entrySet.getValue().toString();
+            String value = removeSelfReference(key, entrySet.getValue().toString());
             String resolvedValue = this.resolve(value);
             resolvedProperties.put(key, resolvedValue);
         }
@@ -75,13 +98,14 @@ public class MCRPropertiesResolver extends MCRTextResolver {
      * @param toResolve properties to resolve
      * @return resolved properties
      */
-    public Map<String,String> resolveAll(Map<String, String> toResolve){
-        Map<String, String> resolvedMap=new HashMap<>();
+    public Map<String, String> resolveAll(Map<String, String> toResolve) {
+        Map<String, String> resolvedMap = new HashMap<>();
         for (Entry<String, String> entrySet : toResolve.entrySet()) {
             String key = entrySet.getKey();
-            String value = entrySet.getValue();
+            String value = removeSelfReference(key, entrySet.getValue());
             resolvedMap.put(key, this.resolve(value));
         }
         return resolvedMap;
     }
+
 }

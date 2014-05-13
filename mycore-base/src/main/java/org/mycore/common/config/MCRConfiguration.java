@@ -32,7 +32,6 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
-import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -50,6 +49,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.SimpleLayout;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRPropertiesResolver;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -134,14 +134,19 @@ public class MCRConfiguration {
 
     /**
      * The properties instance that stores the values that have been read from
-     * every configuration file
+     * every configuration file. These properties are unresolved
      */
-    protected MCRProperties properties;
+    protected MCRProperties baseProperties;
+
+    /**
+     * The same as baseProperties but all %properties% are resolved.
+     */
+    protected MCRProperties resolvedProperties;
 
     /**
      * List of deprecated properties with their new name
      */
-    protected Properties depr;
+    protected MCRProperties deprecatedProperties;
 
     static {
         createSingleton();
@@ -234,9 +239,10 @@ public class MCRConfiguration {
      * @throws IOException 
      */
     protected MCRConfiguration() throws IOException {
-        properties = new MCRProperties();
-        depr = new Properties();
-        substituteDeprecatedProperties();
+        baseProperties = new MCRProperties();
+        resolvedProperties = new MCRProperties();
+        deprecatedProperties = new MCRProperties();
+        loadDeprecatedProperties();
         createLastModifiedFile();
     }
 
@@ -247,7 +253,7 @@ public class MCRConfiguration {
      */
     protected void createLastModifiedFile() throws IOException {
         final String dataDirKey = "MCR.datadir";
-        if (properties.containsKey(dataDirKey)) {
+        if (getResolvedProperties().containsKey(dataDirKey)) {
             File dataDir = new File(getString(dataDirKey));
             if (dataDir.exists() && dataDir.isDirectory()) {
                 lastModifiedFile = new File(getString(dataDirKey), ".systemTime");
@@ -317,86 +323,64 @@ public class MCRConfiguration {
             }
 
         };
-        tmp.putAll(properties);
+        tmp.putAll(getResolvedProperties());
         return tmp;
     }
 
     /**
-     * Substitute any %reference% in any property value with the value of the
-     * referenced property, recursively.
+     * Substitute all %properties%.
      */
-    private void substituteReferences() {
-        boolean found;
-        do {
-            found = false;
-            Enumeration<Object> keys = properties.keys();
-            while (keys.hasMoreElements()) {
-                String key = (String) keys.nextElement();
-                String value = properties.getProperty(key, "");
-                int pos1 = value.indexOf("%");
-                if (pos1 >= 0) {
-                    int pos2 = value.indexOf("%", pos1 + 1);
-                    if (pos2 == -1) {
-                        continue;
-                    }
-
-                    String ref = value.substring(pos1 + 1, pos2);
-                    if (key.equals(ref)) {
-                        String newValue = value.replaceAll(",?\\s*%" + key + "%\\s*,?", "");
-                        String msg = MessageFormat.format("Self refering property found: {0}={1}\nSetting {2}={3}",
-                            key, value, key, newValue);
-                        logWarn(msg, null);
-                        properties.setProperty(key, newValue);
-                        continue;
-                    } else {
-                        String refValue = properties.getProperty(ref, null);
-                        if (refValue == null) {
-                            continue;
-                        }
-                        found = true;
-                        value = value.substring(0, pos1) + refValue + value.substring(pos2 + 1);
-                        properties.setProperty(key, value);
-                    }
+    protected synchronized void resolveProperties() {
+        MCRProperties tmpProperties = MCRProperties.copy(getBaseProperties());
+        Enumeration<Object> names = getDeprecatedProperties().keys();
+        while (names.hasMoreElements()) {
+            String deprecatedName = (String) names.nextElement();
+            if (getBaseProperties().containsKey(deprecatedName)) {
+                String newName = getDeprecatedProperties().getProperty(deprecatedName);
+                String msg = "DEPRECATED: User should rename property " + deprecatedName + " to " + newName;
+                logWarn(msg, null);
+                if (!getBaseProperties().containsKey(newName)) {
+                    tmpProperties.put(newName, getBaseProperties().get(deprecatedName).toString());
                 }
             }
-        } while (found);
+        }
+        MCRPropertiesResolver resolver = new MCRPropertiesResolver(tmpProperties);
+        resolvedProperties = MCRProperties.copy(resolver.resolveAll(tmpProperties));
     }
 
     /**
      * Loads file deprecated.properties that can be used to rename old properties.
      * The file contains a list of renamed properties: OldPropertyName=NewPropertyName.
      * The old property is automatically replaced with the new name, so that
-     * existing mycore.properties files must not be migrated immediately. Users get a
-     * warning when their configuration still contains deprecated properties. 
+     * existing mycore.properties files must not be migrated immediately.
      */
-    private void substituteDeprecatedProperties() {
+    private void loadDeprecatedProperties() {
         InputStream in = this.getClass().getResourceAsStream("/deprecated.properties");
         if (in == null) {
             return;
         }
         try {
-            depr.load(in);
+            getDeprecatedProperties().load(in);
             in.close();
         } catch (Exception exc) {
             throw new MCRConfigurationException("Could not load configuration file deprecated.properties", exc);
         }
+    }
 
-        Enumeration<Object> names = depr.keys();
-        while (names.hasMoreElements()) {
-            String deprecatedName = (String) names.nextElement();
-            if (properties.containsKey(deprecatedName)) {
-                String newName = depr.getProperty(deprecatedName);
-                String msg = "DEPRECATED: User should rename property " + deprecatedName + " to " + newName;
-                logWarn(msg, null);
-                if (!properties.containsKey(newName)) {
-                    properties.put(newName, properties.get(deprecatedName));
-                }
-            }
-        }
+    private MCRProperties getResolvedProperties() {
+        return resolvedProperties;
+    }
+
+    private MCRProperties getBaseProperties() {
+        return baseProperties;
+    }
+
+    public MCRProperties getDeprecatedProperties() {
+        return deprecatedProperties;
     }
 
     public Map<String, String> getPropertiesMap() {
-        return Collections.unmodifiableMap(properties.getAsMap());
+        return Collections.unmodifiableMap(getResolvedProperties().getAsMap());
     }
 
     /**
@@ -422,7 +406,7 @@ public class MCRConfiguration {
     public synchronized void configureLogging() {
         Properties prop = new Properties();
         @SuppressWarnings("unchecked")
-        Enumeration<String> names = (Enumeration<String>) properties.propertyNames();
+        Enumeration<String> names = (Enumeration<String>) getResolvedProperties().propertyNames();
         boolean reconfigure = false;
         java.util.List<String> warn = new java.util.ArrayList<String>();
 
@@ -431,7 +415,7 @@ public class MCRConfiguration {
             if (!name.contains("log4j")) {
                 continue;
             }
-            String value = properties.getProperty(name);
+            String value = getResolvedProperties().getProperty(name);
             if (name.startsWith("MCR.log4j")) {
                 warn.add(name);
                 name = name.substring(4);
@@ -644,17 +628,16 @@ public class MCRConfiguration {
      * @return the value of the configuration property as a String
      */
     public String getString(String name, String defaultValue) {
-        checkInitialized();
-        if (depr.containsKey(name)) {
-            String msg = "DEPRECATED: Developer should rename property " + name + " to " + depr.getProperty(name);
+        if (getBaseProperties().isEmpty()) {
+            throw new MCRConfigurationException("MCRConfiguration is still not initialized");
+        }
+        MCRProperties properties = getResolvedProperties();
+        if (getDeprecatedProperties().containsKey(name)) {
+            String msg = "DEPRECATED: Developer should rename property " + name + " to "
+                + getDeprecatedProperties().getProperty(name);
             logWarn(msg, null);
         }
-
         String value = properties.getProperty(name);
-        if (value == null && depr.containsKey(name)) {
-            value = properties.getProperty(depr.getProperty(name));
-        }
-
         return value == null ? defaultValue : value.trim();
     }
 
@@ -866,28 +849,29 @@ public class MCRConfiguration {
      */
     public void set(String name, String value) {
         if (value == null) {
-            properties.remove(name);
+            getBaseProperties().remove(name);
         } else {
-            properties.setProperty(name, value);
+            getBaseProperties().setProperty(name, value);
         }
+        resolveProperties();
     }
 
     public synchronized void initialize(Map<String, String> props, boolean clear) {
         HashMap<String, String> copy = new HashMap<>(props);
         copy.remove(null);
         if (clear) {
-            properties.clear();
+            getBaseProperties().clear();
         } else {
             Map<String, String> nullValues = Maps.filterValues(copy, Predicates.<String> isNull());
             for (String key : nullValues.keySet()) {
-                properties.remove(key);
+                getBaseProperties().remove(key);
             }
         }
         Map<String, String> notNullValues = Maps.filterValues(copy, Predicates.notNull());
         for (Entry<String, String> entry : notNullValues.entrySet()) {
-            properties.setProperty(entry.getKey(), entry.getValue());
+            getBaseProperties().setProperty(entry.getKey(), entry.getValue());
         }
-        substituteReferences();
+        resolveProperties();
         if (clear) {
             configureLogging();
         }
@@ -973,7 +957,7 @@ public class MCRConfiguration {
      *            the PrintStream to list the configuration properties on
      */
     public void list(PrintStream out) {
-        properties.list(out);
+        getResolvedProperties().list(out);
     }
 
     /**
@@ -986,7 +970,7 @@ public class MCRConfiguration {
      *            the PrintWriter to list the configuration properties on
      */
     public void list(PrintWriter out) {
-        properties.list(out);
+        getResolvedProperties().list(out);
     }
 
     /**
@@ -1003,7 +987,7 @@ public class MCRConfiguration {
      *             </CODE>
      */
     public void store(OutputStream out, String header) throws IOException {
-        properties.store(out, header);
+        getResolvedProperties().store(out, header);
     }
 
     /**
@@ -1018,7 +1002,7 @@ public class MCRConfiguration {
      */
     @Override
     public String toString() {
-        return properties.toString();
+        return getResolvedProperties().toString();
     }
 
     private void logWarn(String msg, Throwable throwable) {
@@ -1041,12 +1025,6 @@ public class MCRConfiguration {
             Logger.getLogger(getClass()).debug(msg);
         } else {
             System.out.printf("DEBUG: %s\n", msg);
-        }
-    }
-
-    private void checkInitialized() {
-        if (properties.isEmpty()) {
-            throw new MCRConfigurationException("MCRConfiguration is still not initialized");
         }
     }
 

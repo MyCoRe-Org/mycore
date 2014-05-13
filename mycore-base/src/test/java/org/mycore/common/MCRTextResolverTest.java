@@ -45,6 +45,8 @@ public class MCRTextResolverTest extends MCRTestCase {
         // resolving variables in an other variable
         assertEquals("value1", resolver.resolve("{x_{num}[_{add}]}"));
         assertEquals("value2", resolver.resolve("{x_{num}[_{add2}]}"));
+        // uncompleted variable
+        assertEquals("{f1 v2", resolver.resolve("{f1 [{f2}]"));
     }
 
     @Test
