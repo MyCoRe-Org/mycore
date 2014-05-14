@@ -2,7 +2,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:acl="xalan://org.mycore.access.MCRAccessManager" xmlns:mcr="http://www.mycore.org/"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:encoder="xalan://java.net.URLEncoder"
-  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" exclude-result-prefixes="xalan xlink mcr i18n acl mods mcrxsl encoder" version="1.0">
+  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mcrurn="xalan://org.mycore.urn.MCRXMLFunctions" exclude-result-prefixes="xalan xlink mcr i18n acl mods mcrxsl mcrurn encoder" version="1.0">
   <xsl:param select="'local'" name="objectHost" />
   <xsl:param name="MCR.Users.Superuser.UserName" />
   <xsl:include href="mods-utils.xsl" />
@@ -364,7 +364,7 @@
               <div class="derivateBox">
                 <xsl:variable select="concat('mcrobject:',$deriv)" name="derivlink" />
                 <xsl:variable select="document($derivlink)" name="derivate" />
-                <xsl:variable name="derivateWithURN" select="mcrxsl:hasURNDefined($deriv)" />
+                <xsl:variable name="derivateWithURN" select="mcrurn:hasURNDefined($deriv)" />
 
                 <xsl:apply-templates select="$derivate/mycorederivate/derivate/internals" />
                 <xsl:if test="$derivateWithURN">
@@ -461,7 +461,7 @@
     </xsl:variable>
     <xsl:variable name="hasDerivateWithURN">
       <xsl:for-each select="./structure/derobjects/derobject">
-        <xsl:if test="mcrxsl:hasURNDefined(@xlink:href)">
+        <xsl:if test="mcrurn:hasURNDefined(@xlink:href)">
           <xsl:value-of select="true()" />
         </xsl:if>
       </xsl:for-each>
