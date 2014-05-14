@@ -197,7 +197,12 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * @param realmID the ID of the realm the user belongs to.
      */
     void setRealmID(String realmID) {
-        setRealm(MCRRealmFactory.getRealm(realmID));
+    	if(realmID==null){
+    		setRealm(MCRRealmFactory.getLocalRealm());
+    	}
+    	else{
+    		setRealm(MCRRealmFactory.getRealm(realmID));
+    	}
     }
 
     /**
