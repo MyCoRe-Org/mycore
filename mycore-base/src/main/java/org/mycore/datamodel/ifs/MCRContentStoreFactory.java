@@ -87,7 +87,11 @@ public class MCRContentStoreFactory {
             return null;
         }
         if (!STORES.containsKey(storeID)) {
-            initStore(storeID);
+            synchronized (STORES) {
+                if (!STORES.containsKey(storeID)){
+                    initStore(storeID);
+                }
+            }
         }
         return STORES.get(storeID);
     }
