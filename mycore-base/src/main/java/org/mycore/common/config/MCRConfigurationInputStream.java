@@ -143,7 +143,8 @@ public class MCRConfigurationInputStream extends InputStream {
 
     private static ByteArrayInputStream getBaseDirInputStream(File configurationDirectory) throws IOException {
         Properties dataProp = new Properties();
-        dataProp.setProperty("MCR.basedir", configurationDirectory.getAbsolutePath());
+        //On Windows we require forward slashes
+        dataProp.setProperty("MCR.basedir", configurationDirectory.getAbsolutePath().replace('\\', '/'));
         ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
         dataProp.store(out, null);
         ByteArrayInputStream inputStream = new ByteArrayInputStream(out.toByteArray());
