@@ -87,6 +87,15 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
                 splitup(documents);
                 return;
             }
+            if (LOGGER.isDebugEnabled()) {
+                ArrayList<SolrInputDocument> debugList = new ArrayList<>();
+                while (documents.hasNext()) {
+                    debugList.add(documents.next());
+                }
+                LOGGER.debug("Sending these documents: " + debugList);
+                //recreate documents interator;
+                documents = debugList.iterator();
+            }
             if (server instanceof HttpSolrServer) {
                 updateResponse = ((HttpSolrServer) server).add(documents);
             } else {
@@ -105,7 +114,8 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
             LOGGER.error("Error while indexing document collection. Split and retry: " + updateResponse.getResponse());
             splitup();
         } else {
-            LOGGER.info("Sending " + totalCount + " documents was successful in " + updateResponse.getElapsedTime() + " ms.");
+            LOGGER.info("Sending " + totalCount + " documents was successful in " + updateResponse.getElapsedTime()
+                + " ms.");
         }
 
     }
@@ -121,7 +131,8 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
 
     private void splitup() {
         for (Map.Entry<MCRObjectID, MCRContent> entry : contentMap.entrySet()) {
-            MCRSolrMCRContentIndexHandler subHandler = new MCRSolrMCRContentIndexHandler(entry.getKey(), entry.getValue(), getSolrServer());
+            MCRSolrMCRContentIndexHandler subHandler = new MCRSolrMCRContentIndexHandler(entry.getKey(),
+                entry.getValue(), getSolrServer());
             subHandler.setCommitWithin(getCommitWithin());
             subhandlers.add(subHandler);
         }
