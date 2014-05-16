@@ -180,7 +180,8 @@ public class MCRPersistentServlet extends MCRServlet {
                 inDoc = sub.getXML();
             else if (failOnMissing)
                 throw new ServletException("No MCREditorSubmission");
-            return null;
+            else
+                return null;
         }
         if (inDoc.getRootElement().getAttribute("ID") == null) {
             String mcrID = getProperty(job.getRequest(), "mcrid");
