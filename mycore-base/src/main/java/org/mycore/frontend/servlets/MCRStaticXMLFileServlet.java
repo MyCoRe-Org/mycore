@@ -103,6 +103,9 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
 
         URL resource = getServletContext().getResource(requestedPath);
         if (resource != null) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Resolved to " + resource);
+            }
             return resource;
         }
 
