@@ -718,6 +718,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         transformer.transform(new JDOMSource(doc), result);
         // write to mycore
         MCRXMLMetadataManager.instance().update(mcrId, result.getDocument(), new Date(System.currentTimeMillis()));
+        MCRMetadataManager.fireUpdateEvent(MCRMetadataManager.retrieveMCRObject(mcrId));
     }
 
     /**
