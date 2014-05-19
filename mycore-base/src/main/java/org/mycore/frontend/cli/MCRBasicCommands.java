@@ -19,10 +19,13 @@ package org.mycore.frontend.cli;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfigurationDir;
@@ -135,7 +138,7 @@ public class MCRBasicCommands {
     }
 
     @MCRCommand(syntax = "create configuration directory", help = "Creates the MCRConfiguration directory if it does not exist.", order = 130)
-    public static void createConfigurationDirectory() {
+    public static void createConfigurationDirectory() throws IOException {
         File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
         ArrayList<File> directories = new ArrayList<>(3);
         directories.add(configurationDirectory);
@@ -146,20 +149,42 @@ public class MCRBasicCommands {
                 break;
             }
         }
+        createSampleConfigFile("mycore.properties");
+        createSampleConfigFile("hibernate.cfg.xml");
     }
 
     private static boolean createDirectory(File directory) {
-        Logger logger = Logger.getLogger(MCRBasicCommands.class);
         if (directory.exists()) {
-            logger.warn("Directory " + directory.getAbsolutePath() + " already exists.");
+            LOGGER.warn("Directory " + directory.getAbsolutePath() + " already exists.");
             return true;
         }
         if (directory.mkdirs()) {
-            logger.info("Successfully created directory: " + directory.getAbsolutePath());
+            LOGGER.info("Successfully created directory: " + directory.getAbsolutePath());
             return true;
         } else {
-            logger.warn("Due to unknown error the directory could not be created: " + directory.getAbsolutePath());
+            LOGGER.warn("Due to unknown error the directory could not be created: " + directory.getAbsolutePath());
             return false;
+        }
+    }
+
+    private static void createSampleConfigFile(String path) throws IOException {
+        ClassLoader classLoader = MCRBasicCommands.class.getClassLoader();
+        File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
+        File targetFile = new File(configurationDirectory, path);
+        if (targetFile.exists()) {
+            LOGGER.warn("File " + targetFile.getAbsolutePath() + " already exists.");
+            return;
+        }
+        if (!targetFile.getParentFile().exists() && !targetFile.getParentFile().mkdirs()) {
+            throw new IOException("Could not create directory for file: " + targetFile);
+        }
+        try (InputStream templateResource = classLoader.getResourceAsStream("configdir.template/" + path);
+            FileOutputStream fout = new FileOutputStream(targetFile)) {
+            if (templateResource == null) {
+                throw new IOException("Could not find template for " + path);
+            }
+            IOUtils.copy(templateResource, fout);
+            LOGGER.info("Created template for " + path + " in " + configurationDirectory);
         }
     }
 

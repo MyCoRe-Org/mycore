@@ -64,6 +64,8 @@ public class MCRCommandLineInterface {
     /** The name of the system */
     private static String system = null;
 
+    private static boolean hibernateEnabled;
+
     /** A queue of commands waiting to be executed */
     protected static Vector<String> commandQueue = new Vector<String>();
 
@@ -148,6 +150,7 @@ public class MCRCommandLineInterface {
     }
 
     private static void initSession() {
+        hibernateEnabled = MCRHIBConnection.isEnabled();
         MCRSession session = MCRSessionMgr.getCurrentSession();
         session.setCurrentIP("127.0.0.1");
         session.setUserInformation(MCRSystemUserInformation.getSuperUserInstance());
@@ -204,7 +207,7 @@ public class MCRCommandLineInterface {
     }
 
     private static void clearSession(MCRSession session) {
-        if (MCRHIBConnection.isEnabled() && !session.isTransactionActive()) {
+        if (hibernateEnabled && !session.isTransactionActive()) {
             session.beginTransaction();
             MCRHIBConnection.instance().getSession().clear();
             session.commitTransaction();
