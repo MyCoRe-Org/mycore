@@ -77,7 +77,7 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
     }
 
     private void loadExternalLibs() {
-        File libDir = MCRConfigurationDir.getConfigFile("libs");
+        File libDir = MCRConfigurationDir.getConfigFile("lib");
         if (libDir != null && libDir.isDirectory()) {
             File[] listFiles = libDir.listFiles(new FilenameFilter() {
                 @Override
