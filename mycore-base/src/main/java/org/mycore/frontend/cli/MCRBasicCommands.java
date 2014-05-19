@@ -139,7 +139,7 @@ public class MCRBasicCommands {
         File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
         ArrayList<File> directories = new ArrayList<>(3);
         directories.add(configurationDirectory);
-        directories.add(new File(configurationDirectory, "libs"));
+        directories.add(new File(configurationDirectory, "lib"));
         directories.add(new File(configurationDirectory, "resources"));
         for (File directory : directories) {
             if (!createDirectory(directory)) {
