@@ -1148,17 +1148,23 @@ public final class MCRURIResolver implements URIResolver {
         }
 
     }
-
+    
     /**
      * <p>
      * Includes xsl files which are set in the mycore.properties file.
      * </p>
      * Example: MCR.URIResolver.xslIncludes.components=iview.xsl,wcms.xsl
+     * <p>
+     * Or retrieve the include hrefs from a class implementing 
+     * {@link org.mycore.common.xml.MCRURIResolver.MCRXslIncludeHrefs}.
+     * The class. part have to be set, everything after class. can be freely choosen.
+     * </p>
+     * Example: MCR.URIResolver.xslIncludes.class.template=org.foo.XSLHrefs
      * 
      * @return A xsl file with the includes as href.
      */
     private static class MCRXslIncludeResolver implements URIResolver {
-
+        private static Logger LOGGER = Logger.getLogger(MCRXslIncludeResolver.class);
         @Override
         public Source resolve(String href, String base) throws TransformerException {
             String includePart = href.substring(href.indexOf(":") + 1);
@@ -1166,18 +1172,31 @@ public final class MCRURIResolver implements URIResolver {
 
             Element root = new Element("stylesheet", xslNamespace);
             root.setAttribute("version", "1.0");
-
+            
             // get the parameters from mycore.properties
+            String propertyName = "MCR.URIResolver.xslIncludes." + includePart;
             List<String> propValue = Collections.emptyList();
-            propValue = MCRConfiguration.instance().getStrings("MCR.URIResolver.xslIncludes." + includePart, propValue);
+            if(includePart.startsWith("class.")){
+                MCRXslIncludeHrefs incHrefClass = MCRConfiguration.instance().<MCRXslIncludeHrefs>getInstanceOf(propertyName);
+                propValue = incHrefClass.getHrefs();
+            }else{
+                propValue = MCRConfiguration.instance().getStrings(propertyName, propValue);
+                
+            }
+
             for (String include : propValue) {
                 // create a new include element
                 Element includeElement = new Element("include", xslNamespace);
                 includeElement.setAttribute("href", include);
                 root.addContent(includeElement);
+                LOGGER.info("Resolved XSL include: " + include);
             }
             return new JDOMSource(root);
         }
+    }
+    
+    public interface MCRXslIncludeHrefs{
+        public List<String> getHrefs();
     }
 
     /**
