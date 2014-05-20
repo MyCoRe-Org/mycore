@@ -242,6 +242,7 @@
 
     <xsl:for-each select="xalan:tokenize($controls)">
       <xsl:choose>
+        <xsl:when test="(. = 'add') and ($pos &lt; $num)" />
         <xsl:when test="(. = 'append') and ($pos &lt; $num)" />
         <xsl:when test="(. = 'up') and ($pos = 1)" />
         <xsl:when test="(. = 'down') and ($pos = $num)" />
@@ -252,7 +253,7 @@
             <xsl:with-param name="name">
               <xsl:value-of select="concat('_xed_submit_',.,':')" />
               <xsl:choose>
-                <xsl:when test="(. = 'remove') or (. = 'append') or (. = 'insert')">
+                <xsl:when test="(. = 'remove') or (. = 'add') or (. = 'append') or (. = 'insert')">
                   <xsl:value-of select="transformer:getAbsoluteXPath($transformer)" />
                 </xsl:when>
                 <xsl:when test="(. = 'up')">
