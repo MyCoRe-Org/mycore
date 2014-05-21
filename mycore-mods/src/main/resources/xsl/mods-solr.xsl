@@ -12,18 +12,7 @@
   <xsl:template match="mycoreobject[contains(@ID,'_mods_')]">
     <xsl:apply-imports />
     <!-- classification fields from mycore-mods -->
-    <xsl:for-each select="metadata//mods:*[@authority or @authorityURI]">
-      <xsl:variable name="uri" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport" select="mcrmods:getClassCategParentLink(.)" />
-      <xsl:if test="string-length($uri) &gt; 0">
-        <xsl:variable name="topField" select="not(ancestor::mods:relatedItem[@type='host'])"/>
-        <xsl:variable name="classdoc" select="document($uri)" />
-        <xsl:variable name="classid" select="$classdoc/mycoreclass/@ID" />
-        <xsl:apply-templates select="$classdoc//category" mode="category">
-          <xsl:with-param name="classid" select="$classid" />
-          <xsl:with-param name="withTopField" select="$topField" />
-        </xsl:apply-templates>
-      </xsl:if>
-    </xsl:for-each>
+    <xsl:apply-templates select="metadata//mods:*[@authority or @authorityURI]" />
     <xsl:apply-templates select="metadata/def.modsContainer/modsContainer/mods:mods" />
     <field name="mods.type">
       <xsl:apply-templates select="." mode="mods-type" />
@@ -37,6 +26,19 @@
         <xsl:apply-templates select="$parent" mode="resulttitle" />
       </field>
     </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template match="mods:*[@authority or @authorityURI]">
+    <xsl:variable name="uri" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport" select="mcrmods:getClassCategParentLink(.)" />
+    <xsl:if test="string-length($uri) &gt; 0">
+      <xsl:variable name="topField" select="not(ancestor::mods:relatedItem[@type='host'])" />
+      <xsl:variable name="classdoc" select="document($uri)" />
+      <xsl:variable name="classid" select="$classdoc/mycoreclass/@ID" />
+      <xsl:apply-templates select="$classdoc//category" mode="category">
+        <xsl:with-param name="classid" select="$classid" />
+        <xsl:with-param name="withTopField" select="$topField" />
+      </xsl:apply-templates>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="mods:mods">
@@ -55,6 +57,8 @@
         <xsl:value-of select="substring-after(@valueURI,'http://d-nb.info/gnd/')" />
       </field>
     </xsl:for-each>
+    <xsl:apply-templates select=".//mods:name" mode="childdoc" />
+    <!-- keep mods:name fields for legacy reasons -->
     <xsl:for-each select=".//mods:name">
       <field name="mods.name">
         <xsl:for-each select="mods:displayForm | mods:namePart | text()">
@@ -136,5 +140,36 @@
         </field>
       </xsl:for-each>
     </xsl:for-each>
+  </xsl:template>
+  <xsl:template match="mods:name" mode="childdoc">
+    <xsl:variable name="topField" select="not(ancestor::mods:relatedItem[@type='host'])" />
+    <doc>
+      <field name="id">
+        <xsl:value-of select="concat(ancestor::mycoreobject/@ID,'-',generate-id(.))" />
+      </field>
+      <xsl:apply-templates select=".//mods:*[@authority or @authorityURI]" />
+      <xsl:for-each select=".//descendant-or-self::*[contains(@valueURI,'http://d-nb.info/gnd/')]">
+        <field name="mods.gnd">
+          <xsl:value-of select="substring-after(@valueURI,'http://d-nb.info/gnd/')" />
+        </field>
+      </xsl:for-each>
+      <field name="mods.name">
+        <xsl:for-each select="mods:displayForm | mods:namePart | text()">
+          <xsl:value-of select="concat(' ',.)" />
+        </xsl:for-each>
+      </field>
+      <xsl:if test="$topField">
+        <xsl:for-each select="mods:name/descendant-or-self::*[contains(@valueURI,'http://d-nb.info/gnd/')]">
+          <field name="mods.gnd.top">
+            <xsl:value-of select="substring-after(@valueURI,'http://d-nb.info/gnd/')" />
+          </field>
+        </xsl:for-each>
+        <field name="mods.name.top">
+          <xsl:for-each select="mods:displayForm | mods:namePart | text()">
+            <xsl:value-of select="concat(' ',.)" />
+          </xsl:for-each>
+        </field>
+      </xsl:if>
+    </doc>
   </xsl:template>
 </xsl:stylesheet>

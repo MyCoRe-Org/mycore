@@ -8,6 +8,7 @@ import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +22,7 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
@@ -29,6 +31,7 @@ import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
 import org.mycore.solr.index.handlers.MCRSolrOptimizeIndexHandler;
 import org.mycore.solr.index.handlers.stream.MCRSolrFilesIndexHandler;
@@ -61,23 +64,26 @@ public class MCRSolrIndexer {
 
     static {
         int poolSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Indexer.ThreadCount", 4);
-        final MCRListeningPriorityExecutorService executorService = new MCRListeningPriorityExecutorService(new ThreadPoolExecutor(
-                poolSize, poolSize, 0L, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>()));
+        final MCRListeningPriorityExecutorService executorService = new MCRListeningPriorityExecutorService(
+            new ThreadPoolExecutor(poolSize, poolSize, 0L, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>()));
         Runnable onShutdown = new Runnable() {
 
             @Override
             public void run() {
                 executorService.shutdown();
                 String documentStats = MessageFormat.format("Solr documents: {0}, each: {1} ms.",
-                        MCRSolrIndexStatisticCollector.documents.getDocuments(), MCRSolrIndexStatisticCollector.documents.reset());
+                    MCRSolrIndexStatisticCollector.documents.getDocuments(),
+                    MCRSolrIndexStatisticCollector.documents.reset());
                 String metadataStats = MessageFormat.format("XML documents: {0}, each: {1} ms.",
-                        MCRSolrIndexStatisticCollector.xml.getDocuments(), MCRSolrIndexStatisticCollector.xml.reset());
+                    MCRSolrIndexStatisticCollector.xml.getDocuments(), MCRSolrIndexStatisticCollector.xml.reset());
                 String fileStats = MessageFormat.format("File transfers: {0}, each: {1} ms.",
-                        MCRSolrIndexStatisticCollector.fileTransfer.getDocuments(), MCRSolrIndexStatisticCollector.fileTransfer.reset());
+                    MCRSolrIndexStatisticCollector.fileTransfer.getDocuments(),
+                    MCRSolrIndexStatisticCollector.fileTransfer.reset());
                 String operationsStats = MessageFormat.format("Other index operations: {0}, each: {1} ms.",
-                        MCRSolrIndexStatisticCollector.operations.getDocuments(), MCRSolrIndexStatisticCollector.operations.reset());
-                String msg = MessageFormat.format("\nFinal statistics:\n{0}\n{1}\n{2}\n{3}", documentStats, metadataStats, fileStats,
-                        operationsStats);
+                    MCRSolrIndexStatisticCollector.operations.getDocuments(),
+                    MCRSolrIndexStatisticCollector.operations.reset());
+                String msg = MessageFormat.format("\nFinal statistics:\n{0}\n{1}\n{2}\n{3}", documentStats,
+                    metadataStats, fileStats, operationsStats);
                 LOGGER.info(msg);
                 try {
                     MCRSolrServerFactory.getSolrServer().commit();
@@ -91,18 +97,33 @@ public class MCRSolrIndexer {
     }
 
     /**
-     * @param solrID
-     * @return
-     * 
-     * @see {@link HttpSolrServer#deleteById(String)}
+     * Deletes a list of documents by unique ID.
+     * Also removes any nested document of that ID.
+     * @param ids  the list of document IDs to delete 
      */
-    synchronized public static UpdateResponse deleteByIdFromSolr(String solrID) {
+    public synchronized static UpdateResponse deleteById(String... solrIDs) {
+        if (solrIDs == null || solrIDs.length == 0) {
+            return null;
+        }
         SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
         UpdateResponse updateResponse = null;
         long start = System.currentTimeMillis();
         try {
-            LOGGER.info("Deleting \"" + solrID + "\" from solr");
-            updateResponse = solrServer.deleteById(solrID);
+            LOGGER.info("Deleting \"" + solrIDs + "\" from solr");
+            UpdateRequest req = new UpdateRequest();
+            //delete all documents rooted at this id
+            StringBuilder deleteQuery = new StringBuilder("_root_:(");
+            for (String solrID : solrIDs) {
+                deleteQuery.append('"');
+                deleteQuery.append(MCRSolrUtils.escapeSearchValue(solrID));
+                deleteQuery.append("\" ");
+            }
+            deleteQuery.setCharAt(deleteQuery.length() - 1, ')');
+            LOGGER.info("Delete query:\n" + deleteQuery);
+            req.deleteByQuery(deleteQuery.toString());
+            //for document without nested
+            req.deleteById(Arrays.asList(solrIDs));
+            updateResponse = req.process(solrServer);
             solrServer.commit();
         } catch (Exception e) {
             LOGGER.error("Error deleting document from solr", e);
@@ -112,6 +133,7 @@ public class MCRSolrIndexer {
         operations.addDocument(1);
         operations.addTime(end - start);
         return updateResponse;
+
     }
 
     /**
@@ -172,7 +194,8 @@ public class MCRSolrIndexer {
                 MCRContent content = metadataMgr.retrieveContent(objId);
                 contentMap.put(objId, content);
                 if (i % BULK_SIZE == 0 || totalCount == i) {
-                    MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(contentMap);
+                    MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(
+                        contentMap);
                     indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
                     indexHandler.setSolrServer(solrServer);
                     statistic = indexHandler.getStatistic();
@@ -193,7 +216,8 @@ public class MCRSolrIndexer {
      * Rebuilds solr's content index.
      */
     public static void rebuildContentIndex() {
-        rebuildContentIndex(MCRSolrServerFactory.getSolrServer(), MCRXMLMetadataManager.instance().listIDsOfType("derivate"));
+        rebuildContentIndex(MCRSolrServerFactory.getSolrServer(),
+            MCRXMLMetadataManager.instance().listIDsOfType("derivate"));
     }
 
     public static void rebuildContentIndex(SolrServer solrServer) {
@@ -251,7 +275,8 @@ public class MCRSolrIndexer {
      * @param priority priority
      */
     public static void submitIndexHandler(MCRSolrIndexHandler indexHandler, int priority) {
-        ListenableFuture<List<MCRSolrIndexHandler>> future = EXECUTOR_SERVICE.submit(new MCRSolrIndexTask(indexHandler, priority));
+        ListenableFuture<List<MCRSolrIndexHandler>> future = EXECUTOR_SERVICE.submit(new MCRSolrIndexTask(indexHandler,
+            priority));
         Futures.addCallback(future, new FutureIndexHandlerCallback());
     }
 
@@ -284,7 +309,7 @@ public class MCRSolrIndexer {
         }
 
         LOGGER.info("Dropping solr index for type " + type + "...");
-        MCRSolrServerFactory.getSolrServer().deleteByQuery("+objectType:" + type);
+        MCRSolrServerFactory.getSolrServer().deleteByQuery("objectType:" + type + " _root_:*_" + type + "_*");
         LOGGER.info("Dropping solr index for type " + type + "...done");
     }
 
@@ -347,7 +372,7 @@ public class MCRSolrIndexer {
         }
         if (!toRemove.isEmpty()) {
             LOGGER.info("remove " + toRemove.size() + " zombie objects from solr");
-            solrServer.deleteById(toRemove, 5000);
+            deleteById(toRemove.toArray(new String[toRemove.size()]));
         }
         // documents to add
         storeList.removeAll(solrList);

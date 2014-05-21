@@ -68,7 +68,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
 
     @MCRCommand(syntax = "delete from solr index by id {0}", help = "Deletes an document from the index by id", order = 110)
     public static void deleteByIdFromSolr(String solrID) {
-        MCRSolrIndexer.deleteByIdFromSolr(solrID);
+        MCRSolrIndexer.deleteById(solrID);
     }
 
     @MCRCommand(syntax = "set solr server {0}", help = "Sets a new SOLR server, {0} specifies the URL of the SOLR Server", order = 130)

@@ -52,17 +52,21 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     synchronized protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
+        //need to delete to handle nested documents
+        this.handleObjectDeleted(evt, obj);
         this.handleMCRBaseCreated(evt, obj);
     }
 
     @Override
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
+        //need to delete to handle nested documents
+        this.handleObjectDeleted(evt, obj);
         this.handleMCRBaseCreated(evt, obj);
     }
 
     @Override
     synchronized protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
-        MCRSolrIndexer.deleteByIdFromSolr(obj.getId().toString());
+        MCRSolrIndexer.deleteById(obj.getId().toString());
     }
 
     @Override
@@ -72,17 +76,21 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate derivate) {
+        //need to delete to handle nested documents
+        this.handleDerivateDeleted(evt, derivate);
         this.handleMCRBaseCreated(evt, derivate);
     }
 
     @Override
     protected void handleDerivateRepaired(MCREvent evt, MCRDerivate derivate) {
+        //need to delete to handle nested documents
+        this.handleDerivateDeleted(evt, derivate);
         this.handleMCRBaseCreated(evt, derivate);
     }
 
     @Override
     protected void handleDerivateDeleted(MCREvent evt, MCRDerivate derivate) {
-        MCRSolrIndexer.deleteByIdFromSolr(derivate.getId().toString());
+        MCRSolrIndexer.deleteById(derivate.getId().toString());
     }
 
     synchronized protected void handleMCRBaseCreated(MCREvent evt, MCRBase objectOrDerivate) {
@@ -125,7 +133,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleFileDeleted(MCREvent evt, MCRFile file) {
-        MCRSolrIndexer.deleteByIdFromSolr(file.getID());
+        MCRSolrIndexer.deleteById(file.getID());
     }
 
     @Override
