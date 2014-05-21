@@ -21,7 +21,6 @@ import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.mycore.common.config.MCRConfiguration;
@@ -96,12 +95,17 @@ public class MCRSolrIndexer {
         EXECUTOR_SERVICE = executorService;
     }
 
+    public static UpdateResponse deleteOrphanedNestedDocuments() throws SolrServerException, IOException {
+        SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
+        return solrServer.deleteByQuery("-({!join from=id to=_root_}_root_:*) +_root_:*", 0);
+    }
+
     /**
      * Deletes a list of documents by unique ID.
      * Also removes any nested document of that ID.
      * @param ids  the list of document IDs to delete 
      */
-    public synchronized static UpdateResponse deleteById(String... solrIDs) {
+    public static UpdateResponse deleteById(String... solrIDs) {
         if (solrIDs == null || solrIDs.length == 0) {
             return null;
         }
@@ -374,6 +378,7 @@ public class MCRSolrIndexer {
             LOGGER.info("remove " + toRemove.size() + " zombie objects from solr");
             deleteById(toRemove.toArray(new String[toRemove.size()]));
         }
+        deleteOrphanedNestedDocuments();
         // documents to add
         storeList.removeAll(solrList);
         if (!storeList.isEmpty()) {
