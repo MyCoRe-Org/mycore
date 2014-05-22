@@ -27,23 +27,21 @@
       </xsl:choose>
     </xsl:variable>
     <fieldset class="{@name} optional">
-      <legend>
-        <xed:bind xpath="param[@name='{$paraname}']">
-          <label class="checkbox-inline" for="{@name}">
-            <input type="checkbox" value="{$value}" id="{@name}">
-              <xsl:copy-of select="@title" />
-            </input>
-            <xsl:choose>
-              <xsl:when test="mcrsolr:label">
-                <xsl:copy-of select="mcrsolr:label/node()" />
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="@name" />
-              </xsl:otherwise>
-            </xsl:choose>
-          </label>
-        </xed:bind>
-      </legend>
+      <xed:bind xpath="param[@name='{$paraname}']">
+        <label class="checkbox-inline" for="{@name}">
+          <input type="checkbox" value="{$value}" id="{@name}">
+            <xsl:copy-of select="@title" />
+          </input>
+          <xsl:choose>
+            <xsl:when test="mcrsolr:label">
+              <xsl:copy-of select="mcrsolr:label/node()" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="@name" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </label>
+      </xed:bind>
       <div class="fieldset">
         <xsl:apply-templates />
       </div>
