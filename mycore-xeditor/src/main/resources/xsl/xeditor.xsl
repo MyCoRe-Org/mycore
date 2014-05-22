@@ -347,7 +347,7 @@
   </xsl:template>
 
   <xsl:template match="xed:output[@i18n and not(@value)]" mode="xeditor">
-    <xsl:value-of select="i18n:translate(@i18n)" />
+    <xsl:value-of select="i18n:translate(@i18n)" disable-output-escaping="yes" />
   </xsl:template>
 
   <xsl:template match="xed:output[@i18n and @value]" mode="xeditor">
