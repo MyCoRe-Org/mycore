@@ -16,6 +16,8 @@
 
 <xsl:output method="xml" omit-xml-declaration="yes" />
 
+<xsl:include href="coreFunctions.xsl" />
+
 <xsl:param name="ServletsBaseURL" />
 <xsl:param name="WebApplicationBaseURL" />
 
@@ -23,6 +25,14 @@
 <xsl:param name="subselect.session" />
 <xsl:param name="subselect.varpath" />
 <xsl:param name="subselect.webpage" />
+
+<!-- ========== XED Subselect detection ========== -->
+<xsl:variable name="xedSession">
+  <xsl:call-template name="UrlGetParam">
+    <xsl:with-param name="url" select="/classificationBrowserData/@webpage" />
+    <xsl:with-param name="par" select="'_xed_subselect_session'" />
+  </xsl:call-template>
+</xsl:variable>
 
 <xsl:variable name="folder.closed" select="concat($WebApplicationBaseURL,'images/folder_closed_in_use.gif')" />
 <xsl:variable name="folder.open" select="concat($WebApplicationBaseURL,'images/folder_open.gif')" />
@@ -43,10 +53,6 @@
         </xsl:choose>
         <a>
           <xsl:attribute name="href">
-            <xsl:value-of select="concat($ServletsBaseURL,'XMLEditor?_action=end.subselect')" />
-            <xsl:value-of select="concat('&amp;subselect.session=',encoder:encode($subselect.session,'UTF-8'))" />
-            <xsl:value-of select="concat('&amp;subselect.varpath=',encoder:encode($subselect.varpath,'UTF-8'))" />
-            <xsl:value-of select="concat('&amp;subselect.webpage=',encoder:encode($subselect.webpage,'UTF-8'))" />
             <xsl:variable name="groupName">
               <xsl:choose>
                 <xsl:when test="../@classification=const:getRoleRootId()">
@@ -57,8 +63,23 @@
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:variable>
-            <xsl:value-of select="concat('&amp;_var_@name=',encoder:encode($groupName,'UTF-8'))" />
-            <xsl:value-of select="concat('&amp;_var_label/@text=',encoder:encode(label,'UTF-8'))" />
+            
+            <xsl:choose>
+              <xsl:when test="string-length($xedSession) &gt; 0">
+                <xsl:value-of select="concat($ServletsBaseURL,'XEditor?_xed_submit_return= ')" />
+                <xsl:value-of select="concat('&amp;_xed_session=',encoder:encode($xedSession,'UTF-8'))" />
+                <xsl:value-of select="concat('&amp;@name=',encoder:encode($groupName,'UTF-8'))" />
+                <xsl:value-of select="concat('&amp;label/@text=',encoder:encode(label,'UTF-8'))" />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="concat($ServletsBaseURL,'XMLEditor?_action=end.subselect')" />
+                <xsl:value-of select="concat('&amp;subselect.session=',encoder:encode($subselect.session,'UTF-8'))" />
+                <xsl:value-of select="concat('&amp;subselect.varpath=',encoder:encode($subselect.varpath,'UTF-8'))" />
+                <xsl:value-of select="concat('&amp;subselect.webpage=',encoder:encode($subselect.webpage,'UTF-8'))" />
+                <xsl:value-of select="concat('&amp;_var_@name=',encoder:encode($groupName,'UTF-8'))" />
+                <xsl:value-of select="concat('&amp;_var_label/@text=',encoder:encode(label,'UTF-8'))" />
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:attribute>
           <xsl:value-of select="label" />
         </a>

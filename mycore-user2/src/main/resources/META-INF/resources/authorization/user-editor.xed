@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xed:template xmlns:xed="http://www.mycore.de/xeditor" xmlns:mcruser="http://www.mycore.de/components/mcruser">
+  <xed:template id="failed-validation-messages">
+    <xed:if test="$xed-validation-failed">
+      <div class="alert alert-danger">
+        <h4>
+          <xed:output i18n="component.user2.admin.inputhints" />
+        </h4>
+        <xed:display-validation-messages />
+      </div>
+    </xed:if>
+  </xed:template>
+
+  <xed:template id="editor4currentUser">
+    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="realName" />
+    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="email" />
+  </xed:template>
+
+  <xed:template id="editor4newReadUser">
+    <mcruser:template name="textInput" xpath="@name" id="userName" i18n="component.user2.admin.userAccount" i18n.error="component.user2.admin.inputhints.username"
+      required="true" maxlength="16" />
+    <xed:bind xpath="realm/@id" default="local" />
+    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="passwords" />
+    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="passwordHint" />
+    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="realName" />
+
+    <xed:validate xpath="/user" display="global" class="org.mycore.user2.MCRUserServlet" method="checkUserName" i18n="component.user2.admin.inputhints.sameUsername" />
+  </xed:template>
+  
+  <xed:template id="editor4changeReadUser">
+    <mcruser:template name="textInput" xpath="@name" id="userName" i18n="component.user2.admin.userAccount" i18n.error="component.user2.admin.inputhints.username"
+      required="true" maxlength="16" />
+    <xed:bind xpath="realm/@id" default="local" />
+    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="passwordHint" />
+    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="realName" />
+
+    <xed:validate xpath="/user" display="global" class="org.mycore.user2.MCRUserServlet" method="checkUserName" i18n="component.user2.admin.inputhints.sameUsername" />
+  </xed:template>
+
+  <xed:template id="editor4newAdmins">
+    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="userAccount" />
+    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="passwords" />
+    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="passwordHint" />
+    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="realName" />
+    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="email" />
+
+    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="editor4admins" />
+  </xed:template>
+
+  <xed:template id="editor4changeAdmins">
+    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="userAccount" />
+    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="passwordHint" />
+    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="realName" />
+    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="email" />
+
+    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="editor4admins" />
+  </xed:template>
+
+  <xed:template id="editor4admins">
+    <mcruser:template name="checkboxList" inline="true" xpath="@locked" id="locked">
+      <option value="true" i18n="component.user2.admin.user.locked" />
+    </mcruser:template>
+    <mcruser:template name="textInput" xpath="validUntil" id="validUntil" i18n="component.user2.admin.user.validUntil" i18n.error="component.user2.admin.inputhints.date"
+      validate="true" type="datetime" format="yyyy-MM-dd;yyyy-MM-dd'T'HH:mm:ss'Z'" maxlength="20" />
+
+    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="owner" />
+    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="roles" />
+  </xed:template>
+
+  <xed:template id="buttons">
+    <mcruser:template name="submitButton" i18n="component.user2.button.save" target="servlet" href="MCRUserServlet" />
+    <mcruser:template name="cancelButton" i18n="component.user2.button.cancel" />
+  </xed:template>  
+
+  <!-- editor elements -->
+
+  <xed:template id="userAccount">
+    <div class="form-group">
+      <label class="col-md-3 control-label" for="userName">
+        <xed:output i18n="component.user2.admin.userAccount" />
+      </label>
+      <div class="col-md-9 row">
+        <mcruser:template name="textInput" xpath="@name" id="userName" inline="true" colsize="sm" colwidth="9"
+          i18n.error="component.user2.admin.inputhints.username" required="true" maxlength="16" />
+        <mcruser:template name="selectInput" xpath="realm/@id" default="local" id="realmId" inline="true" colsize="sm" colwidth="3"
+          uri="xslStyle:items2options:xslStyle:realms2items:realm:all" />
+      </div>
+    </div>
+
+    <xed:validate xpath="/user" display="global" class="org.mycore.user2.MCRUserServlet" method="checkUserName" i18n="component.user2.admin.inputhints.sameUsername" />
+  </xed:template>
+
+  <xed:template id="userAccountReadOnly">
+    <div class="form-group">
+      <label class="col-md-3 control-label" for="userName">
+        <xed:output i18n="component.user2.admin.userAccount" />
+      </label>
+      <div class="col-md-9 row">
+        <mcruser:template name="textInput" xpath="@name" id="userName" disabled="true" inline="true" colsize="sm" colwidth="9"
+          i18n.error="component.user2.admin.inputhints.username" required="true" maxlength="16" />
+        <mcruser:template name="selectInput" xpath="realm/@id" default="local" id="realmId" disabled="true" inline="true" colsize="sm" colwidth="3"
+          uri="xslStyle:items2options:xslStyle:realms2items:realm:all" />
+      </div>
+    </div>
+  </xed:template>
+
+  <xed:template id="passwords">
+    <mcruser:template name="passwordInput" xpath="password" id="password" i18n="component.user2.admin.password" i18n.error="component.user2.admin.inputhints.password"
+      required="true" matches="[\S]*" maxlength="16" />
+    <mcruser:template name="passwordInput" xpath="password2" id="password2" i18n="component.user2.admin.passwordRepeat" i18n.error="component.user2.admin.inputhints.password"
+      required="true" matches="[\S]*" maxlength="16" />
+
+    <xed:validate xpath="user" display="global" test="(realm/@id != 'local') or ((string-length(password) &gt; 0) and (password = password2 ))"
+      i18n="component.user2.admin.inputhints.passwordLocalUsers" />
+  </xed:template>
+
+  <xed:template id="passwordHint">
+    <mcruser:template name="textInput" xpath="password/@hint" id="hint" i18n="component.user2.admin.passwordHint" maxlength="128" />
+  </xed:template>
+
+  <xed:template id="realName">
+    <mcruser:template name="textInput" xpath="realName" id="realName" i18n="component.user2.admin.realName" maxlength="64" />
+  </xed:template>
+
+  <xed:template id="email">
+    <mcruser:template name="textInput" xpath="eMail" id="email" i18n="component.user2.admin.email" i18n.error="component.user2.admin.email.syntax"
+      validate="true" matches="\S+@\S+\.\S+" maxlength="64" />
+  </xed:template>
+
+  <xed:template id="owner">
+    <div class="form-group">
+      <label class="col-md-3 control-label" for="ownerSelect">
+        <xed:output i18n="component.user2.admin.owner" />
+      </label>
+      <div class="col-md-9">
+        <xed:repeat xpath="owner" min="1" max="1">
+          <div class="row">
+            <div class="col-sm-10">
+              <mcruser:template name="submitButton" id="ownerSelect" i18n="component.user2.button.select" target="subselect"
+                href="MCRUserServlet?XSL.Style=subselect" />
+              <xed:output value="@name" />
+              <xed:output value="' ['" />
+              <xed:choose>
+                <xed:when test="string-length(@realm) &gt; 0">
+                  <xed:output value="@realm" />
+                </xed:when>
+                <xed:otherwise>
+                  <xed:multi-lang>
+                    <xed:lang xml:lang="de">bitte wählen</xed:lang>
+                    <xed:lang xml:lang="en">please select</xed:lang>
+                  </xed:multi-lang>
+                </xed:otherwise>
+              </xed:choose>
+              <xed:output value="']'" />
+            </div>
+            <div class="col-sm-2">
+              <xed:controls>remove</xed:controls>
+            </div>
+          </div>
+        </xed:repeat>
+      </div>
+    </div>
+  </xed:template>
+
+  <xed:template id="roles">
+    <div class="form-group">
+      <label class="col-md-3 control-label" for="roleSelect">
+        <xed:output i18n="component.user2.admin.roles" />
+      </label>
+      <div class="col-md-9">
+        <xed:bind xpath="roles">
+          <xed:repeat xpath="role" min="0" max="20">
+            <div class="row">
+              <div class="col-sm-10">
+                <mcruser:template name="submitButton" id="roleSelect" i18n="component.user2.button.select" target="subselect" href="MCRRoleServlet" />
+                <xed:output value="@name" />
+                <xed:output value="' ['" />
+                <xed:choose>
+                  <xed:when test="string-length(label/@text) &gt; 0">
+                    <xed:output value="label/@text" />
+                  </xed:when>
+                  <xed:otherwise>
+                    <xed:multi-lang>
+                      <xed:lang xml:lang="de">bitte wählen</xed:lang>
+                      <xed:lang xml:lang="en">please select</xed:lang>
+                    </xed:multi-lang>
+                  </xed:otherwise>
+                </xed:choose>
+                <xed:output value="']'" />
+              </div>
+              <div class="col-sm-2">
+                <xed:controls>add remove up down</xed:controls>
+              </div>
+            </div>
+          </xed:repeat>
+        </xed:bind>
+      </div>
+    </div>
+  </xed:template>
+</xed:template>

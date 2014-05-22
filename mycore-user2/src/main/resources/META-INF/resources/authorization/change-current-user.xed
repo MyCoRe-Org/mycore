@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+<MyCoReWebPage>
+  <section i18n="component.user2.admin.changeCurrent.title" xml:lang="all">
+    <xed:form class="userEditor form-horizontal" role="form" xmlns:xed="http://www.mycore.de/xeditor" xmlns:mcruser="http://www.mycore.de/components/mcruser">
+      <xed:source uri="user:current" />
+      <xed:cancel url="{$ServletsBaseURL}MCRUserServlet?action=show" />
+
+      <xed:bind xpath="user">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">
+              <xed:output i18n="component.user2.admin.changeCurrent.title" />
+            </h3>
+          </div>
+          <div class="panel-body">
+            <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="failed-validation-messages" />
+
+            <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="editor4currentUser" />
+          </div>
+          <div class="panel-footer clearfix">
+            <div class="pull-right">
+              <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="buttons" />
+            </div>
+          </div>
+        </div>
+      </xed:bind>
+    </xed:form>
+  </section>
+</MyCoReWebPage>
