@@ -37,7 +37,7 @@
         fieldset.find('div.fieldset :input:not(:disabled)').prop("disabled", true);
       };
     };
-    $('form .optional legend input[type=checkbox]')
+    $('form .optional > label input[type=checkbox]')
     .off('change')
     .on('change', function(event){
       updateFieldsets.apply(this);
