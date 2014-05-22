@@ -36,8 +36,8 @@ import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.GregorianCalendar;
 
 /**
- * This class implements all methods for handling with the MCRMetaHistoryDate
- * part of a metadata object. It use the GPL licensed ICU library of IBM.
+ * This class implements all methods for handling the MCRMetaHistoryDate
+ * part of a metadata object. It uses the GPL licensed ICU library of IBM.
  * 
  * @author Juergen Vogler
  * @author Jens Kupferschmidt
@@ -439,7 +439,6 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      *            a relevant JDOM element for the metadata
      */
     @Override
-    @SuppressWarnings("unchecked")
     public void setFromDOM(org.jdom2.Element element) {
         super.setFromDOM(element);
         texts.clear(); // clear
