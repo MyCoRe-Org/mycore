@@ -18,6 +18,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRURLContent;
+import org.mycore.tools.MyCoReWebPageProvider;
 import org.mycore.wcms2.MCRWebPagesSynchronizer;
 import org.xml.sax.SAXException;
 
@@ -86,13 +87,17 @@ public class MCRWCMSContentManager {
             throwError(ErrorType.invalidDirectory, webpageId);
         }
         // file is not in web application directory
-        if (resourceURL == null) {
-            throwError(ErrorType.notExist, webpageId);
-        } else if (!isXML) {
+        if (!isXML) {
             throwError(ErrorType.invalidFile, webpageId);
         }
-
-        Document doc = new MCRURLContent(resourceURL).asXML();
+        Document doc = null;
+        if (resourceURL == null) {
+            MyCoReWebPageProvider wpp = new MyCoReWebPageProvider();
+            wpp.addSection("neuer Eintrag", new Element("p").setText("TODO"), "de");
+            doc = wpp.getXML();
+        } else {
+            doc = new MCRURLContent(resourceURL).asXML();
+        }
         Element rootElement = doc.getRootElement();
         if (!rootElement.getName().equals("MyCoReWebPage")) {
             throwError(ErrorType.notMyCoReWebPage, webpageId);
