@@ -60,10 +60,13 @@
 
   <xsl:template match="user">
     <div class="user-details">
-      <div id="buttons btn-group pull-right">
+      <div id="buttons" class="btn-group pull-right">
         <xsl:apply-templates select="." mode="actions" />
       </div>
       <div class="clearfix" />
+      <h2>
+        <xsl:value-of select="concat(i18n:translate('component.user2.admin.userDisplay'),@name)" />
+      </h2>
       <xsl:if test="$step = 'confirmDelete'">
         <div class="section alert alert-danger">
           <p>
