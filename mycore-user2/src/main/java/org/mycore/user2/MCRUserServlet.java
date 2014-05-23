@@ -35,7 +35,6 @@ import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.filter.Filters;
-import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessManager;
@@ -197,7 +196,6 @@ public class MCRUserServlet extends MCRServlet {
      */
     @Deprecated
     public static boolean checkUserName(Element u) {
-        System.out.println((new XMLOutputter()).outputString(u));
         String userName = u.getAttributeValue("name");
 
         String realmID = MCRRealmFactory.getLocalRealm().getID();
