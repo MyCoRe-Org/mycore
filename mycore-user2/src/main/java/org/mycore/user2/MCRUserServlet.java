@@ -35,6 +35,7 @@ import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.filter.Filters;
+import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessManager;
@@ -175,10 +176,28 @@ public class MCRUserServlet extends MCRServlet {
     }
 
     /**
+     * Invoked by editor form user-editor.xed to check for a valid
+     * login user name.
+     */
+    public static boolean checkUserName(String userName) {
+        String realmID = MCRRealmFactory.getLocalRealm().getID();
+
+        // Check for required fields is done in the editor form itself, not here
+        if ((userName == null) || (realmID == null)) {
+            return true;
+        }
+
+        // In all other cases, combination of userName and realm must not exist
+        return !MCRUserManager.exists(userName, realmID);
+    }
+
+    /**
      * Invoked by editor form user-editor.xml to check for a valid
      * login user name and realm combination.
      */
+    @Deprecated
     public static boolean checkUserName(Element u) {
+        System.out.println((new XMLOutputter()).outputString(u));
         String userName = u.getAttributeValue("name");
 
         String realmID = MCRRealmFactory.getLocalRealm().getID();
@@ -207,7 +226,7 @@ public class MCRUserServlet extends MCRServlet {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-        
+
         Document doc = (Document) (req.getAttribute("MCRXEditorSubmission"));
         if (doc == null) {
             MCREditorSubmission sub = (MCREditorSubmission) (req.getAttribute("MCREditorSubmission"));

@@ -24,7 +24,7 @@
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="passwordHint" />
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="realName" />
 
-    <xed:validate xpath="/user" display="global" class="org.mycore.user2.MCRUserServlet" method="checkUserName" i18n="component.user2.admin.inputhints.sameUsername" />
+    <xed:validate xpath="/user[realm/@id = 'local']/@name" display="global" class="org.mycore.user2.MCRUserServlet" method="checkUserName" i18n="component.user2.admin.inputhints.sameUsername" />
   </xed:template>
   
   <xed:template id="editor4changeReadUser">
@@ -33,8 +33,6 @@
     <xed:bind xpath="realm/@id" default="local" />
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="passwordHint" />
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="realName" />
-
-    <xed:validate xpath="/user" display="global" class="org.mycore.user2.MCRUserServlet" method="checkUserName" i18n="component.user2.admin.inputhints.sameUsername" />
   </xed:template>
 
   <xed:template id="editor4newAdmins">
@@ -45,6 +43,8 @@
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="email" />
 
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="editor4admins" />
+    
+    <xed:validate xpath="/user[realm/@id = 'local']/@name" display="global" class="org.mycore.user2.MCRUserServlet" method="checkUserName" i18n="component.user2.admin.inputhints.sameUsername" />
   </xed:template>
 
   <xed:template id="editor4changeAdmins">
@@ -52,8 +52,6 @@
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="passwordHint" />
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="realName" />
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="email" />
-
-    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="editor4admins" />
   </xed:template>
 
   <xed:template id="editor4admins">
@@ -86,8 +84,6 @@
           uri="xslStyle:items2options:xslStyle:realms2items:realm:all" />
       </div>
     </div>
-
-    <xed:validate xpath="/user" display="global" class="org.mycore.user2.MCRUserServlet" method="checkUserName" i18n="component.user2.admin.inputhints.sameUsername" />
   </xed:template>
 
   <xed:template id="userAccountReadOnly">

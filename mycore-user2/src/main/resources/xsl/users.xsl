@@ -2,19 +2,16 @@
 
 <!-- XSL to search for users and display the list users found -->
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
-  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:encoder="xalan://java.net.URLEncoder" exclude-result-prefixes="xsl xalan i18n encoder">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
+  xmlns:encoder="xalan://java.net.URLEncoder" exclude-result-prefixes="xsl xalan i18n encoder"
+>
 
   <xsl:include href="MyCoReLayout.xsl" />
 
-  <xsl:variable name="PageID" select="'select-user'" />
+  <xsl:variable name="PageID" select="'users'" />
 
-  <xsl:variable name="PageTitle" select="'Nutzer auswählen'" />
-
-<!-- ========== Subselect Parameter ========== -->
-  <xsl:param name="subselect.session" />
-  <xsl:param name="subselect.varpath" />
-  <xsl:param name="subselect.webpage" />
+  <xsl:variable name="PageTitle" select="i18n:translate('component.user2.admin.users.title')" />
+  
   <xsl:param name="MCR.Ajax.LoadingImage" />
 
   <xsl:template match="/users" mode="headAdditional" />
@@ -23,12 +20,15 @@
     <div class="user-list-users">
       <xsl:if test="@num">
         <div class="section">
-          <form action="{$ServletsBaseURL}MCRUserServlet" onsubmit="document.getElementById('indicator').style.display='inline';">
-            <p>
-              <xsl:value-of select="i18n:translate('component.user2.admin.search')"/>
-              <input type="text" name="search" value="{@search}" />
+          <form class="form-inline" action="{$ServletsBaseURL}MCRUserServlet" onsubmit="document.getElementById('indicator').style.display='inline';">
+            <div class="form-group">
+              <label class="control-label" for="name">
+                <xsl:value-of select="i18n:translate('component.user2.admin.search')" />
+                <xsl:text>&#160;</xsl:text>
+              </label>
+              <input class="form-control" type="text" name="search" value="{@search}" />
               <img id="indicator" style="display:none" src="{$WebApplicationBaseURL}{$MCR.Ajax.LoadingImage}" />
-            </p>
+            </div>
           </form>
           <xsl:apply-templates select="." mode="headAdditional" />
         </div>
@@ -36,50 +36,59 @@
       <div class="section" id="sectionlast">
         <xsl:choose>
           <xsl:when test="user">
-            <table class="user">
-              <caption>
-                <xsl:value-of select="i18n:translate('component.user2.admin.search.found', count(user))"/>
-              </caption>
-              <tr>
-                <th scope="col">
-                  <xsl:value-of select="i18n:translate('component.user2.admin.userAccount')"/>
-                </th>
-                <xsl:choose>
-                  <xsl:when test="@num">
+            <strong>
+              <xsl:value-of select="i18n:translate('component.user2.admin.search.found', count(user))" />
+            </strong>
+            <div class="table-responsive">
+              <table class="user table table-striped">
+                <thead>
+                  <tr>
                     <th scope="col">
-                      <xsl:value-of select="i18n:translate('component.user2.admin.user.origin')"/>
+                      <xsl:value-of select="i18n:translate('component.user2.admin.userAccount')" />
                     </th>
-                    <th scope="col">
-                      <xsl:value-of select="i18n:translate('component.user2.admin.user.name')"/>
-                    </th>
-                    <th scope="col">
-                      <xsl:value-of select="i18n:translate('component.user2.admin.user.email')"/>
-                    </th>
-                  </xsl:when>
-                  <xsl:otherwise>
-                    <th scope="col">
-                      <xsl:value-of select="i18n:translate('component.user2.admin.user.description')"/>
-                    </th>
-                  </xsl:otherwise>
-                </xsl:choose>
-              </tr>
-              <xsl:apply-templates select="user" />
-            </table>
+                    <xsl:choose>
+                      <xsl:when test="@num">
+                        <th scope="col">
+                          <xsl:value-of select="i18n:translate('component.user2.admin.user.origin')" />
+                        </th>
+                        <th scope="col">
+                          <xsl:value-of select="i18n:translate('component.user2.admin.user.name')" />
+                        </th>
+                        <th scope="col">
+                          <xsl:value-of select="i18n:translate('component.user2.admin.user.email')" />
+                        </th>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <th scope="col">
+                          <xsl:value-of select="i18n:translate('component.user2.admin.user.description')" />
+                        </th>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </tr>
+                </thead>
+                <tbody>
+                  <xsl:apply-templates select="user" />
+                </tbody>
+              </table>
+            </div>
           </xsl:when>
           <xsl:when test="string-length(@num) = 0">
-            <p>
-              <xsl:value-of select="i18n:translate('component.user2.admin.search.error.noRight')"/>
-            </p>
+            <br />
+            <div class="alert alert-danger">
+              <xsl:value-of select="i18n:translate('component.user2.admin.search.error.noRight')" />
+            </div>
           </xsl:when>
           <xsl:when test="@num = 0">
-            <p>
-              <xsl:value-of select="i18n:translate('component.user2.admin.search.error.noUserFound')"/>
-            </p>
+            <br />
+            <div class="alert alert-warning">
+              <xsl:value-of select="i18n:translate('component.user2.admin.search.error.noUserFound')" />
+            </div>
           </xsl:when>
           <xsl:when test="number(@num) &gt; number(@max)">
-            <p>
-              <xsl:value-of select="i18n:translate('component.user2.admin.search.error.tooManyUsers', concat(@num,';',@max))"/>
-            </p>
+            <br />
+            <div class="alert alert-warning">
+              <xsl:value-of select="i18n:translate('component.user2.admin.search.error.tooManyUsers', concat(@num,';',@max))" />
+            </div>
           </xsl:when>
         </xsl:choose>
       </div>
@@ -88,12 +97,6 @@
 
   <xsl:template match="user">
     <tr>
-      <xsl:attribute name="class">
-      <xsl:choose>
-        <xsl:when test="position() mod 2">background1</xsl:when>  
-        <xsl:otherwise>background2</xsl:otherwise>  
-      </xsl:choose>
-    </xsl:attribute>
       <td>
         <xsl:apply-templates select="." mode="link" />
       </td>

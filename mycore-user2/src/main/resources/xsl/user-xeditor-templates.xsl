@@ -5,9 +5,30 @@
 
   <xsl:include href="copynodes.xsl" />
 
+  <xsl:param name="MCR.user2.Layout.inputSize" />
+  <xsl:param name="MCR.user2.Layout.inputWidth" />
+
   <xsl:variable name="grid-width" select="12" />
-  <xsl:variable name="input-size" select="'md'" />
-  <xsl:variable name="input-width" select="9" />
+  <xsl:variable name="input-size">
+    <xsl:choose>
+      <xsl:when test="string-length($MCR.user2.Layout.inputSize) &gt; 0">
+        <xsl:value-of select="$MCR.user2.Layout.inputSize" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>md</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+  <xsl:variable name="input-width">
+    <xsl:choose>
+      <xsl:when test="string-length($MCR.user2.Layout.inputSize) &gt; 0">
+        <xsl:value-of select="$MCR.user2.Layout.inputSize" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="9" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
   <xsl:variable name="label-width" select="$grid-width - $input-width" />
 
   <xsl:template match="mcruser:template[contains('textInput|passwordInput|selectInput|checkboxList|radioList|textArea', @name)]">
