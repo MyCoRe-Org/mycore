@@ -1,6 +1,7 @@
 package org.mycore.iview2.frontend;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,6 +14,8 @@ import org.jdom2.JDOMException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRContentServlet;
 import org.xml.sax.SAXException;
 
@@ -38,6 +41,8 @@ public class MCRIViewClientServlet extends MCRContentServlet {
         MCRIViewMetsClientConfiguration config = new MCRIViewMetsClientConfiguration(req);
         
         config.lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
+        config.objId = MCRMetadataManager.getObjectId(MCRObjectID.getInstance(config.derivate), 10, TimeUnit.SECONDS).toString();
+        
         try {
             MCRJDOMContent source = new MCRJDOMContent(buildResponseDocument(config));
             return getLayoutService().getTransformedContent(req, resp, source);

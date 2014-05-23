@@ -41,6 +41,11 @@
             <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/js/iview-client-pdf.min.js"></script>
           </xsl:when>
         </xsl:choose>
+
+        <xsl:if test="iviewClientConfiguration/metadataUrl and iviewClientConfiguration/metadataUrl!=''">
+          <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/js/iview-client-metadata.min.js"></script>
+        </xsl:if>
+        
         <script>
           window.onload = function() {
           new mycore.iview.imageviewer.MyCoReImageViewer(jQuery("body"),

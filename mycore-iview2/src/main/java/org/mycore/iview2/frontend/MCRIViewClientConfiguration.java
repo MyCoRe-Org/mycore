@@ -6,10 +6,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.mycore.common.MCRLanguageDetector;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.common.content.MCRXMLContent;
-import org.mycore.datamodel.language.MCRLanguage;
 import org.mycore.iview2.services.MCRIView2Tools;
 
 import com.google.gson.Gson;
@@ -17,13 +16,28 @@ import com.google.gson.Gson;
 @XmlRootElement(name = "iviewClientConfiguration")
 abstract class MCRIViewClientConfiguration {
 
+    private static final String MCR_BASE_URL = MCRConfiguration.instance().getString("MCR.baseurl");
+
     public MCRIViewClientConfiguration() {
-        this.i18nPath = "/servlets/MCRLocaleServlet/{lang}/component.iview2.*";
+        this.i18nPath = MCR_BASE_URL + "servlets/MCRLocaleServlet/{lang}/component.iview2.*";
         this.lang = "de";
         this.pdfCreatorStyle = MCRIView2Tools.getIView2Property("PDFCreatorStyle");
         this.pdfCreatorURI = MCRIView2Tools.getIView2Property("PDFCreatorURI");
+        this.metadataUrl = MCRIView2Tools.getIView2Property("MetadataUrl");
     }
-
+    
+    /**
+     * Needed by the metadata plugin
+     */
+    @XmlElement
+    public String objId;
+    
+    /**
+     * Needed by the metadata plugin
+     */
+    @XmlElement
+    public String metadataUrl;
+    
     /**
     * Should the mobile or the desktop client started
     */
