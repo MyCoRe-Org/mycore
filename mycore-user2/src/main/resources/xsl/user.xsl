@@ -128,7 +128,7 @@
               <th class="col-md-3">
                 <xsl:value-of select="i18n:translate('component.user2.admin.userAccount')" />
               </th>
-              <td>
+              <td class="col-md-9">
                 <xsl:apply-templates select="." mode="name" />
               </td>
             </tr>
@@ -136,7 +136,7 @@
               <th class="col-md-3">
                 <xsl:value-of select="i18n:translate('component.user2.admin.passwordHint')" />
               </th>
-              <td>
+              <td class="col-md-9">
                 <xsl:value-of select="password/@hint" />
               </td>
             </tr>
@@ -144,7 +144,7 @@
               <th class="col-md-3">
                 <xsl:value-of select="i18n:translate('component.user2.admin.user.lastLogin')" />
               </th>
-              <td>
+              <td class="col-md-9">
                 <xsl:call-template name="formatISODate">
                   <xsl:with-param name="date" select="lastLogin" />
                   <xsl:with-param name="format" select="i18n:translate('component.user2.metaData.dateTime')" />
@@ -155,18 +155,18 @@
               <th class="col-md-3">
                 <xsl:value-of select="i18n:translate('component.user2.admin.user.validUntil')" />
               </th>
-              <td>
+              <td class="col-md-9">
                 <xsl:call-template name="formatISODate">
                   <xsl:with-param name="date" select="validUntil" />
                   <xsl:with-param name="format" select="i18n:translate('component.user2.metaData.dateTime')" />
                 </xsl:call-template>
               </td>
             </tr>
-            <tr class="abstand">
+            <tr>
               <th class="col-md-3">
                 <xsl:value-of select="i18n:translate('component.user2.admin.user.name')" />
               </th>
-              <td>
+              <td class="col-md-9">
                 <xsl:value-of select="realName" />
               </td>
             </tr>
@@ -175,7 +175,7 @@
                 <th class="col-md-3">
                   <xsl:value-of select="i18n:translate('component.user2.admin.user.email')" />
                 </th>
-                <td>
+                <td class="col-md-9">
                   <a href="mailto:{eMail}">
                     <xsl:value-of select="eMail" />
                   </a>
@@ -186,7 +186,7 @@
               <th class="col-md-3">
                 <xsl:value-of select="i18n:translate('component.user2.admin.user.locked')" />
               </th>
-              <td>
+              <td class="col-md-9">
                 <xsl:choose>
                   <xsl:when test="@locked='true'">
                     <xsl:value-of select="i18n:translate('component.user2.admin.user.locked.true')" />
@@ -202,7 +202,7 @@
                 <th class="col-md-3">
                   <xsl:value-of select="i18n:translate('component.user2.admin.user.attributes')" />
                 </th>
-                <td>
+                <td class="col-md-9">
                   <dl>
                     <xsl:for-each select="attributes/attribute">
                       <dt>
@@ -216,11 +216,11 @@
                 </td>
               </tr>
             </xsl:if>
-            <tr class="abstand">
+            <tr>
               <th class="col-md-3">
                 <xsl:value-of select="i18n:translate('component.user2.admin.owner')" />
               </th>
-              <td>
+              <td class="col-md-9">
                 <xsl:apply-templates select="owner" mode="link" />
                 <xsl:if test="count(owner)=0">
                   <xsl:value-of select="i18n:translate('component.user2.admin.userIndependent')" />
@@ -231,7 +231,7 @@
               <th class="col-md-3">
                 <xsl:value-of select="i18n:translate('component.user2.admin.roles')" />
               </th>
-              <td>
+              <td class="col-md-9">
                 <xsl:for-each select="roles/role">
                   <xsl:value-of select="@name" />
                   <xsl:variable name="lang">
@@ -250,7 +250,7 @@
               <th class="col-md-3">
                 <xsl:value-of select="i18n:translate('component.user2.admin.userOwns')" />
               </th>
-              <td>
+              <td class="col-md-9">
                 <xsl:for-each select="$owns/user">
                   <xsl:apply-templates select="." mode="link" />
                   <xsl:if test="position() != last()">
