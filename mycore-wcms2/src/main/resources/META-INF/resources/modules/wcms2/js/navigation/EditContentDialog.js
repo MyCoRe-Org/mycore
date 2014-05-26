@@ -158,7 +158,9 @@ wcms.navigation.EditContentDialog = function() {
 		// ckeditor events
 		CKEDITOR.on("instanceReady", dojo.hitch(this, function(e) {
 			// set old webpageContent
-			this.selectedSection.data = this.editor.getData();
+			if(this.selectedSection != null) {
+				this.selectedSection.data = this.editor.getData();
+			}
 			this.oldWebpageContent = dojo.clone(this.webpageContent);
 			for(var i = 0; i < this.oldWebpageContent.length; i++) {
 				delete(this.oldWebpageContent[i].id);
@@ -175,10 +177,9 @@ wcms.navigation.EditContentDialog = function() {
 		
 		dojo.removeClass(this.editorDiv.id,"hidden");
 		dojo.removeClass(this.canNotEdit.id, "visible");
-		if(this.selectedSection.hidden == "true"){
+		if(this.selectedSection == null || this.selectedSection.hidden == "true") {
 			dojo.addClass(this.editorDiv.id, "hidden");
 			dojo.addClass(this.canNotEdit.id, "visible");
-			
 		}
 	}
 
@@ -213,7 +214,7 @@ wcms.navigation.EditContentDialog = function() {
 			language: lang,
 			height:"495px", width:"98%",
 			entities: false,
-			basicEntities: false,
+			basicEntities: true,
 			allowedContent: true,
 			autoParagraph: false
 		}, contentData);
