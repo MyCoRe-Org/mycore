@@ -21,8 +21,8 @@
   </xsl:variable>
   <xsl:variable name="input-width">
     <xsl:choose>
-      <xsl:when test="string-length($MCR.user2.Layout.inputSize) &gt; 0">
-        <xsl:value-of select="$MCR.user2.Layout.inputSize" />
+      <xsl:when test="string-length($MCR.user2.Layout.inputWidth) &gt; 0">
+        <xsl:value-of select="$MCR.user2.Layout.inputWidth" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="9" />
