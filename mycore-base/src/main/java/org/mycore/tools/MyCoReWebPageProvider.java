@@ -6,7 +6,9 @@ package org.mycore.tools;
 import java.io.IOException;
 import java.io.StringReader;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.jdom2.Content;
 import org.jdom2.DocType;
@@ -17,6 +19,8 @@ import org.jdom2.Namespace;
 import org.jdom2.Text;
 import org.jdom2.input.JDOMParseException;
 import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.frontend.servlets.MCRServlet;
 
 /**
@@ -49,17 +53,27 @@ public class MyCoReWebPageProvider {
     public static final String DE = "de";
 
     public static final String XML_MYCORE_WEBPAGE = "MyCoReWebPage";
+
     public static final String XML_SECTION = "section";
+
     public static final String XML_LANG = "lang";
+
     public static final String XML_TITLE = "title";
+
     public static final String XML_META = "meta";
+
     public static final String XML_LOG = "log";
+
     public static final String XML_LASTEDITOR = "lastEditor";
+
     public static final String XML_LABELPATH = "labelPath";
+
     public static final String XML_DATE = "date";
+
     public static final String XML_TIME = "time";
 
     public static final String DATE_FORMAT = "yyyy-MM-dd";
+
     public static final String TIME_FORMAT = "HH:mm";
 
     private Document xml;
@@ -78,17 +92,20 @@ public class MyCoReWebPageProvider {
      * @return added section
      */
     public Element addSection(String title, String xmlAsString, String lang) throws IOException, JDOMException {
-        Content content = null;
+        String tmpXmlAsString = "<tmp>" + xmlAsString + "</tmp>";
         try {
             SAXBuilder saxBuilder = new SAXBuilder();
-            StringReader reader = new StringReader(xmlAsString);
+            StringReader reader = new StringReader(tmpXmlAsString);
             Document doc = saxBuilder.build(reader);
-            content = doc.getRootElement();
-            content.detach();
-        } catch(JDOMParseException jdomParseExc) {
-            content = new Text(xmlAsString);
+            Element tmpRoot = doc.getRootElement();
+            List<Content> contentList = new ArrayList<>();
+            for(int i = 0; i < tmpRoot.getContentSize(); i++) {
+                contentList.add(tmpRoot.getContent(i).detach());
+            }
+            return this.addSection(title, contentList, lang);
+        } catch (JDOMParseException jdomParseExc) {
+            return this.addSection(title, new Text(xmlAsString), lang);
         }
-        return this.addSection(title, content, lang);
     }
 
     /**
@@ -99,8 +116,21 @@ public class MyCoReWebPageProvider {
      * @return added section
      */
     public Element addSection(String title, Content content, String lang) {
+        List<Content> contentList = new ArrayList<>(1);
+        contentList.add(content);
+        return addSection(title, contentList, lang);
+    }
+
+    /**
+     * Adds a section to the MyCoRe webpage
+     * @param title the title of the section
+     * @param content list of content added to the section
+     * @param lang the language of the section specified by a language key.
+     * @return added section
+     */
+    public Element addSection(String title, List<Content> content, String lang) {
         Element section = new Element(XML_SECTION);
-        if(lang != null) {
+        if (lang != null) {
             section.setAttribute(XML_LANG, lang, Namespace.XML_NAMESPACE);
         }
         if (title != null && !title.equals("")) {
@@ -120,20 +150,20 @@ public class MyCoReWebPageProvider {
     public void updateMeta(String editor, String labelPath) {
         // get meta & log element
         Element meta = this.xml.getRootElement().getChild(XML_META);
-        if(meta == null) {
+        if (meta == null) {
             meta = new Element(XML_META);
             this.xml.getRootElement().addContent(meta);
         }
         Element log = meta.getChild(XML_LOG);
-        if(log == null) {
+        if (log == null) {
             log = new Element(XML_LOG);
             meta.addContent(log);
         }
         // update attributes
-        if(editor != null) {
+        if (editor != null) {
             log.setAttribute(XML_LASTEDITOR, editor);
         }
-        if(labelPath != null) {
+        if (labelPath != null) {
             log.setAttribute(XML_LABELPATH, labelPath);
         }
         Date date = new Date(System.currentTimeMillis());
