@@ -1,6 +1,7 @@
 package org.mycore.wcms2.resources;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -20,7 +21,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.MCRLayoutUtilities;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
@@ -43,8 +43,6 @@ import com.google.gson.JsonStreamParser;
 @Path("wcms/navigation")
 @MCRRestrictedAccess(MCRWCMSPermission.class)
 public class MCRWCMSNavigationResource {
-
-    private static final Logger LOGGER = Logger.getLogger(MCRWCMSNavigationResource.class);
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -78,7 +76,10 @@ public class MCRWCMSNavigationResource {
         // get navigation
         MCRNavigation newNavigation = getNavigationProvider().fromJSON(saveObject);
         // save navigation
-        MCRWCMSUtil.save(newNavigation, MCRWebPagesSynchronizer.getOutputStream(MCRLayoutUtilities.NAV_RESOURCE));
+        OutputStream out = MCRWebPagesSynchronizer.getOutputStream(MCRLayoutUtilities.NAV_RESOURCE);
+        MCRWCMSUtil.save(newNavigation, out);
+        out.flush();
+        out.close();
         // save content
         JsonArray items = saveObject.get(MCRWCMSNavigationProvider.JSON_ITEMS).getAsJsonArray();
         getContentManager().save(items);
