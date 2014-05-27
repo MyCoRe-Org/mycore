@@ -83,7 +83,7 @@
       <div class="form-actions">
         <xsl:choose>
           <xsl:when test="$direction = 'rtl' ">
-            <button class="btn btn-default" onClick="self.location.href='{$ServletsBaseURL}MCRLoginServlet{$HttpSession}?action=cancel'"
+            <button class="btn btn-default" type="button" onClick="self.location.href='{returnURL}'"
               tabindex="999">
               <xsl:value-of select="i18n:translate('component.user2.button.cancel')" />
             </button>
@@ -97,7 +97,7 @@
               <xsl:value-of select="i18n:translate('component.user2.button.login')" />
             </button>
             <xsl:value-of select="' '" />
-            <button class="btn btn-default" onClick="self.location.href='{$ServletsBaseURL}MCRLoginServlet{$HttpSession}?action=cancel'"
+            <button class="btn btn-default" type="button" onClick="self.location.href='{returnURL}'"
               tabindex="999">
               <xsl:value-of select="i18n:translate('component.user2.button.cancel')" />
             </button>
