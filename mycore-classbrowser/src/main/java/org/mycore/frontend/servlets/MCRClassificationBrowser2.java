@@ -96,7 +96,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         MCRQueryAdapter queryAdapter = null;
 
         String field = req.getParameter("field");
-        if (countResults || field.length() > 0) {
+        if (countResults || (field != null && field.length() > 0)) {
             queryAdapter = getQueryAdapter(field);
 
             configureQueryAdapter(queryAdapter, req);
