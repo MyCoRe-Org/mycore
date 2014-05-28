@@ -25,6 +25,8 @@ package org.mycore.frontend.xeditor;
 
 import java.util.Enumeration;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -44,6 +46,12 @@ public class MCRXEditorServlet extends MCRServlet {
 
         String sessionID = xEditorStepID.split("-")[0];
         MCREditorSession session = MCREditorSessionStoreFactory.getSessionStore().getSession(sessionID);
+
+        if (session == null) {
+            String msg = getErrorI18N("xeditor.error", "noSession", sessionID);
+            job.getResponse().sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
+            return;
+        }
 
         String referrer = job.getRequest().getHeader("referer");
         session.setPageURL(referrer);
