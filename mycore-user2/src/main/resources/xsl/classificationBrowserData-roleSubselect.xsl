@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- 
-  XSL to transform XML output from MCRClassificationBrowser servlet
-  to HTML for client browser, which is loaded by AJAX. The browser
-  sends data of all child categories of the requested node.
- -->
+<!-- XSL to transform XML output from MCRClassificationBrowser servlet to HTML for client browser, which is loaded by AJAX. The browser sends data of all child categories 
+  of the requested node. -->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" xmlns:encoder="xalan://java.net.URLEncoder"
   xmlns:const="xalan://org.mycore.user2.MCRUser2Constants" exclude-result-prefixes="xsl xalan encoder const"
@@ -14,10 +11,11 @@
 
   <xsl:include href="coreFunctions.xsl" />
 
-  <xsl:param name="ServletsBaseURL" />
   <xsl:param name="WebApplicationBaseURL" />
+  <xsl:param name="ServletsBaseURL" />
+  <xsl:param name="template" />
 
-<!-- ========== XED Subselect detection ========== -->
+  <!-- ========== XED Subselect detection ========== -->
   <xsl:variable name="xedSession">
     <xsl:call-template name="UrlGetParam">
       <xsl:with-param name="url" select="/classificationBrowserData/@webpage" />
@@ -25,9 +23,9 @@
     </xsl:call-template>
   </xsl:variable>
 
-  <xsl:variable name="folder.closed" select="concat($WebApplicationBaseURL,'images/folder_closed_in_use.gif')" />
-  <xsl:variable name="folder.open" select="concat($WebApplicationBaseURL,'images/folder_open.gif')" />
-  <xsl:variable name="folder.leaf" select="concat($WebApplicationBaseURL,'images/folder_closed_empty.gif')" />
+  <xsl:variable name="folder.closed" select="'fa fa-lg fa-fw fa-plus-square-o'" />
+  <xsl:variable name="folder.open" select="'fa fa-lg fa-fw fa-minus-square-o'" />
+  <xsl:variable name="folder.leaf" select="'fa fa-lg fa-fw fa-square-o'" />
 
   <xsl:template match="/classificationBrowserData">
     <ul class="cbList">
@@ -36,29 +34,32 @@
         <li>
           <xsl:choose>
             <xsl:when test="@children = 'true'">
-              <input type="image" id="cbButton_{$id}" src="{$folder.closed}" onclick="toogle('{@id}','{$folder.closed}','{$folder.open}');" />
+              <a href="#" onclick="toggleClass('{@id}','{$folder.closed}','{$folder.open}');">
+                <i class="{$folder.closed}" id="cbButton_{$id}" />
+              </a>
             </xsl:when>
             <xsl:otherwise>
-              <img src="{$folder.leaf}" />
+              <i class="{$folder.leaf}" id="cbButton_{$id}" />
             </xsl:otherwise>
           </xsl:choose>
           <a>
             <xsl:attribute name="href">
-            <xsl:variable name="groupName">
-              <xsl:choose>
-                <xsl:when test="../@classification=const:getRoleRootId()">
-                  <xsl:value-of select="@id" />
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="concat(../@classification,':',@id)" />
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:variable>
-            <xsl:value-of select="concat($ServletsBaseURL,'XEditor?_xed_submit_return= ')" />
-            <xsl:value-of select="concat('&amp;_xed_session=',encoder:encode($xedSession,'UTF-8'))" />
-            <xsl:value-of select="concat('&amp;@name=',encoder:encode($groupName,'UTF-8'))" />
-            <xsl:value-of select="concat('&amp;label/@text=',encoder:encode(label,'UTF-8'))" />
-          </xsl:attribute>
+              <xsl:variable name="groupName">
+                <xsl:choose>
+                  <xsl:when test="../@classification=const:getRoleRootId()">
+                    <xsl:value-of select="@id" />
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="concat(../@classification,':',@id)" />
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+            
+              <xsl:value-of select="concat($ServletsBaseURL,'XEditor?_xed_submit_return= ')" />
+              <xsl:value-of select="concat('&amp;_xed_session=',encoder:encode($xedSession,'UTF-8'))" />
+              <xsl:value-of select="concat('&amp;@name=',encoder:encode($groupName,'UTF-8'))" />
+              <xsl:value-of select="concat('&amp;label/@text=',encoder:encode(label,'UTF-8'))" />
+            </xsl:attribute>
             <xsl:value-of select="label" />
           </a>
           <xsl:if test="description">
