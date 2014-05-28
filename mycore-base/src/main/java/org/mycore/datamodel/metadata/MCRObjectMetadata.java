@@ -28,7 +28,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.jdom2.Attribute;
 import org.jdom2.Element;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
@@ -43,6 +46,8 @@ import org.mycore.common.config.MCRConfigurationException;
  * @version $Revision$ $Date$
  */
 public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
+    private static final Logger LOGGER = Logger.getLogger(MCRObjectMetadata.class);
+
     // common data
     private boolean herited_xml = true;
 
@@ -100,7 +105,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
 
     /**
      * <em>removeInheritedMetadata</em> removes all inherited metadata elements  
-     * 
+     * TODO check necessary of <code>counter</code>
      */
     public final void removeInheritedMetadata() {
         Iterator<MCRMetaElement> elements = meta_list.iterator();
@@ -126,7 +131,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      */
     public final void appendMetadata(MCRObjectMetadata input) {
 
-        for (MCRMetaElement newelm:input) {
+        for (MCRMetaElement newelm : input) {
             int pos = -1;
 
             for (int j = 0; j < size(); j++) {
@@ -147,6 +152,72 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
             } else {
                 newelm.setNotInherit(false);
                 meta_list.add(newelm);
+            }
+        }
+    }
+
+    /**
+     * This method adds MCRMetaElement's from a given MCRObjectMetadata to
+     * this data set if there are any differences between the data sets.
+     * 
+     * @param input
+     *            the MCRObjectMetadata, that should merged into this data set
+     */
+    public final void mergeMetadata(MCRObjectMetadata input) {
+
+        for (MCRMetaElement metaElement : input) {
+            int pos = -1;
+            for (int j = 0; j < size(); j++) {
+                if (meta_list.get(j).getTag().equals(metaElement.getTag())) {
+                    pos = j;
+                }
+            }
+            if (pos != -1) {
+                for (int j = 0; j < metaElement.size(); j++) {
+                    boolean found = false;
+                    for (MCRMetaInterface mcrMetaInterface : meta_list.get(pos)) {
+                        Element xml = mcrMetaInterface.createXML();
+                        Element xmlNEW = metaElement.getElement(j).createXML();
+                        List<Element> childrenXML = xml.getChildren();
+                        if (childrenXML.size() > 0 && xmlNEW.getChildren().size() > 0) {
+                            int i = 0;
+                            for (Element element : childrenXML) {
+                                Element elementNew = xmlNEW.getChild(element.getName());
+                                if (element.getText().equals(elementNew.getText())) {
+                                    i++;
+                                }
+                            }
+                            if (i == childrenXML.size()) {
+                                found = true;
+                            }
+                        } else {
+                            if (xml.getText().equals(xmlNEW.getText())) {
+                                found = true;
+                            } else if (!found){
+                                int i = 0;
+                                List<Attribute> attributes = xml.getAttributes();
+                                for (Attribute attribute : attributes) {
+                                    Attribute attr = xmlNEW.getAttribute(attribute.getName());
+                                    if ((attr != null) && attr.equals(attribute)){
+                                        i++;
+                                    }
+                                }
+                                if (i == attributes.size()){
+                                    found = true;
+                                }
+                                
+                            }
+                        }
+                    }
+                    MCRMetaInterface obj = metaElement.getElement(j);
+                    if (!found) {
+                        meta_list.get(pos).addMetaObject(obj);
+                    } else if (LOGGER.isDebugEnabled()) {
+                        LOGGER.info("Found equal tags: \n\r" + new XMLOutputter(Format.getPrettyFormat()).outputString(obj.createXML()));
+                    }
+                }
+            } else {
+                meta_list.add(metaElement);
             }
         }
     }
@@ -235,6 +306,8 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      *            a list of relevant DOM elements for the metadata
      * @exception MCRException
      *                if a problem is occured
+     *                
+     * TODO check necessary of <code>SuppressWarnings("unchecked")</code>
      */
     public final void setFromDOM(org.jdom2.Element element) throws MCRException {
         @SuppressWarnings("unchecked")
