@@ -39,9 +39,7 @@ public class MCRLabelTransformer {
         if (MetaDataElementFactory.stringNotEmpty(label.getLang())) {
             le.setAttribute("lang", label.getLang(), XML_NAMESPACE);
         }
-        if (MetaDataElementFactory.stringNotEmpty(label.getText())) {
-            le.setAttribute("text", label.getText());
-        }
+        le.setAttribute("text", label.getText() != null ? label.getText() : "");
         if (MetaDataElementFactory.stringNotEmpty(label.getDescription())) {
             le.setAttribute("description", label.getDescription());
         }

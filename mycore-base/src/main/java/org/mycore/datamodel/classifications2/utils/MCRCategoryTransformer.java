@@ -28,7 +28,11 @@ import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.net.URI;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -229,7 +233,6 @@ public class MCRCategoryTransformer {
                 addChildren(root, category);
             }
             if (sort) {
-                @SuppressWarnings("unchecked")
                 final List<Element> items = root.getChildren("item");
                 sortItems(items);
             }
@@ -282,7 +285,6 @@ public class MCRCategoryTransformer {
             le.setText(text);
         }
 
-        @SuppressWarnings("unchecked")
         private void sortItems(List<Element> items) {
             sort(items, MCREditorItemComparator.getCurrentLangComperator());
             for (Element item : items) {
