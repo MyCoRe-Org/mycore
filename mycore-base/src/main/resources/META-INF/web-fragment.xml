@@ -383,6 +383,7 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
     <welcome-file>index.xml</welcome-file>
+    <welcome-file>index.xed</welcome-file>
   </welcome-file-list>
 
   <servlet>
