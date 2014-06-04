@@ -113,7 +113,7 @@ public class MCRSolrIndexer {
         UpdateResponse updateResponse = null;
         long start = System.currentTimeMillis();
         try {
-            LOGGER.info("Deleting \"" + solrIDs + "\" from solr");
+            LOGGER.debug("Deleting \"" + solrIDs + "\" from solr");
             UpdateRequest req = new UpdateRequest();
             //delete all documents rooted at this id
             StringBuilder deleteQuery = new StringBuilder("_root_:(");
@@ -123,7 +123,7 @@ public class MCRSolrIndexer {
                 deleteQuery.append("\" ");
             }
             deleteQuery.setCharAt(deleteQuery.length() - 1, ')');
-            LOGGER.info("Delete query:\n" + deleteQuery);
+            LOGGER.debug("Delete query:\n" + deleteQuery);
             req.deleteByQuery(deleteQuery.toString());
             //for document without nested
             req.deleteById(Arrays.asList(solrIDs));
