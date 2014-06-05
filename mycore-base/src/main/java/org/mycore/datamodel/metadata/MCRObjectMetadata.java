@@ -109,15 +109,12 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      */
     public final void removeInheritedMetadata() {
         Iterator<MCRMetaElement> elements = meta_list.iterator();
-        int counter = 0;
         while (elements.hasNext()) {
             MCRMetaElement me = elements.next();
             me.removeInheritedMetadata();
             //remove meta element if empty (else isValid() will fail)
             if (me.size() == 0) {
                 elements.remove();
-            } else {
-                counter++;
             }
         }
     }
@@ -183,8 +180,11 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
                             int i = 0;
                             for (Element element : childrenXML) {
                                 Element elementNew = xmlNEW.getChild(element.getName());
-                                if (element.getText().equals(elementNew.getText())) {
-                                    i++;
+
+                                if (elementNew != null && element != null) {
+                                    if (element.getText().equals(elementNew.getText())) {
+                                        i++;
+                                    }
                                 }
                             }
                             if (i == childrenXML.size()) {
@@ -193,19 +193,19 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
                         } else {
                             if (xml.getText().equals(xmlNEW.getText())) {
                                 found = true;
-                            } else if (!found){
+                            } else if (!found) {
                                 int i = 0;
                                 List<Attribute> attributes = xml.getAttributes();
                                 for (Attribute attribute : attributes) {
                                     Attribute attr = xmlNEW.getAttribute(attribute.getName());
-                                    if ((attr != null) && attr.equals(attribute)){
+                                    if ((attr != null) && attr.equals(attribute)) {
                                         i++;
                                     }
                                 }
-                                if (i == attributes.size()){
+                                if (i == attributes.size()) {
                                     found = true;
                                 }
-                                
+
                             }
                         }
                     }
@@ -305,12 +305,9 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      * @param element
      *            a list of relevant DOM elements for the metadata
      * @exception MCRException
-     *                if a problem is occured
-     *                
-     * TODO check necessary of <code>SuppressWarnings("unchecked")</code>
+     *                if a problem occured
      */
     public final void setFromDOM(org.jdom2.Element element) throws MCRException {
-        @SuppressWarnings("unchecked")
         List<Element> elements_list = element.getChildren();
         meta_list.clear();
         for (Element sub : elements_list) {
