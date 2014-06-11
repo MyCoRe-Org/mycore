@@ -38,7 +38,6 @@ import javax.activation.MimetypesFileTypeMap;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.jdom2.Document;
-import org.jdom2.JDOMException;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
 import org.mycore.common.MCRPersistenceException;
@@ -188,7 +187,8 @@ public class MCRSolrMCRFileDocumentFactory {
 				List<AbstractLogicalDiv> childs = getAllChilds(rootDiv);
 
 				for (AbstractLogicalDiv abstractLogicalDiv : childs) {
-					doc.addField("allMeta", abstractLogicalDiv.getLabel());
+                    doc.addField("content", abstractLogicalDiv.getLabel());
+                    doc.addField("mets."+abstractLogicalDiv.getType(), abstractLogicalDiv.getLabel());
 				}
 			} catch (Exception e) {
 				throw new MCRPersistenceException("could not parse mets.xml", e);
