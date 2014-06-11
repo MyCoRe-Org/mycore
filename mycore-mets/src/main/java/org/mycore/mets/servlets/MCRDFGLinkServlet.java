@@ -56,6 +56,10 @@ import org.mycore.mets.model.struct.PhysicalSubDiv;
  * This servlet redirect to the DFG-viewer and 
  * sets all parameters for specific images automatically if needed
  * 
+ * parameters:
+ * deriv = the MyCoReID of the derivate
+ * file = the Filename of the image
+ * 
  * @author Sebastian Röher (basti890)
  */
 public class MCRDFGLinkServlet extends MCRServlet {
