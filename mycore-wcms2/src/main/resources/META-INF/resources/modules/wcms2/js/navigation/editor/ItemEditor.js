@@ -18,6 +18,7 @@ wcms.navigation.ItemEditor = function() {
 	// layout
 	this.templateSelect = null;
 	this.styleSelect = null;
+	this.cssInput = null;
 };
 
 ( function() {
@@ -37,6 +38,7 @@ wcms.navigation.ItemEditor = function() {
 	var templateText = "component.wcms.navigation.itemEditor.template";
 	var templateNoneText = "component.wcms.navigation.itemEditor.template.none";
 	var styleText = "component.wcms.navigation.itemEditor.style";
+	var cssText = "component.wcms.navigation.itemEditor.css";
 
 	function create(/*wcms.navigation.NavigationContent*/ content) {
 		// create dijit components
@@ -55,6 +57,7 @@ wcms.navigation.ItemEditor = function() {
 //		dojo.addClass(this.templateSelect.focusNode, "mediumComponent");
 		this.styleSelect = new dijit.form.Select();
 //		dojo.addClass(this.styleSelect.focusNode, "smallComponent");
+		this.cssInput = new dijit.form.TextBox();
 
 		// call create methods
 		this.typeEditor.create(content);
@@ -179,6 +182,15 @@ wcms.navigation.ItemEditor = function() {
 				this.eventHandler.notify({"type" : "itemUpdated", "item": this.currentItem});
 			}
 		});
+		// -css input
+		dojo.connect(this.cssInput, "onChange", this, function(value) {
+			if(this.currentItem == null)
+				return;
+			if(!equal(this.currentItem.css, value)) {
+				this.currentItem.css = value;
+				this.eventHandler.notify({"type" : "itemUpdated", "item": this.currentItem});
+			}
+		});
 	}
 
 	function buildTable() {
@@ -197,6 +209,7 @@ wcms.navigation.ItemEditor = function() {
 		this.addCaption(layoutHeaderText);
 		this.addElement(templateText, this.templateSelect.domNode);
 		this.addElement(styleText, this.styleSelect.domNode);
+		this.addElement(cssText, this.cssInput.domNode);
 		
 		// update i18n texts
 		this.updateLang();
@@ -221,6 +234,7 @@ wcms.navigation.ItemEditor = function() {
 		// layout
 		this.setValue(this.templateSelect, item.template);
 		this.setValue(this.styleSelect, item.style);
+		this.setValue(this.cssInput, item.css);
 	}
 
 	function reset() {
@@ -233,6 +247,7 @@ wcms.navigation.ItemEditor = function() {
 		this.constrainPopUpCheckBox.set("checked", false);
 		this.templateSelect.set("value", null);
 		this.styleSelect.set("value", null);
+		this.cssInput.set("value", null);
 	}
 
 	function setDisabled(/*boolean*/ value) {
@@ -245,6 +260,7 @@ wcms.navigation.ItemEditor = function() {
 		this.constrainPopUpCheckBox.set("disabled", this.disabled);
 		this.templateSelect.set("disabled", this.disabled);
 		this.styleSelect.set("disabled", this.disabled);
+		this.cssInput.set("disabled", this.disabled);
 	}
 
 	function updateLang() {
