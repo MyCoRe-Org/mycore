@@ -48,7 +48,17 @@
     <servlet-name>MCRJSONProviderServlet</servlet-name>
     <url-pattern>/servlets/MCRJSONProviderServlet</url-pattern>
   </servlet-mapping>
+  
+  <servlet id="MCRDFGLinkServlet">
+    <servlet-name>MCRDFGLinkServlet</servlet-name>
+    <servlet-class>org.mycore.mets.servlets.MCRDFGLinkServlet</servlet-class>
+  </servlet>
 
+  <servlet-mapping>
+    <servlet-name>MCRDFGLinkServlet</servlet-name>
+    <url-pattern>/servlets/MCRDFGLinkServlet</url-pattern>
+  </servlet-mapping>
+  
   <filter-mapping>
     <filter-name>UserAgentFilter</filter-name>
     <servlet-name>MCRMETSServlet</servlet-name>
