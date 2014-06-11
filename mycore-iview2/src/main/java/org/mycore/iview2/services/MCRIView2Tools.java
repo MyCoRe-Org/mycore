@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
-import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -40,7 +39,6 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
 import org.apache.log4j.Logger;
-import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
@@ -55,13 +53,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
-import org.mycore.mets.model.Mets;
-import org.mycore.mets.model.files.FLocat;
-import org.mycore.mets.model.files.FileGrp;
-import org.mycore.mets.model.struct.Fptr;
-import org.mycore.mets.model.struct.PhysicalDiv;
-import org.mycore.mets.model.struct.PhysicalStructMap;
-import org.mycore.mets.model.struct.PhysicalSubDiv;
 
 /**
  * Tools class with common methods for IView2.
@@ -151,58 +142,6 @@ public class MCRIView2Tools {
         // get main file
         MCRFile mainFile = (MCRFile) root.getChildByPath(absolutePath);
         return mainFile;
-    }
-
-    /**
-     * returns the OrderNumber of mets.xml for "@xlink:href"-Value of a derivatlink
-     * 
-     * @param href
-     * @return orderNumber or 0 if not found
-     */
-    public static int getOrderNumber(String href) {
-        int orderNumber = 0;
-        String derivateID = href.substring(0, href.indexOf("/"));
-        String fileHref = href.substring(href.lastIndexOf("/") + 1, href.length());
-        String fileID = null;
-
-        MCRDirectory dir = MCRDirectory.getRootDirectory(derivateID);
-        MCRFile metsFile = (MCRFile) dir.getChildByPath("mets.xml");
-
-        if (metsFile == null) {
-            return 0;
-        }
-
-        try {
-            Document metsDoc = metsFile.getContent().asXML();
-            Mets mets = new Mets(metsDoc);
-            List<FileGrp> fileGroups = mets.getFileSec().getFileGroups();
-            for (FileGrp fileGrp : fileGroups) {
-                List<org.mycore.mets.model.files.File> fileList = fileGrp.getFileList();
-                for (org.mycore.mets.model.files.File file : fileList) {
-                    FLocat fLocat = file.getFLocat();
-                    if (fLocat.getHref().equals(fileHref))
-                        fileID = file.getId();
-                }
-            }
-
-            if (fileID != null) {
-                PhysicalStructMap structMap = (PhysicalStructMap) mets.getStructMap(PhysicalStructMap.TYPE);
-                PhysicalDiv rootDiv = structMap.getDivContainer();
-                List<PhysicalSubDiv> children = rootDiv.getChildren();
-                for (PhysicalSubDiv physicalSubDiv : children) {
-                    List<Fptr> fptrList = physicalSubDiv.getChildren();
-                    for (Fptr fptr : fptrList) {
-                        if (fptr.getFileId().equals(fileID))
-                            orderNumber = physicalSubDiv.getOrder();
-                    }
-                }
-            }
-        } catch (Exception e) {
-            throw new MCRPersistenceException("could not parse mets.xml", e);
-        }
-
-        return orderNumber;
-
     }
 
     /**
