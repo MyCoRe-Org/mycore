@@ -6,7 +6,7 @@
   <xsl:template match="mets:mdWrap[@MDTYPE='MODS']/mets:xmlData/mods:mods">
     <div class="metadata well">
       <!-- Print Authors -->
-      <xsl:if test="mods:name">
+      <xsl:if test="mods:name/mods:displayForm[../mods:role/mods:roleTerm='aut']">
         <span class="names">
           <xsl:apply-templates select="mods:name" />
           <xsl:value-of select="': ' "></xsl:value-of>
