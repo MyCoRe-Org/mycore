@@ -16,11 +16,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
-import org.jdom2.Text;
-import org.jdom2.input.JDOMParseException;
 import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 import org.mycore.frontend.servlets.MCRServlet;
 
 /**
@@ -86,6 +82,7 @@ public class MyCoReWebPageProvider {
 
     /**
      * Adds a section to the MyCoRe webpage.
+     * 
      * @param title the title of the section
      * @param xmlAsString xml string which is added to the section
      * @param lang the language of the section specified by a language key.
@@ -93,19 +90,15 @@ public class MyCoReWebPageProvider {
      */
     public Element addSection(String title, String xmlAsString, String lang) throws IOException, JDOMException {
         String tmpXmlAsString = "<tmp>" + xmlAsString + "</tmp>";
-        try {
-            SAXBuilder saxBuilder = new SAXBuilder();
-            StringReader reader = new StringReader(tmpXmlAsString);
-            Document doc = saxBuilder.build(reader);
-            Element tmpRoot = doc.getRootElement();
-            List<Content> contentList = new ArrayList<>();
-            for(int i = 0; i < tmpRoot.getContentSize(); i++) {
-                contentList.add(tmpRoot.getContent(i).detach());
-            }
-            return this.addSection(title, contentList, lang);
-        } catch (JDOMParseException jdomParseExc) {
-            return this.addSection(title, new Text(xmlAsString), lang);
+        SAXBuilder saxBuilder = new SAXBuilder();
+        StringReader reader = new StringReader(tmpXmlAsString);
+        Document doc = saxBuilder.build(reader);
+        Element tmpRoot = doc.getRootElement();
+        List<Content> contentList = new ArrayList<>();
+        for (int i = 0; i < tmpRoot.getContentSize(); i++) {
+            contentList.add(tmpRoot.getContent(i).detach());
         }
+        return this.addSection(title, contentList, lang);
     }
 
     /**
