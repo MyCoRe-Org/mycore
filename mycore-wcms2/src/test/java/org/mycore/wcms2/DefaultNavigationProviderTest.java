@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.mycore.wcms2.MCRWCMSUtil;
 import org.mycore.wcms2.navigation.MCRWCMSDefaultNavigationProvider;
 
 import com.google.gson.JsonArray;

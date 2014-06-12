@@ -205,8 +205,9 @@ wcms.navigation.NavigationContent = function() {
 	}
 
 	function getWebpageContentFromServer(/*JSON*/ item, /*function*/ onSuccess, /*function*/ onError, /*boolean*/ initialize) {
+		var href = item.href != null ? item.href : (item.hrefStartingPage != null ? item.hrefStartingPage : null);
 		var xhrArgs = {
-			url : wcms.settings.wcmsURL + "/navigation/content?webpagePath=" + item.href,
+			url : wcms.settings.wcmsURL + "/navigation/content?webpagePath=" + href,
 			handleAs : "json",
 			load : dojo.hitch(this, function(returnData) {
 				var content = returnData.content;

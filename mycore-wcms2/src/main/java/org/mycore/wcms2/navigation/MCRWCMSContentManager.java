@@ -148,7 +148,10 @@ public class MCRWCMSContentManager {
             if (!item.has("dirty") || !item.get("dirty").getAsBoolean()) {
                 continue;
             }
-            if (!item.has("href") || !item.get("href").isJsonPrimitive()) {
+
+            JsonElement webpageIdElement = item.has("href") ? item.get("href") : (item.has("hrefStartingPage") ? item
+                .get("hrefStartingPage") : null);
+            if(webpageIdElement == null || !webpageIdElement.isJsonPrimitive()) {
                 continue;
             }
             //TODO wenn man nur den href ändert und nicht den content muss die datei
@@ -156,13 +159,12 @@ public class MCRWCMSContentManager {
             if (!item.has("content") || !item.get("content").isJsonArray()) {
                 continue;
             }
-            String webpageId = item.get("href").getAsString();
-            JsonArray content = item.get("content").getAsJsonArray();
-
-            Element mycoreWebpage = this.sectionProvider.fromJSON(content);
+            String webpageId = webpageIdElement.getAsString();
             if (!webpageId.endsWith(".xml")) {
                 throwError(ErrorType.invalidFile, webpageId);
             }
+            JsonArray content = item.get("content").getAsJsonArray();
+            Element mycoreWebpage = this.sectionProvider.fromJSON(content);
             // save
             try (OutputStream fout = MCRWebPagesSynchronizer.getOutputStream(webpageId)) {
                 out.output(new Document(mycoreWebpage), fout);

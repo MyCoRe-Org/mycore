@@ -3,13 +3,13 @@ package org.mycore.wcms2.navigation;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.frontend.MCRLayoutUtilities;
+import org.mycore.wcms2.datamodel.MCRNavigation;
+import org.mycore.wcms2.datamodel.MCRNavigationBaseItem;
 import org.mycore.wcms2.datamodel.MCRNavigationGroup;
 import org.mycore.wcms2.datamodel.MCRNavigationInsertItem;
 import org.mycore.wcms2.datamodel.MCRNavigationItem;
 import org.mycore.wcms2.datamodel.MCRNavigationItemContainer;
 import org.mycore.wcms2.datamodel.MCRNavigationMenuItem;
-import org.mycore.wcms2.datamodel.MCRNavigation;
-import org.mycore.wcms2.datamodel.MCRNavigationBaseItem;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;

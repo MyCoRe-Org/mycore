@@ -52,7 +52,7 @@ wcms.navigation.NavigationTab = function(navContent) {
 		createDomFunc();
 		
 		// create editor
-		this.rootItemEditor.create();
+		this.rootItemEditor.create(this.content);
 		this.rootItemEditor.eventHandler.attach(dojo.hitch(this, handleEditorEvents));
 		this.menuItemEditor.create();
 		this.menuItemEditor.eventHandler.attach(dojo.hitch(this, handleEditorEvents));

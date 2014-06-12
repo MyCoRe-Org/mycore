@@ -30,14 +30,16 @@ import com.google.gson.JsonObject;
 public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
     private static final Logger LOGGER = Logger.getLogger(MCRWCMSDefaultSectionProvider.class);
 
-    private static final List<String> HTML_TAG_LIST = Arrays.asList("html", "head", "title", "base", "link", "meta", "style", "script",
-            "noscript", "body", "body", "section", "nav", "article", "aside", "h1", "h2", "h3", "h4", "h5", "h6", "header", "footer",
-            "address", "main", "p", "hr", "pre", "blockquote", "ol", "ul", "li", "dl", "dt", "dd", "figure", "figcaption", "div", "a",
-            "em", "strong", "small", "s", "cite", "q", "dfn", "abbr", "data", "time", "code", "var", "samp", "kbd", "sub", "sup", "i", "b",
-            "u", "mark", "ruby", "rt", "rp", "bdi", "bdo", "span", "br", "wbr", "ins", "del", "img", "iframe", "embed", "object", "param",
-            "video", "audio", "source", "track", "canvas", "map", "area", "svg", "math", "table", "caption", "colgroup", "col", "tbody",
-            "thead", "tfoot", "tr", "td", "th", "form", "fieldset", "legend", "label", "input", "button", "select", "datalist", "optgroup",
-            "option", "textarea", "keygen", "output", "progress", "meter", "details", "summary", "menuitem", "menu");
+    private static final List<String> HTML_TAG_LIST = Arrays.asList("html", "head", "title", "base", "link", "meta",
+        "style", "script", "noscript", "body", "body", "section", "nav", "article", "aside", "h1", "h2", "h3", "h4",
+        "h5", "h6", "header", "footer", "address", "main", "p", "hr", "pre", "blockquote", "ol", "ul", "li", "dl",
+        "dt", "dd", "figure", "figcaption", "div", "a", "em", "strong", "small", "s", "cite", "q", "dfn", "abbr",
+        "data", "time", "code", "var", "samp", "kbd", "sub", "sup", "i", "b", "u", "mark", "ruby", "rt", "rp", "bdi",
+        "bdo", "span", "br", "wbr", "ins", "del", "img", "iframe", "embed", "object", "param", "video", "audio",
+        "source", "track", "canvas", "map", "area", "svg", "math", "table", "caption", "colgroup", "col", "tbody",
+        "thead", "tfoot", "tr", "td", "th", "form", "fieldset", "legend", "label", "input", "button", "select",
+        "datalist", "optgroup", "option", "textarea", "keygen", "output", "progress", "meter", "details", "summary",
+        "menuitem", "menu");
 
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
@@ -93,7 +95,8 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
      * Returns true if an element and all childs are HTML or Mycore Tags
      */
     private boolean isHTMLElment(Element element) {
-        if (HTML_TAG_LIST.contains(element.getName().toLowerCase()) || MYCORE_TAG_LIST.contains(element.getName().toLowerCase())) {
+        if (HTML_TAG_LIST.contains(element.getName().toLowerCase())
+            || MYCORE_TAG_LIST.contains(element.getName().toLowerCase())) {
             boolean valid = true;
             for (Element el : element.getChildren()) {
                 valid = valid & isHTMLElment(el);
@@ -156,8 +159,7 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
             try {
                 wp.addSection(title, xmlAsString, lang);
             } catch (Exception exc) {
-                LOGGER.error("while add a section", exc);
-                continue;
+                throw new RuntimeException("unable to add section " + title, exc);
             }
         }
         wp.updateMeta(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID(), null);

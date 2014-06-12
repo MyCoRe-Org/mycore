@@ -15,10 +15,6 @@ import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMResult;
 import org.junit.Before;
 import org.junit.Test;
-import org.mycore.wcms2.datamodel.MCRNavigationInsertItem;
-import org.mycore.wcms2.datamodel.MCRNavigationItem;
-import org.mycore.wcms2.datamodel.MCRNavigationMenuItem;
-import org.mycore.wcms2.datamodel.MCRNavigation;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;

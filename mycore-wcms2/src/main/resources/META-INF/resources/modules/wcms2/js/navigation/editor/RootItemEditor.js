@@ -10,7 +10,8 @@ wcms.navigation.RootItemEditor = function() {
 
 	// links
 	this.hrefTextBox = null;
-	this.hrefStartingPageTextBox = null;
+	this.hrefStartingPageEditor = null;
+	
 	this.dirTextBox = null;
 	// titles & layout
 	this.mainTitleTextBox = null;
@@ -33,11 +34,11 @@ wcms.navigation.RootItemEditor = function() {
 	var templateText = "component.wcms.navigation.itemEditor.template";
 	var templateNoneText = "component.wcms.navigation.itemEditor.template.none";
 
-	function create() {
+	function create(/*wcms.navigation.NavigationContent*/ content) {
 		// create dijit components
 		// links
 		this.hrefTextBox = new dijit.form.TextBox({intermediateChanges: true});
-		this.hrefStartingPageTextBox = new dijit.form.TextBox({intermediateChanges: true});
+		this.hrefStartingPageEditor = new wcms.navigation.TypeEditor();
 		this.dirTextBox = new dijit.form.TextBox({intermediateChanges: true});
 		// titles & layout
 		this.mainTitleTextBox = new dijit.form.TextBox({intermediateChanges: true});
@@ -45,6 +46,9 @@ wcms.navigation.RootItemEditor = function() {
 		this.templateSelect = new dijit.form.Select({
 			maxHeight: "300",
 		});
+
+		// call create methods
+		this.hrefStartingPageEditor.create(content);
 
 		// layout
 		getTemplateList(dojo.hitch(this, function(data) {
@@ -77,14 +81,28 @@ wcms.navigation.RootItemEditor = function() {
 			}
 		});
 		// -href starting page
-		dojo.connect(this.hrefStartingPageTextBox, "onChange", this, function(/*String*/ value) {
+		this.hrefStartingPageEditor.eventHandler.attach(dojo.hitch(this, function(/*TypeEditor*/ source, /*Json*/ args) {
 			if(this.currentItem == null)
 				return;
-			if(!equal(this.currentItem.hrefStartingPage, value)) {
-				this.currentItem.hrefStartingPage = value;
-				this.eventHandler.notify({"type" : "itemUpdated", "item": this.currentItem});
+			var dirty = false;
+			var forceNoMerge = false;
+			if(args.type == "contentChanged") {
+				this.currentItem.content = args.webpageContent;
+				dirty = true;
+				forceNoMerge = true;
+			} else if(args.type == "hrefChanged" && this.currentItem.hrefStartingPage != args.value &&
+					  !(this.currentItem.hrefStartingPage == undefined && args.value == "")) {
+				this.currentItem.hrefStartingPage = args.value;
+				dirty = true;
 			}
-		});
+			if(dirty) {
+				this.eventHandler.notify({
+					"type" : "itemUpdated",
+					"item": this.currentItem,
+					"forceNoMerge" : forceNoMerge
+				});
+			}
+		}));
 		// -directory
 		dojo.connect(this.dirTextBox, "onChange", this, function(/*String*/ value) {
 			if(this.currentItem == null)
@@ -129,7 +147,7 @@ wcms.navigation.RootItemEditor = function() {
 
 		// links
 		this.addElement(hrefText, this.hrefTextBox.domNode);
-		this.addElement(hrefStartingPageText, this.hrefStartingPageTextBox.domNode);
+		this.addElement(hrefStartingPageText, this.hrefStartingPageEditor.domNode);
 		this.addElement(dirText, this.dirTextBox.domNode);
 		// titles and layouts
 		this.addCaption(titleAndLayoutCaption);
@@ -144,7 +162,7 @@ wcms.navigation.RootItemEditor = function() {
 		this.currentItem = item;
 		// general
 		this.setValue(this.hrefTextBox, item.href);
-		this.setValue(this.hrefStartingPageTextBox, item.hrefStartingPage);
+		this.hrefStartingPageEditor.update(item);
 		this.setValue(this.dirTextBox, item.dir);
 		// titles & layout
 		this.setValue(this.mainTitleTextBox, item.mainTitle);
@@ -157,7 +175,7 @@ wcms.navigation.RootItemEditor = function() {
 			this.currentItem = null;
 		// links
 		this.hrefTextBox.set("value", null);
-		this.hrefStartingPageTextBox.set("value", null);
+		this.hrefStartingPageEditor.reset();
 		this.dirTextBox.set("value", null);
 		// titles and layouts
 		this.mainTitleText.set("value", null);
@@ -169,7 +187,7 @@ wcms.navigation.RootItemEditor = function() {
 		this.disabled = value;
 		// links
 		this.hrefTextBox.set("disabled", this.disabled);
-		this.hrefStartingPageTextBox.set("disabled", this.disabled);
+		this.hrefStartingPageEditor.setDisabled(this.disabled);
 		this.dirTextBox.set("disabled", this.disabled);
 		// titles and layouts
 		this.mainTitleTextBox.set("disabled", this.disabled);
@@ -180,6 +198,8 @@ wcms.navigation.RootItemEditor = function() {
 	function updateLang() {
 		// update labels
 		wcms.gui.ContentEditor.prototype.updateLang.call(this);
+		// editors
+		this.hrefStartingPageEditor.updateLang();
 		// update drop down labels
 		I18nManager.getInstance().updateI18nSelect(this.templateSelect);
 	}

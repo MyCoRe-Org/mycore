@@ -12,9 +12,13 @@ import com.google.gson.JsonObject;
 public interface MCRWCMSNavigationProvider extends MCRWCMSJSONProvider<MCRNavigation, JsonObject> {
 
     public final static String JSON_HIERARCHY = "hierarchy";
+
     public final static String JSON_ITEMS = "items";
+
     public final static String JSON_CHILDREN = "children";
+
     public final static String JSON_WCMS_ID = "wcmsId";
+
     public final static String JSON_WCMS_TYPE = "wcmsType";
 
     public enum WCMSType {

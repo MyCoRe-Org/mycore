@@ -11,7 +11,9 @@ import com.google.gson.JsonArray;
 public interface MCRWCMSSectionProvider extends MCRWCMSJSONProvider<Element, JsonArray> {
 
     public final static String JSON_TITLE = "title";
+
     public final static String JSON_LANG = "lang";
+
     public final static String JSON_DATA = "data";
 
     /**

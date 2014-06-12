@@ -11,7 +11,6 @@ import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMResult;
 import org.junit.Before;
 import org.junit.Test;
-import org.mycore.wcms2.datamodel.MCRNavigationItem;
 import org.mycore.wcms2.datamodel.MCRNavigationItem.Style;
 import org.mycore.wcms2.datamodel.MCRNavigationItem.Target;
 import org.mycore.wcms2.datamodel.MCRNavigationItem.Type;

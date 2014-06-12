@@ -116,8 +116,11 @@ wcms.navigation.TypeEditor = function() {
 	function update(/* JSON */item) {
 		this.itemId = item.wcmsId;
 		this.typeSelect.set("value", item.type);
-		this.hrefTextBox.set("value", item.href);
-		if (item.href == undefined) {
+		if (item.href != undefined) {
+			this.hrefTextBox.set("value", item.href);
+		} else if(item.hrefStartingPage != undefined) {
+			this.hrefTextBox.set("value", item.hrefStartingPage);
+		} else {
 			this.hrefTextBox.set("value", null);
 		}
 		var updateEditContentButtonFunc = dojo.hitch(this, updateEditContentButton);
