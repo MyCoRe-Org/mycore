@@ -22,6 +22,8 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.events.MCREvent;
+import org.mycore.common.events.MCREventManager;
 
 /**
  * Represents a stored file or directory node with its metadata and content.
@@ -234,13 +236,14 @@ public abstract class MCRFilesystemNode {
     public void setName(String name) {
         ensureNotDeleted();
 
-        if (this.name.equals(name)) {
+        if (this.name != null && this.name.equals(name)) {
             return;
         }
 
         checkName(name, true);
         this.name = name;
         touch(true);
+        fireUpdateEvent();
     }
 
     protected void touch(boolean recursive) {
@@ -251,6 +254,12 @@ public abstract class MCRFilesystemNode {
         if (recursive && parentID != null) {
             getParent().touch(true);
         }
+    }
+
+    protected void fireUpdateEvent() {
+        MCREvent event = new MCREvent(MCREvent.FILE_TYPE, MCREvent.UPDATE_EVENT);
+        event.put("file", this);
+        MCREventManager.instance().handleEvent(event);
     }
 
     /**
@@ -277,12 +286,13 @@ public abstract class MCRFilesystemNode {
             label = null;
         }
 
-        if (this.label.equals(label)) {
+        if (label != null && label.equals(this.label)) {
             return;
         }
 
         this.label = label;
         touch(true);
+        fireUpdateEvent();
     }
 
     /**
