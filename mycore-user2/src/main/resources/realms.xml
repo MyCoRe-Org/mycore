@@ -16,8 +16,8 @@
         </label>
       </info>
     </login>
-    <!-- 
-    <create url="../authorization/create-account.xml">
+    <!--
+    <create url="../authorization/create-account.xed">
       <label xml:lang="de">Neue persönliche Benutzerkennung einrichten</label>
       <label xml:lang="en">Generate a new personal user account</label>
       <info>
@@ -29,9 +29,9 @@
       </info>
     </create>
      -->
-    <passwordChangeURL>../authorization/change-password.xml?action=password</passwordChangeURL>
+    <passwordChangeURL>../authorization/change-password.xed?action=password</passwordChangeURL>
   </realm>
-  <!-- 
+  <!--
   <realm id="servlet3">
     <label xml:lang="de">Servlet 3 Login</label>
     <label xml:lang="en">Servlet 3 login</label>
