@@ -241,7 +241,7 @@ public class MCRConfigurationDir {
                         pos = -1;
                         currentUrl = testURL;
                     }
-                    if (pos > 0) {
+                    if (pos > 0 && libsOrder != null /*if <absolute-ordering> present in web.xml */) {
                         for (int i = 0; i < libsOrder.size(); i++) {
                             if (testURLStr.contains(libsOrder.get(i)) && i < pos) {
                                 currentUrl = testURL;
