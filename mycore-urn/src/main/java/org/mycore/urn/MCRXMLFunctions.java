@@ -26,14 +26,13 @@ package org.mycore.urn;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.xml.MCRDOMUtils;
 import org.mycore.urn.hibernate.MCRURN;
 import org.mycore.urn.services.MCRURNManager;
 import org.w3c.dom.Document;
@@ -47,18 +46,6 @@ import org.w3c.dom.NodeList;
 public class MCRXMLFunctions {
 
     private static Logger LOGGER = Logger.getLogger(MCRXMLFunctions.class);
-
-    private static final DocumentBuilder DOC_BUILDER;
-
-    static {
-        DocumentBuilder documentBuilder = null;
-        try {
-            documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            LOGGER.error("Could not instantiate DocumentBuilder. Not all functions will be available.", e);
-        }
-        DOC_BUILDER = documentBuilder;
-    }
 
     private MCRXMLFunctions() {
     }
@@ -122,51 +109,56 @@ public class MCRXMLFunctions {
      */
     @SuppressWarnings("unchecked")
     public static NodeList getURNsForMCRID(String mcrid) {
-        Session session = MCRHIBConnection.instance().getSession();
-        Criteria criteria = session.createCriteria(MCRURN.class);
-        criteria.add(Restrictions.eq("key.mcrid", mcrid));
-        Document document = DOC_BUILDER.newDocument();
-        Element rootElement = document.createElement("urn");
-        document.appendChild(rootElement);
+        DocumentBuilder documentBuilder = MCRDOMUtils.getDocumentBuilderUnchecked();
+        try {
+            Document document = documentBuilder.newDocument();
+            Session session = MCRHIBConnection.instance().getSession();
+            Criteria criteria = session.createCriteria(MCRURN.class);
+            criteria.add(Restrictions.eq("key.mcrid", mcrid));
+            Element rootElement = document.createElement("urn");
+            document.appendChild(rootElement);
 
-        LOGGER.info("Getting all urns for object " + mcrid);
-        long start = System.currentTimeMillis();
-        long temp = start;
+            LOGGER.info("Getting all urns for object " + mcrid);
+            long start = System.currentTimeMillis();
+            long temp = start;
 
-        List<MCRURN> results = criteria.list();
-        LOGGER.debug("This took " + (System.currentTimeMillis() - start) + " ms");
-        LOGGER.debug("Processing the result list");
+            List<MCRURN> results = criteria.list();
+            LOGGER.debug("This took " + (System.currentTimeMillis() - start) + " ms");
+            LOGGER.debug("Processing the result list");
 
-        for (MCRURN result : results) {
-            LOGGER.debug("Processing urn " + result.getURN());
-            start = System.currentTimeMillis();
+            for (MCRURN result : results) {
+                LOGGER.debug("Processing urn " + result.getURN());
+                start = System.currentTimeMillis();
 
-            String path = result.getPath();
-            String filename = result.getFilename();
+                String path = result.getPath();
+                String filename = result.getFilename();
 
-            if (path != null && filename != null) {
-                path = path.trim();
-                if (path.length() > 0 && path.charAt(0) == '/') {
-                    path = path.substring(1);
+                if (path != null && filename != null) {
+                    path = path.trim();
+                    if (path.length() > 0 && path.charAt(0) == '/') {
+                        path = path.substring(1);
+                    }
+
+                    path += filename.trim();
+
+                    Element file = document.createElement("file");
+                    file.setAttribute("urn", result.getKey().getMcrurn());
+                    file.setAttribute("name", path);
+                    rootElement.appendChild(file);
+
+                } else {
+                    rootElement.setAttribute("mcrid", result.getKey().getMcrid());
+                    rootElement.setAttribute("urn", result.getKey().getMcrurn());
                 }
-
-                path += filename.trim();
-
-                Element file = document.createElement("file");
-                file.setAttribute("urn", result.getKey().getMcrurn());
-                file.setAttribute("name", path);
-                rootElement.appendChild(file);
-
-            } else {
-                rootElement.setAttribute("mcrid", result.getKey().getMcrid());
-                rootElement.setAttribute("urn", result.getKey().getMcrurn());
+                session.evict(result);
+                long duration = System.currentTimeMillis() - start;
+                LOGGER.debug("URN processed in " + duration + " ms");
             }
-            session.evict(result);
-            long duration = System.currentTimeMillis() - start;
-            LOGGER.debug("URN processed in " + duration + " ms");
+            LOGGER.debug("Processing all URN took " + (System.currentTimeMillis() - temp) + " ms");
+            return rootElement.getChildNodes();
+        } finally {
+            MCRDOMUtils.releaseDocumentBuilder(documentBuilder);
         }
-        LOGGER.debug("Processing all URN took " + (System.currentTimeMillis() - temp) + " ms");
-        return rootElement.getChildNodes();
     }
 
     public static String getURNforFile(String derivate, String path) {

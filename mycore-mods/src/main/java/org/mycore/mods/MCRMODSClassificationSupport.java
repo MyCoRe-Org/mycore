@@ -28,12 +28,11 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.xml.MCRDOMUtils;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -54,18 +53,6 @@ public final class MCRMODSClassificationSupport {
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
     private static final Logger LOGGER = Logger.getLogger(MCRMODSClassificationSupport.class);
-
-    private static final DocumentBuilder DOC_BUILDER;
-
-    static {
-        DocumentBuilder documentBuilder = null;
-        try {
-            documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            LOGGER.error("Could not instantiate DocumentBuilder. Not all functions will be available.", e);
-        }
-        DOC_BUILDER = documentBuilder;
-    }
 
     private MCRMODSClassificationSupport() {
     }
@@ -112,34 +99,41 @@ public final class MCRMODSClassificationSupport {
      * it represents that category. This is used as a Xalan extension.
      */
     public static NodeList getClassNodes(final NodeList sources) {
+        DocumentBuilder documentBuilder = MCRDOMUtils.getDocumentBuilderUnchecked();
         try {
+            Document document = documentBuilder.newDocument();
             final Element source = (Element) sources.item(0);
             final String categId = source.getAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "categId");
             final MCRCategoryID categoryID = MCRCategoryID.fromString(categId);
             final MCRAuthorityInfo mCRAuthorityInfo = MCRAuthorityInfo.getAuthorityInfo(categoryID);
-            final Element returns = DOC_BUILDER.newDocument().createElement("returns");
+            final Element returns = document.createElement("returns");
             mCRAuthorityInfo.setInElement(returns);
             return returns.getChildNodes();
         } catch (Throwable e) {
             LOGGER.warn("Error in Xalan Extension", e);
             return null;
+        } finally {
+            MCRDOMUtils.releaseDocumentBuilder(documentBuilder);
         }
     }
 
     public static NodeList getMCRClassNodes(final NodeList sources) {
+        DocumentBuilder documentBuilder = MCRDOMUtils.getDocumentBuilderUnchecked();
         try {
+            final Document document = documentBuilder.newDocument();
             final Element source = (Element) sources.item(0);
             MCRCategoryID category = getCategoryID(source);
             if (category == null) {
                 return null;
             }
-            final Document document = DOC_BUILDER.newDocument();
             final Element returns = document.createElement("returns");
             returns.setAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "mcr:categId", category.toString());
             return returns.getChildNodes();
         } catch (Throwable e) {
             LOGGER.warn("Error in Xalan Extension", e);
             return null;
+        } finally {
+            MCRDOMUtils.releaseDocumentBuilder(documentBuilder);
         }
     }
 

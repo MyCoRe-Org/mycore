@@ -47,6 +47,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.xml.MCRDOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -76,18 +77,6 @@ public class MCRTranslation {
     private static Properties DEPRECATED_MAPPING = loadProperties();
 
     private static Set<String> AVAILABLE_LANGUAGES = loadAvailableLanguages();
-
-    private static final ThreadLocal<DocumentBuilder> BUILDER_LOCAL = new ThreadLocal<DocumentBuilder>() {
-        @Override
-        protected DocumentBuilder initialValue() {
-            try {
-                return DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            } catch (ParserConfigurationException pce) {
-                LOGGER.error("Unable to create document builder", pce);
-                return null;
-            }
-        }
-    };
 
     /**
      * provides translation for the given label (property key).
@@ -295,15 +284,20 @@ public class MCRTranslation {
     }
 
     public static Document getAvailableLanguagesAsXML() {
-        Document document = BUILDER_LOCAL.get().newDocument();
-        Element i18nRoot = document.createElement("i18n");
-        document.appendChild(i18nRoot);
-        for (String lang : AVAILABLE_LANGUAGES) {
-            Element langElement = document.createElement("lang");
-            langElement.setTextContent(lang);
-            i18nRoot.appendChild(langElement);
+        DocumentBuilder documentBuilder = MCRDOMUtils.getDocumentBuilderUnchecked();
+        try {
+            Document document = documentBuilder.newDocument();
+            Element i18nRoot = document.createElement("i18n");
+            document.appendChild(i18nRoot);
+            for (String lang : AVAILABLE_LANGUAGES) {
+                Element langElement = document.createElement("lang");
+                langElement.setTextContent(lang);
+                i18nRoot.appendChild(langElement);
+            }
+            return document;
+        } finally {
+            MCRDOMUtils.releaseDocumentBuilder(documentBuilder);
         }
-        return document;
     }
 
     static String[] getStringArray(String masked) {
@@ -395,7 +389,8 @@ public class MCRTranslation {
     }
 
     public static ResourceBundle getResourceBundle(String baseName, Locale locale) {
-        return baseName.contains(".")?ResourceBundle.getBundle(baseName, locale):ResourceBundle.getBundle("stacked:" + baseName, locale, CONTROL);
+        return baseName.contains(".") ? ResourceBundle.getBundle(baseName, locale) : ResourceBundle.getBundle(
+            "stacked:" + baseName, locale, CONTROL);
     }
 
 }

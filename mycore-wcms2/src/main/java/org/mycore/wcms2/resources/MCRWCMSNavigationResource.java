@@ -18,10 +18,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.xml.MCRDOMUtils;
 import org.mycore.frontend.MCRLayoutUtilities;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 import org.mycore.wcms2.MCRWCMSUtil;
@@ -104,22 +104,24 @@ public class MCRWCMSNavigationResource {
 
     protected MCRNavigation getNavigation() throws IOException, ParserConfigurationException, SAXException,
         JAXBException {
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        docFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-        org.w3c.dom.Document doc = docBuilder.parse(MCRLayoutUtilities.getNavigationURL().toString());
-        if (doc.getElementsByTagName("menu").getLength() == 0) {
-            NodeList nodeList = doc.getFirstChild().getChildNodes();
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                if (nodeList.item(i).getNodeType() == Node.ELEMENT_NODE) {
-                    ((org.w3c.dom.Element) nodeList.item(i)).setAttribute("id", nodeList.item(i).getNodeName());
-                    doc.renameNode(nodeList.item(i), null, "menu");
+        DocumentBuilder documentBuilder = MCRDOMUtils.getDocumentBuilderUnchecked();
+        try {
+            org.w3c.dom.Document doc = documentBuilder.parse(MCRLayoutUtilities.getNavigationURL().toString());
+            if (doc.getElementsByTagName("menu").getLength() == 0) {
+                NodeList nodeList = doc.getFirstChild().getChildNodes();
+                for (int i = 0; i < nodeList.getLength(); i++) {
+                    if (nodeList.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                        ((org.w3c.dom.Element) nodeList.item(i)).setAttribute("id", nodeList.item(i).getNodeName());
+                        doc.renameNode(nodeList.item(i), null, "menu");
+                    }
                 }
+            } else {
+                getConfig().set("MCR.NavigationFile.SaveInOldFormat", false);
             }
-        } else {
-            getConfig().set("MCR.NavigationFile.SaveInOldFormat", false);
+            return MCRWCMSUtil.load(doc);
+        } finally {
+            MCRDOMUtils.releaseDocumentBuilder(documentBuilder);
         }
-        return MCRWCMSUtil.load(doc);
     }
 
     protected MCRWCMSNavigationProvider getNavigationProvider() {
