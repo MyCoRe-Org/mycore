@@ -12,6 +12,8 @@ wcms.navigation.EditContentDialog = function() {
 	this.i18nTitle = "component.wcms.navigation.itemEditor.editContent.title";
 
 	this.selectedSection = null;
+	
+	this.href = null;
 
 	// ck editor
 	this.editorDiv = null;
@@ -168,10 +170,11 @@ wcms.navigation.EditContentDialog = function() {
 		}));
 	}
 
-	function show(/*JSON*/ content) {
+	function show(/*JSON*/ content, href) {
 		// super.show();
 		wcms.gui.AbstractDialog.prototype.show.call(this);
 		// load content
+		this.href = href;
 		var loadContentFunc = dojo.hitch(this, loadContent);
 		loadContentFunc(content);
 		
@@ -208,6 +211,7 @@ wcms.navigation.EditContentDialog = function() {
 			contentData = this.selectedSection.data;
 		// ck editor settings
 		var lang=I18nManager.getInstance().getLang();
+		var folderHref = this.href.substring(0, this.href.lastIndexOf("/"))
 		this.editor = CKEDITOR.appendTo(this.editorDiv.domNode, {
 			toolbar : contentToolbar,
 			uiColor : '#9AB8F3',
@@ -216,7 +220,9 @@ wcms.navigation.EditContentDialog = function() {
 			entities: false,
 			basicEntities: true,
 			allowedContent: true,
-			autoParagraph: false
+			autoParagraph: false,
+			filebrowserImageBrowseUrl: '/rsc/wcms2/filebrowser?href=' + folderHref,
+		  	filebrowserImageUploadUrl: '/rsc/wcms2/filebrowser/upload?href=' + folderHref
 		}, contentData);
 	}
 

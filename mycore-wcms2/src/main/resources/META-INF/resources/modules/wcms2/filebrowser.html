@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+	<link href="filebrowser/gui/css/filebrowser.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="/bootstrap/css/bootstrap.css">
+<title>MyCore File Browser</title>
+</head>
+<body>
+	<div id="filebrowser">
+		<div id="folder-list-div" class="well">
+			<h2 id="folder-label"></h2>
+			<ul id="folder-list-ul"></ul>
+			<div id="bottom-buttons">			
+				<div id="add-folder"><span class="glyphicon glyphicon-plus-sign"></span></div>
+				<div id="delete-folder"><span class="glyphicon glyphicon-minus-sign"></span></div>
+			</div>
+
+		</div>
+		<div id="file-view" class="well">
+			<div id="uploadbar"></div>
+			<div id="files" ondragover="return false"></div>
+		</div>
+	</div>
+
+ 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+ 	<script src="filebrowser/gui/js/filebrowser.js"></script>
+
+</body>
+</html>

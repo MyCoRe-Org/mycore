@@ -1,0 +1,228 @@
+html,body{
+	width: 100%;
+	height: 100%;
+}
+
+#filebrowser{
+	padding: 15px;
+	width: 100%;
+	height: 100%;
+}
+
+.hide-folder {
+    display: none;
+}
+
+ul{
+	list-style: none outside none;
+}
+
+.button{
+	cursor: pointer;
+	padding-right: 5px;
+}
+
+.icon{
+	padding-right: 5px;
+	cursor: default;
+}
+
+.no-button{
+	min-width: 19px;
+	padding-right: 5px;
+	display: inline-block;
+}
+
+.folder-name{
+	display: inline;
+	position: relative;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.folder{
+	white-space: nowrap;
+}
+
+.file{
+	border: 1px solid #000;
+	width: 110px;
+	height: 150px;
+	display: inline-block;
+	float: left;
+	margin-right: 10px;
+	margin-bottom: 10px;
+	text-align: center;
+	position: relative;
+	background-color: white;
+}
+
+.file-image{
+	position: absolute;
+	margin: auto;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	width: auto;
+	height: auto;
+	max-width: 100px;
+	max-height: 100px;
+}
+
+.file-image-cotainer{
+	display: block;
+	width: 100px;
+	height: 100px;
+	position: relative;
+	margin: auto;
+}
+
+.file-title{
+	width: 100px;
+	padding-right: 5px;
+	padding-left: 5px;
+	position: absolute;
+	bottom: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+
+}
+
+#file-view{
+	display: inline-block;
+	width: 70%;
+	height: 100%;
+	overflow: auto;
+	margin-bottom: 0px;
+}
+
+#files{
+	height: 100%;
+	
+}
+
+#folder-list-div{
+	margin-bottom: 0px;
+	display: inline-block;
+	width: 30%;
+	height: 100%;
+	float: left;
+	position: relative;
+}
+
+.statusbar{
+	border: 1px solid #000;
+	width: 100%;
+	height: 70px;
+	display: inline-block;
+	float: left;
+	margin-right: 10px;
+	margin-bottom: 10px;
+	text-align: center;
+	position: relative;
+}
+
+.statusbar-image{
+	position: absolute;
+	margin: auto;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	width: auto;
+	height: auto;
+	max-width: 50px;
+	max-height: 50px;
+}
+
+.statusbar-image-cotainer{
+	display: inline-block;
+	width: 50px;
+	height: 50px;
+	position: relative;
+	float: left;
+	margin-left: 5px;
+}
+
+.statusbar-progress{
+	width: 520px;
+	height: 20px;
+	border: 1px solid #000;
+}
+
+.statusbar-progress-container{
+	display: inline-block;
+}
+
+.statusbar-progress-status{
+	background-color: #F4AB75;
+	width: 0%;
+	height: 100%;
+}
+
+.faded{
+    opacity: 0.3;
+}
+
+.aktiv:BEFORE {
+    background-color: #3276B1;
+    content: "";
+    height: 20px;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    left: 0;
+}
+
+.aktiv{
+	position: relative;
+}
+
+li.aktiv > div.folder-name{
+	color: #FFFFFF;
+}
+
+li.aktiv > span{
+	color: #FFFFFF;
+}
+
+#folder-list-ul{
+	padding-left: 0px;
+	overflow: auto;
+	max-height: 70%;
+}
+
+ul{
+	padding-left: 15px;
+}
+
+#bottom-buttons{
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	padding-left: 20px;
+	padding-top: 5px;
+	width: 100%;
+	margin-bottom: 10px;
+}
+
+#bottom-buttons > div{
+	cursor: pointer;
+}
+
+#bottom-buttons > div > span{
+	padding-right: 5px;
+}
+
+.folder-name{
+	cursor: default;
+}
+
+.file-file{
+	font-size: 50px;
+	padding-top: 20px;
+	text-align: center;
+}

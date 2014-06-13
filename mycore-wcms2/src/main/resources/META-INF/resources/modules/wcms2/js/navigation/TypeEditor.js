@@ -178,7 +178,7 @@ wcms.navigation.TypeEditor = function() {
 			return;
 		}
 		this.content.getWebpageContent(this.itemId, dojo.hitch(this, function(content, item) {
-			this.editContentDialog.show(content);
+			this.editContentDialog.show(content, item.href);
 		}), dojo.hitch(this, handleError));
 	}
 
