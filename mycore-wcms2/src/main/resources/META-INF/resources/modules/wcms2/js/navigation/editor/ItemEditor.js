@@ -120,6 +120,9 @@ wcms.navigation.ItemEditor = function() {
 					  !(this.currentItem.href == undefined && args.value == "")) {
 				this.currentItem.href = args.value;
 				dirty = true;
+			} else if(args.type == "contentMoved") {
+				this.currentItem.href = args.to;
+				dirty = true;
 			}
 			if(dirty) {
 				this.eventHandler.notify({

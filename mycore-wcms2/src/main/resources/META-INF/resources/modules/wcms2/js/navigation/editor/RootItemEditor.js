@@ -94,6 +94,9 @@ wcms.navigation.RootItemEditor = function() {
 					  !(this.currentItem.hrefStartingPage == undefined && args.value == "")) {
 				this.currentItem.hrefStartingPage = args.value;
 				dirty = true;
+			} else if(args.type == "contentMoved") {
+				this.currentItem.hrefStartingPage = args.to;
+				dirty = true;
 			}
 			if(dirty) {
 				this.eventHandler.notify({

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -14,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration;
@@ -38,7 +41,7 @@ public class MCRWCMSContentManager {
     private MCRWCMSSectionProvider sectionProvider;
 
     public enum ErrorType {
-        notExist, invalidFile, notMyCoReWebPage, invalidDirectory, couldNotSave
+        notExist, invalidFile, notMyCoReWebPage, invalidDirectory, couldNotSave, couldNotMove
     }
 
     public MCRWCMSContentManager() {
@@ -151,7 +154,7 @@ public class MCRWCMSContentManager {
 
             JsonElement webpageIdElement = item.has("href") ? item.get("href") : (item.has("hrefStartingPage") ? item
                 .get("hrefStartingPage") : null);
-            if(webpageIdElement == null || !webpageIdElement.isJsonPrimitive()) {
+            if (webpageIdElement == null || !webpageIdElement.isJsonPrimitive()) {
                 continue;
             }
             //TODO wenn man nur den href ändert und nicht den content muss die datei
@@ -172,6 +175,24 @@ public class MCRWCMSContentManager {
                 LOGGER.error("Error while saving " + webpageId, exc);
                 throwError(ErrorType.couldNotSave, webpageId);
             }
+        }
+    }
+
+    public void move(String from, String to) {
+        try {
+            // copy
+            URL fromURL = MCRWebPagesSynchronizer.getURL(from);
+            SAXBuilder builder = new SAXBuilder();
+            Document document = builder.build(fromURL);
+            XMLOutputter out = new XMLOutputter(Format.getPrettyFormat().setEncoding("UTF-8"));
+            try (OutputStream fout = MCRWebPagesSynchronizer.getOutputStream(to)) {
+                out.output(document, fout);
+            }
+            // delete old
+            Files.delete(Paths.get(fromURL.toURI()));
+        } catch (Exception exc) {
+            LOGGER.error("Error moving " + from + " to " + to, exc);
+            throwError(ErrorType.couldNotMove, to);
         }
     }
 

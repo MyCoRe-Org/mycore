@@ -94,6 +94,7 @@
         <script type="text/javascript" src="{$jsPath}/navigation/I18nEditor.js"></script>
         <script type="text/javascript" src="{$jsPath}/navigation/TypeEditor.js"></script>
         <script type="text/javascript" src="{$jsPath}/navigation/EditContentDialog.js"></script>
+        <script type="text/javascript" src="{$jsPath}/navigation/MoveContentDialog.js"></script>
 
         <script type="text/javascript" src="{$jsPath}/navigation/undo/InsertUndo.js"></script>
         <script type="text/javascript" src="{$jsPath}/navigation/undo/RemoveUndo.js"></script>

@@ -1,7 +1,5 @@
 package org.mycore.wcms2.resources;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -16,24 +14,14 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.xml.MCRDOMUtils;
-import org.mycore.frontend.MCRLayoutUtilities;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
-import org.mycore.wcms2.MCRWCMSUtil;
-import org.mycore.wcms2.MCRWebPagesSynchronizer;
 import org.mycore.wcms2.access.MCRWCMSPermission;
 import org.mycore.wcms2.datamodel.MCRNavigation;
 import org.mycore.wcms2.navigation.MCRWCMSContentManager;
-import org.mycore.wcms2.navigation.MCRWCMSDefaultNavigationProvider;
+import org.mycore.wcms2.navigation.MCRWCMSNavigationManager;
 import org.mycore.wcms2.navigation.MCRWCMSNavigationProvider;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -48,7 +36,7 @@ public class MCRWCMSNavigationResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String get() {
         try {
-            JsonObject json = getNavigationProvider().toJSON(getNavigation());
+            JsonObject json = MCRWCMSNavigationManager.getNavigationAsJSON();
             return json.toString();
         } catch (Exception exc) {
             throw new WebApplicationException(exc, Status.INTERNAL_SERVER_ERROR);
@@ -74,12 +62,9 @@ public class MCRWCMSNavigationResource {
         }
         JsonObject saveObject = jsonStreamParser.next().getAsJsonObject();
         // get navigation
-        MCRNavigation newNavigation = getNavigationProvider().fromJSON(saveObject);
+        MCRNavigation newNavigation = MCRWCMSNavigationManager.fromJSON(saveObject);
         // save navigation
-        OutputStream out = MCRWebPagesSynchronizer.getOutputStream(MCRLayoutUtilities.NAV_RESOURCE);
-        MCRWCMSUtil.save(newNavigation, out);
-        out.flush();
-        out.close();
+        MCRWCMSNavigationManager.save(newNavigation);
         // save content
         JsonArray items = saveObject.get(MCRWCMSNavigationProvider.JSON_ITEMS).getAsJsonArray();
         getContentManager().save(items);
@@ -90,7 +75,7 @@ public class MCRWCMSNavigationResource {
     @Path("templates")
     @Produces(MediaType.APPLICATION_JSON)
     public String getTemplates(@Context ServletContext servletContext) throws Exception {
-        String templatePath = getConfig().getString("MCR.WCMS2.templatePath", "/templates/master/");
+        String templatePath = MCRConfiguration.instance().getString("MCR.WCMS2.templatePath", "/templates/master/");
         Set<String> resourcePaths = servletContext.getResourcePaths(templatePath);
         JsonArray returnArr = new JsonArray();
         if (resourcePaths != null) {
@@ -102,39 +87,26 @@ public class MCRWCMSNavigationResource {
         return returnArr.toString();
     }
 
-    protected MCRNavigation getNavigation() throws IOException, ParserConfigurationException, SAXException,
-        JAXBException {
-        DocumentBuilder documentBuilder = MCRDOMUtils.getDocumentBuilderUnchecked();
-        try {
-            org.w3c.dom.Document doc = documentBuilder.parse(MCRLayoutUtilities.getNavigationURL().toString());
-            if (doc.getElementsByTagName("menu").getLength() == 0) {
-                NodeList nodeList = doc.getFirstChild().getChildNodes();
-                for (int i = 0; i < nodeList.getLength(); i++) {
-                    if (nodeList.item(i).getNodeType() == Node.ELEMENT_NODE) {
-                        ((org.w3c.dom.Element) nodeList.item(i)).setAttribute("id", nodeList.item(i).getNodeName());
-                        doc.renameNode(nodeList.item(i), null, "menu");
-                    }
-                }
-            } else {
-                getConfig().set("MCR.NavigationFile.SaveInOldFormat", false);
-            }
-            return MCRWCMSUtil.load(doc);
-        } finally {
-            MCRDOMUtils.releaseDocumentBuilder(documentBuilder);
+    @POST
+    @Path("move")
+    public void move(@QueryParam("from") String from, @QueryParam("to") String to) throws Exception {
+        if (from == null || to == null) {
+            throw new WebApplicationException(Response.status(Status.BAD_REQUEST)
+                .entity("from or to parameter not set").build());
         }
-    }
+        // move it
+        getContentManager().move(from, to);
 
-    protected MCRWCMSNavigationProvider getNavigationProvider() {
-        return getConfig().getInstanceOf("MCR.WCMS2.NavigationProvider",
-            MCRWCMSDefaultNavigationProvider.class.getName());
+        // update navigation
+        MCRNavigation navigation = MCRWCMSNavigationManager.getNavigation();
+        boolean hrefUpdated = MCRWCMSNavigationManager.updateHref(navigation, from, to);
+        if (hrefUpdated) {
+            MCRWCMSNavigationManager.save(navigation);
+        }
     }
 
     protected MCRWCMSContentManager getContentManager() {
         return new MCRWCMSContentManager();
-    }
-
-    protected static MCRConfiguration getConfig() {
-        return MCRConfiguration.instance();
     }
 
 }

@@ -24,9 +24,11 @@ wcms.navigation.TypeEditor = function() {
 
 	// components
 	this.extraDiv = dojo.create("div");
+	this.moveContentButton = null;
 	this.editContent = null;
 	this.reloadContentButton = null;
 	this.editContentDialog = new wcms.navigation.EditContentDialog();
+	this.moveContentDialog = new wcms.navigation.MoveContentDialog();
 	this.hrefTextBox = null;
 
 	// current item
@@ -42,6 +44,7 @@ wcms.navigation.TypeEditor = function() {
 (function() {
 
 	var editorContentText = "component.wcms.navigation.typeEditor.editContent";
+	var moveContentText = "component.wcms.navigation.typeEditor.moveContent";
 
 	var internText = "component.wcms.navigation.typeEditor.intern";
 	var externText = "component.wcms.navigation.typeEditor.extern";
@@ -77,6 +80,9 @@ wcms.navigation.TypeEditor = function() {
 		});
 
 		// content
+		this.moveContentButton = new dijit.form.Button({
+			i18n : moveContentText
+		});
 		this.editContent = new dijit.form.Button({
 			i18n : editorContentText
 		});
@@ -89,10 +95,12 @@ wcms.navigation.TypeEditor = function() {
 		this.domNode.appendChild(this.typeSelect.domNode);
 		this.domNode.appendChild(this.hrefTextBox.domNode);
 		this.domNode.appendChild(this.extraDiv);
+		this.extraDiv.appendChild(this.moveContentButton.domNode);
 		this.extraDiv.appendChild(this.editContent.domNode);
 		this.extraDiv.appendChild(this.reloadContentButton.domNode);
 
 		// events
+		dojo.connect(this.moveContentButton, "onClick", this, onMoveContent);
 		dojo.connect(this.editContent, "onClick", this, onEditContent);
 		dojo.connect(this.reloadContentButton, "onClick", this, onReloadContent);
 		dojo.connect(this.hrefTextBox, "onChange", this, function(/* String */newValue) {
@@ -111,6 +119,27 @@ wcms.navigation.TypeEditor = function() {
 				});
 			}
 		}));
+		this.moveContentDialog.eventHandler.attach(dojo.hitch(this, function(/* MoveContentDialog */source, /* Json */args) {
+			var from = this.hrefTextBox.get("value");
+			var to = args.href;
+			if (args.type == "moveButtonClicked" && to != from) {
+				var xhrArgs = {
+					url : wcms.settings.wcmsURL + "/navigation/move?from=" + from + "&to=" + to,
+					load : dojo.hitch(this, function() {
+						this.eventHandler.notify({
+							"type" : "contentMoved",
+							"from" : from,
+							"to" : to
+						});
+					}),
+					error : function(error, xhr) {
+						console.log(error);
+						alert("An error occur. Cannot move file from " + from + " to " + to);
+					}
+				};
+				dojo.xhrPost(xhrArgs);
+			}
+		}));
 	}
 
 	function update(/* JSON */item) {
@@ -123,8 +152,7 @@ wcms.navigation.TypeEditor = function() {
 		} else {
 			this.hrefTextBox.set("value", null);
 		}
-		var updateEditContentButtonFunc = dojo.hitch(this, updateEditContentButton);
-		updateEditContentButtonFunc();
+		dojo.hitch(this, onUpdateType)();
 	}
 
 	function reset() {
@@ -137,23 +165,25 @@ wcms.navigation.TypeEditor = function() {
 		this.disabled = value;
 		this.typeSelect.set("disabled", this.disabled);
 		this.editContent.set("disabled", this.disabled);
+		this.moveContentButton.set("disabled", this.disabled);
 		this.hrefTextBox.set("disabled", this.disabled);
 	}
 
 	function updateType(/* String */type) {
-		var updateEditContentButtonFunc = dojo.hitch(this, updateEditContentButton);
-		updateEditContentButtonFunc();
+		dojo.hitch(this, onUpdateType)();
 		this.eventHandler.notify({
 			"type" : "typeChanged",
 			"value" : type
 		});
 	}
 
-	function updateEditContentButton() {
+	function onUpdateType() {
 		var item = this.content.getItem(this.itemId);
 		var type = this.typeSelect.get("value");
 		var showContentButton = (item != null && type != this.Type.extern && this.hrefTextBox.isValid());
 		this.editContent.set("disabled", !showContentButton);
+		this.moveContentButton.set("disabled", !showContentButton);
+		this.hrefTextBox.set("disabled", showContentButton);
 		if (showContentButton && item.content != null) {
 			this.reloadContentButton.set("disabled", false);
 			this.reloadContentButton.set("iconClass", "icon16 reloadIcon16");
@@ -164,10 +194,20 @@ wcms.navigation.TypeEditor = function() {
 	}
 
 	function updateLang() {
+		I18nManager.getInstance().updateI18nButton(this.moveContentButton);
 		I18nManager.getInstance().updateI18nButton(this.editContent);
 		I18nManager.getInstance().updateI18nSelect(this.typeSelect);
 		I18nManager.getInstance().updateI18nValidationTextBox(this.hrefTextBox);
 		this.editContentDialog.updateLang();
+	}
+
+	function onMoveContent() {
+		var href = this.hrefTextBox.get("value");
+		if (href == null || href == "") {
+			console.log("Unexpected error: href is null or empty");
+			return;
+		}
+		this.moveContentDialog.show(href);
 	}
 
 	function onEditContent() {
@@ -178,7 +218,8 @@ wcms.navigation.TypeEditor = function() {
 			return;
 		}
 		this.content.getWebpageContent(this.itemId, dojo.hitch(this, function(content, item) {
-			this.editContentDialog.show(content, item.href);
+			var href = this.hrefTextBox.get("value");
+			this.editContentDialog.show(content, href);
 		}), dojo.hitch(this, handleError));
 	}
 
