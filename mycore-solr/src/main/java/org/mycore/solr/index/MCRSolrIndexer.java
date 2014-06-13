@@ -298,7 +298,8 @@ public class MCRSolrIndexer {
      */
     public static void dropIndex() throws Exception {
         LOGGER.info("Dropping solr index...");
-        MCRSolrServerFactory.getSolrServer().deleteByQuery("*:*");
+        SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
+        solrServer.deleteByQuery("*:*", BATCH_AUTO_COMMIT_WITHIN_MS);
         LOGGER.info("Dropping solr index...done");
     }
 
@@ -313,7 +314,8 @@ public class MCRSolrIndexer {
         }
 
         LOGGER.info("Dropping solr index for type " + type + "...");
-        MCRSolrServerFactory.getSolrServer().deleteByQuery("objectType:" + type + " _root_:*_" + type + "_*");
+        String deleteQuery = MessageFormat.format("objectType:{0} _root_:*_{1}_*", type, type);
+        MCRSolrServerFactory.getSolrServer().deleteByQuery(deleteQuery, BATCH_AUTO_COMMIT_WITHIN_MS);
         LOGGER.info("Dropping solr index for type " + type + "...done");
     }
 
