@@ -207,13 +207,15 @@ return declare("mycore.classification.RestStore", JsonRest, {
 	 * @return position as integer
 	 */
     indexAt: function(item, parent) {
-    	parent = (parent != null) ? parent : this.getParent(item); 
-		for(var index = 0; index < parent.children.length; index++) {
-			var childItem = parent.children[index];
-			if(classUtil.isIdEqual(childItem.id, item.id)) {
-				return index;
+    	parent = (parent != null) ? parent : this.getParent(item);
+    	if(parent != null) {
+			for(var index = 0; index < parent.children.length; index++) {
+				var childItem = parent.children[index];
+				if(classUtil.isIdEqual(childItem.id, item.id)) {
+					return index;
+				}
 			}
-		}
+    	}
 		return -1;
     },
 
