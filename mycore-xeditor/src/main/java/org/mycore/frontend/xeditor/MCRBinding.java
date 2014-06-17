@@ -138,6 +138,17 @@ public class MCRBinding {
             track(MCRRemoveAttribute.remove((Attribute) node));
     }
 
+    public Element addEmptyElement(int index) {
+        Element template = (Element) (boundNodes.get(index));
+        Element newElement = new Element(template.getQualifiedName());
+        Element parent = template.getParentElement();
+        int indexInParent = parent.indexOf(template) + 1;
+        parent.addContent(indexInParent, newElement);
+        boundNodes.add(index + 1, newElement);
+        trackNodeCreated(newElement);
+        return newElement;
+    }
+    
     public Element cloneBoundElement(int index) {
         Element template = (Element) (boundNodes.get(index));
         Element newElement = template.clone();
