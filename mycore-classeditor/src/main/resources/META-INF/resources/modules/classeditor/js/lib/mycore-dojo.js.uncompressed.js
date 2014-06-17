@@ -464,7 +464,7 @@ return declare("mycore.common.I18nResolver", null, {
 });
 },
 'dojo/NodeList-manipulate':function(){
-define(["./query", "./_base/lang", "./_base/array", "./dom-construct", "./NodeList-dom"], function(dquery, lang, array, construct){
+define(["./query", "./_base/lang", "./_base/array", "./dom-construct", "./dom-attr", "./NodeList-dom"], function(dquery, lang, array, construct, attr){
 	// module:
 	//		dojo/NodeList-manipulate
 
@@ -480,25 +480,6 @@ define(["./query", "./_base/lang", "./_base/array", "./dom-construct", "./NodeLi
 
 	//TODO: add a way to parse for widgets in the injected markup?
 
-	function getText(/*DOMNode*/node){
-		// summary:
-		//		recursion method for text() to use. Gets text value for a node.
-		// description:
-		//		Juse uses nodedValue so things like <br/> tags do not end up in
-		//		the text as any sort of line return.
-		var text = "", ch = node.childNodes;
-		for(var i = 0, n; n = ch[i]; i++){
-			//Skip comments.
-			if(n.nodeType != 8){
-				if(n.nodeType == 1){
-					text += getText(n);
-				}else{
-					text += n.nodeValue;
-				}
-			}
-		}
-		return text;
-	}
 
 	function getWrapInsertion(/*DOMNode*/node){
 		// summary:
@@ -591,13 +572,19 @@ define(["./query", "./_base/lang", "./_base/array", "./dom-construct", "./NodeLi
 			//	|	<div id="foo"></div>
 			//	|	<div id="bar"></div>
 			//		This code inserts `<p>Hello World</p>` into both divs:
-			//	|	dojo.query("div").innerHTML("<p>Hello World</p>");
+			//	|	require(["dojo/query", "dojo/NodeList-manipulate"
+			//	|	], function(query){
+			//	|		query("div").innerHTML("<p>Hello World</p>");
+			//	| 	});
 			// example:
 			//		assume a DOM created by this markup:
 			//	|	<div id="foo"><p>Hello Mars</p></div>
 			//	|	<div id="bar"><p>Hello World</p></div>
 			//		This code returns `<p>Hello Mars</p>`:
-			//	|	var message = dojo.query("div").innerHTML();
+			//	|	require(["dojo/query", "dojo/NodeList-manipulate"
+			//	|	], function(query){
+			//	|		var message = query("div").innerHTML();
+			//	| 	});
 			if(arguments.length){
 				return this.addContent(value, "only"); // dojo/NodeList
 			}else{
@@ -636,28 +623,33 @@ define(["./query", "./_base/lang", "./_base/array", "./dom-construct", "./NodeLi
 			//	|	<div id="foo"></div>
 			//	|	<div id="bar"></div>
 			//		This code inserts "Hello World" into both divs:
-			//	|	dojo.query("div").text("Hello World");
+			//	|	require(["dojo/query", "dojo/NodeList-manipulate"
+			//	|	], function(query){
+			//	|		query("div").text("Hello World");
+			//	| 	});
 			// example:
 			//		assume a DOM created by this markup:
 			//	|	<div id="foo"><p>Hello Mars <span>today</span></p></div>
 			//	|	<div id="bar"><p>Hello World</p></div>
 			//		This code returns "Hello Mars today":
-			//	|	var message = dojo.query("div").text();
+			//	|	require(["dojo/query", "dojo/NodeList-manipulate"
+			//	|	], function(query){
+			//	|		var message = query("div").text();
+			//	| 	});
 			// returns:
 			//		if no value is passed, the result is String, the text value of the first node.
 			//		If a value is passed, the return is this dojo/NodeList
 			if(arguments.length){
 				for(var i = 0, node; node = this[i]; i++){
 					if(node.nodeType == 1){
-						construct.empty(node);
-						node.appendChild(node.ownerDocument.createTextNode(value));
+						attr.set(node, 'textContent', value);
 					}
 				}
 				return this; // dojo/NodeList
 			}else{
 				var result = "";
 				for(i = 0; node = this[i]; i++){
-					result += getText(node);
+					result += attr.get(node, 'textContent');
 				}
 				return result; //String
 			}
@@ -682,10 +674,13 @@ define(["./query", "./_base/lang", "./_base/array", "./dom-construct", "./NodeLi
 			//	|		<option value="yellow" selected>Yellow</option>
 			//	|	</select>
 			//		This code gets and sets the values for the form fields above:
-			//	|	dojo.query('[type="text"]').val(); //gets value foo
-			//	|	dojo.query('[type="text"]').val("bar"); //sets the input's value to "bar"
-			// 	|	dojo.query("select").val() //gets array value ["red", "yellow"]
-			// 	|	dojo.query("select").val(["blue", "yellow"]) //Sets the blue and yellow options to selected.
+			//	|	require(["dojo/query", "dojo/NodeList-manipulate"
+			//	|	], function(query){
+			//	|		query('[type="text"]').val(); //gets value foo
+			//	|		query('[type="text"]').val("bar"); //sets the input's value to "bar"
+			// 	|		query("select").val() //gets array value ["red", "yellow"]
+			// 	|		query("select").val(["blue", "yellow"]) //Sets the blue and yellow options to selected.
+			//	| 	});
 
 			//Special work for input elements.
 			if(arguments.length){
@@ -755,7 +750,10 @@ define(["./query", "./_base/lang", "./_base/array", "./dom-construct", "./NodeLi
 			//	|	<div id="foo"><p>Hello Mars</p></div>
 			//	|	<div id="bar"><p>Hello World</p></div>
 			//		Running this code:
-			//	|	dojo.query("div").append("<span>append</span>");
+			//	|	require(["dojo/query", "dojo/NodeList-manipulate"
+			//	|	], function(query){
+			//	|		query("div").append("<span>append</span>");
+			//	| 	});
 			//		Results in this DOM structure:
 			//	|	<div id="foo"><p>Hello Mars</p><span>append</span></div>
 			//	|	<div id="bar"><p>Hello World</p><span>append</span></div>
@@ -779,7 +777,10 @@ define(["./query", "./_base/lang", "./_base/array", "./dom-construct", "./NodeLi
 			//	|	<p>Hello Mars</p>
 			//	|	<p>Hello World</p>
 			//		Running this code:
-			//	|	dojo.query("span").appendTo("p");
+			//	|	require(["dojo/query", "dojo/NodeList-manipulate"
+			//	|	], function(query){
+			//	|		query("span").appendTo("p");
+			//	| 	});
 			//		Results in this DOM structure:
 			//	|	<p>Hello Mars<span>append</span></p>
 			//	|	<p>Hello World<span>append</span></p>
@@ -800,7 +801,10 @@ define(["./query", "./_base/lang", "./_base/array", "./dom-construct", "./NodeLi
 			//	|	<div id="foo"><p>Hello Mars</p></div>
 			//	|	<div id="bar"><p>Hello World</p></div>
 			//		Running this code:
-			//	|	dojo.query("div").prepend("<span>prepend</span>");
+			//	|	require(["dojo/query", "dojo/NodeList-manipulate"
+			//	|	], function(query){
+			//	|		query("div").prepend("<span>prepend</span>");
+			//	| 	});
 			//		Results in this DOM structure:
 			//	|	<div id="foo"><span>prepend</span><p>Hello Mars</p></div>
 			//	|	<div id="bar"><span>prepend</span><p>Hello World</p></div>
@@ -824,7 +828,10 @@ define(["./query", "./_base/lang", "./_base/array", "./dom-construct", "./NodeLi
 			//	|	<p>Hello Mars</p>
 			//	|	<p>Hello World</p>
 			//		Running this code:
-			//	|	dojo.query("span").prependTo("p");
+			//	|	require(["dojo/query", "dojo/NodeList-manipulate"
+			//	|	], function(query){
+			//	|		query("span").prependTo("p");
+			//	| 	});
 			//		Results in this DOM structure:
 			//	|	<p><span>prepend</span>Hello Mars</p>
 			//	|	<p><span>prepend</span>Hello World</p>
@@ -846,7 +853,10 @@ define(["./query", "./_base/lang", "./_base/array", "./dom-construct", "./NodeLi
 			//	|	<div id="foo"><p>Hello Mars</p></div>
 			//	|	<div id="bar"><p>Hello World</p></div>
 			//		Running this code:
-			//	|	dojo.query("div").after("<span>after</span>");
+			//	|	require(["dojo/query", "dojo/NodeList-manipulate"
+			//	|	], function(query){
+			//	|		query("div").after("<span>after</span>");
+			//	| 	});
 			//		Results in this DOM structure:
 			//	|	<div id="foo"><p>Hello Mars</p></div><span>after</span>
 			//	|	<div id="bar"><p>Hello World</p></div><span>after</span>
@@ -870,7 +880,10 @@ define(["./query", "./_base/lang", "./_base/array", "./dom-construct", "./NodeLi
 			//	|	<p>Hello Mars</p>
 			//	|	<p>Hello World</p>
 			//		Running this code:
-			//	|	dojo.query("span").insertAfter("p");
+			//	|	require(["dojo/query", "dojo/NodeList-manipulate"
+			//	|	], function(query){
+			//	|		query("span").insertAfter("p");
+			//	| 	});
 			//		Results in this DOM structure:
 			//	|	<p>Hello Mars</p><span>after</span>
 			//	|	<p>Hello World</p><span>after</span>
@@ -892,7 +905,10 @@ define(["./query", "./_base/lang", "./_base/array", "./dom-construct", "./NodeLi
 			//	|	<div id="foo"><p>Hello Mars</p></div>
 			//	|	<div id="bar"><p>Hello World</p></div>
 			//		Running this code:
-			//	|	dojo.query("div").before("<span>before</span>");
+			//	|	require(["dojo/query", "dojo/NodeList-manipulate"
+			//	|	], function(query){
+			//	|		query("div").before("<span>before</span>");
+			//	| 	});
 			//		Results in this DOM structure:
 			//	|	<span>before</span><div id="foo"><p>Hello Mars</p></div>
 			//	|	<span>before</span><div id="bar"><p>Hello World</p></div>
@@ -916,7 +932,10 @@ define(["./query", "./_base/lang", "./_base/array", "./dom-construct", "./NodeLi
 			//	|	<p>Hello Mars</p>
 			//	|	<p>Hello World</p>
 			//		Running this code:
-			//	|	dojo.query("span").insertBefore("p");
+			//	|	require(["dojo/query", "dojo/NodeList-manipulate"
+			//	|	], function(query){
+			//	|		query("span").insertBefore("p");
+			//	| 	});
 			//		Results in this DOM structure:
 			//	|	<span>before</span><p>Hello Mars</p>
 			//	|	<span>before</span><p>Hello World</p>
@@ -955,7 +974,10 @@ define(["./query", "./_base/lang", "./_base/array", "./dom-construct", "./NodeLi
 			//	|	<b>one</b>
 			//	|	<b>two</b>
 			//		Running this code:
-			//	|	dojo.query("b").wrap("<div><span></span></div>");
+			//	|	require(["dojo/query", "dojo/NodeList-manipulate"
+			//	|	], function(query){
+			//	|		query("b").wrap("<div><span></span></div>");
+			//	| 	});
 			//		Results in this DOM structure:
 			//	|	<div><span><b>one</b></span></div>
 			//	|	<div><span><b>two</b></span></div>
@@ -995,7 +1017,10 @@ define(["./query", "./_base/lang", "./_base/array", "./dom-construct", "./NodeLi
 			// 	|		<div class="blue">Blue Two</div>
 			//	|	</div>
 			//		Running this code:
-			//	|	dojo.query(".red").wrapAll('<div class="allRed"></div>');
+			//	|	require(["dojo/query", "dojo/NodeList-manipulate"
+			//	|	], function(query){
+			//	|		query(".red").wrapAll('<div class="allRed"></div>');
+			//	| 	});
 			//		Results in this DOM structure:
 			//	|	<div class="container">
 			// 	|		<div class="allRed">
@@ -1040,7 +1065,10 @@ define(["./query", "./_base/lang", "./_base/array", "./dom-construct", "./NodeLi
 			// 	|		<div class="blue">Blue Two</div>
 			//	|	</div>
 			//		Running this code:
-			//	|	dojo.query(".red").wrapInner('<span class="special"></span>');
+			//	|	require(["dojo/query", "dojo/NodeList-manipulate"
+			//	|	], function(query){
+			//	|		query(".red").wrapInner('<span class="special"></span>');
+			//	| 	});
 			//		Results in this DOM structure:
 			//	|	<div class="container">
 			// 	|		<div class="red"><span class="special">Red One</span></div>
@@ -1083,7 +1111,10 @@ define(["./query", "./_base/lang", "./_base/array", "./dom-construct", "./NodeLi
 			// 	|		<div class="blue">Blue Two</div>
 			//	|	</div>
 			//		Running this code:
-			//	|	dojo.query(".red").replaceWith('<div class="green">Green</div>');
+			//	|	require(["dojo/query", "dojo/NodeList-manipulate"
+			//	|	], function(query){
+			//	|		query(".red").replaceWith('<div class="green">Green</div>');
+			//	| 	});
 			//		Results in this DOM structure:
 			//	|	<div class="container">
 			// 	|		<div class="green">Green</div>
@@ -1124,7 +1155,10 @@ define(["./query", "./_base/lang", "./_base/array", "./dom-construct", "./NodeLi
 			// 	|		<div class="blue">Blue Two</div>
 			//	|	</div>
 			//		Running this code:
-			//	|	dojo.query(".red").replaceAll(".blue");
+			//	|	require(["dojo/query", "dojo/NodeList-manipulate"
+			//	|	], function(query){
+			//	|		query(".red").replaceAll(".blue");
+			//	| 	});
 			//		Results in this DOM structure:
 			//	|	<div class="container">
 			// 	|		<div class="spacer">___</div>
@@ -1161,7 +1195,10 @@ define(["./query", "./_base/lang", "./_base/array", "./dom-construct", "./NodeLi
 			// 	|		<div class="blue">Blue Two</div>
 			//	|	</div>
 			//		Running this code:
-			//	|	dojo.query(".red").clone().appendTo(".container");
+			//	|	require(["dojo/query", "dojo/NodeList-manipulate"
+			//	|	], function(query){
+			//	|		query(".red").clone().appendTo(".container");
+			//	| 	});
 			//		Results in this DOM structure:
 			//	|	<div class="container">
 			// 	|		<div class="red">Red One</div>

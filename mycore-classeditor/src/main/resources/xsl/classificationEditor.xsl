@@ -31,14 +31,18 @@
                 preloadCSS.push(domUtil.loadCSS(classeditor.settings.cssURL + "/font-awesome.min.css"));
               }
               all(preloadCSS).then(function() {
-                var classEditor = new mycore.classification.Editor({settings: classeditor.settings});
-                var wrapper = dom.byId("classificationEditorWrapper");
-                if(wrapper == null) {
-                  console.log("Unable to find element with id: 'classificationEditorWrapper'.");
+                try {
+                  var classEditor = new mycore.classification.Editor({settings: classeditor.settings});
+                  var wrapper = dom.byId("classificationEditorWrapper");
+                  if(wrapper == null) {
+                    console.log("Unable to find element with id: 'classificationEditorWrapper'.");
+                  }
+                  domConstruct.place(classEditor.domNode, wrapper);
+                  classEditor.loadClassification(classeditor.classId, classeditor.categoryId);
+                  classEditor.startup();
+                } catch(error) {
+                  console.log(error);
                 }
-                domConstruct.place(classEditor.domNode, wrapper);
-                classEditor.loadClassification(classeditor.classId, classeditor.categoryId);
-                classEditor.startup();
               });
             });
           });

@@ -95,6 +95,13 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 		on(this.store, "saved", lang.hitch(this, this.onStoreSaved));
 		on(this.store, "saveError", lang.hitch(this, this.onStoreSaveError));
 		on(this.store, "saveEvent", lang.hitch(this, this.onStoreSaveEvent));
+
+		// on body change event for fullscreen
+		MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+		var observer = new MutationObserver(lang.hitch(this, this.onBodyChange));
+		observer.observe(document.body, {
+			childList: true
+		});
 	},
 
 	startup: function() {
@@ -283,6 +290,19 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 		this.settingsDialog.show(this.store.isDirty());
 	},
 
+	onBodyChange: function(mutation, observer) {
+		if(!this.isFullscreen()) {
+			return;
+		}
+		var selector = ".dijitDialog, .dijitPopup, .dijitTooltip, .dijitDialogUnderlayWrapper";
+		for(var m = 0; m < mutation.length; m++) {
+			var nodes = mutation[m].addedNodes;
+			for(var n = 0; n < nodes.length; n++) {
+				domConstruct.place(nodes[n], this.domNode);
+			}
+		}
+	},
+
 	toggleFullscreen: function() {
 		var fullscreen = this.isFullscreen();
 		// toggle fullscreen
@@ -306,12 +326,17 @@ return declare("mycore.classification.Editor", [_WidgetBase, _TemplatedMixin, _W
 			}
 		}
 		// move outer div's
+		var body = query("body")[0];
+		var classEditorNode = this.domNode;
+		var selector = ".dijitDialog, .dijitPopup, .dijitTooltip, .dijitDialogUnderlayWrapper";
 		if(fullscreen) {
-			domConstruct.place(this.settingsDialog.domNode, query("body")[0]);
-			domConstruct.place(this.treePane.exportDialog.domNode, query("body")[0]);
+			query(selector, this.domNode).forEach(function(node) {
+				domConstruct.place(node, body);
+			});
 		} else {
-			domConstruct.place(this.settingsDialog.domNode, this.domNode);
-			domConstruct.place(this.treePane.exportDialog.domNode, this.domNode);
+			query(selector, body).forEach(function(node) {
+				domConstruct.place(node, classEditorNode);
+			});
 		}
 	},
 
