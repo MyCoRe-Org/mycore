@@ -46,5 +46,11 @@
       <groupId>org.apache.axis</groupId>
       <artifactId>axis-ant</artifactId>
     </dependency>
+    <dependency>
+      <!-- required for tomcat 7.0.27 or later -->
+      <scope>runtime</scope>
+      <groupId>org.apache.axis</groupId>
+      <artifactId>axis-jaxrpc</artifactId>
+    </dependency>
   </dependencies>
 </project>
