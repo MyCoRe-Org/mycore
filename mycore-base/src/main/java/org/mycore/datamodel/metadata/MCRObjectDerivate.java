@@ -233,11 +233,7 @@ public class MCRObjectDerivate {
      * @throws @{@link NullPointerException} if first argument is null
      */
     public MCRFileMetadata getOrCreateFileMetadata(MCRFile file, String urn) {
-        if (file == null) {
-            throw new NullPointerException("File may not be null");
-        }
-        String path = file.getAbsolutePath();
-        return getOrCreateFileMetadata(path, urn, null);
+        return getOrCreateFileMetadata(file, urn, null);
     }
 
     public MCRFileMetadata getOrCreateFileMetadata(MCRFile file, String urn, String handle) {
