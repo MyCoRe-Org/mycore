@@ -60,7 +60,7 @@
         <condition id="mods.typeOfResource.cond" required="true">
           <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
           <label xml:lang="en">Please select one entry!</label>
-          <label xml:lang="it">Scegliere!</label>
+          <label xml:lang="it">Scegli!</label>
         </condition>
       </list>
     </cell>
@@ -342,7 +342,7 @@
               <condition id="mods.languageTerm.cond" required="true">
                 <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
                 <label xml:lang="en">Please select one entry!</label>
-                <label xml:lang="it">Scegliere!</label>
+                <label xml:lang="it">Scegli!</label>
               </condition>
             </list>
           </cell>
@@ -1614,7 +1614,7 @@
               <item value="">
                 <label xml:lang="de">(bitte wählen)</label>
                 <label xml:lang="en">(please select)</label>
-                <label xml:lang="it">(scegliere)</label>
+                <label xml:lang="it">(scegli)</label>
               </item>
               <item value="yes">
                 <label xml:lang="de">Ja</label>
@@ -1736,7 +1736,7 @@
         <item value="">
           <label xml:lang="de">(bitte wählen)</label>
           <label xml:lang="en">(please select)</label>
-          <label xml:lang="it">(scegliere)</label>
+          <label xml:lang="it">(scegli)</label>
         </item>
         <item value="rights_reserved">
           <label xml:lang="de">Alle Rechte vorbehalten</label>
@@ -1870,7 +1870,7 @@
     <item value="">
       <label xml:lang="de">(bitte wählen)</label>
       <label xml:lang="en">(please select)</label>
-      <label xml:lang="it">(scegliere)</label>
+      <label xml:lang="it">(scegli)</label>
     </item>
   </list>
 
