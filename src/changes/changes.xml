@@ -5,7 +5,161 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2014.04" date="2014-04-00" description="Codenamed &apos;Ü-Ei&apos;">
+    <release version="2014.04" date="2014-06-00" description="2014 LTS">
+      <action dev="mcrmeich" type="add">
+        mycore-wcms2: add move content button
+      </action>
+      <action dev="mcrtchef" type="fix" date="2014-06-13" due-to="Kathleen Neumann">
+        mycore-solr: Solr index is not current
+        automatically commit when dropping index
+        <fixes issue="704"/>
+      </action>
+      <action dev="mcrtchef" type="add">
+        added MCRDOMUtils to get pooled DocumentBuilder instances
+      </action>
+      <action dev="mcrmibue" type="add">
+        mycore-wcms2: first version of wcms2 filebrowser
+        allows upload and usage of images
+      </action>
+      <action dev="mcrmeich" type="fix">
+        mycore-wcms2: xml file of navigation root is now editable
+      </action>
+      <action dev="mcrsroeh" type="add">
+        added MCRDFGLinkServlet to generate links for DFG Viewer
+      </action>
+      <action dev="mcrmeich" type="fix" date="2014-05-28">
+        classifications: return empty text labels instead of removing them -> avoid schema invalid xml
+      </action>
+      <action dev="mcrtchef" type="fix" date="2014-05-28">
+        mycore-xeditor: fixed NPE if session does not exist
+      </action>
+      <action dev="mcrsroeh" type="add">
+        MCRObjectMetadata: added method to merge two metadata sets (similar metadata gets ignored differences get added to the end)
+      </action>
+      <action dev="mcrtchef" type="fix" date="2014-05-17">
+        mycore-user2: fixed cancel button in login form
+      </action>
+      <action dev="mcrmeich" type="fix" date="2014-05-23">
+        mycore-wcms2: not existing content files can now be edited and saved
+      </action>
+      <action dev="mcradler" type="update">
+        mycore-user2: replaced old editor forms by xeditor forms
+      </action>
+      <action dev="mcrvuchi" type="add">
+        extend XSL include resolver, now can use a Java class instead of property values
+      </action>
+      <action dev="mcradler" type="add">
+        mycore-xeditor: add target to create a new empty element depend on xpath
+      </action>
+      <action dev="mcrtchef" type="add">
+        create template for mycore.properties and hibernate.cfg.xml with "create configuration directory" command
+      </action>
+      <action dev="mcrtchef" type="update">
+        MCRConfiguraionDirectory: renamed "libs" directory in configuration dir to "lib"
+      </action>
+      <action dev="mcrfluet" type="update">
+        MCRPersistentServlet accepts XEditor submissions
+      </action>
+      <action dev="mcrmeich" type="fix" date="2014-05-14">
+        mycore-wcms2: fixed issues when using "https://..."
+      </action>
+      <action dev="mcrmeich" type="update">
+        mycore-wcms2: update to dojo 1.6.2
+      </action>
+      <action dev="mcrmeich" type="update">
+        Use MCRPropertiesResolver for property substitution in MCRConfiguration
+        Properties can now be added/modified and substituted at runtime
+      </action>
+      <action dev="mcrsherm" type="add">
+        add parameter $User-Agent for XSL stylesheets
+      </action>
+      <action dev="mcrmeich" type="add">
+        mycore-iview2: add zip resource (/iview/zip): zips iview jpgs of a derivate 
+      </action>
+      <action dev="mcrmeich" type="add">
+        added MCRCategoryDAO.setLabels()
+      </action>
+      <action dev="mcrtchef" type="add">
+        mycore-solr: add support for child documents (requires SOLR 4.5)
+        see http://blog.griddynamics.com/2013/09/solr-block-join-support.html
+      </action>
+      <action dev="mcrkrebs" type="add">
+        added Italian translations
+      </action>
+      <action dev="mcrtchef" type="update">
+        moved URN related classes and files from mycore-base to newly created mycore-urn
+      </action>
+      <action dev="mcrtchef" type="fix" date="2014-04-10">
+        mycore-wcms2: allow changes of web resources from jar files
+      </action>
+      <action dev="mcrmeich" type="add">
+        mycore-wcms2: added frontend support for groups of items
+      </action>
+      <action dev="mcrtchef" type="update">
+        add default value for property: MCR.Save.FileSystem=%MCR.datadir%/save
+      </action>
+      <action dev="mcrtchef" type="add">
+        MCRLayoutUtils.getPersonalNavigation() returns complete navigation filtered for the current user
+      </action>
+      <action dev="mcrtchef" type="add">
+        mycore-wcms2: added (backend) support for group of items
+      </action>
+      <action dev="mcrmibue" type="fix" date="2014-04-04">
+        mycore-acl-editor2: fixed security issues
+      </action>
+      <action dev="mcrtchef" type="update">
+        mycore-base: disable useful but not needed eventhandler in mycore-base
+      </action>
+      <action dev="mcrtchef" type="fix" date="2014-04-03" due-to="Jens Kupferschmidt">
+        missing character set in html in mycore
+        <fixes issue="694" />
+      </action>
+      <action dev="mcrtchef" type="fix" date="2014-04-03">
+        Cache fails for MCRContentServlet with XSLTransformer
+        <fixes issue="695" />
+      </action>
+      <action dev="mcrjkupf" type="add">
+        added French translations
+      </action>
+      <action dev="mcrjkupf" type="update">
+        mycore-swf: accept input from mycore-xeditor
+      </action>
+      <action dev="mcrshofm" type="add">
+        mycore-iview2: Added new Iview-Client which can be enabled with parameter iview2.client=true
+      </action>
+      <action dev="mcrtchef" type="update">
+        when trying to resolve classpath resource use order defined in ServletContext.ORDERED_LIBS (allows overwriting of XSL files in jar files)
+      </action>
+      <action dev="mcrsroeh" type="add">
+        mycore-solr: index logical struct map of mets.xml to field "content"
+      </action>
+      <action dev="mcrtchef" type="fix" date="2014-03-28">
+        close MCRSession that is created by MCRServlet.getBaseURL()
+      </action>
+      <action dev="mcrtchef" type="update">
+        added IPv6 support for trusted proxies
+      </action>
+      <action dev="mcrmeich" type="add">
+        mycore-classeditor: add link dialog (you can see all linked objects of a classification or category)
+      </action>
+      <action dev="mcrtchef" type="update">
+        use ServletContainerInitializer to setup mycore webapp
+      </action>
+      <action dev="mcrmibue" type="fix" date="2014-03-19">
+        mycore-acl-editor2: fixed several bugs
+      </action>
+      <action dev="mcrkrebs" type="update">
+        added property for sherpa/romeo api key: MCR.Mods.SherpaRomeo.ApiKey
+      </action>
+      <action dev="mcrfluet" type="fix" date="2014-03-17">
+        mycore-base: Fixed non-unique id of checkbox and radio input elements generated from list items.
+      </action>
+      <action dev="mcrshofm" type="fix" date="2014-03-17">
+        mycore-mets: Fixed fast clicking on save button causes multiple mets.xml
+      </action>
+      <action dev="mcrtchef" type="fix">
+        mycore-solr: fixed several issues
+      </action>
       <action dev="mcrtchef" type="fix" date="2014-03-13">
         mycore-solr: fixed "mycoreobject-solrdocument" Transformer to work with MCRContentServlet
         <fixes issue="697"/>
@@ -13,6 +167,18 @@
       <action dev="mcrtchef" type="fix" date="2014-03-12" due-to="Silvio Hermann">
         mycore-solr: First request to a solr request handler results in a NullPointerException
         <fixes issue="688"/>
+      </action>
+      <action dev="mcrtchef" type="fix" date="2014-03-12">
+        add UserAgentFilter to MCRBasketServlet
+      </action>
+      <action dev="mcrsherm" type="add">
+        added xalan extension function MCRTranslation:exist(), MCRXMLFunction:getDisplayName(), MCRXMLFunction:isCategoryID()
+      </action>
+      <action dev="mcrtchef" type="remove">
+        removed mycore-wcms (replaced by mycore-wcms2)
+      </action>
+      <action dev="mcrtchef" type="remove">
+        removed old MCRSearcher code (you may need to add mycore-legacy-search dependency)
       </action>
     </release>
     <release version="2014.03" date="2014-03-07" description="Codenamed &apos;Lenzing&apos;">
