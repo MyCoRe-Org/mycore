@@ -41,8 +41,8 @@
     </site>
   </distributionManagement>
   <issueManagement>
-    <system>sourceforge</system>
-    <url>http://sourceforge.net/p/mycore/bugs/</url>
+    <system>SourceForge2</system>
+    <url>https://sourceforge.net/p/mycore/bugs/</url>
   </issueManagement>
   <ciManagement>
     <system>jenkins</system>
@@ -159,11 +159,6 @@
                 <reports>
                   <report>changes-report</report>
                 </reports>
-                <configuration>
-                  <issueLinkTemplatePerSystem>
-                    <default>http://sourceforge.net/p/mycore/bugs/%ISSUE%/</default>
-                  </issueLinkTemplatePerSystem>
-                </configuration>
               </reportSet>
             </reportSets>
           </plugin>
