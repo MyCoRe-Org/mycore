@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRCache;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRURLContent;
 
@@ -55,7 +56,8 @@ public class MCRXMLResource {
     private static Logger LOGGER = Logger.getLogger(MCRXMLResource.class);
 
     private MCRXMLResource() {
-        resourceCache = new MCRCache<String, CacheEntry>(MCRConfiguration.instance().getInt("MCR.MCRXMLResource.Cache.Size", 100), "XML resources");
+        resourceCache = new MCRCache<String, CacheEntry>(MCRConfiguration.instance().getInt(
+            "MCR.MCRXMLResource.Cache.Size", 100), "XML resources");
     }
 
     /**
@@ -161,7 +163,8 @@ public class MCRXMLResource {
         if (con == null) {
             return null;
         }
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream(64 * 1024); InputStream in = new BufferedInputStream(con.getInputStream())) {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream(64 * 1024);
+            InputStream in = new BufferedInputStream(con.getInputStream())) {
             IOUtils.copy(in, baos);
             return baos.toByteArray();
         } finally {
@@ -171,7 +174,7 @@ public class MCRXMLResource {
 
     private static URLConnection getResourceURLConnection(String name, ClassLoader classLoader) throws IOException {
         LOGGER.debug("Reading xml from classpath resource " + name);
-        URL url = classLoader.getResource(name);
+        URL url = MCRConfigurationDir.getConfigResource(name, classLoader);
         LOGGER.debug("Resource URL:" + url);
         if (url == null) {
             return null;
@@ -225,7 +228,7 @@ public class MCRXMLResource {
         }
 
         public URL getURL() {
-            return this.resolvedURL == null ? classLoader.getResource(name) : this.resolvedURL;
+            return this.resolvedURL == null ? MCRConfigurationDir.getConfigResource(name, classLoader) : this.resolvedURL;
         }
 
         @Override

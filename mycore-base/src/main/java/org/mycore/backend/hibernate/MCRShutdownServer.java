@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jdom2.JDOMException;
+import org.mycore.common.config.MCRConfigurationDir;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -79,7 +80,7 @@ public class MCRShutdownServer {
     }
 
     private static Map<String, String> getConnectionProperties() throws IOException, SAXException {
-        URL hibernateCfg = CLASS_LOADER.getResource("hibernate.cfg.xml");
+        URL hibernateCfg = MCRConfigurationDir.getConfigResource(MCRHIBConnection.getHibernateConfigResourceName());
         if (hibernateCfg == null) {
             throw new IOException("Could not find 'hibernate.cfg.xml'");
         }

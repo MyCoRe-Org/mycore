@@ -29,6 +29,7 @@ import javax.xml.transform.sax.SAXSource;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRCache;
+import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.xml.MCREntityResolver;
 import org.mycore.common.xml.MCRXMLResource;
 import org.xml.sax.InputSource;
@@ -62,7 +63,7 @@ public class MCRTemplatesSource {
     public SAXSource getSource() throws SAXException {
         XMLReader reader = XMLReaderFactory.createXMLReader();
         reader.setEntityResolver(MCREntityResolver.instance());
-        URL resourceURL = MCRXSLTransformerFactory.class.getClassLoader().getResource(resource);
+        URL resourceURL = MCRConfigurationDir.getConfigResource(resource);
         if (resourceURL == null) {
             throw new SAXException("Could not find resource: " + resource);
         }

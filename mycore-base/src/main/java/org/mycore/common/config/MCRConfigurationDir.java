@@ -196,11 +196,21 @@ public class MCRConfigurationDir {
 
     /**
      * Returns URL of a config resource.
-     * If {@link #getConfigFile(String)} returns an existing file for "resources"+{relativePath}, its URL is returned.
-     * In any other case this method returns the same as {@link ClassLoader#getResource(String)} 
+     * Same as {@link #getConfigResource(String, ClassLoader)} with second argument <code>null</code>.
      * @param relativePath as defined in {@link #getConfigFile(String)}
      */
     public static URL getConfigResource(String relativePath) {
+        return getConfigResource(relativePath, null);
+    }
+
+    /**
+     * Returns URL of a config resource.
+     * If {@link #getConfigFile(String)} returns an existing file for "resources"+{relativePath}, its URL is returned.
+     * In any other case this method returns the same as {@link ClassLoader#getResource(String)} 
+     * @param relativePath as defined in {@link #getConfigFile(String)}
+     * @param classLoader a classLoader to resolve the resource (see above), null defaults to this class' class loader
+     */
+    public static URL getConfigResource(String relativePath, ClassLoader classLoader) {
         File resolvedFile = getConfigFile("resources/" + relativePath);
         if (resolvedFile != null && resolvedFile.exists()) {
             try {
@@ -210,11 +220,11 @@ public class MCRConfigurationDir {
                     "Exception while returning URL for file: " + resolvedFile, e);
             }
         }
-        return getClassPathResource(relativePath);
+        return getClassPathResource(relativePath, classLoader == null ? MCRConfigurationDir.class.getClassLoader()
+            : classLoader);
     }
 
-    private static URL getClassPathResource(String relativePath) {
-        ClassLoader classLoader = MCRConfigurationDir.class.getClassLoader();
+    private static URL getClassPathResource(String relativePath, ClassLoader classLoader) {
         URL currentUrl = classLoader.getResource(relativePath);
         if (SERVLET_CONTEXT != null && currentUrl != null) {
             Enumeration<URL> resources = null;

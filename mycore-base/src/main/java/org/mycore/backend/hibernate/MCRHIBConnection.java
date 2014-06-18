@@ -109,8 +109,11 @@ public class MCRHIBConnection implements Closeable {
                 LOGGER.warn("Error while looking for: " + configFile, e);
             }
         }
-        String resource = MCRConfiguration.instance().getString("MCR.Hibernate.Configuration", "hibernate.cfg.xml");
-        return MCRHIBConnection.class.getClassLoader().getResource(resource);
+        return MCRConfigurationDir.getConfigResource(getHibernateConfigResourceName());
+    }
+
+    static String getHibernateConfigResourceName() {
+        return MCRConfiguration.instance().getString("MCR.Hibernate.Configuration", "hibernate.cfg.xml");
     }
 
     /**
