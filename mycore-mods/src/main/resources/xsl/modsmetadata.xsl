@@ -254,7 +254,7 @@
             </xsl:for-each>
             <xsl:if test="./structure/children/child">
               <xsl:apply-templates mode="printChildren" select="./structure/children">
-                <xsl:with-param name="label" select="'enthält'" />
+                <xsl:with-param name="label" select="i18n:translate('component.mods.metaData.dictionary.contains')" />
               </xsl:apply-templates>
             </xsl:if>
           </table>

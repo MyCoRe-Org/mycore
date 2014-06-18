@@ -1431,7 +1431,7 @@
   <helpPopup id="mods.edition.help" width="400px" height="250px">
     <label xml:lang="de">Auflage des Buches, Konferenzbandes ...</label>
     <label xml:lang="en">Edition of a book, conference proceeding ...</label>
-    <label xml:lang="it">Edizione del libro, Atti di convegno</label>
+    <label xml:lang="it">Tiratura del libro, degli Atti di convegno...</label>
   </helpPopup>
   <!-- Edition END -->
 
@@ -1526,6 +1526,7 @@
   <text id="mods.book.volume.count.label">
     <label xml:lang="de">Jahrgang/Band</label>
     <label xml:lang="en">Volume Count</label>
+    <label xml:lang="it">Conte volume</label>
   </text>
 
   <panel id="mods.book.volume.count">
@@ -1541,6 +1542,7 @@
       (Vol.) geben sowie die Bandzählung.
     </label>
     <label xml:lang="en">Volume Count</label>
+    <label xml:lang="it">Conte volume</label>
   </helpPopup>
   <!-- Bandzählung END -->
 
@@ -1548,6 +1550,7 @@
   <text id="mods.article.coverage.label">
     <label xml:lang="de">Seiten von-bis</label>
     <label xml:lang="en">Site coverage</label>
+    <label xml:lang="it">Pagine di-fino</label>
   </text>
 
   <panel id="mods.article.coverage">
@@ -1561,6 +1564,7 @@
   <helpPopup id="mods.article.coverage.help" width="400px" height="250px">
     <label xml:lang="de">Seiten von-bis</label>
     <label xml:lang="en">Site coverage</label>
+    <label xml:lang="it">Pagine di-fino</label>
   </helpPopup>
   <!-- Bandzählung END -->
 
@@ -1819,7 +1823,7 @@
         <hidden var="parents/parent/@editor.parentName" />
         <cell col="1" row="1" style="width:85px;" anchor="NORTHEAST">
           <label xml:lang="de">
-            <xhtml:span class="editorlabel">Teil von</xhtml:span>
+            <xhtml:span class="editorlabel"><text i18n="component.mods.metaData.dictionary.partOf" /></xhtml:span>
           </label>
         </cell>
         <cell col="2" row="1" var="parents" anchor="NORTHWEST" style="padding-left:3px;">
@@ -1843,11 +1847,11 @@
         <hidden var="parents/parent/@editor.parentName" />
         <cell col="1" row="1" style="width:145px;" anchor="NORTHEAST">
           <label xml:lang="de">
-            <xhtml:span class="editorlabel">Serie</xhtml:span>
+            <xhtml:span class="editorlabel"><text i18n="component.mods.metaData.dictionary.series" /></xhtml:span>
           </label>
         </cell>
         <cell col="2" row="1" var="parents" anchor="NORTHWEST" style="padding-left:3px;">
-          <output var="parent/@editor.parentName" default="keine Serie gewählt" />
+          <output var="parent/@editor.parentName" i18n="component.mods.metaData.dictionary.noSeries" />
         </cell>
       </panel>
     </cell>
