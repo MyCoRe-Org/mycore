@@ -720,7 +720,7 @@
   </xsl:template>
 
   <xsl:template match="children" mode="printChildren">
-    <xsl:param name="label" select="'enthält'" />
+    <xsl:param name="label" select="i18n:translate('component.mods.metaData.dictionary.contains')" />
     <!--*** List children per object type ************************************* -->
     <!-- 1.) get a list of objectTypes of all child elements 2.) remove duplicates from this list 3.) for-each objectTyp id list child elements -->
     <xsl:variable name="objectTypes">
