@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2014.04" date="2014-06-00" description="2014 LTS">
+      <action dev="mcrmeich" type="fix" date="2014-06-17">
+        mycore-classeditor: better exception handling and fixed editing language in fullscreen mode
+      </action>
       <action dev="mcrmeich" type="add">
         mycore-wcms2: add move content button
       </action>
