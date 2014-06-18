@@ -65,12 +65,34 @@ public class MCRMetsSave {
      * @param derivateId
      */
     public static synchronized void saveMets(Document document, MCRObjectID derivateId) {
+        saveMets(document, derivateId, true);
+    }
+
+    /**
+     * Saves the content of the given document to file, if no mets present and then adds the file to
+     * the derivate with the given id. The name of the file depends on property
+     * 'MCR.Mets.Filename'. If this property has not been set 'mets.xml' is used
+     * as a default filename.
+     * 
+     * @param document
+     * @param derivateId
+     * @param overwrite 
+     *          if true existing mets-file will be overwritten
+     */
+    public static synchronized void saveMets(Document document, MCRObjectID derivateId, boolean overwrite) {
         // add the file to the existing derivate in ifs
-        String fileName = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
-        LOGGER.info("Storing file content from \"" + fileName + "\" to derivate \"" + derivateId + "\"");
-        MCRFile uploadFile = new MCRFile(fileName, MCRMetadataManager.retrieveMCRDerivate(derivateId)
-            .receiveDirectoryFromIFS());
-        uploadFile.setContentFrom(document);
+        Document mets = null;
+        try {
+            mets = getCurrentMets(derivateId.toString());
+        } catch (Exception e) {
+            LOGGER.error(e);
+        }
+        if (mets == null || overwrite) {
+            String fileName = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
+            LOGGER.info("Storing file content from \"" + fileName + "\" to derivate \"" + derivateId + "\"");
+            MCRFile uploadFile = new MCRFile(fileName, MCRMetadataManager.retrieveMCRDerivate(derivateId).receiveDirectoryFromIFS());
+            uploadFile.setContentFrom(document);
+        }
     }
 
     /**
@@ -135,42 +157,39 @@ public class MCRMetsSave {
             f.setFLocat(fLocat);
 
             // alter the mets document
-            XPathExpression<Element> xpath = XPathFactory.instance().compile("mets:mets/mets:fileSec/mets:fileGrp",
-                Filters.element(), null, MCRConstants.METS_NAMESPACE);
+            XPathExpression<Element> xpath = XPathFactory.instance().compile("mets:mets/mets:fileSec/mets:fileGrp", Filters.element(),
+                    null, MCRConstants.METS_NAMESPACE);
             Element fileSec = xpath.evaluateFirst(mets);
             fileSec.addContent(f.asElement());
 
             /* add to structMap physical */
             XPathExpression<Attribute> attributeXpath = XPathFactory.instance().compile(
-                "mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[last()]/@ORDER",
-                Filters.attribute(), null, MCRConstants.METS_NAMESPACE);
+                    "mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[last()]/@ORDER",
+                    Filters.attribute(), null, MCRConstants.METS_NAMESPACE);
             Attribute orderAttribute = attributeXpath.evaluateFirst(mets);
             PhysicalSubDiv div = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE,
-                orderAttribute.getIntValue() + 1);
+                    orderAttribute.getIntValue() + 1);
             div.add(new Fptr(fileId));
 
             // actually alter the mets document
-            xpath = XPathFactory.instance().compile(
-                "mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']", Filters.element(), null,
-                MCRConstants.METS_NAMESPACE);
+            xpath = XPathFactory.instance().compile("mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']",
+                    Filters.element(), null, MCRConstants.METS_NAMESPACE);
             Element structMapPhys = xpath.evaluateFirst(mets);
             structMapPhys.addContent(div.asElement());
 
             /* add to structLink */
-            attributeXpath = XPathFactory.instance().compile("mets:mets/mets:structMap[@TYPE='LOGICAL']/mets:div/@ID",
-                Filters.attribute(), null, MCRConstants.METS_NAMESPACE);
+            attributeXpath = XPathFactory.instance().compile("mets:mets/mets:structMap[@TYPE='LOGICAL']/mets:div/@ID", Filters.attribute(),
+                    null, MCRConstants.METS_NAMESPACE);
             Attribute idAttribute = attributeXpath.evaluateFirst(mets);
             String rootID = idAttribute.getValue();
 
-            xpath = XPathFactory.instance().compile("mets:mets/mets:structLink", Filters.element(), null,
-                MCRConstants.METS_NAMESPACE);
+            xpath = XPathFactory.instance().compile("mets:mets/mets:structLink", Filters.element(), null, MCRConstants.METS_NAMESPACE);
             Element structLink = xpath.evaluateFirst(mets);
 
             structLink.addContent((new SmLink(rootID, div.getId()).asElement()));
 
         } catch (Exception ex) {
-            LOGGER
-                .error("Error occured while adding file " + file.getAbsolutePath() + " to the existing mets file", ex);
+            LOGGER.error("Error occured while adding file " + file.getAbsolutePath() + " to the existing mets file", ex);
             return null;
         }
 
@@ -239,8 +258,7 @@ public class MCRMetsSave {
             idFileMap.put(file.getId(), file.getFLocat().getHref());
         }
 
-        List<PhysicalSubDiv> childs = ((PhysicalStructMap) mets.getStructMap(PhysicalStructMap.TYPE)).getDivContainer()
-            .getChildren();
+        List<PhysicalSubDiv> childs = ((PhysicalStructMap) mets.getStructMap(PhysicalStructMap.TYPE)).getDivContainer().getChildren();
         for (PhysicalSubDiv divChild : childs) {
             String idMets = divChild.getChildren().get(0).getFileId();
 
@@ -264,8 +282,7 @@ public class MCRMetsSave {
             String href = file.getAbsolutePath().substring(1);
 
             // remove file from mets:fileSec/mets:fileGrp
-            org.mycore.mets.model.files.File fileToRemove = modifiedMets.getFileSec().getFileGroup(FileGrp.USE_MASTER)
-                .getFileByHref(href);
+            org.mycore.mets.model.files.File fileToRemove = modifiedMets.getFileSec().getFileGroup(FileGrp.USE_MASTER).getFileByHref(href);
             FileSec fileSec = modifiedMets.getFileSec();
             FileGrp fileGroup = fileSec.getFileGroup(FileGrp.USE_MASTER);
             fileGroup.removeFile(fileToRemove);
@@ -275,8 +292,7 @@ public class MCRMetsSave {
             physStructMap.getDivContainer().remove(PhysicalSubDiv.ID_PREFIX + fileToRemove.getId());
 
             //remove links in mets:structLink section
-            List<SmLink> list = modifiedMets.getStructLink().getSmLinkByTo(
-                PhysicalSubDiv.ID_PREFIX + fileToRemove.getId());
+            List<SmLink> list = modifiedMets.getStructLink().getSmLinkByTo(PhysicalSubDiv.ID_PREFIX + fileToRemove.getId());
             LogicalStructMap logicalStructMap = (LogicalStructMap) modifiedMets.getStructMap(LogicalStructMap.TYPE);
 
             for (SmLink linkToRemove : list) {
@@ -319,8 +335,7 @@ public class MCRMetsSave {
 
             }
         } catch (Exception ex) {
-            LOGGER.error(
-                "Error occured while removing file " + file.getAbsolutePath() + " from the existing mets file", ex);
+            LOGGER.error("Error occured while removing file " + file.getAbsolutePath() + " from the existing mets file", ex);
             return null;
         }
 
