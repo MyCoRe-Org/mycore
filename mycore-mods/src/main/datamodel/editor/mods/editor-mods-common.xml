@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <imports xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  <include uri="webapp:editor/editor-mods-external.xml" ref="external.monster.blob" />
+  <include uri="redirect:editor-mods-external" ref="external.monster.blob" />
 
   <list id="language" type="dropdown" default="en">
     <include uri="classification:editor:-1:children:rfc4646" cacheable="false" />

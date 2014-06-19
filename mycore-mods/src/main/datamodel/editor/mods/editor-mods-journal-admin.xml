@@ -9,7 +9,7 @@
     <hidden var="service" descendants="true" />
     <hidden var="metadata/@xml:lang" default="de" />
 
-    <include uri="webapp:editor/editor-mods-external.xml" ref="mods.additional.admin" />
+    <include uri="redirect:editor-mods-external" ref="mods.additional.admin" />
 
     <hidden var="metadata/def.modsContainer/modsContainer/mods:mods/@ID" />
     <hidden var="metadata/def.modsContainer/@class" default="MCRMetaXML" />

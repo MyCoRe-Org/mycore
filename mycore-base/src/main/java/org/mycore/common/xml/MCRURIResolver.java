@@ -190,6 +190,7 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("basket", new org.mycore.frontend.basket.MCRBasketResolver());
         supportedSchemes.put("language", new org.mycore.datamodel.language.MCRLanguageResolver());
         supportedSchemes.put("chooseTemplate", new MCRChooseTemplateResolver());
+        supportedSchemes.put("redirect", new MCRRedirectResolver());
         return supportedSchemes;
     }
 
@@ -1148,7 +1149,7 @@ public final class MCRURIResolver implements URIResolver {
         }
 
     }
-    
+
     /**
      * <p>
      * Includes xsl files which are set in the mycore.properties file.
@@ -1165,6 +1166,7 @@ public final class MCRURIResolver implements URIResolver {
      */
     private static class MCRXslIncludeResolver implements URIResolver {
         private static Logger LOGGER = Logger.getLogger(MCRXslIncludeResolver.class);
+
         @Override
         public Source resolve(String href, String base) throws TransformerException {
             String includePart = href.substring(href.indexOf(":") + 1);
@@ -1172,16 +1174,17 @@ public final class MCRURIResolver implements URIResolver {
 
             Element root = new Element("stylesheet", xslNamespace);
             root.setAttribute("version", "1.0");
-            
+
             // get the parameters from mycore.properties
             String propertyName = "MCR.URIResolver.xslIncludes." + includePart;
             List<String> propValue = Collections.emptyList();
-            if(includePart.startsWith("class.")){
-                MCRXslIncludeHrefs incHrefClass = MCRConfiguration.instance().<MCRXslIncludeHrefs>getInstanceOf(propertyName);
+            if (includePart.startsWith("class.")) {
+                MCRXslIncludeHrefs incHrefClass = MCRConfiguration.instance().<MCRXslIncludeHrefs> getInstanceOf(
+                    propertyName);
                 propValue = incHrefClass.getHrefs();
-            }else{
+            } else {
                 propValue = MCRConfiguration.instance().getStrings(propertyName, propValue);
-                
+
             }
 
             for (String include : propValue) {
@@ -1194,8 +1197,8 @@ public final class MCRURIResolver implements URIResolver {
             return new JDOMSource(root);
         }
     }
-    
-    public interface MCRXslIncludeHrefs{
+
+    public interface MCRXslIncludeHrefs {
         public List<String> getHrefs();
     }
 
@@ -1428,6 +1431,28 @@ public final class MCRURIResolver implements URIResolver {
             }
             MCRFileMetadata fileMetadata = objectDerivate.getOrCreateFileMetadata("/" + pathParts[1]);
             return new JDOMSource(fileMetadata.createXML());
+        }
+    }
+
+    /**
+     * Redirect to different URIResolver that is defined via property.
+     * 
+     * This resolver is meant to serve static content as no variable substitution takes place
+     * 
+     * Example: MCR.URIResolver.redirect.alias=webapp:path/to/alias.xml
+     */
+    private static class MCRRedirectResolver implements URIResolver {
+        private static Logger LOGGER = Logger.getLogger(MCRRedirectResolver.class);
+
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            String configsuffix = href.substring(href.indexOf(":") + 1);
+
+            // get the parameters from mycore.properties
+            String propertyName = "MCR.URIResolver.redirect." + configsuffix;
+            String propValue = MCRConfiguration.instance().getString(propertyName);
+            LOGGER.info("Redirect " + href + " to " + propValue);
+            return singleton.resolve(propValue, base);
         }
     }
 
