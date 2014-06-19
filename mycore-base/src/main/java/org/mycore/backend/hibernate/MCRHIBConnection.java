@@ -113,7 +113,8 @@ public class MCRHIBConnection implements Closeable {
     }
 
     static String getHibernateConfigResourceName() {
-        return MCRConfiguration.instance().getString("MCR.Hibernate.Configuration", "hibernate.cfg.xml");
+        //do not query MCRConfiguration as it is maybe not yet initialized.
+        return "hibernate.cfg.xml"; //standard anyway
     }
 
     /**
