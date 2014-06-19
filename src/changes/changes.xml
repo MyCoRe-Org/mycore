@@ -5,7 +5,22 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
-    <release version="2014.04" date="2014-06-00" description="2014 LTS">
+    <release version="2014.04" date="2014-06-20" description="2014 LTS">
+      <action dev="mcrtchef" type="remove">
+        removed support of property MCR.Hibernate.Configuration property (is fixed to 'hibernate.cfg.xml')
+      </action>
+      <action dev="mcrtchef" type="add">
+        mycore-mods: added MCRMODSEmbargoFilter that enforces an embargo on requested files
+      </action>
+      <action dev="mcrtchef" type="add">
+        added "redirect:" URIResolver
+      </action>
+      <action dev="mcrtchef" type="update">
+        when resolving class resources use MCRConfigurationDir.getConfigResource() instead of j.l.ClassLoader.getResource()
+      </action>
+      <action dev="mcrsroeh" type="add">
+        mycore-mets: added method to overwrite a METS file
+      </action>
       <action dev="mcrmeich" type="fix" date="2014-06-17">
         mycore-classeditor: better exception handling and fixed editing language in fullscreen mode
       </action>
