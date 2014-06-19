@@ -44,7 +44,6 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.common.MCRISO8601Date;
-import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.i18n.MCRTranslation;
@@ -226,10 +225,6 @@ public class MCRUserServlet extends MCRServlet {
         }
 
         Document doc = (Document) (req.getAttribute("MCRXEditorSubmission"));
-        if (doc == null) {
-            MCREditorSubmission sub = (MCREditorSubmission) (req.getAttribute("MCREditorSubmission"));
-            doc = sub.getXML();
-        }
         Element u = doc.getRootElement();
         updateBasicUserInfo(u, currentUser);
         MCRUserManager.updateUser(currentUser);
@@ -258,10 +253,6 @@ public class MCRUserServlet extends MCRServlet {
         }
 
         Document doc = (Document) (req.getAttribute("MCRXEditorSubmission"));
-        if (doc == null) {
-            MCREditorSubmission sub = (MCREditorSubmission) (req.getAttribute("MCREditorSubmission"));
-            doc = sub.getXML();
-        }
         Element u = doc.getRootElement();
         String userName = u.getAttributeValue("name");
 
@@ -398,10 +389,6 @@ public class MCRUserServlet extends MCRServlet {
         LOGGER.info("change password of user " + user.getUserID() + " " + user.getUserName() + " " + user.getRealmID());
 
         Document doc = (Document) (req.getAttribute("MCRXEditorSubmission"));
-        if (doc == null) {
-            MCREditorSubmission sub = (MCREditorSubmission) (req.getAttribute("MCREditorSubmission"));
-            doc = sub.getXML();
-        }
         String password = doc.getRootElement().getChildText("password");
         MCRUserManager.updatePasswordHashToSHA256(user, password);
         MCRUserManager.updateUser(user);
