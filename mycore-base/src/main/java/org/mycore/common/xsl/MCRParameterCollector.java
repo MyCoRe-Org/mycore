@@ -271,11 +271,13 @@ public class MCRParameterCollector {
         parameters.put("CurrentLang", session.getCurrentLanguage());
         parameters.put("WebApplicationBaseURL", MCRServlet.getBaseURL());
         parameters.put("ServletsBaseURL", MCRServlet.getServletBaseURL());
-        String defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
+        String defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang",
+            MCRConstants.DEFAULT_LANG);
         parameters.put("DefaultLang", defaultLang);
 
-        if (request != null) {
-            parameters.put("User-Agent", request.getHeader("User-Agent"));
+        String userAgent = request != null ? request.getHeader("User-Agent") : null;
+        if (userAgent != null) {
+            parameters.put("User-Agent", userAgent);
         }
 
     }
