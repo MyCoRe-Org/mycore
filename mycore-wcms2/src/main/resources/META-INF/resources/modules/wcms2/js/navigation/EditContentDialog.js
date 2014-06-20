@@ -211,7 +211,8 @@ wcms.navigation.EditContentDialog = function() {
 			contentData = this.selectedSection.data;
 		// ck editor settings
 		var lang=I18nManager.getInstance().getLang();
-		var folderHref = this.href.substring(0, this.href.lastIndexOf("/"))
+		var folderHref = this.href.substring(0, this.href.lastIndexOf("/"));
+		var context = window.location.pathname.substring(0, window.location.pathname.indexOf("/modules"));
 		this.editor = CKEDITOR.appendTo(this.editorDiv.domNode, {
 			toolbar : contentToolbar,
 			uiColor : '#9AB8F3',
@@ -221,8 +222,9 @@ wcms.navigation.EditContentDialog = function() {
 			basicEntities: true,
 			allowedContent: true,
 			autoParagraph: false,
-			filebrowserImageBrowseUrl: '/rsc/wcms2/filebrowser?href=' + folderHref,
-		  	filebrowserImageUploadUrl: '/rsc/wcms2/filebrowser/upload?href=' + folderHref
+			filebrowserImageBrowseUrl: context + '/rsc/wcms2/filebrowser?href=' + folderHref,
+		  	filebrowserImageUploadUrl: context + '/rsc/wcms2/filebrowser/upload?href=' + folderHref,
+		  	baseHref: context + folderHref + "/"
 		}, contentData);
 	}
 

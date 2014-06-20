@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 	<link href="filebrowser/gui/css/filebrowser.css" rel="stylesheet" type="text/css">
-	<link rel="stylesheet" href="/bootstrap/css/bootstrap.css">
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 <title>MyCore File Browser</title>
 </head>
 <body>
@@ -17,14 +17,14 @@
 			</div>
 
 		</div>
-		<div id="file-view" class="well">
+		<div id="file-view" class="well" ondragover="return false">
+			<div id="drag-and-drop-info"><span id="hide-drag-drop-info" class="glyphicon glyphicon-remove"></span></div>
 			<div id="uploadbar"></div>
-			<div id="files" ondragover="return false"></div>
+			<div id="files"></div>
 		</div>
 	</div>
 
  	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
  	<script src="filebrowser/gui/js/filebrowser.js"></script>
-
 </body>
 </html>
