@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2014.04" date="2014-06-20" description="2014 LTS">
+      <action dev="mcrfluet" type="fix" date="2014-06-20">
+        mycore-xeditor: Make a copy of original request parameters, may be re-used by servlet container after request ended.
+      </action>
       <action dev="mcrtchef" type="remove">
         removed support of property MCR.Hibernate.Configuration property (is fixed to 'hibernate.cfg.xml')
       </action>
