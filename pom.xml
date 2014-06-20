@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>mycore-parent</artifactId>
     <groupId>org.mycore</groupId>
-    <version>22-SNAPSHOT</version>
+    <version>22</version>
   </parent>
   <artifactId>mycore</artifactId>
   <packaging>pom</packaging>
-  <version>2014.04-SNAPSHOT</version>
+  <version>2014.06</version>
   <name>MyCoRe</name>
   <description>
     MyCoRe is a system for the development of institutional content repositories, publication servers, image collections,
@@ -61,9 +60,9 @@
     </notifiers>
   </ciManagement>
   <scm>
-    <connection>scm:svn:http://server.mycore.de/svn/mycore/trunk</connection>
-    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/trunk</developerConnection>
-    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/trunk</url>
+    <connection>scm:svn:http://server.mycore.de/svn/mycore/tags/mycore-2014.06</connection>
+    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/tags/mycore-2014.06</developerConnection>
+    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/tags/mycore-2014.06</url>
   </scm>
   <profiles>
     <profile>
@@ -543,7 +542,7 @@
       <dependency>
       	<groupId>org.mycore.iview2</groupId>
       	<artifactId>iview-client</artifactId>
-      	<version>0.1-SNAPSHOT</version>
+      	<version>0.1</version>
       	<scope>runtime</scope>
       </dependency>
       <dependency>
