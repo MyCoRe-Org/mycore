@@ -56,7 +56,7 @@ public class MCREditorSession {
 
     private String url;
 
-    private Map<String, String[]> requestParameters;
+    private Map<String, String[]> requestParameters = new HashMap<String, String[]>();
 
     private Map<String, Object> variables;
 
@@ -75,7 +75,7 @@ public class MCREditorSession {
     private MCRXEditorPostProcessor postProcessor = new MCRXEditorPostProcessor();
 
     public MCREditorSession(Map<String, String[]> requestParameters, MCRParameterCollector collector) {
-        this.requestParameters = requestParameters;
+        this.requestParameters.putAll(requestParameters); // make a copy, the original may be re-used by servlet container
         this.variables = new HashMap<>(collector.getParameterMap());
         removeIllegalVariables();
     }
