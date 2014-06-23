@@ -8,7 +8,7 @@
   </parent>
   <artifactId>mycore</artifactId>
   <packaging>pom</packaging>
-  <version>2014.06</version>
+  <version>2014.06.0-SNAPSHOT</version>
   <name>MyCoRe</name>
   <description>
     MyCoRe is a system for the development of institutional content repositories, publication servers, image collections,
@@ -26,7 +26,7 @@
     <jersey.version>1.18.1</jersey.version>
     <changelog.since>2014-03-07</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
-    <changes.version>2014.04</changes.version>
+    <changes.version>2014.06</changes.version>
     <site.suffix />
     <!-- lowest is 99, highest is 0 -->
     <manifest.priority>99</manifest.priority>
