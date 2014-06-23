@@ -562,10 +562,6 @@
           <xsl:when test="@authority='sdnb'">
             <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.sdnb'), ':')" />
           </xsl:when>
-          <xsl:when test="@displayLabel='annual_review'">
-            <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.annual_review'), ' (')" />
-            <xsl:value-of select="concat(@edition, ') :')" />
-          </xsl:when>
           <xsl:when test="@displayLabel='status'">
             <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.status'), ':')" />
           </xsl:when>
