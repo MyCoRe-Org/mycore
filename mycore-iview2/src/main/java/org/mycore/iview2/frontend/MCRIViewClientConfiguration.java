@@ -1,10 +1,17 @@
 package org.mycore.iview2.frontend;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlValue;
 
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRJAXBContent;
@@ -24,20 +31,21 @@ abstract class MCRIViewClientConfiguration {
         this.pdfCreatorStyle = MCRIView2Tools.getIView2Property("PDFCreatorStyle");
         this.pdfCreatorURI = MCRIView2Tools.getIView2Property("PDFCreatorURI");
         this.metadataUrl = MCRIView2Tools.getIView2Property("MetadataUrl");
+        this.addResources();
     }
-    
+
     /**
      * Needed by the metadata plugin
      */
     @XmlElement
     public String objId;
-    
+
     /**
      * Needed by the metadata plugin
      */
     @XmlElement
     public String metadataUrl;
-    
+
     /**
     * Should the mobile or the desktop client started
     */
@@ -81,6 +89,24 @@ abstract class MCRIViewClientConfiguration {
     @XmlElement()
     public String pdfCreatorStyle;
 
+    @XmlElements({ @XmlElement(name = "resource", type = MCRIViewClientResource.class) })
+    @XmlElementWrapper()
+    public List<MCRIViewClientResource> resources;
+
+    protected void addResources() {
+        this.resources = new ArrayList<>();
+        List<String> scripts = MCRConfiguration.instance().getStrings(MCRIView2Tools.CONFIG_PREFIX + "resource.script",
+            new ArrayList<String>());
+        for (String script : scripts) {
+            this.resources.add(new MCRIViewClientResource("script", script));
+        }
+        List<String> stylesheets = MCRConfiguration.instance().getStrings(
+            MCRIView2Tools.CONFIG_PREFIX + "resource.css", new ArrayList<String>());
+        for (String css : stylesheets) {
+            this.resources.add(new MCRIViewClientResource("css", css));
+        }
+    }
+
     public String toJSON() {
         Gson gson = new Gson();
         return gson.toJson(this);
@@ -91,14 +117,36 @@ abstract class MCRIViewClientConfiguration {
             JAXBContext.newInstance(MCRIViewClientConfiguration.class, MCRIViewMetsClientConfiguration.class), this);
         return config;
     }
-    
-    public static boolean isMobile(HttpServletRequest req){
+
+    public static boolean isMobile(HttpServletRequest req) {
         String mobileParameter = req.getParameter("mobile");
-        if(mobileParameter!= null){
+        if (mobileParameter != null) {
             return mobileParameter.toLowerCase().equals(Boolean.TRUE.toString());
         } else {
             return req.getHeader("User-Agent").indexOf("Mobile") != -1;
         }
+    }
+
+    @XmlRootElement(name = "resource")
+    public static class MCRIViewClientResource {
+
+        public static enum Type {
+            script, css
+        }
+
+        public MCRIViewClientResource() {
+        }
+
+        public MCRIViewClientResource(String type, String url) {
+            this.type = Type.valueOf(type);
+            this.url = url;
+        }
+
+        @XmlAttribute(name = "type", required = true)
+        public Type type;
+
+        @XmlValue
+        public String url;
     }
 
 }
