@@ -278,6 +278,16 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         return job;
     }
 
+    /**
+     * returns a specific job from given parameters or null if not found.
+     *  
+     * @param params the parameters
+     * @return the job
+     */
+    public MCRJob getJob(Map<String, String> params) {
+        return getJob(action, params);
+    }
+    
     private MCRJob getJob(Class<? extends MCRJobAction> action, Map<String, String> params) {
         if (!running)
             return null;
