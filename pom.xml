@@ -8,7 +8,7 @@
   </parent>
   <artifactId>mycore</artifactId>
   <packaging>pom</packaging>
-  <version>2014.06.0-SNAPSHOT</version>
+  <version>2014.06.0</version>
   <name>MyCoRe</name>
   <description>
     MyCoRe is a system for the development of institutional content repositories, publication servers, image collections,
@@ -60,9 +60,9 @@
     </notifiers>
   </ciManagement>
   <scm>
-    <connection>scm:svn:http://server.mycore.de/svn/mycore/tags/mycore-2014.06</connection>
-    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/tags/mycore-2014.06</developerConnection>
-    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/tags/mycore-2014.06</url>
+    <connection>scm:svn:http://server.mycore.de/svn/mycore/tags/mycore-2014.06.0</connection>
+    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/tags/mycore-2014.06.0</developerConnection>
+    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/tags/mycore-2014.06.0</url>
   </scm>
   <profiles>
     <profile>
