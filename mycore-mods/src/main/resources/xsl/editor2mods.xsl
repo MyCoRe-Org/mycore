@@ -65,7 +65,7 @@
 
   <xsl:template match="mods:language">
     <!-- only copy mods:language where a language is given -->
-    <xsl:if test="mods:languageTerm/@mcr:categId">
+    <xsl:if test="mods:languageTerm/@mcr:categId or normalize-space(mods:languageTerm) != ''">
       <xsl:copy>
         <xsl:apply-templates select='@*|node()' />
       </xsl:copy>
