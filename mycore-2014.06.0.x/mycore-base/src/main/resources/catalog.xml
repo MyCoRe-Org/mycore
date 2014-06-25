@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
-
-  <system systemId="http://www.w3.org/2001/xml.xsd" uri="xml-2001.xsd" />
-  <system systemId="http://www.w3.org/XML/2008/06/xlink.xsd" uri="xlink-2008-06.xsd" />
-
-</catalog>
