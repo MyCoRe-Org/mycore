@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreclass xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns=""
+  xsi:noNamespaceSchemaLocation="MCRClassification.xsd" ID="jportal_class_00000038">
+  <label xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="de" text="JST Art der Publikation" description="erklrung zur art der publikation" />
+  <categories>
+    <category ID="000100" counter="72">
+      <label xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="de" text="Anzeigen" />
+      <category ID="000200" counter="78">
+        <label xml:lang="de" text="Anzeiger" />
+      </category>
+    </category>
+  </categories>
+</mycoreclass>

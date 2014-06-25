@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!ELEMENT FileContentTypes (type)*>
+<!ATTLIST FileContentTypes default CDATA #IMPLIED>
+
+<!ELEMENT type (url|rules|mime|label)*>
+<!ATTLIST type ID CDATA #IMPLIED>
+
+<!ELEMENT label (#PCDATA)>
+<!ELEMENT mime  (#PCDATA)>
+<!ELEMENT url   (#PCDATA)>
+
+<!ELEMENT rules (extension|pattern)*>
+
+<!ELEMENT extension (#PCDATA)>
+<!ATTLIST extension score CDATA #IMPLIED>
+
+<!ELEMENT pattern (#PCDATA)>
+<!ATTLIST pattern
+    format CDATA #IMPLIED
+    offset CDATA #IMPLIED
+    score  CDATA #IMPLIED
+>
+

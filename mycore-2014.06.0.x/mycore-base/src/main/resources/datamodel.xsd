@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:attributeGroup name="occurs">
+    <xs:attribute name="minOccurs" type="xs:nonNegativeInteger" use="optional" default="1" />
+    <xs:attribute name="maxOccurs" use="optional" default="1">
+      <xs:simpleType>
+        <xs:union>
+          <xs:simpleType>
+            <xs:restriction base="xs:nonNegativeInteger" />
+          </xs:simpleType>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="unbounded" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:union>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="objecttype">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="children" />
+        <xs:element ref="metadata" />
+      </xs:sequence>
+      <xs:attribute name="hasDerivates" use="required" type="xs:boolean" />
+      <xs:attribute name="isChild" use="required" type="xs:boolean" />
+      <xs:attribute name="isParent" use="required" type="xs:boolean" />
+      <xs:attribute name="name" use="required" type="xs:NCName" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="children">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="child" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="child">
+    <xs:complexType>
+      <xs:attribute name="type" use="required" type="xs:NCName" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="metadata">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="element" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="element">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="classification" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="type" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="target" />
+      </xs:choice>
+      <xs:attributeGroup ref="occurs" />
+      <xs:attribute name="name" use="required" type="xs:NCName" />
+      <xs:attribute name="wrapper" type="xs:NCName" />
+      <xs:attribute name="style" use="required" type="xs:NCName" />
+      <xs:attribute name="type" use="required" type="xs:NCName" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="classification">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:NCName" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="type">
+    <xs:complexType>
+      <xs:attribute name="name" use="required" type="xs:NCName" />
+      <xs:attributeGroup ref="occurs" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="target">
+    <xs:complexType>
+      <xs:attribute name="type" use="required" type="xs:NCName" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

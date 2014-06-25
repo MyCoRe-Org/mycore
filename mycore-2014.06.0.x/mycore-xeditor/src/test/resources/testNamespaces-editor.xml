@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<html>
+  <body>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:source uri="resource:{$input}" />
+      <xed:bind xpath="mods:mods">
+        <xed:bind xpath="mods:titleInfo/mods:title">
+          <input type="text" />
+        </xed:bind>
+        <xed:bind xpath="mods:relatedItem/@xlink:href">
+          <input type="text" />
+        </xed:bind>
+      </xed:bind>
+    </xed:form>
+  </body>
+</html>

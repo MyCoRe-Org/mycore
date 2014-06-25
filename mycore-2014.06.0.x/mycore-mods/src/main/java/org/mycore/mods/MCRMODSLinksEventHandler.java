@@ -1,0 +1,101 @@
+/*
+ * $Id$
+ * $Revision: 5697 $ $Date: 07.09.2011 $
+ *
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * This program is free software; you can use it, redistribute it
+ * and / or modify it under the terms of the GNU General Public License
+ * (GPL) as published by the Free Software Foundation; either version 2
+ * of the License or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program, in a file called gpl.txt or license.txt.
+ * If not, write to the Free Software Foundation Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ */
+
+package org.mycore.mods;
+
+import java.util.HashSet;
+import java.util.List;
+
+import org.jdom2.Element;
+import org.mycore.common.events.MCREvent;
+import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.common.events.MCREventManager;
+import org.mycore.datamodel.classifications2.MCRCategLinkReference;
+import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
+
+/**
+ * Eventhandler for linking MODS_OBJECTTYPE document to MyCoRe classifications.
+ * @author Thomas Scheffler (yagee)
+ *
+ */
+public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
+
+    /* (non-Javadoc)
+     * @see org.mycore.common.events.MCREventHandlerBase#handleObjectCreated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
+     */
+    @Override
+    protected void handleObjectCreated(final MCREvent evt, final MCRObject obj) {
+        if (!getSupportedObjectType().equals(obj.getId().getTypeId())) {
+            return;
+        }
+        MCRMODSWrapper modsWrapper = new MCRMODSWrapper(obj);
+        final List<Element> categoryNodes = modsWrapper.getElements("mods:typeOfResource | .//*[(@authority or @authorityURI) and not(ancestor::mods:relatedItem[@type='host'])]");
+        final HashSet<MCRCategoryID> categories = new HashSet<MCRCategoryID>();
+        for (Element node : categoryNodes) {
+            final MCRCategoryID categoryID = MCRMODSClassificationSupport.getCategoryID(node);
+            if (categoryID != null) {
+                categories.add(categoryID);
+            }
+        }
+        if (!categories.isEmpty()) {
+            final MCRCategLinkReference objectReference = new MCRCategLinkReference(obj.getId());
+            MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categories);
+        }
+    }
+
+    protected String getSupportedObjectType() {
+        return "mods";
+    }
+
+    /* (non-Javadoc)
+     * @see org.mycore.common.events.MCREventHandlerBase#handleObjectUpdated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
+     */
+    @Override
+    protected void handleObjectUpdated(final MCREvent evt, final MCRObject obj) {
+        if (!getSupportedObjectType().equals(obj.getId().getTypeId())) {
+            return;
+        }
+        handleObjectCreated(evt, obj);
+        //may have to reindex children, if they inherit any information
+        for (MCRMetaLinkID childLinkID : obj.getStructure().getChildren()) {
+            MCRObjectID childID = childLinkID.getXLinkHrefID();
+            MCREvent childEvent = new MCREvent(childID.getTypeId(), MCREvent.INDEX_EVENT);
+            childEvent.put("object", MCRMetadataManager.retrieve(childID));
+            MCREventManager.instance().handleEvent(childEvent);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.mycore.common.events.MCREventHandlerBase#handleObjectRepaired(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
+     */
+    @Override
+    protected void handleObjectRepaired(final MCREvent evt, final MCRObject obj) {
+        handleObjectUpdated(evt, obj);
+    }
+
+}

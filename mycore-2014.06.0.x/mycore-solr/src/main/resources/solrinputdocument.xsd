@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="add" type="MCRSolrInputDocumentList" />
+
+  <xs:complexType name="MCRSolrInputDocumentList">
+    <xs:sequence>
+      <xs:element name="doc" maxOccurs="unbounded" minOccurs="0" type="MCRSolrInputDocument" />
+    </xs:sequence>
+    <xs:attribute type="xs:int" name="commitWithin" />
+    <xs:attribute type="xs:boolean" name="overwrite" default="true" />
+  </xs:complexType>
+
+  <xs:complexType name="MCRSolrInputDocument">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="field" type="MCRSolrInputField" />
+      <xs:element name="doc" type="MCRSolrInputDocument" />
+    </xs:choice>
+    <!-- @id is only used in mycore -->
+    <xs:attribute type="xs:ID" name="id" />
+    <xs:attribute type="xs:decimal" name="boost" />
+  </xs:complexType>
+
+  <xs:complexType name="MCRSolrInputField">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:Name" name="name" use="required" />
+        <xs:attribute type="xs:decimal" name="boost" />
+        <!-- since solr 4.0 -->
+        <xs:attribute name="update">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="add" />
+              <xs:enumeration value="set" />
+              <xs:enumeration value="inc" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+</xs:schema>

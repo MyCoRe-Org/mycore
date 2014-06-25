@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<html>
+  <body>
+    <form action="/servlets/XEditor">
+      <div class="form-group ">
+        <input name="/document/title" value="Der neue XEditor - Utopie oder Wahnsinn?" type="text" />
+      </div>
+      <div class="form-group ">
+        <input name="/document/year" value="" type="text" />
+      </div>
+      <input value="testBasicInputComponents-source.xml" name="input" type="hidden" />
+      <input value="1-0" name="_xed_session" type="hidden" />
+    </form>
+  </body>
+</html>

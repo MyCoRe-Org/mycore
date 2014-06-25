@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- File: xsd-2001.xsd
+     Updated version of http://www.w3.org/2001/xml.xsd
+-->
+<schema targetNamespace="http://www.w3.org/XML/1998/namespace" 
+        xmlns:xml="http://www.w3.org/XML/1998/namespace"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xml:lang="en">
+
+ <annotation>
+  <documentation>
+        This schema defines attributes and an attribute group
+        suitable for use by
+        schemas wishing to allow xml:lang or xml:space attributes
+        on elements they define.
+
+        To enable this, such a schema must import this schema
+        for the XML namespace, e.g. as follows:
+        &lt;schema . . .>
+         . . .
+         &lt;import namespace="http://www.w3.org/XML/1998/namespace"
+                    schemaLocation="xml-2001.xsd"/>
+
+        Subsequently, qualified reference to either of the attributes
+        or the group defined below will have the desired effect, e.g.
+
+        &lt;type . . .>
+         . . .
+         &lt;attribute ref="xml:lang"/>
+ 
+        will define a type which will schema-validate a instance
+        element with both xml:space and xml:lang attribute
+  </documentation>
+ </annotation>
+
+ <attribute name="lang" type="language">
+  <annotation>
+   <documentation>In due course, we should install the relevant ISO 2- and 3-letter
+         codes as the enumerated possible values . . .</documentation>
+  </annotation>
+ </attribute>
+
+ <attribute name="space" default="preserve">
+  <simpleType>
+   <restriction base="NCName">
+    <enumeration value="default"/>
+    <enumeration value="preserve"/>
+   </restriction>
+  </simpleType>
+ </attribute>
+
+ <attributeGroup name="specialAttrs">
+  <attribute ref="xml:lang"/>
+  <attribute ref="xml:space"/>
+ </attributeGroup>
+
+</schema>

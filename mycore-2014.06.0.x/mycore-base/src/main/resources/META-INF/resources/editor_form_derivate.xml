@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+  
+  <section i18n="component.swf.page.commit.derivate.title" xml:lang="all">
+    <editor id="editor-derivate">
+      <source uri="{sourceUri}"/>
+      <target type="servlet" name="UpdateDerivateServlet" method="post" format="xml"/>
+      <cancel url="{cancelUrl}"/>
+      
+      <components root="editor-derivate" var="/mycorederivate" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <include uri="webapp:editor/editor-derivate.xml"/>
+      </components>
+    </editor>
+  </section>
+  
+</MyCoReWebPage>

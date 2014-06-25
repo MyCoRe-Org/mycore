@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+
+<section i18n="component.broadcasting.page.start.title" direction="ltr">
+  <editor id="editor-broadcasting-ltr">
+      <include uri="webapp:modules/broadcasting/web/editor/editor-broadcasting-ltr.xml"/>
+  </editor>
+</section>
+
+<section i18n="component.broadcasting.page.start.title" direction="rtl">
+	<bdo dir="rtl">
+		<div id="editorForm-rtl">
+		  <editor id="editor-broadcasting-rtl">
+			  <include uri="webapp:modules/broadcasting/web/editor/editor-broadcasting-rtl.xml"/>
+		  </editor>
+		</div>
+	</bdo>
+</section>
+
+</MyCoReWebPage>
+
+

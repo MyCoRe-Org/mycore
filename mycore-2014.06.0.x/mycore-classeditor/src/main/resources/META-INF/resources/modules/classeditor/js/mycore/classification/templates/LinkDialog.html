@@ -1,0 +1,32 @@
+<div class="dijitDialog classeditor ${baseClass}" role="dialog" aria-labelledby="${id}_title">
+  <div data-dojo-attach-point="titleBar" class="dijitDialogTitleBar">
+    <span data-dojo-attach-point="titleNode" class="dijitDialogTitle" id="${id}_title"></span> <span
+      data-dojo-attach-point="closeButtonNode" class="dijitDialogCloseIcon" data-dojo-attach-event="ondijitclick: onCancel"
+      title="${buttonCancel}" role="button" tabIndex="-1"> <span data-dojo-attach-point="closeText" class="closeText"
+      title="${buttonCancel}">x</span>
+    </span>
+  </div>
+  <div data-dojo-attach-point="containerNode" class="dijitDialogPaneContent">
+    <div data-dojo-type="dijit.layout.BorderContainer" data-dojo-props="gutters:true, liveSplitters:false"
+      data-dojo-attach-point="borderContainer">
+      <div data-dojo-type="dijit.Toolbar" data-dojo-attach-point="toolbar" data-dojo-props="splitter:false, region:'top'">
+        <div data-dojo-type="dijit.form.Button" data-dojo-attach-point="nextButton"
+          data-dojo-props="iconClass:'fa fa-step-forward', showLabel:false, disabled: true"></div>
+        <div data-dojo-type="dijit.form.Button" data-dojo-attach-point="allButton"
+          data-dojo-props="iconClass:'fa fa-forward', showLabel:false, disabled: true"></div>
+      </div>
+      <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="splitter:false, region:'center'">
+        <table>
+          <colgroup>
+            <col width="50%" />
+            <col width="50%" />
+          </colgroup>
+          <tbody data-dojo-attach-point="linkTable">
+          </tbody>
+        </table>
+      </div>
+      <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="splitter:false, region:'bottom'" data-dojo-attach-point="infoPane"
+        class="infoPane"></div>
+    </div>
+  </div>
+</div>

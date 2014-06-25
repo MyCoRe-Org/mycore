@@ -1,0 +1,340 @@
+html,body {
+	font-family: verdana, sans-serif;
+	font-size: 90%;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+}
+
+table {
+	font-size: 100%;
+}
+
+/********************************************************************
+* GENERAL
+********************************************************************/
+.center {
+    left: 50%;
+    position: relative;
+    text-align: center;
+    top: 50%;
+}
+
+.preload {
+	margin-left: -150px;
+    margin-top: -25px;
+    height: 50px;
+    width: 300px;	
+}
+
+.hidden {
+	display: none !important;
+}
+
+.visible {
+	display: block !important;
+}
+
+/********************************************************************
+* HEADER
+********************************************************************/
+#header {
+	padding: 3px;
+}
+
+#headerText {
+	font-size: 1.5em;
+	font-weight: bold;
+	left: 50%;
+	margin-left: -90px;
+	position: fixed;
+	text-align: center;
+	top: 5px;
+	width: 180px;
+	z-index: 5;
+}
+
+#headerMenu {
+	left: 100%;
+	margin-left: -114px;
+	position: fixed;
+	top: 6px;
+	width: 110px;
+	z-index: 5;
+	text-align: center;
+}
+
+#closeButton {
+	border-left: 1px solid #CCCCCC;
+	padding-left: 8px;
+	padding-top: 8px;
+}
+
+/********************************************************************
+* CONTENT
+********************************************************************/
+#content {
+	width: 100%;
+	height: 100%;
+}
+
+#tabContainer {
+	height: 100%;
+}
+
+#mainContainer,#navigationContainer,#navigationTreeContainer {
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+
+/********************************************************************
+* DIALOG
+********************************************************************/
+.dialogContentPanel {
+	padding-bottom: 8px;
+}
+
+.dialogOkPanel {
+	text-align: right;
+	border-top: 1px solid rgb(210, 210, 255);
+	padding-top: 5px;
+}
+
+/********************************************************************
+* NAVIGATION
+********************************************************************/
+.editorHeader {
+	background-color: #8eb6ff;
+	margin-bottom: 6px;
+	font-size: 110%;
+	font-weight: bold;
+	border-bottom: 1px solid #b7d1ff;
+	text-align: center;
+	padding-top: 6px;
+	padding-bottom: 6px;
+}
+
+.editorCaption {
+	background-color: #caddff;
+	font-weight: bold;
+	text-align: center;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	margin-top: 7px;
+	margin-bottom: 2px;
+}
+
+.editorDescription {
+	padding-top: 5px;
+	vertical-align: top;
+	text-align: left;
+}
+
+.editorValue {
+	text-align: right;
+}
+
+.editorValue .dijitTextBox {
+	width: 300px;
+}
+
+.editorValue .i18nLang {
+	width: 25px;
+}
+
+.smallComponent {
+	width: 150px;
+}
+
+.mediumComponent {
+	width: 300px;
+}
+
+.largeComponent {
+	width: 450px;
+}
+
+#nav_form_type_select,#nav_form_target,#nav_form_layout,#nav_form_style
+	{
+	width: 150px;
+}
+
+#nav_form_type {
+	width: 100%;
+}
+
+#navigationTreePane {
+	padding: 0px;
+}
+
+#navigationTreeToolbar {
+	border: 1px solid #cccccc;
+	margin-top: 5px;
+}
+
+/*******************************************************
+* Icons
+********************************************************/
+.loading {
+	background-repeat: no-repeat;
+	background-position: center center;
+	width: 50px;
+	height: 50px;
+	background-image: url(../images/loading.gif);
+}
+
+.icon12 {
+	background-repeat: no-repeat;
+	background-position: center center;
+	width: 12px;
+	height: 12px;
+}
+
+.icon16 {
+	background-repeat: no-repeat;
+	background-position: center center;
+	width: 16px;
+	height: 16px;
+}
+
+.icon24 {
+	background-repeat: no-repeat;
+	background-position: center center;
+	width: 24px;
+	height: 24px;
+}
+
+.addIcon12 {
+	background-image: url(../images/plus_12.png);
+}
+
+.addIcon16 {
+	background-image: url(../images/plus_16.png);
+}
+
+.addDisabledIcon16 {
+	background-image: url(../images/plusDisabled_16.png);
+}
+
+.removeIcon12 {
+	background-image: url(../images/remove_12.png);
+}
+
+.removeIcon16 {
+	background-image: url(../images/remove_16.png);
+}
+
+.removeDisabledIcon16 {
+	background-image: url(../images/removeDisabled_16.png);
+}
+
+.saveIcon {
+	background-image: url(../images/save_16.png);
+}
+
+.saveDisabledIcon {
+	background-image: url(../images/saveDisabled_16.png);
+}
+
+.restoreIcon16 {
+	background-image: url(../images/restore_16.png);
+}
+
+.restoreDisabledIcon16 {
+	background-image: url(../images/restoreDisabled_16.png);
+}
+
+.upIcon16 {
+	background-image: url(../images/up_16.png);
+}
+
+.downIcon16 {
+	background-image: url(../images/down_16.png);
+}
+
+.editIcon16 {
+	background-image: url(../images/edit_16.png);
+}
+.undoIcon16 {
+	background-image: url(../images/undo_16.png);
+}
+.undoDisabledIcon16 {
+	background-image: url(../images/undoDisabled_16.png);
+}
+.redoIcon16 {
+	background-image: url(../images/redo_16.png);
+}
+.redoDisabledIcon16 {
+	background-image: url(../images/redoDisabled_16.png);
+}
+.reloadIcon16 {
+	background-image: url(../images/reload_16.png);
+}
+.reloadDisabledIcon16 {
+	background-image: url(../images/reloadDisabled_16.png);
+}
+.tick16 {
+	background-image: url(../images/tick_16.png);
+}
+
+/*tree items 22 px*/
+.item {
+	background-image: url(../images/item_22.png);
+}
+
+.insertItem {
+	background-image: url(../images/insertItem_22.png);
+}
+
+.menuItem {
+	background-image: url(../images/menu_22.png);
+}
+
+.navigationItem {
+	background-image: url(../images/navigation_22.png);
+}
+
+.groupItem {
+	background-image: url(../images/group_22.png);
+}
+
+.addItem {
+	background-image: url(../images/addItem_24.png);
+}
+
+.addInsertItem {
+	background-image: url(../images/addInsertItem_24.png);
+}
+
+.addMenuItem {
+	background-image: url(../images/addMenu_24.png);
+}
+
+/*tree items 16 px*/
+.item16 {
+	background-image: url(../images/item_16.png);
+}
+
+.insertItem16 {
+	background-image: url(../images/insertItem_16.png);
+}
+
+.menuItem16 {
+	background-image: url(../images/menu_16.png);
+}
+
+.navigationItem16 {
+	background-image: url(../images/navigation_16.png);
+}
+
+.groupItem16 {
+	background-image: url(../images/group_16.png);
+}
+
+/*******************************************************
+* Misc
+********************************************************/
+.imgButton {
+	cursor: pointer;
+}

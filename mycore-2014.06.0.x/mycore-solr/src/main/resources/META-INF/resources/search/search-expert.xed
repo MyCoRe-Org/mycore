@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MyCoReWebPage xmlns:xed="http://www.mycore.de/xeditor" xmlns:mcrsolr="http://www.mycore.de/components/solr">
+  <section title="SOLR Experten-Suche" xml:lang="de" />
+
+  <section title="SOLR expert search" xml:lang="en" />
+
+  <section xml:lang="all">
+    <script type="text/javascript">
+    <![CDATA[
+"use strict";
+(function($) {
+  $(document).ready(function(){
+    $.fn.cloneForm = function(val1, val2){
+      var ret, cur;
+      ret = $(this).clone(val1, val2);
+      cur = $(this);
+      //due to: http://bugs.jquery.com/ticket/3016
+      ret.find('textarea').each(function() {
+          var value;
+          value = cur.find('[name="$name"]'.replace('$name', $(this).attr('name'))).val();
+          $(this).val(value);
+      });
+      //due to: http://bugs.jquery.com/ticket/1294
+      cur.find('select').each(function(i){
+        var select = this;
+        ret.find('select[name="$name"]'.replace('$name', $(this).attr('name'))).val($(select).val());
+      });
+      return ret;
+    };
+    var updateFieldsets=function(){
+      var fieldset = $(this).parents('fieldset');
+      if (this.checked) {
+        fieldset.addClass('expanded');
+        fieldset.find('div.fieldset :input:not(:enabled)').prop("disabled", false);
+      } else {
+        fieldset.removeClass('expanded');
+        fieldset.find('div.fieldset :input:not(:disabled)').prop("disabled", true);
+      };
+    };
+    $('form .optional > label input[type=checkbox]')
+    .off('change')
+    .on('change', function(event){
+      updateFieldsets.apply(this);
+    }).each(function(i, inputElement){
+      updateFieldsets.apply(this);
+    })
+    .parents('form').on('submit', function(event){
+      event.preventDefault();
+      var form=$(this).cloneForm(true, true);
+      form.off('submit');
+      var origButtonName = $(this).data('button') || form.find('*[type="submit"]').get(0).name;
+      $('#formSpace').empty().append(form);
+      form.find(':disabled').val("").prop('disabled',false);
+      form[0][origButtonName].click();
+    })
+    .find('*[type="submit"]').on('click', function(){
+      $(this).parents('form').data('button', this.name);
+    });
+    $('[data-toggle=offcanvas]').click(function() {
+      $('.row-offcanvas').toggleClass('active');
+    });
+  });
+})(jQuery);
+    ]]>
+    </script>
+    <style type="text/css">
+    <![CDATA[
+form .optional .fieldset{
+  display:none;
+}
+form .optional.expanded .fieldset{
+  display:block;
+}
+@media screen and (max-width: 767px) {
+  .row-offcanvas {
+    position: relative;
+    -webkit-transition: all 0.25s ease-out;
+    -moz-transition: all 0.25s ease-out;
+    transition: all 0.25s ease-out 0s;
+  }
+  .row-offcanvas-right .sidebar-offcanvas {
+    right: -50%;
+  }
+  .row-offcanvas-left .sidebar-offcanvas {
+    left: -50%;
+  }
+  .row-offcanvas-right.active {
+    right: 50%;
+  }
+  .row-offcanvas-left.active {
+    left: 50%;
+  }
+  .sidebar-offcanvas {
+    position: absolute;
+    top: 0;
+    width: 50%;
+  }
+}
+    ]]>
+    </style>
+    <div class="row row-offcanvas row-offcanvas-right">
+
+      <div class="col-xs-12 col-sm-7 col-md-8">
+        <p class="pull-right visible-xs">
+          <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle fields</button>
+        </p>
+        <xed:form class="form-horizontal" role="form">
+          <xed:cleanup-rule xpath="/solr-query/*" relevant-if="string-length(.)&gt;0" />
+          <xed:bind xpath="solr-query">
+            <xed:bind name="label-width" xpath="@labelWidth" default="3">
+              <xed:cleanup-rule xpath="/solr-query/@labelWidth" relevant-if="false()" />
+            </xed:bind>
+            <xed:bind name="input-width" xpath="@inputWidth" default="9">
+              <xed:cleanup-rule xpath="/solr-query/@inputWidth" relevant-if="false()" />
+            </xed:bind>
+
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">
+                  <xed:output i18n="component.solr.expertsearch.headline" />
+                </h3>
+              </div>
+              <div class="panel-body">
+                <mcrsolr:textfield name="qt" title="Request handler in solrconfig.xml." default="/select" />
+
+                <fieldset class="common">
+                  <legend>common</legend>
+                  <div class="fieldset">
+
+                    <mcrsolr:textarea name="q" default="*:*" title="The query string." />
+                    <mcrsolr:textfield name="fq" repeatable="true" />
+                    <mcrsolr:textfield name="sort" title="Sort field or function with asc|desc." />
+
+                    <div class="form-group">
+                      <label class="col-md-{$label-width} control-label" for="start">
+                        start, rows
+                      </label>
+                      <div class="col-md-{$input-width}">
+                        <div class="row">
+                          <xed:bind xpath="param[@name='start']">
+                            <div class="col-xs-6">
+                              <input class="form-control" type="text" title="Number of leading documents to skip. (Integer)" pattern="[0-9]+"
+                                placeholder="0" id="start" />
+                            </div>
+                          </xed:bind>
+                          <xed:bind xpath="param[@name='rows']">
+                            <div class="col-xs-6">
+                              <input class="form-control" type="text" title="Number of documents to return after 'start'. (Integer)"
+                                pattern="[0-9]+" placeholder="10" id="rows" />
+                            </div>
+                          </xed:bind>
+                        </div>
+                      </div>
+                    </div>
+
+                    <mcrsolr:textfield name="fl" title="Field list, comma separated." />
+                    <mcrsolr:textfield name="df" title="Default search field" />
+
+                    <div class="form-group">
+                      <label class="col-md-{$label-width} control-label" for="custom_parameters">
+                        Raw Query Parameters
+                      </label>
+                      <div class="col-md-{$input-width}">
+                        <xed:repeat xpath="cparam">
+                          <div class="row clearfix">
+                            <div class="col-md-4">
+                              <xed:bind xpath="@name">
+                                <input class="form-control" type="text" placeholder="key" id="custom_parameters" />
+                              </xed:bind>
+                            </div>
+                            <div class="col-md-5">
+                              <input class="form-control" type="text" placeholder="value" />
+                            </div>
+                            <div class="col-md-3">
+                              <span class="pull-right">
+                                <div class="btn-group">
+                                  <xed:controls>insert remove</xed:controls>
+                                </div>
+                              </span>
+                            </div>
+                          </div>
+                        </xed:repeat>
+                      </div>
+                    </div>
+
+                    <xed:bind xpath="param[@name='wt']" default="xml">
+                      <div class="form-group">
+                        <label class="col-md-{$label-width} control-label" for="wt">
+                          wt
+                        </label>
+                        <div class="col-md-{$input-width}">
+                          <select title="The writer type (response format)." class="form-control" id="wt">
+                            <option>json</option>
+                            <option>xml</option>
+                            <option>python</option>
+                            <option>ruby</option>
+                            <option>php</option>
+                            <option>csv</option>
+                          </select>
+                        </div>
+                      </div>
+                    </xed:bind>
+
+                    <mcrsolr:checkbox name="indent" />
+                    <mcrsolr:checkbox name="debugQuery" />
+                    <mcrsolr:checkbox param="XSL.Style" name="xml" label="XSL.Style=xml" title="Do not layout XML output." />
+
+                  </div>
+                </fieldset>
+
+                <mcrsolr:fieldset name="dismax" param="defType">
+                  <mcrsolr:textfield name="q.alt" title="Alternate query when 'q' is absent." />
+                  <mcrsolr:textfield name="qf" title="Query fields with optional boosts." />
+                  <mcrsolr:textfield name="mm" title="Min-should-match expression." />
+                  <mcrsolr:textfield name="pf" title="Phrase boosted fields." />
+                  <mcrsolr:textfield name="ps" title="Phrase boost slop." />
+                  <mcrsolr:textfield name="qs" title="Query string phrase slop." />
+                  <mcrsolr:textfield name="tie" title="Score tie-breaker. Try 0.1." placeholder="0.1" />
+                  <mcrsolr:textfield name="bq" title="Boost query." />
+                  <mcrsolr:textfield name="bf" title="Boost function (added)." />
+                </mcrsolr:fieldset>
+
+                <mcrsolr:fieldset name="edismax" param="defType">
+                  <mcrsolr:label>
+                    <strong>e</strong>
+                    dismax
+                  </mcrsolr:label>
+                  <mcrsolr:textfield name="q.alt" id="edismax_q_alt" title="Alternate query when 'q' is absent." />
+                  <mcrsolr:textfield name="qf" id="edismax_qf" title="Query fields with optional boosts." />
+                  <mcrsolr:textfield name="mm" id="edismax_mm" title="Min-should-match expression." />
+                  <mcrsolr:textfield name="pf" id="edismax_pf" title="Phrase boosted fields." />
+                  <mcrsolr:textfield name="ps" id="edismax_ps" title="Phrase boost slop." />
+                  <mcrsolr:textfield name="qs" id="edismax_qs" title="Query string phrase slop." />
+                  <mcrsolr:textfield name="tie" id="edismax_tie" title="Score tie-breaker. Try 0.1." placeholder="0.1" />
+                  <mcrsolr:textfield name="bq" id="edismax_bq" title="Boost query." />
+                  <mcrsolr:textfield name="bf" id="edismax_bf" title="Boost function (added)." />
+                  <mcrsolr:textfield name="uf" id="edismax_uf" title="User Fields" />
+                  <mcrsolr:textfield name="pf2" id="edismax_pf2" title="bigram phrase boost fields" />
+                  <mcrsolr:textfield name="pf3" id="edismax_pf3" title="trigram phrase boost fields" />
+                  <mcrsolr:textfield name="ps2" id="edismax_ps2" title="phrase slop for bigram phrases" />
+                  <mcrsolr:textfield name="ps3" id="edismax_ps3" title="phrase slop for trigram phrases" />
+                  <mcrsolr:textfield name="boost" id="edismax_boost" title="multiplicative boost function" />
+                  <mcrsolr:checkbox name="stopwords" id="edismax_stopwords" title="remove stopwords from mandatory 'matching' component" />
+                  <mcrsolr:checkbox name="lowercaseOperators" id="edismax_lowercaseOperators" title="Enable lower-case 'and' and 'or' as operators" />
+                </mcrsolr:fieldset>
+
+                <mcrsolr:fieldset name="hl" title="Enable highlighting.">
+                  <mcrsolr:textfield name="hl.fl" title="Fields to highlight on." />
+                  <mcrsolr:textfield name="hl.simple.pre" initially="&lt;em&gt;" />
+                  <mcrsolr:textfield name="hl.simple.post" initially="&lt;/em&gt;" />
+                  <mcrsolr:checkbox name="hl.requireFieldMatch" />
+                  <mcrsolr:checkbox name="hl.usePhraseHighlighter" />
+                  <mcrsolr:checkbox name="hl.highlightMultiTerm" />
+                </mcrsolr:fieldset>
+
+                <mcrsolr:fieldset name="facet">
+                  <mcrsolr:textarea name="facet.query" />
+                  <mcrsolr:textfield name="facet.field" />
+                  <mcrsolr:textfield name="facet.prefix" />
+                </mcrsolr:fieldset>
+
+                <mcrsolr:fieldset name="spatial">
+                  <mcrsolr:textfield name="pt" />
+                  <mcrsolr:textfield name="sfield" />
+                  <mcrsolr:textfield name="d" />
+                </mcrsolr:fieldset>
+
+                <mcrsolr:fieldset name="spellcheck">
+                  <mcrsolr:checkbox name="spellcheck.build" />
+                  <mcrsolr:checkbox name="spellcheck.reload" />
+                  <mcrsolr:textfield name="spellcheck.dictionary" />
+                  <mcrsolr:textfield name="spellcheck.count" />
+                  <mcrsolr:checkbox name="spellcheck.onlyMorePopular" />
+                  <mcrsolr:checkbox name="spellcheck.extendedResults" />
+                  <mcrsolr:checkbox name="spellcheck.collate" />
+                  <mcrsolr:textfield name="spellcheck.maxCollations" />
+                  <mcrsolr:textfield name="spellcheck.maxCollationTries" />
+                  <mcrsolr:textfield name="spellcheck.accuracy" />
+                </mcrsolr:fieldset>
+
+                <div class="col-md-offset-{$label-width} col-md-{$input-width}">
+                  <button type="submit" xed:target="servlet" xed:href="MCRSolrSelectProxyServlet" class="btn btn-primary">
+                    <xed:output i18n="editor.search.search" />
+                  </button>
+                  <button type="submit" xed:target="debug" class="btn btn-default">
+                    Debug
+                  </button>
+                </div>
+              </div>
+            </div>
+          </xed:bind>
+        </xed:form>
+      </div>
+      <div class="col-xs-6 col-sm-5 col-md-4 sidebar-offcanvas" id="sidebar">
+        <mcrsolr:fieldsHelp />
+      </div><!--/span-->
+    </div>
+    <div style="display:none" id="formSpace" />
+  </section>
+</MyCoReWebPage>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<navigation hrefStartingPage="{tenantPath}/content/below/index.xml" dir="/content" mainTitle="main title" historyTitle="history title" template="template1">
+
+  <!-- main menu  -->
+  <menu id="main" dir="/content/main">
+    <label xml:lang="en">main menu</label>
+
+    <sampleItem name="myownitem" />
+
+  </menu>
+
+</navigation>

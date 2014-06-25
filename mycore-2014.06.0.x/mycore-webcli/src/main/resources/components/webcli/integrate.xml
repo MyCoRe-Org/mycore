@@ -1,0 +1,20 @@
+<project name="webcli">
+  <import file="../../integrate.xml" />
+
+  <!-- - - - - - - - - - - - - - - - - - 
+          target: create.default-rules                      
+         - - - - - - - - - - - - - - - - -
+-->
+  <target name="create.default-rules">
+    <property name="commands.file" value="${basedir}/commands.txt" />
+    <echo file="${commands.file}" append="false">
+      update permission read for id webpage:/modules/webcli/launchpad.xml with rulefile grant-local-admins.xml described by adminstrators on localhost
+      load permissions data from file permissions.xml
+	</echo>
+    <antcall target="invoke.cli">
+      <param name="cli.directory" value="${basedir}/config" />
+      <param name="cli.command" value="process ${commands.file}" />
+    </antcall>
+    <delete file="${commands.file}" />
+  </target>
+</project>

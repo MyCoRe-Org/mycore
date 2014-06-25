@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreobject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="datamodel-test.xsd" xmlns:xlink="http://www.w3.org/1999/xlink"
+  ID="mcr_test_01" label="JUnit Test object 1">
+  <structure />
+  <metadata>
+    <def.textfield class="MCRMetaLangText" heritable="true">
+      <textfield>JUnit Test object 1</textfield>
+    </def.textfield>
+  </metadata>
+</mycoreobject>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<json>
+  [
+    {
+      "item":{
+        "id":{"rootid":"2a98df7a7b3944bf891ddebe2f0db61e"},
+        "labels":[{"lang":"de","text":"Test Klassifikation","description":"Test"}],
+        "uri":"http://localhost:8291/modules/classeditor/classificationEditor.xml"
+      },
+      "state":"update",
+      "parentId":"_placeboid_",
+      "depthLevel" :0,
+      "index":44
+    },
+    {
+      "item":{
+        "id":{"rootid":"2a98df7a7b3944bf891ddebe2f0db61e","categid":"b578c47bf353469dadc64c1bea0ccce6"},
+        "labels":[{"lang":"de","text":"Kategorie","description":"Test Kategorie"},
+        {"lang":"en","text":"Category","description":"Test category"}],
+        "uri":"http://localhost:8291/modules/classeditor/classificationEditor.xml"
+      },
+      "state":"update",
+      "parentId":{"rootid":"2a98df7a7b3944bf891ddebe2f0db61e"},
+      "depthLevel" :1,
+      "index":0
+    }
+  ]
+</json>

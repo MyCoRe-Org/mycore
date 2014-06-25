@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<html>
+  <body>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:source uri="resource:{$input}" />
+      <xed:bind xpath="document">
+        <xed:if test="$xed-validation-failed">
+          <h3>Fehlerhafte Eingabe:</h3>
+          <xed:display-validation-messages />
+        </xed:if>
+        <xed:bind xpath="title">
+          <div class="form-group {$xed-validation-marker}">
+            <xed:display-validation-message />
+            <input type="text" />
+            <xed:validate display="here local global" required="true" xsl="contains(.,'Utopie')">
+              Titel erforderlich, muss utopisch sein!
+            </xed:validate>
+          </div>
+        </xed:bind>
+        <xed:bind xpath="year">
+          <div class="form-group {$xed-validation-marker}">
+            <input type="text" />
+            <xed:validate display="here" xsl="string-length(.) = 4"> <!-- since not required, will only check if input exists -->
+              Jahr vierstellig eingeben!
+            </xed:validate>
+          </div>
+        </xed:bind>
+      </xed:bind>
+    </xed:form>
+  </body>
+</html>

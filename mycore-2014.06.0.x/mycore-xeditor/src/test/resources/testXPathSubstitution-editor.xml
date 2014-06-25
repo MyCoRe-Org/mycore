@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<div xmlns:xed="http://www.mycore.de/xeditor">
+  <xed:form>
+    <xed:source uri="resource:{$input}" />
+    <xed:bind xpath="/document">
+      <xed:bind xpath="title">
+        <div>
+          Diese Publikation mit dem Titel "<xed:output />" dürfen Sie als <xed:output value="$SomeUser" /> bearbeiten.
+          <input type="text" size="{string-length(.)}" />
+        </div>
+      </xed:bind>
+    </xed:bind>
+  </xed:form>
+</div>

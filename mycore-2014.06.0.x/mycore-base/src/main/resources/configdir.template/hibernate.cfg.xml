@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+<!--
+  This file is just an quick start example and not for productive use.
+  Do not forget to store required libraries in the 'lib' directory.
+ -->
+
+  <session-factory>
+    <!-- Database connection settings -->
+    <!-- H2 -->
+    <property name="connection.driver_class">org.h2.Driver</property>
+    <!-- please modify -->
+    <property name="connection.url">jdbc:h2:file:/path/to/.mycore/myapp/data/h2/mir</property>
+    <property name="connection.username">sa</property>
+    <property name="connection.password"></property>
+    <property name="dialect">org.hibernate.dialect.H2Dialect</property>
+    <!-- MySQL -->
+    <!--
+    <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+    <property name="connection.url">jdbc:mysql://127.0.0.1/mycore</property>
+    <property name="connection.username">mcradmin</property>
+    <property name="connection.password"></property>
+    <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
+    -->
+    <!-- DB2 -->
+    <!--
+    <property name="connection.driver_class">com.ibm.db2.jcc.DB2Driver</property>
+    <property name="connection.url">jdbc:db2://localhost:50000/mycore</property>
+    <property name="connection.username"></property>
+    <property name="connection.password"></property>
+    <property name="dialect">org.hibernate.dialect.DB2Dialect</property>
+    -->
+    <!--  PostgreSQL (with "docportal" database schema) -->
+    <!--
+    <property name="connection.driver_class">org.postgresql.Driver</property>
+    <property name="connection.url">jdbc:postgresql://127.0.0.1/mycore</property>
+    <property name="default_schema">mycore</property>
+    <property name="connection.username">mcradmin</property>
+    <property name="connection.password"></property>
+    <property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+    -->
+    <!--  PostgreSQL (with default database schema) -->
+    <!--
+    <property name="connection.driver_class">org.postgresql.Driver</property>
+    <property name="connection.url">jdbc:postgresql://127.0.0.1/mycore</property>
+    <property name="connection.username">mcradmin</property>
+    <property name="connection.password"></property>
+    <property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+    -->
+
+    <property name="generate_statistics">false</property>
+
+    <!-- Enable Hibernate's automatic session context management -->
+    <property name="current_session_context_class">org.mycore.backend.hibernate.MCRSessionContext</property>
+
+    <!-- second-level cache  -->
+    <!-- disabled -->
+    <property name="cache.region.factory_class">org.hibernate.cache.internal.NoCachingRegionFactory</property>
+    <property name="cache.use_second_level_cache">false</property>
+    <property name="cache.use_query_cache">false</property>
+    <!-- net/sf/ehcache/hibernate/Provider -->
+    <!--
+    <property name="cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</property>
+    <property name="cache.use_second_level_cache">true</property>
+    <property name="cache.use_query_cache">true</property>
+    -->
+    <!-- more human readable cache entries -->
+<!--     <property name="cache.use_structured_entries">true</property> -->
+    <!-- do not read to often from db just to save a few write operations -->
+<!--     <property name="cache.use_minimal_puts">false</property> -->
+
+    <!-- Echo all executed SQL to stdout -->
+    <property name="show_sql">false</property>
+
+    <!-- configuration pool via c3p0 -->
+    <!-- HowTo: http://www.hibernate.org/214.html -->
+    <!--
+    <property name="hibernate.connection.provider_class">org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider</property>
+    <property name="c3p0.validate">false</property>
+    <property name="c3p0.maxStatements">2000</property>
+    <property name="c3p0.maxStatementsPerConnection">30</property>
+    <property name="c3p0.idleConnectionTestPeriod">300</property>
+    <property name="c3p0.minPoolSize">10</property>
+    <property name="c3p0.maxPoolSize">100</property>
+    <property name="c3p0.acquireIncrement">2</property>
+    <property name="c3p0.numHelperThreads">6</property>
+    -->
+
+    <!-- misc options -->
+    <property name="hibernate.bytecode.use_reflection_optimizer">true</property>
+    <!-- Set batch_size to "0" in case of SQL batch Errors -->
+    <property name="jdbc.batch_size">2000</property>
+    <property name="default_batch_fetch_size">100</property>
+  </session-factory>
+
+</hibernate-configuration>

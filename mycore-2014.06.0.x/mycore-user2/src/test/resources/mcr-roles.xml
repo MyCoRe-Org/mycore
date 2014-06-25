@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mycoreclass ID="mcr-roles" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="MCRClassification.xsd">
+  <label xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="en" text="system user roles" />
+  <label xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="de" text="Systemnutzerrollen" />
+  <categories>
+    <category ID="admin">
+      <label xml:lang="de" text="Administratoren" />
+      <label xml:lang="en" text="Admins" />
+    </category>
+    <category ID="editor">
+      <label xml:lang="de" text="Bearbeiter" />
+      <label xml:lang="en" text="editors" />
+    </category>
+  </categories>
+</mycoreclass>

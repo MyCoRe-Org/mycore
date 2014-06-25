@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+<MyCoReWebPage>
+  <section xml:lang="de" title="Title one">
+    <p>Content one</p>
+    <br />
+  </section>
+  <section xml:lang="en" title="Title two">
+    Content two
+  </section>
+  <meta>
+    <log date="2015-06-12" time="09:05" labelPath="label Path" lastEditor="Administrator" />
+  </meta>
+</MyCoReWebPage>

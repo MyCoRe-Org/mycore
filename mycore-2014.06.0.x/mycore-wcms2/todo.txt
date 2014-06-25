@@ -1,0 +1,18 @@
+TODO:
+-Trennung zwischen JAXB und Datenmodell -> eigener JAXB Serialisierer für Datenmodell
+-Mandantenauswahl implementieren (extra Reiter? oder sogar übergeordneter Reiter?)
+-Überprüfen der Erweiterbarkeit von Items -> z.b. extra Attribut in MenuItem
+-I18nManager sollte mehrere packages preloaden können und nicht auf component.wcms beschränkt sein
+Es muss das Ziel sein auch die i18nKeys in der navigation.xml mit einmal zu laden.
+
+-Umschreiben von Tree.js -> 1. Trennung Tree/Pane/Model
+                            2. Model in eigene Dojo Klasse abgeleitet von TreeStoreModel
+
+-siehe WCMSContentManager 148
+-error log messages beenden siehe ErrorUtils.js
+
+- Navigation umbauen das es mit 'menu' funktioniert - am besten ganzes xsl gedöns loswerden
+- navigation.xml wird für xsl vorberechnet mit allen Rechten. xsl nur noch für die darstellung zuständig
+
+- Datein die in Jars liegen, als extern markieren. → Damit keien Änderungen daran vorgenommen werden können
+- Änderungen an der Navigation.xml im eigenem Format speichern (<menu id="navi-below" dir="/content/main/" .../> = <navi-below href="/content/main/" .../>)

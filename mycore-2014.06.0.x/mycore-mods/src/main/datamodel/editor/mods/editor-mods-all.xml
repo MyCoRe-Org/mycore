@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<imports>
+
+  <panel id="edit-mods-all">
+
+
+    <!-- pub_title_orig [text] -->
+    <cell row="10" col="1" anchor="NORTHEAST">
+      <label>MODS</label>
+    </cell>
+    <cell row="10" col="2" anchor="NORTHWEST">
+      <textarea id="mods.title.text" width="80" height="60" />
+    </cell>
+
+    <!-- pub_title_orig [text] END -->
+
+    <cell col="1" colspan="2" row="300" anchor="EAST" style="padding-top:20px;">
+      <submitButton width="100px" i18n="common.button.save" />
+      <cancelButton width="100px" i18n="common.button.cancel" />
+    </cell>
+
+  </panel>
+</imports>

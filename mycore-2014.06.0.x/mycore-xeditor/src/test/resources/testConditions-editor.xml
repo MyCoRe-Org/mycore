@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<html>
+  <body>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:source uri="resource:{$input}" />
+      <xed:bind xpath="document">
+      
+        <xed:if test="$switch = 'off'">
+          <label>The switch is off.</label>
+        </xed:if>
+        <xed:if test="$switch = 'on'">
+          <label>The switch is on.</label>
+        </xed:if>
+        
+        <xed:if test="/document/author">
+          <label>There is author information.</label>
+        </xed:if>
+        <xed:if test="edition">
+          <label>There is edition information.</label>
+        </xed:if>
+        
+        <xed:choose>
+          <xed:when test="$case='1'">
+            <label>The value is 1.</label>
+          </xed:when>
+          <xed:when test="$case &lt; 3">
+            <label>The value is less than 3.</label>
+          </xed:when>
+          <xed:otherwise>
+            <label>The value is bigger than 2</label>
+          </xed:otherwise>
+        </xed:choose>
+        
+        <xed:choose>
+          <xed:when test="$case='2'">
+            <label>The value is 2.</label>
+          </xed:when>
+          <xed:when test="$case &gt; 1">
+            <label>The value is bigger than 1 but not 2.</label>
+          </xed:when>
+          <xed:otherwise>
+            <label>The value is bigger than 2.</label>
+          </xed:otherwise>
+        </xed:choose>
+        
+      </xed:bind>
+    </xed:form>
+  </body>
+</html>

@@ -1,0 +1,4 @@
+copied from  http://developer.k-int.com/
+JZKit is made available from developer.k-int.com under the GNU Public License
+
+further information is found in file COPYING of jzkit-z3950-server-for-mycore.zip

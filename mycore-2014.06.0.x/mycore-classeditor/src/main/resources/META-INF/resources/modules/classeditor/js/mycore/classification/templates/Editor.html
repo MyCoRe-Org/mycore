@@ -1,0 +1,18 @@
+<div class="${baseClass} mainDialog" role="presentation" tabindex="-1">
+  
+  <div data-dojo-type="dijit.layout.BorderContainer" data-dojo-attach-point="borderContainer">
+	<div data-dojo-type="dijit.Toolbar" data-dojo-attach-point="navigationToolbar" data-dojo-props="region: 'top', splitter: false">
+		<div data-dojo-type="dijit.form.Button" data-dojo-attach-point="saveButton" data-dojo-props="iconClass:'icon16 saveDisabledIcon', showLabel:false, disabled: true, i18nTooltip: 'component.classeditor.save.changes'"></div>
+		<div data-dojo-type="dijit.form.Button" data-dojo-attach-point="refreshButton" data-dojo-props="iconClass:'icon16 refreshIcon', showLabel:false, i18nTooltip: 'component.classeditor.refresh.dialog'"></div>
+		<div data-dojo-type="dijit.form.Button" data-dojo-attach-point="settingsButton" data-dojo-props="iconClass:'icon16 settingsIcon', showLabel:false, i18nTooltip: 'component.classeditor.settings.dialog'"></div>
+		<div data-dojo-type="dijit.form.Button" data-dojo-attach-point="fullscreenButton" data-dojo-props="class: 'align-right', iconClass:'icon16 fullscreenIcon', showLabel:false, i18nTooltip: 'component.classeditor.settings.fullscreen'"></div>
+	</div>
+	<div data-dojo-type="dijit.layout.ContentPane" class="treeContentPane" data-dojo-props="region: 'left', splitter: true">
+		<div data-dojo-type="mycore.classification.TreePane" data-dojo-attach-point="treePane"></div>
+	</div>
+    <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region: 'center', splitter: true">
+		<div data-dojo-type="mycore.classification.CategoryEditorPane" data-dojo-attach-point="categoryEditorPane"></div>
+    </div>
+  </div>
+
+</div>

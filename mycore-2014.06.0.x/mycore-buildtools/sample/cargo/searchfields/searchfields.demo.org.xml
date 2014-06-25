@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<searchfields xmlns="http://www.mycore.org/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mycore.org/ searchfields.xsd">
+	<!-- Search in MCRObject metadata -->
+	<index id="metadata">
+		<field name="title" type="text" source="objectMetadata" objects="document"
+			xpath="/mycoreobject/metadata/titles/title" value="text()"
+			i18n="editor.search.document.title" sortable="true" />
+		<field name="titleDE" type="text" source="objectMetadata"
+			objects="document" xpath="/mycoreobject/metadata/titles/title[lang('de')]"
+			value="text()" i18n="editor.search.document.title.de" sortable="true" />
+		<field name="author" type="name" source="objectMetadata"
+			objects="document"
+			xpath="/mycoreobject/metadata/creators/creator | /mycoreobject/metadata/publishers/publisher"
+			value="text()" i18n="editor.search.document.author" />
+		<field name="authorID" type="identifier" source="objectMetadata"
+			objects="document"
+			xpath="/mycoreobject/metadata/creatorlinks/creatorlink | /mycoreobject/metadata/publisherlinks/publisherlink"
+			value="@xlink:href" />
+	    <field name="subject" type="identifier" source="objectCategory" objects="document" 
+	           xpath="/mycoreobject/metadata/subjects/subject" value="@ID" 
+	           i18n="editor.search.document.subject" classification="DocPortal_class_00000007" />
+ 
+		<field name="dateCreated" type="date" source="objectMetadata"
+			objects="document"
+			xpath="/mycoreobject/metadata/dates/date[starts-with(@type,'create')]"
+			value="ext:normalizeDate(string(text()))" sortable="true"
+			i18n="editor.search.document.datecr" />
+		<field name="identifier" type="identifier" source="objectMetadata"
+			objects="document" xpath="/mycoreobject/metadata/identifiers/identifier"
+			value="text()" i18n="editor.search.document.identifier" />
+		<!-- ... -->
+	</index>
+	<index id="content">
+		<field name="content" type="text" source="fileTextContent"
+			objects="http pdf ps txt xml msword95 msword97 msppt rtf otd sxw" />
+
+		<!-- Search in technical metadata of files -->
+		<field name="fileID" type="identifier" source="fileMetadata"
+			xpath="file/@id" value="." />
+		<field name="fileName" type="identifier" source="fileMetadata"
+			xpath="file/@name" value="." />
+		<field name="filePath" type="identifier" source="fileMetadata"
+			xpath="file/@path" value="." />
+		<field name="fileSize" type="integer" source="fileMetadata"
+			xpath="file/@size" value="." />
+	</index>
+</searchfields>

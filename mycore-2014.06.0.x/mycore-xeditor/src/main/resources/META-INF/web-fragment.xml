@@ -1,0 +1,28 @@
+<web-fragment xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd" version="3.0" metadata-complete="true">
+<!-- **************************************************************** -->
+<!-- MyCoRe XEditor -->
+<!-- **************************************************************** -->
+
+  <servlet id="MCRXEditorServlet">
+    <servlet-name>MCRXEditorServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.xeditor.MCRXEditorServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MCRXEditorServlet</servlet-name>
+    <url-pattern>/servlets/XEditor</url-pattern>
+  </servlet-mapping>
+
+  <servlet id="MCRStaticXEditorFileServlet">
+    <servlet-name>MCRStaticXEditorFileServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.xeditor.MCRStaticXEditorFileServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MCRStaticXEditorFileServlet</servlet-name>
+    <url-pattern>*.xhtml</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRStaticXEditorFileServlet</servlet-name>
+    <url-pattern>*.xed</url-pattern>
+  </servlet-mapping>
+</web-fragment>

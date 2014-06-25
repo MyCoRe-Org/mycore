@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<json>
+    [{"item":{"id":{"rootid":"rootID_01","categid":"7b290d9473264491a5beda92967ee89f"},"labels":[{"lang":"de","text":"dfgdfg","description":"dfgdfg"}],"uri":"http://localhost:8291/modules/classeditor/classificationEditor.xml"},"state":"update","parentId":{"rootid":"rootID_01"},"index":0},{"item":{"id":{"rootid":"rootID_02","categid":"856772c24ed044dbba2b14ef54f6271f"},"labels":[{"lang":"de","text":"neuer Eintrag"}]},"state":"update","parentId":{"rootid":"rootID_02"},"index":1}]
+</json>

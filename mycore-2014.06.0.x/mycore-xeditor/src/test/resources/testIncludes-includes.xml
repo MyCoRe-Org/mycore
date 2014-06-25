@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xed:template xmlns:xed="http://www.mycore.de/xeditor">
+  <xed:template id="b">
+    <b />
+  </xed:template>
+  <span>
+    <xed:include uri="resource:testIncludes-includes.xml" ref="b" />
+    <c />
+  </span>
+</xed:template>

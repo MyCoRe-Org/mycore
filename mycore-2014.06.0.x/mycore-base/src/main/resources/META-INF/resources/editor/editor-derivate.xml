@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+  <!-- ============================================== -->
+  <!-- $Revision: 1.5 $ $Date: 2008/12/05 12:59:02 $ -->
+  <!-- ============================================== -->
+
+<imports>
+
+  <headline anchor="CENTER">
+    <text i18n="component.base.editor.derivate.headline" />
+  </headline>
+
+  <panel id="editor-derivate">
+    <hidden var="@ID" />
+    <hidden var="@version" />
+    <hidden var="derivate/linkmetas" descendants="true" />
+    <hidden var="derivate/externals" descendants="true" />
+    <hidden var="derivate/internals" descendants="true" />
+    <hidden var="derivate/fileset" descendants="true" />
+    <hidden var="service" descendants="true" />
+
+    <cell col="1" row="1" anchor="NORTHWEST">
+      <text i18n="component.base.editor.derivate.label.label" />
+    </cell>
+    <cell col="2" row="1" anchor="NORTHWEST" var="@label">
+      <textfield id="Zla" width="48" maxlength="64">
+        <condition id="Cola" required="true" i18n="component.base.editor.derivate.label.cond" />
+      </textfield>
+    </cell>
+    <cell col="3" row="1" anchor="NORTHWEST">
+      <helpPopup width="400" height="250" i18n="component.base.editor.derivate.label.help" />
+    </cell>
+
+    <cell col="1" row="2" anchor="NORTHWEST">
+      <text i18n="component.base.editor.derivate.title.label" />
+    </cell>
+    <cell col="2" row="2" anchor="NORTHWEST" var="derivate/titles">
+      <panel id="DDERtitle">
+        <hidden var="@class" default="MCRMetaLangText" />
+        <hidden var="@notinherit" default="false" />
+        <hidden var="@heritable" default="true" />
+        <cell anchor="NORTHWEST" var="title">
+          <repeater min="1" max="10" pos="right">
+            <panel>
+              <cell col="1" anchor="WEST" var="@xml:lang">
+                <list type="dropdown" default="de">
+                  <item value="de" label="de" />
+                  <item value="en" label="en" />
+                </list>
+              </cell>
+              <cell col="2" anchor="NORTHWEST">
+                <textfield id="ZtitleRep" width="52" maxlength="1024" />
+              </cell>
+            </panel>
+          </repeater>
+        </cell>
+      </panel>
+    </cell>
+    <cell col="3" row="2" anchor="NORTHWEST">
+      <helpPopup width="400" height="250" i18n="component.base.editor.derivate.title.help" />
+    </cell>
+
+    <cell colspan="3" row="3" anchor="WEST">
+      <panel id="TwoButtons">
+        <cell col="1" row="1" anchor="WEST">
+          <cancelButton i18n="common.button.cancel" />
+        </cell>
+        <cell col="2" row="1" anchor="WEST">
+          <submitButton i18n="common.button.save" />
+        </cell>
+      </panel>
+    </cell>
+  </panel>
+</imports>

@@ -1,0 +1,36 @@
+<div class="dijitDialog classeditor ${baseClass}" role="dialog" aria-labelledby="${id}_title">
+	<div data-dojo-attach-point="titleBar" class="dijitDialogTitleBar">
+	<span data-dojo-attach-point="titleNode" class="dijitDialogTitle" id="${id}_title"></span>
+	<span data-dojo-attach-point="closeButtonNode" class="dijitDialogCloseIcon" data-dojo-attach-event="ondijitclick: onCancel" title="${buttonCancel}" role="button" tabIndex="-1">
+		<span data-dojo-attach-point="closeText" class="closeText" title="${buttonCancel}">x</span>
+	</span>
+	</div>
+	<div data-dojo-attach-point="containerNode" class="dijitDialogPaneContent settingsContent">
+		<div data-dojo-type="dijit.form.Form" id="classImportForm" enctype="multipart/form-data" method="POST">
+			<h1 data-dojo-attach-point="importClassLabel" i18n="component.classeditor.settings.import"></h1>
+			<input data-dojo-type="dijit.form.TextBox" data-dojo-attach-point="importInput" data-dojo-props="disabled: true"></input>
+			<div data-dojo-type="dijit.form.Button" data-dojo-attach-point="importOpenButton" data-dojo-props="iconClass:'icon16 folder', showLabel:false"></div>
+			<div data-dojo-type="dijit.form.Button" data-dojo-attach-point="importStartButton" data-dojo-props="disabled: true">Import</div>
+			<!-- this is kinda hack @see http://stackoverflow.com/questions/210643/in-javascript-can-i-make-a-click-event-fire-programmatically-for-a-file-input
+				 create a new input button to open the dialog -->
+			<input type="file" name="classificationFile" data-dojo-attach-point="hiddenFileDialog" style="position: absolute; z-index: -1; overflow: hidden; width: 1px" accept="text/xml">
+		</div>
+		<div>
+			<h1 data-dojo-attach-point="languageSelectLabel" i18n="component.classeditor.settings.language"></h1>
+			<div data-dojo-attach-point="languageEditorDiv"></div>
+		</div>
+		<div>
+			<h1 data-dojo-attach-point="miscLabel" i18n="component.classeditor.settings.additionalSettings"></h1>
+			<input data-dojo-attach-point="showIdCheckBox" data-dojo-type="dijit.form.CheckBox" i18n="component.classeditor.settings.showId"></input>
+		</div>
+	</div>
+
+	<div data-dojo-type="dijit.Dialog" data-dojo-id="confirmImportDialog" data-dojo-attach-point="confirmImportDialog">
+		<div class="dijitDialogPaneContentArea" data-dojo-attach-point="confirmImportContent" i18n="component.classeditor.settings.beforesubmit"></div>
+		<div class="dijitDialogPaneActionBar">
+			<div data-dojo-attach-point="cancelImportButton" data-dojo-type="dijit.form.Button" i18n="component.classeditor.settings.cancelImport" class="align-left"></div>
+			<div data-dojo-attach-point="noSaveAndImportButton" data-dojo-type="dijit.form.Button" i18n="component.classeditor.settings.noSaveAndImport"></div>
+			<div data-dojo-attach-point="saveAndImportButton" data-dojo-type="dijit.form.Button" i18n="component.classeditor.settings.saveAndImport"></div>
+		</div>
+	</div>
+</div>

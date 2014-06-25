@@ -1,0 +1,83 @@
+/*appears on div/span via dojos css, dont want it!*/
+div, span {
+	outline: none;
+}
+
+/***********************************************************
+* DIALOG
+***********************************************************/
+.mycoreDialog .content {
+	
+}
+
+.mycoreDialog .controls {
+	text-align: right;
+	border-top: 1px solid rgb(210, 210, 255);
+	padding: 4px;
+}
+
+/***********************************************************
+* PRELOADER
+***********************************************************/
+.mycorePreloader .text {
+	text-align: center;
+}
+
+/***********************************************************
+* REPEATER
+***********************************************************/
+.mycoreRepeater .contentNode {
+	width: 100%;
+}
+
+.mycoreRepeater .control.remove {
+	width: 24px;
+}
+
+.mycoreRepeater .content {
+	vertical-align: top;
+}
+
+.mycoreRepeater .i18nRow .lang {
+	width: 15%;
+}
+
+.mycoreRepeater .i18nRow .text {
+	width: 40%;
+	min-width: 150px;
+}
+
+.mycoreRepeater .i18nRow .description {
+	padding: 0px;
+	width: 45%;
+	min-width: 150px;
+}
+
+/***********************************************************
+* PLAIN BUTTON
+***********************************************************/
+.plain-button {
+	text-decoration: none;
+	display: inline-block;
+	cursor: pointer;
+	padding: 2px;
+}
+.plain-button-disabled {
+	cursor: default !important;
+	color: #888888 !important;
+}
+
+/***********************************************************
+* COLORS
+***********************************************************/
+.color-black {
+	color: black;
+}
+
+.color-green {
+	color: #229922;
+}
+
+.color-red {
+	color: #BB3344;
+}

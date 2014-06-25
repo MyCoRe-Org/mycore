@@ -1,0 +1,16 @@
+<web-fragment xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd" version="3.0" metadata-complete="true">
+  <!-- **************************************************************** -->
+  <!-- Servlets and mapping for MediaObject Thumbnail                   -->
+  <!-- **************************************************************** -->
+
+  <servlet id="MCRMediaThumbnailServlet">
+    <servlet-name>MCRMediaThumbnailServlet</servlet-name>
+    <servlet-class>org.mycore.media.frontend.MCRMediaThumbnailServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>MCRMediaThumbnailServlet</servlet-name>
+    <url-pattern>/servlets/MCRMediaThumbnailServlet/*</url-pattern>
+  </servlet-mapping>
+</web-fragment>
