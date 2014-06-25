@@ -43,6 +43,7 @@ import org.jdom2.Namespace;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRLayoutService;
 import org.xml.sax.SAXException;
@@ -155,7 +156,7 @@ public class MCRErrorServlet extends HttpServlet {
         LOGGER.log(exceptionThrown ? Level.ERROR : Level.WARN, MessageFormat.format(
             "{0}: Error {1} occured. The following message was given: {2}", requestURI, statusCode, msg), ex);
 
-        String rootname = "mcr_error";
+        String rootname = MCRConfiguration.instance().getString("MCR.Frontend.ErrorPage", "mcr_error");
         String style = MCRServlet.getProperty(request, "XSL.Style");
         if (!"xml".equals(style)) {
             style = "default";
