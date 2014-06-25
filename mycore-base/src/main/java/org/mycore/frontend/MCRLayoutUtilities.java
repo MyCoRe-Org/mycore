@@ -82,71 +82,73 @@ public class MCRLayoutUtilities {
 
     private static HashMap<String, Element> itemStore = new HashMap<String, Element>();
 
-    public static final String NAV_RESOURCE = MCRConfiguration.instance().getString("MCR.NavigationFile", "/config/navigation.xml");
+    public static final String NAV_RESOURCE = MCRConfiguration.instance().getString("MCR.NavigationFile",
+        "/config/navigation.xml");
 
     private static final ServletContext SERVLET_CONTEXT = MCRURIResolver.getServletContext();
 
     private static LoadingCache<String, URL> NAV_URL_CACHE = CacheBuilder.newBuilder().maximumSize(1)
-            .expireAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS).build(new CacheLoader<String, URL>() {
+        .expireAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS).build(new CacheLoader<String, URL>() {
 
-                @Override
-                public URL load(String key) throws Exception {
-                    return SERVLET_CONTEXT.getResource(NAV_RESOURCE);
-                }
-            });
+            @Override
+            public URL load(String key) throws Exception {
+                return SERVLET_CONTEXT.getResource(NAV_RESOURCE);
+            }
+        });
 
     private static final LoadingCache<URL, Long> NAV_MODIFIED_CACHE = CacheBuilder.newBuilder().maximumSize(1)
-            .expireAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS).build(new CacheLoader<URL, Long>() {
+        .expireAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS).build(new CacheLoader<URL, Long>() {
 
-                @Override
-                public Long load(URL key) throws Exception {
-                    URLConnection urlConnection = key.openConnection();
-                    return urlConnection.getLastModified();
-                }
-            });
+            @Override
+            public Long load(URL key) throws Exception {
+                URLConnection urlConnection = key.openConnection();
+                return urlConnection.getLastModified();
+            }
+        });
 
     private static final LoadingCache<String, Document> NAV_DOCUMENT_CACHE = CacheBuilder.newBuilder()
-            .refreshAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS).build(new CacheLoader<String, Document>() {
-                Executor executor = Executors.newSingleThreadExecutor(new ThreadFactory() {
-                    @Override
-                    public Thread newThread(Runnable r) {
-                        return new Thread("navigation.xml refresh");
-                    }
-                });
-
+        .refreshAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS).build(new CacheLoader<String, Document>() {
+            Executor executor = Executors.newSingleThreadExecutor(new ThreadFactory() {
                 @Override
-                public Document load(String key) throws Exception {
-                    URL url = NAV_URL_CACHE.get(key);
-                    try {
-                        return new SAXBuilder(XMLReaders.NONVALIDATING).build(url);
-                    } finally {
-                        itemStore.clear();
-                    }
-
-                }
-
-                @Override
-                public ListenableFuture<Document> reload(final String key, Document oldValue) throws Exception {
-                    URL url = NAV_URL_CACHE.getUnchecked(key);
-                    long lastModified = NAV_MODIFIED_CACHE.getUnchecked(url);
-                    long diff = System.currentTimeMillis() - lastModified;
-                    if (TimeUnit.SECONDS.convert(diff, TimeUnit.MILLISECONDS) > STANDARD_CACHE_SECONDS) {
-                        LOGGER.info("Keeping " + url + " in cache");
-                        return Futures.immediateFuture(oldValue);
-                    } else {
-                        ListenableFutureTask<Document> task = ListenableFutureTask.create(new Callable<Document>() {
-                            @Override
-                            public Document call() throws Exception {
-                                return load(key);
-                            }
-                        });
-                        executor.execute(task);
-                        return task;
-                    }
+                public Thread newThread(Runnable r) {
+                    return new Thread("navigation.xml refresh");
                 }
             });
 
-    private static final boolean ACCESS_CONTROLL_ON = MCRConfiguration.instance().getBoolean("MCR.Website.ReadAccessVerification", true);
+            @Override
+            public Document load(String key) throws Exception {
+                URL url = NAV_URL_CACHE.get(key);
+                try {
+                    return new SAXBuilder(XMLReaders.NONVALIDATING).build(url);
+                } finally {
+                    itemStore.clear();
+                }
+
+            }
+
+            @Override
+            public ListenableFuture<Document> reload(final String key, Document oldValue) throws Exception {
+                URL url = NAV_URL_CACHE.getUnchecked(key);
+                long lastModified = NAV_MODIFIED_CACHE.getUnchecked(url);
+                long diff = System.currentTimeMillis() - lastModified;
+                if (TimeUnit.SECONDS.convert(diff, TimeUnit.MILLISECONDS) > STANDARD_CACHE_SECONDS) {
+                    LOGGER.info("Keeping " + url + " in cache");
+                    return Futures.immediateFuture(oldValue);
+                } else {
+                    ListenableFutureTask<Document> task = ListenableFutureTask.create(new Callable<Document>() {
+                        @Override
+                        public Document call() throws Exception {
+                            return load(key);
+                        }
+                    });
+                    executor.execute(task);
+                    return task;
+                }
+            }
+        });
+
+    private static final boolean ACCESS_CONTROLL_ON = MCRConfiguration.instance().getBoolean(
+        "MCR.Website.ReadAccessVerification", true);
 
     /**
      * Verifies a given $webpage-ID (//item/@href) from navigation.xml on read
@@ -166,8 +168,8 @@ public class MCRLayoutUtilities {
         if (ACCESS_CONTROLL_ON) {
             long startTime = System.currentTimeMillis();
             boolean access = getAccess(webpageID, PERMISSION_READ, ALL2BLOCKER_TRUE, blockerWebpageID);
-            LOGGER.debug("checked read access for webpageID= " + webpageID + " (with blockerWebpageID =" + blockerWebpageID + ") => " + access + ": took "
-                    + getDuration(startTime) + " msec.");
+            LOGGER.debug("checked read access for webpageID= " + webpageID + " (with blockerWebpageID ="
+                + blockerWebpageID + ") => " + access + ": took " + getDuration(startTime) + " msec.");
             return access;
         } else {
             return true;
@@ -187,7 +189,8 @@ public class MCRLayoutUtilities {
         if (ACCESS_CONTROLL_ON) {
             long startTime = System.currentTimeMillis();
             boolean access = getAccess(webpageID, PERMISSION_READ, ALLTRUE);
-            LOGGER.debug("checked read access for webpageID= " + webpageID + " => " + access + ": took " + getDuration(startTime) + " msec.");
+            LOGGER.debug("checked read access for webpageID= " + webpageID + " => " + access + ": took "
+                + getDuration(startTime) + " msec.");
             return access;
         } else {
             return true;
@@ -215,7 +218,8 @@ public class MCRLayoutUtilities {
             ic = ic.getParentElement();
             String webpageID = getWebpageID(ic);
             Element labelEl = null;
-            xpath = XPATH_FACTORY.compile("//.[@href='" + webpageID + "']/label[@xml:lang='" + lang + "']", Filters.element());
+            xpath = XPATH_FACTORY.compile("//.[@href='" + webpageID + "']/label[@xml:lang='" + lang + "']",
+                Filters.element());
             labelEl = xpath.evaluateFirst(getNavi());
             if (labelEl != null) {
                 if (label.equals("")) {
@@ -351,7 +355,7 @@ public class MCRLayoutUtilities {
     }
 
     private static String getWebpageID(Element item) {
-        return item == null ? null : item.getAttributeValue("href");
+        return item == null ? null : item.getAttributeValue("href", item.getAttributeValue("dir"));
     }
 
     /**
@@ -397,17 +401,20 @@ public class MCRLayoutUtilities {
         DOMOutputter accessCleaner = new DOMOutputter(new AccessCleaningDOMOutputProcessor());
         org.w3c.dom.Document personalNavi = accessCleaner.output(navi);
         XPath xpath = javax.xml.xpath.XPathFactory.newInstance().newXPath();
-        NodeList emptyGroups = (NodeList) xpath.evaluate("/navigation/menu/group[not(item)]", personalNavi, XPathConstants.NODESET);
+        NodeList emptyGroups = (NodeList) xpath.evaluate("/navigation/menu/group[not(item)]", personalNavi,
+            XPathConstants.NODESET);
         for (int i = 0; i < emptyGroups.getLength(); ++i) {
             org.w3c.dom.Element group = (org.w3c.dom.Element) emptyGroups.item(i);
             group.getParentNode().removeChild(group);
         }
-        NodeList emptyMenu = (NodeList) xpath.evaluate("/navigation/menu[not(item or group)]", personalNavi, XPathConstants.NODESET);
+        NodeList emptyMenu = (NodeList) xpath.evaluate("/navigation/menu[not(item or group)]", personalNavi,
+            XPathConstants.NODESET);
         for (int i = 0; i < emptyMenu.getLength(); ++i) {
             org.w3c.dom.Element menu = (org.w3c.dom.Element) emptyMenu.item(i);
             menu.getParentNode().removeChild(menu);
         }
-        NodeList emptyNodes = (NodeList) xpath.evaluate("//text()[normalize-space(.) = '']", personalNavi, XPathConstants.NODESET);
+        NodeList emptyNodes = (NodeList) xpath.evaluate("//text()[normalize-space(.) = '']", personalNavi,
+            XPathConstants.NODESET);
         for (int i = 0; i < emptyNodes.getLength(); ++i) {
             Node emptyTextNode = emptyNodes.item(i);
             emptyTextNode.getParentNode().removeChild(emptyTextNode);
@@ -426,7 +433,8 @@ public class MCRLayoutUtilities {
                 ByteArrayOutputStream bout = new ByteArrayOutputStream();
                 transformer.transform(new DOMSource(personalNavi), new StreamResult(bout));
                 LOGGER.debug("personal navigation: " + bout.toString(encoding));
-            } catch (IllegalArgumentException | TransformerFactoryConfigurationError | TransformerException | UnsupportedEncodingException e) {
+            } catch (IllegalArgumentException | TransformerFactoryConfigurationError | TransformerException
+                | UnsupportedEncodingException e) {
                 LOGGER.warn("Error while getting debug information.", e);
             }
 
@@ -474,9 +482,11 @@ public class MCRLayoutUtilities {
     private static class AccessCleaningDOMOutputProcessor extends AbstractDOMOutputProcessor {
 
         @Override
-        protected org.w3c.dom.Element printElement(FormatStack fstack, NamespaceStack nstack, org.w3c.dom.Document basedoc, Element element) {
+        protected org.w3c.dom.Element printElement(FormatStack fstack, NamespaceStack nstack,
+            org.w3c.dom.Document basedoc, Element element) {
             Attribute href = element.getAttribute("href");
-            return (href == null || itemAccess(PERMISSION_READ, element, true)) ? super.printElement(fstack, nstack, basedoc, element) : null;
+            return (href == null || itemAccess(PERMISSION_READ, element, true)) ? super.printElement(fstack, nstack,
+                basedoc, element) : null;
         }
 
     }
