@@ -24,53 +24,47 @@ import com.google.gson.Gson;
 @XmlRootElement(name = "iviewClientConfiguration")
 abstract class MCRIViewClientConfiguration {
 
-    private static final String MCR_BASE_URL = MCRConfiguration.instance().getString("MCR.baseurl");
-
-    public MCRIViewClientConfiguration() {
-        this.webApplicationBaseURL = MCRServlet.getBaseURL();
-        this.i18nPath = MCR_BASE_URL + "servlets/MCRLocaleServlet/{lang}/component.iview2.*";
-        this.lang = "de";
-        this.pdfCreatorStyle = MCRIView2Tools.getIView2Property("PDFCreatorStyle");
-        this.pdfCreatorURI = MCRIView2Tools.getIView2Property("PDFCreatorURI");
-        this.metadataUrl = MCRIView2Tools.getIView2Property("MetadataUrl");
-        this.addResources();
-    }
-
     @XmlElement
     public String webApplicationBaseURL;
 
     /**
-     * Needed by the metadata plugin
+     * The name of the derivate which should be displayed.
+     */
+    @XmlElement()
+    public String derivate;
+
+    /**
+     * Needed by the metadata plugin.
      */
     @XmlElement
     public String objId;
 
     /**
-     * Needed by the metadata plugin
+     * Needed by the metadata plugin.
      */
     @XmlElement
     public String metadataUrl;
 
     /**
-    * Should the mobile or the desktop client started
+    * Should the mobile or the desktop client started.
     */
     @XmlElement()
     public Boolean mobile;
 
     /**
-     *  The type of the structure(mets /pdf)
+     *  The type of the structure(mets /pdf).
      */
     @XmlElement()
     public String doctype;
 
     /**
-     * The location of the Structure (mets.xml / document.pdf)
+     * The location of the Structure (mets.xml / document.pdf).
      */
     @XmlElement()
     public String location;
 
     /**
-     * The location where the iview-client can load the i18n.json
+     * The location where the iview-client can load the i18n.json.
      */
     @XmlElement()
     public String i18nPath;
@@ -98,28 +92,67 @@ abstract class MCRIViewClientConfiguration {
     @XmlElementWrapper()
     public List<MCRIViewClientResource> resources;
 
-    protected void addResources() {
+    /**
+     * Setup the configuration object.
+     * 
+     * @param request 
+     */
+    public void setup(HttpServletRequest request) {
+        this.webApplicationBaseURL = MCRServlet.getBaseURL();
+        this.i18nPath = MCRServlet.getServletBaseURL() + "MCRLocaleServlet/{lang}/component.iview2.*";
+        this.lang = "de";
+        this.pdfCreatorStyle = MCRIView2Tools.getIView2Property("PDFCreatorStyle");
+        this.pdfCreatorURI = MCRIView2Tools.getIView2Property("PDFCreatorURI");
+        this.metadataUrl = MCRIView2Tools.getIView2Property("MetadataUrl");
+        this.derivate = request.getParameter("derivate");
+        this.location = MCRServlet.getServletBaseURL() + "MCRMETSServlet/" + this.derivate;
+        this.mobile = isMobile(request);
         this.resources = new ArrayList<>();
+        this.addResources();
+    }
+
+    protected void addResources() {
         List<String> scripts = MCRConfiguration.instance().getStrings(MCRIView2Tools.CONFIG_PREFIX + "resource.script",
             new ArrayList<String>());
         for (String script : scripts) {
-            this.resources.add(new MCRIViewClientResource("script", script));
+            addScript(script);
         }
         List<String> stylesheets = MCRConfiguration.instance().getStrings(
             MCRIView2Tools.CONFIG_PREFIX + "resource.css", new ArrayList<String>());
         for (String css : stylesheets) {
-            this.resources.add(new MCRIViewClientResource("css", css));
+            addCSS(css);
         }
     }
 
+    /**
+     * Adds a new javascript file which should be included by the image viewer.
+     * 
+     * @param url 
+     */
+    public void addScript(final String url) {
+        this.resources.add(new MCRIViewClientResource("script", url));
+    }
+
+    /**
+     * Adds a new css file which should be included by the image viewer.
+     * 
+     * @param url
+     */
+    public void addCSS(final String url) {
+        this.resources.add(new MCRIViewClientResource("css", url));
+    }
+
+    /**
+     * @return json
+     */
     public String toJSON() {
-        Gson gson = new Gson();
+        final Gson gson = new Gson();
         return gson.toJson(this);
     }
 
     public MCRXMLContent toXMLContent() throws JAXBException {
         MCRJAXBContent<MCRIViewClientConfiguration> config = new MCRJAXBContent<MCRIViewClientConfiguration>(
-            JAXBContext.newInstance(MCRIViewClientConfiguration.class, MCRIViewMetsClientConfiguration.class), this);
+            JAXBContext.newInstance(this.getClass()), this);
         return config;
     }
 
