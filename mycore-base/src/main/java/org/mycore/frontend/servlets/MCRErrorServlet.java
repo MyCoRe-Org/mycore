@@ -149,18 +149,21 @@ public class MCRErrorServlet extends HttpServlet {
         }
     }
 
-    protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, String msg,
-        Throwable ex, Integer statusCode, Class<? extends Throwable> exceptionType, String requestURI,
-        String servletName) throws IOException, TransformerException, SAXException {
-        boolean exceptionThrown = ex != null;
-        LOGGER.log(exceptionThrown ? Level.ERROR : Level.WARN, MessageFormat.format(
-            "{0}: Error {1} occured. The following message was given: {2}", requestURI, statusCode, msg), ex);
-
+    /**
+     * Builds a jdom document containing the error parameter.
+     * 
+     * @param msg the message of the error
+     * @param statusCode the http status code
+     * @param requestURI the uri of the request
+     * @param exceptionType type of the exception
+     * @param source source of the error 
+     * @param ex exception which is occured
+     * 
+     * @return jdom document containing all error parameter
+     */
+    public static Document buildErrorPage(String msg, Integer statusCode, String requestURI,
+        Class<? extends Throwable> exceptionType, String source, Throwable ex) {
         String rootname = MCRConfiguration.instance().getString("MCR.Frontend.ErrorPage", "mcr_error");
-        String style = MCRServlet.getProperty(request, "XSL.Style");
-        if (!"xml".equals(style)) {
-            style = "default";
-        }
         Element root = new Element(rootname);
         root.setAttribute("errorServlet", Boolean.TRUE.toString());
         root.setAttribute("space", "preserve", Namespace.XML_NAMESPACE);
@@ -176,12 +179,9 @@ public class MCRErrorServlet extends HttpServlet {
         if (exceptionType != null) {
             root.setAttribute("exceptionType", exceptionType.getName());
         }
-        if (servletName != null) {
-            root.setAttribute("servletName", servletName);
+        if (source != null) {
+            root.setAttribute("source", source);
         }
-
-        Document errorDoc = new Document(root, new DocType(rootname));
-
         while (ex != null) {
             Element exception = new Element("exception");
             exception.setAttribute("type", ex.getClass().getName());
@@ -193,8 +193,23 @@ public class MCRErrorServlet extends HttpServlet {
             root.addContent(exception);
             ex = ex.getCause();
         }
+        return new Document(root, new DocType(rootname));
+    }
 
+    protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, String msg,
+        Throwable ex, Integer statusCode, Class<? extends Throwable> exceptionType, String requestURI,
+        String servletName) throws IOException, TransformerException, SAXException {
+        boolean exceptionThrown = ex != null;
+        LOGGER.log(exceptionThrown ? Level.ERROR : Level.WARN, MessageFormat.format(
+            "{0}: Error {1} occured. The following message was given: {2}", requestURI, statusCode, msg), ex);
+
+        String style = MCRServlet.getProperty(request, "XSL.Style");
+        if (!"xml".equals(style)) {
+            style = "default";
+        }
         request.setAttribute("XSL.Style", style);
+
+        Document errorDoc = buildErrorPage(msg, statusCode, requestURI, exceptionType, servletName, ex);
 
         final String requestAttr = "MCRErrorServlet.generateErrorPage";
         if (!response.isCommitted() && request.getAttribute(requestAttr) == null) {
