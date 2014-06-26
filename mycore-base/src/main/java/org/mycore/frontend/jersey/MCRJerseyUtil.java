@@ -89,4 +89,14 @@ public abstract class MCRJerseyUtil {
         }
     }
 
+    /**
+     * Returns a human readable message of a http status code. 
+     * 
+     * @param statusCode http status code
+     * @return human readable string
+     */
+    public static String fromStatusCode(int statusCode) {
+        return Response.Status.fromStatusCode(statusCode).getReasonPhrase();
+    }
+
 }
