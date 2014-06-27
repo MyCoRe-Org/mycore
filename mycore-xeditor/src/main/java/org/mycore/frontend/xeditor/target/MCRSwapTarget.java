@@ -31,14 +31,10 @@ import org.mycore.frontend.xeditor.MCREditorSession;
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRSwapTarget implements MCREditorTarget {
+public class MCRSwapTarget extends MCRRepeaterControl {
 
-    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String swapParam) throws Exception {
-        session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
+    protected void handleRepeaterControl(ServletContext context, MCRServletJob job, MCREditorSession session, String swapParam) throws Exception {
         session.getRootBinding().swap(swapParam);
-
         session.setBreakpoint("After handling target swap " + swapParam);
-
-        job.getResponse().sendRedirect(session.getRedirectURL());
     }
 }

@@ -219,20 +219,21 @@
     <xsl:variable name="xed_repeat" select="." />
 
     <xsl:for-each select="xalan:tokenize(transformer:repeat($transformer,@xpath,@min,@max))">
+      <a name="rep-{transformer:nextAnchorID($transformer)}" />
       <xsl:value-of select="transformer:bindRepeatPosition($transformer)" />
       <xsl:apply-templates select="$xed_repeat/node()" mode="xeditor" />
       <xsl:value-of select="transformer:unbind($transformer)" />
     </xsl:for-each>
     <xsl:value-of select="transformer:unbind($transformer)" />
   </xsl:template>
-
+  
   <!-- ========== <xed:controls /> ========== -->
 
   <xsl:template match="xed:controls" mode="xeditor">
     <xsl:variable name="pos" select="transformer:getRepeatPosition($transformer)" />
     <xsl:variable name="num" select="transformer:getNumRepeats($transformer)" />
     <xsl:variable name="max" select="transformer:getMaxRepeats($transformer)" />
-
+    
     <xsl:variable name="controls">
       <xsl:if test="string-length(.) = 0">
         insert remove up down
@@ -262,6 +263,15 @@
                 <xsl:when test="(. = 'down')">
                   <xsl:value-of select="transformer:getSwapParameter($transformer,$pos,$pos + 1)" />
                 </xsl:when>
+              </xsl:choose>
+              <xsl:text>|rep-</xsl:text>
+              <xsl:choose>
+                <xsl:when test="(. = 'remove') and ($pos &gt; 1)"> <!-- redirect to anchor of preceding, since this one will be removed -->
+                  <xsl:value-of select="transformer:previousAnchorID($transformer)" />
+                </xsl:when>
+                <xsl:otherwise> 
+                  <xsl:value-of select="transformer:getAnchorID($transformer)" />
+                </xsl:otherwise>
               </xsl:choose>
             </xsl:with-param>
           </xsl:apply-templates>

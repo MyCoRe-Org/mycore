@@ -32,7 +32,7 @@ public class MCRSubselectReturnTarget implements MCREditorTarget {
             session.setBreakpoint("After returning from subselect for " + baseXPath);
         }
 
-        job.getResponse().sendRedirect(session.getRedirectURL());
+        job.getResponse().sendRedirect(session.getRedirectURL(null));
     }
 
     private String getBaseXPathForSubselect(MCREditorSession session) throws JaxenException, JDOMException {

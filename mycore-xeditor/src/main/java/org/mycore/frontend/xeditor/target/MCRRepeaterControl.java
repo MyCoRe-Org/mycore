@@ -1,6 +1,6 @@
 /*
- * $Revision$ 
- * $Date$
+ * $Revision: 28114 $ 
+ * $Date: 2013-10-11 18:04:09 +0200 (Fr, 11 Okt 2013) $
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -26,18 +26,22 @@ package org.mycore.frontend.xeditor.target;
 import javax.servlet.ServletContext;
 
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
 
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRCloneTarget extends MCRRepeaterControl {
+public abstract class MCRRepeaterControl implements MCREditorTarget {
 
-    protected void handleRepeaterControl(ServletContext context, MCRServletJob job, MCREditorSession session, String xPath) throws Exception {
-        MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
-        binding.cloneBoundElement(0);
-        binding.detach();
-        session.setBreakpoint("After handling target clone " + xPath);
+    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String buttonName) throws Exception {
+        session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
+        int posOfAnchor = buttonName.lastIndexOf('|'); 
+        String param = buttonName.substring(0, posOfAnchor);
+        String anchor = buttonName.substring(posOfAnchor+1);
+        handleRepeaterControl(context, job, session, param);
+        job.getResponse().sendRedirect(session.getRedirectURL(anchor));
     }
+
+    protected abstract void handleRepeaterControl(ServletContext context, MCRServletJob job, MCREditorSession session, String param)
+            throws Exception;
 }

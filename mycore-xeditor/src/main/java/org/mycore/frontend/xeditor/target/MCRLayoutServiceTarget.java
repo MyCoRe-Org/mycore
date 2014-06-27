@@ -56,7 +56,7 @@ public class MCRLayoutServiceTarget implements MCREditorTarget {
             session.setBreakpoint("After handling target layout " + style);
         } else {
             session.setBreakpoint("After validation failed, target layout " + style);
-            job.getResponse().sendRedirect(session.getRedirectURL());
+            job.getResponse().sendRedirect(session.getRedirectURL(null));
         }
     }
 }

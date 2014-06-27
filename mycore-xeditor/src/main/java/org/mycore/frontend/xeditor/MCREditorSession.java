@@ -116,8 +116,8 @@ public class MCREditorSession {
             this.url = pageURL.contains("?") ? pageURL.substring(0, pageURL.indexOf("?")) : pageURL;
     }
 
-    public String getRedirectURL() {
-        return url + "?" + MCREditorSessionStore.XEDITOR_SESSION_PARAM + "=" + id;
+    public String getRedirectURL(String anchor) {
+        return url + "?" + MCREditorSessionStore.XEDITOR_SESSION_PARAM + "=" + id + ( anchor != null ? "#" + anchor : "" );
     }
 
     public Map<String, String[]> getRequestParameters() {

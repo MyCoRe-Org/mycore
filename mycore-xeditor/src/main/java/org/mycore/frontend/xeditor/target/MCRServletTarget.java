@@ -58,7 +58,7 @@ public class MCRServletTarget implements MCREditorTarget {
             dispatcher.forward(job.getRequest(), job.getResponse());
         } else {
             session.setBreakpoint("After validation failed, target servlet " + servletNameOrPath);
-            job.getResponse().sendRedirect(session.getRedirectURL());
+            job.getResponse().sendRedirect(session.getRedirectURL(null));
         }
     }
 }
