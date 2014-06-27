@@ -469,6 +469,28 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         assertEquals("Label does not match.", description, rootNode.getLabel(lang).getDescription());
     }
 
+    @Test
+    public void setLabels() {
+        addWorldClassification();
+        startNewTransaction();
+        MCRCategory germany = DAO.getCategory(MCRCategoryID.fromString("World:Germany"), 0);
+        MCRCategory france = DAO.getCategory(MCRCategoryID.fromString("World:France"), 0);
+        Set<MCRLabel> labels1 = new HashSet<>();
+        labels1.add(new MCRLabel("de", "deutschland", null));
+        DAO.setLabels(germany.getId(), labels1);
+        startNewTransaction();
+        Set<MCRLabel> labels2 = new HashSet<>();
+        labels2.add(new MCRLabel("de", "frankreich", null));
+        DAO.setLabels(france.getId(), labels2);
+        startNewTransaction();
+        germany = DAO.getCategory(MCRCategoryID.fromString("World:Germany"), 0);
+        france = DAO.getCategory(MCRCategoryID.fromString("World:France"), 0);
+        assertEquals(1, germany.getLabels().size());
+        assertEquals(1, france.getLabels().size());
+        assertEquals("deutschland", germany.getLabel("de").getText());
+        assertEquals("frankreich", france.getLabel("de").getText());
+    }
+
     /**
      * tests relink child to grantparent and removal of parent.
      * 
