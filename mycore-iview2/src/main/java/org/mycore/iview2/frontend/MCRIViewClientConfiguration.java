@@ -92,6 +92,10 @@ abstract class MCRIViewClientConfiguration {
     @XmlElementWrapper()
     public List<MCRIViewClientResource> resources;
 
+    @XmlElements({ @XmlElement(name = "property") })
+    @XmlElementWrapper()
+    public List<MCRIViewClientProperty> properties;
+
     /**
      * Setup the configuration object.
      * 
@@ -108,6 +112,7 @@ abstract class MCRIViewClientConfiguration {
         this.location = MCRServlet.getServletBaseURL() + "MCRMETSServlet/" + this.derivate;
         this.mobile = isMobile(request);
         this.resources = new ArrayList<>();
+        this.properties = new ArrayList<>();
         this.addResources();
     }
 
@@ -130,7 +135,7 @@ abstract class MCRIViewClientConfiguration {
      * @param url 
      */
     public void addScript(final String url) {
-        this.resources.add(new MCRIViewClientResource("script", url));
+        this.resources.add(new MCRIViewClientResource(MCRIViewClientResource.Type.script, url));
     }
 
     /**
@@ -139,7 +144,17 @@ abstract class MCRIViewClientConfiguration {
      * @param url
      */
     public void addCSS(final String url) {
-        this.resources.add(new MCRIViewClientResource("css", url));
+        this.resources.add(new MCRIViewClientResource(MCRIViewClientResource.Type.css, url));
+    }
+
+    /**
+     * Adds a new property.
+     * 
+     * @param name name of the property
+     * @param value value of the property
+     */
+    public void addProperty(String name, String value) {
+        this.properties.add(new MCRIViewClientProperty(name, value));
     }
 
     /**
@@ -172,19 +187,39 @@ abstract class MCRIViewClientConfiguration {
             script, css
         }
 
-        public MCRIViewClientResource() {
-        }
-
-        public MCRIViewClientResource(String type, String url) {
-            this.type = Type.valueOf(type);
-            this.url = url;
-        }
-
         @XmlAttribute(name = "type", required = true)
         public Type type;
 
         @XmlValue
         public String url;
+
+        public MCRIViewClientResource() {
+        }
+
+        public MCRIViewClientResource(Type type, String url) {
+            this.type = type;
+            this.url = url;
+        }
+
+    }
+
+    @XmlRootElement(name = "property")
+    public static class MCRIViewClientProperty {
+
+        @XmlAttribute(name = "name", required = true)
+        public String name;
+
+        @XmlValue
+        public String value;
+
+        public MCRIViewClientProperty() {
+        }
+
+        public MCRIViewClientProperty(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }
+
     }
 
 }
