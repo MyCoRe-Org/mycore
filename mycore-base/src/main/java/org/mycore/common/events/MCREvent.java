@@ -59,6 +59,8 @@ public class MCREvent extends java.util.Hashtable<String, Object> {
 
     final static public String CLASS_TYPE = "MCRClassification";
 
+    final public static String MOVE_EVENT = "move";
+
     /** The object type like object or file * */
     private String objType;
 
