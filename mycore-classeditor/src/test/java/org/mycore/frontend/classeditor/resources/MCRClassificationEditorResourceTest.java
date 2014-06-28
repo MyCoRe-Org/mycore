@@ -39,6 +39,8 @@ import org.mycore.frontend.classeditor.json.MCRJSONCategory;
 import org.mycore.frontend.classeditor.mocks.CategoryDAOMock;
 import org.mycore.frontend.classeditor.mocks.CategoryLinkServiceMock;
 import org.mycore.frontend.classeditor.mocks.LinkTableStoreMock;
+import org.mycore.frontend.classeditor.resources.MCRClassificationEditorResource.MCRSessionWrapper;
+import org.mycore.frontend.classeditor.resources.MCRClassificationEditorResource.OperationInSession;
 import org.mycore.frontend.classeditor.utils.MCRCategUtils;
 import org.mycore.frontend.classeditor.wrapper.MCRCategoryListWrapper;
 import org.mycore.frontend.jersey.MCRJerseyResourceTest;
@@ -50,6 +52,16 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyResourceTest {
     private CategoryDAOMock categDAO;
 
     static Logger LOGGER = Logger.getLogger(MCRClassificationEditorResourceTest.class);
+    
+    public static class SessionWrapperMock implements MCRSessionWrapper{
+
+        @Override
+        public <T extends OperationInSession> T wrap(T op) {
+            op.run();
+            return op;
+        }
+        
+    }
 
     @BeforeClass
     public static void setup() {
@@ -70,6 +82,7 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyResourceTest {
         mcrProperties.set("ClassificationResouce.useSession", "false");
         mcrProperties.set("MCR.Category.LinkService", CategoryLinkServiceMock.class.getName());
         mcrProperties.set("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
+        mcrProperties.set("MCR.Session.Wrapper.Class", SessionWrapperMock.class.getName());
     }
 
     @Before
