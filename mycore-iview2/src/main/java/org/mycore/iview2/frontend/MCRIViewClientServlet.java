@@ -22,6 +22,10 @@ import org.xml.sax.SAXException;
 
 public class MCRIViewClientServlet extends MCRContentServlet {
 
+    private static final MCRIviewACLProvider IVIEW_ACL_PROVDER = MCRConfiguration.instance()
+        .<MCRIviewACLProvider> getInstanceOf("MCR.Module-iview2.MCRIviewACLProvider",
+            MCRIviewDefaultACLProvider.class.getName());
+
     private static final int EXPIRE_METADATA_CACHE_TIME = 10; // in seconds
 
     private static final long serialVersionUID = 1L;
@@ -49,15 +53,23 @@ public class MCRIViewClientServlet extends MCRContentServlet {
         config.lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
         final MCRObjectID derivateID = MCRObjectID.getInstance(config.derivate);
         if (!MCRMetadataManager.exists(derivateID)) {
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "derivate not found " + derivateID);
+            String errorMessage = this.getErrorI18N("component.iview2", "object.not.found", derivateID);
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND, errorMessage);
             return null;
         }
         final MCRObjectID objectID = MCRMetadataManager.getObjectId(derivateID, EXPIRE_METADATA_CACHE_TIME,
             TimeUnit.SECONDS);
         if (objectID == null) {
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "mycore object not found " + objectID);
+            String errorMessage = this.getErrorI18N("component.iview2", "object.not.found", objectID);
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND, errorMessage);
             return null;
         }
+
+        if (IVIEW_ACL_PROVDER != null && !IVIEW_ACL_PROVDER.checkAccess(req.getSession(), derivateID)) {
+            String errorMessage = this.getErrorI18N("component.iview2", "noRights", derivateID);
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN, errorMessage);
+        }
+
         config.objId = objectID.toString();
         try {
             MCRJDOMContent source = new MCRJDOMContent(buildResponseDocument(config));
