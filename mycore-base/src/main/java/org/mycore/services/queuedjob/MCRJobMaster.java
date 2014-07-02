@@ -116,7 +116,8 @@ public class MCRJobMaster implements Runnable, Closeable {
      */
     public static void startMasterThread(Class<? extends MCRJobAction> action) {
         if (!isRunning(action)) {
-            LOGGER.info("Starting job master thread" + (action == null ? "" : " for action \"" + action.getName()) + "\".");
+            LOGGER.info("Starting job master thread" + (action == null ? "" : " for action \"" + action.getName())
+                    + "\".");
             final Thread master = new Thread(getInstance(action));
             master.start();
         }
@@ -136,23 +137,24 @@ public class MCRJobMaster implements Runnable, Closeable {
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
 
         boolean activated = CONFIG.getBoolean(MCRJobQueue.CONFIG_PREFIX + "activated", true);
-        activated = activated && CONFIG.getBoolean(MCRJobQueue.CONFIG_PREFIX + JOB_QUEUE.CONFIG_PREFIX_ADD + "activated", true);
-        
+        activated = activated
+                && CONFIG.getBoolean(MCRJobQueue.CONFIG_PREFIX + JOB_QUEUE.CONFIG_PREFIX_ADD + "activated", true);
+
         LOGGER.info("JobQueue" + (MCRJobQueue.singleQueue ? "" : " for \"" + action.getName() + "\"") + " is "
                 + (activated ? "activated" : "deactivated"));
         if (activated) {
             running = true;
             int jobThreadCount = CONFIG.getInt(MCRJobQueue.CONFIG_PREFIX + "JobThreads", 2);
-            jobThreadCount = CONFIG.getInt(MCRJobQueue.CONFIG_PREFIX + JOB_QUEUE.CONFIG_PREFIX_ADD + "JobThreads", jobThreadCount);
-            
+            jobThreadCount = CONFIG.getInt(MCRJobQueue.CONFIG_PREFIX + JOB_QUEUE.CONFIG_PREFIX_ADD + "JobThreads",
+                    jobThreadCount);
+
             ThreadFactory slaveFactory = new ThreadFactory() {
                 AtomicInteger tNum = new AtomicInteger();
 
                 ThreadGroup tg = new ThreadGroup("MCRJob slave job thread group");
 
                 public Thread newThread(Runnable r) {
-                    Thread t = new Thread(tg, r, preLabel + "Slave#"
-                            + tNum.incrementAndGet());
+                    Thread t = new Thread(tg, r, preLabel + "Slave#" + tNum.incrementAndGet());
                     return t;
                 }
             };
@@ -172,7 +174,8 @@ public class MCRJobMaster implements Runnable, Closeable {
                     activeThreads.incrementAndGet();
                 }
             };
-            LOGGER.info("JobMaster" + (MCRJobQueue.singleQueue ? "" : " for \"" + action.getName() + "\"") + " with " + jobThreadCount + " thread(s) is started");
+            LOGGER.info("JobMaster" + (MCRJobQueue.singleQueue ? "" : " for \"" + action.getName() + "\"") + " with "
+                    + jobThreadCount + " thread(s) is started");
             while (running) {
                 while (activeThreads.get() < jobThreadCount) {
                     runLock.lock();
@@ -200,7 +203,11 @@ public class MCRJobMaster implements Runnable, Closeable {
                         } catch (HibernateException e) {
                             LOGGER.error("Error while getting next job.", e);
                             if (transaction != null) {
-                                transaction.rollback();
+                                try {
+                                    transaction.rollback();
+                                } catch (RuntimeException re) {
+                                    LOGGER.warn("Could not rollback transaction.", re);
+                                }
                             }
                         } finally {
                             session.close();
