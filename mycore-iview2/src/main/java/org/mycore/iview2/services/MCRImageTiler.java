@@ -52,8 +52,9 @@ public class MCRImageTiler implements Runnable, Closeable {
         MCRShutdownHandler.getInstance().addCloseable(this);
         runLock = new ReentrantLock();
         try {
-            Class<? extends MCRTilingAction> tilingActionImpl = (Class<? extends MCRTilingAction>) Class.forName(MCRConfiguration.instance().getString(
-                MCRIView2Tools.CONFIG_PREFIX + "MCRTilingActionImpl", MCRTilingAction.class.getName()));
+            Class<? extends MCRTilingAction> tilingActionImpl = (Class<? extends MCRTilingAction>) Class
+                .forName(MCRConfiguration.instance().getString(MCRIView2Tools.CONFIG_PREFIX + "MCRTilingActionImpl",
+                    MCRTilingAction.class.getName()));
             tilingActionConstructor = tilingActionImpl.getConstructor(MCRTileJob.class);
         } catch (Exception e) {
             LOGGER.error("Error while initializing", e);
@@ -87,7 +88,8 @@ public class MCRImageTiler implements Runnable, Closeable {
         //get this MCRSession a speaking name
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
-        boolean activated = MCRConfiguration.instance().getBoolean(MCRIView2Tools.CONFIG_PREFIX + "LocalTiler.activated", true);
+        boolean activated = MCRConfiguration.instance().getBoolean(
+            MCRIView2Tools.CONFIG_PREFIX + "LocalTiler.activated", true);
         LOGGER.info("Local Tiling is " + (activated ? "activated" : "deactivated"));
         LOGGER.info("Supported image file types for reading: " + Arrays.toString(ImageIO.getReaderFormatNames()));
         if (activated) {
@@ -104,7 +106,8 @@ public class MCRImageTiler implements Runnable, Closeable {
             };
             final AtomicInteger activeThreads = new AtomicInteger();
             final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>();
-            tilingServe = new ThreadPoolExecutor(tilingThreadCount, tilingThreadCount, 1, TimeUnit.DAYS, workQueue, slaveFactory) {
+            tilingServe = new ThreadPoolExecutor(tilingThreadCount, tilingThreadCount, 1, TimeUnit.DAYS, workQueue,
+                slaveFactory) {
 
                 @Override
                 protected void afterExecute(Runnable r, Throwable t) {
@@ -135,7 +138,11 @@ public class MCRImageTiler implements Runnable, Closeable {
                             } catch (HibernateException e) {
                                 LOGGER.error("Error while getting next tiling job.", e);
                                 if (transaction != null) {
-                                    transaction.rollback();
+                                    try {
+                                        transaction.rollback();
+                                    } catch (RuntimeException re) {
+                                        LOGGER.warn("Could not rollback transaction.", re);
+                                    }
                                 }
                             } finally {
                                 session.close();
