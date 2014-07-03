@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:iview2="xalan://org.mycore.iview2.frontend.MCRIView2XSLFunctions"
-  exclude-result-prefixes="iview2">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:iview2="xalan://org.mycore.iview2.frontend.MCRIView2XSLFunctions"
+  exclude-result-prefixes="iview2 encoder">
 
   <xsl:include href="mcr-module-iview2.xsl" />
 
@@ -60,7 +60,7 @@
     <xsl:param name="file" />
     <xsl:param name="derivateID" />
     <div class="container">
-      <a class="thumbnail col-md-4" href="{concat($ServletsBaseURL,'MCRIviewClient?derivate=', $derivateID, '&amp;startImage=', $file)}">
+      <a class="thumbnail col-md-12" href="{concat($ServletsBaseURL,'MCRIviewClient?derivate=', $derivateID, '&amp;startImage=', encoder:encode($file, 'UTF-8'))}">
         <xsl:call-template name="iview2.getImageElement">
           <xsl:with-param name="derivate" select="$derivateID" />
           <xsl:with-param name="imagePath" select="$file" />
