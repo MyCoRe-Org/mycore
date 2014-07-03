@@ -96,16 +96,16 @@ abstract class MCRIViewClientConfiguration {
     public List<MCRIViewClientResource> resources;
 
     @XmlElements({ @XmlElement(name = "property") })
-    @XmlElementWrapper()
+    @XmlElementWrapper(name = "properties")
     public List<MCRIViewClientProperty> getProperties() {
-        List<MCRIViewClientProperty> properties = new ArrayList<>();
-        for (Entry<String, String> entry : propertyMap.entrySet()) {
-            properties.add(new MCRIViewClientProperty(entry.getKey(), entry.getValue()));
+        List<MCRIViewClientProperty> propertyList = new ArrayList<>();
+        for (Entry<String, String> entry : properties.entrySet()) {
+            propertyList.add(new MCRIViewClientProperty(entry.getKey(), entry.getValue()));
         }
-        return properties;
+        return propertyList;
     }
 
-    private Map<String, String> propertyMap;
+    private Map<String, String> properties;
 
     /**
      * Setup the configuration object.
@@ -123,7 +123,7 @@ abstract class MCRIViewClientConfiguration {
         this.location = MCRServlet.getServletBaseURL() + "MCRMETSServlet/" + this.derivate;
         this.mobile = isMobile(request);
         this.resources = new ArrayList<>();
-        this.propertyMap = new HashMap<>();
+        this.properties = new HashMap<>();
         this.addResources();
     }
 
@@ -165,7 +165,7 @@ abstract class MCRIViewClientConfiguration {
      * @param value value of the property
      */
     public void setProperty(String name, String value) {
-        this.propertyMap.put(name, value);
+        this.properties.put(name, value);
     }
 
     /**
