@@ -71,10 +71,10 @@
   <xsl:template match="resource" mode="iview.resource">
     <xsl:choose>
       <xsl:when test="@type='script'">
-        <script src="{$WebApplicationBaseURL}{text()}" type="text/javascript"  />
+        <script src="{text()}" type="text/javascript"  />
       </xsl:when>
       <xsl:when test="@type='css'">
-        <link href="{$WebApplicationBaseURL}{text()}" type="text/css" rel="stylesheet"></link>
+        <link href="{text()}" type="text/css" rel="stylesheet"></link>
       </xsl:when>
     </xsl:choose>
   </xsl:template>
