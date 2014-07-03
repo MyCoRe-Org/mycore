@@ -23,23 +23,39 @@
 
 package org.mycore.common;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * This class acts as an {@link Iterable} on top of another instance.
  * 
  * Use this if you want to convert every element of a source into a different target object.
+ * <br/>This example will print which file for a file name exists and which not:
+ * <pre>
+ * private void testExistence(List&lt;String&gt; fileNames) {
+ *     for (File file : new MCRDecoratedIterable<String, File>(fileNames) {
+ *         {@literal @}Override
+ *         protected File getInstance(String source) {
+ *             return new File(source);
+ *         }
+ *     }) {
+ *         System.out.println(file.getAbsolutePath() + (file.exists() ? " exists." : " does not exist."));
+ *     }
+ * }
+ * </pre>
  * @author Thomas Scheffler (yagee)
  * @since 2014.07
  */
-public abstract class MCRDecoratedIteratable<S, T> implements Iterable<T> {
+public abstract class MCRDecoratedIterable<S, T> implements Iterable<T> {
 
     private final Iterable<S> source;
 
     /**
      * @param source every element of this will be transformed by {@link #getInstance(Object)}
      */
-    public MCRDecoratedIteratable(Iterable<S> source) {
+    public MCRDecoratedIterable(Iterable<S> source) {
         this.source = source;
     }
 
@@ -70,5 +86,4 @@ public abstract class MCRDecoratedIteratable<S, T> implements Iterable<T> {
      * This is your transformation method to generate instances of T from S.
      */
     protected abstract T getInstance(S source);
-
 }
