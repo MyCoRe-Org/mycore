@@ -1,7 +1,10 @@
 package org.mycore.iview2.frontend;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBContext;
@@ -94,7 +97,15 @@ abstract class MCRIViewClientConfiguration {
 
     @XmlElements({ @XmlElement(name = "property") })
     @XmlElementWrapper()
-    public List<MCRIViewClientProperty> properties;
+    public List<MCRIViewClientProperty> getProperties() {
+        List<MCRIViewClientProperty> properties = new ArrayList<>();
+        for (Entry<String, String> entry : propertyMap.entrySet()) {
+            properties.add(new MCRIViewClientProperty(entry.getKey(), entry.getValue()));
+        }
+        return properties;
+    }
+
+    private Map<String, String> propertyMap;
 
     /**
      * Setup the configuration object.
@@ -112,7 +123,7 @@ abstract class MCRIViewClientConfiguration {
         this.location = MCRServlet.getServletBaseURL() + "MCRMETSServlet/" + this.derivate;
         this.mobile = isMobile(request);
         this.resources = new ArrayList<>();
-        this.properties = new ArrayList<>();
+        this.propertyMap = new HashMap<>();
         this.addResources();
     }
 
@@ -148,13 +159,13 @@ abstract class MCRIViewClientConfiguration {
     }
 
     /**
-     * Adds a new property.
+     * Sets a new property.
      * 
      * @param name name of the property
      * @param value value of the property
      */
-    public void addProperty(String name, String value) {
-        this.properties.add(new MCRIViewClientProperty(name, value));
+    public void setProperty(String name, String value) {
+        this.propertyMap.put(name, value);
     }
 
     /**
