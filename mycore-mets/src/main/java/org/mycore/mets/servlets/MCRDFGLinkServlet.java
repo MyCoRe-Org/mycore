@@ -75,8 +75,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
     protected void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
-        String filePath = request.getParameter("file");
-        ;
+        String filePath = request.getParameter("file") == null ? "" : request.getParameter("file");
         String derivateID = request.getParameter("deriv") == null ? "" : request.getParameter("deriv");
 
         if (derivateID.equals("")) {
