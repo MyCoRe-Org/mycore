@@ -64,7 +64,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     protected MCRAudioVideoExtender avExtender;
 
     /** Is true if this file is a new MCRFile and not retrieved from store * */
-    protected boolean isNew;
+    private boolean isNew;
 
     /**
      * Creates a new and empty root MCRFile with the given filename, belonging to the given ownerID. The file is assumed to be a standalone "root file" that has
@@ -78,7 +78,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     public MCRFile(String name, String ownerID) {
         super(name, ownerID);
         initContentFields();
-        isNew = true;
+        setNew(true);
         storeNew();
     }
 
@@ -111,7 +111,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     public MCRFile(String name, MCRDirectory parent, boolean doExistCheck) {
         super(name, parent, doExistCheck);
         initContentFields();
-        isNew = true;
+        setNew(true);
         storeNew();
     }
 
@@ -126,7 +126,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         this.storeID = storeID;
         contentTypeID = fctID;
         this.md5 = md5;
-        isNew = false;
+        setNew(false);
     }
 
     /**
@@ -371,12 +371,12 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         }
 
         // If file content has changed, call event handlers to index content
-        String type = isNew ? MCREvent.CREATE_EVENT : MCREvent.UPDATE_EVENT;
+        String type = isNew() ? MCREvent.CREATE_EVENT : MCREvent.UPDATE_EVENT;
         MCREvent event = new MCREvent(MCREvent.FILE_TYPE, type);
         event.put("file", this);
         MCREventManager.instance().handleEvent(event);
 
-        isNew = false;
+        setNew(false);
     }
 
     /**
@@ -630,6 +630,14 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     public static MCRCategLinkReference getCategLinkReference(MCRObjectID derivateID, String path) {
         MCRCategLinkReference ref = new MCRCategLinkReference(path, derivateID.toString());
         return ref;
+    }
+
+    public boolean isNew() {
+        return isNew;
+    }
+
+    private void setNew(boolean isNew) {
+        this.isNew = isNew;
     }
 
 }
