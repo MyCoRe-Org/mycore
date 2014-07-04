@@ -38,6 +38,8 @@ import javax.activation.MimetypesFileTypeMap;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.jdom2.Document;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
 import org.mycore.common.MCRPersistenceException;
@@ -160,7 +162,8 @@ public class MCRSolrMCRFileDocumentFactory {
             doc.setField("mediaType", (ext.hasVideoStream() ? "video" : "audio"));
         }
 
-        if (absolutePath.contains("mets.xml")) {
+        String metsFileName = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
+        if (absolutePath.contains(metsFileName)) {
             try {
                 Document d = input.getContentAsJDOM();
                 Mets p = new Mets(d);
