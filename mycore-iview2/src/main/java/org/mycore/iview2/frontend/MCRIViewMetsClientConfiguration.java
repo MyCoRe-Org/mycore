@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.iview2.services.MCRIView2Tools;
 
 @XmlRootElement(name = "iviewClientConfiguration")
@@ -36,7 +37,8 @@ public class MCRIViewMetsClientConfiguration extends MCRIViewClientConfiguration
 
         this.startImage = request.getParameter("startImage");
 
-        this.imageXmlPath = MCRIView2Tools.getIView2Property("BaseURL");
+
+        this.imageXmlPath =  MCRIView2Tools.getIView2Property("BaseURL"); // Parameter can be used to provide multiple urls
         if (this.imageXmlPath == null || this.imageXmlPath.isEmpty()) {
             this.imageXmlPath = "MCRTileServlet/";
         }
@@ -46,6 +48,14 @@ public class MCRIViewMetsClientConfiguration extends MCRIViewClientConfiguration
         if (this.imageXmlPath.contains(",")) {
             this.imageXmlPath = this.imageXmlPath.split(",")[0];
         }
+        
+        String baseUrl = MCRServlet.getBaseURL();
+        String logoUrl = MCRIView2Tools.getIView2Property("logoUrl");
+        if (logoUrl != null) {
+            this.addScript(baseUrl + "modules/iview2/js/iview-client-logo.js");
+            this.setProperty("logoUrl", logoUrl);
+        }
+
     }
 
 }
