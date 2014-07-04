@@ -73,6 +73,7 @@ import org.xml.sax.SAXParseException;
 
 /**
  * @author Thomas Scheffler (yagee)
+ * @author Jens Kupferschmidt
  *
  */
 public class MCRPersistentServlet extends MCRServlet {
@@ -412,6 +413,23 @@ public class MCRPersistentServlet extends MCRServlet {
         }
     }
 
+    /** Check for existing file type *.xed or *.xml
+     * 
+     * @param file name base
+     * @return the complete file name, *.xed is default
+     */
+    private String checkFileName(String base_name) {
+        String file_name = base_name + ".xed";
+        MCRURIResolver URI_RESOLVER = MCRURIResolver.instance();
+        try {
+          URI_RESOLVER.resolve("webapp:" + file_name);
+          return file_name;
+        } catch (MCRException e) {
+            LOGGER.warn("Can't find " + file_name + ", now we try it with " + base_name + ".xml");
+            return base_name + ".xml";
+        }
+    }
+
     /**
      * redirects to new mcrobject form.
      * 
@@ -446,7 +464,7 @@ public class MCRPersistentServlet extends MCRServlet {
         if (layout != null && layout.length() != 0) {
             sb.append('-').append(layout);
         }
-        String form = sb.append(".xml").toString();
+        String form = checkFileName(sb.toString());
         Properties params = new Properties();
         params.put("cancelUrl", getCancelUrl(job));
         params.put("mcrid", MCRObjectID.formatID(base, 0));
