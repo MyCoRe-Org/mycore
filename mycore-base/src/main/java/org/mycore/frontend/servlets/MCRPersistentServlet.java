@@ -73,6 +73,7 @@ import org.xml.sax.SAXParseException;
 
 /**
  * @author Thomas Scheffler (yagee)
+ * @author Jens Kupferschmidt
  *
  */
 public class MCRPersistentServlet extends MCRServlet {
@@ -173,16 +174,13 @@ public class MCRPersistentServlet extends MCRServlet {
      *  if failOnMissing==true and no editor submission is present
      */
     private Document getEditorSubmission(MCRServletJob job, boolean failOnMissing) throws ServletException {
-        Document inDoc = (Document) (job.getRequest().getAttribute("MCRXEditorSubmission"));
-        if (inDoc == null) {
-            MCREditorSubmission sub = (MCREditorSubmission) job.getRequest().getAttribute("MCREditorSubmission");
-            if (sub != null)
-                inDoc = sub.getXML();
-            else if (failOnMissing)
+        MCREditorSubmission sub = (MCREditorSubmission) job.getRequest().getAttribute("MCREditorSubmission");
+        if (sub == null) {
+            if (failOnMissing)
                 throw new ServletException("No MCREditorSubmission");
-            else
-                return null;
+            return null;
         }
+        Document inDoc = sub.getXML();
         if (inDoc.getRootElement().getAttribute("ID") == null) {
             String mcrID = getProperty(job.getRequest(), "mcrid");
             LOGGER.info("Adding MCRObjectID from request: " + mcrID);
@@ -240,12 +238,10 @@ public class MCRPersistentServlet extends MCRServlet {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    private MCRObjectID createObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException, MCRException,
-            SAXParseException {
+    private MCRObjectID createObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException, MCRException, SAXParseException {
         MCRObject mcrObject = getMCRObject(doc);
         MCRObjectID objectId = mcrObject.getId();
-        if (MCRAccessManager.checkPermission("create-" + objectId.getBase())
-                || MCRAccessManager.checkPermission("create-" + objectId.getTypeId())) {
+        if (MCRAccessManager.checkPermission("create-" + objectId.getBase()) || MCRAccessManager.checkPermission("create-" + objectId.getTypeId())) {
             //noinspection SynchronizeOnNonFinalField
             synchronized (operation) {
                 if (objectId.getNumberAsInteger() == 0) {
@@ -277,8 +273,7 @@ public class MCRPersistentServlet extends MCRServlet {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    private MCRObjectID updateObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException, MCRException,
-            SAXParseException {
+    private MCRObjectID updateObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException, MCRException, SAXParseException {
         MCRObject mcrObject = getMCRObject(doc);
         LOGGER.info("ID: " + mcrObject.getId());
         try {
@@ -418,6 +413,23 @@ public class MCRPersistentServlet extends MCRServlet {
         }
     }
 
+    /** Check for existing file type *.xed or *.xml
+     * 
+     * @param file name base
+     * @return the complete file name, *.xed is default
+     */
+    private String checkFileName(String base_name) {
+        String file_name = base_name + ".xed";
+        MCRURIResolver URI_RESOLVER = MCRURIResolver.instance();
+        try {
+          URI_RESOLVER.resolve("webapp:" + file_name);
+          return file_name;
+        } catch (MCRException e) {
+            LOGGER.warn("Can't find " + file_name + ", now we try it with " + base_name + ".xml");
+            return base_name + ".xml";
+        }
+    }
+
     /**
      * redirects to new mcrobject form.
      * 
@@ -452,10 +464,11 @@ public class MCRPersistentServlet extends MCRServlet {
         if (layout != null && layout.length() != 0) {
             sb.append('-').append(layout);
         }
-        String form = sb.append(".xml").toString();
+        String form = checkFileName(sb.toString());
         Properties params = new Properties();
         params.put("cancelUrl", getCancelUrl(job));
         params.put("mcrid", MCRObjectID.formatID(base, 0));
+        @SuppressWarnings("unchecked")
         Enumeration<String> e = job.getRequest().getParameterNames();
         while (e.hasMoreElements()) {
             String name = e.nextElement();
