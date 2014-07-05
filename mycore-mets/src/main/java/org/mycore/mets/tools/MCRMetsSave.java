@@ -18,6 +18,8 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
@@ -81,18 +83,15 @@ public class MCRMetsSave {
      */
     public static synchronized void saveMets(Document document, MCRObjectID derivateId, boolean overwrite) {
         // add the file to the existing derivate in ifs
-        Document mets = null;
-        try {
-            mets = getCurrentMets(derivateId.toString());
-        } catch (Exception e) {
-            LOGGER.error(e);
+        String derivIDStr = derivateId.toString();
+        
+        MCRFile metsFile = getMetsFile(derivIDStr);
+        
+        if(!metsFile.isNew() && !overwrite){
+            return;
         }
-        if (mets == null || overwrite) {
-            String fileName = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
-            LOGGER.info("Storing file content from \"" + fileName + "\" to derivate \"" + derivateId + "\"");
-            MCRFile uploadFile = new MCRFile(fileName, MCRMetadataManager.retrieveMCRDerivate(derivateId).receiveDirectoryFromIFS());
-            uploadFile.setContentFrom(document);
-        }
+        
+        metsFile.setContentFrom(document);
     }
 
     /**
@@ -126,13 +125,24 @@ public class MCRMetsSave {
      * @throws SAXException 
      */
     private static Document getCurrentMets(String derivateID) throws JDOMException, IOException, SAXException {
-        String mf = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
+        MCRFile metsFile = getMetsFile(derivateID);
+        return metsFile == null ? null : metsFile.getContent().asXML();
+    }
+
+    private static MCRFile getMetsFile(String derivateID) {
         MCRDirectory rootDir = MCRDirectory.getRootDirectory(derivateID);
         if (rootDir == null) {
             return null;
         }
-        MCRFile metsFile = (MCRFile) rootDir.getChild(mf);
-        return metsFile == null ? null : metsFile.getContent().asXML();
+        
+        String metsFileName = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
+        MCRFile metsFile = (MCRFile) rootDir.getChild(metsFileName);
+        
+        if(metsFile == null){
+            metsFile = new MCRFile(metsFileName, rootDir);
+        }
+        
+        return metsFile;
     }
 
     /**
@@ -145,6 +155,7 @@ public class MCRMetsSave {
      * @return the modified mets or null if an exception occures
      */
     private static Document updateOnFileAdd(Document mets, MCRFile file) {
+        
         try {
             UUID uuid = UUID.randomUUID();
             String fileId = org.mycore.mets.model.files.File.PREFIX_MASTER + uuid;
