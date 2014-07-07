@@ -19,7 +19,7 @@
     <property name="finished" type="java.util.Date" />
     <map name="parameters" table="MCRJobParameter" cascade="all" lazy="false">
       <key column="jobID" />
-      <index column="paramKey" type="string" length="128" />
+      <map-key column="paramKey" type="string" length="128" />
       <element column="paramValue" type="string" length="255" />
     </map>
   </class>

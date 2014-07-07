@@ -287,7 +287,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     public MCRJob getJob(Map<String, String> params) {
         return getJob(action, params);
     }
-    
+
     private MCRJob getJob(Class<? extends MCRJobAction> action, Map<String, String> params) {
         if (!running)
             return null;
@@ -405,7 +405,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
         Session session = MCRHIBConnection.instance().getSession();
 
-        StringBuilder qStr = new StringBuilder("DELETE FROM MCRJob job WHERE action = '" + action.getName() + "' ");
+        StringBuilder qStr = new StringBuilder("FROM MCRJob job WHERE action = '" + action.getName() + "' ");
         for (String paramKey : params.keySet()) {
             qStr.append(" AND job.parameters['" + paramKey + "'] = '" + params.get(paramKey) + "'");
         }
@@ -421,6 +421,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
         try {
             session.delete(job);
+            session.evict(job);
             return 1;
         } finally {
             clearPreFetch();
@@ -439,7 +440,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
         Session session = MCRHIBConnection.instance().getSession();
 
-        Query query = session.createQuery("DELETE FROM MCRJob job WHERE action = '" + action.getName() + "'");
+        Query query = session.createQuery("FROM MCRJob job WHERE action = '" + action.getName() + "'");
 
         @SuppressWarnings("unchecked")
         Iterator<MCRJob> results = query.iterate();
@@ -449,7 +450,9 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             int delC = 0;
             while (results.hasNext()) {
                 MCRJob job = results.next();
+
                 session.delete(job);
+                session.evict(job);
                 delC++;
             }
             return delC;
