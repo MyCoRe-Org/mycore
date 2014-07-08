@@ -96,7 +96,8 @@ public abstract class MCRJerseyUtil {
      * @return human readable string
      */
     public static String fromStatusCode(int statusCode) {
-        return Response.Status.fromStatusCode(statusCode).getReasonPhrase();
+        Status status = Response.Status.fromStatusCode(statusCode);
+        return status != null ? status.getReasonPhrase() : "Unknown Error";
     }
 
 }
