@@ -43,9 +43,11 @@
   <!-- ========== pass request parameters ========== -->
 
   <xsl:template name="passAdditionalParameters">
-    <xsl:for-each select="transformer:getAdditionalParameters($transformer)">
-      <input type="hidden" name="{@name}" value="{text()}" />
-    </xsl:for-each>
+    <div style="visibility:hidden">
+      <xsl:for-each select="transformer:getAdditionalParameters($transformer)">
+        <input type="hidden" name="{@name}" value="{text()}" />
+      </xsl:for-each>
+    </div>
   </xsl:template>
 
   <!-- ========== <xed:source uri="" /> ========== -->
