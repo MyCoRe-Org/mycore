@@ -113,8 +113,7 @@
         <configuration>
           <doCheck>false</doCheck>
           <doUpdate>true</doUpdate>
-          <useLastCommittedRevision>true</useLastCommittedRevision>
-          <revisionOnScmFailure>1</revisionOnScmFailure>
+          <revisionOnScmFailure>0</revisionOnScmFailure>
         </configuration>
       </plugin>
       <plugin>
