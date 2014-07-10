@@ -6,7 +6,9 @@
       Diese Publikation mit dem Titel "Der neue XEditor - Utopie oder Wahnsinn?" dürfen Sie als John Doe bearbeiten.
       <input name="/document/title" value="Der neue XEditor - Utopie oder Wahnsinn?" type="text" size="40" />
     </div>
-    <input value="testBasicInputComponents-source.xml" name="input" type="hidden" />
-    <input value="1-0" name="_xed_session" type="hidden" />
+    <div style="visibility:hidden">
+      <input value="testBasicInputComponents-source.xml" name="input" type="hidden" />
+      <input value="1-0" name="_xed_session" type="hidden" />
+    </div>
   </form>
 </div>

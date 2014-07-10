@@ -5,8 +5,10 @@
     <form action="/servlets/XEditor">
       <input name="/mods:mods/mods:titleInfo/mods:title" value="Test" type="text" />
       <input name="/mods:mods/mods:relatedItem/@xlink:href" value="" type="text" />
-      <input value="testNamespaces-source.xml" name="input" type="hidden" />
-      <input value="1-1" name="_xed_session" type="hidden" />
+      <div style="visibility:hidden">
+        <input value="testNamespaces-source.xml" name="input" type="hidden" />
+        <input value="1-1" name="_xed_session" type="hidden" />
+      </div>
     </form>
   </body>
 </html>

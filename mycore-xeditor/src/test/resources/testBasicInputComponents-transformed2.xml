@@ -20,9 +20,11 @@
       </select>
       <input name="/document/service" checked="checked" id="oai" value="oai" type="checkbox" />
       <input name="/document/service" checked="checked" id="urn" value="urn" type="checkbox" />
-      <input value="testBasicInputComponents-source.xml" name="input" type="hidden" />
-      <input value="type service service[2]" name="_xed_check" type="hidden" />
-      <input value="1-3" name="_xed_session" type="hidden" />
+      <div style="visibility:hidden">
+        <input value="testBasicInputComponents-source.xml" name="input" type="hidden" />
+        <input value="type service service[2]" name="_xed_check" type="hidden" />
+        <input value="1-3" name="_xed_session" type="hidden" />
+      </div>
     </form>
   </body>
 </html>

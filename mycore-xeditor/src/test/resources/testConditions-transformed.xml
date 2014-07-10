@@ -7,8 +7,10 @@
       <label>There is author information.</label>
       <label>The value is less than 3.</label>
       <label>The value is 2.</label>
-      <input value="testBasicInputComponents-source.xml" name="input" type="hidden" />
-      <input value="1-0" name="_xed_session" type="hidden" />
+      <div style="visibility:hidden">
+        <input value="testBasicInputComponents-source.xml" name="input" type="hidden" />
+        <input value="1-0" name="_xed_session" type="hidden" />
+      </div>
     </form>
   </body>
 </html>

@@ -5,6 +5,8 @@
     <h1>Artikel
         in
         Zeitschrift</h1>
-    <input value="1-2" name="_xed_session" type="hidden" />
+    <div style="visibility:hidden">
+      <input value="1-2" name="_xed_session" type="hidden" />
+    </div>
   </form>
 </div>
