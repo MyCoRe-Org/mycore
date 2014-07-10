@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <artifactId>mycore</artifactId>
     <groupId>org.mycore</groupId>
@@ -112,7 +113,8 @@
         <configuration>
           <doCheck>false</doCheck>
           <doUpdate>true</doUpdate>
-          <revisionOnScmFailure>0</revisionOnScmFailure>
+          <useLastCommittedRevision>true</useLastCommittedRevision>
+          <revisionOnScmFailure>1</revisionOnScmFailure>
         </configuration>
       </plugin>
       <plugin>
@@ -126,6 +128,7 @@
             <exclude>**/MCRTestCase.java</exclude>
             <exclude>**/MCRHibTestCase.java</exclude>
             <exclude>**/*$*</exclude>
+            <exclude>${excludes.test}</exclude>
           </excludes>
           <property>
             <name>known.issues</name>
