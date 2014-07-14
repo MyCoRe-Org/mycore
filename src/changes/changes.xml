@@ -6,6 +6,12 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrfluet" type="fix">
+        mycore-xeditor: Wrap hidden input elements with hidden div for valid html
+      </action>
+      <action dev="mcrjkupf" type="add">
+        mycore-xeditor: add selection of *.xed editor files
+      </action>
       <action dev="mcrsroeh" type="update">
         mycore-mets: updated DFGLinkServlet to use maindoc of derivate if no image and no mets exists
       </action>
