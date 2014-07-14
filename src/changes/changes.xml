@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrtchef" type="fix">
+        mycore-mods: fixed NPE if typeOfResource is not present
+      </action>
       <action dev="mcrmibue" type="fix">
         mycore-wcms2: fixed image handling (file browser now uses relative image paths and only shows images)
       </action>
