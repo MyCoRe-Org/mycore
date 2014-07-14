@@ -41,6 +41,9 @@ import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.mets.model.MCRMETSGenerator;
@@ -70,49 +73,62 @@ public class MCRDFGLinkServlet extends MCRServlet {
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
-        String filePath = job.getRequest().getParameter("file");
-        String derivate = job.getRequest().getParameter("deriv");
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
-        int imageNumber = -1;
+        String filePath = request.getParameter("file");
+        ;
+        String derivateID = request.getParameter("deriv") == null ? "" : request.getParameter("deriv");
 
-        String encodedMetsURL = URLEncoder.encode(MCRServlet.getServletBaseURL() + "MCRMETSServlet/" + derivate + "?XSL.Style=dfg", "UTF-8");
+        if (derivateID.equals("")) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Derivate is not set");
+        }
+
+        String encodedMetsURL = URLEncoder.encode(MCRServlet.getServletBaseURL() + "MCRMETSServlet/" + derivateID + "?XSL.Style=dfg",
+                "UTF-8");
         LOGGER.info(request.getPathInfo());
 
-        MCRDirectory dir = MCRDirectory.getRootDirectory(derivate);
+        MCRDirectory dir = MCRDirectory.getRootDirectory(derivateID);
 
         if (dir == null) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, MessageFormat.format("Derivate {0} does not exist.", derivate));
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, MessageFormat.format("Derivate {0} does not exist.", derivateID));
             return;
         }
-        request.setAttribute("XSL.derivateID", derivate);
-        Collection<String> linkList = MCRLinkTableManager.instance().getSourceOf(derivate);
+        request.setAttribute("XSL.derivateID", derivateID);
+        Collection<String> linkList = MCRLinkTableManager.instance().getSourceOf(derivateID);
         if (linkList.isEmpty()) {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    MessageFormat.format("Derivate {0} is not linked with a MCRObject. Please contact an administrator.", derivate));
+                    MessageFormat.format("Derivate {0} is not linked with a MCRObject. Please contact an administrator.", derivateID));
             return;
         }
 
-        if (filePath == null) {
-            String dfgURL = "http://dfg-viewer.de/show/?set[mets]=" + encodedMetsURL;
-            response.sendRedirect(dfgURL);
-            return;
+        if (filePath == "") {
+            MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateID));
+            filePath = derivate.getDerivate().getInternals().getMainDoc();
         }
 
         MCRFile metsFile = (MCRFile) dir.getChildByPath("mets.xml");
+        int imageNumber = -2;
         if (metsFile != null) {
             imageNumber = getOrderNumber(metsFile.getContent().asXML(), filePath);
         } else {
-            MCRContent metsContent = getMetsSource(job, useExistingMets(request), derivate);
+            MCRContent metsContent = getMetsSource(job, useExistingMets(request), derivateID);
             imageNumber = getOrderNumber(metsContent.asXML(), filePath);
         }
-        if (imageNumber == -1) {
+
+        String dfgURL = "";
+        switch (imageNumber) {
+        case -1:
             response.sendError(HttpServletResponse.SC_CONFLICT,
                     MessageFormat.format("Image {0} not found in the MCRDerivate. Please contact an administrator.", filePath));
             return;
+        case -2:
+            dfgURL = "http://dfg-viewer.de/show/?set[mets]=" + encodedMetsURL;
+            break;
+        default:
+            dfgURL = "http://dfg-viewer.de/show/?set[mets]=" + encodedMetsURL + "&set[image]=" + imageNumber;
+            break;
         }
 
-        String dfgURL = "http://dfg-viewer.de/show/?set[mets]=" + encodedMetsURL + "&set[image]=" + imageNumber;
         response.sendRedirect(dfgURL);
     }
 

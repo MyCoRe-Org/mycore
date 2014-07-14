@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrsroeh" type="update">
+        mycore-mets: updated DFGLinkServlet to use maindoc of derivate if no image and no mets exists
+      </action>
       <action dev="mcradler" type="fix">
         mycore-base: catch exception if transaction rollback fails due to database outage
       </action>
