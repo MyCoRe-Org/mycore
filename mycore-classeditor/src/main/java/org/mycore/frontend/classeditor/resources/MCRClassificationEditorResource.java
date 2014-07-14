@@ -207,13 +207,13 @@ public class MCRClassificationEditorResource {
         return sessionized(new DeleteOp(category)).getResponse();
     }
     
-    private <T extends OperationInSession> T sessionized(T op){
+    private <T extends OperationInSession> T sessionized(T op) {
         // we don't use getSingleInstanceOf(name, default) to keep DefaultSessionWrapper private
-        MCRSessionWrapper sessionWrapper = MCRConfiguration.instance().<MCRSessionWrapper>getSingleInstanceOf("MCR.Session.Wrapper.Class");
-        if(sessionWrapper == null){
+        MCRSessionWrapper sessionWrapper = MCRConfiguration.instance().<MCRSessionWrapper> getSingleInstanceOf(
+            "MCR.Session.Wrapper.Class", null);
+        if (sessionWrapper == null) {
             sessionWrapper = new DefaultSessionWrapper();
         }
-        
         return sessionWrapper.wrap(op);
     }
     
