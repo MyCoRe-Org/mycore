@@ -6,6 +6,12 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrmeich" type="fix">
+        mycore-classeditor: create a new db transaction for every category to update/delete
+      </action>
+      <action dev="mcrjkupf" type="fix">
+        mycore-xeditor: solve lost request informations
+      </action>
       <action dev="mcrtchef" type="fix">
         mycore-base: if "href" attribute is not given check acl rights against "dir" attribute
       </action>

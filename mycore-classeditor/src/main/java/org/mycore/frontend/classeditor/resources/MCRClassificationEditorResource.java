@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.ws.rs.Consumes;
@@ -46,6 +45,7 @@ import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRJSONManager;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
@@ -55,7 +55,6 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.frontend.classeditor.access.MCRClassificationWritePermission;
@@ -205,7 +204,9 @@ public class MCRClassificationEditorResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteCateg(String json) {
         MCRJSONCategory category = parseJson(json);
-
+        if (!MCRSessionMgr.getCurrentSession().isTransactionActive()) {
+            MCRSessionMgr.getCurrentSession().beginTransaction();
+        }
         try {
             MCRCategoryID categoryID = category.getId();
             if (CATEGORY_DAO.exist(categoryID)) {
@@ -221,6 +222,8 @@ public class MCRClassificationEditorResource {
         } catch (MCRPersistenceException e) {
             e.printStackTrace();
             return Response.status(Status.NOT_FOUND).build();
+        } finally {
+            MCRSessionMgr.getCurrentSession().commitTransaction();
         }
     }
 
@@ -381,18 +384,25 @@ public class MCRClassificationEditorResource {
     }
 
     protected void updateCateg(MCRJSONCategory categ) {
-        MCRCategoryID newParentID = categ.getParentID();
-        if (newParentID != null && !CATEGORY_DAO.exist(newParentID)) {
-            throw new WebApplicationException(Status.NOT_FOUND);
+        if (!MCRSessionMgr.getCurrentSession().isTransactionActive()) {
+            MCRSessionMgr.getCurrentSession().beginTransaction();
         }
-        if (CATEGORY_DAO.exist(categ.getId())) {
-            CATEGORY_DAO.setLabels(categ.getId(), categ.getLabels());
-            CATEGORY_DAO.setURI(categ.getId(), categ.getURI());
-            if (newParentID != null) {
-                CATEGORY_DAO.moveCategory(categ.getId(), newParentID, categ.getPositionInParent());
+        try {
+            MCRCategoryID newParentID = categ.getParentID();
+            if (newParentID != null && !CATEGORY_DAO.exist(newParentID)) {
+                throw new WebApplicationException(Status.NOT_FOUND);
             }
-        } else {
-            CATEGORY_DAO.addCategory(newParentID, categ.asMCRImpl(), categ.getPositionInParent());
+            if (CATEGORY_DAO.exist(categ.getId())) {
+                CATEGORY_DAO.setLabels(categ.getId(), categ.getLabels());
+                CATEGORY_DAO.setURI(categ.getId(), categ.getURI());
+                if (newParentID != null) {
+                    CATEGORY_DAO.moveCategory(categ.getId(), newParentID, categ.getPositionInParent());
+                }
+            } else {
+                CATEGORY_DAO.addCategory(newParentID, categ.asMCRImpl(), categ.getPositionInParent());
+            }
+        } finally {
+            MCRSessionMgr.getCurrentSession().commitTransaction();
         }
     }
 
