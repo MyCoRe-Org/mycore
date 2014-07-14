@@ -54,6 +54,8 @@ public class MCREvent extends java.util.Hashtable<String, Object> {
     final static public String DERIVATE_TYPE = "MCRDerivate";
 
     final static public String FILE_TYPE = "MCRFile";
+    
+    final static public String DIRECTORY_TYPE = "MCRDirectory";
 
     final static public String CLASS_TYPE = "MCRClassification";
 

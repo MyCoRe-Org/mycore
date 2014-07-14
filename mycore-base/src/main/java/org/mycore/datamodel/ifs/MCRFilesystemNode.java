@@ -107,7 +107,8 @@ public abstract class MCRFilesystemNode {
         this.name = name;
     }
 
-    protected MCRFilesystemNode(String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date) {
+    protected MCRFilesystemNode(String ID, String parentID, String ownerID, String name, String label, long size,
+            GregorianCalendar date) {
         this.ID = ID;
         this.parentID = parentID;
         this.ownerID = ownerID;
@@ -242,6 +243,7 @@ public abstract class MCRFilesystemNode {
 
         checkName(name, true);
         this.name = name;
+
         touch(true);
         fireUpdateEvent();
     }
@@ -257,8 +259,16 @@ public abstract class MCRFilesystemNode {
     }
 
     protected void fireUpdateEvent() {
-        MCREvent event = new MCREvent(MCREvent.FILE_TYPE, MCREvent.UPDATE_EVENT);
-        event.put("file", this);
+        String nodeType = MCREvent.FILE_TYPE;
+        String dataType = "file";
+
+        if (this instanceof MCRDirectory) {
+            nodeType = MCREvent.DIRECTORY_TYPE;
+            dataType = "dir";
+        }
+
+        MCREvent event = new MCREvent(nodeType, MCREvent.UPDATE_EVENT);
+        event.put(dataType, this);
         MCREventManager.instance().handleEvent(event);
     }
 
