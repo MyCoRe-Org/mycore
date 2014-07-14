@@ -5,10 +5,12 @@
     <form action="/servlets/XEditor">
       <input name="/document/@publish" id="publish" type="checkbox" value="true" />
       <label for="publish">Dokument publizieren</label>
-      <input value="testDefaultValue-input.xml" name="input" type="hidden" />
-      <input value="@publish" name="_xed_check" type="hidden" />
-      <input value="false" name="_xed_default_/document/@publish" type="hidden" />
-      <input value="1-2" name="_xed_session" type="hidden" />
+      <div style="visibility:hidden">
+        <input value="testDefaultValue-input.xml" name="input" type="hidden" />
+        <input value="@publish" name="_xed_check" type="hidden" />
+        <input value="false" name="_xed_default_/document/@publish" type="hidden" />
+        <input value="1-2" name="_xed_session" type="hidden" />
+      </div>
     </form>
   </body>
 </html>

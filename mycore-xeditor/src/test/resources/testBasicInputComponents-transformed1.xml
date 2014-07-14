@@ -18,8 +18,10 @@
       </select>
       <input name="/document/service" id="oai" value="oai" type="checkbox" />
       <input name="/document/service" id="urn" value="urn" type="checkbox" checked="checked" />
-      <input value="type service" name="_xed_check" type="hidden" />
-      <input value="1-10" name="_xed_session" type="hidden" />
+      <div style="visibility:hidden">
+        <input value="type service" name="_xed_check" type="hidden" />
+        <input value="1-10" name="_xed_session" type="hidden" />
+      </div>
     </form>
   </body>
 </html>
