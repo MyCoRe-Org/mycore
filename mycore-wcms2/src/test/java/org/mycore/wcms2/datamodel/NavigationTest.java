@@ -92,7 +92,7 @@ public class NavigationTest {
         assertEquals("{tenantPath}/content/main/search.xml", searchItem.getHref());
         assertEquals(MCRNavigationItem.Type.intern, searchItem.getType());
         assertEquals(MCRNavigationItem.Target._self, searchItem.getTarget());
-        assertEquals(MCRNavigationItem.Style.normal, searchItem.getStyle());
+        assertEquals("normal", searchItem.getStyle());
         assertEquals(false, searchItem.isReplaceMenu());
         assertEquals(true, searchItem.isConstrainPopUp());
         assertEquals("Suche", searchItem.getLabel("de"));

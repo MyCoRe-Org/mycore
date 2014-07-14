@@ -11,7 +11,6 @@ import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMResult;
 import org.junit.Before;
 import org.junit.Test;
-import org.mycore.wcms2.datamodel.MCRNavigationItem.Style;
 import org.mycore.wcms2.datamodel.MCRNavigationItem.Target;
 import org.mycore.wcms2.datamodel.MCRNavigationItem.Type;
 
@@ -27,7 +26,7 @@ public class ItemTest {
     public void setup() {
         this.item = new MCRNavigationItem();
         this.item.setHref("/content/main/search.xml");
-        this.item.setStyle(Style.bold);
+        this.item.setStyle("bold");
         this.item.setTarget(Target._self);
         this.item.setType(Type.intern);
         this.item.setTemplate("template_mysample");

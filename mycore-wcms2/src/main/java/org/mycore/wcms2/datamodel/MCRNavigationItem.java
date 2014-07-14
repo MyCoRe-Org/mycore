@@ -25,10 +25,6 @@ public class MCRNavigationItem extends MCRNavigationI18nItem implements MCRNavig
         _self, _blank
     }
 
-    public enum Style {
-        normal, bold
-    }
-
     // general
     @XmlAttribute(required = true)
     private String href;
@@ -46,15 +42,11 @@ public class MCRNavigationItem extends MCRNavigationI18nItem implements MCRNavig
     @XmlAttribute
     private boolean constrainPopUp;
 
-    // layout
-    @XmlAttribute
-    private Style style;
-
     @XmlAttribute
     protected String template;
 
     @XmlAttribute
-    protected String css;
+    protected String style;
 
     // children
     @XmlElementRefs({ @XmlElementRef(type = MCRNavigationItem.class),
@@ -86,10 +78,6 @@ public class MCRNavigationItem extends MCRNavigationI18nItem implements MCRNavig
         return target;
     }
 
-    public Style getStyle() {
-        return style;
-    }
-
     public String getTemplate() {
         return template;
     }
@@ -114,20 +102,16 @@ public class MCRNavigationItem extends MCRNavigationI18nItem implements MCRNavig
         this.constrainPopUp = constrainPopUp;
     }
 
-    public void setStyle(Style style) {
-        this.style = style;
-    }
-
     public void setTemplate(String template) {
         this.template = template;
     }
 
-    public void setCss(String css) {
-        this.css = css;
+    public void setStyle(String style) {
+        this.style = style;
     }
 
-    public String getCss() {
-        return css;
+    public String getStyle() {
+        return style;
     }
 
     public void addItem(MCRNavigationItem item) {
