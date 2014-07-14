@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrmeich" type="fix">
+        mycore-iview2: don't use minfied js version if debug mode is set to true
+      </action>
       <action dev="mcrtchef" type="fix">
         mycore-mods: fixed NPE if typeOfResource is not present
       </action>
