@@ -204,27 +204,107 @@ public class MCRClassificationEditorResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteCateg(String json) {
         MCRJSONCategory category = parseJson(json);
-        if (!MCRSessionMgr.getCurrentSession().isTransactionActive()) {
-            MCRSessionMgr.getCurrentSession().beginTransaction();
+        return sessionized(new DeleteOp(category)).getResponse();
+    }
+    
+    private <T extends OperationInSession> T sessionized(T op){
+        // we don't use getSingleInstanceOf(name, default) to keep DefaultSessionWrapper private
+        MCRSessionWrapper sessionWrapper = MCRConfiguration.instance().<MCRSessionWrapper>getSingleInstanceOf("MCR.Session.Wrapper.Class");
+        if(sessionWrapper == null){
+            sessionWrapper = new DefaultSessionWrapper();
         }
-        try {
-            MCRCategoryID categoryID = category.getId();
-            if (CATEGORY_DAO.exist(categoryID)) {
-                if (categoryID.isRootID()
-                    && !MCRAccessManager.checkPermission(categoryID.getRootID(), PERMISSION_DELETE)) {
-                    throw new WebApplicationException(Status.UNAUTHORIZED);
-                }
-                CATEGORY_DAO.deleteCategory(categoryID);
-                return Response.status(Status.GONE).build();
-            } else {
-                return Response.notModified().build();
+        
+        return sessionWrapper.wrap(op);
+    }
+    
+    interface MCRSessionWrapper {
+        public <T extends OperationInSession> T wrap(T op);
+    }
+    
+    private class DefaultSessionWrapper implements MCRSessionWrapper{
+        @Override
+        public <T extends OperationInSession> T wrap(T op) {
+            if (!MCRSessionMgr.getCurrentSession().isTransactionActive()) {
+                MCRSessionMgr.getCurrentSession().beginTransaction();
             }
-        } catch (MCRPersistenceException e) {
-            e.printStackTrace();
-            return Response.status(Status.NOT_FOUND).build();
-        } finally {
-            MCRSessionMgr.getCurrentSession().commitTransaction();
+            try {
+                op.run();
+            } finally {
+                MCRSessionMgr.getCurrentSession().commitTransaction();
+            }
+            return op;
         }
+        
+    }
+    
+    interface OperationInSession {
+        public void run();
+    }
+    
+    private class DeleteOp implements OperationInSession{
+        
+        private MCRJSONCategory category;
+        private Response response;
+
+        public DeleteOp(MCRJSONCategory category) {
+            this.category = category;
+        }
+
+        @Override
+        public void run() {
+            try {
+                MCRCategoryID categoryID = category.getId();
+                if (CATEGORY_DAO.exist(categoryID)) {
+                    if (categoryID.isRootID()
+                        && !MCRAccessManager.checkPermission(categoryID.getRootID(), PERMISSION_DELETE)) {
+                        throw new WebApplicationException(Status.UNAUTHORIZED);
+                    }
+                    CATEGORY_DAO.deleteCategory(categoryID);
+                    setResponse(Response.status(Status.GONE).build());
+                } else {
+                    setResponse(Response.notModified().build());
+                }
+            } catch (MCRPersistenceException e) {
+                e.printStackTrace();
+                setResponse(Response.status(Status.NOT_FOUND).build());
+            }
+        }
+
+        public Response getResponse() {
+            return response;
+        }
+
+        private void setResponse(Response response) {
+            this.response = response;
+        }
+        
+    }
+    
+    private class UpdateOp implements OperationInSession{
+        
+        private MCRJSONCategory category;
+
+        public UpdateOp(MCRJSONCategory category) {
+            this.category = category;
+        }
+
+        @Override
+        public void run() {
+            MCRCategoryID newParentID = category.getParentID();
+            if (newParentID != null && !CATEGORY_DAO.exist(newParentID)) {
+                throw new WebApplicationException(Status.NOT_FOUND);
+            }
+            if (CATEGORY_DAO.exist(category.getId())) {
+                CATEGORY_DAO.setLabels(category.getId(), category.getLabels());
+                CATEGORY_DAO.setURI(category.getId(), category.getURI());
+                if (newParentID != null) {
+                    CATEGORY_DAO.moveCategory(category.getId(), newParentID, category.getPositionInParent());
+                }
+            } else {
+                CATEGORY_DAO.addCategory(newParentID, category.asMCRImpl(), category.getPositionInParent());
+            }
+        }
+        
     }
 
     @POST
@@ -252,7 +332,8 @@ public class MCRClassificationEditorResource {
                         return Response.status(Status.CONFLICT).entity(buildJsonError("duplicateID", mcrCategoryID))
                             .build();
                     }
-                    updateCateg(parsedCateg);
+                    
+                    sessionized(new UpdateOp(parsedCateg));
                 } else if ("delete".equals(status)) {
                     deleteCateg(categ.getJson());
                 } else {
@@ -381,29 +462,6 @@ public class MCRClassificationEditorResource {
         Gson gson = MCRJSONManager.instance().createGson();
         MCRJSONCategory category = gson.fromJson(json, MCRJSONCategory.class);
         return category;
-    }
-
-    protected void updateCateg(MCRJSONCategory categ) {
-        if (!MCRSessionMgr.getCurrentSession().isTransactionActive()) {
-            MCRSessionMgr.getCurrentSession().beginTransaction();
-        }
-        try {
-            MCRCategoryID newParentID = categ.getParentID();
-            if (newParentID != null && !CATEGORY_DAO.exist(newParentID)) {
-                throw new WebApplicationException(Status.NOT_FOUND);
-            }
-            if (CATEGORY_DAO.exist(categ.getId())) {
-                CATEGORY_DAO.setLabels(categ.getId(), categ.getLabels());
-                CATEGORY_DAO.setURI(categ.getId(), categ.getURI());
-                if (newParentID != null) {
-                    CATEGORY_DAO.moveCategory(categ.getId(), newParentID, categ.getPositionInParent());
-                }
-            } else {
-                CATEGORY_DAO.addCategory(newParentID, categ.asMCRImpl(), categ.getPositionInParent());
-            }
-        } finally {
-            MCRSessionMgr.getCurrentSession().commitTransaction();
-        }
     }
 
     protected String buildJsonError(String errorType, MCRCategoryID mcrCategoryID) {
