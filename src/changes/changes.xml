@@ -2,9 +2,14 @@
   xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
   <properties>
     <title>MyCoRe Changes Report</title>
-    <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
+    <author email="kathleen.neumann(at)gbv.de">Kathleen Neumann</author>
   </properties>
   <body>
+    <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrmibue" type="fix">
+        mycore-wcms2: fixed image handling (file browser now uses relative image paths and only shows images)
+      </action>
+    </release>
     <release version="2014.06.0" date="2014-06-20" description="2014 LTS">
       <action dev="mcrfluet" type="fix" date="2014-06-20">
         mycore-xeditor: Make a copy of original request parameters, may be re-used by servlet container after request ended.
@@ -95,7 +100,7 @@
         add parameter $User-Agent for XSL stylesheets
       </action>
       <action dev="mcrmeich" type="add">
-        mycore-iview2: add zip resource (/iview/zip): zips iview jpgs of a derivate 
+        mycore-iview2: add zip resource (/iview/zip): zips iview jpgs of a derivate
       </action>
       <action dev="mcrmeich" type="add">
         added MCRCategoryDAO.setLabels()
@@ -207,11 +212,11 @@
         mycore-webcli: fixed "process {0}"
       </action>
       <action dev="mcrtchef" type="remove">
-        MCRObjectServlet: removed support for browsing in MCRResults 
+        MCRObjectServlet: removed support for browsing in MCRResults
       </action>
       <action dev="mcrtchef" type="add">
         added MCRContentServlet to provide support for reliable browser cache and HTTP range requests
-        currently used by MCRFileNodeServlet and MCRObjectServlet 
+        currently used by MCRFileNodeServlet and MCRObjectServlet
       </action>
       <action dev="mcrsherm" type="add">
         mycore-solr: added support to mycoreobject-dynamicfields.xsl to index remote content

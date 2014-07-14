@@ -1,5 +1,6 @@
 package org.mycore.wcms2.resources;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -52,6 +53,9 @@ public class MCRWCMSFileBrowserResource {
 
     @Context
     HttpServletResponse response;
+    
+    @Context
+    ServletContext context;
 
     
     @GET
@@ -111,7 +115,6 @@ public class MCRWCMSFileBrowserResource {
                 return Response.status(Status.FORBIDDEN).build(); 
             }
         }
-
         return Response.status(Status.CONFLICT).build(); 
     }
 
@@ -124,21 +127,16 @@ public class MCRWCMSFileBrowserResource {
         File[] fileArray = dir.listFiles();
         if (fileArray != null){
             for(File file : fileArray){
-                if (!file.getName().endsWith(".xml")){
+                String mimetype =  Files.probeContentType(file.toPath());
+                if (mimetype != null && mimetype.split("/")[0].equals("image")){
                     JsonObject fileJsonObj = new JsonObject();
                     fileJsonObj.addProperty("name", file.getName());
-                    fileJsonObj.addProperty("path", path +  "/" + file.getName());
+                    fileJsonObj.addProperty("path",context.getContextPath() + path +  "/" + file.getName());
                     if (file.isDirectory()){
                         fileJsonObj.addProperty("type", "folder");
                     }
                     else{
-                        String mimetype =  Files.probeContentType(file.toPath());
-                        if (mimetype != null){
-                            fileJsonObj.addProperty("type", mimetype.split("/")[0]); 
-                        }
-                        else{
-                            fileJsonObj.addProperty("type", ""); 
-                        }
+                        fileJsonObj.addProperty("type", mimetype.split("/")[0]);
                     }
                     jsonArray.add(fileJsonObj);
                 }
@@ -184,7 +182,7 @@ public class MCRWCMSFileBrowserResource {
             e.printStackTrace();
             return "";
         }
-        return "<script type='text/javascript'>window.parent.CKEDITOR.tools.callFunction(" + funcNum + ",'" + path +  "', '');</script>";
+        return "<script type='text/javascript'>window.parent.CKEDITOR.tools.callFunction(" + funcNum + ",'" + path.substring(path.lastIndexOf("/") + 1, path.length()) +  "', '');</script>";
     }
     
     protected String saveFile(InputStream inputStream, String path) throws IOException {
