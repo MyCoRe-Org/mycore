@@ -6,6 +6,15 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrtchef" type="fix">
+        mycore-iview2: catch exception if transaction rollback fails due to database outage
+      </action>
+      <action dev="mcrmeich" type="fix">
+        mycore-classeditor: fix configuration exception when MCR.Session.Wrapper.Class is not set
+      </action>
+      <action dev="mcrvuchi" type="fix">
+        mycore-base: don't use Collections.EMTY_LIST, it's immuteable, can't add children to emtpty MCRDirectiory
+      </action>
       <action dev="mcrmeich" type="fix">
         mycore-classeditor: create a new db transaction for every category to update/delete
       </action>
