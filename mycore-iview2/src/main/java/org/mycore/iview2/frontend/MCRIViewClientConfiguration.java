@@ -16,6 +16,7 @@ import javax.xml.bind.annotation.XmlValue;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.common.content.MCRXMLContent;
+import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.iview2.services.MCRIView2Tools;
 
 import com.google.gson.Gson;
@@ -26,6 +27,7 @@ abstract class MCRIViewClientConfiguration {
     private static final String MCR_BASE_URL = MCRConfiguration.instance().getString("MCR.baseurl");
 
     public MCRIViewClientConfiguration() {
+        this.webApplicationBaseURL = MCRServlet.getBaseURL();
         this.i18nPath = MCR_BASE_URL + "servlets/MCRLocaleServlet/{lang}/component.iview2.*";
         this.lang = "de";
         this.pdfCreatorStyle = MCRIView2Tools.getIView2Property("PDFCreatorStyle");
@@ -33,6 +35,9 @@ abstract class MCRIViewClientConfiguration {
         this.metadataUrl = MCRIView2Tools.getIView2Property("MetadataUrl");
         this.addResources();
     }
+
+    @XmlElement
+    public String webApplicationBaseURL;
 
     /**
      * Needed by the metadata plugin
