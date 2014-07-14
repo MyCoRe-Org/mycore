@@ -42,6 +42,11 @@ import org.mycore.common.config.MCRConfigurationDirSetup;
  */
 public class MCRStartupHandler {
 
+    /**
+     * Can set <code>true</code> or <code>false</code> as {@link ServletContext#setAttribute(String, Object)} to skip errors on startup. 
+     */
+    public static final String HALT_ON_ERROR = "MCR.Startup.haltOnError";
+    
     private static final Logger LOGGER = Logger.getLogger(MCRStartupHandler.class);
 
     public static interface AutoExecutable {
@@ -95,7 +100,19 @@ public class MCRStartupHandler {
         }
         for (AutoExecutable autoExecutable : autoExecutables) {
             LOGGER.info(autoExecutable.getPriority() + ": Starting " + autoExecutable.getName());
-            autoExecutable.startUp(servletContext);
+            try {
+                autoExecutable.startUp(servletContext);
+            } catch (ExceptionInInitializerError e) {
+                boolean haltOnError = servletContext.getAttribute(HALT_ON_ERROR) == null ? true : Boolean
+                        .parseBoolean((String) servletContext.getAttribute(HALT_ON_ERROR));
+
+                if (haltOnError) {
+                    throw e;
+                } else {
+                    LOGGER.warn(e.toString());
+                    continue;
+                }
+            }
         }
     }
 }
