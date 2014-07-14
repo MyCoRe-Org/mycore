@@ -17,8 +17,7 @@ wcms.navigation.ItemEditor = function() {
 	this.constrainPopUpCheckBox = null;
 	// layout
 	this.templateSelect = null;
-	this.styleSelect = null;
-	this.cssInput = null;
+	this.styleInput = null;
 };
 
 ( function() {
@@ -38,7 +37,6 @@ wcms.navigation.ItemEditor = function() {
 	var templateText = "component.wcms.navigation.itemEditor.template";
 	var templateNoneText = "component.wcms.navigation.itemEditor.template.none";
 	var styleText = "component.wcms.navigation.itemEditor.style";
-	var cssText = "component.wcms.navigation.itemEditor.css";
 
 	function create(/*wcms.navigation.NavigationContent*/ content) {
 		// create dijit components
@@ -55,9 +53,8 @@ wcms.navigation.ItemEditor = function() {
 			maxHeight: 300,
 		});
 //		dojo.addClass(this.templateSelect.focusNode, "mediumComponent");
-		this.styleSelect = new dijit.form.Select();
-//		dojo.addClass(this.styleSelect.focusNode, "smallComponent");
-		this.cssInput = new dijit.form.TextBox();
+
+		this.styleInput = new dijit.form.TextBox();
 
 		// call create methods
 		this.typeEditor.create(content);
@@ -75,9 +72,6 @@ wcms.navigation.ItemEditor = function() {
 
 			I18nManager.getInstance().updateI18nSelect(this.templateSelect);
 		}));
-
-		this.styleSelect.addOption({value: "normal", label: "normal"});
-		this.styleSelect.addOption({value: "bold", label: "bold"});
 
 		var buildTableFunc = dojo.hitch(this, buildTable);
 		buildTableFunc();
@@ -174,23 +168,12 @@ wcms.navigation.ItemEditor = function() {
 				this.eventHandler.notify({"type" : "itemUpdated", "item": this.currentItem});
 			}
 		});
-		// -style select
-		dojo.connect(this.styleSelect, "onChange", this, function(/*String*/ value) {
+		// -style input
+		dojo.connect(this.styleInput, "onChange", this, function(value) {
 			if(this.currentItem == null)
-				return;
-			if(this.currentItem.style == undefined && value == "normal")
 				return;
 			if(!equal(this.currentItem.style, value)) {
 				this.currentItem.style = value;
-				this.eventHandler.notify({"type" : "itemUpdated", "item": this.currentItem});
-			}
-		});
-		// -css input
-		dojo.connect(this.cssInput, "onChange", this, function(value) {
-			if(this.currentItem == null)
-				return;
-			if(!equal(this.currentItem.css, value)) {
-				this.currentItem.css = value;
 				this.eventHandler.notify({"type" : "itemUpdated", "item": this.currentItem});
 			}
 		});
@@ -211,8 +194,7 @@ wcms.navigation.ItemEditor = function() {
 		// layout
 		this.addCaption(layoutHeaderText);
 		this.addElement(templateText, this.templateSelect.domNode);
-		this.addElement(styleText, this.styleSelect.domNode);
-		this.addElement(cssText, this.cssInput.domNode);
+		this.addElement(styleText, this.styleInput.domNode);
 		
 		// update i18n texts
 		this.updateLang();
@@ -236,8 +218,7 @@ wcms.navigation.ItemEditor = function() {
 			this.constrainPopUpCheckBox.set("checked", false);
 		// layout
 		this.setValue(this.templateSelect, item.template);
-		this.setValue(this.styleSelect, item.style);
-		this.setValue(this.cssInput, item.css);
+		this.setValue(this.styleInput, item.style);
 	}
 
 	function reset() {
@@ -249,8 +230,7 @@ wcms.navigation.ItemEditor = function() {
 		this.replaceMenuCheckBox.set("checked", false);
 		this.constrainPopUpCheckBox.set("checked", false);
 		this.templateSelect.set("value", null);
-		this.styleSelect.set("value", null);
-		this.cssInput.set("value", null);
+		this.styleInput.set("value", null);
 	}
 
 	function setDisabled(/*boolean*/ value) {
@@ -262,8 +242,7 @@ wcms.navigation.ItemEditor = function() {
 		this.replaceMenuCheckBox.set("disabled", this.disabled);
 		this.constrainPopUpCheckBox.set("disabled", this.disabled);
 		this.templateSelect.set("disabled", this.disabled);
-		this.styleSelect.set("disabled", this.disabled);
-		this.cssInput.set("disabled", this.disabled);
+		this.styleInput.set("disabled", this.disabled);
 	}
 
 	function updateLang() {
