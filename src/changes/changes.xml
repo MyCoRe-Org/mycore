@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrtchef" type="fix">
+        mycore-base: if "href" attribute is not given check acl rights against "dir" attribute
+      </action>
       <action dev="mcrvuchi" type="fix">
         mycore-base: fix class cast exception while using setname() on MCRDirectories
       </action>
