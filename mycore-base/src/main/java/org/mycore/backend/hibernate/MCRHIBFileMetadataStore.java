@@ -157,9 +157,6 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
         Criteria c = session.createCriteria(MCRFSNODES.class);
         c.add(Restrictions.eq("pid", parentID));
         List<MCRFSNODES> l = c.list();
-        if (l.size() == 0) {
-            return Collections.EMPTY_LIST;
-        }
 
         List<MCRFilesystemNode> list = new ArrayList<MCRFilesystemNode>(l.size());
         for (MCRFSNODES node : l) {
