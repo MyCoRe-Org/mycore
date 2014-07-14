@@ -2,7 +2,7 @@
   <section title="MODS-Dokument bearbeiten" xml:lang="de"/>
   <section title="Edit MODS document" xml:lang="en"/>
   <section xml:lang="all">
-    <div class="borderbox">
+    <div id="editorForm">
       <editor id="edit-mods-all">
         <source uri="xslStyle:mods2editor-viatxt:{sourceUri}"/>
         <source uri="xslStyle:mods2editor-viatxt:xslStyle:asParent:mcrobject:{parentId}"/>

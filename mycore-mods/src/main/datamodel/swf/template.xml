@@ -5,7 +5,7 @@
   <section title="Neueingabe eines Objektes" xml:lang="de" />
   <section title="Create a new object" xml:lang="en" />
   <section xml:lang="all">
-    <div class="borderbox">
+    <div id="editorForm">
       <editor id="author-file">
         <source uri="xslStyle:mods2editor:{sourceURI}" />
         <source uri="xslStyle:asParent,mods2editor:mcrobject:{parentId}" />
