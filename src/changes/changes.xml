@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcradler" type="fix">
+        mycore-base: catch exception if transaction rollback fails due to database outage
+      </action>
       <action dev="mcrtchef" type="fix">
         mycore-iview2: catch exception if transaction rollback fails due to database outage
       </action>
