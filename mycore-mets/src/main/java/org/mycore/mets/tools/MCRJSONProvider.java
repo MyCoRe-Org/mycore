@@ -29,7 +29,7 @@ import org.mycore.mets.tools.model.MCRMETSTreeBuilder;
  *          Sebastian Hofmann
  */
 public class MCRJSONProvider {
-    public static final String DEFAULT_METS_FILENAME = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
+    public static final String DEFAULT_METS_FILENAME = MCRMetsSave.getMetsFileName();
 
     //final private static Logger LOGGER = Logger.getLogger(MCRJSONProvider.class);
 

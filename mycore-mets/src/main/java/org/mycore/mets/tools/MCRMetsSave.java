@@ -88,11 +88,15 @@ public class MCRMetsSave {
             LOGGER.error(e);
         }
         if (mets == null || overwrite) {
-            String fileName = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
+            String fileName = getMetsFileName();
             LOGGER.info("Storing file content from \"" + fileName + "\" to derivate \"" + derivateId + "\"");
             MCRFile uploadFile = new MCRFile(fileName, MCRMetadataManager.retrieveMCRDerivate(derivateId).receiveDirectoryFromIFS());
             uploadFile.setContentFrom(document);
         }
+    }
+
+    public static String getMetsFileName() {
+        return MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
     }
 
     /**
@@ -126,7 +130,7 @@ public class MCRMetsSave {
      * @throws SAXException 
      */
     private static Document getCurrentMets(String derivateID) throws JDOMException, IOException, SAXException {
-        String mf = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
+        String mf = getMetsFileName();
         MCRDirectory rootDir = MCRDirectory.getRootDirectory(derivateID);
         if (rootDir == null) {
             return null;

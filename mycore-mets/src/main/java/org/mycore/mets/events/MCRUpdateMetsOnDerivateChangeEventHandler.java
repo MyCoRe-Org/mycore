@@ -21,20 +21,20 @@ import org.mycore.mets.tools.MCRMetsSave;
  */
 public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBase {
     private static final Logger LOGGER = Logger.getLogger(MCRUpdateMetsOnDerivateChangeEventHandler.class);
+    private String mets = MCRMetsSave.getMetsFileName();
 
     /* (non-Javadoc)
      * @see org.mycore.common.events.MCREventHandlerBase#handleFileDeleted(org.mycore.common.events.MCREvent, org.mycore.datamodel.ifs.MCRFile)
      */
     @Override
     protected void handleFileDeleted(MCREvent evt, MCRFile file) {
-        String mets = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
         // do nothing if mets.xml itself is deleted
-        if (file.getName().equals(mets)) {
+        if (file.getName().equals(mets )) {
             return;
         }
 
         MCRDirectory rootDir = file.getRootDirectory();
-        if (rootDir == null || !rootDir.hasChild(mets)) {
+        if (rootDir == null || !rootDir.hasChild(mets )) {
             return;
         }
 
@@ -47,8 +47,6 @@ public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBa
 
     @Override
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
-        String mets = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
-
         // do nothing if mets.xml itself is deleted
         if (file.getName().equals(mets)) {
             return;
