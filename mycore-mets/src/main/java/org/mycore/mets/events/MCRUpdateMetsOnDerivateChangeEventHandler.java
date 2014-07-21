@@ -47,7 +47,7 @@ public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBa
 
     @Override
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
-        // do nothing if mets.xml itself is deleted
+        // do nothing if mets.xml itself is created
         if (file.getName().equals(mets)) {
             return;
         }
