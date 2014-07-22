@@ -21,7 +21,7 @@ Date:		September 2008
 .fg-menu-container.fg-menu-ipod .fg-menu-content ul { background: none !important; }
 
 .fg-menu.fg-menu-scroll,
-.fg-menu ul.fg-menu-scroll { overflow: scroll;  overflow-x: hidden; }
+.fg-menu ul.fg-menu-scroll { overflow: scroll !important;  overflow-x: hidden !important; }
 
 .fg-menu li { clear:both; float:left; width:100%; margin: 0; padding:0; border: 0; }	
 .fg-menu li li { font-size:1em; } /* inner li font size must be reset so that they don't blow up */
