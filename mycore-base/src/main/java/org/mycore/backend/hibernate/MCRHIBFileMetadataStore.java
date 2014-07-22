@@ -185,10 +185,20 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
         GregorianCalendar greg = new GregorianCalendar();
         greg.setTime(node.getDate());
 
-        MCRFilesystemNode filesystemNode = MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(),
-            node.getOwner(), node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(),
-            node.getFctid(), node.getMd5(), node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
+        MCRFilesystemNode filesystemNode = MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(),
+            node.getPid(), node.getOwner(), node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(),
+            node.getStorageid(), node.getFctid(), node.getMd5(), node.getNumchdd(), node.getNumchdf(),
+            node.getNumchtd(), node.getNumchtf());
         getSession().evict(node);
         return filesystemNode;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Iterable<String> getOwnerIDs() throws MCRPersistenceException {
+        Session session = getSession();
+        Criteria criteria = session.createCriteria(MCRFSNODES.class);
+        criteria.setProjection(Projections.distinct(Projections.property("owner")));
+        return criteria.list();
     }
 }

@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.ifs;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import org.mycore.common.MCRPersistenceException;
@@ -99,4 +100,10 @@ public interface MCRFileMetadataStore {
      *            the unique ID of the MCRFilesystemNode to delete
      */
     public void deleteNode(String ID) throws MCRPersistenceException;
+    
+    /**
+     * Returns an object to iterate over the owner IDs.
+     * @throws MCRPersistenceException
+     */
+    public Iterable<String> getOwnerIDs() throws MCRPersistenceException;
 }

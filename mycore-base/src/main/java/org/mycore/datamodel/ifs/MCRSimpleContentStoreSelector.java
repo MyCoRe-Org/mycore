@@ -105,4 +105,9 @@ public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector {
     public String[] getAvailableStoreIDs() {
         return storeIDs;
     }
+
+    @Override
+    public String getDefaultStore() {
+        return defaultID;
+    }
 }

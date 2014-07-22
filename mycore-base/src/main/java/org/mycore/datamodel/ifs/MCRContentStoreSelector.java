@@ -44,6 +44,8 @@ public interface MCRContentStoreSelector {
      * properties of the given file or based on system configuration.
      */
     public String selectStore(MCRFile file) throws MCRException;
+    
+    public String getDefaultStore();
 
     /**
      * Returns the IDs of all ContentStores available to MyCoRe

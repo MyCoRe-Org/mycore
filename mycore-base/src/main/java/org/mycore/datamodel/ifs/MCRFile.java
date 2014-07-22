@@ -20,9 +20,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.FileTime;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.GregorianCalendar;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+
+import javax.annotation.processing.SupportedOptions;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -40,6 +54,9 @@ import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.ifs1.MCRFileChannel;
+
+import com.google.common.collect.Sets;
 
 /**
  * Represents a stored file with its metadata and content.
@@ -48,6 +65,13 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * @version $Revision$ $Date$
  */
 public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
+
+    private static Pattern MD5_HEX_PATTERN = Pattern.compile("[a-fA-F0-9]{32}");
+
+    private static Set<? extends OpenOption> supportedOptions = EnumSet.of(StandardOpenOption.APPEND,
+        StandardOpenOption.DSYNC, StandardOpenOption.READ, StandardOpenOption.SPARSE, StandardOpenOption.SYNC,
+        StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+
     /** The ID of the store that holds this file's content */
     protected String storeID;
 
@@ -118,8 +142,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     /*
      * Internal constructor, do not use on your own.
      */
-    public MCRFile(String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, String storeID, String storageID,
-            String fctID, String md5) {
+    public MCRFile(String ID, String parentID, String ownerID, String name, String label, long size,
+        GregorianCalendar date, String storeID, String storageID, String fctID, String md5) {
         super(ID, parentID, ownerID, name, label, size, date);
 
         this.storageID = storageID;
@@ -218,6 +242,43 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     /**
+     * Opens a file, returning a seekable byte channel to access the file.
+     * See 
+     * @param options
+     * @return
+     * @throws  IllegalArgumentException
+     *          if the set contains an invalid combination of options
+     * @throws  UnsupportedOperationException
+     *          if an unsupported open option is specified
+     * @throws  IOException
+     *          if an I/O error occurs
+     *
+     * @see java.nio.channels.FileChannel#open(Path,Set,FileAttribute[])
+     */
+    public FileChannel getFileChannel(Set<? extends OpenOption> options) throws IOException {
+        for (OpenOption option : options) {
+            checkOpenOption(option);
+        }
+        SeekableByteChannel byteChannel = Files.newByteChannel(getLocalFile().toPath(), options);
+        if (byteChannel instanceof FileChannel) {
+            throw new IOException("Could not get FileChannel from path: " + getLocalFile().toPath());
+        }
+        boolean write = options.contains(StandardOpenOption.WRITE) || options.contains(StandardOpenOption.APPEND);
+        boolean read = options.contains(StandardOpenOption.READ) || !write;
+        return new MCRFileChannel(this, (FileChannel) byteChannel, read, write);
+    }
+
+    /**
+     * checks if 
+     * @param option
+     */
+    public static void checkOpenOption(OpenOption option) {
+        if (supportedOptions.contains(option)) {
+            throw new UnsupportedOperationException("Unsupported OpenOption: " + option);
+        }
+    }
+
+    /**
      * Returns the MCRContentStore instance that holds the content of this file
      * 
      * @return the MCRContentStore instance that holds the content of this file, or null if no content is stored
@@ -252,7 +313,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
      * @param encoding
      *            the character encoding to use to store the String as bytes
      */
-    public void setContentFrom(String source, String encoding) throws MCRPersistenceException, UnsupportedEncodingException {
+    public void setContentFrom(String source, String encoding) throws MCRPersistenceException,
+        UnsupportedEncodingException {
         MCRArgumentChecker.ensureNotNull(source, "source string");
         MCRArgumentChecker.ensureNotNull(source, "source string encoding");
 
@@ -346,18 +408,21 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
             storeID = store.getID();
         }
 
-        size = cis.getLength();
-        md5 = cis.getMD5String();
+        long new_size = cis.getLength();
+        String new_md5 = cis.getMD5String();
 
         if ((old_storageID.length() != 0) && (!(old_storageID.equals(storageID) && (old_storeID.equals(storeID))))) {
             old_store.deleteContent(old_storageID);
         }
 
-        boolean changed = size != old_size || !md5.equals(old_md5);
+        boolean changed = new_size != old_size || new_md5.equals(old_md5);
 
         if (changed) {
             if (storeContentChange) {
-                storeContentChange(size - old_size);
+                adjustMetadata(null, new_md5, new_size);
+            } else {
+                this.md5 = new_md5;
+                this.size = new_size;
             }
         }
 
@@ -365,7 +430,19 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     public void storeContentChange(long sizeDiff) {
-        touch(false);
+        adjustMetadata(FileTime.fromMillis(System.currentTimeMillis()), md5, size + sizeDiff);
+    }
+
+    public synchronized void adjustMetadata(FileTime lastModified, String md5, long newSize) {
+        long sizeDiff = newSize - getSize();
+        if (!MD5_HEX_PATTERN.matcher(md5).matches()) {
+            throw new IllegalArgumentException("MD5 sum is not valid: " + md5);
+        }
+        this.md5 = md5;
+        this.size = newSize;
+        if (lastModified != null) {
+            touch(lastModified, false);
+        }
         if (hasParent()) {
             getParent().sizeOfChildChanged(sizeDiff);
         }
@@ -375,7 +452,6 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         MCREvent event = new MCREvent(MCREvent.FILE_TYPE, type);
         event.put("file", this);
         MCREventManager.instance().handleEvent(event);
-
         setNew(false);
     }
 
@@ -575,7 +651,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         root.setAttribute("contentType", getContentType().getLabel());
         root.setAttribute("returnId", getMCRObjectID().toString());
         Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.getInstance().getLinksFromReference(
-                getCategLinkReference(MCRObjectID.getInstance(getOwnerID()), absolutePath));
+            getCategLinkReference(MCRObjectID.getInstance(getOwnerID()), absolutePath));
         for (MCRCategoryID category : linksFromReference) {
             Element catEl = new Element("category");
             catEl.setAttribute("id", category.toString());

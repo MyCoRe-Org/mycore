@@ -10,6 +10,9 @@
 package org.mycore.datamodel.ifs;
 
 import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.attribute.FileTime;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,6 +27,9 @@ import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
+import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
+import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.datamodel.niofs.ifs1.MCRFileSystemProvider;
 
 /**
  * Represents a stored file or directory node with its metadata and content.
@@ -108,7 +114,7 @@ public abstract class MCRFilesystemNode {
     }
 
     protected MCRFilesystemNode(String ID, String parentID, String ownerID, String name, String label, long size,
-            GregorianCalendar date) {
+        GregorianCalendar date) {
         this.ID = ID;
         this.parentID = parentID;
         this.ownerID = ownerID;
@@ -168,13 +174,10 @@ public abstract class MCRFilesystemNode {
         if (error) {
             throw new MCRUsageException(errorMsg);
         }
-
         if (hasParent() && doExistCheck) {
             boolean exists = getParent().hasChild(name);
             if (exists) {
-                getParent().getChild(name).delete();
-                LOGGER.info(name + " exists already, file was deleted...");
-                checkName(name, true);
+                throw new MCRUsageException(this.getAbsolutePath() + " -> " + name + " exists already.");
             }
         }
     }
@@ -249,12 +252,18 @@ public abstract class MCRFilesystemNode {
     }
 
     protected void touch(boolean recursive) {
-        lastModified = new GregorianCalendar();
+        touch(null, recursive);
+    }
 
+    protected void touch(FileTime time, boolean recursive) {
+        lastModified = new GregorianCalendar();
+        if (time != null) {
+            lastModified.setTimeInMillis(time.toMillis());
+        }
         manager.storeNode(this);
 
         if (recursive && parentID != null) {
-            getParent().touch(true);
+            getParent().touch(time, true);
         }
     }
 
@@ -346,6 +355,11 @@ public abstract class MCRFilesystemNode {
             return path + name;
         }
         return "/";
+    }
+
+    public MCRPath toPath() {
+        FileSystem fileSystem = FileSystems.getFileSystem(MCRFileSystemProvider.FS_URI);
+        return MCRAbstractFileSystem.getPath(ownerID, getAbsolutePath(), (MCRAbstractFileSystem) fileSystem);
     }
 
     /**

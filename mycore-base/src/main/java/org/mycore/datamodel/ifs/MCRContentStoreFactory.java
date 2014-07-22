@@ -88,12 +88,21 @@ public class MCRContentStoreFactory {
         }
         if (!STORES.containsKey(storeID)) {
             synchronized (STORES) {
-                if (!STORES.containsKey(storeID)){
+                if (!STORES.containsKey(storeID)) {
                     initStore(storeID);
                 }
             }
         }
         return STORES.get(storeID);
+    }
+
+    /**
+     * Returns instance of a default content store.
+     * 
+     * Depends on the configured MCRContentStoreSelector which instance is "default".
+     */
+    public static MCRContentStore getDefaultStore() {
+        return getStore(STORE_SELECTOR.getDefaultStore());
     }
 
     private static void initStore(String storeID) {
