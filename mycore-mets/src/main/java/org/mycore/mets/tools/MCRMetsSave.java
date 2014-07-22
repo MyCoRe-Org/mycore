@@ -157,7 +157,12 @@ public class MCRMetsSave {
             String contentType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(new File(file.getName()));
             LOGGER.info(MessageFormat.format("Content Type is : {0}", contentType));
             org.mycore.mets.model.files.File f = new org.mycore.mets.model.files.File(fileId, contentType);
-            FLocat fLocat = new FLocat(LOCTYPE.URL, file.getName());
+            String filePath = file.getAbsolutePath();
+            if(!filePath.equals("/")) {
+                filePath = filePath.substring(1);
+            }
+            
+            FLocat fLocat = new FLocat(LOCTYPE.URL, filePath);
             f.setFLocat(fLocat);
 
             // alter the mets document
