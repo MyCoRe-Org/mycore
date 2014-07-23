@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.IOError;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -43,6 +44,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+
+import org.mycore.common.MCRException;
 
 import com.google.common.primitives.Ints;
 
@@ -456,18 +459,24 @@ public abstract class MCRPath implements Path {
      */
     @Override
     public MCRPath relativize(final Path other) {
-        if (equals(other)) {
+        if (equals(Objects.requireNonNull(other, "Cannot relativize against 'null'."))) {
             return getFileSystem().emptyPath();
         }
         if (isAbsolute() != other.isAbsolute()) {
             throw new IllegalArgumentException("'other' must be absolute if and only if this is absolute, too.");
         }
         final MCRPath that = toMCRPath(other);
-        if (isEmpty()) {
+        if (!isAbsolute() && isEmpty()) {
             return that;
         }
-        final URI thisURI = URI.create(path);
-        final URI thatURI = URI.create(that.path);
+        URI thisURI;
+        URI thatURI;
+        try {
+            thisURI = new URI(null, null, path, null);
+            thatURI = new URI(null, null, that.path, null);
+        } catch (URISyntaxException e) {
+            throw new MCRException(e);
+        }
         final URI relativizedURI = thisURI.relativize(thatURI);
         if (thatURI.equals(relativizedURI)) {
             return that;
@@ -586,7 +595,7 @@ public abstract class MCRPath implements Path {
      * @see java.nio.file.Path#subpath(int, int)
      */
     @Override
-    public Path subpath(final int beginIndex, final int endIndex) {
+    public MCRPath subpath(final int beginIndex, final int endIndex) {
         if (beginIndex < 0) {
             throw new IllegalArgumentException("beginIndex may not be negative: " + beginIndex);
         }
