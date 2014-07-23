@@ -85,16 +85,16 @@ public class MCRSaveMETSServlet extends MCRServlet {
     }
 
     private synchronized void saveMets(MCRObjectID derivateId, Mets mets) throws Exception {
-        LOGGER.info("Saving mets file ...");
-        Document metsDoc = mets.asDocument();
-        MCRMetsSave.saveMets(metsDoc, derivateId);
-
         LOGGER.info("Writing urn as contentids to mets file (if any)");
         MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(derivateId);
         Map<String, String> urns = der.getUrnMap();
         if (urns.size() > 0) {
-            MCRMetsSave.updateMetsOnUrnGenerate(der.getId(), urns);
+            MCRMetsSave.updateURNsInMetsDocument(mets, urns);
         }
+        
+        LOGGER.info("Saving mets file ...");
+        Document metsDoc = mets.asDocument();
+        MCRMetsSave.saveMets(metsDoc, derivateId);
     }
 
 }
