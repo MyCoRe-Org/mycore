@@ -40,11 +40,13 @@ import javax.annotation.processing.SupportedOptions;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
@@ -55,6 +57,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.ifs1.MCRFileChannel;
+import org.xml.sax.SAXException;
 
 import com.google.common.collect.Sets;
 
@@ -259,13 +262,10 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         for (OpenOption option : options) {
             checkOpenOption(option);
         }
-        SeekableByteChannel byteChannel = Files.newByteChannel(getLocalFile().toPath(), options);
-        if (byteChannel instanceof FileChannel) {
-            throw new IOException("Could not get FileChannel from path: " + getLocalFile().toPath());
-        }
+        FileChannel fileChannel = FileChannel.open(getLocalFile().toPath(), options);
         boolean write = options.contains(StandardOpenOption.WRITE) || options.contains(StandardOpenOption.APPEND);
         boolean read = options.contains(StandardOpenOption.READ) || !write;
-        return new MCRFileChannel(this, (FileChannel) byteChannel, read, write);
+        return new MCRFileChannel(this, (FileChannel) fileChannel, read, write);
     }
 
     /**
@@ -502,7 +502,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
      * @throws IOException
      */
     public InputStream getContentAsInputStream() throws IOException {
-        return getContentStore().retrieveContent(this);
+        return getContent().getInputStream();
     }
 
     /**
@@ -515,7 +515,11 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         ensureNotDeleted();
 
         if (storageID.length() != 0) {
-            getContentStore().retrieveContent(this, target);
+            try {
+                getContent().sendTo(target);
+            } catch (IOException e) {
+                throw new MCRPersistenceException("Could not write content to target stream.", e);
+            }
         }
     }
 
@@ -526,7 +530,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
      *            the local file to write the content to
      */
     public void getContentTo(File target) throws MCRPersistenceException, IOException {
-        getContentTo(new FileOutputStream(target));
+        getContent().sendTo(target);
     }
 
     /**
@@ -535,15 +539,11 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
      * @return the content of this file as a byte array
      */
     public byte[] getContentAsByteArray() throws MCRPersistenceException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
         try {
-            getContentTo(baos);
-            baos.close();
-        } catch (IOException willNotBeThrown) {
+            return getContent().asByteArray();
+        } catch (IOException e) {
+            throw new MCRPersistenceException("Error while getting file content.", e);
         }
-
-        return baos.toByteArray();
     }
 
     /**
@@ -567,7 +567,11 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     public org.jdom2.Document getContentAsJDOM() throws MCRPersistenceException, IOException, org.jdom2.JDOMException {
-        return new org.jdom2.input.SAXBuilder().build(getContentAsInputStream());
+        try {
+            return getContent().asXML();
+        } catch (SAXException e) {
+            throw new JDOMException("Could not parse XML file.", e);
+        }
     }
 
     /**
