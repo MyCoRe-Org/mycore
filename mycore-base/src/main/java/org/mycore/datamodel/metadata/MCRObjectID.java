@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
@@ -227,7 +228,7 @@ public final class MCRObjectID {
      * @exception MCRException if the given identifier is not valid
      */
     public static MCRObjectID getInstance(String id) {
-        return MCRObjectIDPool.getMCRObjectID(id);
+        return MCRObjectIDPool.getMCRObjectID(Objects.requireNonNull(id, "'id' must not be null."));
     }
 
     /**
