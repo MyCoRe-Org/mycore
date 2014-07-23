@@ -1,6 +1,6 @@
 /*
- * $Revision$ 
- * $Date$
+ * $Id$
+ * $Revision: 5697 $ $Date: Jul 22, 2014 $
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -23,21 +23,18 @@
 
 package org.mycore.common.content;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.channels.SeekableByteChannel;
 
 /**
- * Reads MCRContent from a local file.
+ * An optional interface to MCRContent implementations.
  * 
- * @author Thomas Scheffler
+ * Allows random reads.
+ * @author Thomas Scheffler (yagee)
+ *
  */
-public class MCRFileContent extends MCRPathContent {
+public interface MCRSeekableChannelContent {
 
-    public MCRFileContent(File file) {
-        super(file.toPath());
-    }
-
-    public MCRFileContent(String file) {
-        this(new File(file));
-    }
+    public SeekableByteChannel getSeekableByteChannel() throws IOException;
 
 }
