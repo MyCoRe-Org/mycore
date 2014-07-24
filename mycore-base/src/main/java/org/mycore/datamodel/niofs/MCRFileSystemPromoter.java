@@ -23,12 +23,8 @@
 
 package org.mycore.datamodel.niofs;
 
-import java.lang.reflect.Field;
 import java.nio.file.FileSystem;
 import java.nio.file.spi.FileSystemProvider;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,10 +33,7 @@ import java.util.ServiceLoader;
 import javax.servlet.ServletContext;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRDecoratedIterable;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
-
-import com.google.common.collect.Iterables;
 
 /**
  * This {@link AutoExecutable} checks if the {@link FileSystem} implementations are available.
@@ -98,30 +91,13 @@ public class MCRFileSystemPromoter implements AutoExecutable {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void promoteFileSystemProvider(List<FileSystemProvider> detectedProviders) {
         if (detectedProviders.isEmpty()) {
             return;
         }
-        MCRDecoratedIterable<FileSystemProvider, String> schemes = new MCRDecoratedIterable<FileSystemProvider, String>(
-            detectedProviders) {
-
-            @Override
-            protected String getInstance(FileSystemProvider source) {
-                return source.getScheme();
-            }
-        };
-        try {
-            Field field = FileSystemProvider.class.getDeclaredField("installedProviders");
-            field.setAccessible(true);
-            ArrayList<FileSystemProvider> newInstalledProviders = new ArrayList<>();
-            newInstalledProviders.addAll((Collection<? extends FileSystemProvider>) field.get(null));
-            newInstalledProviders.addAll(detectedProviders);
-            LOGGER.info("Promoting these new filesystems: " + Iterables.toString(schemes));
-            field.set(null, Collections.unmodifiableList(newInstalledProviders));
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-            LOGGER.warn("Please file a bug!Could not promote filesystems: " + Iterables.toString(schemes), e);
-
+        for (FileSystemProvider provider : detectedProviders) {
+            LOGGER.info("Promoting filesystem " + provider.getScheme() + ": " + provider.getClass().getCanonicalName());
+            MCRPaths.addFileSystemProvider(provider);
         }
     }
 

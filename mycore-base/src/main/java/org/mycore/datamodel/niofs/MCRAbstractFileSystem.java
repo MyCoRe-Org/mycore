@@ -1,18 +1,25 @@
 package org.mycore.datamodel.niofs;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.FileSystem;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.UserPrincipalLookupService;
+import java.nio.file.spi.FileSystemProvider;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
+import org.mycore.common.MCRException;
+
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 public abstract class MCRAbstractFileSystem extends FileSystem {
@@ -35,6 +42,27 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
     public MCRAbstractFileSystem() {
         super();
         emptyPath = getPath(null, "", this);
+    }
+
+    /**
+     * Returns any subclass that implements and handles the given scheme.
+     * @param scheme
+     * @throws FileSystemNotFoundException if no filesystem handles this scheme
+     */
+    public static MCRAbstractFileSystem getInstance(String scheme) {
+        URI uri;
+        try {
+            uri = MCRPaths.getURI(scheme, "helper", SEPARATOR_STRING);
+        } catch (URISyntaxException e) {
+            throw new MCRException(e);
+        }
+        for (FileSystemProvider provider : Iterables.concat(MCRPaths.webAppProvider,
+            FileSystemProvider.installedProviders())) {
+            if (provider.getScheme().equals(scheme)) {
+                return (MCRAbstractFileSystem) provider.getFileSystem(uri);
+            }
+        }
+        throw new FileSystemNotFoundException("Provider \"" + scheme + "\" not found");
     }
 
     public static MCRPath getPath(final String owner, final String path, final MCRAbstractFileSystem fs) {

@@ -38,7 +38,6 @@ import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.FileSystemNotFoundException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.LinkOption;
@@ -662,8 +661,8 @@ public class MCRFileSystemProvider extends FileSystemProvider {
 
     }
 
-    static MCRIFSFileSystem getMCRIFSFileSystem() {
-        return (MCRIFSFileSystem) (FILE_SYSTEM_INSTANCE == null ? FileSystems.getFileSystem(FS_URI)
+    public static MCRIFSFileSystem getMCRIFSFileSystem() {
+        return (MCRIFSFileSystem) (FILE_SYSTEM_INSTANCE == null ? MCRAbstractFileSystem.getInstance(SCHEME)
             : FILE_SYSTEM_INSTANCE);
     }
 

@@ -24,6 +24,10 @@
 package org.mycore.datamodel.ifs;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,6 +38,9 @@ import org.jdom2.Document;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.MCRPathContent;
+import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.datamodel.niofs.MCRPathXML;
 import org.mycore.frontend.servlets.MCRContentServlet;
 import org.xml.sax.SAXException;
 
@@ -68,48 +75,31 @@ public class MCRFileNodeServlet extends MCRContentServlet {
             return null;
         }
         String ownerID = getOwnerID(request);
-        // local node to be retrieved
-        MCRFilesystemNode root;
-
-        try {
-            root = MCRFilesystemNode.getRootNode(ownerID);
-        } catch (org.mycore.common.MCRPersistenceException e) {
-            // Could not get value from JDBC result set
-            LOGGER.error("Error while getting root node!", e);
-            root = null;
-        }
-
-        if (root == null) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "No root node found for owner ID " + ownerID);
+        if (!MCRAccessManager.checkPermissionForReadingDerivate(ownerID)) {
+            LOGGER.info("AccessForbidden to " + request.getPathInfo());
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return null;
         }
-
-        if (root instanceof MCRFile) {
-            if (request.getPathInfo().length() > ownerID.length() + 1) {
-                // request path is too long
-                response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                    "Error: No such file or directory " + request.getPathInfo());
-                return null;
-            }
-            return sendFile(request, response, (MCRFile) root);
-        }
-
-        // root node is a directory
-        MCRDirectory dir = (MCRDirectory) root;
         String path = getPath(request);
-        MCRFilesystemNode node = dir.getChildByPath(path);
-
-        if (node == null) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Error: No such file or directory " + path);
-            return null;
-        } else if (node instanceof MCRFile) {
-            return sendFile(request, response, (MCRFile) node);
-        } else {
-            try {
-                return sendDirectory(request, response, (MCRDirectory) node);
-            } catch (TransformerException | SAXException e) {
-                throw new IOException(e);
+        MCRPath mcrPath = MCRPath.getPath(ownerID, path);
+        try {
+            BasicFileAttributes attr = Files.readAttributes(mcrPath, BasicFileAttributes.class);
+            if (attr.isDirectory()) {
+                try {
+                    return sendDirectory(request, response, mcrPath);
+                } catch (TransformerException | SAXException e) {
+                    throw new IOException(e);
+                }
             }
+            if (attr.isRegularFile()) {
+                return sendFile(request, response, mcrPath);
+            }
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Not a file or directory: " + mcrPath);
+            return null;
+        } catch (NoSuchFileException e) {
+            LOGGER.info("Catched NoSuchFileException:", e);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
+            return null;
         }
     }
 
@@ -162,35 +152,9 @@ public class MCRFileNodeServlet extends MCRContentServlet {
         return path.toString();
     }
 
-    /**
-     * Sends the contents of an MCRFile to the client. If the MCRFile provides
-     * an MCRAudioVideoExtender, the file's content is NOT sended to the client,
-     * instead the stream that starts the associated streaming player is sended
-     * to the client. The HTTP request may then contain StartPos and StopPos
-     * parameters that contain the timecodes where to start and/or stop
-     * streaming.
-     */
-    private MCRContent sendFile(HttpServletRequest req, HttpServletResponse res, MCRFile file) throws IOException {
-        if (!MCRAccessManager.checkPermissionForReadingDerivate(file.getOwnerID())) {
-            LOGGER.info("AccessForbidden to " + file.getName());
-            res.sendError(HttpServletResponse.SC_FORBIDDEN);
-            return null;
-        }
-
-        LOGGER.info("Sending file " + file.getName() + ("HEAD".equals(req.getMethod()) ? " (HEAD only)" : ""));
-
-        if (file.hasAudioVideoExtender()) {
-            // Start streaming player
-            MCRAudioVideoExtender ext = file.getAudioVideoExtender();
-
-            String startPos = req.getParameter("StartPos");
-            String stopPos = req.getParameter("StopPos");
-
-            return ext.getPlayerStarter(startPos, stopPos);
-        } else {
-            // Send contents of ordinary file
-            return file.getContent();
-        }
+    private MCRContent sendFile(HttpServletRequest request, HttpServletResponse response, MCRPath mcrPath) {
+        // TODO: Does MCRFileNodeServlet really has to handle IFS1 AudioVideoExtender support? (last rev: 30037))
+        return new MCRPathContent(mcrPath);
     }
 
     /**
@@ -198,15 +162,14 @@ public class MCRFileNodeServlet extends MCRContentServlet {
      * @throws SAXException 
      * @throws TransformerException 
      */
-    private MCRContent sendDirectory(HttpServletRequest req, HttpServletResponse res, MCRDirectory dir)
+    private MCRContent sendDirectory(HttpServletRequest request, HttpServletResponse response, MCRPath mcrPath)
         throws IOException, TransformerException, SAXException {
-        LOGGER.info("Sending listing of directory " + dir.getName()
-            + ("HEAD".equals(req.getMethod()) ? " (HEAD only)" : ""));
-        Document jdom = MCRDirectoryXML.getInstance().getDirectoryXML(dir);
-        MCRJDOMContent source = new MCRJDOMContent(jdom);
-        source.setLastModified(dir.getLastModified().getTimeInMillis());
-        source.setName(dir.getName());
-        return getLayoutService().getTransformedContent(req, res, source);
+        Document directoryXML = MCRPathXML.getDirectoryXML(mcrPath);
+        MCRJDOMContent source = new MCRJDOMContent(directoryXML);
+        source.setLastModified(Files.getLastModifiedTime(mcrPath).toMillis());
+        String fileName = mcrPath.getNameCount() == 0 ? mcrPath.getOwner() : mcrPath.getFileName().toString();
+        source.setName(fileName);
+        return getLayoutService().getTransformedContent(request, response, source);
     }
 
 }

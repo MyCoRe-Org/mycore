@@ -362,8 +362,7 @@ public abstract class MCRFilesystemNode {
     }
 
     public MCRPath toPath() {
-        FileSystem fileSystem = FileSystems.getFileSystem(MCRFileSystemProvider.FS_URI);
-        return MCRAbstractFileSystem.getPath(ownerID, getAbsolutePath(), (MCRAbstractFileSystem) fileSystem);
+        return MCRAbstractFileSystem.getPath(ownerID, getAbsolutePath(), MCRFileSystemProvider.getMCRIFSFileSystem());
     }
 
     /**

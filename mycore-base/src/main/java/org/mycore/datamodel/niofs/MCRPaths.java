@@ -25,9 +25,13 @@ package org.mycore.datamodel.niofs;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.spi.FileSystemProvider;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import org.apache.log4j.Logger;
@@ -40,6 +44,8 @@ import org.mycore.common.config.MCRConfiguration;
 final class MCRPaths {
 
     static final String DEFAULT_SCHEME_PROPERTY = "MCR.NIO.DefaultScheme";
+
+    static List<FileSystemProvider> webAppProvider = new ArrayList<>(4);
 
     private MCRPaths() {
     }
@@ -63,12 +69,26 @@ final class MCRPaths {
     }
 
     static Path getPath(String scheme, String owner, String path) {
+        URI uri;
         try {
-            URI uri = getURI(scheme, owner, path);
+            uri = getURI(scheme, owner, path);
             Logger.getLogger(MCRPaths.class).info("Generated path URI:" + uri);
-            return Paths.get(uri);
         } catch (URISyntaxException e) {
             throw new InvalidPathException(path, "URI syntax error (" + e.getMessage() + ") for path");
         }
+        try {
+            return Paths.get(uri);
+        } catch (FileSystemNotFoundException e) {
+            for (FileSystemProvider provider : webAppProvider) {
+                if (provider.getScheme().equals(uri.getScheme())) {
+                    return provider.getPath(uri);
+                }
+            }
+            throw e;
+        }
+    }
+
+    static void addFileSystemProvider(FileSystemProvider provider) {
+        webAppProvider.add(provider);
     }
 }
