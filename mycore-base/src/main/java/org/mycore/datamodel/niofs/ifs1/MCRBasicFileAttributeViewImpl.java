@@ -34,7 +34,8 @@ abstract class MCRBasicFileAttributeViewImpl implements BasicFileAttributeView {
             return MCRFileAttributes.file(file.getID() + file.getMD5(), file.getSize(), file.getMD5(), creationTime,
                 lastModified, lastAccessTime);
         }
-        return MCRFileAttributes.directory(node.getID(), FileTime.fromMillis(node.getLastModified().getTimeInMillis()));
+        return MCRFileAttributes.directory(node.getID(), node.getSize(),
+            FileTime.fromMillis(node.getLastModified().getTimeInMillis()));
     }
 
     @Override
