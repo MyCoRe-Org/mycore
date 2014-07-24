@@ -239,11 +239,12 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
             this.mcrDirectoryStream = mcrDirectoryStream;
             this.nextPath = null;
             hasNextCalled = false;
-            pos = 0;
+            pos = -1;
         }
 
         @Override
         public boolean hasNext() {
+            LOGGER.debug("hasNext() called: " + pos);
             MCRDirectory dir = mcrDirectoryStream.dir;
             if (dir == null) {
                 return false; //stream closed
@@ -267,7 +268,9 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
 
         private MCRPath getPath(MCRFilesystemNode[] children, int index) {
             try {
-                return children[index].toPath();
+                MCRPath path = children[index].toPath();
+                LOGGER.debug("getting path at index " + index + ": " + path);
+                return path;
             } catch (RuntimeException e) {
                 throw new DirectoryIteratorException(new IOException(e));
             }
@@ -275,6 +278,7 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
 
         @Override
         public Path next() {
+            LOGGER.debug("next() called: " + pos);
             pos++;
             if (hasNextCalled) {
                 hasNextCalled = false;
