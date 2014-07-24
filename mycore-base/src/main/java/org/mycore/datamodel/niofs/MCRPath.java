@@ -91,6 +91,11 @@ public abstract class MCRPath implements Path {
         return (MCRPath) other;
     }
 
+    public static MCRPath getPath(String owner, String path) {
+        Path resolved = MCRPaths.getPath(owner, path);
+        return toMCRPath(resolved);
+    }
+
     /**
      * removes redundant slashes and checks for invalid characters
      * @param uncleanPath path to check
@@ -658,15 +663,14 @@ public abstract class MCRPath implements Path {
      */
     @Override
     public URI toUri() {
-        final StringBuilder sb = new StringBuilder();
-        sb.append(getFileSystem().provider().getScheme());
-        sb.append("://");
-        if (isAbsolute()) {
-            sb.append(root);
-            sb.append(":");
+        try {
+            if (isAbsolute()) {
+                return MCRPaths.getURI(getFileSystem().provider().getScheme(), root, path);
+            }
+            return new URI(null, null, path, null);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
         }
-        sb.append(path);
-        return URI.create(sb.toString());
     }
 
     private String getPathElement(final int index) {
@@ -683,7 +687,7 @@ public abstract class MCRPath implements Path {
                 // empty path considered to have one name element
                 list.add(0);
             }
-        } else {
+        } else if (!isAbsolute() || !path.equals(SEPARATOR_STRING)) {
             int start = 0;
             int off = 0;
             while (off < path.length()) {
