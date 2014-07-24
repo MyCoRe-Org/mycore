@@ -81,17 +81,19 @@ public class MCRMetsSave {
      */
     public static synchronized void saveMets(Document document, MCRObjectID derivateId, boolean overwrite) {
         // add the file to the existing derivate in ifs
-        Document mets = null;
+        MCRFile metsFile = getMetsFile(derivateId.toString());
+        
+        if(metsFile == null){
+            metsFile = createMetsFile(derivateId.toString());
+        }else if(!overwrite){
+            return;
+        }
+        
         try {
-            mets = getCurrentMets(derivateId.toString());
+            metsFile.setContentFrom(document);
+            LOGGER.info("Storing file content from \"" + getMetsFileName() + "\" to derivate \"" + derivateId + "\"");
         } catch (Exception e) {
             LOGGER.error(e);
-        }
-        if (mets == null || overwrite) {
-            String fileName = getMetsFileName();
-            LOGGER.info("Storing file content from \"" + fileName + "\" to derivate \"" + derivateId + "\"");
-            MCRFile uploadFile = new MCRFile(fileName, MCRMetadataManager.retrieveMCRDerivate(derivateId).receiveDirectoryFromIFS());
-            uploadFile.setContentFrom(document);
         }
     }
 
@@ -130,13 +132,31 @@ public class MCRMetsSave {
      * @throws SAXException 
      */
     private static Document getCurrentMets(String derivateID) throws JDOMException, IOException, SAXException {
-        String mf = getMetsFileName();
+        MCRFile metsFile = getMetsFile(derivateID);
+        return metsFile == null ? null : metsFile.getContent().asXML();
+    }
+
+    public static MCRFile getMetsFile(String derivateID) {
         MCRDirectory rootDir = MCRDirectory.getRootDirectory(derivateID);
         if (rootDir == null) {
             return null;
         }
-        MCRFile metsFile = (MCRFile) rootDir.getChild(mf);
-        return metsFile == null ? null : metsFile.getContent().asXML();
+        
+        MCRFilesystemNode metsFile = rootDir.getChild(getMetsFileName());
+        if(!(metsFile instanceof MCRFile)){
+            return null;
+        }
+        
+        return (MCRFile) metsFile;
+    }
+    
+    public static MCRFile createMetsFile(String derivateID) {
+        MCRDirectory rootDir = MCRDirectory.getRootDirectory(derivateID);
+        if (rootDir == null) {
+            return null;
+        }
+        
+        return new MCRFile(getMetsFileName(), rootDir);
     }
 
     /**
