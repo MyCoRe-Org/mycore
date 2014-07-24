@@ -70,7 +70,7 @@ import org.mycore.common.config.MCRConfigurationException;
  * MCR.IFS2.Store.ID.BaseDir=/foo/bar
  * MCR.IFS2.Store.ID.SlotLayout=4-2-2
  * 
- * @author Frank Lützenkirchen
+ * @author Frank L��tzenkirchen
  */
 public abstract class MCRStore {
 
@@ -312,6 +312,8 @@ public abstract class MCRStore {
                 }
 
                 final FileObject first = files.remove(0);
+                // checks basename length against prefix (projectId_typeId), file suffix (.xml) and configured id length
+                // if they match it should be a parseable id
                 if (first.getName().getBaseName().length() == idLength + prefix.length() + suffix.length()) {
                     return MCRStore.this.slot2id(first.getName().getBaseName());
                 }
