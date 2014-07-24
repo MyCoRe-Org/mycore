@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.GregorianCalendar;
+import java.util.Objects;
 
 import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRPersistenceException;
@@ -243,7 +244,7 @@ public class MCROldFile implements MCRFileReader {
      * Sets the time of last modification of this file
      */
     public void setLastModified(GregorianCalendar date) {
-        MCRArgumentChecker.ensureNotNull(date, "date");
+        Objects.requireNonNull(date, "date is null");
         lastModified = date;
     }
 
@@ -259,7 +260,7 @@ public class MCROldFile implements MCRFileReader {
      * of this file
      */
     public void setStoreID(String ID) {
-        MCRArgumentChecker.ensureNotNull(ID, "ID");
+        Objects.requireNonNull(ID, "ID is null");
         storeID = ID.trim();
     }
 
@@ -276,7 +277,7 @@ public class MCROldFile implements MCRFileReader {
      * has stored the content of this file
      */
     public void setStorageID(String ID) {
-        MCRArgumentChecker.ensureNotNull(ID, "ID");
+        Objects.requireNonNull(ID, "ID is null");
         storageID = ID.trim();
     }
 

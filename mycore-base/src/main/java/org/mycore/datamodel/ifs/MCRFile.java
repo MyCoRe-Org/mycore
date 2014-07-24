@@ -15,15 +15,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.channels.FileChannel;
-import java.nio.channels.SeekableByteChannel;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -32,11 +28,10 @@ import java.nio.file.attribute.FileTime;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.GregorianCalendar;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-
-import javax.annotation.processing.SupportedOptions;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -46,7 +41,6 @@ import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
@@ -58,8 +52,6 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.ifs1.MCRFileChannel;
 import org.xml.sax.SAXException;
-
-import com.google.common.collect.Sets;
 
 /**
  * Represents a stored file with its metadata and content.
@@ -298,7 +290,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
      *            the String that is the file's content
      */
     public void setContentFrom(String source) throws MCRPersistenceException {
-        MCRArgumentChecker.ensureNotNull(source, "source string");
+        Objects.requireNonNull(source, "source string is null");
 
         byte[] bytes = source.getBytes();
 
@@ -315,8 +307,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
      */
     public void setContentFrom(String source, String encoding) throws MCRPersistenceException,
         UnsupportedEncodingException {
-        MCRArgumentChecker.ensureNotNull(source, "source string");
-        MCRArgumentChecker.ensureNotNull(source, "source string encoding");
+        Objects.requireNonNull(source, "source string is null");
+        Objects.requireNonNull(source, "source string encoding is null");
 
         byte[] bytes = source.getBytes(encoding);
 
@@ -330,7 +322,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
      *            the file in the local host's filesystem thats content should be imported
      */
     public void setContentFrom(File source) throws MCRPersistenceException {
-        MCRArgumentChecker.ensureNotNull(source, "source file");
+        Objects.requireNonNull(source, "source file is null");
         MCRArgumentChecker.ensureIsTrue(source.exists(), "source file does not exist:" + source.getPath());
         MCRArgumentChecker.ensureIsTrue(source.canRead(), "source file not readable:" + source.getPath());
         FileInputStream fin = null;
@@ -350,7 +342,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
      *            the file's content
      */
     public void setContentFrom(byte[] source) throws MCRPersistenceException {
-        MCRArgumentChecker.ensureNotNull(source, "source byte array");
+        Objects.requireNonNull(source, "source byte array is null");
 
         setContentFrom(new ByteArrayInputStream(source));
     }
@@ -362,7 +354,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
      *            the JDOM xml document that should be stored as file content
      */
     public void setContentFrom(Document xml) {
-        MCRArgumentChecker.ensureNotNull(xml, "jdom xml document");
+        Objects.requireNonNull(xml, "jdom xml document is null");
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {

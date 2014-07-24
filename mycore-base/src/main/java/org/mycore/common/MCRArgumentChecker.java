@@ -23,6 +23,8 @@
 
 package org.mycore.common;
 
+import java.util.Objects;
+
 /**
  * This class provides some static utility methods for checking values of
  * arguments and conditions. This can be used to ensure that a method is not
@@ -75,21 +77,6 @@ public abstract class MCRArgumentChecker {
     }
 
     /**
-     * Ensures that a given variable does not contain a null reference, or
-     * throws an MCRUsageException with an error message otherwise.
-     * 
-     * @param o
-     *            the Object variable that must not contain a null reference
-     * @param argumentName
-     *            the name of the argument variable that must not be null
-     * @throws MCRUsageException
-     *             if o is null
-     */
-    public static void ensureNotNull(Object o, String argumentName) {
-        ensureIsTrue(o != null, argumentName + " is null");
-    }
-
-    /**
      * Ensures that a given String variable does not contain a null reference,
      * or a String of length 0, or a String containing only blanks.
      * 
@@ -101,8 +88,7 @@ public abstract class MCRArgumentChecker {
      *             if s is null or s.trim().length() is 0
      */
     public static void ensureNotEmpty(String s, String argumentName) {
-        ensureNotNull(s, argumentName);
-        ensureIsTrue(s.trim().length() > 0, argumentName + " is an empty String");
+        ensureIsTrue(Objects.requireNonNull(s, argumentName + " is null").trim().length() > 0, argumentName + " is an empty String");
     }
 
     /**

@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Objects;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -111,7 +112,7 @@ public class MCRFileImportExport {
      * @throws IOException 
      */
     public static void importFiles(File local, MCRDirectory dir) throws IOException {
-        MCRArgumentChecker.ensureNotNull(local, "local file");
+        Objects.requireNonNull(local, "local file is null");
 
         String path = local.getPath();
         String name = local.getName();
@@ -202,8 +203,8 @@ public class MCRFileImportExport {
      *            the directory thats contents should be exported
      */
     public static void exportFiles(MCRDirectory dir, File local) throws MCRException {
-        MCRArgumentChecker.ensureNotNull(dir, "internal directory");
-        MCRArgumentChecker.ensureNotNull(local, "local file");
+        Objects.requireNonNull(dir, "internal directory is null");
+        Objects.requireNonNull(local, "local file is null");
 
         String path = local.getPath();
         MCRArgumentChecker.ensureIsTrue(local.canWrite(), "Not writeable: " + path);
