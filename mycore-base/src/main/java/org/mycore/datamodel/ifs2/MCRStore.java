@@ -70,7 +70,7 @@ import org.mycore.common.config.MCRConfigurationException;
  * MCR.IFS2.Store.ID.BaseDir=/foo/bar
  * MCR.IFS2.Store.ID.SlotLayout=4-2-2
  * 
- * @author Frank L��tzenkirchen
+ * @author Frank Lützenkirchen
  */
 public abstract class MCRStore {
 
