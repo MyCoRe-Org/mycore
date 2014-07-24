@@ -177,7 +177,7 @@ public abstract class MCRFilesystemNode {
         if (hasParent() && doExistCheck) {
             boolean exists = getParent().hasChild(name);
             if (exists) {
-                throw new MCRUsageException(this.getAbsolutePath() + " -> " + name + " exists already.");
+                throw new MCRUsageException(getParent().getAbsolutePath() + " -> " + name + " exists already.");
             }
         }
     }
@@ -232,6 +232,10 @@ public abstract class MCRFilesystemNode {
         if (deleted) {
             throw new MCRUsageException("Do not use this node, it is deleted");
         }
+    }
+    
+    public boolean isDeleted(){
+        return deleted;
     }
 
     /**
