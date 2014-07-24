@@ -141,7 +141,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         if (!FS_URI.getScheme().equals(Objects.requireNonNull(uri).getScheme())) {
             throw new FileSystemNotFoundException("Unkown filesystem: " + uri);
         }
-        String path = uri.getPath();
+        String path = uri.getPath().substring(1);//URI path is absolute -> remove first slash
         String owner = null;
         for (int i = 0; i < path.length(); i++) {
             if (path.charAt(i) == MCRAbstractFileSystem.SEPARATOR) {
@@ -294,8 +294,11 @@ public class MCRFileSystemProvider extends FileSystemProvider {
     @Override
     public DirectoryStream<Path> newDirectoryStream(Path dir, Filter<? super Path> filter) throws IOException {
         MCRPath mcrPath = checkPathAbsolute(dir);
-        MCRDirectory mcrDir = null;
-        return new MCRDirectoryStream(mcrDir);
+        MCRFilesystemNode node = resolvePath(mcrPath);
+        if (node instanceof MCRDirectory) {
+            return new MCRDirectoryStream((MCRDirectory) node);
+        }
+        throw new NotDirectoryException(dir.toString());
     }
 
     /* (non-Javadoc)
