@@ -1,0 +1,163 @@
+/**
+ * 
+ * $Revision: 28688 $ $Date: 2013-12-18 15:27:20 +0100 (Wed, 18 Dec 2013) $
+ *
+ * This file is part of ** M y C o R e **
+ * Visit our homepage at http://www.mycore.de/ for details.
+ *
+ * This program is free software; you can use it, redistribute it
+ * and / or modify it under the terms of the GNU General Public License
+ * (GPL) as published by the Free Software Foundation; either version 2
+ * of the License or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program, normally in the file license.txt.
+ * If not, write to the Free Software Foundation Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ *
+ **/
+package org.mycore.datamodel.niofs;
+
+import java.io.IOException;
+import java.nio.file.FileVisitOption;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
+import java.util.EnumSet;
+
+import org.apache.log4j.Logger;
+import org.jdom2.Document;
+import org.jdom2.Element;
+
+/**
+ * @author Thomas Scheffler (yagee)
+ * 
+ * @version $Revision: 28688 $ $Date: 2013-12-18 15:27:20 +0100 (Wed, 18 Dec 2013) $
+ */
+public class MCRPathXML {
+
+    static Logger LOGGER = Logger.getLogger(MCRPathXML.class);
+
+    /**
+     *  
+     */
+    private MCRPathXML() {
+    }
+
+    /**
+     * Sends the contents of an MCRDirectory as XML data to the client
+     * @throws IOException 
+     */
+    public static Document getDirectoryXML(MCRPath path) throws IOException {
+        LOGGER.info("MCRDirectoryXML: start listing of directory " + path.toString());
+
+        Element root = new Element("mcr_directory");
+        Document doc = new org.jdom2.Document(root);
+
+        addString(root, "uri", path.toUri().toString());
+        addString(root, "ownerID", path.getOwner());
+        addString(root, "path", "/" + path.getRoot().relativize(path).toString());
+        BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
+        addBasicAttributes(root, attr, path);
+
+        Element nodes = new Element("children");
+        root.addContent(nodes);
+        FileVisitor<? super Path> visitor = new ChildVisitor(nodes, path);
+        Files.walkFileTree(path, EnumSet.noneOf(FileVisitOption.class), 1, visitor);
+
+        LOGGER.info("MCRDirectoryXML: end listing of directory " + path);
+
+        return doc;
+
+    }
+
+    private static void addBasicAttributes(Element root, BasicFileAttributes attr, MCRPath path) throws IOException {
+        addString(root, "size", String.valueOf(attr.size()));
+        addDate(root, "created", attr.creationTime());
+        addDate(root, "lastModified", attr.lastModifiedTime());
+        addDate(root, "lastAccessed", attr.lastAccessTime());
+        if (attr.isRegularFile()) {
+            addString(root, "contentType", Files.probeContentType(path));
+        }
+    }
+
+    private static void addAttributes(Element root, MCRFileAttributes<?> attr, MCRPath path) throws IOException {
+        addBasicAttributes(root, attr, path);
+        addString(root, "md5", attr.md5sum());
+    }
+
+    private static void addDate(Element parent, String type, FileTime date) {
+        Element xDate = new Element("date");
+        parent.addContent(xDate);
+        xDate.setAttribute("type", type);
+        xDate.addContent(date.toString());
+    }
+
+    private static void addString(Element parent, String itemName, String content) {
+        if (content == null || content.trim().length() == 0) {
+            return;
+        }
+
+        parent.addContent(new Element(itemName).addContent(content.trim()));
+    }
+
+    /**
+     * returns a error document to display error messages
+     * TODO:should be extended to provide stacktraces etc.
+     * @return JDOM Document with root element "mcr_error"
+     */
+    private Document getErrorDocument(String msg) {
+        return new Document(new Element("mcr_error").setText(msg));
+    }
+
+    private static class ChildVisitor extends SimpleFileVisitor<Path> {
+
+        private Element children;
+
+        private MCRPath baseDir;
+
+        public ChildVisitor(Element nodes, MCRPath baseDir) {
+            this.baseDir = baseDir;
+            this.children = nodes;
+        }
+
+        @Override
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+            LOGGER.info("Visiting directory: " + dir);
+            if (!baseDir.equals(dir)) {
+                addChild(MCRPath.toMCRPath(dir), "directory", attrs);
+            }
+            return FileVisitResult.CONTINUE;
+        }
+
+        private void addChild(MCRPath path, String type, BasicFileAttributes attrs) throws IOException {
+            Element child = new Element("child");
+            child.setAttribute("type", type);
+            addString(child, "name", path.getFileName().toString());
+            addString(child, "uri", path.toUri().toString());
+            children.addContent(child);
+            if (attrs instanceof MCRFileAttributes) {
+                addAttributes(child, (MCRFileAttributes<?>) attrs, path);
+            } else {
+                addBasicAttributes(child, attrs, path);
+            }
+        }
+
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            LOGGER.info("Visiting file: " + file);
+            addChild(MCRPath.toMCRPath(file), "file", attrs);
+            return FileVisitResult.CONTINUE;
+        }
+
+    }
+}
