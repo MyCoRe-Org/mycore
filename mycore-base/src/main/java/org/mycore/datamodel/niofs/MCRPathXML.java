@@ -86,7 +86,7 @@ public class MCRPathXML {
         addDate(root, "lastModified", attr.lastModifiedTime());
         addDate(root, "lastAccessed", attr.lastAccessTime());
         if (attr.isRegularFile()) {
-            addString(root, "contentType", Files.probeContentType(path));
+            addString(root, "contentType", MCRContentTypes.probeContentType(path));
         }
     }
 
