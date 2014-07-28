@@ -666,7 +666,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             : FILE_SYSTEM_INSTANCE);
     }
 
-    private static MCRFilesystemNode resolvePath(MCRPath path) throws NoSuchFileException, NotDirectoryException,
+    static MCRFilesystemNode resolvePath(MCRPath path) throws NoSuchFileException, NotDirectoryException,
         IOException {
         if (path.getNameCount() == 0) {
             //root components
