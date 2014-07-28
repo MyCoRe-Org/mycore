@@ -25,8 +25,6 @@ package org.mycore.datamodel.ifs;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 
 import javax.servlet.http.HttpServletRequest;
@@ -82,25 +80,19 @@ public class MCRFileNodeServlet extends MCRContentServlet {
         }
         String path = getPath(request);
         MCRPath mcrPath = MCRPath.getPath(ownerID, path);
-        try {
-            BasicFileAttributes attr = Files.readAttributes(mcrPath, BasicFileAttributes.class);
-            if (attr.isDirectory()) {
-                try {
-                    return sendDirectory(request, response, mcrPath);
-                } catch (TransformerException | SAXException e) {
-                    throw new IOException(e);
-                }
+        BasicFileAttributes attr = Files.readAttributes(mcrPath, BasicFileAttributes.class);
+        if (attr.isDirectory()) {
+            try {
+                return sendDirectory(request, response, mcrPath);
+            } catch (TransformerException | SAXException e) {
+                throw new IOException(e);
             }
-            if (attr.isRegularFile()) {
-                return sendFile(request, response, mcrPath);
-            }
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Not a file or directory: " + mcrPath);
-            return null;
-        } catch (NoSuchFileException e) {
-            LOGGER.info("Catched NoSuchFileException:", e);
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
-            return null;
         }
+        if (attr.isRegularFile()) {
+            return sendFile(request, response, mcrPath);
+        }
+        response.sendError(HttpServletResponse.SC_NOT_FOUND, "Not a file or directory: " + mcrPath);
+        return null;
     }
 
     private boolean isParametersValid(HttpServletRequest request, HttpServletResponse response) throws IOException {
