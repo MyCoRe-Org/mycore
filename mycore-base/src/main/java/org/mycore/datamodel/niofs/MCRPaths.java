@@ -56,8 +56,9 @@ final class MCRPaths {
     }
 
     static URI getURI(String scheme, String owner, String path) throws URISyntaxException {
-        String aPath = Objects.requireNonNull(path, "No 'path' specified.").charAt(0) == MCRAbstractFileSystem.SEPARATOR ? path
-            : (MCRAbstractFileSystem.SEPARATOR_STRING + path);
+        boolean needSeperator = Objects.requireNonNull(path, "No 'path' specified.").isEmpty()
+            || path.charAt(0) != MCRAbstractFileSystem.SEPARATOR;
+        String aPath = needSeperator ? (MCRAbstractFileSystem.SEPARATOR_STRING + path) : path;
         String finalPath = MCRAbstractFileSystem.SEPARATOR_STRING
             + Objects.requireNonNull(owner, "No 'owner' specified.") + ":" + aPath;
         return new URI(Objects.requireNonNull(scheme, "No 'scheme' specified."), null, finalPath, null);
