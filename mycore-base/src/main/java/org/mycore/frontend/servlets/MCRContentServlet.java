@@ -26,9 +26,16 @@ package org.mycore.frontend.servlets;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.EOFException;
+import java.io.FileNotFoundException;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.channels.WritableByteChannel;
+import java.nio.file.NoSuchFileException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -44,6 +51,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRSeekableChannelContent;
 import org.mycore.common.content.MCRVFSContent;
 
 /**
@@ -142,7 +150,13 @@ public abstract class MCRContentServlet extends MCRServlet {
         final HttpServletRequest request = job.getRequest();
         final HttpServletResponse response = job.getResponse();
         final boolean servContent = request.getAttribute(ATT_SERVE_CONTENT) != Boolean.FALSE;
-        serveContent(request, response, servContent);
+        try {
+            serveContent(request, response, servContent);
+        } catch (NoSuchFileException | FileNotFoundException e) {
+            LOGGER.info("Catched " + e.getClass().getSimpleName() + ":", e);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
+            return;
+        }
         LOGGER.info("Finished serving resource.");
     }
 
@@ -277,23 +291,57 @@ public abstract class MCRContentServlet extends MCRServlet {
         return true;
     }
 
+    private long copyChannel(final ReadableByteChannel src, final WritableByteChannel dest, int bufferSize)
+        throws IOException {
+        long bytes = 0;
+        final ByteBuffer buffer = ByteBuffer.allocateDirect(bufferSize);
+        while (src.read(buffer) != -1) {
+            bytes += buffer.position();
+            // prepare the buffer to be drained
+            buffer.flip();
+
+            // write to the channel, may block
+            dest.write(buffer);
+            // If partial transfer, shift remainder down
+            // If buffer is empty, same as doing clear()
+            buffer.compact();
+        }
+        bytes += buffer.position();
+        // EOF will leave buffer in fill state
+        buffer.flip();
+        // make sure the buffer is fully drained.
+        while (buffer.hasRemaining()) {
+            dest.write(buffer);
+        }
+        return bytes;
+    }
+
     /**
      * Consumes the content and writes it to the ServletOutputStream.
      */
     private void copy(final MCRContent content, final ServletOutputStream out) throws IOException {
-        try (InputStream contentIS = content.getInputStream();
-            final InputStream in = isInputStreamBuffered(contentIS, content) ? contentIS : new BufferedInputStream(
-                contentIS, inputBufferSize);) {
-            endCurrentTransaction();
-            // Copy the inputBufferSize stream to the outputBufferSize stream
-            final long bytesCopied = IOUtils.copyLarge(in, out, new byte[outputBufferSize]);
-            long length = content.length();
-            if (length >= 0 && length != bytesCopied) {
-                throw new EOFException("Bytes to send: " + length + " actual: " + bytesCopied);
+        final long bytesCopied;
+        long length = content.length();
+        if (content instanceof MCRSeekableChannelContent) {
+            try (SeekableByteChannel byteChannel = ((MCRSeekableChannelContent) content).getSeekableByteChannel();
+                WritableByteChannel nout = Channels.newChannel(out)) {
+                endCurrentTransaction();
+                bytesCopied = copyChannel(byteChannel, nout, outputBufferSize);
             }
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Wrote " + bytesCopied + " bytes.");
+        } else {
+            try (InputStream contentIS = content.getInputStream();
+                final InputStream in = isInputStreamBuffered(contentIS, content) ? contentIS : new BufferedInputStream(
+                    contentIS, inputBufferSize);) {
+                endCurrentTransaction();
+                // Copy the inputBufferSize stream to the outputBufferSize stream
+                bytesCopied = IOUtils.copyLarge(in, out, new byte[outputBufferSize]);
             }
+        }
+        if (length >= 0 && length != bytesCopied) {
+            throw new EOFException("Bytes to send: " + length + " actual: " + bytesCopied);
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Wrote " + bytesCopied + " bytes.");
         }
     }
 
