@@ -45,7 +45,7 @@ public class MCRIViewClientResource {
 
     @GET
     @Produces(MediaType.APPLICATION_XML)
-    @Path("{derivate}/{path}")
+    @Path("{derivate}/{path: [^?]+}")
     public void show(@Context HttpServletRequest request, @Context HttpServletResponse response,
         @Context ServletContext context, @Context ServletConfig config) throws Exception {
         MCRContent content = getContent(request, response);
@@ -81,9 +81,9 @@ public class MCRIViewClientResource {
                 derivateID);
             throw new WebApplicationException(Response.status(Status.FORBIDDEN).entity(errorMessage).build());
         }
-        MCRIViewClientConfiguration config = MCRConfiguration.instance().getInstanceOf(
-            "MCR.Module-iview2.configuration", null);
-        if (config != null) {
+        MCRIViewClientConfiguration config;
+        if (MCRConfiguration.instance().getString("MCR.Module-iview2.configuration", null) != null) {
+            config = MCRConfiguration.instance().getInstanceOf("MCR.Module-iview2.configuration");
             config.setup(req);
         } else {
             config = MCRIViewClientConfigurationBuilder.metsAndPlugins(req).get();
@@ -91,4 +91,5 @@ public class MCRIViewClientResource {
         MCRJDOMContent source = new MCRJDOMContent(buildResponseDocument(config));
         return MCRLayoutService.instance().getTransformedContent(req, resp, source);
     }
+
 }
