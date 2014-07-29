@@ -26,6 +26,7 @@ package org.mycore.common.xml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -77,7 +78,6 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRDirectoryXML;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
@@ -87,6 +87,8 @@ import org.mycore.datamodel.metadata.MCRFileMetadata;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.datamodel.niofs.MCRPathXML;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.tools.MCRObjectFactory;
 import org.xml.sax.InputSource;
@@ -169,7 +171,7 @@ public final class MCRURIResolver implements URIResolver {
         // don't let interal mapping be overwritten
         supportedSchemes.putAll(extResolverMapping);
         supportedSchemes.put("webapp", new MCRWebAppResolver());
-        supportedSchemes.put("ifs", getURIResolver(new MCRIFSResolver()));
+        supportedSchemes.put("ifs", new MCRIFSResolver());
         supportedSchemes.put("mcrfile", new MCRMCRFileResolver());
         supportedSchemes.put("mcrobject", new MCRObjectResolver());
         supportedSchemes.put("request", getURIResolver(new MCRRequestResolver()));
@@ -736,7 +738,7 @@ public final class MCRURIResolver implements URIResolver {
 
     }
 
-    private static class MCRIFSResolver implements MCRResolver {
+    private static class MCRIFSResolver implements URIResolver {
 
         /**
          * Reads XML from a http or https URL.
@@ -745,18 +747,27 @@ public final class MCRURIResolver implements URIResolver {
          *            the URL of the xml document
          * @return the root element of the xml document
          */
-        public Element resolveElement(String uri) {
-            LOGGER.debug("Reading xml from url " + uri);
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            LOGGER.debug("Reading xml from url " + href);
 
-            String path = uri.substring(uri.indexOf(":") + 1);
+            String path = href.substring(href.indexOf(":") + 1);
 
             int i = path.indexOf("?host");
             if (i > 0) {
                 path = path.substring(0, i);
             }
-            return MCRDirectoryXML.getInstance().getDirectory(path).getRootElement();
-        }
+            StringTokenizer st = new StringTokenizer(path, "/");
 
+            String ownerID = st.nextToken();
+            try {
+                String aPath = MCRXMLFunctions.decodeURIPath(path.substring(ownerID.length() + 1));
+                LOGGER.info("Get " + ownerID + " path: " + aPath, new RuntimeException("ignore"));
+                return new JDOMSource(MCRPathXML.getDirectoryXML(MCRPath.getPath(ownerID, aPath)));
+            } catch (IOException | URISyntaxException e) {
+                throw new TransformerException(e);
+            }
+        }
     }
 
     private static class MCRMCRFileResolver implements URIResolver {

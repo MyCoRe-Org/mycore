@@ -342,6 +342,18 @@ public class MCRXMLFunctions {
         return asciiOnly ? relativeURI.toASCIIString() : relativeURI.getRawPath();
     }
 
+    /**
+     * Decodes the path so that it can be displayed without encoded octets.
+     * @param path
+     *            encoded path as described in RFC 2396
+     * @return decoded path
+     * @throws URISyntaxException
+     */
+    public static String decodeURIPath(String path) throws URISyntaxException {
+        URI relativeURI = new URI(null, null, path, null, null);
+        return relativeURI.getPath();
+    }
+
     public static boolean isDisplayedEnabledDerivate(String derivateId) {
         MCRObjectID derId = MCRObjectID.getInstance(derivateId);
         ModifiedHandle modifiedHandle = MCRXMLMetaDataManagerHolder.instance.getLastModifiedHandle(derId, 30,
