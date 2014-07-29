@@ -18,11 +18,6 @@
     <servlet-class>org.mycore.iview2.frontend.MCRThumbnailServlet</servlet-class>
   </servlet>
   
-  <servlet>
-    <servlet-name>MCRIviewClientServlet</servlet-name>
-    <servlet-class>org.mycore.iview2.frontend.MCRIViewClientServlet</servlet-class>
-  </servlet>
-
   <servlet-mapping>
     <servlet-name>MCRTileServlet</servlet-name>
     <url-pattern>/servlets/MCRTileServlet/*</url-pattern>
@@ -38,11 +33,6 @@
     <url-pattern>/servlets/MCRThumbnailServlet/*</url-pattern>
   </servlet-mapping>
   
-  <servlet-mapping>
-    <servlet-name>MCRIviewClientServlet</servlet-name>
-    <url-pattern>/servlets/MCRIviewClient/*</url-pattern>
-  </servlet-mapping>
-
   <filter-mapping>
     <filter-name>UserAgentFilter</filter-name>
     <servlet-name>MCRTileCombineServlet</servlet-name>
