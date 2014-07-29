@@ -317,6 +317,14 @@ public abstract class MCRPath implements Path {
         }
         final int lastOffset = offsets[nameCount - 1] - 1;
         if (lastOffset <= 0) {
+            if (root.isEmpty()) {
+                if (path.startsWith("/")) {
+                    //we have root as parent
+                    return MCRAbstractFileSystem.getPath(root, "/", getFileSystem());
+                }
+                // path is like "foo" -> no parent
+                return null;
+            }
             return getRoot();
         }
         return MCRAbstractFileSystem.getPath(root, path.substring(0, lastOffset), getFileSystem());
@@ -486,7 +494,7 @@ public abstract class MCRPath implements Path {
         if (thatURI.equals(relativizedURI)) {
             return that;
         }
-        return MCRAbstractFileSystem.getPath(null, relativizedURI.toString(), getFileSystem());
+        return MCRAbstractFileSystem.getPath(null, relativizedURI.getPath(), getFileSystem());
     }
 
     /* (non-Javadoc)
