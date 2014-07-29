@@ -23,6 +23,9 @@
  **/
 package org.mycore.datamodel.niofs;
 
+import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR;
+import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR_STRING;
+
 import java.io.IOException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
@@ -37,6 +40,8 @@ import java.util.EnumSet;
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
+
+;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -53,11 +58,16 @@ public class MCRPathXML {
     private MCRPathXML() {
     }
 
+    public static Document getDirectoryXML(MCRPath path) throws IOException {
+        BasicFileAttributes attr = path.getFileSystem().provider().readAttributes(path, BasicFileAttributes.class);
+        return getDirectoryXML(path, attr);
+    }
+
     /**
      * Sends the contents of an MCRDirectory as XML data to the client
      * @throws IOException 
      */
-    public static Document getDirectoryXML(MCRPath path) throws IOException {
+    public static Document getDirectoryXML(MCRPath path, BasicFileAttributes attr) throws IOException {
         LOGGER.info("MCRDirectoryXML: start listing of directory " + path.toString());
 
         Element root = new Element("mcr_directory");
@@ -65,8 +75,11 @@ public class MCRPathXML {
 
         addString(root, "uri", path.toUri().toString());
         addString(root, "ownerID", path.getOwner());
-        addString(root, "path", "/" + path.getRoot().relativize(path).toString());
-        BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
+        MCRPath relativePath = path.getRoot().relativize(path);
+        addString(root, "path", toStringValue(relativePath));
+        if (relativePath.getNameCount() > 0) {
+            addString(root, "parentPath", toStringValue(relativePath.getParent()));
+        }
         addBasicAttributes(root, attr, path);
 
         Element nodes = new Element("children");
@@ -78,6 +91,20 @@ public class MCRPathXML {
 
         return doc;
 
+    }
+
+    private static String toStringValue(MCRPath relativePath) {
+        if (relativePath == null) {
+            return SEPARATOR_STRING;
+        }
+        String pathString = relativePath.toString();
+        if (pathString.isEmpty()) {
+            return SEPARATOR_STRING;
+        }
+        if (pathString.equals(SEPARATOR_STRING)) {
+            return pathString;
+        }
+        return SEPARATOR + pathString + SEPARATOR;
     }
 
     private static void addBasicAttributes(Element root, BasicFileAttributes attr, MCRPath path) throws IOException {
