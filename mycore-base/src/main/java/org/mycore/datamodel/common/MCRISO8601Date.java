@@ -1,11 +1,13 @@
 package org.mycore.datamodel.common;
 
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.mycore.common.config.MCRConfiguration;
@@ -69,11 +71,38 @@ public class MCRISO8601Date {
      * @return null if date is not set yet
      */
     public String format(final String format, final Locale locale) {
+        return format(format, locale, null);
+    }
+
+    /**
+     * formats the date to a String.
+     * @param format as in {@link DateTimeFormat}
+     * @param locale used by format process
+     * @param timeZone valid timeZone id, e.g. "Europe/Berlin", or null
+     * @return null if date is not set yet
+     */
+    public String format(final String format, final Locale locale, String timeZone) {
         DateTimeFormatter df = DateTimeFormat.forPattern(format);
         if (locale != null) {
             df = df.withLocale(locale);
         }
-
+        DateTimeZone zone = null;
+        if (timeZone != null) {
+            try {
+                zone = DateTimeZone.forID(timeZone);
+            } catch (IllegalArgumentException e) {
+                LOGGER.warn(e.getMessage());
+            }
+        }
+        if (zone == null) {
+            zone = DateTimeZone.getDefault();
+        }
+        df = df.withZone(zone);
+        if (LOGGER.isDebugEnabled()) {
+            String msg = MessageFormat.format("DateTime ''{0}'', using time zone ''{1}'', formatted: {2}", dt, zone,
+                df.print(dt));
+            LOGGER.debug(msg);
+        }
         return dt == null ? null : format.indexOf("G") == -1 ? df.print(dt) : df.print(dt).replace("-", "");
     }
 

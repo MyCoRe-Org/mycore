@@ -51,6 +51,7 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.jdom2.output.DOMOutputter;
+import org.joda.time.DateTimeZone;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
@@ -170,17 +171,22 @@ public class MCRXMLFunctions {
 
     public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language)
         throws ParseException {
+        return formatISODate(isoDate, isoFormat, simpleFormat, iso639Language, DateTimeZone.getDefault().getID());
+    }
+
+    public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language,
+        String timeZone) throws ParseException {
         if (LOGGER.isDebugEnabled()) {
             StringBuilder sb = new StringBuilder("isoDate=");
             sb.append(isoDate).append(", simpleFormat=").append(simpleFormat).append(", isoFormat=").append(isoFormat)
-                .append(", iso649Language=").append(iso639Language);
+                .append(", iso649Language=").append(iso639Language).append(", timeZone=").append(timeZone);
             LOGGER.debug(sb.toString());
         }
         Locale locale = new Locale(iso639Language);
         MCRISO8601Date mcrdate = new MCRISO8601Date();
         mcrdate.setFormat(isoFormat);
         mcrdate.setDate(isoDate);
-        String formatted = mcrdate.format(simpleFormat, locale);
+        String formatted = mcrdate.format(simpleFormat, locale, timeZone);
         return formatted == null ? "?" + isoDate + "?" : formatted;
     }
 
