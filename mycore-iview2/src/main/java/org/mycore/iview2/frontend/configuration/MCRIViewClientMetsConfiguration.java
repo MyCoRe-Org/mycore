@@ -23,6 +23,9 @@ public class MCRIViewClientMetsConfiguration extends MCRIViewClientBaseConfigura
             imageXmlPath = imageXmlPath.split(",")[0];
         }
         setProperty("imageXmlPath", imageXmlPath);
+        
+        setProperty("pdfCreatorStyle", MCRIView2Tools.getIView2Property("PDFCreatorStyle"));
+        setProperty("pdfCreatorURI", MCRIView2Tools.getIView2Property("PDFCreatorURI"));
 
         // script
         addLocalScript("iview-client-mets.js");
