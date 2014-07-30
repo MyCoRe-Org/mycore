@@ -52,9 +52,6 @@ public class MCRPathXML {
 
     static Logger LOGGER = Logger.getLogger(MCRPathXML.class);
 
-    /**
-     *  
-     */
     private MCRPathXML() {
     }
 
@@ -77,14 +74,14 @@ public class MCRPathXML {
         addString(root, "ownerID", path.getOwner());
         MCRPath relativePath = path.getRoot().relativize(path);
         addString(root, "path", toStringValue(relativePath));
-        if (relativePath.getNameCount() > 0) {
+        if (!relativePath.toString().isEmpty()) {
             addString(root, "parentPath", toStringValue(relativePath.getParent()));
         }
         addBasicAttributes(root, attr, path);
 
         Element nodes = new Element("children");
         root.addContent(nodes);
-        FileVisitor<? super Path> visitor = new ChildVisitor(nodes, path);
+        FileVisitor<? super Path> visitor = new ChildVisitor(nodes);
         Files.walkFileTree(path, EnumSet.noneOf(FileVisitOption.class), 1, visitor);
 
         LOGGER.info("MCRDirectoryXML: end listing of directory " + path);
@@ -137,37 +134,23 @@ public class MCRPathXML {
         parent.addContent(new Element(itemName).addContent(content.trim()));
     }
 
-    /**
-     * returns a error document to display error messages
-     * TODO:should be extended to provide stacktraces etc.
-     * @return JDOM Document with root element "mcr_error"
-     */
-    private Document getErrorDocument(String msg) {
-        return new Document(new Element("mcr_error").setText(msg));
-    }
-
     private static class ChildVisitor extends SimpleFileVisitor<Path> {
 
         private Element children;
 
-        private MCRPath baseDir;
-
-        public ChildVisitor(Element nodes, MCRPath baseDir) {
-            this.baseDir = baseDir;
+        public ChildVisitor(Element nodes) {
             this.children = nodes;
         }
 
         @Override
         public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
             LOGGER.info("Visiting directory: " + dir);
-            if (!baseDir.equals(dir)) {
-                addChild(MCRPath.toMCRPath(dir), "directory", attrs);
-            }
             return FileVisitResult.CONTINUE;
         }
 
-        private void addChild(MCRPath path, String type, BasicFileAttributes attrs) throws IOException {
+        private void addChild(MCRPath path, BasicFileAttributes attrs) throws IOException {
             Element child = new Element("child");
+            String type = attrs.isDirectory() ? "directory" : "file";
             child.setAttribute("type", type);
             addString(child, "name", path.getFileName().toString());
             addString(child, "uri", path.toUri().toString());
@@ -182,7 +165,7 @@ public class MCRPathXML {
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
             LOGGER.info("Visiting file: " + file);
-            addChild(MCRPath.toMCRPath(file), "file", attrs);
+            addChild(MCRPath.toMCRPath(file), attrs);
             return FileVisitResult.CONTINUE;
         }
 
