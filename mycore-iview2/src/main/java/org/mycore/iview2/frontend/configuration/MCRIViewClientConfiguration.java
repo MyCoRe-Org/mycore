@@ -18,6 +18,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlValue;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -27,7 +28,7 @@ import org.mycore.common.content.MCRXMLContent;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.iview2.services.MCRIView2Tools;
 
-import com.google.common.collect.HashMultimap;
+import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -50,12 +51,12 @@ public class MCRIViewClientConfiguration {
 
     private Multimap<ResourceType, String> resources;
 
-    private Map<String, String> properties;
+    private Map<String, Object> properties;
 
     private boolean debugMode;
 
     public MCRIViewClientConfiguration() {
-        resources = HashMultimap.create();
+        resources = LinkedListMultimap.create();
         properties = new HashMap<>();
         debugMode = false;
     }
@@ -65,7 +66,7 @@ public class MCRIViewClientConfiguration {
      * 
      * @return
      */
-    public Map<String, String> getProperties() {
+    public Map<String, Object> getProperties() {
         return properties;
     }
 
@@ -192,7 +193,7 @@ public class MCRIViewClientConfiguration {
      * @param name name of the property
      * @param value value of the property
      */
-    public void setProperty(String name, String value) {
+    public void setProperty(String name, Object value) {
         this.properties.put(name, value);
     }
 
@@ -202,7 +203,7 @@ public class MCRIViewClientConfiguration {
      * @param name name of the property which should be removed
      * @return the removed value or null when nothing is done
      */
-    public String removeProperty(String name) {
+    public Object removeProperty(String name) {
         return this.properties.remove(name);
     }
 
@@ -234,13 +235,13 @@ public class MCRIViewClientConfiguration {
 
         private Multimap<ResourceType, String> resources;
 
-        private Map<String, String> properties;
+        private Map<String, Object> properties;
 
         @SuppressWarnings("unused")
         public MCRIViewClientXMLConfiguration() {
         }
 
-        public MCRIViewClientXMLConfiguration(Multimap<ResourceType, String> resources, Map<String, String> properties) {
+        public MCRIViewClientXMLConfiguration(Multimap<ResourceType, String> resources, Map<String, Object> properties) {
             this.resources = resources;
             this.properties = properties;
         }
@@ -259,7 +260,7 @@ public class MCRIViewClientConfiguration {
         @XmlElementWrapper(name = "properties")
         public final List<MCRIViewClientProperty> getProperties() {
             List<MCRIViewClientProperty> propertyList = new ArrayList<>();
-            for (Entry<String, String> entry : properties.entrySet()) {
+            for (Entry<String, Object> entry : properties.entrySet()) {
                 propertyList.add(new MCRIViewClientProperty(entry.getKey(), entry.getValue()));
             }
             return propertyList;
@@ -308,14 +309,19 @@ public class MCRIViewClientConfiguration {
         @XmlAttribute(name = "name", required = true)
         public String name;
 
+        @XmlTransient
+        public Object value;
+
         @XmlValue
-        public String value;
+        public String getXMLValue() {
+            return (value == null) ? "" : value.toString();
+        }
 
         @SuppressWarnings("unused")
         public MCRIViewClientProperty() {
         }
 
-        public MCRIViewClientProperty(String name, String value) {
+        public MCRIViewClientProperty(String name, Object value) {
             this.name = name;
             this.value = value;
         }

@@ -56,8 +56,8 @@ public class MCRIViewClientConfigurationBuilder {
      * @param conf2
      */
     public static void mixin(MCRIViewClientConfiguration conf1, MCRIViewClientConfiguration conf2) {
-        Map<String, String> conf2Props = conf2.getProperties();
-        for (Map.Entry<String, String> property : conf2Props.entrySet()) {
+        Map<String, Object> conf2Props = conf2.getProperties();
+        for (Map.Entry<String, Object> property : conf2Props.entrySet()) {
             conf1.setProperty(property.getKey(), property.getValue());
         }
         Multimap<ResourceType, String> resources = conf2.getResources();

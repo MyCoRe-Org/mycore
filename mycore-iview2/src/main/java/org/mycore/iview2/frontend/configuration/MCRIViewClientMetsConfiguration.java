@@ -14,8 +14,9 @@ public class MCRIViewClientMetsConfiguration extends MCRIViewClientBaseConfigura
         // properties
         setProperty("metsURL", MCRServlet.getServletBaseURL() + "MCRMETSServlet/" + getDerivate(request));
         String imageXmlPath = MCRIView2Tools.getIView2Property("BaseURL"); // Parameter can be used to provide multiple urls
+        
         if (imageXmlPath == null || imageXmlPath.isEmpty()) {
-            imageXmlPath = "MCRTileServlet/";
+            imageXmlPath = MCRServlet.getServletBaseURL() + "MCRTileServlet/";
         }
         setProperty("tileProviderPath", imageXmlPath);
         if (imageXmlPath.contains(",")) {

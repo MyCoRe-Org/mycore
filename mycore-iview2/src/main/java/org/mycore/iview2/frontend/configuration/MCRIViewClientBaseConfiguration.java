@@ -27,7 +27,7 @@ public abstract class MCRIViewClientBaseConfiguration extends MCRIViewClientConf
         setProperty("filePath", getFilePath(request));
         setProperty("doctype", getDocType(request));
         boolean mobile = isMobile(request);
-        setProperty("mobile", String.valueOf(mobile));
+        setProperty("mobile", mobile);
         setProperty("i18nURL", MCRServlet.getServletBaseURL() + "MCRLocaleServlet/{lang}/component.iview2.*");
         setProperty("lang", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
 

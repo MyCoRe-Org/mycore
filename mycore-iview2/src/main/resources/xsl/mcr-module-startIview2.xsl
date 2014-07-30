@@ -60,7 +60,7 @@
     <xsl:param name="file" />
     <xsl:param name="derivateID" />
     <div class="container">
-      <a class="thumbnail col-md-12" href="{concat($ServletsBaseURL,'MCRIviewClient?derivate=', $derivateID, '&amp;startImage=', encoder:encode($file, 'UTF-8'))}">
+      <a class="thumbnail col-md-12" href="{concat($WebApplicationBaseURL,'rsc/iview/client/', $derivateID, $file)}">
         <xsl:call-template name="iview2.getImageElement">
           <xsl:with-param name="derivate" select="$derivateID" />
           <xsl:with-param name="imagePath" select="$file" />
