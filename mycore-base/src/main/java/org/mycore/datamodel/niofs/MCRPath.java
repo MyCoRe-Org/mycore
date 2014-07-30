@@ -695,9 +695,15 @@ public abstract class MCRPath implements Path {
                 // empty path considered to have one name element
                 list.add(0);
             }
-        } else if (!isAbsolute() || !path.equals(SEPARATOR_STRING)) {
+        } else {
             int start = 0;
-            int off = 0;
+            while (start < path.length()) {
+                if (path.charAt(start) != SEPARATOR) {
+                    break;
+                }
+                start++;
+            }
+            int off = start;
             while (off < path.length()) {
                 if (path.charAt(off) != SEPARATOR) {
                     off++;
