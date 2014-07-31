@@ -412,14 +412,13 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 
         if (changed) {
             if (storeContentChange) {
-                adjustMetadata(null, new_md5, new_size);
+                adjustMetadata(FileTime.fromMillis(System.currentTimeMillis()), new_md5, new_size);
             } else {
                 this.md5 = new_md5;
-                this.size = new_size;
             }
         }
 
-        return size - old_size;
+        return new_size - old_size;
     }
 
     public void storeContentChange(long sizeDiff) {
