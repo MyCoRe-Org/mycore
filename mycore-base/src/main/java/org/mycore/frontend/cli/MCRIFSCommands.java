@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -18,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -126,7 +128,7 @@ public class MCRIFSCommands {
             if (localFile.length() != node.getSize()) {
                 LOGGER.warn("File size does not match for file: " + localFile);
                 atts.addAttribute(MCRIFSCommands.NS_URI, "actualSize", "actualSize", MCRIFSCommands.CDATA,
-                        Long.toString(localFile.length()));
+                    Long.toString(localFile.length()));
                 return false;
             }
             //we can check MD5Sum
@@ -268,7 +270,7 @@ public class MCRIFSCommands {
                     }
                 }
                 String path = currentStoreBaseDir != null ? currentStore.getLocalFile(storageID).getAbsolutePath()
-                        : storageID;
+                    : storageID;
                 //current store initialized
                 String line = MessageFormat.format("{0}  {1}\n", md5, path);
                 fw.write(line);
@@ -287,7 +289,7 @@ public class MCRIFSCommands {
 
     @MCRCommand(syntax = "generate missing file report in directory {0}", help = "generates XML a report over all content stores about missing files and write it in directory {0}")
     public static void writeMissingFileReport(String targetDirectory) throws IOException, SAXException,
-            TransformerConfigurationException {
+        TransformerConfigurationException {
         File targetDir = getDirectory(targetDirectory);
         FSNodeChecker checker = new LocalFileExistChecker();
         writeReport(targetDir, checker);
@@ -295,14 +297,14 @@ public class MCRIFSCommands {
 
     @MCRCommand(syntax = "generate md5 file report in directory {0}", help = "generates XML a report over all content stores about failed md5 checks and write it in directory {0}")
     public static void writeFileMD5Report(String targetDirectory) throws IOException, SAXException,
-            TransformerConfigurationException {
+        TransformerConfigurationException {
         File targetDir = getDirectory(targetDirectory);
         FSNodeChecker checker = new MD5Checker();
         writeReport(targetDir, checker);
     }
 
     private static void writeReport(File targetDir, FSNodeChecker checker) throws TransformerFactoryConfigurationError,
-            SAXException, IOException, FileNotFoundException, TransformerConfigurationException {
+        SAXException, IOException, FileNotFoundException, TransformerConfigurationException {
         Session session = MCRHIBConnection.instance().getSession();
         Criteria criteria = session.createCriteria(MCRFSNODES.class);
         criteria.addOrder(Order.asc("storeid"));
@@ -345,7 +347,7 @@ public class MCRIFSCommands {
                         }
                     }
                     File outputFile = new File(targetDir, MessageFormat.format("{0}-{1}-{2}.xml", nameOfProject,
-                            storeID, rootName));
+                        storeID, rootName));
                     streamResult = new StreamResult(new FileOutputStream(outputFile));
                     th = tf.newTransformerHandler();
                     Transformer serializer = th.getTransformer();
@@ -359,7 +361,7 @@ public class MCRIFSCommands {
                     try {
                         currentStoreBaseDir = currentStore.getBaseDir();
                         atts.addAttribute(nsURI, ATT_BASEDIR, ATT_BASEDIR, ATT_TYPE,
-                                currentStoreBaseDir.getAbsolutePath());
+                            currentStoreBaseDir.getAbsolutePath());
                     } catch (Exception e) {
                         LOGGER.warn("Could not get baseDir of store: " + storeID, e);
                         currentStoreBaseDir = null;
@@ -401,14 +403,14 @@ public class MCRIFSCommands {
         File targetDir = new File(targetDirectory);
         if (!targetDir.isDirectory()) {
             throw new IllegalArgumentException("Target directory " + targetDir.getAbsolutePath()
-                    + " is not a directory.");
+                + " is not a directory.");
         }
         return targetDir;
     }
 
     @MCRCommand(syntax = "generate missing nodes report in directory {0}", help = "generates XML report over all content stores about missing ifs nodes and write it in directory {0}")
     public static void writeMissingNodesReport(String targetDirectory) throws SAXException,
-            TransformerConfigurationException, IOException {
+        TransformerConfigurationException, IOException {
         File targetDir = getDirectory(targetDirectory);
         Map<String, MCRContentStore> availableStores = MCRContentStoreFactory.getAvailableStores();
         final String nsURI = NS_URI;
@@ -440,7 +442,7 @@ public class MCRIFSCommands {
                 String nameOfProject = MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe");
                 String storeID = currentStore.getID();
                 File outputFile = new File(targetDir, MessageFormat.format("{0}-{1}-{2}.xml", nameOfProject, storeID,
-                        rootName));
+                    rootName));
                 StreamResult streamResult;
                 try {
                     streamResult = new StreamResult(new FileOutputStream(outputFile));
@@ -474,7 +476,7 @@ public class MCRIFSCommands {
                                 LOGGER.warn("Found orphaned file: " + currentFile);
                                 atts.clear();
                                 atts.addAttribute(NS_URI, ATT_FILE_NAME, ATT_FILE_NAME, CDATA,
-                                        baseURI.relativize(currentFile.toURI()).getPath());
+                                    baseURI.relativize(currentFile.toURI()).getPath());
                                 th.startElement(NS_URI, ELEMENT_FILE, ELEMENT_FILE, atts);
                                 th.endElement(NS_URI, ELEMENT_FILE, ELEMENT_FILE);
                             }
@@ -503,8 +505,37 @@ public class MCRIFSCommands {
             return;
         }
         LOGGER.info(MessageFormat.format("Deleting IFS Node {0}: {1}{2}", nodeID, node.getOwnerID(),
-                node.getAbsolutePath()));
+            node.getAbsolutePath()));
         node.delete();
+    }
+
+    @MCRCommand(syntax = "repair content length for mcrrev 30327", help = "fixes a data for a bug introduced in revision 30327 and fixed in 30396")
+    public static void fixRev30327() throws IOException {
+        long bugCommitTime = 1406022288L;
+        Session session = MCRHIBConnection.instance().getSession();
+        Criteria c = session.createCriteria(MCRFSNODES.class);
+        c.add(Restrictions.eq("type", "F"));
+        c.add(Restrictions.gt("date", new Date(bugCommitTime)));
+        c.setProjection(Projections.id());
+        @SuppressWarnings("unchecked")
+        List<String> affectedFileNodes = c.list();
+        ArrayList<String> copy = new ArrayList<>(affectedFileNodes);
+        LOGGER.info("Got " + copy.size() + " possibly affected files.");
+        for (String id : copy) {
+            fixContentLengthOfFile(id);
+        }
+    }
+
+    private static void fixContentLengthOfFile(String id) throws IOException {
+        MCRFile file = Objects.requireNonNull(MCRFile.getFile(id), "No such file: " + id);
+        long storedSize = file.getSize();
+        long physicalSize = file.getLocalFile().length();
+        if (storedSize == physicalSize * 2) {
+            LOGGER.info("Fixing: " + file.getPath());
+            file.storeContentChange(physicalSize - storedSize);
+        } else {
+            LOGGER.info("File is not affected: " + file.getName());
+        }
     }
 
     /**
@@ -540,20 +571,20 @@ public class MCRIFSCommands {
     @MCRCommand(syntax = "move derivates from content store {0} to content store {1} for owner {2}", help = "moves all files of derivates from content store {0} to content store {1} for defined owner {2}")
     public static void moveContentOfOwnerToNewStore(String source_store, String target_store, String owner) {
         LOGGER.info("Start move data from content store " + source_store + " to store " + target_store + " for owner "
-                + owner);
+            + owner);
         moveContentToNewStore(source_store, target_store, "owner", owner, 0);
     }
 
     @MCRCommand(syntax = "move derivates from content store {0} to content store {1} for filetype {2}", help = "moves all files of derivates from content store {0} to content store {1} for defined file type {2} - delimiting number of moved files with property MCR.IFS.ContentStore.MoveCounter")
     public static void moveContentOfFiletypeToNewStore(String source_store, String target_store, String file_type) {
         LOGGER.info("Start move data from content store " + source_store + " to store " + target_store
-                + " for file type " + file_type);
+            + " for file type " + file_type);
         int max_counter = MCRConfiguration.instance().getInt("MCR.IFS.ContentStore.MoveCounter", MAX_COUNTER);
         moveContentToNewStore(source_store, target_store, "fctid", file_type, max_counter);
     }
 
     private static void moveContentToNewStore(String source_store, String target_store, String select_key,
-            String select_value, int max_counter) {
+        String select_value, int max_counter) {
         // check stores
         Map<String, MCRContentStore> availableStores = MCRContentStoreFactory.getAvailableStores();
         MCRContentStore from_store = availableStores.get(source_store);
@@ -592,19 +623,20 @@ public class MCRIFSCommands {
                 String md5 = fsNode.getMd5();
                 session.evict(fsNode);
                 LOGGER.info("File for [id] " + id + " [pid] " + pid + " [owner] " + owner + " [name] " + name
-                        + " [size] " + size + " [storageid] " + storageid + " [fctid] " + fctid + " [md5] " + md5);
+                    + " [size] " + size + " [storageid] " + storageid + " [fctid] " + fctid + " [md5] " + md5);
                 // get input
                 MCRFile file_reader_from = new MCRFile(id, pid, owner, name, "", size, datecal, source_store,
-                        storageid, fctid, md5);
+                    storageid, fctid, md5);
                 File file_from = from_store.getLocalFile(file_reader_from);
-                LOGGER.debug("File in source under store " + source_store + " with path " + file_from.getAbsolutePath());
+                LOGGER
+                    .debug("File in source under store " + source_store + " with path " + file_from.getAbsolutePath());
                 // copy file
                 MCRFile file_reader_to = new MCRFile(id, pid, owner, name, "", size, datecal, target_store, "", fctid,
-                        md5);
+                    md5);
                 MCRContentInputStream ins = new MCRContentInputStream(new FileInputStream(file_from));
                 String new_storageid = to_store.storeContent(file_reader_to, ins);
                 LOGGER.debug("Copied to new store " + target_store + " as STORAGEID " + new_storageid + " with MD5 "
-                        + file_reader_to.getMD5() + " and file size " + file_reader_to.getSize());
+                    + file_reader_to.getMD5() + " and file size " + file_reader_to.getSize());
                 if (new_storageid != null && new_storageid.length() != 0 && md5.equals(file_reader_to.getMD5())) {
                     // update database
                     String queryString = "UPDATE MCRFSNODES SET pid = :pid , storeid = :storeid , storageid = :storageid WHERE md5 like :md5 AND owner LIKE :owner";
@@ -616,7 +648,7 @@ public class MCRIFSCommands {
                     query.setParameter("owner", owner);
                     int result = query.executeUpdate();
                     LOGGER.debug("Update MCRFSNODES entry for OWNER " + owner + " AND MD5 " + md5 + " to STORAGEID "
-                            + new_storageid + " for " + Integer.toBinaryString(result) + " entries");
+                        + new_storageid + " for " + Integer.toBinaryString(result) + " entries");
                     if (result == 1) {
                         // remove old file
                         file_from.delete();
@@ -643,7 +675,7 @@ public class MCRIFSCommands {
             LOGGER.info(max_counter + " entries finished, for continue restart this command!");
         }
     }
-    
+
     @MCRCommand(syntax = "check derivates of mcrfsnodes with project id {0}", help = "check the entries of MCRFSNODES for all derivates with project ID {0}")
     public static void checkMCRFSNODESForDerivatesWithProjectID(String project_id) {
         LOGGER.info("Start check of MCRFSNODES for derivates with project ID " + project_id);
@@ -654,7 +686,7 @@ public class MCRIFSCommands {
         Map<String, MCRContentStore> availableStores = MCRContentStoreFactory.getAvailableStores();
         Session session = MCRHIBConnection.instance().getSession();
         MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
-        List <String> id_list = mgr.listIDsForBase(project_id + "_derivate");
+        List<String> id_list = mgr.listIDsForBase(project_id + "_derivate");
         int counter = 0;
         int maxresults = id_list.size();
         for (String derid : id_list) {
@@ -682,7 +714,7 @@ public class MCRIFSCommands {
                     String md5 = fsNode.getMd5();
                     session.evict(fsNode);
                     LOGGER.debug("File for [owner] " + derid + " [name] " + name + " [storeid] " + store_name
-                           + " [storageid] " + storageid + " [fctid] " + fctid + " [size] " + size + " [md5] " + md5);
+                        + " [storageid] " + storageid + " [fctid] " + fctid + " [size] " + size + " [md5] " + md5);
                     // get path of file
                     MCRContentStore fs_store = availableStores.get(store_name);
                     if (fs_store == null) {
@@ -692,10 +724,10 @@ public class MCRIFSCommands {
                     try {
                         File content_file = fs_store.getLocalFile(storageid);
                         if (content_file == null || !content_file.canRead()) {
-                            LOGGER.error("   !!!! Can't access to file " + storageid + " of store " + store_name );
+                            LOGGER.error("   !!!! Can't access to file " + storageid + " of store " + store_name);
                         }
                     } catch (Exception e) {
-                        LOGGER.error("   !!!! Can't access to file " + storageid + " of store " + store_name );
+                        LOGGER.error("   !!!! Can't access to file " + storageid + " of store " + store_name);
                     }
                 }
                 if (file_counter == 0) {
@@ -709,8 +741,7 @@ public class MCRIFSCommands {
         }
         LOGGER.info("Check done for " + Integer.toString(counter) + " entries");
     }
-    
-    
+
     @MCRCommand(syntax = "check mcrfsnodes of derivates with project id {0}", help = "check the entries of MCRFSNODES with project ID {0} that the derivate exists")
     public static void checkDerivatesWithProjectIDInMCRFSNODES(String project_id) {
         LOGGER.info("Start check of MCRFSNODES for derivates with project ID " + project_id);
@@ -744,5 +775,5 @@ public class MCRIFSCommands {
         }
         LOGGER.info("Check done for " + Integer.toString(counter) + " entries");
     }
-    
+
 }
