@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
@@ -49,6 +50,7 @@ import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRContentStore;
 import org.mycore.datamodel.ifs.MCRContentStoreFactory;
 import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.ifs.MCRFileMetadataManager;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
@@ -532,7 +534,14 @@ public class MCRIFSCommands {
         long physicalSize = file.getLocalFile().length();
         if (storedSize == physicalSize * 2) {
             LOGGER.info("Fixing: " + file.getPath());
-            file.storeContentChange(physicalSize - storedSize);
+            try {
+                Field sizeField = MCRFilesystemNode.class.getDeclaredField("size");
+                sizeField.setAccessible(true);
+                sizeField.set(file, physicalSize);
+            } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+                LOGGER.warn("Cannot use reflections to fix file. Request update!", e);
+            }
+            MCRFileMetadataManager.instance().storeNode(file);
         } else {
             LOGGER.info("File is not affected: " + file.getName());
         }
