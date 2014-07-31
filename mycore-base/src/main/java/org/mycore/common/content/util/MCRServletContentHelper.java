@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.channels.WritableByteChannel;
@@ -66,9 +67,9 @@ public abstract class MCRServletContentHelper {
 
     public static final String ATT_SERVE_CONTENT = MCRServletContentHelper.class.getName() + ".serveContent";
 
-    public static final int DEFAULT_BUFFER_SIZE = 4096;
+    public static final int DEFAULT_BUFFER_SIZE = 65536;
 
-    public static final int MIN_BUFFER_SIZE = 256;
+    public static final int MIN_BUFFER_SIZE = 512;
 
     public static class Config {
 
@@ -420,27 +421,54 @@ public abstract class MCRServletContentHelper {
         return true;
     }
 
-    private static long copyChannel(final ReadableByteChannel src, final WritableByteChannel dest, int bufferSize)
+    private static long copyChannel(final ReadableByteChannel src, final WritableByteChannel dest, final int bufferSize)
         throws IOException {
+        if (src instanceof FileChannel) {
+            return copyFileChannel((FileChannel) src, dest, bufferSize);
+        }
         long bytes = 0;
         final ByteBuffer buffer = ByteBuffer.allocateDirect(bufferSize);
         while (src.read(buffer) != -1) {
-            bytes += buffer.position();
             // prepare the buffer to be drained
             buffer.flip();
 
             // write to the channel, may block
-            dest.write(buffer);
+            bytes += dest.write(buffer);
             // If partial transfer, shift remainder down
             // If buffer is empty, same as doing clear()
             buffer.compact();
         }
-        bytes += buffer.position();
         // EOF will leave buffer in fill state
         buffer.flip();
         // make sure the buffer is fully drained.
         while (buffer.hasRemaining()) {
-            dest.write(buffer);
+            bytes += dest.write(buffer);
+        }
+        return bytes;
+    }
+
+    private static long copyFileChannel(final FileChannel src, final WritableByteChannel dest, final int bufferSize)
+        throws IOException {
+        long bytes = 0L;
+        long time = -System.currentTimeMillis();
+        long size = src.size();
+        while (bytes < size) {
+            long bytesToTransfer = Math.min(bufferSize, size - bytes);
+            long bytesTransfered = src.transferTo(bytes, bytesToTransfer, dest);
+
+            bytes += bytesTransfered;
+
+            if (LOGGER.isDebugEnabled()) {
+                long percentage = Math.round(bytes / ((double) size) * 100.0);
+                LOGGER.debug("overall bytes transfered: " + bytes + " progress " + percentage + "%");
+            }
+
+        }
+
+        if (LOGGER.isDebugEnabled()) {
+            time += System.currentTimeMillis();
+            double kBps = (bytes / 1024.0) / (time / 1000.0);
+            LOGGER.debug("Transfered: " + bytes + " bytes in: " + (time / 1000.0) + " s -> " + kBps + " kbytes/s");
         }
         return bytes;
     }
