@@ -73,8 +73,10 @@ public class MCRPathXML {
         addString(root, "uri", path.toUri().toString());
         addString(root, "ownerID", path.getOwner());
         MCRPath relativePath = path.getRoot().relativize(path);
+        boolean isRoot = relativePath.toString().isEmpty();
+        addString(root, "name", (isRoot ? "" : relativePath.getFileName().toString()));
         addString(root, "path", toStringValue(relativePath));
-        if (!relativePath.toString().isEmpty()) {
+        if (!isRoot) {
             addString(root, "parentPath", toStringValue(relativePath.getParent()));
         }
         addBasicAttributes(root, attr, path);
@@ -127,7 +129,7 @@ public class MCRPathXML {
     }
 
     private static void addString(Element parent, String itemName, String content) {
-        if (content == null || content.trim().length() == 0) {
+        if (content == null) {
             return;
         }
 
