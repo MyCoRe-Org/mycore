@@ -99,8 +99,7 @@ public class MCRIViewClientConfigurationBuilder {
      * @return
      */
     public static MCRIViewClientConfigurationBuilder metsAndPlugins(HttpServletRequest request) {
-        return mets(request).mixin(new MCRIViewClientLogoConfiguration())
-            .mixin(new MCRIViewClientMetadataConfiguration()).mixin(new MCRIViewClientPiwikConfiguration());
+        return mets(request).mixin(plugins(request).get());
     }
 
     /**
@@ -112,6 +111,17 @@ public class MCRIViewClientConfigurationBuilder {
     public static MCRIViewClientConfigurationBuilder pdf(HttpServletRequest request) {
         MCRIViewClientPDFConfiguration pdfConfig = new MCRIViewClientPDFConfiguration();
         return MCRIViewClientConfigurationBuilder.build(request).mixin(pdfConfig);
+    }
+
+    /**
+     * Builds just the plugins (metadata, piwik, logo).
+     * 
+     * @param request
+     * @return
+     */
+    public static MCRIViewClientConfigurationBuilder plugins(HttpServletRequest request) {
+        return MCRIViewClientConfigurationBuilder.build(request).mixin(new MCRIViewClientLogoConfiguration())
+            .mixin(new MCRIViewClientMetadataConfiguration()).mixin(new MCRIViewClientPiwikConfiguration());
     }
 
 }

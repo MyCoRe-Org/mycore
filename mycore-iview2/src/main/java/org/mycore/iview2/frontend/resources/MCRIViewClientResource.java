@@ -30,7 +30,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.iview2.frontend.MCRIviewACLProvider;
 import org.mycore.iview2.frontend.MCRIviewDefaultACLProvider;
 import org.mycore.iview2.frontend.configuration.MCRIViewClientConfiguration;
-import org.mycore.iview2.frontend.configuration.MCRIViewClientConfigurationBuilder;
+import org.mycore.iview2.frontend.configuration.MCRIViewClientConfigurationStrategy;
+import org.mycore.iview2.frontend.configuration.MCRIViewClientDefaultConfigurationStrategy;
 import org.mycore.services.i18n.MCRTranslation;
 import org.xml.sax.SAXException;
 
@@ -81,14 +82,15 @@ public class MCRIViewClientResource {
                 derivateID);
             throw new WebApplicationException(Response.status(Status.FORBIDDEN).entity(errorMessage).build());
         }
-        MCRIViewClientConfiguration config;
-        if (MCRConfiguration.instance().getString("MCR.Module-iview2.configuration", null) != null) {
-            config = MCRConfiguration.instance().getInstanceOf("MCR.Module-iview2.configuration");
-            config.setup(req);
+
+        MCRIViewClientConfigurationStrategy configurationStrategy;
+        if (MCRConfiguration.instance().getString("MCR.Module-iview2.configuration.strategy", null) != null) {
+            configurationStrategy = MCRConfiguration.instance().getInstanceOf(
+                "MCR.Module-iview2.configuration.strategy");
         } else {
-            config = MCRIViewClientConfigurationBuilder.metsAndPlugins(req).get();
+            configurationStrategy = new MCRIViewClientDefaultConfigurationStrategy();
         }
-        MCRJDOMContent source = new MCRJDOMContent(buildResponseDocument(config));
+        MCRJDOMContent source = new MCRJDOMContent(buildResponseDocument(configurationStrategy.get(req)));
         return MCRLayoutService.instance().getTransformedContent(req, resp, source);
     }
 
