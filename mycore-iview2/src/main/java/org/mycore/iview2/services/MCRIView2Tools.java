@@ -230,15 +230,19 @@ public class MCRIView2Tools {
             }
             MCRTiledPictureProps imageProps = MCRTiledPictureProps.getInstance(iviewFile);
             if (zoomLevel < 0 || zoomLevel > imageProps.getZoomlevel()) {
-                throw new IndexOutOfBoundsException("Zoom level " + zoomLevel + " is not in range 0 - " + imageProps.getZoomlevel());
+                throw new IndexOutOfBoundsException("Zoom level " + zoomLevel + " is not in range 0 - "
+                    + imageProps.getZoomlevel());
             }
             double zoomFactor = Math.pow(2, (imageProps.getZoomlevel() - zoomLevel));
             int maxX = (int) Math.ceil((imageProps.getWidth() / zoomFactor) / MCRImage.getTileSize());
             int maxY = (int) Math.ceil((imageProps.getHeight() / zoomFactor) / MCRImage.getTileSize());
-            LOGGER.debug(MessageFormat.format("Image size:{0}x{1}, tiles:{2}x{3}", imageProps.getWidth(), imageProps.getHeight(), maxX, maxY));
+            LOGGER.debug(MessageFormat.format("Image size:{0}x{1}, tiles:{2}x{3}", imageProps.getWidth(),
+                imageProps.getHeight(), maxX, maxY));
             int imageType = getImageType(iviewImage, reader, zoomLevel, 0, 0);
-            int xDim = ((maxX - 1) * MCRImage.getTileSize() + readTile(iviewImage, reader, zoomLevel, maxX - 1, 0).getWidth());
-            int yDim = ((maxY - 1) * MCRImage.getTileSize() + readTile(iviewImage, reader, zoomLevel, 0, maxY - 1).getHeight());
+            int xDim = ((maxX - 1) * MCRImage.getTileSize() + readTile(iviewImage, reader, zoomLevel, maxX - 1, 0)
+                .getWidth());
+            int yDim = ((maxY - 1) * MCRImage.getTileSize() + readTile(iviewImage, reader, zoomLevel, 0, maxY - 1)
+                .getHeight());
             BufferedImage resultImage = new BufferedImage(xDim, yDim, imageType);
             graphics = resultImage.getGraphics();
             for (int x = 0; x < maxX; x++) {
@@ -260,7 +264,8 @@ public class MCRIView2Tools {
         return ImageIO.getImageReadersByMIMEType("image/jpeg").next();
     }
 
-    public static BufferedImage readTile(ZipFile iviewImage, ImageReader imageReader, int zoomLevel, int x, int y) throws IOException {
+    public static BufferedImage readTile(ZipFile iviewImage, ImageReader imageReader, int zoomLevel, int x, int y)
+        throws IOException {
         String tileName = MessageFormat.format("{0}/{1}/{2}.jpg", zoomLevel, y, x);
         ZipEntry tile = iviewImage.getEntry(tileName);
         if (tile != null) {
@@ -278,7 +283,8 @@ public class MCRIView2Tools {
         }
     }
 
-    public static int getImageType(ZipFile iviewImage, ImageReader imageReader, int zoomLevel, int x, int y) throws IOException {
+    public static int getImageType(ZipFile iviewImage, ImageReader imageReader, int zoomLevel, int x, int y)
+        throws IOException {
         String tileName = MessageFormat.format("{0}/{1}/{2}.jpg", zoomLevel, y, x);
         ZipEntry tile = iviewImage.getEntry(tileName);
         if (tile != null) {
@@ -296,15 +302,22 @@ public class MCRIView2Tools {
     }
 
     /**
+     * short for {@link MCRIView2Tools}{@link #getIView2Property(String, String)} defaultProp = null
+     */
+    public static String getIView2Property(String propName) {
+        return getIView2Property(propName, null);
+    }
+
+    /**
      * short for
-     * <code>MCRConfiguration.instance().getString("MCR.Module-iview2." + propName, null);</code>
+     * <code>MCRConfiguration.instance().getString("MCR.Module-iview2." + propName, defaultProp);</code>
      * 
      * @param propName
      *            any suffix
      * @return null or property value
      */
-    public static String getIView2Property(String propName) {
-        return MCRConfiguration.instance().getString(CONFIG_PREFIX + propName, null);
+    public static String getIView2Property(String propName, String defaultProp) {
+        return MCRConfiguration.instance().getString(CONFIG_PREFIX + propName, defaultProp);
     }
 
     /**
@@ -322,8 +335,8 @@ public class MCRIView2Tools {
         if (!MCRIView2Tools.isFileSupported(file)) {
             return null;
         }
-        String params = MCRXMLFunctions.encodeURIPath(MessageFormat.format("jumpback=true&maximized=true&page={0}&derivate={1}", file.getAbsolutePath(),
-                file.getOwnerID()));
+        String params = MCRXMLFunctions.encodeURIPath(MessageFormat.format(
+            "jumpback=true&maximized=true&page={0}&derivate={1}", file.getAbsolutePath(), file.getOwnerID()));
         String url = MessageFormat.format("{0}receive/{1}?{2}", MCRServlet.getBaseURL(), file.getMCRObjectID(), params);
 
         return url;

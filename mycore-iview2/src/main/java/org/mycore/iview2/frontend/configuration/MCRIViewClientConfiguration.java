@@ -144,6 +144,14 @@ public class MCRIViewClientConfiguration {
         this.resources.put(ResourceType.script, url);
     }
 
+
+    /**
+     * Shorthand MCRIViewClientConfiguration#addLocalScript(String, true)
+     */
+    public void addLocalScript(final String file) {
+        this.addLocalScript(file, true);
+    }
+
     /**
      * Adds a local (based in modules/iview2/js/) javascript file which should be included
      * by the image viewer. This method takes care of the debug mode. You should always
@@ -152,12 +160,13 @@ public class MCRIViewClientConfiguration {
      * So the included file will look like "iview-client-mobile.min.js".
      * 
      * @param file to include
+     * @param only uses the minified version if true
      */
-    public void addLocalScript(final String file) {
+    public void addLocalScript(final String file, final boolean hasMinified) {
         String baseURL = MCRServlet.getBaseURL();
         StringBuffer scriptURL = new StringBuffer(baseURL);
         scriptURL.append("modules/iview2/js/");
-        if (!isDebugMode()) {
+        if (!isDebugMode() && hasMinified) {
             scriptURL.append(file);
         } else {
             scriptURL.append(file.substring(0, file.lastIndexOf(".")));
