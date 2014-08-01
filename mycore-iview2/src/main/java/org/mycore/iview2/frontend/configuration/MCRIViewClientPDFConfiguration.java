@@ -2,8 +2,6 @@ package org.mycore.iview2.frontend.configuration;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.mycore.iview2.services.MCRIView2Tools;
-
 public class MCRIViewClientPDFConfiguration extends MCRIViewClientBaseConfiguration {
 
     @Override
@@ -11,6 +9,7 @@ public class MCRIViewClientPDFConfiguration extends MCRIViewClientBaseConfigurat
         super.setup(request);
 
         // script
+        addLocalScript("lib/pdf.js");
         addLocalScript("iview-client-pdf.js");
 
         return this;
