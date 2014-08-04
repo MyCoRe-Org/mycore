@@ -51,12 +51,15 @@ public class MCRIViewClientConfiguration {
 
     private Map<String, Object> properties;
 
-    private boolean debugMode;
+    private static boolean DEBUG_MODE;
+
+    static {
+        DEBUG_MODE = Boolean.valueOf(MCRIView2Tools.getIView2Property("DeveloperMode", "false").toLowerCase());
+    }
 
     public MCRIViewClientConfiguration() {
         resources = LinkedListMultimap.create();
         properties = new HashMap<>();
-        debugMode = false;
     }
 
     /**
@@ -84,8 +87,6 @@ public class MCRIViewClientConfiguration {
      * @return itself
      */
     public MCRIViewClientConfiguration setup(HttpServletRequest request) {
-        String developerMode = MCRIView2Tools.getIView2Property("DeveloperMode");
-        debugMode = developerMode != null && Boolean.valueOf(developerMode.toLowerCase());
         return this;
     }
 
@@ -94,8 +95,8 @@ public class MCRIViewClientConfiguration {
      * 
      * @return
      */
-    public boolean isDebugMode() {
-        return debugMode;
+    public static boolean isDebugMode() {
+        return DEBUG_MODE;
     }
 
     /**
