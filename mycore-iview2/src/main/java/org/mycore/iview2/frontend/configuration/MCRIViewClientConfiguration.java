@@ -1,8 +1,6 @@
 package org.mycore.iview2.frontend.configuration;
 
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -123,16 +121,12 @@ public class MCRIViewClientConfiguration {
      * @return path to the file
      */
     public static String getFilePath(HttpServletRequest request) {
-        String requestURI = request.getRequestURI();
-        int i = requestURI.indexOf("_derivate_");
+        String pathInfo = request.getPathInfo();
+        int i = pathInfo.indexOf("_derivate_");
         if (i == -1) {
             return null;
         }
-        try {
-            return URLDecoder.decode(requestURI.substring(i + 18), "UTF-8");
-        } catch (UnsupportedEncodingException uee) {
-            throw new IllegalArgumentException(uee);
-        }
+        return pathInfo.substring(i + 18);
     }
 
     /**
@@ -143,7 +137,6 @@ public class MCRIViewClientConfiguration {
     public void addScript(final String url) {
         this.resources.put(ResourceType.script, url);
     }
-
 
     /**
      * Shorthand MCRIViewClientConfiguration#addLocalScript(String, true)
@@ -160,13 +153,13 @@ public class MCRIViewClientConfiguration {
      * So the included file will look like "iview-client-mobile.min.js".
      * 
      * @param file to include
-     * @param only uses the minified version if true
+     * @param hasMinified only uses the minified version if true
      */
     public void addLocalScript(final String file, final boolean hasMinified) {
         String baseURL = MCRServlet.getBaseURL();
         StringBuffer scriptURL = new StringBuffer(baseURL);
         scriptURL.append("modules/iview2/js/");
-        if (!isDebugMode() && hasMinified) {
+        if (isDebugMode() || !hasMinified) {
             scriptURL.append(file);
         } else {
             scriptURL.append(file.substring(0, file.lastIndexOf(".")));

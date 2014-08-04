@@ -21,6 +21,7 @@ public abstract class MCRIViewClientBaseConfiguration extends MCRIViewClientConf
 
     @Override
     public MCRIViewClientConfiguration setup(HttpServletRequest request) {
+        super.setup(request);
         // property
         setProperty("webApplicationBaseURL", MCRServlet.getBaseURL());
         setProperty("derivate", getDerivate(request));
@@ -40,8 +41,7 @@ public abstract class MCRIViewClientBaseConfiguration extends MCRIViewClientConf
             addLocalScript("iview-client-desktop.js");
             addLocalCSS("default.css");
         }
-
-        return super.setup(request);
+        return this;
     }
 
     protected boolean isMobile(HttpServletRequest req) {
