@@ -762,6 +762,10 @@ public final class MCRURIResolver implements URIResolver {
             String ownerID = st.nextToken();
             try {
                 String aPath = MCRXMLFunctions.decodeURIPath(path.substring(ownerID.length() + 1));
+                // TODO: make this more pretty
+                if(ownerID.endsWith(":")) {
+                    ownerID = ownerID.substring(0, ownerID.length() - 1);
+                }
                 LOGGER.debug("Get " + ownerID + " path: " + aPath);
                 return new JDOMSource(MCRPathXML.getDirectoryXML(MCRPath.getPath(ownerID, aPath)));
             } catch (IOException | URISyntaxException e) {
