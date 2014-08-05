@@ -50,7 +50,8 @@ public class MCRSolrProxyServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Attribute key to store Query parameters as <code>Map&lt;String, String[]&gt;</code> for SOLR.
+     * Attribute key to store Query parameters as
+     * <code>Map&lt;String, String[]&gt;</code> for SOLR.
      * 
      * This takes precedence over any {@link HttpServletRequest} parameter.
      */
@@ -59,12 +60,13 @@ public class MCRSolrProxyServlet extends MCRServlet {
     /**
      * Attribute key to store a {@link SolrQuery}.
      * 
-     * This takes precedence over {@link #MAP_KEY} or any {@link HttpServletRequest} parameter.
+     * This takes precedence over {@link #MAP_KEY} or any
+     * {@link HttpServletRequest} parameter.
      */
     public static final String QUERY_KEY = MCRSolrProxyServlet.class.getName() + ".query";
 
     private static int MAX_CONNECTIONS = MCRConfiguration.instance().getInt(
-        CONFIG_PREFIX + "SelectProxy.MaxConnections");
+            CONFIG_PREFIX + "SelectProxy.MaxConnections");
 
     private CloseableHttpClient httpClient;
 
@@ -85,7 +87,8 @@ public class MCRSolrProxyServlet extends MCRServlet {
             getQueryHandlerAndPrepareParameterMap(input, resp);
             return;
         }
-        String queryHandlerPath = request.getPathInfo();
+        String queryHandlerPath = job.getRequest().getParameter("requestHandler") == null ? request.getPathInfo() : "/"
+                + job.getRequest().getParameter("requestHandler");
         if (queryHandlerPath == null) {
             boolean refresh = "true".equals(getProperty(request, "refresh"));
             if (refresh) {
@@ -108,7 +111,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
     }
 
     private void getQueryHandlerAndPrepareParameterMap(Document input, HttpServletResponse resp) throws IOException,
-        TransformerException, SAXException {
+            TransformerException, SAXException {
         LinkedHashMap<String, String[]> parameters = new LinkedHashMap<>();
         List<Element> children = input.getRootElement().getChildren();
         for (Element param : children) {
@@ -120,13 +123,13 @@ public class MCRSolrProxyServlet extends MCRServlet {
         String queryHandlerPath = parameters.get("qt")[0];
         parameters.remove("qt");
         String requestURL = MessageFormat.format("{0}solr{1}?{2}", getServletBaseURL(), queryHandlerPath,
-            getQueryString(parameters));
+                getQueryString(parameters));
         LOGGER.info("Redirect XEditor input to: " + requestURL);
         resp.sendRedirect(resp.encodeRedirectURL(requestURL));
     }
 
     private void handleQuery(MCRSolrQueryHandler queryHandler, HttpServletRequest request, HttpServletResponse resp)
-        throws IOException, TransformerException, SAXException {
+            throws IOException, TransformerException, SAXException {
         ModifiableSolrParams solrParameter = getSolrQueryParameter(request);
         HttpGet solrHttpMethod = MCRSolrProxyServlet.getSolrHttpMethod(queryHandler, solrParameter);
         try {
@@ -156,7 +159,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
                         IOUtils.copy(solrResponseStream, servletOutput);
                     } else {
                         MCRStreamContent solrResponse = new MCRStreamContent(solrResponseStream, solrHttpMethod
-                            .getURI().toString(), "response");
+                                .getURI().toString(), "response");
                         MCRLayoutService.instance().doLayout(request, resp, solrResponse);
                     }
                 }
@@ -170,7 +173,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
     private void redirectToDefaultQueryHandler(HttpServletRequest request, HttpServletResponse resp) throws IOException {
         String selectProxyURL = MessageFormat.format("{0}solr{1}?{2}", MCRServlet.getServletBaseURL(), QUERY_PATH,
-            getSolrQueryParameter(request).toString());
+                getSolrQueryParameter(request).toString());
         resp.sendRedirect(resp.encodeRedirectURL(selectProxyURL));
     }
 
@@ -188,7 +191,8 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
     /**
      * Gets a HttpGet to make a request to the Solr-Server.
-     * @param queryHandler 
+     * 
+     * @param queryHandler
      * 
      * @param parameterMap
      *            Parameters to use with the Request
@@ -196,7 +200,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
      */
     private static HttpGet getSolrHttpMethod(MCRSolrQueryHandler queryHandler, ModifiableSolrParams params) {
         HttpGet httpGet = new HttpGet(MessageFormat.format("{0}{1}?{2}", SERVER_URL, queryHandler.getPath(),
-            params.toString()));
+                params.toString()));
         return httpGet;
     }
 
@@ -209,7 +213,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
         Map<String, String[]> solrParameter;
         solrParameter = (Map<String, String[]>) request.getAttribute(MAP_KEY);
         if (solrParameter == null) {
-            //good old way
+            // good old way
             solrParameter = request.getParameterMap();
         }
         return getQueryString(solrParameter);
@@ -238,7 +242,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
         httpClientConnectionManager = MCRSolrProxyUtils.getConnectionManager(MAX_CONNECTIONS);
         httpClient = MCRSolrProxyUtils.getHttpClient(httpClientConnectionManager, MAX_CONNECTIONS);
 
-        //start thread to monitor stalled connections
+        // start thread to monitor stalled connections
         idleConnectionMonitorThread = new MCRIdleConnectionMonitorThread(httpClientConnectionManager);
         idleConnectionMonitorThread.start();
     }
@@ -256,7 +260,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
     }
 
     private static ModifiableSolrParams getQueryString(Map<String, String[]> parameters) {
-        //to maintain order
+        // to maintain order
         LinkedHashMap<String, String[]> copy = new LinkedHashMap<String, String[]>(parameters);
         ModifiableSolrParams solrParams = new ModifiableSolrParams(copy);
         if (!parameters.containsKey("version") && !parameters.containsKey("wt")) {

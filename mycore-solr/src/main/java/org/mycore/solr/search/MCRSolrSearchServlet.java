@@ -19,23 +19,27 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.solr.legacy.MCRConditionTransformer;
 import org.mycore.solr.proxy.MCRSolrProxyServlet;
 
 /**
- * Used to map a formular-post to a solr request. </br></br>
- * <b>Parameters</b>
+ * Used to map a formular-post to a solr request. </br></br> <b>Parameters</b>
  * <dl>
- *  <dt><strong>Solr reserved parameters</strong></dt>
- *      <dd>They will directly forwarded to the server.</dd>
- *  <dt><strong>Type parameters</strong></dt>
- *      <dd>They are used to join other documents in the search. They start with "solr.type.".</dd>
- *  <dt><strong>Sort parameters</strong></dt>
- *      <dd>They are used to sort the results in the right order. They start with "sort."</dd>
- *  <dt><strong>Query parameters</strong></dt>
- *      <dd>They are used to build the query for solr. All parameters wich arent reserved, type or sort parameters will be stored here.</dd>
+ * <dt><strong>Solr reserved parameters</strong></dt>
+ * <dd>They will directly forwarded to the server.</dd>
+ * <dt><strong>Type parameters</strong></dt>
+ * <dd>They are used to join other documents in the search. They start with
+ * "solr.type.".</dd>
+ * <dt><strong>Sort parameters</strong></dt>
+ * <dd>They are used to sort the results in the right order. They start with
+ * "sort."</dd>
+ * <dt><strong>Query parameters</strong></dt>
+ * <dd>They are used to build the query for solr. All parameters wich arent
+ * reserved, type or sort parameters will be stored here.</dd>
  * </dl>
  * 
  * @author mcrshofm
@@ -60,25 +64,32 @@ public class MCRSolrSearchServlet extends MCRServlet {
 
     private static final String PHRASE_QUERY_PARAM = "solr.phrase";
 
-    /** Parameters that can be used within a select request to solr*/
+    /** Parameters that can be used within a select request to solr */
     static final List<String> RESERVED_PARAMETER_KEYS;
 
     static {
-        String[] parameter = new String[] { "q", "sort", "start", "rows", "pageDoc", "pageScore", "fq", "cache", "fl", "glob", "debug", "explainOther",
-                "defType", "timeAllowed", "omitHeader", "sortOrder", "sortBy", "wt", "qf", "q.alt", "mm", "pf", "ps", "qs", "tie", "bq", "bf", "lang", "facet",
-                "facet.field", "facet.sort", "facet.method", PHRASE_QUERY_PARAM };
+        String[] parameter = new String[] { "q", "sort", "start", "rows", "pageDoc", "pageScore", "fq", "cache", "fl",
+                "glob", "debug", "explainOther", "defType", "timeAllowed", "omitHeader", "sortOrder", "sortBy", "wt",
+                "qf", "q.alt", "mm", "pf", "ps", "qs", "tie", "bq", "bf", "lang", "facet", "facet.field", "facet.sort",
+                "facet.method", PHRASE_QUERY_PARAM };
+
         RESERVED_PARAMETER_KEYS = Collections.unmodifiableList(Arrays.asList(parameter));
     }
 
     /**
-     * Adds a field  with all values to a {@link StringBuilder}
-     * A empty field value will be skipped.
-     * @param query represents a solr query
-     * @param fieldValues containing all the values for the field
-     * @param fieldName the name of the field
-     * @throws ServletException 
+     * Adds a field with all values to a {@link StringBuilder} A empty field
+     * value will be skipped.
+     * 
+     * @param query
+     *            represents a solr query
+     * @param fieldValues
+     *            containing all the values for the field
+     * @param fieldName
+     *            the name of the field
+     * @throws ServletException
      */
-    private void addFieldToQuery(StringBuilder query, String[] fieldValues, String fieldName, QueryType queryType) throws ServletException {
+    private void addFieldToQuery(StringBuilder query, String[] fieldValues, String fieldName, QueryType queryType)
+            throws ServletException {
         for (String fieldValue : fieldValues) {
             if (fieldValue.length() == 0) {
                 continue;
@@ -98,14 +109,19 @@ public class MCRSolrSearchServlet extends MCRServlet {
     }
 
     /**
-     * @param queryParameters all parameter where <code>getParameterGroup.equals(QueryParameter)</code> 
-     * @param typeParameters all parameter where <code>getParameterGroup.equals(TypeParameter)</code>
-     * @param phraseQuery 
+     * @param queryParameters
+     *            all parameter where
+     *            <code>getParameterGroup.equals(QueryParameter)</code>
+     * @param typeParameters
+     *            all parameter where
+     *            <code>getParameterGroup.equals(TypeParameter)</code>
+     * @param phraseQuery
      * @return a map wich can be forwarded to {@link MCRSolrProxyServlet}
-     * @throws ServletException 
+     * @throws ServletException
      */
-    protected Map<String, String[]> buildSelectParameterMap(Map<String, String[]> queryParameters, Map<String, String[]> typeParameters,
-            Map<String, String[]> sortParameters, Set<String> phraseQuery) throws ServletException {
+    protected Map<String, String[]> buildSelectParameterMap(Map<String, String[]> queryParameters,
+            Map<String, String[]> typeParameters, Map<String, String[]> sortParameters, Set<String> phraseQuery)
+            throws ServletException {
         HashMap<String, String[]> queryParameterMap = new HashMap<String, String[]>();
 
         HashMap<String, String> fieldTypeMap = createFieldTypeMap(typeParameters);
@@ -182,7 +198,9 @@ public class MCRSolrSearchServlet extends MCRServlet {
             sortBuilder.append(" ");
             if (order == null) {
                 order = "asc";
-                LOGGER.warn(MessageFormat.format("No sort order found for field with number ''{0}'' use default value : ''{1}''", position, order));
+                LOGGER.warn(MessageFormat.format(
+                        "No sort order found for field with number ''{0}'' use default value : ''{1}''", position,
+                        order));
             }
             sortBuilder.append(order);
         }
@@ -194,8 +212,10 @@ public class MCRSolrSearchServlet extends MCRServlet {
     }
 
     /**
-     * This method is used to create a map wich contains all fields as key and the type of the field as value.
-     * @param typeParameters 
+     * This method is used to create a map wich contains all fields as key and
+     * the type of the field as value.
+     * 
+     * @param typeParameters
      * @return
      */
     private HashMap<String, String> createFieldTypeMap(Map<String, String[]> typeParameters) {
@@ -225,7 +245,8 @@ public class MCRSolrSearchServlet extends MCRServlet {
         HttpServletResponse response = job.getResponse();
 
         extractParameterList(request.getParameterMap(), queryParameters, solrParameters, typeParameters, sortParameters);
-        Map<String, String[]> buildedSolrParameters = buildSelectParameterMap(queryParameters, typeParameters, sortParameters, phraseQuery);
+        Map<String, String[]> buildedSolrParameters = buildSelectParameterMap(queryParameters, typeParameters,
+                sortParameters, phraseQuery);
         buildedSolrParameters.putAll(solrParameters);
 
         request.setAttribute(MCRSolrProxyServlet.MAP_KEY, buildedSolrParameters);
@@ -240,14 +261,21 @@ public class MCRSolrSearchServlet extends MCRServlet {
 
     /**
      * Splits the parameters into three groups.
-     * @param requestParameter the map of parameters to split.
-     * @param queryParameter all querys will be stored here.
-     * @param solrParameter all solr-parameters will be stored here.
-     * @param typeParameter all type-parameters will be stored here.
-     * @param sortParameter all sort-parameters will be stored here.
+     * 
+     * @param requestParameter
+     *            the map of parameters to split.
+     * @param queryParameter
+     *            all querys will be stored here.
+     * @param solrParameter
+     *            all solr-parameters will be stored here.
+     * @param typeParameter
+     *            all type-parameters will be stored here.
+     * @param sortParameter
+     *            all sort-parameters will be stored here.
      */
-    protected void extractParameterList(Map<String, String[]> requestParameter, Map<String, String[]> queryParameter, Map<String, String[]> solrParameter,
-            Map<String, String[]> typeParameter, Map<String, String[]> sortParameter) {
+    protected void extractParameterList(Map<String, String[]> requestParameter, Map<String, String[]> queryParameter,
+            Map<String, String[]> solrParameter, Map<String, String[]> typeParameter,
+            Map<String, String[]> sortParameter) {
         for (Entry<String, String[]> currentEntry : requestParameter.entrySet()) {
             String parameterName = currentEntry.getKey();
             if (PHRASE_QUERY_PARAM.equals(parameterName)) {
@@ -276,7 +304,8 @@ public class MCRSolrSearchServlet extends MCRServlet {
     }
 
     /**
-     * @param filterQueryMap a map wich contains all {@link StringBuilder}
+     * @param filterQueryMap
+     *            a map wich contains all {@link StringBuilder}
      * @param fieldType
      * @return a {@link StringBuilder} for the specific fieldType
      */
@@ -290,37 +319,54 @@ public class MCRSolrSearchServlet extends MCRServlet {
 
     /**
      * Returns the {@link SolrParameterGroup} for a specific parameter name.
-     * @param parameterName the name of the parameter
+     * 
+     * @param parameterName
+     *            the name of the parameter
      * @return the parameter group enum
      */
     private SolrParameterGroup getParameterType(String parameterName) {
         if (isTypeParameter(parameterName)) {
-            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName, SolrParameterGroup.TypeParameter.toString()));
+            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName,
+                    SolrParameterGroup.TypeParameter.toString()));
             return SolrParameterGroup.TypeParameter;
         } else if (isSolrParameter(parameterName)) {
-            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName, SolrParameterGroup.SolrParameter.toString()));
+            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName,
+                    SolrParameterGroup.SolrParameter.toString()));
             return SolrParameterGroup.SolrParameter;
         } else if (isSortParameter(parameterName)) {
-            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName, SolrParameterGroup.SolrParameter.toString()));
+            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName,
+                    SolrParameterGroup.SolrParameter.toString()));
             return SolrParameterGroup.SortParameter;
         } else {
-            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName, SolrParameterGroup.QueryParameter.toString()));
+            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName,
+                    SolrParameterGroup.QueryParameter.toString()));
             return SolrParameterGroup.QueryParameter;
         }
     }
 
     /**
      * Detects if a parameter is a solr parameter
-     * @param parameterName the name of the parameter
+     * 
+     * @param parameterName
+     *            the name of the parameter
      * @return true if the parameter is a solr parameter
      */
     private boolean isSolrParameter(String parameterName) {
-        return parameterName.startsWith("XSL.") || RESERVED_PARAMETER_KEYS.contains(parameterName);
+        boolean reservedCostumKey;
+        try {
+            reservedCostumKey = MCRConfiguration.instance().getStrings("MCR.Module-solr.ReservedParameterKeys")
+                    .contains(parameterName);
+        } catch (MCRConfigurationException e) {
+            reservedCostumKey = false;
+        }
+        return parameterName.startsWith("XSL.") || RESERVED_PARAMETER_KEYS.contains(parameterName) || reservedCostumKey;
     }
 
     /**
      * Detects if a parameter is a sort parameter
-     * @param parameterName the name of the parameter
+     * 
+     * @param parameterName
+     *            the name of the parameter
      * @return true if the parameter is a sort parameter
      */
     private boolean isSortParameter(String parameterName) {
@@ -329,7 +375,9 @@ public class MCRSolrSearchServlet extends MCRServlet {
 
     /**
      * Detects if a parameter is a Type parameter
-     * @param parameterName the name of the parameter
+     * 
+     * @param parameterName
+     *            the name of the parameter
      * @return true if the parameter is a type parameter
      */
     private boolean isTypeParameter(String parameterName) {
