@@ -86,6 +86,7 @@
               <xsl:call-template name="iview2.getImageElement">
                 <xsl:with-param select="$derivate" name="derivate" />
                 <xsl:with-param select="$pageToDisplay" name="imagePath" />
+                <xsl:with-param select="'resultListPreviewImage'" name="class" />
               </xsl:call-template>
             </a>
           </xsl:when>
