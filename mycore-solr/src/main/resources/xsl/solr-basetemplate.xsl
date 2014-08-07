@@ -63,10 +63,6 @@
     <field name="maindoc">
       <xsl:value-of select="derivate/internals/internal/@maindoc" />
     </field>
-    <field name="component">
-      <xsl:value-of
-        select="document(concat('mcrobject:',derivate/linkmetas/linkmeta/@xlink:href))/mycoreobject/metadata/def.component/component/@categid" />
-    </field>
   </xsl:template>
 
   <xsl:template match="mycoreobject|mycorederivate" mode="baseFields">
