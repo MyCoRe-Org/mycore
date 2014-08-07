@@ -143,7 +143,7 @@
     <xsl:param name="imagePath" />
     <xsl:param name="style" select="''" />
     <xsl:param name="class" select="''" />
-    <img src="{concat($WebApplicationBaseURL,'servlets/MCRThumbnailServlet/',$derivate,$imagePath)}" style="{$style}" class="{$class}" />
+    <img src="{concat($WebApplicationBaseURL,'servlets/MCRTileCombineServlet/THUMBNAIL/',$derivate,$imagePath)}" style="{$style}" class="{$class}" />
   </xsl:template>
 
 </xsl:stylesheet>
