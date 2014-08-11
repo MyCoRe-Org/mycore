@@ -35,16 +35,16 @@ public abstract class MCRJerseyResourceTest extends JerseyTest {
         return builder;
     }
 
-    protected Map<String, String> getInitParams() {
+    public Map<String, String> getInitParams() {
         return new HashMap<String, String>();
     }
 
-    protected String getContextPath() {
+    public String getContextPath() {
         String contextPath = "context";
         return contextPath;
     }
 
-    protected abstract String[] getPackageName();
+    public abstract String[] getPackageName();
 
     public static class GrizzlyWebTestContainerApacheClient implements TestContainer {
         private TestContainer container;
