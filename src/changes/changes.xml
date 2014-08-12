@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrjkupf" type="update">
+        mycore-user2: improve login output
+      </action>
       <action dev="mcrkrebs" type="fix">
         mycore-mods: added missing title translated
       </action>

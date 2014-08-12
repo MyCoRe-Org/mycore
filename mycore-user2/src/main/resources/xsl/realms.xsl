@@ -74,7 +74,7 @@
         <xsl:with-param name="nodes" select="label" />
       </xsl:call-template>
     </xsl:variable>
-    <xsl:value-of select="label[lang($lang)]" />
+    <xsl:copy-of select="label[lang($lang)]" />
   </xsl:template>
 
   <xsl:template match="realm">
