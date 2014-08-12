@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!-- XSL to display login options as defined in realms.xml -->
 
@@ -28,7 +28,8 @@
             </xsl:choose>
             <xsl:value-of select="'&lt;/strong&gt;'" />
           </xsl:variable>
-          <xsl:value-of select="i18n:translate('component.user2.login.currentAccount', $currentAccount)" disable-output-escaping="yes" />
+          <xsl:value-of select="i18n:translate('component.user2.login.currentAccount', $currentAccount)"
+            disable-output-escaping="yes" />
         </p>
       </div>
       <div class="section" id="sectionlast">
@@ -38,14 +39,20 @@
           </strong>
           <br />
           <xsl:if test="@guest != 'true'">
-            <li>
-              <a href="{$ServletsBaseURL}logout">
-                <xsl:value-of select="i18n:translate('component.user2.login.logout')" />
-              </a>
-              <div>
-                <xsl:value-of select="i18n:translate('component.user2.login.openAccess')" />
-              </div>
-            </li>
+            <dl class="realms">
+              <dd>
+                <ul>
+                  <li>
+                    <a href="{$ServletsBaseURL}logout">
+                      <xsl:value-of select="i18n:translate('component.user2.login.logout')" />
+                    </a>
+                    <div>
+                      <xsl:value-of select="i18n:translate('component.user2.login.openAccess')" />
+                    </div>
+                  </li>
+                </ul>
+              </dd>
+            </dl>
           </xsl:if>
           <dl class="realms">
             <xsl:apply-templates select="realm" />
