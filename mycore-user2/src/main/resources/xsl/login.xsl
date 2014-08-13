@@ -83,8 +83,7 @@
       <div class="form-actions">
         <xsl:choose>
           <xsl:when test="$direction = 'rtl' ">
-            <button class="btn btn-default" type="button" onClick="self.location.href='{returnURL}'"
-              tabindex="999">
+            <button class="btn btn-default" type="button" onClick="self.location.href='{returnURL}'" tabindex="999">
               <xsl:value-of select="i18n:translate('component.user2.button.cancel')" />
             </button>
             <xsl:value-of select="' '" />
@@ -97,8 +96,7 @@
               <xsl:value-of select="i18n:translate('component.user2.button.login')" />
             </button>
             <xsl:value-of select="' '" />
-            <button class="btn btn-default" type="button" onClick="self.location.href='{returnURL}'"
-              tabindex="999">
+            <button class="btn btn-default" type="button" onClick="self.location.href='{returnURL}'" tabindex="999">
               <xsl:value-of select="i18n:translate('component.user2.button.cancel')" />
             </button>
           </xsl:otherwise>
@@ -109,12 +107,20 @@
 
   <xsl:template match="login" mode="userStatus">
     <xsl:if test="@loginFailed='true'">
-      <p class="alert alert-error">
+      <div class="alert alert-danger" role="alert">
         <strong>
           <xsl:value-of select="i18n:translate('component.user2.login.failed')" />
         </strong>
-        <xsl:value-of select="concat(' ',i18n:translate('component.user2.login.invalidUserPwd'))" />
-      </p>
+        <xsl:choose>
+          <xsl:when test="errorMessage">
+            <br/>
+            <xsl:value-of select="i18n:translate('component.user2.login.failed.reason', errorMessage)" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat(' ',i18n:translate('component.user2.login.invalidUserPwd'))" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </div>
     </xsl:if>
   </xsl:template>
   <xsl:template match="login" mode="controlGroupClass">
