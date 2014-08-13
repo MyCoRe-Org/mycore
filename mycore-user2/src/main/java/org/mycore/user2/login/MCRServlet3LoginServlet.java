@@ -83,23 +83,28 @@ public class MCRServlet3LoginServlet extends MCRContainerLoginServlet {
 
     @Override
     protected void render(MCRServletJob job, Exception ex) throws Exception {
-        if (ex != null) {
-            throw ex;
-        }
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
+        if (ex != null) {
+            if (ex instanceof ServletException) {
+                //Login failed
+                presentLoginForm(req, res, (ServletException) ex);
+            } else {
+                throw ex;
+            }
+        }
         if (!res.isCommitted()) {
             String uid = getProperty(req, "uid");
             if (uid == null) {
-                presentLoginForm(req, res);
+                presentLoginForm(req, res, null);
             }
             if (!job.getResponse().isCommitted())
                 super.render(job, ex);
         }
     }
 
-    private void presentLoginForm(HttpServletRequest req, HttpServletResponse res) throws IOException,
-        TransformerException, SAXException {
+    private void presentLoginForm(HttpServletRequest req, HttpServletResponse res, ServletException ex)
+        throws IOException, TransformerException, SAXException {
         Element root = new Element("login");
         MCRLoginServlet.addCurrentUserInfo(root);
         root.addContent(new org.jdom2.Element("returnURL").addContent(MCRLoginServlet.getReturnURL(req)));
@@ -107,6 +112,12 @@ public class MCRServlet3LoginServlet extends MCRContainerLoginServlet {
         String realm = getProperty(req, "realm");
         if (realm != null) {
             req.setAttribute("XSL.Realm", realm);
+        }
+        if (ex != null) {
+            //Login failed
+            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            root.setAttribute("loginFailed", "true");
+            root.addContent(new Element("errorMessage").setText(ex.getMessage()));
         }
         getLayoutService().doLayout(req, res, new MCRJDOMContent(root));
     }
