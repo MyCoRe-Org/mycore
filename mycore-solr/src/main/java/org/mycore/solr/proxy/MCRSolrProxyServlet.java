@@ -87,8 +87,13 @@ public class MCRSolrProxyServlet extends MCRServlet {
             getQueryHandlerAndPrepareParameterMap(input, resp);
             return;
         }
-        String queryHandlerPath = job.getRequest().getParameter("requestHandler") == null ? request.getPathInfo() : "/"
-                + job.getRequest().getParameter("requestHandler");
+        String queryHandlerPath = null;
+        String requetsHandler = job.getRequest().getParameter("requestHandler");
+        if (requetsHandler == null || requetsHandler.equals("")) {
+            queryHandlerPath = request.getPathInfo();
+        } else {
+            queryHandlerPath = "/" + requetsHandler;
+        }
         if (queryHandlerPath == null || queryHandlerPath.length() <= 1) {
             boolean refresh = "true".equals(getProperty(request, "refresh"));
             if (refresh) {
