@@ -94,7 +94,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
         } else {
             queryHandlerPath = "/" + requetsHandler;
         }
-        if (queryHandlerPath == null || queryHandlerPath.length() <= 1) {
+        if (queryHandlerPath == null) {
             boolean refresh = "true".equals(getProperty(request, "refresh"));
             if (refresh) {
                 updateQueryHandlerMap(resp);
