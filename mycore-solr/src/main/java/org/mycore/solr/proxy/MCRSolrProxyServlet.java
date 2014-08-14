@@ -66,7 +66,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
     public static final String QUERY_KEY = MCRSolrProxyServlet.class.getName() + ".query";
 
     private static int MAX_CONNECTIONS = MCRConfiguration.instance().getInt(
-            CONFIG_PREFIX + "SelectProxy.MaxConnections");
+        CONFIG_PREFIX + "SelectProxy.MaxConnections");
 
     private CloseableHttpClient httpClient;
 
@@ -116,7 +116,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
     }
 
     private void getQueryHandlerAndPrepareParameterMap(Document input, HttpServletResponse resp) throws IOException,
-            TransformerException, SAXException {
+        TransformerException, SAXException {
         LinkedHashMap<String, String[]> parameters = new LinkedHashMap<>();
         List<Element> children = input.getRootElement().getChildren();
         for (Element param : children) {
@@ -128,13 +128,13 @@ public class MCRSolrProxyServlet extends MCRServlet {
         String queryHandlerPath = parameters.get("qt")[0];
         parameters.remove("qt");
         String requestURL = MessageFormat.format("{0}solr{1}?{2}", getServletBaseURL(), queryHandlerPath,
-                getQueryString(parameters));
+            getQueryString(parameters));
         LOGGER.info("Redirect XEditor input to: " + requestURL);
         resp.sendRedirect(resp.encodeRedirectURL(requestURL));
     }
 
     private void handleQuery(MCRSolrQueryHandler queryHandler, HttpServletRequest request, HttpServletResponse resp)
-            throws IOException, TransformerException, SAXException {
+        throws IOException, TransformerException, SAXException {
         ModifiableSolrParams solrParameter = getSolrQueryParameter(request);
         HttpGet solrHttpMethod = MCRSolrProxyServlet.getSolrHttpMethod(queryHandler, solrParameter);
         try {
@@ -164,7 +164,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
                         IOUtils.copy(solrResponseStream, servletOutput);
                     } else {
                         MCRStreamContent solrResponse = new MCRStreamContent(solrResponseStream, solrHttpMethod
-                                .getURI().toString(), "response");
+                            .getURI().toString(), "response");
                         MCRLayoutService.instance().doLayout(request, resp, solrResponse);
                     }
                 }
@@ -178,7 +178,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
     private void redirectToDefaultQueryHandler(HttpServletRequest request, HttpServletResponse resp) throws IOException {
         String selectProxyURL = MessageFormat.format("{0}solr{1}?{2}", MCRServlet.getServletBaseURL(), QUERY_PATH,
-                getSolrQueryParameter(request).toString());
+            getSolrQueryParameter(request).toString());
         resp.sendRedirect(resp.encodeRedirectURL(selectProxyURL));
     }
 
@@ -205,7 +205,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
      */
     private static HttpGet getSolrHttpMethod(MCRSolrQueryHandler queryHandler, ModifiableSolrParams params) {
         HttpGet httpGet = new HttpGet(MessageFormat.format("{0}{1}?{2}", SERVER_URL, queryHandler.getPath(),
-                params.toString()));
+            params.toString()));
         return httpGet;
     }
 
