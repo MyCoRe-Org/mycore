@@ -113,7 +113,7 @@ public class MCRRuntimeComponentDetector {
         
         if(artifactId == null){
             LOGGER.warn("Could not found " + ATT_MCR_ARTIFACT_ID + " in Manifest, add this for future compability.");
-            LOGGER.warn("Try reading from pom.properties instead.");
+            LOGGER.info("Try reading from pom.properties instead.");
             
             if (!mainAttributes.containsKey(ATT_POM)) {
                 return null;
