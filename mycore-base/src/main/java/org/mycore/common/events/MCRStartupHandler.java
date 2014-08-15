@@ -88,7 +88,6 @@ public class MCRStartupHandler {
         }
 
         List<AutoExecutable> autoExecutables = new ArrayList<AutoExecutable>(startupClasses.size());
-        Collections.sort(autoExecutables, new AutoExecutableComparator());
 
         for (String className : startupClasses) {
             try {
@@ -98,6 +97,8 @@ public class MCRStartupHandler {
                 LOGGER.error("Error while starting startup class: " + className, e);
             }
         }
+        
+        Collections.sort(autoExecutables, new AutoExecutableComparator());
         for (AutoExecutable autoExecutable : autoExecutables) {
             LOGGER.info(autoExecutable.getPriority() + ": Starting " + autoExecutable.getName());
             try {
