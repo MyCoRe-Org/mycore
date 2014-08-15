@@ -3,6 +3,8 @@
   <!-- Transforms output of "classification:editorComplete:*" URIs to xeditor compatible format -->
   <xsl:param name="CurrentLang" />
   <xsl:param name="DefaultLang" />
+  <xsl:param name="MaxLengthVisible" />
+
   <xsl:variable name="editor.list.indent" select="'&#160;&#160;&#160;'" />
   <xsl:template match="items">
     <select>
@@ -12,6 +14,7 @@
   </xsl:template>
   <xsl:template match="item">
     <xsl:param name="indent" select="''" />
+
     <xsl:variable name="toolTip">
       <xsl:apply-templates select="." mode="toolTip" />
     </xsl:variable>
@@ -43,8 +46,8 @@
     </xsl:variable>
 
     <xsl:choose>
-      <xsl:when test="string-length($onDisplay) &gt; 75 ">
-        <xsl:value-of select="concat(substring($onDisplay, 0, 75), ' [...]')" />
+      <xsl:when test="$MaxLengthVisible and (string-length($onDisplay &gt; $MaxLengthVisible)) ">
+        <xsl:value-of select="concat(substring($onDisplay, 0, $MaxLengthVisible), ' [...]')" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$onDisplay" />
