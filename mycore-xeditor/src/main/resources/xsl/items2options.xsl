@@ -46,7 +46,7 @@
     </xsl:variable>
 
     <xsl:choose>
-      <xsl:when test="$MaxLengthVisible and (string-length($onDisplay &gt; $MaxLengthVisible)) ">
+      <xsl:when test="$MaxLengthVisible and (string-length($onDisplay) &gt; $MaxLengthVisible) ">
         <xsl:value-of select="concat(substring($onDisplay, 0, $MaxLengthVisible), ' [...]')" />
       </xsl:when>
       <xsl:otherwise>
