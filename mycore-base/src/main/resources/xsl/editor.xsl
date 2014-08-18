@@ -1029,6 +1029,7 @@
       <xsl:with-param name="vars"    select="key('vars',$var)" />
       <xsl:with-param name="default" select="@default" />
     </xsl:apply-templates>
+    <xsl:copy-of select="option" />
   </select>
 </xsl:template>
 
