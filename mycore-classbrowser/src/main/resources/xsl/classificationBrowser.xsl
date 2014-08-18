@@ -1,25 +1,27 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<!-- 
+<!--
   XSL to include a classification browser into any MyCoReWebPage.
 
   Usage:
-    <classificationbrowser 
-      classification="{ClassificationID}" 
-      category="{CategoryID to start with, optional}" 
+    <classificationbrowser
+      classification="{ClassificationID}"
+      category="{CategoryID to start with, optional}"
       sortby="{id|label, optional sort order of categories}"
       objecttype="{MCRObject type, optional}"
       field="{search field for category queries in this classification}"
       restriction="{additional query expression}"
+      filterCategory="{true|false, if true join returnId to id, ignored with lucene, default true}"
       parameters="{additional MCRSearchServlet parameters}"
       addParameter="{any additional request parameters to forward to classification browser servlet}"
       countresults="{true|false, default false, whether to execute queries to count results}"
       countlinks="{true|false, default false, whether to count links to each category}"
       emptyleaves="{true|false, when false and counting activated, skip empty leaves}"
-      adduri="{true|false, whether to include URI from classification data}" 
-      adddescription="{true|false, whether to include description from category label}" 
-      class="{CSS class, default is 'classificationBrowser'}" 
-      style="{XSL.Style to use, default is classificationBrowserData.xsl}" 
+      adduri="{true|false, whether to include URI from classification data}"
+      adddescription="{true|false, whether to include description from category label}"
+      addclassid="{true|false, adds classification ID to category, default false}"
+      class="{CSS class, default is 'classificationBrowser'}"
+      style="{XSL.Style to use, default is classificationBrowserData.xsl}"
     />
  -->
 
@@ -31,7 +33,7 @@
   <xsl:param name="HttpSession" />
   <xsl:param name="MCR.Ajax.LoadingImage" />
   <xsl:param name="MCR.classbrowser.Servlet" select="'ClassificationBrowser'"/>
-  
+
   <xsl:template match="classificationbrowser">
     <xsl:call-template name="mcrClassificationBrowser">
       <xsl:with-param name="class" select="@class"/>
@@ -83,20 +85,20 @@
           <xsl:otherwise>classificationBrowser</xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
-      
+
       <!-- jQuery -->
       <script type="text/javascript">
         /* &lt;![CDATA[ */
-        
+
         var openCategs=[];
-        
+
         function update(elementID,categID, f) {
           <xsl:if test="string-length($MCR.Ajax.LoadingImage) &gt; 0">
             var loaderImage = '&lt;img class="loading" src="<xsl:value-of select="concat($WebApplicationBaseURL,$MCR.Ajax.LoadingImage)"/>" /&gt;';
             jQuery(document.getElementById(elementID)).html(loaderImage);
           </xsl:if>
-          
-          var requestParam = { 
+
+          var requestParam = {
             classification : '<xsl:value-of select="$classification" />',
             category       : categID,
             sortby         : '<xsl:value-of select="$sortby" />',
@@ -119,14 +121,14 @@
               <xsl:value-of select="concat('?',$addParameter)"/>
             </xsl:if>
           </xsl:variable>
-          jQuery(document.getElementById(elementID)).load('<xsl:value-of select="concat($ServletsBaseURL,$MCR.classbrowser.Servlet,$HttpSession,$addParam)" />', requestParam, f );      
+          jQuery(document.getElementById(elementID)).load('<xsl:value-of select="concat($ServletsBaseURL,$MCR.classbrowser.Servlet,$HttpSession,$addParam)" />', requestParam, f );
         }
-       
+
         function toogle(categID, closedImageURL, openImageURL) {
           var childrenID = 'cbChildren_<xsl:value-of select="$classification" />_' + categID;
           var button = document.getElementById( 'cbButton_<xsl:value-of select="$classification" />_' + categID );
           var children = document.getElementById( childrenID );
-          
+
           if( button.value == '-' ) {
             button.value = '+';
             if (button.type == 'image' &amp;&amp; closedImageURL.length > 0){
@@ -149,7 +151,7 @@
           }
           window.location.href=addState(window.location.href);
         }
-        
+
         function toggleClass(categID, closedClass, openClass){
           var childrenID = 'cbChildren_<xsl:value-of select="$classification" />_' + categID;
           var button = document.getElementById( 'cbButton_<xsl:value-of select="$classification" />_' + categID );
@@ -171,7 +173,7 @@
             jButton.data("open", true);
           }
         }
-        
+
         function addState(url){
           var state=(openCategs.length>0)? "#open"+escape('["'+openCategs.join('","')+'"]') :"#open[]";
           var pos=url.indexOf("#open");
@@ -179,15 +181,15 @@
             return url.substring(0,pos)+state;
           } else {
             return url+=state;
-          }          
+          }
         }
-        
+
         function startSearch(baseURL, query, mask, parameters){
           mask=escape(addState(unescape(mask)));
           window.location.href=baseURL+((baseURL.indexOf("?") == -1)?"?query=":"")+query+"&amp;mask="+mask+"&amp;"+parameters;
           return false;
         }
-        
+
         function loadState() {
           var pos=window.location.href.indexOf("#open");
           if (pos>0){
@@ -197,10 +199,10 @@
             });
           }
         }
-  
+
         /* ]]&gt; */
       </script>
-      
+
       <xsl:variable name="id" select="generate-id(.)" />
       <div id="{$id}" class="cbVisible">
         <script type="text/javascript">
