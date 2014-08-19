@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:mets="http://www.loc.gov/METS/">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:mods="http://www.loc.gov/mods/v3"
+  xmlns:mets="http://www.loc.gov/METS/">
 
- <xsl:output method="html" encoding="UTF-8" indent="yes" />
+  <xsl:output method="html" encoding="UTF-8" indent="yes" />
 
   <xsl:template match="mets:mdWrap[@MDTYPE='MODS']/mets:xmlData/mods:mods">
     <div class="metadata well">
@@ -39,7 +40,19 @@
   <!-- Title -->
   <xsl:template match="mods:titleInfo/mods:title">
     <span class="title">
-      <xsl:value-of select="." />
+      <xsl:choose>
+        <xsl:when test="../../mods:identifier[@type='uri']">
+          <xsl:message>
+            test
+          </xsl:message>
+          <a href="{../../mods:identifier[@type='uri']}">
+            <xsl:value-of select="." />
+          </a>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="." />
+        </xsl:otherwise>
+      </xsl:choose>
     </span>
   </xsl:template>
 
