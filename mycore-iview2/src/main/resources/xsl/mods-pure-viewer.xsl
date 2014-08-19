@@ -44,7 +44,7 @@
   </xsl:template>
 
   <!-- place -->
-  <xsl:template match="mods:originInfo[mods:place]">
+  <xsl:template match="mods:originInfo[mods:place and not(contains(mods:edition, '[Electronic ed.]'))]">
     <span class="place">
       <xsl:for-each select="mods:place/mods:placeTerm">
         <xsl:value-of select="." />
