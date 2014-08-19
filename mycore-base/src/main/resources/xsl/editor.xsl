@@ -1029,7 +1029,9 @@
       <xsl:with-param name="vars"    select="key('vars',$var)" />
       <xsl:with-param name="default" select="@default" />
     </xsl:apply-templates>
+    
     <xsl:copy-of select="option" />
+    
   </select>
 </xsl:template>
 
@@ -1076,7 +1078,7 @@
   <table>
     <xsl:call-template name="editor.set.css" />
 
-    <xsl:for-each select="item">
+    <xsl:for-each select="item | option">
 
       <xsl:variable name="pxy" select="position() - 1" />
 
