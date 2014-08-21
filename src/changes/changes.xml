@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrkrebs" type="fix">
+        mycore-xeditor: readded "accept XEditor submissions"
+      </action>
       <action dev="mcrtchef" type="update">
         mycore-user2: do not throw ServletException if login failed in MCRServlet3LoginServlet
       </action>

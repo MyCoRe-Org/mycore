@@ -174,13 +174,16 @@ public class MCRPersistentServlet extends MCRServlet {
      *  if failOnMissing==true and no editor submission is present
      */
     private Document getEditorSubmission(MCRServletJob job, boolean failOnMissing) throws ServletException {
-        MCREditorSubmission sub = (MCREditorSubmission) job.getRequest().getAttribute("MCREditorSubmission");
-        if (sub == null) {
-            if (failOnMissing)
+        Document inDoc = (Document) (job.getRequest().getAttribute("MCRXEditorSubmission"));
+        if (inDoc == null) {
+            MCREditorSubmission sub = (MCREditorSubmission) job.getRequest().getAttribute("MCREditorSubmission");
+            if (sub != null)
+                inDoc = sub.getXML();
+            else if (failOnMissing)
                 throw new ServletException("No MCREditorSubmission");
-            return null;
+            else
+                return null;
         }
-        Document inDoc = sub.getXML();
         if (inDoc.getRootElement().getAttribute("ID") == null) {
             String mcrID = getProperty(job.getRequest(), "mcrid");
             LOGGER.info("Adding MCRObjectID from request: " + mcrID);
@@ -238,10 +241,12 @@ public class MCRPersistentServlet extends MCRServlet {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    private MCRObjectID createObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException, MCRException, SAXParseException {
+    private MCRObjectID createObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException, MCRException,
+            SAXParseException {
         MCRObject mcrObject = getMCRObject(doc);
         MCRObjectID objectId = mcrObject.getId();
-        if (MCRAccessManager.checkPermission("create-" + objectId.getBase()) || MCRAccessManager.checkPermission("create-" + objectId.getTypeId())) {
+        if (MCRAccessManager.checkPermission("create-" + objectId.getBase())
+                || MCRAccessManager.checkPermission("create-" + objectId.getTypeId())) {
             //noinspection SynchronizeOnNonFinalField
             synchronized (operation) {
                 if (objectId.getNumberAsInteger() == 0) {
@@ -273,7 +278,8 @@ public class MCRPersistentServlet extends MCRServlet {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    private MCRObjectID updateObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException, MCRException, SAXParseException {
+    private MCRObjectID updateObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException, MCRException,
+            SAXParseException {
         MCRObject mcrObject = getMCRObject(doc);
         LOGGER.info("ID: " + mcrObject.getId());
         try {
@@ -468,7 +474,6 @@ public class MCRPersistentServlet extends MCRServlet {
         Properties params = new Properties();
         params.put("cancelUrl", getCancelUrl(job));
         params.put("mcrid", MCRObjectID.formatID(base, 0));
-        @SuppressWarnings("unchecked")
         Enumeration<String> e = job.getRequest().getParameterNames();
         while (e.hasMoreElements()) {
             String name = e.nextElement();
