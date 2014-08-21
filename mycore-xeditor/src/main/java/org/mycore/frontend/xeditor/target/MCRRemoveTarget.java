@@ -32,17 +32,13 @@ import org.mycore.frontend.xeditor.MCREditorSession;
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRRemoveTarget implements MCREditorTarget {
+public class MCRRemoveTarget extends MCRRepeaterControl {
 
-    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String xPath) throws Exception {
-        session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
-
+    protected void handleRepeaterControl(ServletContext context, MCRServletJob job, MCREditorSession session, String xPath) throws Exception {
         MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
         binding.removeBoundNode(0);
         binding.detach();
         
         session.setBreakpoint("After handling target remove " + xPath);
-
-        job.getResponse().sendRedirect(session.getRedirectURL());
     }
 }

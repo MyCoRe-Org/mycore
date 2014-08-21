@@ -32,14 +32,12 @@ import org.mycore.frontend.xeditor.MCREditorSession;
 /**
  * @author Ren\u00E9 Adler
  */
-public class MCRAddTarget implements MCREditorTarget {
+public class MCRAddTarget extends MCRRepeaterControl {
 
-    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String xPath) throws Exception {
-        session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
+    protected void handleRepeaterControl(ServletContext context, MCRServletJob job, MCREditorSession session, String xPath) throws Exception {
         MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
         binding.addEmptyElement(0);
         binding.detach();
         session.setBreakpoint("After handling target add " + xPath);
-        job.getResponse().sendRedirect(session.getRedirectURL());
     }
 }

@@ -238,6 +238,20 @@ public class MCRXEditorTransformer {
     public String getSwapParameter(int posA, int posB) {
         return getCurrentRepeat().getSwapParameter(posA, posB);
     }
+    
+    public int anchorID = 0;
+
+    public int nextAnchorID() {
+        return ++anchorID;
+    }
+
+    public int getAnchorID() {
+        return anchorID;
+    }
+
+    public int previousAnchorID() {
+        return (anchorID == 0 ? 1 : anchorID - 1 );
+    }
 
     public void loadResource(String uri, String name) {
         Element resource = MCRURIResolver.instance().resolve(uri);
