@@ -65,6 +65,8 @@ public class MCRSolrProxyServlet extends MCRServlet {
      */
     public static final String QUERY_KEY = MCRSolrProxyServlet.class.getName() + ".query";
 
+    public static final String QUERY_HANDLER_PAR_NAME = "qt";
+
     private static int MAX_CONNECTIONS = MCRConfiguration.instance().getInt(
         CONFIG_PREFIX + "SelectProxy.MaxConnections");
 
@@ -82,27 +84,29 @@ public class MCRSolrProxyServlet extends MCRServlet {
     protected void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse resp = job.getResponse();
-        Document input = (Document) request.getAttribute("MCRXEditorSubmission");
-        if (input != null) {
-            getQueryHandlerAndPrepareParameterMap(input, resp);
+        //handle redirects
+        if (request.getParameter(QUERY_HANDLER_PAR_NAME) != null || request.getAttribute(MAP_KEY) != null) {
+            //redirect to Request Handler
+            redirectToQueryHandler(request, resp);
             return;
         }
-        String queryHandlerPath = null;
-        String requetsHandler = job.getRequest().getParameter("requestHandler");
-        if (requetsHandler == null || requetsHandler.equals("")) {
-            queryHandlerPath = request.getPathInfo();
-        } else {
-            queryHandlerPath = "/" + requetsHandler;
+        Document input = (Document) request.getAttribute("MCRXEditorSubmission");
+        if (input != null) {
+            redirectToQueryHandler(input, resp);
+            return;
         }
+        String queryHandlerPath = request.getPathInfo();
         if (queryHandlerPath == null) {
             boolean refresh = "true".equals(getProperty(request, "refresh"));
             if (refresh) {
                 updateQueryHandlerMap(resp);
                 return;
             }
-            redirectToDefaultQueryHandler(request, resp);
+            redirectToQueryHandler(request, resp);
             return;
         }
+        //end of redirects
+        //either we have a queryHandler specified by path here or use the default one
         MCRSolrQueryHandler queryHandler = queryHandlerMap.get(queryHandlerPath);
         if (queryHandler == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -115,7 +119,21 @@ public class MCRSolrProxyServlet extends MCRServlet {
         handleQuery(queryHandler, request, resp);
     }
 
-    private void getQueryHandlerAndPrepareParameterMap(Document input, HttpServletResponse resp) throws IOException,
+    /**
+     * redirects to query handler by using value of 'qt' parameter
+     */
+    private static void redirectToQueryHandler(HttpServletRequest request, HttpServletResponse resp) throws IOException {
+        ModifiableSolrParams solrQueryParameter = getSolrQueryParameter(request);
+        String queryHandlerPath = solrQueryParameter.get(QUERY_HANDLER_PAR_NAME, QUERY_PATH);
+        solrQueryParameter.remove(QUERY_HANDLER_PAR_NAME);
+        Map<String, String[]> parameters = ModifiableSolrParams.toMultiMap(solrQueryParameter.toNamedList());
+        doRedirectToQueryHandler(resp, queryHandlerPath, parameters);
+    }
+
+    /**
+     * redirects to query handler by using xeditor input document
+     */
+    private static void redirectToQueryHandler(Document input, HttpServletResponse resp) throws IOException,
         TransformerException, SAXException {
         LinkedHashMap<String, String[]> parameters = new LinkedHashMap<>();
         List<Element> children = input.getRootElement().getChildren();
@@ -125,11 +143,19 @@ public class MCRSolrProxyServlet extends MCRServlet {
                 parameters.put(attribute, new String[] { param.getTextTrim() });
             }
         }
-        String queryHandlerPath = parameters.get("qt")[0];
+        String queryHandlerPath = parameters.get(QUERY_HANDLER_PAR_NAME)[0];
         parameters.remove("qt");
+        doRedirectToQueryHandler(resp, queryHandlerPath, parameters);
+    }
+
+    /**
+     * used by 
+     */
+    private static void doRedirectToQueryHandler(HttpServletResponse resp, String queryHandlerPath,
+        Map<String, String[]> parameters) throws IOException {
         String requestURL = MessageFormat.format("{0}solr{1}?{2}", getServletBaseURL(), queryHandlerPath,
             getQueryString(parameters));
-        LOGGER.info("Redirect XEditor input to: " + requestURL);
+        LOGGER.info("Redirect to: " + requestURL);
         resp.sendRedirect(resp.encodeRedirectURL(requestURL));
     }
 
@@ -176,12 +202,6 @@ public class MCRSolrProxyServlet extends MCRServlet {
         solrHttpMethod.releaseConnection();
     }
 
-    private void redirectToDefaultQueryHandler(HttpServletRequest request, HttpServletResponse resp) throws IOException {
-        String selectProxyURL = MessageFormat.format("{0}solr{1}?{2}", MCRServlet.getServletBaseURL(), QUERY_PATH,
-            getSolrQueryParameter(request).toString());
-        resp.sendRedirect(resp.encodeRedirectURL(selectProxyURL));
-    }
-
     private void updateQueryHandlerMap(HttpServletResponse resp) throws IOException, SolrServerException {
         Map<String, MCRSolrQueryHandler> handlerMap = MCRSolrProxyUtils.getQueryHandlerMap();
         queryHandlerMap = handlerMap;
@@ -209,14 +229,13 @@ public class MCRSolrProxyServlet extends MCRServlet {
         return httpGet;
     }
 
-    @SuppressWarnings("unchecked")
     private static ModifiableSolrParams getSolrQueryParameter(HttpServletRequest request) {
         SolrQuery query = (SolrQuery) request.getAttribute(QUERY_KEY);
         if (query != null) {
             return query;
         }
-        Map<String, String[]> solrParameter;
-        solrParameter = (Map<String, String[]>) request.getAttribute(MAP_KEY);
+        @SuppressWarnings("unchecked")
+        Map<String, String[]> solrParameter = (Map<String, String[]>) request.getAttribute(MAP_KEY);
         if (solrParameter == null) {
             // good old way
             solrParameter = request.getParameterMap();
