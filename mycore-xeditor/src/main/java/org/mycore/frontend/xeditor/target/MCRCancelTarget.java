@@ -34,6 +34,14 @@ import org.mycore.frontend.xeditor.MCREditorSession;
 
 /**
  * @author Frank L\u00FCtzenkirchen
+ * 
+ * Implements the "cancel" target to redirect when cancel button is clicked.
+ * The target URL is set by <xed:cancel url="..." /> 
+ * 
+ * When no URL is set, the web application base URL is used.
+ * When a complete URL is given, it is used as is.
+ * When a relative path is given, the URL is calculated relative to the page containing the editor form.
+ * When an absolute path is given, the web application base URL is prepended. 
  */
 public class MCRCancelTarget implements MCREditorTarget {
 
@@ -41,6 +49,16 @@ public class MCRCancelTarget implements MCREditorTarget {
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter) throws IOException,
             ServletException {
         String cancelURL = session.getCancelURL();
-        job.getResponse().sendRedirect(cancelURL == null ? MCRServlet.getBaseURL() : cancelURL);
+
+        if (cancelURL == null)
+            cancelURL = MCRServlet.getBaseURL();
+        else if (cancelURL.startsWith("/"))
+            cancelURL = MCRServlet.getBaseURL() + cancelURL.substring(1);
+        else if (!(cancelURL.startsWith("http:") || cancelURL.startsWith("https:"))) {
+            String pageURL = session.getPageURL();
+            cancelURL = pageURL.substring(0, pageURL.lastIndexOf('/') + 1) + cancelURL;
+        }
+
+        job.getResponse().sendRedirect(cancelURL);
     }
 }
