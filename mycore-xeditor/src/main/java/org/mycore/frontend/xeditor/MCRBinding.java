@@ -127,7 +127,7 @@ public class MCRBinding {
     }
 
     public Object getBoundNode() {
-        return boundNodes.get(0);
+        return boundNodes.size() > 0 ? boundNodes.get(0) : null;
     }
 
     public void removeBoundNode(int index) {
@@ -230,7 +230,10 @@ public class MCRBinding {
     }
 
     private void setValue(Object node, String value) {
-        if (value.equals(getValue(node)))
+        if (node == null)
+            // FIXME occurs if a repeater element (with children) was deleted  
+            LOGGER.warn("Binding not found, ignore!");
+        else if (value.equals(getValue(node)))
             return;
         else if (node instanceof Attribute)
             track(MCRSetAttributeValue.setValue((Attribute) node, value));
