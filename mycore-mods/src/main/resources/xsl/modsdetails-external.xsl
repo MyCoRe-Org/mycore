@@ -61,5 +61,9 @@
 
   </xsl:template>
 
+  <xsl:template name="documentEditExternals">
+    <xsl:param name="objectId" />
+    <!-- add here your application specific edit menu entries, as <li />  -->
+  </xsl:template>
 
 </xsl:stylesheet>
