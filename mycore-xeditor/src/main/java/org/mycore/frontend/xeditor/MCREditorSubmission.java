@@ -25,6 +25,11 @@ public class MCREditorSubmission {
     public MCREditorSubmission(MCREditorSession session) {
         this.session = session;
     }
+    
+    public void clear() {
+        xPaths2CheckResubmission.clear();
+        xPath2DefaultValue.clear();
+    }
 
     public void mark2checkResubmission(MCRBinding binding) {
         for (Object node : binding.getBoundNodes())

@@ -73,6 +73,7 @@ public class MCRXEditorTransformer {
 
     public MCRContent transform(MCRContent editorSource) throws IOException, JDOMException, SAXException {
         editorSession.getValidator().clearRules();
+        editorSession.getSubmission().clear();
 
         MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("xeditor");
         if (transformer instanceof MCRParameterizedTransformer) {
