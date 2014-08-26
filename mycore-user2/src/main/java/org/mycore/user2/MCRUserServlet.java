@@ -25,7 +25,12 @@ package org.mycore.user2;
 import static org.mycore.user2.utils.MCRUserTransformer.JAXB_CONTEXT;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -309,8 +314,13 @@ public class MCRUserServlet extends MCRServlet {
             if (validUntilText == null || validUntilText.length() == 0) {
                 user.setValidUntil(null);
             } else {
-                MCRISO8601Date date = new MCRISO8601Date(validUntilText);
-                user.setValidUntil(date.getDate());
+
+                String dateInUTC = validUntilText;
+                if (validUntilText.length() == 10) {
+                    dateInUTC = convertToUTC(validUntilText, "yyyy-MM-dd");
+                }
+
+                MCRISO8601Date date = new MCRISO8601Date(dateInUTC);
             }
         } else { // save read user of creator
             user.setRealm(MCRRealmFactory.getLocalRealm());
@@ -339,6 +349,15 @@ public class MCRUserServlet extends MCRServlet {
         }
 
         res.sendRedirect(res.encodeRedirectURL("MCRUserServlet?action=show&id=" + user.getUserID()));
+    }
+
+    private String convertToUTC(String validUntilText, String format) throws ParseException {
+        DateFormat inputFormat = new SimpleDateFormat(format);
+        DateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+
+        Date d = inputFormat.parse(validUntilText);
+        outputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return outputFormat.format(d);
     }
 
     private void updateBasicUserInfo(Element u, MCRUser user) {
