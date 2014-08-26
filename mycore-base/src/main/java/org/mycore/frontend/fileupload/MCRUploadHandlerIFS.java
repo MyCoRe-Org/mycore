@@ -44,6 +44,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * handles uploads via the UploadApplet and store files directly into the IFS.
  * 
  * @author Thomas Scheffler (yagee)
+ * @author Frank L\u00FCtzenkirchen
  * 
  * @version $Revision$ $Date$
  * 
@@ -51,96 +52,118 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
-    protected MCRDerivate derivate;
-
-    protected MCRDirectory rootDir;
-
-    protected String derID, docID;
-
-    protected boolean newDerivate = true;
-
-    private static final String ID_TYPE = "derivate";
-
-    private static final String PROJECT = MCRConfiguration.instance().getString("MCR.SWF.Project.ID", "MCR");
-
     private static final Logger LOGGER = Logger.getLogger(MCRUploadHandlerIFS.class);
 
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-    public MCRUploadHandlerIFS(String docId, String derId, String url) {
+    private static final String ID_TYPE = "derivate";
+
+    private static final String ID_PROJECT = MCRConfiguration.instance().getString("MCR.SWF.Project.ID", "MCR");
+
+    protected String documentID;
+
+    protected String derivateID;
+
+    protected MCRDerivate derivate;
+
+    protected MCRDirectory rootDir;
+
+    public MCRUploadHandlerIFS(String documentID, String derivateID, String returnURL) {
         super();
-        this.url = url;
-        init(docId, derId);
+        this.url = returnURL;
+        this.derivateID = derivateID;
+        this.documentID = documentID;
     }
 
-    protected void init(String docId, String derId) {
-        docID = docId;
-        if (derId == null) {
-            return;
-        }
-        MCRObjectID derOID = MCRObjectID.getInstance(derId);
-        derID = derOID.toString();
-        if (MCRMetadataManager.exists(derOID)) {
-            LOGGER.debug("Derivate allready exists: " + derId);
-            newDerivate = false;
-            derivate = MCRMetadataManager.retrieveMCRDerivate(derOID);
-        }
-    }
-
-    /**
-     * Start Upload for MyCoRe
-     */
     @Override
     public void startUpload(int numFiles) throws Exception {
-        if (derivate == null) {
-            if (derID == null) {
-                // create new derivate
-                LOGGER.debug("derId=null create derivate with next free ID");
-                createNewDerivate(docID, getFreeDerivateID());
-            } else {
-                // create new derivate with given ID
-                LOGGER.debug("derId='" + derID + "' create derivate with that ID");
-                createNewDerivate(docID, MCRObjectID.getInstance(derID));
-            }
-            LOGGER.debug("Create new derivate with id: " + derivate.getId());
-            MCRMetadataManager.create(derivate);
-        }
-        rootDir = getRootDir(derivate.getId().toString());
+        LOGGER.debug("upload starting, expecting " + numFiles + " files");
+
+        MCRObjectID derivateID = getOrCreateDerivateID();
+
+        if (MCRMetadataManager.exists(derivateID))
+            this.derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
+        else
+            this.derivate = createDerivate(derivateID);
+
+        getOrCreateRootDirectory();
+
+        LOGGER.debug("uploading into " + this.derivateID + " of " + this.documentID);
     }
 
-    /**
-     * Message from UploadApplet If you want all files transfered omit this
-     * method
-     * 
-     * @param path
-     *            file name
-     * @param checksum
-     *            md5 checksum of of file
-     * @param length
-     *            the length of the file in bytes (file size)
-     * 
-     * @return true transfer file false don't send file
-     * 
-     */
+    private MCRObjectID getOrCreateDerivateID() {
+        if (derivateID == null) {
+            MCRObjectID oid = MCRObjectID.getNextFreeId(ID_PROJECT + '_' + ID_TYPE);
+            this.derivateID = oid.toString();
+            return oid;
+        } else
+            return MCRObjectID.getInstance(derivateID);
+    }
+
+    private MCRDerivate createDerivate(MCRObjectID derivateID) {
+        MCRDerivate derivate = new MCRDerivate();
+        derivate.setId(derivateID);
+        derivate.setLabel("data object from " + documentID);
+
+        String schema = CONFIG.getString("MCR.Metadata.Config.derivate", "datamodel-derivate.xml").replaceAll(".xml", ".xsd");
+        derivate.setSchema(schema);
+
+        MCRMetaLinkID linkId = new MCRMetaLinkID();
+        linkId.setSubTag("linkmeta");
+        linkId.setReference(documentID, null, null);
+        derivate.getDerivate().setLinkMeta(linkId);
+
+        MCRMetaIFS ifs = new MCRMetaIFS();
+        ifs.setSubTag("internal");
+        ifs.setSourcePath(null);
+        derivate.getDerivate().setInternals(ifs);
+
+        LOGGER.debug("Creating new derivate with ID " + this.derivateID);
+        MCRMetadataManager.create(derivate);
+
+        setDefaultPermissions(derivateID);
+
+        return derivate;
+    }
+
+    protected void setDefaultPermissions(MCRObjectID derivateID) {
+        if (CONFIG.getBoolean("MCR.Access.AddDerivateDefaultRule", true)) {
+            MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
+            Collection<String> configuredPermissions = AI.getAccessPermissionsFromConfiguration();
+            for (String permission : configuredPermissions) {
+                MCRAccessManager.addRule(derivateID, permission, MCRAccessManager.getTrueRule(), "default derivate rule");
+            }
+        }
+    }
+
+    private void getOrCreateRootDirectory() {
+        this.rootDir = (MCRDirectory) (MCRFilesystemNode.getRootNode(derivateID));
+        if (rootDir == null)
+            this.rootDir = new MCRDirectory(derivateID);
+    }
+
     @Override
     public boolean acceptFile(String path, String checksum, long length) throws Exception {
         LOGGER.debug("incoming acceptFile request: " + path + " " + checksum + " " + length + " bytes");
+        boolean shouldAcceptFile = true;
         MCRFilesystemNode child = rootDir.getChildByPath(path);
-        if (!(child instanceof MCRFile)) {
-            return true;
+        if (child instanceof MCRFile) {
+            MCRFile file = (MCRFile) child;
+            shouldAcceptFile = file.getSize() != length || !(checksum.equals(file.getMD5()) && file.isValid());
         }
-        MCRFile file = (MCRFile) child;
-        return file.getSize() != length || !(checksum.equals(file.getMD5()) && file.isValid());
+        LOGGER.debug("Should the client send this file? " + shouldAcceptFile);
+        return shouldAcceptFile;
     }
 
     @Override
     public synchronized long receiveFile(String path, InputStream in, long length, String checksum) throws Exception {
         LOGGER.debug("incoming receiveFile request: " + path + " " + checksum + " " + length + " bytes");
+
         try {
-            LOGGER.debug("adding file: " + path);
             startTransaction();
-            MCRFile file = getNewFile(path);
+            MCRFile file = getFile(path);
             commitTransaction();
+
             long sizeDiff = file.setContentFrom(in, false);
             startTransaction();
             file.storeContentChange(sizeDiff);
@@ -169,95 +192,59 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         }
     }
 
-    /**
-     * Finish upload, store derivate
-     * 
-     */
-    @Override
-    public synchronized void finishUpload() throws Exception {
-        // existing files
-        if (!rootDir.hasChildren()) {
-            MCRMetadataManager.deleteMCRDerivate(derivate.getId());
-            LOGGER.warn("No file were uploaded, delete entry in database for " + derivate.getId().toString() + " and return.");
-            return;
-        }
-        String mainfile = getMainFilePath(rootDir);
-        if (newDerivate) {
-            derivate.getDerivate().getInternals().setMainDoc(mainfile);
-            MCRMetadataManager.updateMCRDerivateXML(derivate);
-            setDefaultPermissions(derivate.getId());
-        } else {
-            String mf = derivate.getDerivate().getInternals().getMainDoc();
-            if (mf.trim().length() == 0) {
-                derivate.getDerivate().getInternals().setMainDoc(mainfile);
-                MCRMetadataManager.updateMCRDerivateXML(derivate);
-            }
-        }
-    }
-
-    private static MCRObjectID getFreeDerivateID() {
-        return MCRObjectID.getNextFreeId(PROJECT + '_' + ID_TYPE);
-    }
-
-    protected void createNewDerivate(String docId, MCRObjectID newDerID) {
-        newDerivate = true;
-        derivate = new MCRDerivate();
-        derivate.setId(newDerID);
-        String schema = CONFIG.getString("MCR.Metadata.Config.derivate", "datamodel-derivate.xml").replaceAll(".xml", ".xsd");
-        derivate.setSchema(schema);
-        derivate.setLabel("data object from " + docId);
-        // set link to Object
-        MCRMetaLinkID linkId = new MCRMetaLinkID();
-        linkId.setSubTag("linkmeta");
-        linkId.setReference(docId, null, null);
-        MCRMetaIFS ifs = new MCRMetaIFS();
-        ifs.setSubTag("internal");
-        ifs.setSourcePath(null);
-        derivate.getDerivate().setInternals(ifs);
-        derivate.getDerivate().setLinkMeta(linkId);
-    }
-
-    private MCRFile getNewFile(String path) {
-        if (!path.contains("/")) {
-            return new MCRFile(path, rootDir);
-        }
-        StringTokenizer tok = new StringTokenizer(path, "/");
+    private MCRFile getFile(String path) {
         MCRDirectory parent = rootDir;
-        while (tok.hasMoreTokens()) {
-            String child = tok.nextToken();
+        for (StringTokenizer tokenizer = new StringTokenizer(path, "/"); tokenizer.hasMoreTokens();) {
+            String child = tokenizer.nextToken();
             if (parent.hasChild(child)) {
                 MCRFilesystemNode childNode = parent.getChild(child);
-                if (childNode instanceof MCRFile && !tok.hasMoreTokens()) {
-                    return (MCRFile) childNode;
-                } else if (childNode instanceof MCRDirectory) {
+                if (childNode instanceof MCRDirectory) {
                     parent = (MCRDirectory) childNode;
+                } else if (tokenizer.hasMoreTokens()) {
+                    throw new RuntimeException("Trying to upload " + path + ", but " + childNode.getAbsolutePath()
+                            + " is an already existing file");
                 } else {
-                    // obviously a file should not contain any other files
-                    return null;
+                    return (MCRFile) childNode;
                 }
             } else {
-                if (tok.hasMoreTokens()) {
+                if (tokenizer.hasMoreTokens()) {
                     parent = new MCRDirectory(child, parent);
                 } else {
-                    // NOTE: How should we handle empty directories?
                     return new MCRFile(child, parent);
                 }
             }
         }
+
         LOGGER.error("Please investigate getNewFile() method in IFS upload handler. Server shouldn't get to this point!");
         return null;
     }
 
-    private static MCRDirectory getRootDir(String derID) {
-        MCRFilesystemNode root = MCRFilesystemNode.getRootNode(derID);
-        if (!(root instanceof MCRDirectory)) {
-            root = new MCRDirectory(derID);
-        }
-        MCRDirectory rootDir = (MCRDirectory) root;
-        return rootDir;
+    @Override
+    public synchronized void finishUpload() throws Exception {
+        if (this.derivate == null)
+            return;
+        else if (rootDir.hasChildren())
+            updateMainFile();
+        else
+            deleteEmptyDerivate();
     }
 
-    protected static String getMainFilePath(MCRDirectory root) {
+    private void deleteEmptyDerivate() {
+        LOGGER.warn("No files were uploaded, delete entry in database for " + derivate.getId().toString() + " and return:");
+        MCRMetadataManager.deleteMCRDerivate(derivate.getId());
+    }
+
+    private void updateMainFile() {
+        String mainFile = derivate.getDerivate().getInternals().getMainDoc();
+        if ((mainFile == null) || mainFile.trim().isEmpty()) {
+            mainFile = getPathOfMainFile(rootDir);
+            LOGGER.debug("Setting main file to " + mainFile);
+            derivate.getDerivate().getInternals().setMainDoc(mainFile);
+            MCRMetadataManager.updateMCRDerivateXML(derivate);
+        }
+    }
+
+    protected static String getPathOfMainFile(MCRDirectory root) {
         MCRDirectory parent = root;
         while (parent.hasChildren()) {
             MCRFilesystemNode[] children = parent.getChildren(MCRDirectory.SORT_BY_NAME);
@@ -272,15 +259,4 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         }
         return "";
     }
-
-    protected static void setDefaultPermissions(MCRObjectID derID) {
-        if (CONFIG.getBoolean("MCR.Access.AddDerivateDefaultRule", true)) {
-            MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-            Collection<String> configuredPermissions = AI.getAccessPermissionsFromConfiguration();
-            for (String permission : configuredPermissions) {
-                MCRAccessManager.addRule(derID, permission, MCRAccessManager.getTrueRule(), "default derivate rule");
-            }
-        }
-    }
-
 }
