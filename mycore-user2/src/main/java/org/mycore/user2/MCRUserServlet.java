@@ -321,6 +321,7 @@ public class MCRUserServlet extends MCRServlet {
                 }
 
                 MCRISO8601Date date = new MCRISO8601Date(dateInUTC);
+                user.setValidUntil(date.getDate());
             }
         } else { // save read user of creator
             user.setRealm(MCRRealmFactory.getLocalRealm());
