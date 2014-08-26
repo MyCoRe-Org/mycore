@@ -75,13 +75,11 @@ public class MCRIPAddress {
     }
 
     public boolean contains(MCRIPAddress other) {
-        int t;
-
         if (address.length != other.address.length) {
-            throw new IllegalStateException("can't map IPv6 to IPv4 and vice versa");
+            return false;
         }
 
-        for (t = 0; t < address.length; t++) {
+        for (int t = 0; t < address.length; t++) {
             if ((address[t] & mask[t]) != (other.address[t] & mask[t])) {
                 return false;
             }
