@@ -6,6 +6,10 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrfluet" type="fix">
+        mycore-mods: use underscore in category IDs, they will be converted to spaces in MODS
+        <fixes issue="702" />
+      </action>
       <action dev="mcrkrebs" type="add">
         mycore-mods: new xsl-template 'documentEditExternals' to add application specific menu entries in document options
       </action>

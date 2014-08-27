@@ -239,7 +239,7 @@ public final class MCRMODSClassificationSupport {
             MCRCategory classification = category.getRoot();
 
             if (classification.getId().getRootID().equals(MCRTypeOfResource.TYPE_OF_RESOURCE)) {
-                return new MCRTypeOfResource(categoryID.getID());
+                return new MCRTypeOfResource(categoryID.getID().replace('_', ' ')); // Category IDs can not contain spaces
             }
 
             String authority = MCRAuthorityAndCode.getAuthority(classification);
@@ -626,7 +626,7 @@ public final class MCRMODSClassificationSupport {
 
         @Override
         protected MCRCategoryID lookupCategoryID() {
-            return new MCRCategoryID(TYPE_OF_RESOURCE, code);
+            return new MCRCategoryID(TYPE_OF_RESOURCE, code.replace(" ", "_")); // Category IDs can not contain spaces
         }
 
         @Override
