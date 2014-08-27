@@ -23,7 +23,6 @@
 
 package org.mycore.frontend.fileupload;
 
-import org.apache.log4j.Logger;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 
@@ -32,14 +31,14 @@ import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
  * 
  * @author Thomas Scheffler (yagee)
  * @author Jens Kupferschmidt
+ * @author Frank L\u00FCtzenkirchen
  * 
  * @version $Revision$ $Date$
  * 
  * @see MCRUploadHandler
  */
 public class MCRSWFUploadHandlerIFS extends MCRUploadHandlerIFS {
-    private static final Logger LOGGER = Logger.getLogger(MCRSWFUploadHandlerIFS.class);
-
+    
     /**
      * The constructor for this class. It set all data to handle with IFS upload
      * store.
@@ -55,13 +54,13 @@ public class MCRSWFUploadHandlerIFS extends MCRUploadHandlerIFS {
         super(docId, derId, url);
     }
 
-    @Override
-    protected void init(String docId, String derId) {
-        LOGGER.debug("MCRUploadHandlerMyCoRe DocID: " + docId + " DerId: " + derId);
-        if (derId == null) {
-            derId = MCRSimpleWorkflowManager.instance().getNextDrivateID(MCRObjectID.getInstance(docId)).toString();
-        }
-        super.init(docId, derId);
+    protected MCRObjectID getOrCreateDerivateID() {
+        if (derivateID == null) {
+            MCRObjectID documentOID = MCRObjectID.getInstance( documentID );
+            MCRObjectID derivateOID = MCRSimpleWorkflowManager.instance().getNextDrivateID( documentOID );
+            this.derivateID = derivateOID.toString();
+            return derivateOID;
+        } else
+            return MCRObjectID.getInstance(derivateID);
     }
-
 }
