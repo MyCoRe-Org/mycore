@@ -512,9 +512,9 @@
                       </xsl:otherwise>
                     </xsl:choose>
                   </li>
-                  <xsl:call-template name="documentEditExternals">
-                    <xsl:with-param name="objectId" select="$id" />
-                  </xsl:call-template>
+
+                  <xsl:apply-templates select="." mode="externalObjectActions" />
+
                   <xsl:if test="$displayAddDerivate='true'">
                     <li>
                       <xsl:if test="not($CurrentUser=$MCR.Users.Superuser.UserName) and
