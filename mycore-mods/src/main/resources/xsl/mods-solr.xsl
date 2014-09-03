@@ -172,4 +172,9 @@
       </xsl:if>
     </doc>
   </xsl:template>
+  <xsl:template match="mods:accessCondition[@type='embargo']">
+    <field name="mods.embargo">
+      <xsl:value-of select="." />
+    </field>
+  </xsl:template>
 </xsl:stylesheet>
