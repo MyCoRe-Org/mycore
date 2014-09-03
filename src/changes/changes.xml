@@ -6,8 +6,12 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrmeich" type="fix">
+        mycore-oai: fix last resumptionToken
+        <fixes issue="717" />
+      </action>
       <action dev="mcrtchef" type="fix">
-        mycore-base: Docportal/MyCore 2014.06.0 :can't map IPv6 to IPv4
+        mycore-base: DocPortal/MyCoRe 2014.06.0 :can't map IPv6 to IPv4
         <fixes issue="716" />
       </action>
       <action dev="mcrfluet" type="fix">

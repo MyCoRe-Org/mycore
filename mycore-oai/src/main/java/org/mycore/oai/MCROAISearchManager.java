@@ -57,7 +57,8 @@ public class MCROAISearchManager {
         new Timer().schedule(tt, new Date(System.currentTimeMillis() + MAX_AGE), MAX_AGE);
     }
 
-    public void init(String configPrefix, DeletedRecordPolicy deletedRecordPolicy, MCROAIObjectManager objManager, int partitionSize) {
+    public void init(String configPrefix, DeletedRecordPolicy deletedRecordPolicy, MCROAIObjectManager objManager,
+        int partitionSize) {
         this.configPrefix = configPrefix;
         this.objManager = objManager;
         this.deletedRecordPolicy = deletedRecordPolicy;
@@ -147,12 +148,15 @@ public class MCROAISearchManager {
     }
 
     protected void setResumptionToken(OAIDataList<?> dataList, String id, Date expirationDate, int cursor, int hits) {
-        if (cursor < hits) {
+        boolean setToken = cursor < hits;
+        if (getPartitionSize() != cursor || setToken) {
             DefaultResumptionToken rsToken = new DefaultResumptionToken();
             rsToken.setCompleteListSize(hits);
             rsToken.setCursor(cursor);
             rsToken.setExpirationDate(expirationDate);
-            rsToken.setToken(id + TOKEN_DELIMITER + String.valueOf(cursor));
+            if (setToken) {
+                rsToken.setToken(id + TOKEN_DELIMITER + String.valueOf(cursor));
+            }
             dataList.setResumptionToken(rsToken);
         }
     }
@@ -173,9 +177,12 @@ public class MCROAISearchManager {
         return MCRConfiguration.instance();
     }
 
-    public static MCROAISearcher getSearcher(String configPrefix, MetadataFormat format, DeletedRecordPolicy deletedRecordPolicy, int partitionSize) {
-        MCROAISearcher searcher = getConfig().<MCROAISearcher> getInstanceOf(configPrefix + "Searcher", "org.mycore.oai.MCROAILuceneSearcher");
-        searcher.init(configPrefix, format, new Date(System.currentTimeMillis() + MAX_AGE), deletedRecordPolicy, partitionSize);
+    public static MCROAISearcher getSearcher(String configPrefix, MetadataFormat format,
+        DeletedRecordPolicy deletedRecordPolicy, int partitionSize) {
+        MCROAISearcher searcher = getConfig().<MCROAISearcher> getInstanceOf(configPrefix + "Searcher",
+            "org.mycore.oai.MCROAILuceneSearcher");
+        searcher.init(configPrefix, format, new Date(System.currentTimeMillis() + MAX_AGE), deletedRecordPolicy,
+            partitionSize);
         return searcher;
     }
 
