@@ -368,7 +368,9 @@
                   <xsl:value-of select="@factor" />
                 </td>
                 <td>
-                  <xsl:value-of select="i18n:translate(concat('component.mods.metaData.dictionary.refereed.',@refereed))" />
+                  <xsl:if test="@refereed">
+                    <xsl:value-of select="i18n:translate(concat('component.mods.metaData.dictionary.refereed.',@refereed))" />
+                  </xsl:if>
                 </td>
               </tr>
             </xsl:for-each>
