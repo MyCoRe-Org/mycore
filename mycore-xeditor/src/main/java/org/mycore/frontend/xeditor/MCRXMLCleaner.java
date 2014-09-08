@@ -19,6 +19,9 @@ public class MCRXMLCleaner {
 
     private static final MCRCleaningRule REMOVE_EMPTY_ELEMENTS = new MCRCleaningRule("//*", "@* or * or (string-length(text()) > 0)");
 
+    private static final MCRCleaningRule PRESERVE_STRUCTURE_AND_SERVICE = new MCRCleaningRule(
+            "/mycoreobject/structure|/mycoreobject/service", "true()");
+
     private List<MCRCleaningRule> rules = new ArrayList<MCRCleaningRule>();
 
     private Map<Object, MCRCleaningRule> nodes2rules = new HashMap<Object, MCRCleaningRule>();
@@ -26,6 +29,7 @@ public class MCRXMLCleaner {
     public MCRXMLCleaner() {
         addRule(REMOVE_EMPTY_ATTRIBUTES);
         addRule(REMOVE_EMPTY_ELEMENTS);
+        addRule(PRESERVE_STRUCTURE_AND_SERVICE);
     }
 
     public void addRule(String xPathExprNodesToInspect, String xPathExprRelevancyTest) {

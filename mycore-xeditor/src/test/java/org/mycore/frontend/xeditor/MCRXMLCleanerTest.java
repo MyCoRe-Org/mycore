@@ -76,6 +76,13 @@ public class MCRXMLCleanerTest extends MCRTestCase {
     }
 
     @Test
+    public void testPreserveStructureAndService() throws JDOMException, JaxenException {
+        String xPathInput = "mycoreobject[structure][metadata/field.title/title][service]";
+        String xPathExpected = "mycoreobject[structure][service]";
+        cleanAndCompareTo(xPathInput, xPathExpected);
+    }
+
+    @Test
     public void testOverwriteDefaultRules() throws JDOMException, JaxenException {
         String xPath2i = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:namePart[@type='given']][mods:relatedItem/@xlink:href='test']]";
         String xPath2o = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:relatedItem/@xlink:href='test']]";
