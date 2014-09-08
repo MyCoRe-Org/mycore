@@ -462,6 +462,10 @@ public class MCRConfiguration {
             throw new MCRConfigurationException("Configuration property missing: " + name);
         }
 
+        return this.<T>loadClass(classname);
+    }
+
+    private <T> T loadClass(String classname) {
         logDebug("Loading Class: " + classname);
 
         T o = null;
@@ -506,6 +510,28 @@ public class MCRConfiguration {
         }
         return o;
     }
+    
+    /**
+     * Returns a new instance of the class specified in the configuration
+     * property with the given name.
+     * 
+     * @param name
+     *            the non-null and non-empty qualified name of the configuration property
+     * @param defaulObj
+     *            the default object;
+     * @return Instance of the value of the configuration property
+     * @throws MCRConfigurationException
+     *             if the property is not set or the class can not be loaded or
+     *             instantiated
+     */ 
+    public <T> T getInstanceOf(String name, T defaultObj) {
+        String classname = getString(name, null);
+        if (classname == null) {
+            return defaultObj;
+        }
+
+        return this.<T>loadClass(classname);
+    }
 
     /**
      * Returns a new instance of the class specified in the configuration
@@ -547,7 +573,7 @@ public class MCRConfiguration {
         instanceHolder.put(key, inst); // save the instance in the hashtable
         return inst;
     }
-
+   
     /**
      * Returns a instance of the class specified in the configuration property
      * with the given name. If the class was prevously instantiated by this
