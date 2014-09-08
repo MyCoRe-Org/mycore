@@ -6,8 +6,11 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrsteph" type="add">
+        mycore-base: add topological sorting of MyCoRe IDs to load and update from directory commands
+      </action>
       <action dev="mcrkrebs" type="add">
-        mycore-mods: searchfield mod.embargo added
+        mycore-mods: searchfield mods.embargo added
       </action>
       <action dev="mcrmeich" type="fix">
         mycore-oai: fix last resumptionToken

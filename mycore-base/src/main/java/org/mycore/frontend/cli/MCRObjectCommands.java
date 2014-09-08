@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
@@ -51,19 +52,21 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
+import org.mycore.tools.MCRTopologicalSort;
 import org.xml.sax.SAXParseException;
 
 /**
  * Provides static methods that implement commands for the MyCoRe command line interface.
  * 
  * Robert: Ideas for clean-up
- * - "transform ..." and "xslt..." do the same thinsg and should thereform be named uniquely - "transformm ...."
+ * - "transform ..." and "xslt..." do the same thing and should thereform be named uniquely - "transformm ...."
  * - "delete by Query ..." can be deleted - "select ..." and "delete selected ..." supply the same behaviour in 2 commands  
  * - "list objects matching ..." can be deleted - "select ..." and "list selected" supply the same behaviour in 2 commands
  * 
- * 
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
+ * @author Robert Stephan
+ * 
  * @version $Revision$ $Date$
  */
 @MCRCommandGroup(name = "MCRObject Commands")
@@ -165,6 +168,33 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
+     * Load MCRObject's from all XML files in a directory
+     * in proper order (respecting parent-child-relationships).
+     * 
+     * @param directory
+     *            the directory containing the XML files
+     * @throws MCRActiveLinkException
+     */
+    @MCRCommand(syntax = "load all objects in topological order from directory {0}", help = "Loads all MCRObjects form the directory {0} to the system respecting the order of parents and children.", order = 75)
+    public static List<String> loadTopologicalFromDirectory(String directory) throws MCRActiveLinkException {
+        return processFromDirectory(true, directory, false);
+    }
+
+    /**
+     * Update MCRObject's from all XML files in a directory 
+     * in proper order (respecting parent-child-relationships).
+     * 
+     * @param directory
+     *            the directory containing the XML files
+     * @throws MCRActiveLinkException
+     */
+    @MCRCommand(syntax = "update all objects in topological order from directory {0}", help = "Updates all MCRObjects form the directory {0} in the system respecting the order of parents and children.", order = 95)
+    public static List<String> updateTopologicalFromDirectory(String directory) throws MCRActiveLinkException {
+        return processFromDirectory(true, directory, true);
+    }
+
+  
+    /**
      * Load MCRObject's from all XML files in a directory.
      * 
      * @param directory
@@ -173,7 +203,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     @MCRCommand(syntax = "load all objects from directory {0}", help = "Loads all MCRObjects form the directory {0} to the system.", order = 70)
     public static List<String> loadFromDirectory(String directory) throws MCRActiveLinkException {
-        return processFromDirectory(directory, false);
+        return processFromDirectory(false, directory, false);
     }
 
     /**
@@ -185,11 +215,14 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     @MCRCommand(syntax = "update all objects from directory {0}", help = "Updates all MCRObjects form the directory {0} in the system.", order = 90)
     public static List<String> updateFromDirectory(String directory) throws MCRActiveLinkException {
-        return processFromDirectory(directory, true);
+        return processFromDirectory(false, directory, true);
     }
 
     /**
      * Load or update MCRObject's from all XML files in a directory.
+     *
+     * @param topological
+     *            if true, the dependencies of parent and child objects will be respected
      * 
      * @param directory
      *            the directory containing the XML files
@@ -197,7 +230,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            if true, object will be updated, else object is created
      * @throws MCRActiveLinkException
      */
-    private static List<String> processFromDirectory(String directory, boolean update) throws MCRActiveLinkException {
+    private static List<String> processFromDirectory(boolean topological, String directory, boolean update) throws MCRActiveLinkException {
         File dir = new File(directory);
 
         if (!dir.isDirectory()) {
@@ -211,12 +244,28 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.warn("No files found in directory " + directory);
             return null;
         }
-
-        List<String> cmds = new ArrayList<String>();
-        for (String file : list) {
-            if (file.endsWith(".xml") && !file.contains("derivate")) {
-                cmds.add((update ? "update" : "load") + " object from file " + new File(dir, file).getAbsolutePath());
-            }
+        
+    	List<String> cmds = new ArrayList<String>();
+        if(topological){
+        	MCRTopologicalSort ts = new MCRTopologicalSort();
+        	ts.prepareData(list, dir);
+        	int[] order = ts.doTopoSort();
+    		if(order!=null) {
+    			for(int o: order){
+    				String file = list[o];
+    				if (file.endsWith(".xml") && !file.contains("derivate")) {
+    					cmds.add((update ? "update" : "load") + " object from file " + new File(dir, file).getAbsolutePath());
+    				}
+    			}
+    		}
+        }
+        else{
+        	Arrays.sort(list);
+        	for (String file : list) {
+        		if (file.endsWith(".xml") && !file.contains("derivate")) {
+        			cmds.add((update ? "update" : "load") + " object from file " + new File(dir, file).getAbsolutePath());
+        		}
+        	}
         }
 
         return cmds;
