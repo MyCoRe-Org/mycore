@@ -6,6 +6,10 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrfluet" type="fix">
+        mycore-xeditor: Added default rules to preserve /mycoreobject/structure/ and /mycoreobject/service/
+        <fixes issue="718" />
+      </action>
       <action dev="mcrsteph" type="add">
         mycore-base: add topological sorting of MyCoRe IDs to load and update from directory commands
       </action>
