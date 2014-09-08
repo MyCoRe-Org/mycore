@@ -67,12 +67,12 @@ public class MCRResourceSecurityTest extends MCRJerseyResourceTest {
     }
 
     @Override
-    protected String[] getPackageName() {
+    public String[] getPackageName() {
         return new String[] { MCRTestResource.class.getPackage().getName() };
     }
 
     @Override
-    protected Map<String, String> getInitParams() {
+    public Map<String, String> getInitParams() {
         Map<String, String> initParams = new HashMap<String, String>();
         initParams.put(ResourceFilter.class.getName() + "s", MCRSecurityFilterFactory.class.getName());
         return initParams;

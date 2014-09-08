@@ -352,7 +352,7 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyResourceTest {
     }
 
     @Override
-    protected String[] getPackageName() {
+    public String[] getPackageName() {
         return new String[] { MCRClassificationEditorResource.class.getPackage().getName() };
     }
 }

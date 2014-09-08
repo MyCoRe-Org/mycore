@@ -85,14 +85,14 @@ import com.sun.jersey.multipart.FormDataParam;
  *      ],
  *      "parentID":{"rootID":"abcd","categID":"parent"}
  *      "children:"URL"
- * 
+ *
  * }
  * ...
  * ]
  * </code>
- * 
+ *
  * @author chi
- * 
+ *
  */
 @Path("classifications")
 public class MCRClassificationEditorResource {
@@ -206,22 +206,20 @@ public class MCRClassificationEditorResource {
         MCRJSONCategory category = parseJson(json);
         return sessionized(new DeleteOp(category)).getResponse();
     }
-    
+
     private <T extends OperationInSession> T sessionized(T op) {
         // we don't use getSingleInstanceOf(name, default) to keep DefaultSessionWrapper private
-        MCRSessionWrapper sessionWrapper = MCRConfiguration.instance().<MCRSessionWrapper> getSingleInstanceOf(
-            "MCR.Session.Wrapper.Class", null);
-        if (sessionWrapper == null) {
-            sessionWrapper = new DefaultSessionWrapper();
-        }
+        //        MCRSessionWrapper sessionWrapper = MCRConfiguration.instance().<MCRSessionWrapper>getSingleInstanceOf("MCR.Session.Wrapper.Class");
+        MCRSessionWrapper sessionWrapper = MCRConfiguration.instance().getInstanceOf("MCR.Session.Wrapper.Class",
+                new DefaultSessionWrapper());
         return sessionWrapper.wrap(op);
     }
-    
+
     interface MCRSessionWrapper {
         public <T extends OperationInSession> T wrap(T op);
     }
-    
-    private class DefaultSessionWrapper implements MCRSessionWrapper{
+
+    private class DefaultSessionWrapper implements MCRSessionWrapper {
         @Override
         public <T extends OperationInSession> T wrap(T op) {
             if (!MCRSessionMgr.getCurrentSession().isTransactionActive()) {
@@ -234,16 +232,17 @@ public class MCRClassificationEditorResource {
             }
             return op;
         }
-        
+
     }
-    
+
     interface OperationInSession {
         public void run();
     }
-    
-    private class DeleteOp implements OperationInSession{
-        
+
+    private class DeleteOp implements OperationInSession {
+
         private MCRJSONCategory category;
+
         private Response response;
 
         public DeleteOp(MCRJSONCategory category) {
@@ -256,7 +255,7 @@ public class MCRClassificationEditorResource {
                 MCRCategoryID categoryID = category.getId();
                 if (CATEGORY_DAO.exist(categoryID)) {
                     if (categoryID.isRootID()
-                        && !MCRAccessManager.checkPermission(categoryID.getRootID(), PERMISSION_DELETE)) {
+                            && !MCRAccessManager.checkPermission(categoryID.getRootID(), PERMISSION_DELETE)) {
                         throw new WebApplicationException(Status.UNAUTHORIZED);
                     }
                     CATEGORY_DAO.deleteCategory(categoryID);
@@ -277,11 +276,11 @@ public class MCRClassificationEditorResource {
         private void setResponse(Response response) {
             this.response = response;
         }
-        
+
     }
-    
-    private class UpdateOp implements OperationInSession{
-        
+
+    private class UpdateOp implements OperationInSession {
+
         private MCRJSONCategory category;
 
         public UpdateOp(MCRJSONCategory category) {
@@ -304,7 +303,7 @@ public class MCRClassificationEditorResource {
                 CATEGORY_DAO.addCategory(newParentID, category.asMCRImpl(), category.getPositionInParent());
             }
         }
-        
+
     }
 
     @POST
@@ -330,9 +329,9 @@ public class MCRClassificationEditorResource {
                     if (isAdded && MCRCategoryDAOFactory.getInstance().exist(mcrCategoryID)) {
                         // an added category already exist -> throw conflict error
                         return Response.status(Status.CONFLICT).entity(buildJsonError("duplicateID", mcrCategoryID))
-                            .build();
+                                .build();
                     }
-                    
+
                     sessionized(new UpdateOp(parsedCateg));
                 } else if ("delete".equals(status)) {
                     deleteCateg(categ.getJson());
@@ -352,7 +351,7 @@ public class MCRClassificationEditorResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_HTML)
     public Response importClassification(@FormDataParam("classificationFile") InputStream uploadedInputStream,
-        @FormDataParam("classificationFile") FormDataContentDisposition fileDetail) {
+            @FormDataParam("classificationFile") FormDataContentDisposition fileDetail) {
         MCRCategory classification;
         try {
             Document jdom = MCRXMLParserFactory.getParser().parseXML(new MCRStreamContent(uploadedInputStream));
@@ -382,7 +381,7 @@ public class MCRClassificationEditorResource {
     @Path("link/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response retrieveLinkedObjects(@PathParam("id") String id, @QueryParam("start") Integer start,
-        @QueryParam("rows") Integer rows) throws SolrServerException, UnsupportedEncodingException {
+            @QueryParam("rows") Integer rows) throws SolrServerException, UnsupportedEncodingException {
         // do solr query
         SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
         ModifiableSolrParams params = new ModifiableSolrParams();
@@ -522,7 +521,7 @@ public class MCRClassificationEditorResource {
             if (depthLevel1.getAsInt() != depthLevel2.getAsInt()) {
                 return new Integer(depthLevel1.getAsInt()).compareTo(depthLevel2.getAsInt());
             }
-            // compare index            
+            // compare index
             JsonPrimitive index1 = jsonElement1.getAsJsonObject().getAsJsonPrimitive("index");
             JsonPrimitive index2 = jsonElement2.getAsJsonObject().getAsJsonPrimitive("index");
             if (index1 == null) {
