@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 
 import com.sun.jersey.spi.container.ContainerRequest;
@@ -34,9 +35,9 @@ class MCRSessionHookFilter implements ResourceFilter, ContainerRequestFilter, Co
     public ContainerRequest filter(ContainerRequest request) {
         MCRSession session = MCRServlet.getSession(httpRequest);
         MCRSessionMgr.setCurrentSession(session);
-        LOGGER.info(MessageFormat.format("{0} ip={1} mcr={2} user={3}", request.getPath(), MCRServlet.getRemoteAddr(httpRequest), session.getID(), session
-            .getUserInformation()
-            .getUserID()));
+        LOGGER.info(MessageFormat.format("{0} ip={1} mcr={2} user={3}", request.getPath(),
+            MCRFrontendUtil.getRemoteAddr(httpRequest), session.getID(), session.getUserInformation().getUserID()));
+        MCRFrontendUtil.configureSession(session, httpRequest);
         return request;
     }
 

@@ -46,6 +46,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRLayoutService;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.xml.sax.SAXException;
 
 /**
@@ -144,8 +145,8 @@ public class MCRErrorServlet extends HttpServlet {
     }
 
     private void setWebAppBaseURL(MCRSession session, HttpServletRequest request) {
-        if (request.getAttribute(MCRServlet.BASE_URL_ATTRIBUTE) != null) {
-            session.put(MCRServlet.BASE_URL_ATTRIBUTE, request.getAttribute(MCRServlet.BASE_URL_ATTRIBUTE));
+        if (request.getAttribute(MCRFrontendUtil.BASE_URL_ATTRIBUTE) != null) {
+            session.put(MCRFrontendUtil.BASE_URL_ATTRIBUTE, request.getAttribute(MCRFrontendUtil.BASE_URL_ATTRIBUTE));
         }
     }
 
@@ -203,7 +204,7 @@ public class MCRErrorServlet extends HttpServlet {
         LOGGER.log(exceptionThrown ? Level.ERROR : Level.WARN, MessageFormat.format(
             "{0}: Error {1} occured. The following message was given: {2}", requestURI, statusCode, msg), ex);
 
-        String style = MCRServlet.getProperty(request, "XSL.Style");
+        String style = MCRFrontendUtil.getProperty(request, "XSL.Style");
         if (!"xml".equals(style)) {
             style = "default";
         }

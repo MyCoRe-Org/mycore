@@ -50,7 +50,7 @@ import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
 
@@ -337,7 +337,8 @@ public class MCRIView2Tools {
         }
         String params = MCRXMLFunctions.encodeURIPath(MessageFormat.format(
             "jumpback=true&maximized=true&page={0}&derivate={1}", file.getAbsolutePath(), file.getOwnerID()));
-        String url = MessageFormat.format("{0}receive/{1}?{2}", MCRServlet.getBaseURL(), file.getMCRObjectID(), params);
+        String url = MessageFormat.format("{0}receive/{1}?{2}", MCRFrontendUtil.getBaseURL(), file.getMCRObjectID(),
+            params);
 
         return url;
     }

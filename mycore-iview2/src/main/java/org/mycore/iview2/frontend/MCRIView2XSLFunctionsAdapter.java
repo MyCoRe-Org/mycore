@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.iview2.services.MCRIView2Tools;
 
@@ -65,7 +66,7 @@ public class MCRIView2XSLFunctionsAdapter {
         options.append('{');
         options.append("\"derivateId\":").append('\"').append(derivateID).append("\",");
         options.append("\"objectId\":").append('\"').append(objectID).append("\",");
-        options.append("\"webappBaseUri\":").append('\"').append(MCRServlet.getBaseURL()).append("\",");
+        options.append("\"webappBaseUri\":").append('\"').append(MCRFrontendUtil.getBaseURL()).append("\",");
         String baseUris = config.getString("MCR.Module-iview2.BaseURL", "");
         if (baseUris.length() < 10) {
             baseUris = MCRServlet.getServletBaseURL() + "MCRTileServlet";

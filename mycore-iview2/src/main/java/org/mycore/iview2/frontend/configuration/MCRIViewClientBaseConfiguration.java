@@ -3,6 +3,7 @@ package org.mycore.iview2.frontend.configuration;
 import javax.servlet.http.HttpServletRequest;
 
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 
 /**
@@ -23,7 +24,7 @@ public abstract class MCRIViewClientBaseConfiguration extends MCRIViewClientConf
     public MCRIViewClientConfiguration setup(HttpServletRequest request) {
         super.setup(request);
         // property
-        setProperty("webApplicationBaseURL", MCRServlet.getBaseURL());
+        setProperty("webApplicationBaseURL", MCRFrontendUtil.getBaseURL());
         setProperty("derivate", getDerivate(request));
         setProperty("filePath", getFilePath(request));
         setProperty("doctype", getDocType(request));

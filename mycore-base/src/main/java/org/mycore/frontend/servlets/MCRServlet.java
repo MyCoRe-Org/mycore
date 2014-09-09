@@ -23,26 +23,23 @@
 
 package org.mycore.frontend.servlets;
 
+import static org.mycore.frontend.MCRFrontendUtil.BASE_HOST_IP;
+import static org.mycore.frontend.MCRFrontendUtil.BASE_URL;
+import static org.mycore.frontend.MCRFrontendUtil.BASE_URL_ATTRIBUTE;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.net.UnknownHostException;
 import java.text.MessageFormat;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -66,6 +63,7 @@ import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.common.xsl.MCRErrorListener;
 import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.services.i18n.MCRTranslation;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -92,21 +90,12 @@ public class MCRServlet extends HttpServlet {
 
     private static Logger LOGGER = Logger.getLogger(MCRServlet.class);
 
-    private static String BASE_URL;
-
-    private static String BASE_HOST_IP;
-
     private static String SERVLET_URL;
 
     private static final boolean ENABLE_BROWSER_CACHE = MCRConfiguration.instance().getBoolean(
         "MCR.Servlet.BrowserCache.enable", false);
 
     private static MCRLayoutService LAYOUT_SERVICE;
-
-    public static final String BASE_URL_ATTRIBUTE = "org.mycore.base.url";
-
-    /** The IP addresses of trusted web proxies */
-    protected static final Set<String> TRUSTED_PROXIES = getTrustedProxies();
 
     static {
         prepareBaseURLs(""); // getBaseURL() etc. may be called before any HTTP Request    
@@ -124,18 +113,19 @@ public class MCRServlet extends HttpServlet {
         }
     }
 
-    /** returns the base URL of the mycore system */
+    /** 
+     * Returns the base URL of the mycore system
+     * 
+     * @deprecated use {@link MCRFrontendUtil#getBaseURL()}
+     **/
+    @Deprecated
     public static String getBaseURL() {
-        MCRSession session = MCRSessionMgr.getCurrentSession();
-        Object value = session.get(BASE_URL_ATTRIBUTE);
-        if (value != null) {
-            LOGGER.debug("Returning BaseURL " + value.toString() + " from user session.");
-            return value.toString();
-        }
-        return BASE_URL;
+        return MCRFrontendUtil.getBaseURL();
     }
 
-    /** returns the servlet base URL of the mycore system */
+    /**
+     * Returns the servlet base URL of the mycore system
+     **/
     public static String getServletBaseURL() {
         MCRSession session = MCRSessionMgr.getCurrentSession();
         Object value = session.get(BASE_URL_ATTRIBUTE);
@@ -160,21 +150,9 @@ public class MCRServlet extends HttpServlet {
         prepareBaseURLs(baseURLofRequest);
     }
 
-    private static synchronized void prepareBaseURLs(String baseURL) {
-        BASE_URL = MCRConfiguration.instance().getString("MCR.baseurl", baseURL);
-        if (!BASE_URL.endsWith("/")) {
-            BASE_URL = BASE_URL + "/";
-        }
+    private static void prepareBaseURLs(String baseURLofRequest) {
+        MCRFrontendUtil.prepareBaseURLs(baseURLofRequest);
         SERVLET_URL = BASE_URL + "servlets/";
-        try {
-            URL url = new URL(BASE_URL);
-            InetAddress BASE_HOST = InetAddress.getByName(url.getHost());
-            BASE_HOST_IP = BASE_HOST.getHostAddress();
-        } catch (MalformedURLException e) {
-            LOGGER.error("Can't create URL from String " + BASE_URL);
-        } catch (UnknownHostException e) {
-            LOGGER.error("Can't find host IP for URL " + BASE_URL);
-        }
     }
 
     // The methods doGet() and doPost() simply call the private method
@@ -371,25 +349,6 @@ public class MCRServlet extends HttpServlet {
         msg.append(" mcr=").append(session.getID());
         msg.append(" user=").append(session.getUserInformation().getUserID());
         LOGGER.info(msg.toString());
-
-        String lang = getProperty(job.getRequest(), "lang");
-
-        if (lang != null && lang.trim().length() != 0) {
-            session.setCurrentLanguage(lang.trim());
-        }
-
-        // Set the IP of the current session
-        if (session.getCurrentIP().length() == 0) {
-            session.setCurrentIP(getRemoteAddr(job.getRequest()));
-        }
-
-        // set BASE_URL_ATTRIBUTE to MCRSession
-        if (job.getRequest().getAttribute(BASE_URL_ATTRIBUTE) != null) {
-            session.put(BASE_URL_ATTRIBUTE, job.getRequest().getAttribute(BASE_URL_ATTRIBUTE));
-        }
-
-        // Store XSL.*.SESSION parameters to MCRSession
-        putParamsToSession(job.getRequest());
     }
 
     private Exception processThinkPhase(MCRServletJob job) {
@@ -630,77 +589,16 @@ public class MCRServlet extends HttpServlet {
         return -1; // time is not known
     }
 
-    public static String getProperty(HttpServletRequest request, String name) {
-        String value = (String) request.getAttribute(name);
-
-        // if Attribute not given try Parameter
-        if (value == null || value.length() == 0) {
-            value = request.getParameter(name);
-        }
-
-        return value;
-    }
-
     /**
-     * Builds a list of trusted proxy IPs from MCR.Request.TrustedProxies. The
-     * IP address of the local host is automatically added to this list.
-     * @return 
+     * 
+     * @param request
+     * @param name
+     * @return
+     * @deprecated use {@link MCRFrontendUtil#getProperty(HttpServletRequest, String)}
      */
-    private static TreeSet<String> getTrustedProxies() {
-        boolean closeSession = !MCRSessionMgr.hasCurrentSession();
-        HashSet<InetAddress> trustedProxies = new HashSet<>();
-
-        String sTrustedProxies = MCRConfiguration.instance().getString("MCR.Request.TrustedProxies", "");
-        StringTokenizer st = new StringTokenizer(sTrustedProxies, " ,;");
-        while (st.hasMoreTokens()) {
-            String host = st.nextToken().trim();
-            try {
-                Collections.addAll(trustedProxies, InetAddress.getAllByName(host));
-            } catch (UnknownHostException e) {
-                LOGGER.warn("Unknown host: " + host);
-            }
-        }
-
-        // Always trust the local host
-        try {
-            InetAddress[] localAddresses = InetAddress.getAllByName(InetAddress.getLocalHost().getHostName());
-            Collections.addAll(trustedProxies, localAddresses);
-        } catch (UnknownHostException e) {
-            LOGGER.warn("Could not get local host name.", e);
-        }
-        trustedProxies.add(InetAddress.getLoopbackAddress());
-        try {
-            Collections.addAll(trustedProxies, InetAddress.getAllByName("localhost"));
-        } catch (UnknownHostException e) {
-            LOGGER.warn("Could not get IP adresses of 'localhost'.", e);
-        }
-
-        //junit test cannot configure baseurl properly
-        if (getBaseURL() != null) {
-            try {
-                String host = new java.net.URL(getBaseURL()).getHost();
-                Collections.addAll(trustedProxies, InetAddress.getAllByName(host));
-            } catch (Exception ex) {
-                LOGGER.warn("Could not determine IP of local host serving:" + getBaseURL(), ex);
-            }
-        }
-
-        TreeSet<String> sortedAdresses = new TreeSet<>();
-        if (LOGGER.isDebugEnabled()) {
-            for (InetAddress address : trustedProxies) {
-                sortedAdresses.add(address.toString());
-            }
-            LOGGER.debug("Trusted proxies: " + sortedAdresses);
-            sortedAdresses.clear();
-        }
-        for (InetAddress address : trustedProxies) {
-            sortedAdresses.add(address.getHostAddress());
-        }
-        if (closeSession) {
-            //getBaseURL() creates MCRSession
-            MCRSessionMgr.getCurrentSession().close();
-        }
-        return sortedAdresses;
+    @Deprecated
+    public static String getProperty(HttpServletRequest request, String name) {
+        return MCRFrontendUtil.getProperty(request, name);
     }
 
     /**
@@ -711,84 +609,12 @@ public class MCRServlet extends HttpServlet {
      * proxy IPs can be configured using the property
      * MCR.Request.TrustedProxies, which is a List of IP addresses separated by
      * blanks and/or comma.
+     * 
+     * @deprecated use {@link MCRFrontendUtil#getRemoteAddr(HttpServletRequest)}
      */
+    @Deprecated
     public static String getRemoteAddr(HttpServletRequest req) {
-        String remoteAddress = req.getRemoteAddr();
-        if (TRUSTED_PROXIES.contains(remoteAddress)) {
-            String xff = getXForwardedFor(req);
-            if (xff != null)
-                remoteAddress = xff;
-        }
-        return remoteAddress;
-    }
-
-    /**
-     * Get header to check if request comes in via a proxy.
-     * There are two possible header names
-     */
-    private static String getXForwardedFor(HttpServletRequest req) {
-        String xff = req.getHeader("X-Forwarded-For");
-        if ((xff == null) || xff.trim().isEmpty()) {
-            xff = req.getHeader("X_Forwarded_For");
-        }
-        if ((xff == null) || xff.trim().isEmpty())
-            return null;
-
-        // X_FORWARDED_FOR can be comma separated list of hosts,
-        // if so, take last entry, all others are not reliable because
-        // any client may have set the header to any value.
-
-        LOGGER.debug("X-Forwarded-For complete: " + xff);
-        StringTokenizer st = new StringTokenizer(xff, " ,;");
-        while (st.hasMoreTokens()) {
-            xff = st.nextToken().trim();
-        }
-        LOGGER.debug("X-Forwarded-For last: " + xff);
-        return xff;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static void putParamsToSession(HttpServletRequest request) {
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-
-        for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
-            String name = e.nextElement();
-            if (name.startsWith("XSL.") && name.endsWith(".SESSION")) {
-                String key = name.substring(0, name.length() - 8);
-                // parameter is not empty -> store
-                if (!request.getParameter(name).trim().equals("")) {
-                    mcrSession.put(key, request.getParameter(name));
-                    LOGGER.debug("Found HTTP-Req.-Parameter " + name + "=" + request.getParameter(name)
-                        + " that should be saved in session, safed " + key + "=" + request.getParameter(name));
-                }
-                // paramter is empty -> do not store and if contained in
-                // session, remove from it
-                else {
-                    if (mcrSession.get(key) != null) {
-                        mcrSession.deleteObject(key);
-                    }
-                }
-            }
-        }
-        for (Enumeration<String> e = request.getAttributeNames(); e.hasMoreElements();) {
-            String name = e.nextElement();
-            if (name.startsWith("XSL.") && name.endsWith(".SESSION")) {
-                String key = name.substring(0, name.length() - 8);
-                // attribute is not empty -> store
-                if (!request.getAttribute(name).toString().trim().equals("")) {
-                    mcrSession.put(key, request.getAttribute(name));
-                    LOGGER.debug("Found HTTP-Req.-Attribute " + name + "=" + request.getParameter(name)
-                        + " that should be saved in session, safed " + key + "=" + request.getParameter(name));
-                }
-                // attribute is empty -> do not store and if contained in
-                // session, remove from it
-                else {
-                    if (mcrSession.get(key) != null) {
-                        mcrSession.deleteObject(key);
-                    }
-                }
-            }
-        }
+        return MCRFrontendUtil.getRemoteAddr(req);
     }
 
     /**

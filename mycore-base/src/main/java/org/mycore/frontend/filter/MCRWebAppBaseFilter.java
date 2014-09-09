@@ -34,21 +34,22 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.MCRFrontendUtil;
 
 public class MCRWebAppBaseFilter implements Filter {
     private static final String PROXY_HEADER = "X-Forwarded-Host";
 
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
+        ServletException {
         // check if BASE_URL_ATTRIBUTE is present
         // for used proxy header use the first entry of list
-        if (req.getAttribute(MCRServlet.BASE_URL_ATTRIBUTE) == null) {
+        if (req.getAttribute(MCRFrontendUtil.BASE_URL_ATTRIBUTE) == null) {
             HttpServletRequest request = (HttpServletRequest) req;
             StringBuilder webappBase = new StringBuilder(request.getScheme());
             webappBase.append("://");
             String proxyHeader = request.getHeader(PROXY_HEADER);
             if (proxyHeader != null) {
-                StringTokenizer sttoken = new StringTokenizer(proxyHeader,",");
+                StringTokenizer sttoken = new StringTokenizer(proxyHeader, ",");
                 String proxyHost = sttoken.nextToken().trim();
                 webappBase.append(proxyHost);
             } else {
@@ -59,7 +60,7 @@ public class MCRWebAppBaseFilter implements Filter {
                 }
             }
             webappBase.append(request.getContextPath()).append('/');
-            request.setAttribute(MCRServlet.BASE_URL_ATTRIBUTE, webappBase);
+            request.setAttribute(MCRFrontendUtil.BASE_URL_ATTRIBUTE, webappBase);
         }
         chain.doFilter(req, res);
     }

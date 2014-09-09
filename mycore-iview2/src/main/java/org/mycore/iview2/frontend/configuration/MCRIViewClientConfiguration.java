@@ -23,7 +23,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.common.content.MCRXMLContent;
-import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.iview2.services.MCRIView2Tools;
 
 import com.google.common.collect.LinkedListMultimap;
@@ -157,7 +157,7 @@ public class MCRIViewClientConfiguration {
      * @param hasMinified only uses the minified version if true
      */
     public void addLocalScript(final String file, final boolean hasMinified) {
-        String baseURL = MCRServlet.getBaseURL();
+        String baseURL = MCRFrontendUtil.getBaseURL();
         StringBuffer scriptURL = new StringBuffer(baseURL);
         scriptURL.append("modules/iview2/js/");
         if (isDebugMode() || !hasMinified) {
@@ -184,7 +184,7 @@ public class MCRIViewClientConfiguration {
      * @param file to include
      */
     public void addLocalCSS(final String file) {
-        String baseURL = MCRServlet.getBaseURL();
+        String baseURL = MCRFrontendUtil.getBaseURL();
         StringBuffer cssURL = new StringBuffer(baseURL);
         cssURL.append("modules/iview2/css/").append(file);
         addCSS(cssURL.toString());
