@@ -154,6 +154,9 @@
               <xsl:when test="$gndType='CorporateBody'">
                 <xsl:value-of select="$gndEntry//gndo:preferredNameForTheCorporateBody" />
               </xsl:when>
+              <xsl:when test="$gndType='ConferenceOrEvent'">
+                <xsl:value-of select="$gndEntry//gndo:preferredNameForTheConferenceOrEvent" />
+              </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="$gndEntry//gndo:preferredNameForThePerson[not(@rdf:parseType)]"/>
               </xsl:otherwise>

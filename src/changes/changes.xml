@@ -7,6 +7,9 @@
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
       <action dev="mcrkrebs" type="fix">
+        mycore-mods: added type "ConferenceOrEvent" to rdf import
+      </action>
+      <action dev="mcrkrebs" type="fix">
         mycore-mods: show refereed only if any value is given
       </action>
       <action dev="mcrfluet" type="fix">
