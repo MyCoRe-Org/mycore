@@ -193,7 +193,21 @@
       <xsl:value-of select="$mods-type" />
     </xsl:message>
 
-    <div id="detail_view" class="blockbox">
+    <xsl:variable name="rdfaTypeOf">
+      <xsl:choose>
+        <xsl:when test="$mods-type = 'article'">  <xsl:value-of select="'ScholarlyArticle'" /></xsl:when>
+        <xsl:when test="$mods-type = 'book'">     <xsl:value-of select="'Book'" />            </xsl:when>
+        <xsl:when test="$mods-type = 'confpro'">  <xsl:value-of select="'Book'" />            </xsl:when>
+        <xsl:when test="$mods-type = 'confpub'">  <xsl:value-of select="'ScholarlyArticle'" /></xsl:when>
+        <xsl:when test="$mods-type = 'journal'">  <xsl:value-of select="'Periodical'" />      </xsl:when>
+        <xsl:when test="$mods-type = 'series'">   <xsl:value-of select="'Periodical'" />      </xsl:when>
+        <xsl:when test="$mods-type = 'chapter'">  <xsl:value-of select="'CreativeWork'" />    </xsl:when>
+        <xsl:when test="$mods-type = 'report'">   <xsl:value-of select="'CreativeWork'" />    </xsl:when>
+        <xsl:when test="$mods-type = 'av-medium'"><xsl:value-of select="'MediaObject'" />     </xsl:when>
+      </xsl:choose>
+    </xsl:variable>
+
+    <div id="detail_view" class="blockbox" typeOf="{$rdfaTypeOf}">
       <h3>
         <xsl:apply-templates select="." mode="resulttitle" /><!-- shorten plain text title (without html) -->
       </h3>
