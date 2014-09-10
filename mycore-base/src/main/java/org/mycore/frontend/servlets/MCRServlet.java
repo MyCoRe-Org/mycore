@@ -345,10 +345,12 @@ public class MCRServlet extends HttpServlet {
         StringBuilder msg = new StringBuilder();
         msg.append(c);
         msg.append(" ip=");
-        msg.append(getRemoteAddr(job.getRequest()));
+        msg.append(MCRFrontendUtil.getRemoteAddr(job.getRequest()));
         msg.append(" mcr=").append(session.getID());
         msg.append(" user=").append(session.getUserInformation().getUserID());
         LOGGER.info(msg.toString());
+
+        MCRFrontendUtil.configureSession(session, job.getRequest());
     }
 
     private Exception processThinkPhase(MCRServletJob job) {
@@ -594,9 +596,7 @@ public class MCRServlet extends HttpServlet {
      * @param request
      * @param name
      * @return
-     * @deprecated use {@link MCRFrontendUtil#getProperty(HttpServletRequest, String)}
      */
-    @Deprecated
     public static String getProperty(HttpServletRequest request, String name) {
         return MCRFrontendUtil.getProperty(request, name);
     }
