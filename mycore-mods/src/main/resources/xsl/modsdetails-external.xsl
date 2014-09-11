@@ -61,8 +61,7 @@
 
   </xsl:template>
 
-  <xsl:template name="documentEditExternals">
-    <xsl:param name="objectId" />
+  <xsl:template match="/mycoreobject[contains(@ID,'_mods_')]" mode="externalObjectActions">
     <!-- add here your application specific edit menu entries, as <li />  -->
   </xsl:template>
 
