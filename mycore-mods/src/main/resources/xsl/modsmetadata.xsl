@@ -16,6 +16,7 @@
     <xsl:param name="nodes" />
     <xsl:param name="label" select="i18n:translate(concat('component.mods.metaData.dictionary.',local-name($nodes[1])))" />
     <xsl:param name="sep" select="''" />
+    <xsl:param name="property" select="''" />
     <xsl:message>
       <xsl:value-of select="concat('label: ',$label)" />
     </xsl:message>
@@ -28,6 +29,11 @@
           <xsl:value-of select="concat($label,':')" />
         </td>
         <td class="metavalue">
+          <xsl:if test="$property != ''">
+            <xsl:attribute name="property">
+              <xsl:value-of select="$property" />
+            </xsl:attribute>
+          </xsl:if>
           <xsl:variable name="selectPresentLang">
             <xsl:call-template name="selectPresentLang">
               <xsl:with-param name="nodes" select="$nodes" />
@@ -62,6 +68,13 @@
         <xsl:value-of select="concat($label,':')" />
       </td>
       <td class="metavalue">
+        <xsl:if test="mods:dateIssued">
+          <meta property="datePublished">
+            <xsl:attribute name="content">
+              <xsl:value-of select="." />
+            </xsl:attribute>
+          </meta>
+        </xsl:if>
         <xsl:apply-templates select="." mode="formatDate" />
       </td>
     </tr>
@@ -177,7 +190,7 @@
               </xsl:otherwise>
             </xsl:choose>
           </td>
-          <td class="metavalue">
+          <td class="metavalue" property="name">
             <xsl:choose>
               <xsl:when test="not(./../@type='translated' or ./../@type='alternative') and //mods:titleInfo[@transliteration='text/html']">
                 <xsl:value-of select="//mods:titleInfo[@transliteration='text/html']/mods:title" disable-output-escaping="yes" />
@@ -392,41 +405,48 @@
   </xsl:template>
 
   <xsl:template match="mods:name" mode="printName">
-    <xsl:choose>
-      <xsl:when test="@valueURI">
-        <!-- derived from printModsClassInfo template -->
-        <xsl:variable name="classlink" select="mcrmods:getClassCategParentLink(.)" />
-        <xsl:choose>
-          <xsl:when test="string-length($classlink) &gt; 0">
-            <xsl:for-each select="document($classlink)/mycoreclass//category[position()=1 or position()=last()]">
-              <xsl:if test="position() > 1">
-                <xsl:value-of select="', '" />
-              </xsl:if>
-              <xsl:apply-templates select="." mode="printModsClassInfo" />
-            </xsl:for-each>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:apply-templates select="." mode="hrefLink" />
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
-      <xsl:when test="mods:namePart">
-        <xsl:choose>
-          <xsl:when test="mods:namePart[@type='given'] and mods:namePart[@type='family']">
-            <xsl:value-of select="concat(mods:namePart[@type='family'], ', ',mods:namePart[@type='given'])" />
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="mods:namePart" />
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
-      <xsl:when test="mods:displayForm">
-        <xsl:value-of select="mods:displayForm" />
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="." />
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:variable name="personName">
+      <xsl:choose>
+        <xsl:when test="@valueURI">
+          <!-- derived from printModsClassInfo template -->
+          <xsl:variable name="classlink" select="mcrmods:getClassCategParentLink(.)" />
+          <xsl:choose>
+            <xsl:when test="string-length($classlink) &gt; 0">
+              <xsl:for-each select="document($classlink)/mycoreclass//category[position()=1 or position()=last()]">
+                <xsl:if test="position() > 1">
+                  <xsl:value-of select="', '" />
+                </xsl:if>
+                <xsl:apply-templates select="." mode="printModsClassInfo" />
+              </xsl:for-each>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:apply-templates select="." mode="hrefLink" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:when test="mods:namePart">
+          <xsl:choose>
+            <xsl:when test="mods:namePart[@type='given'] and mods:namePart[@type='family']">
+              <xsl:value-of select="concat(mods:namePart[@type='family'], ', ',mods:namePart[@type='given'])" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="mods:namePart" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:when test="mods:displayForm">
+          <xsl:value-of select="mods:displayForm" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="." />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <span property="author" typeof="Person">
+      <xsl:value-of select="$personName" />
+      <meta property="name" content="{$personName}"/>
+    </span>
   </xsl:template>
 
   <xsl:template match="mods:name" mode="present"><!-- ToDo: all authors, rev ... in one column -->
@@ -599,6 +619,11 @@
             </xsl:choose>
           </xsl:if>
           <xsl:apply-templates select="." mode="printModsClassInfo" />
+          <meta property="inLanguage">
+            <xsl:attribute name="content">
+              <xsl:value-of select="." />
+            </xsl:attribute>
+          </meta>
         </xsl:for-each>
       </td>
     </tr>
@@ -880,6 +905,7 @@
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject" />
               <xsl:with-param name="sep" select="'; '" />
+              <xsl:with-param name="property" select="'keyword'" />
             </xsl:call-template>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:part/mods:extent" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url" />
@@ -1087,6 +1113,7 @@
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject" />
               <xsl:with-param name="sep" select="'; '" />
+              <xsl:with-param name="property" select="'keyword'" />
             </xsl:call-template>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition" />
@@ -1158,6 +1185,7 @@
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject" />
               <xsl:with-param name="sep" select="'; '" />
+              <xsl:with-param name="property" select="'keyword'" />
             </xsl:call-template>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition" />
@@ -1241,6 +1269,7 @@
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject" />
               <xsl:with-param name="sep" select="'; '" />
+              <xsl:with-param name="property" select="'keyword'" />
             </xsl:call-template>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition" />
@@ -1313,6 +1342,7 @@
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject" />
               <xsl:with-param name="sep" select="'; '" />
+              <xsl:with-param name="property" select="'keyword'" />
             </xsl:call-template>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:location/mods:url" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:accessCondition" />
@@ -1486,6 +1516,7 @@
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:subject" />
               <xsl:with-param name="sep" select="'; '" />
+              <xsl:with-param name="property" select="'keyword'" />
             </xsl:call-template>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
             <xsl:call-template name="printMetaDate.mods.permalink" />
