@@ -59,7 +59,7 @@ public class MCRDebugTarget implements MCREditorTarget {
 
         List<Step> steps = new ArrayList<Step>();
         for (String label; (label = tracker.undoLastBreakpoint(result)) != null;)
-            steps.add(0, new Step(label, MCRChangeTracker.removeChangeTracking(result)));
+            steps.add(0, new Step(label, result.clone()));
 
         result = session.getEditedXML().clone();
         result = MCRChangeTracker.removeChangeTracking(result);
