@@ -84,6 +84,7 @@
     <xsl:variable name="formatted">
       <xsl:call-template name="formatISODate">
         <xsl:with-param name="date" select="." />
+        <xsl:with-param name="format" select="'dd.MM.yyyy'" />
       </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
