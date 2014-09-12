@@ -68,7 +68,7 @@
         <xsl:value-of select="concat($label,':')" />
       </td>
       <td class="metavalue">
-        <xsl:if test="mods:dateIssued">
+        <xsl:if test="local-name()='dateIssued'">
           <meta property="datePublished">
             <xsl:attribute name="content">
               <xsl:value-of select="." />
@@ -84,6 +84,7 @@
     <xsl:variable name="formatted">
       <xsl:call-template name="formatISODate">
         <xsl:with-param name="date" select="." />
+        <xsl:with-param name="format" select="'dd.MM.yyyy'" />
       </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
@@ -191,16 +192,28 @@
             </xsl:choose>
           </td>
           <td class="metavalue" property="name">
-            <xsl:choose>
-              <xsl:when test="not(./../@type='translated' or ./../@type='alternative') and //mods:titleInfo[@transliteration='text/html']">
-                <xsl:value-of select="//mods:titleInfo[@transliteration='text/html']/mods:title" disable-output-escaping="yes" />
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:call-template name="lf2br">
-                  <xsl:with-param name="string" select="." />
-                </xsl:call-template>
-              </xsl:otherwise>
-            </xsl:choose>
+            <span>
+              <xsl:attribute name="property">
+                <xsl:choose>
+                  <xsl:when test="./../@type='translated' or ./../@type='alternative'">
+                    <xsl:text>alternativeHeadline</xsl:text>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:text>headline</xsl:text>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
+              <xsl:choose>
+                <xsl:when test="not(./../@type='translated' or ./../@type='alternative') and //mods:titleInfo[@transliteration='text/html']">
+                  <xsl:value-of select="//mods:titleInfo[@transliteration='text/html']/mods:title" disable-output-escaping="yes" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:call-template name="lf2br">
+                    <xsl:with-param name="string" select="." />
+                  </xsl:call-template>
+                </xsl:otherwise>
+              </xsl:choose>
+            </span>
           </td>
         </tr>
       </xsl:for-each>
@@ -210,7 +223,9 @@
             <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.subtitle'),':')" />
           </td>
           <td class="metavalue subTitle">
-            <xsl:value-of select="mods:subTitle" />
+            <span property="alternativeHeadline">
+              <xsl:value-of select="mods:subTitle" />
+            </span>
           </td>
         </tr>
       </xsl:if>
@@ -443,10 +458,19 @@
       </xsl:choose>
     </xsl:variable>
 
-    <span property="author" typeof="Person">
-      <xsl:value-of select="$personName" />
-      <meta property="name" content="{$personName}"/>
-    </span>
+    <xsl:if test="mods:role/mods:roleTerm='aut'">
+      <xsl:variable name="propType">
+        <xsl:choose>
+          <xsl:when test="@type='corporate'"><xsl:text>Organisation</xsl:text></xsl:when>
+          <xsl:otherwise><xsl:text>Person</xsl:text></xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <span property="author" typeof="{$propType}">
+        <xsl:value-of select="$personName" />
+        <meta property="name" content="{$personName}"/>
+      </span>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="mods:name" mode="present"><!-- ToDo: all authors, rev ... in one column -->
@@ -1085,9 +1109,7 @@
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
             <xsl:call-template name="printMetaDate.mods.permalink" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
-            <xsl:call-template name="printMetaDate.mods">
-              <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" />
-            </xsl:call-template>
+            <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" mode="present" />
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:publisher" />
             </xsl:call-template>
@@ -1254,9 +1276,7 @@
               <xsl:with-param name="nodes"
                 select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:place/mods:placeTerm" />
             </xsl:call-template>
-            <xsl:call-template name="printMetaDate.mods">
-              <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" />
-            </xsl:call-template>
+            <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" mode="present" />
             <xsl:call-template name="printMetaDate.mods">
               <xsl:with-param name="label" select="i18n:translate('component.mods.metaData.dictionary.volume.article')" />
               <xsl:with-param name="nodes"
@@ -1321,15 +1341,11 @@
             <xsl:call-template name="printMetaDate.mods.permalink" />
             <xsl:choose>
               <xsl:when test="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:originInfo/mods:dateIssued">
-                <xsl:call-template name="printMetaDate.mods">
-                  <xsl:with-param name="nodes" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:originInfo/mods:dateIssued" />
-                </xsl:call-template>
+                <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:originInfo/mods:dateIssued" mode="present" />
               </xsl:when>
               <xsl:when test="./structure/parents/parent/@xlink:href">
                 <xsl:variable name="parent" select="document(concat('mcrobject:',./structure/parents/parent/@xlink:href))/mycoreobject"/>
-                <xsl:call-template name="printMetaDate.mods">
-                  <xsl:with-param name="nodes" select="$parent//mods:mods/mods:originInfo/mods:dateIssued" />
-                </xsl:call-template>
+                <xsl:apply-templates select="$parent//mods:mods/mods:originInfo/mods:dateIssued" mode="present" />
               </xsl:when>
             </xsl:choose>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
@@ -1520,10 +1536,7 @@
             </xsl:call-template>
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:identifier" />
             <xsl:call-template name="printMetaDate.mods.permalink" />
-            <xsl:call-template name="printMetaDate.mods">
-              <xsl:with-param name="nodes"
-                select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" />
-            </xsl:call-template>
+            <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo/mods:dateIssued" mode="present" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
             <xsl:apply-templates mode="present" select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:classification" />
             <xsl:call-template name="printMetaDate.mods">
