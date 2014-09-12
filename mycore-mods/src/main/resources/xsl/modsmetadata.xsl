@@ -68,7 +68,7 @@
         <xsl:value-of select="concat($label,':')" />
       </td>
       <td class="metavalue">
-        <xsl:if test="mods:dateIssued">
+        <xsl:if test="name(parent::*)='mods:dateIssued'">
           <meta property="datePublished">
             <xsl:attribute name="content">
               <xsl:value-of select="." />
@@ -191,16 +191,28 @@
             </xsl:choose>
           </td>
           <td class="metavalue" property="name">
-            <xsl:choose>
-              <xsl:when test="not(./../@type='translated' or ./../@type='alternative') and //mods:titleInfo[@transliteration='text/html']">
-                <xsl:value-of select="//mods:titleInfo[@transliteration='text/html']/mods:title" disable-output-escaping="yes" />
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:call-template name="lf2br">
-                  <xsl:with-param name="string" select="." />
-                </xsl:call-template>
-              </xsl:otherwise>
-            </xsl:choose>
+            <span>
+              <xsl:attribute name="property">
+                <xsl:choose>
+                  <xsl:when test="./../@type='translated' or ./../@type='alternative'">
+                    <xsl:text>alternativeHeadline</xsl:text>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:text>headline</xsl:text>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
+              <xsl:choose>
+                <xsl:when test="not(./../@type='translated' or ./../@type='alternative') and //mods:titleInfo[@transliteration='text/html']">
+                  <xsl:value-of select="//mods:titleInfo[@transliteration='text/html']/mods:title" disable-output-escaping="yes" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:call-template name="lf2br">
+                    <xsl:with-param name="string" select="." />
+                  </xsl:call-template>
+                </xsl:otherwise>
+              </xsl:choose>
+            </span>
           </td>
         </tr>
       </xsl:for-each>
@@ -210,7 +222,9 @@
             <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.subtitle'),':')" />
           </td>
           <td class="metavalue subTitle">
-            <xsl:value-of select="mods:subTitle" />
+            <span property="alternativeHeadline">
+              <xsl:value-of select="mods:subTitle" />
+            </span>
           </td>
         </tr>
       </xsl:if>
@@ -443,7 +457,14 @@
       </xsl:choose>
     </xsl:variable>
 
-    <span property="author" typeof="Person">
+    <xsl:variable name="propType">
+      <xsl:choose>
+        <xsl:when test="@type='corporate'"><xsl:text>Organisation</xsl:text></xsl:when>
+        <xsl:otherwise><xsl:text>Person</xsl:text></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <span property="author" typeof="{$propType}">
       <xsl:value-of select="$personName" />
       <meta property="name" content="{$personName}"/>
     </span>
