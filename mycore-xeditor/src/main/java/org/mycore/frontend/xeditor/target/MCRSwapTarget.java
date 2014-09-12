@@ -27,6 +27,7 @@ import javax.servlet.ServletContext;
 
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
+import org.mycore.frontend.xeditor.MCRRepeatBinding;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -34,7 +35,7 @@ import org.mycore.frontend.xeditor.MCREditorSession;
 public class MCRSwapTarget extends MCRRepeaterControl {
 
     protected void handleRepeaterControl(ServletContext context, MCRServletJob job, MCREditorSession session, String swapParam) throws Exception {
-        session.getRootBinding().swap(swapParam);
+        MCRRepeatBinding.swap(swapParam, session.getRootBinding());
         session.setBreakpoint("After handling target swap " + swapParam);
     }
 }

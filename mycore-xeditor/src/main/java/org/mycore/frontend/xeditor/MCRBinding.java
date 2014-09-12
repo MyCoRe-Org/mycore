@@ -48,7 +48,6 @@ import org.mycore.frontend.xeditor.tracker.MCRRemoveAttribute;
 import org.mycore.frontend.xeditor.tracker.MCRRemoveElement;
 import org.mycore.frontend.xeditor.tracker.MCRSetAttributeValue;
 import org.mycore.frontend.xeditor.tracker.MCRSetElementText;
-import org.mycore.frontend.xeditor.tracker.MCRSwapElements;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -277,18 +276,6 @@ public class MCRBinding {
 
     public String getAbsoluteXPath() {
         return MCRXPathBuilder.buildXPath(getBoundNode());
-    }
-
-    public void swap(String swapParameter) throws JaxenException, JDOMException {
-        String[] tokens = swapParameter.split("\\|");
-        String xPath = tokens[0];
-        int posA = Integer.parseInt(tokens[1]);
-        int posB = Integer.parseInt(tokens[2]);
-
-        MCRBinding binding = new MCRBinding(xPath, false, this);
-        Element parent = (Element) (binding.getBoundNode());
-        binding.track(MCRSwapElements.swap(parent, posA, posB));
-        binding.detach();
     }
 
     public void track(MCRChangeData change) {

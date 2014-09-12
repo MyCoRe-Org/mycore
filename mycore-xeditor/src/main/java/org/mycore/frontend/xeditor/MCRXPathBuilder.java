@@ -56,7 +56,11 @@ public class MCRXPathBuilder {
         String parentXPath = buildXPath(element.getParent());
         if ((!parentXPath.isEmpty()) || (element.getParent() instanceof Document))
             parentXPath += "/";
-        return parentXPath + element.getQualifiedName() + buildPositionPredicate(element);
+        return parentXPath + buildChildPath(element);
+    }
+    
+    public static String buildChildPath(Element element) {
+        return element.getQualifiedName() + buildPositionPredicate(element);
     }
 
     private static String buildPositionPredicate(Element element) {

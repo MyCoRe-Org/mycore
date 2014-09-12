@@ -87,8 +87,8 @@ public class MCRRepeatBindingTest extends MCRTestCase {
         MCRRepeatBinding repeat = new MCRRepeatBinding("parent/name[contains(text(),'a')]", root, 0, 0);
         assertEquals(3, repeat.getBoundNodes().size());
 
-        assertEquals("/parent|0|1", repeat.getSwapParameter(1, 2));
-        assertEquals("/parent|1|3", repeat.getSwapParameter(2, 3));
+        assertEquals("/parent|name|name[2]", repeat.getSwapParameter(1, 2));
+        assertEquals("/parent|name[2]|name[4]", repeat.getSwapParameter(2, 3));
     }
 
     @Test
@@ -107,7 +107,7 @@ public class MCRRepeatBindingTest extends MCRTestCase {
         assertEquals("b", ((Element) (repeat.getBoundNodes().get(1))).getText());
 
         String swapParameter = repeat.getSwapParameter(1,2);
-        repeat.swap(swapParameter);
+        MCRRepeatBinding.swap(swapParameter, root);
         
         assertEquals("b", doc.getRootElement().getChildren().get(0).getText());
         assertEquals("a", doc.getRootElement().getChildren().get(3).getText());

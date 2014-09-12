@@ -1,9 +1,9 @@
 package org.mycore.frontend.xeditor;
 
 import org.jaxen.JaxenException;
-import org.jdom2.Content;
+import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.jdom2.Parent;
+import org.mycore.frontend.xeditor.tracker.MCRSwapElements;
 
 public class MCRRepeatBinding extends MCRBinding {
 
@@ -40,12 +40,33 @@ public class MCRRepeatBinding extends MCRBinding {
     }
 
     public String getSwapParameter(int posA, int posB) {
-        Content a = (Content) (boundNodes.get(posA - 1));
-        Content b = (Content) (boundNodes.get(posB - 1));
-        Parent parent = a.getParent();
-        posA = parent.indexOf(a);
-        posB = parent.indexOf(b);
-        String xPath = MCRXPathBuilder.buildXPath(parent);
-        return xPath + "|" + posA + "|" + posB;
+        Element a = (Element) (boundNodes.get(posA - 1));
+        Element b = (Element) (boundNodes.get(posB - 1));
+        
+        String xPathP = MCRXPathBuilder.buildXPath( a.getParent() );
+        String xPathA = MCRXPathBuilder.buildChildPath(a);
+        String xPathB = MCRXPathBuilder.buildChildPath(b);
+        
+        return xPathP + "|" + xPathA + "|" + xPathB;
+    }
+    
+    public static void swap(String swapParameter, MCRBinding context) throws JaxenException, JDOMException {
+        String[] tokens = swapParameter.split("\\|");
+        String xPathP = tokens[0];
+        String xPathA = tokens[1];
+        String xPathB = tokens[2];
+        
+        MCRBinding bindingP = new MCRBinding(xPathP, false, context);
+        MCRBinding bindingA = new MCRBinding(xPathA, false, bindingP);
+        MCRBinding bindingB = new MCRBinding(xPathB, false, bindingP);
+
+        Element parent = (Element) (bindingP.getBoundNode());
+        Element elementA = (Element)( bindingA.getBoundNode() );
+        Element elementB = (Element)( bindingB.getBoundNode() );
+        bindingP.track(MCRSwapElements.swap(parent, elementA, elementB));
+        
+        bindingA.detach();
+        bindingB.detach();
+        bindingP.detach();
     }
 }

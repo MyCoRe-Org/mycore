@@ -28,7 +28,7 @@ import java.io.IOException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
-import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
 
@@ -51,9 +51,9 @@ public class MCRCancelTarget implements MCREditorTarget {
         String cancelURL = session.getCancelURL();
 
         if (cancelURL == null)
-            cancelURL = MCRServlet.getBaseURL();
+            cancelURL = MCRFrontendUtil.getBaseURL();
         else if (cancelURL.startsWith("/"))
-            cancelURL = MCRServlet.getBaseURL() + cancelURL.substring(1);
+            cancelURL = MCRFrontendUtil.getBaseURL() + cancelURL.substring(1);
         else if (!(cancelURL.startsWith("http:") || cancelURL.startsWith("https:"))) {
             String pageURL = session.getPageURL();
             cancelURL = pageURL.substring(0, pageURL.lastIndexOf('/') + 1) + cancelURL;

@@ -6,6 +6,10 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrfluet" type="fix">
+        mycore-xeditor: fixed repeater up/down buttons do not work when repeated element is direct child of root element
+        <fixes issue="720" />
+      </action>
       <action dev="mcrkrebs" type="add">
         mycore-mods: added rdfA Tags
       </action>

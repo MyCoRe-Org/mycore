@@ -5,12 +5,21 @@ import org.jdom2.Element;
 
 public class MCRSwapElements implements MCRChange {
 
-    public static MCRChangeData swap(Element parent, int posA, int posB) {
-        if (posA > posB)
-            return swap(parent, posB, posA);
+    public static MCRChangeData swap(Element parent, Element a, Element b) {
+        int posA = parent.indexOf(a);
+        int posB = parent.indexOf(b);
+        return swap(parent, posA, a, posB, b);
+    }
 
+    public static MCRChangeData swap(Element parent, int posA, int posB) {
         Content a = parent.getContent().get(posA);
         Content b = parent.getContent().get(posB);
+        return swap(parent, posA, a, posB, b);
+    }
+
+    public static MCRChangeData swap(Element parent, int posA, Content a, int posB, Content b) {
+        if (posA > posB)
+            return swap(parent, posB, b, posA, a);
 
         b.detach(); // x a x x x  
         parent.addContent(posA, b); // x b a x x x 
