@@ -265,8 +265,25 @@
         </xsl:otherwise>
       </xsl:choose>
       <!--*** Editor Buttons ************************************* -->
+      <!-- put all derivates and display value in one variable -->
+      <xsl:variable name="derivateDisplayList">
+        <derivates>
+        <xsl:for-each select="./structure/derobjects/derobject">
+          <derivate>
+            <id><xsl:value-of select="@xlink:href" /></id>
+            <display><xsl:value-of select="mcrxsl:isDisplayedEnabledDerivate(@xlink:href)" /></display>
+          </derivate>
+        </xsl:for-each>
+        </derivates>
+      </xsl:variable>
+      <xsl:variable name="isDisplayedEnabled">
+        <xsl:choose>
+          <xsl:when test="xalan:nodeset($derivateDisplayList)//display='true'"><xsl:value-of select="true()" /></xsl:when>
+          <xsl:otherwise><xsl:value-of select="false()" /></xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
       <xsl:if
-        test="((./structure/children/child) and not($mods-type='series' or $mods-type='journal' or $mods-type='confpro' or $mods-type='book')) or (./structure/derobjects/derobject)">
+        test="((./structure/children/child) and not($mods-type='series' or $mods-type='journal' or $mods-type='confpro' or $mods-type='book')) or (./structure/derobjects/derobject and ($isDisplayedEnabled or not(mcrxsl:isCurrentUserGuestUser())))">
         <div id="derivate_box" class="detailbox">
           <h4 id="derivate_switch" class="block_switch">
             <a name="derivate_box"></a>
