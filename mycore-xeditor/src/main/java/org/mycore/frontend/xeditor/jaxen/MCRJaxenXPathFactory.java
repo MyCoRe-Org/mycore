@@ -27,29 +27,42 @@ public class MCRJaxenXPathFactory extends JaxenXPathFactory {
     @Override
     public <T> XPathExpression<T> compile(String expression, Filter<T> filter, Map<String, Object> variables, Namespace... namespaces) {
         XPathExpression<T> jaxenCompiled = super.compile(expression, filter, variables, namespaces);
+        if (expression.contains(EXTENSION_FUNCTIONS_PREFX))
+            patchJaxenCompiled(jaxenCompiled, namespaces);
+        return jaxenCompiled;
+    }
+
+    private <T> void patchJaxenCompiled(XPathExpression<T> jaxenCompiled, Namespace... namespaces) {
         try {
-            Field xPathField = jaxenCompiled.getClass().getDeclaredField("xPath");
-            xPathField.setAccessible(true);
-            XPath xPath = (XPath) (xPathField.get(jaxenCompiled));
-            xPathField.setAccessible(false);
-
-            SimpleNamespaceContext nc = new SimpleNamespaceContext();
-            nc.addNamespace(EXTENSION_FUNCTIONS_PREFX, EXTENSION_FUNCTIONS_URI);
-            if (namespaces.length > 0)
-                for (int i = 0; i < namespaces.length; i++)
-                    nc.addNamespace(namespaces[i].getPrefix(), namespaces[i].getURI());
-
-            xPath.setNamespaceContext(nc);
-
-            XPathFunctionContext xfc = (XPathFunctionContext) (xPath.getFunctionContext());
-            xfc.registerFunction(EXTENSION_FUNCTIONS_URI, "generate-id", new MCRFunctionGenerateID());
-            xfc.registerFunction(EXTENSION_FUNCTIONS_URI, "call-java", new MCRFunctionCallJava());
-            xPath.setFunctionContext(xfc);
-
-            return jaxenCompiled;
+            XPath xPath = getXPath(jaxenCompiled);
+            setNamespaces(xPath, namespaces);
+            addExtensionFunctions(xPath);
         } catch (Exception ex) {
             LOGGER.warn(ex);
-            return jaxenCompiled;
         }
+    }
+
+    private void addExtensionFunctions(XPath xPath) {
+        XPathFunctionContext xfc = (XPathFunctionContext) (xPath.getFunctionContext());
+        xfc.registerFunction(EXTENSION_FUNCTIONS_URI, "generate-id", new MCRFunctionGenerateID());
+        xfc.registerFunction(EXTENSION_FUNCTIONS_URI, "call-java", new MCRFunctionCallJava());
+        xPath.setFunctionContext(xfc);
+    }
+
+    private void setNamespaces(XPath xPath, Namespace... namespaces) {
+        SimpleNamespaceContext nc = new SimpleNamespaceContext();
+        nc.addNamespace(EXTENSION_FUNCTIONS_PREFX, EXTENSION_FUNCTIONS_URI);
+        if (namespaces.length > 0)
+            for (int i = 0; i < namespaces.length; i++)
+                nc.addNamespace(namespaces[i].getPrefix(), namespaces[i].getURI());
+        xPath.setNamespaceContext(nc);
+    }
+
+    private <T> XPath getXPath(XPathExpression<T> jaxenCompiled) throws NoSuchFieldException, IllegalAccessException {
+        Field xPathField = jaxenCompiled.getClass().getDeclaredField("xPath");
+        xPathField.setAccessible(true);
+        XPath xPath = (XPath) (xPathField.get(jaxenCompiled));
+        xPathField.setAccessible(false);
+        return xPath;
     }
 }

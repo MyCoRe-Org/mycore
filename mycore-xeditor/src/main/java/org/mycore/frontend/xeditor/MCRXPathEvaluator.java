@@ -91,10 +91,11 @@ public class MCRXPathEvaluator {
             return true;
     }
 
+    private final static XPathFactory factory = XPathFactory.newInstance(MCRJaxenXPathFactory.class.getName());
+
     public Object evaluateFirst(String xPathExpression) {
         try {
             List<Namespace> namespaces = MCRUsedNamespaces.getNamespaces();
-            XPathFactory factory = XPathFactory.newInstance(MCRJaxenXPathFactory.class.getName());
             XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), variables, namespaces);
             return xPath.evaluateFirst(context);
         } catch (Exception ex) {
@@ -105,4 +106,3 @@ public class MCRXPathEvaluator {
     }
 
 }
-
