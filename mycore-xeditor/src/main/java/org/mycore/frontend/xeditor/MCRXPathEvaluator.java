@@ -15,6 +15,7 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRException;
+import org.mycore.frontend.xeditor.jaxen.MCRJaxenXPathFactory;
 import org.mycore.services.i18n.MCRTranslation;
 
 /**
@@ -93,14 +94,15 @@ public class MCRXPathEvaluator {
     public Object evaluateFirst(String xPathExpression) {
         try {
             List<Namespace> namespaces = MCRUsedNamespaces.getNamespaces();
-            XPathFactory factory = XPathFactory.instance();
+            XPathFactory factory = XPathFactory.newInstance(MCRJaxenXPathFactory.class.getName());
             XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), variables, namespaces);
             return xPath.evaluateFirst(context);
         } catch (Exception ex) {
             LOGGER.warn("unable to evaluate XPath: " + xPathExpression);
-            LOGGER.debug(ex);
+            LOGGER.warn(ex.getCause());
             return null;
         }
     }
 
 }
+
