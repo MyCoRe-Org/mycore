@@ -81,10 +81,23 @@
   </xsl:template>
 
   <xsl:template match="mods:dateCreated|mods:dateOther|mods:dateIssued" mode="formatDate">
+    <xsl:variable name="dateFormat">
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space(.))=4">
+          <xsl:value-of select="'yyyy'" />
+        </xsl:when>
+        <xsl:when test="string-length(normalize-space(.))=7">
+          <xsl:value-of select="'MM.yyyy'" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="'dd.MM.yyyy'" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:variable name="formatted">
       <xsl:call-template name="formatISODate">
         <xsl:with-param name="date" select="." />
-        <xsl:with-param name="format" select="'dd.MM.yyyy'" />
+        <xsl:with-param name="format" select="$dateFormat" />
       </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
