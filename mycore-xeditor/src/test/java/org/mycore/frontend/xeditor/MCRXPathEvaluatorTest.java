@@ -25,7 +25,9 @@ package org.mycore.frontend.xeditor;
 
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jaxen.JaxenException;
 import org.jdom2.Document;
@@ -49,6 +51,9 @@ public class MCRXPathEvaluatorTest extends MCRTestCase {
         String builder = "document[name/@id='n1'][note/@href='#n1'][location/@href='#n1'][name[@id='n2']][location[@href='#n2']]";
         Element document = new MCRNodeBuilder().buildElement(builder, null, null);
         MCRBinding rootBinding = new MCRBinding(new Document(document));
+        Map<String, Object> variables = new HashMap<String, Object>();
+        variables.put("CurrentUser", "gast");
+        rootBinding.setVariables(variables);
         MCRBinding documentBinding = new MCRBinding("/document", false, rootBinding);
         evaluator = new MCRXPathEvaluator(documentBinding);
     }
@@ -61,24 +66,24 @@ public class MCRXPathEvaluatorTest extends MCRTestCase {
 
     @Test
     public void testGenerateID() throws JaxenException, JDOMException {
-        String id = evaluator.replaceXPathOrI18n("xedf:generate-id(/document)");
-        assertEquals(id, evaluator.replaceXPathOrI18n("xedf:generate-id(.)"));
-        assertFalse(id.equals(evaluator.replaceXPathOrI18n("xedf:generate-id(/document/name[1])")));
+        String id = evaluator.replaceXPathOrI18n("xed:generate-id(/document)");
+        assertEquals(id, evaluator.replaceXPathOrI18n("xed:generate-id(.)"));
+        assertFalse(id.equals(evaluator.replaceXPathOrI18n("xed:generate-id(/document/name[1])")));
 
-        id = evaluator.replaceXPathOrI18n("xedf:generate-id(/document/name[1])");
-        assertEquals(id, evaluator.replaceXPathOrI18n("xedf:generate-id(/document/name[1])"));
-        assertEquals(id, evaluator.replaceXPathOrI18n("xedf:generate-id(/document/name)"));
-        assertFalse(id.equals(evaluator.replaceXPathOrI18n("xedf:generate-id(/document/name[2])")));
+        id = evaluator.replaceXPathOrI18n("xed:generate-id(/document/name[1])");
+        assertEquals(id, evaluator.replaceXPathOrI18n("xed:generate-id(/document/name[1])"));
+        assertEquals(id, evaluator.replaceXPathOrI18n("xed:generate-id(/document/name)"));
+        assertFalse(id.equals(evaluator.replaceXPathOrI18n("xed:generate-id(/document/name[2])")));
 
-        id = evaluator.replaceXPathOrI18n("xedf:generate-id()");
+        id = evaluator.replaceXPathOrI18n("xed:generate-id()");
     }
 
     @Test
     public void testJavaCall() throws JaxenException, JDOMException {
-        String res = evaluator.replaceXPathOrI18n("xedf:call-java('org.mycore.frontend.xeditor.MCRXPathEvaluatorTest','testNoArgs')");
+        String res = evaluator.replaceXPathOrI18n("xed:call-java('org.mycore.frontend.xeditor.MCRXPathEvaluatorTest','testNoArgs')");
         assertEquals(testNoArgs(), res);
 
-        res = evaluator.replaceXPathOrI18n("xedf:call-java('org.mycore.frontend.xeditor.MCRXPathEvaluatorTest','testOneArg',name[2])");
+        res = evaluator.replaceXPathOrI18n("xed:call-java('org.mycore.frontend.xeditor.MCRXPathEvaluatorTest','testOneArg',name[2])");
         assertEquals("n2", res);
     }
 
@@ -87,9 +92,20 @@ public class MCRXPathEvaluatorTest extends MCRTestCase {
     }
 
     public static String testOneArg(Object nodeList) {
-        List list = (List<Object>) nodeList;
+        List<Object> list = (List<Object>) nodeList;
         Object first = list.get(0);
         Element element = (Element) first;
         return element.getAttributeValue("id");
+    }
+
+    @Test
+    public void testTest() throws JaxenException, JDOMException {
+        assertFalse(evaluator.test("xed:call-java('org.mycore.frontend.xeditor.MCRXPathEvaluatorTest','isUserInRole',$CurrentUser,'admin')"));
+        assertTrue(evaluator.test("xed:call-java('org.mycore.frontend.xeditor.MCRXPathEvaluatorTest','isUserInRole',$CurrentUser,'gast')"));
+    }
+
+    public static boolean isUserInRole(Object userName, Object role) {
+        assertEquals("gast", userName);
+        return role.equals("gast");
     }
 }

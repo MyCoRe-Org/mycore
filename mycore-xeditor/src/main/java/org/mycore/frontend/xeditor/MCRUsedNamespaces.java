@@ -41,8 +41,11 @@ public class MCRUsedNamespaces {
 
     private static Map<String, Namespace> prefix2namespace = new HashMap<String, Namespace>();
 
+    public static Namespace XEDITOR_NAMESPACE = Namespace.getNamespace( "xed", "http://www.mycore.de/xeditor" );
+
     static {
         addNamespace(Namespace.XML_NAMESPACE);
+        addNamespace(XEDITOR_NAMESPACE);
         for (Namespace ns : MCRConstants.getStandardNamespaces())
             addNamespace(ns);
     }

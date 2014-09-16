@@ -4,21 +4,21 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.jaxen.SimpleNamespaceContext;
 import org.jaxen.XPath;
 import org.jaxen.XPathFunctionContext;
 import org.jdom2.Namespace;
 import org.jdom2.filter.Filter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.jaxen.JaxenXPathFactory;
+import org.mycore.frontend.xeditor.MCRUsedNamespaces;
 
 public class MCRJaxenXPathFactory extends JaxenXPathFactory {
 
     private final static Logger LOGGER = Logger.getLogger(MCRJaxenXPathFactory.class);
 
-    private final static String EXTENSION_FUNCTIONS_PREFX = "xedf";
+    private final static String EXTENSION_FUNCTIONS_PREFX = MCRUsedNamespaces.XEDITOR_NAMESPACE.getPrefix();
 
-    private final static String EXTENSION_FUNCTIONS_URI = "http://www.mycore.org/xed-functions";
+    private final static String EXTENSION_FUNCTIONS_URI = MCRUsedNamespaces.XEDITOR_NAMESPACE.getURI();
 
     public MCRJaxenXPathFactory() {
         super();
@@ -35,7 +35,6 @@ public class MCRJaxenXPathFactory extends JaxenXPathFactory {
     private <T> void patchJaxenCompiled(XPathExpression<T> jaxenCompiled, Namespace... namespaces) {
         try {
             XPath xPath = getXPath(jaxenCompiled);
-            setNamespaces(xPath, namespaces);
             addExtensionFunctions(xPath);
         } catch (Exception ex) {
             LOGGER.warn(ex);
@@ -47,15 +46,6 @@ public class MCRJaxenXPathFactory extends JaxenXPathFactory {
         xfc.registerFunction(EXTENSION_FUNCTIONS_URI, "generate-id", new MCRFunctionGenerateID());
         xfc.registerFunction(EXTENSION_FUNCTIONS_URI, "call-java", new MCRFunctionCallJava());
         xPath.setFunctionContext(xfc);
-    }
-
-    private void setNamespaces(XPath xPath, Namespace... namespaces) {
-        SimpleNamespaceContext nc = new SimpleNamespaceContext();
-        nc.addNamespace(EXTENSION_FUNCTIONS_PREFX, EXTENSION_FUNCTIONS_URI);
-        if (namespaces.length > 0)
-            for (int i = 0; i < namespaces.length; i++)
-                nc.addNamespace(namespaces[i].getPrefix(), namespaces[i].getURI());
-        xPath.setNamespaceContext(nc);
     }
 
     private <T> XPath getXPath(XPathExpression<T> jaxenCompiled) throws NoSuchFieldException, IllegalAccessException {

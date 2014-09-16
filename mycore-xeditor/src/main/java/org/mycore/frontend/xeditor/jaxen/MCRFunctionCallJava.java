@@ -16,7 +16,7 @@ class MCRFunctionCallJava implements org.jaxen.Function {
         try {
             String clazz = (String) (args.get(0));
             String method = (String) (args.get(1));
-            System.out.println(clazz + " " + method);
+            LOGGER.info("XEditor extension function calling " + clazz + " " + method);
 
             Class[] argTypes = new Class[args.size() - 2];
             Object[] params = new Object[args.size() - 2];
