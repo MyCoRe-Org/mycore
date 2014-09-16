@@ -42,9 +42,6 @@
     <span class="title">
       <xsl:choose>
         <xsl:when test="../../mods:identifier[@type='uri']">
-          <xsl:message>
-            test
-          </xsl:message>
           <a href="{../../mods:identifier[@type='uri']}">
             <xsl:value-of select="." />
           </a>
