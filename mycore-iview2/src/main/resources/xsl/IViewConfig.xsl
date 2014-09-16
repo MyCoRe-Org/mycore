@@ -18,7 +18,7 @@
         <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/js/lib/jquery-2.0.3.min.js"></script>
 
         <xsl:choose>
-          <xsl:when test="xml/mobile = 'true'">
+          <xsl:when test="xml/properties/property[@name='mobile'] = 'true'">
             <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
             <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet" type="text/css" />
           </xsl:when>
