@@ -68,14 +68,13 @@ public class MCRXPathEvaluatorTest extends MCRTestCase {
     public void testGenerateID() throws JaxenException, JDOMException {
         String id = evaluator.replaceXPathOrI18n("xed:generate-id(/document)");
         assertEquals(id, evaluator.replaceXPathOrI18n("xed:generate-id(.)"));
+        assertEquals(id, evaluator.replaceXPathOrI18n("xed:generate-id()"));
         assertFalse(id.equals(evaluator.replaceXPathOrI18n("xed:generate-id(/document/name[1])")));
 
         id = evaluator.replaceXPathOrI18n("xed:generate-id(/document/name[1])");
         assertEquals(id, evaluator.replaceXPathOrI18n("xed:generate-id(/document/name[1])"));
         assertEquals(id, evaluator.replaceXPathOrI18n("xed:generate-id(/document/name)"));
         assertFalse(id.equals(evaluator.replaceXPathOrI18n("xed:generate-id(/document/name[2])")));
-
-        id = evaluator.replaceXPathOrI18n("xed:generate-id()");
     }
 
     @Test
@@ -91,21 +90,14 @@ public class MCRXPathEvaluatorTest extends MCRTestCase {
         return "testNoArgs";
     }
 
-    public static String testOneArg(Object nodeList) {
-        List<Object> list = (List<Object>) nodeList;
-        Object first = list.get(0);
-        Element element = (Element) first;
-        return element.getAttributeValue("id");
+    public static String testOneArg(List<Element> nodes) {
+        return nodes.get(0).getAttributeValue("id");
     }
 
     @Test
-    public void testTest() throws JaxenException, JDOMException {
-        assertFalse(evaluator.test("xed:call-java('org.mycore.frontend.xeditor.MCRXPathEvaluatorTest','isUserInRole',$CurrentUser,'admin')"));
-        assertTrue(evaluator.test("xed:call-java('org.mycore.frontend.xeditor.MCRXPathEvaluatorTest','isUserInRole',$CurrentUser,'gast')"));
-    }
-
-    public static boolean isUserInRole(Object userName, Object role) {
-        assertEquals("gast", userName);
-        return role.equals("gast");
+    public void testExternalJavaTest() throws JaxenException, JDOMException {
+        assertTrue(evaluator.test("xed:call-java('org.mycore.common.xml.MCRXMLFunctions','isCurrentUserGuestUser')"));
+        assertFalse(evaluator.test("xed:call-java('org.mycore.common.xml.MCRXMLFunctions','isCurrentUserSuperUser')"));
+        assertFalse(evaluator.test("xed:call-java('org.mycore.common.xml.MCRXMLFunctions','isCurrentUserInRole','admins')"));
     }
 }
