@@ -11,6 +11,7 @@
         <source uri="xslStyle:asParent,mods2editor:mcrobject:{parentId}" />
         <source uri="xslStyle:mycoreobject-editor,mods2editor:mcrobject:{id}" />
         <source uri="xslStyle:RDF-mods-journal,mycoreobject-editor,mods2editor:http://ld.zdb-services.de/data/{zdbid}.rdf" />
+        <source uri="xslStyle:PPN-mods-simple,mycoreobject-editor,mods2editor:http://unapi.gbv.de/?id=gvk:ppn:{ppn}&format=mods" />
         <cancel url="servlets/MCRLockServlet?action=unlock&amp;id={id}&amp;url=/receive/{id}" />
         <cancel url="{cancelUrl}" />
         <postprocessor class="org.mycore.frontend.editor.postprocessor.MCREditorPostProcessorXSL" stylesheet="editor2mods.xsl" />
