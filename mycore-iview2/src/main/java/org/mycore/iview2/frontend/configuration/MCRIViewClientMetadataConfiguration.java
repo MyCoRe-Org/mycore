@@ -9,6 +9,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.iview2.services.MCRIView2Tools;
 import org.mycore.services.i18n.MCRTranslation;
 
@@ -33,7 +34,8 @@ public class MCRIViewClientMetadataConfiguration extends MCRIViewClientConfigura
 
         // properties
         setProperty("objId", objectID.toString());
-        setProperty("metadataURL", MCRIView2Tools.getIView2Property("metadataURL"));
+        String urlFormat = "%sreceive/%s?XSL.Transformer=%s";
+        setProperty("metadataURL", String.format(urlFormat, MCRFrontendUtil.getBaseURL(), objectID, MCRIView2Tools.getIView2Property("metadata.transformer")));
 
         // script
         addLocalScript("iview-client-metadata.js");
