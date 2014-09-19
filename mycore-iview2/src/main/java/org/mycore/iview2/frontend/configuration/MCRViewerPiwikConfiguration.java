@@ -4,10 +4,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.mycore.common.config.MCRConfiguration;
 
-public class MCRIViewClientPiwikConfiguration extends MCRIViewClientConfiguration {
+public class MCRViewerPiwikConfiguration extends MCRViewerConfiguration {
 
     @Override
-    public MCRIViewClientConfiguration setup(HttpServletRequest request) {
+    public MCRViewerConfiguration setup(HttpServletRequest request) {
         super.setup(request);
         if (MCRConfiguration.instance().getBoolean("MCR.Piwik.enable", false)) {
             this.addLocalScript("iview-client-piwik.js");

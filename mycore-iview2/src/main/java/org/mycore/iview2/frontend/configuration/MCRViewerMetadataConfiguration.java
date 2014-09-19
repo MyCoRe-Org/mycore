@@ -13,12 +13,12 @@ import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.iview2.services.MCRIView2Tools;
 import org.mycore.services.i18n.MCRTranslation;
 
-public class MCRIViewClientMetadataConfiguration extends MCRIViewClientConfiguration {
+public class MCRViewerMetadataConfiguration extends MCRViewerConfiguration {
 
     private static final int EXPIRE_METADATA_CACHE_TIME = 10; // in seconds
 
     @Override
-    public MCRIViewClientConfiguration setup(HttpServletRequest request) {
+    public MCRViewerConfiguration setup(HttpServletRequest request) {
         super.setup(request);
 
         String derivate = getDerivate(request);

@@ -8,10 +8,10 @@ import javax.servlet.http.HttpServletRequest;
  * 
  * @author Matthias Eichner
  */
-public class MCRIViewClientDefaultConfigurationStrategy implements MCRIViewClientConfigurationStrategy {
+public class MCRViewerDefaultConfigurationStrategy implements MCRViewerConfigurationStrategy {
 
     @Override
-    public MCRIViewClientConfiguration get(HttpServletRequest request) {
+    public MCRViewerConfiguration get(HttpServletRequest request) {
         if (isPDF(request)) {
             return getPDF(request);
         } else {
@@ -21,17 +21,17 @@ public class MCRIViewClientDefaultConfigurationStrategy implements MCRIViewClien
 
     protected boolean isPDF(HttpServletRequest request) {
         // well, this is the best test to check the type, for sure!
-        String filePath = MCRIViewClientConfiguration.getFilePath(request);
+        String filePath = MCRViewerConfiguration.getFilePath(request);
         return filePath.toLowerCase().endsWith(".pdf");
     }
 
-    protected MCRIViewClientConfiguration getPDF(HttpServletRequest request) {
-        return MCRIViewClientConfigurationBuilder.pdf(request)
-            .mixin(MCRIViewClientConfigurationBuilder.plugins(request).get()).get();
+    protected MCRViewerConfiguration getPDF(HttpServletRequest request) {
+        return MCRViewerConfigurationBuilder.pdf(request)
+            .mixin(MCRViewerConfigurationBuilder.plugins(request).get()).get();
     }
 
-    protected MCRIViewClientConfiguration getMETS(HttpServletRequest request) {
-        return MCRIViewClientConfigurationBuilder.metsAndPlugins(request).get();
+    protected MCRViewerConfiguration getMETS(HttpServletRequest request) {
+        return MCRViewerConfigurationBuilder.metsAndPlugins(request).get();
     }
 
 }

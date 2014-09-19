@@ -29,14 +29,14 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.iview2.frontend.MCRIviewACLProvider;
 import org.mycore.iview2.frontend.MCRIviewDefaultACLProvider;
-import org.mycore.iview2.frontend.configuration.MCRIViewClientConfiguration;
-import org.mycore.iview2.frontend.configuration.MCRIViewClientConfigurationStrategy;
-import org.mycore.iview2.frontend.configuration.MCRIViewClientDefaultConfigurationStrategy;
+import org.mycore.iview2.frontend.configuration.MCRViewerConfiguration;
+import org.mycore.iview2.frontend.configuration.MCRViewerConfigurationStrategy;
+import org.mycore.iview2.frontend.configuration.MCRViewerDefaultConfigurationStrategy;
 import org.mycore.services.i18n.MCRTranslation;
 import org.xml.sax.SAXException;
 
-@Path("/iview/client")
-public class MCRIViewClientResource {
+@Path("/viewer")
+public class MCRViewerResource {
 
     private static final MCRIviewACLProvider IVIEW_ACL_PROVDER = MCRConfiguration.instance()
         .<MCRIviewACLProvider> getInstanceOf("MCR.Module-iview2.MCRIviewACLProvider",
@@ -55,7 +55,7 @@ public class MCRIViewClientResource {
             MCRServletContentHelper.buildConfig(config), serveContent);
     }
 
-    private static Document buildResponseDocument(MCRIViewClientConfiguration config) throws JDOMException,
+    private static Document buildResponseDocument(MCRViewerConfiguration config) throws JDOMException,
         IOException, SAXException, JAXBException {
         String configJson = config.toJSON();
         Element startIviewClientElement = new Element("IViewConfig");
@@ -70,7 +70,7 @@ public class MCRIViewClientResource {
     protected MCRContent getContent(final HttpServletRequest req, final HttpServletResponse resp) throws JDOMException,
         IOException, SAXException, JAXBException, TransformerException {
 
-        String derivate = MCRIViewClientConfiguration.getDerivate(req);
+        String derivate = MCRViewerConfiguration.getDerivate(req);
         final MCRObjectID derivateID = MCRObjectID.getInstance(derivate);
         if (!MCRMetadataManager.exists(derivateID)) {
             String errorMessage = MCRTranslation.translate("component.iview2.MCRIViewClientServlet.object.not.found",
@@ -83,12 +83,12 @@ public class MCRIViewClientResource {
             throw new WebApplicationException(Response.status(Status.FORBIDDEN).entity(errorMessage).build());
         }
 
-        MCRIViewClientConfigurationStrategy configurationStrategy;
+        MCRViewerConfigurationStrategy configurationStrategy;
         if (MCRConfiguration.instance().getString("MCR.Module-iview2.configuration.strategy", null) != null) {
             configurationStrategy = MCRConfiguration.instance().getInstanceOf(
                 "MCR.Module-iview2.configuration.strategy");
         } else {
-            configurationStrategy = new MCRIViewClientDefaultConfigurationStrategy();
+            configurationStrategy = new MCRViewerDefaultConfigurationStrategy();
         }
         MCRJDOMContent source = new MCRJDOMContent(buildResponseDocument(configurationStrategy.get(req)));
         return MCRLayoutService.instance().getTransformedContent(req, resp, source);

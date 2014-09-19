@@ -41,7 +41,7 @@ import com.google.gson.JsonSerializer;
  * 
  * @author Matthias Eichner
  */
-public class MCRIViewClientConfiguration {
+public class MCRViewerConfiguration {
 
     public static enum ResourceType {
         script, css
@@ -57,7 +57,7 @@ public class MCRIViewClientConfiguration {
         DEBUG_MODE = Boolean.valueOf(MCRIView2Tools.getIView2Property("DeveloperMode", "false").toLowerCase());
     }
 
-    public MCRIViewClientConfiguration() {
+    public MCRViewerConfiguration() {
         resources = LinkedListMultimap.create();
         properties = new HashMap<>();
     }
@@ -86,7 +86,7 @@ public class MCRIViewClientConfiguration {
      * @param request the request which should be parsed to build this configuration.
      * @return itself
      */
-    public MCRIViewClientConfiguration setup(HttpServletRequest request) {
+    public MCRViewerConfiguration setup(HttpServletRequest request) {
         return this;
     }
 
@@ -140,7 +140,7 @@ public class MCRIViewClientConfiguration {
     }
 
     /**
-     * Shorthand MCRIViewClientConfiguration#addLocalScript(String, true)
+     * Shorthand MCRViewerConfiguration#addLocalScript(String, true)
      */
     public void addLocalScript(final String file) {
         this.addLocalScript(file, true);

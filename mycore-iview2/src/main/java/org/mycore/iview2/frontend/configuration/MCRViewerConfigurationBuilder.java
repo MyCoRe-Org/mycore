@@ -4,27 +4,27 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.mycore.iview2.frontend.configuration.MCRIViewClientConfiguration.ResourceType;
+import org.mycore.iview2.frontend.configuration.MCRViewerConfiguration.ResourceType;
 
 import com.google.common.collect.Multimap;
 
 /**
- * Use this class to build your {@link MCRIViewClientConfiguration}.
+ * Use this class to build your {@link MCRViewerConfiguration}.
  * You can use {@link #mets(HttpServletRequest)} or {@link #pdf(HttpServletRequest)}
- * as entry point and use {@link #mixin(MCRIViewClientConfiguration)} to append
+ * as entry point and use {@link #mixin(MCRViewerConfiguration)} to append
  * additional configuration.
  * 
  * @author Matthias Eichner
  */
-public class MCRIViewClientConfigurationBuilder {
+public class MCRViewerConfigurationBuilder {
 
-    private MCRIViewClientConfiguration internalConfig;
+    private MCRViewerConfiguration internalConfig;
 
     private HttpServletRequest request;
 
-    private MCRIViewClientConfigurationBuilder(HttpServletRequest request) {
+    private MCRViewerConfigurationBuilder(HttpServletRequest request) {
         this.request = request;
-        this.internalConfig = new MCRIViewClientConfiguration();
+        this.internalConfig = new MCRViewerConfiguration();
     }
 
     /**
@@ -34,7 +34,7 @@ public class MCRIViewClientConfigurationBuilder {
      * @param configuration the configuration to mix in.
      * @return same instance
      */
-    public MCRIViewClientConfigurationBuilder mixin(MCRIViewClientConfiguration configuration) {
+    public MCRViewerConfigurationBuilder mixin(MCRViewerConfiguration configuration) {
         configuration.setup(request);
         mixin(internalConfig, configuration);
         return this;
@@ -45,7 +45,7 @@ public class MCRIViewClientConfigurationBuilder {
      * 
      * @return
      */
-    public MCRIViewClientConfiguration get() {
+    public MCRViewerConfiguration get() {
         return internalConfig;
     }
 
@@ -55,7 +55,7 @@ public class MCRIViewClientConfigurationBuilder {
      * @param conf1
      * @param conf2
      */
-    public static void mixin(MCRIViewClientConfiguration conf1, MCRIViewClientConfiguration conf2) {
+    public static void mixin(MCRViewerConfiguration conf1, MCRViewerConfiguration conf2) {
         Map<String, Object> conf2Props = conf2.getProperties();
         for (Map.Entry<String, Object> property : conf2Props.entrySet()) {
             conf1.setProperty(property.getKey(), property.getValue());
@@ -76,8 +76,8 @@ public class MCRIViewClientConfigurationBuilder {
      * @param request the servlet request
      * @return a new configuration builder instance.
      */
-    public static MCRIViewClientConfigurationBuilder build(HttpServletRequest request) {
-        MCRIViewClientConfigurationBuilder builder = new MCRIViewClientConfigurationBuilder(request);
+    public static MCRViewerConfigurationBuilder build(HttpServletRequest request) {
+        MCRViewerConfigurationBuilder builder = new MCRViewerConfigurationBuilder(request);
         return builder;
     }
 
@@ -87,9 +87,9 @@ public class MCRIViewClientConfigurationBuilder {
      * @param request
      * @return
      */
-    public static MCRIViewClientConfigurationBuilder mets(HttpServletRequest request) {
-        MCRIViewClientMetsConfiguration metsConfig = new MCRIViewClientMetsConfiguration();
-        return MCRIViewClientConfigurationBuilder.build(request).mixin(metsConfig);
+    public static MCRViewerConfigurationBuilder mets(HttpServletRequest request) {
+        MCRViewerMetsConfiguration metsConfig = new MCRViewerMetsConfiguration();
+        return MCRViewerConfigurationBuilder.build(request).mixin(metsConfig);
     }
 
     /**
@@ -98,7 +98,7 @@ public class MCRIViewClientConfigurationBuilder {
      * @param request
      * @return
      */
-    public static MCRIViewClientConfigurationBuilder metsAndPlugins(HttpServletRequest request) {
+    public static MCRViewerConfigurationBuilder metsAndPlugins(HttpServletRequest request) {
         return mets(request).mixin(plugins(request).get());
     }
 
@@ -108,9 +108,9 @@ public class MCRIViewClientConfigurationBuilder {
      * @param request
      * @return
      */
-    public static MCRIViewClientConfigurationBuilder pdf(HttpServletRequest request) {
-        MCRIViewClientPDFConfiguration pdfConfig = new MCRIViewClientPDFConfiguration();
-        return MCRIViewClientConfigurationBuilder.build(request).mixin(pdfConfig);
+    public static MCRViewerConfigurationBuilder pdf(HttpServletRequest request) {
+        MCRViewerPDFConfiguration pdfConfig = new MCRViewerPDFConfiguration();
+        return MCRViewerConfigurationBuilder.build(request).mixin(pdfConfig);
     }
 
     /**
@@ -119,9 +119,9 @@ public class MCRIViewClientConfigurationBuilder {
      * @param request
      * @return
      */
-    public static MCRIViewClientConfigurationBuilder plugins(HttpServletRequest request) {
-        return MCRIViewClientConfigurationBuilder.build(request).mixin(new MCRIViewClientLogoConfiguration())
-            .mixin(new MCRIViewClientMetadataConfiguration()).mixin(new MCRIViewClientPiwikConfiguration());
+    public static MCRViewerConfigurationBuilder plugins(HttpServletRequest request) {
+        return MCRViewerConfigurationBuilder.build(request).mixin(new MCRViewerLogoConfiguration())
+            .mixin(new MCRViewerMetadataConfiguration()).mixin(new MCRViewerPiwikConfiguration());
     }
 
 }

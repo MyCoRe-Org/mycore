@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletRequest;
  * 
  * @author Matthias Eichner
  */
-public interface MCRIViewClientConfigurationStrategy {
+public interface MCRViewerConfigurationStrategy {
 
     /**
      * Gets the image view configuration.
@@ -16,6 +16,6 @@ public interface MCRIViewClientConfigurationStrategy {
      * @param request
      * @return
      */
-    public MCRIViewClientConfiguration get(HttpServletRequest request);
+    public MCRViewerConfiguration get(HttpServletRequest request);
 
 }

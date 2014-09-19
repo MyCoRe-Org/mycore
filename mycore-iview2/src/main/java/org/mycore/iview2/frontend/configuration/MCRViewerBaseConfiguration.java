@@ -18,10 +18,10 @@ import org.mycore.frontend.servlets.MCRServlet;
  * 
  * @author Matthias Eichner
  */
-public abstract class MCRIViewClientBaseConfiguration extends MCRIViewClientConfiguration {
+public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration {
 
     @Override
-    public MCRIViewClientConfiguration setup(HttpServletRequest request) {
+    public MCRViewerConfiguration setup(HttpServletRequest request) {
         super.setup(request);
         // property
         setProperty("webApplicationBaseURL", MCRFrontendUtil.getBaseURL());

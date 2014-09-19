@@ -33,7 +33,7 @@
         <script>
           window.onload = function() {
             var json = <xsl:value-of select="json" />;
-            new mycore.iview.imageviewer.MyCoReImageViewer(jQuery("body"), json.properties);
+            new mycore.viewer.MyCoReViewer(jQuery("body"), json.properties);
           };
         </script>
       </head>

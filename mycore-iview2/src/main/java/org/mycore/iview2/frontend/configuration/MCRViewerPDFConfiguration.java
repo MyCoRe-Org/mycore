@@ -5,10 +5,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.iview2.services.MCRIView2Tools;
 
-public class MCRIViewClientPDFConfiguration extends MCRIViewClientBaseConfiguration {
+public class MCRViewerPDFConfiguration extends MCRViewerBaseConfiguration {
 
     @Override
-    public MCRIViewClientConfiguration setup(HttpServletRequest request) {
+    public MCRViewerConfiguration setup(HttpServletRequest request) {
         super.setup(request);
 
         String pdfProviderURL = MCRIView2Tools.getIView2Property("pdfProviderURL", MCRServlet.getServletBaseURL() + "MCRFileNodeServlet/{derivate}/{filePath}");

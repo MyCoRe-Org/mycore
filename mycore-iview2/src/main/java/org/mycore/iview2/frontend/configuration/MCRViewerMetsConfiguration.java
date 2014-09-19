@@ -5,10 +5,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.iview2.services.MCRIView2Tools;
 
-public class MCRIViewClientMetsConfiguration extends MCRIViewClientBaseConfiguration {
+public class MCRViewerMetsConfiguration extends MCRViewerBaseConfiguration {
 
     @Override
-    public MCRIViewClientConfiguration setup(HttpServletRequest request) {
+    public MCRViewerConfiguration setup(HttpServletRequest request) {
         super.setup(request);
 
         // properties

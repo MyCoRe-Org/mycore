@@ -5,10 +5,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.iview2.services.MCRIView2Tools;
 
-public class MCRIViewClientLogoConfiguration extends MCRIViewClientConfiguration {
+public class MCRViewerLogoConfiguration extends MCRViewerConfiguration {
 
     @Override
-    public MCRIViewClientConfiguration setup(HttpServletRequest request) {
+    public MCRViewerConfiguration setup(HttpServletRequest request) {
         super.setup(request);
         String logoURL = MCRIView2Tools.getIView2Property("logo.URL");
         if (logoURL != null) {
