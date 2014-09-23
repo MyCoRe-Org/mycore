@@ -3,9 +3,11 @@
   xmlns:xalan="http://xml.apache.org/xalan" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
   xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" exclude-result-prefixes="acl mcrxsl encoder xalan i18n">
 
+  <xsl:param name="MCR.Module-iview2.Use.Rsc.Preview" />
+
   <xsl:template match="doc" mode="fileLink" priority="2">
     <xsl:param name="mcrid" select="str[@name='returnId']" />
-    <xsl:param name="derivateId" select="str[@name='derivateID']"/>
+    <xsl:param name="derivateId" select="str[@name='derivateID']" />
     <xsl:param name="fileNodeServlet" select="concat($ServletsBaseURL,'MCRFileNodeServlet/')" />
     <!-- doc element of 'unmerged' response -->
     <xsl:variable name="filePath" select="str[@name='filePath']" />
@@ -80,9 +82,20 @@
         <xsl:choose>
           <xsl:when
             test="acl:checkPermissionForReadingDerivate($derivate) and $object-view-derivate and $isDisplayedEnabled = 'true' or $mayWriteDerivate">
-            <a
-              href="{concat($WebApplicationBaseURL, 'receive/', $mcrid, '?jumpback=true&amp;maximized=true&amp;page=',$pageToDisplay,'&amp;derivate=', $derivate)}"
-              title="{i18n:translate('metaData.iView')}">
+
+            <xsl:variable name="href">
+              <xsl:choose>
+                <xsl:when test="$MCR.Module-iview2.Use.Rsc.Preview">
+                  <xsl:value-of select="concat($WebApplicationBaseURL,  'rsc/viewer/', $derivate, '/', $pageToDisplay)" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of
+                    select="concat($WebApplicationBaseURL, 'receive/', $mcrid, '?jumpback=true&amp;maximized=true&amp;page=',$pageToDisplay,'&amp;derivate=', $derivate)" />
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:variable>
+
+            <a href="{$href}" title="{i18n:translate('metaData.iView')}">
               <xsl:call-template name="iview2.getImageElement">
                 <xsl:with-param select="$derivate" name="derivate" />
                 <xsl:with-param select="$pageToDisplay" name="imagePath" />
