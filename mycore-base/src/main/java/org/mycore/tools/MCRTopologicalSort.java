@@ -51,7 +51,7 @@ import com.google.common.collect.HashBiMap;
  * It can be used to retrieve the order in which MyCoRe object can be imported to be
  * sure that parent objects are imported first.
  * 
- * It also checks for circular dependencies and throws an exception it it occurs.
+ * It also checks for circular dependencies and will throw an exception if it occurs.
  * 
  * The doTopoSort() method can only be called once, since it processes the internal data.
  * Afterwards prepareData() must be called again or a new object has to be used.

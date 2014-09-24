@@ -188,7 +188,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the directory containing the XML files
      * @throws MCRActiveLinkException
      */
-    @MCRCommand(syntax = "update all objects in topological order from directory {0}", help = "Updates all MCRObjects form the directory {0} in the system respecting the order of parents and children.", order = 95)
+    @MCRCommand(syntax = "update all objects in topological order from directory {0}", help = "Updates all MCRObjects from the directory {0} in the system respecting the order of parents and children.", order = 95)
     public static List<String> updateTopologicalFromDirectory(String directory) throws MCRActiveLinkException {
         return processFromDirectory(true, directory, true);
     }
@@ -201,7 +201,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the directory containing the XML files
      * @throws MCRActiveLinkException
      */
-    @MCRCommand(syntax = "load all objects from directory {0}", help = "Loads all MCRObjects form the directory {0} to the system.", order = 70)
+    @MCRCommand(syntax = "load all objects from directory {0}", help = "Loads all MCRObjects from the directory {0} to the system.", order = 70)
     public static List<String> loadFromDirectory(String directory) throws MCRActiveLinkException {
         return processFromDirectory(false, directory, false);
     }
@@ -213,7 +213,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the directory containing the XML files
      * @throws MCRActiveLinkException
      */
-    @MCRCommand(syntax = "update all objects from directory {0}", help = "Updates all MCRObjects form the directory {0} in the system.", order = 90)
+    @MCRCommand(syntax = "update all objects from directory {0}", help = "Updates all MCRObjects from the directory {0} in the system.", order = 90)
     public static List<String> updateFromDirectory(String directory) throws MCRActiveLinkException {
         return processFromDirectory(false, directory, true);
     }
@@ -280,7 +280,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    @MCRCommand(syntax = "load object from file {0}", help = "Adds a MCRObject form the file {0} to the system.", order = 60)
+    @MCRCommand(syntax = "load object from file {0}", help = "Adds a MCRObject from the file {0} to the system.", order = 60)
     public static boolean loadFromFile(String file) throws MCRActiveLinkException, MCRException, SAXParseException,
         IOException {
         return loadFromFile(file, true);
@@ -311,7 +311,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    @MCRCommand(syntax = "update object from file {0}", help = "Updates a MCRObject form the file {0} in the system.", order = 80)
+    @MCRCommand(syntax = "update object from file {0}", help = "Updates a MCRObject from the file {0} in the system.", order = 80)
     public static boolean updateFromFile(String file) throws MCRActiveLinkException, MCRException, SAXParseException,
         IOException {
         return updateFromFile(file, true);
