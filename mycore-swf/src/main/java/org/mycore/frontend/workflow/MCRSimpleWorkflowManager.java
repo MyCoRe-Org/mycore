@@ -630,12 +630,19 @@ public class MCRSimpleWorkflowManager {
     public final String getWorkflowFile(ServletContext context, String pagedir, String base) {
         StringBuffer sb = new StringBuffer();
         sb.append(pagedir).append("editor_").append(base).append("_editor.xml");
-        if (!new File(context.getRealPath(sb.toString())).exists()) {
+        String file_path = context.getRealPath(sb.toString());
+        if (file_path == null || !(new File(file_path).exists())) {
             sb = new StringBuffer();
             int i = base.indexOf('_');
-            sb.append(pagedir).append("editor_").append(base.substring(i + 1)).append("_editor.xml");
-            if (!new File(context.getRealPath(sb.toString())).exists())
+            if (i > -1) {
+              sb.append(pagedir).append("editor_").append(base.substring(i + 1)).append("_editor.xml");
+              file_path = context.getRealPath(sb.toString());
+              if (file_path == null || !new File(file_path).exists()) {
                 sb = new StringBuffer("");
+              }
+           } else {
+               sb = new StringBuffer("");
+           }
         }
         return sb.toString();
     }
