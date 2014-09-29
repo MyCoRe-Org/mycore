@@ -272,6 +272,39 @@
     </xsl:apply-templates>
   </xsl:template>
 
+  <xsl:template match="element[@type='personname']" mode="metadata">
+    <xsl:apply-templates select="." mode="enclosing">
+      <xsl:with-param name="class" select="'MCRMetaPersonName'" />
+    </xsl:apply-templates>
+    <xsl:variable name="innerSchema">
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" minOccurs="1" name="text">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attribute use="optional" ref="xml:lang" />
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element maxOccurs="1" minOccurs="0" type="xs:string" name="firstname" />
+        <xs:element maxOccurs="1" minOccurs="0" type="xs:integer" name="callname" />
+        <xs:element maxOccurs="1" minOccurs="0" type="xs:string" name="surname" />
+        <xs:element maxOccurs="1" minOccurs="0" type="xs:integer" name="fullname" />
+        <xs:element maxOccurs="1" minOccurs="0" type="xs:string" name="academic" />
+        <xs:element maxOccurs="1" minOccurs="0" type="xs:string" name="peerage" />
+        <xs:element maxOccurs="1" minOccurs="0" type="xs:string" name="numeration" />
+        <xs:element maxOccurs="1" minOccurs="0" type="xs:string" name="title" />
+        <xs:element maxOccurs="1" minOccurs="0" type="xs:string" name="prefix" />
+        <xs:element maxOccurs="1" minOccurs="0" type="xs:string" name="affix" />
+      </xs:sequence>
+    </xsl:variable>
+    <xsl:apply-templates select="." mode="inner">
+      <xsl:with-param name="class" select="'MCRMetaPersonName'" />
+      <xsl:with-param name="complexType" select="xalan:nodeset($innerSchema)/*" />
+    </xsl:apply-templates>
+  </xsl:template>
+
   <xsl:template match="element" mode="types">
     <xsl:choose>
       <xsl:when test="type">
