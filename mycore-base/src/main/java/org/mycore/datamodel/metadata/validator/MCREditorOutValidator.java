@@ -348,6 +348,15 @@ public class MCREditorOutValidator {
         }
     }
 
+    static class MCRMetaPersonNameCheck implements MCREditorMetadataValidator {
+        public String checkDataSubTag(Element datasubtag) {
+            if (datasubtag.getChildren().size() == 0) {
+                return "person name is empty";
+            }
+            return checkMetaObjectWithLang(datasubtag, MCRMetaAddress.class);
+        }
+    }
+
     /**
      * @throws IOException 
      * @throws JDOMException 

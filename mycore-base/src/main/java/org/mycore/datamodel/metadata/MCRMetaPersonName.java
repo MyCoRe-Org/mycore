@@ -1,7 +1,4 @@
 /*
- * 
- * $Revision$ $Date$
- *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
@@ -28,12 +25,14 @@ import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
 /**
- * This class implements all methods for handling with the MCRMetaPersonName
- * part of a metadata object. The MCRMetaPersonName class represents a natural
- * person specified by a list of names.
+ * This class implements all methods for handling a name with the
+ * MCRMetaPersonName datamodel. The MCRMetaPersonName class represents a natural
+ * or juristic person specified by a list of names parts.
  * 
  * @author J. Vogler
- * @version $Revision$ $Date$
+ * @author J. Kupferschmidt
+ * @version $Revision$ $Date: 2013-01-23 14:55:57 +0100 (Mi, 23. Jan
+ *          2013) $
  */
 final public class MCRMetaPersonName extends MCRMetaDefault {
     // MetaPerson data
@@ -49,113 +48,107 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
 
     private String peerage;
 
+    private String numeration;
+
+    private String title;
+
     private String prefix;
-    
+
+    private String affix;
+
     private static final Logger LOGGER = Logger.getLogger(MCRMetaPersonName.class);
 
     /**
      * This is the constructor. <br>
-     * The language element was set to <b>en </b>. All other elemnts are set to
-     * an empty string.
+     * The language element was set to <b>application default language</b>. All
+     * other elements will be set to an empty string.
      */
     public MCRMetaPersonName() {
         super();
+        lang = DEFAULT_LANGUAGE;
         firstname = "";
         callname = "";
         surname = "";
         fullname = "";
         academic = "";
         peerage = "";
+        numeration = "";
+        title = "";
         prefix = "";
+        affix = "";
     }
 
     /**
      * This is the constructor. <br>
-     * The language element was set. If the value of <em>default_lang</em> is
-     * null, empty or false <b>en </b> was set. The subtag element was set to
-     * the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
-     * is null or empty an exception was throwed. The type element was set to
-     * the value of <em>set_type<em>, if it is null, an empty string was set
-     * to the type element. The firstname, callname, surname, academic and
-     * peerage element was set to the value of <em>set_...<em>, if they are null,
-     * an empty string was set to this element.
-     * @param set_subtag      the name of the subtag
-     * @param default_lang    the default language
-     * @param set_type        the optional type string
-     * @param set_inherted    a value >= 0
-     * @param set_firstname   the first name
-     * @param set_callname    the callname
-     * @param set_surname     the surname
-     * @param set_fullname    the fullname
-     * @param set_academic    the academic title
-     * @param set_peerage     the peerage title
-     * @param set_prefix      the prefix title
-     *
-     * @exception MCRException if the parameter values are invalid
+     * The method set all common fields of all MCRMetaXXX datamodel types. It
+     * set the language to the <b>application default language</b>. The type
+     * attribute will be set to an empty String.
+     * 
+     * @param set_subtag
+     *            the name of the subtag
+     * @param set_inherted
+     *            a value >= 0
+     * 
+     * @exception MCRException
+     *                if the parameter values are invalid
      */
-    public MCRMetaPersonName(String set_subtag, String default_lang, String set_type, int set_inherted, String set_firstname,
-            String set_callname, String set_surname, String set_fullname, String set_academic, String set_peerage, String set_prefix) throws MCRException {
-        super(set_subtag, default_lang, set_type, set_inherted);
+    public MCRMetaPersonName(String set_subtag, int set_inherted) throws MCRException {
+        super(set_subtag, DEFAULT_LANGUAGE, "", set_inherted);
+        type = "";
         firstname = "";
         callname = "";
         surname = "";
         fullname = "";
         academic = "";
         peerage = "";
+        numeration = "";
+        title = "";
         prefix = "";
-        set(set_firstname, set_callname, set_surname, set_fullname, set_academic, set_peerage, set_prefix);
+        affix = "";
     }
 
     /**
-     * This methode set all name componets.
+     * This method get the first name text element.
      * 
-     * @param set_firstname
-     *            the first name
-     * @param set_callname
-     *            the callname
-     * @param set_surname
-     *            the surname
-     * @param set_fullname
-     *            the fullname
-     * @param set_academic
-     *            the academic title
-     * @param set_peerage
-     *            the peerage title
-     * @param set_prefix
-     *            the prefix title
-     */
-    public final void set(String set_firstname, String set_callname, String set_surname, String set_fullname, String set_academic,
-            String set_peerage, String set_prefix) {
-        if (set_firstname == null || set_callname == null || set_surname == null || set_fullname == null || set_academic == null
-                || set_peerage == null || set_prefix == null) {
-            throw new MCRException("One or more parameter(s) are null.");
-        }
-
-        firstname = set_firstname.trim();
-        callname = set_callname.trim();
-        surname = set_surname.trim();
-        fullname = set_fullname.trim();
-        academic = set_academic.trim();
-        peerage = set_peerage.trim();
-        prefix = set_prefix.trim();
-    }
-
-    /**
-     * This method get the firstname text element.
-     * 
-     * @return the firstname
+     * @return the first name
      */
     public final String getFirstName() {
         return firstname;
     }
 
     /**
-     * This method get the callname text element.
+     * This method set the first name text element.
      * 
-     * @return the callname
+     * @param set_firstname
+     */
+    public final void setFirstName(String set_firstname) {
+        if (set_firstname != null) {
+            firstname = set_firstname.trim();
+        } else {
+            firstname = "";
+        }
+    }
+
+    /**
+     * This method get the call name text element.
+     * 
+     * @return the call name
      */
     public final String getCallName() {
         return callname;
+    }
+
+    /**
+     * This method set the call name text element.
+     * 
+     * @param set_callname
+     */
+    public final void setCallName(String set_callname) {
+        if (set_callname != null) {
+            callname = set_callname.trim();
+        } else {
+            callname = "";
+        }
     }
 
     /**
@@ -168,12 +161,38 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
     }
 
     /**
-     * This method get the fullname text element.
+     * This method set the surname text element.
      * 
-     * @return the fullname
+     * @param set_surname
+     */
+    public final void setSurName(String set_surname) {
+        if (set_surname != null) {
+            surname = set_surname.trim();
+        } else {
+            surname = "";
+        }
+    }
+
+    /**
+     * This method get the full name text element.
+     * 
+     * @return the full name
      */
     public final String getFullName() {
         return fullname;
+    }
+
+    /**
+     * This method set the full name text element.
+     * 
+     * @param set_fullname
+     */
+    public final void setFullName(String set_fullname) {
+        if (set_fullname != null) {
+            fullname = set_fullname.trim();
+        } else {
+            fullname = "";
+        }
     }
 
     /**
@@ -186,12 +205,82 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
     }
 
     /**
+     * This method set the academic text element.
+     * 
+     * @param set_academic
+     */
+    public final void setAcademic(String set_academic) {
+        if (set_academic != null) {
+            academic = set_academic.trim();
+        } else {
+            academic = "";
+        }
+    }
+
+    /**
      * This method get the peerage text element.
      * 
      * @return the peerage
      */
     public final String getPeerage() {
         return peerage;
+    }
+
+    /**
+     * This method set the peerage text element.
+     * 
+     * @param set_peerage
+     */
+    public final void setPeerage(String set_peerage) {
+        if (set_peerage != null) {
+            peerage = set_peerage.trim();
+        } else {
+            peerage = "";
+        }
+    }
+
+    /**
+     * This method get the numeration text element.
+     * 
+     * @return the numeration
+     */
+    public final String getNumeration() {
+        return numeration;
+    }
+
+    /**
+     * This method set the numeration text element.
+     * 
+     * @param set_numeration
+     */
+    public final void setNumeration(String set_numeration) {
+        if (set_numeration != null) {
+            numeration = set_numeration.trim();
+        } else {
+            numeration = "";
+        }
+    }
+
+    /**
+     * This method get the title text element.
+     * 
+     * @return the title
+     */
+    public final String getTitle() {
+        return title;
+    }
+
+    /**
+     * This method set the title text element.
+     * 
+     * @param set_title
+     */
+    public final void setTitle(String set_title) {
+        if (set_title != null) {
+            title = set_title.trim();
+        } else {
+            title = "";
+        }
     }
 
     /**
@@ -204,6 +293,41 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
     }
 
     /**
+     * This method set the prefix text element.
+     * 
+     * @param set_prefix
+     */
+    public final void setPrefix(String set_prefix) {
+        if (set_prefix != null) {
+            prefix = set_prefix.trim();
+        } else {
+            prefix = "";
+        }
+    }
+
+    /**
+     * This method get the affix text element.
+     * 
+     * @return the affix
+     */
+    public final String getAffix() {
+        return affix;
+    }
+
+    /**
+     * This method set the affix text element.
+     * 
+     * @param set_affix
+     */
+    public final void setAffix(String set_affix) {
+        if (set_affix != null) {
+            affix = set_affix.trim();
+        } else {
+            affix = "";
+        }
+    }
+
+    /**
      * This method reads the XML input stream part from a DOM part for the
      * metadata of the document.
      * 
@@ -213,47 +337,16 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
     @Override
     public final void setFromDOM(org.jdom2.Element element) {
         super.setFromDOM(element);
-        firstname = element.getChildTextTrim("firstname");
-
-        if (firstname == null) {
-            firstname = "";
-        }
-
-        callname = element.getChildTextTrim("callname");
-
-        if (callname == null) {
-            callname = "";
-        }
-
-        surname = element.getChildTextTrim("surname");
-
-        if (surname == null) {
-            surname = "";
-        }
-
-        fullname = element.getChildTextTrim("fullname");
-
-        if (fullname == null) {
-            fullname = "";
-        }
-
-        academic = element.getChildTextTrim("academic");
-
-        if (academic == null) {
-            academic = "";
-        }
-
-        peerage = element.getChildTextTrim("peerage");
-
-        if (peerage == null) {
-            peerage = "";
-        }
-
-        prefix = element.getChildTextTrim("prefix");
-
-        if (prefix == null) {
-            prefix = "";
-        }
+        setFirstName(element.getChildTextTrim("firstname"));
+        setCallName(element.getChildTextTrim("callname"));
+        setSurName(element.getChildTextTrim("surname"));
+        setFullName(element.getChildTextTrim("fullname"));
+        setAcademic(element.getChildTextTrim("academic"));
+        setPeerage(element.getChildTextTrim("peerage"));
+        setNumeration(element.getChildTextTrim("numeration"));
+        setTitle(element.getChildTextTrim("title"));
+        setPrefix(element.getChildTextTrim("prefix"));
+        setAffix(element.getChildTextTrim("affix"));
     }
 
     /**
@@ -291,8 +384,20 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
             elm.addContent(new org.jdom2.Element("peerage").addContent(peerage));
         }
 
+        if ((numeration = numeration.trim()).length() != 0) {
+            elm.addContent(new org.jdom2.Element("numeration").addContent(numeration));
+        }
+
+        if ((title = title.trim()).length() != 0) {
+            elm.addContent(new org.jdom2.Element("title").addContent(title));
+        }
+
         if ((prefix = prefix.trim()).length() != 0) {
             elm.addContent(new org.jdom2.Element("prefix").addContent(prefix));
+        }
+
+        if ((affix = affix.trim()).length() != 0) {
+            elm.addContent(new org.jdom2.Element("affix").addContent(affix));
         }
 
         return elm;
@@ -302,8 +407,8 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
      * This method checks the validation of the content of this class. The
      * method returns <em>false</em> if
      * <ul>
-     * <li>the firstname is empty and
-     * <li>the surname is empty
+     * <li>the full name is empty or
+     * <li>the catenation of academic, peerage, first name, prefix and surname is an empty String
      * </ul>
      * otherwise the method returns <em>true</em>.
      * 
@@ -319,16 +424,15 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
             callname = firstname;
         }
 
-        if ((firstname = firstname.trim()).length() == 0 && (surname = surname.trim()).length() == 0) {
-            LOGGER.warn(getSubTag()+": firstname or surname is null or empty");
-            return false;
-        }
-
         if ((fullname = fullname.trim()).length() == 0) {
             StringBuilder sb = new StringBuilder(128);
-            sb.append(academic).append(' ').append(peerage).append(' ').append(firstname).append(' ').append(prefix).append(' ').append(
-                    surname);
-            fullname = sb.toString();
+            sb.append(academic).append(' ').append(peerage).append(' ').append(firstname).append(' ').append(prefix)
+                    .append(' ').append(surname);
+            fullname = sb.toString().trim();
+            if (fullname.length() == 0) {
+                LOGGER.warn(getSubTag() + ": full name / first name or surname is empty");
+                return false;
+            }
         }
 
         return true;
@@ -339,7 +443,7 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
      */
     @Override
     public final MCRMetaPersonName clone() {
-        return new MCRMetaPersonName(subtag, lang, type, inherited, firstname, callname, surname, fullname, academic, peerage, prefix);
+        return new MCRMetaPersonName(subtag, inherited);
     }
 
     /**
@@ -348,13 +452,16 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
     @Override
     public final void debug() {
         super.debugDefault();
-        LOGGER.debug("Firstname          = " + firstname);
-        LOGGER.debug("Callname           = " + callname);
+        LOGGER.debug("First name         = " + firstname);
+        LOGGER.debug("Call name          = " + callname);
         LOGGER.debug("Surname            = " + surname);
-        LOGGER.debug("Fullname           = " + fullname);
+        LOGGER.debug("Full name          = " + fullname);
         LOGGER.debug("Academic           = " + academic);
         LOGGER.debug("Peerage            = " + peerage);
+        LOGGER.debug("Numeration         = " + numeration);
+        LOGGER.debug("Title              = " + title);
         LOGGER.debug("Prefix             = " + prefix);
+        LOGGER.debug("Affix              = " + affix);
         LOGGER.debug("");
     }
 }
