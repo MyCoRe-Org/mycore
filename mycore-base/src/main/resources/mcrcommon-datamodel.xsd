@@ -87,6 +87,9 @@
       </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
+  <xs:attributeGroup name="MCRMetaPersonName">
+    <xs:attributeGroup ref="baseMetaAttributes" />
+  </xs:attributeGroup>
 
   <!-- this is how a mycore object looks like: <structure> has to be defined elsewhere <metadata> has to be defined elsewhere <service> is defined 
     below -->

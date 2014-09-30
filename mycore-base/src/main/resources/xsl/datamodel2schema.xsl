@@ -111,6 +111,7 @@
       </xs:complexType>
     </xs:element>
   </xsl:template>
+  
   <xsl:template match="element" mode="inner">
     <xsl:param name="class" />
     <xsl:param name="containsText" select="false()" />
@@ -278,19 +279,10 @@
     </xsl:apply-templates>
     <xsl:variable name="innerSchema">
       <xs:sequence>
-        <xs:element maxOccurs="unbounded" minOccurs="1" name="text">
-          <xs:complexType>
-            <xs:simpleContent>
-              <xs:extension base="xs:string">
-                <xs:attribute use="optional" ref="xml:lang" />
-              </xs:extension>
-            </xs:simpleContent>
-          </xs:complexType>
-        </xs:element>
         <xs:element maxOccurs="1" minOccurs="0" type="xs:string" name="firstname" />
-        <xs:element maxOccurs="1" minOccurs="0" type="xs:integer" name="callname" />
+        <xs:element maxOccurs="1" minOccurs="0" type="xs:string" name="callname" />
         <xs:element maxOccurs="1" minOccurs="0" type="xs:string" name="surname" />
-        <xs:element maxOccurs="1" minOccurs="0" type="xs:integer" name="fullname" />
+        <xs:element maxOccurs="1" minOccurs="0" type="xs:string" name="fullname" />
         <xs:element maxOccurs="1" minOccurs="0" type="xs:string" name="academic" />
         <xs:element maxOccurs="1" minOccurs="0" type="xs:string" name="peerage" />
         <xs:element maxOccurs="1" minOccurs="0" type="xs:string" name="numeration" />
