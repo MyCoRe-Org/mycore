@@ -190,7 +190,10 @@ public class MCRCStoreIFS2 extends MCRContentStore {
                 else
                     dir = (MCRDirectory) child;
             } else {
-                MCRFile file = dir.createFile(step);
+                MCRFile file = (MCRFile) (dir.getChild(step));
+                if (file == null)
+                    file = dir.createFile(step);
+
                 file.setContent(new MCRStreamContent(source));
             }
         }
