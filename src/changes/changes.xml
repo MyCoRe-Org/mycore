@@ -6,6 +6,13 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrmeich" type="fix">
+        mycore-wcms2: fix whitespaces occur between inline elements -> use compact format (not that pretty but working)
+        mycore-base: add html entity support for mycore webpage provider
+      </action>
+      <action dev="mcrmeich" type="fix">
+        mycore-wcms2: fix npe when moving xml file of new entry
+      </action>
       <action dev="mcrfluet" type="fix">
         mycore-xeditor: fixed repeater up/down buttons do not work when repeated element is direct child of root element
         <fixes issue="720" />

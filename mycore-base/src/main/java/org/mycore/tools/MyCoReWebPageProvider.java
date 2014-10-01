@@ -4,20 +4,22 @@
 package org.mycore.tools;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.jdom2.Content;
 import org.jdom2.DocType;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
-import org.jdom2.input.SAXBuilder;
+import org.jdom2.filter.ElementFilter;
+import org.mycore.common.content.MCRStringContent;
+import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.frontend.servlets.MCRServlet;
+import org.xml.sax.SAXParseException;
 
 /**
  * This class provides a simple way to dynamically create MyCoRe webpages. These pages might be rendered 
@@ -88,17 +90,22 @@ public class MyCoReWebPageProvider {
      * @param lang the language of the section specified by a language key.
      * @return added section
      */
-    public Element addSection(String title, String xmlAsString, String lang) throws IOException, JDOMException {
-        String tmpXmlAsString = "<tmp>" + xmlAsString + "</tmp>";
-        SAXBuilder saxBuilder = new SAXBuilder();
-        StringReader reader = new StringReader(tmpXmlAsString);
-        Document doc = saxBuilder.build(reader);
+    public Element addSection(String title, String xmlAsString, String lang) throws IOException, SAXParseException {
+        StringBuilder sb = new StringBuilder("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\" ");
+        sb.append("\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
+        sb.append("<html><head><meta content=\"text/html; charset=UTF-8\"/><title>temp</title></head><body>");
+        sb.append(xmlAsString);
+        sb.append("</body></html>");
+        Document doc = MCRXMLParserFactory.getParser().parseXML(new MCRStringContent(sb.toString()));
         Element tmpRoot = doc.getRootElement();
-        List<Content> contentList = new ArrayList<>();
-        for (int i = 0; i < tmpRoot.getContentSize(); i++) {
-            contentList.add(tmpRoot.getContent(i).detach());
+        Element body = tmpRoot.getChild("body", Namespace.getNamespace("http://www.w3.org/1999/xhtml"));
+        List<Content> bodyContent = new ArrayList<>();
+        for (int i = 0; i < body.getContentSize(); i++) {
+            Content content = body.getContent(i).detach();
+            getRidOfXHTMLNamespace(content);
+            bodyContent.add(content);
         }
-        return this.addSection(title, contentList, lang);
+        return this.addSection(title, bodyContent, lang);
     }
 
     /**
@@ -171,5 +178,25 @@ public class MyCoReWebPageProvider {
      */
     public Document getXML() {
         return this.xml;
+    }
+
+    /**
+     * Remove xhtml namespace of all children.
+     * 
+     * @param e
+     */
+    private void getRidOfXHTMLNamespace(Content c) {
+        if (!(c instanceof Element)) {
+            return;
+        }
+        Element e = (Element) c;
+        String xhtmlURI = "http://www.w3.org/1999/xhtml";
+        if (e.getNamespace().getURI().equals(xhtmlURI)) {
+            e.setNamespace(Namespace.NO_NAMESPACE);
+        }
+        Iterator<Element> iterator = e.getDescendants(new ElementFilter(Namespace.getNamespace(xhtmlURI))).iterator();
+        while (iterator.hasNext()) {
+            iterator.next().setNamespace(Namespace.NO_NAMESPACE);
+        }
     }
 }
