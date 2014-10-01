@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrtchef" type="fix">
+        mycore-iview2: fix another to-much-to-log-bug if beginning a new transaction and database is not available
+      </action>
       <action dev="mcrfluet" type="fix">
         mycore-base: fix duplicate entry in mcrdata.xml when existing file gets updated
         <fixes issue="649" />

@@ -127,12 +127,14 @@ public class MCRImageTiler implements Runnable, Closeable {
                     while (activeThreads.get() < tilingThreadCount) {
                         runLock.lock();
                         try {
-                            if (!running)
+                            if (!running) {
                                 break;
+                            }
                             Session session = sessionFactory.getCurrentSession();
-                            Transaction transaction = session.beginTransaction();
+                            Transaction transaction = null;
                             MCRTileJob job = null;
                             try {
+                                transaction = session.beginTransaction();
                                 job = tq.poll();
                                 transaction.commit();
                             } catch (HibernateException e) {
