@@ -180,16 +180,27 @@ public class MCRWCMSContentManager {
 
     public void move(String from, String to) {
         try {
-            // copy
+            // get from
             URL fromURL = MCRWebPagesSynchronizer.getURL(from);
-            SAXBuilder builder = new SAXBuilder();
-            Document document = builder.build(fromURL);
+            Document document;
+            if (fromURL == null) {
+                // if the from resource couldn't be found we assume its not created jet.
+                MyCoReWebPageProvider wpp = new MyCoReWebPageProvider();
+                wpp.addSection("neuer Eintrag", new Element("p").setText("TODO"), "de");
+                document = wpp.getXML();
+            } else {
+                SAXBuilder builder = new SAXBuilder();
+                document = builder.build(fromURL);
+            }
+            // save
             XMLOutputter out = new XMLOutputter(Format.getPrettyFormat().setEncoding("UTF-8"));
             try (OutputStream fout = MCRWebPagesSynchronizer.getOutputStream(to)) {
                 out.output(document, fout);
             }
             // delete old
-            Files.delete(Paths.get(fromURL.toURI()));
+            if (fromURL != null) {
+                Files.delete(Paths.get(fromURL.toURI()));
+            }
         } catch (Exception exc) {
             LOGGER.error("Error moving " + from + " to " + to, exc);
             throwError(ErrorType.couldNotMove, to);
