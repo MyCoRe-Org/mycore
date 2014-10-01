@@ -6,6 +6,10 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrjkupf" type="fix">
+        mycore-base: fix exception using $CurrentGroup for dynamic ACL generation - The parameter $CurrentGroup of a default ACL is no more supported since USER2-System and release 2014.06.x because the Servlet 3.0 API definition.
+        <fixes issue="712" />
+      </action>
       <action dev="mcrtchef" type="fix">
         mycore-iview2: fix another to-much-to-log-bug if beginning a new transaction and database is not available
       </action>
@@ -20,6 +24,13 @@
       <action dev="mcrmeich" type="fix">
         mycore-wcms2: fix whitespaces occur between inline elements -> use compact format (not that pretty but working)
         mycore-base: add html entity support for mycore webpage provider
+      </action>
+      <action dev="mcrjkupf" type="fix">
+        mycore-swf: fixes NPE in getWorkflowFile()
+        <fixes issue="721" />
+      </action>
+      <action dev="mcrjkupf" type="add">
+        mycore-base: add MCRMetaPersonName with numeration, affix and title for compatibility with marc21
       </action>
       <action dev="mcrmeich" type="fix">
         mycore-wcms2: fix npe when moving xml file of new entry
