@@ -149,14 +149,17 @@ public class MCROAISearchManager {
 
     protected void setResumptionToken(OAIDataList<?> dataList, String id, Date expirationDate, int cursor, int hits) {
         boolean setToken = cursor < hits;
-        if (getPartitionSize() != cursor || setToken) {
+        if(hits>getPartitionSize()){
             DefaultResumptionToken rsToken = new DefaultResumptionToken();
             rsToken.setCompleteListSize(hits);
-            rsToken.setCursor(cursor);
+            // this has to be the position (starting at 0) of the FIRST record of the OAI response !!! 
+            // see http://www.openarchives.org/OAI/openarchivesprotocol.html#FlowControl
+            rsToken.setCursor(((cursor-1) / partitionSize)*partitionSize); 
             rsToken.setExpirationDate(expirationDate);
             if (setToken) {
                 rsToken.setToken(id + TOKEN_DELIMITER + String.valueOf(cursor));
             }
+
             dataList.setResumptionToken(rsToken);
         }
     }
