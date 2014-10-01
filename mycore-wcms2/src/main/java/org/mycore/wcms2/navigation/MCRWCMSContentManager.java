@@ -18,6 +18,7 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
+import org.jdom2.output.Format.TextMode;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRURLContent;
@@ -141,7 +142,7 @@ public class MCRWCMSContentManager {
      * @param items
      */
     public void save(JsonArray items) {
-        XMLOutputter out = new XMLOutputter(Format.getPrettyFormat().setEncoding("UTF-8"));
+        XMLOutputter out = new XMLOutputter(Format.getCompactFormat().setEncoding("UTF-8"));
         for (JsonElement e : items) {
             if (!e.isJsonObject()) {
                 LOGGER.warn("Invalid json element in items " + e);
@@ -184,7 +185,7 @@ public class MCRWCMSContentManager {
             URL fromURL = MCRWebPagesSynchronizer.getURL(from);
             Document document;
             if (fromURL == null) {
-                // if the from resource couldn't be found we assume its not created jet.
+                // if the from resource couldn't be found we assume its not created yet.
                 MyCoReWebPageProvider wpp = new MyCoReWebPageProvider();
                 wpp.addSection("neuer Eintrag", new Element("p").setText("TODO"), "de");
                 document = wpp.getXML();
