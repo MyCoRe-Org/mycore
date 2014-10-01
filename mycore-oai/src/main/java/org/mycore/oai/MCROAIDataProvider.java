@@ -21,7 +21,11 @@
  */
 package org.mycore.oai;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -32,6 +36,7 @@ import org.jdom2.ProcessingInstruction;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.oai.pmh.dataprovider.OAIAdapter;
@@ -66,7 +71,7 @@ public class MCROAIDataProvider extends MCRServlet {
         HttpServletRequest request = job.getRequest();
         // get base url
         if (this.myBaseURL == null) {
-            this.myBaseURL = getBaseURL() + request.getServletPath().substring(1);
+            this.myBaseURL = MCRFrontendUtil.getBaseURL() + request.getServletPath().substring(1);
         }
         logRequest(request);
         // create new oai request
@@ -125,7 +130,7 @@ public class MCROAIDataProvider extends MCRServlet {
         if (!xsl.isEmpty()) {
             Map<String, String> pairs = new HashMap<String, String>();
             pairs.put("type", "text/xsl");
-            pairs.put("href", MCRServlet.getBaseURL() + xsl);
+            pairs.put("href", MCRFrontendUtil.getBaseURL() + xsl);
             doc.addContent(0, new ProcessingInstruction("xml-stylesheet", pairs));
         }
         return doc;
