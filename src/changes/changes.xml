@@ -6,6 +6,10 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrfluet" type="fix">
+        mycore-base: fix duplicate entry in mcrdata.xml when existing file gets updated
+        <fixes issue="649" />
+      </action>
       <action dev="mcrtchef" type="fix">
         mycore-base: fix can't see new menu entries created with wcms2
         <fixes issue="703" />
