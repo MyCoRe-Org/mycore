@@ -510,15 +510,7 @@ public class MCREditorOutValidator {
                         continue;
                     }
                     if (value.equals("$CurrentGroup")) {
-                        MCRUserInformation userInformation = MCRSessionMgr.getCurrentSession().getUserInformation();
-                        String thisgroup = userInformation.getUserAttribute(MCRUserInformation.ATT_PRIMARY_GROUP);
-                        if (thisgroup != null) {
-                            firstcond.setAttribute("value", thisgroup);
-                        } else {
-                            throw new MCRException("Could not aquire primary group for user "
-                                + userInformation.getUserID());
-                        }
-                        continue;
+                    	throw new MCRException("The parameter $CurrentGroup in default ACLs is no more supported since MyCoRe 2014.06 because it is not supported in Servlet API 3.0");
                     }
                     int i = value.indexOf("$CurrentIP");
                     if (i != -1) {
