@@ -51,6 +51,12 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         if (restriction != null) {
             params.add("q", restriction);
         }
+        
+        String sortBy = getConfig().getString(getConfigPrefix() + "Search.SortBy", null);
+        if(sortBy!=null){
+        	sortBy.replace("ascending", "asc").replace("descending", "desc");
+        	params.add("sort", sortBy);
+        }
         // filter query
         StringBuilder fq = new StringBuilder();
         if (this.set != null) {
