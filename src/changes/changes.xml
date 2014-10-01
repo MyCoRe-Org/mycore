@@ -6,6 +6,10 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrtchef" type="fix">
+        mycore-base: fix can't see new menu entries created with wcms2
+        <fixes issue="703" />
+      </action>
       <action dev="mcrmeich" type="fix">
         mycore-wcms2: fix whitespaces occur between inline elements -> use compact format (not that pretty but working)
         mycore-base: add html entity support for mycore webpage provider

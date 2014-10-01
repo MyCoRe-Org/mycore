@@ -87,39 +87,51 @@ public class MCRLayoutUtilities {
 
     private static final ServletContext SERVLET_CONTEXT = MCRURIResolver.getServletContext();
 
-    private static LoadingCache<String, URL> NAV_URL_CACHE = CacheBuilder.newBuilder().maximumSize(1)
-        .expireAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS).build(new CacheLoader<String, URL>() {
+    private static class DocumentHolder {
+        URL docURL;
 
-            @Override
-            public URL load(String key) throws Exception {
-                return SERVLET_CONTEXT.getResource(NAV_RESOURCE);
-            }
-        });
+        Document parsedDocument;
 
-    private static final LoadingCache<URL, Long> NAV_MODIFIED_CACHE = CacheBuilder.newBuilder().maximumSize(1)
-        .expireAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS).build(new CacheLoader<URL, Long>() {
+        long lastModified;
 
-            @Override
-            public Long load(URL key) throws Exception {
-                URLConnection urlConnection = key.openConnection();
-                return urlConnection.getLastModified();
-            }
-        });
+        public DocumentHolder(URL url) throws JDOMException, IOException {
+            docURL = url;
+            parseDocument();
+        }
 
-    private static final LoadingCache<String, Document> NAV_DOCUMENT_CACHE = CacheBuilder.newBuilder()
-        .refreshAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS).build(new CacheLoader<String, Document>() {
+        public boolean isValid(URL url) throws IOException {
+            return docURL.equals(url) && lastModified == getLastModified();
+        }
+
+        private void parseDocument() throws JDOMException, IOException {
+            lastModified = getLastModified();
+            LOGGER.info("Parsing: " + docURL);
+            parsedDocument = new SAXBuilder(XMLReaders.NONVALIDATING).build(docURL);
+        }
+
+        private long getLastModified() throws IOException {
+            URLConnection urlConnection = docURL.openConnection();
+            long modified = urlConnection.getLastModified();
+            return modified;
+        }
+    }
+
+    private static final LoadingCache<String, DocumentHolder> NAV_DOCUMENT_CACHE = CacheBuilder.newBuilder()
+        .refreshAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS).build(new CacheLoader<String, DocumentHolder>() {
+
             Executor executor = Executors.newSingleThreadExecutor(new ThreadFactory() {
                 @Override
                 public Thread newThread(Runnable r) {
-                    return new Thread("navigation.xml refresh");
+                    return new Thread(r, "navigation.xml refresh");
                 }
             });
 
             @Override
-            public Document load(String key) throws Exception {
-                URL url = NAV_URL_CACHE.get(key);
+            public DocumentHolder load(String key) throws Exception {
+                URL url = SERVLET_CONTEXT.getResource(key);
                 try {
-                    return new SAXBuilder(XMLReaders.NONVALIDATING).build(url);
+                    DocumentHolder holder = new DocumentHolder(url);
+                    return holder;
                 } finally {
                     itemStore.clear();
                 }
@@ -127,23 +139,20 @@ public class MCRLayoutUtilities {
             }
 
             @Override
-            public ListenableFuture<Document> reload(final String key, Document oldValue) throws Exception {
-                URL url = NAV_URL_CACHE.getUnchecked(key);
-                long lastModified = NAV_MODIFIED_CACHE.getUnchecked(url);
-                long diff = System.currentTimeMillis() - lastModified;
-                if (TimeUnit.SECONDS.convert(diff, TimeUnit.MILLISECONDS) > STANDARD_CACHE_SECONDS) {
+            public ListenableFuture<DocumentHolder> reload(final String key, DocumentHolder oldValue) throws Exception {
+                URL url = SERVLET_CONTEXT.getResource(key);
+                if (oldValue.isValid(url)) {
                     LOGGER.info("Keeping " + url + " in cache");
                     return Futures.immediateFuture(oldValue);
-                } else {
-                    ListenableFutureTask<Document> task = ListenableFutureTask.create(new Callable<Document>() {
-                        @Override
-                        public Document call() throws Exception {
-                            return load(key);
-                        }
-                    });
-                    executor.execute(task);
-                    return task;
                 }
+                ListenableFutureTask<DocumentHolder> task = ListenableFutureTask.create(new Callable<DocumentHolder>() {
+                    @Override
+                    public DocumentHolder call() throws Exception {
+                        return load(key);
+                    }
+                });
+                executor.execute(task);
+                return task;
             }
         });
 
@@ -365,7 +374,7 @@ public class MCRLayoutUtilities {
      * @return navigation.xml as org.jdom2.document
      */
     public static Document getNavi() {
-        return NAV_DOCUMENT_CACHE.getUnchecked(NAV_RESOURCE);
+        return NAV_DOCUMENT_CACHE.getUnchecked(NAV_RESOURCE).parsedDocument;
     }
 
     /**
