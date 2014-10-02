@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xalan="http://xml.apache.org/xalan" xmlns:iview2="xalan://org.mycore.iview2.frontend.MCRIView2XSLFunctions"
-  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:ex="http://exslt.org/dates-and-times" exclude-result-prefixes="mcrxsl xalan mods xlink iview2 ex">
+  xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xalan="http://xml.apache.org/xalan" xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions"
+  xmlns:ex="http://exslt.org/dates-and-times" exclude-result-prefixes="mcrxsl xalan mods xlink ex">
   <!-- should really be last stylesheet to be imported -->
   <xsl:import href="xslImport:solr-document:solr-basetemplate.xsl" />
   <xsl:template match="text()" />
@@ -54,12 +54,6 @@
     <field name="derivateDisplay">
       <xsl:value-of select="not(derivate/@display='false')" />
     </field>
-    <xsl:variable name="iviewMainFile" select="iview2:getSupportedMainFile(@ID)" />
-    <xsl:if test="string-length($iviewMainFile) &gt; 0">
-      <field name="iviewFile">
-        <xsl:value-of select="concat(@xlink:href,$iviewMainFile)" />
-      </field>
-    </xsl:if>
     <field name="maindoc">
       <xsl:value-of select="derivate/internals/internal/@maindoc" />
     </field>

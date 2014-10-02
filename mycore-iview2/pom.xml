@@ -10,7 +10,7 @@
   <artifactId>mycore-iview2</artifactId>
   <name>MyCoRe IView2</name>
   <properties>
-    <manifest.priority>27</manifest.priority>
+    <manifest.priority>50</manifest.priority>
   </properties>
   <build>
     <plugins>
