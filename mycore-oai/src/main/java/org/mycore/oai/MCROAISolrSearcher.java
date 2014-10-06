@@ -10,6 +10,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.datamodel.common.MCRISO8601Date;
+import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
 import org.mycore.oai.pmh.Set;
 import org.mycore.solr.MCRSolrServerFactory;
 
@@ -49,13 +50,42 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         // query
         String restriction = getConfig().getString(getConfigPrefix() + "Search.Restriction", null);
         if (restriction != null) {
-            params.add("q", restriction);
+            params.set("q", restriction);
+        }
+        
+        String sortBy = getConfig().getString(getConfigPrefix() + "Search.SortBy", null);
+        if(sortBy!=null){
+        	sortBy.replace("ascending", "asc").replace("descending", "desc");
+        	params.set("sort", sortBy);
+        }
+
+        if (this.set != null) {
+        	String solrQuery = null;
+        	String origSet = set.getSpec();
+        	String query = getConfig().getString(getConfigPrefix() + "MapSetToQuery."+origSet, null);
+         	if(query!=null){
+        		solrQuery = query;
+        	}
+        	else{
+        		String classid = MCRClassificationAndSetMapper.mapSetToClassification(getConfigPrefix(), set.getSpec().split("\\:")[0]);
+        		if(origSet.contains(":")){
+        			solrQuery = "category.top:"+classid+"\\:"+origSet.substring(origSet.indexOf(":")+1);
+        		}
+        		else{
+        			solrQuery = "category.top:"+classid+"*";
+        		}
+        	}
+        	if(solrQuery!=null){
+        		 if (restriction == null) {
+        			 params.set("q", solrQuery);
+        	     }
+        		 else{
+        			 params.set("q", restriction + " AND "+ solrQuery);
+        		 }
+        	}
         }
         // filter query
         StringBuilder fq = new StringBuilder();
-        if (this.set != null) {
-            // TODO: handle set
-        }
         // from & until
         if (this.from != null || this.until != null) {
             fq.append(buildFromUntilCondition(this.from, this.until));
