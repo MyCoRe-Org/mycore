@@ -54,8 +54,8 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         }
         
         String sortBy = getConfig().getString(getConfigPrefix() + "Search.SortBy", null);
-        if(sortBy!=null){
-        	sortBy.replace("ascending", "asc").replace("descending", "desc");
+        if(sortBy!=null){                              
+        	sortBy = sortBy.replace("ascending", "asc").replace("descending", "desc");
         	params.set("sort", sortBy);
         }
 
