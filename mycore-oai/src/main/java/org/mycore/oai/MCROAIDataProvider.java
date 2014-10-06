@@ -1,19 +1,19 @@
 /*
  * $Revision$ $Date$
- * 
+ *
  * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
  * details.
- * 
+ *
  * This program is free software; you can use it, redistribute it and / or
  * modify it under the terms of the GNU General Public License (GPL) as
  * published by the Free Software Foundation; either version 2 of the License or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program, in a file called gpl.txt or license.txt. If not, write to the
  * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -36,7 +36,6 @@ import org.jdom2.ProcessingInstruction;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.oai.pmh.dataprovider.OAIAdapter;
@@ -47,7 +46,7 @@ import org.mycore.oai.pmh.dataprovider.jaxb.JAXBOAIProvider;
 
 /**
  * Implements an OAI-PMH 2.0 Data Provider as a servlet.
- * 
+ *
  * @author Matthias Eichner
  */
 public class MCROAIDataProvider extends MCRServlet {
@@ -71,7 +70,7 @@ public class MCROAIDataProvider extends MCRServlet {
         HttpServletRequest request = job.getRequest();
         // get base url
         if (this.myBaseURL == null) {
-            this.myBaseURL = MCRFrontendUtil.getBaseURL() + request.getServletPath().substring(1);
+            this.myBaseURL = MCRServlet.getBaseURL() + request.getServletPath().substring(1);
         }
         logRequest(request);
         // create new oai request
@@ -91,7 +90,7 @@ public class MCROAIDataProvider extends MCRServlet {
 
     /**
      * Converts the servlet parameter map to deal with oaipmh api.
-     * 
+     *
      * @param pMap servlet parameter map
      * @return parameter map with generics and list
      */
@@ -130,7 +129,7 @@ public class MCROAIDataProvider extends MCRServlet {
         if (!xsl.isEmpty()) {
             Map<String, String> pairs = new HashMap<String, String>();
             pairs.put("type", "text/xsl");
-            pairs.put("href", MCRFrontendUtil.getBaseURL() + xsl);
+            pairs.put("href", MCRServlet.getBaseURL() + xsl);
             doc.addContent(0, new ProcessingInstruction("xml-stylesheet", pairs));
         }
         return doc;

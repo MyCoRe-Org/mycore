@@ -9,8 +9,7 @@
       <action dev="mcrsteph" type="fix">
         mycore-oai: implementation of "set handling" in OAI2 with SOLR, made cursor attribute of resumptionToken
                     compliant with http://www.openarchives.org/OAI/openarchivesprotocol.html#FlowControl (cursor
-                    starts at 0, last chunk returns empty resumptionToken element), replaced deprecated
-                    MCRServlet.getBaseURL() with MCRFrontendUtil.getBaseURL() and enable sortby in MCROAISolrSearcher
+                    starts at 0, last chunk returns empty resumptionToken element) and enable sortby in MCROAISolrSearcher
       </action>
       <action dev="mcrtchef" type="fix">
         mycore-solr: removed dependency to Iview2
