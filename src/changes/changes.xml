@@ -6,6 +6,10 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrtchef" type="fix">
+        mycore-solr: removed dependency to Iview2
+        <fixes issue="708" />
+      </action>
       <action dev="mcrjkupf" type="fix">
         mycore-base: fix exception using $CurrentGroup for dynamic ACL generation - The parameter $CurrentGroup of a default ACL is no more supported since USER2-System and release 2014.06.x because the Servlet 3.0 API definition.
         <fixes issue="712" />
