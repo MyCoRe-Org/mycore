@@ -72,13 +72,13 @@ public class MCRFileNodeServlet extends MCRContentServlet {
         if (!isParametersValid(request, response)) {
             return null;
         }
-        String ownerID = getOwnerID(request);
+        String ownerID = getOwnerID(request.getPathInfo());
         if (!MCRAccessManager.checkPermissionForReadingDerivate(ownerID)) {
             LOGGER.info("AccessForbidden to " + request.getPathInfo());
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return null;
         }
-        String path = getPath(request);
+        String path = getPath(request.getPathInfo());
         MCRPath mcrPath = MCRPath.getPath(ownerID, path);
         BasicFileAttributes attr = Files.readAttributes(mcrPath, BasicFileAttributes.class);
         if (attr.isDirectory()) {
@@ -108,19 +108,20 @@ public class MCRFileNodeServlet extends MCRContentServlet {
 
     /**
      *  retrieves the derivate ID of the owning derivate from request path.
-     *  @param request - the http request object
+     *  This method is overridden by JSPDocportal.
+     *  
+     *  @param pathInfo - the pathInfo from http request object (request.getPathInfo())
      */
-    public static String getOwnerID(HttpServletRequest request) {
-        String pI = request.getPathInfo();
-        StringBuilder ownerID = new StringBuilder(request.getPathInfo().length());
+    protected String getOwnerID(String pathInfo) {
+        StringBuilder ownerID = new StringBuilder(pathInfo.length());
         boolean running = true;
-        for (int i = pI.charAt(0) == '/' ? 1 : 0; i < pI.length() && running; i++) {
-            switch (pI.charAt(i)) {
+        for (int i = pathInfo.charAt(0) == '/' ? 1 : 0; i < pathInfo.length() && running; i++) {
+            switch (pathInfo.charAt(i)) {
                 case '/':
                     running = false;
                     break;
                 default:
-                    ownerID.append(pI.charAt(i));
+                    ownerID.append(pathInfo.charAt(i));
                     break;
             }
         }
@@ -129,12 +130,14 @@ public class MCRFileNodeServlet extends MCRContentServlet {
 
     /**
      *  Retrieves the path of the file to display from request path.
-     *  @param request - the http request object
+     *  This method is overridden by JSPDocportal.
+     *  
+     *  @param pathInfo - the pathInfo from http request object (request.getPathInfo())
      */
-    protected String getPath(HttpServletRequest request) {
-        String ownerID = getOwnerID(request);
+    protected String getPath(String pathInfo) {
+    	String ownerID = getOwnerID(pathInfo);
         int pos = ownerID.length() + 1;
-        StringBuilder path = new StringBuilder(request.getPathInfo().substring(pos));
+        StringBuilder path = new StringBuilder(pathInfo.substring(pos));
         if (path.length() > 1 && path.charAt(path.length() - 1) == '/') {
             path.deleteCharAt(path.length() - 1);
         }
