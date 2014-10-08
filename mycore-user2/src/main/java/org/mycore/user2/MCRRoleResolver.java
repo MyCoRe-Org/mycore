@@ -51,9 +51,9 @@ public class MCRRoleResolver implements URIResolver {
 
         // The list of assignable groups depends on the privileges of the
         // current user.
-        if (MCRAccessManager.checkPermission("administrate-user")) {
+        if (MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION)) {
             groupIDs = MCRRoleManager.listSystemRoles();
-        } else if (MCRAccessManager.checkPermission("create-user")) {
+        } else if (MCRAccessManager.checkPermission(MCRUser2Constants.USER_CREATE_PERMISSION)) {
             final MCRUser currentUser = MCRUserManager.getCurrentUser();
             groupIDs = new ArrayList<MCRRole>(currentUser.getSystemRoleIDs().size());
             for (final String id : currentUser.getSystemRoleIDs()) {
