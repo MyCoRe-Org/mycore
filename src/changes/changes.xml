@@ -9,6 +9,9 @@
       <action dev="mcrfluet" type="fix">
         mycore-xeditor: Replacing variables in xed:include/@uri did not work
       </action>
+      <action dev="mcrmeich" type="fix">
+        mycore-user2: fix invalid adminstrate-user rule -> use constants
+      </action>
       <action dev="mcrsteph" type="fix">
         mycore-oai: implementation of "set handling" in OAI2 with SOLR, made cursor attribute of resumptionToken
                     compliant with http://www.openarchives.org/OAI/openarchivesprotocol.html#FlowControl (cursor
