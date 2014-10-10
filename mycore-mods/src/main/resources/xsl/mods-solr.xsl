@@ -145,6 +145,11 @@
         <xsl:value-of select="." />
       </field>
     </xsl:for-each>
+    <xsl:for-each select="mods:accessCondition[@type='use and reproduction']">
+      <field name="mods.rights">
+        <xsl:value-of select="." />
+      </field>
+    </xsl:for-each>
   </xsl:template>
   <xsl:template match="mods:name" mode="childdoc">
     <xsl:variable name="topField" select="not(ancestor::mods:relatedItem[@type='host'])" />
