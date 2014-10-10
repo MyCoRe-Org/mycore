@@ -26,6 +26,7 @@ package org.mycore.datamodel.ifs;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -56,13 +57,13 @@ import org.xml.sax.SAXException;
  * @author A.Schaar
  * @author Robert Stephan
  * 
- * @version $Revision$ $Date: 2008-01-14 11:02:17 +0000 (Mo, 14 Jan
- *          2008) $
+ * @version $Revision$ $Date$
  */
 public class MCRFileNodeServlet extends MCRContentServlet {
     private static final long serialVersionUID = 1L;
 
     private static Logger LOGGER = Logger.getLogger(MCRFileNodeServlet.class);
+    private static Pattern patternDerivateID = Pattern.compile(".+_derivate_[0-9]+");
 
     /* (non-Javadoc)
      * @see org.mycore.frontend.servlets.MCRContentServlet#getContent(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
@@ -72,13 +73,13 @@ public class MCRFileNodeServlet extends MCRContentServlet {
         if (!isParametersValid(request, response)) {
             return null;
         }
-        String ownerID = getOwnerID(request.getPathInfo());
+        String ownerID = getOwnerID(request);
         if (!MCRAccessManager.checkPermissionForReadingDerivate(ownerID)) {
             LOGGER.info("AccessForbidden to " + request.getPathInfo());
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return null;
         }
-        String path = getPath(request.getPathInfo());
+        String path = getPath(request);
         MCRPath mcrPath = MCRPath.getPath(ownerID, path);
         BasicFileAttributes attr = Files.readAttributes(mcrPath, BasicFileAttributes.class);
         if (attr.isDirectory()) {
@@ -108,38 +109,30 @@ public class MCRFileNodeServlet extends MCRContentServlet {
 
     /**
      *  retrieves the derivate ID of the owning derivate from request path.
-     *  This method is overridden by JSPDocportal.
-     *  
-     *  @param pathInfo - the pathInfo from http request object (request.getPathInfo())
+     *  Attention: derivateID is not always at the first position in path 
+     *  @param request - the http request object
      */
-    protected String getOwnerID(String pathInfo) {
-        StringBuilder ownerID = new StringBuilder(pathInfo.length());
-        boolean running = true;
-        for (int i = pathInfo.charAt(0) == '/' ? 1 : 0; i < pathInfo.length() && running; i++) {
-            switch (pathInfo.charAt(i)) {
-                case '/':
-                    running = false;
-                    break;
-                default:
-                    ownerID.append(pathInfo.charAt(i));
-                    break;
-            }
+    public static String getOwnerID(HttpServletRequest request) {
+        String pI = request.getPathInfo();
+        for(String fragment: pI.split("/")){
+        	if(patternDerivateID.matcher(fragment).matches()){
+        		return fragment;
+        	}
         }
-        return ownerID.toString();
+        return "";
     }
 
     /**
      *  Retrieves the path of the file to display from request path.
-     *  This method is overridden by JSPDocportal.
-     *  
-     *  @param pathInfo - the pathInfo from http request object (request.getPathInfo())
+     *  @param request - the http request object
      */
-    protected String getPath(String pathInfo) {
-    	String ownerID = getOwnerID(pathInfo);
-        int pos = ownerID.length() + 1;
-        StringBuilder path = new StringBuilder(pathInfo.substring(pos));
-        if (path.length() > 1 && path.charAt(path.length() - 1) == '/') {
-            path.deleteCharAt(path.length() - 1);
+    protected String getPath(HttpServletRequest request) {
+        String pI=request.getPathInfo();
+    	String ownerID = getOwnerID(request);
+        int pos = pI.indexOf(ownerID)+ownerID.length() + 1;
+        String path = pI.substring(pos);
+        if(path.endsWith("/")){
+        	path = path.substring(0, path.length()-1);
         }
         if (path.length() == 0) {
             return "/";
