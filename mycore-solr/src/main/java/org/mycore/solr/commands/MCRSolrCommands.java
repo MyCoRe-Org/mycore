@@ -50,8 +50,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(syntax = "optimize solr index", help = "An optimize is like a hard commit except that it forces all of the index segments to be merged into a single segment first. "
-            + "Depending on the use cases, this operation should be performed infrequently (like nightly), "
-            + "if at all, since it is very expensive and involves reading and re-writing the entire index", order = 80)
+        + "Depending on the use cases, this operation should be performed infrequently (like nightly), "
+        + "if at all, since it is very expensive and involves reading and re-writing the entire index", order = 80)
     public static void optimize() {
         MCRSolrIndexer.optimize();
     }
@@ -101,8 +101,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
 
     @MCRCommand(syntax = "create solr metadata and content index at {0}", help = "create solr's metadata and content index on specific solr server", order = 120)
     public static void createIndex(String url) throws Exception {
-        SolrServer cuss = MCRSolrServerFactory.createConcurrentUpdateSolrServer(url);
-        SolrServer hss = MCRSolrServerFactory.createSolrServer(url);
+        SolrServer cuss = MCRSolrServerFactory.getConcurrentSolrServer();
+        SolrServer hss = MCRSolrServerFactory.getSolrServer();
         MCRSolrIndexer.rebuildMetadataIndex(cuss);
         MCRSolrIndexer.rebuildContentIndex(hss);
         if (cuss instanceof ConcurrentUpdateSolrServer) {

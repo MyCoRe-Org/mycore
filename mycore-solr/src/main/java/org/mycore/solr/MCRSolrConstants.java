@@ -33,7 +33,11 @@ public class MCRSolrConstants {
 
     public static final String CONFIG_PREFIX = "MCR.Module-solr.";
 
+    public static final String SERVER_BASE_URL;
+
     public static final String SERVER_URL;
+
+    public static final String CORE = MCRConfiguration.instance().getString(CONFIG_PREFIX + "Core", null);
 
     public static final String QUERY_XML_PROTOCOL_VERSION = MCRConfiguration.instance().getString(
         CONFIG_PREFIX + "XMLProtocolVersion");
@@ -48,6 +52,11 @@ public class MCRSolrConstants {
 
     static {
         String serverURL = MCRConfiguration.instance().getString(CONFIG_PREFIX + "ServerURL");
+        if (!serverURL.endsWith("/")) {
+            serverURL = serverURL += "/";
+        }
+        SERVER_BASE_URL = serverURL;
+        serverURL = CORE != null ? SERVER_BASE_URL + CORE : SERVER_BASE_URL;
         if (serverURL.endsWith("/")) {
             serverURL = serverURL.substring(0, serverURL.length() - 1);
         }

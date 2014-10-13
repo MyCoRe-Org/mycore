@@ -1,89 +1,62 @@
 package org.mycore.solr;
 
 import static org.mycore.solr.MCRSolrConstants.SERVER_URL;
-import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
+import static org.mycore.solr.MCRSolrConstants.CORE;
+import static org.mycore.solr.MCRSolrConstants.SERVER_BASE_URL;
 
 import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.impl.BinaryRequestWriter;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.events.MCRShutdownHandler;
 
 /**
  * @author shermann
  * @author Thomas Scheffler (yagee)
+ * @author Matthias Eichner
  */
-public class MCRSolrServerFactory {
+public abstract class MCRSolrServerFactory {
 
     private static final Logger LOGGER = Logger.getLogger(MCRSolrServerFactory.class);
 
-    private static SolrServer SOLR_SERVER;
+    private static String DEFAULT_CORE_NAME;
 
-    private static SolrServer CONCURRENT_SOLR_SERVER;
-
-    private static boolean USE_CONCURRENT_SERVER = MCRConfiguration.instance().getBoolean(
-        CONFIG_PREFIX + "ConcurrentUpdateSolrServer.Enabled", true);
+    private static Map<String, MCRSolrCore> CORE_MAP;
 
     static {
         try {
-            setSolrServer(SERVER_URL);
-            MCRShutdownHandler.getInstance().addCloseable(new MCRShutdownHandler.Closeable() {
-
-                @Override
-                public void prepareClose() {
-                }
-
-                @Override
-                public int getPriority() {
-                    return Integer.MIN_VALUE;
-                }
-
-                @Override
-                public void close() {
-                    SolrServer solrServer = getSolrServer();
-                    LOGGER.info("Shutting down solr server: " + solrServer);
-                    solrServer.shutdown();
-                    SolrServer concurrentSolrServer = getConcurrentSolrServer();
-                    LOGGER.info("Shutting down concurrent solr server: " + concurrentSolrServer);
-                    concurrentSolrServer.shutdown();
-                    LOGGER.info("Solr shutdown process completed.");
-                }
-            });
+            CORE_MAP = Collections.synchronizedMap(new HashMap<String, MCRSolrCore>());
+            if (CORE != null) {
+                setSolrServer(SERVER_BASE_URL, CORE);
+            } else {
+                setSolrServer(SERVER_URL);
+            }
         } catch (Exception e) {
             LOGGER.error("Exception creating solr server object", e);
         } catch (Error error) {
             LOGGER.error("Error creating solr server object", error);
         } finally {
-            LOGGER.info(MessageFormat.format("Using server at address \"{0}\"",
-                SOLR_SERVER instanceof HttpSolrServer ? ((HttpSolrServer) SOLR_SERVER).getBaseURL() : "n/a"));
+            LOGGER.info(MessageFormat.format("Using server at address \"{0}\"", getDefaultSolrCore().getServer()
+                .getBaseURL()));
         }
     }
 
-    public static SolrServer createSolrServer(String solrServerUrl) {
-        HttpSolrServer hss = new HttpSolrServer(solrServerUrl);
-        hss.setRequestWriter(new BinaryRequestWriter());
-        return hss;
+    public static void add(MCRSolrCore core) {
+        CORE_MAP.put(core.getName(), core);
     }
 
-    public static SolrServer createConcurrentUpdateSolrServer(String solrServerUrl) {
-        if (USE_CONCURRENT_SERVER) {
-            int queueSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "ConcurrentUpdateSolrServer.QueueSize", 100);
-            int threadSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "ConcurrentUpdateSolrServer.ThreadSize", 4);
-            ConcurrentUpdateSolrServer cuss = new ConcurrentUpdateSolrServer(solrServerUrl, queueSize, threadSize);
-            cuss.setRequestWriter(new BinaryRequestWriter());
-            return cuss;
-        }
-        return createSolrServer(solrServerUrl);
+    public static MCRSolrCore remove(String coreName) {
+        return CORE_MAP.remove(coreName);
     }
 
-    /**
-     * Hide constructor.
-     * */
-    private MCRSolrServerFactory() {
+    public static MCRSolrCore get(String coreName) {
+        return CORE_MAP.get(coreName);
+    }
+
+    public static MCRSolrCore getDefaultSolrCore() {
+        return DEFAULT_CORE_NAME != null ? CORE_MAP.get(DEFAULT_CORE_NAME) : null;
     }
 
     /**
@@ -92,50 +65,43 @@ public class MCRSolrServerFactory {
      * @return an instance of {@link SolrServer}
      */
     public static SolrServer getSolrServer() {
-        return SOLR_SERVER;
+        return getDefaultSolrCore().getServer();
     }
 
     public static SolrServer getConcurrentSolrServer() {
-        return CONCURRENT_SOLR_SERVER;
+        return getDefaultSolrCore().getConcurrentServer();
     }
 
-    public static void setSolrServer(SolrServer solrServer) {
-        if (solrServer instanceof ConcurrentUpdateSolrServer) {
-            LOGGER.error("Do not set a ConcurrentUpdateSolrServer instance as current solr server!");
-            return;
-        }
-        replaceSolrServer(solrServer);
+    /**
+     * Sets the new solr url including the core.
+     * 
+     * @param serverURL
+     */
+    public static void setSolrServer(String serverURL) {
+        removeDefaultCore();
+        MCRSolrCore defaultCore = new MCRSolrCore(serverURL);
+        add(defaultCore);
+        DEFAULT_CORE_NAME = defaultCore.getName();
     }
 
-    public static void setConcurrentSolrServer(ConcurrentUpdateSolrServer concurrentUpdateSolrServer) {
-        replaceConcurrentUpdateSolrServer(concurrentUpdateSolrServer);
+    /**
+     * Sets the new solr url.
+     * 
+     * @param serverURL base solr url
+     * @param core core of the server
+     */
+    public static void setSolrServer(String serverURL, String core) {
+        removeDefaultCore();
+        add(new MCRSolrCore(serverURL, core));
+        DEFAULT_CORE_NAME = core;
     }
 
-    public static void setSolrServer(String solrServerURL) {
-        replaceSolrServer(createSolrServer(solrServerURL));
-        replaceConcurrentUpdateSolrServer(createConcurrentUpdateSolrServer(solrServerURL));
-    }
-
-    private synchronized static void replaceConcurrentUpdateSolrServer(SolrServer server) {
-        if (CONCURRENT_SOLR_SERVER == server) {
-            return;
-        }
-        SolrServer oldServer = CONCURRENT_SOLR_SERVER;
-        CONCURRENT_SOLR_SERVER = server;
-        if (oldServer != null) {
-            oldServer.shutdown();
-        }
-    }
-
-    private synchronized static void replaceSolrServer(SolrServer server) {
-        if (SOLR_SERVER == server) {
-            return;
-        }
-        SolrServer oldServer = SOLR_SERVER;
-        SOLR_SERVER = server;
-        if (oldServer != null) {
-            oldServer.shutdown();
+    private static void removeDefaultCore() {
+        MCRSolrCore defaultCore = getDefaultSolrCore();
+        if (defaultCore != null) {
+            defaultCore.shutdown();
+            CORE_MAP.remove(defaultCore.getName());
+            DEFAULT_CORE_NAME = null;
         }
     }
-
 }
