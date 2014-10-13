@@ -56,12 +56,12 @@ import org.mycore.mets.model.struct.PhysicalStructMap;
 import org.mycore.mets.model.struct.PhysicalSubDiv;
 
 /**
- * This servlet redirect to the DFG-viewer and 
+ * This servlet redirects to the DFG-viewer and 
  * sets all parameters for specific images automatically if needed
  * 
  * parameters:
- * deriv = the MyCoReID of the derivate
- * file = the Filename of the image
+ * deriv = the MyCoReID of the derivate (needed)
+ * file = the Filename of the image that had to be shown in the DFG-Viewer (optional)
  * 
  * @author Sebastian Röher (basti890)
  */
@@ -174,7 +174,8 @@ public class MCRDFGLinkServlet extends MCRServlet {
      * @return
      * @throws Exception
      */
-    static MCRContent getMetsSource(MCRServletJob job, boolean useExistingMets, String derivate) throws Exception {
+    private static MCRContent getMetsSource(MCRServletJob job, boolean useExistingMets, String derivate)
+        throws Exception {
         MCRDirectory dir = MCRDirectory.getRootDirectory(derivate);
 
         MCRFilesystemNode metsFile = dir.getChildByPath("mets.xml");

@@ -1,5 +1,7 @@
 package org.mycore.mets.servlets;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -18,7 +20,7 @@ public class MCRMETSUnlockServlet extends MCRServlet {
             MCRMetsLock.doUnlock(derivate);
         } else {
             LOGGER.warn("Derivate is null!");
-            job.getResponse().sendError(400);
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter \"derivate\" isn't set!");
         }
         
     }

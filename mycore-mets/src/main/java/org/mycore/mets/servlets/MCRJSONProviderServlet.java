@@ -51,6 +51,12 @@ public class MCRJSONProviderServlet extends MCRServlet {
     public void doGetPost(MCRServletJob job) throws Exception {
         String derivate = job.getRequest().getParameter("derivate");
 
+        if (derivate == null || derivate.isEmpty()) {
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter \"derivate\" isn't set");
+            return;
+        }
+
+        //TODO check if useExistingMets shall be set to false if the parameter is not set.
         boolean useExistingMets = true;
         useExistingMets = Boolean.valueOf(job.getRequest().getParameter("useExistingMets"));
         MCRContent metsSource = MCRMETSServlet.getMetsSource(job, useExistingMets, derivate);
