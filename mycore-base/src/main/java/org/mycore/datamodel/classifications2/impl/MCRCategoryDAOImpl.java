@@ -74,17 +74,17 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     private static HashMap<String, Long> LAST_MODIFIED_MAP = new HashMap<String, Long>();
 
-    public void addCategory(MCRCategoryID parentID, MCRCategory category) {
+    public MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category) {
         int position = -1;
         if (category instanceof MCRCategoryImpl) {
             position = ((MCRCategoryImpl) category).getPositionInParent();
         }
-        addCategory(parentID, category, position);
+        return addCategory(parentID, category, position);
     }
 
-    public void addCategory(MCRCategoryID parentID, MCRCategory category, int position) {
+    public MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category, int position) {
         if (exist(category.getId())) {
-            throw new MCRException("Cannot add category. A category with ID " + category.getId() + " allready exists");
+            throw new MCRException("Cannot add category. A category with ID " + category.getId() + " already exists");
         }
         int leftStart = LEFT_START_VALUE;
         int levelStart = LEVEL_START_VALUE;
@@ -124,6 +124,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         updateTimeStamp();
 
         updateLastModified(category.getRoot().getId().toString());
+        return parent;
     }
 
     public void deleteCategory(MCRCategoryID id) {
@@ -393,7 +394,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         updateLastModified(id.getRootID());
     }
 
-    public void removeLabel(MCRCategoryID id, String lang) {
+    public MCRCategory removeLabel(MCRCategoryID id, String lang) {
         Session session = getHibConnection().getSession();
         MCRCategoryImpl category = getByNaturalID(session, id);
         MCRLabel oldLabel = category.getLabel(lang);
@@ -402,6 +403,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             updateTimeStamp();
             updateLastModified(category.getRootID());
         }
+        return category;
     }
 
     public void replaceCategory(MCRCategory newCategory) throws IllegalArgumentException {
@@ -493,7 +495,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         updateLastModified(newCategory.getRoot().getId().toString());
     }
 
-    public void setLabel(MCRCategoryID id, MCRLabel label) {
+    public MCRCategory setLabel(MCRCategoryID id, MCRLabel label) {
         Session session = getHibConnection().getSession();
         MCRCategoryImpl category = getByNaturalID(session, id);
         MCRLabel oldLabel = category.getLabel(label.getLang());
@@ -504,25 +506,28 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         session.update(category);
         updateTimeStamp();
         updateLastModified(category.getRootID());
+        return category;
     }
 
     @Override
-    public void setLabels(MCRCategoryID id, Set<MCRLabel> labels) {
+    public MCRCategory setLabels(MCRCategoryID id, Set<MCRLabel> labels) {
         Session session = getHibConnection().getSession();
         MCRCategoryImpl category = getByNaturalID(session, id);
         category.setLabels(labels);
         session.update(category);
         updateTimeStamp();
         updateLastModified(category.getRootID());
+        return category;
     }
 
-    public void setURI(MCRCategoryID id, URI uri) {
+    public MCRCategory setURI(MCRCategoryID id, URI uri) {
         Session session = getHibConnection().getSession();
         MCRCategoryImpl category = getByNaturalID(session, id);
         category.setURI(uri);
         session.update(category);
         updateTimeStamp();
         updateLastModified(category.getRootID());
+        return category;
     }
 
     public void repairLeftRightValue(String classID) {
@@ -765,7 +770,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      * Method updates the last modified timestamp, for the given root id.
      * 
      */
-    synchronized private void updateLastModified(String root) {
+    synchronized protected void updateLastModified(String root) {
         LAST_MODIFIED_MAP.put(root, System.currentTimeMillis());
     }
 

@@ -47,6 +47,7 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
@@ -65,10 +66,11 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     private static Class<MCRCategoryLink> LINK_CLASS = MCRCategoryLink.class;
 
-    private static MCRCache<MCRCategoryID, MCRCategoryImpl> categCache = new MCRCache<MCRCategoryID, MCRCategoryImpl>(MCRConfiguration.instance().getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size", 1000),
+    private static MCRCache<MCRCategoryID, MCRCategory> categCache = new MCRCache<MCRCategoryID, MCRCategory>(
+        MCRConfiguration.instance().getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size", 1000),
         "MCRCategLinkService category cache");
 
-    private static MCRCategoryDAOImpl DAO = new MCRCategoryDAOImpl();
+    private static MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
     public MCRCategLinkServiceImpl() {
         HIB_CONNECTION_INSTANCE = MCRHIBConnection.instance();
@@ -198,19 +200,27 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     public void setLinks(MCRCategLinkReference objectReference, Collection<MCRCategoryID> categories) {
         Session session = HIB_CONNECTION_INSTANCE.getSession();
         for (MCRCategoryID categID : categories) {
-            final MCRCategoryImpl category = getMCRCategory(session, categID);
+            final MCRCategory category = getMCRCategory(session, categID);
             if (category == null) {
                 throw new MCRPersistenceException("Could not link to unknown category " + categID);
             }
             MCRCategoryLink link = new MCRCategoryLink(category, objectReference);
-            LOGGER.debug("Adding Link from " + link.getCategory().getId() + "(" + link.getCategory().getInternalID() + ") to " + objectReference.getObjectID());
+            if (LOGGER.isDebugEnabled()) {
+                MCRCategory linkedCategory = link.getCategory();
+                StringBuilder debugMessage = new StringBuilder("Adding Link from ").append(linkedCategory.getId());
+                if (linkedCategory instanceof MCRCategoryImpl) {
+                    debugMessage.append("(").append(((MCRCategoryImpl) linkedCategory).getInternalID()).append(") ");
+                }
+                debugMessage.append("to ").append(objectReference);
+                LOGGER.debug(debugMessage.toString());
+            }
             session.save(link);
             LOGGER.debug("===DONE: " + link.id);
         }
     }
 
-    private static MCRCategoryImpl getMCRCategory(Session session, MCRCategoryID categID) {
-        MCRCategoryImpl categ = categCache.getIfUpToDate(categID, DAO.getLastModified());
+    private static MCRCategory getMCRCategory(Session session, MCRCategoryID categID) {
+        MCRCategory categ = categCache.getIfUpToDate(categID, DAO.getLastModified());
         if (categ != null) {
             return categ;
         }
@@ -227,7 +237,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             return hasLinksForClassification(category);
         }
 
-        MCRCategoryImpl rootImpl = (MCRCategoryImpl) MCRCategoryDAOFactory.getInstance().getCategory(category.getRoot().getId(), -1);
+        MCRCategoryImpl rootImpl = (MCRCategoryImpl) MCRCategoryDAOFactory.getInstance().getCategory(
+            category.getRoot().getId(), -1);
         if (rootImpl == null) {
             //Category does not exist, so it has no links
             return getNoLinksMap(category);
@@ -250,7 +261,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         };
 
         Session session = MCRHIBConnection.instance().getSession();
-        String queryString = MessageFormat.format("select distinct node.rootID from {0} as node, {1} as link where node.internalID=link.category",
+        String queryString = MessageFormat.format(
+            "select distinct node.rootID from {0} as node, {1} as link where node.internalID=link.category",
             MCRCategoryImpl.class.getCanonicalName(), MCRCategoryLink.class.getCanonicalName());
         Query queryHasLink = session.createQuery(queryString);
         @SuppressWarnings("unchecked")

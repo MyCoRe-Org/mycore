@@ -75,7 +75,8 @@ public class MCRXMLTransformer {
         return category;
     }
 
-    private static List<MCRCategory> buildChildCategories(String classID, List<Element> elements, MCRCategory parent) throws URISyntaxException {
+    private static List<MCRCategory> buildChildCategories(String classID, List<Element> elements, MCRCategory parent)
+        throws URISyntaxException {
         List<MCRCategory> children = new ArrayList<MCRCategory>(elements.size());
         for (Object o : elements) {
             children.add(buildCategory(classID, (Element) o, parent));
@@ -94,7 +95,8 @@ public class MCRXMLTransformer {
 
     public static MCRLabel getLabel(Element labelElement) {
         String lang = labelElement.getAttributeValue("lang", Namespace.XML_NAMESPACE);
-        MCRLabel label = new MCRLabel(lang, labelElement.getAttributeValue("text"), labelElement.getAttributeValue("description"));
+        MCRLabel label = new MCRLabel(lang, labelElement.getAttributeValue("text"),
+            labelElement.getAttributeValue("description"));
         return label;
     }
 

@@ -44,8 +44,9 @@ public interface MCRCategoryDAO {
      *            ID of the parent category
      * @param category
      *            Category (with children) to be added
+     * @return the parent category
      */
-    public abstract void addCategory(MCRCategoryID parentID, MCRCategory category);
+    public abstract MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category);
 
     /**
      * Adds a category as child of another category.
@@ -57,8 +58,9 @@ public interface MCRCategoryDAO {
      *            Category (with children) to be added
      * @param position
      *            insert position
+     * @return the parent category
      */
-    public abstract void addCategory(MCRCategoryID parentID, MCRCategory category, int position);
+    public abstract MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category, int position);
 
     /**
      * Deletes a category with all child categories.
@@ -204,8 +206,9 @@ public interface MCRCategoryDAO {
      *            ID of the category
      * @param lang
      *            which language should be removed?
+     * @return category where the label was removed
      */
-    public abstract void removeLabel(MCRCategoryID id, String lang);
+    public MCRCategory removeLabel(MCRCategoryID id, String lang);
 
     /**
      * Replaces a <code>MCRCategory</code> by a new version of the same
@@ -232,8 +235,9 @@ public interface MCRCategoryDAO {
      *            ID of the category
      * @param label
      *            to be set or updated
+     * @return category where the label was set
      */
-    public abstract void setLabel(MCRCategoryID id, MCRLabel label);
+    public abstract MCRCategory setLabel(MCRCategoryID id, MCRLabel label);
 
     /**
      * Sets a new set of labels from a Category.
@@ -242,8 +246,9 @@ public interface MCRCategoryDAO {
      *            ID of the category
      * @param labels
      *            to be set
+     * @return category where the labels was set
      */
-    public abstract void setLabels(MCRCategoryID id, Set<MCRLabel> labels);
+    public abstract MCRCategory setLabels(MCRCategoryID id, Set<MCRLabel> labels);
 
     /**
      * Sets or updates the URI from a Category.
@@ -252,8 +257,9 @@ public interface MCRCategoryDAO {
      *            ID of the category
      * @param uri
      *            to be set or updated
+     * @return category where the uri was set
      */
-    public abstract void setURI(MCRCategoryID id, URI uri);
+    public abstract MCRCategory setURI(MCRCategoryID id, URI uri);
 
     /**
      * allows to determine when the last change was made to the categories.

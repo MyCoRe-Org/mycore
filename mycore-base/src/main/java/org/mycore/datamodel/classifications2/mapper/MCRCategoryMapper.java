@@ -27,16 +27,16 @@ import java.util.List;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
-import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 
 /**
  * @author Frank Lützenkirchen
  */
 public class MCRCategoryMapper extends MCRCategoryMapperBase {
 
-    private static final MCRCategoryDAO DAO = new MCRCategoryDAOImpl();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
     protected String getMappingRule(MCRCategoryID categoryID) {
         MCRCategory category = DAO.getCategory(categoryID, 0);
