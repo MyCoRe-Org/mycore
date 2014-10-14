@@ -65,13 +65,15 @@ public class CategoryDAOMock implements MCRCategoryDAO {
     }
 
     @Override
-    public void addCategory(MCRCategoryID parentID, MCRCategory category) {
+    public MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category) {
         categMap.put(category.getId(), category);
+        return categMap.get(parentID);
     }
 
     @Override
-    public void addCategory(MCRCategoryID parentID, MCRCategory category, int position) {
+    public MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category, int position) {
         categMap.put(category.getId(), category);
+        return categMap.get(parentID);
     }
 
     @Override
@@ -138,7 +140,8 @@ public class CategoryDAOMock implements MCRCategoryDAO {
     }
 
     @Override
-    public void removeLabel(MCRCategoryID id, String lang) {
+    public MCRCategory removeLabel(MCRCategoryID id, String lang) {
+        return categMap.get(id);
     }
 
     @Override
@@ -150,15 +153,18 @@ public class CategoryDAOMock implements MCRCategoryDAO {
     }
 
     @Override
-    public void setLabel(MCRCategoryID id, MCRLabel label) {
+    public MCRCategory setLabel(MCRCategoryID id, MCRLabel label) {
+        return categMap.get(id);
     }
 
     @Override
-    public void setLabels(MCRCategoryID id, Set<MCRLabel> labels) {
+    public MCRCategory setLabels(MCRCategoryID id, Set<MCRLabel> labels) {
+        return categMap.get(id);
     }
 
     @Override
-    public void setURI(MCRCategoryID id, URI uri) {
+    public MCRCategory setURI(MCRCategoryID id, URI uri) {
+        return categMap.get(id);
     }
 
     @Override
