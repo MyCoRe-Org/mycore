@@ -6,6 +6,10 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrtchef" type="fix">
+        mycore-base: added normalizeUnicode() to normalize String to KFC normal form
+        mycore-solr: normalize mods.name* and mods.author
+      </action>
       <action dev="mcrfluet" type="fix">
         mycore-xeditor: Replacing variables in xed:include/@uri did not work
       </action>
