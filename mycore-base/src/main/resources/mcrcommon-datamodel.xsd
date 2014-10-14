@@ -162,6 +162,7 @@
         <xs:element ref="servdates" minOccurs="0" />
         <xs:element ref="servacls" minOccurs="0" />
         <xs:element ref="servflags" minOccurs="0" />
+        <xs:element ref="servstates" minOccurs="0" />
       </xs:all>
     </xs:complexType>
   </xs:element>
@@ -227,6 +228,23 @@
           <xs:attributeGroup ref="MCRMetaLangText" />
         </xs:extension>
       </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+   <xs:element name="servstates">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="servstate" maxOccurs="1" />
+      </xs:sequence>
+      <xs:attribute fixed="MCRMetaClassification" use="required" type="xs:string" name="class" />
+      <xs:attribute use="optional" type="xs:boolean" name="heritable" />
+      <xs:attribute use="optional" type="xs:boolean" name="notinherit" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="servstate">
+    <xs:complexType>
+      <xs:attribute name="inherited" use="optional" type="xs:integer" fixed="0" />
+      <xs:attribute name="type" type="xs:string" />
+      <xs:attributeGroup ref="MCRMetaClassification" />
     </xs:complexType>
   </xs:element>
 </xs:schema>

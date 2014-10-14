@@ -31,10 +31,10 @@ import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
 /**
- * This class implements all methode for handling one document service data. The
- * service data are to use to handel the database with batch jobs automatical
- * changes. The service class holds two types of data, dates and flags. The
- * flags are text strings and are optional.
+ * This class implements all methods for handling MCRObject service data. 
+ * The service data stores technical information that is no metadata. 
+ * The service data holds three types of data, dates, flags and states. 
+ * The flags are text strings and are optional.
  * <p>
  * 
  * The dates are represent by a date and a type. Two types are in service data
@@ -55,8 +55,11 @@ import org.mycore.common.MCRException;
  * valid to use</li>
  * </ul>
  * 
+ * The state is optional and represented by a MyCoRe classification object.
+ * 
  * @author Jens Kupferschmidt
  * @author Matthias Eichner
+ * @author Robert Stephan
  * @version $Revision$ $Date$
  */
 public class MCRObjectService {
@@ -84,6 +87,8 @@ public class MCRObjectService {
     private final ArrayList<MCRMetaAccessRule> rules;
 
     private final ArrayList<MCRMetaLangText> flags;
+    
+    private MCRMetaClassification state;
 
     /**
      * This is the constructor of the MCRObjectService class. All data are set
@@ -103,6 +108,7 @@ public class MCRObjectService {
 
         rules = new ArrayList<MCRMetaAccessRule>();
         flags = new ArrayList<MCRMetaLangText>();
+        state = new MCRMetaClassification();
     }
 
     /**
@@ -118,7 +124,6 @@ public class MCRObjectService {
         dates.clear();
 
         if (dates_element != null) {
-            @SuppressWarnings("unchecked")
             List<Element> dateList = dates_element.getChildren();
 
             for (Element dateElement : dateList) {
@@ -138,7 +143,6 @@ public class MCRObjectService {
         // Rule part
         Element servacls = service.getChild("servacls");
         if (servacls != null) {
-            @SuppressWarnings("unchecked")
             List<Element> ruleList = servacls.getChildren();
             for (Element ruleElement : ruleList) {
                 if (!ruleElement.getName().equals("servacl")) {
@@ -153,7 +157,6 @@ public class MCRObjectService {
         // Flag part
         org.jdom2.Element flagsElement = service.getChild("servflags");
         if (flagsElement != null) {
-            @SuppressWarnings("unchecked")
             List<Element> flagList = flagsElement.getChildren();
             for (Element flagElement : flagList) {
                 if (!flagElement.getName().equals("servflag")) {
@@ -162,6 +165,17 @@ public class MCRObjectService {
                 MCRMetaLangText flag = new MCRMetaLangText();
                 flag.setFromDOM(flagElement);
                 flags.add(flag);
+            }
+        }
+        
+        org.jdom2.Element statesElement = service.getChild("servstates");
+        if (statesElement != null) {
+            List<Element> flagList = statesElement.getChildren();
+            for (Element stateElement : flagList) {
+                if (!stateElement.getName().equals("servstate")) {
+                    continue;
+                }
+                state.setFromDOM(stateElement);
             }
         }
     }
@@ -175,6 +189,16 @@ public class MCRObjectService {
         return dates.size();
     }
 
+    /**
+     * This method returns the status classification
+     * 
+     * @return the status as MCRMetaClassification,
+     *         can return null
+     * 
+     */
+    public final MCRMetaClassification getState() {
+       return state;
+    }
     /**
      * This method get a date for a given type. If the type was not found, an
      * null was returned.
@@ -223,6 +247,16 @@ public class MCRObjectService {
      */
     public final void setDate(String type) {
         setDate(type, new Date());
+    }
+    
+    /**
+     * This method sets the status classification
+     * 
+     * @param classid
+     * @param categid
+     */
+    public final void setStatus(String classid, String categid) {
+        state = new MCRMetaClassification("state", 0, null, classid, categid);
     }
 
     /**
@@ -625,6 +659,11 @@ public class MCRObjectService {
             }
 
             elm.addContent(elmm);
+        }
+        if(state!=null){
+        	org.jdom2.Element elmm = new org.jdom2.Element("servstates");
+            elmm.setAttribute("class", "MCRMetaClassification");
+            elmm.addContent(state.createXML());
         }
 
         return elm;
