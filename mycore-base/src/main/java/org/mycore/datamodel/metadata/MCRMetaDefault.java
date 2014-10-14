@@ -328,7 +328,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
         LOGGER.debug("Language           = " + lang);
         LOGGER.debug("Type               = " + type);
         LOGGER.debug("DataPart           = " + datapart);
-        LOGGER.debug("Inhreited          = " + String.valueOf(inherited));
+        LOGGER.debug("Inherited          = " + String.valueOf(inherited));
     }
 
     @Override
