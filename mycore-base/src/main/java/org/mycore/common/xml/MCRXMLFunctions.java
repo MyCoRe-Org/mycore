@@ -31,6 +31,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
+import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -129,6 +130,16 @@ public class MCRXMLFunctions {
      */
     public static String trim(String arg0) {
         return arg0.trim();
+    }
+    
+    /**
+     * returns the given String in unicode NFC normal form.
+     * 
+     * @param arg0 String to be normalized
+     * @see Normalizer#normalize(CharSequence, java.text.Normalizer.Form)
+     */
+    public static String normalizeUnicode(String arg0){
+        return Normalizer.normalize(arg0, Normalizer.Form.NFC);
     }
 
     /**
