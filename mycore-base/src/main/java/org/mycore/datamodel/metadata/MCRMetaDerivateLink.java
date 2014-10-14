@@ -1,16 +1,14 @@
 package org.mycore.datamodel.metadata;
 
+import java.nio.file.Files;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFilesystemNode;
+import org.mycore.datamodel.niofs.MCRPath;
 
 public class MCRMetaDerivateLink extends MCRMetaLink {
 
@@ -28,15 +26,14 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         map = new HashMap<String, String>();
     }
 
-    public void setLinkToFile(MCRFile file) {
-        String owner = file.getOwnerID();
-        String path = file.getAbsolutePath();
-        super.href = owner + path;
+    public void setLinkToFile(MCRPath file) {
+        String owner = file.getOwner();
+        String path = file.subpath(0, file.getNameCount() - 1).toString();
+        super.href = owner + '/' + path;
     }
 
     public void setFromDOM(org.jdom2.Element element) throws MCRException {
         super.setFromDOM(element);
-        @SuppressWarnings("unchecked")
         List<Element> childrenList = element.getChildren(MCRMetaDerivateLink.ANNOTATION);
         if (childrenList == null)
             return;
@@ -64,14 +61,13 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         return elm;
     }
 
-    public MCRFile getLinkedFile() {
+    public MCRPath getLinkedFile() {
         int index = super.href.indexOf('/');
         if (index < 0)
             return null;
         String owner = super.href.substring(0, index);
         String path = super.href.substring(index);
-        MCRFilesystemNode rootNode = MCRFile.getRootNode(owner);
-        return rootNode == null ? null : (MCRFile) ((MCRDirectory) rootNode).getChildByPath(path);
+        return MCRPath.getPath(owner, path);
     }
 
     @Override
@@ -79,7 +75,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         if (!super.isValid()) {
             return false;
         }
-        if (getLinkedFile() == null) {
+        if (Files.exists(getLinkedFile())) {
             LOGGER.warn("File not found: " + super.href);
             return false;
         }
