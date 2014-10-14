@@ -24,16 +24,15 @@ package org.mycore.services.zipper;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.zip.Deflater;
 
 import javax.servlet.ServletOutputStream;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
-import org.apache.commons.io.IOUtils;
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.niofs.MCRPath;
 
 /**
  * Uses ZIP format to deliver requested content.
@@ -44,24 +43,23 @@ public class MCRZipServlet extends MCRCompressServlet<ZipArchiveOutputStream> {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected void sendCompressed(MCRDirectory dir, ZipArchiveOutputStream container) throws IOException {
-        ZipArchiveEntry entry = new ZipArchiveEntry(dir.getPath() + "/");
-        entry.setComment(dir.getLabel());
-        entry.setTime(dir.getLastModified().getTimeInMillis());
+    protected void sendCompressedDirectory(MCRPath file, BasicFileAttributes attrs, ZipArchiveOutputStream container)
+        throws IOException {
+        ZipArchiveEntry entry = new ZipArchiveEntry(getFilename(file) + "/");
+        entry.setTime(attrs.lastModifiedTime().toMillis());
         container.putArchiveEntry(entry);
         container.closeArchiveEntry();
-        super.sendCompressed(dir, container);
     }
 
     @Override
-    protected void sendCompressed(MCRFile file, ZipArchiveOutputStream container) throws IOException {
-        ZipArchiveEntry entry = new ZipArchiveEntry(file.getPath());
-        entry.setTime(file.getLastModified().getTimeInMillis());
-        entry.setComment(file.getLabel());
-        entry.setSize(file.getSize());
+    protected void sendCompressedFile(MCRPath file, BasicFileAttributes attrs, ZipArchiveOutputStream container)
+        throws IOException {
+        ZipArchiveEntry entry = new ZipArchiveEntry(getFilename(file));
+        entry.setTime(attrs.lastModifiedTime().toMillis());
+        entry.setSize(attrs.size());
         container.putArchiveEntry(entry);
-        try (InputStream in = file.getContentAsInputStream()) {
-            IOUtils.copy(in, container);
+        try {
+            Files.copy(file, container);
         } finally {
             container.closeArchiveEntry();
         }

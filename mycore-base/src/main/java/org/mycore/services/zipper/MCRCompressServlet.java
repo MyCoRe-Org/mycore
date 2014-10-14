@@ -29,6 +29,12 @@ import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
@@ -51,10 +57,8 @@ import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -202,35 +206,20 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
 
     private void sendDerivate(MCRObjectID id, String path, T container) throws IOException {
 
-        MCRFilesystemNode root = MCRFilesystemNode.getRootNode(id.toString());
+        MCRPath resolvedPath = MCRPath.getPath(id.toString(), path == null ? "/" : path);
 
-        if (root == null) {
-            String msg = "Error: No root node found for owner ID " + id;
-            throw new FileNotFoundException(msg);
+        if (!Files.exists(resolvedPath)) {
+            throw new NoSuchFileException(id.toString(), path, "Could not find path " + resolvedPath.toString());
         }
 
-        if (root instanceof MCRFile) {
-            sendCompressed((MCRFile) root, container);
-            LOGGER.debug("file " + root.getName() + " zipped");
+        if (Files.isRegularFile(resolvedPath)) {
+            BasicFileAttributes attrs = Files.readAttributes(resolvedPath, BasicFileAttributes.class);
+            sendCompressedFile(resolvedPath, attrs, container);
+            LOGGER.debug("file " + resolvedPath.toString() + " zipped");
             return;
         }
         // root is a directory
-        if (path == null || path.equals("")) {
-            sendCompressed((MCRDirectory) root, container);
-            LOGGER.debug("directory " + root.getName() + " zipped");
-            return;
-        }
-        MCRDirectory rootdirectory = (MCRDirectory) root;
-        MCRFilesystemNode requestedNode = rootdirectory.getChildByPath(path);
-
-        if (requestedNode == null) {
-            String msg = MessageFormat.format("No such file or directory: {0}/{1}", id, path);
-            throw new FileNotFoundException(msg);
-        } else if (requestedNode instanceof MCRFile) {
-            sendCompressed((MCRFile) requestedNode, container);
-        } else {
-            sendCompressed((MCRDirectory) requestedNode, container);
-        }
+        Files.walkFileTree(resolvedPath, new CompressVisitor<T>(this, container));
     }
 
     private String getFileName(MCRObjectID id, String path) {
@@ -241,20 +230,19 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
         }
     }
 
-    protected void sendCompressed(MCRDirectory dir, T container) throws IOException {
-        MCRFilesystemNode[] nodeArray;
-        nodeArray = dir.getChildren();
-
-        for (MCRFilesystemNode element : nodeArray) {
-            if (element instanceof MCRFile) {
-                sendCompressed((MCRFile) element, container);
-            } else {
-                sendCompressed((MCRDirectory) element, container);
-            }
-        }
+    /**
+     * Constructs a path name in form of {ownerID}+'/'+{path} or {ownerID} if path is root component.
+     * @param path absolute path
+     */
+    protected String getFilename(MCRPath path) {
+        return path.getNameCount() == 0 ? path.getOwner() : path.getOwner() + '/'
+            + path.getRoot().relativize(path).toString();
     }
 
-    protected abstract void sendCompressed(MCRFile file, T container) throws IOException;
+    protected abstract void sendCompressedDirectory(MCRPath file, BasicFileAttributes attrs, T container)
+        throws IOException;
+
+    protected abstract void sendCompressedFile(MCRPath file, BasicFileAttributes attrs, T container) throws IOException;
 
     protected abstract void sendMetadataCompressed(String fileName, byte[] content, long modified, T container)
         throws IOException;
@@ -266,5 +254,31 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
     protected abstract T createContainer(ServletOutputStream sout, String comment);
 
     protected abstract void disposeContainer(T container) throws IOException;
+
+    private static class CompressVisitor<T extends AutoCloseable> extends SimpleFileVisitor<Path> {
+
+        private MCRCompressServlet<T> impl;
+
+        private T container;
+
+        public CompressVisitor(MCRCompressServlet<T> impl, T container) {
+            this.impl = impl;
+            this.container = container;
+        }
+
+        @Override
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+            impl.sendCompressedDirectory(MCRPath.toMCRPath(dir), attrs, container);
+            return super.preVisitDirectory(dir, attrs);
+        }
+
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            impl.sendCompressedFile(MCRPath.toMCRPath(file), attrs, container);
+            LOGGER.debug("file " + file.toString() + " zipped");
+            return super.visitFile(file, attrs);
+        }
+
+    }
 
 }

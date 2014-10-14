@@ -1,16 +1,15 @@
 package org.mycore.services.zipper;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import javax.servlet.ServletOutputStream;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.niofs.MCRPath;
 
 /**
  * Uses TAR format to deliver requested content.
@@ -25,22 +24,23 @@ public class MCRTarServlet extends MCRCompressServlet<TarArchiveOutputStream> {
     private static final Logger LOGGER = Logger.getLogger(MCRTarServlet.class);
 
     @Override
-    protected void sendCompressed(MCRDirectory dir, TarArchiveOutputStream container) throws IOException {
-        TarArchiveEntry entry = new TarArchiveEntry(dir.getPath(), TarArchiveEntry.LF_DIR);
-        entry.setModTime(dir.getLastModified().getTimeInMillis());
-        container.putArchiveEntry(entry);
-        container.closeArchiveEntry();
-        super.sendCompressed(dir, container);
+    protected void sendCompressedDirectory(MCRPath file, BasicFileAttributes attrs,
+        TarArchiveOutputStream container) throws IOException {
+            TarArchiveEntry entry = new TarArchiveEntry(getFilename(file), TarArchiveEntry.LF_DIR);
+            entry.setModTime(attrs.lastModifiedTime().toMillis());
+            container.putArchiveEntry(entry);
+            container.closeArchiveEntry();
     }
 
     @Override
-    protected void sendCompressed(MCRFile file, TarArchiveOutputStream container) throws IOException {
-        TarArchiveEntry entry = new TarArchiveEntry(file.getPath());
-        entry.setModTime(file.getLastModified().getTimeInMillis());
-        entry.setSize(file.getSize());
+    protected void sendCompressedFile(MCRPath file, BasicFileAttributes attrs,
+        TarArchiveOutputStream container) throws IOException {
+        TarArchiveEntry entry = new TarArchiveEntry(getFilename(file));
+        entry.setModTime(attrs.lastModifiedTime().toMillis());
+        entry.setSize(attrs.size());
         container.putArchiveEntry(entry);
-        try (InputStream in = file.getContentAsInputStream()) {
-            IOUtils.copy(in, container);
+        try {
+            Files.copy(file, container);
         } finally {
             container.closeArchiveEntry();
         }
