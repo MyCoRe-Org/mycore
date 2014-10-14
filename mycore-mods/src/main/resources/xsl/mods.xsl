@@ -627,16 +627,31 @@
   <xsl:template name="mods.getObjectEditURL">
     <xsl:param name="id" />
     <xsl:param name="layout" select="'$'" />
+    <xsl:param name="collection" select="''" />
     <xsl:choose>
       <xsl:when test="mcrxsl:resourceAvailable('actionmappings.xml')">
-      <!-- URL mapping enabled -->
+        <!-- URL mapping enabled -->
         <xsl:variable name="url">
           <xsl:choose>
-            <xsl:when test="$layout = 'all'">
-              <xsl:value-of select="actionmapping:getURLforID('update-xml',$id,true())" xmlns:actionmapping="xalan://org.mycore.wfc.actionmapping.MCRURLRetriever" />
+            <xsl:when test="string-length($collection) &gt; 0">
+              <xsl:choose>
+                <xsl:when test="$layout = 'all'">
+                  <xsl:value-of select="actionmapping:getURLforCollection('update-xml',$collection,true())" xmlns:actionmapping="xalan://org.mycore.wfc.actionmapping.MCRURLRetriever" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="actionmapping:getURLforCollection('update',$collection,true())" xmlns:actionmapping="xalan://org.mycore.wfc.actionmapping.MCRURLRetriever" />
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="actionmapping:getURLforID('update',$id,true())" xmlns:actionmapping="xalan://org.mycore.wfc.actionmapping.MCRURLRetriever" />
+              <xsl:choose>
+                <xsl:when test="$layout = 'all'">
+                  <xsl:value-of select="actionmapping:getURLforID('update-xml',$id,true())" xmlns:actionmapping="xalan://org.mycore.wfc.actionmapping.MCRURLRetriever" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="actionmapping:getURLforID('update',$id,true())" xmlns:actionmapping="xalan://org.mycore.wfc.actionmapping.MCRURLRetriever" />
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
