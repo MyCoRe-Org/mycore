@@ -108,7 +108,7 @@ public class MCRObjectService {
 
         rules = new ArrayList<MCRMetaAccessRule>();
         flags = new ArrayList<MCRMetaLangText>();
-        state = new MCRMetaClassification();
+        state = null;
     }
 
     /**
@@ -256,7 +256,7 @@ public class MCRObjectService {
      * @param categid
      */
     public final void setStatus(String classid, String categid) {
-        state = new MCRMetaClassification("state", 0, null, classid, categid);
+        state = new MCRMetaClassification("servstate", 0, null, classid, categid);
     }
 
     /**
