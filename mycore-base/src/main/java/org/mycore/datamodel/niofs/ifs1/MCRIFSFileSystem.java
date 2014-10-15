@@ -43,6 +43,7 @@ public class MCRIFSFileSystem extends MCRAbstractFileSystem {
     private MCRFileSystemProvider provider;
 
     MCRIFSFileSystem(MCRFileSystemProvider provider) {
+        super();
         this.provider = provider;
     }
 
