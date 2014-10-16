@@ -200,7 +200,8 @@ public abstract class MCRServletContentHelper {
                 response.setDateHeader("Last-Modified", lastModified);
             }
             if (serveContent) {
-                response.setHeader("Content-Disposition", "inline;filename=\"" + filename + "\"");
+                String dispositionType = request.getParameter("dl") == null ? "inline" : "attachment";
+                response.setHeader("Content-Disposition", dispositionType + ";filename=\"" + filename + "\"");
             }
         }
 
