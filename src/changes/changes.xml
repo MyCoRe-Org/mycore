@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrvuchi" type="add">
+        mycore-xeditor: xed:ouput now support variable resolving in i18n names
+      </action>
       <action dev="mcrtchef" type="fix">
         mycore-base: added normalizeUnicode() to normalize String to KFC normal form
         mycore-solr: normalize mods.name* and mods.author
