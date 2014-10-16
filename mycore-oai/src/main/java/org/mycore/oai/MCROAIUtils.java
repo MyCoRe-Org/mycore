@@ -58,7 +58,7 @@ public abstract class MCROAIUtils {
             return new MCRQueryCondition("category", "=", id);
         } else {
             String id = setSpec;
-            String query = MCRConfiguration.instance().getString(configPrefix + "MapSetToQuery." + id, "");
+            String query = MCRConfiguration.instance().getString(configPrefix + "MapSetToQuery." + id.replace(":","_"), "");
             if (!query.equals("")) {
                 return new MCRQueryParser().parse(query);
             } else {

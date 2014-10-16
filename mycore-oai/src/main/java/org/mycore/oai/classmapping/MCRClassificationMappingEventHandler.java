@@ -36,9 +36,9 @@ import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
-import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -54,7 +54,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  */
 public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
 
-    private static final MCRCategoryDAO DAO = new MCRCategoryDAOImpl();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
     private static Logger LOGGER = Logger.getLogger(MCRClassificationMappingEventHandler.class);
 
@@ -100,7 +100,8 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
         Element currentClassElement = null;
         try {
             Document doc = new Document((Element) obj.getMetadata().createXML().detach());
-            XPathExpression<Element> classElementPath = XPathFactory.instance().compile("//*[@categid]", Filters.element());
+            XPathExpression<Element> classElementPath = XPathFactory.instance().compile("//*[@categid]",
+                Filters.element());
             List<Element> classList = classElementPath.evaluate(doc);
             if (classList.size() > 0) {
                 mappings = new MCRMetaElement();
@@ -112,7 +113,8 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             }
             for (Element classElement : classList) {
                 currentClassElement = classElement;
-                MCRCategory categ = DAO.getCategory(new MCRCategoryID(classElement.getAttributeValue("classid"), classElement.getAttributeValue("categid")), 0);
+                MCRCategory categ = DAO.getCategory(new MCRCategoryID(classElement.getAttributeValue("classid"),
+                    classElement.getAttributeValue("categid")), 0);
                 addMappings(mappings, categ);
             }
         } catch (Exception je) {
@@ -120,7 +122,10 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                 LOGGER.error("Error while finding classification elements", je);
             } else {
                 try {
-                    LOGGER.error("Error while finding classification elements for " + MCRUtils.asString(currentClassElement), je);
+                    LOGGER
+                        .error(
+                            "Error while finding classification elements for " + MCRUtils.asString(currentClassElement),
+                            je);
                 } catch (IOException e) {
                     LOGGER.error("Error while finding classification elements", je);
                 }
@@ -140,7 +145,8 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                 for (String s : str) {
                     if (s.contains(":")) {
                         String[] mapClass = s.split(":");
-                        MCRMetaClassification metaClass = new MCRMetaClassification("mapping", 0, null, mapClass[0], mapClass[1]);
+                        MCRMetaClassification metaClass = new MCRMetaClassification("mapping", 0, null, mapClass[0],
+                            mapClass[1]);
                         mappings.addMetaObject(metaClass);
                     }
                 }
