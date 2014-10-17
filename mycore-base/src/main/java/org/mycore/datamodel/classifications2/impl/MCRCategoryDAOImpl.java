@@ -25,6 +25,7 @@ package org.mycore.datamodel.classifications2.impl;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -406,7 +407,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         return category;
     }
 
-    public void replaceCategory(MCRCategory newCategory) throws IllegalArgumentException {
+    public Collection<MCRCategoryImpl> replaceCategory(MCRCategory newCategory) throws IllegalArgumentException {
         if (!exist(newCategory.getId())) {
             throw new IllegalArgumentException("MCRCategory can not be replaced. MCRCategoryID '" + newCategory.getId()
                 + "' is unknown.");
@@ -493,6 +494,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         session.saveOrUpdate(newCategoryImpl);
         updateTimeStamp();
         updateLastModified(newCategory.getRoot().getId().toString());
+        return newMap.values();
     }
 
     public MCRCategory setLabel(MCRCategoryID id, MCRLabel label) {

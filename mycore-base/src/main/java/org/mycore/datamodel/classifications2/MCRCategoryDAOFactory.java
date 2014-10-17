@@ -36,13 +36,17 @@ public class MCRCategoryDAOFactory {
 
     private static final String STANDARD_DAO = MCRCategoryDAOImpl.class.getCanonicalName();
 
-    private static MCRCategoryDAO instance = MCRConfiguration.instance().<MCRCategoryDAO> getInstanceOf("MCR.Category.DAO", STANDARD_DAO);
+    private static MCRCategoryDAO INSTANCE;
+
+    static {
+        INSTANCE = MCRConfiguration.instance().<MCRCategoryDAO> getInstanceOf("MCR.Category.DAO", STANDARD_DAO);
+    }
 
     /**
      * Returns an instance of a MCRCategoryDAO implementator.
      */
     public static MCRCategoryDAO getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
     /**
@@ -54,8 +58,9 @@ public class MCRCategoryDAOFactory {
      * @throws IllegalAccessException
      * @throws InstantiationException
      */
-    public static synchronized void set(Class<? extends MCRCategoryDAO> daoClass) throws IllegalAccessException, InstantiationException {
-        instance = daoClass.newInstance();
+    public static synchronized void set(Class<? extends MCRCategoryDAO> daoClass) throws IllegalAccessException,
+        InstantiationException {
+        INSTANCE = daoClass.newInstance();
     }
 
 }

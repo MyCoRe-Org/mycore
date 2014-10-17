@@ -24,6 +24,7 @@
 package org.mycore.datamodel.classifications2;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -225,8 +226,9 @@ public interface MCRCategoryDAO {
      *            new version of MCRCategory
      * @throws IllegalArgumentException
      *             if old version of MCRCategory does not exist
+     * @return collection of replaced categories
      */
-    public abstract void replaceCategory(MCRCategory newCategory) throws IllegalArgumentException;
+    public abstract Collection<? extends MCRCategory> replaceCategory(MCRCategory newCategory) throws IllegalArgumentException;
 
     /**
      * Sets or updates a label from a Category.
