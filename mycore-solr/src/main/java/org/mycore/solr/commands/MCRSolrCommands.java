@@ -17,6 +17,7 @@ import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.classification.MCRSolrClassificationUtil;
 import org.mycore.solr.index.MCRSolrIndexer;
 import org.mycore.solr.search.MCRSolrSearchUtils;
 
@@ -44,6 +45,11 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         MCRSolrIndexer.rebuildContentIndex();
     }
 
+    @MCRCommand(syntax = "rebuild solr classification index", help = "rebuilds solr's classification index", order = 35)
+    public static void rebuildClassificationIndex() {
+        MCRSolrClassificationUtil.rebuildIndex();
+    }
+
     @MCRCommand(syntax = "restricted rebuild solr metadata index for objecttype {0}", help = "rebuilds solr's metadata index for the given type in {0}", order = 40)
     public static void rebuildMetadataIndex(String type) {
         MCRSolrIndexer.rebuildMetadataIndex(type);
@@ -59,6 +65,11 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     @MCRCommand(syntax = "drop solr index", help = "Deletes an existing index from solr", order = 90)
     public static void dropIndex() throws Exception {
         MCRSolrIndexer.dropIndex();
+    }
+
+    @MCRCommand(syntax = "drop solr classification index", help = "Deletes an existing classification index from solr", order = 95)
+    public static void dropClassificationIndex() {
+        MCRSolrClassificationUtil.dropIndex();
     }
 
     @MCRCommand(syntax = "delete index part for type {0}", help = "Deletes an existing index from solr but only for the given object type.", order = 100)

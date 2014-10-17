@@ -33,10 +33,8 @@ public abstract class MCRSolrServerFactory {
             } else {
                 setSolrServer(SERVER_URL);
             }
-        } catch (Exception e) {
-            LOGGER.error("Exception creating solr server object", e);
-        } catch (Error error) {
-            LOGGER.error("Error creating solr server object", error);
+        } catch (Throwable t) {
+            LOGGER.error("Exception creating solr server object", t);
         } finally {
             LOGGER.info(MessageFormat.format("Using server at address \"{0}\"", getDefaultSolrCore().getServer()
                 .getBaseURL()));
@@ -60,7 +58,7 @@ public abstract class MCRSolrServerFactory {
     }
 
     /**
-     * Returns an instance of {@link SolrServer}.
+     * Returns the solr server of the default core.
      * 
      * @return an instance of {@link SolrServer}
      */
@@ -68,6 +66,11 @@ public abstract class MCRSolrServerFactory {
         return getDefaultSolrCore().getServer();
     }
 
+    /**
+     * Returns the concurrent solr server of the default core.
+     * 
+     * @return
+     */
     public static SolrServer getConcurrentSolrServer() {
         return getDefaultSolrCore().getConcurrentServer();
     }
