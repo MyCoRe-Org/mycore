@@ -145,11 +145,12 @@ public class CategoryDAOMock implements MCRCategoryDAO {
     }
 
     @Override
-    public void replaceCategory(MCRCategory newCategory) throws IllegalArgumentException {
+    public Collection<MCRCategory> replaceCategory(MCRCategory newCategory) throws IllegalArgumentException {
         if (!categMap.containsKey(newCategory.getId())) {
             throw new IllegalArgumentException();
         }
         categMap.put(newCategory.getId(), newCategory);
+        return categMap.values();
     }
 
     @Override
