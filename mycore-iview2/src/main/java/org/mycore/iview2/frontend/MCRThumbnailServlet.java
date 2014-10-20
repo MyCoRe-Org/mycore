@@ -27,8 +27,11 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -37,6 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
@@ -47,6 +51,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
+import org.mycore.datamodel.niofs.MCRPathUtils;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.imagetiler.MCRImage;
@@ -80,9 +85,13 @@ public class MCRThumbnailServlet extends MCRServlet {
             @Override
             public Long load(String id) throws Exception {
                 ThumnailInfo thumbnailInfo = getThumbnailInfo(id);
-                File iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), thumbnailInfo.derivate,
+                Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), thumbnailInfo.derivate,
                     thumbnailInfo.imagePath);
-                return iviewFile.exists() ? iviewFile.lastModified() : -1;
+                try {
+                    return Files.readAttributes(iviewFile, BasicFileAttributes.class).lastModifiedTime().toMillis();
+                } catch (IOException x) {
+                    return -1l;
+                }
             }
         });
 
@@ -120,10 +129,11 @@ public class MCRThumbnailServlet extends MCRServlet {
     protected void render(MCRServletJob job, Exception ex) throws IOException, JDOMException {
         try {
             ThumnailInfo thumbnailInfo = getThumbnailInfo(job.getRequest().getPathInfo());
-            File iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), thumbnailInfo.derivate,
+            Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), thumbnailInfo.derivate,
                 thumbnailInfo.imagePath);
-            LOGGER.info("IView2 file: " + iviewFile.getAbsolutePath());
-            if (!iviewFile.exists()) {
+            LOGGER.info("IView2 file: " + iviewFile);
+            BasicFileAttributes fileAttributes = MCRPathUtils.getAttributes(iviewFile, BasicFileAttributes.class);
+            if (fileAttributes == null) {
                 job.getResponse().sendError(
                     HttpServletResponse.SC_NOT_FOUND,
                     MessageFormat.format("Could not find iview2 file for {0}{1}", thumbnailInfo.derivate,
@@ -138,9 +148,9 @@ public class MCRThumbnailServlet extends MCRServlet {
             if (thumbnail != null) {
                 job.getResponse().setHeader("Cache-Control", "max-age=" + MCRTileServlet.MAX_AGE);
                 job.getResponse().setContentType("image/png");
-                job.getResponse().setDateHeader("Last-Modified", iviewFile.lastModified());
+                job.getResponse().setDateHeader("Last-Modified", fileAttributes.lastModifiedTime().toMillis());
                 Date expires = new Date(System.currentTimeMillis() + MCRTileServlet.MAX_AGE * 1000);
-                LOGGER.debug("Last-Modified: " + new Date(iviewFile.lastModified()) + ", expire on: " + expires);
+                LOGGER.debug("Last-Modified: " + fileAttributes.lastModifiedTime() + ", expire on: " + expires);
                 job.getResponse().setDateHeader("Expires", expires.getTime());
 
                 ImageWriter imageWriter = getImageWriter();
@@ -177,12 +187,21 @@ public class MCRThumbnailServlet extends MCRServlet {
         return new ThumnailInfo(derivate, imagePath);
     }
 
-    private BufferedImage getThumbnail(File iviewFile, boolean centered) throws IOException, JDOMException {
-        MCRTiledPictureProps props = MCRTiledPictureProps.getInstance(iviewFile);
-        if (props.getZoomlevel() == 0)
-            return MCRIView2Tools.getZoomLevel(iviewFile, 0);
-        //get next bigger zoomLevel and scale image to THUMBNAIL_SIZE
-        BufferedImage level1Image = MCRIView2Tools.getZoomLevel(iviewFile, 1);
+    private BufferedImage getThumbnail(Path iviewFile, boolean centered) throws IOException, JDOMException {
+        BufferedImage level1Image;
+        try (FileSystem fs = MCRIView2Tools.getFileSystem(iviewFile)) {
+            Path iviewFileRoot = fs.getRootDirectories().iterator().next();
+            MCRTiledPictureProps props = MCRTiledPictureProps.getInstanceFromDirectory(iviewFile);
+            if (props.getZoomlevel() == 0)
+                return MCRIView2Tools.getZoomLevel(iviewFile, 0);
+            //get next bigger zoomLevel and scale image to THUMBNAIL_SIZE
+            ImageReader reader = MCRIView2Tools.getTileImageReader();
+            try {
+                level1Image = MCRIView2Tools.getZoomLevel(iviewFileRoot, props, reader, 1);
+            } finally {
+                reader.dispose();
+            }
+        }
         final double width = level1Image.getWidth();
         final double height = level1Image.getHeight();
         final int newWidth = width < height ? (int) Math.ceil(thumbnailSize * width / height) : thumbnailSize;
@@ -193,15 +212,18 @@ public class MCRThumbnailServlet extends MCRServlet {
         final BufferedImage bicubic = new BufferedImage(centered ? thumbnailSize : newWidth, centered ? thumbnailSize
             : newHeight, imageType);
         final Graphics2D bg = bicubic.createGraphics();
-        bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        int x = centered ? (thumbnailSize - newWidth) / 2 : 0;
-        int y = centered ? (thumbnailSize - newHeight) / 2 : 0;
-        if (x != 0 && y != 0) {
-            LOGGER.warn("Writing at position " + x + "," + y);
+        try {
+            bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+            int x = centered ? (thumbnailSize - newWidth) / 2 : 0;
+            int y = centered ? (thumbnailSize - newHeight) / 2 : 0;
+            if (x != 0 && y != 0) {
+                LOGGER.warn("Writing at position " + x + "," + y);
+            }
+            bg.drawImage(level1Image, x, y, x + newWidth, y + newHeight, 0, 0, (int) Math.ceil(width),
+                (int) Math.ceil(height), null);
+        } finally {
+            bg.dispose();
         }
-        bg.drawImage(level1Image, x, y, x + newWidth, y + newHeight, 0, 0, (int) Math.ceil(width),
-            (int) Math.ceil(height), null);
-        bg.dispose();
         return bicubic;
     }
 

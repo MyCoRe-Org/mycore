@@ -1,5 +1,8 @@
 package org.mycore.iview2.events;
 
+import java.io.IOException;
+
+import org.mycore.common.MCRException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -14,12 +17,17 @@ import org.mycore.iview2.services.MCRTilingQueue;
 public class MCRImageTileEventHandler extends MCREventHandlerBase {
 
     MCRTilingQueue tq = MCRTilingQueue.getInstance();
+
     /**
      * creates image tiles if <code>file</code> is an image file.
      */
     @Override
     public void handleFileCreated(MCREvent evt, MCRFile file) {
-        MCRIView2Commands.tileImage(file);
+        try {
+            MCRIView2Commands.tileImage(file.toPath());
+        } catch (IOException e) {
+            throw new MCRException(e);
+        }
     }
 
     /**
@@ -27,7 +35,11 @@ public class MCRImageTileEventHandler extends MCREventHandlerBase {
      */
     @Override
     public void handleFileDeleted(MCREvent evt, MCRFile file) {
-        MCRIView2Commands.deleteImageTiles(file.getOwnerID(), file.getAbsolutePath());
+        try {
+            MCRIView2Commands.deleteImageTiles(file.getOwnerID(), file.getAbsolutePath());
+        } catch (IOException e) {
+            throw new MCRException(e);
+        }
     }
 
     /**

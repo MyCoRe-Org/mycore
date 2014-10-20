@@ -96,8 +96,9 @@ public class MCRRequestHandleAdd extends TimerTask {
      * @param gbvObjectUUID
      * @param messageSignature
      * @return
+     * @throws IOException 
      */
-    private JsonObject createJson(String gbvObjectUUID, String messageSignature, MCRFile file) throws URISyntaxException {
+    private JsonObject createJson(String gbvObjectUUID, String messageSignature, MCRFile file) throws URISyntaxException, IOException {
         JsonObject handleProps = new JsonObject();
         handleProps.addProperty("handle-url", getHandleURL(file));
         handleProps.addProperty("handle-email", MCRHandleCommons.HANDLE_MAIL);
@@ -132,8 +133,8 @@ public class MCRRequestHandleAdd extends TimerTask {
      * @param file
      * @return
      */
-    private String getHandleURL(MCRFile file) throws URISyntaxException {
-        String url = MCRIView2Tools.getViewerURL(file);
+    private String getHandleURL(MCRFile file) throws URISyntaxException, IOException {
+        String url = MCRIView2Tools.getViewerURL(file.toPath());
         if (url == null) {
             url = MCRServlet.getServletBaseURL() + MCRFileNodeServlet.class.getSimpleName() + file.getAbsolutePath();
             return url;

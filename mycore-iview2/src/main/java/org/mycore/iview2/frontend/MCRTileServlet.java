@@ -23,11 +23,11 @@
 
 package org.mycore.iview2.frontend;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -35,7 +35,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
@@ -65,36 +64,39 @@ public class MCRTileServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         final TileInfo tileInfo = getTileInfo(getPathInfo(req));
-        File iviewFile = getTileFile(tileInfo);
-        if (!iviewFile.exists()) {
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "File does not exist: " + iviewFile.getAbsolutePath());
+        Path iviewFile = getTileFile(tileInfo);
+        if (!Files.exists(iviewFile)) {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "File does not exist: " + iviewFile.toString());
             return;
         }
-        try (ZipFile zipFile = new ZipFile(iviewFile);) {
-            ZipEntry ze = zipFile.getEntry(tileInfo.tile);
-            if (ze != null) {
-                resp.setHeader("Cache-Control", "max-age=" + MAX_AGE);
-                resp.setDateHeader("Last-Modified", iviewFile.lastModified());
-                if (tileInfo.tile.endsWith("xml")) {
-                    resp.setContentType("text/xml");
-                } else {
-                    resp.setContentType("image/jpeg");
-                }
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Extracting " + ze.getName() + " size " + ze.getSize());
-                }
-                //size of a tile or imageinfo.xml file is always smaller than Integer.MAX_VALUE
-                resp.setContentLength((int) ze.getSize());
-
-                try (ServletOutputStream out = resp.getOutputStream(); InputStream zin = zipFile.getInputStream(ze);) {
-                    IOUtils.copy(zin, out);
-                }
-            } else {
+        try (FileSystem iviewFS = MCRIView2Tools.getFileSystem(iviewFile)) {
+            Path root = iviewFS.getRootDirectories().iterator().next();
+            Path tilePath = root.resolve(tileInfo.tile);
+            BasicFileAttributes fileAttributes;
+            try {
+                fileAttributes = Files.readAttributes(tilePath, BasicFileAttributes.class);
+            } catch (IOException e) {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Tile not found: " + tileInfo);
                 return;
             }
-            LOGGER.debug("Ending MCRTileServlet");
+            resp.setHeader("Cache-Control", "max-age=" + MAX_AGE);
+            resp.setDateHeader("Last-Modified", fileAttributes.lastModifiedTime().toMillis());
+            if (tileInfo.tile.endsWith("xml")) {
+                resp.setContentType("text/xml");
+            } else {
+                resp.setContentType("image/jpeg");
+            }
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Extracting " + tilePath + " size " + fileAttributes.size());
+            }
+            //size of a tile or imageinfo.xml file is always smaller than Integer.MAX_VALUE
+            resp.setContentLength((int) fileAttributes.size());
+            try (ServletOutputStream out = resp.getOutputStream()) {
+                Files.copy(tilePath, out);
+            }
+            
         }
+        LOGGER.debug("Ending MCRTileServlet");
     }
 
     /**
@@ -103,7 +105,12 @@ public class MCRTileServlet extends HttpServlet {
     @Override
     protected long getLastModified(final HttpServletRequest req) {
         final TileInfo tileInfo = getTileInfo(getPathInfo(req));
-        return getTileFile(tileInfo).lastModified();
+        try {
+            return Files.getLastModifiedTime(getTileFile(tileInfo)).toMillis();
+        } catch (IOException e) {
+            LOGGER.warn("Could not get lastmodified time.", e);
+            return -1;
+        }
     }
 
     /**
@@ -137,10 +144,10 @@ public class MCRTileServlet extends HttpServlet {
             int cnt = 0;
             while (--pos > 0 && cnt < 3) {
                 switch (imagePath.charAt(pos)) {
-                case '/':
-                    cnt++;
-                    break;
-                default:
+                    case '/':
+                        cnt++;
+                        break;
+                    default:
                 }
             }
             tile = imagePath.substring(pos + 2);
@@ -150,7 +157,7 @@ public class MCRTileServlet extends HttpServlet {
         return tileInfo;
     }
 
-    private static File getTileFile(TileInfo tileInfo) {
+    private static Path getTileFile(TileInfo tileInfo) {
         return MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), tileInfo.derivate, tileInfo.imagePath);
     }
 

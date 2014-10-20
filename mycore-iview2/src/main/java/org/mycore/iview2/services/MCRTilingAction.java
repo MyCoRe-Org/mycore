@@ -11,8 +11,9 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.imagetiler.MCRImage;
+import org.mycore.imagetiler.MCRTileEventHandler;
 import org.mycore.imagetiler.MCRTiledPictureProps;
 
 /**
@@ -39,28 +40,37 @@ public class MCRTilingAction implements Runnable {
     public void run() {
         tileJob.setStart(new Date());
         MCRImage image;
+        try {
+            image = getMCRImage();
+            image.setTileDir(MCRIView2Tools.getTileDir());
+        } catch (IOException e) {
+            LOGGER.error("Error while retrieving image for job: " + tileJob, e);
+            return;
+        }
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
-        Session session = sessionFactory.getCurrentSession();
-        Transaction transaction = session.beginTransaction();
+        final Session session = sessionFactory.getCurrentSession();
+        Transaction transaction = null;
         try {
-            try {
-                image = getMCRImage();
-                session.clear(); //no write access so far
-                transaction.commit(); //close transaction while tiling image to increase concurrency
-            } catch (IOException e) {
-                LOGGER.error("Error while retrieving image for job: " + tileJob, e);
-                try {
-                    transaction.rollback();
-                } catch (Exception ie) {
-                    LOGGER.error("Error whil transaction rollback");
+            MCRTileEventHandler tileEventHandler = new MCRTileEventHandler() {
+                Transaction transaction;
+
+                @Override
+                public void preImageReaderCreated() {
+                    transaction = session.beginTransaction();
                 }
-                return;
-            }
+
+                @Override
+                public void postImageReaderCreated() {
+                    session.clear(); //beside tileJob, no write access so far
+                    if (transaction.isActive()) {
+                        transaction.commit();
+                    }
+                }
+
+            };
             try {
-                image.setTileDir(MCRIView2Tools.getTileDir());
-                MCRTiledPictureProps picProps = new MCRTiledPictureProps();
-                picProps = image.tile();
+                MCRTiledPictureProps picProps = image.tile(tileEventHandler);
                 tileJob.setFinished(new Date());
                 tileJob.setStatus(MCRJobState.FINISHED);
                 tileJob.setHeight(picProps.getHeight());
@@ -71,7 +81,7 @@ public class MCRTilingAction implements Runnable {
                 LOGGER.error("IOException occured while tiling a queued picture", e);
                 return;
             }
-            transaction = session.beginTransaction(); //start a new transaction to commit data
+            transaction = session.beginTransaction();
             session.update(tileJob);
             transaction.commit();
         } catch (Exception e) {
@@ -91,8 +101,8 @@ public class MCRTilingAction implements Runnable {
      * @throws IOException thrown by {@link MCRImage#getInstance(java.io.File, String, String)}
      */
     protected MCRImage getMCRImage() throws IOException {
-        MCRFile file = MCRIView2Tools.getMCRFile(tileJob.getDerivate(), tileJob.getPath());
-        MCRImage imgTiler = MCRImage.getInstance(file.getLocalFile(), file.getOwnerID(), file.getAbsolutePath());
+        MCRPath file = MCRPath.getPath(tileJob.getDerivate(), tileJob.getPath());
+        MCRImage imgTiler = MCRImage.getInstance(file, file.getOwner(), file.subpathComplete().toString());
         return imgTiler;
     }
 

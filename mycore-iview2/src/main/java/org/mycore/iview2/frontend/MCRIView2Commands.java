@@ -24,13 +24,20 @@
 package org.mycore.iview2.frontend;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystem;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
@@ -43,11 +50,9 @@ import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
@@ -144,9 +149,10 @@ public class MCRIView2Commands extends MCRAbstractCommands {
      * meta command to tile all images of this derivate.
      * @param derivateID a derivate ID
      * @return list of commands to execute.
+     * @throws IOException 
      */
     @MCRCommand(syntax = TILE_DERIVATE_TILES_COMMAND_SYNTAX, help = "tiles all images of derivate {0} with a supported image type as main document", order = 60)
-    public static List<String> tileDerivate(String derivateID) {
+    public static List<String> tileDerivate(String derivateID) throws IOException {
         return forAllImages(derivateID, TILE_IMAGE_COMMAND_SYNTAX);
     }
 
@@ -156,29 +162,29 @@ public class MCRIView2Commands extends MCRAbstractCommands {
      * meta command to check (and repair) all tiles of all images of this derivate.
      * @param derivateID a derivate ID
      * @return list of commands to execute.
+     * @throws IOException 
      */
     @MCRCommand(syntax = CHECK_TILES_OF_DERIVATE_COMMAND_SYNTAX, help = "checks if all images of derivate {0} with a supported image type as main document have valid iview2 files and start tiling if not ", order = 20)
-    public static List<String> checkTilesOfDerivate(String derivateID) {
+    public static List<String> checkTilesOfDerivate(String derivateID) throws IOException {
         return forAllImages(derivateID, CHECK_TILES_OF_IMAGE_COMMAND_SYNTAX);
     }
 
-    private static List<String> forAllImages(String derivateID, String batchCommandSyntax) {
+    private static List<String> forAllImages(String derivateID, String batchCommandSyntax) throws IOException {
         if (!MCRIView2Tools.isDerivateSupported(derivateID)) {
             LOGGER.info("Skipping tiling of derivate " + derivateID + " as it's main file is not supported by IView2.");
             return null;
         }
         List<String> returns = new ArrayList<String>();
-        MCRDirectory derivate = null;
 
-        MCRFilesystemNode node = MCRFilesystemNode.getRootNode(derivateID);
+        MCRPath derivateRoot = MCRPath.getPath(derivateID, "/");
 
-        if (node == null || !(node instanceof MCRDirectory))
+        if (!Files.exists(derivateRoot)) {
             throw new MCRException("Derivate " + derivateID + " does not exist or is not a directory!");
-        derivate = (MCRDirectory) node;
+        }
 
-        List<MCRFile> supportedFiles = getSupportedFiles(derivate);
-        for (MCRFile image : supportedFiles) {
-            returns.add(MessageFormat.format(batchCommandSyntax, derivateID, image.getAbsolutePath()));
+        List<MCRPath> supportedFiles = getSupportedFiles(derivateRoot);
+        for (MCRPath image : supportedFiles) {
+            returns.add(MessageFormat.format(batchCommandSyntax, derivateID, image.subpathComplete().toString()));
         }
         return returns;
     }
@@ -186,22 +192,23 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     private static final String CHECK_TILES_OF_IMAGE_COMMAND_SYNTAX = "check tiles of image {0} {1}";
 
     /**
-     * checks and repairs tile of this {@link MCRFile}
+     * checks and repairs tile of this derivate.
      * @param derivate derivate ID
      * @param absoluteImagePath absolute path to image file
+     * @throws IOException 
      */
     @MCRCommand(syntax = CHECK_TILES_OF_IMAGE_COMMAND_SYNTAX, help = "checks if tiles a specific file identified by its derivate {0} and absolute path {1} are valid or generates new one", order = 30)
-    public static void checkImage(String derivate, String absoluteImagePath) {
-        File iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, absoluteImagePath);
+    public static void checkImage(String derivate, String absoluteImagePath) throws IOException {
+        Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, absoluteImagePath);
         //file checks
-        if (!iviewFile.exists()) {
-            LOGGER.warn("IView2 file does not exist: " + iviewFile.getAbsolutePath());
+        if (!Files.exists(iviewFile)) {
+            LOGGER.warn("IView2 file does not exist: " + iviewFile);
             tileImage(derivate, absoluteImagePath);
             return;
         }
         MCRTiledPictureProps props;
         try {
-            props = MCRTiledPictureProps.getInstance(iviewFile);
+            props = MCRTiledPictureProps.getInstanceFromFile(iviewFile);
         } catch (Exception e) {
             LOGGER.warn("Error while reading image metadata. Recreating tiles.", e);
             tileImage(derivate, absoluteImagePath);
@@ -214,46 +221,49 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         }
         ZipFile iviewImage;
         try {
-            iviewImage = new ZipFile(iviewFile);
+            iviewImage = new ZipFile(iviewFile.toFile());
             validateZipFile(iviewImage);
         } catch (Exception e) {
-            LOGGER.warn("Error while reading Iview2 file: " + iviewFile.getAbsolutePath(), e);
+            LOGGER.warn("Error while reading Iview2 file: " + iviewFile, e);
             tileImage(derivate, absoluteImagePath);
             return;
         }
-        //structure and metadata checks
-        int tilesCount = iviewImage.size() - 1; //one for metadata
-        if (props.getTilesCount() != tilesCount) {
-            LOGGER.warn("Metadata tile count does not match stored tile count: " + iviewFile.getAbsolutePath());
-            tileImage(derivate, absoluteImagePath);
-            return;
-        }
-        int x = props.getWidth();
-        int y = props.getHeight();
-        if (MCRImage.getTileCount(x, y) != tilesCount) {
-            LOGGER.warn("Calculated tile count does not match stored tile count: " + iviewFile.getAbsolutePath());
-            tileImage(derivate, absoluteImagePath);
-            return;
-        }
-        try {
-            @SuppressWarnings("unused")
-            BufferedImage thumbnail = MCRIView2Tools.getZoomLevel(iviewFile, 0);
-            int maxX = (int) Math.ceil((double) props.getWidth() / MCRImage.getTileSize());
-            int maxY = (int) Math.ceil((double) props.getHeight() / MCRImage.getTileSize());
-            LOGGER.debug(MessageFormat.format("Image size:{0}x{1}, tiles:{2}x{3}", props.getWidth(), props.getHeight(),
-                maxX, maxY));
-            ImageReader imageReader = MCRIView2Tools.getTileImageReader();
-            try {
-                @SuppressWarnings("unused")
-                BufferedImage sampleTile = MCRIView2Tools.readTile(iviewImage, imageReader, props.getZoomlevel(),
-                    maxX - 1, 0);
-            } finally {
-                imageReader.dispose();
+        try (FileSystem fs = MCRIView2Tools.getFileSystem(iviewFile)) {
+            Path iviewFileRoot = fs.getRootDirectories().iterator().next();
+            //structure and metadata checks
+            int tilesCount = iviewImage.size() - 1; //one for metadata
+            if (props.getTilesCount() != tilesCount) {
+                LOGGER.warn("Metadata tile count does not match stored tile count: " + iviewFile);
+                tileImage(derivate, absoluteImagePath);
+                return;
             }
-        } catch (IOException | JDOMException e) {
-            LOGGER.warn("Could not read thumbnail of " + iviewFile.getAbsolutePath(), e);
-            tileImage(derivate, absoluteImagePath);
-            return;
+            int x = props.getWidth();
+            int y = props.getHeight();
+            if (MCRImage.getTileCount(x, y) != tilesCount) {
+                LOGGER.warn("Calculated tile count does not match stored tile count: " + iviewFile);
+                tileImage(derivate, absoluteImagePath);
+                return;
+            }
+            try {
+                ImageReader imageReader = MCRIView2Tools.getTileImageReader();
+                @SuppressWarnings("unused")
+                BufferedImage thumbnail = MCRIView2Tools.getZoomLevel(iviewFileRoot, props, imageReader, 0);
+                int maxX = (int) Math.ceil((double) props.getWidth() / MCRImage.getTileSize());
+                int maxY = (int) Math.ceil((double) props.getHeight() / MCRImage.getTileSize());
+                LOGGER.debug(MessageFormat.format("Image size:{0}x{1}, tiles:{2}x{3}", props.getWidth(),
+                    props.getHeight(), maxX, maxY));
+                try {
+                    @SuppressWarnings("unused")
+                    BufferedImage sampleTile = MCRIView2Tools.readTile(iviewFileRoot, imageReader,
+                        props.getZoomlevel(), maxX - 1, 0);
+                } finally {
+                    imageReader.dispose();
+                }
+            } catch (IOException | JDOMException e) {
+                LOGGER.warn("Could not read thumbnail of " + iviewFile, e);
+                tileImage(derivate, absoluteImagePath);
+                return;
+            }
         }
     }
 
@@ -282,7 +292,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     private static final String TILE_IMAGE_COMMAND_SYNTAX = "tile image {0} {1}";
 
     /**
-     * Tiles this {@link MCRFile}.
+     * Tiles this image.
      * @param derivate derivate ID
      * @param absoluteImagePath absolute path to image file
      */
@@ -296,16 +306,17 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     }
 
     /**
-     * Tiles this {@link MCRFile}
+     * Tiles this {@link MCRPath}
      * @param file
+     * @throws IOException 
      */
-    public static void tileImage(MCRFile file) {
+    public static void tileImage(MCRPath file) throws IOException {
         if (MCRIView2Tools.isFileSupported(file)) {
             MCRTileJob job = new MCRTileJob();
-            job.setDerivate(file.getOwnerID());
-            job.setPath(file.getAbsolutePath());
+            job.setDerivate(file.getOwner());
+            job.setPath(file.subpathComplete().toString());
             MCRTilingQueue.getInstance().offer(job);
-            LOGGER.info("Added to TilingQueue: " + file.getID() + " " + file.getAbsolutePath());
+            LOGGER.info("Added to TilingQueue: " + file);
             startMasterTilingThread();
         }
     }
@@ -320,16 +331,12 @@ public class MCRIView2Commands extends MCRAbstractCommands {
 
     /**
      * Deletes all image tiles.
+     * @throws IOException 
      */
     @MCRCommand(syntax = "delete all tiles", help = "removes all tiles of all derivates", order = 80)
-    public static void deleteAllTiles() {
-        File storeDir = MCRIView2Tools.getTileDir();
-        for (File sub : storeDir.listFiles()) {
-            if (sub.isFile())
-                sub.delete();
-            else
-                deleteDirectory(sub);
-        }
+    public static void deleteAllTiles() throws IOException {
+        Path storeDir = MCRIView2Tools.getTileDir();
+        deleteDirectory(storeDir);
         MCRTilingQueue.getInstance().clear();
     }
 
@@ -366,63 +373,77 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     /**
      * Deletes all image tiles of this derivate.
      * @param derivateID a derivate ID
+     * @throws IOException 
      */
     @MCRCommand(syntax = DEL_DERIVATE_TILES_COMMAND_SYNTAX, help = "removes tiles of a specific file identified by its derivate ID {0}", order = 100)
-    public static void deleteDerivateTiles(String derivateID) {
-        File derivateDir = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivateID, null);
+    public static void deleteDerivateTiles(String derivateID) throws IOException {
+        Path derivateDir = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivateID, null);
         deleteDirectory(derivateDir);
         MCRTilingQueue.getInstance().remove(derivateID);
     }
 
     /**
-     * Deletes all image tiles of this {@link MCRFile}
+     * Deletes all image tiles of this derivate.
      * @param derivate derivate ID
      * @param absoluteImagePath absolute path to image file
+     * @throws IOException 
      */
     @MCRCommand(syntax = "delete tiles of image {0} {1}", help = "removes tiles of a specific file identified by its derivate ID {0} and absolute path {1}", order = 110)
-    public static void deleteImageTiles(String derivate, String absoluteImagePath) {
-        File tileFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, absoluteImagePath);
+    public static void deleteImageTiles(String derivate, String absoluteImagePath) throws IOException {
+        Path tileFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, absoluteImagePath);
         deleteFileAndEmptyDirectories(tileFile);
         int removed = MCRTilingQueue.getInstance().remove(derivate, absoluteImagePath);
         LOGGER.info("removed tiles from " + removed + " images");
     }
 
-    private static void deleteFileAndEmptyDirectories(File file) {
-        File parent = file.getParentFile();
-        if (file.exists())
-            file.delete();
-        if (parent != null && parent.isDirectory() && parent.list().length == 0)
+    private static void deleteFileAndEmptyDirectories(Path file) throws IOException {
+        if (Files.isRegularFile(file)) {
+            Files.delete(file);
+        }
+        if (Files.isDirectory(file)) {
+            try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(file)) {
+                for (@SuppressWarnings("unused") Path entry : directoryStream) {
+                    return;
+                }
+                Files.delete(file);
+            }
+        }
+        Path parent = file.getParent();
+        if (parent != null && parent.getNameCount() > 0) {
             deleteFileAndEmptyDirectories(parent);
-    }
-
-    private static boolean deleteDirectory(File path) {
-        if (path.exists()) {
-            File[] files = path.listFiles();
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    deleteDirectory(file);
-                } else {
-                    file.delete();
-                }
-            }
         }
-        return (path.delete());
     }
 
-    private static List<MCRFile> getSupportedFiles(MCRDirectory rootNode) {
-        ArrayList<MCRFile> files = new ArrayList<MCRFile>();
-        MCRFilesystemNode[] nodes = rootNode.getChildren();
-        for (MCRFilesystemNode node : nodes) {
-            if (node instanceof MCRDirectory) {
-                MCRDirectory dir = (MCRDirectory) node;
-                files.addAll(getSupportedFiles(dir));
-            } else {
-                MCRFile file = (MCRFile) node;
+    private static void deleteDirectory(Path path) throws IOException {
+        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.delete(file);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+                return FileVisitResult.CONTINUE;
+            }
+        });
+    }
+
+    private static List<MCRPath> getSupportedFiles(MCRPath rootNode) throws IOException {
+        final ArrayList<MCRPath> files = new ArrayList<>();
+        SimpleFileVisitor<Path> test = new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Objects.requireNonNull(file);
+                Objects.requireNonNull(attrs);
                 if (MCRIView2Tools.isFileSupported(file)) {
-                    files.add(file);
+                    files.add(MCRPath.toMCRPath(file));
                 }
+                return FileVisitResult.CONTINUE;
             }
-        }
+        };
+        Files.walkFileTree(rootNode, test);
         return files;
     }
 

@@ -537,7 +537,7 @@
       <dependency>
         <groupId>org.mycore.iview2</groupId>
         <artifactId>image-tiler</artifactId>
-        <version>1.9</version>
+        <version>1.10-SNAPSHOT</version>
       </dependency>
       <dependency>
       	<groupId>org.mycore</groupId>
@@ -625,7 +625,7 @@
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>16.0.1</version>
+        <version>18.0</version>
       </dependency>
       <dependency>
         <!-- required for commons-vfs -->

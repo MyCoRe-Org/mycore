@@ -23,12 +23,14 @@
 
 package org.mycore.iview2.frontend;
 
+import java.nio.file.Files;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.iview2.services.MCRIView2Tools;
@@ -46,12 +48,13 @@ public class MCRIView2XSLFunctionsAdapter {
     private static final MCRLinkTableManager LINK_TABLE_MANAGER = MCRLinkTableManager.instance();
 
     public static MCRIView2XSLFunctionsAdapter getInstance() {
-        return (MCRIView2XSLFunctionsAdapter) MCRConfiguration.instance().getInstanceOf(MCRIView2Tools.CONFIG_PREFIX + "MCRIView2XSLFunctionsAdapter",
-            MCRIView2XSLFunctionsAdapter.class.getName());
+        return (MCRIView2XSLFunctionsAdapter) MCRConfiguration.instance()
+            .getInstanceOf(MCRIView2Tools.CONFIG_PREFIX + "MCRIView2XSLFunctionsAdapter",
+                MCRIView2XSLFunctionsAdapter.class.getName());
     }
 
     public boolean hasMETSFile(String derivateID) {
-        return (MCRIView2Tools.getMCRFile(derivateID, "/mets.xml") != null);
+        return Files.exists(MCRPath.getPath(derivateID, "/mets.xml"));
     }
 
     public String getSupportedMainFile(String derivateID) {
@@ -73,8 +76,10 @@ public class MCRIView2XSLFunctionsAdapter {
         }
         options.append("\"baseUri\":").append('\"').append(baseUris).append("\".split(\",\")");
         if (MCRAccessManager.checkPermission(derivateID, "create-pdf")) {
-            options.append(",\"pdfCreatorURI\":").append('\"').append(config.getString("MCR.Module-iview2.PDFCreatorURI", "")).append("\",");
-            options.append("\"pdfCreatorStyle\":").append('\"').append(config.getString("MCR.Module-iview2.PDFCreatorStyle", "")).append("\"");
+            options.append(",\"pdfCreatorURI\":").append('\"')
+                .append(config.getString("MCR.Module-iview2.PDFCreatorURI", "")).append("\",");
+            options.append("\"pdfCreatorStyle\":").append('\"')
+                .append(config.getString("MCR.Module-iview2.PDFCreatorStyle", "")).append("\"");
         }
 
         if (extensions != null && !extensions.equals("")) {

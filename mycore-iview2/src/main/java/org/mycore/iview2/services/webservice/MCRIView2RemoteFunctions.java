@@ -23,6 +23,7 @@
 
 package org.mycore.iview2.services.webservice;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,10 +65,11 @@ public class MCRIView2RemoteFunctions {
     /**
      * Asks web service to get next image in the tiling queue.
      * @return Info about next image to be tiled
+     * @throws Exception 
      */
     @WebMethod(operationName = "next-tile-job")
     @WebResult(name = "tile-job")
-    public MCRIView2RemoteJob getNextTileParameters() {
+    public MCRIView2RemoteJob getNextTileParameters() throws Exception {
         Session session = sessionFactory.getCurrentSession();
         Transaction transaction = session.beginTransaction();
         try {
@@ -81,7 +83,7 @@ public class MCRIView2RemoteFunctions {
             String imagePath = MCRIView2Tools.getFilePath(derID, derPath);
             transaction.commit();
             return new MCRIView2RemoteJob(derID, derPath, imagePath);
-        } catch (HibernateException e) {
+        } catch (HibernateException | IOException e) {
             LOGGER.error("Error while getting next tiling job.", e);
             if (transaction != null && transaction.isActive()) {
                 transaction.rollback();

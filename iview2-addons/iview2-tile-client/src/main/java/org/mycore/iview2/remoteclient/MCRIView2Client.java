@@ -22,10 +22,12 @@
  */
 package org.mycore.iview2.remoteclient;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -50,6 +52,7 @@ import sun.misc.SignalHandler;
  * @author Thomas Scheffler (yagee)
  *
  */
+@SuppressWarnings("restriction")
 public class MCRIView2Client {
 
     private static Logger LOGGER = Logger.getLogger(MCRIView2Client.class);
@@ -70,15 +73,15 @@ public class MCRIView2Client {
         LOGGER.info("Activating headless mode");
         System.setProperty("java.awt.headless", "true");
         String endPoint = args[0];
-        final File fileStoreDir = new File(System.getProperty("fileStoreDir", "filestore"));
-        if (!fileStoreDir.exists() && !fileStoreDir.canRead()) {
-            LOGGER.error("Cannot access fileStoreDir: " + fileStoreDir.getAbsolutePath());
+        final Path fileStoreDir = Paths.get(System.getProperty("fileStoreDir", "filestore"));
+        if (!Files.isDirectory(fileStoreDir) && !Files.isReadable(fileStoreDir)) {
+            LOGGER.error("Cannot access fileStoreDir: " + fileStoreDir.toAbsolutePath());
             return;
         }
-        final File tileDir = new File(System.getProperty("tileDir", "iview2/tiles"));
-        if (!tileDir.exists()) {
-            LOGGER.warn("Creating tileDir: " + tileDir.getAbsolutePath());
-            tileDir.mkdirs();
+        final Path tileDir = Paths.get(System.getProperty("tileDir", "iview2/tiles"));
+        if (!Files.exists(tileDir)) {
+            LOGGER.warn("Creating tileDir: " + tileDir.toAbsolutePath());
+            Files.createDirectories(tileDir);
         }
         int threadCount = Integer.parseInt(System.getProperty("tileThreads", "1"));
         LOGGER.info("Starting ExecutorService with " + threadCount + " Threads");
@@ -123,18 +126,22 @@ public class MCRIView2Client {
         URL serviceURL = new URL(endPoint + "?wsdl");
         MCRIView2RemoteFunctionsService service = new MCRIView2RemoteFunctionsService(serviceURL, qName);
         MCRIView2RemoteFunctions iView2RemoteFunctions = service.getMCRIView2RemoteFunctionsPort();
-        ((BindingProvider) iView2RemoteFunctions).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endPoint);
+        ((BindingProvider) iView2RemoteFunctions).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+            endPoint);
         return iView2RemoteFunctions;
     }
 
     private static class ImageTiler implements Callable<MCRIView2RemoteJob> {
-        File tileDir, fileStoreDir;
+        Path tileDir;
+
+        Path fileStoreDir;
 
         MCRIView2RemoteFunctions iView2RemoteFunctions;
 
         private boolean skipExisting;
 
-        public ImageTiler(MCRIView2RemoteFunctions iView2RemoteFunctions, File tileDir, File fileStoreDir, boolean skipExisting) {
+        public ImageTiler(MCRIView2RemoteFunctions iView2RemoteFunctions, Path tileDir, Path fileStoreDir,
+            boolean skipExisting) {
             super();
             this.iView2RemoteFunctions = iView2RemoteFunctions;
             this.tileDir = tileDir;
@@ -169,16 +176,21 @@ public class MCRIView2Client {
             return null;
         }
 
-        private static boolean handleTileJob(MCRIView2RemoteJob tileJob, File tileDir, File fileStoreDir, boolean skipExisting) throws IOException,
-            JDOMException {
+        private static boolean handleTileJob(MCRIView2RemoteJob tileJob, Path tileDir, Path fileStoreDir,
+            boolean skipExisting) throws IOException, JDOMException {
 
             LOGGER.info("Tiling " + tileJob.getDerivateID() + tileJob.getDerivatePath());
-            File tiledFile = MCRImage.getTiledFile(tileDir, tileJob.getDerivateID(), tileJob.getDerivatePath());
+            Path tiledFile = MCRImage.getTiledFile(tileDir, tileJob.getDerivateID(), tileJob.getDerivatePath());
             MCRTiledPictureProps tiledPictureProps;
-            if (skipExisting && tiledFile.exists()) {
-                tiledPictureProps=MCRTiledPictureProps.getInstance(tiledFile);
+            if (skipExisting && Files.exists(tiledFile)) {
+                tiledPictureProps = MCRTiledPictureProps.getInstanceFromFile(tiledFile);
             } else {
-                MCRImage mcrImage = MCRImage.getInstance(new File(fileStoreDir, tileJob.getFileSystemPath()), tileJob.getDerivateID(), tileJob.getDerivatePath());
+                String fileSystemPath = tileJob.getFileSystemPath();
+                if (!fileStoreDir.getFileSystem().getSeparator().equals("/")) {
+                    fileSystemPath = fileSystemPath.replace("/", fileStoreDir.getFileSystem().getSeparator());
+                }
+                MCRImage mcrImage = MCRImage.getInstance(fileStoreDir.resolve(fileSystemPath), tileJob.getDerivateID(),
+                    tileJob.getDerivatePath());
                 mcrImage.setTileDir(tileDir);
                 tiledPictureProps = mcrImage.tile();
             }

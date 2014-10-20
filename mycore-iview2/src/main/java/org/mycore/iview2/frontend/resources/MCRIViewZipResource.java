@@ -2,9 +2,13 @@ package org.mycore.iview2.frontend.resources;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Objects;
 import java.util.zip.Deflater;
 
 import javax.imageio.ImageIO;
@@ -20,10 +24,10 @@ import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFilesystemNode;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
 import org.mycore.iview2.services.MCRIView2Tools;
@@ -45,49 +49,62 @@ public class MCRIViewZipResource {
         if (!MCRAccessManager.checkPermissionForReadingDerivate(derivateID)) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
-        MCRFilesystemNode root = MCRFilesystemNode.getRootNode(derivateID);
-        if (root == null) {
+        MCRPath derivateRoot = MCRPath.getPath(derivateID, "/");
+        if (!Files.exists(derivateRoot)) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
-        ZipStreamingOutput stream = new ZipStreamingOutput(derivateID, zoom, root);
+        ZipStreamingOutput stream = new ZipStreamingOutput(derivateRoot, zoom);
         return Response.ok(stream).header("Content-Disposition", "attachnment; filename=\"" + derivateID + ".zip\"")
             .build();
     }
 
     public static class ZipStreamingOutput implements StreamingOutput {
 
-        protected String derivateID;
+        protected MCRPath derivateRoot;
 
         protected Integer zoom;
 
-        protected MCRFilesystemNode root;
-
-        public ZipStreamingOutput(String derivateID, Integer zoom, MCRFilesystemNode root) {
-            this.derivateID = derivateID;
+        public ZipStreamingOutput(MCRPath derivateRoot, Integer zoom) {
+            this.derivateRoot = derivateRoot;
             this.zoom = zoom;
-            this.root = root;
         }
 
         @Override
         public void write(OutputStream out) throws IOException, WebApplicationException {
             MCRSessionMgr.getCurrentSession().beginTransaction();
             try {
-                ZipArchiveOutputStream zipStream = new ZipArchiveOutputStream(new BufferedOutputStream(out));
+                final ZipArchiveOutputStream zipStream = new ZipArchiveOutputStream(new BufferedOutputStream(out));
                 zipStream.setLevel(Deflater.BEST_SPEED);
-                for (MCRFile file : root.getFiles()) {
-                    File iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivateID, file.getName());
-                    if (!iviewFile.exists()) {
-                        continue;
+                SimpleFileVisitor<java.nio.file.Path> zipper = new SimpleFileVisitor<java.nio.file.Path>() {
+                    @Override
+                    public FileVisitResult visitFile(java.nio.file.Path file, BasicFileAttributes attrs)
+                        throws IOException {
+                        Objects.requireNonNull(file);
+                        Objects.requireNonNull(attrs);
+                        MCRPath mcrPath = MCRPath.toMCRPath(file);
+                        if (MCRIView2Tools.isFileSupported(file)) {
+                            java.nio.file.Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(),
+                                mcrPath.getOwner(), mcrPath.subpathComplete().toString());
+                            if (!Files.exists(iviewFile)) {
+                                return super.visitFile(iviewFile, attrs);
+                            }
+                            try {
+                                MCRTiledPictureProps imageProps = MCRTiledPictureProps.getInstanceFromFile(iviewFile);
+                                Integer zoomLevel = (zoom == null || zoom > imageProps.getZoomlevel()) ? imageProps
+                                    .getZoomlevel() : zoom;
+                                BufferedImage image = MCRIView2Tools.getZoomLevel(iviewFile, zoomLevel);
+                                ZipArchiveEntry entry = new ZipArchiveEntry(file.getFileName() + ".jpg");
+                                zipStream.putArchiveEntry(entry);
+                                ImageIO.write(image, "jpg", zipStream);
+                            } catch (JDOMException e) {
+                                throw new WebApplicationException(e);
+                            }
+                            zipStream.closeArchiveEntry();
+                        }
+                        return FileVisitResult.CONTINUE;
                     }
-                    MCRTiledPictureProps imageProps = MCRTiledPictureProps.getInstance(iviewFile);
-                    Integer zoomLevel = (zoom == null || zoom > imageProps.getZoomlevel()) ? imageProps.getZoomlevel()
-                        : zoom;
-                    BufferedImage image = MCRIView2Tools.getZoomLevel(iviewFile, zoomLevel);
-                    ZipArchiveEntry entry = new ZipArchiveEntry(file.getName() + ".jpg");
-                    zipStream.putArchiveEntry(entry);
-                    ImageIO.write(image, "jpg", zipStream);
-                    zipStream.closeArchiveEntry();
-                }
+                };
+                Files.walkFileTree(derivateRoot, zipper);
                 zipStream.close();
             } catch (Exception exc) {
                 throw new WebApplicationException(exc);

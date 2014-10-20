@@ -28,6 +28,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileSystem;
+import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -36,6 +38,7 @@ import java.util.zip.ZipFile;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
@@ -142,57 +145,66 @@ public class MCRTileCombineServlet extends MCRServlet {
             final String derivate = pathInfo.substring(0, pathInfo.indexOf('/'));
             final String imagePath = pathInfo.substring(derivate.length());
             LOGGER.info("Zoom-Level: " + zoomAlias + ", derivate: " + derivate + ", image: " + imagePath);
-            final File iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, imagePath);
-            final MCRTiledPictureProps pictureProps = MCRTiledPictureProps.getInstance(iviewFile);
-            final int maxZoomLevel = pictureProps.getZoomlevel();
-            request.setAttribute(THUMBNAIL_KEY, iviewFile);
-            LOGGER.info("IView2 file: " + iviewFile.getAbsolutePath());
-            int zoomLevel = 0;
-            switch (zoomAlias) {
-            case "MIN":
-                zoomLevel = 1;
-                break;
-            case "MID":
-                zoomLevel = 2;
-                break;
-            case "MAX":
-                zoomLevel = 3;
-                break;
-            }
-            HttpServletResponse response = job.getResponse();
-            if (zoomLevel > maxZoomLevel) {
-                switch (maxZoomLevel) {
-                case 2:
-                    zoomAlias = "MID";
-                    break;
-                case 1:
-                    zoomAlias = "MIN";
-                    break;
-                default:
-                    zoomAlias = "THUMB";
-                    break;
+            final Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, imagePath);
+            try (FileSystem fs = MCRIView2Tools.getFileSystem(iviewFile)) {
+                Path iviewFileRoot = fs.getRootDirectories().iterator().next();
+                final MCRTiledPictureProps pictureProps = MCRTiledPictureProps.getInstanceFromDirectory(iviewFileRoot);
+                final int maxZoomLevel = pictureProps.getZoomlevel();
+                request.setAttribute(THUMBNAIL_KEY, iviewFile);
+                LOGGER.info("IView2 file: " + iviewFile);
+                int zoomLevel = 0;
+                switch (zoomAlias) {
+                    case "MIN":
+                        zoomLevel = 1;
+                        break;
+                    case "MID":
+                        zoomLevel = 2;
+                        break;
+                    case "MAX":
+                        zoomLevel = 3;
+                        break;
                 }
-                String redirectURL = response.encodeRedirectURL(MessageFormat.format("{0}{1}/{2}/{3}/{4}", request.getContextPath(),
-                        request.getServletPath(), zoomAlias, derivate, imagePath));
-                response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
-                response.setHeader("Location", redirectURL);
-                response.flushBuffer();
-                return;
-            }
-            if (zoomLevel == 0 && footerImpl == null) {
-                //we're done, sendThumbnail is called in render phase
-                return;
-            }
-            BufferedImage combinedImage = MCRIView2Tools.getZoomLevel(iviewFile, zoomLevel);
-            if (combinedImage != null) {
-                if (footerImpl != null) {
-                    BufferedImage footer = footerImpl.getFooter(combinedImage.getWidth(), derivate, imagePath);
-                    combinedImage = attachFooter(combinedImage, footer);
+                HttpServletResponse response = job.getResponse();
+                if (zoomLevel > maxZoomLevel) {
+                    switch (maxZoomLevel) {
+                        case 2:
+                            zoomAlias = "MID";
+                            break;
+                        case 1:
+                            zoomAlias = "MIN";
+                            break;
+                        default:
+                            zoomAlias = "THUMB";
+                            break;
+                    }
+                    String redirectURL = response.encodeRedirectURL(MessageFormat.format("{0}{1}/{2}/{3}/{4}",
+                        request.getContextPath(), request.getServletPath(), zoomAlias, derivate, imagePath));
+                    response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+                    response.setHeader("Location", redirectURL);
+                    response.flushBuffer();
+                    return;
                 }
-                request.setAttribute(IMAGE_KEY, combinedImage);
-            } else {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                return;
+                if (zoomLevel == 0 && footerImpl == null) {
+                    //we're done, sendThumbnail is called in render phase
+                    return;
+                }
+                ImageReader reader = MCRIView2Tools.getTileImageReader();
+                try {
+                    BufferedImage combinedImage = MCRIView2Tools.getZoomLevel(iviewFileRoot, pictureProps, reader,
+                        zoomLevel);
+                    if (combinedImage != null) {
+                        if (footerImpl != null) {
+                            BufferedImage footer = footerImpl.getFooter(combinedImage.getWidth(), derivate, imagePath);
+                            combinedImage = attachFooter(combinedImage, footer);
+                        }
+                        request.setAttribute(IMAGE_KEY, combinedImage);
+                    } else {
+                        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                        return;
+                    }
+                } finally {
+                    reader.dispose();
+                }
             }
 
         } finally {
@@ -235,7 +247,7 @@ public class MCRTileCombineServlet extends MCRServlet {
 
         final ImageWriter curImgWriter = imageWriter.get();
         try (ServletOutputStream sout = job.getResponse().getOutputStream();
-                ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout);) {
+            ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(sout);) {
             curImgWriter.setOutput(imageOutputStream);
             final IIOImage iioImage = new IIOImage(combinedImage, null, null);
             curImgWriter.write(null, iioImage, imageWriteParam);
@@ -251,8 +263,8 @@ public class MCRTileCombineServlet extends MCRServlet {
      * @return a {@link BufferedImage} with <code>footer</code> attached to <code>combinedImage</code>
      */
     protected static BufferedImage attachFooter(final BufferedImage combinedImage, final BufferedImage footer) {
-        final BufferedImage resultImage = new BufferedImage(combinedImage.getWidth(), combinedImage.getHeight() + footer.getHeight(),
-                combinedImage.getType());
+        final BufferedImage resultImage = new BufferedImage(combinedImage.getWidth(), combinedImage.getHeight()
+            + footer.getHeight(), combinedImage.getType());
         final Graphics2D graphics = resultImage.createGraphics();
         try {
             graphics.drawImage(combinedImage, 0, 0, null);

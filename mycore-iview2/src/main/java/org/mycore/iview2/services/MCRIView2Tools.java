@@ -26,30 +26,39 @@ package org.mycore.iview2.services;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.FileStore;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
-import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRXMLFunctions;
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRAbstractFileStore;
+import org.mycore.datamodel.niofs.MCRContentTypes;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
@@ -68,14 +77,14 @@ public class MCRIView2Tools {
 
     private static String SUPPORTED_CONTENT_TYPE = CONFIG.getString(CONFIG_PREFIX + "SupportedContentTypes", "");
 
-    private static File TILE_DIR = new File(MCRIView2Tools.getIView2Property("DirectoryForTiles"));
+    private static Path TILE_DIR = Paths.get(MCRIView2Tools.getIView2Property("DirectoryForTiles"));
 
     private static Logger LOGGER = Logger.getLogger(MCRIView2Tools.class);
 
     /**
      * @return directory for tiles
      */
-    public static File getTileDir() {
+    public static Path getTileDir() {
         return TILE_DIR;
     }
 
@@ -91,57 +100,14 @@ public class MCRIView2Tools {
             String nameOfMainFile = deriv.getDerivate().getInternals().getMainDoc();
             // verify support
             if (nameOfMainFile != null && !nameOfMainFile.equals("")) {
-                MCRFile mainFile = getMCRFile(derivateID, nameOfMainFile);
+                MCRPath mainFile = MCRPath.getPath(derivateID, '/' + nameOfMainFile);
                 if (mainFile != null && isFileSupported(mainFile))
-                    return mainFile.getAbsolutePath();
+                    return mainFile.getRoot().relativize(mainFile).toString();
             }
         } catch (Exception e) {
             LOGGER.warn("Could not get main file of derivate.", e);
         }
         return "";
-    }
-
-    /**
-     * @param derivateID
-     *            ID of derivate
-     * @param absolutePath
-     *            absolute path to file of derivate
-     * @return local {@link File} of {@link MCRFile} instance
-     * @throws IOException
-     */
-    public static File getFile(String derivateID, String absolutePath) throws IOException {
-        MCRFile mcrFile = getMCRFile(derivateID, absolutePath);
-        return mcrFile.getLocalFile();
-    }
-
-    /**
-     * @param derivateID
-     *            ID of derivate
-     * @param absolutePath
-     *            absolute path to file of derivate
-     * @return local path of {@link MCRFile} instance rooted by content store
-     * @see MCRFile#getStorageID()
-     */
-    public static String getFilePath(String derivateID, String absolutePath) {
-        MCRFile mcrFile = getMCRFile(derivateID, absolutePath);
-        return mcrFile.getStorageID();
-    }
-
-    /**
-     * 
-     * @param derivateID
-     *            ID of derivate
-     * @param absolutePath
-     *            absolute path to file of derivate
-     * @return {@link MCRFile} instance for this file.
-     */
-    public static MCRFile getMCRFile(String derivateID, String absolutePath) {
-        MCRDirectory root = (MCRDirectory) MCRFilesystemNode.getRootNode(derivateID);
-        if (root == null)
-            throw new MCRPersistenceException("Could not get root node of derivate " + derivateID);
-        // get main file
-        MCRFile mainFile = (MCRFile) root.getChildByPath(absolutePath);
-        return mainFile;
     }
 
     /**
@@ -157,20 +123,21 @@ public class MCRIView2Tools {
     /**
      * @param file
      *            image file
-     * @return if {@link MCRFile#getContentTypeID()} is in property
+     * @return if content type is in property
      *         <code>MCR.Module-iview2.SupportedContentTypes</code>
+     * @throws IOException 
+     * @see {@link MCRContentTypes#probeContentType(Path)}
      */
-    public static boolean isFileSupported(MCRFile file) {
-        return file == null ? false : SUPPORTED_CONTENT_TYPE.contains(file.getContentTypeID());
+    public static boolean isFileSupported(Path file) throws IOException {
+        return file == null ? false : SUPPORTED_CONTENT_TYPE.contains(MCRContentTypes.probeContentType(file));
     }
 
     /**
      * @param filename
      * @return true if the file is supported, false otherwise
-     * @see @link{MCRIView2Tools#isFileSupported(MCRFile)}
      */
     public static boolean isFileSupported(String filename) {
-        return SUPPORTED_CONTENT_TYPE.contains(filename.substring(filename.lastIndexOf(".") + 1));
+        return SUPPORTED_CONTENT_TYPE.contains(MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(filename));
     }
 
     /**
@@ -180,19 +147,37 @@ public class MCRIView2Tools {
      * @param derivateId
      * @return true if all files in belonging to the derivate are tiled, false
      *         otherwise
+     * @throws IOException 
      */
-    public static boolean isCompletelyTiled(String derivateId) {
+    public static boolean isCompletelyTiled(String derivateId) throws IOException {
         if (!MCRMetadataManager.exists(MCRObjectID.getInstance(derivateId))) {
             return false;
         }
-        for (MCRFile f : MCRUtils.getFiles(derivateId)) {
-            if (MCRIView2Tools.isFileSupported(f)) {
-                if (!MCRIView2Tools.isTiled(f)) {
-                    return false;
+        MCRPath derivatePath = MCRPath.getPath(derivateId, "/");
+        TileCompleteFileVisitor tileCompleteFileVisitor = new TileCompleteFileVisitor();
+        Files.walkFileTree(derivatePath, tileCompleteFileVisitor);
+        return tileCompleteFileVisitor.isTiled();
+    }
+
+    private static class TileCompleteFileVisitor extends SimpleFileVisitor<Path> {
+
+        private boolean isTiled = true;
+
+        public boolean isTiled() {
+            return isTiled;
+        }
+
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            MCRPath mcrFile = MCRPath.toMCRPath(file);
+            if (isFileSupported(mcrFile)) {
+                if (!MCRIView2Tools.isTiled(mcrFile)) {
+                    isTiled = false;
+                    return FileVisitResult.TERMINATE;
                 }
             }
+            return super.visitFile(file, attrs);
         }
-        return true;
     }
 
     /**
@@ -202,9 +187,9 @@ public class MCRIView2Tools {
      *         exists
      * @see #getTileDir()
      */
-    public static boolean isTiled(MCRFile file) {
-        File tiledFile = MCRImage.getTiledFile(getTileDir(), file.getOwnerID(), file.getAbsolutePath());
-        return tiledFile.exists();
+    public static boolean isTiled(MCRPath file) {
+        Path tiledFile = MCRImage.getTiledFile(getTileDir(), file.getOwner(), file.subpathComplete().toString());
+        return Files.exists(tiledFile);
     }
 
     /**
@@ -220,56 +205,84 @@ public class MCRIView2Tools {
      * @throws JDOMException
      *             if image properties could not be parsed.
      */
-    public static BufferedImage getZoomLevel(File iviewFile, int zoomLevel) throws IOException, JDOMException {
-        ZipFile iviewImage = new ZipFile(iviewFile);
-        Graphics graphics = null;
+    public static BufferedImage getZoomLevel(Path iviewFile, int zoomLevel) throws IOException, JDOMException {
         ImageReader reader = getTileImageReader();
-        try {
-            if (zoomLevel == 0) {
-                return readTile(iviewImage, reader, 0, 0, 0);
-            }
-            MCRTiledPictureProps imageProps = MCRTiledPictureProps.getInstance(iviewFile);
+        try (FileSystem zipFileSystem = getFileSystem(iviewFile)) {
+            Path iviewFileRoot = zipFileSystem.getRootDirectories().iterator().next();
+            MCRTiledPictureProps imageProps = MCRTiledPictureProps.getInstanceFromDirectory(iviewFileRoot);
             if (zoomLevel < 0 || zoomLevel > imageProps.getZoomlevel()) {
                 throw new IndexOutOfBoundsException("Zoom level " + zoomLevel + " is not in range 0 - "
                     + imageProps.getZoomlevel());
             }
-            double zoomFactor = Math.pow(2, (imageProps.getZoomlevel() - zoomLevel));
-            int maxX = (int) Math.ceil((imageProps.getWidth() / zoomFactor) / MCRImage.getTileSize());
-            int maxY = (int) Math.ceil((imageProps.getHeight() / zoomFactor) / MCRImage.getTileSize());
-            LOGGER.debug(MessageFormat.format("Image size:{0}x{1}, tiles:{2}x{3}", imageProps.getWidth(),
-                imageProps.getHeight(), maxX, maxY));
-            int imageType = getImageType(iviewImage, reader, zoomLevel, 0, 0);
-            int xDim = ((maxX - 1) * MCRImage.getTileSize() + readTile(iviewImage, reader, zoomLevel, maxX - 1, 0)
-                .getWidth());
-            int yDim = ((maxY - 1) * MCRImage.getTileSize() + readTile(iviewImage, reader, zoomLevel, 0, maxY - 1)
-                .getHeight());
-            BufferedImage resultImage = new BufferedImage(xDim, yDim, imageType);
-            graphics = resultImage.getGraphics();
+            return getZoomLevel(iviewFileRoot, imageProps, reader, zoomLevel);
+        } finally {
+            reader.dispose();
+        }
+    }
+
+    /**
+     * combines image tiles of specified zoomLevel to one image.
+     * 
+     * @param iviewFileRoot
+     *            root directory of .iview2 file
+     * @param imagePropertiess
+     *            imageProperties, if available or null
+     * @param zoomLevel
+     *            the zoom level where 0 is thumbnail size
+     * @return a combined image
+     * @throws IOException
+     *             any IOException while reading tiles
+     * @throws JDOMException
+     *             if image properties could not be parsed.
+     */
+    public static BufferedImage getZoomLevel(final Path iviewFileRoot, final MCRTiledPictureProps imageProperties,
+        final ImageReader reader, final int zoomLevel) throws IOException, JDOMException {
+        if (zoomLevel == 0) {
+            return readTile(iviewFileRoot, reader, 0, 0, 0);
+        }
+        MCRTiledPictureProps imageProps = imageProperties == null ? MCRTiledPictureProps
+            .getInstanceFromDirectory(iviewFileRoot) : imageProperties;
+        double zoomFactor = Math.pow(2, (imageProps.getZoomlevel() - zoomLevel));
+        int maxX = (int) Math.ceil((imageProps.getWidth() / zoomFactor) / MCRImage.getTileSize());
+        int maxY = (int) Math.ceil((imageProps.getHeight() / zoomFactor) / MCRImage.getTileSize());
+        LOGGER.debug(MessageFormat.format("Image size:{0}x{1}, tiles:{2}x{3}", imageProps.getWidth(),
+            imageProps.getHeight(), maxX, maxY));
+        int imageType = getImageType(iviewFileRoot, reader, zoomLevel, 0, 0);
+        int xDim = ((maxX - 1) * MCRImage.getTileSize() + readTile(iviewFileRoot, reader, zoomLevel, maxX - 1, 0)
+            .getWidth());
+        int yDim = ((maxY - 1) * MCRImage.getTileSize() + readTile(iviewFileRoot, reader, zoomLevel, 0, maxY - 1)
+            .getHeight());
+        BufferedImage resultImage = new BufferedImage(xDim, yDim, imageType);
+        Graphics graphics = resultImage.getGraphics();
+        try {
             for (int x = 0; x < maxX; x++) {
                 for (int y = 0; y < maxY; y++) {
-                    BufferedImage tile = readTile(iviewImage, reader, zoomLevel, x, y);
+                    BufferedImage tile = readTile(iviewFileRoot, reader, zoomLevel, x, y);
                     graphics.drawImage(tile, x * MCRImage.getTileSize(), y * MCRImage.getTileSize(), null);
                 }
             }
             return resultImage;
         } finally {
-            iviewImage.close();
-            if (graphics != null)
-                graphics.dispose();
-            reader.dispose();
+            graphics.dispose();
         }
+    }
+
+    public static FileSystem getFileSystem(Path iviewFile) throws IOException {
+        URI uri = URI.create("jar:" + iviewFile.toUri().toString());
+        return FileSystems.newFileSystem(uri, Collections.<String, Object> emptyMap(),
+            MCRIView2Tools.class.getClassLoader());
     }
 
     public static ImageReader getTileImageReader() {
         return ImageIO.getImageReadersByMIMEType("image/jpeg").next();
     }
 
-    public static BufferedImage readTile(ZipFile iviewImage, ImageReader imageReader, int zoomLevel, int x, int y)
+    public static BufferedImage readTile(Path iviewFileRoot, ImageReader imageReader, int zoomLevel, int x, int y)
         throws IOException {
         String tileName = MessageFormat.format("{0}/{1}/{2}.jpg", zoomLevel, y, x);
-        ZipEntry tile = iviewImage.getEntry(tileName);
+        Path tile = iviewFileRoot.resolve(tileName);
         if (tile != null) {
-            try (InputStream zin = iviewImage.getInputStream(tile);) {
+            try (SeekableByteChannel zin = Files.newByteChannel(tile)) {
                 ImageInputStream iis = ImageIO.createImageInputStream(zin);
                 imageReader.setInput(iis, false);
                 BufferedImage image = imageReader.read(0);
@@ -278,17 +291,17 @@ public class MCRIView2Tools {
                 return image;
             }
         } else {
-            LOGGER.warn("Did not find " + tileName + " in " + iviewImage.getName());
+            LOGGER.warn("Did not find " + tileName + " in " + iviewFileRoot);
             return null;
         }
     }
 
-    public static int getImageType(ZipFile iviewImage, ImageReader imageReader, int zoomLevel, int x, int y)
+    public static int getImageType(Path iviewFileRoot, ImageReader imageReader, int zoomLevel, int x, int y)
         throws IOException {
         String tileName = MessageFormat.format("{0}/{1}/{2}.jpg", zoomLevel, y, x);
-        ZipEntry tile = iviewImage.getEntry(tileName);
+        Path tile = iviewFileRoot.resolve(tileName);
         if (tile != null) {
-            try (InputStream zin = iviewImage.getInputStream(tile)) {
+            try (SeekableByteChannel zin = Files.newByteChannel(tile)) {
                 ImageInputStream iis = ImageIO.createImageInputStream(zin);
                 imageReader.setInput(iis, false);
                 int imageType = MCRImage.getImageType(imageReader);
@@ -297,7 +310,7 @@ public class MCRIView2Tools {
                 return imageType;
             }
         } else {
-            throw new FileNotFoundException("Did not find " + tileName + " in " + iviewImage.getName());
+            throw new NoSuchFileException(iviewFileRoot.toString(), tileName, null);
         }
     }
 
@@ -326,20 +339,36 @@ public class MCRIView2Tools {
      * @param file
      *            the file to display
      * @return the url to the image viewer displaying given file unless
-     *         {@link MCRIView2Tools#isFileSupported(MCRFile)} returns
+     *         {@link MCRIView2Tools#isFileSupported(Path)} returns
      *         <code>false</code> in this case <code>null</code> is returned
+     * @throws IOException 
      * 
-     * @see {@link MCRIView2Tools#isFileSupported(MCRFile)}
+     * @see {@link MCRIView2Tools#isFileSupported(Path)}
      */
-    public static String getViewerURL(MCRFile file) throws URISyntaxException {
+    public static String getViewerURL(MCRPath file) throws URISyntaxException, IOException {
         if (!MCRIView2Tools.isFileSupported(file)) {
             return null;
         }
+        MCRObjectID mcrObjectID = MCRMetadataManager.getObjectId(MCRObjectID.getInstance(file.getOwner()), 10,
+            TimeUnit.SECONDS);
         String params = MCRXMLFunctions.encodeURIPath(MessageFormat.format(
-            "jumpback=true&maximized=true&page={0}&derivate={1}", file.getAbsolutePath(), file.getOwnerID()));
-        String url = MessageFormat.format("{0}receive/{1}?{2}", MCRFrontendUtil.getBaseURL(), file.getMCRObjectID(),
-            params);
+            "jumpback=true&maximized=true&page={0}&derivate={1}", file.subpathComplete(), file.getOwner()));
+        String url = MessageFormat.format("{0}receive/{1}?{2}", MCRFrontendUtil.getBaseURL(), mcrObjectID, params);
 
         return url;
+    }
+
+    public static String getFilePath(String derID, String derPath) throws IOException {
+        MCRPath mcrPath = MCRPath.getPath(derID, derPath);
+        Path physicalPath = mcrPath.toPhysicalPath();
+        for (FileStore fs : mcrPath.getFileSystem().getFileStores()) {
+            if (fs instanceof MCRAbstractFileStore) {
+                Path basePath = ((MCRAbstractFileStore) fs).getBaseDirectory();
+                if (physicalPath.startsWith(basePath)) {
+                    return basePath.relativize(physicalPath).toString();
+                }
+            }
+        }
+        return physicalPath.toString();
     }
 }
