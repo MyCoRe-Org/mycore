@@ -82,6 +82,7 @@ import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.language.MCRLanguageFactory;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
@@ -1003,6 +1004,7 @@ public class MCRUtils {
      * @param derivate the id of the derivate
      * 
      * @return the list of {@link MCRFile}s contained by the given derivate id, or an empty list if the derivate id is invalid
+     * @deprecated direct access to MCRFile is not supported use {@link MCRPath}.
      */
     public static List<MCRFile> getFiles(String derivate) {
         List<MCRFile> fList = new Vector<MCRFile>();
