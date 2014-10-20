@@ -6,6 +6,15 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrmeich" type="add">
+        mycore-oai: make granularity configurable
+      </action>
+      <action dev="mcrsteph" type="fix">
+        mycore-oai: replace ":" with "_" in property keys of map2set properties
+      </action>
+      <action dev="mcrmeich" type="add">
+        mycore-oai: use category dao factory
+      </action>
       <action dev="mcrvuchi" type="add">
         mycore-xeditor: xed:ouput now support variable resolving in i18n names
       </action>
