@@ -109,7 +109,7 @@
       </xsl:if>
     </xsl:for-each>
   </xsl:variable>
-  
+
   <xsl:template name="solr.Pagination">
     <xsl:param name="i" select="1" />
     <xsl:param name="href" select="concat($proxyBaseURL,$HttpSession,$solrParams)" />
@@ -120,7 +120,7 @@
     <xsl:variable name="prev" select="'«'" />
     <xsl:variable name="next" select="'»'" />
 
-    <div class="text-center">
+    <div class="pagination_box text-center">
       <ul>
         <xsl:attribute name="class">
           <xsl:value-of select="concat('pagination ',$class)" />
@@ -226,7 +226,7 @@
         <xsl:when test="$i &gt; $currentpage">
           <xsl:choose>
             <!-- jump only one if your near currentpage,
-                or at last page 
+                or at last page
                 or to support bigger window at beginning
                 or to skip a jump of 2
             -->
