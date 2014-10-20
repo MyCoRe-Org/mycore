@@ -172,5 +172,5 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
     private MCRAbstractFileSystem instance() {
         return this;
     }
-
+    
 }

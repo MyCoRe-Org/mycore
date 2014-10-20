@@ -4,18 +4,23 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.attribute.FileAttributeView;
 import java.nio.file.attribute.FileStoreAttributeView;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.log4j.Logger;
 import org.mycore.datamodel.ifs.MCRContentStore;
 import org.mycore.datamodel.ifs.MCRContentStoreFactory;
+import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.niofs.MCRAbstractFileStore;
+import org.mycore.datamodel.niofs.MCRPath;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
-public class MCRFileStore extends FileStore {
+public class MCRFileStore extends MCRAbstractFileStore {
 
     private MCRContentStore contentStore;
 
@@ -101,6 +106,23 @@ public class MCRFileStore extends FileStore {
     @Override
     public Object getAttribute(String attribute) throws IOException {
         return this.baseFileStore.getAttribute(attribute);
+    }
+
+    @Override
+    public Path getBaseDirectory() throws IOException {
+        return this.contentStore.getBaseDir().toPath();
+    }
+
+    @Override
+    public Path getPhysicalPath(MCRPath path) {
+        MCRFileSystemUtils.checkPathAbsolute(path);
+        try {
+            MCRFile mcrFile = MCRFileSystemUtils.getMCRFile(path, false, false);
+            return mcrFile.getLocalFile().toPath();
+        } catch (IOException e) {
+            Logger.getLogger(getClass()).info(e.getMessage());
+            return null;
+        }
     }
 
 }

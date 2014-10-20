@@ -152,7 +152,7 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
             }
         }
         MCRFileSystemProvider provider = (MCRFileSystemProvider) mcrPath.getFileSystem().provider();
-        MCRFile mcrFile = provider.getMCRFile(dir, mcrPath, create, createNew);
+        MCRFile mcrFile = MCRFileSystemUtils.getMCRFile(dir, mcrPath, create, createNew);
         return provider.newByteChannel(mcrFile.toPath(), fileOpenOptions, attrs);
     }
 

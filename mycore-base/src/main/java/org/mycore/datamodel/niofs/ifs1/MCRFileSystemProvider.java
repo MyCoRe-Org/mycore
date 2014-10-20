@@ -45,7 +45,6 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.nio.file.ProviderMismatchException;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributeView;
@@ -55,11 +54,9 @@ import java.nio.file.attribute.FileAttributeView;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -169,7 +166,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         if (attrs.length > 0) {
             throw new UnsupportedOperationException("Atomically setting of file attributes is not supported.");
         }
-        MCRPath ifsPath = checkPathAbsolute(path);
+        MCRPath ifsPath = MCRFileSystemUtils.checkPathAbsolute(path);
         Set<? extends OpenOption> fileOpenOptions = Sets.filter(options, new Predicate<OpenOption>() {
             @Override
             public boolean apply(OpenOption option) {
@@ -184,7 +181,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
                 MCRFile.checkOpenOption(option);
             }
         }
-        MCRFile mcrFile = getMCRFile(ifsPath, create, createNew);
+        MCRFile mcrFile = MCRFileSystemUtils.getMCRFile(ifsPath, create, createNew);
         if (mcrFile == null) {
             throw new NoSuchFileException(path.toString());
         }
@@ -200,99 +197,12 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         return root;
     }
 
-    private MCRFile getMCRFile(MCRPath ifsPath, boolean create, boolean createNew) throws IOException {
-        if (!ifsPath.isAbsolute()) {
-            throw new IllegalArgumentException("'path' needs to be absolute.");
-        }
-        MCRFile file;
-        MCRDirectory root = null;
-        boolean rootCreated = false;
-        try {
-            try {
-                root = getRootDirectory(ifsPath);
-            } catch (NoSuchFileException e) {
-                if (create || createNew) {
-                    root = new MCRDirectory(ifsPath.getOwner());
-                    rootCreated = true;
-                } else {
-                    throw e;
-                }
-            }
-            MCRPath relativePath = root.toPath().relativize(ifsPath);
-            file = getMCRFile(root, relativePath, create, createNew);
-        } catch (Exception e) {
-            if (rootCreated) {
-                LOGGER.error("Exception while getting MCRFile " + ifsPath + ". Removing created filesystem nodes.");
-                try {
-                    root.delete();
-                } catch (Exception de) {
-                    LOGGER.fatal("Error while deleting file system node: " + root.getName(), de);
-                }
-            }
-            throw e;
-        }
-        return file;
-    }
-
-    MCRFile getMCRFile(MCRDirectory baseDir, MCRPath relativePath, boolean create, boolean createNew)
-        throws IOException {
-        MCRPath ifsPath = relativePath;
-        if (relativePath.isAbsolute()) {
-            if (baseDir.getOwnerID().equals(relativePath.getOwner())) {
-                ifsPath = baseDir.toPath().relativize(relativePath);
-            } else
-                throw new IOException(relativePath + " is absolute does not fit to " + baseDir.toPath());
-        }
-        Deque<MCRFilesystemNode> created = new LinkedList<>();
-        MCRFile file;
-        try {
-            file = (MCRFile) baseDir.getChildByPath(ifsPath.toString());
-            if (file != null && createNew) {
-                throw new FileAlreadyExistsException(baseDir.toPath().resolve(ifsPath).toString());
-            }
-            if (file == null & (create || createNew)) {
-                Path normalized = ifsPath.normalize();
-                MCRDirectory parent = baseDir;
-                int nameCount = normalized.getNameCount();
-                int directoryCount = nameCount - 1;
-                int i = 0;
-                while (i < directoryCount) {
-                    String curName = normalized.getName(i).toString();
-                    MCRDirectory curDir = (MCRDirectory) parent.getChild(curName);
-                    if (curDir == null) {
-                        curDir = new MCRDirectory(curName, parent);
-                        created.addFirst(curDir);
-                    }
-                    i++;
-                    parent = curDir;
-                }
-                String fileName = normalized.getFileName().toString();
-                file = new MCRFile(fileName, parent);
-                created.addFirst(file);
-            }
-        } catch (Exception e) {
-            if (create || createNew) {
-                LOGGER.error("Exception while getting MCRFile " + ifsPath + ". Removing created filesystem nodes.");
-                while (created.peekFirst() != null) {
-                    MCRFilesystemNode node = created.pollFirst();
-                    try {
-                        node.delete();
-                    } catch (Exception de) {
-                        LOGGER.fatal("Error while deleting file system node: " + node.getName(), de);
-                    }
-                }
-            }
-            throw e;
-        }
-        return file;
-    }
-
     /* (non-Javadoc)
      * @see java.nio.file.spi.FileSystemProvider#newDirectoryStream(java.nio.file.Path, java.nio.file.DirectoryStream.Filter)
      */
     @Override
     public DirectoryStream<Path> newDirectoryStream(Path dir, Filter<? super Path> filter) throws IOException {
-        MCRPath mcrPath = checkPathAbsolute(dir);
+        MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(dir);
         MCRFilesystemNode node = resolvePath(mcrPath);
         if (node instanceof MCRDirectory) {
             return new MCRDirectoryStream((MCRDirectory) node);
@@ -308,7 +218,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         if (attrs.length > 0) {
             throw new UnsupportedOperationException("Setting 'attrs' atomically is unsupported.");
         }
-        MCRPath mcrPath = checkPathAbsolute(dir);
+        MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(dir);
         MCRDirectory rootDirectory;
         if (mcrPath.isAbsolute() && mcrPath.getNameCount() == 0) {
             rootDirectory = MCRDirectory.getDirectory(mcrPath.getOwner());
@@ -350,7 +260,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
      */
     @Override
     public void delete(Path path) throws IOException {
-        MCRPath mcrPath = checkPathAbsolute(path);
+        MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(path);
         MCRDirectory parentDir = getParentDirectory(mcrPath);
         MCRFilesystemNode child = parentDir.getChild(mcrPath.getFileName().toString());
         if (child == null) {
@@ -400,8 +310,8 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         checkCopyOptions(options);
         HashSet<CopyOption> copyOptions = Sets.newHashSet(options);
         boolean createNew = !copyOptions.contains(StandardCopyOption.REPLACE_EXISTING);
-        MCRPath src = checkPathAbsolute(source);
-        MCRPath tgt = checkPathAbsolute(target);
+        MCRPath src = MCRFileSystemUtils.checkPathAbsolute(source);
+        MCRPath tgt = MCRFileSystemUtils.checkPathAbsolute(target);
         MCRDirectory srcRootDirectory = getRootDirectory(src);
         MCRPath srcAbsolutePath = getAbsolutePathFromRootComponent(src);
         MCRFilesystemNode srcNode = srcRootDirectory.getChildByPath(srcAbsolutePath.toString());
@@ -421,7 +331,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         MCRDirectory tgtParentDir = getParentDirectory(tgt);
         if (srcNode instanceof MCRFile) {
             MCRFile srcFile = (MCRFile) srcNode;
-            MCRFile targetFile = getMCRFile(tgt, true, createNew);
+            MCRFile targetFile = MCRFileSystemUtils.getMCRFile(tgt, true, createNew);
             targetFile.setContentFrom(srcFile.getContentAsInputStream());
             if (copyOptions.contains(StandardCopyOption.COPY_ATTRIBUTES)) {
                 @SuppressWarnings("unchecked")
@@ -480,7 +390,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
      */
     @Override
     public boolean isSameFile(Path path, Path path2) throws IOException {
-        return checkPathAbsolute(path).equals(checkPathAbsolute(path2));
+        return MCRFileSystemUtils.checkPathAbsolute(path).equals(MCRFileSystemUtils.checkPathAbsolute(path2));
     }
 
     /* (non-Javadoc)
@@ -488,7 +398,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
      */
     @Override
     public boolean isHidden(Path path) throws IOException {
-        checkPathAbsolute(path);
+        MCRFileSystemUtils.checkPathAbsolute(path);
         return false;
     }
 
@@ -497,7 +407,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
      */
     @Override
     public FileStore getFileStore(Path path) throws IOException {
-        MCRPath mcrPath = checkPathAbsolute(path);
+        MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(path);
         if (mcrPath.getNameCount() > 0) {
             MCRDirectory parentDirectory = getParentDirectory(mcrPath);
             MCRFilesystemNode node = parentDirectory.getChild(mcrPath.getFileName().toString());
@@ -518,7 +428,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
      */
     @Override
     public void checkAccess(Path path, AccessMode... modes) throws IOException {
-        MCRPath mcrPath = checkPathAbsolute(path);
+        MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(path);
         if (mcrPath.getNameCount() == 0) {
             //handle root component
             MCRDirectory rootDirectory = MCRDirectory.getRootDirectory(mcrPath.getOwner());
@@ -570,7 +480,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
     @SuppressWarnings("unchecked")
     @Override
     public <V extends FileAttributeView> V getFileAttributeView(Path path, Class<V> type, LinkOption... options) {
-        MCRPath mcrPath = checkPathAbsolute(path);
+        MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(path);
         if (type == null) {
             throw new NullPointerException();
         }
@@ -585,17 +495,6 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         return (V) null;
     }
 
-    private static MCRPath checkPathAbsolute(Path path) {
-        MCRPath mcrPath = MCRPath.toMCRPath(path);
-        if (!(Objects.requireNonNull(mcrPath.getFileSystem(), "'path' requires a associated filesystem.").provider() instanceof MCRFileSystemProvider)) {
-            throw new ProviderMismatchException("Path does not match to this provider: " + path.toString());
-        }
-        if (!mcrPath.isAbsolute()) {
-            throw new InvalidPathException(mcrPath.toString(), "'path' must be absolute.");
-        }
-        return mcrPath;
-    }
-
     /* (non-Javadoc)
      * @see java.nio.file.spi.FileSystemProvider#readAttributes(java.nio.file.Path, java.lang.Class, java.nio.file.LinkOption[])
      */
@@ -603,7 +502,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
     @Override
     public <A extends BasicFileAttributes> A readAttributes(Path path, Class<A> type, LinkOption... options)
         throws IOException {
-        MCRPath mcrPath = checkPathAbsolute(path);
+        MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(path);
         MCRFilesystemNode node = resolvePath(mcrPath);
         Class<?> c = type;
         //must support BasicFileAttributeView
@@ -619,7 +518,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
     @Override
     public Map<String, Object> readAttributes(Path path, String attributes, LinkOption... options) throws IOException {
         // TODO Auto-generated method stub
-        MCRPath mcrPath = checkPathAbsolute(path);
+        MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(path);
         String[] s = splitAttrName(attributes);
         if (s[0].length() == 0) {
             throw new IllegalArgumentException(attributes);

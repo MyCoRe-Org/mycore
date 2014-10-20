@@ -31,6 +31,7 @@ import java.io.IOError;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.FileStore;
 import java.nio.file.InvalidPathException;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -304,6 +305,14 @@ public abstract class MCRPath implements Path {
 
     public String getOwner() {
         return root;
+    }
+
+    /**
+     * returns complete subpath.
+     * same as {@link #subpath(int, int)} with '0' and '{@link #getNameCount()}'.
+     */
+    public MCRPath subpathComplete() {
+        return isAbsolute() ? subpath(0, offsets.length) : this;
     }
 
     /* (non-Javadoc)
@@ -657,6 +666,21 @@ public abstract class MCRPath implements Path {
             final MCRPath normalized = (MCRPath) normalize();
             getFileSystem().provider().checkAccess(normalized); //eventually throws IOException
             return normalized;
+        }
+        throw new IOException("Cannot get real path from relative path.");
+    }
+
+    public Path toPhysicalPath() throws IOException {
+        if (isAbsolute()) {
+            for (FileStore fs : getFileSystem().getFileStores()) {
+                if (fs instanceof MCRAbstractFileStore) {
+                    Path physicalPath = ((MCRAbstractFileStore) fs).getPhysicalPath(this);
+                    if (physicalPath != null) {
+                        return physicalPath;
+                    }
+                }
+            }
+            return null;
         }
         throw new IOException("Cannot get real path from relative path.");
     }
