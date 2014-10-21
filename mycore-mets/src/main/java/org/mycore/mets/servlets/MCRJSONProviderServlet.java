@@ -56,11 +56,10 @@ public class MCRJSONProviderServlet extends MCRServlet {
             return;
         }
 
-        //TODO check if useExistingMets shall be set to false if the parameter is not set.
-        boolean useExistingMets = true;
-        useExistingMets = Boolean.valueOf(job.getRequest().getParameter("useExistingMets"));
-        MCRContent metsSource = MCRMETSServlet.getMetsSource(job, useExistingMets, derivate);
+        String useMets = job.getRequest().getParameter("useExistingMets");
+        boolean useExistingMets = useMets != null ? useExistingMets = Boolean.valueOf(useMets) : true;
 
+        MCRContent metsSource = MCRMETSServlet.getMetsSource(job, useExistingMets, derivate);
         Document metsDocument = metsSource.asXML();
 
         long start = System.currentTimeMillis();
@@ -75,12 +74,13 @@ public class MCRJSONProviderServlet extends MCRServlet {
         MCRJSONProvider provider = new MCRJSONProvider(metsDocument, derivate);
         json = provider.getJson();
 
-        LOGGER.debug("Generation of JSON (" + getClass().getSimpleName() + ") took " + (System.currentTimeMillis() - start) + " ms");
+        LOGGER.debug("Generation of JSON (" + getClass().getSimpleName() + ") took "
+            + (System.currentTimeMillis() - start) + " ms");
         HttpServletResponse response = job.getResponse();
         response.setContentType("application/x-json");
         response.setCharacterEncoding(MCRConfiguration.instance().getString("MCR.Request.CharEncoding", "UTF-8"));
         PrintWriter writer = response.getWriter();
-		writer.print(json);
+        writer.print(json);
         writer.flush();
         writer.close();
         return;
