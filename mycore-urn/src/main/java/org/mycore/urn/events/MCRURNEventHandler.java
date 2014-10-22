@@ -26,12 +26,16 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Document;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRBaseContent;
@@ -45,6 +49,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.urn.hibernate.MCRURN;
 import org.mycore.urn.services.MCRURNManager;
 
 /**
@@ -76,12 +81,13 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
             String type = obj.getId().getTypeId();
 
             MCRConfiguration conf = MCRConfiguration.instance();
-            String xPathString = conf.getString(" MCR.Persistence.URN.XPath." + type, conf.getString("MCR.Persistence.URN.XPath", ""));
+            String xPathString = conf.getString(" MCR.Persistence.URN.XPath." + type,
+                conf.getString("MCR.Persistence.URN.XPath", ""));
 
             if (!xPathString.isEmpty()) {
                 String urn = null;
-                XPathExpression<Object> xpath = XPathFactory.instance()
-                        .compile(xPathString, Filters.fpassthrough(), null, MCRConstants.getStandardNamespaces());
+                XPathExpression<Object> xpath = XPathFactory.instance().compile(xPathString, Filters.fpassthrough(),
+                    null, MCRConstants.getStandardNamespaces());
                 Object o = xpath.evaluateFirst(doc);
                 if (o instanceof Attribute) {
                     urn = ((Attribute) o).getValue();
@@ -100,7 +106,8 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
                 }
             }
         } catch (Exception ex) {
-            LOGGER.error("Could not store / update the urn for object with id " + obj.getId().toString() + " into the database", ex);
+            LOGGER.error("Could not store / update the urn for object with id " + obj.getId().toString()
+                + " into the database", ex);
         }
     }
 
@@ -194,7 +201,8 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
         for (MCRFileMetadata metadata : fileMetadata) {
             String fileURN = metadata.getUrn();
             if (urn != null) {
-                LOGGER.info(MessageFormat.format("load file urn : %s, %s, %s", fileURN, derivateID, metadata.getName()).toString());
+                LOGGER.info(MessageFormat.format("load file urn : %s, %s, %s", fileURN, derivateID, metadata.getName())
+                    .toString());
                 MCRURNManager.assignURN(fileURN, derivateID.toString(), metadata.getName());
             }
         }
@@ -202,9 +210,23 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
+        Criteria q = getSession().createCriteria(MCRURN.class);
+        q.add(Restrictions.isNull("path"));
+        q.add(Restrictions.isNull("filename"));
+        q.add(Restrictions.eq("key.mcrid", der.getId().toString()));
+
+        MCRURN entry = (MCRURN) q.uniqueResult();
+        if (entry != null) {
+            entry.setDfg(false);
+            getSession().update(entry);
+        }
         MCREvent indexEvent = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.INDEX_EVENT);
         indexEvent.put("derivate", der);
         MCREventManager.instance().handleEvent(indexEvent);
+    }
+
+    private Session getSession() {
+        return MCRHIBConnection.instance().getSession();
     }
 
     /* (non-Javadoc)
@@ -233,16 +255,16 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
             LOGGER.warn("Sorry, directories are currently not supported.");
             return;
         }
-    
+
         String derivateId = file.getOwnerID();
         String absolutePath = file.getAbsolutePath();
         String path = absolutePath.substring(0, absolutePath.lastIndexOf("/") + 1);
         String urn = MCRURNManager.getURNForFile(derivateId, path, file.getName());
-    
+
         if (urn == null) {
             return;
         }
-    
+
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateId));
         derivate.getDerivate().getOrCreateFileMetadata(file, urn);
         MCRMetadataManager.update(derivate);
