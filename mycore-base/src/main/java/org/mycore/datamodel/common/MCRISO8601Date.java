@@ -1,10 +1,8 @@
 package org.mycore.datamodel.common;
 
-import java.text.MessageFormat;
-import java.text.ParseException;
-import java.util.Date;
-import java.util.Locale;
-
+import com.ibm.icu.text.DateFormat;
+import com.ibm.icu.util.StringTokenizer;
+import com.ibm.icu.util.TimeZone;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -12,9 +10,10 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.mycore.common.config.MCRConfiguration;
 
-import com.ibm.icu.text.DateFormat;
-import com.ibm.icu.util.StringTokenizer;
-import com.ibm.icu.util.TimeZone;
+import java.text.MessageFormat;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * holds info about a specific point in time.
@@ -62,6 +61,12 @@ public class MCRISO8601Date {
             lang = locale;
         }
         return new Locale(lang, country);
+    }
+
+    public static MCRISO8601Date now() {
+        MCRISO8601Date instance = new MCRISO8601Date();
+        instance.setDateTime(new DateTime());
+        return instance;
     }
 
     /**
