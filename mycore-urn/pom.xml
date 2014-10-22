@@ -12,6 +12,8 @@
   <description>Component to support Uniform Resource Name (URN) in form of the National Bibliography Number (NBN) of the German National Library (urn:nbn:de)</description>
   <properties>
     <manifest.priority>85</manifest.priority>
+    <!-- TODO: remove -->
+    <forbiddenapis.skip>true</forbiddenapis.skip>
   </properties>
   <dependencies>
     <dependency>

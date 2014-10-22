@@ -27,7 +27,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
@@ -42,6 +44,10 @@ import org.mycore.datamodel.common.MCRISO8601Date;
 public class MCRMODSDateHelper {
 
     private static final String ISO8601 = "iso8601";
+
+    private static final TimeZone MODS_TIMEZONE = TimeZone.getTimeZone("UTC");
+
+    private static final Locale DATE_LOCALE = Locale.ROOT;
 
     private final static Map<String, String> formats = new HashMap<String, String>();
 
@@ -71,7 +77,7 @@ public class MCRMODSDateHelper {
         if ((text == null) || text.isEmpty())
             return null;
 
-        String encoding = element.getAttributeValue("encoding", "unknown").toLowerCase();
+        String encoding = element.getAttributeValue("encoding", "unknown").toLowerCase(DATE_LOCALE);
         String key = encoding + "-" + text.length();
 
         String format = formats.get(key);
@@ -84,7 +90,9 @@ public class MCRMODSDateHelper {
         }
 
         try {
-            return new SimpleDateFormat(format).parse(text);
+            SimpleDateFormat dateFormat = new SimpleDateFormat(format, DATE_LOCALE);
+            dateFormat.setTimeZone(MODS_TIMEZONE);
+            return dateFormat.parse(text);
         } catch (ParseException ex) {
             throw reportParseException(encoding, text, ex);
         }
@@ -101,7 +109,7 @@ public class MCRMODSDateHelper {
             return null;
         }
 
-        GregorianCalendar cal = new GregorianCalendar();
+        GregorianCalendar cal = new GregorianCalendar(MODS_TIMEZONE, DATE_LOCALE);
         cal.setTime(date);
         return cal;
     }
@@ -109,7 +117,9 @@ public class MCRMODSDateHelper {
     public static void setDate(Element element, Date date, String encoding) {
         String format = formats.get(encoding);
         if (format != null) {
-            String text = new SimpleDateFormat(format).format(date);
+            SimpleDateFormat dateFormat = new SimpleDateFormat(format, DATE_LOCALE);
+            dateFormat.setTimeZone(MODS_TIMEZONE);
+            String text = dateFormat.format(date);
             element.setText(text);
             encoding = encoding.split("-")[0];
         } else {

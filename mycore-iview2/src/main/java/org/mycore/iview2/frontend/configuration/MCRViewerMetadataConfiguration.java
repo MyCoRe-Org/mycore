@@ -1,5 +1,6 @@
 package org.mycore.iview2.frontend.configuration;
 
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,7 +36,10 @@ public class MCRViewerMetadataConfiguration extends MCRViewerConfiguration {
         // properties
         setProperty("objId", objectID.toString());
         String urlFormat = "%sreceive/%s?XSL.Transformer=%s";
-        setProperty("metadataURL", String.format(urlFormat, MCRFrontendUtil.getBaseURL(), objectID, MCRIView2Tools.getIView2Property("metadata.transformer")));
+        setProperty(
+            "metadataURL",
+            String.format(Locale.ROOT, urlFormat, MCRFrontendUtil.getBaseURL(), objectID,
+                MCRIView2Tools.getIView2Property("metadata.transformer")));
 
         // script
         addLocalScript("iview-client-metadata.js");

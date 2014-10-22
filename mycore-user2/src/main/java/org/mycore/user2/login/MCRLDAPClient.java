@@ -23,6 +23,7 @@
 package org.mycore.user2.login;
 
 import java.util.Hashtable;
+import java.util.Locale;
 
 import javax.naming.Context;
 import javax.naming.NameNotFoundException;
@@ -159,7 +160,8 @@ public class MCRLDAPClient {
         try {
             SearchControls controls = new SearchControls();
             controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-            NamingEnumeration<SearchResult> results = ctx.search(baseDN, String.format(uidFilter, userName), controls);
+            NamingEnumeration<SearchResult> results = ctx.search(baseDN,
+                String.format(Locale.ROOT, uidFilter, userName), controls);
 
             while (results.hasMore()) {
                 SearchResult searchResult = results.next();
@@ -233,8 +235,10 @@ public class MCRLDAPClient {
             user = new MCRUser(userName, realmID);
         }
 
-        LOGGER.info("\n" + new XMLOutputter(Format.getPrettyFormat()).outputString(MCRUserTransformer.buildExportableSafeXML(user)));
+        LOGGER.info("\n"
+            + new XMLOutputter(Format.getPrettyFormat()).outputString(MCRUserTransformer.buildExportableSafeXML(user)));
         MCRLDAPClient.instance().updateUserProperties(user);
-        LOGGER.info("\n" + new XMLOutputter(Format.getPrettyFormat()).outputString(MCRUserTransformer.buildExportableSafeXML(user)));
+        LOGGER.info("\n"
+            + new XMLOutputter(Format.getPrettyFormat()).outputString(MCRUserTransformer.buildExportableSafeXML(user)));
     }
 }

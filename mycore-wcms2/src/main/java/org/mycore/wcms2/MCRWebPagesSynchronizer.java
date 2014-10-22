@@ -32,6 +32,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.FileChannel;
+import java.util.Locale;
 
 import javax.servlet.ServletContext;
 
@@ -128,13 +129,13 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
         File webappBaseDir = getWebAppBaseDir();
         File webappTarget = new File(webappBaseDir, cleanPath);
         if (!webappTarget.toPath().startsWith(webappBaseDir.toPath())) {
-            throw new IOException(String.format("Cannot write %s outside the web application: %s", webappTarget,
-                webappBaseDir));
+            throw new IOException(String.format(Locale.ROOT, "Cannot write %s outside the web application: %s",
+                webappTarget, webappBaseDir));
         }
         File wcmsDataDirTarget = new File(wcmsDataDir, cleanPath);
         createDirectoryIfNeeded(webappTarget);
         createDirectoryIfNeeded(wcmsDataDirTarget);
-        LOGGER.info(String.format("Writing content to %s and to %s.", webappTarget, wcmsDataDirTarget));
+        LOGGER.info(String.format(Locale.ROOT, "Writing content to %s and to %s.", webappTarget, wcmsDataDirTarget));
         return new TeeOutputStream(new FileOutputStream(wcmsDataDirTarget), new FileOutputStream(webappTarget));
     }
 
@@ -142,7 +143,7 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
         File targetDirectory = targetFile.getParentFile();
         if (!targetDirectory.isDirectory()) {
             if (!targetDirectory.mkdirs()) {
-                throw new IOException(String.format("Could not create directory: %s", targetDirectory));
+                throw new IOException(String.format(Locale.ROOT, "Could not create directory: %s", targetDirectory));
             }
         }
     }
@@ -156,7 +157,7 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
      * @throws MalformedURLException
      */
     public static URL getURL(String path) throws MalformedURLException {
-        String cleanPath = path.startsWith("/") ? path : String.format("/%s", path);
+        String cleanPath = path.startsWith("/") ? path : String.format(Locale.ROOT, "/%s", path);
         return SERVLET_CONTEXT.getResource(cleanPath);
     }
 
@@ -167,7 +168,7 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
      * @return null, if no resource with that path could be found
      */
     public InputStream getInputStream(String path) {
-        String cleanPath = path.startsWith("/") ? path : String.format("/%s", path);
+        String cleanPath = path.startsWith("/") ? path : String.format(Locale.ROOT, "/%s", path);
         return SERVLET_CONTEXT.getResourceAsStream(cleanPath);
     }
 
@@ -233,8 +234,8 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
         }
         boolean successTimestampOp = destFile.setLastModified(srcFile.lastModified());
         if (!successTimestampOp) {
-            LOGGER.warn(String
-                .format("Could not change timestamp for %s. Index synchronization may be slow.", destFile));
+            LOGGER.warn(String.format(Locale.ROOT,
+                "Could not change timestamp for %s. Index synchronization may be slow.", destFile));
         }
     }
 
@@ -246,7 +247,7 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
         }
         if (file.exists()) {
             if (!file.delete()) {
-                LOGGER.warn(String.format("Could not delete %s.", file));
+                LOGGER.warn(String.format(Locale.ROOT, "Could not delete %s.", file));
             }
         }
     }

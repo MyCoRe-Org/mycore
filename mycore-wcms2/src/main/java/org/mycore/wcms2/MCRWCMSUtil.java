@@ -95,7 +95,7 @@ public abstract class MCRWCMSUtil {
         XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
         StringWriter stringWriter = new StringWriter();
         out.output(doc, stringWriter);
-        return stringWriter.toString().getBytes();
+        return stringWriter.toString().getBytes(StandardCharsets.UTF_8);
     }
 
     private static boolean saveInOldFormat() {

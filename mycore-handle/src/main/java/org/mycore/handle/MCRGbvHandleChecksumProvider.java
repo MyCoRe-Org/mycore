@@ -3,11 +3,12 @@
  */
 package org.mycore.handle;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
 import org.mycore.urn.services.MCRIConcordanceTable;
-
 
 /**
  * Class provides functionality for calculating the checksum of a {@link MCRHandle}. 
@@ -15,6 +16,8 @@ import org.mycore.urn.services.MCRIConcordanceTable;
  * @author shermann
  */
 public class MCRGbvHandleChecksumProvider {
+
+    private static final Charset HANDLE_CHARSET = StandardCharsets.UTF_8;
 
     /**
      * Calculates the checksum of the given handle. 
@@ -25,7 +28,7 @@ public class MCRGbvHandleChecksumProvider {
     public int checksum(MCRHandle handle) {
         String combine = MCRGbvHandleProvider.URN_PREFIX + handle.getLocalName();
 
-        byte[] bytes = combine.getBytes();
+        byte[] bytes = combine.getBytes(HANDLE_CHARSET);
 
         Checksum chk = new CRC32();
         chk.update(bytes, 0, bytes.length);

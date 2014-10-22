@@ -10,6 +10,9 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>mycore-base</artifactId>
   <name>MyCoRe Base Components</name>
+  <properties>
+    <forbiddenapis.skip>true</forbiddenapis.skip>
+  </properties>
   <build>
     <resources>
       <resource>
@@ -344,4 +347,5 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
+
 </project>

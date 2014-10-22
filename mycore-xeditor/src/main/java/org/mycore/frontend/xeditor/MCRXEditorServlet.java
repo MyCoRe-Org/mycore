@@ -24,6 +24,7 @@
 package org.mycore.frontend.xeditor;
 
 import java.util.Enumeration;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -74,7 +75,7 @@ public class MCRXEditorServlet extends MCRServlet {
                 if (name.endsWith(".x") || name.endsWith(".y")) // input type="image"
                     name = name.substring(0, name.length() - 2);
 
-                targetID = name.split("[_\\:]")[3].toLowerCase();
+                targetID = name.split("[_\\:]")[3].toLowerCase(Locale.ROOT);
                 parameter = name.substring(TARGET_PATTERN.length() + targetID.length());
                 if (!parameter.isEmpty())
                     parameter = parameter.substring(1);

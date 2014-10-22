@@ -25,11 +25,13 @@ package org.mycore.frontend.indexbrowser;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
@@ -71,11 +73,20 @@ public final class MCRGoogleSitemapCommon {
     /** The logger */
     private static Logger LOGGER = Logger.getLogger(MCRGoogleSitemapCommon.class.getName());
 
+    /** Zone information **/
+    private static final Locale SITEMAP_LOCALE = Locale.ROOT;
+
+    private static final TimeZone SITEMAP_TIMEZONE = TimeZone.getTimeZone("UTC");
+
     /** The namespaces */
     private static final Namespace ns = Namespace.getNamespace("http://www.sitemaps.org/schemas/sitemap/0.9");
+
     private final static String XSI_URL = "http://www.w3.org/2001/XMLSchema-instance";
+
     private final static Namespace XSI_NAMESPACE = Namespace.getNamespace("xsi", XSI_URL);
+
     private final static String SITEINDEX_SCHEMA = "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd";
+
     private final static String SITEMAP_SCHEMA = "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd";
 
     /** The base URL */
@@ -88,7 +99,8 @@ public final class MCRGoogleSitemapCommon {
     private static final String cdir = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Directory", "");
 
     /** The types to build sitemaps */
-    private static final String[] types = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Types", "document").split(",");
+    private static final String[] types = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Types", "document")
+        .split(",");
 
     /** The frequence of crawle by Google */
     private static final String freq = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Freq", "monthly");
@@ -97,7 +109,8 @@ public final class MCRGoogleSitemapCommon {
     private static final String style = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Style", "");
 
     /** The url path for retrieving object metadata */
-    private static final String objectPath = MCRConfiguration.instance().getString("MCR.GoogleSitemap.ObjectPath", "receive/");
+    private static final String objectPath = MCRConfiguration.instance().getString("MCR.GoogleSitemap.ObjectPath",
+        "receive/");
 
     /** Number of URLs in one sitemap */
     private static int numberOfURLs = MCRConfiguration.instance().getInt("MCR.GoogleSitemap.NumberOfURLs", 10000);
@@ -106,10 +119,10 @@ public final class MCRGoogleSitemapCommon {
     private static final MCRXMLMetadataManager tm = MCRXMLMetadataManager.instance();
 
     /** number format for parts */
-    private static DecimalFormat number_format = new DecimalFormat("00000");
-    
+    private static NumberFormat number_format = getNumberFormat();
+
     /** date formatter */
-    private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+    private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", SITEMAP_LOCALE);
 
     /** local data */
     private List<MCRObjectIDDate> objidlist = null;
@@ -125,6 +138,12 @@ public final class MCRGoogleSitemapCommon {
                 sitemap_directory.mkdirs();
             }
         }
+    }
+
+    private static NumberFormat getNumberFormat() {
+        NumberFormat nf = NumberFormat.getIntegerInstance(SITEMAP_LOCALE);
+        nf.setMinimumFractionDigits(5);
+        return nf;
     }
 
     public MCRGoogleSitemapCommon(String baseURL) {
@@ -220,7 +239,8 @@ public final class MCRGoogleSitemapCommon {
         int stop = numberOfURLs * (number + 1);
         if (stop > objidlist.size())
             stop = objidlist.size();
-        LOGGER.debug("Build Google URL in range from " + Integer.toString(start) + " to " + Integer.toString(stop - 1) + ".");
+        LOGGER.debug("Build Google URL in range from " + Integer.toString(start) + " to " + Integer.toString(stop - 1)
+            + ".");
         for (int i = start; i < stop; i++) {
             MCRObjectIDDate objectIDDate = objidlist.get(i);
             urlset.addContent(buildURLElement(objectIDDate));
@@ -266,7 +286,7 @@ public final class MCRGoogleSitemapCommon {
             StringBuilder sb = new StringBuilder(128);
             sb.append(baseurl).append(getFileName(i + 2, false));
             sitemap.addContent(new Element("loc", ns).addContent(sb.toString().trim()));
-            String datestr = formatter.format((new GregorianCalendar()).getTime());
+            String datestr = formatter.format((new GregorianCalendar(SITEMAP_TIMEZONE, SITEMAP_LOCALE)).getTime());
             sitemap.addContent(new Element("lastmod", ns).addContent(datestr.trim()));
         }
         return jdom;
@@ -276,7 +296,7 @@ public final class MCRGoogleSitemapCommon {
      * This method remove all sitemap files from the webapps directory.
      */
     protected final void removeSitemapFiles() {
-        File dir = new File(webappBaseDir,cdir);
+        File dir = new File(webappBaseDir, cdir);
         File[] li = dir.listFiles();
         if (li != null) {
             for (File fi : li) {

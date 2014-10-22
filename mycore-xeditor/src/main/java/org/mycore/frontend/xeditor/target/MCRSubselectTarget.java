@@ -23,7 +23,7 @@
 
 package org.mycore.frontend.xeditor.target;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletContext;
 
@@ -45,7 +45,8 @@ public class MCRSubselectTarget implements MCREditorTarget {
 
     private final static Logger LOGGER = Logger.getLogger(MCRSubselectTarget.class);
 
-    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter) throws Exception {
+    public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter)
+        throws Exception {
         session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
 
         int pos = parameter.lastIndexOf(":");
@@ -67,16 +68,12 @@ public class MCRSubselectTarget implements MCREditorTarget {
     }
 
     public static String encode(String href) {
-        try {
-            return Hex.encodeHexString(href.getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException ex) {
-            throw new MCRException(ex);
-        }
+        return Hex.encodeHexString(href.getBytes(StandardCharsets.UTF_8));
     }
 
     public static String decode(String href) {
         try {
-            return new String(Hex.decodeHex(href.toCharArray()));
+            return new String(Hex.decodeHex(href.toCharArray()), StandardCharsets.UTF_8);
         } catch (DecoderException ex) {
             throw new MCRException(ex);
         }

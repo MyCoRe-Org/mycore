@@ -1,5 +1,7 @@
 package org.mycore.iview2.frontend.configuration;
 
+import java.util.Locale;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -22,12 +24,12 @@ public class MCRViewerDefaultConfigurationStrategy implements MCRViewerConfigura
     protected boolean isPDF(HttpServletRequest request) {
         // well, this is the best test to check the type, for sure!
         String filePath = MCRViewerConfiguration.getFilePath(request);
-        return filePath.toLowerCase().endsWith(".pdf");
+        return filePath.toLowerCase(Locale.ROOT).endsWith(".pdf");
     }
 
     protected MCRViewerConfiguration getPDF(HttpServletRequest request) {
-        return MCRViewerConfigurationBuilder.pdf(request)
-            .mixin(MCRViewerConfigurationBuilder.plugins(request).get()).get();
+        return MCRViewerConfigurationBuilder.pdf(request).mixin(MCRViewerConfigurationBuilder.plugins(request).get())
+            .get();
     }
 
     protected MCRViewerConfiguration getMETS(HttpServletRequest request) {

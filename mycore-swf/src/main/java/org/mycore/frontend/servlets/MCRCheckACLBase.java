@@ -23,8 +23,8 @@
 
 package org.mycore.frontend.servlets;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +56,7 @@ import org.xml.sax.SAXParseException;
 abstract public class MCRCheckACLBase extends MCRCheckBase {
 
     private static final long serialVersionUID = 1L;
+
     private static Logger LOGGER = Logger.getLogger(MCRCheckACLBase.class);
 
     /**
@@ -121,7 +122,8 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    abstract public boolean storeService(Element outelm, MCRServletJob job, MCRObjectID ID) throws MCRException, SAXParseException, IOException;
+    abstract public boolean storeService(Element outelm, MCRServletJob job, MCRObjectID ID) throws MCRException,
+        SAXParseException, IOException;
 
     /**
      * The method read the incoming servacls JDOM tree in a MCRService and
@@ -181,7 +183,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                                             }
                                             if (k == 1) {
                                                 String inbooloper = anInbool.getAttributeValue("operator");
-                                                if ((inbooloper != null) && inbooloper.toLowerCase().equals("and")) {
+                                                if ((inbooloper != null) && inbooloper.equalsIgnoreCase("and")) {
                                                     Element newtrue = new Element("boolean");
                                                     newtrue.setAttribute("operator", "true");
                                                     anInbool.addContent(newtrue);
@@ -235,7 +237,8 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
      * @param lang
      *            the current language
      */
-    private void errorHandlerValid(MCRServletJob job, List<String> logtext, MCRObjectID ID, String lang) throws Exception {
+    private void errorHandlerValid(MCRServletJob job, List<String> logtext, MCRObjectID ID, String lang)
+        throws Exception {
         if (logtext.size() == 0) {
             return;
         }
@@ -247,7 +250,8 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
 
         // prepare editor with error messages
         String pagedir = MCRConfiguration.instance().getString("MCR.SWF.PageDir", "");
-        String myfile = pagedir + MCRConfiguration.instance().getString("MCR.SWF.PageErrorFormular", "editor_error_formular.xml");
+        String myfile = pagedir
+            + MCRConfiguration.instance().getString("MCR.SWF.PageErrorFormular", "editor_error_formular.xml");
         Document jdom;
 
         try {
@@ -264,7 +268,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
             List<Element> sectionlist = root.getChildren("section");
 
             for (Element section : sectionlist) {
-                if (!section.getAttributeValue("lang", Namespace.XML_NAMESPACE).equals(lang.toLowerCase())) {
+                if (!section.getAttributeValue("lang", Namespace.XML_NAMESPACE).equalsIgnoreCase(lang)) {
                     continue;
                 }
 
@@ -295,7 +299,8 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
 
                 // the edit button
                 Element form = section.getChild("form");
-                form.setAttribute("action", job.getResponse().encodeRedirectURL(getBaseURL() + "servlets/MCRStartEditorServlet"));
+                form.setAttribute("action",
+                    job.getResponse().encodeRedirectURL(getBaseURL() + "servlets/MCRStartEditorServlet"));
 
                 Element input1 = new Element("input");
                 input1.setAttribute("name", "lang");
@@ -323,5 +328,5 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
         job.getRequest().setAttribute("XSL.Style", lang);
         getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(jdom));
     }
-    
+
 }

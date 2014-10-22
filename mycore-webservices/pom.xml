@@ -11,6 +11,7 @@
   <name>MyCoRe Webservices</name>
   <properties>
     <manifest.priority>72</manifest.priority>
+    <forbiddenapis.skip>true</forbiddenapis.skip>
   </properties>
   <dependencies>
     <dependency>

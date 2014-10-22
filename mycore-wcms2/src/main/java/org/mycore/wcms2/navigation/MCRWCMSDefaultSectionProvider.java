@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Content;
@@ -95,8 +96,8 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
      * Returns true if an element and all childs are HTML or Mycore Tags
      */
     private boolean isHTMLElment(Element element) {
-        if (HTML_TAG_LIST.contains(element.getName().toLowerCase())
-            || MYCORE_TAG_LIST.contains(element.getName().toLowerCase())) {
+        if (HTML_TAG_LIST.contains(element.getName().toLowerCase(Locale.ROOT))
+            || MYCORE_TAG_LIST.contains(element.getName().toLowerCase(Locale.ROOT))) {
             boolean valid = true;
             for (Element el : element.getChildren()) {
                 valid = valid & isHTMLElment(el);

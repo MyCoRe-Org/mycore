@@ -207,7 +207,7 @@ public class MCRURNManager {
      * correct.
      */
     public static boolean isValid(String urn) {
-        if (urn == null || urn.length() < 14 || !urn.startsWith("urn:nbn:") || !urn.toLowerCase().equals(urn)) {
+        if (urn == null || urn.length() < 14 || !urn.startsWith("urn:nbn:") || !urn.equalsIgnoreCase(urn)) {
             return false;
         } else {
             String start = urn.substring(0, urn.length() - 1);

@@ -54,7 +54,7 @@ public class MCRViewerConfiguration {
     private static boolean DEBUG_MODE;
 
     static {
-        DEBUG_MODE = Boolean.valueOf(MCRIView2Tools.getIView2Property("DeveloperMode", "false").toLowerCase());
+        DEBUG_MODE = Boolean.parseBoolean(MCRIView2Tools.getIView2Property("DeveloperMode", "false"));
     }
 
     public MCRViewerConfiguration() {

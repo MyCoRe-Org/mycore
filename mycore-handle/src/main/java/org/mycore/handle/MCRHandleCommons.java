@@ -4,6 +4,7 @@
 package org.mycore.handle;
 
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
@@ -35,7 +36,7 @@ public class MCRHandleCommons {
     static final String HANDLE_MAIL = "thulb_handle@listserv.uni-jena.de";
 
     /** the format timestamps must be in */
-    static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
+    static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss", Locale.ROOT);
 
     /**
      * The url to the gbv object repository.

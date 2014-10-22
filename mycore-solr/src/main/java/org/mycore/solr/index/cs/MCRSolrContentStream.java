@@ -5,6 +5,8 @@ import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
@@ -51,7 +53,7 @@ public class MCRSolrContentStream extends MCRSolrAbstractContentStream<MCRConten
         getTransformer().transform(content, out);
         byte[] byteArray = out.toByteArray();
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(new String(byteArray, Charsets.UTF_8));
+            LOGGER.debug(new String(byteArray, StandardCharsets.UTF_8));
         }
         this.setSourceInfo(content.getSystemId());
         try {
@@ -69,6 +71,12 @@ public class MCRSolrContentStream extends MCRSolrAbstractContentStream<MCRConten
 
     public static MCRContentTransformer getTransformer() {
         return TRANSFORMER;
+    }
+
+    @Override
+    protected Charset getCharset() {
+        String encoding = super.source.getEncoding();
+        return encoding == null ? null : Charset.forName(encoding);
     }
 
 }

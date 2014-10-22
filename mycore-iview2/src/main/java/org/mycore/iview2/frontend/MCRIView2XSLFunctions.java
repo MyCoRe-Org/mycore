@@ -132,7 +132,7 @@ public class MCRIView2XSLFunctions {
         NamedNodeMap attributes = base.getAttributes();
         for (int i = 0; i < attributes.getLength(); i++) {
             Attr attr = (Attr) attributes.item(i);
-            if (attr.getLocalName().toLowerCase().equals("id") && attr.getNodeValue().equals(ID)) {
+            if (attr.getLocalName().equalsIgnoreCase("id") && attr.getNodeValue().equals(ID)) {
                 return base;
             }
         }

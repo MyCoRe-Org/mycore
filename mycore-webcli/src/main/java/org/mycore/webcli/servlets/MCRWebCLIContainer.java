@@ -15,11 +15,11 @@
 package org.mycore.webcli.servlets;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -302,7 +302,7 @@ class MCRWebCLIContainer {
             LOGGER.info("Writing unprocessed commands to file " + file.getAbsolutePath());
 
             try {
-                PrintWriter pw = new PrintWriter(new FileWriter(file));
+                PrintWriter pw = new PrintWriter(file, Charset.defaultCharset().name());
                 if (lastCommand != null) {
                     pw.println(lastCommand);
                 }
