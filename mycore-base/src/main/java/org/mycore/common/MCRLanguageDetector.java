@@ -27,6 +27,9 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import com.ibm.icu.lang.UCharacter;
+import com.ibm.icu.lang.UScript;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -45,20 +48,18 @@ public class MCRLanguageDetector {
     private static Properties endings = new Properties();
 
     static {
-        words
-                .put(
-                        "de",
-                        "als am auch auf aus bei bis das dem den der deren derer des dessen die dies diese dieser dieses ein eine einer eines einem für hat im ist mit sich sie über und vom von vor wie zu zum zur");
-        words.put("en", "a and are as at do for from has have how its like new of on or the their through to with you your");
-        words
-                .put(
-                        "fr",
-                        "la le les un une des, à aux de pour par sur comme aussi jusqu'à jusqu'aux quel quels quelles laquelle lequel lesquelles lesquelles auxquels auxquelles avec sans ont sont duquel desquels desquelles quand");
+        words.put(
+                "de",
+                "als am auch auf aus bei bis das dem den der deren derer des dessen die dies diese dieser dieses ein eine einer eines einem für hat im ist mit sich sie über und vom von vor wie zu zum zur");
+        words.put("en",
+                "a and are as at do for from has have how its like new of on or the their through to with you your");
+        words.put(
+                "fr",
+                "la le les un une des, à aux de pour par sur comme aussi jusqu'à jusqu'aux quel quels quelles laquelle lequel lesquelles lesquelles auxquels auxquelles avec sans ont sont duquel desquels desquelles quand");
 
         endings.put("en", "ar ble cal ce ced ed ent ic ies ing ive ness our ous ons ral th ure y");
-        endings
-                .put("de",
-                        "ag chen gen ger iche icht ig ige isch ische ischen kar ker keit ler mus nen ner rie rer ter ten trie tz ung yse");
+        endings.put("de",
+                "ag chen gen ger iche icht ig ige isch ische ischen kar ker keit ler mus nen ner rie rer ter ten trie tz ung yse");
         endings.put("fr", "é, és, ée, ées, euse, euses, ème, euil, asme, isme, aux");
     }
 
@@ -97,6 +98,43 @@ public class MCRLanguageDetector {
         return score;
     }
 
+    public static String detectLanguageByCharacter(String text) {
+        if (text == null || text.length() == 0) {
+            LOGGER.warn("The text for language detection is null or empty");
+            return null;
+        }
+        LOGGER.debug("Detecting language of [" + text + "]");
+        int code;
+        try {
+            char[] chararray = text.toCharArray();
+            for (int i = 0; i < text.length(); i++) {
+                code = UScript.getScript(UCharacter.codePointAt(chararray, i));
+                switch (code) {
+                case UScript.ARABIC:
+                    LOGGER.debug("The language looks like ARABIC");
+                    return "ar";
+                case UScript.GREEK:
+                    LOGGER.debug("The language looks like GREEK");
+                    return "el";
+                case UScript.HAN:
+                    LOGGER.debug("The language looks like HAN");
+                    return "zh";
+                case UScript.HEBREW:
+                    LOGGER.debug("The language looks like HEBREW");
+                    return "he";
+                case UScript.JAPANESE:
+                    LOGGER.debug("The language looks like JAPANESE");
+                    return "ja";
+                case UScript.KATAKANA:
+                    LOGGER.debug("The language looks like KATAKANA");
+                    return "ja";
+                }
+            }
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
     /**
      * Detects the language of a given text string.
      * 
@@ -106,19 +144,21 @@ public class MCRLanguageDetector {
     public static String detectLanguage(String text) {
         LOGGER.debug("Detecting language of [" + text + "]");
 
-        String bestLanguage = null;
-        int bestScore = 0;
+        String bestLanguage = detectLanguageByCharacter(text);
 
-        Enumeration languages = words.keys();
-        while (languages.hasMoreElements()) {
-            String language = (String) languages.nextElement();
-            String wordList = words.getProperty(language);
-            String endingList = endings.getProperty(language);
+        if (bestLanguage == null) {
+            int bestScore = 0;
+            Enumeration languages = words.keys();
+            while (languages.hasMoreElements()) {
+                String language = (String) languages.nextElement();
+                String wordList = words.getProperty(language);
+                String endingList = endings.getProperty(language);
 
-            int score = buildScore(text, language, wordList, endingList);
-            if (score > bestScore) {
-                bestLanguage = language;
-                bestScore = score;
+                int score = buildScore(text, language, wordList, endingList);
+                if (score > bestScore) {
+                    bestLanguage = language;
+                    bestScore = score;
+                }
             }
         }
 
