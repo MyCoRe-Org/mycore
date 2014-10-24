@@ -23,7 +23,23 @@
 
 package org.mycore.iview2.frontend;
 
-import java.awt.Graphics2D;
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+import org.jdom2.JDOMException;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.imagetiler.MCRImage;
+import org.mycore.imagetiler.MCRTiledPictureProps;
+import org.mycore.iview2.services.MCRIView2Tools;
+
+import javax.imageio.*;
+import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
+import javax.imageio.stream.ImageOutputStream;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -35,27 +51,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
-import javax.imageio.stream.ImageOutputStream;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-import org.jdom2.JDOMException;
-import org.mycore.frontend.servlets.MCRServlet;
-import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.imagetiler.MCRImage;
-import org.mycore.imagetiler.MCRTiledPictureProps;
-import org.mycore.iview2.services.MCRIView2Tools;
 
 /**
  * Combines tiles of an image in specific resolutions.
@@ -231,7 +226,7 @@ public class MCRTileCombineServlet extends MCRServlet {
             throw ex;
         }
         //check for thumnail
-        final File iviewFile = (File) job.getRequest().getAttribute(THUMBNAIL_KEY);
+        final File iviewFile = ((Path) job.getRequest().getAttribute(THUMBNAIL_KEY)).toFile();
         final BufferedImage combinedImage = (BufferedImage) job.getRequest().getAttribute(IMAGE_KEY);
         if (iviewFile != null && combinedImage == null) {
             sendThumbnail(iviewFile, job.getResponse());

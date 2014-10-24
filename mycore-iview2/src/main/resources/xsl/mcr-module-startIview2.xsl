@@ -60,7 +60,7 @@
     <xsl:param name="file" />
     <xsl:param name="derivateID" />
     <div class="container">
-      <a class="thumbnail col-md-12" href="{concat($WebApplicationBaseURL,'rsc/viewer/', $derivateID, $file)}">
+      <a class="thumbnail col-md-12" href="{concat($WebApplicationBaseURL,'rsc/viewer/', $derivateID, '/', $file)}">
         <xsl:call-template name="iview2.getImageElement">
           <xsl:with-param name="derivate" select="$derivateID" />
           <xsl:with-param name="imagePath" select="$file" />
