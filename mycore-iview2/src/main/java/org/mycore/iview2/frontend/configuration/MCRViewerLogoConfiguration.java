@@ -1,9 +1,9 @@
 package org.mycore.iview2.frontend.configuration;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.mycore.frontend.MCRFrontendUtil;
+        import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.iview2.services.MCRIView2Tools;
+
+import javax.servlet.http.HttpServletRequest;
 
 public class MCRViewerLogoConfiguration extends MCRViewerConfiguration {
 
@@ -12,14 +12,18 @@ public class MCRViewerLogoConfiguration extends MCRViewerConfiguration {
         super.setup(request);
         String logoURL = MCRIView2Tools.getIView2Property("logo.URL");
         if (logoURL != null) {
-            this.addLocalScript("iview-client-logo.js");
-            this.setProperty("logoURL", MCRFrontendUtil.getBaseURL() + logoURL);
+            String framedParameter = request.getParameter("frame");
+            if (framedParameter == null || !Boolean.parseBoolean(framedParameter)) {
+                this.addLocalScript("iview-client-logo.js");
+                this.setProperty("logoURL", MCRFrontendUtil.getBaseURL() + logoURL);
 
-            String logoCssProperty = MCRIView2Tools.getIView2Property("logo.css");
-            if(logoCssProperty != null) {
-                this.addCSS(MCRFrontendUtil.getBaseURL() + logoCssProperty);
+                String logoCssProperty = MCRIView2Tools.getIView2Property("logo.css");
+                if (logoCssProperty != null) {
+                    this.addCSS(MCRFrontendUtil.getBaseURL() + logoCssProperty);
+                }
             }
         }
+
         return this;
     }
 

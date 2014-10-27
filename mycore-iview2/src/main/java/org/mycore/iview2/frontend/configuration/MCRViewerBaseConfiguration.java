@@ -1,10 +1,10 @@
 package org.mycore.iview2.frontend.configuration;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Base configuration for the mycore image viewer. Sets the following parameter:
@@ -39,7 +39,12 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
             addLocalScript("iview-client-mobile.js");
             addLocalCSS("mobile.css");
         } else {
-            addLocalScript("iview-client-desktop.js");
+            if(this.isFramed(request)){
+                addLocalScript("iview-client-frame.js");
+            } else {
+                addLocalScript("iview-client-desktop.js");
+            }
+
             addLocalCSS("default.css");
         }
         return this;
@@ -48,10 +53,15 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
     protected boolean isMobile(HttpServletRequest req) {
         String mobileParameter = req.getParameter("mobile");
         if (mobileParameter != null) {
-            return Boolean.TRUE.toString().equalsIgnoreCase(mobileParameter);
+            return Boolean.parseBoolean(mobileParameter);
         } else {
             return req.getHeader("User-Agent").indexOf("Mobile") != -1;
         }
+    }
+
+    protected boolean isFramed(HttpServletRequest req) {
+        String frameParameter = req.getParameter("frame");
+        return frameParameter != null && Boolean.parseBoolean(frameParameter);
     }
 
     public abstract String getDocType(HttpServletRequest request);
