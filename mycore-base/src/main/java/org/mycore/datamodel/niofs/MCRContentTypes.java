@@ -24,7 +24,6 @@
 package org.mycore.datamodel.niofs;
 
 import java.io.IOException;
-import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.spi.FileTypeDetector;
@@ -42,7 +41,15 @@ public class MCRContentTypes {
 
     private static final Logger LOGGER = Logger.getLogger(MCRContentTypes.class);
 
-    private static List<FileTypeDetector> fileTypeDetectors = getInstalledDetectors();
+    private static List<FileTypeDetector> fileTypeDetectors;
+
+    static {
+        try {
+            fileTypeDetectors = getInstalledDetectors();
+        } catch (Exception exc) {
+            LOGGER.error("Unable to retrieve installed file type detectors", exc);
+        }
+    }
 
     private MCRContentTypes() {
     }

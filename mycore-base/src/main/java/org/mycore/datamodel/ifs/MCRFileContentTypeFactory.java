@@ -27,8 +27,10 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.HashSet;
 
+import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRArgumentChecker;
+import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xml.MCRURIResolver;
@@ -49,8 +51,11 @@ import org.mycore.common.xml.MCRURIResolver;
  * @author Frank Lützenkirchen
  */
 public class MCRFileContentTypeFactory {
+
+    static final Logger LOGGER = Logger.getLogger(MCRURIResolver.class);
+
     /** Table for looking up all file content types by ID */
-    protected static Hashtable typesTable = new Hashtable();
+    protected static Hashtable<String, MCRFileContentType> typesTable = new Hashtable<>();
 
     /** The default file content type if unknown */
     protected static MCRFileContentType defaultType;
@@ -67,7 +72,11 @@ public class MCRFileContentTypeFactory {
         String file = config.getString("MCR.IFS.FileContentTypes.DefinitionFile");
 
         Element xml = MCRURIResolver.instance().resolve("resource:" + file);
-        List types = xml.getChildren("type");
+        if (xml == null) {
+            throw new MCRException("Unable to initialize file content type factory because '" + file
+                + "' does not exist! Check the MCR.IFS.FileContentTypes.DefinitionFile property.");
+        }
+        List<Element> types = xml.getChildren("type");
 
         for (Object type1 : types) {
             // Build file content type from XML element
@@ -112,7 +121,7 @@ public class MCRFileContentTypeFactory {
         String msg = "There is no file content type with ID = " + ID + " configured";
         throw new MCRConfigurationException(msg);
     }
-    
+
     /**
      * Returns the file content type with the given mime type
      * 
@@ -124,12 +133,12 @@ public class MCRFileContentTypeFactory {
      *             if no such file content type is known in the system
      */
     public static MCRFileContentType getTypeByMimeType(String mimeType) throws MCRConfigurationException {
-        HashSet<String> types = new HashSet( typesTable.keySet() );
-        
-        for ( String key : types ) {
-            MCRFileContentType contentType = (MCRFileContentType)typesTable.get(key);
-            
-            if ( mimeType.equals( contentType.getMimeType() ) )
+        HashSet<String> types = new HashSet(typesTable.keySet());
+
+        for (String key : types) {
+            MCRFileContentType contentType = (MCRFileContentType) typesTable.get(key);
+
+            if (mimeType.equals(contentType.getMimeType()))
                 return (MCRFileContentType) typesTable.get(key);
         }
         String msg = "There is no file content type for mime type = " + mimeType + " configured";

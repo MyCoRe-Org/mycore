@@ -116,13 +116,22 @@ public final class MCRURIResolver implements URIResolver {
 
     private static final String CONFIG_PREFIX = "MCR.URIResolver.";
 
-    private static final MCRResolverProvider EXT_RESOLVER = getExternalResolverProvider();
+    private static MCRResolverProvider EXT_RESOLVER;
 
-    private static final MCRURIResolver singleton = new MCRURIResolver();
+    private static MCRURIResolver singleton;
 
     private static ServletContext context;
 
     final static String SESSION_OBJECT_NAME = "URI_RESOLVER_DEBUG";
+
+    static {
+        try {
+            EXT_RESOLVER = getExternalResolverProvider();
+            singleton = new MCRURIResolver();
+        } catch(Exception exc) {
+            LOGGER.error("Unable to initialize MCRURIResolver", exc);
+        }
+    }
 
     /**
      * Creates a new MCRURIResolver
@@ -864,10 +873,19 @@ public final class MCRURIResolver implements URIResolver {
 
         private static final String SORT_CONFIG_PREFIX = CONFIG_PREFIX + "Classification.Sort.";
 
-        private static MCRCache<String, Element> categoryCache = new MCRCache<String, Element>(MCRConfiguration
-            .instance().getInt(CONFIG_PREFIX + "Classification.CacheSize", 1000), "URIResolver categories");
+        private static MCRCache<String, Element> categoryCache;
 
-        private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
+        private static MCRCategoryDAO DAO;
+
+        static {
+            try {
+                DAO = MCRCategoryDAOFactory.getInstance();
+                categoryCache = new MCRCache<String, Element>(MCRConfiguration
+                .instance().getInt(CONFIG_PREFIX + "Classification.CacheSize", 1000), "URIResolver categories");
+            } catch(Exception exc) {
+                LOGGER.error("Unable to initialize classification resolver", exc);
+            }
+        }
 
         public MCRClassificationResolver() {
         }
