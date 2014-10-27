@@ -34,19 +34,28 @@
   <xsl:template match="doc" mode="iview">
     <xsl:variable name="mcrid" select="@id" />
     <xsl:variable name="derivates" select="key('derivate', $mcrid)" />
-    <xsl:for-each select="$derivates/str[@name='iviewFile']">
+
+    <xsl:comment>
+      Start - match="doc" mode="iview"
+    </xsl:comment>
+
+    <xsl:for-each select="$derivates/str[@name='maindoc']">
       <xsl:call-template name="iViewLinkPrev">
         <xsl:with-param name="mcrid" select="$mcrid" />
         <xsl:with-param name="derivate" select="../str[@name='id']" />
         <xsl:with-param name="fileName" select="." />
       </xsl:call-template>
     </xsl:for-each>
+
     <xsl:for-each select="./arr[@name='derivateLink']/str">
       <xsl:call-template name="iViewLinkPrev">
         <xsl:with-param name="mcrid" select="$mcrid" />
         <xsl:with-param name="derivateLink" select="." />
       </xsl:call-template>
     </xsl:for-each>
+    <xsl:comment>
+      End - match="doc" mode="iview"
+    </xsl:comment>
   </xsl:template>
 
   <xsl:template name="iViewLinkPrev">
@@ -58,6 +67,10 @@
     </xsl:param>
     <xsl:param name="mcrid" />
     <xsl:param name="fileName" />
+
+    <xsl:comment>
+      Start - iViewLinkPrev (iview2-solrresponse.xsl)
+    </xsl:comment>
 
     <xsl:if test="string-length($derivate) &gt; 0 and $mcrid">
       <xsl:variable name="pageToDisplay">
@@ -115,5 +128,8 @@
         </xsl:choose>
       </xsl:if>
     </xsl:if>
+    <xsl:comment>
+      End - iViewLinkPrev (iview2-solrresponse.xsl)
+    </xsl:comment>
   </xsl:template>
 </xsl:stylesheet>
