@@ -673,13 +673,14 @@
       </xsl:when>
       <xsl:otherwise>
       <!-- URL mapping disabled -->
-        <xsl:variable name="layoutSuffix">
-          <xsl:if test="$layout != '$'">
-            <xsl:value-of select="concat('-',$layout)" />
-          </xsl:if>
-        </xsl:variable>
-        <xsl:variable name="form" select="concat('editor_form_commit-mods',$layoutSuffix,'.xml')" />
-        <xsl:value-of select="concat($WebApplicationBaseURL,$form,$HttpSession,'?id=',$id)" />
+        <xsl:choose>
+          <xsl:when test="$layout != '$'">
+            <xsl:value-of select="concat($WebApplicationBaseURL,'/editor/editor-dynamic.xed',$HttpSession,'?id=',$id,'&amp;genre=article&amp;host=standalone')" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat($WebApplicationBaseURL,'/editor/editor-admin.xed',$HttpSession,'?id=',$id)" />
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
