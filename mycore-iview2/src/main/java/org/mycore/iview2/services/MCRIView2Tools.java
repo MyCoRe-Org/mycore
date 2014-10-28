@@ -282,10 +282,12 @@ public class MCRIView2Tools {
                     try {
                         Thread.sleep(10);
                     } catch (InterruptedException ie) {
-                        LOGGER.error("", ie);
+                        // get out of here
+                        throw new IOException(ie);
                     }
                 }
             } catch (FileSystemNotFoundException fsnfe) {
+                // seems closed now -> do nothing and try to return the file system again
             }
             return getFileSystem(iviewFile);
         }
