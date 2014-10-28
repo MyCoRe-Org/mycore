@@ -32,6 +32,8 @@ import java.net.URISyntaxException;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
+import java.nio.file.FileSystemAlreadyExistsException;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -269,8 +271,24 @@ public class MCRIView2Tools {
 
     public static FileSystem getFileSystem(Path iviewFile) throws IOException {
         URI uri = URI.create("jar:" + iviewFile.toUri().toString());
-        return FileSystems.newFileSystem(uri, Collections.<String, Object> emptyMap(),
-            MCRIView2Tools.class.getClassLoader());
+        try {
+            return FileSystems.newFileSystem(uri, Collections.<String, Object> emptyMap(),
+                MCRIView2Tools.class.getClassLoader());
+        } catch (FileSystemAlreadyExistsException exc) {
+            // block until file system is closed
+            try {
+                FileSystem fileSystem = FileSystems.getFileSystem(uri);
+                while (fileSystem.isOpen()) {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException ie) {
+                        LOGGER.error("", ie);
+                    }
+                }
+            } catch (FileSystemNotFoundException fsnfe) {
+            }
+            return getFileSystem(iviewFile);
+        }
     }
 
     public static ImageReader getTileImageReader() {
