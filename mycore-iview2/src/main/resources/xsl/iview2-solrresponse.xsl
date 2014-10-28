@@ -53,6 +53,7 @@
         <xsl:with-param name="derivateLink" select="." />
       </xsl:call-template>
     </xsl:for-each>
+
     <xsl:comment>
       End - match="doc" mode="iview"
     </xsl:comment>
@@ -88,13 +89,13 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
+
       <xsl:if test="$pageToDisplay != ''">
-        <xsl:variable name="object-view-derivate" select="acl:checkPermission($mcrid,'view-derivate')" />
+        <xsl:variable name="object-view-derivate" select="acl:checkPermission('view-derivate')" />
         <xsl:variable name="isDisplayedEnabled" select="mcrxsl:isDisplayedEnabledDerivate($derivate)" />
         <xsl:variable name="mayWriteDerivate" select="acl:checkPermission($derivate,'writedb')" />
         <xsl:choose>
-          <xsl:when
-            test="acl:checkPermissionForReadingDerivate($derivate) and $object-view-derivate and $isDisplayedEnabled = 'true' or $mayWriteDerivate">
+          <xsl:when test="$object-view-derivate or $isDisplayedEnabled = 'true' or $mayWriteDerivate">
 
             <xsl:variable name="href">
               <xsl:choose>
@@ -116,6 +117,7 @@
               </xsl:call-template>
             </a>
           </xsl:when>
+
           <xsl:otherwise>
             <xsl:if test="$isDisplayedEnabled = 'true'">
               <xsl:variable name="objectType" select="substring-before(substring-after($mcrid,'_'),'_')" />
