@@ -3,7 +3,7 @@
   xmlns:xalan="http://xml.apache.org/xalan" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
   xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" exclude-result-prefixes="acl mcrxsl encoder xalan i18n">
 
-  <xsl:param name="MCR.Module-iview2.Use.Rsc.Preview" />
+  <xsl:param name="MCR.Module-iview2.useNewViewer" />
 
   <xsl:template match="doc" mode="fileLink" priority="2">
     <xsl:param name="mcrid" select="str[@name='returnId']" />
@@ -99,7 +99,7 @@
 
             <xsl:variable name="href">
               <xsl:choose>
-                <xsl:when test="$MCR.Module-iview2.Use.Rsc.Preview">
+                <xsl:when test="$MCR.Module-iview2.useNewViewer">
                   <xsl:value-of select="concat($WebApplicationBaseURL,  'rsc/viewer/', $derivate, '/', $pageToDisplay)" />
                 </xsl:when>
                 <xsl:otherwise>
