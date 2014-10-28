@@ -2,8 +2,10 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:iview2="xalan://org.mycore.iview2.frontend.MCRIView2XSLFunctions"
   exclude-result-prefixes="iview2 encoder">
 
+
   <xsl:include href="mcr-module-iview2.xsl" />
 
+  <xsl:param name="MCR.Module-iview2.useNewViewer" />
   <xsl:param name="WebApplicationBaseURL" />
   <xsl:param name="ServletsBaseURL" />
 
@@ -27,14 +29,15 @@
     <xsl:param name="derivateID" />
     <xsl:param name="extensions" />
     <xsl:if test="$file != ''">
-      <xsl:variable name="iviewClient">
+      <xsl:variable name="mcrViewerURL">
         <xsl:call-template name="UrlGetParam">
           <xsl:with-param name="url" select="$RequestURL" />
           <xsl:with-param name="par" select="'iview2.client'" />
         </xsl:call-template>
       </xsl:variable>
+
       <xsl:choose>
-        <xsl:when test="$iviewClient = 'true'">
+        <xsl:when test="$mcrViewerURL = 'true' or $MCR.Module-iview2.useNewViewer = 'true'">
           <xsl:call-template name="iview2.clientLink">
             <xsl:with-param name="derivateID" select="$derivateID" />
             <xsl:with-param name="file" select="$file" />
