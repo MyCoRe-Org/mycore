@@ -30,6 +30,7 @@ import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -107,7 +108,7 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
         MCRObject object = wrapper.getMCRObject();
         MCRObjectID oid = MCRObjectID.getNextFreeId(childID.getBase());
         object.setId(oid);
-
+        object.getStructure().addChild(new MCRMetaLinkID("child", childID, childID.toString(), childID.toString()));
         Element mods = cloneRelatedItem(relatedItem);
         wrapper.setMODS(mods);
 
