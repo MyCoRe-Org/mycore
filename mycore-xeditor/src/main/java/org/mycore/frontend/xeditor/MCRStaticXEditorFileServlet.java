@@ -63,6 +63,10 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
 			session = MCREditorSessionStoreFactory.getSessionStore().getSession(sessionID);
 		} else {
 			session = new MCREditorSession(request.getParameterMap(), pc);
+
+			String referrer = request.getHeader("referer");
+	        session.setPageURL(referrer);
+	        
 			MCREditorSessionStoreFactory.getSessionStore().storeSession(session);
 		}
 

@@ -54,9 +54,6 @@ public class MCRXEditorServlet extends MCRServlet {
             return;
         }
 
-        String referrer = job.getRequest().getHeader("referer");
-        session.setPageURL(referrer);
-
         int stepNr = Integer.parseInt(xEditorStepID.split("-")[1]);
         session.getChangeTracker().undoChanges(session.getEditedXML(), stepNr);
 
