@@ -213,8 +213,7 @@ public class MCRIView2Tools {
             Path iviewFileRoot = zipFileSystem.getRootDirectories().iterator().next();
             MCRTiledPictureProps imageProps = MCRTiledPictureProps.getInstanceFromDirectory(iviewFileRoot);
             if (zoomLevel < 0 || zoomLevel > imageProps.getZoomlevel()) {
-                throw new IndexOutOfBoundsException("Zoom level " + zoomLevel + " is not in range 0 - "
-                    + imageProps.getZoomlevel());
+                throw new IndexOutOfBoundsException("Zoom level " + zoomLevel + " is not in range 0 - " + imageProps.getZoomlevel());
             }
             return getZoomLevel(iviewFileRoot, imageProps, reader, zoomLevel);
         } finally {
@@ -238,22 +237,19 @@ public class MCRIView2Tools {
      *             if image properties could not be parsed.
      */
     public static BufferedImage getZoomLevel(final Path iviewFileRoot, final MCRTiledPictureProps imageProperties,
-        final ImageReader reader, final int zoomLevel) throws IOException, JDOMException {
+            final ImageReader reader, final int zoomLevel) throws IOException, JDOMException {
         if (zoomLevel == 0) {
             return readTile(iviewFileRoot, reader, 0, 0, 0);
         }
-        MCRTiledPictureProps imageProps = imageProperties == null ? MCRTiledPictureProps
-            .getInstanceFromDirectory(iviewFileRoot) : imageProperties;
+        MCRTiledPictureProps imageProps = imageProperties == null ? MCRTiledPictureProps.getInstanceFromDirectory(iviewFileRoot)
+                : imageProperties;
         double zoomFactor = Math.pow(2, (imageProps.getZoomlevel() - zoomLevel));
         int maxX = (int) Math.ceil((imageProps.getWidth() / zoomFactor) / MCRImage.getTileSize());
         int maxY = (int) Math.ceil((imageProps.getHeight() / zoomFactor) / MCRImage.getTileSize());
-        LOGGER.debug(MessageFormat.format("Image size:{0}x{1}, tiles:{2}x{3}", imageProps.getWidth(),
-            imageProps.getHeight(), maxX, maxY));
+        LOGGER.debug(MessageFormat.format("Image size:{0}x{1}, tiles:{2}x{3}", imageProps.getWidth(), imageProps.getHeight(), maxX, maxY));
         int imageType = getImageType(iviewFileRoot, reader, zoomLevel, 0, 0);
-        int xDim = ((maxX - 1) * MCRImage.getTileSize() + readTile(iviewFileRoot, reader, zoomLevel, maxX - 1, 0)
-            .getWidth());
-        int yDim = ((maxY - 1) * MCRImage.getTileSize() + readTile(iviewFileRoot, reader, zoomLevel, 0, maxY - 1)
-            .getHeight());
+        int xDim = ((maxX - 1) * MCRImage.getTileSize() + readTile(iviewFileRoot, reader, zoomLevel, maxX - 1, 0).getWidth());
+        int yDim = ((maxY - 1) * MCRImage.getTileSize() + readTile(iviewFileRoot, reader, zoomLevel, 0, maxY - 1).getHeight());
         BufferedImage resultImage = new BufferedImage(xDim, yDim, imageType);
         Graphics graphics = resultImage.getGraphics();
         try {
@@ -269,11 +265,15 @@ public class MCRIView2Tools {
         }
     }
 
+    /**
+     * @param iviewFile
+     * @return
+     * @throws IOException
+     */
     public static FileSystem getFileSystem(Path iviewFile) throws IOException {
         URI uri = URI.create("jar:" + iviewFile.toUri().toString());
         try {
-            return FileSystems.newFileSystem(uri, Collections.<String, Object> emptyMap(),
-                MCRIView2Tools.class.getClassLoader());
+            return FileSystems.newFileSystem(uri, Collections.<String, Object> emptyMap(), MCRIView2Tools.class.getClassLoader());
         } catch (FileSystemAlreadyExistsException exc) {
             // block until file system is closed
             try {
@@ -288,17 +288,29 @@ public class MCRIView2Tools {
                 }
             } catch (FileSystemNotFoundException fsnfe) {
                 // seems closed now -> do nothing and try to return the file system again
+                LOGGER.error("Filesystem not found", fsnfe);
             }
             return getFileSystem(iviewFile);
         }
     }
 
+    /**
+     * @return
+     */
     public static ImageReader getTileImageReader() {
         return ImageIO.getImageReadersByMIMEType("image/jpeg").next();
     }
 
-    public static BufferedImage readTile(Path iviewFileRoot, ImageReader imageReader, int zoomLevel, int x, int y)
-        throws IOException {
+    /**
+     * @param iviewFileRoot
+     * @param imageReader
+     * @param zoomLevel
+     * @param x
+     * @param y
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage readTile(Path iviewFileRoot, ImageReader imageReader, int zoomLevel, int x, int y) throws IOException {
         String tileName = MessageFormat.format("{0}/{1}/{2}.jpg", zoomLevel, y, x);
         Path tile = iviewFileRoot.resolve(tileName);
         if (tile != null) {
@@ -316,8 +328,7 @@ public class MCRIView2Tools {
         }
     }
 
-    public static int getImageType(Path iviewFileRoot, ImageReader imageReader, int zoomLevel, int x, int y)
-        throws IOException {
+    public static int getImageType(Path iviewFileRoot, ImageReader imageReader, int zoomLevel, int x, int y) throws IOException {
         String tileName = MessageFormat.format("{0}/{1}/{2}.jpg", zoomLevel, y, x);
         Path tile = iviewFileRoot.resolve(tileName);
         if (tile != null) {
@@ -369,10 +380,9 @@ public class MCRIView2Tools {
         if (!MCRIView2Tools.isFileSupported(file)) {
             return null;
         }
-        MCRObjectID mcrObjectID = MCRMetadataManager.getObjectId(MCRObjectID.getInstance(file.getOwner()), 10,
-            TimeUnit.SECONDS);
-        String params = MCRXMLFunctions.encodeURIPath(MessageFormat.format(
-            "jumpback=true&maximized=true&page={0}&derivate={1}", file.subpathComplete(), file.getOwner()));
+        MCRObjectID mcrObjectID = MCRMetadataManager.getObjectId(MCRObjectID.getInstance(file.getOwner()), 10, TimeUnit.SECONDS);
+        String params = MCRXMLFunctions.encodeURIPath(MessageFormat.format("jumpback=true&maximized=true&page={0}&derivate={1}",
+                file.subpathComplete(), file.getOwner()));
         String url = MessageFormat.format("{0}receive/{1}?{2}", MCRFrontendUtil.getBaseURL(), mcrObjectID, params);
 
         return url;
