@@ -109,6 +109,11 @@
         <xsl:value-of select="." />
       </field>
     </xsl:for-each>
+    <xsl:for-each select="service/servstates/servstate">
+      <field name="state">
+        <xsl:value-of select="concat(@classid,':',@categid)" />
+      </field>
+    </xsl:for-each>
   </xsl:template>
 
   <xsl:template match="category" mode="category">

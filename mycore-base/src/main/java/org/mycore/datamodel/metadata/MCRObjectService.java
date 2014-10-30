@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 /**
  * This class implements all methods for handling MCRObject service data. 
@@ -88,7 +89,7 @@ public class MCRObjectService {
 
     private final ArrayList<MCRMetaLangText> flags;
     
-    private MCRMetaClassification state;
+    private MCRCategoryID state;
 
     /**
      * This is the constructor of the MCRObjectService class. All data are set
@@ -108,7 +109,6 @@ public class MCRObjectService {
 
         rules = new ArrayList<MCRMetaAccessRule>();
         flags = new ArrayList<MCRMetaLangText>();
-        state = null;
     }
 
     /**
@@ -175,7 +175,9 @@ public class MCRObjectService {
                 if (!stateElement.getName().equals("servstate")) {
                     continue;
                 }
-                state.setFromDOM(stateElement);
+                MCRMetaClassification stateClass = new MCRMetaClassification();
+                stateClass.setFromDOM(stateElement);
+                state = new MCRCategoryID(stateClass.getClassId(), stateClass.getCategId());
             }
         }
     }
@@ -196,7 +198,7 @@ public class MCRObjectService {
      *         can return null
      * 
      */
-    public final MCRMetaClassification getState() {
+    public final MCRCategoryID getState() {
        return state;
     }
     /**
@@ -255,8 +257,8 @@ public class MCRObjectService {
      * @param classid
      * @param categid
      */
-    public final void setStatus(String classid, String categid) {
-        state = new MCRMetaClassification("servstate", 0, null, classid, categid);
+    public final void setState(MCRCategoryID state) {
+    	this.state = state;
     }
 
     /**
@@ -663,7 +665,9 @@ public class MCRObjectService {
         if(state!=null){
         	org.jdom2.Element elmm = new org.jdom2.Element("servstates");
             elmm.setAttribute("class", "MCRMetaClassification");
-            elmm.addContent(state.createXML());
+            MCRMetaClassification stateClass = new MCRMetaClassification("servstate", 0, null, state);
+            elmm.addContent(stateClass.createXML());
+            elm.addContent(elmm);
         }
 
         return elm;
