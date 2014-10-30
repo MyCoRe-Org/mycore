@@ -1,27 +1,23 @@
 package org.mycore.solr.classification;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.common.SolrInputDocument;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
-import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl;
-import org.mycore.solr.search.MCRSolrSearchUtils;
 
 /**
  * Solr extension of the category link service. Updates the solr index on set and delete
  * operations.
  * 
+ * @see MCRSolrCategoryLink
  * @author Matthias Eichner
- *
  */
 public class MCRSolrCategLinkService extends MCRCategLinkServiceImpl {
 
@@ -30,49 +26,55 @@ public class MCRSolrCategLinkService extends MCRCategLinkServiceImpl {
     @Override
     public void setLinks(MCRCategLinkReference objectReference, Collection<MCRCategoryID> categories) {
         super.setLinks(objectReference, categories);
-        MCRSolrClassificationUtil.reindex(categories);
+        // solr
+        List<SolrInputDocument> solrDocumentList = MCRSolrClassificationUtil
+            .toSolrDocument(objectReference, categories);
+        MCRSolrClassificationUtil.bulkIndex(solrDocumentList);
     }
 
     @Override
     public void deleteLink(MCRCategLinkReference reference) {
         super.deleteLink(reference);
+        // solr
         try {
-            List<MCRCategory> linkedCategories = getLinkedCategories(reference.getObjectID());
-            MCRSolrClassificationUtil.bulkIndex(linkedCategories);
-        } catch (Exception e) {
-            LOGGER.error("Unable to delete link of category", e);
+            SolrServer solrServer = MCRSolrClassificationUtil.getCore().getServer();
+            delete(solrServer, reference);
+            solrServer.commit();
+        } catch (Exception exc) {
+            LOGGER.error("Unable to delete links of object " + reference.getObjectID(), exc);
         }
     }
 
     @Override
     public void deleteLinks(Collection<MCRCategLinkReference> references) {
         super.deleteLinks(references);
-        Set<MCRCategory> linkedCategories = new HashSet<>();
-        for (MCRCategLinkReference ref : references) {
+        // solr
+        SolrServer solrServer = MCRSolrClassificationUtil.getCore().getServer();
+        for (MCRCategLinkReference reference : references) {
             try {
-                linkedCategories.addAll(getLinkedCategories(ref.getObjectID()));
+                delete(solrServer, reference);
             } catch (Exception exc) {
-                LOGGER.error("Unable to delete linked categories of object " + ref.getObjectID(), exc);
+                LOGGER.error("Unable to delete links of object " + reference.getObjectID(), exc);
             }
         }
-        MCRSolrClassificationUtil.bulkIndex(linkedCategories);
+        try {
+            solrServer.commit();
+        } catch (SolrServerException | IOException e) {
+            LOGGER.error("Unable to commit.", e);
+        }
     }
 
     /**
-     * Returns a list of categories which are linked with the given object.
+     * Delete the given reference in solr.
      * 
-     * @param objectId
-     * @return
+     * @param solrServer
+     * @param reference
      * @throws SolrServerException
+     * @throws IOException
      */
-    protected List<MCRCategory> getLinkedCategories(String objectId) throws SolrServerException {
-        SolrServer solrServer = MCRSolrClassificationUtil.getCore().getServer();
-        List<String> idList = MCRSolrSearchUtils.listIDs(solrServer, "link:" + objectId);
-        List<MCRCategory> categoryList = new ArrayList<>(idList.size());
-        for (String id : idList) {
-            MCRCategory category = MCRCategoryDAOFactory.getInstance().getCategory(MCRCategoryID.fromString(id), 0);
-            categoryList.add(category);
-        }
-        return categoryList;
+    protected void delete(SolrServer solrServer, MCRCategLinkReference reference) throws SolrServerException,
+        IOException {
+        solrServer.deleteByQuery("+type:link +object:" + reference.getObjectID());
     }
+
 }

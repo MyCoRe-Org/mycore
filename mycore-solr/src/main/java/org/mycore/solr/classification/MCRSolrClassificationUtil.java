@@ -10,6 +10,9 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
+import org.mycore.datamodel.classifications2.MCRCategLinkReference;
+import org.mycore.datamodel.classifications2.MCRCategLinkService;
+import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -38,29 +41,46 @@ public abstract class MCRSolrClassificationUtil {
      */
     public static void rebuildIndex() {
         LOGGER.info("rebuild classification index...");
-        MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
-        List<MCRCategoryID> rootCategoryIDs = dao.getRootCategoryIDs();
+        // categories
+        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+        List<MCRCategoryID> rootCategoryIDs = categoryDAO.getRootCategoryIDs();
         for (MCRCategoryID rootID : rootCategoryIDs) {
-            LOGGER.info("rebuild " + rootID + "...");
-            MCRCategory rootCategory = dao.getCategory(rootID, -1);
+            LOGGER.info("rebuild classification '" + rootID + "'...");
+            MCRCategory rootCategory = categoryDAO.getCategory(rootID, -1);
             List<MCRCategory> categoryList = getDescendants(rootCategory);
             categoryList.add(rootCategory);
-            bulkIndex(categoryList);
+            List<SolrInputDocument> solrDocumentList = toSolrDocument(categoryList);
+            bulkIndex(solrDocumentList);
+        }
+        // links
+        MCRCategLinkService linkService = MCRCategLinkServiceFactory.getInstance();
+        Collection<String> linkTypes = linkService.getTypes();
+        for (String linkType : linkTypes) {
+            LOGGER.info("rebuild '" + linkType + "' links...");
+            List<SolrInputDocument> solrDocumentList = new ArrayList<>();
+            Collection<MCRCategLinkReference> linkReferences = linkService.getReferences(linkType);
+            for (MCRCategLinkReference linkReference : linkReferences) {
+                Collection<MCRCategoryID> categories = linkService.getLinksFromReference(linkReference);
+                solrDocumentList.addAll(toSolrDocument(linkReference, categories));
+            }
+            bulkIndex(solrDocumentList);
         }
     }
 
     /**
-     * Bulk index categories. The collection is split into parts of one hundred.
+     * Bulk index. The collection is split into parts of one thousand.
      * 
-     * @param categoryList the list to index
+     * @param solrDocumentList the list to index
      */
-    public static void bulkIndex(Collection<MCRCategory> categoryList) {
+    public static void bulkIndex(List<SolrInputDocument> solrDocumentList) {
         SolrServer server = getCore().getConcurrentServer();
-        List<SolrInputDocument> solrDocumentList = toSolrDocument(categoryList);
-        List<List<SolrInputDocument>> partitionList = Lists.partition(solrDocumentList, 100);
+        List<List<SolrInputDocument>> partitionList = Lists.partition(solrDocumentList, 1000);
+        int docNum = solrDocumentList.size();
+        int added = 0;
         for (List<SolrInputDocument> part : partitionList) {
             try {
                 server.add(part);
+                LOGGER.info("Added " + (added += part.size()) + "/" + docNum + " documents");
             } catch (SolrServerException | IOException e) {
                 LOGGER.error("Unable to add classification documents.", e);
             }
@@ -113,7 +133,7 @@ public abstract class MCRSolrClassificationUtil {
         LinkedList<MCRCategory> ancestors = new LinkedList<MCRCategory>();
         MCRCategory parent = category.getParent();
         while (parent != null) {
-            ancestors.add(parent);
+            ancestors.addFirst(parent);
             parent = parent.getParent();
         }
         return ancestors;
@@ -130,6 +150,23 @@ public abstract class MCRSolrClassificationUtil {
         for (MCRCategory category : categoryList) {
             MCRSolrCategory mcrSolrCategory = new MCRSolrCategory(category);
             solrDocumentList.add(mcrSolrCategory.toSolrDocument());
+        }
+        return solrDocumentList;
+    }
+
+    /**
+     * Creates a new list of {@link SolrInputDocument} based on the given categories and the link.
+     * 
+     * @param linkReference
+     * @param categories
+     * @return
+     */
+    public static List<SolrInputDocument> toSolrDocument(MCRCategLinkReference linkReference,
+        Collection<MCRCategoryID> categories) {
+        List<SolrInputDocument> solrDocumentList = new ArrayList<>();
+        for (MCRCategoryID categoryId : categories) {
+            MCRSolrCategoryLink link = new MCRSolrCategoryLink(categoryId, linkReference);
+            solrDocumentList.add(link.toSolrDocument());
         }
         return solrDocumentList;
     }

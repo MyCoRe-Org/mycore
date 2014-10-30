@@ -1,12 +1,9 @@
 package org.mycore.solr.classification;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Set;
 
 import org.apache.solr.common.SolrInputDocument;
-import org.mycore.datamodel.classifications2.MCRCategLinkService;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
@@ -27,6 +24,7 @@ public class MCRSolrCategory {
         MCRCategoryID id = category.getId();
         doc.setField("id", id.toString());
         doc.setField("classification", id.getRootID());
+        doc.setField("type", "node");
         if (category.isCategory()) {
             doc.setField("category", id.getID());
         }
@@ -49,12 +47,6 @@ public class MCRSolrCategory {
         // ancestors
         for (MCRCategory ancestor : ancestors) {
             doc.addField("ancestors", ancestor.getId().toString());
-        }
-        // links
-        MCRCategLinkService linkService = MCRCategLinkServiceFactory.getInstance();
-        Collection<String> links = linkService.getLinksFromCategory(category.getId());
-        for (String link : links) {
-            doc.addField("link", link);
         }
         return doc;
     }

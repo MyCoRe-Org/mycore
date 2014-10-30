@@ -33,9 +33,12 @@
     <!-- required solr fields -->
     <field name="_version_" type="long" />
 
-    <!-- id -->
+    <!-- base fields -->
     <field name="id" type="string" required="true" />
-    <field name="classification" type="string" required="true" />
+    <field name="type" type="string" required="true" />
+
+    <!-- ids -->
+    <field name="classification" type="string" />
     <field name="category" type="string" />
 
     <!-- label -->
@@ -47,14 +50,17 @@
     <field name="children" type="string" multiValued="true" />
     <field name="ancestors" type="string" multiValued="true" />
 
-    <!-- linked objects -->
-    <field name="link" type="string" multiValued="true" />
-
     <!-- all meta -->
     <field name="allMeta" type="text" multiValued="true" stored="false" />
     <copyField source="classification" dest="allMeta" />
     <copyField source="category" dest="allMeta" />
     <copyField source="label.*" dest="allMeta" />
+
+    <!-- link -->
+    <field name="node" type="string" />
+    <field name="object" type="string" />
+    <field name="linkType" type="string" />
+
   </fields>
 
   <uniqueKey>id</uniqueKey>
