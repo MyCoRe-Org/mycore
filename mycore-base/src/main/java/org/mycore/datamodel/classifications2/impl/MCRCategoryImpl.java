@@ -355,4 +355,38 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
         return getId() == null ? null : getId().getID();
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + internalID;
+        result = prime * result + left;
+        result = prime * result + level;
+        result = prime * result + positionInParent;
+        result = prime * result + right;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        MCRCategoryImpl other = (MCRCategoryImpl) obj;
+        if (internalID != other.internalID)
+            return false;
+        if (left != other.left)
+            return false;
+        if (level != other.level)
+            return false;
+        if (positionInParent != other.positionInParent)
+            return false;
+        if (right != other.right)
+            return false;
+        return true;
+    }
+
 }
