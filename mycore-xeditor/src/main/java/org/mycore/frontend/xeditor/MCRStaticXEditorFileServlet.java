@@ -41,35 +41,34 @@ import org.xml.sax.SAXException;
  */
 public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
 
-	private static final long serialVersionUID = 1L;
-	protected final static Logger LOGGER = Logger.getLogger(MCRStaticXEditorFileServlet.class);
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	protected MCRContent expandEditorElements(HttpServletRequest request, URL resource) throws IOException, JDOMException, SAXException, MalformedURLException {
-		MCRContent content = super.expandEditorElements(request, resource);
-		if (mayContainEditorForm(content)) {
-			content = doExpandEditorElements(content, request);
-		}
-		return content;
-	}
+    protected final static Logger LOGGER = Logger.getLogger(MCRStaticXEditorFileServlet.class);
 
-	public static MCRContent doExpandEditorElements(MCRContent content, HttpServletRequest request) throws IOException, JDOMException, SAXException,
-			MalformedURLException {
-		MCRParameterCollector pc = new MCRParameterCollector(request, false);
-		String sessionID = request.getParameter(MCREditorSessionStore.XEDITOR_SESSION_PARAM);
-		MCREditorSession session = null;
+    @Override
+    protected MCRContent expandEditorElements(HttpServletRequest request, URL resource) throws IOException, JDOMException, SAXException,
+            MalformedURLException {
+        MCRContent content = super.expandEditorElements(request, resource);
+        if (mayContainEditorForm(content)) {
+            content = doExpandEditorElements(content, request);
+        }
+        return content;
+    }
 
-		if (sessionID != null) {
-			session = MCREditorSessionStoreFactory.getSessionStore().getSession(sessionID);
-		} else {
-			session = new MCREditorSession(request.getParameterMap(), pc);
+    public static MCRContent doExpandEditorElements(MCRContent content, HttpServletRequest request) throws IOException, JDOMException,
+            SAXException, MalformedURLException {
+        MCRParameterCollector pc = new MCRParameterCollector(request, false);
+        String sessionID = request.getParameter(MCREditorSessionStore.XEDITOR_SESSION_PARAM);
+        MCREditorSession session = null;
 
-			String referrer = request.getHeader("referer");
-	        session.setPageURL(referrer);
-	        
-			MCREditorSessionStoreFactory.getSessionStore().storeSession(session);
-		}
+        if (sessionID != null) {
+            session = MCREditorSessionStoreFactory.getSessionStore().getSession(sessionID);
+        } else {
+            session = new MCREditorSession(request.getParameterMap(), pc);
+            session.setPageURL(request.getRequestURL().toString());
+            MCREditorSessionStoreFactory.getSessionStore().storeSession(session);
+        }
 
-		return new MCRXEditorTransformer(session, pc).transform(content);
-	}
+        return new MCRXEditorTransformer(session, pc).transform(content);
+    }
 }
