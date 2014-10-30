@@ -9,12 +9,15 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.ws.rs.Consumes;
@@ -35,6 +38,7 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -64,6 +68,8 @@ import org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName;
 import org.mycore.frontend.classeditor.wrapper.MCRCategoryListWrapper;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.classification.MCRSolrClassificationUtil;
+import org.mycore.solr.search.MCRSolrSearchUtils;
 import org.xml.sax.SAXParseException;
 
 import com.google.gson.Gson;
@@ -211,7 +217,7 @@ public class MCRClassificationEditorResource {
         // we don't use getSingleInstanceOf(name, default) to keep DefaultSessionWrapper private
         //        MCRSessionWrapper sessionWrapper = MCRConfiguration.instance().<MCRSessionWrapper>getSingleInstanceOf("MCR.Session.Wrapper.Class");
         MCRSessionWrapper sessionWrapper = MCRConfiguration.instance().getInstanceOf("MCR.Session.Wrapper.Class",
-                new DefaultSessionWrapper());
+            new DefaultSessionWrapper());
         return sessionWrapper.wrap(op);
     }
 
@@ -255,7 +261,7 @@ public class MCRClassificationEditorResource {
                 MCRCategoryID categoryID = category.getId();
                 if (CATEGORY_DAO.exist(categoryID)) {
                     if (categoryID.isRootID()
-                            && !MCRAccessManager.checkPermission(categoryID.getRootID(), PERMISSION_DELETE)) {
+                        && !MCRAccessManager.checkPermission(categoryID.getRootID(), PERMISSION_DELETE)) {
                         throw new WebApplicationException(Status.UNAUTHORIZED);
                     }
                     CATEGORY_DAO.deleteCategory(categoryID);
@@ -329,7 +335,7 @@ public class MCRClassificationEditorResource {
                     if (isAdded && MCRCategoryDAOFactory.getInstance().exist(mcrCategoryID)) {
                         // an added category already exist -> throw conflict error
                         return Response.status(Status.CONFLICT).entity(buildJsonError("duplicateID", mcrCategoryID))
-                                .build();
+                            .build();
                     }
 
                     sessionized(new UpdateOp(parsedCateg));
@@ -351,7 +357,7 @@ public class MCRClassificationEditorResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_HTML)
     public Response importClassification(@FormDataParam("classificationFile") InputStream uploadedInputStream,
-            @FormDataParam("classificationFile") FormDataContentDisposition fileDetail) {
+        @FormDataParam("classificationFile") FormDataContentDisposition fileDetail) {
         MCRCategory classification;
         try {
             Document jdom = MCRXMLParserFactory.getParser().parseXML(new MCRStreamContent(uploadedInputStream));
@@ -378,10 +384,46 @@ public class MCRClassificationEditorResource {
     }
 
     @GET
+    @Path("filter/{text}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response filter(@PathParam("text") String text) throws SolrServerException {
+        HttpSolrServer server = MCRSolrClassificationUtil.getCore().getServer();
+        List<List<String>> ids = MCRSolrSearchUtils.list(server, "*" + text + "*",
+            new MCRSolrSearchUtils.DocumentHandler<List<String>>() {
+                @Override
+                public List<String> getResult(SolrDocument document) {
+                    List<String> ids = new ArrayList<String>();
+                    ids.add(document.getFirstValue("id").toString());
+                    Collection<Object> fieldValues = document.getFieldValues("ancestors");
+                    if (fieldValues != null) {
+                        for (Object anc : fieldValues) {
+                            ids.add(anc.toString());
+                        }
+                    }
+                    return ids;
+                }
+
+                @Override
+                public String fl() {
+                    return "id,ancestors";
+                }
+            });
+        Set<String> idSet = new HashSet<>();
+        for (List<String> internalList : ids) {
+            idSet.addAll(internalList);
+        }
+        JsonArray docList = new JsonArray();
+        for (String id : idSet) {
+            docList.add(new JsonPrimitive(id));
+        }
+        return Response.ok().entity(docList.toString()).build();
+    }
+
+    @GET
     @Path("link/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response retrieveLinkedObjects(@PathParam("id") String id, @QueryParam("start") Integer start,
-            @QueryParam("rows") Integer rows) throws SolrServerException, UnsupportedEncodingException {
+        @QueryParam("rows") Integer rows) throws SolrServerException, UnsupportedEncodingException {
         // do solr query
         SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
         ModifiableSolrParams params = new ModifiableSolrParams();

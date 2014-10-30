@@ -21,7 +21,7 @@ define([
 		var id = item.id;
 		return id.categid != null ? id.categid : "";
 	}
-	
+
 	exports.formatId = function(/*dojo.data.item*/ item) {
 		if(item.fakeRoot || item.id == null) {
 			return "";

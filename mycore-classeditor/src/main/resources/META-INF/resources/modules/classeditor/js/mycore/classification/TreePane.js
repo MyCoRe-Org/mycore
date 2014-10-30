@@ -14,6 +14,7 @@ define([
 	"dijit/layout/ContentPane",
 	"dijit/layout/BorderContainer",
 	"dijit/form/Button",
+	"dijit/form/TextBox",
 	"mycore/classification/LazyLoadingTree",
 	"mycore/classification/ExportDialog",
 	"mycore/classification/LinkDialog"
@@ -30,13 +31,31 @@ return declare("mycore.classification.TreePane", [ContentPane, _Templated, _Sett
 	linkDialog: null,
 
 	disabled: false,
-
+	
+	filterTextBox: null,
+	
     constructor: function(/*Object*/ args) {
     	declare.safeMixin(this, args);
     },
 
     create: function(args) {
     	this.inherited(arguments);
+    },
+
+    onSettingsReady: function() {
+    	// filter
+    	if(this.settings.solrEnabled) {
+    		var filterBoxContainer = new ContentPane({region: 'top', style: "padding-bottom: 5px;"});
+    		this.filterTextBox = new dijit.form.TextBox({intermediateChanges: true, disabled: true, placeHolder: "Filter", style: "width: 99%;"});
+    		filterBoxContainer.set("content", this.filterTextBox.domNode);
+    		this.mainContainer.addChild(filterBoxContainer);
+    	}
+
+    	/*	<!-- Filter -->
+    	<div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region: 'top'" style="padding-bottom: 5px;">
+    		<input data-dojo-type="dijit.form.TextBox" data-dojo-props="intermediateChanges: true, disabled: true" data-dojo-attach-point="filterTextBox" placeHolder="Filter" style="width: 99%;"/>
+    	</div>*/
+    		
     	// dialogs
     	this.exportDialog = new mycore.classification.ExportDialog();
     	this.linkDialog = new mycore.classification.LinkDialog();
@@ -45,12 +64,21 @@ return declare("mycore.classification.TreePane", [ContentPane, _Templated, _Sett
     	on(this.removeTreeItemButton, "click", lang.hitch(this, this.remove));
     	on(this.exportClassificationButton, "click", lang.hitch(this, this.exportClassification));
     	on(this.linkDialogButton, "click", lang.hitch(this, this.openLinkDialog));
+    	if(this.filterTextBox != null) {
+    		on(this.filterTextBox, "change", lang.hitch(this, this.filterTree));
+    	}
     	// tree event
     	on(this.tree, "itemSelected", lang.hitch(this, this.updateToolbar));
     },
 
 	updateToolbar: function() {
 		var disabled = this.get("disabled") == true;
+
+		// filter
+		if(this.filterTextBox != null) {
+			this.filterTextBox.set("disabled", disabled);
+		}
+
 		// remove button
 		var selectedItems = this.tree.getSelectedItems();
 		var removeVisable = selectedItems != null && selectedItems.length > 0 && !disabled;
@@ -97,6 +125,10 @@ return declare("mycore.classification.TreePane", [ContentPane, _Templated, _Sett
 	openLinkDialog: function() {
 		var selectedItems = this.tree.getSelectedItems();
 		this.linkDialog.show(selectedItems[0]);
+	},
+
+	filterTree: function(filterValue) {
+		this.tree.filter(filterValue);
 	},
 
 	showID: function() {

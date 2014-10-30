@@ -14,19 +14,18 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonStreamParser;
 
 public class MCRCategUtils {
+
     public static MCRCategory newCategory(MCRCategoryID id, Set<MCRLabel> labels, MCRCategoryID mcrCategoryID) {
         MCRJSONCategory category = new MCRJSONCategory();
         category.setId(id);
         category.setLabels(labels);
         category.setParentID(mcrCategoryID);
-
         return category;
     }
 
     public static String maskCategID(MCRCategoryID categoryID) {
         String rootID = categoryID.getRootID();
         String id = categoryID.getID();
-
         return rootID + "." + (id == null ? "" : id);
     }
 
@@ -43,7 +42,8 @@ public class MCRCategUtils {
             for (JsonElement jsonElement : saveObjArray) {
                 //jsonObject.item.id.rootid
                 JsonObject root = jsonElement.getAsJsonObject();
-                String rootId = root.getAsJsonObject("item").getAsJsonObject("id").getAsJsonPrimitive("rootid").getAsString();
+                String rootId = root.getAsJsonObject("item").getAsJsonObject("id").getAsJsonPrimitive("rootid")
+                    .getAsString();
                 categories.add(MCRCategoryID.rootID(rootId));
             }
         } else {
@@ -68,4 +68,5 @@ public class MCRCategUtils {
         }
         return rootCategories;
     }
+    
 }

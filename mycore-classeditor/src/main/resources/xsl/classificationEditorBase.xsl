@@ -4,6 +4,7 @@
   <!-- General MyCoRe XSL Parameter -->
   <xsl:param name="CurrentLang" select="'de'"/>
   <xsl:param name="WebApplicationBaseURL"/>
+  <xsl:param name="MCR.Category.DAO"/>
   <xsl:param name="returnURL" select="$WebApplicationBaseURL"/>
   <!-- Classeditor XSL Parameter -->
   <xsl:param name="classeditor.debug" select="false()" />
@@ -39,7 +40,8 @@
           showId: "<xsl:value-of select='$classeditor.showId' />" === "true",
           language: "<xsl:value-of select='$CurrentLang' />",
           editable: true,
-          debug: "<xsl:value-of select='$classeditor.debug' />" === "true"
+          debug: "<xsl:value-of select='$classeditor.debug' />" === "true",
+          solrEnabled: "<xsl:value-of select='$MCR.Category.DAO' />" === "org.mycore.solr.classification.MCRSolrCategoryDAO"
         },
         classId: "<xsl:value-of select='$classeditor.class' />",
         categoryId: "<xsl:value-of select='$classeditor.categ' />"

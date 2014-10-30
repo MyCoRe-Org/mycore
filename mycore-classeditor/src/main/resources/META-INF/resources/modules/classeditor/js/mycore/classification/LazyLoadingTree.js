@@ -7,13 +7,14 @@ define([
 	"dojo/aspect",
 	"dojo/_base/lang", // hitch, clone
 	"dojo/dom-construct", // create place
+	"dojo/dom-style",
 	"dojo/_base/array", // forEach
 	"dojo/request/xhr",
 	"mycore/classification/Util",
 	"mycore/classification/TreeDndSource",
 	"mycore/common/I18nManager",
 	"dijit/Tree"
-], function(declare, ContentPane, Evented, _SettingsMixin, on, aspect, lang, domConstruct, array, xhr, classUtil, dndSource, i18n) {
+], function(declare, ContentPane, Evented, _SettingsMixin, on, aspect, lang, domConstruct, domStyle, array, xhr, classUtil, dndSource, i18n) {
 
 return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _SettingsMixin], {
 
@@ -24,6 +25,8 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 	enableDnD: true,
 	
 	disabled: false,
+	
+	filterList: null,
 
     constructor: function(/*Object*/ args) {
     	this.gutters = false;
@@ -65,6 +68,7 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 
 		// events
 		aspect.after(this.tree.dndController, "onDndDrop", lang.hitch(this, this.onDndDrop));
+		aspect.after(this.tree, "onOpen", lang.hitch(this, this.onOpen));
 		aspect.after(this.tree, "focusNode", lang.hitch(this, this.onFocusNode));
 		on.emit(this, "treeCreated");
 	},
@@ -113,8 +117,28 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 		this.updateLabel(item);
 	},
 
+	onOpen: function(undefinedArgh, node) {
+		this._updateLabels(node[0]);
+	},
+
+	setLabelColor: function(item, color) {
+		var nodes = this.tree.getNodesByItem(item);
+    	array.forEach(nodes, function(node) {
+    		if(node != null) {
+    			domStyle.set(node.labelNode, "color",  color);
+    		} else {
+    			console.log("Unable to get node of item " + classUtil.toString(item));
+    		}
+    	});
+	},
+
+	getLabelColor: function(item) {
+		return (item.fakeRoot || this.filterList == null || this.filterList.indexOf(classUtil.formatId(item)) >= 0) ? "#000000" : "#BBBBBB";
+	},
+
 	updateLabel: function(item) {
 		this.setLabel(item, this.getLabel(item));
+		this.setLabelColor(item, this.getLabelColor(item));
 	},
 
     updateLabels: function() {
@@ -236,7 +260,7 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 		}).then(lang.hitch(this, function(newID) {
 			this.newItem(selectedItem, newID);
 		}), function(err) {
-			console.log("error while retrieving new id: " + error);
+			console.log("error while retrieving new id: " + err);
 		});
 	},
 
@@ -338,6 +362,22 @@ return declare("mycore.classification.LazyLoadingTree", [ContentPane, Evented, _
 		this.tree._itemNodesMap[newIdentity] = this.tree._itemNodesMap[oldIdentity];
 		delete this.tree._itemNodesMap[oldIdentity];
 		return true;
+	},
+
+	filter: function(value) {
+		if(value == "") {
+			this.filterList = null;
+			this.updateLabels();
+		} else {
+			xhr(this.settings.resourceURL + "filter/" + value, {
+				handleAs : "json"
+			}).then(lang.hitch(this, function(filterArray) {
+				this.filterList = filterArray;
+				this.updateLabels();
+			}), function(err) {
+				console.log("error while filtering: " + err);
+			});
+		}
 	}
 
 });
