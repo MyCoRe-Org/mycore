@@ -88,4 +88,8 @@ public class CategoryLinkServiceMock implements MCRCategLinkService{
         return null;
     }
 
+    @Override
+    public Collection<String> getTypes() {
+        return null;
+    }
 }

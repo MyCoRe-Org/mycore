@@ -361,4 +361,15 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         List<MCRCategLinkReference> result = criteria.list();
         return result;
     }
+
+    @Override
+    public Collection<String> getTypes() {
+        Session session = HIB_CONNECTION_INSTANCE.getSession();
+        Criteria criteria = session.createCriteria(LINK_CLASS);
+        criteria.setProjection(Projections.distinct(Projections.property("objectReference.type")));
+        @SuppressWarnings("unchecked")
+        List<String> result = criteria.list();
+        return result;
+    }
+
 }

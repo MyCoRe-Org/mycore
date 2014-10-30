@@ -140,6 +140,13 @@ public interface MCRCategLinkService {
     public abstract Collection<MCRCategLinkReference> getReferences(String type);
 
     /**
+     * Return a collection of all link types.
+     * 
+     * @return
+     */
+    public abstract Collection<String> getTypes();
+
+    /**
      * Add links between categories and Objects.
      * 
      * Implementors must assure that ancestor (parent) axis categories are
