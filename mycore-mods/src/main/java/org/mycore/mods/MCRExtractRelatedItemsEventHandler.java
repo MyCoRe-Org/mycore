@@ -108,7 +108,11 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
         MCRObject object = wrapper.getMCRObject();
         MCRObjectID oid = MCRObjectID.getNextFreeId(childID.getBase());
         object.setId(oid);
-        object.getStructure().addChild(new MCRMetaLinkID("child", childID, childID.toString(), childID.toString()));
+
+        if (isParent(relatedItem)) {
+            object.getStructure().addChild(new MCRMetaLinkID("child", childID, childID.toString(), childID.toString()));
+        }
+
         Element mods = cloneRelatedItem(relatedItem);
         wrapper.setMODS(mods);
 
