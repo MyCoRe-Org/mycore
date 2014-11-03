@@ -36,7 +36,7 @@ public class MCRDerivateServlet extends MCRServlet {
         }
         String derivateId = getProperty(request, "derivateid");
         if (performTask(job, getProperty(request, "todo"), derivateId, getProperty(request, "file"))) {
-            response.sendRedirect(response.encodeRedirectURL(getServletBaseURL() + "MCRFileNodeServlet/" + derivateId));
+            response.sendRedirect(response.encodeRedirectURL(getServletBaseURL() + "MCRFileNodeServlet/" + derivateId + "/"));
         }
     }
 
