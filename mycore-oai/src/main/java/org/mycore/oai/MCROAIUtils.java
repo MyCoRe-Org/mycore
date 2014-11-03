@@ -58,7 +58,7 @@ public abstract class MCROAIUtils {
             String categID = setSpec.substring(setSpec.lastIndexOf(':') + 1).trim();
             String classID = setSpec.substring(0, setSpec.indexOf(':')).trim();
             classID = MCRClassificationAndSetMapper.mapSetToClassification(configPrefix, classID);
-            return "category:" + classID + "\\\\:" + categID;
+            return "category:" + classID + "\\:" + categID;
         } else {
             String id = setSpec;
             String query = MCRConfiguration.instance().getString(
