@@ -1747,6 +1747,10 @@
           <label xml:lang="en">All rights reserved</label>
           <label xml:lang="it">Tutti i diritti riservati</label>
         </item>
+        <item value="oa_nlz">
+          <label xml:lang="de">Open-Access im Zuge einer Allianz- bzw. Nationallizenz</label>
+          <label xml:lang="en">open access as part of an Alliance or national licence</label>
+        </item>
         <item value="cc_by">
           <label xml:lang="de">CC BY</label>
           <label xml:lang="en">CC BY</label>

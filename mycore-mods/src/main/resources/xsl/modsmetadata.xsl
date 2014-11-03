@@ -712,6 +712,9 @@
               <xsl:when test="contains($trimmed, 'rights_reserved')">
                 <xsl:apply-templates select="." mode="rights_reserved" />
               </xsl:when>
+              <xsl:when test="contains($trimmed, 'oa_nlz')">
+                <xsl:apply-templates select="." mode="oa_nlz" />
+              </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="." />
               </xsl:otherwise>
@@ -723,19 +726,6 @@
         </xsl:choose>
       </td>
     </tr>
-  </xsl:template>
-
-  <xsl:template match="mods:accessCondition" mode="cc-logo">
-    <xsl:variable name="licenseVersion" select="'3.0'" />
-    <!-- like cc_by-nc-sa: remove the 'cc_' -->
-    <xsl:variable name="licenseString" select="substring-after(normalize-space(.),'cc_')" />
-    <a rel="license" href="http://creativecommons.org/licenses/{$licenseString}/{$licenseVersion}/">
-      <img src="//i.creativecommons.org/l/{$licenseString}/{$licenseVersion}/88x31.png" />
-    </a>
-  </xsl:template>
-
-  <xsl:template match="mods:accessCondition" mode="rights_reserved">
-    <xsl:value-of select="i18n:translate('component.mods.metaData.dictionary.rightsReserved')" />
   </xsl:template>
 
   <xsl:template name="printMetaDate.mods.relatedItem">

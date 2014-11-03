@@ -108,4 +108,28 @@
     <xsl:value-of select="mcrxml:shortenText($completeTitle,70)" />
   </xsl:template>
 
+  <!--Template for access conditions -->
+  <xsl:template match="mods:accessCondition" mode="cc-logo">
+    <xsl:variable name="licenseVersion" select="'3.0'" />
+    <!-- like cc_by-nc-sa: remove the 'cc_' -->
+    <xsl:variable name="licenseString" select="substring-after(normalize-space(.),'cc_')" />
+    <a rel="license" href="http://creativecommons.org/licenses/{$licenseString}/{$licenseVersion}/">
+      <img src="//i.creativecommons.org/l/{$licenseString}/{$licenseVersion}/88x31.png" />
+    </a>
+  </xsl:template>
+
+  <xsl:template match="mods:accessCondition" mode="cc-text">
+    <!-- like cc_by-nc-sa: remove the 'cc_' -->
+    <xsl:variable name="licenseString" select="substring-after(normalize-space(.),'cc_')" />
+    <xsl:value-of select="i18n:translate(concat('component.mods.metaData.dictionary.cc.30.', $licenseString))" />
+  </xsl:template>
+
+  <xsl:template match="mods:accessCondition" mode="rights_reserved">
+    <xsl:value-of select="i18n:translate('component.mods.metaData.dictionary.rightsReserved')" />
+  </xsl:template>
+
+  <xsl:template match="mods:accessCondition" mode="oa_nlz">
+    <xsl:value-of select="i18n:translate('component.mods.metaData.dictionary.oa_nlz')" />
+  </xsl:template>
+
 </xsl:stylesheet>
