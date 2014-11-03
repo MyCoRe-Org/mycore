@@ -34,7 +34,7 @@ import org.mycore.common.MCRException;
  * <p>
  * &lt;tag class="MCRMetaBoolean" heritable="..."&gt; <br>
  * &lt;subtag type="..."&gt; <br>
- * true|false or yes|no or ja|nein or wahr|falsch <br>
+ * true|false<br>
  * &lt;/subtag&gt; <br>
  * &lt;/tag&gt; <br>
  * 
@@ -72,7 +72,8 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      *
      * @exception MCRException if the set_subtag value is null or empty
      */
-    public MCRMetaBoolean(String set_subtag, String default_lang, String set_type, int set_inherted, String set_value) throws MCRException {
+    public MCRMetaBoolean(String set_subtag, String default_lang, String set_type, int set_inherted, String set_value)
+        throws MCRException {
         this(set_subtag, set_type, set_inherted, false);
         setValue(set_value);
     }
@@ -103,41 +104,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      *            the boolean value (true or false) as string
      */
     public void setValue(String set_value) {
-        try {
-            value = Boolean.parseBoolean(set_value);
-            return;
-        } catch (Exception e) {
-            LOGGER.warn("Boolean is not parseable, using legacy code to parse.", e);
-        }
-        if (set_value != null) {
-            set_value = set_value.toLowerCase();
-
-            if (set_value.equals("true")) {
-                value = true;
-
-                return;
-            }
-
-            if (set_value.equals("ja")) {
-                value = true;
-
-                return;
-            }
-
-            if (set_value.equals("yes")) {
-                value = true;
-
-                return;
-            }
-
-            if (set_value.equals("wahr")) {
-                value = true;
-
-                return;
-            }
-
-            value = false;
-        }
+        value = Boolean.parseBoolean(set_value);
     }
 
     /**
