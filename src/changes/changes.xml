@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrkrebs" type="add">
+        mycore-mods: added open access for national licences and refactured solr rights search field
+      </action>
       <action dev="mcrmeich" type="add">
         mycore-oai: make granularity configurable
       </action>

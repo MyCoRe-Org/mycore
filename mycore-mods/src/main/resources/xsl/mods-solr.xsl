@@ -147,7 +147,21 @@
     </xsl:for-each>
     <xsl:for-each select="mods:accessCondition[@type='use and reproduction']">
       <field name="mods.rights">
-        <xsl:value-of select="." />
+        <xsl:variable name="trimmed" select="normalize-space(.)" />
+        <xsl:choose>
+          <xsl:when test="contains($trimmed, 'cc_by')">
+            <xsl:apply-templates select="." mode="cc-text" />
+          </xsl:when>
+          <xsl:when test="contains($trimmed, 'rights_reserved')">
+            <xsl:apply-templates select="." mode="rights_reserved" />
+          </xsl:when>
+          <xsl:when test="contains($trimmed, 'oa_nlz')">
+            <xsl:apply-templates select="." mode="oa_nlz" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="." />
+          </xsl:otherwise>
+        </xsl:choose>
       </field>
     </xsl:for-each>
   </xsl:template>
