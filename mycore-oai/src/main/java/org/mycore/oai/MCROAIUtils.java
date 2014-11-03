@@ -35,9 +35,13 @@ import org.mycore.services.fieldquery.MCRSortBy;
 
 public abstract class MCROAIUtils {
 
-    public static MCRCondition getDefaultRestriction(String configPrefix) {
+    public static String getDefaultRestriction(String configPrefix) {
         MCRConfiguration config = MCRConfiguration.instance();
-        String r = config.getString(configPrefix + "Search.Restriction", null);
+        return config.getString(configPrefix + "Search.Restriction", null);
+    }
+
+    public static MCRCondition getDefaultRestrictionCondition(String configPrefix) {
+        String r = getDefaultRestriction(configPrefix);
         if (r != null) {
             try {
                 return new MCRQueryParser().parse(r);
@@ -49,6 +53,25 @@ public abstract class MCROAIUtils {
         return null;
     }
 
+    public static String getDefaultSetQuery(String setSpec, String configPrefix) {
+        if (setSpec.contains(":")) {
+            String categID = setSpec.substring(setSpec.lastIndexOf(':') + 1).trim();
+            String classID = setSpec.substring(0, setSpec.indexOf(':')).trim();
+            classID = MCRClassificationAndSetMapper.mapSetToClassification(configPrefix, classID);
+            return "category:" + classID + "\\\\:" + categID;
+        } else {
+            String id = setSpec;
+            String query = MCRConfiguration.instance().getString(
+                configPrefix + "MapSetToQuery." + id.replace(":", "_"), "");
+            if (!query.equals("")) {
+                return query;
+            } else {
+                id = MCRClassificationAndSetMapper.mapSetToClassification(configPrefix, id);
+                return "category:*" + id + "*";
+            }
+        }
+    }
+
     public static MCRCondition getDefaultSetCondition(String setSpec, String configPrefix) {
         if (setSpec.contains(":")) {
             String categID = setSpec.substring(setSpec.lastIndexOf(':') + 1).trim();
@@ -58,7 +81,8 @@ public abstract class MCROAIUtils {
             return new MCRQueryCondition("category", "=", id);
         } else {
             String id = setSpec;
-            String query = MCRConfiguration.instance().getString(configPrefix + "MapSetToQuery." + id.replace(":","_"), "");
+            String query = MCRConfiguration.instance().getString(
+                configPrefix + "MapSetToQuery." + id.replace(":", "_"), "");
             if (!query.equals("")) {
                 return new MCRQueryParser().parse(query);
             } else {
@@ -74,7 +98,7 @@ public abstract class MCROAIUtils {
         String searchSortBy = config.getString(configField, defaultValue);
         for (StringTokenizer st = new StringTokenizer(searchSortBy, ",;:"); st.hasMoreTokens();) {
             String token = st.nextToken().trim();
-            String  field = token.split(" ")[0];
+            String field = token.split(" ")[0];
             boolean order = "ascending".equalsIgnoreCase(token.split(" ")[1]);
             sortBy.add(new MCRSortBy(field, order));
         }

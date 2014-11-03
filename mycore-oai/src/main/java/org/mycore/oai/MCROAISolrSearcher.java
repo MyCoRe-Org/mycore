@@ -60,29 +60,27 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         }
 
         if (this.set != null) {
-        	String solrQuery = null;
-        	String origSet = set.getSpec();
-        	String query = getConfig().getString(getConfigPrefix() + "MapSetToQuery."+origSet, null);
-         	if(query!=null){
-        		solrQuery = query;
-        	}
-        	else{
-        		String classid = MCRClassificationAndSetMapper.mapSetToClassification(getConfigPrefix(), set.getSpec().split("\\:")[0]);
-        		if(origSet.contains(":")){
-        			solrQuery = "category.top:"+classid+"\\:"+origSet.substring(origSet.indexOf(":")+1);
-        		}
-        		else{
-        			solrQuery = "category.top:"+classid+"*";
-        		}
-        	}
-        	if(solrQuery!=null){
-        		 if (restriction == null) {
-        			 params.set("q", solrQuery);
-        	     }
-        		 else{
-        			 params.set("q", restriction + " AND "+ solrQuery);
-        		 }
-        	}
+            String solrQuery = null;
+            String origSet = set.getSpec();
+            String query = getConfig().getString(getConfigPrefix() + "MapSetToQuery." + origSet, null);
+            if (query != null) {
+                solrQuery = query;
+            } else {
+                String classid = MCRClassificationAndSetMapper.mapSetToClassification(getConfigPrefix(), set.getSpec()
+                    .split("\\:")[0]);
+                if (origSet.contains(":")) {
+                    solrQuery = "category.top:" + classid + "\\:" + origSet.substring(origSet.indexOf(":") + 1);
+                } else {
+                    solrQuery = "category.top:" + classid + "*";
+                }
+            }
+            if (solrQuery != null) {
+                if (restriction == null) {
+                    params.set("q", solrQuery);
+                } else {
+                    params.set("q", restriction + " AND " + solrQuery);
+                }
+            }
         }
         // filter query
         StringBuilder fq = new StringBuilder();
