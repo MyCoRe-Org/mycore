@@ -46,7 +46,7 @@
   <xsl:template name="iview2.init">
     <!-- design settings -->
     <xsl:param name="styleFolderUri" select="'gfx/'" />
-	<!-- chapter settings -->
+    <!-- chapter settings -->
     <xsl:param name="chapterEmbedded" select="'false'" />
     <xsl:param name="chapDynResize" select="'false'" />
     <!-- thumbnail settings -->
@@ -143,7 +143,27 @@
     <xsl:param name="imagePath" />
     <xsl:param name="style" select="''" />
     <xsl:param name="class" select="''" />
-      <img src="{concat($WebApplicationBaseURL,'servlets/MCRTileCombineServlet/THUMBNAIL/',$derivate,'/',$imagePath)}" style="{$style}" class="{$class}"/>
+
+    <xsl:comment>
+      Begin - iview2.getImageElement (mcr-module-iview2.xsl)
+    </xsl:comment>
+
+    <xsl:variable name="file">
+      <xsl:choose>
+        <xsl:when test="starts-with($imagePath, '/')">
+          <xsl:value-of select="substring-after($imagePath,'/')" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$imagePath" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <img src="{concat($WebApplicationBaseURL,'servlets/MCRTileCombineServlet/THUMBNAIL/',$derivate,'/',$file)}" style="{$style}" class="{$class}" />
+
+    <xsl:comment>
+      End - iview2.getImageElement (mcr-module-iview2.xsl)
+    </xsl:comment>
   </xsl:template>
 
 </xsl:stylesheet>
