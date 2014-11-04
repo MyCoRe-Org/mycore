@@ -61,7 +61,8 @@
 
   <xsl:template name="iview2.clientLink">
     <xsl:param name="file" />
-
+    <xsl:param name="derivateID" />
+    
     <xsl:variable name="linkedFile">
       <xsl:choose>
         <xsl:when test="starts-with($file, '/')">
@@ -72,8 +73,6 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-
-    <xsl:param name="derivateID" />
     <div class="container">
       <a class="thumbnail col-md-12" href="{concat($WebApplicationBaseURL,'rsc/viewer/', $derivateID, '/', $linkedFile)}">
         <xsl:call-template name="iview2.getImageElement">
