@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:iview2="xalan://org.mycore.iview2.frontend.MCRIView2XSLFunctions"
-  exclude-result-prefixes="iview2 encoder">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:encoder="xalan://java.net.URLEncoder"
+  xmlns:iview2="xalan://org.mycore.iview2.frontend.MCRIView2XSLFunctions" exclude-result-prefixes="iview2 encoder">
 
 
   <xsl:include href="mcr-module-iview2.xsl" />
@@ -61,6 +61,18 @@
 
   <xsl:template name="iview2.clientLink">
     <xsl:param name="file" />
+
+    <xsl:variable name="linkedFile">
+      <xsl:choose>
+        <xsl:when test="starts-with($file, '/')">
+          <xsl:value-of select="substring-after($file,'/')" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$file" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
     <xsl:param name="derivateID" />
     <div class="container">
       <a class="thumbnail col-md-12" href="{concat($WebApplicationBaseURL,'rsc/viewer/', $derivateID, '/', $file)}">
@@ -70,6 +82,5 @@
         </xsl:call-template>
       </a>
     </div>
-
   </xsl:template>
 </xsl:stylesheet>
