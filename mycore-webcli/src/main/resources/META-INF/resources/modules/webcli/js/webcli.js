@@ -350,7 +350,11 @@ var webcli={
 			var oldSize=webcli.logs.ringBuffer.curSize;
 			dojo.forEach(webcli.logs.logBuffer, function(line){
 				webcli.logs.ringBuffer.add(line);
-				logElement.appendChild(document.createTextNode(line.logLevel+": "+line.message+"\r\n"));
+                var message = line.logLevel + ": " + line.message + "\r\n";
+                if (line.exception != null) {
+                    message = message + line.exception + "\r\n";
+                }
+                logElement.appendChild(document.createTextNode(message));
 			});
 			var curSize = oldSize + webcli.logs.logBuffer.length;
 			//remove old log lines
