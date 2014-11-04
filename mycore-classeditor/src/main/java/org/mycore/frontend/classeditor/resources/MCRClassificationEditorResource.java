@@ -32,6 +32,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
@@ -289,12 +290,23 @@ public class MCRClassificationEditorResource {
 
         private MCRJSONCategory category;
 
-        public UpdateOp(MCRJSONCategory category) {
+        private JsonObject jsonObject;
+
+        public UpdateOp(MCRJSONCategory category, JsonObject jsonObject) {
             this.category = category;
+            this.jsonObject = jsonObject;
         }
 
         @Override
         public void run() {
+            MCRCategoryID mcrCategoryID = category.getId();
+            boolean isAdded = isAdded(jsonObject);
+            if (isAdded && MCRCategoryDAOFactory.getInstance().exist(mcrCategoryID)) {
+                // an added category already exist -> throw conflict error
+                throw new WebApplicationException(Response.status(Status.CONFLICT)
+                    .entity(buildJsonError("duplicateID", mcrCategoryID)).build());
+            }
+
             MCRCategoryID newParentID = category.getParentID();
             if (newParentID != null && !CATEGORY_DAO.exist(newParentID)) {
                 throw new WebApplicationException(Status.NOT_FOUND);
@@ -327,18 +339,10 @@ public class MCRClassificationEditorResource {
             Collections.sort(saveList, new IndexComperator());
             for (JsonObject jsonObject : saveList) {
                 String status = getStatus(jsonObject);
-                boolean isAdded = isAdded(jsonObject);
                 SaveElement categ = getCateg(jsonObject);
                 MCRJSONCategory parsedCateg = parseJson(categ.getJson());
                 if ("update".equals(status)) {
-                    MCRCategoryID mcrCategoryID = parsedCateg.getId();
-                    if (isAdded && MCRCategoryDAOFactory.getInstance().exist(mcrCategoryID)) {
-                        // an added category already exist -> throw conflict error
-                        return Response.status(Status.CONFLICT).entity(buildJsonError("duplicateID", mcrCategoryID))
-                            .build();
-                    }
-
-                    sessionized(new UpdateOp(parsedCateg));
+                    sessionized(new UpdateOp(parsedCateg, jsonObject));
                 } else if ("delete".equals(status)) {
                     deleteCateg(categ.getJson());
                 } else {
