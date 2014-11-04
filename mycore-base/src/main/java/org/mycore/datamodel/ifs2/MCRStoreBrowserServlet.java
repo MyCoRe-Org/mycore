@@ -29,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 import org.jdom2.Document;
@@ -55,9 +56,9 @@ import org.mycore.frontend.servlets.MCRServletJob;
  */
 public class MCRStoreBrowserServlet extends MCRServlet {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Override
+    @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
         String pathInfo = job.getRequest().getPathInfo();
 
@@ -153,7 +154,7 @@ class MCRStoreBrowserRequest {
      */
     private String getLastModifiedDate(int id) throws IOException {
         Date lastModified = store.retrieve(id).getLastModified();
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(lastModified);
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ROOT).format(lastModified);
     }
 
     /**

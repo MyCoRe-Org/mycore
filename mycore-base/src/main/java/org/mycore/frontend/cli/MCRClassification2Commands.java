@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -83,8 +84,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @param classID
      * @see MCRCategoryDAO#deleteCategory(MCRCategoryID)
      */
-    @MCRCommand(syntax = "delete classification {0}",
-            help = "The command remove the classification with MCRObjectID {0} from the system.", order = 30)
+    @MCRCommand(syntax = "delete classification {0}", help = "The command remove the classification with MCRObjectID {0} from the system.", order = 30)
     public static void delete(String classID) {
         DAO.deleteCategory(MCRCategoryID.rootID(classID));
     }
@@ -95,12 +95,10 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @param classID
      * @see MCRCategoryDAO#deleteCategory(MCRCategoryID)
      */
-    @MCRCommand(syntax = "count classification children of {0}",
-            help = "The command count the categoies of the classification with MCRObjectID {0} in the system.",
-            order = 80)
+    @MCRCommand(syntax = "count classification children of {0}", help = "The command count the categoies of the classification with MCRObjectID {0} in the system.", order = 80)
     public static void countChildren(String classID) {
         MCRCategory category = DAO.getCategory(MCRCategoryID.rootID(classID), -1);
-        System.out.printf("%s has %d children", category.getId(), category.getChildren().size());
+        System.out.printf(Locale.ROOT, "%s has %d children", category.getId(), category.getChildren().size());
     }
 
     /**
@@ -115,10 +113,9 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @throws MCRException
      * @see MCRCategoryDAO#addCategory(MCRCategoryID, MCRCategory)
      */
-    @MCRCommand(syntax = "load classification from file {0}",
-            help = "The command adds a new classification from file {0} to the system.", order = 10)
+    @MCRCommand(syntax = "load classification from file {0}", help = "The command adds a new classification from file {0} to the system.", order = 10)
     public static void loadFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException,
-            IOException {
+        IOException {
         Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRFileContent(filename));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         DAO.addCategory(null, category);
@@ -134,10 +131,9 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @throws MCRException
      * @see MCRCategoryDAO#replaceCategory(MCRCategory)
      */
-    @MCRCommand(syntax = "update classification from file {0}",
-            help = "The command updates a classification from file {0} to the system.", order = 20)
+    @MCRCommand(syntax = "update classification from file {0}", help = "The command updates a classification from file {0} to the system.", order = 20)
     public static void updateFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException,
-            IOException {
+        IOException {
         Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRFileContent(filename));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         if (DAO.exist(category.getId())) {
@@ -155,8 +151,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      *            the directory containing the XML files
      * @throws MCRActiveLinkException
      */
-    @MCRCommand(syntax = "load all classifications from directory {0}",
-            help = "The command add all classifications in the directory {0} to the system.", order = 40)
+    @MCRCommand(syntax = "load all classifications from directory {0}", help = "The command add all classifications in the directory {0} to the system.", order = 40)
     public static List<String> loadFromDirectory(String directory) throws MCRActiveLinkException {
         return processFromDirectory(directory, false);
     }
@@ -168,8 +163,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      *            the directory containing the XML files
      * @throws MCRActiveLinkException
      */
-    @MCRCommand(syntax = "update all classifications from directory {0}",
-            help = "The command update all classifications in the directory {0} to the system.", order = 50)
+    @MCRCommand(syntax = "update all classifications from directory {0}", help = "The command update all classifications in the directory {0} to the system.", order = 50)
     public static List<String> updateFromDirectory(String directory) throws MCRActiveLinkException {
         return processFromDirectory(directory, true);
     }
@@ -203,7 +197,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         for (String file : list) {
             if (file.endsWith(".xml")) {
                 cmds.add((update ? "update" : "load") + " classification from file "
-                        + new File(dir, file).getAbsolutePath());
+                    + new File(dir, file).getAbsolutePath());
             }
         }
 
@@ -222,10 +216,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      *            -classification.xsl
      * @return false if an error was occured, else true
      */
-    @MCRCommand(
-            syntax = "export classification {0} to directory {1} with {2}",
-            help = "The command exports the classification with MCRObjectID {0} as xml file to directory named {1} using the stylesheet {2}-object.xsl. For {2} save is the default.",
-            order = 60)
+    @MCRCommand(syntax = "export classification {0} to directory {1} with {2}", help = "The command exports the classification with MCRObjectID {0} as xml file to directory named {1} using the stylesheet {2}-object.xsl. For {2} save is the default.", order = 60)
     public static boolean export(String ID, String dirname, String style) throws Exception {
         String dname = "";
         if (dirname.length() != 0) {
@@ -274,7 +265,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @throws TransformerConfigurationException
      */
     private static Transformer getTransformer(String style) throws TransformerFactoryConfigurationError,
-            TransformerConfigurationException {
+        TransformerConfigurationException {
         String xslfile = DEFAULT_TRANSFORMER;
         if (style != null && style.trim().length() != 0) {
             xslfile = style + "-classification.xsl";
@@ -304,10 +295,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      *            -classification.xsl
      * @return false if an error was occured, else true
      */
-    @MCRCommand(
-            syntax = "export all classifications to directory {0} with {1}",
-            help = "The command store all classifications to the directory with name {0} with the stylesheet {1}-object.xsl. For {1} save is the default.",
-            order = 70)
+    @MCRCommand(syntax = "export all classifications to directory {0} with {1}", help = "The command store all classifications to the directory with name {0} with the stylesheet {1}-object.xsl. For {1} save is the default.", order = 70)
     public static boolean exportAll(String dirname, String style) throws Exception {
         List<MCRCategoryID> allClassIds = DAO.getRootCategoryIDs();
         boolean ret = false;
@@ -320,8 +308,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     /**
      * List all IDs of all classifications stored in the database
      */
-    @MCRCommand(syntax = "list all classifications",
-            help = "The command list all classification stored in the database.", order = 100)
+    @MCRCommand(syntax = "list all classifications", help = "The command list all classification stored in the database.", order = 100)
     public static void listAllClassifications() {
         List<MCRCategoryID> allClassIds = DAO.getRootCategoryIDs();
         for (MCRCategoryID id : allClassIds) {
@@ -336,8 +323,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @param classid
      *            the MCRObjectID of the classification
      */
-    @MCRCommand(syntax = "list classification {0}",
-            help = "The command list the classification with MCRObjectID {0}.", order = 90)
+    @MCRCommand(syntax = "list classification {0}", help = "The command list the classification with MCRObjectID {0}.", order = 90)
     public static void listClassification(String classid) {
         MCRCategoryID clid = MCRCategoryID.rootID(classid);
         MCRCategory cl = DAO.getCategory(clid, -1);
@@ -368,9 +354,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         }
     }
 
-    @MCRCommand(syntax = "repair category with empty labels",
-            help = "fixes all categories with no labels (adds a label with categid as @text for default lang)",
-            order = 110)
+    @MCRCommand(syntax = "repair category with empty labels", help = "fixes all categories with no labels (adds a label with categid as @text for default lang)", order = 110)
     public static void repairEmptyLabels() {
         Session session = MCRHIBConnection.instance().getSession();
         String sqlQuery = "select cat.classid,cat.categid from mcrcategory cat left outer join mcrcategorylabels label on cat.internalid = label.category where label.text is null";
@@ -386,39 +370,39 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             MCRLabel mcrCategLabel = new MCRLabel(MCRConstants.DEFAULT_LANG, categIDString, null);
             MCRCategoryDAOFactory.getInstance().setLabel(mcrCategID, mcrCategLabel);
             LOGGER.info("fixing category with class ID \"" + classIDString + "\" and category ID \"" + categIDString
-                    + "\"");
+                + "\"");
         }
         LOGGER.info("Fixing category labels completed!");
     }
 
-    @MCRCommand(syntax = "repair position in parent",
-            help = "fixes all categories gaps in position in parent", order = 120)
+    @MCRCommand(syntax = "repair position in parent", help = "fixes all categories gaps in position in parent", order = 120)
     @SuppressWarnings("unchecked")
     public static void repairPositionInParent() {
         Session session = MCRHIBConnection.instance().getSession();
         // this SQL-query find missing numbers in positioninparent
         String sqlQuery = "select parentid, min(cat1.positioninparent+1) from MCRCATEGORY cat1 "
-                + "where cat1.parentid is not null and not exists" + "(select 1 from MCRCATEGORY cat2 "
-                + "where cat2.parentid=cat1.parentid and cat2.positioninparent=(cat1.positioninparent+1))"
-                + "and cat1.positioninparent not in " + "(select max(cat3.positioninparent) from MCRCATEGORY cat3 "
-                + "where cat3.parentid=cat1.parentid) group by cat1.parentid";
+            + "where cat1.parentid is not null and not exists" + "(select 1 from MCRCATEGORY cat2 "
+            + "where cat2.parentid=cat1.parentid and cat2.positioninparent=(cat1.positioninparent+1))"
+            + "and cat1.positioninparent not in " + "(select max(cat3.positioninparent) from MCRCATEGORY cat3 "
+            + "where cat3.parentid=cat1.parentid) group by cat1.parentid";
 
         for (List<Object[]> parentWithErrorsList = session.createSQLQuery(sqlQuery).list(); !parentWithErrorsList
-                .isEmpty(); parentWithErrorsList = session.createSQLQuery(sqlQuery).list()) {
+            .isEmpty(); parentWithErrorsList = session.createSQLQuery(sqlQuery).list()) {
             for (Object[] parentWithErrors : parentWithErrorsList) {
                 Number parentID = (Number) parentWithErrors[0];
                 Number firstErrorPositionInParent = (Number) parentWithErrors[1];
-                LOGGER.info("Category " + parentID + " has the missing position " + firstErrorPositionInParent + " ...");
+                LOGGER
+                    .info("Category " + parentID + " has the missing position " + firstErrorPositionInParent + " ...");
                 repairCategoryWithGapInPos(parentID, firstErrorPositionInParent);
                 LOGGER.info("Fixed position " + firstErrorPositionInParent + " for category " + parentID + ".");
             }
         }
 
         sqlQuery = "select parentid, min(cat1.positioninparent-1) from MCRCATEGORY cat1 "
-                + "where cat1.parentid is not null and not exists" + "(select 1 from MCRCATEGORY cat2 "
-                + "where cat2.parentid=cat1.parentid and cat2.positioninparent=(cat1.positioninparent-1))"
-                + "and cat1.positioninparent not in " + "(select max(cat3.positioninparent) from MCRCATEGORY cat3 "
-                + "where cat3.parentid=cat1.parentid) and cat1.positioninparent > 0 group by cat1.parentid";
+            + "where cat1.parentid is not null and not exists" + "(select 1 from MCRCATEGORY cat2 "
+            + "where cat2.parentid=cat1.parentid and cat2.positioninparent=(cat1.positioninparent-1))"
+            + "and cat1.positioninparent not in " + "(select max(cat3.positioninparent) from MCRCATEGORY cat3 "
+            + "where cat3.parentid=cat1.parentid) and cat1.positioninparent > 0 group by cat1.parentid";
 
         while (true) {
             List<Object[]> parentWithErrorsList = session.createSQLQuery(sqlQuery).list();
@@ -431,7 +415,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
                 Number parentID = (Number) parentWithErrors[0];
                 Number wrongStartPositionInParent = (Number) parentWithErrors[1];
                 LOGGER.info("Category " + parentID + " has the the starting position " + wrongStartPositionInParent
-                        + " ...");
+                    + " ...");
                 repairCategoryWithWrongStartPos(parentID, wrongStartPositionInParent);
                 LOGGER.info("Fixed position " + wrongStartPositionInParent + " for category " + parentID + ".");
             }
@@ -442,7 +426,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     public static void repairCategoryWithWrongStartPos(Number parentID, Number wrongStartPositionInParent) {
         Session session = MCRHIBConnection.instance().getSession();
         String sqlQuery = "update MCRCATEGORY set positioninparent= positioninparent -" + wrongStartPositionInParent
-                + "-1 where parentid=" + parentID + " and positioninparent > " + wrongStartPositionInParent;
+            + "-1 where parentid=" + parentID + " and positioninparent > " + wrongStartPositionInParent;
 
         session.createSQLQuery(sqlQuery).executeUpdate();
     }
@@ -455,21 +439,17 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         // 3
         // so the reate is 5-3 = 2
         String sqlQuery = "update MCRCATEGORY set positioninparent=(positioninparent - (select min(positioninparent) from MCRCATEGORY where parentid="
-                + parentID
-                + " and positioninparent > "
-                + firstErrorPositionInParent
-                + ")+"
-                + firstErrorPositionInParent
-                + ") where parentid="
-                + parentID
-                + " and positioninparent > "
-                + firstErrorPositionInParent;
+            + parentID
+            + " and positioninparent > "
+            + firstErrorPositionInParent
+            + ")+"
+            + firstErrorPositionInParent
+            + ") where parentid=" + parentID + " and positioninparent > " + firstErrorPositionInParent;
 
         session.createSQLQuery(sqlQuery).executeUpdate();
     }
 
-    @MCRCommand(syntax = "repair left right values for classification {0}",
-            help = "fixes all left and right values in the given classification", order = 130)
+    @MCRCommand(syntax = "repair left right values for classification {0}", help = "fixes all left and right values in the given classification", order = 130)
     public static void repairLeftRightValue(String classID) {
         if (!(DAO instanceof MCRCategoryDAOImpl)) {
             LOGGER.error("Command not compatible with " + DAO.getClass().getName());
@@ -478,8 +458,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         ((MCRCategoryDAOImpl) DAO).repairLeftRightValue(classID);
     }
 
-    @MCRCommand(syntax = "check all classifications",
-            help = "checks if all redundant information are stored without conflicts", order = 140)
+    @MCRCommand(syntax = "check all classifications", help = "checks if all redundant information are stored without conflicts", order = 140)
     public static List<String> checkAllClassifications() {
         List<MCRCategoryID> classifications = MCRCategoryDAOFactory.getInstance().getRootCategoryIDs();
         List<String> commands = new ArrayList<String>(classifications.size());
@@ -489,12 +468,11 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         return commands;
     }
 
-    @MCRCommand(syntax = "check classification {0}",
-            help = "checks if all redundant information are stored without conflicts", order = 150)
+    @MCRCommand(syntax = "check classification {0}", help = "checks if all redundant information are stored without conflicts", order = 150)
     public static void checkClassification(String id) {
         LOGGER.info("Checking classifcation " + id);
         MCRCategoryImpl category = (MCRCategoryImpl) MCRCategoryDAOFactory.getInstance().getCategory(
-                MCRCategoryID.rootID(id), -1);
+            MCRCategoryID.rootID(id), -1);
         LOGGER.info(id + ": checking left, right and level values and for non-null children");
         ArrayList<String> log = new ArrayList<String>();
         checkLeftRightAndLevel(category, 0, 0, log);
@@ -541,7 +519,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     private static void checkEmptyLabels(String classID, List<String> log) {
         Session session = MCRHIBConnection.instance().getSession();
         String sqlQuery = "select cat.categid from MCRCategory cat left outer join MCRCategoryLabels label on cat.internalid = label.category where cat.classid='"
-                + classID + "' and label.text is null";
+            + classID + "' and label.text is null";
         @SuppressWarnings("unchecked")
         List<String> list = session.createSQLQuery(sqlQuery).list();
 

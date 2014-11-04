@@ -26,6 +26,7 @@ package org.mycore.common;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Locale;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -73,8 +74,8 @@ public class MCRCoreVersion {
     }
 
     public static void main(String arg[]) {
-        System.out.printf("MyCoRe\tver: %s\trev: %d\n", VERSION, REVISION);
-        System.out.printf("Config directory: %s\n", MCRConfigurationDir.getConfigurationDirectory());
+        System.out.printf(Locale.ROOT, "MyCoRe\tver: %s\trev: %d\n", VERSION, REVISION);
+        System.out.printf(Locale.ROOT, "Config directory: %s\n", MCRConfigurationDir.getConfigurationDirectory());
     }
 
     private static int getRevisionFromProperty() {

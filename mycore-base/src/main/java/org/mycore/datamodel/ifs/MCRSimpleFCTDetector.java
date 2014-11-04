@@ -25,6 +25,7 @@ package org.mycore.datamodel.ifs;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
@@ -251,12 +252,12 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
             super(score);
 
             if (format.equals("text")) {
-                this.pattern = pattern.getBytes();
+                this.pattern = pattern.getBytes(StandardCharsets.ISO_8859_1);
             } else if (format.equals("hex")) {
                 this.pattern = new byte[pattern.length() / 2];
 
                 for (int i = 0; i < pattern.length(); i += 2) {
-                    String hex = pattern.substring(i, i + 2).toLowerCase();
+                    String hex = pattern.substring(i, i + 2);
                     this.pattern[i / 2] = (byte) Integer.parseInt(hex, 16);
                 }
             } else if (format.equals("bytes")) {
@@ -340,7 +341,7 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
 
         @Override
         double getScore(String filename, byte[] header) {
-            String head = new String(header);
+            String head = new String(header, StandardCharsets.ISO_8859_1);
             if (head.contains(string)) {
                 return score;
             }

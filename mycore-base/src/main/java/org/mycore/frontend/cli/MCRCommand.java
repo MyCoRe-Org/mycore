@@ -31,6 +31,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang.ClassUtils;
@@ -49,9 +50,9 @@ import org.mycore.common.config.MCRConfigurationException;
  * @version $Revision$ $Date$
  */
 public class MCRCommand {
-    
+
     private static final Logger LOGGER = Logger.getLogger(MCRCommand.class);
-    
+
     /** The input format used for invoking this command */
     protected MessageFormat messageFormat;
 
@@ -100,26 +101,27 @@ public class MCRCommand {
         methodName = token.substring(point + 1);
         int numParameters = st.countTokens();
         parameterTypes = new Class<?>[numParameters];
-        messageFormat = new MessageFormat(format);
+        messageFormat = new MessageFormat(format, Locale.ROOT);
 
         for (int i = 0; i < numParameters; i++) {
             token = st.nextToken();
 
             Format f = null;
-
-            if (token.equals("int")) {
-                parameterTypes[i] = Integer.TYPE;
-                f = NumberFormat.getIntegerInstance();
-            } else if (token.equals("long")) {
-                parameterTypes[i] = Long.TYPE;
-                f = NumberFormat.getIntegerInstance();
-            } else if (token.equals("String")) {
-                parameterTypes[i] = String.class;
-                f = null;
-            } else {
-                unsupportedArgException(methodSignature, token);
+            switch (token) {
+                case "int":
+                    parameterTypes[i] = Integer.TYPE;
+                    f = NumberFormat.getIntegerInstance(Locale.ROOT);
+                    break;
+                case "long":
+                    parameterTypes[i] = Long.TYPE;
+                    f = NumberFormat.getIntegerInstance(Locale.ROOT);
+                    break;
+                case "String":
+                    parameterTypes[i] = String.class;
+                    break;
+                default:
+                    unsupportedArgException(methodSignature, token);
             }
-
             messageFormat.setFormat(i, f);
         }
 
@@ -145,14 +147,14 @@ public class MCRCommand {
         org.mycore.frontend.cli.annotation.MCRCommand cmdAnnotation = cmd
             .getAnnotation(org.mycore.frontend.cli.annotation.MCRCommand.class);
         help = cmdAnnotation.help();
-        messageFormat = new MessageFormat(cmdAnnotation.syntax());
+        messageFormat = new MessageFormat(cmdAnnotation.syntax(), Locale.ROOT);
         method = cmd;
 
         for (int i = 0; i < parameterTypes.length; i++) {
             Class<?> paramtype = parameterTypes[i];
             if (ClassUtils.isAssignable(paramtype, Integer.class, true)
                 || ClassUtils.isAssignable(paramtype, Long.class, true)) {
-                messageFormat.setFormat(i, NumberFormat.getIntegerInstance());
+                messageFormat.setFormat(i, NumberFormat.getIntegerInstance(Locale.ROOT));
             } else if (!String.class.isAssignableFrom(paramtype)) {
                 unsupportedArgException(className + "." + methodName, paramtype.getName());
             }
@@ -255,11 +257,11 @@ public class MCRCommand {
         Object[] commandParameters = parseCommandLine(input);
 
         if (commandParameters == null) {
-            LOGGER.info("No match for syntax: "+getSyntax());
+            LOGGER.info("No match for syntax: " + getSyntax());
             return null;
         }
-        LOGGER.info("Syntax matched (executed): "+getSyntax());
-        
+        LOGGER.info("Syntax matched (executed): " + getSyntax());
+
         initMethod(classLoader);
         prepareInvocationParameters(commandParameters);
         Object result = method.invoke(null, commandParameters);

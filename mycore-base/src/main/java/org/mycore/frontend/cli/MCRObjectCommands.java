@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -193,7 +194,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         return processFromDirectory(true, directory, true);
     }
 
-  
     /**
      * Load MCRObject's from all XML files in a directory.
      * 
@@ -230,7 +230,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            if true, object will be updated, else object is created
      * @throws MCRActiveLinkException
      */
-    private static List<String> processFromDirectory(boolean topological, String directory, boolean update) throws MCRActiveLinkException {
+    private static List<String> processFromDirectory(boolean topological, String directory, boolean update)
+        throws MCRActiveLinkException {
         File dir = new File(directory);
 
         if (!dir.isDirectory()) {
@@ -244,28 +245,29 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.warn("No files found in directory " + directory);
             return null;
         }
-        
-    	List<String> cmds = new ArrayList<String>();
-        if(topological){
-        	MCRTopologicalSort ts = new MCRTopologicalSort();
-        	ts.prepareData(list, dir);
-        	int[] order = ts.doTopoSort();
-    		if(order!=null) {
-    			for(int o: order){
-    				String file = list[o];
-    				if (file.endsWith(".xml") && !file.contains("derivate")) {
-    					cmds.add((update ? "update" : "load") + " object from file " + new File(dir, file).getAbsolutePath());
-    				}
-    			}
-    		}
-        }
-        else{
-        	Arrays.sort(list);
-        	for (String file : list) {
-        		if (file.endsWith(".xml") && !file.contains("derivate")) {
-        			cmds.add((update ? "update" : "load") + " object from file " + new File(dir, file).getAbsolutePath());
-        		}
-        	}
+
+        List<String> cmds = new ArrayList<String>();
+        if (topological) {
+            MCRTopologicalSort ts = new MCRTopologicalSort();
+            ts.prepareData(list, dir);
+            int[] order = ts.doTopoSort();
+            if (order != null) {
+                for (int o : order) {
+                    String file = list[o];
+                    if (file.endsWith(".xml") && !file.contains("derivate")) {
+                        cmds.add((update ? "update" : "load") + " object from file "
+                            + new File(dir, file).getAbsolutePath());
+                    }
+                }
+            }
+        } else {
+            Arrays.sort(list);
+            for (String file : list) {
+                if (file.endsWith(".xml") && !file.contains("derivate")) {
+                    cmds.add((update ? "update" : "load") + " object from file "
+                        + new File(dir, file).getAbsolutePath());
+                }
+            }
         }
 
         return cmds;
@@ -664,7 +666,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     @MCRCommand(syntax = "list revisions of {0}", help = "List revisions of MCRObject.", order = 260)
     public static void listRevisions(String id) {
         MCRObjectID mcrId = MCRObjectID.getInstance(id);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ROOT);
         try {
             StringBuilder log = new StringBuilder("Revisions:\n");
             List<MCRMetadataVersion> revisions = MCRXMLMetadataManager.instance().listRevisions(mcrId);
@@ -880,7 +882,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     public static List<String> repairMetadataSearch(String type) {
         LOGGER.info("Start the repair for type " + type);
         String typetest = CONFIG.getString("MCR.Metadata.Type." + type, "");
-    
+
         if (typetest.length() == 0) {
             LOGGER.error("The type " + type + " was not found.");
             return Collections.emptyList();
@@ -890,9 +892,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.warn("No ID's was found for type " + type + ".");
             return Collections.emptyList();
         }
-    
+
         List<String> cmds = new ArrayList<String>(ar.size());
-    
+
         for (String stid : ar) {
             cmds.add("repair metadata search of ID " + stid);
         }
@@ -908,16 +910,16 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     @MCRCommand(syntax = "repair metadata search of ID {0}", help = "Retrieves the MCRObject with the MCRObjectID {0} and restores it in the search store.", order = 180)
     public static void repairMetadataSearchForID(String id) {
         LOGGER.info("Start the repair for the ID " + id);
-    
+
         MCRObjectID mid = null;
-    
+
         try {
             mid = MCRObjectID.getInstance(id);
         } catch (Exception e) {
             LOGGER.error("The String " + id + " is not a MCRObjectID.");
             return;
         }
-    
+
         MCRBase obj = MCRMetadataManager.retrieve(mid);
         MCRMetadataManager.fireRepairEvent(obj);
         LOGGER.info("Repaired " + mid.toString());

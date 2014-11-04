@@ -18,15 +18,16 @@
 package org.mycore.frontend.cli;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Vector;
 
 import org.apache.commons.lang.text.StrSubstitutor;
@@ -241,7 +242,8 @@ public class MCRCommandLineInterface {
         output("The following command failed:");
         output(lastCommand);
         if (!commandQueue.isEmpty()) {
-            System.out.printf("%s There are %s other commands still unprocessed.\n", system, commandQueue.size());
+            System.out.printf(Locale.ROOT, "%s There are %s other commands still unprocessed.\n", system,
+                commandQueue.size());
         } else if (interactiveMode) {
             return;
         }
@@ -251,13 +253,12 @@ public class MCRCommandLineInterface {
 
     private static void saveCommandQueueToFile(final Vector<String> queue, String fname) {
         output("Writing unprocessed commands to file " + fname);
-
-        try {
-            PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(fname)));
+        try (BufferedWriter bw = Files.newBufferedWriter(new File(fname).toPath(), Charset.defaultCharset(),
+            StandardOpenOption.CREATE)) {
             for (String command : queue) {
-                pw.println(command);
+                bw.append(command);
+                bw.newLine();
             }
-            pw.close();
         } catch (IOException ex) {
             MCRCLIExceptionHandler.handleException(ex);
         }
@@ -268,7 +269,8 @@ public class MCRCommandLineInterface {
         output("The following command failed:");
         output(lastCommand);
         if (!commandQueue.isEmpty()) {
-            System.out.printf("%s There are %s other commands still unprocessed.\n", system, commandQueue.size());
+            System.out.printf(Locale.ROOT, "%s There are %s other commands still unprocessed.\n", system,
+                commandQueue.size());
         }
         failedCommands.add(lastCommand);
     }
@@ -288,14 +290,14 @@ public class MCRCommandLineInterface {
      * @throws Exception
      */
     public static void show(String fname) throws Exception {
-        BufferedReader br = new BufferedReader(new FileReader(fname));
-        System.out.println();
-        String line;
-        int i = 1;
-        while ((line = br.readLine()) != null) {
-            System.out.printf("%04d: %s\n", i++, line);
+        try (BufferedReader br = Files.newBufferedReader(new File(fname).toPath(), Charset.defaultCharset())) {
+            System.out.println();
+            String line;
+            int i = 1;
+            while ((line = br.readLine()) != null) {
+                System.out.printf(Locale.ROOT, "%04d: %s\n", i++, line);
+            }
         }
-        br.close();
         System.out.println();
     }
 
@@ -321,22 +323,21 @@ public class MCRCommandLineInterface {
      *             when the file was not found
      */
     public static List<String> readCommandsFile(String file) throws IOException, FileNotFoundException {
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        output("Reading commands from file " + file);
+        try (BufferedReader reader = Files.newBufferedReader(new File(file).toPath(), Charset.defaultCharset())) {
+            output("Reading commands from file " + file);
 
-        String line;
-        List<String> list = new ArrayList<String>();
-        while ((line = reader.readLine()) != null) {
-            line = line.trim();
+            String line;
+            List<String> list = new ArrayList<String>();
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
 
-            if (line.startsWith("#") || line.isEmpty()) {
-                continue;
+                if (line.startsWith("#") || line.isEmpty()) {
+                    continue;
+                }
+                list.add(line);
             }
-            list.add(line);
+            return list;
         }
-
-        reader.close();
-        return list;
     }
 
     /**

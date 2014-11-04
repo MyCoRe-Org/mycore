@@ -3,12 +3,12 @@
  */
 package org.mycore.tools;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
+import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -57,10 +57,9 @@ public class MCRObjectFactory {
     }
 
     private static String getDateString(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        String toReturn = sdf.format(date);
-
-        return toReturn;
+        MCRISO8601Date isoDate = new MCRISO8601Date();
+        isoDate.setDate(date);
+        return isoDate.getISOString();
     }
 
     /***/

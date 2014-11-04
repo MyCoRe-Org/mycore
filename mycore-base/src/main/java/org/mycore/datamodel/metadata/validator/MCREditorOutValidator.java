@@ -48,7 +48,6 @@ import org.jdom2.xpath.XPath;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRUserInformation;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRMetaAccessRule;
@@ -109,13 +108,11 @@ public class MCREditorOutValidator {
         input = jdom_in;
         this.id = id;
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("XML before validation:\n"
-                + new String(MCRUtils.getByteArray(input, Format.getPrettyFormat())));
+            LOGGER.debug("XML before validation:\n" + new XMLOutputter(Format.getPrettyFormat()).outputString(input));
         }
         checkObject();
         if (LOGGER.isDebugEnabled()) {
-            LOGGER
-                .debug("XML after validation:\n" + new String(MCRUtils.getByteArray(input, Format.getPrettyFormat())));
+            LOGGER.debug("XML after validation:\n" + new XMLOutputter(Format.getPrettyFormat()).outputString(input));
         }
     }
 
@@ -510,7 +507,8 @@ public class MCREditorOutValidator {
                         continue;
                     }
                     if (value.equals("$CurrentGroup")) {
-                    	throw new MCRException("The parameter $CurrentGroup in default ACLs is no more supported since MyCoRe 2014.06 because it is not supported in Servlet API 3.0");
+                        throw new MCRException(
+                            "The parameter $CurrentGroup in default ACLs is no more supported since MyCoRe 2014.06 because it is not supported in Servlet API 3.0");
                     }
                     int i = value.indexOf("$CurrentIP");
                     if (i != -1) {

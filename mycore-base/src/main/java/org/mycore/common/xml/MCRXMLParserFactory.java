@@ -23,7 +23,6 @@
 
 package org.mycore.common.xml;
 
-import org.apache.xerces.parsers.SAXParser;
 import org.jdom2.input.sax.XMLReaderJDOMFactory;
 import org.jdom2.input.sax.XMLReaderSAX2Factory;
 import org.mycore.common.config.MCRConfiguration;
@@ -37,9 +36,9 @@ import org.mycore.common.config.MCRConfiguration;
 public class MCRXMLParserFactory {
     private static boolean VALIDATE_BY_DEFAULT = MCRConfiguration.instance().getBoolean("MCR.XMLParser.ValidateSchema", true);
 
-    private final static String PARSER_CLASS_NAME = SAXParser.class.getCanonicalName();
+    private final static String XMLREADER_CLASS_NAME = "org.apache.xerces.parsers.SAXParser";
 
-    private static XMLReaderJDOMFactory nonValidatingFactory = new XMLReaderSAX2Factory(false, PARSER_CLASS_NAME);
+    private static XMLReaderJDOMFactory nonValidatingFactory = new XMLReaderSAX2Factory(false, XMLREADER_CLASS_NAME);
 
     private static ThreadLocal<MCRXMLParserImpl> nonValidating = new ThreadLocal<MCRXMLParserImpl>() {
         @Override
@@ -48,7 +47,7 @@ public class MCRXMLParserFactory {
         }
     };
 
-    private static XMLReaderJDOMFactory validatingFactory = new XMLReaderSAX2Factory(true, PARSER_CLASS_NAME);
+    private static XMLReaderJDOMFactory validatingFactory = new XMLReaderSAX2Factory(true, XMLREADER_CLASS_NAME);
 
     private static ThreadLocal<MCRXMLParserImpl> validating = new ThreadLocal<MCRXMLParserImpl>() {
         @Override

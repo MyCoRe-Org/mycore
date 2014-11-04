@@ -30,6 +30,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -56,7 +57,7 @@ public class MCRConfigurationInputStream extends InputStream {
 
     private static final String MYCORE_PROPERTIES = "mycore.properties";
 
-    private static final byte[] lbr = "\n".getBytes();
+    private static final byte[] lbr = System.getProperty("line.separator").getBytes(StandardCharsets.ISO_8859_1); //latin1 for properties
 
     InputStream in;
 
@@ -117,14 +118,15 @@ public class MCRConfigurationInputStream extends InputStream {
         }
         for (MCRComponent component : MCRRuntimeComponentDetector.getAllComponents()) {
             String comment = "\n\n#\n#\n# Component: " + component.getName() + "\n#\n#\n";
-            cList.add(new ByteArrayInputStream(comment.getBytes()));
+            cList.add(new ByteArrayInputStream(comment.getBytes(StandardCharsets.ISO_8859_1)));
             InputStream is = component.getConfigFileStream(filename);
             if (is != null) {
                 cList.add(is);
                 //workaround if last property is not terminated with line break
                 cList.add(new ByteArrayInputStream(lbr));
             } else {
-                cList.add(new ByteArrayInputStream(("# Unable to find " + filename + " in " + component.getResourceBase() + "\n").getBytes()));
+                cList.add(new ByteArrayInputStream(("# Unable to find " + filename + " in "
+                    + component.getResourceBase() + "\n").getBytes(StandardCharsets.ISO_8859_1)));
             }
         }
         InputStream propertyStream = getPropertyStream(filename);

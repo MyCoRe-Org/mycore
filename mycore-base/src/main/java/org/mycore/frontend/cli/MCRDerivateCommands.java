@@ -304,7 +304,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             path = path.replace('/', File.separatorChar).replace('\\', File.separatorChar);
             if (path.trim().length() <= 1) {
                 // the path is the path name plus the name of the derivate -
-                path = derivate.getId().toString().toLowerCase();
+                path = derivate.getId().toString();
             }
             File sPath = new File(path);
 

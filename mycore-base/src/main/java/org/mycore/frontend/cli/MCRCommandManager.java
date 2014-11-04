@@ -74,14 +74,15 @@ public class MCRCommandManager {
         String prefix = "MCR.CLI.Classes." + type;
         Map<String, String> p = MCRConfiguration.instance().getPropertiesMap(prefix);
         for (String propertyName : p.keySet()) {
-            List<String> classNames = MCRConfiguration.instance().getStrings(propertyName, MCRConfiguration.emptyList());
+            List<String> classNames = MCRConfiguration.instance()
+                .getStrings(propertyName, MCRConfiguration.emptyList());
 
             for (String className : classNames) {
                 className = className.trim();
                 if (className.isEmpty()) {
                     continue;
                 }
-                LOGGER.debug("Will load commands from the " + type.toLowerCase() + " class " + className);
+                LOGGER.debug("Will load commands from the " + type + " class " + className);
                 try {
                     Class<?> cliClass = Class.forName(className);
                     if (cliClass.isAnnotationPresent(MCRCommandGroup.class)) {

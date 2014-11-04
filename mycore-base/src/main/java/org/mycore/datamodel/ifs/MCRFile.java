@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -293,7 +294,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     public void setContentFrom(String source) throws MCRPersistenceException {
         Objects.requireNonNull(source, "source string is null");
 
-        byte[] bytes = source.getBytes();
+        byte[] bytes = source.getBytes(Charset.defaultCharset());
 
         setContentFrom(bytes);
     }
@@ -545,7 +546,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
      * @return the file's content as a String
      */
     public String getContentAsString() throws MCRPersistenceException {
-        return new String(getContentAsByteArray());
+        return new String(getContentAsByteArray(), Charset.defaultCharset());
     }
 
     /**

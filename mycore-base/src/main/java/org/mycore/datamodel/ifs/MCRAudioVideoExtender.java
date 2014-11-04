@@ -30,14 +30,19 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.text.DecimalFormat;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.text.NumberFormat;
+import java.util.Locale;
 
+import org.apache.commons.io.IOUtils;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
+
+import com.google.common.net.MediaType;
 
 /**
  * For MCRFiles that contain streaming audio/video, instances of this class
@@ -123,12 +128,17 @@ public abstract class MCRAudioVideoExtender {
      * @return the streaming bitrate formatted as a String
      */
     public String getBitRateFormatted() {
-        if (bitRate > 1024 * 1024) {
-            double b = Math.round(bitRate / 10485.76) / 100.0;
-            return new DecimalFormat("##0.##").format(b) + " MBit";
+        NumberFormat bitRateFormatter = NumberFormat.getInstance(Locale.ROOT);
+        bitRateFormatter.setMinimumIntegerDigits(1);
+        bitRateFormatter.setGroupingUsed(false);
+        if (bitRate > 100 * 1024) {
+            bitRateFormatter.setMaximumFractionDigits(2);
+            double b = bitRate / (1024f * 1024f);
+            return bitRateFormatter.format(b) + " MBit";
         }
-        double b = Math.round(bitRate / 102.4) / 10.0;
-        return new DecimalFormat("##0.#").format(b) + " kBit";
+        bitRateFormatter.setMaximumFractionDigits(1);
+        double b = bitRate / 1024f;
+        return bitRateFormatter.format(b) + " kBit";
     }
 
     /**
@@ -149,7 +159,11 @@ public abstract class MCRAudioVideoExtender {
      */
     public String getFrameRateFormatted() {
         // double r = (double)( Math.round( frameRate * 10.0 ) ) / 10.0;
-        return new DecimalFormat("##.#").format(frameRate);
+        NumberFormat formatter = NumberFormat.getInstance(Locale.ROOT);
+        formatter.setMinimumIntegerDigits(2);
+        formatter.setMinimumFractionDigits(1);
+        formatter.setMaximumFractionDigits(1);
+        return formatter.format(frameRate);
     }
 
     /**
@@ -240,7 +254,8 @@ public abstract class MCRAudioVideoExtender {
      * @return the duration foramatted as a timecode like "hh:mm:ss"
      */
     public String getDurationTimecode() {
-        DecimalFormat formatter = new DecimalFormat("00");
+        NumberFormat formatter = NumberFormat.getIntegerInstance(Locale.ROOT);
+        formatter.setMinimumIntegerDigits(2);
         StringBuilder sb = new StringBuilder();
         sb.append(formatter.format(durationHours));
         sb.append(":");
@@ -399,9 +414,10 @@ public abstract class MCRAudioVideoExtender {
      *            the OutputStream to write the bytes to
      */
     protected void forwardData(URLConnection connection, OutputStream out) throws IOException {
-        InputStream in = connection.getInputStream();
-        MCRUtils.copyStream(in, out);
-        out.close();
+        try (InputStream in = connection.getInputStream()) {
+            IOUtils.copy(in, out);
+            out.close();
+        }
     }
 
     /**
@@ -435,10 +451,16 @@ public abstract class MCRAudioVideoExtender {
         try {
             URLConnection connection = getConnection(url);
             connection.setConnectTimeout(getConnectTimeout());
+            String contentType = connection.getContentType();
+            Charset charset = StandardCharsets.ISO_8859_1; //defined by RFC 2616 (sec 3.7.1)
+            if (contentType != null) {
+                MediaType mediaType = MediaType.parse(contentType);
+                mediaType.charset().or(StandardCharsets.ISO_8859_1);
+            }
             ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
             forwardData(connection, out);
 
-            return new String(out.toByteArray());
+            return new String(out.toByteArray(), charset);
         } catch (IOException exc) {
             String msg = "Could not get metadata from Audio/Video Store URL: " + url;
             throw new MCRPersistenceException(msg, exc);

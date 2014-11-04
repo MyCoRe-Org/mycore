@@ -444,7 +444,7 @@ public class MCRCalendar {
     private static GregorianCalendar getCalendarFromGregorianDate(String datestr, boolean last) throws MCRException {
         try {
             // look for BC
-            datestr = datestr.toUpperCase();
+            datestr = datestr.toUpperCase(Locale.ROOT); //limited cases: AD, BC, V. CHR, N. CHR
             boolean bc = false;
             int start = 0;
             int ende = datestr.length();
@@ -623,7 +623,7 @@ public class MCRCalendar {
     private static GregorianCalendar getCalendarFromJulianDate(String datestr, boolean last) throws MCRException {
         try {
             // look for v. Chr.
-            datestr = datestr.toUpperCase();
+            datestr = datestr.toUpperCase(Locale.ROOT); //limited cases: AD, BC, V. CHR, N. CHR
             boolean bc = false;
             int start = 0;
             int ende = datestr.length();

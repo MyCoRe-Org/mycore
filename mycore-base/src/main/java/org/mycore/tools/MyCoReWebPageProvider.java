@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import org.jdom2.Content;
 import org.jdom2.DocType;
@@ -167,9 +168,9 @@ public class MyCoReWebPageProvider {
             log.setAttribute(XML_LABELPATH, labelPath);
         }
         Date date = new Date(System.currentTimeMillis());
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.ROOT);
         log.setAttribute(XML_DATE, dateFormat.format(date));
-        SimpleDateFormat timeFormat = new SimpleDateFormat(TIME_FORMAT);
+        SimpleDateFormat timeFormat = new SimpleDateFormat(TIME_FORMAT, Locale.ROOT);
         log.setAttribute(XML_TIME, timeFormat.format(date));
     }
 

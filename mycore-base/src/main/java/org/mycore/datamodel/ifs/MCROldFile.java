@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.GregorianCalendar;
 import java.util.Objects;
 
@@ -377,7 +378,7 @@ public class MCROldFile implements MCRFileReader {
      * Gets the content of this file as a string, using the default encoding
      */
     public String getContentAsString() throws MCRPersistenceException {
-        return new String(getContentAsByteArray());
+        return new String(getContentAsByteArray(), Charset.defaultCharset());
     }
 
     /**
