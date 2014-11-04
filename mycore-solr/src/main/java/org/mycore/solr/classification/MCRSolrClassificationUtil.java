@@ -182,6 +182,9 @@ public abstract class MCRSolrClassificationUtil {
     public static void reindex(MCRCategory... categories) {
         SolrServer server = getCore().getServer();
         for (MCRCategory category : categories) {
+            if (category == null) {
+                continue;
+            }
             MCRSolrCategory solrCategory = new MCRSolrCategory(category);
             try {
                 server.add(solrCategory.toSolrDocument());
