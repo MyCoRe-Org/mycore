@@ -550,11 +550,13 @@ public class MCRMetsSave {
                             }
 
                             physicalSubDivsToRemove.add(physicalSubDiv);
+
                         }
                     }
                     for (PhysicalSubDiv physicalSubDivToRemove : physicalSubDivsToRemove) {
                         divContainer.remove(physicalSubDivToRemove);
                     }
+                    correctSubDivOrder(divContainer);
                 }
             }
         } catch (Exception ex) {
@@ -563,6 +565,25 @@ public class MCRMetsSave {
         }
 
         return modifiedMets.asDocument();
+    }
+
+    /**
+     * corrects the order of all PhysicalSubDiv of a PhysicalDiv
+     * @param physicalDiv
+     */
+    private static void correctSubDivOrder(PhysicalDiv physicalDiv) {
+        List<PhysicalSubDiv> children = physicalDiv.getChildren();
+
+        Collections.sort(children, new Comparator<PhysicalSubDiv>() {
+            @Override
+            public int compare(PhysicalSubDiv o1, PhysicalSubDiv o2) {
+                return o1.getOrder() - o2.getOrder();
+            }
+        });
+
+        for (int i = 1; i <= children.size(); i++) {
+            children.get(i-1).setOrder(i);
+        }
     }
 
     /**
