@@ -97,10 +97,21 @@
         <xsl:choose>
           <xsl:when test="$object-view-derivate or $isDisplayedEnabled = 'true' or $mayWriteDerivate">
 
+            <xsl:variable name="file">
+              <xsl:choose>
+                <xsl:when test="starts-with($pageToDisplay, '/')">
+                  <xsl:value-of select="substring-after($pageToDisplay,'/')" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="$pageToDisplay" />
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:variable>
+
             <xsl:variable name="href">
               <xsl:choose>
                 <xsl:when test="$MCR.Module-iview2.useNewViewer">
-                  <xsl:value-of select="concat($WebApplicationBaseURL,  'rsc/viewer/', $derivate, '/', $pageToDisplay)" />
+                  <xsl:value-of select="concat($WebApplicationBaseURL,  'rsc/viewer/', $derivate, '/', $file)" />
                 </xsl:when>
                 <xsl:otherwise>
                   <xsl:value-of
