@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping package="org.mycore.datamodel.classifications2.impl">
-  <class name="MCRCategoryLink">
+  <class name="MCRCategoryLinkImpl" table="MCRCategoryLink">
     <cache usage="nonstrict-read-write" />
 
     <id name="id" access="field">
@@ -19,7 +19,7 @@
     <query name="NumberPerClassID">
       <![CDATA[
 SELECT cat.categID, count(distinct link.objectReference.objectID) as num
-  FROM MCRCategoryLink link, MCRCategoryImpl cat, MCRCategoryImpl cattree
+  FROM MCRCategoryLinkImpl link, MCRCategoryImpl cat, MCRCategoryImpl cattree
   WHERE cattree.internalID = link.category
     AND cattree.rootID=:classID
     AND cat.rootID=:classID
@@ -35,7 +35,7 @@ SELECT cat.categID, count(distinct link.objectReference.objectID) as num
 SELECT baseCat.categID, count(distinct link.objectID) as num
   FROM MCRCategory baseCat
   LEFT JOIN MCRCategory AS node ON node.leftValue BETWEEN baseCat.leftValue AND baseCat.rightValue
-  LEFT JOIN MCRCategoryLink AS link ON node.internalID = link.category
+  LEFT JOIN MCRCategoryLinkImpl AS link ON node.internalID = link.category
   WHERE node.ClassID=:classID
     AND baseCat.ClassID=:classID
   GROUP BY baseCat.categID
@@ -44,7 +44,7 @@ SELECT baseCat.categID, count(distinct link.objectID) as num
     <query name="NumberByTypePerClassID">
       <![CDATA[
 SELECT cat.categID, count(distinct link.objectReference.objectID) as num
-  FROM MCRCategoryLink link, MCRCategoryImpl cat, MCRCategoryImpl cattree
+  FROM MCRCategoryLinkImpl link, MCRCategoryImpl cat, MCRCategoryImpl cattree
   WHERE cattree.internalID = link.category
     AND link.objectReference.type=:type
     AND cattree.rootID=:classID
@@ -59,7 +59,7 @@ SELECT cat.categID, count(distinct link.objectReference.objectID) as num
       <return-scalar column="num" type="integer" />
       <![CDATA[
 SELECT p.parentCategID as categID, count(distinct link.objectID) as num
-  FROM parents p, MCRCategoryLink link
+  FROM parents p, MCRCategoryLinkImpl link
   WHERE p.childID = link.category
     AND link.objectType=:type
     AND p.ClassID=:classID
@@ -69,7 +69,7 @@ SELECT p.parentCategID as categID, count(distinct link.objectID) as num
     <query name="NumberPerChildOfParentID">
       <![CDATA[
 SELECT cat.categID, count(distinct link.objectReference.objectID) as num
-  FROM MCRCategoryLink link, MCRCategoryImpl cat, MCRCategoryImpl cattree
+  FROM MCRCategoryLinkImpl link, MCRCategoryImpl cat, MCRCategoryImpl cattree
   WHERE cattree.internalID = link.category
     AND cattree.rootID=:classID
     AND cat.parent.internalID=:parentID
@@ -85,7 +85,7 @@ SELECT cat.categID, count(distinct link.objectReference.objectID) as num
 SELECT baseCat.categID, count( DISTINCT link.objectID ) AS num
   FROM MCRCategory AS baseCat
   LEFT JOIN MCRCategory AS node ON node.leftValue BETWEEN baseCat.leftValue AND baseCat.rightValue
-  LEFT JOIN MCRCategoryLink AS link ON node.internalID = link.category
+  LEFT JOIN MCRCategoryLinkImpl AS link ON node.internalID = link.category
   WHERE node.ClassID=:classID
     AND baseCat.parentID=:parentID
   GROUP BY baseCat.categID
@@ -94,7 +94,7 @@ SELECT baseCat.categID, count( DISTINCT link.objectID ) AS num
     <query name="NumberByTypePerChildOfParentID">
       <![CDATA[
 SELECT cat.categID, count(distinct link.objectReference.objectID) as num
-  FROM MCRCategoryLink link, MCRCategoryImpl cat, MCRCategoryImpl cattree
+  FROM MCRCategoryLinkImpl link, MCRCategoryImpl cat, MCRCategoryImpl cattree
   WHERE cattree.internalID = link.category
     AND link.objectReference.type=:type
     AND cattree.rootID=:classID
@@ -105,23 +105,23 @@ SELECT cat.categID, count(distinct link.objectReference.objectID) as num
     </query>
     <query name="deleteByObjectID">
       <![CDATA[
-DELETE FROM MCRCategoryLink WHERE objectReference.objectID=:id and objectReference.type=:type
+DELETE FROM MCRCategoryLinkImpl WHERE objectReference.objectID=:id and objectReference.type=:type
       ]]>
     </query>
     <query name="deleteByObjectCollection">
       <![CDATA[
-DELETE FROM MCRCategoryLink WHERE objectReference.objectID IN (:ids) and objectReference.type=:type
+DELETE FROM MCRCategoryLinkImpl WHERE objectReference.objectID IN (:ids) and objectReference.type=:type
       ]]>
     </query>
     <query name="ObjectIDByCategory">
       <![CDATA[
-SELECT objectReference.objectID FROM MCRCategoryLink WHERE category.rootID=:rootID and category.categID=:categID
+SELECT objectReference.objectID FROM MCRCategoryLinkImpl WHERE category.rootID=:rootID and category.categID=:categID
       ]]>
     </query>
     <query name="CategoryAndObjectID">
       <![CDATA[
 SELECT link.objectReference.objectID
-  FROM MCRCategoryLink link, MCRCategoryImpl cat, MCRCategoryImpl cattree
+  FROM MCRCategoryLinkImpl link, MCRCategoryImpl cat, MCRCategoryImpl cattree
   WHERE cattree.internalID = link.category
     AND link.objectReference.objectID=:objectID
     AND link.objectReference.type=:type
@@ -133,12 +133,12 @@ SELECT link.objectReference.objectID
     </query>
     <query name="ObjectIDByCategoryAndType">
       <![CDATA[
-SELECT objectReference.objectID FROM MCRCategoryLink WHERE category.rootID=:rootID and category.categID=:categID and objectReference.type=:type
+SELECT objectReference.objectID FROM MCRCategoryLinkImpl WHERE category.rootID=:rootID and category.categID=:categID and objectReference.type=:type
       ]]>
     </query>
     <query name="categoriesByObjectID">
       <![CDATA[
-SELECT category.rootID, category.categID FROM MCRCategoryLink WHERE objectReference.objectID=:id and objectReference.type=:type
+SELECT category.rootID, category.categID FROM MCRCategoryLinkImpl WHERE objectReference.objectID=:id and objectReference.type=:type
       ]]>
     </query>
   </class>

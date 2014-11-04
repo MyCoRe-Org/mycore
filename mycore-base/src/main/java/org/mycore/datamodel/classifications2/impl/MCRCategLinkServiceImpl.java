@@ -50,6 +50,7 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.MCRCategoryLink;
 
 /**
  * 
@@ -64,7 +65,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     private static Logger LOGGER = Logger.getLogger(MCRCategLinkServiceImpl.class);
 
-    private static Class<MCRCategoryLink> LINK_CLASS = MCRCategoryLink.class;
+    private static Class<MCRCategoryLinkImpl> LINK_CLASS = MCRCategoryLinkImpl.class;
 
     private static MCRCache<MCRCategoryID, MCRCategory> categCache = new MCRCache<MCRCategoryID, MCRCategory>(
         MCRConfiguration.instance().getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size", 1000),
@@ -204,7 +205,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             if (category == null) {
                 throw new MCRPersistenceException("Could not link to unknown category " + categID);
             }
-            MCRCategoryLink link = new MCRCategoryLink(category, objectReference);
+            MCRCategoryLinkImpl link = new MCRCategoryLinkImpl(category, objectReference);
             if (LOGGER.isDebugEnabled()) {
                 MCRCategory linkedCategory = link.getCategory();
                 StringBuilder debugMessage = new StringBuilder("Adding Link from ").append(linkedCategory.getId());
@@ -263,7 +264,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         Session session = MCRHIBConnection.instance().getSession();
         String queryString = MessageFormat.format(
             "select distinct node.rootID from {0} as node, {1} as link where node.internalID=link.category",
-            MCRCategoryImpl.class.getCanonicalName(), MCRCategoryLink.class.getCanonicalName());
+            MCRCategoryImpl.class.getCanonicalName(), MCRCategoryLinkImpl.class.getCanonicalName());
         Query queryHasLink = session.createQuery(queryString);
         @SuppressWarnings("unchecked")
         List<String> categList = queryHasLink.list();
@@ -369,6 +370,16 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         criteria.setProjection(Projections.distinct(Projections.property("objectReference.type")));
         @SuppressWarnings("unchecked")
         List<String> result = criteria.list();
+        return result;
+    }
+
+    @Override
+    public Collection<MCRCategoryLink> getLinks(String type) {
+        Session session = HIB_CONNECTION_INSTANCE.getSession();
+        Criteria criteria = session.createCriteria(LINK_CLASS);
+        criteria.add(Restrictions.eq("objectReference.type", type));
+        @SuppressWarnings("unchecked")
+        List<MCRCategoryLink> result = criteria.list();
         return result;
     }
 

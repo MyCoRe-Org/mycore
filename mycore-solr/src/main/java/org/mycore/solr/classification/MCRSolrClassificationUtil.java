@@ -17,6 +17,7 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.MCRCategoryLink;
 import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.MCRSolrServerFactory;
@@ -58,10 +59,11 @@ public abstract class MCRSolrClassificationUtil {
         for (String linkType : linkTypes) {
             LOGGER.info("rebuild '" + linkType + "' links...");
             List<SolrInputDocument> solrDocumentList = new ArrayList<>();
-            Collection<MCRCategLinkReference> linkReferences = linkService.getReferences(linkType);
-            for (MCRCategLinkReference linkReference : linkReferences) {
-                Collection<MCRCategoryID> categories = linkService.getLinksFromReference(linkReference);
-                solrDocumentList.addAll(toSolrDocument(linkReference, categories));
+            Collection<MCRCategoryLink> links = linkService.getLinks(linkType);
+            for (MCRCategoryLink link : links) {
+                MCRSolrCategoryLink solrink = new MCRSolrCategoryLink(link.getCategory().getId(),
+                    link.getObjectReference());
+                solrDocumentList.add(solrink.toSolrDocument());
             }
             bulkIndex(solrDocumentList);
         }

@@ -131,8 +131,7 @@ public interface MCRCategLinkService {
      * @return list of MCRCategoryID of linked categories
      */
     public abstract Collection<MCRCategoryID> getLinksFromReference(MCRCategLinkReference reference);
-    
-    
+
     /**
      * Return a collection of all category link references for the given type
      * @param type
@@ -145,6 +144,14 @@ public interface MCRCategLinkService {
      * @return
      */
     public abstract Collection<String> getTypes();
+
+    /**
+     * Returns a collection of all links for the given type.
+     * 
+     * @param type
+     * @return
+     */
+    public abstract Collection<MCRCategoryLink> getLinks(String type);
 
     /**
      * Add links between categories and Objects.

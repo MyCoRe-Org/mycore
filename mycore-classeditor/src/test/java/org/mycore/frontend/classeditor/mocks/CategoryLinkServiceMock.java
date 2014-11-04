@@ -10,26 +10,27 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
+import org.mycore.datamodel.classifications2.MCRCategoryLink;
 
-public class CategoryLinkServiceMock implements MCRCategLinkService{
+public class CategoryLinkServiceMock implements MCRCategLinkService {
 
     @Override
     public Map<MCRCategoryID, Boolean> hasLinks(MCRCategory category) {
         List<MCRCategory> categories;
-        if(category == null) {
+        if (category == null) {
             categories = MCRCategoryDAOFactory.getInstance().getRootCategories();
-        }else{
+        } else {
             categories = category.getChildren();
         }
-        
+
         Map<MCRCategoryID, Boolean> linkMap = new HashMap<MCRCategoryID, Boolean>();
         int i = 0;
         for (MCRCategory mcrCategory : categories) {
             boolean haslink = false;
-            if(i++%2 == 0) {
+            if (i++ % 2 == 0) {
                 haslink = true;
             }
-            
+
             linkMap.put(mcrCategory.getId(), haslink);
         }
         return linkMap;
@@ -54,7 +55,6 @@ public class CategoryLinkServiceMock implements MCRCategLinkService{
     public Collection<String> getLinksFromCategory(MCRCategoryID id) {
         return null;
     }
-
 
     @Override
     public Collection<String> getLinksFromCategoryForType(MCRCategoryID id, String type) {
@@ -90,6 +90,11 @@ public class CategoryLinkServiceMock implements MCRCategLinkService{
 
     @Override
     public Collection<String> getTypes() {
+        return null;
+    }
+
+    @Override
+    public Collection<MCRCategoryLink> getLinks(String type) {
         return null;
     }
 }

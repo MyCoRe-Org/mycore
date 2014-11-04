@@ -46,7 +46,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
 
     private MCRCategory category;
 
-    private Collection<MCRCategoryLink> testLinks;
+    private Collection<MCRCategoryLinkImpl> testLinks;
 
     private static MCRCategLinkServiceImpl SERVICE = null;
 
@@ -67,17 +67,17 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         MCRCategoryImpl germany = (MCRCategoryImpl) category.getChildren().get(0).getChildren().get(0);
         MCRCategoryImpl uk = (MCRCategoryImpl) category.getChildren().get(0).getChildren().get(1);
         DAO.addCategory(null, category);
-        testLinks = new ArrayList<MCRCategoryLink>();
-        testLinks.add(new MCRCategoryLink(germany, new MCRCategLinkReference("Jena", "city")));
-        testLinks.add(new MCRCategoryLink(germany, new MCRCategLinkReference("Thüringen", "state")));
-        testLinks.add(new MCRCategoryLink(germany, new MCRCategLinkReference("Hessen", "state")));
-        testLinks.add(new MCRCategoryLink(germany, new MCRCategLinkReference("Saale", "river")));
+        testLinks = new ArrayList<MCRCategoryLinkImpl>();
+        testLinks.add(new MCRCategoryLinkImpl(germany, new MCRCategLinkReference("Jena", "city")));
+        testLinks.add(new MCRCategoryLinkImpl(germany, new MCRCategLinkReference("Thüringen", "state")));
+        testLinks.add(new MCRCategoryLinkImpl(germany, new MCRCategLinkReference("Hessen", "state")));
+        testLinks.add(new MCRCategoryLinkImpl(germany, new MCRCategLinkReference("Saale", "river")));
         final MCRCategLinkReference northSeaReference = new MCRCategLinkReference("North Sea", "sea");
-        testLinks.add(new MCRCategoryLink(germany, northSeaReference));
-        testLinks.add(new MCRCategoryLink(uk, LONDON_REFERENCE));
-        testLinks.add(new MCRCategoryLink(uk, ENGLAND_REFERENCE));
-        testLinks.add(new MCRCategoryLink(uk, new MCRCategLinkReference("Thames", "river")));
-        testLinks.add(new MCRCategoryLink(uk, northSeaReference));
+        testLinks.add(new MCRCategoryLinkImpl(germany, northSeaReference));
+        testLinks.add(new MCRCategoryLinkImpl(uk, LONDON_REFERENCE));
+        testLinks.add(new MCRCategoryLinkImpl(uk, ENGLAND_REFERENCE));
+        testLinks.add(new MCRCategoryLinkImpl(uk, new MCRCategLinkReference("Thames", "river")));
+        testLinks.add(new MCRCategoryLinkImpl(uk, northSeaReference));
     }
 
     /**
@@ -90,7 +90,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         addTestLinks();
         startNewTransaction();
         assertEquals("Link count does not match.", testLinks.size(),
-            sessionFactory.getCurrentSession().createCriteria(MCRCategoryLink.class).list().size());
+            sessionFactory.getCurrentSession().createCriteria(MCRCategoryLinkImpl.class).list().size());
     }
 
     /**
@@ -102,7 +102,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         startNewTransaction();
         SERVICE.deleteLink(LONDON_REFERENCE);
         assertEquals("Link count does not match.", testLinks.size() - 1, sessionFactory.getCurrentSession()
-            .createCriteria(MCRCategoryLink.class).list().size());
+            .createCriteria(MCRCategoryLinkImpl.class).list().size());
     }
 
     /**
@@ -114,7 +114,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         startNewTransaction();
         SERVICE.deleteLinks(Arrays.asList(LONDON_REFERENCE, ENGLAND_REFERENCE));
         assertEquals("Link count does not match.", testLinks.size() - 2, sessionFactory.getCurrentSession()
-            .createCriteria(MCRCategoryLink.class).list().size());
+            .createCriteria(MCRCategoryLinkImpl.class).list().size());
     }
 
     /**
@@ -124,7 +124,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     public void getLinksFromObject() {
         addTestLinks();
         startNewTransaction();
-        MCRCategoryLink link = testLinks.iterator().next();
+        MCRCategoryLinkImpl link = testLinks.iterator().next();
         assertTrue("Did not find category: " + link.getCategory().getId(),
             SERVICE.getLinksFromReference(link.getObjectReference()).contains(link.getCategory().getId()));
     }
@@ -136,7 +136,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     public void getLinksFromCategory() {
         addTestLinks();
         startNewTransaction();
-        MCRCategoryLink link = testLinks.iterator().next();
+        MCRCategoryLinkImpl link = testLinks.iterator().next();
         assertTrue("Did not find object: " + link.getObjectReference(),
             SERVICE.getLinksFromCategory(link.getCategory().getId()).contains(link.getObjectReference().getObjectID()));
     }
@@ -148,7 +148,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     public void getLinksFromCategoryForType() {
         addTestLinks();
         startNewTransaction();
-        MCRCategoryLink link = testLinks.iterator().next();
+        MCRCategoryLinkImpl link = testLinks.iterator().next();
         final String objectType = link.getObjectReference().getType();
         final MCRCategoryID categoryID = link.getCategory().getId();
         final String objectID = link.getObjectReference().getObjectID();
@@ -161,7 +161,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     }
 
     private String getType(String objectID) {
-        for (MCRCategoryLink link : testLinks) {
+        for (MCRCategoryLinkImpl link : testLinks) {
             if (link.getObjectReference().getObjectID().equals(objectID)) {
                 return link.getObjectReference().getType();
             }
@@ -240,7 +240,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
             assertEquals("Type of reference is not correct.", type, ref.getType());
         }
         int counter = 0;
-        for (MCRCategoryLink link : testLinks) {
+        for (MCRCategoryLinkImpl link : testLinks) {
             if (link.getObjectReference().getType().equals(type)) {
                 counter++;
             }
@@ -255,7 +255,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     }
 
     private void addTestLinks() {
-        for (MCRCategoryLink link : testLinks) {
+        for (MCRCategoryLinkImpl link : testLinks) {
             SERVICE.setLinks(link.getObjectReference(), Collections.nCopies(1, link.getCategory().getId()));
         }
     }

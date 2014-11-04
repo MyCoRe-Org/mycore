@@ -25,6 +25,7 @@ package org.mycore.datamodel.classifications2.impl;
 
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryLink;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -32,7 +33,7 @@ import org.mycore.datamodel.classifications2.MCRCategory;
  * @version $Revision$ $Date$
  * @since 2.0
  */
-class MCRCategoryLink {
+class MCRCategoryLinkImpl implements MCRCategoryLink {
 
     int id;
 
@@ -40,11 +41,11 @@ class MCRCategoryLink {
 
     private MCRCategLinkReference objectReference;
 
-    MCRCategoryLink() {
+    MCRCategoryLinkImpl() {
         this(null, null);
     }
 
-    MCRCategoryLink(MCRCategory category, MCRCategLinkReference objectReference) {
+    MCRCategoryLinkImpl(MCRCategory category, MCRCategLinkReference objectReference) {
         this.category = category;
         this.objectReference = objectReference;
     }
@@ -82,10 +83,10 @@ class MCRCategoryLink {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof MCRCategoryLink)) {
+        if (!(obj instanceof MCRCategoryLinkImpl)) {
             return false;
         }
-        final MCRCategoryLink other = (MCRCategoryLink) obj;
+        final MCRCategoryLinkImpl other = (MCRCategoryLinkImpl) obj;
         if (category == null) {
             if (other.category != null) {
                 return false;
