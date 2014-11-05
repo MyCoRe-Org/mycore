@@ -17,6 +17,10 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mets-validator</artifactId>
+    </dependency>
+    <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
     </dependency>
