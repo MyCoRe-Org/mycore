@@ -73,7 +73,7 @@ import org.xml.sax.SAXParseException;
 public class MCRClassification2Commands extends MCRAbstractCommands {
     private static Logger LOGGER = Logger.getLogger(MCRClassification2Commands.class);
 
-    private static final MCRCategoryDAO DAO = new MCRCategoryDAOImpl();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
     /** Default transformer script */
     public static final String DEFAULT_TRANSFORMER = "save-classification.xsl";
