@@ -33,7 +33,7 @@ import java.net.URI;
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
@@ -109,7 +109,7 @@ public abstract class MCRBase {
      */
     public MCRBase() throws MCRException, MCRConfigurationException {
         mcr_label = "";
-        mcr_version = MCRConstants.VERSION;
+        mcr_version = MCRCoreVersion.getVersion();
         mcr_schema = "";
 
         // Service class
@@ -245,7 +245,7 @@ public abstract class MCRBase {
      * @param version
      */
     public final void setVersion(String version) {
-        mcr_version = version != null ? version : MCRConstants.VERSION;
+        mcr_version = version != null ? version : MCRCoreVersion.getVersion();
     }
 
     /**

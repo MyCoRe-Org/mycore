@@ -98,8 +98,8 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      *
      * @exception MCRException if the parameter values are invalid
      */
-    public MCRMetaHistoryDate(String set_subtag, String default_lang, String set_type, int set_inherted) throws MCRException {
-        super(set_subtag, default_lang, set_type, set_inherted);
+    public MCRMetaHistoryDate(String set_subtag, String set_type, int set_inherted) throws MCRException {
+        super(set_subtag, null, set_type, set_inherted);
         texts = new ArrayList<MCRMetaHistoryDateText>();
         calendar = MCRCalendar.CALENDARS_INPUT[0];
         setDefaultVon();
@@ -526,7 +526,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     @Override
     public MCRMetaHistoryDate clone() {
-        MCRMetaHistoryDate out = new MCRMetaHistoryDate(subtag, lang, type, inherited);
+        MCRMetaHistoryDate out = new MCRMetaHistoryDate(subtag, type, inherited);
         for (MCRMetaHistoryDateText h : texts) {
             out.setText(h.getText(), h.getLang());
         }
