@@ -189,7 +189,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
     }
 
     static MCRDirectory getRootDirectory(MCRPath ifsPath) throws NoSuchFileException {
-        LOGGER.info("Get root directory of " + ifsPath.getOwner());
+        LOGGER.debug("Get root directory of " + ifsPath.getOwner());
         MCRDirectory root = MCRDirectory.getRootDirectory(ifsPath.getOwner());
         if (root == null) {
             throw new NoSuchFileException(ifsPath.toString(), null, "Could not get root directory.");
