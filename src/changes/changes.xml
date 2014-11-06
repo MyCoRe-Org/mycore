@@ -6,6 +6,16 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+      <action dev="mcrmeich" type="add">
+        mycore-oai: add request handler property CONFIG_PREFIX + "Search.RequestHandler" -> sets the qt parameter of solr
+      </action>
+      <action dev="mcrmeich" type="fix">
+        mycore-oai: fixed backslash encoding
+      </action>
+      <action dev="mcrmeich" type="fix">
+        mycore-oai: fixed bug - when using solr searcher in oai interface the ListSets verb my not be working
+        <fixes issue="727" />
+      </action>
       <action dev="mcrkrebs" type="add">
         mycore-mods: added open access for national licenses and refactured solr rights search field
       </action>

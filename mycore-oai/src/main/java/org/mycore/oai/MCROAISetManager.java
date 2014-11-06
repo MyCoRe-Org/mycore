@@ -186,7 +186,6 @@ public class MCROAISetManager {
         return clonedList;
     }
 
-    @SuppressWarnings("unchecked")
     protected OAIDataList<Set> createSetList() {
         OAIDataList<Set> setList = new OAIDataList<Set>();
         for (String uri : this.setURIs) {
@@ -206,34 +205,55 @@ public class MCROAISetManager {
                 }
             }
         }
+        return this.filterEmptySets ? filterEmptySets(setList) : setList;
+    }
 
-        // Filter out empty sets
-        if (this.filterEmptySets) {
-            for (Iterator<Set> it = setList.iterator(); it.hasNext();) {
-                Set set = it.next();
-                String setSpec = set.getSpec();
-                // Check parent set, if existing
-                if (setSpec.contains(":") && (setSpec.lastIndexOf(":") > setSpec.indexOf(":"))) {
-                    String parentSetSpec = setSpec.substring(0, setSpec.lastIndexOf(":"));
-                    // If parent set is empty, all child sets must be empty, too
-                    if (!contains(parentSetSpec, setList)) {
-                        it.remove();
-                        continue;
-                    }
-                }
-                // Build a query to count results
-                MCRAndCondition query = new MCRAndCondition();
-                query.addChild(buildSetCondition(setSpec));
-                MCRCondition restriction = MCROAIUtils.getDefaultRestriction(this.configPrefix);
-                if (restriction != null) {
-                    query.addChild(restriction);
-                }
-                if (hasNoResults(new MCRQuery(query))) {
+    /**
+     * Removes all sets which are empty.
+     * 
+     * <li>The parent is empty -> all child sets must be empty too</li>
+     * <li>There are no results for this set</li>
+     * 
+     * @param setList the list to filter
+     * @return the same list filtered
+     */
+    protected OAIDataList<Set> filterEmptySets(OAIDataList<Set> setList) {
+        for (Iterator<Set> it = setList.iterator(); it.hasNext();) {
+            Set set = it.next();
+            String setSpec = set.getSpec();
+            // Check parent set, if existing
+            if (setSpec.contains(":") && (setSpec.lastIndexOf(":") > setSpec.indexOf(":"))) {
+                String parentSetSpec = setSpec.substring(0, setSpec.lastIndexOf(":"));
+                // If parent set is empty, all child sets must be empty, too
+                if (!contains(parentSetSpec, setList)) {
                     it.remove();
+                    continue;
                 }
+            }
+            if (isEmptySet(setSpec)) {
+                it.remove();
             }
         }
         return setList;
+    }
+
+    /**
+     * Checks if the given set has results. Returns true if there are no
+     * results for this set, otherwise false.
+     * 
+     * @param setSpec spec to check
+     * @return
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    protected boolean isEmptySet(String setSpec) {
+        // Build a query to count results
+        MCRAndCondition query = new MCRAndCondition();
+        query.addChild(buildSetCondition(setSpec));
+        MCRCondition restriction = MCROAIUtils.getDefaultRestrictionCondition(this.configPrefix);
+        if (restriction != null) {
+            query.addChild(restriction);
+        }
+        return hasNoResults(new MCRQuery(query));
     }
 
     /**
@@ -272,7 +292,8 @@ public class MCROAISetManager {
     }
 
     public boolean hasNoResults(MCRQuery query) {
-        SolrQuery solrQuery = MCRConditionTransformer.getSolrQuery(query.getCondition(), Collections.<MCRSortBy> emptyList(), 1);
+        SolrQuery solrQuery = MCRConditionTransformer.getSolrQuery(query.getCondition(),
+            Collections.<MCRSortBy> emptyList(), 1);
         try {
             QueryResponse queryResponse = MCRSolrServerFactory.getSolrServer().query(solrQuery);
             return queryResponse.getResults().isEmpty();
