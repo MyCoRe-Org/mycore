@@ -238,7 +238,6 @@
    </xsd:sequence>
    <xsd:attribute name="type" use="optional" type="xsd:string" />
    <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
-   <xsd:attribute ref="xml:lang" />
   </xsd:complexType>
  </xsd:element>
 </xsd:sequence>
