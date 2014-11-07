@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
@@ -46,58 +47,56 @@ public class MCROAISolrSearcher extends MCROAISearcher {
     }
 
     protected MCROAIResult solrQuery(int start) {
-        ModifiableSolrParams params = new ModifiableSolrParams();
+        SolrQuery query = new SolrQuery();
         // query
         String restriction = getConfig().getString(getConfigPrefix() + "Search.Restriction", null);
         if (restriction != null) {
-            params.set("q", restriction);
+            query.set("q", restriction);
         }
 
+        // sort
         String sortBy = getConfig().getString(getConfigPrefix() + "Search.SortBy", null);
         if (sortBy != null) {
             sortBy = sortBy.replace("ascending", "asc").replace("descending", "desc");
-            params.set("sort", sortBy);
+            query.set("sort", sortBy);
         }
 
+        // set support
         if (this.set != null) {
-            String solrQuery = null;
             String origSet = set.getSpec();
-            String query = getConfig().getString(getConfigPrefix() + "MapSetToQuery." + origSet, null);
-            if (query != null) {
-                solrQuery = query;
-            } else {
+            String setFilter = getConfig().getString(getConfigPrefix() + "MapSetToQuery." + origSet, null);
+            if (setFilter == null) {
                 String classid = MCRClassificationAndSetMapper.mapSetToClassification(getConfigPrefix(), set.getSpec()
                     .split("\\:")[0]);
                 if (origSet.contains(":")) {
-                    solrQuery = "category.top:" + classid + "\\:" + origSet.substring(origSet.indexOf(":") + 1);
+                    setFilter = "category.top:" + classid + "\\:" + origSet.substring(origSet.indexOf(":") + 1);
                 } else {
-                    solrQuery = "category.top:" + classid + "*";
+                    setFilter = "category.top:" + classid + "*";
                 }
             }
-            if (solrQuery != null) {
-                if (restriction == null) {
-                    params.set("q", solrQuery);
-                } else {
-                    params.set("q", restriction + " AND " + solrQuery);
-                }
-            }
+            query.add("fq", setFilter);
         }
-        // filter query
-        StringBuilder fq = new StringBuilder();
+
+        // date range
+        StringBuilder dateFilter = new StringBuilder();
         // from & until
         if (this.from != null || this.until != null) {
-            fq.append(buildFromUntilCondition(this.from, this.until));
+            dateFilter.append(buildFromUntilCondition(this.from, this.until));
         }
-        if (fq.length() > 0) {
-            params.add("fq", fq.toString());
+        if (dateFilter.length() > 0) {
+            query.add("fq", dateFilter.toString());
         }
+
         // start & rows
-        params.add("start", String.valueOf(start));
-        params.add("rows", String.valueOf(getPartitionSize()));
-        params.set("qt", getConfig().getString(getConfigPrefix() + "Search.RequestHandler", "/select"));
+        query.add("start", String.valueOf(start));
+        query.add("rows", String.valueOf(getPartitionSize()));
+        // request handler
+        query.setRequestHandler(getConfig().getString(getConfigPrefix() + "Search.RequestHandler", "/select"));
+
+        // do the query
         SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
         try {
-            QueryResponse response = solrServer.query(params);
+            QueryResponse response = solrServer.query(query);
             return new MCROAISolrResult(response, this.deletedRecords);
         } catch (Exception exc) {
             LOGGER.error("Unable to handle solr request", exc);
