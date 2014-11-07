@@ -27,8 +27,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 /**
@@ -64,6 +66,8 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
  * @version $Revision$ $Date$
  */
 public class MCRObjectService {
+	private static Logger LOGGER = Logger.getLogger(MCRObjectService.class);
+
     /**
      * constant for create date
      */
@@ -258,7 +262,17 @@ public class MCRObjectService {
      * @param categid
      */
     public final void setState(MCRCategoryID state) {
-    	this.state = state;
+    	if(state==null){
+    		this.state = state;
+    	}
+    	else{
+    		if(MCRCategoryDAOFactory.getInstance().exist(state)){
+    			this.state = state;
+    		}
+    		else{
+    			LOGGER.error("Error at setting servstate classification.", new MCRException("The category "+state.toString() + " does not exist."));
+    		}
+    	}
     }
 
     /**
