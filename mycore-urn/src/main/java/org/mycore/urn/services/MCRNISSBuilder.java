@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ** M y C o R e **
@@ -28,17 +28,17 @@ package org.mycore.urn.services;
  * NISS (namespace specific string) for a new URN. Each subnamespace
  * configuration can have its own instance. A NISS must be a unique ID within
  * the subnamespace.
- * 
+ *
  * MCR.URN.SubNamespace.[ConfigID].NISSBuilder=[Class], for example
- * MCR.URN.SubNamespace.Essen.NISSBuilder=org.mycore.services.urn.MCRNISSBuilderDateCounter
- * 
+ * MCR.URN.SubNamespace.Essen.NISSBuilder=org.mycore.urn.services.MCRNISSBuilderDateCounter
+ *
  * @author Frank Lützenkirchen
  */
 public interface MCRNISSBuilder {
     /**
      * Initializes this instance of a MCRNISSBuilder. This method is only called
      * once for each instance before this builder is used.
-     * 
+     *
      * @param configID
      *            the ID of a subnamespace configuration in mycore.properties
      */

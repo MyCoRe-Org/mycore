@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -62,7 +62,7 @@ public class MCRHIBURNStore implements MCRURNStore {
 
     /**
      * The method create a new item in the datastore.
-     * 
+     *
      * @param urn
      *            a URN
      * @param id
@@ -87,7 +87,7 @@ public class MCRHIBURNStore implements MCRURNStore {
 
     /**
      * The method creates a new item in the datastore.
-     * 
+     *
      * @param urn
      *            a URN
      * @param id
@@ -113,7 +113,7 @@ public class MCRHIBURNStore implements MCRURNStore {
 
     /**
      * Assigns the given urn to the given document ID
-     * 
+     *
      * @param urn
      *            a URN
      * @param id
@@ -127,7 +127,7 @@ public class MCRHIBURNStore implements MCRURNStore {
 
     /**
      * Assigns the given urn to the given derivate ID
-     * 
+     *
      * @param urn
      *            a URN
      * @param id
@@ -144,7 +144,7 @@ public class MCRHIBURNStore implements MCRURNStore {
 
     /**
      * The method removes an entry for the given URN from the datastore.
-     * 
+     *
      * @param urn
      *            a URN
      */
@@ -167,9 +167,9 @@ public class MCRHIBURNStore implements MCRURNStore {
 
     /**
      * The method remove a item for the URN from the datastore.
-     * 
+     *
      * @param objID
-     *            an object id 
+     *            an object id
      * @exception MCRPersistenceException
      *                the method argument is not correct
      */
@@ -187,7 +187,7 @@ public class MCRHIBURNStore implements MCRURNStore {
 
     /**
      * Removes the urn (and assigned document ID) from the persistent store
-     * 
+     *
      * @param urn
      *            a URN
      * @exception MCRPersistenceException
@@ -199,7 +199,7 @@ public class MCRHIBURNStore implements MCRURNStore {
 
     /**
      * Retrieves the URN that is assigned to the given document ID
-     * 
+     *
      * @param id
      *            the MCRObjectID as String
      * @return the urn, or null if no urn is assigned to this ID
@@ -221,9 +221,9 @@ public class MCRHIBURNStore implements MCRURNStore {
     }
 
     /**
-     * Removes the urn (and assigned document ID) from the persistent store by the given 
+     * Removes the urn (and assigned document ID) from the persistent store by the given
      * object id
-     * 
+     *
      * @param objID
      *            object id
      * @exception MCRPersistenceException
@@ -235,7 +235,7 @@ public class MCRHIBURNStore implements MCRURNStore {
 
     /**
      * Retrieves the URN that is assigned to the given document ID
-     * 
+     *
      * @param urn
      *            the URN as String
      * @return the document ID, or null if no urn is assigned to this ID
@@ -258,7 +258,7 @@ public class MCRHIBURNStore implements MCRURNStore {
 
     /**
      * Checks wether an object has an urn assigned or not
-     * 
+     *
      * @param id
      *            the MCRObjectID as String
      * @return true if an urn is assigned to the given object, false otherwise
@@ -278,7 +278,7 @@ public class MCRHIBURNStore implements MCRURNStore {
 
     /**
      * This method check that the URN exist in this store.
-     * 
+     *
      * @return true if the URN exist, else return false
      */
     @SuppressWarnings("unchecked")
@@ -299,7 +299,7 @@ public class MCRHIBURNStore implements MCRURNStore {
 
     /**
      * Returns true if the given urn is assigned to a document ID
-     * 
+     *
      * @param urn
      *            a URN
      * @return true if the URN exist, else return false
@@ -310,8 +310,8 @@ public class MCRHIBURNStore implements MCRURNStore {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see org.mycore.services.urn.MCRURNStore#getURNForFile(java.lang.String,
+     *
+     * @see org.mycore.urn.services.MCRURNStore#getURNForFile(java.lang.String,
      * java.lang.String)
      */
     @SuppressWarnings("unchecked")
@@ -340,7 +340,7 @@ public class MCRHIBURNStore implements MCRURNStore {
     }
 
     /**
-     * @param derivateId 
+     * @param derivateId
      * @param path
      * @param fileName
      * @return
@@ -439,7 +439,7 @@ public class MCRHIBURNStore implements MCRURNStore {
 
     /**
      * Get all URN for the given object id.
-     * 
+     *
      * @param id
      * @return
      */
@@ -457,7 +457,7 @@ public class MCRHIBURNStore implements MCRURNStore {
      * @param dfg
      * @param start
      * @param rows
-     * 
+     *
      * @return a {@link List<MCRURN>} of {@link MCRURN} where path and file name are just blanks or null;
      */
     @SuppressWarnings("unchecked")
