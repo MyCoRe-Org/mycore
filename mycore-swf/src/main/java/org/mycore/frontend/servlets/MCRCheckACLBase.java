@@ -36,10 +36,10 @@ import org.jdom2.Namespace;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
@@ -146,7 +146,6 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
         if (root != null) {
             Element servacls = root.getChild("servacls");
             if (servacls != null) {
-                @SuppressWarnings("unchecked")
                 List<Element> servacllist = servacls.getChildren("servacl");
                 if (servacllist.size() != 0) {
                     for (Element servacl : servacllist) {
@@ -154,12 +153,10 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                         if (outcond != null) {
                             Element outbool = outcond.getChild("boolean");
                             if (outbool != null) {
-                                @SuppressWarnings("unchecked")
                                 List<Element> inbool = outbool.getChildren("boolean");
                                 String outoper = outbool.getAttributeValue("operator");
                                 if (inbool.size() != 0 && outoper != null && !outoper.equals("true")) {
                                     for (Element anInbool : inbool) {
-                                        @SuppressWarnings("unchecked")
                                         List<Element> incondlist = anInbool.getChildren("condition");
                                         int k = incondlist.size();
                                         if (k != 0) {
@@ -174,7 +171,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                                                 }
                                                 String condfield = incond.getAttributeValue("field");
                                                 if (condfield.equals("date")) {
-                                                    if (MCRUtils.convertDateToISO(condvalue) == null) {
+                                                    if (new MCRISO8601Date(condvalue).getDate() == null) {
                                                         anInbool.removeContent(incond);
                                                         k--;
                                                         l--;
