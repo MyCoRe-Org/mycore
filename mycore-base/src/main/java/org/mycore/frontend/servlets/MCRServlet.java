@@ -115,10 +115,10 @@ public class MCRServlet extends HttpServlet {
 
     /** 
      * Returns the base URL of the mycore system
-     * 
-     * @deprecated use {@link MCRFrontendUtil#getBaseURL()}
+     * <p>
+     * shortcut for {@link MCRFrontendUtil#getBaseURL()}
+     * </p>
      **/
-    @Deprecated
     public static String getBaseURL() {
         return MCRFrontendUtil.getBaseURL();
     }

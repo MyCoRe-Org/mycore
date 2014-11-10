@@ -118,48 +118,48 @@ public class MCRPersistentServlet extends MCRServlet {
         if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse(), getBaseURL()))
             return;
         switch (operation) {
-        case create:
-            //derivate is handled in render phase
-            if (type == Type.object) {
-                Document editorSubmission = getEditorSubmission(job, false);
-                //editorSubmission is null, when editor input is absent (redirect to editor form in render phase)
-                if (editorSubmission != null) {
-                    MCRObjectID objectID = createObject(editorSubmission);
-                    job.getRequest().setAttribute(OBJECT_ID_KEY, objectID);
+            case create:
+                //derivate is handled in render phase
+                if (type == Type.object) {
+                    Document editorSubmission = getEditorSubmission(job, false);
+                    //editorSubmission is null, when editor input is absent (redirect to editor form in render phase)
+                    if (editorSubmission != null) {
+                        MCRObjectID objectID = createObject(job, editorSubmission);
+                        job.getRequest().setAttribute(OBJECT_ID_KEY, objectID);
+                    }
                 }
-            }
-            break;
-        case update:
-            switch (type) {
-            case object:
-                MCRObjectID objectID = updateObject(getEditorSubmission(job, true));
-                job.getRequest().setAttribute(OBJECT_ID_KEY, objectID);
                 break;
-            case derivate:
-                Document editorSubmission = getEditorSubmission(job, false);
-                if (editorSubmission != null) {
-                    objectID = updateDerivateXML(editorSubmission);
-                    job.getRequest().setAttribute(OBJECT_ID_KEY, objectID);
+            case update:
+                switch (type) {
+                    case object:
+                        MCRObjectID objectID = updateObject(getEditorSubmission(job, true));
+                        job.getRequest().setAttribute(OBJECT_ID_KEY, objectID);
+                        break;
+                    case derivate:
+                        Document editorSubmission = getEditorSubmission(job, false);
+                        if (editorSubmission != null) {
+                            objectID = updateDerivateXML(editorSubmission);
+                            job.getRequest().setAttribute(OBJECT_ID_KEY, objectID);
+                        }
+                        break;
+                    default:
+                        throw new MCRException("Operation " + operation + " is not implemented for type " + type);
+                }
+                break;
+            case delete:
+                switch (type) {
+                    case object:
+                        deleteObject(getProperty(job.getRequest(), "id"));
+                        break;
+                    case derivate:
+                        deleteDerivate(getProperty(job.getRequest(), "id"));
+                        break;
+                    default:
+                        throw new MCRException("Operation " + operation + " is not implemented for type " + type);
                 }
                 break;
             default:
-                throw new MCRException("Operation " + operation + " is not implemented for type " + type);
-            }
-            break;
-        case delete:
-            switch (type) {
-            case object:
-                deleteObject(getProperty(job.getRequest(), "id"));
-                break;
-            case derivate:
-                deleteDerivate(getProperty(job.getRequest(), "id"));
-                break;
-            default:
-                throw new MCRException("Operation " + operation + " is not implemented for type " + type);
-            }
-            break;
-        default:
-            throw new MCRException("Operation " + operation + " is not implemented");
+                throw new MCRException("Operation " + operation + " is not implemented");
         }
     }
 
@@ -241,26 +241,28 @@ public class MCRPersistentServlet extends MCRServlet {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    private MCRObjectID createObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException, MCRException,
-            SAXParseException {
+    private MCRObjectID createObject(MCRServletJob job, Document doc) throws MCRActiveLinkException, JDOMException,
+        IOException, MCRException, SAXParseException {
         MCRObject mcrObject = getMCRObject(doc);
         MCRObjectID objectId = mcrObject.getId();
-        if (MCRAccessManager.checkPermission("create-" + objectId.getBase())
-                || MCRAccessManager.checkPermission("create-" + objectId.getTypeId())) {
-            //noinspection SynchronizeOnNonFinalField
-            synchronized (operation) {
-                if (objectId.getNumberAsInteger() == 0) {
-                    String objId = mcrObject.getId().toString();
-                    objectId = MCRObjectID.getNextFreeId(objectId.getBase());
-                    if (mcrObject.getLabel().equals(objId))
-                        mcrObject.setLabel(objectId.toString());
-                    mcrObject.setId(objectId);
-                }
-                MCRMetadataManager.create(mcrObject);
+        if (!MCRAccessManager.checkPermission("create-" + objectId.getBase())
+            && !MCRAccessManager.checkPermission("create-" + objectId.getTypeId())) {
+            job.getResponse().sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                "You do not have \"create\" permission on " + objectId.getTypeId() + ".");
+            return null;
+        }
+        //noinspection SynchronizeOnNonFinalField
+        synchronized (operation) {
+            if (objectId.getNumberAsInteger() == 0) {
+                String objId = mcrObject.getId().toString();
+                objectId = MCRObjectID.getNextFreeId(objectId.getBase());
+                if (mcrObject.getLabel().equals(objId))
+                    mcrObject.setLabel(objectId.toString());
+                mcrObject.setId(objectId);
             }
-            return objectId;
-        } else
-            throw new MCRPersistenceException("You do not have \"create\" permission on " + objectId.getTypeId() + ".");
+            MCRMetadataManager.create(mcrObject);
+        }
+        return objectId;
     }
 
     /**
@@ -278,8 +280,8 @@ public class MCRPersistentServlet extends MCRServlet {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    private MCRObjectID updateObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException, MCRException,
-            SAXParseException {
+    private MCRObjectID updateObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException,
+        MCRException, SAXParseException {
         MCRObject mcrObject = getMCRObject(doc);
         LOGGER.info("ID: " + mcrObject.getId());
         try {
@@ -287,7 +289,8 @@ public class MCRPersistentServlet extends MCRServlet {
                 MCRMetadataManager.update(mcrObject);
                 return mcrObject.getId();
             } else {
-                throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on " + mcrObject.getId() + ".");
+                throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on "
+                    + mcrObject.getId() + ".");
             }
         } finally {
             MCRObjectIDLockTable.unlock(mcrObject.getId());
@@ -312,7 +315,8 @@ public class MCRPersistentServlet extends MCRServlet {
         MCRDerivate der = new MCRDerivate(xml, true);
         String derivateID = der.getId().toString();
         if (!MCRAccessManager.checkPermission(derivateID, PERMISSION_WRITE)) {
-            throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on " + derivateID + ".");
+            throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on "
+                + derivateID + ".");
         }
         MCRMetadataManager.updateMCRDerivateXML(der);
         objectID = der.getDerivate().getMetaLink().getXLinkHrefID();
@@ -363,59 +367,63 @@ public class MCRPersistentServlet extends MCRServlet {
             throw ex;
         }
         switch (operation) {
-        case create:
-            switch (type) {
-            case object:
-                //return to object itself if created, else call editor form
-                MCRObjectID returnID = (MCRObjectID) job.getRequest().getAttribute(OBJECT_ID_KEY);
-                if (returnID == null)
-                    redirectToCreateObject(job);
-                else
-                    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + "receive/" + returnID.toString()));
-                return;
-            case derivate:
-                redirectToCreateDerivate(job);
-                return;
+            case create:
+                switch (type) {
+                    case object:
+                        //return to object itself if created, else call editor form
+                        MCRObjectID returnID = (MCRObjectID) job.getRequest().getAttribute(OBJECT_ID_KEY);
+                        if (returnID == null)
+                            redirectToCreateObject(job);
+                        else
+                            job.getResponse().sendRedirect(
+                                job.getResponse().encodeRedirectURL(getBaseURL() + "receive/" + returnID.toString()));
+                        return;
+                    case derivate:
+                        redirectToCreateDerivate(job);
+                        return;
+                    default:
+                        throw new MCRException("Operation " + operation + " is not implemented for type " + type);
+                }
+            case update:
+                switch (type) {
+                    case object:
+                        MCRObjectID returnID = (MCRObjectID) job.getRequest().getAttribute(OBJECT_ID_KEY);
+                        if (returnID == null) {
+                            throw new MCRException("No MCRObjectID given.");
+                        } else
+                            job.getResponse().sendRedirect(
+                                job.getResponse().encodeRedirectURL(getBaseURL() + "receive/" + returnID.toString()));
+                        break;
+                    case derivate: {
+                        returnID = (MCRObjectID) job.getRequest().getAttribute(OBJECT_ID_KEY);
+                        if (returnID == null) {
+                            //calculate redirect to title change form or add files form
+                            redirectToUpdateDerivate(job);
+                            return;
+                        } else
+                            job.getResponse().sendRedirect(
+                                job.getResponse().encodeRedirectURL(getBaseURL() + "receive/" + returnID.toString()));
+                        break;
+                    }
+                    default:
+                        throw new MCRException("Operation " + operation + " is not implemented for type " + type);
+                }
+                break;
+            case delete:
+                switch (type) {
+                    case object:
+                        job.getResponse().sendRedirect(
+                            job.getResponse().encodeRedirectURL(getBaseURL() + "editor_deleted.xml"));
+                        break;
+                    case derivate:
+                        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getReferer(job)));
+                        break;
+                    default:
+                        throw new MCRException("Operation " + operation + " is not implemented for type " + type);
+                }
+                break;
             default:
-                throw new MCRException("Operation " + operation + " is not implemented for type " + type);
-            }
-        case update:
-            switch (type) {
-            case object:
-                MCRObjectID returnID = (MCRObjectID) job.getRequest().getAttribute(OBJECT_ID_KEY);
-                if (returnID == null) {
-                    throw new MCRException("No MCRObjectID given.");
-                } else
-                    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + "receive/" + returnID.toString()));
-                break;
-            case derivate: {
-                returnID = (MCRObjectID) job.getRequest().getAttribute(OBJECT_ID_KEY);
-                if (returnID == null) {
-                    //calculate redirect to title change form or add files form
-                    redirectToUpdateDerivate(job);
-                    return;
-                } else
-                    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + "receive/" + returnID.toString()));
-                break;
-            }
-            default:
-                throw new MCRException("Operation " + operation + " is not implemented for type " + type);
-            }
-            break;
-        case delete:
-            switch (type) {
-            case object:
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + "editor_deleted.xml"));
-                break;
-            case derivate:
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getReferer(job)));
-                break;
-            default:
-                throw new MCRException("Operation " + operation + " is not implemented for type " + type);
-            }
-            break;
-        default:
-            throw new MCRException("Operation " + operation + " is not implemented");
+                throw new MCRException("Operation " + operation + " is not implemented");
         }
     }
 
@@ -428,8 +436,8 @@ public class MCRPersistentServlet extends MCRServlet {
         String file_name = base_name + ".xed";
         MCRURIResolver URI_RESOLVER = MCRURIResolver.instance();
         try {
-          URI_RESOLVER.resolve("webapp:" + file_name);
-          return file_name;
+            URI_RESOLVER.resolve("webapp:" + file_name);
+            return file_name;
         } catch (MCRException e) {
             LOGGER.warn("Can't find " + file_name + ", now we try it with " + base_name + ".xml");
             return base_name + ".xml";
@@ -461,6 +469,7 @@ public class MCRPersistentServlet extends MCRServlet {
         }
         String base = projectID + "_" + type;
         if (!(MCRAccessManager.checkPermission("create-" + base) || MCRAccessManager.checkPermission("create-" + type))) {
+            // TODO: don't use swf code here...
             String msg = MCRTranslation.translate("component.swf.page.error.user.text");
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, msg);
             return;
@@ -480,7 +489,8 @@ public class MCRPersistentServlet extends MCRServlet {
             String value = job.getRequest().getParameter(name);
             params.put(name, value);
         }
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(getBaseURL() + form, params)));
+        job.getResponse().sendRedirect(
+            job.getResponse().encodeRedirectURL(buildRedirectURL(getBaseURL() + form, params)));
     }
 
     /**
@@ -497,7 +507,8 @@ public class MCRPersistentServlet extends MCRServlet {
     private void redirectToCreateDerivate(MCRServletJob job) throws IOException {
         String parentObjectID = getProperty(job.getRequest(), "id");
         if (!MCRAccessManager.checkPermission(parentObjectID, PERMISSION_WRITE)) {
-            throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on " + parentObjectID + ".");
+            throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on "
+                + parentObjectID + ".");
         }
         redirectToUploadPage(job, parentObjectID, null);
     }
@@ -523,10 +534,12 @@ public class MCRPersistentServlet extends MCRServlet {
         if (parentObjectID != null) {
             //Load additional files
             if (!MCRAccessManager.checkPermission(parentObjectID, PERMISSION_WRITE)) {
-                throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on " + parentObjectID + ".");
+                throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on "
+                    + parentObjectID + ".");
             }
             if (!MCRAccessManager.checkPermission(derivateID, PERMISSION_WRITE)) {
-                throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on " + derivateID + ".");
+                throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on "
+                    + derivateID + ".");
             }
             redirectToUploadPage(job, parentObjectID, derivateID);
         } else {
@@ -538,7 +551,8 @@ public class MCRPersistentServlet extends MCRServlet {
             params.put("cancelUrl", getCancelUrl(job));
             sb = new StringBuilder();
             sb.append(getBaseURL()).append(pagedir).append("editor_form_derivate.xml");
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));
+            job.getResponse()
+                .sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));
         }
     }
 
@@ -572,7 +586,8 @@ public class MCRPersistentServlet extends MCRServlet {
      * @throws SAXException 
      * @throws TransformerException 
      */
-    private void errorHandlerValid(MCRServletJob job, List<String> logtext) throws IOException, TransformerException, SAXException {
+    private void errorHandlerValid(MCRServletJob job, List<String> logtext) throws IOException, TransformerException,
+        SAXException {
         // write to the log file
         for (String aLogtext : logtext) {
             LOGGER.error(aLogtext);
@@ -580,7 +595,8 @@ public class MCRPersistentServlet extends MCRServlet {
 
         // prepare editor with error messages
         String pagedir = MCRConfiguration.instance().getString("MCR.SWF.PageDir", "");
-        String myfile = pagedir + MCRConfiguration.instance().getString("MCR.SWF.PageErrorFormular", "editor_error_formular.xml");
+        String myfile = pagedir
+            + MCRConfiguration.instance().getString("MCR.SWF.PageErrorFormular", "editor_error_formular.xml");
         //TODO: Access File directly
         Element root = MCRURIResolver.instance().resolve("webapp:" + myfile);
         List<Element> sectionlist = root.getChildren("section");
