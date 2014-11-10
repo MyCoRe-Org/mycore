@@ -78,6 +78,10 @@ public class MCRLayoutService extends MCRDeprecatedLayoutService {
 
     public void doLayout(HttpServletRequest req, HttpServletResponse res, MCRContent source) throws IOException,
         TransformerException, SAXException {
+        if (res.isCommitted()) {
+            LOGGER.warn("Response already committed: " + res.getStatus() + ":" + res.getContentType());
+            return;
+        }
         String docType = source.getDocType();
         try {
             MCRParameterCollector parameter = new MCRParameterCollector(req);
