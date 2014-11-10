@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -156,7 +158,7 @@ public class MCRIFS2Commands {
     }
 
     private static void fixMCRFSNODESForNode(File node, String content_store, String derivate_id, String storage_base,
-            boolean check_only) {
+        boolean check_only) {
         if (node.isDirectory()) {
             LOGGER.debug("fixMCRFSNODESForNode (directory) : " + node.getAbsolutePath());
             fixDirectoryEntry(node, derivate_id, storage_base, check_only);
@@ -235,7 +237,8 @@ public class MCRIFS2Commands {
             mcrfsnodes.setType("D");
             mcrfsnodes.setOwner(derivate_id);
             mcrfsnodes.setName(node.getName());
-            mcrfsnodes.setDate(new Timestamp(new GregorianCalendar().getTime().getTime()));
+            mcrfsnodes.setDate(new Timestamp(new GregorianCalendar(TimeZone.getDefault(), Locale.getDefault())
+                .getTime().getTime()));
             session.save(mcrfsnodes);
             tx.commit();
             LOGGER.debug("Entry " + name + " fixed.");
@@ -250,7 +253,7 @@ public class MCRIFS2Commands {
     }
 
     private static void fixFileEntry(File node, String content_store, String derivate_id, String storage_base,
-            boolean check_only) {
+        boolean check_only) {
         LOGGER.debug("fixFileEntry : name = " + node.getName());
         String storageid = node.getAbsolutePath().substring(storage_base.length());
         LOGGER.debug("fixFileEntry : storageid = " + storageid);
@@ -344,7 +347,8 @@ public class MCRIFS2Commands {
             mcrfsnodes.setOwner(derivate_id);
             mcrfsnodes.setName(node.getName());
             mcrfsnodes.setSize(size);
-            mcrfsnodes.setDate(new Timestamp(new GregorianCalendar().getTime().getTime()));
+            mcrfsnodes.setDate(new Timestamp(new GregorianCalendar(TimeZone.getDefault(), Locale.getDefault())
+                .getTime().getTime()));
             mcrfsnodes.setStoreid(content_store);
             mcrfsnodes.setStorageid(storageid);
             mcrfsnodes.setFctid(fctid);
@@ -381,7 +385,7 @@ public class MCRIFS2Commands {
             }
             if (counter > 1) {
                 LOGGER.error("The directory entry for " + derivate_id + " and " + parent_node.getName()
-                        + " is not unique!");
+                    + " is not unique!");
                 return "";
             }
             return pid;
@@ -397,12 +401,14 @@ public class MCRIFS2Commands {
         MCRConfiguration config = MCRConfiguration.instance();
         String content_store_basepath = config.getString("MCR.IFS.ContentStore." + content_store + ".BaseDir", "");
         if (content_store_basepath.length() == 0) {
-            LOGGER.error("Cant find base directory property in form MCR.IFS.ContentStore." + content_store + ".BaseDir");
+            LOGGER
+                .error("Cant find base directory property in form MCR.IFS.ContentStore." + content_store + ".BaseDir");
             return derivates;
         }
         String slot_layout = config.getString("MCR.IFS.ContentStore." + content_store + ".SlotLayout", "");
         if (slot_layout.length() == 0) {
-            LOGGER.error("Cant find slot layout property in form MCR.IFS.ContentStore." + content_store + ".SlotLayout");
+            LOGGER
+                .error("Cant find slot layout property in form MCR.IFS.ContentStore." + content_store + ".SlotLayout");
             return derivates;
         }
         File project_dir = new File(content_store_basepath, project_id);
@@ -417,7 +423,7 @@ public class MCRIFS2Commands {
     }
 
     private static void searchRecurive(ArrayList<String> derivates, File dir, int max_slot_deep, int current_slot_deep,
-            String project_id) {
+        String project_id) {
         if (current_slot_deep == max_slot_deep)
             return;
         File[] dir_list = dir.listFiles();

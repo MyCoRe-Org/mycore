@@ -10,14 +10,14 @@
 package org.mycore.datamodel.ifs;
 
 import java.io.IOException;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.attribute.FileTime;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
@@ -107,7 +107,7 @@ public abstract class MCRFilesystemNode {
         this.parentID = parentID;
         this.ownerID = ownerID;
         size = 0;
-        lastModified = new GregorianCalendar();
+        lastModified = new GregorianCalendar(TimeZone.getDefault(), Locale.getDefault());
         label = null;
         checkName(name, doExistCheck);
         this.name = name;
@@ -233,8 +233,8 @@ public abstract class MCRFilesystemNode {
             throw new MCRUsageException("Do not use this node, it is deleted");
         }
     }
-    
-    public boolean isDeleted(){
+
+    public boolean isDeleted() {
         return deleted;
     }
 
@@ -260,7 +260,7 @@ public abstract class MCRFilesystemNode {
     }
 
     protected void touch(FileTime time, boolean recursive) {
-        lastModified = new GregorianCalendar();
+        lastModified = new GregorianCalendar(TimeZone.getDefault(), Locale.getDefault());
         if (time != null) {
             lastModified.setTimeInMillis(time.toMillis());
         }
@@ -532,7 +532,7 @@ public abstract class MCRFilesystemNode {
         }
     }
 
-    protected static DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS");
+    protected static DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS", Locale.ROOT);
 
     @Override
     public String toString() {

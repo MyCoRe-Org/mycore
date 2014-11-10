@@ -31,6 +31,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 
 import org.mycore.common.MCRException;
@@ -281,7 +282,7 @@ public abstract class MCRContentStore {
      * Returns the local java.io.File that really stores the content of the MCRFile 
      */
     public abstract File getLocalFile(String storageId) throws IOException;
-    
+
     /**
      * Returns the base dir as {@link File} if available or null if the base directory is no local file.
      * 
@@ -291,7 +292,7 @@ public abstract class MCRContentStore {
     public abstract File getBaseDir() throws IOException;
 
     /** DateFormat used to construct new unique IDs based on timecode */
-    protected static DateFormat formatter = new SimpleDateFormat("yyMMdd-HHmmss-SSS");
+    protected static DateFormat formatter = new SimpleDateFormat("yyMMdd-HHmmss-SSS", Locale.ROOT);
 
     /**
      * Constructs a new unique ID for storing content

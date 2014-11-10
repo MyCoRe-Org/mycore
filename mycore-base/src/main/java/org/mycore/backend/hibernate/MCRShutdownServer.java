@@ -31,6 +31,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.jdom2.JDOMException;
@@ -50,8 +51,6 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * 
  */
 public class MCRShutdownServer {
-
-    private static final ClassLoader CLASS_LOADER = MCRShutdownServer.class.getClassLoader();
 
     /**
      * @param args
@@ -73,7 +72,7 @@ public class MCRShutdownServer {
             if (e.getErrorCode() == -1305 && "08006".equals(e.getSQLState())) {
                 //ignore EOF Exception on closing connection, database shutdown to fast
             } else {
-                System.err.printf("Error while shutting down HSQLDB.\nCode: %d\nState: %s\nMessage: %s\n",
+                System.err.printf(Locale.ROOT, "Error while shutting down HSQLDB.\nCode: %d\nState: %s\nMessage: %s\n",
                     e.getErrorCode(), e.getSQLState(), e.getMessage());
             }
         }

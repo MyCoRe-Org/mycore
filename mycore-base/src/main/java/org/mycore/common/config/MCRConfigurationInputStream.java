@@ -34,6 +34,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -232,7 +233,7 @@ public class MCRConfigurationInputStream extends InputStream {
         if (MCRConfiguration.isLog4JEnabled()) {
             Logger.getLogger(MCRConfigurationInputStream.class).info(msg);
         } else {
-            System.out.printf("INFO: %s\n", msg);
+            System.out.printf(Locale.ROOT, "INFO: %s\n", msg);
         }
     }
 

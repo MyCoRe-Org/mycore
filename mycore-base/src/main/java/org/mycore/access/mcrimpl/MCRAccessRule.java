@@ -27,6 +27,7 @@ import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
@@ -51,7 +52,8 @@ public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
 
     static MCRRuleParser parser = new MCRRuleParser();
 
-    public MCRAccessRule(String id, String creator, Date creationTime, String rule, String description) throws MCRParseException {
+    public MCRAccessRule(String id, String creator, Date creationTime, String rule, String description)
+        throws MCRParseException {
         setId(id);
         setCreator(creator);
         setCreationTime(creationTime);
@@ -137,7 +139,7 @@ public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
         Element el = new Element("mcraccessrule");
         el.addContent(new Element("id").setText(id));
         el.addContent(new Element("creator").setText(id));
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ROOT);
         el.addContent(new Element("creationdate").setText(df.format(creationTime)));
         el.addContent(new Element("rule").setText(rule));
         el.addContent(new Element("description").setText("" + description));

@@ -26,6 +26,7 @@ package org.mycore.access.mcrimpl;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import org.jdom2.Element;
 import org.mycore.parsers.bool.MCRCondition;
@@ -38,7 +39,7 @@ import org.mycore.parsers.bool.MCRCondition;
 class MCRDateAfterClause implements MCRCondition<MCRAccessData> {
     private Date date;
 
-    private DateFormat dateformat = new SimpleDateFormat("dd.MM.yyyy");
+    private DateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd", Locale.ROOT);
 
     MCRDateAfterClause(Date date) {
         this.date = date;

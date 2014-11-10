@@ -26,7 +26,9 @@ package org.mycore.datamodel.ifs;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
@@ -46,11 +48,11 @@ public class MCRDirectoryXML {
 
     private static final String dateFormat = "dd.MM.yyyy HH:mm:ss";
 
-    private static final DateFormat dateFormatter = new SimpleDateFormat(dateFormat);
+    private static final DateFormat dateFormatter = new SimpleDateFormat(dateFormat, Locale.ROOT);
 
     private static final String timeFormat = "HH:mm:ss";
 
-    private static final DateFormat timeFormatter = new SimpleDateFormat(timeFormat);
+    private static final DateFormat timeFormatter = new SimpleDateFormat(timeFormat, Locale.ROOT);
 
     protected static MCRDirectoryXML SINGLETON = new MCRDirectoryXML();
 
@@ -63,7 +65,8 @@ public class MCRDirectoryXML {
     protected final static boolean WITH_ADDITIONAL_DATA_DEFAULT;
 
     static {
-        WITH_ADDITIONAL_DATA_DEFAULT = MCRConfiguration.instance().getBoolean("MCR.IFS.IncludeAdditionalDataByDefault", false);
+        WITH_ADDITIONAL_DATA_DEFAULT = MCRConfiguration.instance().getBoolean("MCR.IFS.IncludeAdditionalDataByDefault",
+            false);
     }
 
     /**
@@ -111,13 +114,15 @@ public class MCRDirectoryXML {
         Element ncHere = new Element("here");
         numChildren.addContent(ncHere);
 
-        addString(ncHere, "directories", String.valueOf(dir.getNumChildren(MCRDirectory.DIRECTORIES, MCRDirectory.HERE)));
+        addString(ncHere, "directories",
+            String.valueOf(dir.getNumChildren(MCRDirectory.DIRECTORIES, MCRDirectory.HERE)));
         addString(ncHere, "files", String.valueOf(dir.getNumChildren(MCRDirectory.FILES, MCRDirectory.HERE)));
 
         Element ncTotal = new Element("total");
         numChildren.addContent(ncTotal);
 
-        addString(ncTotal, "directories", String.valueOf(dir.getNumChildren(MCRDirectory.DIRECTORIES, MCRDirectory.TOTAL)));
+        addString(ncTotal, "directories",
+            String.valueOf(dir.getNumChildren(MCRDirectory.DIRECTORIES, MCRDirectory.TOTAL)));
         addString(ncTotal, "files", String.valueOf(dir.getNumChildren(MCRDirectory.FILES, MCRDirectory.TOTAL)));
 
         Element nodes = new Element("children");
@@ -216,7 +221,8 @@ public class MCRDirectoryXML {
         Element xTime = new Element(type);
         parent.addContent(xTime);
 
-        GregorianCalendar date = new GregorianCalendar(2002, 01, 01, hh, mm, ss);
+        GregorianCalendar date = new GregorianCalendar(TimeZone.getDefault(), Locale.ROOT);
+        date.set(2002, 01, 01, hh, mm, ss);
         String time = timeFormatter.format(date.getTime());
 
         xTime.setAttribute("format", timeFormat);

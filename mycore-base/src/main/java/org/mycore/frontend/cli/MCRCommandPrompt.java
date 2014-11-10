@@ -20,6 +20,7 @@ package org.mycore.frontend.cli;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 
 /**
  * Reads the next command entered at the stdin prompt.
@@ -34,7 +35,7 @@ public class MCRCommandPrompt {
 
     public MCRCommandPrompt(String systemName) {
         this.systemName = systemName;
-        this.console = new BufferedReader(new InputStreamReader(System.in));
+        this.console = new BufferedReader(new InputStreamReader(System.in, Charset.defaultCharset()));
     }
 
     public String readCommand() {

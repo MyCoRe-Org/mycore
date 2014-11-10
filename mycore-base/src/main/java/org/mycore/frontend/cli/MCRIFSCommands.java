@@ -1,14 +1,17 @@
 package org.mycore.frontend.cli;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -18,9 +21,11 @@ import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -245,7 +250,7 @@ public class MCRIFSCommands {
         String currentStoreId = null;
         MCRContentStore currentStore = null;
         File currentStoreBaseDir = null;
-        FileWriter fw = null;
+        BufferedWriter bw = null;
         String nameOfProject = MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe");
         try {
             while (fsnodes.next()) {
@@ -258,12 +263,13 @@ public class MCRIFSCommands {
                     //initialize current store
                     currentStoreId = storeID;
                     currentStore = availableStores.get(storeID);
-                    if (fw != null) {
-                        fw.close();
+                    if (bw != null) {
+                        bw.close();
                     }
                     File outputFile = new File(targetDir, MessageFormat.format("{0}-{1}.md5", nameOfProject, storeID));
                     LOGGER.info("Writing to file: " + outputFile.getAbsolutePath());
-                    fw = new FileWriter(outputFile);
+                    bw = Files.newBufferedWriter(outputFile.toPath(), Charset.defaultCharset(),
+                        StandardOpenOption.CREATE);
                     try {
                         currentStoreBaseDir = currentStore.getBaseDir();
                     } catch (Exception e) {
@@ -275,12 +281,12 @@ public class MCRIFSCommands {
                     : storageID;
                 //current store initialized
                 String line = MessageFormat.format("{0}  {1}\n", md5, path);
-                fw.write(line);
+                bw.write(line);
             }
         } finally {
-            if (fw != null) {
+            if (bw != null) {
                 try {
-                    fw.close();
+                    bw.close();
                 } catch (IOException e1) {
                     LOGGER.warn("Error while closing file.", e1);
                 }
@@ -625,7 +631,7 @@ public class MCRIFSCommands {
                 String name = fsNode.getName();
                 long size = fsNode.getSize();
                 Date date = fsNode.getDate();
-                GregorianCalendar datecal = new GregorianCalendar();
+                GregorianCalendar datecal = new GregorianCalendar(TimeZone.getDefault(), Locale.getDefault());
                 datecal.setTime(date);
                 String storageid = fsNode.getStorageid();
                 String fctid = fsNode.getFctid();
@@ -717,7 +723,7 @@ public class MCRIFSCommands {
                     String name = fsNode.getName();
                     long size = fsNode.getSize();
                     Date date = fsNode.getDate();
-                    GregorianCalendar datecal = new GregorianCalendar();
+                    GregorianCalendar datecal = new GregorianCalendar(TimeZone.getDefault(), Locale.getDefault());
                     datecal.setTime(date);
                     String fctid = fsNode.getFctid();
                     String md5 = fsNode.getMd5();

@@ -27,6 +27,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
@@ -98,7 +100,7 @@ public class MCRSQLRowReader {
                 return null;
             }
 
-            GregorianCalendar cal = new GregorianCalendar();
+            GregorianCalendar cal = new GregorianCalendar(TimeZone.getDefault(), Locale.getDefault());
             cal.setTime(value);
 
             return cal;
@@ -133,7 +135,7 @@ public class MCRSQLRowReader {
                 return null;
             }
 
-            GregorianCalendar cal = new GregorianCalendar();
+            GregorianCalendar cal = new GregorianCalendar(TimeZone.getDefault(), Locale.getDefault());
             cal.setTime(value);
 
             return cal;

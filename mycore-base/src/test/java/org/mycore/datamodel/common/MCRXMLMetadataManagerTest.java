@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -110,6 +111,9 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
 
     @Test
     public void retrieve() throws JDOMException, IOException, SAXException {
+        assertEquals("Stored document ID do not match:", MyCoRe_document_00000001.id.toString(),
+            SAX_BUILDER.build(new ByteArrayInputStream(MyCoRe_document_00000001.blob)).getRootElement()
+                .getAttributeValue("id"));
         getStore().create(MyCoRe_document_00000001.id,
             new MCRByteContent(MyCoRe_document_00000001.blob, MCR_document_00000001.lastModified.getTime()),
             MyCoRe_document_00000001.lastModified);

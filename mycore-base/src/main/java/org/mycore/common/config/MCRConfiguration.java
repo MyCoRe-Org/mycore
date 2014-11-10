@@ -37,6 +37,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -462,7 +463,7 @@ public class MCRConfiguration {
             throw new MCRConfigurationException("Configuration property missing: " + name);
         }
 
-        return this.<T>loadClass(classname);
+        return this.<T> loadClass(classname);
     }
 
     private <T> T loadClass(String classname) {
@@ -486,8 +487,8 @@ public class MCRConfiguration {
                 Method[] querymethods = cl.getMethods();
 
                 for (Method querymethod : querymethods) {
-                    if (querymethod.getName().toLowerCase().equals("instance")
-                        || querymethod.getName().toLowerCase().equals("getinstance")) {
+                    if (querymethod.getName().toLowerCase(Locale.ROOT).equals("instance")
+                        || querymethod.getName().toLowerCase(Locale.ROOT).equals("getinstance")) {
                         Object[] ob = new Object[0];
                         @SuppressWarnings("unchecked")
                         T invoke = (T) querymethod.invoke(cl, ob);
@@ -510,7 +511,7 @@ public class MCRConfiguration {
         }
         return o;
     }
-    
+
     /**
      * Returns a new instance of the class specified in the configuration
      * property with the given name.
@@ -523,14 +524,14 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property is not set or the class can not be loaded or
      *             instantiated
-     */ 
+     */
     public <T> T getInstanceOf(String name, T defaultObj) {
         String classname = getString(name, null);
         if (classname == null) {
             return defaultObj;
         }
 
-        return this.<T>loadClass(classname);
+        return this.<T> loadClass(classname);
     }
 
     /**
@@ -573,7 +574,7 @@ public class MCRConfiguration {
         instanceHolder.put(key, inst); // save the instance in the hashtable
         return inst;
     }
-   
+
     /**
      * Returns a instance of the class specified in the configuration property
      * with the given name. If the class was prevously instantiated by this
@@ -1035,7 +1036,7 @@ public class MCRConfiguration {
         if (isLog4JEnabled()) {
             Logger.getLogger(getClass()).warn(msg, throwable);
         } else {
-            System.err.printf("WARN: %s\n", msg);
+            System.err.printf(Locale.ROOT, "WARN: %s\n", msg);
             if (throwable != null) {
                 throwable.printStackTrace(System.err);
             }
@@ -1050,7 +1051,7 @@ public class MCRConfiguration {
         if (isLog4JEnabled()) {
             Logger.getLogger(getClass()).debug(msg);
         } else {
-            System.out.printf("DEBUG: %s\n", msg);
+            System.out.printf(Locale.ROOT, "DEBUG: %s\n", msg);
         }
     }
 

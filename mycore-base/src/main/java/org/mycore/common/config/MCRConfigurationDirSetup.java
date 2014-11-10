@@ -33,6 +33,7 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -82,7 +83,7 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
             File[] listFiles = libDir.listFiles(new FilenameFilter() {
                 @Override
                 public boolean accept(File dir, String name) {
-                    return name.toLowerCase().endsWith(".jar");
+                    return name.toLowerCase(Locale.ROOT).endsWith(".jar");
                 }
             });
             if (listFiles.length > 0) {
@@ -112,7 +113,7 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
         if (MCRConfiguration.isLog4JEnabled()) {
             Logger.getLogger(MCRConfigurationInputStream.class).error(msg, e);
         } else {
-            System.out.printf("ERROR: %s\n", msg + toString(e));
+            System.out.printf(Locale.ROOT,"ERROR: %s\n", msg + toString(e));
         }
     }
 
@@ -132,7 +133,7 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
         if (MCRConfiguration.isLog4JEnabled()) {
             Logger.getLogger(MCRConfigurationInputStream.class).warn(msg, e);
         } else {
-            System.err.printf("WARN: %s\n", msg + toString(e));
+            System.err.printf(Locale.ROOT,"WARN: %s\n", msg + toString(e));
         }
     }
 
@@ -140,7 +141,7 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
         if (MCRConfiguration.isLog4JEnabled()) {
             Logger.getLogger(MCRConfigurationInputStream.class).info(msg);
         } else {
-            System.out.printf("INFO: %s\n", msg);
+            System.out.printf(Locale.ROOT, "INFO: %s\n", msg);
         }
     }
 }

@@ -24,7 +24,12 @@
 package org.mycore.common;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import org.apache.log4j.Logger;
 
 /**
  * Instances of this class represent a general exception thrown by any part of
@@ -48,7 +53,7 @@ public class MCRException extends RuntimeException {
     public MCRException(String message) {
         super(message);
     }
-    
+
     public MCRException(Throwable cause) {
         super(cause);
     }
@@ -98,16 +103,15 @@ public class MCRException extends RuntimeException {
     public static String getStackTraceAsString(Throwable ex) {
         // We let Java print the stack trace to a buffer in memory to be able to
         // get it as String:
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        try {
-            PrintStream buffer = new PrintStream(baos);
-            ex.printStackTrace(buffer);
-            buffer.close();
-        } catch (Exception willNeverBeThrown) {
+        try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw)) {
+            ex.printStackTrace(pw);
+            pw.flush();
+            return sw.toString();
+        } catch (IOException e) {
+            Logger.getLogger(MCRException.class).warn("Error while transforming stack trace to String.", e);
+            return null;
         }
 
-        return baos.toString();
     }
 
 }

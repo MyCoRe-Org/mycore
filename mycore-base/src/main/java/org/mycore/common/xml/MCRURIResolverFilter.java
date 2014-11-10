@@ -25,8 +25,10 @@ package org.mycore.common.xml;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -192,7 +194,11 @@ public class MCRURIResolverFilter implements Filter {
                  * system default encoding here.
                  */
                 LOGGER.error("Fall back to DEFAULT encoding.");
-                return output.toString();
+                try {
+                    return output.toString(Charset.defaultCharset().name());
+                } catch (UnsupportedEncodingException neverThrown) {
+                    throw new RuntimeException(neverThrown);
+                }
             }
         }
 
@@ -203,7 +209,7 @@ public class MCRURIResolverFilter implements Filter {
 
         @Override
         public PrintWriter getWriter() {
-            return new PrintWriter(output);
+            return new PrintWriter(new OutputStreamWriter(output, Charset.forName(getCharacterEncoding())));
         }
 
         @Override

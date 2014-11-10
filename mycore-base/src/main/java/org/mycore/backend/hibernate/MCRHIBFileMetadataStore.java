@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -182,7 +184,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
     }
 
     public MCRFilesystemNode buildNode(MCRFSNODES node) {
-        GregorianCalendar greg = new GregorianCalendar();
+        GregorianCalendar greg = new GregorianCalendar(TimeZone.getDefault(), Locale.getDefault());
         greg.setTime(node.getDate());
 
         MCRFilesystemNode filesystemNode = MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(),

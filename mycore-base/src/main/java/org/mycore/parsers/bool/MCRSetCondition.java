@@ -26,6 +26,7 @@ package org.mycore.parsers.bool;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import org.jdom2.Element;
 
@@ -70,7 +71,7 @@ public abstract class MCRSetCondition<T> implements MCRCondition<T> {
         for (int i = 0; i < children.size(); i++) {
             sb.append("(").append(children.get(i)).append(")");
             if (i < children.size() - 1) {
-                sb.append(' ').append(operator.toUpperCase()).append(' ');
+                sb.append(' ').append(operator.toUpperCase(Locale.ROOT)).append(' ');
             }
         }
         return sb.toString();

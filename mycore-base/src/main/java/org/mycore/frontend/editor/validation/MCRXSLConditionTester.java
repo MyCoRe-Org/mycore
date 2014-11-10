@@ -1,8 +1,10 @@
 package org.mycore.frontend.editor.validation;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
@@ -14,6 +16,8 @@ import org.jdom2.Namespace;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRUtils;
+
+import com.google.common.base.Optional;
 
 public class MCRXSLConditionTester {
 
@@ -29,8 +33,8 @@ public class MCRXSLConditionTester {
         Document xsl = buildXSLStylesheet(condition);
         String output = transform(xml, xsl);
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(MessageFormat.format("Condition: {0}Stylesheet:\n{1}\nInput:\n{2}\nResult: {3}", condition, MCRUtils.documentAsString(xsl),
-                MCRUtils.documentAsString(xml), output));
+            LOGGER.debug(MessageFormat.format("Condition: {0}Stylesheet:\n{1}\nInput:\n{2}\nResult: {3}", condition,
+                MCRUtils.documentAsString(xsl), MCRUtils.documentAsString(xml), output));
         }
         return "true".equals(output);
     }
@@ -75,9 +79,11 @@ public class MCRXSLConditionTester {
     private String transform(Document input, Document xsl) throws Exception {
         TransformerFactory factory = TransformerFactory.newInstance();
         Transformer transformer = factory.newTransformer(new JDOMSource(xsl));
+        String encoding = Optional.fromNullable(transformer.getOutputProperty(OutputKeys.ENCODING)).or(
+            StandardCharsets.UTF_8.name());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         transformer.transform(new JDOMSource(input), new StreamResult(out));
         out.close();
-        return out.toString();
+        return out.toString(encoding);
     }
 }

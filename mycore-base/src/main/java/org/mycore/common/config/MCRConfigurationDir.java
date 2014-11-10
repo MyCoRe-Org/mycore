@@ -31,6 +31,7 @@ import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.ServletContext;
 
@@ -99,7 +100,7 @@ public class MCRConfigurationDir {
     }
 
     private static boolean isWindows() {
-        return System.getProperty("os.name").toLowerCase().contains("windows");
+        return System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows");
     }
 
     private static String getConfigBaseName() {

@@ -24,6 +24,7 @@
 package org.mycore.common;
 
 import java.util.Enumeration;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -64,7 +65,7 @@ public class MCRLanguageDetector {
     }
 
     private static int buildScore(String text, String lang, String wordList, String endings) {
-        text = text.toLowerCase().trim();
+        text = text.toLowerCase(Locale.ROOT).trim();
         text = text.replace(',', ' ').replace('-', ' ').replace('/', ' ');
         text = " " + text + " ";
 

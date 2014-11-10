@@ -23,8 +23,10 @@
 
 package org.mycore.access.mcrimpl;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import org.jdom2.Element;
 import org.mycore.common.config.MCRConfiguration;
@@ -41,17 +43,22 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
     }
 
     private static Date parseDate(String s, boolean dayafter) throws MCRParseException {
+        long time;
         try {
-            long time = new SimpleDateFormat("dd.MM.yyyy").parse(s).getTime();
-
-            if (dayafter) {
-                time += 1000 * 60 * 60 * 24;
-            }
-
-            return new Date(time);
+            time = new SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).parse(s).getTime();
         } catch (java.text.ParseException e) {
-            throw new MCRParseException("unable to parse date " + s);
+            try {
+                time = new SimpleDateFormat("dd.MM.yyyy", Locale.ROOT).parse(s).getTime();
+            } catch (ParseException e1) {
+                throw new MCRParseException("unable to parse date " + s);
+            }
         }
+
+        if (dayafter) {
+            time += 1000 * 60 * 60 * 24;
+        }
+
+        return new Date(time);
     }
 
     @Override
@@ -84,7 +91,7 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
      * @return 
      */
     protected MCRCondition<?> parseElement(Element e) {
-        String field = e.getAttributeValue("field").toLowerCase().trim();
+        String field = e.getAttributeValue("field").toLowerCase(Locale.ROOT).trim();
         String operator = e.getAttributeValue("operator").trim();
         String value = e.getAttributeValue("value").trim();
         boolean not = "!=".equals(operator);
@@ -119,7 +126,7 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
         } catch (MCRConfigurationException e) {
             return new MCRIPClause(value);
         }
-        
+
     }
 
     /**

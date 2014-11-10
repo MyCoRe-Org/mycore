@@ -23,8 +23,9 @@
 
 package org.mycore.frontend.editor;
 
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 import org.apache.commons.fileupload.FileItem;
@@ -54,6 +55,15 @@ public class MCREditorVariable implements Comparable {
 
     private String sortPattern = "";
 
+    private static NumberFormat sortFormatter = getSortFormater();
+
+    private static NumberFormat getSortFormater() {
+        NumberFormat format = NumberFormat.getIntegerInstance(Locale.ROOT);
+        format.setMinimumIntegerDigits(4);
+        format.setGroupingUsed(false);
+        return format;
+    }
+
     MCREditorVariable(String path, String value) {
         setPath(path);
         setValue(value);
@@ -64,7 +74,7 @@ public class MCREditorVariable implements Comparable {
     }
 
     void setValue(String value) {
-        this.value = MCRXMLHelper.removeIllegalChars( value.trim() );
+        this.value = MCRXMLHelper.removeIllegalChars(value.trim());
     }
 
     public String getValue() {
@@ -136,8 +146,6 @@ public class MCREditorVariable implements Comparable {
 
         sortPattern = sb.toString();
     }
-
-    private static DecimalFormat sortFormatter = new DecimalFormat("0000");
 
     public int compareTo(Object o) {
         MCREditorVariable other = (MCREditorVariable) o;

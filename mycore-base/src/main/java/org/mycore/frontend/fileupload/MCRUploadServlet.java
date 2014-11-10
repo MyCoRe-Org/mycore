@@ -37,6 +37,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -334,7 +335,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
                     path = getFileName(path);
 
                     LOGGER.info("UploadServlet uploading " + path);
-                    if (path.toLowerCase().endsWith(".zip")) {
+                    if (path.toLowerCase(Locale.ROOT).endsWith(".zip")) {
                         uploadZipFile(handler, in);
                     } else {
                         handler.receiveFile(path, in, 0, null);

@@ -20,6 +20,7 @@ package org.mycore.frontend.cli;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.content.MCRByteContent;
@@ -76,7 +77,7 @@ public class MCRExternalProcess {
     }
 
     public String getErrors() {
-        return new String(errors.getOutput());
+        return new String(errors.getOutput(), Charset.defaultCharset());
     }
 
     public MCRContent getOutput() throws IOException {

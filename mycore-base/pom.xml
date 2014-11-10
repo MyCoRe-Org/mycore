@@ -11,7 +11,7 @@
   <artifactId>mycore-base</artifactId>
   <name>MyCoRe Base Components</name>
   <properties>
-    <forbiddenapis.skip>true</forbiddenapis.skip>
+<!--     <forbiddenapis.skip>true</forbiddenapis.skip> -->
   </properties>
   <build>
     <resources>

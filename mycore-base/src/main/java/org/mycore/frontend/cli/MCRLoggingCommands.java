@@ -33,7 +33,7 @@ public class MCRLoggingCommands extends MCRAbstractCommands {
     synchronized public static void changeLogLevel(String name, String logLevelToSet) {
         LOGGER.info("Setting log level for \"" + name + "\" to \"" + logLevelToSet + "\"");
 
-        Level newLevel = Level.toLevel(logLevelToSet.toUpperCase());
+        Level newLevel = Level.toLevel(logLevelToSet);
         if (newLevel == null) {
             LOGGER.error("Unknown log level \"" + logLevelToSet + "\"");
             return;

@@ -131,14 +131,14 @@ public class MCRXMLFunctions {
     public static String trim(String arg0) {
         return arg0.trim();
     }
-    
+
     /**
      * returns the given String in unicode NFC normal form.
      * 
      * @param arg0 String to be normalized
      * @see Normalizer#normalize(CharSequence, java.text.Normalizer.Form)
      */
-    public static String normalizeUnicode(String arg0){
+    public static String normalizeUnicode(String arg0) {
         return Normalizer.normalize(arg0, Normalizer.Form.NFC);
     }
 
@@ -206,7 +206,7 @@ public class MCRXMLFunctions {
         if (simpleFormat.equals("long")) {
             date = new Date(Long.parseLong(simpleDate));
         } else {
-            SimpleDateFormat df = new SimpleDateFormat(simpleFormat);
+            SimpleDateFormat df = new SimpleDateFormat(simpleFormat, Locale.ROOT);
             df.setTimeZone(TimeZone.getTimeZone("UTC"));
             // or else testcase
             // "1964-02-24" would
@@ -253,10 +253,10 @@ public class MCRXMLFunctions {
     public static String getCurrentDate(String format) {
         SimpleDateFormat sdf = null;
         try {
-            sdf = new SimpleDateFormat(format);
+            sdf = new SimpleDateFormat(format, Locale.ROOT);
         } catch (Exception i) {
             LOGGER.warn("Could not parse date format string, will use default \"yyyy-MM-dd\"", i);
-            sdf = new SimpleDateFormat("yyyy-MM-dd");
+            sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.ROOT);
         }
 
         return sdf.format(new Date());
@@ -527,7 +527,7 @@ public class MCRXMLFunctions {
             return "application/octet-stream";
         }
         MimetypesFileTypeMap mTypes = new MimetypesFileTypeMap();
-        return mTypes.getContentType(f.toLowerCase());
+        return mTypes.getContentType(f.toLowerCase(Locale.ROOT));
     }
 
     /**

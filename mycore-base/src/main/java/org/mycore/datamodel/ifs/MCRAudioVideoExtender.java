@@ -160,6 +160,7 @@ public abstract class MCRAudioVideoExtender {
     public String getFrameRateFormatted() {
         // double r = (double)( Math.round( frameRate * 10.0 ) ) / 10.0;
         NumberFormat formatter = NumberFormat.getInstance(Locale.ROOT);
+        formatter.setGroupingUsed(false);
         formatter.setMinimumIntegerDigits(2);
         formatter.setMinimumFractionDigits(1);
         formatter.setMaximumFractionDigits(1);
@@ -255,6 +256,7 @@ public abstract class MCRAudioVideoExtender {
      */
     public String getDurationTimecode() {
         NumberFormat formatter = NumberFormat.getIntegerInstance(Locale.ROOT);
+        formatter.setGroupingUsed(false);
         formatter.setMinimumIntegerDigits(2);
         StringBuilder sb = new StringBuilder();
         sb.append(formatter.format(durationHours));

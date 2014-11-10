@@ -23,11 +23,12 @@
 
 package org.mycore.datamodel.metadata;
 
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -84,7 +85,7 @@ public final class MCRObjectID {
     public interface MCRObjectIDFormat {
         public int numberDistance();
 
-        public DecimalFormat numberFormat();
+        public NumberFormat numberFormat();
     }
 
     private static class MCRObjectIDDefaultFormat implements MCRObjectIDFormat {
@@ -107,10 +108,13 @@ public final class MCRObjectID {
         }
 
         @Override
-        public DecimalFormat numberFormat() {
-            String numberPattern = MCRConfiguration.instance().getString("MCR.Metadata.ObjectID.NumberPattern",
-                "0000000000");
-            return new DecimalFormat(numberPattern);
+        public NumberFormat numberFormat() {
+            String numberPattern = MCRConfiguration.instance()
+                .getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000").trim();
+            NumberFormat format = NumberFormat.getIntegerInstance(Locale.ROOT);
+            format.setGroupingUsed(false);
+            format.setMinimumIntegerDigits(numberPattern.length());
+            return format;
         }
 
     }
@@ -301,7 +305,7 @@ public final class MCRObjectID {
         if (number < 0) {
             throw new IllegalArgumentException("number must be non negative integer");
         }
-        return projectID + '_' + type.toLowerCase() + '_' + idFormat.numberFormat().format(number);
+        return projectID + '_' + type.toLowerCase(Locale.ROOT) + '_' + idFormat.numberFormat().format(number);
     }
 
     /**
@@ -365,7 +369,7 @@ public final class MCRObjectID {
 
         projectId = idParts[0].intern();
 
-        objectType = idParts[1].toLowerCase().intern();
+        objectType = idParts[1].toLowerCase(Locale.ROOT).intern();
 
         if (!CONFIG.getBoolean("MCR.Metadata.Type." + objectType, false)) {
             LOGGER.warn("Property MCR.Metadata.Type." + objectType + " is not set. Thus " + id

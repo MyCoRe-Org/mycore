@@ -28,6 +28,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -47,15 +48,16 @@ import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
  * 
  */
 public class MCRHIBAccessStore extends MCRAccessStore {
-    private final DateFormat dateFormat = new SimpleDateFormat(sqlDateformat);
+    private final DateFormat dateFormat = new SimpleDateFormat(sqlDateformat, Locale.ROOT);
+
     private static final Logger LOGGER = Logger.getLogger(MCRHIBAccessStore.class);
 
     @Override
     public String getRuleID(String objID, String ACPool) {
 
         Session session = MCRHIBConnection.instance().getSession();
-        Criteria c = session.createCriteria(MCRACCESS.class).setProjection(Projections.property("rule.rid")).add(
-                Restrictions.eq("key.objid", objID)).add(Restrictions.eq("key.acpool", ACPool));
+        Criteria c = session.createCriteria(MCRACCESS.class).setProjection(Projections.property("rule.rid"))
+            .add(Restrictions.eq("key.objid", objID)).add(Restrictions.eq("key.acpool", ACPool));
         return (String) c.uniqueResult();
     }
 
@@ -130,8 +132,8 @@ public class MCRHIBAccessStore extends MCRAccessStore {
 
         Session session = MCRHIBConnection.instance().getSession();
         session.createQuery(
-                "delete MCRACCESS " + "where ACPOOL = '" + rulemapping.getPool() + "'" + " AND OBJID = '" + rulemapping.getObjId() + "'")
-                .executeUpdate();
+            "delete MCRACCESS " + "where ACPOOL = '" + rulemapping.getPool() + "'" + " AND OBJID = '"
+                + rulemapping.getObjId() + "'").executeUpdate();
     }
 
     /**
@@ -145,7 +147,8 @@ public class MCRHIBAccessStore extends MCRAccessStore {
             throw new NullPointerException("Cannot map a null rule.");
         }
         // update
-        MCRACCESS accdef = (MCRACCESS) session.get(MCRACCESS.class, new MCRACCESSPK(rulemapping.getPool(), rulemapping.getObjId()));
+        MCRACCESS accdef = (MCRACCESS) session.get(MCRACCESS.class,
+            new MCRACCESSPK(rulemapping.getPool(), rulemapping.getObjId()));
         accdef.setRule(accessRule);
         accdef.setCreator(rulemapping.getCreator());
         accdef.setCreationdate(Timestamp.valueOf(dateFormat.format(rulemapping.getCreationdate())));
@@ -166,8 +169,8 @@ public class MCRHIBAccessStore extends MCRAccessStore {
 
         Session session = MCRHIBConnection.instance().getSession();
         MCRRuleMapping rulemapping = new MCRRuleMapping();
-        MCRACCESS data = (MCRACCESS) session.createCriteria(MCRACCESS.class).add(Restrictions.eq("key", new MCRACCESSPK(pool, objid)))
-                .list().get(0);
+        MCRACCESS data = (MCRACCESS) session.createCriteria(MCRACCESS.class)
+            .add(Restrictions.eq("key", new MCRACCESSPK(pool, objid))).list().get(0);
         if (data != null) {
             rulemapping.setCreationdate(data.getCreationdate());
             rulemapping.setCreator(data.getCreator());

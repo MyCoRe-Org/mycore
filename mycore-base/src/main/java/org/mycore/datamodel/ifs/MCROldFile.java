@@ -32,7 +32,9 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRPersistenceException;
@@ -90,7 +92,7 @@ public class MCROldFile implements MCRFileReader {
         size = 0;
         contentTypeID = "unknown";
         md5 = "d41d8cd98f00b204e9800998ecf8427e";
-        lastModified = new GregorianCalendar();
+        lastModified = new GregorianCalendar(TimeZone.getDefault(), Locale.getDefault());
 
         fireEvent(MCREvent.CREATE_EVENT);
     }
@@ -140,7 +142,7 @@ public class MCROldFile implements MCRFileReader {
     public String getAbsolutePath() {
         return "/" + path;
     }
-    
+
     /**
      * Returns the filename of this file
      */
@@ -334,7 +336,7 @@ public class MCROldFile implements MCRFileReader {
         contentTypeID = "unknown";
         md5 = "d41d8cd98f00b204e9800998ecf8427e";
         size = 0;
-        lastModified = new GregorianCalendar();
+        lastModified = new GregorianCalendar(TimeZone.getDefault(), Locale.getDefault());
     }
 
     private void fireEvent(String type) {

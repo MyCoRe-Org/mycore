@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -210,12 +211,12 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
          */
         MCRExtensionRule(String extension, double score) {
             super(score);
-            this.extension = extension.toLowerCase();
+            this.extension = extension.toLowerCase(Locale.ROOT);
         }
 
         @Override
         double getScore(String filename, byte[] header) {
-            if (filename.toLowerCase().endsWith(extension)) {
+            if (filename.toLowerCase(Locale.ROOT).endsWith(extension)) {
                 return score;
             }
             return 0.0;

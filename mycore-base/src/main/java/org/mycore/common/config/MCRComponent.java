@@ -25,7 +25,8 @@ package org.mycore.common.config;
 
 import java.io.File;
 import java.io.InputStream;
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.Map;
 import java.util.jar.Manifest;
 
@@ -46,7 +47,14 @@ public class MCRComponent implements Comparable<MCRComponent> {
 
     private static final String ATT_PRIORITY = "Priority";
 
-    private static final DecimalFormat PRIORITY_FORMAT = new DecimalFormat("000");
+    private static final NumberFormat PRIORITY_FORMAT = getPriorityFormat();
+
+    private static NumberFormat getPriorityFormat() {
+        NumberFormat format = NumberFormat.getIntegerInstance(Locale.ROOT);
+        format.setGroupingUsed(false);
+        format.setMinimumIntegerDigits(3);
+        return format;
+    }
 
     private static final String DEFAULT_PRIORITY = "99";
 
@@ -133,7 +141,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
         if (MCRConfiguration.isLog4JEnabled()) {
             Logger.getLogger(MCRComponent.class).info(msg);
         } else {
-            System.out.printf("INFO: %s\n", msg);
+            System.out.printf(Locale.ROOT, "INFO: %s\n", msg);
         }
     }
 

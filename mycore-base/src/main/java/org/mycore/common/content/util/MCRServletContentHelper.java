@@ -37,6 +37,7 @@ import java.nio.channels.WritableByteChannel;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletConfig;
@@ -180,7 +181,7 @@ public abstract class MCRServletContentHelper {
         }
         String enc = content.getEncoding();
         if (enc != null) {
-            contentType = String.format("%s; charset=%s", contentType, enc);
+            contentType = String.format(Locale.ROOT, "%s; charset=%s", contentType, enc);
         }
 
         String eTag = null;
