@@ -22,7 +22,6 @@
  */
 package org.mycore.oai.classmapping;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -121,14 +120,8 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             if (currentClassElement == null) {
                 LOGGER.error("Error while finding classification elements", je);
             } else {
-                try {
-                    LOGGER
-                        .error(
-                            "Error while finding classification elements for " + MCRUtils.asString(currentClassElement),
-                            je);
-                } catch (IOException e) {
-                    LOGGER.error("Error while finding classification elements", je);
-                }
+                LOGGER.error(
+                    "Error while finding classification elements for " + MCRUtils.asString(currentClassElement), je);
             }
         } finally {
             if (mappings == null || mappings.size() == 0) {
