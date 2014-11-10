@@ -26,7 +26,6 @@ package org.mycore.common;
 
 import java.lang.reflect.Field;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -166,7 +165,9 @@ public final class MCRConstants {
     /** The default encoding */
     public final static String DEFAULT_ENCODING = "UTF-8";
 
-    /** The date format for the supported languages * */
+    /** The date format for the supported languages
+     * @deprecated undefined behavior of code as first DateFormat is not fixed.
+     **/
     public static DateFormat[] DATE_FORMAT = { DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()), // x-...
             DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.GERMAN), // de,ch,au
             DateFormat.getDateInstance(DateFormat.SHORT, Locale.UK), // ar,en-UK
