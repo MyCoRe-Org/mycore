@@ -18,7 +18,6 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
-import org.jdom2.output.Format.TextMode;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRURLContent;

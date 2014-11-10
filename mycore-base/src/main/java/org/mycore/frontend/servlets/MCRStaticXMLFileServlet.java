@@ -80,7 +80,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
             HttpServletRequest request = job.getRequest();
             HttpServletResponse response = job.getResponse();
             setXSLParameters(resource, request);
-            MCRContent content = expandEditorElements(request, resource);
+            MCRContent content = expandEditorElements(request, response, resource);
             getLayoutService().doLayout(request, response, content);
         }
     }
@@ -115,7 +115,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
     }
 
     /** For defined document types like static webpages, replace editor elements with complete editor definition */
-    protected MCRContent expandEditorElements(HttpServletRequest request, URL resource) throws IOException,
+    protected MCRContent expandEditorElements(HttpServletRequest request, HttpServletResponse response, URL resource) throws IOException,
         JDOMException, SAXException, MalformedURLException {
         MCRContent content = new MCRURLContent(resource);
         if (mayContainEditorForm(content)) {
