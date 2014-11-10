@@ -64,7 +64,9 @@
         </td>
       </tr>
     </table>
-    <xsl:apply-templates select="result/doc[1]" />
+    <xsl:variable name="normalResult" select="result/doc[1]" />
+    <xsl:variable name="groupedResult" select="lst[@name='grouped']/lst[@name='returnId']/arr[@name='groups']/lst/result/doc[1]" />
+    <xsl:apply-templates select="$normalResult|$groupedResult" />
     <!-- table footer -->
     <xsl:copy-of select="$ResultPages" />
   </xsl:template>
