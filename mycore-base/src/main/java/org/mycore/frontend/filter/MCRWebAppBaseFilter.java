@@ -24,7 +24,6 @@
 package org.mycore.frontend.filter;
 
 import java.io.IOException;
-import java.util.StringTokenizer;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -32,35 +31,17 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
 
 import org.mycore.frontend.MCRFrontendUtil;
 
 public class MCRWebAppBaseFilter implements Filter {
-    private static final String PROXY_HEADER = "X-Forwarded-Host";
-
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
         ServletException {
         // check if BASE_URL_ATTRIBUTE is present
         // for used proxy header use the first entry of list
         if (req.getAttribute(MCRFrontendUtil.BASE_URL_ATTRIBUTE) == null) {
-            HttpServletRequest request = (HttpServletRequest) req;
-            StringBuilder webappBase = new StringBuilder(request.getScheme());
-            webappBase.append("://");
-            String proxyHeader = request.getHeader(PROXY_HEADER);
-            if (proxyHeader != null) {
-                StringTokenizer sttoken = new StringTokenizer(proxyHeader, ",");
-                String proxyHost = sttoken.nextToken().trim();
-                webappBase.append(proxyHost);
-            } else {
-                webappBase.append(request.getServerName());
-                int port = request.getServerPort();
-                if (!(port == 80 || request.isSecure() && port == 443)) {
-                    webappBase.append(':').append(port);
-                }
-            }
-            webappBase.append(request.getContextPath()).append('/');
-            request.setAttribute(MCRFrontendUtil.BASE_URL_ATTRIBUTE, webappBase);
+            String webappBase = MCRFrontendUtil.getBaseURL(req);
+            req.setAttribute(MCRFrontendUtil.BASE_URL_ATTRIBUTE, webappBase);
         }
         chain.doFilter(req, res);
     }

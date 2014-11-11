@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -22,6 +23,8 @@ import org.mycore.common.config.MCRConfiguration;
  * Servlet/Jersey Resource utility class.
  */
 public class MCRFrontendUtil {
+
+    private static final String PROXY_HEADER = "X-Forwarded-Host";
 
     public static final String BASE_URL_ATTRIBUTE = "org.mycore.base.url";
 
@@ -43,6 +46,32 @@ public class MCRFrontendUtil {
             return value.toString();
         }
         return BASE_URL;
+    }
+
+    /**
+     * returns the base URL of the mycore system.
+     * 
+     * This method uses the request to 'calculate' the right baseURL.
+     * Generally it is sufficent to use {@link #getBaseURL()} instead.
+     */
+    public static String getBaseURL(ServletRequest req) {
+        HttpServletRequest request = (HttpServletRequest) req;
+        StringBuilder webappBase = new StringBuilder(request.getScheme());
+        webappBase.append("://");
+        String proxyHeader = request.getHeader(PROXY_HEADER);
+        if (proxyHeader != null) {
+            StringTokenizer sttoken = new StringTokenizer(proxyHeader, ",");
+            String proxyHost = sttoken.nextToken().trim();
+            webappBase.append(proxyHost);
+        } else {
+            webappBase.append(request.getServerName());
+            int port = request.getServerPort();
+            if (!(port == 80 || request.isSecure() && port == 443)) {
+                webappBase.append(':').append(port);
+            }
+        }
+        webappBase.append(request.getContextPath()).append('/');
+        return webappBase.toString();
     }
 
     public static synchronized void prepareBaseURLs(String baseURL) {
