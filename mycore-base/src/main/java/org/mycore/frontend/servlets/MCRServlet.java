@@ -97,6 +97,8 @@ public class MCRServlet extends HttpServlet {
 
     private static MCRLayoutService LAYOUT_SERVICE;
 
+    private static String ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
+
     static {
         prepareBaseURLs(""); // getBaseURL() etc. may be called before any HTTP Request    
     }
@@ -115,10 +117,10 @@ public class MCRServlet extends HttpServlet {
 
     /** 
      * Returns the base URL of the mycore system
-     * <p>
-     * shortcut for {@link MCRFrontendUtil#getBaseURL()}
-     * </p>
+     * 
+     * @deprecated use {@link MCRFrontendUtil#getBaseURL()}
      **/
+    @Deprecated
     public static String getBaseURL() {
         return MCRFrontendUtil.getBaseURL();
     }
@@ -392,8 +394,8 @@ public class MCRServlet extends HttpServlet {
     }
 
     private void processRenderingPhase(MCRServletJob job, Exception thinkException) throws Exception {
-        if (allowCrossDomainRequests()) {
-            job.getResponse().setHeader("Access-Control-Allow-Origin", "*");
+        if (allowCrossDomainRequests() && !job.getResponse().containsHeader(ACCESS_CONTROL_ALLOW_ORIGIN)) {
+            job.getResponse().setHeader(ACCESS_CONTROL_ALLOW_ORIGIN, "*");
         }
         MCRSession session = MCRSessionMgr.getCurrentSession();
         if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
