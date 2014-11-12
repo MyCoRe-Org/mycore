@@ -54,10 +54,7 @@ public class MCRCORSFilter implements Filter {
         if (servletRequest instanceof HttpServletRequest && servletResponse instanceof HttpServletResponse) {
             HttpServletRequest req = (HttpServletRequest) servletRequest;
             HttpServletResponse resp = (HttpServletResponse) servletResponse;
-
-            if (this.allowOriginValue != null) {
-                resp.setHeader("Access-Control-Allow-Origin", this.allowOriginValue);
-            }
+            resp.setHeader("Access-Control-Allow-Origin", this.allowOriginValue);
         }
         filterChain.doFilter(servletRequest, servletResponse);
     }
