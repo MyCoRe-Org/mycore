@@ -50,7 +50,7 @@ public class MCRXEditorServlet extends MCRServlet {
 
         if (session == null) {
             String msg = getErrorI18N("xeditor.error", "noSession", sessionID);
-            job.getResponse().sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
+            job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, msg);
             return;
         }
 
