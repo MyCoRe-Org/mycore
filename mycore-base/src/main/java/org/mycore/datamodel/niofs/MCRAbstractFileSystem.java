@@ -3,8 +3,12 @@ package org.mycore.datamodel.niofs;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystem;
+import java.nio.file.FileSystemException;
 import java.nio.file.FileSystemNotFoundException;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.WatchService;
@@ -75,6 +79,30 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
             }
         };
     }
+    
+    /**
+     * Creates a new root under the given name.
+     * 
+     * After calling this method the implementing FileSystem should
+     * be ready to accept data for this root.
+     * 
+     * @param owner ,e.g. derivate ID
+     * @throws FileSystemException if creating the root directory fails
+     * @throws FileAlreadyExistsException more specific, if the directory already exists
+     */
+    public abstract void createRoot(String owner) throws FileSystemException;
+
+    /**
+     * Removes a root with the given name.
+     * 
+     * Call this method if you want to remove a stalled directory that is not in use anymore.
+     * 
+     * @param owner ,e.g. derivate ID
+     * @throws FileSystemException if removing the root directory fails
+     * @throws DirectoryNotEmptyException more specific, if the directory is not empty
+     * @throws NoSuchFileException more specific, if the directory does not exist
+     */
+    public abstract void removeRoot(String owner) throws FileSystemException;
 
     @Override
     public void close() throws IOException {

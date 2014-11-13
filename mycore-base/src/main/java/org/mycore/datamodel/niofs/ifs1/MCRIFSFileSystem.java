@@ -24,15 +24,22 @@
 package org.mycore.datamodel.niofs.ifs1;
 
 import java.io.IOException;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileStore;
+import java.nio.file.FileSystemException;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRDecoratedIterable;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs.MCRContentStore;
 import org.mycore.datamodel.ifs.MCRContentStoreFactory;
+import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFileMetadataManager;
 import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
+import org.mycore.datamodel.niofs.MCRPath;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -86,6 +93,41 @@ public class MCRIFSFileSystem extends MCRAbstractFileSystem {
                 }
             }
         };
+    }
+
+    @Override
+    public void createRoot(String owner) throws FileSystemException {
+        MCRDirectory rootDirectory = MCRDirectory.getRootDirectory(owner);
+        MCRPath rootPath = getPath(owner, "", this);
+        if (rootDirectory != null) {
+            throw new FileAlreadyExistsException(rootPath.toString());
+        }
+        try {
+            rootDirectory = new MCRDirectory(owner);
+        } catch (RuntimeException e) {
+            Logger.getLogger(getClass()).warn("Catched run time exception while creating new root directory.", e);
+            throw new FileSystemException(rootPath.toString(), null, e.getMessage());
+        }
+        Logger.getLogger(getClass()).info("Created root directory: " + rootPath);
+    }
+
+    @Override
+    public void removeRoot(String owner) throws FileSystemException {
+        MCRPath rootPath = getPath(owner, "", this);
+        MCRDirectory rootDirectory = MCRDirectory.getRootDirectory(owner);
+        if (rootDirectory == null) {
+            throw new NoSuchFileException(rootPath.toString());
+        }
+        if (rootDirectory.hasChildren()) {
+            throw new DirectoryNotEmptyException(rootPath.toString());
+        }
+        try {
+            rootDirectory.delete();
+        } catch (RuntimeException e) {
+            Logger.getLogger(getClass()).warn("Catched run time exception while removing root directory.", e);
+            throw new FileSystemException(rootPath.toString(), null, e.getMessage());
+        }
+        Logger.getLogger(getClass()).info("Removed root directory: " + rootPath);
     }
 
 }
