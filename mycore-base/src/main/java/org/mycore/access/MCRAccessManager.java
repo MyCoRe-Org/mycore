@@ -23,6 +23,7 @@
 package org.mycore.access;
 
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
@@ -30,7 +31,7 @@ import org.mycore.access.strategies.MCRAccessCheckStrategy;
 import org.mycore.access.strategies.MCRDerivateIDStrategy;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -251,10 +252,9 @@ public class MCRAccessManager {
     public static boolean checkPermissionForReadingDerivate(String derID) {
         // derID must be a derivate ID
         boolean accessAllowed = false;
-        Collection<String> l = MCRLinkTableManager.instance().getSourceOf(derID, "derivate");
-        if (l != null && !l.isEmpty()) {
-            accessAllowed = checkPermission(l.iterator().next(), PERMISSION_READ)
-                && checkPermission(derID, PERMISSION_READ);
+        MCRObjectID objectId = MCRMetadataManager.getObjectId(MCRObjectID.getInstance(derID), 10, TimeUnit.MINUTES);
+        if (objectId != null) {
+            accessAllowed = checkPermission(objectId, PERMISSION_READ) && checkPermission(derID, PERMISSION_READ);
         } else {
             accessAllowed = checkPermission(derID, PERMISSION_READ);
             Logger.getLogger("MCRAccessManager.class").warn("no mcrobject could be found for derivate: " + derID);
