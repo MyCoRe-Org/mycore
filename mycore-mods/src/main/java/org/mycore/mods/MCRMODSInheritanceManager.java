@@ -46,6 +46,8 @@ public class MCRMODSInheritanceManager implements MCRInheritanceManager {
 
     private static final String HOST_SECTION_XPATH = "mods:relatedItem[@type='host']";
 
+    private static final String SERIES_SECTION_XPATH = "mods:relatedItem[@type='series']";
+
     /* (non-Javadoc)
      * @see org.mycore.datamodel.metadata.inheritance.MCRInheritanceManager#inheritableMetadataChanged(org.mycore.datamodel.metadata.MCRObject, org.mycore.datamodel.metadata.MCRObject)
      */
@@ -100,6 +102,9 @@ public class MCRMODSInheritanceManager implements MCRInheritanceManager {
         childWrapper.removeInheritedMetadata();
         LOGGER.info("Inserting inherited Metadata.");
         Element hostContainer = childWrapper.getElement(HOST_SECTION_XPATH);
+        if (hostContainer == null) {
+            hostContainer = childWrapper.getElement(SERIES_SECTION_XPATH);
+        }
         if (hostContainer == null) {
             LOGGER.info("Adding new relatedItem[@type='host'])");
             hostContainer = new Element("relatedItem", MCRConstants.MODS_NAMESPACE).setAttribute("type", "host");
