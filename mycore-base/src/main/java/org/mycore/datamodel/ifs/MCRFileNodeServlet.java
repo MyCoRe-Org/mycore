@@ -25,6 +25,7 @@ package org.mycore.datamodel.ifs;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.regex.Pattern;
 
@@ -63,6 +64,7 @@ public class MCRFileNodeServlet extends MCRContentServlet {
     private static final long serialVersionUID = 1L;
 
     private static Logger LOGGER = Logger.getLogger(MCRFileNodeServlet.class);
+
     private static Pattern patternDerivateID = Pattern.compile(".+_derivate_[0-9]+");
 
     /* (non-Javadoc)
@@ -81,7 +83,17 @@ public class MCRFileNodeServlet extends MCRContentServlet {
         }
         String path = getPath(request);
         MCRPath mcrPath = MCRPath.getPath(ownerID, path);
-        BasicFileAttributes attr = Files.readAttributes(mcrPath, BasicFileAttributes.class);
+        BasicFileAttributes attr;
+        try {
+            attr = Files.readAttributes(mcrPath, BasicFileAttributes.class);
+        } catch (NoSuchFileException e) {
+            String msg = e.getMessage();
+            if (msg == null) {
+                msg = "File or directory not found: " + mcrPath;
+            }
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, msg);
+            return null;
+        }
         if (attr.isDirectory()) {
             try {
                 return sendDirectory(request, response, mcrPath);
@@ -114,10 +126,10 @@ public class MCRFileNodeServlet extends MCRContentServlet {
      */
     public static String getOwnerID(HttpServletRequest request) {
         String pI = request.getPathInfo();
-        for(String fragment: pI.split("/")){
-        	if(patternDerivateID.matcher(fragment).matches()){
-        		return fragment;
-        	}
+        for (String fragment : pI.split("/")) {
+            if (patternDerivateID.matcher(fragment).matches()) {
+                return fragment;
+            }
         }
         return "";
     }
@@ -127,12 +139,12 @@ public class MCRFileNodeServlet extends MCRContentServlet {
      *  @param request - the http request object
      */
     protected String getPath(HttpServletRequest request) {
-        String pI=request.getPathInfo();
-    	String ownerID = getOwnerID(request);
-        int pos = pI.indexOf(ownerID)+ownerID.length() + 1;
+        String pI = request.getPathInfo();
+        String ownerID = getOwnerID(request);
+        int pos = pI.indexOf(ownerID) + ownerID.length() + 1;
         String path = pI.substring(pos);
-        if(path.endsWith("/")){
-        	path = path.substring(0, path.length()-1);
+        if (path.endsWith("/")) {
+            path = path.substring(0, path.length() - 1);
         }
         if (path.length() == 0) {
             return "/";
