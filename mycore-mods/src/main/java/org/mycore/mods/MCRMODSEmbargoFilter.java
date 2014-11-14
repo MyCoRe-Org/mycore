@@ -101,7 +101,7 @@ public class MCRMODSEmbargoFilter implements Filter {
             session.beginTransaction();
             try {
                 MCRObjectID objectId = MCRMetadataManager.getObjectId(derivateID, EXPIRE, EXPIRE_UNIT);
-                if (!"mods".equals(objectId.getTypeId())) {
+                if (objectId == null || !"mods".equals(objectId.getTypeId())) {
                     return; //no embargo check for non MODS documents
                 }
                 if (!(newSession || session.getUserInformation().getUserID()
