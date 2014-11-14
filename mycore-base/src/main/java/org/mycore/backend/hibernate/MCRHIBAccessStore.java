@@ -33,6 +33,7 @@ import java.util.Locale;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.access.mcrimpl.MCRAccessStore;
@@ -227,12 +228,14 @@ public class MCRHIBAccessStore extends MCRAccessStore {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<String> getDistinctStringIDs() {
-        List<String> ret;
         Session session = MCRHIBConnection.instance().getSession();
-        String query = "select distinct(key.objid) from MCRACCESS order by OBJID";
-        ret = session.createQuery(query).list();
+        Criteria criteria = session.createCriteria(MCRACCESS.class);
+        String propertyName = "key.objid";
+        criteria.setProjection(Projections.distinct(Projections.property(propertyName)));
+        criteria.addOrder(Order.asc(propertyName));
+        @SuppressWarnings("unchecked")
+        List<String> ret = criteria.list();
         return ret;
     }
 
