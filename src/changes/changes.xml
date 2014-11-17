@@ -5,6 +5,8 @@
     <author email="thomas.scheffler(at)uni-jena.de">Thomas Scheffler</author>
   </properties>
   <body>
+    <release version="2014.11" date="2014-11-00" description="Codenamed &apos;TBA&apos;">
+    </release>
     <release version="2014.04" date="2014-06-20" description="2014 LTS">
       <action dev="mcrfluet" type="fix" date="2014-06-20">
         mycore-xeditor: Make a copy of original request parameters, may be re-used by servlet container after request ended.
