@@ -7,7 +7,7 @@
     <xsl:apply-templates select="$normalResult|$groupedResult" />
   </xsl:template>
   <xsl:template match="doc">
-    <xsl:variable name="objId" select="str[@name='id']" />
+    <xsl:variable name="objId" select="str[@name='returnId']" />
     <xsl:apply-templates select="document(concat('mcrobject:',$objId))" mode="attachResponse" />
   </xsl:template>
   <xsl:template match="/*" mode="attachResponse">
