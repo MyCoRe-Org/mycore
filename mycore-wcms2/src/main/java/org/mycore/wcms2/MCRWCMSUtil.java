@@ -1,11 +1,10 @@
 package org.mycore.wcms2;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -50,20 +49,19 @@ public abstract class MCRWCMSUtil {
     /**
      * Save navigation.xml with JAXB.
      * If MCR.navigationFile.SaveInOldFormat is true the navigation is stored in the old format.
-     * @throws TransformerException 
-     * @throws IOException 
-     * @throws SAXException 
-     * @throws ParserConfigurationException 
+     * @throws TransformerException
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParserConfigurationException
      */
     public static void save(MCRNavigation navigation, OutputStream out) throws JAXBException, IOException,
         JDOMException {
-        StringWriter stringWriter = new StringWriter();
         JAXBContext jc = JAXBContext.newInstance(MCRNavigation.class);
         Marshaller m = jc.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        m.marshal(navigation, stringWriter);
-        String xmlAsString = stringWriter.toString();
-        byte[] xml = xmlAsString.getBytes(StandardCharsets.UTF_8);
+        ByteArrayOutputStream bout = new ByteArrayOutputStream(64*1024*1024);
+        m.marshal(navigation, bout);
+        byte[] xml = bout.toByteArray();
         if (saveInOldFormat()) {
             xml = convertToOldFormat(xml);
         }
@@ -72,7 +70,7 @@ public abstract class MCRWCMSUtil {
 
     /**
      * Converts the navigation.xml to the old format.
-     * 
+     *
      * @param outputStream
      * @throws ParserConfigurationException
      * @throws SAXException
@@ -93,9 +91,9 @@ public abstract class MCRWCMSUtil {
             menu.removeAttribute("id");
         }
         XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
-        StringWriter stringWriter = new StringWriter();
-        out.output(doc, stringWriter);
-        return stringWriter.toString().getBytes();
+        ByteArrayOutputStream bout = new ByteArrayOutputStream(xml.length);
+        out.output(doc, bout);
+        return bout.toByteArray();
     }
 
     private static boolean saveInOldFormat() {
