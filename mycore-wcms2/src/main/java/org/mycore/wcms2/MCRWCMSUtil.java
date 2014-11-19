@@ -1,11 +1,10 @@
 package org.mycore.wcms2;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -22,6 +21,7 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.content.util.MCRServletContentHelper;
 import org.mycore.wcms2.datamodel.MCRNavigation;
 import org.xml.sax.SAXException;
 
@@ -57,13 +57,12 @@ public abstract class MCRWCMSUtil {
      */
     public static void save(MCRNavigation navigation, OutputStream out) throws JAXBException, IOException,
         JDOMException {
-        StringWriter stringWriter = new StringWriter();
         JAXBContext jc = JAXBContext.newInstance(MCRNavigation.class);
         Marshaller m = jc.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        m.marshal(navigation, stringWriter);
-        String xmlAsString = stringWriter.toString();
-        byte[] xml = xmlAsString.getBytes(StandardCharsets.UTF_8);
+        ByteArrayOutputStream bout = new ByteArrayOutputStream(MCRServletContentHelper.DEFAULT_BUFFER_SIZE);
+        m.marshal(navigation, bout);
+        byte[] xml = bout.toByteArray();
         if (saveInOldFormat()) {
             xml = convertToOldFormat(xml);
         }
@@ -93,9 +92,9 @@ public abstract class MCRWCMSUtil {
             menu.removeAttribute("id");
         }
         XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
-        StringWriter stringWriter = new StringWriter();
-        out.output(doc, stringWriter);
-        return stringWriter.toString().getBytes(StandardCharsets.UTF_8);
+        ByteArrayOutputStream bout = new ByteArrayOutputStream(xml.length);
+        out.output(doc, bout);
+        return bout.toByteArray();
     }
 
     private static boolean saveInOldFormat() {
