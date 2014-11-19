@@ -6,6 +6,7 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.ifs.MCRDirectory;
@@ -224,10 +225,7 @@ public class MCRMetsSave {
         int newOrder = getNewOrder(mets);
         PhysicalSubDiv div = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE,
                 newOrder);
-
-        if (matchId != null) {
-            div.add(new Fptr(matchId));
-        }
+        div.add(new Fptr(matchId));
 
         // actually alter the mets document
         Element structMapPhys = getPhysicalStructmap(mets);
@@ -288,7 +286,22 @@ public class MCRMetsSave {
         String fileGroupXPathString = String.format(Locale.ROOT, "mets:mets/mets:fileSec/mets:fileGrp[@USE='%s']", fileGrpUSE);
         xpath = XPathFactory.instance().compile(fileGroupXPathString, Filters.element(),
                 null, MCRConstants.METS_NAMESPACE);
-        return xpath.evaluateFirst(mets);
+        Element element = xpath.evaluateFirst(mets);
+
+        if (element == null) {
+            // section does not exist
+            Element fileGroupElement = new FileGrp(fileGrpUSE).asElement();
+            String fileSectionPath = "mets:mets/mets:fileSec";
+            xpath = XPathFactory.instance().compile(fileSectionPath, Filters.element(), null, MCRConstants.METS_NAMESPACE);
+            Element fileSectionElement = xpath.evaluateFirst(mets);
+            if (fileSectionElement == null) {
+                throw new MCRPersistenceException("There is no fileSection in mets.xml!");
+            }
+            fileSectionElement.addContent(fileGroupElement);
+            element = fileGroupElement;
+        }
+
+        return element;
     }
 
     /**
