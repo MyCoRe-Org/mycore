@@ -60,7 +60,8 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
 
     protected SVNURL repURL;
 
-    protected boolean syncLastModifiedOnSVNCommit;
+    protected final static boolean SYNC_LAST_MODIFIED_ON_SVN_COMMIT = MCRConfiguration.instance().getBoolean(
+            "MCR.IFS2.SyncLastModifiedOnSVNCommit", true);
 
     static {
         FSRepositoryFactory.setup();
@@ -101,22 +102,19 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
             String msg = "Error initializing SVN repository at URL " + repositoryURI;
             throw new MCRConfigurationException(msg, ex);
         }
-
-        String syncProperty = "MCR.IFS2.Store." + type + ".SyncLastModifiedOnSVNCommit";
-        syncLastModifiedOnSVNCommit = MCRConfiguration.instance().getBoolean(syncProperty, true);
     }
 
     /**
      * When metadata is saved, this results in SVN commit. If the property
-     * MCR.IFS2.Store.<TypeID>.SyncLastModifiedOnSVNCommit=true (which is default), the
+     * MCR.IFS2.SyncLastModifiedOnSVNCommit=true (which is default), the
      * last modified date of the metadata file in the store will be set to the exactly 
      * same timestamp as the SVN commit. Due to permission restrictions on Linux systems,
      * this may fail, so you can disable that behaviour.
      * 
      * @return true, if last modified of file should be same as timestamp of SVN commit
      */
-    public boolean shouldSyncLastModifiedOnSVNCommit() {
-        return syncLastModifiedOnSVNCommit;
+    public static boolean shouldSyncLastModifiedOnSVNCommit() {
+        return SYNC_LAST_MODIFIED_ON_SVN_COMMIT;
     }
 
     /**
