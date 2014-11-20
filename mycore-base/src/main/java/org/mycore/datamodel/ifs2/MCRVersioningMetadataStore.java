@@ -60,6 +60,8 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
 
     protected SVNURL repURL;
 
+    protected boolean syncLastModifiedOnSVNCommit;
+
     static {
         FSRepositoryFactory.setup();
     }
@@ -78,19 +80,17 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
 
     private void setupSVN(String type) {
         URI repositoryURI;
-        String repositoryURIString = MCRConfiguration.instance().getString(
-            "MCR.IFS2.Store." + type + ".SVNRepositoryURL");
+        String repositoryURIString = MCRConfiguration.instance().getString("MCR.IFS2.Store." + type + ".SVNRepositoryURL");
         try {
             repositoryURI = new URI(repositoryURIString);
         } catch (URISyntaxException e) {
-            String msg = "Syntax error in MCR.IFS2.Store." + type + ".SVNRepositoryURL property: "
-                + repositoryURIString;
+            String msg = "Syntax error in MCR.IFS2.Store." + type + ".SVNRepositoryURL property: " + repositoryURIString;
             throw new MCRConfigurationException(msg, e);
         }
         try {
             LOGGER.info("Versioning metadata store " + type + " repository URL: " + repositoryURI);
             repURL = SVNURL.create(repositoryURI.getScheme(), repositoryURI.getUserInfo(), repositoryURI.getHost(),
-                repositoryURI.getPort(), repositoryURI.getPath(), true);
+                    repositoryURI.getPort(), repositoryURI.getPath(), true);
             LOGGER.info("repURL: " + repURL);
             File dir = new File(repURL.getPath());
             if (!dir.exists() || (dir.isDirectory() && dir.list().length == 0)) {
@@ -101,6 +101,22 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
             String msg = "Error initializing SVN repository at URL " + repositoryURI;
             throw new MCRConfigurationException(msg, ex);
         }
+
+        String syncProperty = "MCR.IFS2.Store." + type + ".SyncLastModifiedOnSVNCommit";
+        syncLastModifiedOnSVNCommit = MCRConfiguration.instance().getBoolean(syncProperty, true);
+    }
+
+    /**
+     * When metadata is saved, this results in SVN commit. If the property
+     * MCR.IFS2.Store.<TypeID>.SyncLastModifiedOnSVNCommit=true (which is default), the
+     * last modified date of the metadata file in the store will be set to the exactly 
+     * same timestamp as the SVN commit. Due to permission restrictions on Linux systems,
+     * this may fail, so you can disable that behaviour.
+     * 
+     * @return true, if last modified of file should be same as timestamp of SVN commit
+     */
+    public boolean shouldSyncLastModifiedOnSVNCommit() {
+        return syncLastModifiedOnSVNCommit;
     }
 
     /**
