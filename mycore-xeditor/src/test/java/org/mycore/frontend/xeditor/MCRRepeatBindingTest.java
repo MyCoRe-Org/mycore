@@ -26,7 +26,6 @@ package org.mycore.frontend.xeditor;
 import static org.junit.Assert.*;
 
 import org.jaxen.JaxenException;
-
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -64,7 +63,7 @@ public class MCRRepeatBindingTest extends MCRTestCase {
         assertEquals("/conditions/condition[5]", binding.getAbsoluteXPath());
         ((Element) (binding.getBoundNode())).setAttribute("value", "c");
 
-        repeat.removeBoundNode(0); 
+        repeat.removeBoundNode(0);
         assertEquals(4, doc.getRootElement().getChildren().size());
         assertEquals(2, repeat.getBoundNodes().size());
         assertEquals("b", ((Element) (repeat.getBoundNodes().get(0))).getAttributeValue("value"));
@@ -102,14 +101,30 @@ public class MCRRepeatBindingTest extends MCRTestCase {
 
         assertEquals("a", doc.getRootElement().getChildren().get(0).getText());
         assertEquals("b", doc.getRootElement().getChildren().get(3).getText());
-        
+
         assertEquals("a", ((Element) (repeat.getBoundNodes().get(0))).getText());
         assertEquals("b", ((Element) (repeat.getBoundNodes().get(1))).getText());
 
-        String swapParameter = repeat.getSwapParameter(1,2);
+        String swapParameter = repeat.getSwapParameter(1, 2);
         MCRRepeatBinding.swap(swapParameter, root);
-        
+
         assertEquals("b", doc.getRootElement().getChildren().get(0).getText());
         assertEquals("a", doc.getRootElement().getChildren().get(3).getText());
+    }
+
+    @Test
+    public void testElementNameWithPredicates() throws JaxenException, JDOMException {
+        String x = "mods:mods[mods:name[@type='personal']='p1'][mods:name[@type='personal'][2]='p2'][mods:name[@type='corporate']='c1']";
+        Element template = new MCRNodeBuilder().buildElement(x, null, null);
+        Document doc = new Document(template);
+        MCRBinding root = new MCRBinding(doc);
+
+        MCRRepeatBinding repeat = new MCRRepeatBinding("mods:mods/mods:name[@type='personal']", root, 1, 10);
+        assertEquals(2, repeat.getBoundNodes().size());
+        assertEquals("mods:name[(@type = \"personal\")]", repeat.getElementNameWithPredicates());
+
+        repeat = new MCRRepeatBinding("mods:mods/mods:name[@type='corporate']", root, 1, 10);
+        assertEquals(1, repeat.getBoundNodes().size());
+        assertEquals("mods:name[(@type = \"corporate\")]", repeat.getElementNameWithPredicates());
     }
 }

@@ -256,7 +256,7 @@ public class MCRNodeBuilder {
         return attribute;
     }
 
-    private String simplify(String xPath) {
+    public static String simplify(String xPath) {
         return xPath.replaceAll("child::", "").replaceAll("attribute::", "@");
     }
 
