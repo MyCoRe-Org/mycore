@@ -51,13 +51,13 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
         throws IOException, JDOMException, SAXException, MalformedURLException {
         MCRContent content = super.expandEditorElements(request, response, resource);
         if (mayContainEditorForm(content)) {
-            content = doExpandEditorElements(content, request, response);
+            content = doExpandEditorElements(content, request, response, request.getRequestURL().toString());
         }
         return content;
     }
 
     public static MCRContent doExpandEditorElements(MCRContent content, HttpServletRequest request,
-        HttpServletResponse response) throws IOException, JDOMException, SAXException, MalformedURLException {
+        HttpServletResponse response, String pageURL) throws IOException, JDOMException, SAXException, MalformedURLException {
         MCRParameterCollector pc = new MCRParameterCollector(request, false);
         String sessionID = request.getParameter(MCREditorSessionStore.XEDITOR_SESSION_PARAM);
         MCREditorSession session = null;
@@ -70,7 +70,7 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
             }
         } else {
             session = new MCREditorSession(request.getParameterMap(), pc);
-            session.setPageURL(request.getRequestURL().toString());
+            session.setPageURL(pageURL);
             MCREditorSessionStoreFactory.getSessionStore().storeSession(session);
         }
 
