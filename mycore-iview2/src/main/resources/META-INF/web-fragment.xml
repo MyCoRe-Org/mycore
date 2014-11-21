@@ -35,7 +35,7 @@
 
   <servlet>
     <servlet-name>MCRPDFThumbnailServlet</servlet-name>
-    <servlet-class>org.mycore.mir.MCRPDFThumbnailServlet</servlet-class>
+    <servlet-class>org.mycore.iview2.frontend.MCRPDFThumbnailServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>MCRPDFThumbnailServlet</servlet-name>
