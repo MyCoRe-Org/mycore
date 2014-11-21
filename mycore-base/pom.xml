@@ -11,7 +11,6 @@
   <artifactId>mycore-base</artifactId>
   <name>MyCoRe Base Components</name>
   <properties>
-<!--     <forbiddenapis.skip>true</forbiddenapis.skip> -->
   </properties>
   <build>
     <resources>
@@ -202,6 +201,10 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.zxing</groupId>
+      <artifactId>core</artifactId>
     </dependency>
     <dependency>
       <!-- required for commons-vfs -->

@@ -340,6 +340,15 @@
     <url-pattern> /servlets/MCRExportServlet/* </url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <servlet-name>MCRQRCodeServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRQRCodeServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MCRQRCodeServlet</servlet-name>
+    <url-pattern>/img/qrcodes/*</url-pattern>
+  </servlet-mapping>
+
   <!-- **************************************************************** -->
   <!-- Jersey -->
   <!-- **************************************************************** -->
