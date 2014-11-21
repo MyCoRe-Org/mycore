@@ -32,6 +32,15 @@
     <servlet-name>MCRThumbnailServlet</servlet-name>
     <url-pattern>/servlets/MCRThumbnailServlet/*</url-pattern>
   </servlet-mapping>
+
+  <servlet>
+    <servlet-name>MCRPDFThumbnailServlet</servlet-name>
+    <servlet-class>org.mycore.mir.MCRPDFThumbnailServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MCRPDFThumbnailServlet</servlet-name>
+    <url-pattern>/img/pdfthumb/*</url-pattern>
+  </servlet-mapping>
   
   <filter-mapping>
     <filter-name>UserAgentFilter</filter-name>
