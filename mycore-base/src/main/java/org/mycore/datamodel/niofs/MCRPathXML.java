@@ -23,23 +23,18 @@
  **/
 package org.mycore.datamodel.niofs;
 
-import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR;
-import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR_STRING;
+import org.apache.log4j.Logger;
+import org.jdom2.Document;
+import org.jdom2.Element;
 
 import java.io.IOException;
-import java.nio.file.FileVisitOption;
-import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.EnumSet;
 
-import org.apache.log4j.Logger;
-import org.jdom2.Document;
-import org.jdom2.Element;
+import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR;
+import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR_STRING;
 
 ;
 
@@ -65,7 +60,7 @@ public class MCRPathXML {
      * @throws IOException 
      */
     public static Document getDirectoryXML(MCRPath path, BasicFileAttributes attr) throws IOException {
-        LOGGER.info("MCRDirectoryXML: start listing of directory " + path.toString());
+        LOGGER.debug("MCRDirectoryXML: start listing of directory " + path.toString());
 
         Element root = new Element("mcr_directory");
         Document doc = new org.jdom2.Document(root);
@@ -86,7 +81,7 @@ public class MCRPathXML {
         FileVisitor<? super Path> visitor = new ChildVisitor(nodes);
         Files.walkFileTree(path, EnumSet.noneOf(FileVisitOption.class), 1, visitor);
 
-        LOGGER.info("MCRDirectoryXML: end listing of directory " + path);
+        LOGGER.debug("MCRDirectoryXML: end listing of directory " + path);
 
         return doc;
 
@@ -146,7 +141,7 @@ public class MCRPathXML {
 
         @Override
         public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-            LOGGER.info("Visiting directory: " + dir);
+            LOGGER.debug("Visiting directory: " + dir);
             return FileVisitResult.CONTINUE;
         }
 
@@ -166,7 +161,7 @@ public class MCRPathXML {
 
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            LOGGER.info("Visiting file: " + file);
+            LOGGER.debug("Visiting file: " + file);
             addChild(MCRPath.toMCRPath(file), attrs);
             return FileVisitResult.CONTINUE;
         }
