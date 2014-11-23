@@ -147,7 +147,6 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
                     }
                 }
             } else {
-                newelm.setNotInherit(false);
                 meta_list.add(newelm);
             }
         }

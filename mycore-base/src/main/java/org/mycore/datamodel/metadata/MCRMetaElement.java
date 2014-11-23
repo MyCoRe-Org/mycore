@@ -54,7 +54,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
 
     public final static boolean DEFAULT_HERITABLE = CONFIG.getBoolean("MCR.MetaElement.defaults.heritable", false);
 
-    public final static boolean DEFAULT_NOT_INHERIT = CONFIG.getBoolean("MCR.MetaElement.defaults.notinherit", false);
+    public final static boolean DEFAULT_NOT_INHERIT = CONFIG.getBoolean("MCR.MetaElement.defaults.notinherit", true);
 
     private String META_PACKAGE_NAME = "org.mycore.datamodel.metadata.";
 
@@ -77,6 +77,8 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      */
     public MCRMetaElement() {
         list = new ArrayList<MCRMetaInterface>();
+        heritable=DEFAULT_HERITABLE;
+        notinherit = DEFAULT_NOT_INHERIT;
     }
 
     /**
