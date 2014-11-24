@@ -39,6 +39,10 @@ return declare("mycore.classification.TreePane", [ContentPane, _Templated, _Sett
     },
 
     create: function(args) {
+    	// dialogs
+    	this.exportDialog = new mycore.classification.ExportDialog();
+    	this.linkDialog = new mycore.classification.LinkDialog();
+    	// create
     	this.inherited(arguments);
     },
 
@@ -56,9 +60,6 @@ return declare("mycore.classification.TreePane", [ContentPane, _Templated, _Sett
     		<input data-dojo-type="dijit.form.TextBox" data-dojo-props="intermediateChanges: true, disabled: true" data-dojo-attach-point="filterTextBox" placeHolder="Filter" style="width: 99%;"/>
     	</div>*/
     		
-    	// dialogs
-    	this.exportDialog = new mycore.classification.ExportDialog();
-    	this.linkDialog = new mycore.classification.LinkDialog();
     	// toolbar events
     	on(this.addTreeItemButton, "click", lang.hitch(this, this.add));
     	on(this.removeTreeItemButton, "click", lang.hitch(this, this.remove));
