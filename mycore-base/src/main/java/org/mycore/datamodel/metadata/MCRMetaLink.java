@@ -51,6 +51,8 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     protected String linktype;
 
+    protected String role;
+
     protected String from;
 
     protected String to;
@@ -206,7 +208,25 @@ public class MCRMetaLink extends MCRMetaDefault {
     }
 
     /**
-     * The methode compare this instance of MCRMetaLink with a input object of the class type MCRMetaLink. The both instances are equal, if: <br>
+     * This method sets the xlink:role.
+     * 
+     * @param role
+     */
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    /**
+     * This method get the xlink:role element as string.
+     * 
+     * @return
+     */
+    public String getRole() {
+        return role;
+    }
+
+    /**
+     * The method compare this instance of MCRMetaLink with a input object of the class type MCRMetaLink. The both instances are equal, if: <br>
      * <ul>
      * <br>
      * <li>for the type 'arc' the 'from' and 'to' element is equal</li>
@@ -228,7 +248,8 @@ public class MCRMetaLink extends MCRMetaDefault {
         }
 
         if (linktype.equals("arc")) {
-            if (linktype.equals(input.getXLinkType()) && from.equals(input.getXLinkFrom()) && to.equals(input.getXLinkTo())) {
+            if (linktype.equals(input.getXLinkType()) && from.equals(input.getXLinkFrom())
+                && to.equals(input.getXLinkTo())) {
                 return true;
             }
         }
@@ -267,6 +288,8 @@ public class MCRMetaLink extends MCRMetaDefault {
             String temp3 = element.getAttributeValue("title", XLINK_NAMESPACE);
             setBiLink(temp1, temp2, temp3);
         }
+
+        setRole(element.getAttributeValue("role", XLINK_NAMESPACE));
     }
 
     /**
@@ -280,7 +303,7 @@ public class MCRMetaLink extends MCRMetaDefault {
     public org.jdom2.Element createXML() throws MCRException {
         Element elm = super.createXML();
         elm.setAttribute("type", linktype, XLINK_NAMESPACE);
-        
+
         if (title != null) {
             elm.setAttribute("title", title, XLINK_NAMESPACE);
         }
@@ -288,7 +311,11 @@ public class MCRMetaLink extends MCRMetaDefault {
         if (label != null) {
             elm.setAttribute("label", label, XLINK_NAMESPACE);
         }
-        
+
+        if (role != null) {
+            elm.setAttribute("role", role, XLINK_NAMESPACE);
+        }
+
         if (linktype.equals("locator")) {
             elm.setAttribute("href", href, XLINK_NAMESPACE);
         } else {
@@ -371,6 +398,7 @@ public class MCRMetaLink extends MCRMetaDefault {
         out.title = title;
         out.type = type;
         out.href = href;
+        out.role = role;
         out.to = to;
         out.from = from;
 
@@ -387,6 +415,7 @@ public class MCRMetaLink extends MCRMetaDefault {
         LOGGER.debug("Label              = " + label);
         LOGGER.debug("Title              = " + title);
         LOGGER.debug("HREF               = " + href);
+        LOGGER.debug("ROLE               = " + role);
         LOGGER.debug("FROM               = " + from);
         LOGGER.debug("TO                 = " + to);
         LOGGER.debug("");
