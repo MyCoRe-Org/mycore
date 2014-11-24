@@ -12,7 +12,74 @@
     - fix: Fehler behoben (mit @date und @due-to Attribut und evtl. <fixes issue="">)
    -->
   <body>
-    <release version="2014.11" date="2014-11-00" description="Codenamed &apos;TBA&apos;">
+    <release version="2014.11" date="2014-11-00" description="Codenamed &apos;Mumme&apos;">
+      <action dev="mcrtchef" type="remove">
+        searchfields.xsd moved to mycore-legacy-search
+      </action>
+      <action dev="mcrtchef" type="add">
+        mycore-iview2: added MCRPDFThumbnailServlet to generate thumbnails from PDF documents
+      </action>
+      <action dev="mcrtchef" type="add">
+        added MCRQRCodeServlet to generate QR codes
+      </action>
+      <action dev="mcrfluet" type="add">
+        Added property MCR.IFS2.SyncLastModifiedOnSVNCommit=true (default).
+        If the property is true, the last modified date of the metadata file is the exactly same as from the SVN commit.
+      </action>
+      <action dev="mcrtchef" type="update">
+        mycore-solr: added support for responses that are embedded in mycoreobject to response-utils.xsl
+      </action>
+      <action dev="mcrtchef" type="fix" date="2014-11-14">
+        mycore-mods: fixed NPE in MCRMODSEmbargoFilter
+      </action>
+      <action dev="mcrshofm" type="add">
+        added MCRCORSFilter to activate Cross Origin Resource Sharing when needed
+      </action>
+      <action dev="mcrtchef" type="update">
+        MCRServlet: do not overwrite Access-Control-Allow-Origin header
+      </action>
+      <action dev="mcrmeich" type="fix" date="2014-11-10">
+        MCRPersistentServlet: send 401 instead of 500 if permission denied
+      </action>
+      <action dev="mcrmeich" type="fix" date="2014-11-10">
+        mycore-xeditor: send 404 if request comes in after session timed out
+      </action>
+      <action dev="mcrjkupf" type="fix" date="2014-11-05">
+        added language support for text in MCRMetaHistoryDate 
+        <fixes issue="728"/>
+      </action>
+      <action dev="mcrshofm" type="add">
+        mycore-webcli: display server-side exceptions
+      </action>
+      <action dev="mcrmeich" type="update">
+        refactored org.mycore.datamodel.classification2 package
+      </action>
+      <action dev="mcrmeich" type="fix" date="2014-11-03" due-to="Silvio Hermann">
+        When using solr searcher in oai interface the ListSets verb my not be working 
+        <fixes issue="727"/>
+      </action>
+      <action dev="mcrshofm" type="update">
+        mycore-mets: synchronize ALTO files with mets.xml
+      </action> 
+      <action dev="mcrmeich" type="add">
+        mycore-classeditor: added category filter (requires solr-classification)
+      </action>
+      <action dev="mcrtchef" type="fix" date="2014-10-27" due-to="Silvio Hermann">
+        MCRMetaDerivateLink.isValid() always returns false
+        <fixes issue="726"/>
+      </action>
+      <action dev="mcrfluet" type="add">
+        mycore-mods: Added event handler to extract related items from MODS and store them as separate objects linked as parent and/or via xlink:href
+      </action>
+      <action dev="mcrjkupf" type="add">
+        MCRLanguageDetector: added "detectLanguageByCharacter" to get language by script
+      </action>
+      <action dev="mcrtchef" type="add">
+        MCRISO8601Date: added 'now' method to get current point in time
+      </action>
+      <action dev="mcrtchef" type="fix" date="2014-10-22">
+        fixed many encoding bugs revealed by forbiddenapis
+      </action>
       <action dev="mcrtchef" type="update">
        mycore-iview2: removed usage of MCRFile and MCRDirectory (replaced by niofs)
       </action>
