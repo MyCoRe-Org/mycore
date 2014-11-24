@@ -173,7 +173,6 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             MCRUploadHandler uploadHandler = MCRUploadHandlerManager.getHandler(uploadId);
             long numBytesStored = uploadHandler.receiveFile(path, zis, length, md5);
 
-            socket.shutdownInput();
             LOGGER.debug("Stored incoming file content with " + numBytesStored + " bytes");
 
             dos.writeLong(numBytesStored);
