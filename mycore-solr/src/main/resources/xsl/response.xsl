@@ -26,10 +26,10 @@
   </xsl:variable>
 
   <xsl:template match="/response">
-    <xsl:apply-templates select="result|response[@subresult='groupOwner']/result|lst[@name='grouped']/lst[@name='returnId' and int[@name='matches']='0']" />
+    <xsl:apply-templates select="result|lst[@name='grouped']/lst[@name='returnId']" />
   </xsl:template>
 
-  <xsl:template match="/response/result|/response/response[@subresult='groupOwner']/result|lst[@name='grouped']/lst[@name='returnId' and int[@name='matches']='0']">
+  <xsl:template match="/response/result|lst[@name='grouped']/lst[@name='returnId']">
     <xsl:variable name="ResultPages">
       <xsl:if test="$hits &gt; 0">
         <xsl:call-template name="solr.Pagination">
@@ -54,7 +54,7 @@
     </h3>
     <xsl:variable name="searchMask" select="$params/str[@name='mask']" />
     <div class="resultHeader">
-      <xsl:if test="$searchMask | doc">
+      <xsl:if test="$searchMask | doc | int[@name='matches' and not (text()='0')]">
         <div class="result_options">
           <div class="btn-group">
             <xsl:if test="$searchMask">
@@ -65,7 +65,7 @@
                 <xsl:value-of select="i18n:translate('results.newSearch')" />
               </a>
             </xsl:if>
-            <xsl:if test="doc">
+            <xsl:if test="doc|arr[@name='groups']/lst">
               <form action="{$ServletsBaseURL}MCRBasketServlet{$HttpSession}" method="post" class="basket_form">
                 <input type="hidden" name="action" value="add" />
                 <input type="hidden" name="redirect" value="referer" />
@@ -73,6 +73,10 @@
                 <xsl:for-each select="doc">
                   <input type="hidden" name="id" value="{@id}" />
                   <input type="hidden" name="uri" value="{concat('mcrobject:',@id)}" />
+                </xsl:for-each>
+                <xsl:for-each select="arr[@name='groups']/lst/str[@name='groupValue']">
+                  <input type="hidden" name="id" value="{.}" />
+                  <input type="hidden" name="uri" value="{concat('mcrobject:',.)}" />
                 </xsl:for-each>
               </form>
               <a class="btn btn-primary" href="" onclick="jQuery('form.basket_form').submit();return false;">
@@ -88,12 +92,17 @@
       RESULT LIST START
     </xsl:comment>
     <div id="resultList">
-      <xsl:apply-templates select="doc" />
+      <xsl:apply-templates select="doc|arr[@name='groups']/lst/str[@name='groupValue']" />
     </div>
     <xsl:comment>
       RESULT LIST END
     </xsl:comment>
     <xsl:copy-of select="$ResultPages" />
+  </xsl:template>
+
+  <xsl:template match="str[@name='groupValue']">
+    <!-- should find matched 'doc' element in subresult 'groupOwner' -->
+    <xsl:apply-templates select="key('groupOwner', .)" />
   </xsl:template>
 
   <xsl:template match="doc">

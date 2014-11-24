@@ -13,6 +13,7 @@
   <xsl:key name="files-by-derivate"
     match="response/response[@subresult='unmerged']/result/doc|response/lst[@name='grouped']/lst[@name='returnId']/arr[@name='groups']/lst/result/doc[str[@name='objectType']='data_file']"
     use="str[@name='derivateID']" />
+  <xsl:key name="groupOwner" match="response/response[@subresult='groupOwner']/result/doc" use="str[@name='id']" />
   <xsl:variable name="params" select="$response/lst[@name='responseHeader']/lst[@name='params']" />
   <xsl:variable name="result" select="$response/result[@name='response']" />
   <xsl:variable name="groups" select="$response/lst[@name='grouped']/lst[@name='returnId']/arr[@name='groups']" />
