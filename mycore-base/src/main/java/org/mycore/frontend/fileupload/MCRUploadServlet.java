@@ -179,7 +179,6 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
             pwOut.println(numBytesStored);
             pwOut.flush();
-            socket.shutdownOutput();
 
             LOGGER.info("File transfer completed successfully.");
         } catch (Exception ex) {
