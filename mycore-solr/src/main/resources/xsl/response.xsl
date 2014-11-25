@@ -102,10 +102,14 @@
 
   <xsl:template match="str[@name='groupValue']">
     <!-- should find matched 'doc' element in subresult 'groupOwner' -->
-    <xsl:apply-templates select="key('groupOwner', .)" />
+    <xsl:variable name="hitNumberOnPage" select="count(../preceding-sibling::*)+1" />
+    <xsl:apply-templates select="key('groupOwner', .)">
+      <xsl:with-param name="hitNumberOnPage" select="$hitNumberOnPage" />
+    </xsl:apply-templates>
   </xsl:template>
 
   <xsl:template match="doc">
+    <xsl:param name="hitNumberOnPage" select="count(preceding-sibling::*[name()=name(.)])+1" />
     <xsl:comment>
       RESULT ITEM START
     </xsl:comment>
@@ -116,11 +120,14 @@
         -->
         <xsl:variable name="mcrobj" select="document(concat('mcrobject:',@id))/mycoreobject" />
         <xsl:apply-templates select="." mode="resultList">
+          <xsl:with-param name="hitNumberOnPage" select="$hitNumberOnPage" />
           <xsl:with-param name="mcrobj" select="$mcrobj" />
         </xsl:apply-templates>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:apply-templates select="." mode="resultList" />
+        <xsl:apply-templates select="." mode="resultList">
+          <xsl:with-param name="hitNumberOnPage" select="$hitNumberOnPage" />
+        </xsl:apply-templates>
       </xsl:otherwise>
     </xsl:choose>
     <xsl:comment>
