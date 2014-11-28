@@ -63,6 +63,9 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     /** if locked, user may not change this instance */
     private boolean locked;
 
+    @XmlAttribute(name = "disabled")
+    private boolean disabled;
+
     @XmlAttribute(name = "name")
     /** The login user name */
     private String userName;
@@ -151,6 +154,26 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     }
 
     /**
+     * @return the disabled
+     */
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    /**
+     * @param disabled the disabled to set
+     */
+    public void setDisabled(Boolean disabled) {
+        this.disabled = disabled == null ? false : disabled;
+    }
+
+    /* Getter for hibernate */
+    @SuppressWarnings("unused")
+    private Boolean getDisabled() {
+        return this.disabled;
+    }
+
+    /**
      * Returns the login user name. The user name is
      * unique within its realm.
      *  
@@ -197,12 +220,11 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * @param realmID the ID of the realm the user belongs to.
      */
     void setRealmID(String realmID) {
-    	if(realmID==null){
-    		setRealm(MCRRealmFactory.getLocalRealm());
-    	}
-    	else{
-    		setRealm(MCRRealmFactory.getRealm(realmID));
-    	}
+        if (realmID == null) {
+            setRealm(MCRRealmFactory.getLocalRealm());
+        } else {
+            setRealm(MCRRealmFactory.getRealm(realmID));
+        }
     }
 
     /**
@@ -517,14 +539,14 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * Enable login for this user.
      */
     public void enableLogin() {
-        setValidUntil(null);
+        setDisabled(false);
     }
 
     /**
      * Disable login for this user.
      */
     public void disableLogin() {
-        setValidUntil(new Date());
+        setDisabled(true);
     }
 
     /**
@@ -532,7 +554,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * @return
      */
     public boolean loginAllowed() {
-        return validUntil == null || validUntil.after(new Date());
+        return !disabled && (validUntil == null || validUntil.after(new Date()));
     }
 
     /**
@@ -698,6 +720,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     public MCRUser getBasicCopy() {
         MCRUser copy = new MCRUser(userName, realmID);
         copy.locked = locked;
+        copy.disabled = disabled;
         copy.owner = this.equals(this.owner) ? copy : this.owner;
         copy.setAttributes(null);
         copy.password = null;

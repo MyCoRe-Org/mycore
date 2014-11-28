@@ -165,6 +165,11 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         user = MCRUserManager.login(this.user.getUserName(), clearPasswd);
         assertNotNull("No date set for last login.", user.getLastLogin());
         assertTrue("Date was not updated", curTime.before(user.getLastLogin()));
+        user.disableLogin();
+        MCRUserManager.updateUser(user);
+        startNewTransaction();
+        assertNull("Should not login user when account is disabled", MCRUserManager.login(this.user.getUserName(), clearPasswd));
+        user.enableLogin();
         user.setValidUntil(new Date());
         MCRUserManager.updateUser(user);
         startNewTransaction();

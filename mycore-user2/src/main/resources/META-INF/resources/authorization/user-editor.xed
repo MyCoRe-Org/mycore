@@ -24,9 +24,10 @@
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="passwordHint" />
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="realName" />
 
-    <xed:validate xpath="/user[realm/@id = 'local']/@name" display="global" class="org.mycore.user2.MCRUserServlet" method="checkUserName" i18n="component.user2.admin.inputhints.sameUsername" />
+    <xed:validate xpath="/user[realm/@id = 'local']/@name" display="global" class="org.mycore.user2.MCRUserServlet" method="checkUserName"
+      i18n="component.user2.admin.inputhints.sameUsername" />
   </xed:template>
-  
+
   <xed:template id="editor4changeReadUser">
     <mcruser:template name="textInput" xpath="@name" id="userName" i18n="component.user2.admin.userAccount" i18n.error="component.user2.admin.inputhints.username"
       required="true" maxlength="16" />
@@ -43,8 +44,9 @@
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="email" />
 
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="editor4admins" />
-    
-    <xed:validate xpath="/user[realm/@id = 'local']/@name" display="global" class="org.mycore.user2.MCRUserServlet" method="checkUserName" i18n="component.user2.admin.inputhints.sameUsername" />
+
+    <xed:validate xpath="/user[realm/@id = 'local']/@name" display="global" class="org.mycore.user2.MCRUserServlet" method="checkUserName"
+      i18n="component.user2.admin.inputhints.sameUsername" />
   </xed:template>
 
   <xed:template id="editor4changeAdmins">
@@ -52,13 +54,16 @@
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="passwordHint" />
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="realName" />
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="email" />
-    
+
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="editor4admins" />
   </xed:template>
 
   <xed:template id="editor4admins">
     <mcruser:template name="checkboxList" inline="true" xpath="@locked" id="locked">
       <option value="true" i18n="component.user2.admin.user.locked" />
+    </mcruser:template>
+    <mcruser:template name="checkboxList" inline="true" xpath="@disabled" id="disabled">
+      <option value="true" i18n="component.user2.admin.user.disabled" />
     </mcruser:template>
     <mcruser:template name="textInput" xpath="validUntil" id="validUntil" i18n="component.user2.admin.user.validUntil" i18n.error="component.user2.admin.inputhints.date"
       validate="true" type="datetime" format="yyyy-MM-dd;yyyy-MM-dd'T'HH:mm:ss'Z'" maxlength="20" />
@@ -96,8 +101,8 @@
       <div class="col-md-9 row">
         <mcruser:template name="textInput" xpath="@name" id="userName" disabled="true" inline="true" colsize="sm" colwidth="9"
           i18n.error="component.user2.admin.inputhints.username" required="true" maxlength="16" />
-        <mcruser:template name="selectInput" xpath="realm/@id" default="local" id="realmId" disabled="true" inline="true" colsize="sm" colwidth="3"
-          uri="xslStyle:items2options:xslStyle:realms2items:realm:all" />
+        <mcruser:template name="selectInput" xpath="realm/@id" default="local" id="realmId" disabled="true" inline="true" colsize="sm"
+          colwidth="3" uri="xslStyle:items2options:xslStyle:realms2items:realm:all" />
       </div>
     </div>
   </xed:template>

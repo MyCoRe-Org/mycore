@@ -197,6 +197,21 @@
                 </xsl:choose>
               </td>
             </tr>
+            <tr>
+              <th class="col-md-3">
+                <xsl:value-of select="i18n:translate('component.user2.admin.user.disabled')" />
+              </th>
+              <td class="col-md-9">
+                <xsl:choose>
+                  <xsl:when test="@disabled='true'">
+                    <xsl:value-of select="i18n:translate('component.user2.admin.user.disabled.true')" />
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="i18n:translate('component.user2.admin.user.disabled.false')" />
+                  </xsl:otherwise>
+                </xsl:choose>
+              </td>
+            </tr>
             <xsl:if test="attributes">
               <tr>
                 <th class="col-md-3">

@@ -117,7 +117,7 @@ public class MCRUserServlet extends MCRServlet {
         if (!checkUserIsNotNull(res, currentUser, null)) {
             return;
         }
-        if (checkUserIsLocked(res, currentUser)) {
+        if (checkUserIsLocked(res, currentUser) || checkUserIsDisabled(res, currentUser)) {
             return;
         }
         String url = currentUser.getRealm().getPasswordChangeURL();
@@ -145,6 +145,16 @@ public class MCRUserServlet extends MCRServlet {
         if (currentUser.isLocked()) {
             String userName = currentUser.getUserID();
             String msg = MCRTranslation.translate("component.user2.UserServlet.isLocked", userName);
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
+            return true;
+        }
+        return false;
+    }
+    
+    private static boolean checkUserIsDisabled(HttpServletResponse res, MCRUser currentUser) throws IOException {
+        if (currentUser.isDisabled()) {
+            String userName = currentUser.getUserID();
+            String msg = MCRTranslation.translate("component.user2.UserServlet.isDisabled", userName);
             res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
             return true;
         }
@@ -224,7 +234,7 @@ public class MCRUserServlet extends MCRServlet {
         if (!checkUserIsNotNull(res, currentUser, null)) {
             return;
         }
-        if (checkUserIsLocked(res, currentUser)) {
+        if (checkUserIsLocked(res, currentUser) || checkUserIsDisabled(res, currentUser)) {
             return;
         }
         if (!currentUser.hasNoOwner()) {
@@ -301,6 +311,10 @@ public class MCRUserServlet extends MCRServlet {
         if (hasAdminPermission) {
             boolean locked = "true".equals(u.getAttributeValue("locked"));
             user.setLocked(locked);
+            
+            boolean disabled = "true".equals(u.getAttributeValue("disabled"));
+            user.setDisabled(disabled);
+            
             Element o = u.getChild("owner");
             if (o != null && !o.getAttributes().isEmpty()) {
                 String ownerName = o.getAttributeValue("name");

@@ -55,7 +55,8 @@ import org.mycore.datamodel.common.MCRISO8601Format;
 public class MCRUserManager {
     private static final MCRHIBConnection MCRHIB_CONNECTION = MCRHIBConnection.instance();
 
-    private static final int HASH_ITERATIONS = MCRConfiguration.instance().getInt(MCRUser2Constants.CONFIG_PREFIX + "HashIterations", 1000);
+    private static final int HASH_ITERATIONS = MCRConfiguration.instance().getInt(
+            MCRUser2Constants.CONFIG_PREFIX + "HashIterations", 1000);
 
     private static final Logger LOGGER = Logger.getLogger(MCRUserManager.class);
 
@@ -64,7 +65,8 @@ public class MCRUserManager {
         try {
             SECURE_RANDOM = SecureRandom.getInstance("SHA1PRNG");
         } catch (NoSuchAlgorithmException e) {
-            throw new InstantiationException("Could not initialize secure SECURE_RANDOM number", MCRUserManager.class, e);
+            throw new InstantiationException("Could not initialize secure SECURE_RANDOM number", MCRUserManager.class,
+                    e);
         }
     }
 
@@ -394,8 +396,12 @@ public class MCRUserManager {
             return null;
         }
         if (!user.loginAllowed()) {
-            LOGGER.warn("Password expired for user " + user.getUserID() + " on "
-                + MCRXMLFunctions.getISODate(user.getValidUntil(), MCRISO8601Format.F_COMPLETE_HH_MM_SS));
+            if (user.isDisabled()) {
+                LOGGER.warn("User " + user.getUserID() + " was disabled!");
+            } else {
+                LOGGER.warn("Password expired for user " + user.getUserID() + " on "
+                        + MCRXMLFunctions.getISODate(user.getValidUntil(), MCRISO8601Format.F_COMPLETE_HH_MM_SS));
+            }
             return null;
         }
         try {
@@ -421,7 +427,8 @@ public class MCRUserManager {
                 updatePasswordHashToSHA256(user, password);
                 break;
             case sha1:
-                if (!MCRUtils.asSHA1String(HASH_ITERATIONS, MCRUtils.fromBase64String(user.getSalt()), password).equals(user.getPassword())) {
+                if (!MCRUtils.asSHA1String(HASH_ITERATIONS, MCRUtils.fromBase64String(user.getSalt()), password)
+                        .equals(user.getPassword())) {
                     waitLoginPanalty();
                     return null;
                 }
@@ -429,7 +436,8 @@ public class MCRUserManager {
                 updatePasswordHashToSHA256(user, password);
                 break;
             case sha256:
-                if (!MCRUtils.asSHA256String(HASH_ITERATIONS, MCRUtils.fromBase64String(user.getSalt()), password).equals(user.getPassword())) {
+                if (!MCRUtils.asSHA256String(HASH_ITERATIONS, MCRUtils.fromBase64String(user.getSalt()), password)
+                        .equals(user.getPassword())) {
                     waitLoginPanalty();
                     return null;
                 }

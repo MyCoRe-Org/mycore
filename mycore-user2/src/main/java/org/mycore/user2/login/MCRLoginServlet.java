@@ -39,6 +39,7 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.user2.MCRRealm;
@@ -141,7 +142,7 @@ public class MCRLoginServlet extends MCRServlet {
         String returnURL = req.getParameter(LOGIN_REDIRECT_URL_PARAMETER);
         if (returnURL == null) {
             String referer = req.getHeader("Referer");
-            returnURL = (referer != null) ? referer : MCRServlet.getBaseURL();
+            returnURL = (referer != null) ? referer : MCRFrontendUtil.getBaseURL();
         }
         return returnURL;
     }
@@ -236,10 +237,10 @@ public class MCRLoginServlet extends MCRServlet {
      */
     private void storeURL(String url) throws Exception {
         if ((url == null) || (url.trim().length() == 0))
-            url = MCRServlet.getBaseURL();
-        else if (url.startsWith(getBaseURL()) && !url.equals(getBaseURL())) {
-            String rest = url.substring(getBaseURL().length());
-            url = getBaseURL() + encodePath(rest);
+            url = MCRFrontendUtil.getBaseURL();
+        else if (url.startsWith(MCRFrontendUtil.getBaseURL()) && !url.equals(MCRFrontendUtil.getBaseURL())) {
+            String rest = url.substring(MCRFrontendUtil.getBaseURL().length());
+            url = MCRFrontendUtil.getBaseURL()+ encodePath(rest);
         }
         LOGGER.info("Storing redirect URL to session: " + url);
         MCRSessionMgr.getCurrentSession().put(LOGIN_REDIRECT_URL_KEY, url);

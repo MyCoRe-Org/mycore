@@ -1,4 +1,4 @@
-<user name="junit" realm="local" locked="false">
+<user name="junit" realm="local" locked="false" disabled="false">
   <owner name="junit" realm="local" />
   <realName>Test Case</realName>
   <eMail>info@mycore.de</eMail>
