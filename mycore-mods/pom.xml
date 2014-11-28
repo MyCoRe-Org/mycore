@@ -17,7 +17,7 @@
       <plugin>
         <groupId>org.mycore.plugins</groupId>
         <artifactId>datamodel-plugin</artifactId>
-        <version>0.4</version>
+        <version>0.5-SNAPSHOT</version>
         <executions>
           <execution>
             <goals>
