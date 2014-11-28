@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
@@ -31,11 +32,17 @@ import com.google.common.collect.Lists;
  */
 public abstract class MCRSolrClassificationUtil {
 
-    public static final String CLASSIFICATION_CORE_NAME = "classification";
-
     private static final Logger LOGGER = Logger.getLogger(MCRSolrClassificationUtil.class);
 
     private static final Object CREATE_LOCK = new Object();
+
+    public static final String CLASSIFICATION_CORE_NAME;
+
+    static {
+        MCRSolrCore defaultCore = MCRSolrServerFactory.getDefaultSolrCore();
+        CLASSIFICATION_CORE_NAME = MCRConfiguration.instance().getString("MCR.Module-solr.Classification.Core",
+            defaultCore != null ? defaultCore.getName() + "_class" : "classification");
+    }
 
     /**
      * Reindex the whole classification system.
