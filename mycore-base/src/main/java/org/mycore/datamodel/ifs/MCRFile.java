@@ -234,7 +234,11 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
      * @return the file in the local filesystem representing this file
      */
     public File getLocalFile() throws IOException {
-        return getContentStore().getLocalFile(this);
+        MCRContentStore contentStore = getContentStore();
+        if (contentStore == null) {
+            throw new IOException("Cannot read file as its content store is unknown:" + this.toString());
+        }
+        return contentStore.getLocalFile(this);
     }
 
     /**
