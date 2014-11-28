@@ -12,7 +12,10 @@
     - fix: Fehler behoben (mit @date und @due-to Attribut und evtl. <fixes issue="">)
    -->
   <body>
-    <release version="2014.11" date="2014-11-00" description="Codenamed &apos;Mumme&apos;">
+    <release version="2014.12" date="2014-12-00" description="Codenamed &apos;Mumme&apos;">
+      <action dev="mcrtchef" type="fix" date="2014-11-44">
+        mycore-solr: fixed hit list order on grouped results
+      </action>
       <action dev="mcrtchef" type="remove">
         searchfields.xsd moved to mycore-legacy-search
       </action>
