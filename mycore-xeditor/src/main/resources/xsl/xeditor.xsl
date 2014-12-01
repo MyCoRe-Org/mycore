@@ -215,12 +215,12 @@
     <xsl:value-of select="transformer:getValue($transformer)" />
   </xsl:template>
 
-  <!-- ========== <xed:repeat xpath="" min="" max="" /> ========== -->
+  <!-- ========== <xed:repeat xpath="" min="" max="" method="build|clone" /> ========== -->
 
   <xsl:template match="xed:repeat" mode="xeditor">
     <xsl:variable name="xed_repeat" select="." />
 
-    <xsl:for-each select="xalan:tokenize(transformer:repeat($transformer,@xpath,@min,@max))">
+    <xsl:for-each select="xalan:tokenize(transformer:repeat($transformer,@xpath,@min,@max,@method))">
       <a name="rep-{transformer:nextAnchorID($transformer)}" />
       <xsl:value-of select="transformer:bindRepeatPosition($transformer)" />
       <xsl:apply-templates select="$xed_repeat/node()" mode="xeditor" />
@@ -245,7 +245,6 @@
 
     <xsl:for-each select="xalan:tokenize($controls)">
       <xsl:choose>
-        <xsl:when test="(. = 'add') and ($pos &lt; $num)" />
         <xsl:when test="(. = 'append') and ($pos &lt; $num)" />
         <xsl:when test="(. = 'up') and ($pos = 1)" />
         <xsl:when test="(. = 'down') and ($pos = $num)" />
@@ -256,14 +255,17 @@
             <xsl:with-param name="name">
               <xsl:value-of select="concat('_xed_submit_',.,':')" />
               <xsl:choose>
-                <xsl:when test="(. = 'remove') or (. = 'add') or (. = 'append') or (. = 'insert')">
+                <xsl:when test="(. = 'append') or (. = 'insert')">
+                  <xsl:value-of select="transformer:getInsertParameter($transformer)" />
+                </xsl:when>
+                <xsl:when test="(. = 'remove')">
                   <xsl:value-of select="transformer:getAbsoluteXPath($transformer)" />
                 </xsl:when>
                 <xsl:when test="(. = 'up')">
-                  <xsl:value-of select="transformer:getSwapParameter($transformer,$pos,$pos - 1)" />
+                  <xsl:value-of select="transformer:getSwapParameter($transformer,'up')" />
                 </xsl:when>
                 <xsl:when test="(. = 'down')">
-                  <xsl:value-of select="transformer:getSwapParameter($transformer,$pos,$pos + 1)" />
+                  <xsl:value-of select="transformer:getSwapParameter($transformer,'down')" />
                 </xsl:when>
               </xsl:choose>
               <xsl:text>|rep-</xsl:text>

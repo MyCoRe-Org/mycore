@@ -13,27 +13,27 @@
     <div>
       <input name="/document/name" value="" type="text" />
     </div>
-    <button name="_xed_submit_down:/document|name|name[2]|rep-3" class="btn btn-default" type="submit">
+    <button name="_xed_submit_down:/document|1|build|name[(@type = &quot;personal&quot;)]|rep-3" class="btn btn-default" type="submit">
       <i class="glyphicon glyphicon-arrow-down" />
     </button>
     <a name="rep-4" />
     <div>
       <input name="/document/name[2]" value="" type="text" />
     </div>
-    <button name="_xed_submit_up:/document|name[2]|name|rep-4" class="btn btn-default" type="submit">
+    <button name="_xed_submit_up:/document|1|build|name[(@type = &quot;personal&quot;)]|rep-4" class="btn btn-default" type="submit">
       <i class="glyphicon glyphicon-arrow-up" />
     </button>
-    <button name="_xed_submit_down:/document|name[2]|name[3]|rep-4" class="btn btn-default" type="submit">
+    <button name="_xed_submit_down:/document|2|build|name[(@type = &quot;personal&quot;)]|rep-4" class="btn btn-default" type="submit">
       <i class="glyphicon glyphicon-arrow-down" />
     </button>
     <a name="rep-5" />
     <div>
       <input name="/document/name[3]" value="" type="text" />
     </div>
-    <button name="_xed_submit_up:/document|name[3]|name[2]|rep-5" class="btn btn-default" type="submit">
+    <button name="_xed_submit_up:/document|2|build|name[(@type = &quot;personal&quot;)]|rep-5" class="btn btn-default" type="submit">
       <i class="glyphicon glyphicon-arrow-up" />
     </button>
-    <button name="_xed_submit_append:/document/name[3]|rep-5" class="btn btn-default" type="submit">
+    <button name="_xed_submit_append:/document|3|build|name[(@type = &quot;personal&quot;)]|rep-5" class="btn btn-default" type="submit">
       <i class="glyphicon glyphicon-chevron-down" />
     </button>
     <div style="visibility:hidden">

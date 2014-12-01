@@ -45,7 +45,7 @@ public class MCRRepeatBindingTest extends MCRTestCase {
         MCRBinding root = new MCRBinding(doc);
         MCRBinding conditions = new MCRBinding("conditions", true, root);
 
-        MCRRepeatBinding repeat = new MCRRepeatBinding("condition[contains(' foo bar ',concat(' ',@type,' '))]", conditions, 3, 5);
+        MCRRepeatBinding repeat = new MCRRepeatBinding("condition[contains(' foo bar ',concat(' ',@type,' '))]", conditions, 3, 5, "build");
         assertEquals(3, repeat.getBoundNodes().size());
 
         MCRBinding binding = repeat.bindRepeatPosition();
@@ -75,56 +75,5 @@ public class MCRRepeatBindingTest extends MCRTestCase {
         assertEquals("b", ((Element) (repeat.getBoundNodes().get(0))).getAttributeValue("value"));
         assertEquals("b", ((Element) (repeat.getBoundNodes().get(1))).getAttributeValue("value"));
         assertEquals("c", ((Element) (repeat.getBoundNodes().get(2))).getAttributeValue("value"));
-    }
-
-    @Test
-    public void testSwapParameter() throws JaxenException, JDOMException {
-        Element template = new MCRNodeBuilder().buildElement("parent[name='aa'][name='ab'][name='bc'][name='ac']", null, null);
-        Document doc = new Document(template);
-        MCRBinding root = new MCRBinding(doc);
-
-        MCRRepeatBinding repeat = new MCRRepeatBinding("parent/name[contains(text(),'a')]", root, 0, 0);
-        assertEquals(3, repeat.getBoundNodes().size());
-
-        assertEquals("/parent|name|name[2]", repeat.getSwapParameter(1, 2));
-        assertEquals("/parent|name[2]|name[4]", repeat.getSwapParameter(2, 3));
-    }
-
-    @Test
-    public void testSwap() throws JaxenException, JDOMException {
-        Element template = new MCRNodeBuilder().buildElement("parent[name='a'][note][foo][name='b'][note[2]]", null, null);
-        Document doc = new Document(template);
-        MCRBinding root = new MCRBinding(doc);
-
-        MCRRepeatBinding repeat = new MCRRepeatBinding("parent/name", root, 2, 0);
-        assertEquals(2, repeat.getBoundNodes().size());
-
-        assertEquals("a", doc.getRootElement().getChildren().get(0).getText());
-        assertEquals("b", doc.getRootElement().getChildren().get(3).getText());
-
-        assertEquals("a", ((Element) (repeat.getBoundNodes().get(0))).getText());
-        assertEquals("b", ((Element) (repeat.getBoundNodes().get(1))).getText());
-
-        String swapParameter = repeat.getSwapParameter(1, 2);
-        MCRRepeatBinding.swap(swapParameter, root);
-
-        assertEquals("b", doc.getRootElement().getChildren().get(0).getText());
-        assertEquals("a", doc.getRootElement().getChildren().get(3).getText());
-    }
-
-    @Test
-    public void testElementNameWithPredicates() throws JaxenException, JDOMException {
-        String x = "mods:mods[mods:name[@type='personal']='p1'][mods:name[@type='personal'][2]='p2'][mods:name[@type='corporate']='c1']";
-        Element template = new MCRNodeBuilder().buildElement(x, null, null);
-        Document doc = new Document(template);
-        MCRBinding root = new MCRBinding(doc);
-
-        MCRRepeatBinding repeat = new MCRRepeatBinding("mods:mods/mods:name[@type='personal']", root, 1, 10);
-        assertEquals(2, repeat.getBoundNodes().size());
-        assertEquals("mods:name[(@type = \"personal\")]", repeat.getElementNameWithPredicates());
-
-        repeat = new MCRRepeatBinding("mods:mods/mods:name[@type='corporate']", root, 1, 10);
-        assertEquals(1, repeat.getBoundNodes().size());
-        assertEquals("mods:name[(@type = \"corporate\")]", repeat.getElementNameWithPredicates());
     }
 }
