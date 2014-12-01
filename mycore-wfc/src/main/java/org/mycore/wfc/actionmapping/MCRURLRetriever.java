@@ -36,7 +36,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.wfc.MCRConstants;
 
 /**
@@ -112,7 +112,7 @@ public final class MCRURLRetriever {
                 }
                 String url = act.getURL(workflowData);
                 if (absolute && url != null && url.startsWith("/")) {
-                    url = MCRServlet.getBaseURL() + url.substring(1);
+                    url = MCRFrontendUtil.getBaseURL() + url.substring(1);
                 }
                 return url;
             }

@@ -23,7 +23,6 @@
 
 package org.mycore.wfc.actionmapping;
 
-import java.text.MessageFormat;
 import java.util.Collection;
 
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;

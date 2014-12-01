@@ -25,7 +25,6 @@ package org.mycore.wfc.actionmapping;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.parsers.bool.MCRBooleanClauseParser;
 import org.mycore.parsers.bool.MCRCondition;
 
