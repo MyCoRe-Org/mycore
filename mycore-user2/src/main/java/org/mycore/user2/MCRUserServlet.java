@@ -150,7 +150,7 @@ public class MCRUserServlet extends MCRServlet {
         }
         return false;
     }
-    
+
     private static boolean checkUserIsDisabled(HttpServletResponse res, MCRUser currentUser) throws IOException {
         if (currentUser.isDisabled()) {
             String userName = currentUser.getUserID();
@@ -311,10 +311,10 @@ public class MCRUserServlet extends MCRServlet {
         if (hasAdminPermission) {
             boolean locked = "true".equals(u.getAttributeValue("locked"));
             user.setLocked(locked);
-            
+
             boolean disabled = "true".equals(u.getAttributeValue("disabled"));
             user.setDisabled(disabled);
-            
+
             Element o = u.getChild("owner");
             if (o != null && !o.getAttributes().isEmpty()) {
                 String ownerName = o.getAttributeValue("name");
@@ -428,8 +428,7 @@ public class MCRUserServlet extends MCRServlet {
 
         Document doc = (Document) (req.getAttribute("MCRXEditorSubmission"));
         String password = doc.getRootElement().getChildText("password");
-        MCRUserManager.updatePasswordHashToSHA256(user, password);
-        MCRUserManager.updateUser(user);
+        MCRUserManager.setPassword(user, password);
 
         res.sendRedirect(res.encodeRedirectURL("MCRUserServlet?action=show&XSL.step=changedPassword&id="
             + user.getUserID()));
