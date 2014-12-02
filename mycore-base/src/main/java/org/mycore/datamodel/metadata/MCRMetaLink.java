@@ -212,7 +212,7 @@ public class MCRMetaLink extends MCRMetaDefault {
      * 
      * @param role
      */
-    public void setRole(String role) {
+    public void setXLinkRole(String role) {
         this.role = role;
     }
 
@@ -221,7 +221,7 @@ public class MCRMetaLink extends MCRMetaDefault {
      * 
      * @return
      */
-    public String getRole() {
+    public String getXLinkRole() {
         return role;
     }
 
@@ -289,7 +289,7 @@ public class MCRMetaLink extends MCRMetaDefault {
             setBiLink(temp1, temp2, temp3);
         }
 
-        setRole(element.getAttributeValue("role", XLINK_NAMESPACE));
+        setXLinkRole(element.getAttributeValue("role", XLINK_NAMESPACE));
     }
 
     /**

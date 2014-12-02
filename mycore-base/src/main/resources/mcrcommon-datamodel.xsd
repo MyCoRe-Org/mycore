@@ -12,6 +12,7 @@
     <xs:attribute ref="xlink:title" />
     <xs:attribute ref="xlink:type" use="required" fixed="locator" />
     <xs:attribute ref="xlink:label" />
+    <xs:attribute ref="xlink:role" />
   </xs:attributeGroup>
   <xs:simpleType name="mycoreDate">
     <xs:union memberTypes="xs:date xs:gYear xs:gYearMonth xs:dateTime" />

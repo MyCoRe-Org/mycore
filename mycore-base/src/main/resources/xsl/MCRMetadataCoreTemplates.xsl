@@ -104,6 +104,7 @@
      <xsd:attribute ref="xlink:href" use="optional"/>
      <xsd:attribute ref="xlink:title" use="optional"/>
      <xsd:attribute ref="xlink:label" use="optional"/>
+     <xsd:attribute ref="xlink:role" use="optional"/>
      <xsd:attribute ref="xlink:from" use="optional"/>
      <xsd:attribute ref="xlink:to" use="optional"/>
    </xsd:complexType>
@@ -125,6 +126,7 @@
      <xsd:attribute ref="xlink:href" use="optional"/>
      <xsd:attribute ref="xlink:title" use="optional"/>
      <xsd:attribute ref="xlink:label" use="optional"/>
+     <xsd:attribute ref="xlink:role" use="optional"/>
      <xsd:attribute ref="xlink:from" use="optional"/>
      <xsd:attribute ref="xlink:to" use="optional"/>
    </xsd:complexType>
@@ -146,6 +148,7 @@
      <xsd:attribute ref="xlink:href" use="optional"/>
      <xsd:attribute ref="xlink:title" use="optional"/>
      <xsd:attribute ref="xlink:label" use="optional"/>
+     <xsd:attribute ref="xlink:role" use="optional"/>
      <xsd:attribute ref="xlink:from" use="optional"/>
      <xsd:attribute ref="xlink:to" use="optional"/>
    </xsd:complexType>
