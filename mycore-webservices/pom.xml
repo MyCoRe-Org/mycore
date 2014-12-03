@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <artifactId>mycore</artifactId>
     <groupId>org.mycore</groupId>
@@ -13,6 +14,24 @@
     <manifest.priority>72</manifest.priority>
     <forbiddenapis.skip>true</forbiddenapis.skip>
   </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>analyze</id>
+            <configuration>
+              <usedDependencies>
+                <!-- required for Java 8 -->
+                <useDependency>org.apache.axis:axis-jaxrpc</useDependency>
+              </usedDependencies>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
   <dependencies>
     <dependency>
       <groupId>org.mycore</groupId>
@@ -48,8 +67,7 @@
       <artifactId>axis-ant</artifactId>
     </dependency>
     <dependency>
-      <!-- required for tomcat 7.0.27 or later -->
-      <scope>runtime</scope>
+      <!-- required for tomcat 7.0.27 or later and Java 8 -->
       <groupId>org.apache.axis</groupId>
       <artifactId>axis-jaxrpc</artifactId>
     </dependency>
