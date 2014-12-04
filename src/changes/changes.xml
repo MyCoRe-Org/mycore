@@ -26,7 +26,10 @@
         mycore-xeditor: Refactored repeater insert/append button. Method to create new elements can be
         chosen now via @method="build|clone". Removed "add" target, it is not needed any more.
       </action>
-      <action dev="mcrtchef" type="fix" date="2014-11-44">
+      <action dev="mcradler" type="update">
+        mycore-user2: MCRUser can be disabled
+      </action>
+      <action dev="mcrtchef" type="fix" date="2014-11-14">
         mycore-solr: fixed hit list order on grouped results
       </action>
       <action dev="mcrtchef" type="remove">
