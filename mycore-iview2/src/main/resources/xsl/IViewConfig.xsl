@@ -20,7 +20,7 @@
         <xsl:choose>
           <xsl:when test="xml/properties/property[@name='mobile'] = 'true'">
             <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-            <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet" type="text/css" />
+            <link href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet" type="text/css" />
           </xsl:when>
           <xsl:otherwise>
             <script type="text/javascript" src="{$MCR.Module-iview2.bootstrapURL}/js/bootstrap.min.js"></script>
