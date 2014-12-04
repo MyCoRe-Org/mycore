@@ -17,7 +17,7 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.mycore</groupId>
+      <groupId>org.mycore.mets</groupId>
       <artifactId>mets-validator</artifactId>
     </dependency>
     <dependency>
