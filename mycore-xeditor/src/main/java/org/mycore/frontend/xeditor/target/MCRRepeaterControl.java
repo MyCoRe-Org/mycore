@@ -35,9 +35,9 @@ public abstract class MCRRepeaterControl implements MCREditorTarget {
 
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String buttonName) throws Exception {
         session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
-        int posOfAnchor = buttonName.lastIndexOf('|'); 
+        int posOfAnchor = buttonName.lastIndexOf('|');
         String param = buttonName.substring(0, posOfAnchor);
-        String anchor = buttonName.substring(posOfAnchor+1);
+        String anchor = buttonName.substring(posOfAnchor + 1);
         handleRepeaterControl(context, job, session, param);
         job.getResponse().sendRedirect(session.getRedirectURL(anchor));
     }

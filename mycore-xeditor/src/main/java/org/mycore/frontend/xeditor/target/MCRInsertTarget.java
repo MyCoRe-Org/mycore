@@ -23,21 +23,19 @@
 
 package org.mycore.frontend.xeditor.target;
 
-import javax.servlet.ServletContext;
-
-import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.frontend.xeditor.MCRBinding;
-import org.mycore.frontend.xeditor.MCREditorSession;
+import org.jaxen.JaxenException;
+import org.mycore.frontend.xeditor.MCRRepeatBinding;
 
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRCloneTarget extends MCRRepeaterControl {
+public class MCRInsertTarget extends MCRSwapInsertTarget {
+    @Override
+    protected void handle(int pos, MCRRepeatBinding repeatBinding) throws JaxenException {
+        repeatBinding.insert(pos);
+    }
 
-    protected void handleRepeaterControl(ServletContext context, MCRServletJob job, MCREditorSession session, String xPath) throws Exception {
-        MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
-        binding.cloneBoundElement(0);
-        binding.detach();
-        session.setBreakpoint("After handling target clone " + xPath);
+    public static String getInsertParameter(MCRRepeatBinding repeatBinding) throws JaxenException {
+        return buildParameter(repeatBinding, repeatBinding.getRepeatPosition());
     }
 }

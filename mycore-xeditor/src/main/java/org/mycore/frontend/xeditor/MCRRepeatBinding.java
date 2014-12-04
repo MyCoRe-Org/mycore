@@ -1,8 +1,17 @@
 package org.mycore.frontend.xeditor;
 
+import java.util.List;
+
+import org.jaxen.BaseXPath;
 import org.jaxen.JaxenException;
+import org.jaxen.dom.DocumentNavigator;
+import org.jaxen.expr.Expr;
+import org.jaxen.expr.LocationPath;
+import org.jaxen.expr.Step;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.mycore.common.config.MCRConfiguration;
+import org.mycore.frontend.xeditor.tracker.MCRAddedElement;
 import org.mycore.frontend.xeditor.tracker.MCRSwapElements;
 
 public class MCRRepeatBinding extends MCRBinding {
@@ -11,18 +20,24 @@ public class MCRRepeatBinding extends MCRBinding {
 
     private int maxRepeats;
 
-    public MCRRepeatBinding(String xPath, MCRBinding parent, int minRepeats, int maxRepeats) throws JaxenException, JDOMException {
-        this(xPath, parent);
+    private final static String DEFAULT_METHOD = MCRConfiguration.instance().getString("MCR.XEditor.InsertTarget.DefaultMethod", "build");
+
+    private String method = DEFAULT_METHOD; // build|clone
+
+    public MCRRepeatBinding(String xPath, MCRBinding parent, int minRepeats, int maxRepeats, String method) throws JaxenException,
+            JDOMException {
+        this(xPath, parent, method);
 
         while (getBoundNodes().size() < minRepeats)
-            cloneBoundElement(getBoundNodes().size() - 1);
+            insert(getBoundNodes().size());
 
         this.maxRepeats = maxRepeats < 1 ? Integer.MAX_VALUE : maxRepeats;
         this.maxRepeats = Math.max(this.maxRepeats, getBoundNodes().size());
     }
 
-    public MCRRepeatBinding(String xPath, MCRBinding parent) throws JaxenException, JDOMException {
+    public MCRRepeatBinding(String xPath, MCRBinding parent, String method) throws JaxenException, JDOMException {
         super(xPath, true, parent);
+        this.method = "clone".equals(method) ? "clone" : "build".equals(method) ? "build" : DEFAULT_METHOD;
         this.maxRepeats = Integer.MAX_VALUE;
     }
 
@@ -39,34 +54,43 @@ public class MCRRepeatBinding extends MCRBinding {
         return maxRepeats;
     }
 
-    public String getSwapParameter(int posA, int posB) {
-        Element a = (Element) (boundNodes.get(posA - 1));
-        Element b = (Element) (boundNodes.get(posB - 1));
-        
-        String xPathP = MCRXPathBuilder.buildXPath( a.getParent() );
-        String xPathA = MCRXPathBuilder.buildChildPath(a);
-        String xPathB = MCRXPathBuilder.buildChildPath(b);
-        
-        return xPathP + "|" + xPathA + "|" + xPathB;
+    public String getMethod() {
+        return method;
     }
-    
-    public static void swap(String swapParameter, MCRBinding context) throws JaxenException, JDOMException {
-        String[] tokens = swapParameter.split("\\|");
-        String xPathP = tokens[0];
-        String xPathA = tokens[1];
-        String xPathB = tokens[2];
-        
-        MCRBinding bindingP = new MCRBinding(xPathP, false, context);
-        MCRBinding bindingA = new MCRBinding(xPathA, false, bindingP);
-        MCRBinding bindingB = new MCRBinding(xPathB, false, bindingP);
 
-        Element parent = (Element) (bindingP.getBoundNode());
-        Element elementA = (Element)( bindingA.getBoundNode() );
-        Element elementB = (Element)( bindingB.getBoundNode() );
-        bindingP.track(MCRSwapElements.swap(parent, elementA, elementB));
-        
-        bindingA.detach();
-        bindingB.detach();
-        bindingP.detach();
+    public Element getParentElement() {
+        return ((Element) getBoundNode()).getParentElement();
+    }
+
+    @SuppressWarnings("unchecked")
+    public String getElementNameWithPredicates() throws JaxenException {
+        BaseXPath baseXPath = new BaseXPath(xPath, new DocumentNavigator());
+        Expr rootExpr = baseXPath.getRootExpr();
+        LocationPath locationPath = (LocationPath) rootExpr;
+        List<Step> steps = locationPath.getSteps();
+        Step lastStep = steps.get(steps.size() - 1);
+        return MCRNodeBuilder.simplify(lastStep.getText());
+    }
+
+    public void swap(int pos) {
+        Element parent = getParentElement();
+        Element elementA = (Element) (getBoundNodes().get(pos - 1));
+        Element elementB = (Element) (getBoundNodes().get(pos));
+        track(MCRSwapElements.swap(parent, elementA, elementB));
+    }
+
+    public void insert(int pos) throws JaxenException {
+        if ("build".equals(method)) {
+            Element parentElement = getParentElement();
+            Element precedingElement = (Element) (getBoundNodes().get(pos - 1));
+            int posOfPrecedingInParent = parentElement.indexOf(precedingElement);
+            int targetPos = posOfPrecedingInParent + 1;
+            String pathToBuild = getElementNameWithPredicates();
+            Element newElement = (Element) (new MCRNodeBuilder().buildNode(pathToBuild, null, null));
+            parentElement.addContent(targetPos, newElement);
+            boundNodes.add(pos, newElement);
+            track(MCRAddedElement.added(newElement));
+        } else
+            cloneBoundElement(pos - 1);
     }
 }

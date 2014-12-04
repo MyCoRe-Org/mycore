@@ -28,6 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
@@ -41,31 +42,38 @@ import org.xml.sax.SAXException;
  */
 public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
 
-	private static final long serialVersionUID = 1L;
-	protected final static Logger LOGGER = Logger.getLogger(MCRStaticXEditorFileServlet.class);
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	protected MCRContent expandEditorElements(HttpServletRequest request, URL resource) throws IOException, JDOMException, SAXException, MalformedURLException {
-		MCRContent content = super.expandEditorElements(request, resource);
-		if (mayContainEditorForm(content)) {
-			content = doExpandEditorElements(content, request);
-		}
-		return content;
-	}
+    protected final static Logger LOGGER = Logger.getLogger(MCRStaticXEditorFileServlet.class);
 
-	public static MCRContent doExpandEditorElements(MCRContent content, HttpServletRequest request) throws IOException, JDOMException, SAXException,
-			MalformedURLException {
-		MCRParameterCollector pc = new MCRParameterCollector(request, false);
-		String sessionID = request.getParameter(MCREditorSessionStore.XEDITOR_SESSION_PARAM);
-		MCREditorSession session = null;
+    @Override
+    protected MCRContent expandEditorElements(HttpServletRequest request, HttpServletResponse response, URL resource)
+        throws IOException, JDOMException, SAXException, MalformedURLException {
+        MCRContent content = super.expandEditorElements(request, response, resource);
+        if (mayContainEditorForm(content)) {
+            content = doExpandEditorElements(content, request, response, request.getRequestURL().toString());
+        }
+        return content;
+    }
 
-		if (sessionID != null) {
-			session = MCREditorSessionStoreFactory.getSessionStore().getSession(sessionID);
-		} else {
-			session = new MCREditorSession(request.getParameterMap(), pc);
-			MCREditorSessionStoreFactory.getSessionStore().storeSession(session);
-		}
+    public static MCRContent doExpandEditorElements(MCRContent content, HttpServletRequest request,
+        HttpServletResponse response, String pageURL) throws IOException, JDOMException, SAXException, MalformedURLException {
+        MCRParameterCollector pc = new MCRParameterCollector(request, false);
+        String sessionID = request.getParameter(MCREditorSessionStore.XEDITOR_SESSION_PARAM);
+        MCREditorSession session = null;
 
-		return new MCRXEditorTransformer(session, pc).transform(content);
-	}
+        if (sessionID != null) {
+            session = MCREditorSessionStoreFactory.getSessionStore().getSession(sessionID);
+            if (session == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Editor session timed out.");
+                return null;
+            }
+        } else {
+            session = new MCREditorSession(request.getParameterMap(), pc);
+            session.setPageURL(pageURL);
+            MCREditorSessionStoreFactory.getSessionStore().storeSession(session);
+        }
+
+        return new MCRXEditorTransformer(session, pc).transform(content);
+    }
 }

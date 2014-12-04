@@ -58,6 +58,8 @@ public class MCRBinding {
 
     protected String name;
 
+    protected String xPath;
+
     protected List<Object> boundNodes = new ArrayList<Object>();
 
     protected MCRBinding parent;
@@ -93,6 +95,8 @@ public class MCRBinding {
     }
 
     private void bind(String xPath, boolean buildIfNotExists, String initialValue) throws JaxenException {
+        this.xPath = xPath;
+
         Map<String, Object> variables = buildXPathVariables();
 
         XPathExpression<Object> xPathExpr = XPathFactory.instance().compile(xPath, Filters.fpassthrough(), variables,
@@ -121,6 +125,10 @@ public class MCRBinding {
         LOGGER.debug("Repeater bind to child [" + pos + "]");
     }
 
+    public String getXPath() {
+        return xPath;
+    }
+
     public List<Object> getBoundNodes() {
         return boundNodes;
     }
@@ -137,17 +145,6 @@ public class MCRBinding {
             track(MCRRemoveAttribute.remove((Attribute) node));
     }
 
-    public Element addEmptyElement(int index) {
-        Element template = (Element) (boundNodes.get(index));
-        Element newElement = new Element(template.getQualifiedName());
-        Element parent = template.getParentElement();
-        int indexInParent = parent.indexOf(template) + 1;
-        parent.addContent(indexInParent, newElement);
-        boundNodes.add(index + 1, newElement);
-        trackNodeCreated(newElement);
-        return newElement;
-    }
-    
     public Element cloneBoundElement(int index) {
         Element template = (Element) (boundNodes.get(index));
         Element newElement = template.clone();

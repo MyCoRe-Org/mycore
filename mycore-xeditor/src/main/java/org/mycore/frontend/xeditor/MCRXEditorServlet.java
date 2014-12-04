@@ -24,6 +24,7 @@
 package org.mycore.frontend.xeditor;
 
 import java.util.Enumeration;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -49,12 +50,9 @@ public class MCRXEditorServlet extends MCRServlet {
 
         if (session == null) {
             String msg = getErrorI18N("xeditor.error", "noSession", sessionID);
-            job.getResponse().sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
+            job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, msg);
             return;
         }
-
-        String referrer = job.getRequest().getHeader("referer");
-        session.setPageURL(referrer);
 
         int stepNr = Integer.parseInt(xEditorStepID.split("-")[1]);
         session.getChangeTracker().undoChanges(session.getEditedXML(), stepNr);
@@ -74,7 +72,7 @@ public class MCRXEditorServlet extends MCRServlet {
                 if (name.endsWith(".x") || name.endsWith(".y")) // input type="image"
                     name = name.substring(0, name.length() - 2);
 
-                targetID = name.split("[_\\:]")[3].toLowerCase();
+                targetID = name.split("[_\\:]")[3].toLowerCase(Locale.ROOT);
                 parameter = name.substring(TARGET_PATTERN.length() + targetID.length());
                 if (!parameter.isEmpty())
                     parameter = parameter.substring(1);

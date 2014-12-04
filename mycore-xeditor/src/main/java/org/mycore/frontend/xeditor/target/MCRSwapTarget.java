@@ -23,19 +23,25 @@
 
 package org.mycore.frontend.xeditor.target;
 
-import javax.servlet.ServletContext;
-
-import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.frontend.xeditor.MCREditorSession;
+import org.jaxen.JaxenException;
 import org.mycore.frontend.xeditor.MCRRepeatBinding;
 
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRSwapTarget extends MCRRepeaterControl {
+public class MCRSwapTarget extends MCRSwapInsertTarget {
 
-    protected void handleRepeaterControl(ServletContext context, MCRServletJob job, MCREditorSession session, String swapParam) throws Exception {
-        MCRRepeatBinding.swap(swapParam, session.getRootBinding());
-        session.setBreakpoint("After handling target swap " + swapParam);
+    @Override
+    protected void handle(int pos, MCRRepeatBinding repeatBinding) {
+        repeatBinding.swap(pos);
+    }
+
+    public final static boolean MOVE_DOWN = true;
+
+    public final static boolean MOVE_UP = false;
+
+    public static String getSwapParameter(MCRRepeatBinding repeatBinding, boolean direction) throws JaxenException {
+        int pos = repeatBinding.getRepeatPosition() + (direction == MOVE_UP ? -1 : 0);
+        return buildParameter(repeatBinding, pos);
     }
 }
