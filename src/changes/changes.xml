@@ -12,7 +12,20 @@
     - fix: Fehler behoben (mit @date und @due-to Attribut und evtl. <fixes issue="">)
    -->
   <body>
-    <release version="2014.12" date="2014-12-00" description="Codenamed &apos;Mumme&apos;">
+    <release version="2014.12" date="2014-12-04" description="Codenamed &apos;Mumme&apos;">
+      <action dev="mcrmeich" type="update">
+        MCRMetaLink classes can handle @xlink:role
+      </action>
+      <action dev="mcrtchef" type="update">
+       mycore-user2: provide setPassword(MCRUser, String) method to MCRUserManager
+      </action>
+      <action dev="mcrtchef" type="update">
+       mycore-mods: on MODS export add identifier[@type='uri'] if not already present
+      </action>
+      <action dev="mcrfluet" type="update">
+        mycore-xeditor: Refactored repeater insert/append button. Method to create new elements can be
+        chosen now via @method="build|clone". Removed "add" target, it is not needed any more.
+      </action>
       <action dev="mcrtchef" type="fix" date="2014-11-44">
         mycore-solr: fixed hit list order on grouped results
       </action>
@@ -27,7 +40,8 @@
       </action>
       <action dev="mcrfluet" type="add">
         Added property MCR.IFS2.SyncLastModifiedOnSVNCommit=true (default).
-        If the property is true, the last modified date of the metadata file is the exactly same as from the SVN commit.
+        If the property is true, the
+        last modified date of the metadata file is the exactly same as from the SVN commit.
       </action>
       <action dev="mcrtchef" type="update">
         mycore-solr: added support for responses that are embedded in mycoreobject to response-utils.xsl
@@ -48,8 +62,8 @@
         mycore-xeditor: send 404 if request comes in after session timed out
       </action>
       <action dev="mcrjkupf" type="fix" date="2014-11-05">
-        added language support for text in MCRMetaHistoryDate 
-        <fixes issue="728"/>
+        added language support for text in MCRMetaHistoryDate
+        <fixes issue="728" />
       </action>
       <action dev="mcrshofm" type="add">
         mycore-webcli: display server-side exceptions
@@ -58,21 +72,22 @@
         refactored org.mycore.datamodel.classification2 package
       </action>
       <action dev="mcrmeich" type="fix" date="2014-11-03" due-to="Silvio Hermann">
-        When using solr searcher in oai interface the ListSets verb my not be working 
-        <fixes issue="727"/>
+        When using solr searcher in oai interface the ListSets verb my not be working
+        <fixes issue="727" />
       </action>
       <action dev="mcrshofm" type="update">
         mycore-mets: synchronize ALTO files with mets.xml
-      </action> 
+      </action>
       <action dev="mcrmeich" type="add">
         mycore-classeditor: added category filter (requires solr-classification)
       </action>
       <action dev="mcrtchef" type="fix" date="2014-10-27" due-to="Silvio Hermann">
         MCRMetaDerivateLink.isValid() always returns false
-        <fixes issue="726"/>
+        <fixes issue="726" />
       </action>
       <action dev="mcrfluet" type="add">
-        mycore-mods: Added event handler to extract related items from MODS and store them as separate objects linked as parent and/or via xlink:href
+        mycore-mods: Added event handler to extract related items from MODS and store them as separate
+        objects linked as parent and/or via xlink:href
       </action>
       <action dev="mcrjkupf" type="add">
         MCRLanguageDetector: added "detectLanguageByCharacter" to get language by script
@@ -84,10 +99,10 @@
         fixed many encoding bugs revealed by forbiddenapis
       </action>
       <action dev="mcrtchef" type="update">
-       mycore-iview2: removed usage of MCRFile and MCRDirectory (replaced by niofs)
+        mycore-iview2: removed usage of MCRFile and MCRDirectory (replaced by niofs)
       </action>
       <action dev="mcrmeich" type="add">
-       mycore-solr: added support to index classifications (used by classification editor)
+        mycore-solr: added support to index classifications (used by classification editor)
       </action>
       <action dev="mcrmeich" type="update">
         classification: made many void methods return something useful
@@ -96,41 +111,41 @@
         MCRServletContentHelper: if 'dl' parameter is present, set Content-Disposition to attachment
       </action>
       <action dev="mcrvuchi" type="add">
-       mycore-xeditor: added support for variables in i18n in xed:output
+        mycore-xeditor: added support for variables in i18n in xed:output
       </action>
       <action dev="mcrtchef" type="update">
         MCRMetaDerivateLink uses niofs to access files
       </action>
       <action dev="mcrtchef" type="update">
-       mycore-mods: normalize mods.name* and mods.author search fields to KFC unicode
+        mycore-mods: normalize mods.name* and mods.author search fields to KFC unicode
       </action>
       <action dev="mcrtchef" type="add">
         added MCRXMLFunctions.normalizeUnicode() to normalize a String to KFC norm
       </action>
       <action dev="mcrtchef" type="update">
-       MCR{Compress,Tar,Zip}Servlet use niofs to access files from derivate
+        MCR{Compress,Tar,Zip}Servlet use niofs to access files from derivate
       </action>
       <action dev="mcrmeich" type="add">
         mycore-solr: added support to use different SOLR cores
       </action>
       <action dev="mcrfluet" type="fix" date="2014-10-09">
-       mycore-xeditor: replacing variables in xed:include/@uri did not work
+        mycore-xeditor: replacing variables in xed:include/@uri did not work
       </action>
       <action dev="mcrmeich" type="fix" date="2014-10-08">
         mycore-user2: fixed invalid permission check in MCRRoleResolver
       </action>
       <action dev="mcrtchef" type="fix" date="2014-10-01" due-to="Robert Stephan">
         removed mycore-iview2 dependency from mycore-solr
-        <fixes issue="708"/>
+        <fixes issue="708" />
       </action>
       <action dev="mcrsteph" type="add">
-       mycore-oai: added implementation for 'set handling' with SOLR
+        mycore-oai: added implementation for 'set handling' with SOLR
       </action>
       <action dev="mcrsteph" type="fix" date="2014-10-01">
-       mycore-oai: made cursor attribute of resumtionToken compliant with standard 
+        mycore-oai: made cursor attribute of resumtionToken compliant with standard
       </action>
       <action dev="mcrsteph" type="add">
-       mycore-oai: support 'sortby' in MCROAISolrSearcher
+        mycore-oai: support 'sortby' in MCROAISolrSearcher
       </action>
       <action dev="mcrjkupf" type="fix" date="2014-10-01" due-to="Christian Windolf">
         The $CurrentGroup parameter of a default ACL is no more supported since USER2-System
