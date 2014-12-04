@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>mycore-parent</artifactId>
     <groupId>org.mycore</groupId>
-    <version>23-SNAPSHOT</version>
+    <version>23</version>
   </parent>
   <artifactId>mycore</artifactId>
   <packaging>pom</packaging>
-  <version>2014.07-SNAPSHOT</version>
+  <version>2014.12</version>
   <name>MyCoRe</name>
   <description>
     MyCoRe is a system for the development of institutional content repositories, publication servers, image collections,
@@ -62,9 +61,9 @@
     </notifiers>
   </ciManagement>
   <scm>
-    <connection>scm:svn:http://server.mycore.de/svn/mycore/trunk</connection>
-    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/trunk</developerConnection>
-    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/trunk</url>
+    <connection>scm:svn:http://server.mycore.de/svn/mycore/tags/mycore-2014.12</connection>
+    <developerConnection>scm:svn:https://server.mycore.de/svn/mycore/tags/mycore-2014.12</developerConnection>
+    <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/tags/mycore-2014.12</url>
   </scm>
   <profiles>
     <profile>
@@ -544,7 +543,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore></ignore>
+                    <ignore />
                   </action>
                 </pluginExecution>
               </pluginExecutions>
@@ -588,23 +587,23 @@
       <dependency>
         <groupId>org.mycore.iview2</groupId>
         <artifactId>image-tiler</artifactId>
-        <version>1.10-SNAPSHOT</version>
+        <version>1.10</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-viewer</artifactId>
-        <version>0.2-SNAPSHOT</version>
+        <version>0.2.1</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.mycore.mets</groupId>
         <artifactId>mets-model</artifactId>
-        <version>0.5-SNAPSHOT</version>
+        <version>0.5</version>
       </dependency>
       <dependency>
         <groupId>org.mycore.mets</groupId>
         <artifactId>mets-validator</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
