@@ -23,7 +23,9 @@
 
 package org.mycore.wfc.actionmapping;
 
+import org.apache.log4j.Logger;
 import org.jdom2.Element;
+import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -55,7 +57,13 @@ public class MCRCategoryCondition implements MCRCondition<MCRWorkflowData> {
      */
     @Override
     public boolean evaluate(MCRWorkflowData workflowData) {
-        return LINK_SERVICE.isInCategory(workflowData.getCategoryReference(), mcrCategoryID) ^ not;
+        MCRCategLinkReference reference = workflowData.getCategoryReference();
+        if (reference == null) {
+            Logger.getLogger(getClass()).error(
+                "Cannot evaluate '" + toString() + "', if MCRWorkflowData does not contain an object reference");
+            return false;
+        }
+        return LINK_SERVICE.isInCategory(reference, mcrCategoryID) ^ not;
     }
 
     @Override
