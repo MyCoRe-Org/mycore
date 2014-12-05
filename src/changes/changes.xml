@@ -6,6 +6,10 @@
   </properties>
   <body>
     <release version="2014.06.0.1" date="TBA" description="2014.06.0 maintenance release 1">
+       <action dev="mcrfluet" type="update">
+        mycore-xeditor: Refactored repeater insert/append button. Method to create new elements can be
+        chosen now via @method="build|clone". Removed "add" target, it is not needed any more.
+      </action>
       <action dev="mcrtchef" type="fix">
         mycore-wcms2: skip StringWriter and operate on byte array directly
       </action>
