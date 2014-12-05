@@ -92,23 +92,30 @@ public final class MCRURLRetriever {
         return getURL(action, collection, wfDataProvider, absolute);
     }
 
-    private static String getURL(String action, String collectionName, WorkflowDataProvider wfDataProvider, boolean absolute) {
-        MCRCollection collection = getCollectionWithAction(collectionName, action);
+    private static String getURL(String action, String collectionName, WorkflowDataProvider wfDataProvider,
+        boolean absolute) {
+        MCRCategLinkReference reference = wfDataProvider.getWorkflowData().getCategoryReference();
+        MCRCollection defaultCollection = reference != null ? getCollectionWithAction(reference.getType(), action, null)
+            : null;
+        MCRCollection collection = getCollectionWithAction(collectionName, action, defaultCollection);
         if (collection == null) {
-            LOGGER.warn(MessageFormat.format("Could not find action ''{0}'' in collection: {1}", action, collectionName));
+            LOGGER.warn(MessageFormat
+                .format("Could not find action ''{0}'' in collection: {1}", action, collectionName));
             return null;
         }
         return getURL(action, collection, wfDataProvider, absolute);
     }
 
-    private static String getURL(String action, MCRCollection collection, WorkflowDataProvider wfDataProvider, boolean absolute) {
+    private static String getURL(String action, MCRCollection collection, WorkflowDataProvider wfDataProvider,
+        boolean absolute) {
         for (MCRAction act : collection.getActions()) {
             if (act.getAction().equals(action)) {
                 MCRWorkflowData workflowData = wfDataProvider.getWorkflowData();
                 if (LOGGER.isDebugEnabled()) {
                     MCRCategLinkReference categoryReference = workflowData.getCategoryReference();
                     String mcrId = categoryReference == null ? null : categoryReference.getObjectID();
-                    LOGGER.debug(MessageFormat.format("Collection: {0}, Action: {1}, Object: {2}", collection.getName(), action, mcrId));
+                    LOGGER.debug(MessageFormat.format("Collection: {0}, Action: {1}, Object: {2}",
+                        collection.getName(), action, mcrId));
                 }
                 String url = act.getURL(workflowData);
                 if (absolute && url != null && url.startsWith("/")) {
@@ -120,7 +127,8 @@ public final class MCRURLRetriever {
         return null;
     }
 
-    private static MCRCollection getCollectionWithAction(String collection, String action) {
+    private static MCRCollection getCollectionWithAction(String collection, String action,
+        MCRCollection defaultCollection) {
         MCRCollection mcrCollection = COLLECTION_MAP.get(collection);
         if (mcrCollection != null) {
             for (MCRAction act : mcrCollection.getActions()) {
@@ -132,12 +140,14 @@ public final class MCRURLRetriever {
         //did not find a collection with that action, checking parent
         String parentCollection = getParentCollection(collection);
         if (parentCollection == null) {
-            return null;
+            LOGGER.info("Using default collection '" + defaultCollection.getName() + "' for action: " + action);
+            return defaultCollection;
         }
         LOGGER.info("Checking parent collection '" + parentCollection + "' for action: " + action);
-        MCRCollection collectionWithAction = getCollectionWithAction(parentCollection, action);
+        MCRCollection collectionWithAction = getCollectionWithAction(parentCollection, action, defaultCollection);
         if (collectionWithAction == null) {
-            return null;
+            LOGGER.info("Using default collection '" + defaultCollection.getName() + "' for action: " + action);
+            return defaultCollection;
         }
         if (mcrCollection == null) {
             mcrCollection = new MCRCollection();
