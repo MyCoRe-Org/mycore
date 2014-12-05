@@ -72,7 +72,6 @@ public class MCRPersistenceServletFilter implements Filter {
     }
 
     private void prepareRequest(HttpServletRequest req) {
-        @SuppressWarnings("unchecked")
         Map<String, String[]> parameterMap = req.getParameterMap();
         for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
             switch (entry.getValue().length) {
