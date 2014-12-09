@@ -58,11 +58,9 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.TimeZone;
-import java.util.Vector;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -81,13 +79,7 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.streams.MCRDevNull;
 import org.mycore.common.content.streams.MCRMD5InputStream;
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.language.MCRLanguageFactory;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.niofs.MCRPath;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
@@ -992,42 +984,6 @@ public class MCRUtils {
     }
 
     /**
-     * @param derivate the id of the derivate
-     * 
-     * @return the list of {@link MCRFile}s contained by the given derivate id, or an empty list if the derivate id is invalid
-     * @deprecated direct access to MCRFile is not supported use {@link MCRPath}.
-     */
-    public static List<MCRFile> getFiles(String derivate) {
-        List<MCRFile> fList = new Vector<MCRFile>();
-        if (derivate == null || derivate.length() == 0
-            || !(MCRMetadataManager.exists(MCRObjectID.getInstance(derivate)))) {
-            return fList;
-        }
-
-        MCRFilesystemNode node = MCRFilesystemNode.getRootNode(derivate);
-        if (node instanceof MCRDirectory) {
-            processNode(node, fList);
-        }
-        return fList;
-    }
-
-    /**
-     * @see {@link MCRUtils#getFiles(String)}
-     * */
-    private static void processNode(MCRFilesystemNode node, List<MCRFile> fList) {
-        MCRDirectory dir = (MCRDirectory) node;
-        MCRFilesystemNode[] children = dir.getChildren();
-        for (MCRFilesystemNode child : children) {
-            if (child instanceof MCRDirectory) {
-                processNode(child, fList);
-            }
-            if (child instanceof MCRFile) {
-                fList.add((MCRFile) child);
-            }
-        }
-    }
-
-    /**
      * Extracts files in a tar archive. Currently works only on uncompressed tar files.
      * 
      * @param source the uncompressed tar to extract
@@ -1051,15 +1007,11 @@ public class MCRUtils {
                     new File(newFile.getParent()).mkdirs();
                 } else {
                     new File(newFile.getParent()).mkdirs();
-                    FileOutputStream fileOutputStream = new FileOutputStream(newFile);
-                    try {
+                    try (FileOutputStream fileOutputStream = new FileOutputStream(newFile)) {
                         int length = -1;
                         while ((length = tarOutputStream.read(buffer)) > 0) {
                             fileOutputStream.write(buffer, 0, length);
                         }
-                    } catch (Exception ex) {
-                        fileOutputStream.close();
-                        throw new IOException("Could not extract file \"" + newFile.getAbsolutePath() + "\"", ex);
                     }
                 }
             }
@@ -1106,6 +1058,40 @@ public class MCRUtils {
         }
         LOGGER.warn("Could not instanciate Exception " + mainExceptionClass.getCanonicalName());
         return e;
+    }
+
+    /**
+     * Takes a file size in bytes and formats it as a string for output. For
+     * values &lt; 5 KB the output format is for example "320 Byte". For values
+     * &gt; 5 KB the output format is for example "6,8 KB". For values &gt; 1 MB
+     * the output format is for example "3,45 MB".
+     */
+    public static String getSizeFormatted(long bytes) {
+        String sizeUnit;
+        String sizeText;
+        double sizeValue;
+
+        if (bytes >= 1024 * 1024) // >= 1 MB
+        {
+            sizeUnit = "MB";
+            sizeValue = (double) Math.round(bytes / 10485.76) / 100;
+        } else if (bytes >= 5 * 1024) // >= 5 KB
+        {
+            sizeUnit = "KB";
+            sizeValue = (double) Math.round(bytes / 102.4) / 10;
+        } else // < 5 KB
+        {
+            sizeUnit = "Byte";
+            sizeValue = bytes;
+        }
+
+        sizeText = String.valueOf(sizeValue).replace('.', ',');
+
+        if (sizeText.endsWith(",0")) {
+            sizeText = sizeText.substring(0, sizeText.length() - 2);
+        }
+
+        return sizeText + " " + sizeUnit;
     }
 
 }
