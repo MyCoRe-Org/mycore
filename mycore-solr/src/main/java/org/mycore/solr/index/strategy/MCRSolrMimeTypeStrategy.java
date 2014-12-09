@@ -2,6 +2,8 @@ package org.mycore.solr.index.strategy;
 
 import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
 
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.regex.Pattern;
 
 import org.mycore.common.config.MCRConfiguration;
@@ -16,6 +18,7 @@ import org.mycore.datamodel.ifs.MCRFile;
  * matches.
  * 
  * @author Matthias Eichner
+ * @author Thomas Scheffler (yagee)
  */
 public class MCRSolrMimeTypeStrategy implements MCRSolrFileStrategy {
 
@@ -27,8 +30,8 @@ public class MCRSolrMimeTypeStrategy implements MCRSolrFileStrategy {
     }
 
     @Override
-    public boolean check(MCRFile file) {
-        String mimeType = MCRXMLFunctions.getMimeType(file.getAbsolutePath());
+    public boolean check(Path file, BasicFileAttributes attrs) {
+        String mimeType = MCRXMLFunctions.getMimeType(file.getFileName().toString());
         return !IGNORE_PATTERN.matcher(mimeType).matches();
     }
 

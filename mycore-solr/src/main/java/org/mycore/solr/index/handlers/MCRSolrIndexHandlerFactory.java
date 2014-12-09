@@ -26,6 +26,8 @@ package org.mycore.solr.index.handlers;
 import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,12 +38,11 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.index.MCRSolrIndexHandler;
-import org.mycore.solr.index.cs.MCRSolrFileContentStream;
-import org.mycore.solr.index.file.MCRSolrMCRFileDocumentFactory;
+import org.mycore.solr.index.cs.MCRSolrPathContentStream;
+import org.mycore.solr.index.file.MCRSolrPathDocumentFactory;
 import org.mycore.solr.index.handlers.document.MCRSolrInputDocumentHandler;
 import org.mycore.solr.index.handlers.stream.MCRSolrFileIndexHandler;
 import org.mycore.solr.index.strategy.MCRSolrIndexStrategyManager;
@@ -54,8 +55,9 @@ public abstract class MCRSolrIndexHandlerFactory {
 
     private static final Logger LOGGER = Logger.getLogger(MCRSolrIndexHandlerFactory.class);
 
-    private static MCRSolrIndexHandlerFactory instance = (MCRSolrIndexHandlerFactory) MCRConfiguration.instance().getInstanceOf(
-        CONFIG_PREFIX + "IndexHandler.Factory", MCRSolrContentStreamHandlerFactory.class.getCanonicalName());
+    private static MCRSolrIndexHandlerFactory instance = (MCRSolrIndexHandlerFactory) MCRConfiguration.instance()
+        .getInstanceOf(CONFIG_PREFIX + "IndexHandler.Factory",
+            MCRSolrContentStreamHandlerFactory.class.getCanonicalName());
 
     public static MCRSolrIndexHandlerFactory getInstance() {
         return instance;
@@ -91,30 +93,32 @@ public abstract class MCRSolrIndexHandlerFactory {
         return getIndexHandler(contentMap);
     }
 
-    public MCRSolrIndexHandler getIndexHandler(MCRFile file, SolrServer solrServer) throws IOException {
-        return this.getIndexHandler(file, solrServer, checkFile(file));
+    public boolean checkFile(Path file, BasicFileAttributes attrs) {
+        return MCRSolrIndexStrategyManager.checkFile(file, attrs);
     }
 
-    public MCRSolrIndexHandler getIndexHandler(MCRFile file, SolrServer solrServer, boolean sendContent) throws IOException {
+    public MCRSolrIndexHandler getIndexHandler(Path file, BasicFileAttributes attrs, SolrServer solrServer)
+        throws IOException {
+        return this.getIndexHandler(file, attrs, solrServer, checkFile(file, attrs));
+    }
+
+    public MCRSolrIndexHandler getIndexHandler(Path file, BasicFileAttributes attrs, SolrServer solrServer,
+        boolean sendContent) throws IOException {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Solr: submitting file \"" + file.getAbsolutePath() + " (" + file.getID() + ")\" for indexing");
+            LOGGER.debug("Solr: submitting file \"" + file.toString() + " for indexing");
         }
         MCRSolrIndexHandler indexHandler;
         long start = System.currentTimeMillis();
         if (sendContent) {
             /* extract metadata with tika */
-            indexHandler = new MCRSolrFileIndexHandler(new MCRSolrFileContentStream(file), solrServer);
+            indexHandler = new MCRSolrFileIndexHandler(new MCRSolrPathContentStream(file, attrs), solrServer);
         } else {
-            SolrInputDocument doc = MCRSolrMCRFileDocumentFactory.getInstance().getDocument(file);
+            SolrInputDocument doc = MCRSolrPathDocumentFactory.getInstance().getDocument(file, attrs);
             indexHandler = new MCRSolrInputDocumentHandler(doc, solrServer);
         }
         long end = System.currentTimeMillis();
         indexHandler.getStatistic().addTime(end - start);
         return indexHandler;
-    }
-
-    public boolean checkFile(MCRFile file) {
-        return MCRSolrIndexStrategyManager.checkFile(file);
     }
 
 }

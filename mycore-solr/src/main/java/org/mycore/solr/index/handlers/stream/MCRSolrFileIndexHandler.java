@@ -3,6 +3,8 @@ package org.mycore.solr.index.handlers.stream;
 import static org.mycore.solr.MCRSolrConstants.EXTRACT_PATH;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -13,9 +15,9 @@ import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.params.ModifiableSolrParams;
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.solr.index.cs.MCRSolrFileContentStream;
-import org.mycore.solr.index.file.MCRSolrMCRFileDocumentFactory;
+import org.mycore.common.MCRUtils;
+import org.mycore.solr.index.cs.MCRSolrPathContentStream;
+import org.mycore.solr.index.file.MCRSolrPathDocumentFactory;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
 
@@ -25,46 +27,46 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
 
     final static float DEFAULT_BOOST = (new SolrInputField(null)).getBoost(); //normally 1.0f
 
-    public MCRSolrFileIndexHandler(MCRSolrFileContentStream stream) {
+    public MCRSolrFileIndexHandler(MCRSolrPathContentStream stream) {
         super(stream);
     }
 
-    public MCRSolrFileIndexHandler(MCRSolrFileContentStream stream, SolrServer solrServer) {
+    public MCRSolrFileIndexHandler(MCRSolrPathContentStream stream, SolrServer solrServer) {
         super(stream, solrServer);
     }
 
     @Override
     public void index() throws SolrServerException, IOException {
-        MCRFile file = getStream().getSource();
-        String solrID = file.getID();
+        Path file = getStream().getSource();
+        String solrID = file.toUri().toString();
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Solr: indexing file \"" + file.getAbsolutePath() + " (" + solrID + ")\"");
+            LOGGER.debug("Solr: indexing file \"" + file.toString() + "\"");
         }
         /* create the update request object */
         ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest(EXTRACT_PATH);
-        MCRSolrFileContentStream fileContentStream = getStream();
+        MCRSolrPathContentStream fileContentStream = getStream();
         updateRequest.addContentStream(fileContentStream);
 
         /* set the additional parameters */
-        updateRequest.setParams(getSolrParams(file));
+        updateRequest.setParams(getSolrParams(file, fileContentStream.getAttrs()));
         updateRequest.setCommitWithin(getCommitWithin());
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Solr: sending binary data (" + file.getAbsolutePath() + " (" + solrID + "), size is "
-                + file.getSizeFormatted() + ") to solr server.");
+            LOGGER.debug("Solr: sending binary data (" + file.toString() + " (" + solrID + "), size is "
+                + MCRUtils.getSizeFormatted(getStream().getAttrs().size()) + ") to solr server.");
         }
         long t = System.currentTimeMillis();
         /* actually send the request */
         getSolrServer().request(updateRequest);
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Solr: sending binary data \"" + file.getAbsolutePath() + " (" + solrID + ")\"" + " done in "
+            LOGGER.debug("Solr: sending binary data \"" + file.toString() + " (" + solrID + ")\"" + " done in "
                 + (System.currentTimeMillis() - t) + "ms");
         }
     }
 
-    private ModifiableSolrParams getSolrParams(MCRFile file) throws IOException {
+    private ModifiableSolrParams getSolrParams(Path file, BasicFileAttributes attrs) throws IOException {
         ModifiableSolrParams params = new ModifiableSolrParams();
-        SolrInputDocument doc = MCRSolrMCRFileDocumentFactory.getInstance().getDocument(file);
+        SolrInputDocument doc = MCRSolrPathDocumentFactory.getInstance().getDocument(file, attrs);
         for (SolrInputField field : doc) {
             String name = "literal." + field.getName();
             if (field.getValueCount() > 1) {
@@ -89,8 +91,8 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
     }
 
     @Override
-    public MCRSolrFileContentStream getStream() {
-        return (MCRSolrFileContentStream) super.getStream();
+    public MCRSolrPathContentStream getStream() {
+        return (MCRSolrPathContentStream) super.getStream();
     }
 
     @Override

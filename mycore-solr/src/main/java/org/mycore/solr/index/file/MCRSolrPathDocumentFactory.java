@@ -26,6 +26,9 @@ package org.mycore.solr.index.file;
 import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.ProviderMismatchException;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -33,17 +36,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.activation.MimetypesFileTypeMap;
-
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.jdom2.Document;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.content.MCRPathContent;
+import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -51,11 +52,11 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs.MCRAudioVideoExtender;
 import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFileContentType;
-import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRContentTypes;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.mets.model.Mets;
 import org.mycore.mets.model.struct.AbstractLogicalDiv;
 import org.mycore.mets.model.struct.LogicalDiv;
@@ -66,28 +67,27 @@ import org.mycore.solr.index.handlers.stream.MCRSolrFileIndexHandler;
 import org.mycore.solr.index.handlers.stream.MCRSolrFilesIndexHandler;
 import org.mycore.urn.services.MCRURNManager;
 
+import com.google.common.io.Files;
+
 /**
  * @author Thomas Scheffler (yagee)
  * 
  */
-public class MCRSolrMCRFileDocumentFactory {
+public class MCRSolrPathDocumentFactory {
 
-    private static final String DEFAULT_CONTENT_TYPE_ID = MCRFileContentTypeFactory.getDefaultType().getID();
+    private static Logger LOGGER = Logger.getLogger(MCRSolrPathDocumentFactory.class);
 
-    private static Logger LOGGER = Logger.getLogger(MCRSolrMCRFileDocumentFactory.class);
-
-    private static MCRSolrMCRFileDocumentFactory instance = MCRConfiguration.instance().<MCRSolrMCRFileDocumentFactory> getInstanceOf(
-            CONFIG_PREFIX + "SolrInputDocument.MCRFile.Factory", (String) null);
+    private static MCRSolrPathDocumentFactory instance = MCRConfiguration.instance()
+        .<MCRSolrPathDocumentFactory> getInstanceOf(CONFIG_PREFIX + "SolrInputDocument.Path.Factory", (String) null);
 
     private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
 
-    private static MimetypesFileTypeMap mimetypesMap = new MimetypesFileTypeMap();
-
-    private static final MCRCache<String, String> derivateModified = new MCRCache<>(10000, "derivateID ISODateString cache");
+    private static final MCRCache<String, String> derivateModified = new MCRCache<>(10000,
+        "derivateID ISODateString cache");
 
     private static MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.instance();
 
-    public static MCRSolrMCRFileDocumentFactory getInstance() {
+    public static MCRSolrPathDocumentFactory getInstance() {
         return instance;
     }
 
@@ -102,70 +102,68 @@ public class MCRSolrMCRFileDocumentFactory {
      * @throws IOException
      * @throws MCRPersistenceException
      */
-    public SolrInputDocument getDocument(MCRFile input) throws IOException, MCRPersistenceException {
+    public SolrInputDocument getDocument(Path input, BasicFileAttributes attr) throws IOException,
+        MCRPersistenceException {
         SolrInputDocument doc = new SolrInputDocument();
-        doc.setField("id", input.getID());
-        MCRObjectID mcrObjID = input.getMCRObjectID();
-        String absolutePath = input.getAbsolutePath();
-        String ownerID = input.getOwnerID();
-        if (mcrObjID == null) {
-            LOGGER.warn("Could not determine MCRObject for file " + absolutePath);
-            doc.setField("returnId", ownerID);
-        } else {
-            doc.setField("returnId", mcrObjID.toString());
-            doc.setField("objectProject", mcrObjID.getProjectId());
+        doc.setField("id", input.toUri());
+        String absolutePath = '/' + input.subpath(0, input.getNameCount()).toString();
+        try {
+            MCRPath mcrPath = MCRPath.toMCRPath(input); //check if this is an MCRPath -> more metadata
+            MCRObjectID mcrObjID = MCRMetadataManager.getObjectId(MCRObjectID.getInstance(mcrPath.getOwner()), 10,
+                TimeUnit.SECONDS);
+            if (mcrObjID == null) {
+                LOGGER.warn("Could not determine MCRObject for file " + absolutePath);
+                doc.setField("returnId", mcrPath.getOwner());
+            } else {
+                doc.setField("returnId", mcrObjID.toString());
+                doc.setField("objectProject", mcrObjID.getProjectId());
+            }
+            String ownerID = mcrPath.getOwner();
+            doc.setField("derivateID", ownerID);
+            String urn = MCRURNManager.getURNForFile(ownerID,
+                absolutePath.substring(0, absolutePath.lastIndexOf("/") + 1), input.getFileName().toString());
+            if (urn != null) {
+                doc.setField("fileURN", urn);
+            }
+            doc.setField("derivateModified", getDerivateModified(ownerID));
+            Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.getInstance()
+                .getLinksFromReference(MCRFile.getCategLinkReference(MCRObjectID.getInstance(ownerID), absolutePath));
+            HashSet<MCRCategoryID> linkedCategories = new HashSet<>(linksFromReference);
+            for (MCRCategoryID category : linksFromReference) {
+                for (MCRCategory parent : CATEGORY_DAO.getParents(category)) {
+                    linkedCategories.add(parent.getId());
+                }
+            }
+            for (MCRCategoryID category : linkedCategories) {
+                doc.addField("fileCategory", category.toString());
+            }
+        } catch (ProviderMismatchException e) {
+            LOGGER.warn("Cannot build all fields as input is not an instance of MCRPath: " + input);
         }
         doc.setField("objectType", "data_file");
-        doc.setField("derivateID", ownerID);
-        doc.setField("fileName", input.getName());
+        doc.setField("fileName", input.getFileName().toString());
         doc.setField("filePath", absolutePath);
-        doc.setField("stream_size", input.getSize());
+        doc.setField("stream_size", attr.size());
         doc.setField("stream_name", absolutePath);
-        doc.setField("stream_source_info", input.getStoreID() + ":" + input.getStorageID());
-        MCRFileContentType contentType = input.getContentType();
-        String mimeType;
-        // if file content type is default: look for correct mime type
-        if (contentType.getID().equals(DEFAULT_CONTENT_TYPE_ID)) {
-            mimeType = mimetypesMap.getContentType(input.getName());
-        } else {
-            mimeType = contentType.getMimeType();
-        }
-        doc.setField("stream_content_type", mimeType);
-        doc.setField("extension", input.getExtension());
-        doc.setField("contentTypeID", input.getContentTypeID());
-        doc.setField("contentType", input.getContentType().getLabel());
-        String urn = MCRURNManager.getURNForFile(ownerID, absolutePath.substring(0, absolutePath.lastIndexOf("/") + 1), input.getName());
-        if (urn != null) {
-            doc.setField("fileURN", urn);
-        }
-        Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.getInstance().getLinksFromReference(
-                MCRFile.getCategLinkReference(MCRObjectID.getInstance(ownerID), absolutePath));
-        HashSet<MCRCategoryID> linkedCategories = new HashSet<>(linksFromReference);
-        for (MCRCategoryID category : linksFromReference) {
-            for (MCRCategory parent : CATEGORY_DAO.getParents(category)) {
-                linkedCategories.add(parent.getId());
-            }
-        }
-        for (MCRCategoryID category : linkedCategories) {
-            doc.addField("fileCategory", category.toString());
-        }
+        doc.setField("stream_source_info", input.toString());
+        doc.setField("stream_content_type", MCRContentTypes.probeContentType(input));
+        doc.setField("extension", Files.getFileExtension(input.getFileName().toString()));
         MCRISO8601Date iDate = new MCRISO8601Date();
-        iDate.setDate(input.getLastModified().getTime());
+        iDate.setDate(new Date(attr.lastModifiedTime().toMillis()));
         doc.setField("modified", iDate.getISOString());
-        doc.setField("derivateModified", getDerivateModified(ownerID));
 
-        if (input.hasAudioVideoExtender()) {
-            MCRAudioVideoExtender ext = input.getAudioVideoExtender();
-            doc.setField("bitRate", ext.getBitRate());
-            doc.setField("frameRate", ext.getFrameRate());
-            doc.setField("duration", ext.getDurationTimecode());
-            doc.setField("mediaType", (ext.hasVideoStream() ? "video" : "audio"));
-        }
+        //        if (input.hasAudioVideoExtender()) {
+        //            MCRAudioVideoExtender ext = input.getAudioVideoExtender();
+        //            doc.setField("bitRate", ext.getBitRate());
+        //            doc.setField("frameRate", ext.getFrameRate());
+        //            doc.setField("duration", ext.getDurationTimecode());
+        //            doc.setField("mediaType", (ext.hasVideoStream() ? "video" : "audio"));
+        //        }
 
         String metsFileName = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
-        if (absolutePath.contains(metsFileName)) {
+        if (input.getFileName().toString().equalsIgnoreCase(metsFileName)) {
             try {
-                Document d = input.getContentAsJDOM();
+                Document d = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRPathContent(input));
                 Mets p = new Mets(d);
                 LogicalStructMap structMap = (LogicalStructMap) p.getStructMap(LogicalStructMap.TYPE);
                 LogicalDiv rootDiv = structMap.getDivContainer();
@@ -181,7 +179,7 @@ public class MCRSolrMCRFileDocumentFactory {
         }
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("MCRFile " + input.getID() + " transformed to:\n" + doc.toString());
+            LOGGER.debug("MCRFile " + input.toString() + " transformed to:\n" + doc.toString());
         }
 
         return doc;
@@ -205,7 +203,7 @@ public class MCRSolrMCRFileDocumentFactory {
      * @throws IOException
      *             thrown by {@link ModifiedHandle#getLastModified()}
      */
-    public static String getDerivateModified(final String derivateID) throws IOException {
+    private static String getDerivateModified(final String derivateID) throws IOException {
         MCRObjectID derID = MCRObjectID.getInstance(derivateID);
         ModifiedHandle modifiedHandle = XML_MANAGER.getLastModifiedHandle(derID, 30, TimeUnit.SECONDS);
         String modified = derivateModified.getIfUpToDate(derivateID, modifiedHandle);

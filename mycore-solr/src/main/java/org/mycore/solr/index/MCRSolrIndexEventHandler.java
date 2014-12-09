@@ -23,6 +23,8 @@
 
 package org.mycore.solr.index;
 
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributeView;
 import java.util.Arrays;
 
 import org.apache.log4j.Logger;
@@ -34,6 +36,7 @@ import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.solr.MCRSolrServerFactory;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
 
@@ -119,8 +122,10 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     @Override
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
         try {
-            MCRSolrIndexer.submitIndexHandler(MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(file,
-                MCRSolrServerFactory.getSolrServer()));
+            MCRPath path = file.toPath();
+            BasicFileAttributeView fileAttributeView = Files.getFileAttributeView(path, BasicFileAttributeView.class);
+            MCRSolrIndexer.submitIndexHandler(MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(path,
+                fileAttributeView.readAttributes(), MCRSolrServerFactory.getSolrServer()));
         } catch (Exception ex) {
             LOGGER.error("Error creating transfer thread for file " + file.toString(), ex);
         }
