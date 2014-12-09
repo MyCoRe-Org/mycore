@@ -37,6 +37,7 @@ import org.jdom2.Document;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -49,6 +50,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.mets.model.MCRMETSGenerator;
 import org.mycore.mets.model.Mets;
 import org.mycore.mets.model.files.FLocat;
+import org.mycore.mets.model.files.File;
 import org.mycore.mets.model.files.FileGrp;
 import org.mycore.mets.model.struct.Fptr;
 import org.mycore.mets.model.struct.PhysicalDiv;
@@ -82,21 +84,22 @@ public class MCRDFGLinkServlet extends MCRServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Derivate is not set");
         }
 
-        String encodedMetsURL = URLEncoder.encode(MCRServlet.getServletBaseURL() + "MCRMETSServlet/" + derivateID + "?XSL.Style=dfg",
-                "UTF-8");
+        String encodedMetsURL = URLEncoder.encode(MCRServlet.getServletBaseURL() + "MCRMETSServlet/" + derivateID
+            + "?XSL.Style=dfg", "UTF-8");
         LOGGER.info(request.getPathInfo());
 
         MCRDirectory dir = MCRDirectory.getRootDirectory(derivateID);
 
         if (dir == null) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, MessageFormat.format("Derivate {0} does not exist.", derivateID));
+            response.sendError(HttpServletResponse.SC_NOT_FOUND,
+                MessageFormat.format("Derivate {0} does not exist.", derivateID));
             return;
         }
         request.setAttribute("XSL.derivateID", derivateID);
         Collection<String> linkList = MCRLinkTableManager.instance().getSourceOf(derivateID);
         if (linkList.isEmpty()) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    MessageFormat.format("Derivate {0} is not linked with a MCRObject. Please contact an administrator.", derivateID));
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, MessageFormat.format(
+                "Derivate {0} is not linked with a MCRObject. Please contact an administrator.", derivateID));
             return;
         }
 
@@ -116,16 +119,16 @@ public class MCRDFGLinkServlet extends MCRServlet {
 
         String dfgURL = "";
         switch (imageNumber) {
-        case -1:
-            response.sendError(HttpServletResponse.SC_CONFLICT,
-                    MessageFormat.format("Image {0} not found in the MCRDerivate. Please contact an administrator.", filePath));
-            return;
-        case -2:
-            dfgURL = "http://dfg-viewer.de/show/?set[mets]=" + encodedMetsURL;
-            break;
-        default:
-            dfgURL = "http://dfg-viewer.de/show/?set[mets]=" + encodedMetsURL + "&set[image]=" + imageNumber;
-            break;
+            case -1:
+                response.sendError(HttpServletResponse.SC_CONFLICT, MessageFormat.format(
+                    "Image \"{0}\" not found in the MCRDerivate. Please contact an administrator.", filePath));
+                return;
+            case -2:
+                dfgURL = "http://dfg-viewer.de/show/?set[mets]=" + encodedMetsURL;
+                break;
+            default:
+                dfgURL = "http://dfg-viewer.de/show/?set[mets]=" + encodedMetsURL + "&set[image]=" + imageNumber;
+                break;
         }
 
         response.sendRedirect(dfgURL);
@@ -139,10 +142,10 @@ public class MCRDFGLinkServlet extends MCRServlet {
             Mets mets = new Mets(metsDoc);
             List<FileGrp> fileGroups = mets.getFileSec().getFileGroups();
             for (FileGrp fileGrp : fileGroups) {
-                List<org.mycore.mets.model.files.File> fileList = fileGrp.getFileList();
-                for (org.mycore.mets.model.files.File file : fileList) {
+                List<File> fileList = fileGrp.getFileList();
+                for (File file : fileList) {
                     FLocat fLocat = file.getFLocat();
-                    if (fLocat.getHref().equals(fileHref))
+                    if (fLocat.getHref().equals(MCRXMLFunctions.encodeURIPath(fileHref)))
                         fileID = file.getId();
                 }
             }
@@ -182,7 +185,8 @@ public class MCRDFGLinkServlet extends MCRServlet {
 
         try {
             job.getRequest().setAttribute("XSL.derivateID", derivate);
-            job.getRequest().setAttribute("XSL.objectID", MCRLinkTableManager.instance().getSourceOf(derivate).iterator().next());
+            job.getRequest().setAttribute("XSL.objectID",
+                MCRLinkTableManager.instance().getSourceOf(derivate).iterator().next());
         } catch (Exception x) {
             LOGGER.warn("Unable to set \"XSL.objectID\" attribute to current request", x);
         }
