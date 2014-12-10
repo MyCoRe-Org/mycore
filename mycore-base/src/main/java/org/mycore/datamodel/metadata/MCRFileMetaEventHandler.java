@@ -23,12 +23,15 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.events.MCREvent;
+import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
@@ -36,13 +39,14 @@ import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileEventHandlerBase;
+import org.mycore.datamodel.niofs.MCRPath;
 
 /**
  * Handles category links to files
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRFileMetaEventHandler extends MCRFileEventHandlerBase {
+public class MCRFileMetaEventHandler extends MCREventHandlerBase {
     private static MCRCategLinkService CATEGLINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
 
     private static Logger LOGGER = Logger.getLogger(MCRFileMetaEventHandler.class);
@@ -92,15 +96,19 @@ public class MCRFileMetaEventHandler extends MCRFileEventHandlerBase {
     }
 
     @Override
-    protected void handleFileDeleted(MCREvent evt, MCRFile file) {
-        MCRObjectID derivateID = MCRObjectID.getInstance(file.getOwnerID());
+    protected void handlePathDeleted(MCREvent evt, Path path, BasicFileAttributes attrs) {
+        if (attrs.isDirectory()) {
+            return;
+        }
+        MCRPath mcrPath = MCRPath.toMCRPath(path);
+        MCRObjectID derivateID = MCRObjectID.getInstance(mcrPath.getOwner());
         if (!MCRMetadataManager.exists(derivateID)) {
-            LOGGER.warn("Derivate " + derivateID + " from file '" + file + "' does not exist.");
+            LOGGER.warn("Derivate " + derivateID + " from file '" + path + "' does not exist.");
             return;
         }
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
         MCRObjectDerivate objectDerivate = derivate.getDerivate();
-        if (objectDerivate.deleteFileMetaData(file.getAbsolutePath())) {
+        if (objectDerivate.deleteFileMetaData('/' + path.subpath(0, path.getNameCount()).toString())) {
             MCRMetadataManager.update(derivate);
         }
     }
