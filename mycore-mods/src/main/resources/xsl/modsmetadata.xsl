@@ -471,19 +471,24 @@
       </xsl:choose>
     </xsl:variable>
 
-    <xsl:if test="mods:role/mods:roleTerm='aut'">
-      <xsl:variable name="propType">
-        <xsl:choose>
-          <xsl:when test="@type='corporate'"><xsl:text>Organisation</xsl:text></xsl:when>
-          <xsl:otherwise><xsl:text>Person</xsl:text></xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="mods:role/mods:roleTerm='aut'">
+        <xsl:variable name="propType">
+          <xsl:choose>
+            <xsl:when test="@type='corporate'"><xsl:text>Organisation</xsl:text></xsl:when>
+            <xsl:otherwise><xsl:text>Person</xsl:text></xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
 
-      <span property="author" typeof="{$propType}">
+        <span property="author" typeof="{$propType}">
+          <xsl:value-of select="$personName" />
+          <meta property="name" content="{$personName}"/>
+        </span>
+      </xsl:when>
+      <xsl:otherwise>
         <xsl:value-of select="$personName" />
-        <meta property="name" content="{$personName}"/>
-      </span>
-    </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="mods:name" mode="present"><!-- ToDo: all authors, rev ... in one column -->
