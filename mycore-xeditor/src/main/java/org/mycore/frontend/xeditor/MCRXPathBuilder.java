@@ -26,6 +26,7 @@ package org.mycore.frontend.xeditor;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.Namespace;
 import org.jdom2.Parent;
 
 /**
@@ -58,9 +59,22 @@ public class MCRXPathBuilder {
             parentXPath += "/";
         return parentXPath + buildChildPath(element);
     }
-    
+
     public static String buildChildPath(Element element) {
-        return element.getQualifiedName() + buildPositionPredicate(element);
+        return getNamespacePrefix(element) + element.getName() + buildPositionPredicate(element);
+    }
+
+    public static String getNamespacePrefix(Element element) {
+        Namespace nsElement = element.getNamespace();
+        for (Namespace ns : MCRUsedNamespaces.getNamespaces())
+            if (ns.equals(nsElement))
+                return ns.getPrefix() + ":";
+
+        String prefix = nsElement.getPrefix();
+        if ((prefix != null) && !prefix.isEmpty())
+            return prefix + ":";
+        else
+            return "";
     }
 
     private static String buildPositionPredicate(Element element) {

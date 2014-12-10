@@ -63,4 +63,18 @@ public class MCRXPathBuilderTest extends MCRTestCase {
         assertEquals("root", MCRXPathBuilder.buildXPath(root));
         assertEquals("root/contributor", MCRXPathBuilder.buildXPath(author));
     }
+
+    @Test
+    public void testMODS() {
+        Element container = new Element("container");
+        new Document(container);
+        Element mods = new Element("mods", "http://www.loc.gov/mods/v3");
+        Element name = new Element("name", "http://www.loc.gov/mods/v3");
+        mods.addContent(name);
+        container.addContent(mods);
+
+        assertEquals("/container", MCRXPathBuilder.buildXPath(container));
+        assertEquals("/container/mods:mods", MCRXPathBuilder.buildXPath(mods));
+        assertEquals("/container/mods:mods/mods:name", MCRXPathBuilder.buildXPath(name));
+    }
 }
