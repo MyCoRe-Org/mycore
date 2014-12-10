@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xalan="http://xml.apache.org/xalan" xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform" exclude-result-prefixes="xalan">
+  <xsl:param name="WebApplicationBaseURL" />
   <xsl:variable name="relacode" select="document('resource:relacode.xml')/relacode" />
   <xsl:template match="mycoreobject[contains(@ID,'_mods_')]" mode="mods">
     <xsl:apply-templates mode="mods2mods" />
@@ -38,6 +39,11 @@
       <mods:identifier type="citekey">
         <xsl:value-of select="$mycoreobject/@ID" />
       </mods:identifier>
+      <xsl:if test="not(mods:identifier[@type='uri']) and string-length($WebApplicationBaseURL)&gt;0">
+        <mods:identifier type="uri">
+          <xsl:value-of select="concat($WebApplicationBaseURL,'receive/',$mycoreobject/@ID)" />
+        </mods:identifier>
+      </xsl:if>
     </xsl:copy>
   </xsl:template>
 
@@ -61,7 +67,8 @@
       <!-- additional journals data -->
         <mods:genre authority="marcgt">book</mods:genre>
       </xsl:when>
-      <xsl:when test="contains(@valueURI,'thesis') or contains(@valueURI,'#dissertation') or contains(@valueURI,'#habilitation') or contains(@valueURI,'#student_resarch_project')">
+      <xsl:when
+        test="contains(@valueURI,'thesis') or contains(@valueURI,'#dissertation') or contains(@valueURI,'#habilitation') or contains(@valueURI,'#student_resarch_project')">
       <!-- additional journals data -->
         <mods:genre authority="marcgt">thesis</mods:genre>
       </xsl:when>
