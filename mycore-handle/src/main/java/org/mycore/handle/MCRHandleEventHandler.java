@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.ifs.MCRFileEventHandlerBase;
 
 /**
  * Class handles events related to ... handles. 
@@ -11,7 +12,7 @@ import org.mycore.datamodel.ifs.MCRFile;
  * @author shermann
  *
  */
-public class MCRHandleEventHandler extends MCREventHandlerBase {
+public class MCRHandleEventHandler extends MCRFileEventHandlerBase {
     private static final Logger LOGGER = Logger.getLogger(MCRHandleEventHandler.class);
 
     @Override

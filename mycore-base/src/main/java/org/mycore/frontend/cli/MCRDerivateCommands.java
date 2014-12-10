@@ -47,6 +47,7 @@ import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.ifs.MCRFileEventHandlerBase;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -648,7 +649,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             }
         } else {
             // handle events
-            MCREvent evt = new MCREvent(MCREvent.FILE_TYPE, MCREvent.REPAIR_EVENT);
+            MCREvent evt = new MCREvent(MCRFileEventHandlerBase.FILE_TYPE, MCREvent.REPAIR_EVENT);
             evt.put("file", thisnode);
             MCREventManager.instance().handleEvent(evt);
             String fn = ((MCRFile) thisnode).getAbsolutePath();

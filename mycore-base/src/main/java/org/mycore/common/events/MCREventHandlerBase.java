@@ -25,7 +25,6 @@ package org.mycore.common.events;
 
 import org.apache.log4j.Logger;
 import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 
@@ -91,29 +90,6 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 return;
             }
             logger.warn("Can't find method for " + MCREvent.DERIVATE_TYPE + " for event type " + evt.getEventType());
-            return;
-        }
-
-        if (evt.getObjectType().equals(MCREvent.FILE_TYPE)) {
-            MCRFile file = (MCRFile) evt.get("file");
-            if (file != null) {
-                logger.debug(getClass().getName() + " handling " + file.getOwnerID() + "/" + file.getAbsolutePath() + " " + evt.getEventType());
-                if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
-                    handleFileCreated(evt, file);
-                } else if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
-                    handleFileUpdated(evt, file);
-                } else if (evt.getEventType().equals(MCREvent.DELETE_EVENT)) {
-                    handleFileDeleted(evt, file);
-                } else if (evt.getEventType().equals(MCREvent.REPAIR_EVENT)) {
-                    handleFileRepaired(evt, file);
-                } else if (evt.getEventType().equals(MCREvent.INDEX_EVENT)) {
-                    updateFileIndex(evt, file);
-                } else {
-                    logger.warn("Can't find method for file data handler for event type " + evt.getEventType());
-                }
-                return;
-            }
-            logger.warn("Can't find method for " + MCREvent.FILE_TYPE + " for event type " + evt.getEventType());
             return;
         }
 
@@ -188,27 +164,6 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 return;
             }
             logger.warn("Can't find method for " + MCREvent.DERIVATE_TYPE + " for event type " + evt.getEventType());
-            return;
-        }
-
-        if (evt.getObjectType().equals(MCREvent.FILE_TYPE)) {
-            MCRFile file = (MCRFile) evt.get("file");
-            if (file != null) {
-                logger.debug(getClass().getName() + " handling " + file.getOwnerID() + "/" + file.getAbsolutePath() + " " + evt.getEventType());
-                if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
-                    undoFileCreated(evt, file);
-                } else if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
-                    undoFileUpdated(evt, file);
-                } else if (evt.getEventType().equals(MCREvent.DELETE_EVENT)) {
-                    undoFileDeleted(evt, file);
-                } else if (evt.getEventType().equals(MCREvent.REPAIR_EVENT)) {
-                    undoFileRepaired(evt, file);
-                } else {
-                    logger.warn("Can't find method for file data handler for event type " + evt.getEventType());
-                }
-                return;
-            }
-            logger.warn("Can't find method for " + MCREvent.FILE_TYPE + " for event type " + evt.getEventType());
             return;
         }
 
@@ -401,58 +356,6 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     }
 
     /**
-     * Handles file created events. This implementation does nothing and should
-     * be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param file
-     *            the MCRFile that caused the event
-     */
-    protected void handleFileCreated(MCREvent evt, MCRFile file) {
-        doNothing(evt, file);
-    }
-
-    /**
-     * Handles file updated events. This implementation does nothing and should
-     * be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param file
-     *            the MCRFile that caused the event
-     */
-    protected void handleFileUpdated(MCREvent evt, MCRFile file) {
-        doNothing(evt, file);
-    }
-
-    /**
-     * Handles file deleted events. This implementation does nothing and should
-     * be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param file
-     *            the MCRFile that caused the event
-     */
-    protected void handleFileDeleted(MCREvent evt, MCRFile file) {
-        doNothing(evt, file);
-    }
-
-    /**
-     * Handles file repair events. This implementation does nothing and should
-     * be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param file
-     *            the MCRFile that caused the event
-     */
-    protected void handleFileRepaired(MCREvent evt, MCRFile file) {
-        doNothing(evt, file);
-    }
-
-    /**
      * Handles undo of classification created events. This implementation does nothing
      * and should be overwritted by subclasses.
      * 
@@ -608,67 +511,6 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
         doNothing(evt, der);
     }
 
-    /**
-     * Handles undo of file created events. This implementation does nothing and
-     * should be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param file
-     *            the MCRFile that caused the event
-     */
-    protected void undoFileCreated(MCREvent evt, MCRFile file) {
-        doNothing(evt, file);
-    }
-
-    /**
-     * Handles undo of file updated events. This implementation does nothing and
-     * should be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param file
-     *            the MCRFile that caused the event
-     */
-    protected void undoFileUpdated(MCREvent evt, MCRFile file) {
-        doNothing(evt, file);
-    }
-
-    /**
-     * Handles undo of file deleted events. This implementation does nothing and
-     * should be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param file
-     *            the MCRFile that caused the event
-     */
-    protected void undoFileDeleted(MCREvent evt, MCRFile file) {
-        doNothing(evt, file);
-    }
-
-    /**
-     * Handles undo of file repair events. This implementation does nothing and
-     * should be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param file
-     *            the MCRFile that caused the event
-     */
-    protected void undoFileRepaired(MCREvent evt, MCRFile file) {
-        doNothing(evt, file);
-    }
-
-    /**
-     * Updates the index content of the given file.
-     * 
-     * @param evt
-     * @param file
-     */
-    protected void updateFileIndex(MCREvent evt, MCRFile file) {
-        doNothing(evt, file);
-    }
     /**
      * Updates the index content of the given file.
      * 

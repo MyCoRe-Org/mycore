@@ -6,6 +6,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.ifs.MCRFileEventHandlerBase;
 import org.mycore.iview2.frontend.MCRIView2Commands;
 import org.mycore.iview2.services.MCRTilingQueue;
 
@@ -14,7 +15,7 @@ import org.mycore.iview2.services.MCRTilingQueue;
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRImageTileEventHandler extends MCREventHandlerBase {
+public class MCRImageTileEventHandler extends MCRFileEventHandlerBase {
 
     MCRTilingQueue tq = MCRTilingQueue.getInstance();
 

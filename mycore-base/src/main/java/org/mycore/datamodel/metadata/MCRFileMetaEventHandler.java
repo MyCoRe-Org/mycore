@@ -29,20 +29,20 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.events.MCREvent;
-import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.ifs.MCRFileEventHandlerBase;
 
 /**
  * Handles category links to files
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRFileMetaEventHandler extends MCREventHandlerBase {
+public class MCRFileMetaEventHandler extends MCRFileEventHandlerBase {
     private static MCRCategLinkService CATEGLINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
 
     private static Logger LOGGER = Logger.getLogger(MCRFileMetaEventHandler.class);
@@ -79,7 +79,7 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
                 LOGGER.warn("File is linked to category but does not exist:" + der.getId() + ref.getObjectID());
                 continue;
             }
-            MCREvent fileEvent = new MCREvent(MCREvent.FILE_TYPE, MCREvent.INDEX_EVENT);
+            MCREvent fileEvent = new MCREvent(MCRFileEventHandlerBase.FILE_TYPE, MCREvent.INDEX_EVENT);
             fileEvent.put("file", file);
             MCREventManager.instance().handleEvent(fileEvent);
         }

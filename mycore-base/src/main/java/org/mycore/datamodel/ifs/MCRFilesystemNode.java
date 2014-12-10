@@ -272,11 +272,11 @@ public abstract class MCRFilesystemNode {
     }
 
     protected void fireUpdateEvent() {
-        String nodeType = MCREvent.FILE_TYPE;
+        String nodeType = MCRFileEventHandlerBase.FILE_TYPE;
         String dataType = "file";
 
         if (this instanceof MCRDirectory) {
-            nodeType = MCREvent.DIRECTORY_TYPE;
+            nodeType = MCRFileEventHandlerBase.DIRECTORY_TYPE;
             dataType = "dir";
         }
 

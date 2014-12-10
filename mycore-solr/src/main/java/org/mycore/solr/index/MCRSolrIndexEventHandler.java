@@ -33,6 +33,7 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.ifs.MCRFileEventHandlerBase;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -44,7 +45,7 @@ import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
+public class MCRSolrIndexEventHandler extends MCRFileEventHandlerBase {
 
     private static final Logger LOGGER = Logger.getLogger(MCRSolrIndexEventHandler.class);
 

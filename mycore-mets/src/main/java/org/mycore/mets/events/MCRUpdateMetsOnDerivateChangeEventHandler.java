@@ -8,6 +8,7 @@ import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.ifs.MCRFileEventHandlerBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -19,7 +20,7 @@ import org.mycore.mets.tools.MCRMetsSave;
  * 
  * @author shermann
  */
-public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBase {
+public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCRFileEventHandlerBase {
     private static final Logger LOGGER = Logger.getLogger(MCRUpdateMetsOnDerivateChangeEventHandler.class);
     private String mets = MCRMetsSave.getMetsFileName();
 
