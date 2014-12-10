@@ -23,6 +23,12 @@
 
 package org.mycore.common.events;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributeView;
+import java.nio.file.attribute.BasicFileAttributes;
+
 import org.apache.log4j.Logger;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -93,6 +99,41 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
             return;
         }
 
+        if (evt.getObjectType().equals(MCREvent.PATH_TYPE)) {
+            Path path = (Path) evt.get(MCREvent.PATH_KEY);
+            if (path != null) {
+                if (!path.isAbsolute()) {
+                    logger.warn("Cannot handle path events on non absolute paths: " + path.toString());
+                }
+                logger.debug(getClass().getName() + " handling " + path.toString() + " " + evt.getEventType());
+                BasicFileAttributes attrs = (BasicFileAttributes) evt.get(MCREvent.FILEATTR_KEY);
+                if (attrs == null && !evt.getEventType().equals(MCREvent.DELETE_EVENT)) {
+                    logger.warn("BasicFileAttributes for " + path + " was not given. Resolving now.");
+                    try {
+                        attrs = Files.getFileAttributeView(path, BasicFileAttributeView.class).readAttributes();
+                    } catch (IOException e) {
+                        logger.error("Could not get BasicFileAttributes from path: " + path, e);
+                    }
+                }
+                if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
+                    handlePathCreated(evt, path, attrs);
+                } else if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
+                    handlePathUpdated(evt, path, attrs);
+                } else if (evt.getEventType().equals(MCREvent.DELETE_EVENT)) {
+                    handlePathDeleted(evt, path, attrs);
+                } else if (evt.getEventType().equals(MCREvent.REPAIR_EVENT)) {
+                    handlePathRepaired(evt, path, attrs);
+                } else if (evt.getEventType().equals(MCREvent.INDEX_EVENT)) {
+                    updatePathIndex(evt, path, attrs);
+                } else {
+                    logger.warn("Can't find method for Path data handler for event type " + evt.getEventType());
+                }
+                return;
+            }
+            logger.warn("Can't find method for " + MCREvent.PATH_TYPE + " for event type " + evt.getEventType());
+            return;
+        }
+
         if (evt.getObjectType().equals(MCREvent.CLASS_TYPE)) {
             MCRCategory cl = (MCRCategory) evt.get("class");
             if (cl != null) {
@@ -106,7 +147,8 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 } else if (evt.getEventType().equals(MCREvent.REPAIR_EVENT)) {
                     handleClassificationRepaired(evt, cl);
                 } else {
-                    logger.warn("Can't find method for a classification data handler for event type " + evt.getEventType());
+                    logger.warn("Can't find method for a classification data handler for event type "
+                        + evt.getEventType());
                 }
                 return;
             }
@@ -167,6 +209,39 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
             return;
         }
 
+        if (evt.getObjectType().equals(MCREvent.PATH_TYPE)) {
+            Path path = (Path) evt.get(MCREvent.PATH_KEY);
+            if (path != null) {
+                if (!path.isAbsolute()) {
+                    logger.warn("Cannot handle path events on non absolute paths: " + path.toString());
+                }
+                logger.debug(getClass().getName() + " handling " + path.toString() + " " + evt.getEventType());
+                BasicFileAttributes attrs = (BasicFileAttributes) evt.get(MCREvent.FILEATTR_KEY);
+                if (attrs == null && !evt.getEventType().equals(MCREvent.DELETE_EVENT)) {
+                    logger.warn("BasicFileAttributes for " + path + " was not given. Resolving now.");
+                    try {
+                        attrs = Files.getFileAttributeView(path, BasicFileAttributeView.class).readAttributes();
+                    } catch (IOException e) {
+                        logger.error("Could not get BasicFileAttributes from path: " + path, e);
+                    }
+                }
+                if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
+                    undoPathCreated(evt, path, attrs);
+                } else if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
+                    undoPathUpdated(evt, path, attrs);
+                } else if (evt.getEventType().equals(MCREvent.DELETE_EVENT)) {
+                    undoPathDeleted(evt, path, attrs);
+                } else if (evt.getEventType().equals(MCREvent.REPAIR_EVENT)) {
+                    undoPathRepaired(evt, path, attrs);
+                } else {
+                    logger.warn("Can't find method for Path data handler for event type " + evt.getEventType());
+                }
+                return;
+            }
+            logger.warn("Can't find method for " + MCREvent.PATH_TYPE + " for event type " + evt.getEventType());
+            return;
+        }
+
         if (evt.getObjectType().equals(MCREvent.CLASS_TYPE)) {
             MCRCategory obj = (MCRCategory) evt.get("class");
             if (obj != null) {
@@ -180,7 +255,8 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 } else if (evt.getEventType().equals(MCREvent.REPAIR_EVENT)) {
                     undoClassificationRepaired(evt, obj);
                 } else {
-                    logger.warn("Can't find method for an classification data handler for event type " + evt.getEventType());
+                    logger.warn("Can't find method for an classification data handler for event type "
+                        + evt.getEventType());
                 }
                 return;
             }
@@ -192,7 +268,8 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
 
     /** This method does nothing. It is very useful for debugging events. */
     public void doNothing(MCREvent evt, Object obj) {
-        logger.debug(getClass().getName() + " does nothing on " + evt.getEventType() + " " + evt.getObjectType() + " " + obj.getClass().getName());
+        logger.debug(getClass().getName() + " does nothing on " + evt.getEventType() + " " + evt.getObjectType() + " "
+            + obj.getClass().getName());
     }
 
     /**
@@ -355,6 +432,26 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
         doNothing(evt, der);
     }
 
+    protected void handlePathUpdated(MCREvent evt, Path path, BasicFileAttributes attrs) {
+        doNothing(evt, path);
+    }
+
+    protected void handlePathDeleted(MCREvent evt, Path path, BasicFileAttributes attrs) {
+        doNothing(evt, path);
+    }
+
+    protected void handlePathRepaired(MCREvent evt, Path path, BasicFileAttributes attrs) {
+        doNothing(evt, path);
+    }
+
+    protected void updatePathIndex(MCREvent evt, Path path, BasicFileAttributes attrs) {
+        doNothing(evt, path);
+    }
+
+    protected void handlePathCreated(MCREvent evt, Path path, BasicFileAttributes attrs) {
+        doNothing(evt, path);
+    }
+
     /**
      * Handles undo of classification created events. This implementation does nothing
      * and should be overwritted by subclasses.
@@ -509,6 +606,22 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      */
     protected void undoDerivateRepaired(MCREvent evt, MCRDerivate der) {
         doNothing(evt, der);
+    }
+
+    protected void undoPathCreated(MCREvent evt, Path path, BasicFileAttributes attrs) {
+        doNothing(evt, path);
+    }
+
+    protected void undoPathUpdated(MCREvent evt, Path path, BasicFileAttributes attrs) {
+        doNothing(evt, path);
+    }
+
+    protected void undoPathDeleted(MCREvent evt, Path path, BasicFileAttributes attrs) {
+        doNothing(evt, path);
+    }
+
+    protected void undoPathRepaired(MCREvent evt, Path path, BasicFileAttributes attrs) {
+        doNothing(evt, path);
     }
 
     /**

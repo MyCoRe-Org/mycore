@@ -16,6 +16,8 @@
 package org.mycore.datamodel.ifs;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,6 +27,9 @@ import java.util.Vector;
 
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUsageException;
+import org.mycore.common.events.MCREvent;
+import org.mycore.common.events.MCREventManager;
+import org.mycore.datamodel.niofs.MCRFileAttributes;
 
 /**
  * Represents a directory node with its metadata and content.
@@ -97,8 +102,8 @@ public class MCRDirectory extends MCRFilesystemNode {
     /**
      * Internal constructor, do not use on your own.
      */
-    MCRDirectory(String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, int numchdd,
-            int numchdf, int numchtd, int numchtf) {
+    MCRDirectory(String ID, String parentID, String ownerID, String name, String label, long size,
+        GregorianCalendar date, int numchdd, int numchdf, int numchtd, int numchtf) {
         super(ID, parentID, ownerID, name, label, size, date);
 
         numChildDirsHere = numchdd;
@@ -344,6 +349,12 @@ public class MCRDirectory extends MCRFilesystemNode {
         return getNumChildren(NODES, HERE) > 0;
     }
 
+    @Override
+    protected BasicFileAttributes getBasicFileAttributes() {
+        return MCRFileAttributes
+            .directory(getID(), getSize(), FileTime.fromMillis(getLastModified().getTimeInMillis()));
+    }
+
     /** Constant for choosing file nodes * */
     public final static int FILES = 1;
 
@@ -421,8 +432,12 @@ public class MCRDirectory extends MCRFilesystemNode {
         for (int i = getNumChildren(NODES, HERE) - 1; i >= 0; i--) {
             getChild(i).delete();
         }
-
+        BasicFileAttributes attrs = getBasicFileAttributes();
         super.delete();
+        MCREvent evt = new MCREvent(MCREvent.PATH_TYPE, MCREvent.DELETE_EVENT);
+        evt.put(MCREvent.PATH_KEY, toPath());
+        evt.put(MCREvent.FILEATTR_KEY, attrs);
+        MCREventManager.instance().handleEvent(evt);
 
         children = null;
         numChildDirsHere = 0;

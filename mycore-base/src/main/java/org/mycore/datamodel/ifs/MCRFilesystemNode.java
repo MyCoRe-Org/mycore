@@ -10,6 +10,7 @@
 package org.mycore.datamodel.ifs;
 
 import java.io.IOException;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -272,16 +273,10 @@ public abstract class MCRFilesystemNode {
     }
 
     protected void fireUpdateEvent() {
-        String nodeType = MCRFileEventHandlerBase.FILE_TYPE;
-        String dataType = "file";
-
-        if (this instanceof MCRDirectory) {
-            nodeType = MCRFileEventHandlerBase.DIRECTORY_TYPE;
-            dataType = "dir";
-        }
-
-        MCREvent event = new MCREvent(nodeType, MCREvent.UPDATE_EVENT);
-        event.put(dataType, this);
+        MCREvent event = new MCREvent(MCREvent.PATH_TYPE, MCREvent.UPDATE_EVENT);
+        event.put(MCRFileEventHandlerBase.FILE_TYPE, this); //to support old events
+        event.put(MCREvent.PATH_KEY, toPath());
+        event.put(MCREvent.FILEATTR_KEY, getBasicFileAttributes());
         MCREventManager.instance().handleEvent(event);
     }
 
@@ -364,6 +359,8 @@ public abstract class MCRFilesystemNode {
     public MCRPath toPath() {
         return MCRAbstractFileSystem.getPath(ownerID, getAbsolutePath(), MCRFileSystemProvider.getMCRIFSFileSystem());
     }
+
+    protected abstract BasicFileAttributes getBasicFileAttributes();
 
     /**
      * Returns the node size as number of bytes

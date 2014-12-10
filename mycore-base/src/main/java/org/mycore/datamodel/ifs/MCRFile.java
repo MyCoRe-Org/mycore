@@ -24,6 +24,7 @@ import java.nio.charset.Charset;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileTime;
 import java.util.Collection;
@@ -51,6 +52,7 @@ import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.ifs1.MCRFileChannel;
 import org.xml.sax.SAXException;
 
@@ -447,8 +449,10 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 
         // If file content has changed, call event handlers to index content
         String type = isNew() ? MCREvent.CREATE_EVENT : MCREvent.UPDATE_EVENT;
-        MCREvent event = new MCREvent(MCRFileEventHandlerBase.FILE_TYPE, type);
-        event.put("file", this);
+        MCREvent event = new MCREvent(MCREvent.PATH_TYPE, type);
+        event.put(MCRFileEventHandlerBase.FILE_TYPE, this); //to support old events
+        event.put(MCREvent.PATH_KEY, toPath());
+        event.put(MCREvent.FILEATTR_KEY, getBasicFileAttributes());
         MCREventManager.instance().handleEvent(event);
         setNew(false);
     }
@@ -463,11 +467,14 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         ensureNotDeleted();
 
         if (storageID.length() != 0) {
+            BasicFileAttributes attrs = getBasicFileAttributes();
             getContentStore().deleteContent(storageID);
 
             // Call event handlers to update indexed content
-            MCREvent event = new MCREvent(MCRFileEventHandlerBase.FILE_TYPE, MCREvent.DELETE_EVENT);
-            event.put("file", this);
+            MCREvent event = new MCREvent(MCREvent.PATH_TYPE, MCREvent.DELETE_EVENT);
+            event.put(MCRFileEventHandlerBase.FILE_TYPE, this); //to support old events
+            event.put(MCREvent.PATH_KEY, toPath());
+            event.put(MCREvent.FILEATTR_KEY, attrs);
             MCREventManager.instance().handleEvent(event);
 
             if (hasParent()) {
@@ -716,6 +723,12 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 
     private void setNew(boolean isNew) {
         this.isNew = isNew;
+    }
+
+    @Override
+    protected BasicFileAttributes getBasicFileAttributes() {
+        return MCRFileAttributes.file(getID(), getSize(), getMD5(),
+            FileTime.fromMillis(getLastModified().getTimeInMillis()));
     }
 
 }

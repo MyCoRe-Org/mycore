@@ -3,9 +3,13 @@
  */
 package org.mycore.datamodel.ifs;
 
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+
 import org.apache.log4j.Logger;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.datamodel.niofs.ifs1.MCRIFSFileSystem;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -82,6 +86,112 @@ public class MCRFileEventHandlerBase extends MCREventHandlerBase {
         }
 
         super.undoHandleEvent(evt);
+    }
+
+    private void fireMCRFileEvent(MCREvent source, Path path, BasicFileAttributes attrs) {
+        MCREvent target = toMCRFileEvent(source, path, attrs);
+        if (target != null) {
+            doHandleEvent(target);
+        }
+    }
+
+    private MCREvent toMCRFileEvent(MCREvent source, Path path, BasicFileAttributes attrs) {
+        if (!(path.getFileSystem() instanceof MCRIFSFileSystem)) {
+            LOGGER.error("Cannot transform path from " + path.getFileSystem() + " to MCRFile.");
+            return null;
+        }
+        if (attrs != null && !attrs.isDirectory()) {
+            MCREvent target = new MCREvent(FILE_TYPE, source.getEventType());
+            target.putAll(source);//includes probably "file";
+            if (!target.contains(FILE_TYPE)) {
+                if (target.getEventType().equals(MCREvent.DELETE_EVENT)) {
+                    LOGGER.warn("Could not restore MCRFile for Path event: " + path);
+                    return null;
+                } else {
+                    MCRFile file = MCRFile.getFile(attrs.fileKey().toString()); //fileKey is always internal id;
+                    if (file == null) {
+                        LOGGER
+                            .warn("Could not restore MCRFile with id " + attrs.fileKey() + " for Path event: " + path);
+                        return null;
+                    }
+                    target.put(MCRFILE_EVENT_KEY, file);
+                }
+            }
+            LOGGER.info("Transformed " + source + " -> " + target);
+            return target;
+        }
+        return null;
+    }
+
+    private void fireUndoMCRFileEvent(MCREvent source, Path path, BasicFileAttributes attrs) {
+        MCREvent target = toMCRFileEvent(source, path, attrs);
+        if (target != null) {
+            undoHandleEvent(target);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.mycore.common.events.MCREventHandlerBase#handlePathUpdated(org.mycore.common.events.MCREvent, java.nio.file.Path, java.nio.file.attribute.BasicFileAttributes)
+     */
+    @Override
+    protected void handlePathUpdated(MCREvent evt, Path path, BasicFileAttributes attrs) {
+        fireMCRFileEvent(evt, path, attrs);
+    }
+
+    /* (non-Javadoc)
+     * @see org.mycore.common.events.MCREventHandlerBase#handlePathDeleted(org.mycore.common.events.MCREvent, java.nio.file.Path, java.nio.file.attribute.BasicFileAttributes)
+     */
+    @Override
+    protected void handlePathDeleted(MCREvent evt, Path path, BasicFileAttributes attrs) {
+        fireMCRFileEvent(evt, path, attrs);
+    }
+
+    /* (non-Javadoc)
+     * @see org.mycore.common.events.MCREventHandlerBase#handlePathRepaired(org.mycore.common.events.MCREvent, java.nio.file.Path, java.nio.file.attribute.BasicFileAttributes)
+     */
+    @Override
+    protected void handlePathRepaired(MCREvent evt, Path path, BasicFileAttributes attrs) {
+        fireMCRFileEvent(evt, path, attrs);
+    }
+
+    /* (non-Javadoc)
+     * @see org.mycore.common.events.MCREventHandlerBase#handlePathCreated(org.mycore.common.events.MCREvent, java.nio.file.Path, java.nio.file.attribute.BasicFileAttributes)
+     */
+    @Override
+    protected void handlePathCreated(MCREvent evt, Path path, BasicFileAttributes attrs) {
+        fireMCRFileEvent(evt, path, attrs);
+    }
+
+    /* (non-Javadoc)
+     * @see org.mycore.common.events.MCREventHandlerBase#undoPathCreated(org.mycore.common.events.MCREvent, java.nio.file.Path, java.nio.file.attribute.BasicFileAttributes)
+     */
+    @Override
+    protected void undoPathCreated(MCREvent evt, Path path, BasicFileAttributes attrs) {
+        fireUndoMCRFileEvent(evt, path, attrs);
+    }
+
+    /* (non-Javadoc)
+     * @see org.mycore.common.events.MCREventHandlerBase#undoPathUpdated(org.mycore.common.events.MCREvent, java.nio.file.Path, java.nio.file.attribute.BasicFileAttributes)
+     */
+    @Override
+    protected void undoPathUpdated(MCREvent evt, Path path, BasicFileAttributes attrs) {
+        fireUndoMCRFileEvent(evt, path, attrs);
+    }
+
+    /* (non-Javadoc)
+     * @see org.mycore.common.events.MCREventHandlerBase#undoPathDeleted(org.mycore.common.events.MCREvent, java.nio.file.Path, java.nio.file.attribute.BasicFileAttributes)
+     */
+    @Override
+    protected void undoPathDeleted(MCREvent evt, Path path, BasicFileAttributes attrs) {
+        fireUndoMCRFileEvent(evt, path, attrs);
+    }
+
+    /* (non-Javadoc)
+     * @see org.mycore.common.events.MCREventHandlerBase#undoPathRepaired(org.mycore.common.events.MCREvent, java.nio.file.Path, java.nio.file.attribute.BasicFileAttributes)
+     */
+    @Override
+    protected void undoPathRepaired(MCREvent evt, Path path, BasicFileAttributes attrs) {
+        fireUndoMCRFileEvent(evt, path, attrs);
     }
 
     /**

@@ -46,7 +46,7 @@ public class MCREvent extends java.util.Hashtable<String, Object> {
     final static public String DELETE_EVENT = "delete";
 
     final static public String REPAIR_EVENT = "repair";
-    
+
     final static public String INDEX_EVENT = "index";
 
     final static public String OBJECT_TYPE = "MCRObject";
@@ -55,7 +55,13 @@ public class MCREvent extends java.util.Hashtable<String, Object> {
 
     final static public String CLASS_TYPE = "MCRClassification";
 
+    final static public String PATH_TYPE = "MCRPath";
+
     final public static String MOVE_EVENT = "move";
+
+    final static public String PATH_KEY = PATH_TYPE;
+
+    final static public String FILEATTR_KEY = PATH_TYPE + ":attr";
 
     /** The object type like object or file * */
     private String objType;
