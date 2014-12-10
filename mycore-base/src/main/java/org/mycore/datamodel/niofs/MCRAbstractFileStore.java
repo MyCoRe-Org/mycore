@@ -19,7 +19,7 @@ public abstract class MCRAbstractFileStore extends FileStore {
      * @throws IOException 
      */
     public abstract Path getBaseDirectory() throws IOException;
-    
+
     /**
      * Translates the given path into an absolute path of the physical filesystem.
      * 

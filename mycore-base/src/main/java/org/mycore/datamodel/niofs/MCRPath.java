@@ -74,7 +74,8 @@ public abstract class MCRPath implements Path {
             stringValue = this.path;
         } else {
             if (!path.isEmpty() && path.charAt(0) != SEPARATOR) {
-                final String msg = MessageFormat.format("If root is given, path has to start with ''{0}'': {1}", SEPARATOR_STRING, path);
+                final String msg = MessageFormat.format("If root is given, path has to start with ''{0}'': {1}",
+                    SEPARATOR_STRING, path);
                 throw new IllegalArgumentException(msg);
             }
             stringValue = this.root + ":" + (this.path.isEmpty() ? SEPARATOR_STRING : this.path);
@@ -206,7 +207,8 @@ public abstract class MCRPath implements Path {
                 return false;
             }
             //path must be equal too
-            return Objects.deepEquals(offsets, that.offsets) && path.equals(that.path) && that.getFileSystem().equals(getFileSystem());
+            return Objects.deepEquals(offsets, that.offsets) && path.equals(that.path)
+                && that.getFileSystem().equals(getFileSystem());
         }
 
         //that is not absolute
@@ -474,7 +476,8 @@ public abstract class MCRPath implements Path {
      * @see java.nio.file.Path#register(java.nio.file.WatchService, java.nio.file.WatchEvent.Kind[], java.nio.file.WatchEvent.Modifier[])
      */
     @Override
-    public WatchKey register(final WatchService watcher, final Kind<?>[] events, final Modifier... modifiers) throws IOException {
+    public WatchKey register(final WatchService watcher, final Kind<?>[] events, final Modifier... modifiers)
+        throws IOException {
         throw new UnsupportedOperationException();
     }
 
@@ -509,7 +512,8 @@ public abstract class MCRPath implements Path {
     }
 
     private static boolean isEmpty(Path test) {
-        return test instanceof MCRPath && ((MCRPath) test).isEmpty() || (test.getNameCount() == 1 && test.getName(0).toString().isEmpty());
+        return test instanceof MCRPath && ((MCRPath) test).isEmpty()
+            || (test.getNameCount() == 1 && test.getName(0).toString().isEmpty());
     }
 
     /* (non-Javadoc)
@@ -628,13 +632,16 @@ public abstract class MCRPath implements Path {
             throw new IllegalArgumentException("beginIndex may not be negative: " + beginIndex);
         }
         if (beginIndex >= offsets.length) {
-            throw new IllegalArgumentException("beginIndex may not be greater or qual to the number of path elements(" + offsets.length + "): " + beginIndex);
+            throw new IllegalArgumentException("beginIndex may not be greater or qual to the number of path elements("
+                + offsets.length + "): " + beginIndex);
         }
         if (endIndex > offsets.length) {
-            throw new IllegalArgumentException("endIndex may not be greater that the number of path elements(" + offsets.length + "): " + endIndex);
+            throw new IllegalArgumentException("endIndex may not be greater that the number of path elements("
+                + offsets.length + "): " + endIndex);
         }
         if (beginIndex >= endIndex) {
-            throw new IllegalArgumentException("endIndex must be greater than beginIndex(" + beginIndex + "): " + endIndex);
+            throw new IllegalArgumentException("endIndex must be greater than beginIndex(" + beginIndex + "): "
+                + endIndex);
         }
         final int begin = offsets[beginIndex];
         final int end = endIndex == offsets.length ? path.length() : offsets[endIndex] - 1;

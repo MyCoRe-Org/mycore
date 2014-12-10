@@ -79,7 +79,7 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
             }
         };
     }
-    
+
     /**
      * Creates a new root under the given name.
      * 
@@ -200,5 +200,5 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
     private MCRAbstractFileSystem instance() {
         return this;
     }
-    
+
 }
