@@ -121,7 +121,6 @@ public class MCRFileTest extends MCRIFS2TestCase {
         file.setContent(new MCRFileContent(src));
         assertFalse(MCRFile.MD5_OF_EMPTY_FILE.equals(file.getMD5()));
         assertEquals(11, file.getSize());
-        src.delete();
         file.getContent().sendTo(src);
         assertEquals(11, src.length());
     }

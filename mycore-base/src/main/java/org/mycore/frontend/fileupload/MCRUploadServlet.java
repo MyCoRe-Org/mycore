@@ -28,6 +28,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -150,7 +152,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
         LOGGER.info("Client applet connected to socket now.");
 
         try {
-            DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+            PrintWriter pwOut = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
             ZipInputStream zis = new ZipInputStream(socket.getInputStream());
 
             LOGGER.debug("Constructed ZipInputStream and DataOutputStream, receiving data soon.");
@@ -174,8 +176,8 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
             LOGGER.debug("Stored incoming file content with " + numBytesStored + " bytes");
 
-            dos.writeLong(numBytesStored);
-            dos.flush();
+            pwOut.println(numBytesStored);
+            pwOut.flush();
 
             LOGGER.info("File transfer completed successfully.");
         } catch (Exception ex) {
