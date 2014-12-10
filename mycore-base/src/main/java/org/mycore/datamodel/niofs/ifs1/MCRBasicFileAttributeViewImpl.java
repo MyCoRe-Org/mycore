@@ -31,7 +31,7 @@ abstract class MCRBasicFileAttributeViewImpl implements BasicFileAttributeView {
                 LOGGER.warn("lastModified time is before creation time: " + node.toPath().toString());
             }
             FileTime lastAccessTime = localFileAttributes.lastAccessTime(); //unavailable in IFS1
-            return MCRFileAttributes.file(file.getID() + file.getMD5(), file.getSize(), file.getMD5(), creationTime,
+            return MCRFileAttributes.file(file.getID(), file.getSize(), file.getMD5(), creationTime,
                 lastModified, lastAccessTime);
         }
         return MCRFileAttributes.directory(node.getID(), node.getSize(),
