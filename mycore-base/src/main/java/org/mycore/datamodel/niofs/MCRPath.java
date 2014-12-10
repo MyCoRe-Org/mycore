@@ -40,6 +40,7 @@ import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchEvent.Modifier;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.security.acl.Owner;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -73,8 +74,7 @@ public abstract class MCRPath implements Path {
             stringValue = this.path;
         } else {
             if (!path.isEmpty() && path.charAt(0) != SEPARATOR) {
-                final String msg = MessageFormat.format("If root is given, path has to start with ''{0}'': {1}",
-                    SEPARATOR_STRING, path);
+                final String msg = MessageFormat.format("If root is given, path has to start with ''{0}'': {1}", SEPARATOR_STRING, path);
                 throw new IllegalArgumentException(msg);
             }
             stringValue = this.root + ":" + (this.path.isEmpty() ? SEPARATOR_STRING : this.path);
@@ -206,8 +206,7 @@ public abstract class MCRPath implements Path {
                 return false;
             }
             //path must be equal too
-            return Objects.deepEquals(offsets, that.offsets) && path.equals(that.path)
-                && that.getFileSystem().equals(getFileSystem());
+            return Objects.deepEquals(offsets, that.offsets) && path.equals(that.path) && that.getFileSystem().equals(getFileSystem());
         }
 
         //that is not absolute
@@ -305,6 +304,10 @@ public abstract class MCRPath implements Path {
 
     public String getOwner() {
         return root;
+    }
+
+    public String getOwnerRelativePath() {
+        return (path.equals("")) ? "/" : path;
     }
 
     /**
@@ -471,8 +474,7 @@ public abstract class MCRPath implements Path {
      * @see java.nio.file.Path#register(java.nio.file.WatchService, java.nio.file.WatchEvent.Kind[], java.nio.file.WatchEvent.Modifier[])
      */
     @Override
-    public WatchKey register(final WatchService watcher, final Kind<?>[] events, final Modifier... modifiers)
-        throws IOException {
+    public WatchKey register(final WatchService watcher, final Kind<?>[] events, final Modifier... modifiers) throws IOException {
         throw new UnsupportedOperationException();
     }
 
@@ -506,22 +508,26 @@ public abstract class MCRPath implements Path {
         return MCRAbstractFileSystem.getPath(null, relativizedURI.getPath(), getFileSystem());
     }
 
+    private static boolean isEmpty(Path test) {
+        return test instanceof MCRPath && ((MCRPath) test).isEmpty() || (test.getNameCount() == 1 && test.getName(0).toString().isEmpty());
+    }
+
     /* (non-Javadoc)
      * @see java.nio.file.Path#resolve(java.nio.file.Path)
      */
     @Override
     public Path resolve(final Path other) {
-        final MCRPath that = toMCRPath(other);
-        if (that.isAbsolute()) {
+        if (other.isAbsolute()) {
             return other;
         }
-        if (that.isEmpty()) {
+        if (isEmpty(other)) {
             return this;
         }
+        final MCRPath that = toMCRPath(other);
         final int baseLength = path.length();
         final int childLength = that.path.length();
         if (isEmpty() || that.path.charAt(0) == SEPARATOR) {
-            return other;
+            return root == null ? other : MCRAbstractFileSystem.getPath(root, that.path, getFileSystem());
         }
         final StringBuilder result = new StringBuilder(baseLength + 1 + childLength);
         if (baseLength == 1 && path.charAt(0) == SEPARATOR) {
@@ -622,16 +628,13 @@ public abstract class MCRPath implements Path {
             throw new IllegalArgumentException("beginIndex may not be negative: " + beginIndex);
         }
         if (beginIndex >= offsets.length) {
-            throw new IllegalArgumentException("beginIndex may not be greater or qual to the number of path elements("
-                + offsets.length + "): " + beginIndex);
+            throw new IllegalArgumentException("beginIndex may not be greater or qual to the number of path elements(" + offsets.length + "): " + beginIndex);
         }
         if (endIndex > offsets.length) {
-            throw new IllegalArgumentException("endIndex may not be greater that the number of path elements("
-                + offsets.length + "): " + endIndex);
+            throw new IllegalArgumentException("endIndex may not be greater that the number of path elements(" + offsets.length + "): " + endIndex);
         }
         if (beginIndex >= endIndex) {
-            throw new IllegalArgumentException("endIndex must be greater than beginIndex(" + beginIndex + "): "
-                + endIndex);
+            throw new IllegalArgumentException("endIndex must be greater than beginIndex(" + beginIndex + "): " + endIndex);
         }
         final int begin = offsets[beginIndex];
         final int end = endIndex == offsets.length ? path.length() : offsets[endIndex] - 1;

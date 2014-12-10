@@ -232,11 +232,13 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
         boolean hasNextCalled;
 
         private MCRDirectoryStream mcrDirectoryStream;
+        MCRFilesystemNode[] children;
 
         private int pos;
 
         public MCRDirectoryIterator(MCRDirectoryStream mcrDirectoryStream) {
             this.mcrDirectoryStream = mcrDirectoryStream;
+            children = mcrDirectoryStream.dir.getChildren();
             this.nextPath = null;
             hasNextCalled = false;
             pos = -1;
@@ -248,13 +250,6 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
             MCRDirectory dir = mcrDirectoryStream.dir;
             if (dir == null) {
                 return false; //stream closed
-            }
-            MCRFilesystemNode[] children;
-            try {
-                children = dir.getChildren();
-            } catch (RuntimeException e) {
-                LOGGER.warn("Exception while processing next node: " + e.getMessage());
-                return false;
             }
             int nextPos = pos + 1;
             if (nextPos >= children.length) {

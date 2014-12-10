@@ -37,7 +37,7 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
 
             @Override
             public MCRPath load(final String owner) throws Exception {
-                return getPath(owner, "", instance());
+                return getPath(owner, "/", instance());
             }
         });
 

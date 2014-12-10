@@ -29,6 +29,7 @@ import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.AccessMode;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.CopyOption;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.DirectoryStream;
@@ -38,6 +39,7 @@ import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.FileSystemNotFoundException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.LinkOption;
@@ -45,6 +47,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributeView;
@@ -339,7 +342,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
                     (LinkOption[]) null);
                 File targetLocalFile = targetFile.getLocalFile();
                 BasicFileAttributeView targetBasicFileAttributeView = Files.getFileAttributeView(
-                    targetLocalFile.toPath(), BasicFileAttributeView.class, (LinkOption[]) null);
+                    targetLocalFile.toPath(), BasicFileAttributeView.class);
                 MCRFileAttributes<String> srcAttr = srcAttrView.readAllAttributes();
                 targetFile.adjustMetadata(srcAttr.lastModifiedTime(), srcFile.getMD5(), srcFile.getSize());
                 targetBasicFileAttributeView.setTimes(srcAttr.lastModifiedTime(), srcAttr.lastAccessTime(),
@@ -381,8 +384,19 @@ public class MCRFileSystemProvider extends FileSystemProvider {
      */
     @Override
     public void move(Path source, Path target, CopyOption... options) throws IOException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        HashSet<CopyOption> copyOptions = Sets.newHashSet(options);
+        if (copyOptions.contains(StandardCopyOption.ATOMIC_MOVE)){
+            throw new AtomicMoveNotSupportedException(source.toString(), target.toString(), "ATOMIC_MOVE not supported yet");
+        }
+        if (Files.isDirectory(source)){
+            MCRPath src = MCRFileSystemUtils.checkPathAbsolute(source);
+            MCRDirectory srcRootDirectory = getRootDirectory(src);
+            if (srcRootDirectory.hasChildren()){
+                throw new IOException("Directory is not empty");
+            }
+        }
+        copy(source, target, options);
+        delete(source);
     }
 
     /* (non-Javadoc)
