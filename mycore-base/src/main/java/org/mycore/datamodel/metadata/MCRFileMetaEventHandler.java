@@ -23,6 +23,8 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
@@ -37,8 +39,6 @@ import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFileEventHandlerBase;
 import org.mycore.datamodel.niofs.MCRPath;
 
 /**
@@ -59,7 +59,8 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
         for (MCRFileMetadata metadata : fileMetadata) {
             Collection<MCRCategoryID> categories = metadata.getCategories();
             if (!categories.isEmpty()) {
-                MCRCategLinkReference linkReference = MCRFile.getCategLinkReference(derivateID, metadata.getName());
+                MCRPath path = MCRPath.getPath(derivateID.toString(), metadata.getName());
+                MCRCategLinkReference linkReference = new MCRCategLinkReference(path);
                 CATEGLINK_SERVICE.setLinks(linkReference, categories);
             }
         }
@@ -78,13 +79,19 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
         HashSet<MCRCategLinkReference> combined = new HashSet<MCRCategLinkReference>(before);
         combined.addAll(after);
         for (MCRCategLinkReference ref : combined) {
-            MCRFile file = MCRFile.getMCRFile(der.getId(), ref.getObjectID());
-            if (file == null) {
-                LOGGER.warn("File is linked to category but does not exist:" + der.getId() + ref.getObjectID());
+            MCRObjectID derId = der.getId();
+            String path = ref.getObjectID();
+            MCRPath file = MCRPath.getPath(derId.toString(), path);
+            BasicFileAttributes attrs;
+            try {
+                attrs = Files.readAttributes(file, BasicFileAttributes.class);
+            } catch (IOException e) {
+                LOGGER.warn("File is linked to category but cannot be read:" + der.getId() + ref.getObjectID(), e);
                 continue;
             }
-            MCREvent fileEvent = new MCREvent(MCRFileEventHandlerBase.FILE_TYPE, MCREvent.INDEX_EVENT);
-            fileEvent.put("file", file);
+            MCREvent fileEvent = new MCREvent(MCREvent.PATH_TYPE, MCREvent.INDEX_EVENT);
+            fileEvent.put(MCREvent.PATH_KEY, file);
+            fileEvent.put(MCREvent.FILEATTR_KEY, attrs);
             MCREventManager.instance().handleEvent(fileEvent);
         }
     }
