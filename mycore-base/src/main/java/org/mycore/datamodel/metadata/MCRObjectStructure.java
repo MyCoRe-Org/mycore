@@ -275,16 +275,61 @@ public class MCRObjectStructure {
      */
     public final boolean addDerivate(MCRMetaLinkID add_derivate) {
         MCRObjectID href = add_derivate.getXLinkHrefID();
-        for (MCRMetaLinkID derivate : getDerivates()) {
-            if (derivate.getXLinkHrefID().equals(href)) {
-                return false;
-            }
+        if (containsDerivate(href)) {
+            return false;
         }
         if (!MCRMetadataManager.exists(href)) {
             LOGGER.warn("Cannot find derivate " + href.toString() + ", will add it anyway.");
         }
         derivates.add(add_derivate);
         return true;
+    }
+
+    /**
+     * Adds or updates the derivate link. Returns true if the derivate is added
+     * or updated. Returns false when nothing is done.
+     * 
+     * @param derivateLink the link to add or update
+     * @return true when the structure is changed
+     */
+    public final boolean addOrUpdateDerivate(MCRMetaLinkID derivateLink) {
+        if (derivateLink == null) {
+            return false;
+        }
+        MCRObjectID derivateId = derivateLink.getXLinkHrefID();
+        MCRMetaLinkID oldLink = getDerivateLink(derivateId);
+        if(derivateLink.equals(oldLink)) {
+            return false;
+        }
+        if (oldLink != null) {
+            removeDerivate(oldLink.getXLinkHrefID());
+        }
+        return addDerivate(derivateLink);
+    }
+
+    /**
+     * Checks if the derivate is in the derivate vector.
+     * 
+     * @param derivateId derivate to check
+     * @return
+     */
+    public final boolean containsDerivate(MCRObjectID derivateId) {
+        return getDerivateLink(derivateId) != null;
+    }
+
+    /**
+     * Returns the derivate link by id or null.
+     * 
+     * @param derivateId
+     * @return
+     */
+    public final MCRMetaLinkID getDerivateLink(MCRObjectID derivateId) {
+        for (MCRMetaLinkID derivate : getDerivates()) {
+            if (derivate.getXLinkHrefID().equals(derivateId)) {
+                return derivate;
+            }
+        }
+        return null;
     }
 
     /**
@@ -347,7 +392,6 @@ public class MCRObjectStructure {
         Element subElement = element.getChild("children");
 
         if (subElement != null) {
-            @SuppressWarnings("unchecked")
             List<Element> childList = subElement.getChildren();
 
             for (Element linkElement : childList) {
@@ -369,7 +413,6 @@ public class MCRObjectStructure {
         subElement = element.getChild("derobjects");
 
         if (subElement != null) {
-            @SuppressWarnings("unchecked")
             List<Element> derobjectList = subElement.getChildren();
 
             for (Element derElement : derobjectList) {

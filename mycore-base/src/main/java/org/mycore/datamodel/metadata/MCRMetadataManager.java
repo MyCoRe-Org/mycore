@@ -191,7 +191,7 @@ public final class MCRMetadataManager {
 
         try {
             LOGGER.debug("adding Derivate in data store");
-            MCRMetadataManager.addDerivateToObject(objid, der);
+            MCRMetadataManager.addOrUpdateDerivateToObject(objid, der);
         } catch (final Exception e) {
             MCRMetadataManager.restore(mcrDerivate, objectBackup);
             // throw final exception
@@ -583,17 +583,21 @@ public final class MCRMetadataManager {
         MCRDerivate old = MCRMetadataManager.retrieveMCRDerivate(mcrDerivate.getId());
 
         // remove the old link to metadata
-        MCRObjectID oldMetadataObjectID = old.getDerivate().getMetaLink().getXLinkHrefID();
-        MCRObjectID newMetadataObjectID = mcrDerivate.getDerivate().getMetaLink().getXLinkHrefID();
-        if (!newMetadataObjectID.equals(oldMetadataObjectID)) {
-            try {
-                MCRMetadataManager.removeDerivateFromObject(oldMetadataObjectID, mcrDerivate.getId());
-            } catch (final MCRException e) {
-                LOGGER.warn(e.getMessage(), e);
+        MCRMetaLinkID oldLink = old.getDerivate().getMetaLink();
+        MCRMetaLinkID newLink = mcrDerivate.getDerivate().getMetaLink();
+        if (!oldLink.equals(newLink)) {
+            MCRObjectID oldMetadataObjectID = oldLink.getXLinkHrefID();
+            MCRObjectID newMetadataObjectID = newLink.getXLinkHrefID();
+            if(!oldMetadataObjectID.equals(newLink.getXLinkHrefID())) {
+                try {
+                    MCRMetadataManager.removeDerivateFromObject(oldMetadataObjectID, mcrDerivate.getId());
+                } catch (final MCRException e) {
+                    LOGGER.warn(e.getMessage(), e);
+                }
             }
             // add the link to metadata
-            final MCRMetaLinkID der = new MCRMetaLinkID("derobject", mcrDerivate.getId(), null, mcrDerivate.getLabel());
-            MCRMetadataManager.addDerivateToObject(newMetadataObjectID, der);
+            final MCRMetaLinkID der = new MCRMetaLinkID("derobject", mcrDerivate.getId(), null, mcrDerivate.getLabel(), newLink.getXLinkRole());
+            addOrUpdateDerivateToObject(newMetadataObjectID, der);
         }
         // update the derivate
         mcrDerivate.getService().setDate("createdate", old.getService().getDate("createdate"));
@@ -739,7 +743,9 @@ public final class MCRMetadataManager {
      *            a link to a derivate as MCRMetaLinkID
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
+     * @deprecated use {@link #addOrUpdateDerivateToObject(MCRObjectID, MCRMetaLinkID)}
      */
+    @Deprecated
     public static void addDerivateToObject(final MCRObjectID id, final MCRMetaLinkID link) throws MCRPersistenceException {
         final MCRObject object = MCRMetadataManager.retrieveMCRObject(id);
         // don't put the same derivates twice in an object!
@@ -751,6 +757,32 @@ public final class MCRMetadataManager {
         }
         object.getStructure().addDerivate(link);
         MCRMetadataManager.fireUpdateEvent(object);
+    }
+
+    /**
+     * Adds or updates a derivate MCRMetaLinkID to the structure part and updates the
+     * object with the ID in the data store.
+     * 
+     * @param id
+     *            the object ID
+     * @param link
+     *            a link to a derivate as MCRMetaLinkID
+     * @return
+     *            True if the link is added or updated, false if nothing changed.
+     * @throws MCRPersistenceException
+     *            if a persistence problem is occurred
+     */
+    public static boolean addOrUpdateDerivateToObject(final MCRObjectID id, final MCRMetaLinkID link)
+        throws MCRPersistenceException {
+        final MCRObject object = MCRMetadataManager.retrieveMCRObject(id);
+        if (!object.getStructure().addOrUpdateDerivate(link)) {
+            return false;
+        }
+        if (!object.isImportMode()) {
+            object.getService().setDate("modifydate");
+        }
+        MCRMetadataManager.fireUpdateEvent(object);
+        return true;
     }
 
     public static boolean removeDerivateFromObject(final MCRObjectID objectID, final MCRObjectID derivateID) throws MCRPersistenceException {

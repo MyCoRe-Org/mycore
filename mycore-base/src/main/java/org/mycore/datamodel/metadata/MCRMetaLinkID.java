@@ -65,8 +65,17 @@ final public class MCRMetaLinkID extends MCRMetaLink {
      *  This is the same as running {@link #MCRMetaLinkID(String, int)} and {@link #setReference(MCRObjectID, String, String)}.
      */
     public MCRMetaLinkID(String set_subtag, MCRObjectID id, String label, String title) {
+        this(set_subtag, id, label, title, null);
+    }
+
+    /**
+     * initializes with all values needed to link to an MCRObject.
+     * 
+     */
+    public MCRMetaLinkID(String set_subtag, MCRObjectID id, String label, String title, String role) {
         this(set_subtag, 0);
         setReference(id, label, title);
+        setXLinkRole(role);
     }
 
     /**

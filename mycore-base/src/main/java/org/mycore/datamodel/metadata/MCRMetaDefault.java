@@ -23,6 +23,8 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.util.Objects;
+
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -306,6 +308,34 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
         }
         if (getInherited() < 0) {
             LOGGER.warn(getSubTag() + ": inherited can not be smaller than '0': " + getInherited());
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(datapart, inherited, lang, subtag, type);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        MCRMetaDefault other = (MCRMetaDefault) obj;
+        if (!Objects.equals(datapart, other.datapart)) {
+            return false;
+        } else if (!Objects.equals(inherited, other.inherited)) {
+            return false;
+        } else if (!Objects.equals(lang, other.lang)) {
+            return false;
+        } else if (!Objects.equals(subtag, other.subtag)) {
+            return false;
+        } else if (!Objects.equals(type, other.type)) {
             return false;
         }
         return true;

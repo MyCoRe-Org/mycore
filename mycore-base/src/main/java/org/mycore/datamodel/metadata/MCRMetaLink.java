@@ -25,6 +25,8 @@ package org.mycore.datamodel.metadata;
 
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 
+import java.util.Objects;
+
 import org.apache.log4j.Logger;
 import org.apache.xerces.util.XMLChar;
 import org.jdom2.Element;
@@ -255,6 +257,35 @@ public class MCRMetaLink extends MCRMetaDefault {
         }
 
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), from, href, label, linktype, role, title, to);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!super.equals(obj)) {
+            return false;
+        }
+        MCRMetaLink other = (MCRMetaLink) obj;
+        if (!Objects.equals(from, other.from)) {
+            return false;
+        } else if (!Objects.equals(href, other.href)) {
+            return false;
+        } else if (!Objects.equals(label, other.label)) {
+            return false;
+        } else if (!Objects.equals(linktype, other.linktype)) {
+            return false;
+        } else if (!Objects.equals(role, other.role)) {
+            return false;
+        } else if (!Objects.equals(title, other.title)) {
+            return false;
+        } else if (!Objects.equals(to, other.to)) {
+            return false;
+        }
+        return true;
     }
 
     /**
