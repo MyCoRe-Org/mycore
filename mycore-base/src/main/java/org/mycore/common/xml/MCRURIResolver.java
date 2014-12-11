@@ -255,7 +255,7 @@ public final class MCRURIResolver implements URIResolver {
 
         while (tok.hasMoreTokens()) {
             param = tok.nextToken().split("=");
-            params.put(param[0], param[1]);
+            params.put(param[0], param.length >= 2 ? param[1] : "");
         }
         return params;
     }
