@@ -114,7 +114,7 @@ public class MCRXEditorTransformer {
     }
 
     public String replaceParameters(String uri) {
-        return editorSession.replaceParameters(uri);
+        return getXPathEvaluator().replaceXPaths(uri, false);
     }
 
     public void bind(String xPath, String initialValue, String name) throws JDOMException, JaxenException {
