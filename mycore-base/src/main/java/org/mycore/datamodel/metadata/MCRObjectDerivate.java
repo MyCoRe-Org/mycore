@@ -23,16 +23,19 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.ifs2.MCRFile;
+import org.mycore.datamodel.niofs.MCRPath;
 
 /**
  * This class implements all methode for handling one derivate data.
@@ -232,15 +235,13 @@ public class MCRObjectDerivate {
      * 
      * @throws @{@link NullPointerException} if first argument is null
      */
-    public MCRFileMetadata getOrCreateFileMetadata(MCRFile file, String urn) {
+    public MCRFileMetadata getOrCreateFileMetadata(MCRPath file, String urn) {
         return getOrCreateFileMetadata(file, urn, null);
     }
 
-    public MCRFileMetadata getOrCreateFileMetadata(MCRFile file, String urn, String handle) {
-        if (file == null) {
-            throw new NullPointerException("File may not be null");
-        }
-        String path = file.getAbsolutePath();
+    public MCRFileMetadata getOrCreateFileMetadata(MCRPath file, String urn, String handle) {
+        Objects.requireNonNull(file, "File may not be null");
+        String path = "/" + file.subpathComplete().toString();
         return getOrCreateFileMetadata(path, urn, handle);
     }
 
@@ -282,14 +283,14 @@ public class MCRObjectDerivate {
      * @return
      */
     public final MCRFileMetadata getOrCreateFileMetadata(String path) {
-        return getOrCreateFileMetadata(path, null, null);
+        return getOrCreateFileMetadata(MCRPath.getPath(derivateID.toString(), path), null, null);
     }
 
     /**
      * @param file
      * @return
      */
-    public MCRFileMetadata getOrCreateFileMetadata(MCRFile file) {
+    public MCRFileMetadata getOrCreateFileMetadata(MCRPath file) {
         return getOrCreateFileMetadata(file, null, null);
     }
 
@@ -300,9 +301,9 @@ public class MCRObjectDerivate {
      * @return
      */
     private MCRFileMetadata createFileMetadata(String path, String urn, String handle) {
-        MCRFile mcrFile = MCRFile.getMCRFile(derivateID, path);
-        if (mcrFile == null) {
-            throw new MCRPersistenceException("File does not exist: " + derivateID + path);
+        MCRPath mcrFile = MCRPath.getPath(derivateID.toString(), path);
+        if (!Files.exists(mcrFile)) {
+            throw new MCRPersistenceException("File does not exist: " + mcrFile);
         }
         MCRFileMetadata newFileMetadata = new MCRFileMetadata(path, urn, handle, null);
         return newFileMetadata;

@@ -20,6 +20,11 @@
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
+      <artifactId>mycore-ifs</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore</groupId>
       <artifactId>mycore-urn</artifactId>
       <version>${project.version}</version>
     </dependency>

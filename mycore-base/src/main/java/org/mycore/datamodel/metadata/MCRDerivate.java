@@ -36,9 +36,7 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.datamodel.ifs.MCRDirectory;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -174,49 +172,6 @@ final public class MCRDerivate extends MCRBase {
             }
         }
         return fileUrnMap;
-    }
-
-    /**
-     * The methode receive the multimedia object(s) for the given MCRObjectID
-     * and returned it as MCRDirectory.
-     * 
-     * @param id
-     *            the object ID
-     * @return the MCRDirectory of the multimedia object
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     * @deprecated use {@link MCRDerivate#receiveDirectoryFromIFS()} instead
-     */
-    public final MCRDirectory receiveDirectoryFromIFS(String id) throws MCRPersistenceException {
-        // check the ID
-        mcr_id = MCRObjectID.getInstance(id);
-
-        // receive the IFS informations
-        MCRDirectory difs = MCRDirectory.getRootDirectory(mcr_id.toString());
-
-        if (difs == null) {
-            throw new MCRPersistenceException("Error while receiving derivate with " + "ID " + mcr_id + " from IFS.");
-        }
-
-        return difs;
-    }
-
-    /**
-     * The methode receive the multimedia object(s) for the given MCRObjectID
-     * and returned it as MCRDirectory.
-     * 
-     * @return the MCRDirectory of the multimedia object
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occured
-     */
-    public final MCRDirectory receiveDirectoryFromIFS() throws MCRPersistenceException {
-        // receive the IFS informations
-        MCRDirectory difs = MCRDirectory.getRootDirectory(getId().toString());
-
-        if (difs == null) {
-            throw new MCRPersistenceException("Error while receiving derivate with " + "ID " + getId() + " from IFS.");
-        }
-        return difs;
     }
 
     /**

@@ -44,6 +44,12 @@
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
+      <artifactId>mycore-ifs</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore</groupId>
       <artifactId>mycore-iview2</artifactId>
       <version>${project.version}</version>
     </dependency>

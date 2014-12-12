@@ -373,7 +373,7 @@ public class MCRURNAdder {
                      * updating the fileset element, with the current file and
                      * urn
                      */
-                    MCRFileMetadata fileMetadata = derivate.getDerivate().getOrCreateFileMetadata(current.getRightComponent());
+                    MCRFileMetadata fileMetadata = derivate.getDerivate().getOrCreateFileMetadata(current.getRightComponent().toPath());
                     fileMetadata.setUrn(urnToSet[i].toString() + String.valueOf(urnToSet[i].checksum()));
                 } catch (Exception ex) {
                     LOGGER.error("Assigning urn " + urnToSet[i] + urnToSet[i].checksum() + " to " + current.getLeftComponent()

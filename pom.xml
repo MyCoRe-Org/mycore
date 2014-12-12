@@ -1413,6 +1413,7 @@
     <module>mycore-classeditor</module>
     <module>mycore-handle</module>
     <module>mycore-indexing</module>
+    <module>mycore-ifs</module>
     <module>mycore-iview2</module>
     <module>mycore-media</module>
     <module>mycore-meta</module>

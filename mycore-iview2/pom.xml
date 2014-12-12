@@ -164,6 +164,11 @@
       </exclusions>
     </dependency>
     <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-ifs</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.mycore.iview2</groupId>
       <artifactId>image-tiler</artifactId>
     </dependency>

@@ -119,7 +119,7 @@ public class MCRGetRemoteCreatedHandle extends TimerTask {
                 session.update(handle);
                 MCRDerivate derivateObject = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(handle.getMcrid()));
                 MCRFile file = MCRFile.getMCRFile(MCRObjectID.getInstance(handle.getMcrid()), handle.getPath());
-                derivateObject.getDerivate().getOrCreateFileMetadata(file, null, handle.toString());
+                derivateObject.getDerivate().getOrCreateFileMetadata(file.toPath(), null, handle.toString());
 
                 MCRMetadataManager.update(derivateObject);
             }

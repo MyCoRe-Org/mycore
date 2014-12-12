@@ -30,6 +30,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.text.Normalizer;
 import java.text.ParseException;
@@ -41,6 +46,7 @@ import java.util.ListIterator;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.xml.parsers.DocumentBuilder;
@@ -58,6 +64,7 @@ import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
@@ -77,6 +84,7 @@ import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -672,10 +680,20 @@ public class MCRXMLFunctions {
      * @param derivateId
      *            the derivate id for which the size should be returned
      * @return the size as formatted string
+     * @throws IOException 
      */
-    public static String getSize(String derivateId) {
-        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateId));
-        return derivate.receiveDirectoryFromIFS().getSizeFormatted();
+    public static String getSize(String derivateId) throws IOException {
+        MCRPath rootPath = MCRPath.getPath(derivateId, "/");
+        final AtomicLong size = new AtomicLong();
+        Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                size.addAndGet(attrs.size());
+                return super.visitFile(file, attrs);
+            }
+
+        });
+        return MCRUtils.getSizeFormatted(size.get());
     }
 
     /**

@@ -66,6 +66,7 @@ import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
@@ -77,8 +78,6 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRStoredMetadata;
@@ -128,7 +127,7 @@ public final class MCRURIResolver implements URIResolver {
         try {
             EXT_RESOLVER = getExternalResolverProvider();
             singleton = new MCRURIResolver();
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             LOGGER.error("Unable to initialize MCRURIResolver", exc);
         }
     }
@@ -772,7 +771,7 @@ public final class MCRURIResolver implements URIResolver {
             try {
                 String aPath = MCRXMLFunctions.decodeURIPath(path.substring(ownerID.length() + 1));
                 // TODO: make this more pretty
-                if(ownerID.endsWith(":")) {
+                if (ownerID.endsWith(":")) {
                     ownerID = ownerID.substring(0, ownerID.length() - 1);
                 }
                 LOGGER.debug("Get " + ownerID + " path: " + aPath);
@@ -787,27 +786,27 @@ public final class MCRURIResolver implements URIResolver {
         @Override
         public Source resolve(String href, String base) throws TransformerException {
             LOGGER.debug("Reading xml from MCRFile " + href);
-            MCRFile file = null;
+            MCRPath file = null;
             String id = href.substring(href.indexOf(":") + 1);
             if (id.contains("/")) {
                 // assume thats a derivate with path
                 try {
                     MCRObjectID derivateID = MCRObjectID.getInstance(id.substring(0, id.indexOf("/")));
                     String path = id.substring(id.indexOf("/"));
-                    MCRDirectory rootDirectory = MCRDirectory.getRootDirectory(derivateID.toString());
-                    file = (MCRFile) rootDirectory.getChildByPath(path);
+                    file = MCRPath.getPath(derivateID.toString(), path);
                 } catch (MCRException exc) {
                     // just check if the id is valid, don't care about the exception 
                 }
             }
-            file = file != null ? file : MCRFile.getFile(id);
+            if (file == null) {
+                throw new TransformerException("mcrfile: Resolver needs a path: " + href);
+            }
             try {
-                return file.getContent().getSource();
+                return new MCRPathContent(file).getSource();
             } catch (Exception e) {
                 throw new TransformerException(e);
             }
         }
-
     }
 
     private static class MCRACLResolver implements MCRResolver {
@@ -880,9 +879,9 @@ public final class MCRURIResolver implements URIResolver {
         static {
             try {
                 DAO = MCRCategoryDAOFactory.getInstance();
-                categoryCache = new MCRCache<String, Element>(MCRConfiguration
-                .instance().getInt(CONFIG_PREFIX + "Classification.CacheSize", 1000), "URIResolver categories");
-            } catch(Exception exc) {
+                categoryCache = new MCRCache<String, Element>(MCRConfiguration.instance().getInt(
+                    CONFIG_PREFIX + "Classification.CacheSize", 1000), "URIResolver categories");
+            } catch (Exception exc) {
                 LOGGER.error("Unable to initialize classification resolver", exc);
             }
         }

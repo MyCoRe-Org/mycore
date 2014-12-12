@@ -23,16 +23,20 @@
 
 package org.mycore.frontend.basket;
 
+import java.io.IOException;
+import java.nio.file.Files;
+
 import org.jdom2.Document;
+import org.jdom2.output.XMLOutputter;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFilesystemNode;
+import org.mycore.common.content.MCRPathContent;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
 
 /**
  * Manages basket objects in the persistent store.
@@ -43,12 +47,12 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRBasketPersistence {
 
-     /**
-     * Retrieves a basket from an XML file in the given derivate.
-     */
+    /**
+    * Retrieves a basket from an XML file in the given derivate.
+    */
     public static MCRBasket retrieveBasket(String derivateID) throws Exception {
-        MCRFile file = getBasketFile(derivateID);
-        Document xml = file.getContentAsJDOM();
+        MCRPath file = getBasketFile(derivateID);
+        Document xml = new MCRPathContent(file).asXML();
         MCRBasket basket = new MCRBasketXMLParser().parseXML(xml);
         basket.setDerivateID(derivateID);
         return basket;
@@ -57,9 +61,8 @@ public class MCRBasketPersistence {
     /**
      * Returns the MCRFile that stores the persistent data of a basket within the given derivate.
      */
-    private static MCRFile getBasketFile(String derivateID) {
-        MCRDirectory dir = (MCRDirectory) (MCRFilesystemNode.getRootNode(derivateID));
-        return (MCRFile) (dir.getChild("basket.xml"));
+    private static MCRPath getBasketFile(String derivateID) {
+        return MCRPath.getPath(derivateID, "/basket.xml");
     }
 
     /**
@@ -70,7 +73,7 @@ public class MCRBasketPersistence {
         String derivateID = basket.getDerivateID();
         MCRObjectID derivateOID = MCRObjectID.getInstance(derivateID);
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateOID);
-        MCRFile file = getBasketFile(derivateID);
+        MCRPath file = getBasketFile(derivateID);
         writeBasketToFile(basket, derivate, file);
     }
 
@@ -80,19 +83,17 @@ public class MCRBasketPersistence {
      * 
      * @param basket the basket to store in a new file in a new derivate
      * @param ownerID the ID of the MCRObject owning the new derivate 
+     * @throws IOException 
      */
-    public static void createDerivateWithBasket(MCRBasket basket, MCRObjectID ownerID) {
+    public static void createDerivateWithBasket(MCRBasket basket, MCRObjectID ownerID) throws IOException {
         String base = ownerID.getProjectId() + "_derivate";
         MCRObjectID derivateOID = MCRObjectID.getNextFreeId(base);
         String derivateID = derivateOID.toString();
 
         MCRDerivate derivate = createNewDerivate(ownerID, derivateOID);
 
-        MCRDirectory root = (MCRDirectory)( MCRFilesystemNode.getRootNode(derivateID) );
-        
-        MCRFile basketFile = new MCRFile("basket.xml", root);
         basket.setDerivateID(derivateID);
-        writeBasketToFile(basket, derivate, basketFile);
+        writeBasketToFile(basket, derivate, getBasketFile(derivateID));
     }
 
     /**
@@ -101,8 +102,10 @@ public class MCRBasketPersistence {
      * @param ownerID the ID of the object owning the new derivate
      * @param derivateOID a free derivate ID to use for the newly created derivate
      * @return the empty derivate that was created.
+     * @throws IOException 
+     * @throws MCRPersistenceException 
      */
-    private static MCRDerivate createNewDerivate(MCRObjectID ownerID, MCRObjectID derivateOID) {
+    private static MCRDerivate createNewDerivate(MCRObjectID ownerID, MCRObjectID derivateOID) throws MCRPersistenceException, IOException {
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(derivateOID);
         derivate.setLabel("Saved basket data for " + ownerID.toString());
@@ -130,10 +133,12 @@ public class MCRBasketPersistence {
      * @param basket the basket to save.
      * @param derivate the derivate holding the file
      * @param basketFile the file holding the basket's data.
+     * @throws IOException 
      */
-    private static void writeBasketToFile(MCRBasket basket, MCRDerivate derivate, MCRFile basketFile) {
+    private static void writeBasketToFile(MCRBasket basket, MCRDerivate derivate, MCRPath basketFile) throws IOException {
         Document xml = new MCRBasketXMLBuilder(false).buildXML(basket);
-        basketFile.setContentFrom(xml);
+        XMLOutputter xout = new XMLOutputter();
+        xout.output(xml, Files.newOutputStream(basketFile));
         MCRMetadataManager.updateMCRDerivateXML(derivate);
     }
 }

@@ -8,17 +8,21 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemException;
 import java.nio.file.FileSystemNotFoundException;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.nio.file.spi.FileSystemProvider;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -91,6 +95,54 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
      * @throws FileAlreadyExistsException more specific, if the directory already exists
      */
     public abstract void createRoot(String owner) throws FileSystemException;
+
+    /**
+     * Checks if the file for given Path is still valid.
+     * 
+     * This should check if the file is still completely readable and the MD5 sum still matches the recorded value.
+     * @param path Path to the file to check
+     * @return if the file is still in good condition
+     * @throws NoSuchFileException
+     */
+    public boolean verifies(MCRPath path) throws NoSuchFileException {
+        try {
+            return verifies(path, Files.readAttributes(path, MCRFileAttributes.class));
+        } catch (IOException e) {
+            if (e instanceof NoSuchFileException) {
+                throw (NoSuchFileException) e;
+            }
+            return false;
+        }
+    }
+
+    /**
+     * Checks if the file for given Path is still valid.
+     * 
+     * This should check if the file is still completely readable and the MD5 sum still matches the recorded value.
+     * This method does the same as {@link #verifies(MCRPath)} but uses the given attributes to save a file access.
+     * @param path Path to the file to check
+     * @param attrs matching attributes to file
+     * @return
+     * @throws NoSuchFileException 
+     */
+    public boolean verifies(MCRPath path, MCRFileAttributes<?> attrs) throws NoSuchFileException {
+        if (Files.notExists(Objects.requireNonNull(path, "Path may not be null."))) {
+            throw new NoSuchFileException(path.toString());
+        }
+        Objects.requireNonNull(attrs, "attrs may not be null");
+        String md5Sum;
+        try {
+            md5Sum = MCRUtils.getMD5Sum(Files.newInputStream(path));
+        } catch (NoSuchAlgorithmException | IOException e) {
+            Logger.getLogger(getClass()).error("Could not verify path: " + path, e);
+            return false;
+        }
+        boolean returns = md5Sum.matches(attrs.md5sum());
+        if (!returns) {
+            Logger.getLogger(getClass()).warn("MD5sum does not match: " + path);
+        }
+        return returns;
+    }
 
     /**
      * Removes a root with the given name.

@@ -7,17 +7,17 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.mycore.access.MCRAccessManager;
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
 
 /**
  * @author Sebastian Hofmann; Silvio Hermann; Thomas Scheffler (yagee)
@@ -89,9 +89,8 @@ public class MCRDerivateServlet extends MCRServlet {
      */
     private void deleteFile(String derivateId, String file, HttpServletResponse response) throws IOException {
         if (MCRAccessManager.checkPermission(derivateId, PERMISSION_DELETE)) {
-            MCRDirectory rootdir = MCRDirectory.getRootDirectory(derivateId);
-            MCRFilesystemNode filesystemNode = rootdir.getChildByPath(file);
-            filesystemNode.delete();
+            MCRPath pathToFile = MCRPath.getPath(derivateId, file);
+            Files.delete(pathToFile);
         } else {
             response.sendError(HttpServletResponse.SC_FORBIDDEN,
                 MessageFormat.format("User has not the \"" + PERMISSION_DELETE + "\" permission on object {0}.", derivateId));

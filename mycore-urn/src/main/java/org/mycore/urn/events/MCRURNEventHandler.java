@@ -22,6 +22,7 @@
  */
 package org.mycore.urn.events;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -37,6 +38,7 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.events.MCREvent;
@@ -266,7 +268,15 @@ public class MCRURNEventHandler extends MCRFileEventHandlerBase {
         }
 
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateId));
-        derivate.getDerivate().getOrCreateFileMetadata(file, urn);
-        MCRMetadataManager.update(derivate);
+        derivate.getDerivate().getOrCreateFileMetadata(file.toPath(), urn);
+        try {
+            MCRMetadataManager.update(derivate);
+        } catch (MCRPersistenceException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }

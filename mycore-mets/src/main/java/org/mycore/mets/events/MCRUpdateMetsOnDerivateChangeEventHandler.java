@@ -1,17 +1,15 @@
 package org.mycore.mets.events;
 
+import java.nio.file.Files;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCREvent;
-import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileEventHandlerBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.mets.tools.MCRMetsSave;
 
 /**
@@ -53,9 +51,7 @@ public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCRFileEventHandl
             return;
         }
 
-        MCRObjectID derivateID = MCRObjectID.getInstance(file.getOwnerID());
-        MCRDerivate owner = MCRMetadataManager.retrieveMCRDerivate(derivateID);
-        if (!owner.receiveDirectoryFromIFS().hasChild(mets)) {
+        if (Files.notExists(MCRPath.getPath(file.getOwnerID(), mets))) {
             return;
         }
 

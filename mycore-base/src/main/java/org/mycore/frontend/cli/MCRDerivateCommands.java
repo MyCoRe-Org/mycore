@@ -50,13 +50,13 @@ import org.mycore.common.events.MCREventManager;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.xml.sax.SAXParseException;
@@ -505,8 +505,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         Document xml = null;
         MCRDerivate obj;
 
+        MCRObjectID derivateID = MCRObjectID.getInstance(nid);
         try {
-            obj = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(nid));
+            obj = MCRMetadataManager.retrieveMCRDerivate(derivateID);
             String path = obj.getDerivate().getInternals().getSourcePath();
             // reset from the absolute to relative path, for later reload
             LOGGER.info("Old Internal Path ====>" + path);
@@ -525,9 +526,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             LOGGER.warn("Could not read " + nid + ", continue with next ID");
             return;
         }
-        File xmlOutput = new File(dir, nid + ".xml");
+        File xmlOutput = new File(dir, derivateID + ".xml");
         FileOutputStream out = new FileOutputStream(xmlOutput);
-        dir = new File(dir, nid);
+        dir = new File(dir, derivateID.toString());
 
         if (trans != null) {
             trans.setParameter("dirname", dir.getPath());
@@ -542,18 +543,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         LOGGER.info("Object " + nid + " stored under " + xmlOutput + ".");
 
         // store the derivate file under dirname
-        try {
-
-            if (!dir.isDirectory()) {
-                dir.mkdir();
-            }
-
-            MCRFileImportExport.exportFiles(obj.receiveDirectoryFromIFS(), dir);
-        } catch (MCRException ex) {
-            LOGGER.error(ex.getMessage());
-            LOGGER.error("Exception while store to object in " + dir.getAbsolutePath());
-            return;
+        if (!dir.isDirectory()) {
+            dir.mkdir();
         }
+        MCRPath rootPath = MCRPath.getPath(derivateID.toString(), "/");
+        Files.walkFileTree(rootPath, new MCRTreeCopier(rootPath, dir.toPath()));
 
         LOGGER.info("Derivate " + nid + " saved under " + dir.toString() + " and " + xmlOutput.toString() + ".");
     }
