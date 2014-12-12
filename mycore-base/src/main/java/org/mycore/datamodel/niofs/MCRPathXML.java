@@ -23,18 +23,22 @@
  **/
 package org.mycore.datamodel.niofs;
 
+import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR;
+import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR_STRING;
+
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
-
-import java.io.IOException;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
-import java.util.EnumSet;
-
-import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR;
-import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR_STRING;
 
 ;
 
@@ -78,8 +82,34 @@ public class MCRPathXML {
 
         Element nodes = new Element("children");
         root.addContent(nodes);
-        FileVisitor<? super Path> visitor = new ChildVisitor(nodes);
-        Files.walkFileTree(path, EnumSet.noneOf(FileVisitOption.class), 1, visitor);
+        SortedMap<MCRPath, MCRFileAttributes<?>> directories = new TreeMap<>();
+        SortedMap<MCRPath, MCRFileAttributes<?>> files = new TreeMap<>();
+        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(path)) {
+            for (Path child : dirStream) {
+                MCRFileAttributes<?> childAttrs = Files.readAttributes(child, MCRFileAttributes.class);
+                if (childAttrs.isDirectory()) {
+                    directories.put(MCRPath.toMCRPath(child), childAttrs);
+                } else {
+                    files.put(MCRPath.toMCRPath(child), childAttrs);
+                }
+            }
+        }
+        for (Map.Entry<MCRPath, MCRFileAttributes<?>> dirEntry : directories.entrySet()) {
+            Element child = new Element("child");
+            child.setAttribute("type", "directory");
+            addString(child, "name", dirEntry.getKey().getFileName().toString());
+            addString(child, "uri", dirEntry.getKey().toUri().toString());
+            nodes.addContent(child);
+            addBasicAttributes(child, dirEntry.getValue(), dirEntry.getKey());
+        }
+        for (Map.Entry<MCRPath, MCRFileAttributes<?>> fileEntry : files.entrySet()) {
+            Element child = new Element("child");
+            child.setAttribute("type", "file");
+            addString(child, "name", fileEntry.getKey().getFileName().toString());
+            addString(child, "uri", fileEntry.getKey().toUri().toString());
+            nodes.addContent(child);
+            addAttributes(child, fileEntry.getValue(), fileEntry.getKey());
+        }
 
         LOGGER.debug("MCRDirectoryXML: end listing of directory " + path);
 
@@ -129,42 +159,5 @@ public class MCRPathXML {
         }
 
         parent.addContent(new Element(itemName).addContent(content.trim()));
-    }
-
-    private static class ChildVisitor extends SimpleFileVisitor<Path> {
-
-        private Element children;
-
-        public ChildVisitor(Element nodes) {
-            this.children = nodes;
-        }
-
-        @Override
-        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-            LOGGER.debug("Visiting directory: " + dir);
-            return FileVisitResult.CONTINUE;
-        }
-
-        private void addChild(MCRPath path, BasicFileAttributes attrs) throws IOException {
-            Element child = new Element("child");
-            String type = attrs.isDirectory() ? "directory" : "file";
-            child.setAttribute("type", type);
-            addString(child, "name", path.getFileName().toString());
-            addString(child, "uri", path.toUri().toString());
-            children.addContent(child);
-            if (attrs instanceof MCRFileAttributes) {
-                addAttributes(child, (MCRFileAttributes<?>) attrs, path);
-            } else {
-                addBasicAttributes(child, attrs, path);
-            }
-        }
-
-        @Override
-        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            LOGGER.debug("Visiting file: " + file);
-            addChild(MCRPath.toMCRPath(file), attrs);
-            return FileVisitResult.CONTINUE;
-        }
-
     }
 }
