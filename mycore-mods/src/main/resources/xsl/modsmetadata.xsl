@@ -5,7 +5,6 @@
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" exclude-result-prefixes="xalan xlink mcr mcrxsl i18n acl mods mcrmods"
   version="1.0">
   <xsl:param name="MCR.Handle.Resolver.MasterURL" />
-  <xsl:param name="MCR.Users.Guestuser.UserName" />
   <xsl:param name="MCR.Mods.SherpaRomeo.ApiKey" select="''" />
   <xsl:param name="ServletsBaseURL" />
 
@@ -525,11 +524,11 @@
       </td>
     </tr>
     <xsl:if
-      test="($CurrentUser!=$MCR.Users.Guestuser.UserName and ./../mods:note[@xlink:href=$id]) or (./../mods:location/mods:physicalLocation[@xlink:href=$id])">
+      test="(not(mcrxsl:isCurrentUserGuestUser()) and ./../mods:note[@xlink:href=$id]) or (./../mods:location/mods:physicalLocation[@xlink:href=$id])">
       <tr>
         <td colspan="2">
           <table class="metaData">
-            <xsl:if test="$CurrentUser!=$MCR.Users.Guestuser.UserName">
+            <xsl:if test="not(mcrxsl:isCurrentUserGuestUser())">
               <xsl:call-template name="printMetaDate.mods">
                 <xsl:with-param name="nodes" select="./../mods:note[@xlink:href=$id]" />
               </xsl:call-template>
@@ -569,7 +568,7 @@
   </xsl:template>
 
   <xsl:template match="mods:identifier[@type='intern_old']" mode="present">
-    <xsl:if test="($CurrentUser!=$MCR.Users.Guestuser.UserName)">
+    <xsl:if test="not(mcrxsl:isCurrentUserGuestUser())">
       <tr>
         <td valign="top" class="metaname">
           <xsl:value-of select="concat(i18n:translate(concat('component.mods.metaData.dictionary.identifier.',@type)),':')" />
@@ -815,7 +814,7 @@
             <td class="metavalue">
               <p>
                 <xsl:choose>
-                  <xsl:when test="$CurrentUser!=$MCR.Users.Guestuser.UserName">
+                  <xsl:when test="not(mcrxsl:isCurrentUserGuestUser())">
                     <a href="{$ServletsBaseURL}solr/parent?q={$context/@ID}&amp;fq=">
                       <xsl:value-of select="i18n:translate('component.mods.metaData.displayAll')" />
                     </a>

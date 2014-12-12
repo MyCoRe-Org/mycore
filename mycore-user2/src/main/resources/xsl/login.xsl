@@ -32,7 +32,6 @@
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:encoder="xalan://java.net.URLEncoder" exclude-result-prefixes="xlink encoder i18n">
   &html-output;
   <xsl:include href="MyCoReLayout.xsl" />
-  <xsl:param name="MCR.Users.Guestuser.UserName" />
   <xsl:param name="FormTarget" select="concat($ServletsBaseURL,'MCRLoginServlet')" />
   <xsl:param name="Realm" select="'local'" />
   <xsl:variable name="loginToRealm" select="document(concat('realm:',$Realm))" />
