@@ -118,6 +118,9 @@ public class MCRIFSFileSystem extends MCRAbstractFileSystem {
         if (rootDirectory == null) {
             throw new NoSuchFileException(rootPath.toString());
         }
+        if (rootDirectory.isDeleted()) {
+            return;
+        }
         if (rootDirectory.hasChildren()) {
             throw new DirectoryNotEmptyException(rootPath.toString());
         }
