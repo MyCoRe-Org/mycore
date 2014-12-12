@@ -19,7 +19,7 @@
         <xsl:value-of select="''" />
       </xsl:when>
       <xsl:otherwise>
-        <!-- unfortunately every generated page must conain this variable, we do not want a page title for now -->
+        <!-- unfortunately every generated page must contain this variable, we do not want a page title for now -->
         <xsl:value-of select="i18n:translate('component.solr.searchresult.resultList')" />
       </xsl:otherwise>
     </xsl:choose>
@@ -115,7 +115,7 @@
     </xsl:comment>
     <xsl:choose>
       <xsl:when test="$MCR.Results.FetchHit='true'">
-        <!-- 
+        <!--
           LOCAL REQUEST
         -->
         <xsl:variable name="mcrobj" select="document(concat('mcrobject:',@id))/mycoreobject" />
@@ -136,7 +136,7 @@
   </xsl:template>
 
   <xsl:template match="doc" mode="resultList">
-    <!-- 
+    <!--
       Do not read MyCoRe object at this time
     -->
     <xsl:variable name="identifier" select="@id" />
