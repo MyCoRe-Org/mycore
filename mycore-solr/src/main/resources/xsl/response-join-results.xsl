@@ -81,7 +81,7 @@
             <xsl:value-of select="substring-after($orChain, 'OR ')" />
             <xsl:value-of select="')'" />
           </xsl:variable>
-          <xsl:apply-templates select="document(concat('solr:q=', encoder:encode($query)))/response" mode="join">
+          <xsl:apply-templates select="document(concat('solr:rows=1000&amp;q=', encoder:encode($query)))/response" mode="join">
             <xsl:with-param name="resultName" select="'unmerged'" />
           </xsl:apply-templates>
         </xsl:when>
