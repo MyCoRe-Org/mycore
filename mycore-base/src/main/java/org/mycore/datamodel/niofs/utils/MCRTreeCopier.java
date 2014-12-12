@@ -36,7 +36,7 @@ public class MCRTreeCopier implements FileVisitor<Path> {
 
     @Override
     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
-        Path newdir = target.resolve(source.relativize(dir));
+        Path newdir = target.resolve(toTargetFS(source.relativize(dir)));
         try {
             Files.copy(dir, newdir, StandardCopyOption.COPY_ATTRIBUTES);
         } catch (FileAlreadyExistsException x) {
@@ -51,7 +51,7 @@ public class MCRTreeCopier implements FileVisitor<Path> {
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-        copyFile(file, target.resolve(source.relativize(file)));
+        copyFile(file, target.resolve(toTargetFS(source.relativize(file))));
         return FileVisitResult.CONTINUE;
     }
 
@@ -63,11 +63,22 @@ public class MCRTreeCopier implements FileVisitor<Path> {
         }
     }
 
+    private Path toTargetFS(Path source) {
+        if (target.getFileSystem().equals(source.getFileSystem())) {
+            return source;
+        }
+        String[] nameParts = new String[source.getNameCount() - 1];
+        for (int i = 0; i < nameParts.length; i++) {
+            nameParts[i] = source.getName(i + 1).toString();
+        }
+        return target.getFileSystem().getPath(source.getName(0).toString(), nameParts);
+    }
+
     @Override
     public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
         // fix up modification time of directory when done
         if (exc == null) {
-            Path newdir = target.resolve(source.relativize(dir));
+            Path newdir = target.resolve(toTargetFS(source.relativize(dir)));
             try {
                 FileTime time = Files.getLastModifiedTime(dir);
                 Files.setLastModifiedTime(newdir, time);
