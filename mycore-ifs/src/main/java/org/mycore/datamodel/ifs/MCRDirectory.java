@@ -30,6 +30,7 @@ import org.mycore.common.MCRUsageException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
+import org.mycore.datamodel.niofs.MCRPath;
 
 /**
  * Represents a directory node with its metadata and content.
@@ -433,9 +434,10 @@ public class MCRDirectory extends MCRFilesystemNode {
             getChild(i).delete();
         }
         BasicFileAttributes attrs = getBasicFileAttributes();
+        MCRPath path = toPath();
         super.delete();
         MCREvent evt = new MCREvent(MCREvent.PATH_TYPE, MCREvent.DELETE_EVENT);
-        evt.put(MCREvent.PATH_KEY, toPath());
+        evt.put(MCREvent.PATH_KEY, path);
         evt.put(MCREvent.FILEATTR_KEY, attrs);
         MCREventManager.instance().handleEvent(evt);
 
