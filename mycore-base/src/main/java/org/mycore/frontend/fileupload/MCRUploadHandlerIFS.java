@@ -192,7 +192,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             } catch (Exception e2) {
                 LOGGER.error("Error while rolling back transaction", e);
             }
-            return 0;
+            throw e;
         } finally {
             if (Files.exists(tempFile)) {
                 Files.delete(tempFile);

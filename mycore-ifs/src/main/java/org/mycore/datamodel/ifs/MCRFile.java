@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -261,7 +262,13 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         for (OpenOption option : options) {
             checkOpenOption(option);
         }
-        FileChannel fileChannel = FileChannel.open(getLocalFile().toPath(), options);
+        File localFile;
+        try {
+            localFile = getLocalFile();
+        } catch (IOException e) {
+            throw new NoSuchFileException(toPath().toString(), null, e.getMessage());
+        }
+        FileChannel fileChannel = FileChannel.open(localFile.toPath(), options);
         boolean write = options.contains(StandardOpenOption.WRITE) || options.contains(StandardOpenOption.APPEND);
         boolean read = options.contains(StandardOpenOption.READ) || !write;
         return new MCRFileChannel(this, (FileChannel) fileChannel, read, write);
@@ -400,13 +407,10 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 
         contentTypeID = MCRFileContentTypeFactory.detectType(getName(), header).getID();
 
-        if (header.length > 0) // Do not store empty file content
-        {
-            MCRContentStore store = MCRContentStoreFactory.selectStore(this);
+        MCRContentStore store = MCRContentStoreFactory.selectStore(this);
 
-            storageID = store.storeContent(this, cis);
-            storeID = store.getID();
-        }
+        storageID = store.storeContent(this, cis);
+        storeID = store.getID();
 
         long new_size = cis.getLength();
         String new_md5 = cis.getMD5String();

@@ -32,10 +32,12 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.mycore.datamodel.ifs.MCRFile; 
+import org.mycore.datamodel.ifs.MCRContentInputStream;
+import org.mycore.datamodel.ifs.MCRFile;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -78,8 +80,11 @@ public class MCRFileChannel extends FileChannel {
                 md5Channel.close();
             }
         }
+        String md5 = MCRContentInputStream.getMD5String(md5Digest.digest());
+        BasicFileAttributes attrs = Files.readAttributes(file.getLocalFile().toPath(), BasicFileAttributes.class);
+        file.adjustMetadata(attrs.lastModifiedTime(), md5, attrs.size());
     }
-    
+
     //Delegate to baseChannel
 
     public int read(ByteBuffer dst) throws IOException {

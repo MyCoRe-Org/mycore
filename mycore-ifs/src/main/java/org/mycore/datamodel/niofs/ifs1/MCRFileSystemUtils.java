@@ -106,6 +106,7 @@ abstract class MCRFileSystemUtils {
                 }
                 String fileName = normalized.getFileName().toString();
                 file = new MCRFile(fileName, parent);
+                file.setContentFrom(new byte[0]);
                 created.addFirst(file);
             }
         } catch (Exception e) {
