@@ -3,6 +3,7 @@
  */
 package org.mycore.datamodel.niofs.ifs1;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.InvalidPathException;
@@ -106,7 +107,7 @@ abstract class MCRFileSystemUtils {
                 }
                 String fileName = normalized.getFileName().toString();
                 file = new MCRFile(fileName, parent);
-                file.setContentFrom(new byte[0]);
+                file.setContentFrom(new ByteArrayInputStream(new byte[0]), false);//false -> no event handler
                 created.addFirst(file);
             }
         } catch (Exception e) {
