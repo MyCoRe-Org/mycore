@@ -40,7 +40,6 @@ import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchEvent.Modifier;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.security.acl.Owner;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -527,22 +526,28 @@ public abstract class MCRPath implements Path {
         if (isEmpty(other)) {
             return this;
         }
-        final MCRPath that = toMCRPath(other);
+        String otherStr = toMCRPathString(other);
         final int baseLength = path.length();
-        final int childLength = that.path.length();
-        if (isEmpty() || that.path.charAt(0) == SEPARATOR) {
-            return root == null ? other : MCRAbstractFileSystem.getPath(root, that.path, getFileSystem());
+        final int childLength = other.toString().length();
+        if (isEmpty() || otherStr.charAt(0) == SEPARATOR) {
+            return root == null ? other : MCRAbstractFileSystem.getPath(root, otherStr, getFileSystem());
         }
         final StringBuilder result = new StringBuilder(baseLength + 1 + childLength);
         if (baseLength == 1 && path.charAt(0) == SEPARATOR) {
             result.append(SEPARATOR);
-            result.append(that.path);
+            result.append(otherStr);
         } else {
             result.append(path);
             result.append(SEPARATOR);
-            result.append(that.path);
+            result.append(otherStr);
         }
         return MCRAbstractFileSystem.getPath(root, result.toString(), getFileSystem());
+    }
+
+    private String toMCRPathString(final Path other) {
+        String otherStr = other.toString();
+        String otherSeperator = other.getFileSystem().getSeparator();
+        return otherSeperator.equals(SEPARATOR_STRING) ? otherStr : otherStr.replace(otherSeperator, SEPARATOR_STRING);
     }
 
     /* (non-Javadoc)
