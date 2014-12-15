@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.urn.hibernate.MCRURN;
 
 /**
@@ -70,8 +71,8 @@ public class MCRURNManager {
 
     /** The table of character codes for calculating the checksum */
     private static Properties codes;
-    
-    private static final Logger LOGGER = Logger.getLogger(MCRURNManager.class); 
+
+    private static final Logger LOGGER = Logger.getLogger(MCRURNManager.class);
 
     static {
         try {
@@ -118,8 +119,8 @@ public class MCRURNManager {
             codes.put("/", "45");
             codes.put("_", "43");
             codes.put(".", "47");
-            
-            store = (MCRURNStore)MCRConfiguration.instance().getSingleInstanceOf("MCR.Persistence.URN.Store.Class");
+
+            store = (MCRURNStore) MCRConfiguration.instance().getSingleInstanceOf("MCR.Persistence.URN.Store.Class");
         } catch (Throwable t) {
             // TODO: handle exception
             LOGGER.error("Init error: ", t);
@@ -248,6 +249,10 @@ public class MCRURNManager {
         store.assignURN(urn, derivateID, path, filename);
     }
 
+    public static void assignURN(String urn, MCRPath path) {
+        assignURN(urn, path.getOwner(), path.getOwnerRelativePath());
+    }
+
     /** 
      * Assigns the given urn to the given derivate ID 
      * @param urn 
@@ -298,6 +303,10 @@ public class MCRURNManager {
      */
     public static String getURNForFile(String derivateId, String path, String fileName) {
         return store.getURNForFile(derivateId, path, fileName);
+    }
+
+    public static String getURNForPath(MCRPath path) {
+        return getURNForFile(path.getOwner(), path.getOwnerRelativePath());
     }
 
     /**

@@ -23,6 +23,8 @@
 package org.mycore.urn.events;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -42,15 +44,15 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.events.MCREvent;
+import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.common.events.MCREventManager;
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFileEventHandlerBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRFileMetadata;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.urn.hibernate.MCRURN;
 import org.mycore.urn.services.MCRURNManager;
 
@@ -61,7 +63,7 @@ import org.mycore.urn.services.MCRURNManager;
  * @author shermann
  * @author Robert Stephan
  */
-public class MCRURNEventHandler extends MCRFileEventHandlerBase {
+public class MCRURNEventHandler extends MCREventHandlerBase {
 
     private static final Logger LOGGER = Logger.getLogger(MCRURNEventHandler.class);
 
@@ -235,40 +237,42 @@ public class MCRURNEventHandler extends MCRFileEventHandlerBase {
      * @see org.mycore.common.events.MCREventHandlerBase#handleFileDeleted(org.mycore.common.events.MCREvent, org.mycore.datamodel.ifs.MCRFile)
      */
     @Override
-    protected void handleFileDeleted(MCREvent evt, MCRFile file) {
-        String path = file.getAbsolutePath();
-        String urn = MCRURNManager.getURNForFile(file.getOwnerID(), path);
-        if (urn != null) {
-            LOGGER.info(MessageFormat.format("Removing urn {0} for file {1} from database", urn, path));
-            MCRURNManager.removeURN(urn);
+    protected void handlePathDeleted(MCREvent evt, Path path, BasicFileAttributes attrs) {
+        if (path instanceof MCRPath) {
+            String urn = MCRURNManager.getURNForPath(MCRPath.toMCRPath(path));
+            if (urn != null) {
+                LOGGER.info(MessageFormat.format("Removing urn {0} for file {1} from database", urn, path));
+                MCRURNManager.removeURN(urn);
+            }
         }
     }
 
     /**
      * When overriding an existing file with urn, this method ensures the urn remaining in the derivate xml.
      * @param evt
-     * @param file
+     * @param path
      *
      * TODO handle directory structures 
      * */
     @Override
-    protected void handleFileCreated(MCREvent evt, MCRFile file) {
-        if (file.getParent().getParent() != null) {
+    protected void handlePathCreated(MCREvent evt, Path path, BasicFileAttributes attrs) {
+        if (!(path instanceof MCRPath)) {
+            return;
+        }
+        if (path.getParent().getParent() != null) {
             LOGGER.warn("Sorry, directories are currently not supported.");
             return;
         }
 
-        String derivateId = file.getOwnerID();
-        String absolutePath = file.getAbsolutePath();
-        String path = absolutePath.substring(0, absolutePath.lastIndexOf("/") + 1);
-        String urn = MCRURNManager.getURNForFile(derivateId, path, file.getName());
+        MCRPath mcrPath = MCRPath.toMCRPath(path);
+        String urn = MCRURNManager.getURNForPath(mcrPath);
 
         if (urn == null) {
             return;
         }
 
-        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateId));
-        derivate.getDerivate().getOrCreateFileMetadata(file.toPath(), urn);
+        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(mcrPath.getOwner()));
+        derivate.getDerivate().getOrCreateFileMetadata(mcrPath, urn);
         try {
             MCRMetadataManager.update(derivate);
         } catch (MCRPersistenceException e) {
