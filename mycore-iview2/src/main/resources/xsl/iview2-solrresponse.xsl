@@ -12,16 +12,28 @@
     <!-- doc element of 'unmerged' response -->
     <xsl:variable name="filePath" select="str[@name='filePath']" />
     <xsl:variable name="fileName" select="str[@name='fileName']" />
+
     <xsl:choose>
       <xsl:when test="key('derivate',$mcrid)[str/@name='iviewFile' and str[@name='id']=$derivateId]">
         <!-- iview support detected generate link to image viewer -->
         <xsl:variable name="toolTipImg"
           select="concat($ServletsBaseURL,'MCRThumbnailServlet/',$derivateId,mcrxsl:encodeURIPath($filePath),$HttpSession)" />
-        <a onMouseOver="show('{$toolTipImg}')" onMouseOut="toolTip()"
-          href="{concat($WebApplicationBaseURL, 'receive/', $mcrid, '?jumpback=true&amp;maximized=true&amp;page=',$filePath,'&amp;derivate=', $derivateId)}"
-          title="{i18n:translate('metaData.iView')}">
-          <xsl:value-of select="$fileName" />
-        </a>
+        <xsl:choose>
+          <xsl:when test="$MCR.Module-iview2.useNewViewer">
+            <a onMouseOver="show('{$toolTipImg}')" onMouseOut="toolTip()" href="{$WebApplicationBaseURL}rsc/viewer/{$derivateId}/{$filePath}"
+              title="{i18n:translate('metaData.iView')}">
+              <xsl:value-of select="$fileName" />
+            </a>
+          </xsl:when>
+          <xsl:otherwise>
+            <a onMouseOver="show('{$toolTipImg}')" onMouseOut="toolTip()"
+              href="{concat($WebApplicationBaseURL, 'receive/', $mcrid, '?jumpback=true&amp;maximized=true&amp;page=',$filePath,'&amp;derivate=', $derivateId)}"
+              title="{i18n:translate('metaData.iView')}">
+              <xsl:value-of select="$fileName" />
+            </a>
+          </xsl:otherwise>
+        </xsl:choose>
+
       </xsl:when>
       <xsl:otherwise>
         <a href="{concat($fileNodeServlet,$derivateId,mcrxsl:encodeURIPath($filePath),$HttpSession)}">
