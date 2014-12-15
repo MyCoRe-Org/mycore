@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.NotDirectoryException;
 import java.nio.file.StandardOpenOption;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
@@ -170,7 +171,10 @@ public class MCRIFSCommands {
 
         private File baseDir;
 
-        public FileStoreIterator(File basedir) {
+        public FileStoreIterator(File basedir) throws NotDirectoryException {
+            if (!basedir.isDirectory()) {
+                throw new NotDirectoryException(basedir.toString());
+            }
             this.baseDir = basedir;
         }
 
