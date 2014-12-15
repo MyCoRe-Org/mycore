@@ -91,7 +91,10 @@ public class MCREditorSubmission {
                 String xPath = paramName.substring(PREFIX_DEFAULT_VALUE.length());
                 
                 MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
-                if (binding.getBoundNodes().size() == 0) continue;
+                boolean noSuchNode = binding.getBoundNodes().isEmpty();
+                binding.detach();
+                if (noSuchNode)
+                    continue;
 
                 String defaultValue = values.get(paramName)[0];
                 markDefaultValue(xPath, defaultValue);
