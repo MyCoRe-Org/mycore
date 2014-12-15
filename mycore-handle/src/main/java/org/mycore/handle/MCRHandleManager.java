@@ -13,8 +13,8 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.datamodel.niofs.MCRPath;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -118,7 +118,7 @@ public class MCRHandleManager {
      *
      * @param file
      */
-    synchronized public static void delete(MCRFile file) throws Throwable {
+    synchronized public static void delete(MCRPath file) throws Throwable {
         MCRHandle handle = MCRHandleManager.getHandle(file);
         if (handle == null) {
             return;
@@ -138,7 +138,7 @@ public class MCRHandleManager {
 
     /**
     */
-    static private int requestHandleDelete(String objectSignature, String messageSignature, MCRFile file) {
+    static private int requestHandleDelete(String objectSignature, String messageSignature, MCRPath file) {
         PostMethod post = new PostMethod(MCRHandleCommons.EDA_REPOS_URL + messageSignature);
         int status = -1;
         try {
@@ -160,14 +160,14 @@ public class MCRHandleManager {
      * @throws Throwable
      */
     @SuppressWarnings("unchecked")
-    public static MCRHandle getHandle(MCRFile file) throws Throwable {
-        String owner = file.getOwnerID();
+    public static MCRHandle getHandle(MCRPath file) throws Throwable {
+        String owner = file.getOwner();
 
         List<MCRHandle> list = new ArrayList<MCRHandle>();
         Session session = MCRHIBConnection.instance().getSession();
         try {
             Criteria q = session.createCriteria(MCRHandle.class);
-            q.add(Restrictions.and(Restrictions.eq("mcrid", owner), Restrictions.eq("path", file.getAbsolutePath())));
+            q.add(Restrictions.and(Restrictions.eq("mcrid", owner), Restrictions.eq("path", file.getOwnerRelativePath())));
 
             list = q.list();
         } catch (Exception ex) {
@@ -218,7 +218,7 @@ public class MCRHandleManager {
      * @param derivateObject the derivate to update (handle is stored in the derivate's xml as well)
      * @param file the file this handle is assigned to
      */
-    synchronized static public void requestHandle(MCRFile file) throws Throwable {
+    synchronized static public void requestHandle(MCRPath file) throws Throwable {
         Session session = MCRHIBConnection.instance().getSession();
         try {
             MCRIHandleProvider handleProvider = getHandleProvider();
@@ -253,7 +253,7 @@ public class MCRHandleManager {
      * @param messageSignature
      * @return
      */
-    private static JsonObject createJson(String gbvObjectUUID, String messageSignature, MCRFile file) {
+    private static JsonObject createJson(String gbvObjectUUID, String messageSignature, MCRPath file) {
         JsonObject handleProps = new JsonObject();
         handleProps.addProperty("handle-url", "");
         handleProps.addProperty("handle-email", "");

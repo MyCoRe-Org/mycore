@@ -3,7 +3,7 @@
  */
 package org.mycore.handle;
 
-import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.niofs.MCRPath;
 
 
 /**
@@ -19,7 +19,7 @@ public interface MCRIHandleProvider {
      * @param file
      * @return
      */
-    public MCRHandle requestHandle(MCRFile file);
+    public MCRHandle requestHandle(MCRPath file);
 
     /**
      * Generates multiple handles.

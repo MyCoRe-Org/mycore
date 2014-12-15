@@ -14,7 +14,7 @@ import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.log4j.Logger;
-import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.niofs.MCRPath;
 
 import com.google.gson.JsonObject;
 
@@ -49,7 +49,7 @@ public class MCRGbvHandleProvider implements MCRIHandleProvider {
     }
 
     @Override
-    public MCRHandle requestHandle(MCRFile file) {
+    public MCRHandle requestHandle(MCRPath file) {
         String objectSignature = UUID.randomUUID().toString().replace("-", "");
 
         int status = -1;
@@ -60,8 +60,8 @@ public class MCRGbvHandleProvider implements MCRIHandleProvider {
         }
 
         MCRHandle handle = new MCRHandle();
-        handle.setMcrid(file.getOwnerID());
-        handle.setPath(file.getAbsolutePath());
+        handle.setMcrid(file.getOwner());
+        handle.setPath(file.getOwnerRelativePath());
         handle.setObjectSignature(objectSignature);
 
         return handle;

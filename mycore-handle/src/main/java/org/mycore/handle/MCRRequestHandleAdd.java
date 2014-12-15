@@ -18,9 +18,9 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileNodeServlet;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.iview2.services.MCRIView2Tools;
 
@@ -72,7 +72,7 @@ public class MCRRequestHandleAdd extends TimerTask {
                 String messageSignature = UUID.randomUUID().toString().replace("-", "");
 
                 int status = requestHandleAdd(handle.getObjectSignature(), messageSignature,
-                        MCRFile.getMCRFile(MCRObjectID.getInstance(handle.getMcrid()), handle.getPath()));
+                    MCRPath.getPath(MCRObjectID.getInstance(handle.getMcrid()).toString(), handle.getPath()));
 
                 if (!String.valueOf(status).startsWith("2")) {
                     LOGGER.warn("Could not post handle:add");
@@ -98,7 +98,8 @@ public class MCRRequestHandleAdd extends TimerTask {
      * @return
      * @throws IOException 
      */
-    private JsonObject createJson(String gbvObjectUUID, String messageSignature, MCRFile file) throws URISyntaxException, IOException {
+    private JsonObject createJson(String gbvObjectUUID, String messageSignature, MCRPath file)
+        throws URISyntaxException, IOException {
         JsonObject handleProps = new JsonObject();
         handleProps.addProperty("handle-url", getHandleURL(file));
         handleProps.addProperty("handle-email", MCRHandleCommons.HANDLE_MAIL);
@@ -133,10 +134,11 @@ public class MCRRequestHandleAdd extends TimerTask {
      * @param file
      * @return
      */
-    private String getHandleURL(MCRFile file) throws URISyntaxException, IOException {
-        String url = MCRIView2Tools.getViewerURL(file.toPath());
+    private String getHandleURL(MCRPath file) throws URISyntaxException, IOException {
+        String url = MCRIView2Tools.getViewerURL(file);
         if (url == null) {
-            url = MCRServlet.getServletBaseURL() + MCRFileNodeServlet.class.getSimpleName() + file.getAbsolutePath();
+            url = MCRServlet.getServletBaseURL() + MCRFileNodeServlet.class.getSimpleName() + file.getOwner()
+                + file.getOwnerRelativePath();
             return url;
         }
         return url;
@@ -153,13 +155,15 @@ public class MCRRequestHandleAdd extends TimerTask {
      * @throws IOException
      * @throws HttpException
      */
-    private int requestHandleAdd(String objectSignature, String messageSignature, MCRFile file) throws URISyntaxException {
+    private int requestHandleAdd(String objectSignature, String messageSignature, MCRPath file)
+        throws URISyntaxException {
         PostMethod post = new PostMethod(MCRHandleCommons.EDA_REPOS_URL + messageSignature);
         int status = -1;
         try {
             JsonObject jsonAdd = createJson(objectSignature, messageSignature, file);
             post.setRequestEntity(new StringRequestEntity(jsonAdd.toString(), "application/json", "UTF-8"));
-            LOGGER.info(MessageFormat.format("Sending request to {0} (request handle for object signature {1})", post.getURI(), objectSignature));
+            LOGGER.info(MessageFormat.format("Sending request to {0} (request handle for object signature {1})",
+                post.getURI(), objectSignature));
             status = MCRHandleCommons.HTTP_CLIENT.executeMethod(post);
         } catch (IOException e) {
             LOGGER.error("Could not request handle:add", e);

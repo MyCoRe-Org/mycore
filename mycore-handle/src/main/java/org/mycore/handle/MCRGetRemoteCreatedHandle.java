@@ -18,15 +18,14 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 
 /**
  * Class responsible for retrieving and storing the remotely created handle. 
@@ -75,14 +74,16 @@ public class MCRGetRemoteCreatedHandle extends TimerTask {
         try {
             Criteria q = session.createCriteria(MCRHandle.class);
             q.add(Restrictions.eq("checksum", -1));
-            q.add(Restrictions.and(Restrictions.isNotNull("objectSignature"), Restrictions.isNotNull("messageSignature")));
+            q.add(Restrictions.and(Restrictions.isNotNull("objectSignature"),
+                Restrictions.isNotNull("messageSignature")));
 
             List<MCRHandle> list = q.list();
             for (MCRHandle handle : list) {
                 JsonObject message = getMessage(handle.getMessageSignature());
 
                 if (MCRGbvHandleProvider.STATUS_CANCEL.equals(getStatus(message))) {
-                    LOGGER.warn("Status is " + MCRGbvHandleProvider.STATUS_CANCEL + "...deleting handle request in database");
+                    LOGGER.warn("Status is " + MCRGbvHandleProvider.STATUS_CANCEL
+                        + "...deleting handle request in database");
                     try {
                         MCRHandleManager.delete(handle);
                     } catch (Throwable e) {
@@ -98,7 +99,8 @@ public class MCRGetRemoteCreatedHandle extends TimerTask {
 
                 String handleString = getHandle(handle.getObjectSignature());
                 if (handleString == null) {
-                    LOGGER.error("Handle string for object " + handle.getObjectSignature() + " is null but is marked as created. Please investigate");
+                    LOGGER.error("Handle string for object " + handle.getObjectSignature()
+                        + " is null but is marked as created. Please investigate");
                     continue;
                 }
 
@@ -113,13 +115,16 @@ public class MCRGetRemoteCreatedHandle extends TimerTask {
 
                 int calculated = checksumProvider.checksum(handle);
                 if (checksum != calculated) {
-                    LOGGER.warn(MessageFormat.format("Calculated checksum differs from the one submitted calc={0} != submitted={1}", calculated, checksum));
+                    LOGGER.warn(MessageFormat.format(
+                        "Calculated checksum differs from the one submitted calc={0} != submitted={1}", calculated,
+                        checksum));
                 }
 
                 session.update(handle);
-                MCRDerivate derivateObject = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(handle.getMcrid()));
-                MCRFile file = MCRFile.getMCRFile(MCRObjectID.getInstance(handle.getMcrid()), handle.getPath());
-                derivateObject.getDerivate().getOrCreateFileMetadata(file.toPath(), null, handle.toString());
+                MCRDerivate derivateObject = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(handle
+                    .getMcrid()));
+                MCRPath file = MCRPath.getPath(MCRObjectID.getInstance(handle.getMcrid()).toString(), handle.getPath());
+                derivateObject.getDerivate().getOrCreateFileMetadata(file, null, handle.toString());
 
                 MCRMetadataManager.update(derivateObject);
             }
@@ -199,7 +204,8 @@ public class MCRGetRemoteCreatedHandle extends TimerTask {
     private String getHandle(String objectSignature) {
         GetMethod get = new GetMethod(MCRHandleCommons.GBV_OBJECT_REPOS_URL + objectSignature);
         try {
-            LOGGER.info(MessageFormat.format("Sending request to {0} (getting handle for object signature {1})", get.getURI(), objectSignature));
+            LOGGER.info(MessageFormat.format("Sending request to {0} (getting handle for object signature {1})",
+                get.getURI(), objectSignature));
             MCRHandleCommons.HTTP_CLIENT.executeMethod(get);
             String responseBody = get.getResponseBodyAsString();
             if (responseBody == null) {

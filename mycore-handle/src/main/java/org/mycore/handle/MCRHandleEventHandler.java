@@ -1,10 +1,12 @@
 package org.mycore.handle;
 
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+
 import org.apache.log4j.Logger;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFileEventHandlerBase;
+import org.mycore.datamodel.niofs.MCRPath;
 
 /**
  * Class handles events related to ... handles. 
@@ -12,13 +14,15 @@ import org.mycore.datamodel.ifs.MCRFileEventHandlerBase;
  * @author shermann
  *
  */
-public class MCRHandleEventHandler extends MCRFileEventHandlerBase {
+public class MCRHandleEventHandler extends MCREventHandlerBase {
     private static final Logger LOGGER = Logger.getLogger(MCRHandleEventHandler.class);
 
     @Override
-    protected void handleFileDeleted(MCREvent evt, MCRFile file) {
+    protected void handlePathDeleted(MCREvent evt, Path file, BasicFileAttributes attrs) {
         try {
-            MCRHandleManager.delete(file);
+            if (file instanceof MCRPath) {
+                MCRHandleManager.delete(MCRPath.toMCRPath(file));
+            }
         } catch (Throwable e) {
             LOGGER.error("Could not delete handle", e);
         }
