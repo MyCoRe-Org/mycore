@@ -23,6 +23,9 @@
 
 package org.mycore.wfc.mail;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,12 +34,13 @@ import org.mycore.common.MCRMailer;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.events.MCREvent;
+import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFileEventHandlerBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.datamodel.niofs.MCRPathXML;
 
 /**
  * Uses "e-mail-events.xsl" to transform derivate, object and files to emails.
@@ -46,7 +50,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRMailEventHandler extends MCRFileEventHandlerBase {
+public class MCRMailEventHandler extends MCREventHandlerBase {
 
     private static final Logger LOGGER = Logger.getLogger(MCRMailEventHandler.class);
 
@@ -77,9 +81,18 @@ public class MCRMailEventHandler extends MCRFileEventHandlerBase {
         handleEvent(evt, xml);
     }
 
-    private void handleFileEvent(MCREvent evt, MCRFile file) {
-        MCRContent xml = new MCRJDOMContent(file.createXML());
-        handleEvent(evt, xml);
+    private void handlePathEvent(MCREvent evt, Path file, BasicFileAttributes attrs) {
+        if (!(file instanceof MCRPath)) {
+            return;
+        }
+        MCRPath path = MCRPath.toMCRPath(file);
+        MCRContent xml;
+        try {
+            xml = new MCRJDOMContent(MCRPathXML.getFileXML(path, attrs));
+            handleEvent(evt, xml);
+        } catch (IOException e) {
+            LOGGER.error("Error while generating mail for " + file, e);
+        }
     }
 
     private void handleEvent(MCREvent evt, MCRContent xml) {
@@ -136,18 +149,18 @@ public class MCRMailEventHandler extends MCRFileEventHandlerBase {
     }
 
     @Override
-    protected void handleFileCreated(MCREvent evt, MCRFile file) {
-        handleFileEvent(evt, file);
+    protected void handlePathCreated(MCREvent evt, Path file, BasicFileAttributes attrs) {
+        handlePathEvent(evt, file, attrs);
     }
 
     @Override
-    protected void handleFileUpdated(MCREvent evt, MCRFile file) {
-        handleFileEvent(evt, file);
+    protected void handlePathUpdated(MCREvent evt, Path file, BasicFileAttributes attrs) {
+        handlePathEvent(evt, file, attrs);
     }
 
     @Override
-    protected void handleFileDeleted(MCREvent evt, MCRFile file) {
-        handleFileEvent(evt, file);
+    protected void handlePathDeleted(MCREvent evt, Path file, BasicFileAttributes attrs) {
+        handlePathEvent(evt, file, attrs);
     }
 
 }

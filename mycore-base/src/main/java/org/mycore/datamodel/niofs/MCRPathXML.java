@@ -32,13 +32,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
+import java.util.Collection;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.mycore.datamodel.classifications2.MCRCategLinkReference;
+import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 ;
 
@@ -115,6 +122,57 @@ public class MCRPathXML {
 
         return doc;
 
+    }
+
+    /**
+     * Returns metadata of the file retrievable by 'path' in XML form.
+     * 
+     * Same as {@link #getFileXML(MCRPath, BasicFileAttributes)}, but attributes are retrieved first.
+     * 
+     */
+    public static Document getFileXML(MCRPath path) throws IOException {
+        MCRFileAttributes<?> attrs = Files.readAttributes(path, MCRFileAttributes.class);
+        return getFileXML(path, attrs);
+    }
+
+    /**
+     * Returns metadata of the file retrievable by 'path' in XML form.
+     * 
+     * @param path Path to File
+     * @param attrs file attributes of given file
+     */
+    public static Document getFileXML(MCRPath path, BasicFileAttributes attrs) throws IOException {
+        Element root = new Element("file");
+        root.setAttribute("id", path.toUri().toString());
+        root.setAttribute("owner", path.getOwner());
+        String fileName = path.getFileName().toString();
+        root.setAttribute("name", fileName);
+        String absolutePath = path.getOwnerRelativePath();
+        root.setAttribute("path", absolutePath);
+        root.setAttribute("extension", getFileExtension(fileName));
+        root.setAttribute("returnId",
+            MCRMetadataManager.getObjectId(MCRObjectID.getInstance(path.getOwner()), 10, TimeUnit.SECONDS).toString());
+        Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.getInstance().getLinksFromReference(
+            new MCRCategLinkReference(path));
+        for (MCRCategoryID category : linksFromReference) {
+            Element catEl = new Element("category");
+            catEl.setAttribute("id", category.toString());
+            root.addContent(catEl);
+        }
+        if (!attrs.isDirectory() && attrs instanceof MCRFileAttributes<?>) {
+            addAttributes(root, (MCRFileAttributes<?>) attrs, path);
+        } else {
+            addBasicAttributes(root, attrs, path);
+        }
+        return new Document(root);
+    }
+
+    private static String getFileExtension(String fileName) {
+        if (fileName.endsWith(".")) {
+            return "";
+        }
+        int pos = fileName.lastIndexOf(".");
+        return pos == -1 ? "" : fileName.substring(pos + 1);
     }
 
     private static String toStringValue(MCRPath relativePath) {
