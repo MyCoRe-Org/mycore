@@ -23,8 +23,9 @@
 
 package org.mycore.iview2.frontend;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.Date;
 
@@ -34,8 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.content.MCRContent;
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.servlets.MCRContentServlet;
 
 /**
@@ -61,14 +61,9 @@ public class MCRPDFThumbnailServlet extends MCRContentServlet {
     public MCRContent getContent(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             ThumnailInfo thumbnailInfo = getThumbnailInfo(req.getPathInfo());
-            MCRFile mcrFile = MCRFile.getMCRFile(MCRObjectID.getInstance(thumbnailInfo.derivate),
-                thumbnailInfo.filePath);
-            if (mcrFile == null) {
-                return null;
-            }
-            File pdfFile = mcrFile.getLocalFile();
-            LOGGER.info("PDF file: " + pdfFile.getAbsolutePath());
-            if (!pdfFile.exists()) {
+            MCRPath pdfFile = MCRPath.getPath(thumbnailInfo.derivate, thumbnailInfo.filePath);
+            LOGGER.info("PDF file: " + pdfFile);
+            if (Files.notExists(pdfFile)) {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND, MessageFormat.format(
                     "Could not find pdf file for {0}{1}", thumbnailInfo.derivate, thumbnailInfo.filePath));
                 return null;
@@ -78,11 +73,13 @@ public class MCRPDFThumbnailServlet extends MCRContentServlet {
             //defaults to "yes"
             boolean centered = !"no".equals(centerThumb);
             int thumbnailSize = imgSize == null ? this.thumbnailSize : Integer.parseInt(imgSize);
-            MCRContent imageContent = pdfTools.getThumnail(pdfFile, thumbnailSize, centered);
+            BasicFileAttributes attrs = Files.readAttributes(pdfFile, BasicFileAttributes.class);
+            MCRContent imageContent = pdfTools.getThumnail(pdfFile, attrs, thumbnailSize, centered);
             if (imageContent != null) {
                 resp.setHeader("Cache-Control", "max-age=" + MAX_AGE);
                 Date expires = new Date(System.currentTimeMillis() + MAX_AGE * 1000);
-                LOGGER.debug("Last-Modified: " + new Date(pdfFile.lastModified()) + ", expire on: " + expires);
+                LOGGER.debug("Last-Modified: " + new Date(attrs.lastModifiedTime().toMillis()) + ", expire on: "
+                    + expires);
                 resp.setDateHeader("Expires", expires.getTime());
             }
             return imageContent;

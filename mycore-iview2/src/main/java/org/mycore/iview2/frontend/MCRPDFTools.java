@@ -28,12 +28,11 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -66,7 +65,7 @@ class MCRPDFTools implements AutoCloseable {
         this.pngTools = new MCRPNGTools();
     }
 
-    static BufferedImage getThumbnail(File pdfFile, int thumbnailSize, boolean centered) throws IOException {
+    static BufferedImage getThumbnail(Path pdfFile, int thumbnailSize, boolean centered) throws IOException {
         PDDocument pdf = getPDDocument(pdfFile);
         BufferedImage level1Image;
         int imageType = BufferedImage.TYPE_INT_ARGB;
@@ -112,8 +111,8 @@ class MCRPDFTools implements AutoCloseable {
         return bicubic;
     }
 
-    private static PDDocument getPDDocument(File pdfFile) throws IOException {
-        InputStream input = Channels.newInputStream(FileChannel.open(pdfFile.toPath(), StandardOpenOption.READ));
+    private static PDDocument getPDDocument(Path pdfFile) throws IOException {
+        InputStream input = Files.newInputStream(pdfFile);
         RandomAccess rafi = new RandomAccessBuffer();
         PDFParser parser = new PDFParser(input, rafi);
         parser.parse();
@@ -180,10 +179,12 @@ class MCRPDFTools implements AutoCloseable {
 
     }
 
-    MCRContent getThumnail(File pdfFile, int thumbnailSize, boolean centered) throws IOException {
+    MCRContent getThumnail(Path pdfFile, BasicFileAttributes attrs, int thumbnailSize, boolean centered)
+        throws IOException {
         BufferedImage thumbnail = MCRPDFTools.getThumbnail(pdfFile, thumbnailSize, centered);
         MCRContent pngContent = pngTools.toPNGContent(thumbnail);
-        pngContent.setLastModified(pdfFile.lastModified());
+        BasicFileAttributes fattrs = attrs != null ? attrs : Files.readAttributes(pdfFile, BasicFileAttributes.class);
+        pngContent.setLastModified(fattrs.lastModifiedTime().toMillis());
         return pngContent;
     }
 
