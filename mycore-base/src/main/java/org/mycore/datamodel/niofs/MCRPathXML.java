@@ -143,8 +143,8 @@ public class MCRPathXML {
      */
     public static Document getFileXML(MCRPath path, BasicFileAttributes attrs) throws IOException {
         Element root = new Element("file");
-        root.setAttribute("id", path.toUri().toString());
-        root.setAttribute("owner", path.getOwner());
+        root.setAttribute("uri", path.toUri().toString());
+        root.setAttribute("ownerID", path.getOwner());
         String fileName = path.getFileName().toString();
         root.setAttribute("name", fileName);
         String absolutePath = path.getOwnerRelativePath();
