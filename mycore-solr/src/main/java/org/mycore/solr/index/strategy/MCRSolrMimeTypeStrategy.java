@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRXMLFunctions;
-import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.ifs2.MCRFile;
 
 /**
  * Strategy that depends on a files mime type. By default images are

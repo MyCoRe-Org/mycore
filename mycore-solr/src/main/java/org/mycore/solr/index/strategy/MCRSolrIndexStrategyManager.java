@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.datamodel.ifs.MCRFile;
 
 /**
  * @author Matthias Eichner

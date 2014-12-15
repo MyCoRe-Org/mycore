@@ -45,6 +45,7 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
+import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -52,7 +53,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.ifs2.MCRFile;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRContentTypes;
@@ -127,7 +128,7 @@ public class MCRSolrPathDocumentFactory {
             }
             doc.setField("derivateModified", getDerivateModified(ownerID));
             Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.getInstance()
-                .getLinksFromReference(MCRFile.getCategLinkReference(MCRObjectID.getInstance(ownerID), absolutePath));
+                .getLinksFromReference(new MCRCategLinkReference(mcrPath));
             HashSet<MCRCategoryID> linkedCategories = new HashSet<>(linksFromReference);
             for (MCRCategoryID category : linksFromReference) {
                 for (MCRCategory parent : CATEGORY_DAO.getParents(category)) {
