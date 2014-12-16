@@ -6,8 +6,7 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFilesystemNode;
+import org.mycore.datamodel.niofs.MCRPath;
 
 public class METSGeneratorTest {
 
@@ -22,7 +21,7 @@ public class METSGeneratorTest {
 
     public static class TestGenerator extends MCRMETSGenerator {
         @Override
-        public Mets getMETS(MCRDirectory dir, Set<MCRFilesystemNode> ignoreNodes) {
+        public Mets getMETS(MCRPath dir, Set<MCRPath> ignoreNodes) {
             return new Mets();
         }
     }

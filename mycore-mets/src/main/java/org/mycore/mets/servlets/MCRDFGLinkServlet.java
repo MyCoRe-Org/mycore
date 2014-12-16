@@ -24,6 +24,7 @@
 package org.mycore.mets.servlets;
 
 import java.net.URLEncoder;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashSet;
@@ -37,14 +38,13 @@ import org.jdom2.Document;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.common.MCRLinkTableManager;
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.mets.model.MCRMETSGenerator;
@@ -88,9 +88,9 @@ public class MCRDFGLinkServlet extends MCRServlet {
             + "?XSL.Style=dfg", "UTF-8");
         LOGGER.info(request.getPathInfo());
 
-        MCRDirectory dir = MCRDirectory.getRootDirectory(derivateID);
+        MCRPath rootPath = MCRPath.getPath(derivateID, "/");
 
-        if (dir == null) {
+        if (!Files.isDirectory(rootPath)) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND,
                 MessageFormat.format("Derivate {0} does not exist.", derivateID));
             return;
@@ -108,10 +108,10 @@ public class MCRDFGLinkServlet extends MCRServlet {
             filePath = derivate.getDerivate().getInternals().getMainDoc();
         }
 
-        MCRFile metsFile = (MCRFile) dir.getChildByPath("mets.xml");
+        MCRPath metsPath = (MCRPath) rootPath.resolve("mets.xml");
         int imageNumber = -2;
-        if (metsFile != null) {
-            imageNumber = getOrderNumber(metsFile.getContent().asXML(), filePath);
+        if (Files.exists(metsPath)) {
+            imageNumber = getOrderNumber(new MCRPathContent(metsPath).asXML(), filePath);
         } else {
             MCRContent metsContent = getMetsSource(job, useExistingMets(request), derivateID);
             imageNumber = getOrderNumber(metsContent.asXML(), filePath);
@@ -179,9 +179,8 @@ public class MCRDFGLinkServlet extends MCRServlet {
      */
     private static MCRContent getMetsSource(MCRServletJob job, boolean useExistingMets, String derivate)
         throws Exception {
-        MCRDirectory dir = MCRDirectory.getRootDirectory(derivate);
 
-        MCRFilesystemNode metsFile = dir.getChildByPath("mets.xml");
+        MCRPath metsFile = MCRPath.getPath(derivate, "/mets.xml");
 
         try {
             job.getRequest().setAttribute("XSL.derivateID", derivate);
@@ -191,15 +190,17 @@ public class MCRDFGLinkServlet extends MCRServlet {
             LOGGER.warn("Unable to set \"XSL.objectID\" attribute to current request", x);
         }
 
-        if (metsFile != null && useExistingMets) {
-            MCRContent content = ((MCRFile) metsFile).getContent();
+        boolean metsExists = Files.exists(metsFile);
+        if (metsExists && useExistingMets) {
+            MCRContent content = new MCRPathContent(metsFile);
             content.setDocType("mets");
             return content;
         } else {
-            HashSet<MCRFilesystemNode> ignoreNodes = new HashSet<MCRFilesystemNode>();
-            if (metsFile != null)
+            HashSet<MCRPath> ignoreNodes = new HashSet<MCRPath>();
+            if (metsExists) {
                 ignoreNodes.add(metsFile);
-            Document mets = MCRMETSGenerator.getGenerator().getMETS(dir, ignoreNodes).asDocument();
+            }
+            Document mets = MCRMETSGenerator.getGenerator().getMETS(metsFile.getParent(), ignoreNodes).asDocument();
 
             return new MCRJDOMContent(mets);
         }

@@ -19,6 +19,7 @@
 package org.mycore.mets.servlets;
 
 import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.util.HashSet;
 
 import javax.servlet.http.HttpServletResponse;
@@ -27,8 +28,7 @@ import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFilesystemNode;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.mets.model.MCRMETSGenerator;
@@ -92,14 +92,14 @@ public class MCRJSONProviderServlet extends MCRServlet {
      * @return Document the mets document on base of the derivate
      */
     private Document getBaseMetsXML(String derivate) throws Exception {
-        MCRDirectory dir = MCRDirectory.getRootDirectory(derivate);
-        MCRFilesystemNode metsFile = dir.getChildByPath(MCRJSONProvider.DEFAULT_METS_FILENAME);
+        MCRPath metsPath = MCRPath.getPath(derivate, (MCRJSONProvider.DEFAULT_METS_FILENAME));
 
-        HashSet<MCRFilesystemNode> ignoreNodes = new HashSet<MCRFilesystemNode>();
-        if (metsFile != null) {
-            ignoreNodes.add(metsFile);
+        HashSet<MCRPath> ignoreNodes = new HashSet<>();
+        if (Files.exists(metsPath)) {
+            ignoreNodes.add(metsPath);
         }
-        Document mets = MCRMETSGenerator.getGenerator().getMETS(dir, ignoreNodes).asDocument();
+        Document mets = MCRMETSGenerator.getGenerator().getMETS(MCRPath.getPath(derivate, "/"), ignoreNodes)
+            .asDocument();
 
         return mets;
     }

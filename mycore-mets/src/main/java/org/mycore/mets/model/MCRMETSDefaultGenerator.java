@@ -19,21 +19,25 @@
 
 package org.mycore.mets.model;
 
-import java.net.URI;
+import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.xml.MCRXMLFunctions;
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
-import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRContentTypes;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.mets.model.files.FLocat;
 import org.mycore.mets.model.files.File;
 import org.mycore.mets.model.files.FileGrp;
@@ -42,6 +46,7 @@ import org.mycore.mets.model.sections.AmdSec;
 import org.mycore.mets.model.sections.DmdSec;
 import org.mycore.mets.model.struct.AbstractLogicalDiv;
 import org.mycore.mets.model.struct.Fptr;
+import org.mycore.mets.model.struct.LOCTYPE;
 import org.mycore.mets.model.struct.LogicalDiv;
 import org.mycore.mets.model.struct.LogicalStructMap;
 import org.mycore.mets.model.struct.LogicalSubDiv;
@@ -61,22 +66,23 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
 
     private static final Logger LOGGER = Logger.getLogger(MCRMETSGenerator.class);
 
-    public Mets getMETS(MCRDirectory dir, Set<MCRFilesystemNode> ignoreNodes) {
+    public Mets getMETS(MCRPath dir, Set<MCRPath> ignoreNodes) throws IOException {
         // add dmdsec
-        DmdSec dmdSec = new DmdSec("dmd_" + dir.getOwnerID());
+        DmdSec dmdSec = new DmdSec("dmd_" + dir.getOwner());
         // add amdsec
-        AmdSec amdSec = new AmdSec("amd_" + dir.getOwnerID());
+        AmdSec amdSec = new AmdSec("amd_" + dir.getOwner());
         // file sec
         FileSec fileSec = new FileSec();
         FileGrp fileGrp = new FileGrp(FileGrp.USE_MASTER);
         fileSec.addFileGrp(fileGrp);
         // physical structure
         PhysicalStructMap physicalStructMap = new PhysicalStructMap();
-        PhysicalDiv physicalDiv = new PhysicalDiv("phys_dmd_" + dir.getOwnerID(), "physSequence");
+        PhysicalDiv physicalDiv = new PhysicalDiv("phys_dmd_" + dir.getOwner(), "physSequence");
         physicalStructMap.setDivContainer(physicalDiv);
         // logical structure
         LogicalStructMap logicalStructMap = new LogicalStructMap();
-        LogicalDiv logicalDiv = new LogicalDiv("log_" + dir.getOwnerID(), "monograph", dir.getOwnerID(), 1, amdSec.getId(), dmdSec.getId());
+        LogicalDiv logicalDiv = new LogicalDiv("log_" + dir.getOwner(), "monograph", dir.getOwner(), 1, amdSec.getId(),
+            dmdSec.getId());
         logicalDiv.setDmdId(dmdSec.getId());
         logicalStructMap.setDivContainer(logicalDiv);
         // struct Link
@@ -94,7 +100,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         mets.addStructMap(logicalStructMap);
         mets.setStructLink(structLink);
 
-        MCRDerivate owner = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(dir.getOwnerID()));
+        MCRDerivate owner = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(dir.getOwner()));
         Map<String, String> urnFileMap = owner.getUrnMap();
         if (urnFileMap.size() > 0) {
             try {
@@ -106,46 +112,53 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         return mets;
     }
 
-    private void createMets(MCRDirectory dir, Set<MCRFilesystemNode> ignoreNodes, FileGrp fileGrp, PhysicalDiv physicalDiv, AbstractLogicalDiv logicalDiv, StructLink structLink, int logOrder) {
-        MCRFilesystemNode[] children = dir.getChildren(MCRDirectory.SORT_BY_NAME_IGNORECASE);
-        for (MCRFilesystemNode node : children) {
-            if (ignoreNodes.contains(node))
-                continue;
-            if (node instanceof MCRDirectory) {
-                MCRDirectory subDir = (MCRDirectory) node;
-                LogicalSubDiv section = new LogicalSubDiv("log_" + Integer.toString(++logOrder), "section", subDir.getName(), logOrder);
-                logicalDiv.add(section);
-                createMets((MCRDirectory)node, ignoreNodes, fileGrp, physicalDiv, section, structLink, logOrder);
-            } else {
-                MCRFile mcrFile = (MCRFile) node;
-                final UUID uuid = UUID.randomUUID();
-                final String fileID = "master_" + uuid.toString();
-                final String physicalID = "phys_" + uuid.toString();
-                try {
-                    final String href = MCRXMLFunctions.encodeURIPath(mcrFile.getAbsolutePath().substring(1)).toString();//new URI(null, null,mcrFile.getAbsolutePath().substring(1), null, null).toString();
-                    // file
-                    File file = new File(fileID, getMimeType(mcrFile));
-                    FLocat fLocat = new FLocat(FLocat.LOCTYPE_URL, href);
-                    file.setFLocat(fLocat);
-                    fileGrp.addFile(file);
-                } catch(URISyntaxException uriSyntaxException) {
-                    LOGGER.error("invalid href", uriSyntaxException);
+    private void createMets(MCRPath dir, Set<MCRPath> ignoreNodes, FileGrp fileGrp, PhysicalDiv physicalDiv,
+        AbstractLogicalDiv logicalDiv, StructLink structLink, int logOrder) throws IOException {
+        SortedMap<MCRPath, BasicFileAttributes> files = new TreeMap<>(), directories = new TreeMap<>();
+        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(dir)) {
+            for (Path child : dirStream) {
+                MCRPath path = MCRPath.toMCRPath(child);
+                if (ignoreNodes.contains(path)) {
                     continue;
                 }
-                // physical
-                PhysicalSubDiv pyhsicalPage = new PhysicalSubDiv(physicalID, "page",  physicalDiv.getChildren().size() + 1);
-                Fptr fptr = new Fptr(fileID);
-                pyhsicalPage.add(fptr);
-                physicalDiv.add(pyhsicalPage);
-                // struct link
-                SmLink smLink = new SmLink(logicalDiv.getId(), physicalID);
-                structLink.addSmLink(smLink);    
+                BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
+                if (attrs.isDirectory()) {
+                    directories.put(path, attrs);
+                } else {
+                    files.put(path, attrs);
+                }
             }
         }
-    }
-
-    private String getMimeType(MCRFile subFile) {
-        return MCRFileContentTypeFactory.getType(subFile.getContentTypeID()).getMimeType();
+        for (Map.Entry<MCRPath, BasicFileAttributes> file : files.entrySet()) {
+            final UUID uuid = UUID.randomUUID();
+            final String fileID = "master_" + uuid.toString();
+            final String physicalID = "phys_" + uuid.toString();
+            try {
+                final String href = MCRXMLFunctions.encodeURIPath(file.getKey().getOwnerRelativePath().substring(1));
+                // file
+                File metsFile = new File(fileID, MCRContentTypes.probeContentType(file.getKey()));
+                FLocat fLocat = new FLocat(LOCTYPE.URL, href);
+                metsFile.setFLocat(fLocat);
+                fileGrp.addFile(metsFile);
+            } catch (URISyntaxException uriSyntaxException) {
+                LOGGER.error("invalid href", uriSyntaxException);
+                continue;
+            }
+            // physical
+            PhysicalSubDiv pyhsicalPage = new PhysicalSubDiv(physicalID, "page", physicalDiv.getChildren().size() + 1);
+            Fptr fptr = new Fptr(fileID);
+            pyhsicalPage.add(fptr);
+            physicalDiv.add(pyhsicalPage);
+            // struct link
+            SmLink smLink = new SmLink(logicalDiv.getId(), physicalID);
+            structLink.addSmLink(smLink);
+        }
+        for (Map.Entry<MCRPath, BasicFileAttributes> directory : directories.entrySet()) {
+            LogicalSubDiv section = new LogicalSubDiv("log_" + Integer.toString(++logOrder), "section", directory
+                .getKey().getFileName().toString(), logOrder);
+            logicalDiv.add(section);
+            createMets(directory.getKey(), ignoreNodes, fileGrp, physicalDiv, section, structLink, logOrder);
+        }
     }
 
 }

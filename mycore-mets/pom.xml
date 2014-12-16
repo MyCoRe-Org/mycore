@@ -17,11 +17,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.mycore</groupId>
-      <artifactId>mycore-ifs</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.mycore.mets</groupId>
       <artifactId>mets-validator</artifactId>
     </dependency>

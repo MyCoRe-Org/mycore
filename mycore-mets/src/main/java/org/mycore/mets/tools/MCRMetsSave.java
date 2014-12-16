@@ -1,30 +1,57 @@
 package org.mycore.mets.tools;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.log4j.Logger;
-import org.jdom2.*;
+import org.jdom2.Attribute;
+import org.jdom2.DataConversionException;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
+import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.xml.MCRXMLFunctions;
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFilesystemNode;
+import org.mycore.datamodel.ifs2.MCRDirectory;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRContentTypes;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.mets.model.Mets;
 import org.mycore.mets.model.files.FLocat;
 import org.mycore.mets.model.files.FileGrp;
-import org.mycore.mets.model.struct.*;
+import org.mycore.mets.model.struct.AbstractLogicalDiv;
+import org.mycore.mets.model.struct.Fptr;
+import org.mycore.mets.model.struct.LOCTYPE;
+import org.mycore.mets.model.struct.LogicalDiv;
+import org.mycore.mets.model.struct.LogicalStructMap;
+import org.mycore.mets.model.struct.LogicalSubDiv;
+import org.mycore.mets.model.struct.PhysicalDiv;
+import org.mycore.mets.model.struct.PhysicalStructMap;
+import org.mycore.mets.model.struct.PhysicalSubDiv;
+import org.mycore.mets.model.struct.SmLink;
 import org.xml.sax.SAXException;
-
-import javax.activation.MimetypesFileTypeMap;
-import java.io.File;
-import java.io.IOException;
-import java.net.URLDecoder;
-import java.text.MessageFormat;
-import java.util.*;
 
 /**
  * Class is responsible for saving a mets document to a derivate. It also can
@@ -36,8 +63,11 @@ import java.util.*;
 public class MCRMetsSave {
 
     private final static Logger LOGGER = Logger.getLogger(MCRMetsSave.class);
+
     public static final String ALTO_FILE_GROUP_USE = "ALTO";
+
     public static final String DEFAULT_FILE_GROUP_USE = "MASTER";
+
     public static final String ALTO_FOLDER_PREFIX = "alto/";
 
     /**
@@ -66,16 +96,17 @@ public class MCRMetsSave {
      */
     public static synchronized void saveMets(Document document, MCRObjectID derivateId, boolean overwrite) {
         // add the file to the existing derivate in ifs
-        MCRFile metsFile = getMetsFile(derivateId.toString());
-        
-        if(metsFile == null){
+        MCRPath metsFile = getMetsFile(derivateId.toString());
+
+        if (metsFile == null) {
             metsFile = createMetsFile(derivateId.toString());
-        }else if(!overwrite){
+        } else if (!overwrite) {
             return;
         }
-        
+
         try {
-            metsFile.setContentFrom(document);
+            XMLOutputter xout = new XMLOutputter();
+            xout.output(document, Files.newOutputStream(metsFile));
             LOGGER.info("Storing file content from \"" + getMetsFileName() + "\" to derivate \"" + derivateId + "\"");
         } catch (Exception e) {
             LOGGER.error(e);
@@ -94,8 +125,8 @@ public class MCRMetsSave {
      *            a handle for the file to add to the mets.xml
      * @throws Exception
      */
-    public static void updateMetsOnFileAdd(MCRFile file) throws Exception {
-        MCRObjectID derivateID = MCRObjectID.getInstance(file.getOwnerID());
+    public static void updateMetsOnFileAdd(MCRPath file) throws Exception {
+        MCRObjectID derivateID = MCRObjectID.getInstance(file.getOwner());
         Document mets = getCurrentMets(derivateID.toString());
         if (mets == null) {
             LOGGER.info("Derivate with id \"" + derivateID + "\" has no mets file. Nothing to do");
@@ -115,31 +146,17 @@ public class MCRMetsSave {
      * @throws SAXException 
      */
     private static Document getCurrentMets(String derivateID) throws JDOMException, IOException, SAXException {
-        MCRFile metsFile = getMetsFile(derivateID);
-        return metsFile == null ? null : metsFile.getContent().asXML();
+        MCRPath metsFile = getMetsFile(derivateID);
+        return metsFile == null ? null : new MCRPathContent(metsFile).asXML();
     }
 
-    public static MCRFile getMetsFile(String derivateID) {
-        MCRDirectory rootDir = MCRDirectory.getRootDirectory(derivateID);
-        if (rootDir == null) {
-            return null;
-        }
-        
-        MCRFilesystemNode metsFile = rootDir.getChild(getMetsFileName());
-        if(!(metsFile instanceof MCRFile)){
-            return null;
-        }
-        
-        return (MCRFile) metsFile;
+    public static MCRPath getMetsFile(String derivateID) {
+        MCRPath metsFile = createMetsFile(derivateID);
+        return Files.exists(metsFile) ? metsFile : null;
     }
-    
-    public static MCRFile createMetsFile(String derivateID) {
-        MCRDirectory rootDir = MCRDirectory.getRootDirectory(derivateID);
-        if (rootDir == null) {
-            return null;
-        }
-        
-        return new MCRFile(getMetsFileName(), rootDir);
+
+    public static MCRPath createMetsFile(String derivateID) {
+        return MCRPath.getPath(derivateID, "/mets.xml");
     }
 
     // TODO: should use mets-model api
@@ -152,57 +169,50 @@ public class MCRMetsSave {
      *            the file to add
      * @return the modified mets or null if an exception occures
      */
-    private static Document updateOnFileAdd(Document mets, MCRFile file) {
+    private static Document updateOnFileAdd(Document mets, MCRPath file) {
         try {
             UUID uuid = UUID.randomUUID();
             String fileId = org.mycore.mets.model.files.File.PREFIX_MASTER + uuid;
 
             // check for file existance (if a derivate with mets.xml is uploaded
-            String path = file.getAbsolutePath();
-            if (path.startsWith("/")) {
-                path = path.substring(1);
-            }
+            String relPath = file.getOwnerRelativePath().substring(1);
 
             // Check if file already exists -> if yes do nothing
-            String fileExistPathString = "mets:mets/mets:fileSec/mets:fileGrp/mets:file/mets:FLocat[@xlink:href='" + path + "']";
+            String fileExistPathString = "mets:mets/mets:fileSec/mets:fileGrp/mets:file/mets:FLocat[@xlink:href='"
+                + relPath + "']";
             XPathExpression<Element> xpath = XPathFactory.instance().compile(fileExistPathString, Filters.element(),
-                    null, MCRConstants.METS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
+                null, MCRConstants.METS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
             if (xpath.evaluate(mets).size() > 0) {
                 String msgTemplate = "The File : '%s' already exists in mets.xml";
-                LOGGER.warn(String.format(Locale.ROOT, msgTemplate, file.getAbsolutePath()));
+                LOGGER.warn(String.format(Locale.ROOT, msgTemplate, relPath));
                 return null;
             } else {
                 String msgTemplate = "The File : '%s' does not exists in mets.xml";
-                LOGGER.warn(String.format(Locale.ROOT, msgTemplate, file.getAbsolutePath()));
+                LOGGER.warn(String.format(Locale.ROOT, msgTemplate, relPath));
             }
 
             // add to file section
-            String contentType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(new File(file.getName()));
+            String contentType = MCRContentTypes.probeContentType(file);
             LOGGER.warn(MessageFormat.format("Content Type is : {0}", contentType));
 
             org.mycore.mets.model.files.File fileAsMetsFile = new org.mycore.mets.model.files.File(fileId, contentType);
-            String filePath = file.getAbsolutePath();
-            if(!filePath.equals("/")) {
-                filePath = filePath.substring(1);
-            }
 
-            FLocat fLocat = new FLocat(LOCTYPE.URL, filePath);
+            FLocat fLocat = new FLocat(LOCTYPE.URL, relPath);
             fileAsMetsFile.setFLocat(fLocat);
-
 
             String fileGrpUSE = getFileGroupUse(file);
             Element fileSec = getFileGroup(mets, fileGrpUSE);
             fileSec.addContent(fileAsMetsFile.asElement());
 
             if (fileGrpUSE.equals(ALTO_FILE_GROUP_USE)) {
-                updateOnAltoFile(mets, fileId, path);
+                updateOnAltoFile(mets, fileId, relPath);
             } else {
-                updateOnImageFile(mets, fileId, path);
+                updateOnImageFile(mets, fileId, relPath);
             }
 
         } catch (Exception ex) {
-            LOGGER.error("Error occured while adding file " + file.getAbsolutePath() + " to the existing mets file", ex);
+            LOGGER.error("Error occured while adding file " + file + " to the existing mets file", ex);
             return null;
         }
 
@@ -223,8 +233,7 @@ public class MCRMetsSave {
 
         // add to structMap physical
         int newOrder = getNewOrder(mets);
-        PhysicalSubDiv div = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE,
-                newOrder);
+        PhysicalSubDiv div = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE, newOrder);
         div.add(new Fptr(matchId));
 
         // actually alter the mets document
@@ -246,8 +255,8 @@ public class MCRMetsSave {
      */
     private static int getNewOrder(Document mets) throws DataConversionException {
         XPathExpression<Attribute> attributeXpath = XPathFactory.instance().compile(
-                "mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[last()]/@ORDER",
-                Filters.attribute(), null, MCRConstants.METS_NAMESPACE);
+            "mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[last()]/@ORDER",
+            Filters.attribute(), null, MCRConstants.METS_NAMESPACE);
         Attribute orderAttribute = attributeXpath.evaluateFirst(mets);
         return orderAttribute.getIntValue() + 1;
     }
@@ -274,25 +283,31 @@ public class MCRMetsSave {
 
     private static Element getPhysicalFile(Document mets, String matchId) {
         XPathExpression<Element> xpath;
-        String physicalFileExistsXpathString = String.format(Locale.ROOT, "mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[mets:fptr/@FILEID='%s']", matchId);
-        xpath = XPathFactory.instance().compile(physicalFileExistsXpathString, Filters.element(),
-                null, MCRConstants.METS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
+        String physicalFileExistsXpathString = String
+            .format(
+                Locale.ROOT,
+                "mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[mets:fptr/@FILEID='%s']",
+                matchId);
+        xpath = XPathFactory.instance().compile(physicalFileExistsXpathString, Filters.element(), null,
+            MCRConstants.METS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
         return xpath.evaluateFirst(mets);
     }
 
     private static Element getFileGroup(Document mets, String fileGrpUSE) {
         XPathExpression<Element> xpath;// alter the mets document
-        String fileGroupXPathString = String.format(Locale.ROOT, "mets:mets/mets:fileSec/mets:fileGrp[@USE='%s']", fileGrpUSE);
-        xpath = XPathFactory.instance().compile(fileGroupXPathString, Filters.element(),
-                null, MCRConstants.METS_NAMESPACE);
+        String fileGroupXPathString = String.format(Locale.ROOT, "mets:mets/mets:fileSec/mets:fileGrp[@USE='%s']",
+            fileGrpUSE);
+        xpath = XPathFactory.instance().compile(fileGroupXPathString, Filters.element(), null,
+            MCRConstants.METS_NAMESPACE);
         Element element = xpath.evaluateFirst(mets);
 
         if (element == null) {
             // section does not exist
             Element fileGroupElement = new FileGrp(fileGrpUSE).asElement();
             String fileSectionPath = "mets:mets/mets:fileSec";
-            xpath = XPathFactory.instance().compile(fileSectionPath, Filters.element(), null, MCRConstants.METS_NAMESPACE);
+            xpath = XPathFactory.instance().compile(fileSectionPath, Filters.element(), null,
+                MCRConstants.METS_NAMESPACE);
             Element fileSectionElement = xpath.evaluateFirst(mets);
             if (fileSectionElement == null) {
                 throw new MCRPersistenceException("There is no fileSection in mets.xml!");
@@ -313,8 +328,8 @@ public class MCRMetsSave {
      */
     private static SmLink getDefaultSmLink(Document mets, PhysicalSubDiv div) {
         XPathExpression<Attribute> attributeXpath;
-        attributeXpath = XPathFactory.instance().compile("mets:mets/mets:structMap[@TYPE='LOGICAL']/mets:div/@ID", Filters.attribute(),
-                null, MCRConstants.METS_NAMESPACE);
+        attributeXpath = XPathFactory.instance().compile("mets:mets/mets:structMap[@TYPE='LOGICAL']/mets:div/@ID",
+            Filters.attribute(), null, MCRConstants.METS_NAMESPACE);
         Attribute idAttribute = attributeXpath.evaluateFirst(mets);
         String rootID = idAttribute.getValue();
         return new SmLink(rootID, div.getId());
@@ -328,7 +343,8 @@ public class MCRMetsSave {
      */
     private static Element getStructLink(Document mets) {
         XPathExpression<Element> xpath;
-        xpath = XPathFactory.instance().compile("mets:mets/mets:structLink", Filters.element(), null, MCRConstants.METS_NAMESPACE);
+        xpath = XPathFactory.instance().compile("mets:mets/mets:structLink", Filters.element(), null,
+            MCRConstants.METS_NAMESPACE);
         return xpath.evaluateFirst(mets);
     }
 
@@ -340,8 +356,9 @@ public class MCRMetsSave {
      */
     private static Element getPhysicalStructmap(Document mets) {
         XPathExpression<Element> xpath;
-        xpath = XPathFactory.instance().compile("mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']",
-                Filters.element(), null, MCRConstants.METS_NAMESPACE);
+        xpath = XPathFactory.instance().compile(
+            "mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']", Filters.element(), null,
+            MCRConstants.METS_NAMESPACE);
         return xpath.evaluateFirst(mets);
     }
 
@@ -351,8 +368,8 @@ public class MCRMetsSave {
      * @param file
      * @return the id of the filegGroup
      */
-    private static String getFileGroupUse(MCRFile file) {
-        String filePath = file.getAbsolutePath();
+    private static String getFileGroupUse(MCRPath file) {
+        String filePath = file.getOwnerRelativePath();
         // check wich fileGroup is the right
         String fileGrpUSE;
         if (filePath.startsWith("/alto/") && filePath.endsWith(".xml")) {
@@ -373,12 +390,12 @@ public class MCRMetsSave {
      */
     private static String searchFileInGroup(Document mets, String path, String searchFileGroup) {
         XPathExpression<Element> xpath;// first check all files in default file group
-        String relatedFileExistPathString = String.format(Locale.ROOT, "mets:mets/mets:fileSec/mets:fileGrp[@USE='%s']/mets:file/mets:FLocat", searchFileGroup);
-        xpath = XPathFactory.instance().compile(relatedFileExistPathString, Filters.element(),
-                null, MCRConstants.METS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
+        String relatedFileExistPathString = String.format(Locale.ROOT,
+            "mets:mets/mets:fileSec/mets:fileGrp[@USE='%s']/mets:file/mets:FLocat", searchFileGroup);
+        xpath = XPathFactory.instance().compile(relatedFileExistPathString, Filters.element(), null,
+            MCRConstants.METS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
         List<Element> fileLocList = xpath.evaluate(mets);
         String matchId = null;
-
 
         // iterate over all files
         path = getCleanPath(path);
@@ -417,16 +434,17 @@ public class MCRMetsSave {
      *            a handle for the file to add to the mets.xml
      * @throws Exception
      */
-    public static void updateMetsOnFileDelete(MCRFile file) throws Exception {
-        MCRObjectID derivateID = MCRObjectID.getInstance(file.getOwnerID());
+    public static void updateMetsOnFileDelete(MCRPath file) throws Exception {
+        MCRObjectID derivateID = MCRObjectID.getInstance(file.getOwner());
         Document mets = getCurrentMets(derivateID.toString());
         if (mets == null) {
             LOGGER.info("Derivate with id \"" + derivateID + "\" has no mets file. Nothing to do");
             return;
         }
         mets = MCRMetsSave.updateOnFileDelete(mets, file);
-        if (mets != null)
+        if (mets != null) {
             MCRMetsSave.saveMets(mets, derivateID);
+        }
     }
 
     /**
@@ -468,7 +486,8 @@ public class MCRMetsSave {
             idFileMap.put(file.getId(), file.getFLocat().getHref());
         }
 
-        List<PhysicalSubDiv> childs = ((PhysicalStructMap) mets.getStructMap(PhysicalStructMap.TYPE)).getDivContainer().getChildren();
+        List<PhysicalSubDiv> childs = ((PhysicalStructMap) mets.getStructMap(PhysicalStructMap.TYPE)).getDivContainer()
+            .getChildren();
         for (PhysicalSubDiv divChild : childs) {
             String idMets = divChild.getChildren().get(0).getFileId();
 
@@ -485,11 +504,11 @@ public class MCRMetsSave {
      * @param file
      * @return
      */
-    private static Document updateOnFileDelete(Document mets, MCRFile file) {
+    private static Document updateOnFileDelete(Document mets, MCRPath file) {
         Mets modifiedMets = null;
         try {
             modifiedMets = new Mets(mets);
-            String href = file.getAbsolutePath().substring(1);
+            String href = file.getOwnerRelativePath().substring(1);
 
             PhysicalStructMap physStructMap = (PhysicalStructMap) modifiedMets.getStructMap(PhysicalStructMap.TYPE);
             PhysicalDiv divContainer = physStructMap.getDivContainer();
@@ -511,7 +530,8 @@ public class MCRMetsSave {
                             }
                         }
                         for (Fptr fptrToRemove : fptrsToRemove) {
-                            LOGGER.warn(String.format(Locale.ROOT, "remove fptr \"%s\" from mets.xml of \"%s\"", fptrToRemove.getFileId(), file.getOwnerID()));
+                            LOGGER.warn(String.format(Locale.ROOT, "remove fptr \"%s\" from mets.xml of \"%s\"",
+                                fptrToRemove.getFileId(), file.getOwner()));
                             physicalSubDiv.remove(fptrToRemove);
                         }
 
@@ -520,10 +540,12 @@ public class MCRMetsSave {
 
                             //remove links in mets:structLink section
                             List<SmLink> list = modifiedMets.getStructLink().getSmLinkByTo(physicalSubDiv.getId());
-                            LogicalStructMap logicalStructMap = (LogicalStructMap) modifiedMets.getStructMap(LogicalStructMap.TYPE);
+                            LogicalStructMap logicalStructMap = (LogicalStructMap) modifiedMets
+                                .getStructMap(LogicalStructMap.TYPE);
 
                             for (SmLink linkToRemove : list) {
-                                LOGGER.warn(String.format(Locale.ROOT, "remove smLink from \"%s\" to \"%s\"", linkToRemove.getFrom(), linkToRemove.getTo()));
+                                LOGGER.warn(String.format(Locale.ROOT, "remove smLink from \"%s\" to \"%s\"",
+                                    linkToRemove.getFrom(), linkToRemove.getTo()));
                                 modifiedMets.getStructLink().removeSmLink(linkToRemove);
                                 // modify logical struct Map
                                 String logID = linkToRemove.getFrom();
@@ -533,9 +555,11 @@ public class MCRMetsSave {
                                     continue;
                                 }
 
-                                AbstractLogicalDiv logicalDiv = logicalStructMap.getDivContainer().getLogicalSubDiv(logID);
+                                AbstractLogicalDiv logicalDiv = logicalStructMap.getDivContainer().getLogicalSubDiv(
+                                    logID);
                                 if (!(logicalDiv instanceof LogicalSubDiv)) {
-                                    LOGGER.error("Could not find " + LogicalSubDiv.class.getSimpleName() + " with id " + logID);
+                                    LOGGER.error("Could not find " + LogicalSubDiv.class.getSimpleName() + " with id "
+                                        + logID);
                                     LOGGER.error("Mets document remains unchanged");
                                     return mets;
                                 }
@@ -573,7 +597,7 @@ public class MCRMetsSave {
                 }
             }
         } catch (Exception ex) {
-            LOGGER.error("Error occured while removing file " + file.getAbsolutePath() + " from the existing mets file", ex);
+            LOGGER.error("Error occured while removing file " + file + " from the existing mets file", ex);
             return null;
         }
 
@@ -595,7 +619,7 @@ public class MCRMetsSave {
         });
 
         for (int i = 1; i <= children.size(); i++) {
-            children.get(i-1).setOrder(i);
+            children.get(i - 1).setOrder(i);
         }
     }
 
@@ -633,8 +657,8 @@ public class MCRMetsSave {
     public static boolean isComplete(Mets mets, MCRObjectID derivateId) {
         try {
             FileGrp fileGroup = mets.getFileSec().getFileGroup(FileGrp.USE_MASTER);
-            MCRDirectory ifs = MCRDirectory.getRootDirectory(derivateId.toString());
-            return isComplete(fileGroup, ifs);
+            MCRPath rootPath = MCRPath.getPath(derivateId.toString(), "/");
+            return isComplete(fileGroup, rootPath);
         } catch (Exception ex) {
             LOGGER.error("Error while validating mets", ex);
             return false;
@@ -647,30 +671,36 @@ public class MCRMetsSave {
      * @param ifs
      * @return true if all files in the {@link MCRDirectory} appears in the fileGroup
      */
-    public static boolean isComplete(FileGrp fileGroup, MCRDirectory ifs) {
+    public static boolean isComplete(final FileGrp fileGroup, MCRPath rootDir) {
+        final AtomicBoolean complete = new AtomicBoolean(true);
         try {
-            for (MCRFilesystemNode node : ifs.getChildren()) {
-                if (node.getName().equals(MCRJSONProvider.DEFAULT_METS_FILENAME)) {
-                    continue;
-                }
-                if (node instanceof MCRDirectory && !isComplete(fileGroup, (MCRDirectory) node)) {
-                    return false;
-                } else if (node instanceof MCRDirectory) {
-                    continue;
-                }
+            Files.walkFileTree(rootDir, new SimpleFileVisitor<Path>() {
 
-                String path = MCRXMLFunctions.encodeURIPath(node.getAbsolutePath()).substring(1);//remove leading '/'
-                if (!fileGroup.contains(path)) {
-                    LOGGER.warn(MessageFormat.format("{0} does not appear in {1}!", path, ifs.getOwnerID()));
-                    return false;
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    if (!file.getFileName().toString().equals(MCRJSONProvider.DEFAULT_METS_FILENAME)) {
+                        MCRPath mcrPath = MCRPath.toMCRPath(file);
+                        String path;
+                        try {
+                            path = MCRXMLFunctions.encodeURIPath(mcrPath.getOwnerRelativePath().substring(1));//remove leading '/'
+                        } catch (URISyntaxException e) {
+                            throw new IOException(e);
+                        }
+                        if (!fileGroup.contains(path)) {
+                            LOGGER.warn(MessageFormat.format("{0} does not appear in {1}!", path, mcrPath.getOwner()));
+                            complete.set(false);
+                            return FileVisitResult.TERMINATE;
+                        }
+                    }
+                    return super.visitFile(file, attrs);
                 }
-            }
+            });
         } catch (Exception ex) {
             LOGGER.error("Error while validating mets", ex);
             return false;
         }
 
-        return true;
+        return complete.get();
     }
 
 }

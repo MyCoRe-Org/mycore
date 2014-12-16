@@ -22,6 +22,7 @@
 
 package org.mycore.mets.tools;
 
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -34,13 +35,12 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.transform.JDOMSource;
+import org.mycore.common.content.MCRPathContent;
 import org.mycore.datamodel.common.MCRLinkTableManager;
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.mets.model.MCRMETSGenerator;
 
 /**
@@ -65,16 +65,15 @@ public class MCRMetsResolver implements URIResolver {
             }
             id = derivateID;
         }
-        MCRDirectory dir = MCRDirectory.getRootDirectory(id);
-        MCRFilesystemNode metsFile = dir.getChildByPath("mets.xml");
-        HashSet<MCRFilesystemNode> ignoreNodes = new HashSet<MCRFilesystemNode>();
+        MCRPath metsPath = MCRPath.getPath(id, "/mets.xml");
+        HashSet<MCRPath> ignoreNodes = new HashSet<>();
         try {
-            if (metsFile != null) {
+            if (Files.exists(metsPath)) {
                 //TODO: generate new METS Output
                 //ignoreNodes.add(metsFile);
-                return ((MCRFile) metsFile).getContent().getSource();
+                return new MCRPathContent(metsPath).getSource();
             }
-            Document mets = MCRMETSGenerator.getGenerator().getMETS(dir, ignoreNodes).asDocument();
+            Document mets = MCRMETSGenerator.getGenerator().getMETS(MCRPath.getPath(id, "/"), ignoreNodes).asDocument();
             return new JDOMSource(mets);
         } catch (Exception e) {
             throw new TransformerException(e);

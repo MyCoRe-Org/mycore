@@ -23,6 +23,8 @@
 
 package org.mycore.mets.servlets;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashSet;
@@ -38,11 +40,10 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.datamodel.common.MCRLinkTableManager;
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFilesystemNode;
+import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.mets.model.MCRMETSGenerator;
@@ -67,9 +68,9 @@ public class MCRMETSServlet extends MCRServlet {
         LOGGER.info(request.getPathInfo());
 
         String derivate = getOwnerID(request.getPathInfo());
-        MCRDirectory dir = MCRDirectory.getRootDirectory(derivate);
+        MCRPath rootPath = MCRPath.getPath(derivate, "/");
 
-        if (dir == null) {
+        if (!Files.isDirectory(rootPath)) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND,
                 MessageFormat.format("Derivate {0} does not exist.", derivate));
             return;
@@ -84,8 +85,7 @@ public class MCRMETSServlet extends MCRServlet {
         request.setAttribute("XSL.objectID", linkList.iterator().next());
         response.setContentType("text/xml");
 
-        long lastModified = dir.getLastModified().getTimeInMillis();
-
+        long lastModified = Files.getLastModifiedTime(rootPath).toMillis();
 
         writeCacheHeaders(response, CACHE_TIME, lastModified, useExpire);
         long start = System.currentTimeMillis();
@@ -94,7 +94,6 @@ public class MCRMETSServlet extends MCRServlet {
         LOGGER.info("Generation of code by " + this.getClass().getSimpleName() + " took "
             + (System.currentTimeMillis() - start) + " ms");
     }
-
 
     /**
      * Returns the mets document wrapped in a {@link MCRContent} object.
@@ -105,9 +104,7 @@ public class MCRMETSServlet extends MCRServlet {
      * @throws Exception
      */
     static MCRContent getMetsSource(MCRServletJob job, boolean useExistingMets, String derivate) throws Exception {
-        MCRDirectory dir = MCRDirectory.getRootDirectory(derivate);
-
-        MCRFilesystemNode metsFile = dir.getChildByPath("mets.xml");
+        MCRPath metsPath = MCRPath.getPath(derivate, "/mets.xml");
 
         try {
             job.getRequest().setAttribute("XSL.derivateID", derivate);
@@ -117,15 +114,18 @@ public class MCRMETSServlet extends MCRServlet {
             LOGGER.warn("Unable to set \"XSL.objectID\" attribute to current request", x);
         }
 
-        if (metsFile != null && useExistingMets) {
-            MCRContent content = ((MCRFile) metsFile).getContent();
+        boolean metsExists = Files.exists(metsPath);
+        if (metsExists && useExistingMets) {
+            MCRContent content = new MCRPathContent(metsPath);
             content.setDocType("mets");
             return content;
         } else {
-            HashSet<MCRFilesystemNode> ignoreNodes = new HashSet<MCRFilesystemNode>();
-            if (metsFile != null)
-                ignoreNodes.add(metsFile);
-            Document mets = MCRMETSGenerator.getGenerator().getMETS(dir, ignoreNodes).asDocument();
+            HashSet<MCRPath> ignoreNodes = new HashSet<MCRPath>();
+            if (metsExists) {
+                ignoreNodes.add(metsPath);
+            }
+            Document mets = MCRMETSGenerator.getGenerator().getMETS(MCRPath.getPath(derivate, "/"), ignoreNodes)
+                .asDocument();
 
             return new MCRJDOMContent(mets);
         }
@@ -179,11 +179,18 @@ public class MCRMETSServlet extends MCRServlet {
     protected long getLastModified(HttpServletRequest request) {
         String ownerID = getOwnerID(request.getPathInfo());
         MCRSession session = MCRSessionMgr.getCurrentSession();
+        MCRPath metsPath = MCRPath.getPath(ownerID, "/mets.xml");
         try {
             session.beginTransaction();
-            MCRDirectory rootNode = MCRDirectory.getRootDirectory(ownerID);
-            if (rootNode != null)
-                return rootNode.getLastModified().getTimeInMillis();
+            try {
+                if (Files.exists(metsPath)) {
+                    return Files.getLastModifiedTime(metsPath).toMillis();
+                } else if (Files.isDirectory(metsPath.getParent())) {
+                    return Files.getLastModifiedTime(metsPath.getParent()).toMillis();
+                }
+            } catch (IOException e) {
+                LOGGER.warn("Error while retrieving last modified information from " + metsPath, e);
+            }
             return -1l;
         } finally {
             session.commitTransaction();
