@@ -37,7 +37,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.streams.MCRHeaderInputStream;
-import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
+import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 
 /**
@@ -131,8 +131,7 @@ public class MCRFileViewWorkflowServlet extends MCRServlet {
             MCRHeaderInputStream his = new MCRHeaderInputStream(fin);
             OutputStream out = new BufferedOutputStream(job.getResponse().getOutputStream());
             try {
-                byte[] header = his.getHeader();
-                String mime = MCRFileContentTypeFactory.detectType(in.getName(), header).getMimeType();
+                String mime = MCRContentTypes.probeContentType(in.toPath());
                 LOGGER.debug("MimeType = " + mime);
                 job.getResponse().setContentType(mime);
                 job.getResponse().setContentLength((int) (in.length()));
