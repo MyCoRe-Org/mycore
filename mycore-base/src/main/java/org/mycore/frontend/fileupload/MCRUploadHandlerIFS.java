@@ -172,7 +172,8 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     public synchronized long receiveFile(String path, InputStream in, long length, String checksum) throws Exception {
         LOGGER.debug("incoming receiveFile request: " + path + " " + checksum + " " + length + " bytes");
 
-        Path tempFile = Files.createTempFile("upload" + derivateID + checksum, ".stream");
+        Path tempFile = Files.createTempFile("upload" + derivateID + (checksum != null ? checksum : path.hashCode()),
+            ".stream");
         try {
             Files.copy(in, tempFile, StandardCopyOption.REPLACE_EXISTING);
             long myLength = Files.size(tempFile);

@@ -340,7 +340,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
                     if (path.toLowerCase(Locale.ROOT).endsWith(".zip")) {
                         uploadZipFile(handler, in);
                     } else {
-                        handler.receiveFile(path, in, 0, null);
+                        handler.receiveFile(path, in, item.getSize(), null);
                     }
                 }
                 session.beginTransaction();
