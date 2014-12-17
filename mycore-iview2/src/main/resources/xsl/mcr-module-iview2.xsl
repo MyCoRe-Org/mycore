@@ -19,7 +19,9 @@
     <xsl:param name="extensions" select="''" />
     <xsl:param name="style" />
 
-    <div class="viewerContainer min">
+		<xsl:variable name="HTML-ID" select="generate-id()" />
+
+    <div class="viewerContainer min" id="{$HTML-ID}">
       <xsl:if test="string-length($style) &gt; 0">
         <xsl:attribute name="style">
           <xsl:value-of select="$style" />
@@ -33,9 +35,7 @@
       <script type="text/javascript">
         (function(){
         "use strict";
-	<!-- var nodes=document.getElementsByTagName('script'); -->
-	<!-- var currentNode=nodes[nodes.length-1]; -->
-        var parentNode = document.getElementsByClassName('viewerContainer')[0];
+        var parentNode = document.getElementById('<xsl:value-of select="$HTML-ID" />');
         iview.addInstance(new iview.IViewInstance(jQuery(parentNode),
         <xsl:value-of select="iview2:getOptions($groupID, $extensions)" />
         ));
