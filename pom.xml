@@ -700,11 +700,6 @@
         <version>2.4</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.axis</groupId>
-        <artifactId>axis</artifactId>
-        <version>1.4</version>
-      </dependency>
-      <dependency>
         <groupId>log4j</groupId>
         <artifactId>log4j</artifactId>
         <version>1.2.17</version>
@@ -831,11 +826,6 @@
         <version>2.3</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.axis</groupId>
-        <artifactId>axis-jaxrpc</artifactId>
-        <version>1.4</version>
-      </dependency>
-      <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
         <artifactId>fop</artifactId>
         <version>1.1</version>
@@ -857,11 +847,6 @@
             <artifactId>avalon-framework-api</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.ws.security</groupId>
-        <artifactId>wss4j</artifactId>
-        <version>1.6.14</version>
       </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>
@@ -943,18 +928,6 @@
         <artifactId>wsdl4j</artifactId>
         <version>1.6.3</version>
         <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.axis</groupId>
-        <artifactId>axis-saaj</artifactId>
-        <version>1.4</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.axis</groupId>
-        <artifactId>axis-ant</artifactId>
-        <scope>runtime</scope>
-        <version>1.4</version>
       </dependency>
       <dependency>
         <groupId>com.sun.jersey</groupId>
@@ -1429,7 +1402,6 @@
     <module>mycore-user2</module>
     <module>mycore-wcms2</module>
     <module>mycore-webcli</module>
-    <module>mycore-webservices</module>
     <module>mycore-wfc</module>
     <!-- <module>mycore-z3950</module> -->
     <module>mycore-xeditor</module>
