@@ -36,6 +36,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -702,13 +703,26 @@ public final class MCRMetadataManager {
         }
         MCRObject old = MCRMetadataManager.retrieveMCRObject(mcrObject.getId());
 
-        // clean the structure
+        // save the order of derivates and clean the structure
         mcrObject.getStructure().clearChildren();
+        List<String> derOrder = new ArrayList<String>();
+        for(MCRMetaLinkID derID: mcrObject.getStructure().getDerivates()){
+        	derOrder.add(derID.getXLinkHref());
+        }
         mcrObject.getStructure().clearDerivates();
 
         // set the derivate data in structure
         mcrObject.getStructure().getDerivates().addAll(old.getStructure().getDerivates());
-
+        
+        //set the new order of derivates
+        for(int newPos=0;newPos<derOrder.size();newPos++){
+        	for(int pos=0; pos<mcrObject.getStructure().getDerivates().size();pos++){
+        		if(derOrder.get(newPos).equals(mcrObject.getStructure().getDerivates().get(pos).getXLinkHref())){
+        			Collections.swap(mcrObject.getStructure().getDerivates(), pos, newPos);
+        			break;
+        		}
+        	}
+        }
         // set the parent from the original and this update
         boolean setparent = false;
 
