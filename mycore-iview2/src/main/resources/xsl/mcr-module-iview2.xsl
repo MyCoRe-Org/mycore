@@ -33,9 +33,10 @@
       <script type="text/javascript">
         (function(){
         "use strict";
-        var nodes=document.getElementsByTagName('script');
-        var currentNode=nodes[nodes.length-1];
-        iview.addInstance(new iview.IViewInstance(jQuery(currentNode.parentNode),
+	<!-- var nodes=document.getElementsByTagName('script'); -->
+	<!-- var currentNode=nodes[nodes.length-1]; -->
+        var parentNode = document.getElementsByClassName('viewerContainer')[0];
+        iview.addInstance(new iview.IViewInstance(jQuery(parentNode),
         <xsl:value-of select="iview2:getOptions($groupID, $extensions)" />
         ));
         })();
