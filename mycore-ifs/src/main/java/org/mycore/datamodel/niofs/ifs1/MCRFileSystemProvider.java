@@ -446,6 +446,9 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         if (mcrPath.getNameCount() == 0) {
             //handle root component
             MCRDirectory rootDirectory = MCRDirectory.getRootDirectory(mcrPath.getOwner());
+            if (rootDirectory == null) {
+                throw new NoSuchFileException(mcrPath.toString());
+            }
             checkDirectory(rootDirectory, modes);
             return;
         }
