@@ -43,9 +43,6 @@ public class MCRQuery {
     /** A list of MCRSortBy criteria, may be empty */
     private List<MCRSortBy> sortBy = new ArrayList<MCRSortBy>();
 
-    /** A list of remote host aliases, may be empty */
-    private List<String> hosts = new ArrayList<String>();
-
     /** A cached xml representation of the query */
     private Document doc = null;
 
@@ -143,30 +140,6 @@ public class MCRQuery {
         if (sortBy != null) {
             this.sortBy.add(sortBy);
         }
-        doc = null;
-    }
-
-    /**
-     * Returns the list of remote hosts to query
-     * 
-     * @return a list of host alias Strings, may be empty
-     */
-    public List getHosts() {
-        return hosts;
-    }
-
-    /**
-     * Sets the remote hosts to query. Default is an empty list, which means
-     * only the local host is queried.
-     * 
-     * @param hosts
-     *            a list of host alias Strings, may be empty
-     */
-    public void setHosts(List<String> hosts) {
-        if (hosts == null) {
-            hosts = new ArrayList<String>();
-        }
-        this.hosts = hosts;
         doc = null;
     }
 
