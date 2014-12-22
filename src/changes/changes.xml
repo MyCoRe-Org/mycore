@@ -12,15 +12,42 @@
     - fix: Fehler behoben (mit @date und @due-to Attribut und evtl. <fixes issue="">)
    -->
   <body>
+    <release version="2015.01" date="2015-01-00" description="Codenamed &apos;TBA&apos;">
+      <action dev="mcrsherm" type="fix" date="2014-12-15">
+        mycore-iview2: support new viewer on solr response for files
+      </action>
+      <action dev="mcrtchef" type="update">
+       Migrated most occurences of MCRFileNode and subclasses to MCRPath (NIOFS)
+      </action>
+      <action dev="mcrtchef" type="update">
+       mycore-ifs: moved code for internal filesystem from mycore-base to mycore-ifs as a implemention of NIOFS package.
+      </action>
+      <action dev="mcrsroeh" type="fix" date="2014-12-09">
+        mycore-mets: added support for spaces in file names in MCRDFGLinkServlet
+      </action>
+      <action dev="mcrfluet" type="fix" date="2014-12-09">
+        mycore-xeditor: When using a known, predefined namespace, use the already known namespace prefix in XPath, even if the namespace is inherited or
+        otherwise defined in the JDOM tree.
+      </action>
+      <action dev="mcrtchef" type="add">
+        mycore-base: added MCRUtils.getSizeFormatted(long)
+      </action>
+      <action dev="mcrtchef" type="update">
+        mycore-wfc: use object type as default collection (if defined), if no collection is defined
+      </action>
+      <action dev="mcrfluet" type="remove">
+        mycore-xeditor: removed "add" repeater, "append" is default now
+      </action>
+    </release>
     <release version="2014.12" date="2014-12-04" description="Codenamed &apos;Mumme&apos;">
       <action dev="mcrmeich" type="update">
         MCRMetaLink classes can handle @xlink:role
       </action>
       <action dev="mcrtchef" type="update">
-       mycore-user2: provide setPassword(MCRUser, String) method to MCRUserManager
+        mycore-user2: provide setPassword(MCRUser, String) method to MCRUserManager
       </action>
       <action dev="mcrtchef" type="update">
-       mycore-mods: on MODS export add identifier[@type='uri'] if not already present
+        mycore-mods: on MODS export add identifier[@type='uri'] if not already present
       </action>
       <action dev="mcrfluet" type="update">
         mycore-xeditor: Refactored repeater insert/append button. Method to create new elements can be
