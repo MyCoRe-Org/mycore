@@ -26,7 +26,6 @@ public abstract class MCRJerseyUtil {
 
     /**
      * Transforms a jdom document to a <code>MCRContent</code> via the <code>MCRLayoutService</code>.
-     * Use this method to 
      * 
      * @param document the document to transform
      * @param request the http request
@@ -66,7 +65,7 @@ public abstract class MCRJerseyUtil {
     }
 
     /**
-     * Checks if the mycore object has the given permission. Throws an unauthorized exception otherwise.
+     * Checks if the current user has the given permission. Throws an unauthorized exception otherwise.
      * 
      * @param id mycore object id
      * @param permission permission to check
@@ -78,13 +77,24 @@ public abstract class MCRJerseyUtil {
     }
 
     /**
-     * Checks if the mycore object has the given permission. Throws an unauthorized exception otherwise.
+     * Checks if the current user has the given permission. Throws an unauthorized exception otherwise.
      * 
      * @param id mycore object id
      * @param permission permission to check
      */
     public static void checkPermission(String id, String permission) {
         if (!MCRAccessManager.checkPermission(id, permission)) {
+            throw new WebApplicationException(Response.status(Status.UNAUTHORIZED).build());
+        }
+    }
+
+    /**
+     * Checks if the current user has the given permission. Throws an unauthorized exception otherwise.
+     * 
+     * @param permission permission to check
+     */
+    public static void checkPermission(String permission) {
+        if (!MCRAccessManager.checkPermission(permission)) {
             throw new WebApplicationException(Response.status(Status.UNAUTHORIZED).build());
         }
     }
