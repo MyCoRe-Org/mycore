@@ -195,6 +195,7 @@ var ACLEditor = function(){
 						json.accessIDNew = entry.find(".acle2-access-id").hasClass("acle2-show-input") ? entry.find(".acle2-access-id input").val() : entry.find(".acle2-access-id").text();
 						json.accessPoolNew = entry.find(".acle2-access-pool").hasClass("acle2-show-input") ? entry.find(".acle2-access-pool input").val() : entry.find(".acle2-access-pool").text();
 						json.accessRuleNew = entry.find(".acle2-access-rule:not(.select2-container)").val();
+						$(".acle2-edit").removeClass("acle2-edit");
 						entry.addClass("acle2-edit");
 						editAccess(json);
 					}
@@ -377,6 +378,7 @@ var ACLEditor = function(){
 					ruleListInstance.updateCanDelete();
 					ruleListInstance.select($(".acle2-rule-selected").attr("ruleid"));
 					showAlert(geti18n("ACLE.alert.access.edit.success"), true);
+					$(".acle2-edit").removeClass("acle2-edit");
 				},
 				409: function() {
 					$(".acle2-edit").find(".acle2-show-input").addClass("form-group has-error");
