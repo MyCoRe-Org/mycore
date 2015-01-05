@@ -4,9 +4,6 @@
 	box-sizing: border-box;
 }
 
-#mycore-acl-editor2{
-	font-size: 80%;
-}
 
 .tab-content>.tab-pane, .pill-content>.pill-pane {
 	display: none;
