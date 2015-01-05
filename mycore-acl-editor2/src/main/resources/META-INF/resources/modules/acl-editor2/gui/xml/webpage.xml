@@ -3,6 +3,7 @@
 <MyCoReWebPage>
   <section xml:lang="all" title="ACL Editor">
     <div id="mycore-acl-editor2">
+  			<link href="gui/css/bootstrap.acle2.css" rel="stylesheet" type="text/css" />
       	<link href="gui/css/webpage.css" rel="stylesheet" type="text/css" />
       	<link href="gui/select2/select2.css" rel="stylesheet" type="text/css" />
       	<div id="acle2-header">
