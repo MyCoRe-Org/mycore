@@ -1,6 +1,7 @@
 package org.mycore.mets.tools;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.file.FileVisitResult;
@@ -104,9 +105,9 @@ public class MCRMetsSave {
             return;
         }
 
-        try {
+        try (OutputStream metsOut = Files.newOutputStream(metsFile)) {
             XMLOutputter xout = new XMLOutputter();
-            xout.output(document, Files.newOutputStream(metsFile));
+            xout.output(document, metsOut);
             LOGGER.info("Storing file content from \"" + getMetsFileName() + "\" to derivate \"" + derivateId + "\"");
         } catch (Exception e) {
             LOGGER.error(e);
