@@ -11,6 +11,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -60,6 +61,8 @@ import org.xml.sax.SAXException;
  * 
  * @author shermann
  *          Sebastian Hofmann
+ *
+ * TODO: Complete rework needed
  */
 public class MCRMetsSave {
 
@@ -69,7 +72,15 @@ public class MCRMetsSave {
 
     public static final String DEFAULT_FILE_GROUP_USE = "MASTER";
 
+    public static final String TRANSCRIPTION_FILE_GROUP_USE = "TRANSCRIPTION";
+
+    public static final String TRANSLATION_FILE_GROUP_USE = "TRANSLATION";
+
     public static final String ALTO_FOLDER_PREFIX = "alto/";
+
+    public static final String TEI_FOLDER_PREFIX = "tei/";
+    public static final String TRANSLATION_FOLDER_PREFIX = "translation.";
+
 
     /**
      * Saves the content of the given document to file and then adds the file to
@@ -206,12 +217,11 @@ public class MCRMetsSave {
             Element fileSec = getFileGroup(mets, fileGrpUSE);
             fileSec.addContent(fileAsMetsFile.asElement());
 
-            if (fileGrpUSE.equals(ALTO_FILE_GROUP_USE)) {
-                updateOnAltoFile(mets, fileId, relPath);
-            } else {
+            if (fileGrpUSE.equals(DEFAULT_FILE_GROUP_USE)) {
                 updateOnImageFile(mets, fileId, relPath);
+            } else {
+                updateOnCustomFile(mets, fileId, relPath);
             }
-
         } catch (Exception ex) {
             LOGGER.error("Error occured while adding file " + file + " to the existing mets file", ex);
             return null;
@@ -222,20 +232,25 @@ public class MCRMetsSave {
 
     private static void updateOnImageFile(Document mets, String fileId, String path) throws DataConversionException {
         LOGGER.debug("FILE is a image!");
-        //check if alto file is present
-        String matchId = searchFileInGroup(mets, path, ALTO_FILE_GROUP_USE);
-        if (matchId != null) {
-            Element existingPhysicalFile = getPhysicalFile(mets, matchId);
-            if (existingPhysicalFile != null) {
-                existingPhysicalFile.addContent(new Fptr(fileId).asElement());
-                return;
+        //check if custom files are present and save the ids
+        List<String> matches = new ArrayList<>();
+        String[] customFileGroups = {TRANSCRIPTION_FILE_GROUP_USE, ALTO_FILE_GROUP_USE, TRANSLATION_FILE_GROUP_USE};
+        for (String customFileGroup : customFileGroups) {
+            String matchId = searchFileInGroup(mets, path, customFileGroup);
+            if (matchId != null) {
+                matches.add(matchId);
             }
         }
+
 
         // add to structMap physical
         int newOrder = getNewOrder(mets);
         PhysicalSubDiv div = new PhysicalSubDiv(PhysicalSubDiv.ID_PREFIX + fileId, PhysicalSubDiv.TYPE_PAGE, newOrder);
-        div.add(new Fptr(matchId));
+        div.add(new Fptr(fileId));
+
+        for (String match : matches) {
+            div.add(new Fptr(match));
+        }
 
         // actually alter the mets document
         Element structMapPhys = getPhysicalStructmap(mets);
@@ -248,28 +263,14 @@ public class MCRMetsSave {
         structLink.addContent(smLink.asElement());
     }
 
-    /**
-     * gets a new order for a page in a mets file
-     * @param mets
-     * @return
-     * @throws DataConversionException
-     */
-    private static int getNewOrder(Document mets) throws DataConversionException {
-        XPathExpression<Attribute> attributeXpath = XPathFactory.instance().compile(
-            "mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[last()]/@ORDER",
-            Filters.attribute(), null, MCRConstants.METS_NAMESPACE);
-        Attribute orderAttribute = attributeXpath.evaluateFirst(mets);
-        return orderAttribute.getIntValue() + 1;
-    }
-
-    private static void updateOnAltoFile(Document mets, String fileId, String path) {
-        LOGGER.debug("FILE is alto!");
+    private static void updateOnCustomFile(Document mets, String fileId, String path) {
+        LOGGER.debug("FILE is a custom file (ALTO/TEI)!");
 
         String matchId = searchFileInGroup(mets, path, DEFAULT_FILE_GROUP_USE);
 
         if (matchId == null) {
             // there is no file wich belongs to the alto xml so just return
-            LOGGER.warn("no file found wich belongs to the alto xml : " + path);
+            LOGGER.warn("no file found wich belongs to the custom xml : " + path);
             return;
         }
         // check if there is a physical file
@@ -280,6 +281,21 @@ public class MCRMetsSave {
         } else {
             LOGGER.warn("no physical page found for file " + matchId);
         }
+    }
+
+    /**
+     * gets a new order for a page in a mets file
+     *
+     * @param mets
+     * @return
+     * @throws DataConversionException
+     */
+    private static int getNewOrder(Document mets) throws DataConversionException {
+        XPathExpression<Attribute> attributeXpath = XPathFactory.instance().compile(
+                "mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[last()]/@ORDER",
+                Filters.attribute(), null, MCRConstants.METS_NAMESPACE);
+        Attribute orderAttribute = attributeXpath.evaluateFirst(mets);
+        return orderAttribute.getIntValue() + 1;
     }
 
     private static Element getPhysicalFile(Document mets, String matchId) {
@@ -371,14 +387,21 @@ public class MCRMetsSave {
      */
     private static String getFileGroupUse(MCRPath file) {
         String filePath = file.getOwnerRelativePath();
-        // check wich fileGroup is the right
-        String fileGrpUSE;
-        if (filePath.startsWith("/alto/") && filePath.endsWith(".xml")) {
-            fileGrpUSE = ALTO_FILE_GROUP_USE;
+        String teiFolder = "/" + TEI_FOLDER_PREFIX;
+        String altoFolder = "/" + ALTO_FOLDER_PREFIX;
+
+        if (filePath.startsWith(altoFolder) && filePath.endsWith(".xml")) {
+            return ALTO_FILE_GROUP_USE;
+        } else if (filePath.startsWith(teiFolder)) {
+            // translations have to start with TRANSLATION_FOLDER_PREFIX
+            String pathInTeiFolder = filePath.substring(teiFolder.length());
+            if (pathInTeiFolder.startsWith(TRANSLATION_FOLDER_PREFIX)) {
+                return TRANSLATION_FILE_GROUP_USE;
+            }
+            return TRANSCRIPTION_FILE_GROUP_USE;
         } else {
-            fileGrpUSE = DEFAULT_FILE_GROUP_USE;
+            return DEFAULT_FILE_GROUP_USE;
         }
-        return fileGrpUSE;
     }
 
     /**
@@ -406,7 +429,7 @@ public class MCRMetsSave {
             String hrefAttributeValue = hrefAttribute.getValue();
             String hrefPath = getCleanPath(removeExtension(hrefAttributeValue));
 
-            if (hrefPath.equals(removeExtension(path))) {
+             if (hrefPath.equals(removeExtension(path))) {
                 matchId = ((Element) fileLoc.getParent()).getAttributeValue("ID");
                 break;
             }
@@ -417,6 +440,14 @@ public class MCRMetsSave {
     private static String getCleanPath(String path) {
         if (path.startsWith(ALTO_FOLDER_PREFIX)) {
             path = path.substring(ALTO_FOLDER_PREFIX.length());
+        } else if (path.startsWith(TEI_FOLDER_PREFIX)) {
+            path = path.substring(TEI_FOLDER_PREFIX.length());
+
+            if (path.startsWith(TRANSLATION_FOLDER_PREFIX)) {
+                // e.g. tei/TRANSLATION_FOLDER_PREFIXDE/folder/file.tif -> folder/file.tif
+                path = path.substring(TRANSLATION_FOLDER_PREFIX.length());
+                path = path.substring(path.indexOf("/") +1);
+            }
         }
         return path;
     }
@@ -516,6 +547,7 @@ public class MCRMetsSave {
 
             // search the right group and remove the file from the group
             List<FileGrp> fileGroups = modifiedMets.getFileSec().getFileGroups();
+
             for (FileGrp fileGrp : fileGroups) {
                 if (fileGrp.contains(href)) {
                     org.mycore.mets.model.files.File fileToRemove = fileGrp.getFileByHref(href);
@@ -527,7 +559,11 @@ public class MCRMetsSave {
                         ArrayList<Fptr> fptrsToRemove = new ArrayList<Fptr>();
                         for (Fptr fptr : physicalSubDiv.getChildren()) {
                             if (fptr.getFileId().equals(fileToRemove.getId())) {
-                                fptrsToRemove.add(fptr);
+                                if (fileGrp.getUse().equals(FileGrp.USE_MASTER)) {
+                                    physicalSubDivsToRemove.add(physicalSubDiv);
+                                } else {
+                                    fptrsToRemove.add(fptr);
+                                }
                             }
                         }
                         for (Fptr fptrToRemove : fptrsToRemove) {
@@ -535,63 +571,55 @@ public class MCRMetsSave {
                                 fptrToRemove.getFileId(), file.getOwner()));
                             physicalSubDiv.remove(fptrToRemove);
                         }
-
-                        // Remove smlinks only if there is no file linked
-                        if (physicalSubDiv.getChildren().size() == 0) {
-
-                            //remove links in mets:structLink section
-                            List<SmLink> list = modifiedMets.getStructLink().getSmLinkByTo(physicalSubDiv.getId());
-                            LogicalStructMap logicalStructMap = (LogicalStructMap) modifiedMets
+                    }
+                    for (PhysicalSubDiv physicalSubDivToRemove : physicalSubDivsToRemove) {
+                        //remove links in mets:structLink section
+                        List<SmLink> list = modifiedMets.getStructLink().getSmLinkByTo(physicalSubDivToRemove.getId());
+                        LogicalStructMap logicalStructMap = (LogicalStructMap) modifiedMets
                                 .getStructMap(LogicalStructMap.TYPE);
 
-                            for (SmLink linkToRemove : list) {
-                                LOGGER.warn(String.format(Locale.ROOT, "remove smLink from \"%s\" to \"%s\"",
+                        for (SmLink linkToRemove : list) {
+                            LOGGER.warn(String.format(Locale.ROOT, "remove smLink from \"%s\" to \"%s\"",
                                     linkToRemove.getFrom(), linkToRemove.getTo()));
-                                modifiedMets.getStructLink().removeSmLink(linkToRemove);
-                                // modify logical struct Map
-                                String logID = linkToRemove.getFrom();
+                            modifiedMets.getStructLink().removeSmLink(linkToRemove);
+                            // modify logical struct Map
+                            String logID = linkToRemove.getFrom();
 
-                                // the deleted file was not directly assigned to a structure
-                                if (logicalStructMap.getDivContainer().getId().equals(logID)) {
-                                    continue;
-                                }
+                            // the deleted file was not directly assigned to a structure
+                            if (logicalStructMap.getDivContainer().getId().equals(logID)) {
+                                continue;
+                            }
 
-                                AbstractLogicalDiv logicalDiv = logicalStructMap.getDivContainer().getLogicalSubDiv(
+                            AbstractLogicalDiv logicalDiv = logicalStructMap.getDivContainer().getLogicalSubDiv(
                                     logID);
-                                if (!(logicalDiv instanceof LogicalSubDiv)) {
-                                    LOGGER.error("Could not find " + LogicalSubDiv.class.getSimpleName() + " with id "
+                            if (!(logicalDiv instanceof LogicalSubDiv)) {
+                                LOGGER.error("Could not find " + LogicalSubDiv.class.getSimpleName() + " with id "
                                         + logID);
-                                    LOGGER.error("Mets document remains unchanged");
-                                    return mets;
-                                }
+                                LOGGER.error("Mets document remains unchanged");
+                                return mets;
+                            }
 
-                                LogicalSubDiv logicalSubDiv = (LogicalSubDiv) logicalDiv;
+                            LogicalSubDiv logicalSubDiv = (LogicalSubDiv) logicalDiv;
 
-                                // there are still files for this logical sub div, nothing to do
-                                if (modifiedMets.getStructLink().getSmLinkByFrom(logicalSubDiv.getId()).size() > 0) {
-                                    continue;
-                                }
+                            // there are still files for this logical sub div, nothing to do
+                            if (modifiedMets.getStructLink().getSmLinkByFrom(logicalSubDiv.getId()).size() > 0) {
+                                continue;
+                            }
 
-                                // the logical div has other divs included, nothing to do
-                                if (logicalSubDiv.getChildren().size() > 0) {
-                                    continue;
-                                }
+                            // the logical div has other divs included, nothing to do
+                            if (logicalSubDiv.getChildren().size() > 0) {
+                                continue;
+                            }
 
                                 /*
                                  * the log div might be in a hierarchy of divs, which may now be empty
                                  * (only containing empty directories), if so the parent of the log div
                                  * must be deleted
                                  * */
-                                handleParents(logicalSubDiv, modifiedMets);
+                            handleParents(logicalSubDiv, modifiedMets);
 
-                                logicalStructMap.getDivContainer().remove(logicalSubDiv);
-                            }
-
-                            physicalSubDivsToRemove.add(physicalSubDiv);
-
+                            logicalStructMap.getDivContainer().remove(logicalSubDiv);
                         }
-                    }
-                    for (PhysicalSubDiv physicalSubDivToRemove : physicalSubDivsToRemove) {
                         divContainer.remove(physicalSubDivToRemove);
                     }
                     correctSubDivOrder(divContainer);
