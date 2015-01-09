@@ -8,4 +8,3 @@
     <element name="datefield" type="date" minOccurs="0" maxOccurs="unbounded" style="small" notinherit="ignore" heritable="ignore" />
   </metadata>
 </objecttype>
-

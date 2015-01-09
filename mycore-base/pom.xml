@@ -56,29 +56,19 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>xml-maven-plugin</artifactId>
+        <groupId>org.mycore.plugins</groupId>
+        <artifactId>datamodel-plugin</artifactId>
         <executions>
           <execution>
             <phase>generate-test-resources</phase>
             <goals>
-              <goal>transform</goal>
+              <goal>schema</goal>
             </goals>
           </execution>
         </executions>
         <configuration>
-          <transformationSets>
-            <transformationSet>
-              <dir>src/test/resources/datamodel</dir>
-              <stylesheet>src/main/resources/xsl/datamodel2schema.xsl</stylesheet>
-              <fileMappers>
-                <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
-                  <targetExtension>.xsd</targetExtension>
-                </fileMapper>
-              </fileMappers>
-              <outputDir>${project.build.directory}/generated-test-resources</outputDir>
-            </transformationSet>
-          </transformationSets>
+          <dataModelDirectory>src/test/resources/datamodel</dataModelDirectory>
+          <schemaDirectory>${project.build.directory}/generated-test-resources</schemaDirectory>
         </configuration>
       </plugin>
       <plugin>
