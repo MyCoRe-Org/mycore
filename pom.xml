@@ -42,8 +42,8 @@
     </site>
   </distributionManagement>
   <issueManagement>
-    <system>SourceForge2</system>
-    <url>https://sourceforge.net/p/mycore/bugs/</url>
+    <system>JIRA</system>
+    <url>https://mycore.atlassian.net/browse/MCR</url>
   </issueManagement>
   <ciManagement>
     <system>jenkins</system>
@@ -92,6 +92,9 @@
           <plugin>
             <artifactId>maven-changes-plugin</artifactId>
             <configuration>
+              <issueManagementSystems>
+                <issueManagementSystem>JIRA</issueManagementSystem>
+              </issueManagementSystems>
               <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
               <smtpPort implementation="java.lang.Integer">25</smtpPort>
               <toAddresses>
@@ -102,7 +105,11 @@
                 <email>${changes.mailSender.email}</email>
               </mailSender>
               <template>announcement.vm</template>
+              <useJql>true</useJql>
               <templateDirectory>src/changes</templateDirectory>
+<!--               <statusIds>10002,Done</statusIds> -->
+              <!-- due to: http://jira.codehaus.org/browse/MCHANGES-333 -->
+              <maxEntries>1000</maxEntries>
             </configuration>
           </plugin>
           <plugin>
@@ -153,15 +160,21 @@
           </plugin>
           <plugin>
             <artifactId>maven-changes-plugin</artifactId>
-            <version>2.9</version>
+            <version>2.11</version>
             <inherited>false</inherited>
             <reportSets>
               <reportSet>
                 <reports>
-                  <report>changes-report</report>
+                  <report>jira-report</report>
                 </reports>
               </reportSet>
             </reportSets>
+            <configuration>
+              <useJql>true</useJql>
+              <onlyCurrentVersion>true</onlyCurrentVersion>
+              <columnNames>Type,Key,Summary,Assignee,Status,Resolution,Component</columnNames>
+              <sortColumnNames>Type,Component,Key DESC</sortColumnNames>
+            </configuration>
           </plugin>
           <plugin>
             <artifactId>maven-checkstyle-plugin</artifactId>
