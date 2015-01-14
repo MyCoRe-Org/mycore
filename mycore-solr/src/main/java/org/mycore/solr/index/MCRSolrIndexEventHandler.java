@@ -137,7 +137,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handlePathDeleted(MCREvent evt, Path file, BasicFileAttributes attrs) {
-        MCRSolrIndexer.deleteById(attrs.fileKey().toString()); //TODO: should be file.toURI();
+        MCRSolrIndexer.deleteById(file.toUri().toString());
     }
 
     @Override
