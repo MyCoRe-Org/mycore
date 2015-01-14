@@ -2,7 +2,7 @@
 
 <html>
   <body>
-    <form action="/servlets/XEditor">
+    <form action="/servlets/XEditor" method="post">
       <h3>Fehlerhafte Eingabe:</h3>
       <span class="help-inline">Titel erforderlich, muss utopisch sein!</span>
       <div class="form-group has-error">

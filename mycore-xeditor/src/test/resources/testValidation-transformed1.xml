@@ -2,7 +2,7 @@
 
 <html>
   <body>
-    <form action="/servlets/XEditor">
+    <form action="/servlets/XEditor" method="post">
       <div class="form-group ">
         <input name="/document/title" value="Der neue XEditor - Utopie oder Wahnsinn?" type="text" />
       </div>

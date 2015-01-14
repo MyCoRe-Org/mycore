@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <div>
-  <form action="/servlets/XEditor">
+  <form action="/servlets/XEditor" method="post">
     <i1>
       <a />
     </i1>

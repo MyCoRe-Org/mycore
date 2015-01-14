@@ -2,7 +2,7 @@
 
 <html>
   <body>
-    <form action="/servlets/XEditor">
+    <form action="/servlets/XEditor" method="post">
       <input name="/document/title" value="" type="text" />
       <input name="/document/author/firstName" value="" type="text" id="firstName" />
       <input name="/document/author/lastName" value="" type="text" id="lastName" />

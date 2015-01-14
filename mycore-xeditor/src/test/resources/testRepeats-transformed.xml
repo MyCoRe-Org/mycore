@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <div xmlns:xed="http://www.mycore.de/xeditor">
-  <form action="/servlets/XEditor">
+  <form action="/servlets/XEditor" method="post">
     <a name="rep-1" />
     <div>
       <input name="/document/service" value="oai" type="text" />
