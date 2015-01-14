@@ -1,0 +1,17 @@
+<web-fragment xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd" version="3.0" metadata-complete="true">
+<!-- **************************************************************** -->
+<!-- Servlets and mappings of mycore-coma                                  -->
+<!-- **************************************************************** -->
+
+  <servlet>
+    <servlet-name>MCRDerivateContentTransformerServlet</servlet-name>
+    <servlet-class>org.mycore.coma.frontend.MCRDerivateContentTransformerServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>MCRDerivateContentTransformerServlet</servlet-name>
+    <url-pattern>/servlets/MCRDerivateContentTransformerServlet/*</url-pattern>
+  </servlet-mapping>
+
+</web-fragment>
