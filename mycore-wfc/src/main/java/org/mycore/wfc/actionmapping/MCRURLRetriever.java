@@ -139,14 +139,15 @@ public final class MCRURLRetriever {
         }
         //did not find a collection with that action, checking parent
         String parentCollection = getParentCollection(collection);
+        String defaultCollectionName = defaultCollection == null ? null : defaultCollection.getName();
         if (parentCollection == null) {
-            LOGGER.info("Using default collection '" + defaultCollection.getName() + "' for action: " + action);
+            LOGGER.info("Using default collection '" + defaultCollectionName + "' for action: " + action);
             return defaultCollection;
         }
         LOGGER.info("Checking parent collection '" + parentCollection + "' for action: " + action);
         MCRCollection collectionWithAction = getCollectionWithAction(parentCollection, action, defaultCollection);
         if (collectionWithAction == null) {
-            LOGGER.info("Using default collection '" + defaultCollection.getName() + "' for action: " + action);
+            LOGGER.info("Using default collection '" + defaultCollectionName + "' for action: " + action);
             return defaultCollection;
         }
         if (mcrCollection == null) {
