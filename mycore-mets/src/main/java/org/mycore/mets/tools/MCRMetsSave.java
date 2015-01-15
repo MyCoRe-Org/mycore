@@ -11,7 +11,6 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -80,6 +79,7 @@ public class MCRMetsSave {
 
     public static final String TEI_FOLDER_PREFIX = "tei/";
     public static final String TRANSLATION_FOLDER_PREFIX = "translation.";
+    public static final String TRANSCRIPTION_FOLDER_PREFIX = "transcription";
 
 
     /**
@@ -447,6 +447,8 @@ public class MCRMetsSave {
                 // e.g. tei/TRANSLATION_FOLDER_PREFIXDE/folder/file.tif -> folder/file.tif
                 path = path.substring(TRANSLATION_FOLDER_PREFIX.length());
                 path = path.substring(path.indexOf("/") +1);
+            } else if (path.startsWith(TRANSCRIPTION_FOLDER_PREFIX)) {
+                path = path.substring(TRANSCRIPTION_FOLDER_PREFIX.length()+1);
             }
         }
         return path;
