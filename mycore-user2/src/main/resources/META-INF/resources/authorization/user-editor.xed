@@ -187,7 +187,7 @@
                 <xed:output value="']'" />
               </div>
               <div class="col-sm-2">
-                <xed:controls>add remove up down</xed:controls>
+                <xed:controls>append remove up down</xed:controls>
               </div>
             </div>
           </xed:repeat>
