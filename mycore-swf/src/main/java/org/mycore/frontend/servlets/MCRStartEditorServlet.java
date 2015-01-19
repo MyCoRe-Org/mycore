@@ -89,7 +89,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
-    protected static Logger LOGGER = Logger.getLogger(MCRStartEditorServlet.class);
+    private static Logger LOGGER = Logger.getLogger(MCRStartEditorServlet.class);
 
     protected static MCRConfiguration CONFIG = MCRConfiguration.instance();
 
@@ -728,7 +728,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         params.put("type", cd.mytype);
         params.put("step", cd.mystep);
         sb = new StringBuffer();
-        sb.append(getBaseURL()).append(pagedir).append("editor_form_commit-derivate.xml");
+        sb.append(getBaseURL()).append(pagedir).append(checkFileName("editor_form_commit-derivate"));
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));
     }
 
@@ -1241,7 +1241,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         params.put("type", cd.mytype);
         params.put("step", cd.mystep);
         sb = new StringBuffer();
-        sb.append(getBaseURL()).append(pagedir).append("editor_form_editor-derivate.xml");
+        sb.append(getBaseURL()).append(pagedir).append(checkFileName("editor_form_editor-derivate"));
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));
     }
 
