@@ -125,9 +125,17 @@
     <!-- Volume END -->
 
     <!-- Herausgabejahr -->
-    <cell row="40" col="1" anchor="NORTHEAST" ref="mods.dateIssued.book.label" />
-    <cell row="40" col="2" anchor="NORTHWEST" ref="mods.dateIssued.optional" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:originInfo" />
-    <cell row="40" col="3" anchor="NORTHWEST" ref="mods.dateIssued.help" />
+    <cell row="40" colspan="3" anchor="NORTHWEST" var="metadata/def.modsContainer/modsContainer/mods:mods">
+      <panel id="confpro.dateIssued">
+        <cell row="10" col="1" anchor="NORTHEAST" ref="mods.dateIssued.book.label" style="width:153px;" />
+        <cell row="10" col="2" anchor="NORTHWEST" ref="mods.dateIssued.optional" var="mods:originInfo" style="width:560px;" />
+        <cell row="10" col="3" anchor="NORTHWEST" ref="mods.dateIssued.help" />
+        <condition id="mods.dateIssued.confpro.cond" xsl="count(mods:originInfo/mods:dateIssued/text())>=count(mods:titleInfo[not(attribute::type or attribute::transliteration)]/mods:title/text())">
+          <label xml:lang="de">Bitte geben Sie das Veröffentlichungsdatum des Konferenzbandes an!</label>
+          <label xml:lang="en">Please select one entry!</label>
+        </condition>
+      </panel>
+    </cell>
     <!-- Herausgabejahr END -->
 
     <!-- Place -->
@@ -148,9 +156,17 @@
     </cell>
 
     <!-- LANGUAGE -->
-    <cell row="70" col="1" anchor="NORTHEAST" ref="mods.languageTerm.label" />
-    <cell row="70" col="2" anchor="NORTHWEST" ref="mods.languageTerm.optional" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
-    <cell row="70" col="3" anchor="NORTHWEST" ref="mods.languageTerm.help" />
+    <cell row="70" colspan="3" anchor="NORTHWEST">
+      <panel id="confpro.language">
+        <cell row="10" col="1" anchor="NORTHEAST" ref="mods.languageTerm.label" />
+        <cell row="10" col="2" anchor="NORTHWEST" ref="mods.languageTerm.optional" var="metadata/def.modsContainer/modsContainer/mods:mods/mods:language" />
+        <cell row="10" col="3" anchor="NORTHWEST" ref="mods.languageTerm.help" />
+        <condition id="mods.languageTerm.confpro.cond" xsl="count(metadata/def.modsContainer/modsContainer/mods:mods/mods:language/mods:languageTerm/@mcr:categId)>=count(metadata/def.modsContainer/modsContainer/mods:mods/mods:titleInfo[not(attribute::type or attribute::transliteration)]/mods:title/text())">
+          <label xml:lang="de">Bitte geben Sie die Sprache des Konferenzbandes an!</label>
+          <label xml:lang="en">Please select one entry!</label>
+        </condition>
+      </panel>
+    </cell>
     <!-- LANGUAGE END -->
 
     <!-- Abstract -->
