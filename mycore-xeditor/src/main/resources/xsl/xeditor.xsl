@@ -27,9 +27,14 @@
       <xsl:attribute name="action">
         <xsl:value-of select="concat($ServletsBaseURL,'XEditor')" />
       </xsl:attribute>
-      <xsl:attribute name="method">
-        <xsl:value-of select="'post'" />
-      </xsl:attribute>
+      
+      <!-- method="post" is default, may be overwritten by xed:form/@method -->
+      <xsl:if test="not(@method)"> 
+        <xsl:attribute name="method">
+          <xsl:text>post</xsl:text>
+        </xsl:attribute>
+      </xsl:if>
+      
       <xsl:apply-templates select="node()" mode="xeditor" />
       <xsl:call-template name="passAdditionalParameters" />
     </form>
