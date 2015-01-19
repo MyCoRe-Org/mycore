@@ -49,6 +49,7 @@
           </field>
         </xsl:for-each>
       </xsl:for-each>
+
       <!-- dynamic class fields -->
       <xsl:for-each select="metadata/*[@class='MCRMetaClassification']/*">
         <xsl:variable name="classTree"
@@ -56,7 +57,13 @@
         <xsl:variable name="classid" select="@classid" />
         <xsl:variable name="notInherited" select="@inherited = '0'" />
 
-        <xsl:for-each select="$classTree">
+        <field name="{$classid}.leaf">
+          <!-- categid as value -->
+          <xsl:value-of select="@categid" />
+        </field>
+
+
+        <xsl:for-each select=" $ classTree ">
           <xsl:if test="position() = 1">
             <field name="{$classid}.root">
               <!-- categid as value -->
@@ -69,6 +76,7 @@
             <!-- categid as value -->
             <xsl:value-of select="@ID" />
           </field>
+
           <xsl:for-each select="label">
             <field name="{$classid}_Label">
               <xsl:value-of select="@text" />
@@ -84,6 +92,7 @@
           </xsl:if>
         </xsl:for-each>
       </xsl:for-each>
+
       <!-- and once again for mods -->
       <xsl:for-each select="metadata//mods:*[@authority or @authorityURI]">
         <xsl:variable name="uri" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport" select="mcrmods:getClassCategParentLink(.)" />
