@@ -36,7 +36,9 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<WebApplicationE
     public Response toResponse(WebApplicationException exc) {
         if (headers.getAcceptableMediaTypes().contains(MediaType.TEXT_HTML_TYPE)) {
             // try to return a html error page
-            MCRSessionMgr.getCurrentSession().beginTransaction();
+            if(!MCRSessionMgr.getCurrentSession().isTransactionActive()) {
+                MCRSessionMgr.getCurrentSession().beginTransaction();
+            }
             try {
                 int status = exc.getResponse().getStatus();
                 String source = exc.getStackTrace().length > 0 ? exc.getStackTrace()[0].toString() : null;
