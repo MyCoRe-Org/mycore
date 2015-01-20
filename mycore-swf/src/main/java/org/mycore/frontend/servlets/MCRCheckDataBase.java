@@ -50,6 +50,7 @@ import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.validator.MCREditorOutValidator;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
@@ -74,23 +75,12 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
       */
     public void doGetPost(MCRServletJob job) throws Exception {
         // read the XML data
-        MCREditorSubmission sub = null;
-        org.jdom2.Document indoc = null;
-        try {
-        	indoc = (org.jdom2.Document)(job.getRequest().getAttribute("MCRXEditorSubmission"));
-        	if (indoc == null) {
-                sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
-                indoc = sub.getXML();        	    
-        	}
-            MCRUtils.writeJDOMToSysout(indoc);
-        } catch (Exception e) {
-        	sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
-            indoc = sub.getXML();
-        }
+        Document indoc = readEditorOutput(job);
 
         // read the parameter
         MCRRequestParameters parms;
 
+        MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
         if (sub == null) {
             parms = new MCRRequestParameters(job.getRequest());
         } else {
@@ -139,7 +129,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
 
         // check access
         if (!checkAccess(ID)) {
-            job.getResponse().sendRedirect(getBaseURL() + usererrorpage);
+            job.getResponse().sendRedirect(MCRFrontendUtil.getBaseURL() + usererrorpage);
             return;
         }
 
@@ -162,7 +152,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         String url = getNextURL(ID, okay);
         sendMail(ID);
         if (!job.getResponse().isCommitted())
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + url));
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + url));
     }
 
     /**
@@ -274,7 +264,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
 
         try {
             //TODO: Access File directly
-            InputStream in = new URL(getBaseURL() + myfile + sessionID + "?XSL.Style=xml").openStream();
+            InputStream in = new URL(MCRFrontendUtil.getBaseURL() + myfile + sessionID + "?XSL.Style=xml").openStream();
 
             if (in == null) {
                 throw new MCRConfigurationException("Can't read editor file " + myfile);

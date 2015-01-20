@@ -23,11 +23,12 @@
 
 package org.mycore.frontend.servlets;
 
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
@@ -36,11 +37,12 @@ import org.jdom2.Namespace;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
 import org.xml.sax.SAXParseException;
@@ -56,7 +58,6 @@ import org.xml.sax.SAXParseException;
 abstract public class MCRCheckACLBase extends MCRCheckBase {
 
     private static final long serialVersionUID = 1L;
-
     private static Logger LOGGER = Logger.getLogger(MCRCheckACLBase.class);
 
     /**
@@ -92,7 +93,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
 
         // check access
         if (!checkAccess(ID)) {
-            job.getResponse().sendRedirect(getBaseURL() + usererrorpage);
+            job.getResponse().sendRedirect(MCRFrontendUtil.getBaseURL() + usererrorpage);
             return;
         }
 
@@ -106,7 +107,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
         String url = getNextURL(ID, okay);
         sendMail(ID);
 
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + url));
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + url));
     }
 
     /**
@@ -122,8 +123,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
      * @throws SAXParseException 
      * @throws MCRException 
      */
-    abstract public boolean storeService(Element outelm, MCRServletJob job, MCRObjectID ID) throws MCRException,
-        SAXParseException, IOException;
+    abstract public boolean storeService(Element outelm, MCRServletJob job, MCRObjectID ID) throws MCRException, SAXParseException, IOException;
 
     /**
      * The method read the incoming servacls JDOM tree in a MCRService and
@@ -146,6 +146,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
         if (root != null) {
             Element servacls = root.getChild("servacls");
             if (servacls != null) {
+                @SuppressWarnings("unchecked")
                 List<Element> servacllist = servacls.getChildren("servacl");
                 if (servacllist.size() != 0) {
                     for (Element servacl : servacllist) {
@@ -153,10 +154,12 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                         if (outcond != null) {
                             Element outbool = outcond.getChild("boolean");
                             if (outbool != null) {
+                                @SuppressWarnings("unchecked")
                                 List<Element> inbool = outbool.getChildren("boolean");
                                 String outoper = outbool.getAttributeValue("operator");
                                 if (inbool.size() != 0 && outoper != null && !outoper.equals("true")) {
                                     for (Element anInbool : inbool) {
+                                        @SuppressWarnings("unchecked")
                                         List<Element> incondlist = anInbool.getChildren("condition");
                                         int k = incondlist.size();
                                         if (k != 0) {
@@ -171,7 +174,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                                                 }
                                                 String condfield = incond.getAttributeValue("field");
                                                 if (condfield.equals("date")) {
-                                                    if (new MCRISO8601Date(condvalue).getDate() == null) {
+                                                    if (MCRUtils.convertDateToISO(condvalue) == null) {
                                                         anInbool.removeContent(incond);
                                                         k--;
                                                         l--;
@@ -180,7 +183,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                                             }
                                             if (k == 1) {
                                                 String inbooloper = anInbool.getAttributeValue("operator");
-                                                if ((inbooloper != null) && inbooloper.equalsIgnoreCase("and")) {
+                                                if ((inbooloper != null) && inbooloper.toLowerCase(Locale.ROOT).equals("and")) {
                                                     Element newtrue = new Element("boolean");
                                                     newtrue.setAttribute("operator", "true");
                                                     anInbool.addContent(newtrue);
@@ -234,8 +237,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
      * @param lang
      *            the current language
      */
-    private void errorHandlerValid(MCRServletJob job, List<String> logtext, MCRObjectID ID, String lang)
-        throws Exception {
+    private void errorHandlerValid(MCRServletJob job, List<String> logtext, MCRObjectID ID, String lang) throws Exception {
         if (logtext.size() == 0) {
             return;
         }
@@ -247,12 +249,11 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
 
         // prepare editor with error messages
         String pagedir = MCRConfiguration.instance().getString("MCR.SWF.PageDir", "");
-        String myfile = pagedir
-            + MCRConfiguration.instance().getString("MCR.SWF.PageErrorFormular", "editor_error_formular.xml");
+        String myfile = pagedir + MCRConfiguration.instance().getString("MCR.SWF.PageErrorFormular", "editor_error_formular.xml");
         Document jdom;
 
         try {
-            InputStream in = (new URL(getBaseURL() + myfile + "?XSL.Style=xml")).openStream();
+            InputStream in = (new URL(MCRFrontendUtil.getBaseURL() + myfile + "?XSL.Style=xml")).openStream();
 
             if (in == null) {
                 throw new MCRConfigurationException("Can't read editor file " + myfile);
@@ -265,7 +266,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
             List<Element> sectionlist = root.getChildren("section");
 
             for (Element section : sectionlist) {
-                if (!section.getAttributeValue("lang", Namespace.XML_NAMESPACE).equalsIgnoreCase(lang)) {
+                if (!section.getAttributeValue("lang", Namespace.XML_NAMESPACE).equals(lang.toLowerCase(Locale.ROOT))) {
                     continue;
                 }
 
@@ -296,8 +297,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
 
                 // the edit button
                 Element form = section.getChild("form");
-                form.setAttribute("action",
-                    job.getResponse().encodeRedirectURL(getBaseURL() + "servlets/MCRStartEditorServlet"));
+                form.setAttribute("action", job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + "servlets/MCRStartEditorServlet"));
 
                 Element input1 = new Element("input");
                 input1.setAttribute("name", "lang");
@@ -325,5 +325,5 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
         job.getRequest().setAttribute("XSL.Style", lang);
         getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(jdom));
     }
-
+    
 }

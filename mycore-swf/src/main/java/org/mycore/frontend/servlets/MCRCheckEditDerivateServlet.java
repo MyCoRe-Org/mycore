@@ -41,12 +41,12 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.editor.MCREditorSubmission;
+import org.mycore.frontend.MCRFrontendUtil;
 
 /**
  * The servlet store the MCREditorServlet output XML in a file of a MCR type
  * dependencies directory, check it dependence of the MCR type and store the XML
- * in a file in this directory or if an error was occured start the editor again
+ * in a file in this directory or if an error was occurred start the editor again
  * with <b>todo </b> <em>repair</em>.
  * 
  * @author Jens Kupferschmidt
@@ -62,11 +62,7 @@ public class MCRCheckEditDerivateServlet extends MCRCheckBase {
      */
     public void doGetPost(MCRServletJob job) throws Exception {
         // read the XML data
-        MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
-        Document indoc = sub.getXML();
-        if (LOGGER.isDebugEnabled()) {
-            MCRUtils.writeJDOMToSysout(indoc);
-        }
+        Document indoc = readEditorOutput(job);
 
         // create a metadata object and prepare it
         MCRObjectID derID = null;
@@ -111,7 +107,7 @@ public class MCRCheckEditDerivateServlet extends MCRCheckBase {
 
             // check access
             if (!checkAccess(objID)) {
-                job.getResponse().sendRedirect(getBaseURL() + usererrorpage);
+                job.getResponse().sendRedirect(MCRFrontendUtil.getBaseURL() + usererrorpage);
                 return;
             }
 
@@ -126,7 +122,7 @@ public class MCRCheckEditDerivateServlet extends MCRCheckBase {
             e.printStackTrace();
         }
         // return
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + url));
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + url));
     }
 
     /**
