@@ -74,23 +74,12 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
       */
     public void doGetPost(MCRServletJob job) throws Exception {
         // read the XML data
-        MCREditorSubmission sub = null;
-        org.jdom2.Document indoc = null;
-        try {
-        	indoc = (org.jdom2.Document)(job.getRequest().getAttribute("MCRXEditorSubmission"));
-        	if (indoc == null) {
-                sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
-                indoc = sub.getXML();        	    
-        	}
-            MCRUtils.writeJDOMToSysout(indoc);
-        } catch (Exception e) {
-        	sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
-            indoc = sub.getXML();
-        }
+        Document indoc = readEditorOutput(job);
 
         // read the parameter
         MCRRequestParameters parms;
 
+        MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
         if (sub == null) {
             parms = new MCRRequestParameters(job.getRequest());
         } else {

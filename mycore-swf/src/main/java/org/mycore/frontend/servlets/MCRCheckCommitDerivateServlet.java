@@ -66,11 +66,7 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
      */
     public void doGetPost(MCRServletJob job) throws Exception {
         // read the XML data
-        MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
-        Document indoc = sub.getXML();
-        if (LOGGER.isDebugEnabled()) {
-            MCRUtils.writeJDOMToSysout(indoc);
-        }
+        Document indoc = readEditorOutput(job);
 
         // create a metadata object and prepare it
         MCRObjectID derID = null;

@@ -25,9 +25,12 @@ package org.mycore.frontend.servlets;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 
 /**
@@ -41,18 +44,18 @@ abstract public class MCRCheckBase extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
-    // The file separator
     String NL = System.getProperty("file.separator");
 
-    // The Workflow Manager
     protected static MCRSimpleWorkflowManager WFM = MCRSimpleWorkflowManager.instance();
 
-    // pagedir
     protected static String pagedir = MCRConfiguration.instance().getString("MCR.SWF.PageDir", "");
 
     protected List<String> errorlog;
 
-    protected static String usererrorpage = pagedir + MCRConfiguration.instance().getString("MCR.SWF.PageErrorUser", "editor_error_user.xml");
+    protected static String usererrorpage = pagedir
+            + MCRConfiguration.instance().getString("MCR.SWF.PageErrorUser", "editor_error_user.xml");
+
+    protected static Logger LOGGER = Logger.getLogger(MCRCheckBase.class);
 
     /**
      * The method return an URL with the next working step. If okay flag is
@@ -87,12 +90,36 @@ abstract public class MCRCheckBase extends MCRServlet {
     }
 
     /**
-     * check the access permission
+     * The method check the access permission
      * @param ID the mycore ID
      * @return true if the access is set
      */
     protected boolean checkAccess(MCRObjectID ID) {
         return false;
+    }
+
+    /**
+     * The method read the output XML of the editor. The method hold both variants of read: output of XEditor and output of the old MyCoRe Base Editor.
+     * @param job the MCRServletJob
+     * @return a org.jdom2.Document containing the editor output
+     */
+    protected org.jdom2.Document readEditorOutput(MCRServletJob job) {
+        MCREditorSubmission sub = null;
+        org.jdom2.Document indoc = null;
+        try {
+            indoc = (org.jdom2.Document) (job.getRequest().getAttribute("MCRXEditorSubmission"));
+            if (indoc == null) {
+                sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
+                indoc = sub.getXML();
+            }
+            if (LOGGER.isDebugEnabled()) {
+                MCRUtils.writeJDOMToSysout(indoc);
+            }
+        } catch (Exception e) {
+            sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
+            indoc = sub.getXML();
+        }
+        return indoc;
     }
 
 }

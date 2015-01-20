@@ -46,7 +46,7 @@ import org.mycore.frontend.editor.MCREditorSubmission;
 /**
  * The servlet store the MCREditorServlet output XML in a file of a MCR type
  * dependencies directory, check it dependence of the MCR type and store the XML
- * in a file in this directory or if an error was occured start the editor again
+ * in a file in this directory or if an error was occurred start the editor again
  * with <b>todo </b> <em>repair</em>.
  * 
  * @author Jens Kupferschmidt
@@ -62,11 +62,7 @@ public class MCRCheckEditDerivateServlet extends MCRCheckBase {
      */
     public void doGetPost(MCRServletJob job) throws Exception {
         // read the XML data
-        MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
-        Document indoc = sub.getXML();
-        if (LOGGER.isDebugEnabled()) {
-            MCRUtils.writeJDOMToSysout(indoc);
-        }
+        Document indoc = readEditorOutput(job);
 
         // create a metadata object and prepare it
         MCRObjectID derID = null;

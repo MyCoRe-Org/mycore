@@ -700,7 +700,7 @@ public class MCRStartEditorServlet extends MCRServlet {
     /**
      * The method start the editor to modify a derivate object that is stored in
      * the server. The method use the input parameter: <b>type</b>,<b>step</b>
-     * <b>se_mcrid</b> and <b>se_mcrid</b>. Access rights must be 'writedb'.
+     * <b>se_mcrid</b> and <b>re_mcrid</b>. Access rights must be 'writedb' for <b>re_mcrid</b>.
      * 
      * @param job
      *            the MCRServletJob instance
@@ -717,19 +717,31 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         StringBuffer sb = new StringBuffer();
         Properties params = new Properties();
-        sb.append("xslStyle:mycorederivate-editor:mcrobject:").append(cd.mysemcrid);
-
-        params.put("sourceUri", sb.toString());
-        sb = new StringBuffer();
-        sb.append(getBaseURL()).append("receive/").append(cd.myremcrid.toString());
-        params.put("cancelUrl", sb.toString());
+        params.put("mcrid", cd.mysemcrid.toString());
+        
+        // for compatibility to the old editor
+        String sourceUri = getProperty(job.getRequest(), "sourceUri");
+        if (sourceUri == null || sourceUri.length() == 0) {
+            sb.append("xslStyle:mycorederivate-editor:mcrobject:").append(cd.mytfmcrid);
+            params.put("sourceUri", sb.toString());
+            System.out.println("========"+sb.toString());
+            sb = new StringBuffer();
+            sb.append(getBaseURL()).append("receive/").append(cd.myremcrid);
+            params.put("cancelUrl", sb.toString());
+            System.out.println("========"+sb.toString());
+       } else {
+            params.put("sourceUri", sourceUri);
+            System.out.println("========"+sourceUri);
+            params.put("cancelUrl", getReferer(job));
+            System.out.println("========"+getReferer(job));
+        }
         params.put("se_mcrid", cd.mysemcrid.toString());
         params.put("re_mcrid", cd.myremcrid.toString());
         params.put("type", cd.mytype);
         params.put("step", cd.mystep);
-        sb = new StringBuffer();
-        sb.append(getBaseURL()).append(pagedir).append(checkFileName("editor_form_commit-derivate"));
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));
+        
+        String base = getBaseURL() + cd.myfile;
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
     }
 
     /**
