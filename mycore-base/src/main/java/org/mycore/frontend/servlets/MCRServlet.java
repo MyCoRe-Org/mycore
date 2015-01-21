@@ -718,4 +718,24 @@ public class MCRServlet extends HttpServlet {
             response.sendRedirect(response.encodeRedirectURL(MCRServlet.getBaseURL()));
         }
     }
+
+    /**
+     * If a referrer is available this method redirects to the url given by the referrer 
+     * otherwise method redirects to the alternative-url.
+     * 
+     * @param request
+     * @param response
+     * @param altURL
+     * @throws IOException
+     */
+    protected void toReferrer(HttpServletRequest request, HttpServletResponse response, String altURL)
+        throws IOException {
+        URL referrer = getReferer(request);
+        if (referrer != null) {
+            response.sendRedirect(response.encodeRedirectURL(referrer.toString()));
+        } else {
+            LOGGER.warn("Could not get referrer, returning to " + altURL);
+            response.sendRedirect(response.encodeRedirectURL(altURL));
+        }
+    }
 }
