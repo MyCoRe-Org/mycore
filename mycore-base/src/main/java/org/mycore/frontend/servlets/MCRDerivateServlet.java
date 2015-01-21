@@ -20,7 +20,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 
 /**
- * @author Sebastian Hofmann; Silvio Hermann; Thomas Scheffler (yagee)
+ * @author Sebastian Hofmann; Silvio Hermann; Thomas Scheffler (yagee); Sebastian Röher
  */
 public class MCRDerivateServlet extends MCRServlet {
 
@@ -36,7 +36,7 @@ public class MCRDerivateServlet extends MCRServlet {
         }
         String derivateId = getProperty(request, "derivateid");
         if (performTask(job, getProperty(request, "todo"), derivateId, getProperty(request, "file"))) {
-            response.sendRedirect(response.encodeRedirectURL(getServletBaseURL() + "MCRFileNodeServlet/" + derivateId + "/"));
+            toReferrer(request, response);
         }
     }
 
@@ -50,13 +50,15 @@ public class MCRDerivateServlet extends MCRServlet {
         }
     }
 
-    private boolean performTask(MCRServletJob job, String task, String myCoreDerivateId, String file) throws IOException {
+    private boolean performTask(MCRServletJob job, String task, String myCoreDerivateId, String file)
+        throws IOException {
         if (task.equals("ssetfile")) {
             setMainFile(myCoreDerivateId, file, job.getResponse());
         } else if (task.equals("sdelfile")) {
             deleteFile(myCoreDerivateId, file, job.getResponse());
         } else {
-            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, MessageFormat.format("The task \"{0}\" is not supported.", task));
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST,
+                MessageFormat.format("The task \"{0}\" is not supported.", task));
         }
         return !job.getResponse().isCommitted();
     }
@@ -75,8 +77,8 @@ public class MCRDerivateServlet extends MCRServlet {
             der.getDerivate().getInternals().setMainDoc(file);
             MCRMetadataManager.updateMCRDerivateXML(der);
         } else {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN,
-                MessageFormat.format("User has not the \"" + PERMISSION_WRITE + "\" permission on object {0}.", derivateId));
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, MessageFormat.format("User has not the \""
+                + PERMISSION_WRITE + "\" permission on object {0}.", derivateId));
         }
     }
 
@@ -91,9 +93,11 @@ public class MCRDerivateServlet extends MCRServlet {
         if (MCRAccessManager.checkPermission(derivateId, PERMISSION_DELETE)) {
             MCRPath pathToFile = MCRPath.getPath(derivateId, file);
             Files.delete(pathToFile);
+
         } else {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN,
-                MessageFormat.format("User has not the \"" + PERMISSION_DELETE + "\" permission on object {0}.", derivateId));
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, MessageFormat.format("User has not the \""
+                + PERMISSION_DELETE + "\" permission on object {0}.", derivateId));
         }
     }
+
 }
