@@ -7,7 +7,10 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +39,15 @@ public class MCRDerivateServlet extends MCRServlet {
         }
         String derivateId = getProperty(request, "derivateid");
         if (performTask(job, getProperty(request, "todo"), derivateId, getProperty(request, "file"))) {
+            String url = request.getParameter("url");
+            if (url != null && ("".equals(url))) {
+                response.sendError(HttpServletResponse.SC_NO_CONTENT, "Parameter 'url' is set but empty!");
+                return;
+            }
+            if (url != null) {
+                response.sendRedirect(url);
+                return;
+            }
             toReferrer(request, response);
         }
     }
@@ -92,12 +104,32 @@ public class MCRDerivateServlet extends MCRServlet {
     private void deleteFile(String derivateId, String file, HttpServletResponse response) throws IOException {
         if (MCRAccessManager.checkPermission(derivateId, PERMISSION_DELETE)) {
             MCRPath pathToFile = MCRPath.getPath(derivateId, file);
-            Files.delete(pathToFile);
-
+            if (!Files.isDirectory(pathToFile)) {
+                Files.delete(pathToFile);
+            } else {
+                deleteDirectory(pathToFile);
+            }
         } else {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, MessageFormat.format("User has not the \""
                 + PERMISSION_DELETE + "\" permission on object {0}.", derivateId));
         }
+    }
+
+    private void deleteDirectory(MCRPath pathToFile) throws IOException {
+        Files.walkFileTree(pathToFile, new SimpleFileVisitor<java.nio.file.Path>() {
+
+            @Override
+            public FileVisitResult visitFile(java.nio.file.Path file, BasicFileAttributes attrs) throws IOException {
+                Files.delete(file);
+                return super.visitFile(file, attrs);
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(java.nio.file.Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+                return super.postVisitDirectory(dir, exc);
+            }
+        });
     }
 
 }
