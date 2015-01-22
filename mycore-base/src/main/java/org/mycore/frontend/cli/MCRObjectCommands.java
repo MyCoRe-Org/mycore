@@ -42,6 +42,7 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -759,17 +760,20 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             return;
         }
         MCRObjectID mcrId = MCRObjectID.getInstance(objectId);
-        Document doc = MCRXMLMetadataManager.instance().retrieveXML(mcrId);
+        Document document = MCRXMLMetadataManager.instance().retrieveXML(mcrId);
         // do XSL transform
         Transformer transformer = TransformerFactory.newInstance().newTransformer(new StreamSource(xslFile));
         transformer.setURIResolver(MCRURIResolver.instance());
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
         transformer.setOutputProperty(OutputKeys.INDENT, "no");
         JDOMResult result = new JDOMResult();
-        transformer.transform(new JDOMSource(doc), result);
-        // write to mycore
-        MCRXMLMetadataManager.instance().update(mcrId, result.getDocument(), new Date(System.currentTimeMillis()));
-        MCRMetadataManager.fireUpdateEvent(MCRMetadataManager.retrieveMCRObject(mcrId));
+        transformer.transform(new JDOMSource(document), result);
+        Document resultDocument = result.getDocument();
+        // update on diff
+        if(!MCRXMLHelper.deepEqual(document, resultDocument)) {
+            MCRXMLMetadataManager.instance().update(mcrId, resultDocument, new Date(System.currentTimeMillis()));
+            MCRMetadataManager.fireUpdateEvent(MCRMetadataManager.retrieveMCRObject(mcrId));
+        }
     }
 
     /**
