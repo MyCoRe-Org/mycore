@@ -537,6 +537,8 @@
           <version>1.7</version>
           <configuration>
             <failOnUnsupportedJava>false</failOnUnsupportedJava>
+            <!-- compile would fail anyway and this is required for MCR-873 -->
+            <failOnMissingClasses>false</failOnMissingClasses>
             <bundledSignatures>
               <bundledSignature>jdk-unsafe</bundledSignature>
               <bundledSignature>jdk-deprecated</bundledSignature>
