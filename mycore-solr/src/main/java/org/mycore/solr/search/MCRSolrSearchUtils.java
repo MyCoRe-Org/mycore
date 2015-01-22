@@ -13,6 +13,22 @@ import org.apache.solr.common.params.ModifiableSolrParams;
 public abstract class MCRSolrSearchUtils {
 
     /**
+     * Returns the first document.
+     * 
+     * @param server solr server
+     * @param query solr query
+     * @return first solr document or null
+     * @throws SolrServerException communication with the solr server failed in any way
+     */
+    public static SolrDocument first(SolrServer server, String query) throws SolrServerException {
+        ModifiableSolrParams p = new ModifiableSolrParams();
+        p.set("q", query);
+        p.set("rows", 1);
+        QueryResponse response = server.query(p);
+        return response.getResults().isEmpty() ? null : response.getResults().get(0);
+    }
+
+    /**
      * Returns a list of ids found by the given query. Returns an empty list
      * when nothing is found.
      * 
