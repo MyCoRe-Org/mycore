@@ -32,7 +32,8 @@ public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBa
             return;
         }
         // do nothing if mets.xml itself is deleted
-        if (file.getFileName().toString().equals(mets)) {
+        Path fileName = file.getFileName();
+        if (fileName != null && fileName.toString().equals(mets)) {
             return;
         }
         MCRPath mcrPath = MCRPath.toMCRPath(file);
