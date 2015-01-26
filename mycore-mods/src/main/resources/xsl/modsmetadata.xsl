@@ -630,6 +630,9 @@
           <xsl:when test="@displayLabel='status'">
             <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.status'), ':')" />
           </xsl:when>
+          <xsl:when test="not(contains(i18n:translate(concat('component.mods.metaData.dictionary.', @displayLabel)), 'component.mods.metaData.dictionary.'))">
+            <xsl:value-of select="concat(i18n:translate(concat('component.mods.metaData.dictionary.', @displayLabel)), ':')" />
+          </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.classification'), ':')" />
           </xsl:otherwise>
