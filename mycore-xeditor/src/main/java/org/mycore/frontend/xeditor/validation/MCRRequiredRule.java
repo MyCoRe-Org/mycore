@@ -11,10 +11,6 @@ public class MCRRequiredRule extends MCRValidationRule {
 
     @Override
     public boolean validateBinding(MCRValidationResults results, MCRBinding binding) {
-        String absPath = binding.getAbsoluteXPath();
-        if (results.hasError(absPath)) // do not validate already invalid nodes
-            return true;
-
         boolean isValid = false;
 
         // at least one value must exist
@@ -22,7 +18,13 @@ public class MCRRequiredRule extends MCRValidationRule {
             if (!MCRBinding.getValue(node).isEmpty())
                 isValid = true;
 
-        results.mark(absPath, isValid, this);
+        if (binding.getBoundNode() != null) {
+            String absPath = binding.getAbsoluteXPath();
+            if (results.hasError(absPath)) // do not validate already invalid nodes
+                return true;
+            results.mark(absPath, isValid, this);
+        }
+
         return isValid;
     }
 }
