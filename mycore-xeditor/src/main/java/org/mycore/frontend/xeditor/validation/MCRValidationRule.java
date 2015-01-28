@@ -10,7 +10,7 @@ public abstract class MCRValidationRule {
 
     private Node ruleElement;
 
-    private String xPath;
+    protected String xPath;
 
     public MCRValidationRule(String baseXPath, Node ruleElement) {
         Node relativeXPath = ruleElement.getAttributes().getNamedItem("xpath");
