@@ -322,4 +322,11 @@ public class MCRXEditorTransformer {
     public void addCleanupRule(String xPath, String relevantIf) {
         editorSession.getXMLCleaner().addRule(xPath, relevantIf);
     }
+
+    public void declareParameter(String name, String defaultValue) {
+        Object currentValue = editorSession.getVariables().get(name);
+
+        if ((currentValue == null) || "".equals(currentValue))
+            editorSession.getVariables().put(name, defaultValue == null ? "" : defaultValue);
+    }
 }

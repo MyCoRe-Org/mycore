@@ -407,4 +407,9 @@
     <xsl:value-of select="transformer:addCleanupRule($transformer,@xpath,@relevant-if)" />
   </xsl:template>
 
+  <!-- ========== <xed:param name="" default="" ========== -->
+  <xsl:template match="xed:param" mode="xeditor">
+    <xsl:value-of select="transformer:declareParameter($transformer,@name,@default)" />
+  </xsl:template>
+
 </xsl:stylesheet>
