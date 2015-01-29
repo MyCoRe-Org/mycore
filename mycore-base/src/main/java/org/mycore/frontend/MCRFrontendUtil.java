@@ -218,7 +218,7 @@ public class MCRFrontendUtil {
         boolean closeSession = !MCRSessionMgr.hasCurrentSession();
         HashSet<InetAddress> trustedProxies = new HashSet<>();
 
-        String sTrustedProxies = MCRConfiguration.instance().getString("MCR.Request.TrustedProxies", "");
+        String sTrustedProxies = MCRConfiguration.instance().getString("MCR.Request.TrustedProxies");
         StringTokenizer st = new StringTokenizer(sTrustedProxies, " ,;");
         while (st.hasMoreTokens()) {
             String host = st.nextToken().trim();
