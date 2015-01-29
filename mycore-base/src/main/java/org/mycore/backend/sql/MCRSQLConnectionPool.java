@@ -143,10 +143,10 @@ public class MCRSQLConnectionPool {
         // Some properties are NOT deprecated, as long as this class is used
         // anywhere
         MCRConfiguration config = MCRConfiguration.instance();
-        maxNumConnections = config.getInt("MCR.Persistence.SQL.Connections.Max", 6);
-        int initNumConnections = config.getInt("MCR.Persistence.SQL.Connections.Init", maxNumConnections);
-        maxUsages = config.getInt("MCR.Persistence.SQL.Database.Connections.MaxUsages", 1000);
-        maxAge = config.getLong("MCR.Persistence.SQL.Database.Connections.MaxAge", 3600 * 1000); // 1
+        maxNumConnections = config.getInt("MCR.Persistence.SQL.Connections.Max");
+        int initNumConnections = config.getInt("MCR.Persistence.SQL.Connections.Init");
+        maxUsages = config.getInt("MCR.Persistence.SQL.Database.Connections.MaxUsages");
+        maxAge = config.getLong("MCR.Persistence.SQL.Database.Connections.MaxAge"); // 1
         // hour
 
         // Build the initial number of JDBC connections
