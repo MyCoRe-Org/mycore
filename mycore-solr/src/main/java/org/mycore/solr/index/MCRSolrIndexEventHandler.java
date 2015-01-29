@@ -30,6 +30,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCREvent;
@@ -42,7 +43,6 @@ import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
 
 /**
  * @author Thomas Scheffler (yagee)
- *
  */
 public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
@@ -69,7 +69,8 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     synchronized protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
-        MCRSolrIndexer.deleteById(obj.getId().toString());
+        MCRSolrIndexer.deleteById(obj.getId()
+            .toString());
     }
 
     @Override
@@ -93,26 +94,28 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateDeleted(MCREvent evt, MCRDerivate derivate) {
-        MCRSolrIndexer.deleteById(derivate.getId().toString());
+        MCRSolrIndexer.deleteById(derivate.getId()
+            .toString());
     }
 
     synchronized protected void handleMCRBaseCreated(MCREvent evt, MCRBase objectOrDerivate) {
         long tStart = System.currentTimeMillis();
         try {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId().toString() + "\" for indexing");
+                LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId()
+                    .toString() + "\" for indexing");
             }
             MCRContent content = (MCRContent) evt.get("content");
             if (content == null) {
                 content = new MCRBaseContent(objectOrDerivate);
             }
-            MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(content,
-                objectOrDerivate.getId());
+            MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance()
+                .getIndexHandler(content, objectOrDerivate.getId());
             indexHandler.setCommitWithin(1000);
             MCRSolrIndexer.submitIndexHandler(indexHandler, 10);
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId().toString()
-                    + "\" for indexing done in " + (System.currentTimeMillis() - tStart) + "ms ");
+                LOGGER.debug("Solr: submitting data of \"" + objectOrDerivate.getId()
+                    .toString() + "\" for indexing done in " + (System.currentTimeMillis() - tStart) + "ms ");
             }
         } catch (Exception ex) {
             LOGGER.error("Error creating transfer thread for object " + objectOrDerivate, ex);
@@ -123,8 +126,8 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     protected void handlePathCreated(MCREvent evt, Path path, BasicFileAttributes attrs) {
         try {
             BasicFileAttributeView fileAttributeView = Files.getFileAttributeView(path, BasicFileAttributeView.class);
-            MCRSolrIndexer.submitIndexHandler(MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(path,
-                fileAttributeView.readAttributes(), MCRSolrServerFactory.getSolrServer()));
+            MCRSolrIndexer.submitIndexHandler(MCRSolrIndexHandlerFactory.getInstance()
+                .getIndexHandler(path, fileAttributeView.readAttributes(), MCRSolrServerFactory.getSolrServer()));
         } catch (Exception ex) {
             LOGGER.error("Error creating transfer thread for file " + path.toString(), ex);
         }
@@ -137,7 +140,11 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handlePathDeleted(MCREvent evt, Path file, BasicFileAttributes attrs) {
-        MCRSolrIndexer.deleteById(file.toUri().toString());
+        UpdateResponse updateResponse = MCRSolrIndexer.deleteById(file.toUri()
+            .toString());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Deleted file " + file + ". Response:" + updateResponse);
+        }
     }
 
     @Override
@@ -147,7 +154,8 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void updateDerivateFileIndex(MCREvent evt, MCRDerivate derivate) {
-        MCRSolrIndexer.rebuildContentIndex(Arrays.asList(derivate.getId().toString()));
+        MCRSolrIndexer.rebuildContentIndex(Arrays.asList(derivate.getId()
+            .toString()));
     }
 
     @Override
