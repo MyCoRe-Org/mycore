@@ -364,6 +364,13 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         LOGGER.info("Reading file " + file + " ...");
 
         MCRObject mycore_obj = new MCRObject(file.toURI());
+        if (mycore_obj.hasParent()) {
+            MCRObjectID parentID = mycore_obj.getStructure().getParentID();
+            if (!MCRMetadataManager.exists(mycore_obj.getStructure().getParentID())) {
+                throw new MCRException("The parent object " + parentID + "does not exist for " + mycore_obj.toString()
+                    + ".");
+            }
+        }
         mycore_obj.setImportMode(importMode);
         LOGGER.debug("Label --> " + mycore_obj.getLabel());
 
