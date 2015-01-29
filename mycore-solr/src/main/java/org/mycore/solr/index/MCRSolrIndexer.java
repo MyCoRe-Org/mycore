@@ -56,7 +56,10 @@ public class MCRSolrIndexer {
 
     private final static FutureIndexHandlerCounter FUTURE_COUNTER;
 
-    /** Specify how many documents will be submitted to solr at a time when rebuilding the metadata index. Default is 100. */
+    /**
+     * Specify how many documents will be submitted to solr at a time when rebuilding the metadata index. Default is
+     * 100.
+     */
     final static int BULK_SIZE = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Indexer.BulkSize", 100);
 
     private static final int BATCH_AUTO_COMMIT_WITHIN_MS = 60000;
@@ -101,9 +104,10 @@ public class MCRSolrIndexer {
     }
 
     /**
-     * Deletes a list of documents by unique ID.
-     * Also removes any nested document of that ID.
-     * @param ids  the list of document IDs to delete 
+     * Deletes a list of documents by unique ID. Also removes any nested document of that ID.
+     * 
+     * @param ids
+     *            the list of document IDs to delete
      */
     public static UpdateResponse deleteById(String... solrIDs) {
         if (solrIDs == null || solrIDs.length == 0) {
@@ -123,10 +127,12 @@ public class MCRSolrIndexer {
                 deleteQuery.append("\" ");
             }
             deleteQuery.setCharAt(deleteQuery.length() - 1, ')');
-            LOGGER.debug("Delete query:\n" + deleteQuery);
             req.deleteByQuery(deleteQuery.toString());
             //for document without nested
             req.deleteById(Arrays.asList(solrIDs));
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Delete request: " + req.getXML());
+            }
             updateResponse = req.process(solrServer);
             solrServer.commit();
         } catch (Exception e) {
@@ -157,7 +163,8 @@ public class MCRSolrIndexer {
     /**
      * Rebuilds solr's metadata index only for objects of the given type.
      * 
-     * @param type of the objects to index
+     * @param type
+     *            of the objects to index
      */
     public static void rebuildMetadataIndex(String type) {
         List<String> identfiersOfType = MCRXMLMetadataManager.instance().listIDsOfType(type);
@@ -171,8 +178,10 @@ public class MCRSolrIndexer {
     /**
      * Rebuilds solr's metadata index.
      * 
-     * @param list list of identifiers of the objects to index
-     * @param solrServer solr server to index
+     * @param list
+     *            list of identifiers of the objects to index
+     * @param solrServer
+     *            solr server to index
      */
     public static void rebuildMetadataIndex(List<String> list, SolrServer solrServer) {
         LOGGER.info("Re-building Metadata Index");
@@ -229,10 +238,11 @@ public class MCRSolrIndexer {
     }
 
     /**
-     * Rebuilds the content index for the given mycore objects. You can mix derivates and
-     * mcrobjects here. For each mcrobject all its derivates are indexed.
+     * Rebuilds the content index for the given mycore objects. You can mix derivates and mcrobjects here. For each
+     * mcrobject all its derivates are indexed.
      * 
-     * @param list containing mycore object id's
+     * @param list
+     *            containing mycore object id's
      */
     public static void rebuildContentIndex(List<String> list) {
         rebuildContentIndex(MCRSolrServerFactory.getSolrServer(), list);
@@ -266,7 +276,8 @@ public class MCRSolrIndexer {
     /**
      * Submits the index handler to the executor service (execute as a thread) with priority zero.
      * 
-     * @param indexHandler index handler to submit
+     * @param indexHandler
+     *            index handler to submit
      */
     public static void submitIndexHandler(MCRSolrIndexHandler indexHandler) {
         submitIndexHandler(indexHandler, 0);
@@ -275,8 +286,10 @@ public class MCRSolrIndexer {
     /**
      * Submits a index handler to the executor service (execute as a thread) with the given priority.
      * 
-     * @param indexHandler index handler to submit
-     * @param priority priority
+     * @param indexHandler
+     *            index handler to submit
+     * @param priority
+     *            priority
      */
     public static void submitIndexHandler(MCRSolrIndexHandler indexHandler, int priority) {
         ListenableFuture<List<MCRSolrIndexHandler>> future = EXECUTOR_SERVICE.submit(new MCRSolrIndexTask(indexHandler,
@@ -285,7 +298,7 @@ public class MCRSolrIndexer {
     }
 
     /**
-     * Rebuilds and optimizes solr's metadata and content index. 
+     * Rebuilds and optimizes solr's metadata and content index.
      */
     public static void rebuildMetadataAndContentIndex() throws Exception {
         MCRSolrIndexer.rebuildMetadataIndex();
@@ -320,7 +333,7 @@ public class MCRSolrIndexer {
     }
 
     /**
-     * Sends a signal to the remote solr server to optimize its index. 
+     * Sends a signal to the remote solr server to optimize its index.
      */
     public static void optimize() {
         try {
@@ -333,10 +346,8 @@ public class MCRSolrIndexer {
     }
 
     /**
-     * Synchronizes the solr server with the database. As a result the
-     * solr server contains the same documents as the database. All solr
-     * zombie documents will be removed, and all not indexed mycore
-     * objects will be indexed.
+     * Synchronizes the solr server with the database. As a result the solr server contains the same documents as the
+     * database. All solr zombie documents will be removed, and all not indexed mycore objects will be indexed.
      * 
      * @throws IOException
      * @throws SolrServerException
@@ -349,10 +360,9 @@ public class MCRSolrIndexer {
     }
 
     /**
-     * Synchronizes the solr server with the mycore store for a given object type.
-     * As a result the solr server contains the same documents as the store.
-     * All solr zombie documents will be removed, and all not indexed mycore
-     * objects will be indexed.
+     * Synchronizes the solr server with the mycore store for a given object type. As a result the solr server contains
+     * the same documents as the store. All solr zombie documents will be removed, and all not indexed mycore objects
+     * will be indexed.
      * 
      * @throws IOException
      * @throws SolrServerException
@@ -390,7 +400,7 @@ public class MCRSolrIndexer {
     }
 
     /**
-     * Callback to handle a IndexHandlers future non blocking. 
+     * Callback to handle a IndexHandlers future non blocking.
      */
     private static class FutureIndexHandlerCallback implements FutureCallback<List<MCRSolrIndexHandler>> {
         public FutureIndexHandlerCallback() {
