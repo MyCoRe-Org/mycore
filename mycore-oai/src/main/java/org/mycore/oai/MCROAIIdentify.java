@@ -64,7 +64,7 @@ public class MCROAIIdentify extends SimpleIdentify {
         String granularity = this.config.getString(configPrefix + "Granularity", Granularity.YYYY_MM_DD.name());
         this.setGranularity(Granularity.valueOf(granularity));
         String adminMail = this.config.getString(configPrefix + "AdminEmail",
-            config.getString("MCR.Mail.Address", "no_mail_defined@oai_provider.com"));
+            config.getString("MCR.Mail.Sender"));
 
         this.setEarliestDatestamp(calculateEarliestTimestamp());
         this.getAdminEmailList().add(adminMail);

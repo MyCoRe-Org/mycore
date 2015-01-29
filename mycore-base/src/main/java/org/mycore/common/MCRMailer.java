@@ -93,16 +93,16 @@ public class MCRMailer extends MCRServlet {
     /** Initializes the class */
     static {
         MCRConfiguration config = MCRConfiguration.instance();
-        encoding = config.getString("MCR.Mail.Encoding", "ISO-8859-1");
+        encoding = config.getString("MCR.Mail.Encoding");
 
         Properties mailProperties = new Properties();
 
         try {
-            numTries = config.getInt("MCR.Mail.NumTries", 1);
+            numTries = config.getInt("MCR.Mail.NumTries");
             mailProperties.setProperty("mail.smtp.host", config.getString("MCR.Mail.Server"));
-            mailProperties.setProperty("mail.transport.protocol", config.getString("MCR.Mail.Protocol", "smtp"));
+            mailProperties.setProperty("mail.transport.protocol", config.getString("MCR.Mail.Protocol"));
             mailSession = Session.getDefaultInstance(mailProperties, null);
-            mailSession.setDebug(config.getBoolean("MCR.Mail.Debug", false));
+            mailSession.setDebug(config.getBoolean("MCR.Mail.Debug"));
         } catch (MCRConfigurationException mcrx) {
             String msg = "Missing e-mail configuration data.";
             LOGGER.fatal(msg, mcrx);

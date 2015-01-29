@@ -105,7 +105,7 @@ public class MCRSimpleWorkflowManager {
         config = MCRConfiguration.instance();
 
         // read mail sender address
-        sender = config.getString("MCR.Mail.Address", "mcradmin@localhost");
+        sender = config.getString("MCR.Mail.Sender");
 
         // int tables
         ht = new Hashtable<String, File>();
@@ -199,9 +199,9 @@ public class MCRSimpleWorkflowManager {
     }
 
     /**
-     * The method return the mail sender adress form the configuration.
+     * The method return the mail sender address form the configuration.
      * 
-     * @return the mail sender adress
+     * @return the mail sender address
      */
     public final String getMailSender() {
         return sender;
