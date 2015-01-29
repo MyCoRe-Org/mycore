@@ -84,7 +84,7 @@ public class MCRCommandLineInterface {
      */
     public static void main(String[] args) {
         MCRStartupHandler.startUp(null/*no servlet context here*/);
-        system = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName", "MyCoRe") + ":";
+        system = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName") + ":";
 
         initSession();
         output("");

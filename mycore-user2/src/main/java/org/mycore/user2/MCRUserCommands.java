@@ -68,8 +68,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
     /** The logger */
     private static Logger LOGGER = Logger.getLogger(MCRUserCommands.class.getName());
 
-    private static final String SYSTEM = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName",
-            "MyCoRe")
+    private static final String SYSTEM = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName")
             + ":";
 
     /**
