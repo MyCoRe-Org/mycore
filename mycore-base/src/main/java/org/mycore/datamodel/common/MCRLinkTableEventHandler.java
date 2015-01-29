@@ -42,8 +42,7 @@ import org.mycore.datamodel.metadata.MCRObjectMetadata;
 import org.mycore.datamodel.metadata.MCRObjectStructure;
 
 /**
- * This class manages all operations of the LinkTables for operations of an
- * object.
+ * This class manages all operations of the LinkTables for operations of an object.
  * 
  * @author Jens Kupferschmidt
  */
@@ -52,8 +51,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
     static MCRLinkTableManager mcr_linktable = MCRLinkTableManager.instance();
 
     /**
-     * This method add the data to the link and classification table via
-     * MCRLinkTableManager.
+     * This method add the data to the link and classification table via MCRLinkTableManager.
      * 
      * @param evt
      *            the event that occured
@@ -80,9 +78,14 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
                     continue;
                 }
                 if (inf instanceof MCRMetaLinkID) {
-                    mcr_linktable.addReferenceLink(mcr_id.toString(), ((MCRMetaLink) inf).getXLinkHref(), MCRLinkTableManager.ENTRY_TYPE_REFERENCE, "");
+                    mcr_linktable.addReferenceLink(mcr_id.toString(), ((MCRMetaLink) inf).getXLinkHref(),
+                        MCRLinkTableManager.ENTRY_TYPE_REFERENCE, "");
                 }
             }
+        }
+        MCRCategoryID state = obj.getService().getState();
+        if (state != null) {
+            categories.add(state);
         }
         if (categories.size() > 0) {
             MCRCategLinkReference objectReference = new MCRCategLinkReference(mcr_id);
@@ -93,10 +96,11 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
         int dersize = struct.getDerivateSize();
         for (int i = 0; i < dersize; i++) {
             MCRMetaLinkID lid = struct.getDerivate(i);
-            mcr_linktable.addReferenceLink(obj.getId(), lid.getXLinkHrefID(), MCRLinkTableManager.ENTRY_TYPE_DERIVATE, "");
+            mcr_linktable.addReferenceLink(obj.getId(), lid.getXLinkHrefID(), MCRLinkTableManager.ENTRY_TYPE_DERIVATE,
+                "");
         }
         // add parent reference
-        if (struct.getParentID()!=null){
+        if (struct.getParentID() != null) {
             mcr_linktable.addReferenceLink(mcr_id, struct.getParentID(), MCRLinkTableManager.ENTRY_TYPE_PARENT, "");
         }
     }
@@ -108,8 +112,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
     }
 
     /**
-     * This method update the data to the link and classification table via
-     * MCRLinkTableManager.
+     * This method update the data to the link and classification table via MCRLinkTableManager.
      * 
      * @param evt
      *            the event that occured
@@ -122,8 +125,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
     }
 
     /**
-     * This method delete the data from the link and classification table via
-     * MCRLinkTableManager.
+     * This method delete the data from the link and classification table via MCRLinkTableManager.
      * 
      * @param evt
      *            the event that occured
@@ -136,8 +138,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
     }
 
     /**
-     * This method repair the data from the link and classification table via
-     * MCRLinkTableManager.
+     * This method repair the data from the link and classification table via MCRLinkTableManager.
      * 
      * @param evt
      *            the event that occured
