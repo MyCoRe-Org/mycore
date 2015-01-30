@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationLoaderFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
@@ -14,8 +15,8 @@ import org.mycore.frontend.classeditor.mocks.CategoryDAOMock;
 public class GsonSerializationTest {
     @Before
     public void init() {
-        System.setProperty("MCR.Configuration.File", "config/test.properties");
         MCRConfiguration mcrProperties = MCRConfiguration.instance();
+        mcrProperties.initialize(MCRConfigurationLoaderFactory.getConfigurationLoader().load(), true);
         mcrProperties.set("MCR.Category.DAO", CategoryDAOMock.class.getName());
     }
 

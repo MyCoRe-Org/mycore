@@ -5,6 +5,7 @@ import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
 import org.mycore.common.MCRJSONManager;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationLoaderFactory;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 import org.mycore.frontend.classeditor.mocks.CategoryDAOMock;
 
@@ -13,8 +14,8 @@ import com.google.gson.Gson;
 public class MCRCategoryJsonTest {
     @Test
     public void deserialize() throws Exception {
-        System.setProperty("MCR.Configuration.File", "config/test.properties");
         MCRConfiguration mcrProperties = MCRConfiguration.instance();
+        mcrProperties.initialize(MCRConfigurationLoaderFactory.getConfigurationLoader().load(), true);
         mcrProperties.set("MCR.Metadata.DefaultLang", "de");
         mcrProperties.set("MCR.Category.DAO", CategoryDAOMock.class.getName());
         
