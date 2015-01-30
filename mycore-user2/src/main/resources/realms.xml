@@ -49,4 +49,22 @@
     </login>
   </realm>
    -->
+  <!--
+  <realm id="shibboleth">
+    <label xml:lang="de">Shibboleth</label>
+    <label xml:lang="en">Shibboleth</label>
+    <login url="MCRShibbolethLoginServlet" redirectParameter="url">
+      <label xml:lang="de">Anmelden mit dem Login Ihrer Heimateinrichtung</label>
+      <label xml:lang="en">Login with your user credentials of your home institution</label>
+      <info>
+        <label xml:lang="de">
+          Falls unterstützt, müssen Sie sich ggf. nur einmalig anmelden.
+        </label>
+        <label xml:lang="en">
+          This login uses single-sign-on facilities provided by your home institution.
+        </label>
+      </info>
+    </login>
+  </realm>
+   -->
 </realms>

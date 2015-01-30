@@ -35,4 +35,14 @@
     <servlet-name>MCRServlet3LoginServlet</servlet-name>
     <url-pattern>/servlets/MCRServlet3LoginServlet</url-pattern>
   </servlet-mapping>
+  
+  <servlet id="MCRShibbolethLoginServlet">
+    <servlet-name>MCRShibbolethLoginServlet</servlet-name>
+    <servlet-class>org.mycore.user2.login.MCRShibbolethLoginServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MCRShibbolethLoginServlet</servlet-name>
+    <url-pattern>/servlets/MCRShibbolethLoginServlet</url-pattern>
+  </servlet-mapping>
+  
 </web-fragment>
