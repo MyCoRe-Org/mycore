@@ -336,7 +336,7 @@
                   <Implementation-Version>${BUILD_TAG}</Implementation-Version>
                   <Implementation-Build>${BUILD_NUMBER}</Implementation-Build>
                   <Implementation-Revision>${SVN_REVISION}</Implementation-Revision>
-                  <POM>META-INF/maven/${project.groupId}/${project.artifactId}/pom.properties</POM>
+                  <MCR-Artifact-Id>${project.artifactId}</MCR-Artifact-Id>
                   <Priority>${manifest.priority}</Priority>
                 </manifestEntries>
               </archive>
@@ -402,7 +402,7 @@
                 <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
               </manifest>
               <manifestEntries>
-                <POM>META-INF/maven/${project.groupId}/${project.artifactId}/pom.properties</POM>
+                <MCR-Artifact-Id>${project.artifactId}</MCR-Artifact-Id>
                 <Priority>${manifest.priority}</Priority>
               </manifestEntries>
             </archive>
@@ -544,6 +544,15 @@
               <bundledSignature>jdk-deprecated</bundledSignature>
               <bundledSignature>commons-io-unsafe-2.4</bundledSignature>
             </bundledSignatures>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <systemPropertyVariables>
+              <MCR.Home>${project.build.directory}</MCR.Home>
+              <MCR.AppName>${project.artifactId}</MCR.AppName>
+            </systemPropertyVariables>
           </configuration>
         </plugin>
         <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
