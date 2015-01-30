@@ -67,6 +67,7 @@ import org.apache.log4j.Logger;
  * <code>{prefix}</code> can be defined by setting System property <code>MCR.DataPrefix</code>.
  * <code>{appName}</code> is always lowercase String determined using this
  * <ol>
+ *  <li>System property <code>MCR.AppName</code></li>
  *  <li>System property <code>MCR.NameOfProject</code></li>
  *  <li>Servlet Context Path (if not root context, {@link ServletContext#getContextPath()})</li>
  *  <li>Servlet Context Name ({@link ServletContext#getServletContextName()}) with space characters removed</li>
