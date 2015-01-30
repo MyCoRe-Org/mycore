@@ -1,6 +1,5 @@
 package org.mycore.frontend.xeditor.target;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -27,7 +26,7 @@ public class MCRSubselectReturnTarget implements MCREditorTarget {
         if ("cancel".equals(parameter)) {
             session.setBreakpoint("After canceling subselect for " + baseXPath);
         } else {
-            Map<String, String[]> submittedValues = getSubmittedValues(job, baseXPath);
+            Map<String, String[]> submittedValues = MCRTargetUtility.getSubmittedValues(job, baseXPath);
             session.getSubmission().setSubmittedValues(submittedValues);
             session.setBreakpoint("After returning from subselect for " + baseXPath);
         }
@@ -48,19 +47,5 @@ public class MCRSubselectReturnTarget implements MCREditorTarget {
         boolean result = (binding.getBoundNode() instanceof Element) && !xPath.endsWith("]");
         binding.detach();
         return result;
-    }
-
-    private Map<String, String[]> getSubmittedValues(MCRServletJob job, String baseXPath) throws JDOMException, JaxenException {
-        Map<String, String[]> valuesToSet = new HashMap<String, String[]>();
-
-        for (String paramName : job.getRequest().getParameterMap().keySet()) {
-            if (!paramName.startsWith("_xed_")) {
-                String xPath = baseXPath + "/" + paramName;
-                String[] values = job.getRequest().getParameterValues(paramName);
-                valuesToSet.put(xPath, values);
-            }
-        }
-
-        return valuesToSet;
     }
 }
