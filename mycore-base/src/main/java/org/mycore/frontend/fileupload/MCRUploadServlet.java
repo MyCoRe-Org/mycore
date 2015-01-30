@@ -60,6 +60,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.streams.MCRNotClosingInputStream;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
@@ -226,7 +227,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {
         try {
-            initServer(MCRServlet.getBaseURL());
+            initServer(MCRFrontendUtil.getBaseURL());
             invokeMethod(job);
         } catch (Exception ex) {
             LOGGER.error("Error while handling FileUpload", ex);
