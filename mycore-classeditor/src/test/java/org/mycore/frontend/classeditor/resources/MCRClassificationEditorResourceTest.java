@@ -25,6 +25,8 @@ import org.junit.Test;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.common.MCRJSONManager;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationLoader;
+import org.mycore.common.config.MCRConfigurationLoaderFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -65,9 +67,8 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyResourceTest {
 
     @BeforeClass
     public static void setup() {
-        System.out.println("\n\n\n");
-        System.setProperty("MCR.Configuration.File", "config/test.properties");
         MCRConfiguration mcrProperties = MCRConfiguration.instance();
+        mcrProperties.initialize(MCRConfigurationLoaderFactory.getConfigurationLoader().load(), true);
         mcrProperties.set("MCR.Metadata.Type.jpclassi", "true");
         mcrProperties.set("MCR.Metadata.Store.BaseDir", "/tmp");
         mcrProperties.set("MCR.Metadata.Store.SVNBase", "/tmp/versions");

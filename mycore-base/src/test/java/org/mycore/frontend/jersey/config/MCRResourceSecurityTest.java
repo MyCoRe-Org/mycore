@@ -13,6 +13,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mycore.common.MCRSession;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationLoader;
+import org.mycore.common.config.MCRConfigurationLoaderFactory;
 import org.mycore.frontend.jersey.MCRJerseyResourceTest;
 import org.mycore.frontend.jersey.filter.MCRAccessManagerConnector;
 import org.mycore.frontend.jersey.filter.MCRSecurityFilterFactory;
@@ -48,6 +50,8 @@ public class MCRResourceSecurityTest extends MCRJerseyResourceTest {
     @BeforeClass
     public static void init() {
         MCRConfiguration mcrProperties = MCRConfiguration.instance();
+        MCRConfigurationLoader configLoader = MCRConfigurationLoaderFactory.getConfigurationLoader();
+        mcrProperties.initialize(configLoader.load(), true);
         mcrProperties.set("McrSessionSecurityFilter.MCRAccessManager.Connector", MyAccessManagerConnector.class.getName());
         mcrProperties.set("MCR.Persistence.Database.Enable", "false");
     }
