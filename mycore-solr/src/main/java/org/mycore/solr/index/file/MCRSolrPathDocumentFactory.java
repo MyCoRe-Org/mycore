@@ -106,7 +106,7 @@ public class MCRSolrPathDocumentFactory {
     public SolrInputDocument getDocument(Path input, BasicFileAttributes attr) throws IOException,
         MCRPersistenceException {
         SolrInputDocument doc = new SolrInputDocument();
-        doc.setField("id", input.toUri());
+        doc.setField("id", input.toUri().toString());
         String absolutePath = '/' + input.subpath(0, input.getNameCount()).toString();
         try {
             MCRPath mcrPath = MCRPath.toMCRPath(input); //check if this is an MCRPath -> more metadata
