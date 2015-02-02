@@ -19,7 +19,7 @@
         <xsl:variable name="toolTipImg"
           select="concat($ServletsBaseURL,'MCRThumbnailServlet/',$derivateId,mcrxsl:encodeURIPath($filePath),$HttpSession)" />
         <xsl:choose>
-          <xsl:when test="$MCR.Module-iview2.useNewViewer">
+          <xsl:when test="$MCR.Module-iview2.useNewViewer='true'">
             <a onMouseOver="show('{$toolTipImg}')" onMouseOut="toolTip()" href="{$WebApplicationBaseURL}rsc/viewer/{$derivateId}/{$filePath}"
               title="{i18n:translate('metaData.iView')}">
               <xsl:value-of select="$fileName" />
@@ -122,7 +122,7 @@
 
             <xsl:variable name="href">
               <xsl:choose>
-                <xsl:when test="$MCR.Module-iview2.useNewViewer">
+                <xsl:when test="$MCR.Module-iview2.useNewViewer='true'">
                   <xsl:value-of select="concat($WebApplicationBaseURL,  'rsc/viewer/', $derivate, '/', $file)" />
                 </xsl:when>
                 <xsl:otherwise>
