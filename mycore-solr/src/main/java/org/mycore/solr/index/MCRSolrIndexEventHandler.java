@@ -94,8 +94,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateDeleted(MCREvent evt, MCRDerivate derivate) {
-        MCRSolrIndexer.deleteById(derivate.getId()
-            .toString());
+        MCRSolrIndexer.deleteById(derivate.getId().toString());
     }
 
     synchronized protected void handleMCRBaseCreated(MCREvent evt, MCRBase objectOrDerivate) {
