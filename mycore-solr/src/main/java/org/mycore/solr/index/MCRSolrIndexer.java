@@ -117,7 +117,7 @@ public class MCRSolrIndexer {
         UpdateResponse updateResponse = null;
         long start = System.currentTimeMillis();
         try {
-            LOGGER.debug("Deleting \"" + solrIDs + "\" from solr");
+            LOGGER.debug("Deleting \"" + Arrays.asList(solrIDs) + "\" from solr");
             UpdateRequest req = new UpdateRequest();
             //delete all documents rooted at this id
             StringBuilder deleteQuery = new StringBuilder("_root_:(");
