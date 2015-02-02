@@ -2,7 +2,7 @@
 
 <html>
   <body>
-    <form action="/servlets/XEditor" method="post">
+    <form action="http://localhost:8291/servlets/XEditor" method="post">
       <input name="/document/@publish" id="publish" type="checkbox" value="true" />
       <label for="publish">Dokument publizieren</label>
       <div style="visibility:hidden">

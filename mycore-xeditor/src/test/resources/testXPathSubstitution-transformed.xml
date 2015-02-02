@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <div>
-  <form action="/servlets/XEditor" method="post">
+  <form action="http://localhost:8291/servlets/XEditor" method="post">
     <div>
       Diese Publikation mit dem Titel "Der neue XEditor - Utopie oder Wahnsinn?" dürfen Sie als John Doe bearbeiten.
       <input name="/document/title" value="Der neue XEditor - Utopie oder Wahnsinn?" type="text" size="40" />

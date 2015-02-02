@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <div>
-  <form action="/servlets/XEditor" method="post">
+  <form action="http://localhost:8291/servlets/XEditor" method="post">
     <input name="_xed_submit_cancel" type="submit" value="cancel" />
     <label>en is the current language.</label>
     <label>The title "Der neue XEditor - Utopie oder Wahnsinn?" is edited here.</label>

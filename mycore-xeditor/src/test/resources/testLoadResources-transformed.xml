@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <div xmlns:xed="http://www.mycore.de/xeditor">
-  <form action="/servlets/XEditor" method="post">
+  <form action="http://localhost:8291/servlets/XEditor" method="post">
     <h1>Artikel
         in
         Zeitschrift</h1>
