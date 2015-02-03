@@ -375,7 +375,7 @@ public class MCRXMLFunctions {
      * @throws URISyntaxException
      */
     public static String decodeURIPath(String path) throws URISyntaxException {
-        URI relativeURI = new URI(null, null, path, null, null);
+        URI relativeURI = new URI(path);
         return relativeURI.getPath();
     }
 
