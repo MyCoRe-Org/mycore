@@ -54,6 +54,17 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
     }
 
     @Test
+    public void decodeURIPath() throws URISyntaxException {
+        String source = "Space%20Character.test";
+        String result = "Space Character.test";
+        assertEquals("Result URI path is not correct", result, MCRXMLFunctions.decodeURIPath(source));
+        source = "H%C3%BChnerstall.pdf";
+        result = "Hühnerstall.pdf";
+        assertEquals("Result URI path is not correct", source, MCRXMLFunctions.encodeURIPath(source));
+        assertEquals("Result URI path is not correct", result, MCRXMLFunctions.encodeURIPath(source, true));
+    }
+
+    @Test
     public void shortenText() {
         String test = "Foo bar";
         String result = "Foo...";
