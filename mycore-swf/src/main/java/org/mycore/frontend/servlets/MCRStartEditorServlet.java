@@ -90,7 +90,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger LOGGER = Logger.getLogger(MCRStartEditorServlet.class);
+    protected static Logger LOGGER = Logger.getLogger(MCRStartEditorServlet.class);
 
     protected static MCRConfiguration CONFIG = MCRConfiguration.instance();
 
