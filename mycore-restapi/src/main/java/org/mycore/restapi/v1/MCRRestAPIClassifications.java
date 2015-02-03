@@ -188,8 +188,12 @@ public class MCRRestAPIClassifications extends HttpServlet {
             return Response.serverError().status(Status.BAD_REQUEST).build();
             //TODO response.sendError(HttpServletResponse.SC_NOT_FOUND, "Please specify parameters format and classid.");
         }
-        Transaction tx = MCRHIBConnection.instance().getSession().beginTransaction();
+        Transaction t1 = null;
         try {
+            Transaction tx = MCRHIBConnection.instance().getSession().getTransaction();
+            if (tx == null || !tx.isActive()) {
+                t1 = MCRHIBConnection.instance().getSession().beginTransaction();
+            }
             MCRCategory cl = DAO.getCategory(MCRCategoryID.rootID(classID), -1);
             if (cl == null) {
                 return MCRRestAPIError.create(Response.Status.BAD_REQUEST, "Classification not found.",
@@ -228,13 +232,13 @@ public class MCRRestAPIClassifications extends HttpServlet {
                 String xml = writeXML(eRoot, lang);
                 return Response.ok(xml).type("application/xml; charset=UTF-8").build();
             }
-        }
-
-        catch (Exception e) {
+        } catch (Exception e) {
             Logger.getLogger(this.getClass()).error("Error outputting classification", e);
             //TODO response.sendError(HttpServletResponse.SC_NOT_FOUND, "Error outputting classification");
         } finally {
-            tx.commit();
+            if (t1 != null) {
+                t1.commit();
+            }
         }
         return null;
     }
