@@ -39,6 +39,11 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocumentList;
 import org.hibernate.Transaction;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -55,6 +60,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
+import org.mycore.solr.MCRSolrServerFactory;
 
 import com.google.gson.stream.JsonWriter;
 
@@ -68,6 +74,8 @@ import com.google.gson.stream.JsonWriter;
 @Path("/v1/classifications")
 public class MCRRestAPIClassifications extends HttpServlet {
     private static final long serialVersionUID = 1L;
+
+    private static Logger LOGGER = Logger.getLogger(MCRRestAPIClassifications.class);
 
     public static final String FORMAT_JSON = "json";
 
@@ -392,17 +400,23 @@ public class MCRRestAPIClassifications extends HttpServlet {
     }
 
     private void filterNonEmpty(String classId, Element e) {
-        //reduce log level
+        SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
         for (int i = 0; i < e.getChildren("category").size(); i++) {
             Element cat = e.getChildren("category").get(i);
 
-            //ToDO SOLR-Migration
-            //MCRQuery query = new MCRQuery((new MCRQueryParser()).parse("(category = \""+classId+":"+cat.getAttributeValue("ID")+"\")"));
-            //MCRResults result = MCRSOLRQueryManager.search(query);
-            //if(result.getNumHits()==0){
-            //	e.removeContent(cat);
-            //	i--;
-            //}
+            SolrQuery solrQquery = new SolrQuery();
+            solrQquery.setQuery("category:\"" + classId + ":" + cat.getAttributeValue("ID") + "\"");
+            solrQquery.setRows(0);
+            try {
+                QueryResponse response = solrServer.query(solrQquery);
+                SolrDocumentList solrResults = response.getResults();
+                if (solrResults.getNumFound() == 0) {
+                    e.removeContent(cat);
+                    i--;
+                }
+            } catch (SolrServerException exc) {
+                LOGGER.error(exc);
+            }
         }
         for (int i = 0; i < e.getChildren("category").size(); i++) {
             filterNonEmpty(classId, e.getChildren("category").get(i));
