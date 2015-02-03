@@ -218,17 +218,20 @@ public class MCRRestAPIObjectsHelper {
         }
 
         String baseURL = MCRFrontendUtil.getBaseURL()
-            + MCRConfiguration.instance().getString("MCR.RestAPI.v1.Files.baseurl.path", "");
+            + MCRConfiguration.instance().getString("MCR.RestAPI.v1.Files.URL.path");
+        baseURL = baseURL.replace("${mcrid}", mcrObj.getId().toString()).replace("${derid}", derObj.getId().toString());
         XPathExpression<Element> xp = XPathFactory.instance().compile(".//child[@type='file']", Filters.element());
         for (Element e : xp.evaluate(eContents)) {
             String uri = e.getChildText("uri");
             if (uri != null) {
-                uri = uri.replace("ifs:", baseURL + mcrObj.getId().toString());
-                uri = uri.replace(":", "");
-                e.setAttribute("href", uri);
+                int pos = uri.lastIndexOf(":/");
+                String path = uri.substring(pos+2);
+                while (path.startsWith("/")) {
+                    path = path.substring(1);
+                }
+                e.setAttribute("href", baseURL+path);
             }
         }
-
         return eContents;
     }
 
