@@ -60,8 +60,7 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
         assertEquals("Result URI path is not correct", result, MCRXMLFunctions.decodeURIPath(source));
         source = "H%C3%BChnerstall.pdf";
         result = "Hühnerstall.pdf";
-        assertEquals("Result URI path is not correct", source, MCRXMLFunctions.encodeURIPath(source));
-        assertEquals("Result URI path is not correct", result, MCRXMLFunctions.encodeURIPath(source, true));
+        assertEquals("Result URI path is not correct", source, MCRXMLFunctions.decodeURIPath(source));
     }
 
     @Test
