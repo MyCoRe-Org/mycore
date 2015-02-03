@@ -248,6 +248,10 @@
                   <packages>org.mycore.oai*</packages>
                 </group>
                 <group>
+                  <title>MyCoRe Component: REST API</title>
+                  <packages>org.mycore.org.mycore.restapi*</packages>
+                </group>
+                <group>
                   <title>MyCoRe Component: SOLR</title>
                   <packages>org.mycore.solr*</packages>
                 </group>
@@ -472,6 +476,10 @@
               <group>
                 <title>MyCoRe Component: OAI</title>
                 <packages>org.mycore.oai*</packages>
+              </group>
+              <group>
+                <title>MyCoRe Component: REST-API</title>
+                <packages>org.mycore.restapi*</packages>
               </group>
               <group>
                 <title>MyCoRe Component: SOLR</title>
@@ -1424,6 +1432,7 @@
     <module>mycore-migration-2014</module>
     <module>mycore-mods</module>
     <module>mycore-oai</module>
+    <module>mycore-restapi</module>
     <module>mycore-session-listing</module>
     <module>mycore-solr</module>
     <module>mycore-swf</module>
