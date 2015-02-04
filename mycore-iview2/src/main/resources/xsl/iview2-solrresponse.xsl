@@ -107,7 +107,7 @@
         <xsl:variable name="isDisplayedEnabled" select="mcrxsl:isDisplayedEnabledDerivate($derivate)" />
         <xsl:variable name="mayWriteDerivate" select="acl:checkPermission($derivate,'writedb')" />
         <xsl:choose>
-          <xsl:when test="$object-view-derivate or $isDisplayedEnabled = 'true' or $mayWriteDerivate">
+          <xsl:when test="($object-view-derivate and $isDisplayedEnabled = 'true') or $mayWriteDerivate">
 
             <xsl:variable name="file">
               <xsl:choose>
