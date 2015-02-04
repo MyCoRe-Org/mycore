@@ -22,6 +22,12 @@
 
 package org.mycore.restapi.v1;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
+
 import javax.servlet.http.HttpServlet;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -33,9 +39,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.mycore.services.fieldquery.MCRQuery;
-import org.mycore.services.fieldquery.MCRQueryParser;
-import org.mycore.services.fieldquery.MCRSortBy;
+import org.apache.log4j.Logger;
+import org.mycore.solr.MCRSolrConstants;
 
 /**
  * Rest API methods that cover SOLR searches.
@@ -46,6 +51,8 @@ import org.mycore.services.fieldquery.MCRSortBy;
  */
 @Path("/v1/search")
 public class MCRRestAPISearch extends HttpServlet {
+    private static Logger LOGGER = Logger.getLogger(MCRRestAPISearch.class);
+
     private static final long serialVersionUID = 1L;
 
     public static final String FORMAT_JSON = "json";
@@ -57,74 +64,61 @@ public class MCRRestAPISearch extends HttpServlet {
      * 
      * @param info - a Jersey Context Object for URI
      *      
-     * @param q
-     * 		the Query in SOLR Query Syntax
+     * @param query
+     *      the Query in SOLR Query syntax
      * @param sort
-     * 		only one sort field with sort direction "asc" or "desc" is currently supported
+     *      the sort parameter - syntax as defined by SOLR
+     * @param wt
+     *      the format parameter - syntax as defined by SOLR
+     * @param start
+     *      the start parameter (number) - syntax as defined by SOLR      
+     * @param rows
+     *      the rows parameter (number) - syntax as defined by SOLR              
      * @return
      */
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
         MediaType.TEXT_PLAIN + ";charset=ISO-8859-1" })
     public Response search(@Context UriInfo info, @QueryParam("q") String query, @QueryParam("sort") String sort,
-        @QueryParam("format") @DefaultValue("xml") String format) {
+        @QueryParam("wt") @DefaultValue("xml") String wt, @QueryParam("rows") String start, @QueryParam("row") String rows) {
 
-        try {
-
-            String q = "(allMeta like *)";
-            if (query.contains(":")) {
-                q = "(" + query.replace(":", " = ") + ")";
-            } else {
-                q = "(allMeta = " + query + ")";
-            }
-            if (q.contains("*")) {
-                q = q.replace(" = ", " like ");
-            }
-            MCRQuery mcrQuery = new MCRQuery((new MCRQueryParser()).parse(q));
-
-            if (sort != null && sort.length() > 0) {
-                String[] sortData = sort.split(" ");
-                if (sortData.length == 2) {
-                    MCRSortBy sortBy = new MCRSortBy(sortData[0], "asc".equals(sortData[1]));
-                    mcrQuery.setSortBy(sortBy);
-                }
-            }
-
-            //TODO SOLR Migration
-            //MCRResults result = MCRQueryManager.search(mcrQuery);
-            /*
-            if (FORMAT_XML.equals(format)) {
-                Document doc = new Document();
-                Element root = new Element("response");
-                doc.addContent(root);
-                Element eResult = new Element("result");
-                root.addContent(eResult);
-                eResult.setAttribute("name", "response");
-                eResult.setAttribute("numFound", Integer.toString(result.getNumHits()));
-                eResult.setAttribute("start", "0");
-
-                for (int i = 0; i < result.getNumHits(); i++) {
-                    String mcrID = result.getHit(i).getID();
-                    Element eDoc = new Element("doc");
-                    eResult.addContent(eDoc);
-                    eDoc.setAttribute("href", info.getAbsolutePathBuilder().path(mcrID).build((Object[]) null)
-                                            .toString().replace("/search/", "/objects/"));
-                    eDoc.addContent(new Element("str").setAttribute("name", "id").setText(mcrID));
-                    eDoc.addContent(new Element("str").setAttribute("name", "returnId").setText(mcrID));
-                    eDoc.addContent(new Element("str").setAttribute("name", "objectProject").setText(
-                            mcrID.split("_")[0]));
-                    eDoc.addContent(new Element("str").setAttribute("name", "objectType").setText(mcrID.split("_")[1]));
-                }
-                StringWriter sw = new StringWriter();
-                XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
-                outputter.output(doc, sw);
-                return Response.ok(sw.toString()).type("application/xml; charset=UTF-8").build();
-            }
-            */
-
-        } catch (Exception e) {
-            //toDo
+        StringBuffer url = new StringBuffer(MCRSolrConstants.SERVER_URL);
+        url.append("/select?");
+        if (query != null) {
+            url.append("&q=").append(query);
         }
+        if (sort != null) {
+            url.append("&sort=").append(sort);
+        }
+        if (wt != null) {
+            url.append("&wt=").append(wt);
+        }
+        if (start != null) {
+            url.append("&start=").append(start);
+        }
+        if (rows != null) {
+            url.append("&rows=").append(rows);
+        }
+
+        try (InputStream is = new URL(url.toString()).openStream()) {
+            try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8.name())) {
+                String text = scanner.useDelimiter("\\A").next();
+
+                switch (wt) {
+                    case FORMAT_XML:
+                        return Response.ok(text).type("application/xml; charset=UTF-8").build();
+                        //break;
+                    case FORMAT_JSON:
+                        return Response.ok(text).type("application/json; charset=UTF-8").build();
+                        //break;
+                    default:
+                        return Response.ok(text).type("text").build();
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.error(e);
+        }
+  
         return Response.status(Response.Status.BAD_REQUEST).build();
     }
 }
