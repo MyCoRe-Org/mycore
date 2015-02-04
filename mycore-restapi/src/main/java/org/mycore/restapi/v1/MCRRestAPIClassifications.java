@@ -61,6 +61,7 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.MCRSolrUtils;
 
 import com.google.gson.stream.JsonWriter;
 
@@ -405,7 +406,8 @@ public class MCRRestAPIClassifications extends HttpServlet {
             Element cat = e.getChildren("category").get(i);
 
             SolrQuery solrQquery = new SolrQuery();
-            solrQquery.setQuery("category:\"" + classId + ":" + cat.getAttributeValue("ID") + "\"");
+            solrQquery.setQuery("category:\""
+                + MCRSolrUtils.escapeSearchValue(classId + ":" + cat.getAttributeValue("ID")) + "\"");
             solrQquery.setRows(0);
             try {
                 QueryResponse response = solrServer.query(solrQquery);
