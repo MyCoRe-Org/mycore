@@ -27,8 +27,8 @@ import org.mycore.common.events.MCRShutdownHandler.Closeable;
 
 /**
  * Master image tiler thread.
+ * 
  * @author Thomas Scheffler (yagee)
- *
  */
 public class MCRImageTiler implements Runnable, Closeable {
     private static final SessionFactory sessionFactory = MCRHIBConnection.instance().getSessionFactory();
@@ -46,6 +46,8 @@ public class MCRImageTiler implements Runnable, Closeable {
     private ReentrantLock runLock;
 
     private Constructor<? extends MCRTilingAction> tilingActionConstructor;
+
+    private volatile Thread waiter;
 
     @SuppressWarnings("unchecked")
     private MCRImageTiler() {
@@ -80,10 +82,11 @@ public class MCRImageTiler implements Runnable, Closeable {
     }
 
     /**
-     * Starts local tiler threads ( {@link MCRTilingAction}) and gives {@link MCRTileJob} instances to them.
-     * Use property <code>MCR.Module-iview2.TilingThreads</code> to specify how many concurrent threads should be running.
+     * Starts local tiler threads ( {@link MCRTilingAction}) and gives {@link MCRTileJob} instances to them. Use
+     * property <code>MCR.Module-iview2.TilingThreads</code> to specify how many concurrent threads should be running.
      */
     public void run() {
+        waiter = Thread.currentThread();
         Thread.currentThread().setName("TileMaster");
         //get this MCRSession a speaking name
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
@@ -175,7 +178,9 @@ public class MCRImageTiler implements Runnable, Closeable {
                             LOGGER.info("Waiting for a tiling job to finish");
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {
-                            LOGGER.error("Image Tiling thread was interrupted.", e);
+                            if (running) {
+                                LOGGER.error("Image Tiling thread was interrupted.", e);
+                            }
                         }
                 } catch (Throwable e) {
                     LOGGER.error("Keep running while catching exceptions.", e);
@@ -184,6 +189,7 @@ public class MCRImageTiler implements Runnable, Closeable {
         }
         LOGGER.info("Tiling thread finished");
         MCRSessionMgr.releaseCurrentSession();
+        waiter = null;
     }
 
     private MCRTilingAction getTilingAction(MCRTileJob job) {
@@ -236,6 +242,19 @@ public class MCRImageTiler implements Runnable, Closeable {
                 tilingServe.awaitTermination(60, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 LOGGER.debug("Could not wait  60 seconds...", e);
+            }
+        }
+        if (waiter != null && waiter.isAlive()) {
+            //thread still running
+            LOGGER.info(waiter.getName() + " is still running.");
+            Thread masterThread = waiter;
+            waiter = null;
+            masterThread.interrupt();
+            try {
+                masterThread.join();
+                LOGGER.info(masterThread.getName() + " has died.");
+            } catch (InterruptedException e) {
+                e.printStackTrace(System.err);
             }
         }
     }
