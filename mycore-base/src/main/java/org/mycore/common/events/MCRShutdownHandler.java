@@ -15,8 +15,12 @@
 package org.mycore.common.events;
 
 import java.beans.Introspector;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,12 +30,10 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 
 /**
- * is a wrapper for shutdown hooks. When used inside a web application this
- * shutdown hook is bound to the ServletContext. If not this hook is bound to
- * the Java Runtime. Every <code>Closeable</code> that is added via
- * <code>addCloseable()</code> will be closed at shutdown time. Do not forget to
- * remove any closeable via <code>removeCloseable()</code> to remove any
- * instances. For registering this hook for a web application see
+ * is a wrapper for shutdown hooks. When used inside a web application this shutdown hook is bound to the
+ * ServletContext. If not this hook is bound to the Java Runtime. Every <code>Closeable</code> that is added via
+ * <code>addCloseable()</code> will be closed at shutdown time. Do not forget to remove any closeable via
+ * <code>removeCloseable()</code> to remove any instances. For registering this hook for a web application see
  * <code>MCRServletContextListener</code>
  * 
  * @author Thomas Scheffler (yagee)
@@ -48,24 +50,21 @@ public class MCRShutdownHandler {
      */
     public static interface Closeable {
         /**
-         * prepare for closing this object that implements
-         * <code>Closeable</code>. This is the first part of the closing
-         * process. As a object may need database access to close cleanly this
-         * method can be used to be ahead of database outtake.
+         * prepare for closing this object that implements <code>Closeable</code>. This is the first part of the closing
+         * process. As a object may need database access to close cleanly this method can be used to be ahead of
+         * database outtake.
          */
         public void prepareClose();
 
         /**
-         * cleanly closes this object that implements <code>Closeable</code>.
-         * You can provide some functionality to close open files and sockets or
-         * so.
+         * cleanly closes this object that implements <code>Closeable</code>. You can provide some functionality to
+         * close open files and sockets or so.
          */
         public void close();
 
         /**
-         * Returns the priority. A Closeable with a higher priority will be
-         * closed before a Closeable with a lower priority. Default priority is
-         * 5.
+         * Returns the priority. A Closeable with a higher priority will be closed before a Closeable with a lower
+         * priority. Default priority is 5.
          */
         public int getPriority();
 
@@ -133,6 +132,19 @@ public class MCRShutdownHandler {
         System.out.println(system + " closing any remaining MCRSession instances, please wait...\n");
         MCRSessionMgr.close();
         System.out.println(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
+        Enumeration<Driver> drivers = DriverManager.getDrivers();
+        while (drivers.hasMoreElements()) {
+            Driver driver = drivers.nextElement();
+            String driverNameAndVersion = driver.getClass().getName() + " v" + driver.getMajorVersion()
+                + "." + driver.getMinorVersion();
+            System.out.println(system + " Unregister JDBC driver: " + driverNameAndVersion);
+            try {
+                DriverManager.deregisterDriver(driver);
+            } catch (SQLException e) {
+                System.err.println(system + " Error unregistering: " + driverNameAndVersion);
+                e.printStackTrace(System.err);
+            }
+        }
         LogManager.shutdown();
         // may be needed in webapp to release file handles correctly.
         Introspector.flushCaches();
