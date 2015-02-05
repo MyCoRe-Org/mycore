@@ -52,11 +52,8 @@ public class MCRSessionContext extends ThreadLocalSessionContext implements MCRS
 
     private static final Logger LOGGER = Logger.getLogger(MCRSessionContext.class);
 
-    private SessionFactory factory;
-
     public MCRSessionContext(SessionFactoryImplementor factory) {
         super(factory);
-        this.factory = factory;
         MCRSessionMgr.addSessionListener(this);
     }
 
@@ -70,11 +67,11 @@ public class MCRSessionContext extends ThreadLocalSessionContext implements MCRS
                 }
                 break;
             case passivated:
-                currentSession = unbind(factory);
+                currentSession = unbind(factory());
                 autoCloseSession(currentSession);
                 break;
             case destroyed:
-                currentSession = unbind(factory);
+                currentSession = unbind(factory());
                 autoCloseSession(currentSession);
                 break;
             case created:
@@ -115,7 +112,7 @@ public class MCRSessionContext extends ThreadLocalSessionContext implements MCRS
 
     @Override
     protected ThreadLocalSessionContext.CleanupSync buildCleanupSynch() {
-        return new ThreadLocalSessionContext.CleanupSync(factory) {
+        return new ThreadLocalSessionContext.CleanupSync(factory()) {
             private static final long serialVersionUID = -7894370437708819993L;
 
             @Override
