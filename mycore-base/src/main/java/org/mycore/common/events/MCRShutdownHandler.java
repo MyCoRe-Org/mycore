@@ -78,9 +78,6 @@ public class MCRShutdownHandler {
 
     private static final Set<Closeable> requests = Collections.synchronizedSet(new HashSet<Closeable>());
 
-    private static final String system = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName")
-        + ":";
-
     private static boolean shuttingDown = false;
 
     boolean isWebAppRunning;
@@ -111,6 +108,7 @@ public class MCRShutdownHandler {
     }
 
     void shutDown() {
+        final String system = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName") + ":";
         System.out.println(system + " Shutting down system, please wait...\n");
         Logger logger = Logger.getLogger(MCRShutdownHandler.class);
         logger.debug("requests: " + requests.toString());
@@ -148,6 +146,7 @@ public class MCRShutdownHandler {
         LogManager.shutdown();
         // may be needed in webapp to release file handles correctly.
         Introspector.flushCaches();
+        SINGLETON = null;
     }
 
 }

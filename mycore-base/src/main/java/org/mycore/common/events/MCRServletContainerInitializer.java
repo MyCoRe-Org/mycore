@@ -51,6 +51,7 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
      */
     @Override
     public void onStartup(final Set<Class<?>> c, final ServletContext ctx) throws ServletException {
+        MCRShutdownHandler.getInstance().isWebAppRunning = true;
         MCRStartupHandler.startUp(ctx);
         //Make sure logging is configured
         //initialize MCRURIResolver
@@ -67,7 +68,6 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
             }
             LOGGER.debug("This class is here: " + getSource(this.getClass()));
         }
-        MCRShutdownHandler.getInstance().isWebAppRunning = true;
         LOGGER.info("I have these components for you: " + MCRRuntimeComponentDetector.getAllComponents());
         LOGGER.info("I have these mycore components for you: " + MCRRuntimeComponentDetector.getMyCoReComponents());
         LOGGER.info("I have these app modules for you: " + MCRRuntimeComponentDetector.getApplicationModules());

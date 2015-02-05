@@ -23,21 +23,26 @@
  **/
 package org.mycore.common.events;
 
-import javax.servlet.ServletContext;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Enumeration;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.log4j.Logger;
 
 /**
- * is a shutdown hook for the current <code>ServletContext</code>.
+ * is a shutdown hook for the current <code>ServletContext</code>. For this class to register itself as a shutdown hook
+ * to the current ServletContext please add the following code to your web.xml (allready done in MyCoRe-shipped
+ * version):
  * 
- * For this class to register itself as a shutdown hook to the current ServletContext please add the following code to your web.xml (allready done in MyCoRe-shipped version):
  * <pre>
-      &lt;listener&gt;
-            &lt;listener-class&gt;org.mycore.common.events.MCRServletContextListener&lt;/listener-class&gt;
-      &lt;/listener&gt;
- * </pre> 
+ *       &lt;listener&gt;
+ *             &lt;listener-class&gt;org.mycore.common.events.MCRServletContextListener&lt;/listener-class&gt;
+ *       &lt;/listener&gt;
+ * </pre>
  * 
  * @author Thomas Scheffler (yagee)
  * @see org.mycore.common.events.MCRShutdownHandler
