@@ -33,25 +33,31 @@ import java.util.Set;
 
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.config.MCRRuntimeComponentDetector;
 import org.mycore.common.xml.MCRURIResolver;
 
+import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor;
+
 /**
  * @author Thomas Scheffler (yagee)
- *
  */
 public class MCRServletContainerInitializer implements ServletContainerInitializer {
-    private static final Logger LOGGER = Logger.getLogger(MCRServletContainerInitializer.class);
 
     /* (non-Javadoc)
      * @see javax.servlet.ServletContainerInitializer#onStartup(java.util.Set, javax.servlet.ServletContext)
      */
     @Override
     public void onStartup(final Set<Class<?>> c, final ServletContext ctx) throws ServletException {
-        MCRShutdownHandler.getInstance().isWebAppRunning = true;
+        ClassLoaderLeakPreventor leakPreventor = new ClassLoaderLeakPreventor();
+        leakPreventor.contextInitialized(new ServletContextEvent(ctx));
+        final Logger LOGGER = Logger.getLogger(MCRServletContainerInitializer.class);
+        MCRShutdownHandler shutdownHandler = MCRShutdownHandler.getInstance();
+        shutdownHandler.isWebAppRunning = true;
+        shutdownHandler.leakPreventor =leakPreventor;
         MCRStartupHandler.startUp(ctx);
         //Make sure logging is configured
         //initialize MCRURIResolver
@@ -81,7 +87,7 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
         ProtectionDomain protectionDomain = clazz.getProtectionDomain();
         CodeSource codeSource = protectionDomain.getCodeSource();
         if (codeSource == null) {
-            LOGGER.warn("Cannot get CodeSource.");
+            Logger.getLogger(MCRServletContainerInitializer.class).warn("Cannot get CodeSource.");
             return null;
         }
         URL location = codeSource.getLocation();

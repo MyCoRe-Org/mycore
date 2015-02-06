@@ -14,13 +14,8 @@
  **/
 package org.mycore.common.events;
 
-import java.beans.Introspector;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,6 +23,8 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
+
+import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor;
 
 /**
  * is a wrapper for shutdown hooks. When used inside a web application this shutdown hook is bound to the
@@ -82,6 +79,8 @@ public class MCRShutdownHandler {
 
     boolean isWebAppRunning;
 
+    ClassLoaderLeakPreventor leakPreventor;
+
     private MCRShutdownHandler() {
         isWebAppRunning = false;
     }
@@ -130,23 +129,14 @@ public class MCRShutdownHandler {
         System.out.println(system + " closing any remaining MCRSession instances, please wait...\n");
         MCRSessionMgr.close();
         System.out.println(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
-        Enumeration<Driver> drivers = DriverManager.getDrivers();
-        while (drivers.hasMoreElements()) {
-            Driver driver = drivers.nextElement();
-            String driverNameAndVersion = driver.getClass().getName() + " v" + driver.getMajorVersion()
-                + "." + driver.getMinorVersion();
-            System.out.println(system + " Unregister JDBC driver: " + driverNameAndVersion);
-            try {
-                DriverManager.deregisterDriver(driver);
-            } catch (SQLException e) {
-                System.err.println(system + " Error unregistering: " + driverNameAndVersion);
-                e.printStackTrace(System.err);
-            }
-        }
         LogManager.shutdown();
-        // may be needed in webapp to release file handles correctly.
-        Introspector.flushCaches();
         SINGLETON = null;
+        // may be needed in webapp to release file handles correctly.
+        if (leakPreventor != null) {
+            ClassLoaderLeakPreventor myLeakPreventor = leakPreventor;
+            leakPreventor = null;
+            myLeakPreventor.contextDestroyed(null);
+        }
     }
 
 }
