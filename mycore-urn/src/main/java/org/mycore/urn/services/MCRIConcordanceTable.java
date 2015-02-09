@@ -48,8 +48,12 @@ public interface MCRIConcordanceTable {
     public static final int _Z     = 38;
 
     /* Special chars */
-    public static final int _MINUS = 39;
-    public static final int _COLON = 17;
+    public static final int _MINUS      = 39;
+    public static final int _COLON      = 17;
+    public static final int _UNDERSCORE = 43;
+    public static final int _DOT        = 47;
+    public static final int _SLASH      = 45;
+    public static final int _PLUS       = 49;
     
     public static final String  A     = "A";
     public static final String  B     = "B";
