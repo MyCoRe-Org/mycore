@@ -58,6 +58,8 @@ public final class MCRConstants {
     /** MCR.Metadata.DefaultLang */
     public static final String DEFAULT_LANG = "de";
 
+    public final static Namespace XML_NAMESPACE = Namespace.getNamespace("xml", "http://www.w3.org/XML/1998/namespace");
+
     public final static Namespace XLINK_NAMESPACE = Namespace.getNamespace("xlink", "http://www.w3.org/1999/xlink");
 
     /** the MARC 21 namespace */
@@ -101,9 +103,11 @@ public final class MCRConstants {
 
     public static final Namespace INFO_SRW_NAMESPACE = Namespace.getNamespace("info", "info:srw/schema/5/picaXML-v1.0");
 
-    public static final Namespace DIAG_NAMESPACE = Namespace.getNamespace("diag", "http://www.loc.gov/zing/srw/diagnostic");
+    public static final Namespace DIAG_NAMESPACE = Namespace.getNamespace("diag",
+        "http://www.loc.gov/zing/srw/diagnostic");
 
-    public static final Namespace EPICURLITE_NAMESPACE = Namespace.getNamespace("epicurlite", "http://nbn-resolving.org/epicurlite");
+    public static final Namespace EPICURLITE_NAMESPACE = Namespace.getNamespace("epicurlite",
+        "http://nbn-resolving.org/epicurlite");
 
     /** The URL of the MCR */
     private final static String MCR_URL = "http://www.mycore.org/";
@@ -129,7 +133,8 @@ public final class MCRConstants {
                     namespaces.add(namespace);
                     namespacesByPrefix.put(namespace.getPrefix(), namespace);
                 } catch (Exception e) {
-                    Logger.getLogger(MCRConstants.class).error("Error while initialising Namespace list and HashMap", e);
+                    Logger.getLogger(MCRConstants.class)
+                        .error("Error while initialising Namespace list and HashMap", e);
                 }
             }
         }
