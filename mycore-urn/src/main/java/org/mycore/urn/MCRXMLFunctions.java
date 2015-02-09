@@ -96,6 +96,7 @@ public class MCRXMLFunctions {
             LOGGER.error("Could not attach checksum to urn " + b.toString(), ex);
             return null;
         }
+        LOGGER.info(urn + " modified to " + u);
         return u.toString();
     }
 
