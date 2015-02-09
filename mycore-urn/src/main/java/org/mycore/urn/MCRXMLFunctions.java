@@ -83,6 +83,8 @@ public class MCRXMLFunctions {
      *         in the <code>toAppend</code> parameter is attached
      */
     public static String createAlternativeURN(String urn, String toAppend) {
+        LOGGER.info("Base URN: " + urn + ", adding string '" + toAppend + "'");
+
         String[] parts = urn.split("-");
         StringBuilder b = new StringBuilder(parts[0] + "-" + toAppend);
         for (int i = 1; i < parts.length; i++) {
@@ -91,12 +93,14 @@ public class MCRXMLFunctions {
 
         org.mycore.urn.services.MCRURN u = org.mycore.urn.services.MCRURN.valueOf(b.toString());
         try {
+            LOGGER.info(urn + " modified to " + u + "[" + u.checksum() + "]");
             u.attachChecksum();
+
         } catch (Exception ex) {
             LOGGER.error("Could not attach checksum to urn " + b.toString(), ex);
             return null;
         }
-        LOGGER.info(urn + " modified to " + u);
+
         return u.toString();
     }
 
