@@ -127,8 +127,8 @@ public class MCRURN {
          * calculation of the ratio, dividing the productSum by the last element
          * of the converted urn
          */
-        int q = productSum / Integer.parseInt(urn[urn.length - 1]);
-        String[] arr = String.valueOf(q).split("");
+        float q = productSum / Integer.parseInt(urn[urn.length - 1]);
+        String[] arr = String.valueOf(q).substring(0, String.valueOf(q).indexOf(".")).split("");
         this.checksum = Integer.valueOf(arr[arr.length - 1]);
         return this.checksum;
     }
