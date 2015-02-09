@@ -25,6 +25,9 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -58,13 +61,14 @@ import org.mycore.mets.model.struct.StructLink;
 import org.mycore.mets.tools.MCRMetsSave;
 
 /**
- * 
  * @author Thomas Scheffler (yagee)
  * @author Matthias Eichner
+ * @author Sebastian Hofmann
  */
 public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
 
     private static final Logger LOGGER = Logger.getLogger(MCRMETSGenerator.class);
+    private static final List<String> EXCLUDED_ROOT_FOLDERS = Arrays.asList(new String[]{"alto", "tei"});
 
     public Mets getMETS(MCRPath dir, Set<MCRPath> ignoreNodes) throws IOException {
         // add dmdsec
@@ -82,7 +86,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         // logical structure
         LogicalStructMap logicalStructMap = new LogicalStructMap();
         LogicalDiv logicalDiv = new LogicalDiv("log_" + dir.getOwner(), "monograph", dir.getOwner(), 1, amdSec.getId(),
-            dmdSec.getId());
+                dmdSec.getId());
         logicalDiv.setDmdId(dmdSec.getId());
         logicalStructMap.setDivContainer(logicalDiv);
         // struct Link
@@ -113,7 +117,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
     }
 
     private void createMets(MCRPath dir, Set<MCRPath> ignoreNodes, FileGrp fileGrp, PhysicalDiv physicalDiv,
-        AbstractLogicalDiv logicalDiv, StructLink structLink, int logOrder) throws IOException {
+                            AbstractLogicalDiv logicalDiv, StructLink structLink, int logOrder) throws IOException {
         SortedMap<MCRPath, BasicFileAttributes> files = new TreeMap<>(), directories = new TreeMap<>();
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(dir)) {
             for (Path child : dirStream) {
@@ -154,11 +158,31 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
             structLink.addSmLink(smLink);
         }
         for (Map.Entry<MCRPath, BasicFileAttributes> directory : directories.entrySet()) {
-            LogicalSubDiv section = new LogicalSubDiv("log_" + Integer.toString(++logOrder), "section", directory
-                .getKey().getFileName().toString(), logOrder);
-            logicalDiv.add(section);
-            createMets(directory.getKey(), ignoreNodes, fileGrp, physicalDiv, section, structLink, logOrder);
+            // TODO: Add excluded files to extra section and link them to physical page
+            if (!(logOrder == 0 && isExcludedRootFolder(directory.getKey()))) {
+                LogicalSubDiv section = new LogicalSubDiv("log_" + Integer.toString(++logOrder), "section", directory
+                        .getKey().getFileName().toString(), logOrder);
+                logicalDiv.add(section);
+                createMets(directory.getKey(), ignoreNodes, fileGrp, physicalDiv, section, structLink, logOrder);
+            }
         }
+    }
+
+    /**
+     * Checks if a root directory should be included in mets.xml
+     *
+     * @param directory
+     * @return true if the directory should be excluded
+     */
+    private boolean isExcludedRootFolder(MCRPath directory) {
+        String fileName = directory.getFileName().toString();
+        boolean isExcluded = MCRMETSDefaultGenerator.EXCLUDED_ROOT_FOLDERS.contains(fileName);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format(Locale.ROOT, "%s excluded : %s", fileName, isExcluded));
+        }
+
+        return isExcluded;
     }
 
 }
