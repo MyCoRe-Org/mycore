@@ -199,6 +199,14 @@ public class MCRURN {
             return MCRIConcordanceTable._COLON;
         if (s.equalsIgnoreCase("-"))
             return MCRIConcordanceTable._MINUS;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.PLUS))
+            return MCRIConcordanceTable._PLUS;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.SLASH))
+            return MCRIConcordanceTable._SLASH;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.DOT))
+            return MCRIConcordanceTable._DOT;
+        if (s.equalsIgnoreCase(MCRIConcordanceTable.UNDERSCORE))
+            return MCRIConcordanceTable._UNDERSCORE;
         if (s.equalsIgnoreCase("0"))
             return MCRIConcordanceTable._0;
         if (s.equalsIgnoreCase("1"))
