@@ -55,6 +55,13 @@ public interface MCRIConcordanceTable {
     public static final int _SLASH      = 45;
     public static final int _PLUS       = 49;
     
+    public static final String MINUS      = "-";
+    public static final String COLON      = ":";
+    public static final String UNDERSCORE = "_";
+    public static final String DOT        = ".";
+    public static final String SLASH      = "/";
+    public static final String PLUS       = "+";
+    
     public static final String  A     = "A";
     public static final String  B     = "B";
     public static final String  C     = "C";
