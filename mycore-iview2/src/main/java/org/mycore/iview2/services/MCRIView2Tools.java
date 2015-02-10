@@ -69,7 +69,6 @@ import org.mycore.imagetiler.MCRTiledPictureProps;
  * Tools class with common methods for IView2.
  * 
  * @author Thomas Scheffler (yagee)
- * 
  */
 public class MCRIView2Tools {
 
@@ -93,8 +92,7 @@ public class MCRIView2Tools {
     /**
      * @param derivateID
      *            ID of derivate
-     * @return empty String or absolute path to main file of derivate if file is
-     *         supported.
+     * @return empty String or absolute path to main file of derivate if file is supported.
      */
     public static String getSupportedMainFile(String derivateID) {
         try {
@@ -115,8 +113,7 @@ public class MCRIView2Tools {
     /**
      * @param derivateID
      *            ID of derivate
-     * @return true if {@link #getSupportedMainFile(String)} is not an empty
-     *         String.
+     * @return true if {@link #getSupportedMainFile(String)} is not an empty String.
      */
     public static boolean isDerivateSupported(String derivateID) {
         return getSupportedMainFile(derivateID).length() > 0;
@@ -125,9 +122,8 @@ public class MCRIView2Tools {
     /**
      * @param file
      *            image file
-     * @return if content type is in property
-     *         <code>MCR.Module-iview2.SupportedContentTypes</code>
-     * @throws IOException 
+     * @return if content type is in property <code>MCR.Module-iview2.SupportedContentTypes</code>
+     * @throws IOException
      * @see {@link MCRContentTypes#probeContentType(Path)}
      */
     public static boolean isFileSupported(Path file) throws IOException {
@@ -143,13 +139,11 @@ public class MCRIView2Tools {
     }
 
     /**
-     * Checks for a given derivate id whether all files in that derivate are
-     * tiled.
+     * Checks for a given derivate id whether all files in that derivate are tiled.
      * 
      * @param derivateId
-     * @return true if all files in belonging to the derivate are tiled, false
-     *         otherwise
-     * @throws IOException 
+     * @return true if all files in belonging to the derivate are tiled, false otherwise
+     * @throws IOException
      */
     public static boolean isCompletelyTiled(String derivateId) throws IOException {
         if (!MCRMetadataManager.exists(MCRObjectID.getInstance(derivateId))) {
@@ -185,8 +179,7 @@ public class MCRIView2Tools {
     /**
      * @param file
      *            image file
-     * @return true if {@link MCRImage#getTiledFile(File, String, String)}
-     *         exists
+     * @return true if {@link MCRImage#getTiledFile(File, String, String)} exists
      * @see #getTileDir()
      */
     public static boolean isTiled(MCRPath file) {
@@ -319,9 +312,12 @@ public class MCRIView2Tools {
         throws IOException {
         String tileName = MessageFormat.format("{0}/{1}/{2}.jpg", zoomLevel, y, x);
         Path tile = iviewFileRoot.resolve(tileName);
-        if (tile != null) {
-            try (SeekableByteChannel zin = Files.newByteChannel(tile)) {
-                ImageInputStream iis = ImageIO.createImageInputStream(zin);
+        if (Files.notExists(tile)) {
+            try (SeekableByteChannel tileChannel = Files.newByteChannel(tile)) {
+                ImageInputStream iis = ImageIO.createImageInputStream(tileChannel);
+                if (iis == null) {
+                    throw new IOException("Could not acquire ImageInputStream from SeekableByteChannel: " + tile);
+                }
                 imageReader.setInput(iis, false);
                 BufferedImage image = imageReader.read(0);
                 imageReader.reset();
@@ -329,8 +325,7 @@ public class MCRIView2Tools {
                 return image;
             }
         } else {
-            LOGGER.warn("Did not find " + tileName + " in " + iviewFileRoot);
-            return null;
+            throw new NoSuchFileException(iviewFileRoot.toString(), tileName, null);
         }
     }
 
@@ -338,9 +333,12 @@ public class MCRIView2Tools {
         throws IOException {
         String tileName = MessageFormat.format("{0}/{1}/{2}.jpg", zoomLevel, y, x);
         Path tile = iviewFileRoot.resolve(tileName);
-        if (tile != null) {
-            try (SeekableByteChannel zin = Files.newByteChannel(tile)) {
-                ImageInputStream iis = ImageIO.createImageInputStream(zin);
+        if (Files.notExists(tile)) {
+            try (SeekableByteChannel tileChannel = Files.newByteChannel(tile)) {
+                ImageInputStream iis = ImageIO.createImageInputStream(tileChannel);
+                if (iis == null) {
+                    throw new IOException("Could not acquire ImageInputStream from SeekableByteChannel: " + tile);
+                }
                 imageReader.setInput(iis, false);
                 int imageType = MCRImage.getImageType(imageReader);
                 imageReader.reset();
@@ -360,8 +358,7 @@ public class MCRIView2Tools {
     }
 
     /**
-     * short for
-     * <code>MCRConfiguration.instance().getString("MCR.Module-iview2." + propName, defaultProp);</code>
+     * short for <code>MCRConfiguration.instance().getString("MCR.Module-iview2." + propName, defaultProp);</code>
      * 
      * @param propName
      *            any suffix
@@ -376,11 +373,9 @@ public class MCRIView2Tools {
      * 
      * @param file
      *            the file to display
-     * @return the url to the image viewer displaying given file unless
-     *         {@link MCRIView2Tools#isFileSupported(Path)} returns
-     *         <code>false</code> in this case <code>null</code> is returned
-     * @throws IOException 
-     * 
+     * @return the url to the image viewer displaying given file unless {@link MCRIView2Tools#isFileSupported(Path)}
+     *         returns <code>false</code> in this case <code>null</code> is returned
+     * @throws IOException
      * @see {@link MCRIView2Tools#isFileSupported(Path)}
      */
     public static String getViewerURL(MCRPath file) throws URISyntaxException, IOException {
