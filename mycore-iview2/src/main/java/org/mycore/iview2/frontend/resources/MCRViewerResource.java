@@ -9,11 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.JAXBException;
 import javax.xml.transform.TransformerException;
 
@@ -39,24 +36,23 @@ import org.xml.sax.SAXException;
 public class MCRViewerResource {
 
     private static final MCRIviewACLProvider IVIEW_ACL_PROVDER = MCRConfiguration.instance()
-        .<MCRIviewACLProvider> getInstanceOf("MCR.Module-iview2.MCRIviewACLProvider",
-            MCRIviewDefaultACLProvider.class.getName());
+            .<MCRIviewACLProvider>getInstanceOf("MCR.Module-iview2.MCRIviewACLProvider",
+                    MCRIviewDefaultACLProvider.class.getName());
 
     private static final String JSON_CONFIG_ELEMENT_NAME = "json";
 
     @GET
-    @Produces(MediaType.APPLICATION_XML)
+    @Produces(MediaType.TEXT_HTML)
     @Path("{derivate}/{path: [^?]+}")
     public void show(@Context HttpServletRequest request, @Context HttpServletResponse response,
-        @Context ServletContext context, @Context ServletConfig config) throws Exception {
+                     @Context ServletContext context, @Context ServletConfig config) throws Exception {
         MCRContent content = getContent(request, response);
         boolean serveContent = MCRServletContentHelper.isServeContent(request);
-        MCRServletContentHelper.serveContent(content, request, response, context,
-            MCRServletContentHelper.buildConfig(config), serveContent);
+        MCRServletContentHelper.serveContent(content, request, response, context, MCRServletContentHelper.buildConfig(config), serveContent);
     }
 
     private static Document buildResponseDocument(MCRViewerConfiguration config) throws JDOMException,
-        IOException, SAXException, JAXBException {
+            IOException, SAXException, JAXBException {
         String configJson = config.toJSON();
         Element startIviewClientElement = new Element("IViewConfig");
         Element configElement = new Element(JSON_CONFIG_ELEMENT_NAME);
@@ -68,25 +64,25 @@ public class MCRViewerResource {
     }
 
     protected MCRContent getContent(final HttpServletRequest req, final HttpServletResponse resp) throws JDOMException,
-        IOException, SAXException, JAXBException, TransformerException {
+            IOException, SAXException, JAXBException, TransformerException {
 
         String derivate = MCRViewerConfiguration.getDerivate(req);
         final MCRObjectID derivateID = MCRObjectID.getInstance(derivate);
         if (!MCRMetadataManager.exists(derivateID)) {
             String errorMessage = MCRTranslation.translate("component.iview2.MCRIViewClientServlet.object.not.found",
-                derivateID);
-            throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(errorMessage).build());
+                    derivateID);
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND, errorMessage);
         }
         if (IVIEW_ACL_PROVDER != null && !IVIEW_ACL_PROVDER.checkAccess(req.getSession(), derivateID)) {
             String errorMessage = MCRTranslation.translate("component.iview2.MCRIViewClientServlet.noRights",
-                derivateID);
-            throw new WebApplicationException(Response.status(Status.FORBIDDEN).entity(errorMessage).build());
+                    derivateID);
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN, errorMessage);
         }
 
         MCRViewerConfigurationStrategy configurationStrategy;
         if (MCRConfiguration.instance().getString("MCR.Module-iview2.configuration.strategy", null) != null) {
             configurationStrategy = MCRConfiguration.instance().getInstanceOf(
-                "MCR.Module-iview2.configuration.strategy");
+                    "MCR.Module-iview2.configuration.strategy");
         } else {
             configurationStrategy = new MCRViewerDefaultConfigurationStrategy();
         }
