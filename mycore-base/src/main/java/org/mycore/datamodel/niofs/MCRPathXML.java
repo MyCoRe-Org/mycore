@@ -41,6 +41,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -51,7 +52,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * @author Thomas Scheffler (yagee)
- * 
  * @version $Revision: 28688 $ $Date: 2013-12-18 15:27:20 +0100 (Wed, 18 Dec 2013) $
  */
 public class MCRPathXML {
@@ -68,7 +68,8 @@ public class MCRPathXML {
 
     /**
      * Sends the contents of an MCRDirectory as XML data to the client
-     * @throws IOException 
+     * 
+     * @throws IOException
      */
     public static Document getDirectoryXML(MCRPath path, BasicFileAttributes attr) throws IOException {
         LOGGER.debug("MCRDirectoryXML: start listing of directory " + path.toString());
@@ -76,14 +77,14 @@ public class MCRPathXML {
         Element root = new Element("mcr_directory");
         Document doc = new org.jdom2.Document(root);
 
-        addString(root, "uri", path.toUri().toString());
-        addString(root, "ownerID", path.getOwner());
+        addString(root, "uri", path.toUri().toString(), false);
+        addString(root, "ownerID", path.getOwner(), false);
         MCRPath relativePath = path.getRoot().relativize(path);
         boolean isRoot = relativePath.toString().isEmpty();
-        addString(root, "name", (isRoot ? "" : relativePath.getFileName().toString()));
-        addString(root, "path", toStringValue(relativePath));
+        addString(root, "name", (isRoot ? "" : relativePath.getFileName().toString()), true);
+        addString(root, "path", toStringValue(relativePath), true);
         if (!isRoot) {
-            addString(root, "parentPath", toStringValue(relativePath.getParent()));
+            addString(root, "parentPath", toStringValue(relativePath.getParent()), true);
         }
         addBasicAttributes(root, attr, path);
 
@@ -104,16 +105,16 @@ public class MCRPathXML {
         for (Map.Entry<MCRPath, MCRFileAttributes<?>> dirEntry : directories.entrySet()) {
             Element child = new Element("child");
             child.setAttribute("type", "directory");
-            addString(child, "name", dirEntry.getKey().getFileName().toString());
-            addString(child, "uri", dirEntry.getKey().toUri().toString());
+            addString(child, "name", dirEntry.getKey().getFileName().toString(), true);
+            addString(child, "uri", dirEntry.getKey().toUri().toString(), false);
             nodes.addContent(child);
             addBasicAttributes(child, dirEntry.getValue(), dirEntry.getKey());
         }
         for (Map.Entry<MCRPath, MCRFileAttributes<?>> fileEntry : files.entrySet()) {
             Element child = new Element("child");
             child.setAttribute("type", "file");
-            addString(child, "name", fileEntry.getKey().getFileName().toString());
-            addString(child, "uri", fileEntry.getKey().toUri().toString());
+            addString(child, "name", fileEntry.getKey().getFileName().toString(), true);
+            addString(child, "uri", fileEntry.getKey().toUri().toString(), false);
             nodes.addContent(child);
             addAttributes(child, fileEntry.getValue(), fileEntry.getKey());
         }
@@ -125,10 +126,8 @@ public class MCRPathXML {
     }
 
     /**
-     * Returns metadata of the file retrievable by 'path' in XML form.
-     * 
-     * Same as {@link #getFileXML(MCRPath, BasicFileAttributes)}, but attributes are retrieved first.
-     * 
+     * Returns metadata of the file retrievable by 'path' in XML form. Same as
+     * {@link #getFileXML(MCRPath, BasicFileAttributes)}, but attributes are retrieved first.
      */
     public static Document getFileXML(MCRPath path) throws IOException {
         MCRFileAttributes<?> attrs = Files.readAttributes(path, MCRFileAttributes.class);
@@ -138,8 +137,10 @@ public class MCRPathXML {
     /**
      * Returns metadata of the file retrievable by 'path' in XML form.
      * 
-     * @param path Path to File
-     * @param attrs file attributes of given file
+     * @param path
+     *            Path to File
+     * @param attrs
+     *            file attributes of given file
      */
     public static Document getFileXML(MCRPath path, BasicFileAttributes attrs) throws IOException {
         Element root = new Element("file");
@@ -190,18 +191,18 @@ public class MCRPathXML {
     }
 
     private static void addBasicAttributes(Element root, BasicFileAttributes attr, MCRPath path) throws IOException {
-        addString(root, "size", String.valueOf(attr.size()));
+        addString(root, "size", String.valueOf(attr.size()), false);
         addDate(root, "created", attr.creationTime());
         addDate(root, "lastModified", attr.lastModifiedTime());
         addDate(root, "lastAccessed", attr.lastAccessTime());
         if (attr.isRegularFile()) {
-            addString(root, "contentType", MCRContentTypes.probeContentType(path));
+            addString(root, "contentType", MCRContentTypes.probeContentType(path), false);
         }
     }
 
     private static void addAttributes(Element root, MCRFileAttributes<?> attr, MCRPath path) throws IOException {
         addBasicAttributes(root, attr, path);
-        addString(root, "md5", attr.md5sum());
+        addString(root, "md5", attr.md5sum(), false);
     }
 
     private static void addDate(Element parent, String type, FileTime date) {
@@ -211,11 +212,14 @@ public class MCRPathXML {
         xDate.addContent(date.toString());
     }
 
-    private static void addString(Element parent, String itemName, String content) {
+    private static void addString(Element parent, String itemName, String content, boolean preserve) {
         if (content == null) {
             return;
         }
-
-        parent.addContent(new Element(itemName).addContent(content.trim()));
+        Element child = new Element(itemName).addContent(content);
+        if (preserve) {
+            child.setAttribute("space", "preserve", MCRConstants.XML_NAMESPACE);
+        }
+        parent.addContent(child);
     }
 }
