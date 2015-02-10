@@ -312,7 +312,7 @@ public class MCRIView2Tools {
         throws IOException {
         String tileName = MessageFormat.format("{0}/{1}/{2}.jpg", zoomLevel, y, x);
         Path tile = iviewFileRoot.resolve(tileName);
-        if (Files.notExists(tile)) {
+        if (Files.exists(tile)) {
             try (SeekableByteChannel tileChannel = Files.newByteChannel(tile)) {
                 ImageInputStream iis = ImageIO.createImageInputStream(tileChannel);
                 if (iis == null) {
@@ -333,7 +333,7 @@ public class MCRIView2Tools {
         throws IOException {
         String tileName = MessageFormat.format("{0}/{1}/{2}.jpg", zoomLevel, y, x);
         Path tile = iviewFileRoot.resolve(tileName);
-        if (Files.notExists(tile)) {
+        if (Files.exists(tile)) {
             try (SeekableByteChannel tileChannel = Files.newByteChannel(tile)) {
                 ImageInputStream iis = ImageIO.createImageInputStream(tileChannel);
                 if (iis == null) {
