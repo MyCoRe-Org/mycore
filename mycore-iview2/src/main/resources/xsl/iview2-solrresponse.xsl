@@ -103,7 +103,7 @@
       </xsl:variable>
 
       <xsl:if test="$pageToDisplay != ''">
-        <xsl:variable name="object-view-derivate" select="acl:checkPermission($derivate,'view-derivate')" />
+        <xsl:variable name="object-view-derivate" select="acl:checkPermission($mcrid,'view-derivate')" />
         <xsl:variable name="isDisplayedEnabled" select="mcrxsl:isDisplayedEnabledDerivate($derivate)" />
         <xsl:variable name="mayWriteDerivate" select="acl:checkPermission($derivate,'writedb')" />
         <xsl:choose>
