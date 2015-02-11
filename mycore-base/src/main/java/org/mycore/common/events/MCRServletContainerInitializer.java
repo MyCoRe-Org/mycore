@@ -52,7 +52,7 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
      */
     @Override
     public void onStartup(final Set<Class<?>> c, final ServletContext ctx) throws ServletException {
-        ClassLoaderLeakPreventor leakPreventor = new ClassLoaderLeakPreventor();
+        ClassLoaderLeakPreventor leakPreventor = new MCRClassLoaderLeakPreventor();
         leakPreventor.contextInitialized(new ServletContextEvent(ctx));
         final Logger LOGGER = Logger.getLogger(MCRServletContainerInitializer.class);
         MCRShutdownHandler shutdownHandler = MCRShutdownHandler.getInstance();

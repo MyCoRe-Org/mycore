@@ -14,7 +14,6 @@ import javax.imageio.ImageIO;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
@@ -31,8 +30,6 @@ import org.mycore.common.events.MCRShutdownHandler.Closeable;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRImageTiler implements Runnable, Closeable {
-    private static final SessionFactory sessionFactory = MCRHIBConnection.instance().getSessionFactory();
-
     private static MCRImageTiler instance = null;
 
     private static Logger LOGGER = Logger.getLogger(MCRImageTiler.class);
@@ -94,6 +91,7 @@ public class MCRImageTiler implements Runnable, Closeable {
         boolean activated = MCRConfiguration.instance().getBoolean(
             MCRIView2Tools.CONFIG_PREFIX + "LocalTiler.activated", true);
         LOGGER.info("Local Tiling is " + (activated ? "activated" : "deactivated"));
+        ImageIO.scanForPlugins();
         LOGGER.info("Supported image file types for reading: " + Arrays.toString(ImageIO.getReaderFormatNames()));
         if (activated) {
             int tilingThreadCount = Integer.parseInt(MCRIView2Tools.getIView2Property("TilingThreads"));
@@ -133,7 +131,7 @@ public class MCRImageTiler implements Runnable, Closeable {
                             if (!running) {
                                 break;
                             }
-                            Session session = sessionFactory.getCurrentSession();
+                            Session session = MCRHIBConnection.instance().getSession();
                             Transaction transaction = null;
                             MCRTileJob job = null;
                             try {
