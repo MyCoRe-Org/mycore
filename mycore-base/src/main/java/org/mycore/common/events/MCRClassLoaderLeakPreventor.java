@@ -21,7 +21,6 @@ import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor;
  * @since 2015.02
  */
 class MCRClassLoaderLeakPreventor extends ClassLoaderLeakPreventor {
-
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         if (!isJvmShuttingDown()) {
@@ -45,9 +44,8 @@ class MCRClassLoaderLeakPreventor extends ClassLoaderLeakPreventor {
         while (categories.hasNext()) {
             @SuppressWarnings("unchecked")
             Class<IIOServiceProvider> category = (Class<IIOServiceProvider>) categories.next();
-            Iterator<IIOServiceProvider> serviceProviders = registry.<IIOServiceProvider> getServiceProviders(
-                category,
-                classLoaderFilter, true);
+            Iterator<IIOServiceProvider> serviceProviders = registry.<IIOServiceProvider> getServiceProviders(category,
+                    classLoaderFilter, true);
             if (serviceProviders.hasNext()) {
                 info("removing service provider of category: " + category.getSimpleName());
                 //copy to list
@@ -62,5 +60,14 @@ class MCRClassLoaderLeakPreventor extends ClassLoaderLeakPreventor {
             }
         }
     }
+
+    protected void initJarUrlConnection() {
+        /*
+         * this preventer was for the JDK bug id=4405789 -> which duplicate bug id=4353705 and id=4405807
+         * bug id=4353705 was fixed in ver 1.3.1_03 see http://bugs.java.com/bugdatabase/view_bug.do?bug_id=4353705
+         * bug id=4405807 was fixed in ver 1.4.2_06 no working link use use Google cache instead
+         */
+    };
+
 
 }
