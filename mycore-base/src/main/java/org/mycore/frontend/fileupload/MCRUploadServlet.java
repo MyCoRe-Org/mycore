@@ -68,15 +68,13 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
- * This servlet implements the server side of communication with the upload
- * applet. The content of the uploaded files are handled by a MCRUploadHandler
- * subclass.
+ * This servlet implements the server side of communication with the upload applet. The content of the uploaded files
+ * are handled by a MCRUploadHandler subclass.
  * 
  * @author Frank Lützenkirchen
  * @author Harald Richter
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date: 2011-03-03 14:10:21 +0100 (Do, 03. Mär
- *          2011) $
+ * @version $Revision$ $Date$
  * @see org.mycore.frontend.fileupload.MCRUploadHandler
  */
 public final class MCRUploadServlet extends MCRServlet implements Runnable {
@@ -358,14 +356,11 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     }
 
     /**
-     * Extracts all filenames and fileitems of target
-     * {@link MCREditorSubmission}.
+     * Extracts all filenames and fileitems of target {@link MCREditorSubmission}.
      * 
      * @param sub
-     *            editor submission where are file <code>path</code> elements
-     *            are submitted
-     * @return a new {@link LinkedHashMap} with all extracted filenames and file
-     *         items
+     *            editor submission where are file <code>path</code> elements are submitted
+     * @return a new {@link LinkedHashMap} with all extracted filenames and file items
      */
     private LinkedHashMap<String, FileItem> getFileItems(MCREditorSubmission sub) {
         LinkedHashMap<String, FileItem> result = new LinkedHashMap<String, FileItem>();
@@ -378,14 +373,11 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     }
 
     /**
-     * Extracts all filenames and fileitems of target
-     * {@link MCRRequestParameters}.
+     * Extracts all filenames and fileitems of target {@link MCRRequestParameters}.
      * 
      * @param params
-     *            request parameters where file <code>path</code> elements are
-     *            submitted
-     * @return a new {@link LinkedHashMap} with all extracted filenames and file
-     *         items
+     *            request parameters where file <code>path</code> elements are submitted
+     * @return a new {@link LinkedHashMap} with all extracted filenames and file items
      */
     private LinkedHashMap<String, FileItem> getFileItems(MCRRequestParameters params) {
         LinkedHashMap<String, FileItem> result = new LinkedHashMap<String, FileItem>();
@@ -429,13 +421,10 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     }
 
     /**
-     * checks if path contains reserved URI characters.
+     * checks if path contains reserved URI characters or path starts or ends with whitespace. There are some characters
+     * that are maybe allowed in file names but are reserved in URIs.
      * 
-     * There are some characters that are maybe allowed in file names but are
-     * reserved in URIs.
-     * 
-     * @see <a href="http://tools.ietf.org/html/rfc3986#section-2.2">RFC3986,
-     *      Section 2.2</a>
+     * @see <a href="http://tools.ietf.org/html/rfc3986#section-2.2">RFC3986, Section 2.2</a>
      * @param path
      *            complete path name
      * @throws MCRException
@@ -453,9 +442,13 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
         if (path.contains("../") || path.contains("..\\")) {
             throw new MCRException("Path name " + path + " may not contain \"../\".");
         }
+        String fileName = getFileName(path);
+        if (fileName != fileName.trim()) {
+            throw new MCRException("File name '" + fileName + "' may not start or end with whitespace character.");
+        }
     }
 
-    protected String getFileName(String path) {
+    protected static String getFileName(String path) {
         int pos = Math.max(path.lastIndexOf('\\'), path.lastIndexOf("/"));
         return path.substring(pos + 1);
     }
