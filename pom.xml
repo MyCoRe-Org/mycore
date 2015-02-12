@@ -171,7 +171,6 @@
             </reportSets>
             <configuration>
               <useJql>true</useJql>
-              <onlyCurrentVersion>true</onlyCurrentVersion>
               <columnNames>Type,Key,Summary,Assignee,Status,Resolution,Component</columnNames>
               <sortColumnNames>Type,Component,Key DESC</sortColumnNames>
             </configuration>
