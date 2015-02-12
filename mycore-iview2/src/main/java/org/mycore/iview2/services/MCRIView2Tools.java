@@ -27,9 +27,9 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemAlreadyExistsException;
@@ -313,8 +313,8 @@ public class MCRIView2Tools {
         String tileName = MessageFormat.format("{0}/{1}/{2}.jpg", zoomLevel, y, x);
         Path tile = iviewFileRoot.resolve(tileName);
         if (Files.exists(tile)) {
-            try (InputStream zin = Files.newInputStream(tile)) {
-                ImageInputStream iis = ImageIO.createImageInputStream(zin);
+            try (SeekableByteChannel fileChannel = Files.newByteChannel(tile)) {
+                ImageInputStream iis = ImageIO.createImageInputStream(fileChannel);
                 if (iis == null) {
                     throw new IOException("Could not acquire ImageInputStream from SeekableByteChannel: " + tile);
                 }
@@ -334,8 +334,8 @@ public class MCRIView2Tools {
         String tileName = MessageFormat.format("{0}/{1}/{2}.jpg", zoomLevel, y, x);
         Path tile = iviewFileRoot.resolve(tileName);
         if (Files.exists(tile)) {
-            try (InputStream zin = Files.newInputStream(tile)) {
-                ImageInputStream iis = ImageIO.createImageInputStream(zin);
+            try (SeekableByteChannel fileChannel = Files.newByteChannel(tile)) {
+                ImageInputStream iis = ImageIO.createImageInputStream(fileChannel);
                 if (iis == null) {
                     throw new IOException("Could not acquire ImageInputStream from SeekableByteChannel: " + tile);
                 }
