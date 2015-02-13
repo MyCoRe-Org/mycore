@@ -157,7 +157,7 @@ public class MCRLayoutUtilities {
         });
 
     private static final boolean ACCESS_CONTROLL_ON = MCRConfiguration.instance().getBoolean(
-        "MCR.Website.ReadAccessVerification", true);
+        "MCR.Website.ReadAccessVerification");
 
     /**
      * Verifies a given $webpage-ID (//item/@href) from navigation.xml on read
