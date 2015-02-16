@@ -170,6 +170,7 @@
               </reportSet>
             </reportSets>
             <configuration>
+              <fixVersionIds>${changes.version}</fixVersionIds>
               <useJql>true</useJql>
               <columnNames>Type,Key,Summary,Assignee,Status,Resolution,Component</columnNames>
               <sortColumnNames>Type,Component,Key DESC</sortColumnNames>
