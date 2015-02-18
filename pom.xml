@@ -249,7 +249,7 @@
                 </group>
                 <group>
                   <title>MyCoRe Component: REST API</title>
-                  <packages>org.mycore.org.mycore.restapi*</packages>
+                  <packages>org.mycore.restapi*</packages>
                 </group>
                 <group>
                   <title>MyCoRe Component: SOLR</title>
