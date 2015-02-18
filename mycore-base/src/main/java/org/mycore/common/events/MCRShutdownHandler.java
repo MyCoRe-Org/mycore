@@ -23,6 +23,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 
 import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor;
 
@@ -39,6 +40,8 @@ import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor;
  * @since 1.3
  */
 public class MCRShutdownHandler {
+
+    private static final String PROPERTY_SYSTEM_NAME = "MCR.CommandLineInterface.SystemName";
 
     /**
      * Object is cleanly closeable via <code>close()</code>-call.
@@ -107,9 +110,16 @@ public class MCRShutdownHandler {
     }
 
     void shutDown() {
-        final String system = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName") + ":";
-        System.out.println(system + " Shutting down system, please wait...\n");
         Logger logger = Logger.getLogger(MCRShutdownHandler.class);
+        String cfgSystemName = "MyCoRe:";
+        try {
+            cfgSystemName = MCRConfiguration.instance().getString(PROPERTY_SYSTEM_NAME) + ":";
+        } catch (MCRConfigurationException e) {
+            //may occur early if there is an error starting mycore up or in JUnit tests
+            logger.warn("Error getting '" + PROPERTY_SYSTEM_NAME + "': " + e.getMessage());
+        }
+        final String system = cfgSystemName;
+        System.out.println(system + " Shutting down system, please wait...\n");
         logger.debug("requests: " + requests.toString());
         synchronized (requests) {
             shuttingDown = true;
