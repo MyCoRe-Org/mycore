@@ -138,7 +138,7 @@ public class MCRTileCombineServlet extends MCRServlet {
             String zoomAlias = pathInfo.substring(0, pathInfo.indexOf('/'));
             pathInfo = pathInfo.substring(zoomAlias.length() + 1);
             final String derivate = pathInfo.substring(0, pathInfo.indexOf('/'));
-            final String imagePath = pathInfo.substring(derivate.length());
+            String imagePath = pathInfo.substring(derivate.length());
             LOGGER.info("Zoom-Level: " + zoomAlias + ", derivate: " + derivate + ", image: " + imagePath);
             final Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, imagePath);
             try (FileSystem fs = MCRIView2Tools.getFileSystem(iviewFile)) {
@@ -172,7 +172,9 @@ public class MCRTileCombineServlet extends MCRServlet {
                             zoomAlias = "THUMB";
                             break;
                     }
-                    String redirectURL = response.encodeRedirectURL(MessageFormat.format("{0}{1}/{2}/{3}/{4}",
+                    if (!imagePath.startsWith("/"))
+                        imagePath = "/" + imagePath;
+                    String redirectURL = response.encodeRedirectURL(MessageFormat.format("{0}{1}/{2}/{3}{4}",
                         request.getContextPath(), request.getServletPath(), zoomAlias, derivate, imagePath));
                     response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
                     response.setHeader("Location", redirectURL);
