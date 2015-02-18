@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <artifactId>mycore</artifactId>
     <groupId>org.mycore</groupId>
@@ -40,6 +41,11 @@
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-coma</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-handle</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -85,6 +91,11 @@
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
+      <artifactId>mycore-solr</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore</groupId>
       <artifactId>mycore-swf</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -118,25 +129,22 @@
       <artifactId>mycore-wfc</artifactId>
       <version>${project.version}</version>
     </dependency>
-<!--     <dependency> -->
-<!--       <groupId>org.mycore</groupId> -->
-<!--       <artifactId>mycore-z3950</artifactId> -->
-<!--       <version>${project.version}</version> -->
-<!--     </dependency> -->
-    <dependency>
-      <groupId>org.mycore</groupId>
-      <artifactId>mycore-solr</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-xeditor</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.mycore</groupId>
-      <artifactId>mycore-handle</artifactId>
-      <version>${project.version}</version>
-    </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+          <skipDeploy>true</skipDeploy>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
