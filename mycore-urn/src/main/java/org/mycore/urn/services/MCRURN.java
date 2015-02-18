@@ -128,8 +128,7 @@ public class MCRURN {
          * of the converted urn
          */
         float q = productSum / Integer.parseInt(urn[urn.length - 1]);
-        String[] arr = String.valueOf(q).substring(0, String.valueOf(q).indexOf(".")).split("");
-        this.checksum = Integer.valueOf(arr[arr.length - 1]);
+        this.checksum = (int) (Math.floor(q)) % 10;
         return this.checksum;
     }
 
