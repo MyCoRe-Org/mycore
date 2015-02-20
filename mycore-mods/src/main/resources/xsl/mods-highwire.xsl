@@ -146,7 +146,7 @@
   <!-- ========== citation_issn ========== -->
   <!-- ========== citation_isbn ========== -->
 
-  <xsl:template match="mods:identifier[contains('isbn issn',@type)]" mode="highwire">
+  <xsl:template match="mods:identifier[contains('isbn issn doi',@type)]" mode="highwire">
     <meta name="citation_{@type}">
       <xsl:apply-templates select="." mode="highwire.content" />
     </meta>
