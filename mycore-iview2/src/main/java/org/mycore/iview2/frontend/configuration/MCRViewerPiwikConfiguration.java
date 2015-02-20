@@ -10,7 +10,7 @@ public class MCRViewerPiwikConfiguration extends MCRViewerConfiguration {
     public MCRViewerConfiguration setup(HttpServletRequest request) {
         super.setup(request);
         if (MCRConfiguration.instance().getBoolean("MCR.Piwik.enable", false)) {
-            this.addLocalScript("iview-client-piwik.js");
+            this.addLocalScript("iview-client-piwik.js", isDebugParameterSet(request));
             this.setProperty("MCR.Piwik.baseurl", MCRConfiguration.instance().getString("MCR.Piwik.baseurl"));
             this.setProperty("MCR.Piwik.id", MCRConfiguration.instance().getString("MCR.Piwik.id"));
         }

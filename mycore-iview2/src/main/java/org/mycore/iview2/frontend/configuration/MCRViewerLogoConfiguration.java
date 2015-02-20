@@ -1,9 +1,9 @@
 package org.mycore.iview2.frontend.configuration;
 
-        import org.mycore.frontend.MCRFrontendUtil;
-import org.mycore.iview2.services.MCRIView2Tools;
-
 import javax.servlet.http.HttpServletRequest;
+
+import org.mycore.frontend.MCRFrontendUtil;
+import org.mycore.iview2.services.MCRIView2Tools;
 
 public class MCRViewerLogoConfiguration extends MCRViewerConfiguration {
 
@@ -14,7 +14,7 @@ public class MCRViewerLogoConfiguration extends MCRViewerConfiguration {
         if (logoURL != null) {
             String framedParameter = request.getParameter("frame");
             if (framedParameter == null || !Boolean.parseBoolean(framedParameter)) {
-                this.addLocalScript("iview-client-logo.js");
+                this.addLocalScript("iview-client-logo.js", isDebugParameterSet(request));
                 this.setProperty("logoURL", MCRFrontendUtil.getBaseURL() + logoURL);
 
                 String logoCssProperty = MCRIView2Tools.getIView2Property("logo.css");

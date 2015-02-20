@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -88,6 +89,15 @@ public class MCRViewerConfiguration {
      */
     public MCRViewerConfiguration setup(HttpServletRequest request) {
         return this;
+    }
+
+    /**
+     * return true if iview2.debug=true
+     * @param request
+     * @return
+     */
+    protected boolean isDebugParameterSet(HttpServletRequest request) {
+        return Boolean.TRUE.toString().toLowerCase(Locale.ROOT).equals(request.getParameter("iview2.debug"));
     }
 
     /**

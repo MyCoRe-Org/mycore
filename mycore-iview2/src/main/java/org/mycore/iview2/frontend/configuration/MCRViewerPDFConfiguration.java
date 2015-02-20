@@ -1,10 +1,10 @@
 package org.mycore.iview2.frontend.configuration;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.iview2.services.MCRIView2Tools;
-
-import javax.servlet.http.HttpServletRequest;
 
 public class MCRViewerPDFConfiguration extends MCRViewerBaseConfiguration {
 
@@ -19,7 +19,7 @@ public class MCRViewerPDFConfiguration extends MCRViewerBaseConfiguration {
         setProperty("pdfWorkerURL", pdfWorkerLocation);
         // script
         addLocalScript("lib/pdf.js", false);
-        addLocalScript("iview-client-pdf.js");
+        addLocalScript("iview-client-pdf.js", isDebugParameterSet(request));
 
         return this;
     }
