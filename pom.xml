@@ -702,7 +702,7 @@
       <dependency>
         <groupId>com.ibm.icu</groupId>
         <artifactId>icu4j</artifactId>
-        <version>52.1</version>
+        <version>54.1.1</version>
       </dependency>
       <dependency>
         <groupId>javax.mail</groupId>
