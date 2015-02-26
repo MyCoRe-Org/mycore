@@ -19,9 +19,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.common.params.CommonParams;
@@ -29,7 +29,7 @@ import org.apache.solr.common.util.NamedList;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.solr.MCRSolrConstants;
-import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.MCRSolrClientFactory;
 
 class MCRSolrProxyUtils {
 
@@ -43,8 +43,7 @@ class MCRSolrProxyUtils {
 
     static CloseableHttpClient getHttpClient(HttpClientConnectionManager connectionManager, int maxConnections) {
 
-        RequestConfig requestConfig = RequestConfig.custom().setStaleConnectionCheckEnabled(false)
-            .setConnectTimeout(30000).setSocketTimeout(30000).build();
+        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(30000).setSocketTimeout(30000).build();
 
         ConnectionConfig connectionConfig = ConnectionConfig.custom().setCharset(Charset.forName("UTF-8")).build();
         SocketConfig socketConfig = SocketConfig.custom().setTcpNoDelay(true).setSoKeepAlive(true)
@@ -66,6 +65,7 @@ class MCRSolrProxyUtils {
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setDefaultMaxPerRoute(maxConnections);
         connectionManager.setMaxTotal(maxConnections);
+        connectionManager.setValidateAfterInactivity(30000);
         return connectionManager;
     }
 
@@ -81,9 +81,9 @@ class MCRSolrProxyUtils {
     }
 
     static NamedList<NamedList<Object>> getQueryHandlerList() throws SolrServerException, IOException {
-        SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
+        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         SolrRequest request = new QueryRequest(mbeansQuery);
-        NamedList<Object> response = solrServer.request(request);
+        NamedList<Object> response = solrClient.request(request);
         //<lst name="solr-mbeans">
         @SuppressWarnings("unchecked")
         NamedList<NamedList<NamedList<Object>>> solrMBeans = (NamedList<NamedList<NamedList<Object>>>) response

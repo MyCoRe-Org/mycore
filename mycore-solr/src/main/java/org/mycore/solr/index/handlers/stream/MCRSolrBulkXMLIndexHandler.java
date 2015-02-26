@@ -4,14 +4,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.jdom2.Element;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.index.MCRSolrIndexHandler;
-import org.mycore.solr.index.cs.MCRSolrContentStream;
 import org.mycore.solr.index.cs.MCRSolrBulkXMLStream;
+import org.mycore.solr.index.cs.MCRSolrContentStream;
 
 /**
  * This class index a {@link MCRSolrBulkXMLStream}. The stream contains a list of xml elements (mycore objects)
@@ -27,11 +27,11 @@ public class MCRSolrBulkXMLIndexHandler extends MCRSolrDefaultIndexHandler {
     private int docs;
 
     public MCRSolrBulkXMLIndexHandler(MCRSolrBulkXMLStream stream) {
-        this(stream, MCRSolrServerFactory.getSolrServer());
+        this(stream, MCRSolrClientFactory.getSolrClient());
     }
 
-    public MCRSolrBulkXMLIndexHandler(MCRSolrBulkXMLStream stream, SolrServer solrServer) {
-        super(stream, solrServer);
+    public MCRSolrBulkXMLIndexHandler(MCRSolrBulkXMLStream stream, SolrClient solrClient) {
+        super(stream, solrClient);
         this.docs = stream.getList().size();
         this.fallBackList = new ArrayList<>();
     }

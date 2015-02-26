@@ -38,7 +38,7 @@ import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
 
 /**
@@ -126,7 +126,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
         try {
             BasicFileAttributeView fileAttributeView = Files.getFileAttributeView(path, BasicFileAttributeView.class);
             MCRSolrIndexer.submitIndexHandler(MCRSolrIndexHandlerFactory.getInstance()
-                .getIndexHandler(path, fileAttributeView.readAttributes(), MCRSolrServerFactory.getSolrServer()));
+                .getIndexHandler(path, fileAttributeView.readAttributes(), MCRSolrClientFactory.getSolrClient()));
         } catch (Exception ex) {
             LOGGER.error("Error creating transfer thread for file " + path.toString(), ex);
         }

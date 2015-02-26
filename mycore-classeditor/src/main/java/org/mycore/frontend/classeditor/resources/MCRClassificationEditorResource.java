@@ -32,14 +32,12 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -68,7 +66,7 @@ import org.mycore.frontend.classeditor.json.MCRJSONCategory;
 import org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName;
 import org.mycore.frontend.classeditor.wrapper.MCRCategoryListWrapper;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
-import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.classification.MCRSolrClassificationUtil;
 import org.mycore.solr.search.MCRSolrSearchUtils;
 import org.xml.sax.SAXParseException;
@@ -391,8 +389,8 @@ public class MCRClassificationEditorResource {
     @Path("filter/{text}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response filter(@PathParam("text") String text) throws SolrServerException {
-        HttpSolrServer server = MCRSolrClassificationUtil.getCore().getServer();
-        List<List<String>> ids = MCRSolrSearchUtils.list(server, "*" + text + "*",
+        SolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
+        List<List<String>> ids = MCRSolrSearchUtils.list(solrClient, "*" + text + "*",
             new MCRSolrSearchUtils.DocumentHandler<List<String>>() {
                 @Override
                 public List<String> getResult(SolrDocument document) {
@@ -429,7 +427,7 @@ public class MCRClassificationEditorResource {
     public Response retrieveLinkedObjects(@PathParam("id") String id, @QueryParam("start") Integer start,
         @QueryParam("rows") Integer rows) throws SolrServerException, UnsupportedEncodingException {
         // do solr query
-        SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
+        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         ModifiableSolrParams params = new ModifiableSolrParams();
         params.set("start", start != null ? start : 0);
         params.set("rows", rows != null ? rows : 50);
@@ -437,7 +435,7 @@ public class MCRClassificationEditorResource {
         String configQuery = MCRConfiguration.instance().getString("MCR.Module-solr.linkQuery", "category.top:{0}");
         String query = MessageFormat.format(configQuery, id.replaceAll(":", "\\\\:"));
         params.set("q", query);
-        QueryResponse solrResponse = solrServer.query(params);
+        QueryResponse solrResponse = solrClient.query(params);
         SolrDocumentList solrResults = solrResponse.getResults();
         // build json response
         JsonObject response = new JsonObject();

@@ -4,29 +4,29 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
-import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 
 public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler {
 
-    protected SolrServer solrServer;
+    protected SolrClient solrClient;
 
     protected int commitWithin;
 
     public MCRSolrAbstractIndexHandler() {
-        this(MCRSolrServerFactory.getSolrServer());
+        this(MCRSolrClientFactory.getSolrClient());
     }
 
-    public MCRSolrAbstractIndexHandler(SolrServer solrServer) {
-        this.solrServer = solrServer;
+    public MCRSolrAbstractIndexHandler(SolrClient solrClient) {
+        this.solrClient = solrClient;
         this.commitWithin = -1;
     }
 
-    public SolrServer getSolrServer() {
-        return this.solrServer;
+    public SolrClient getSolrClient() {
+        return this.solrClient;
     }
 
     public abstract void index() throws IOException, SolrServerException;
@@ -49,8 +49,8 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
     }
 
     @Override
-    public void setSolrServer(SolrServer solrServer) {
-        this.solrServer = solrServer;
+    public void setSolrServer(SolrClient solrClient) {
+        this.solrClient = solrClient;
     }
 
     @Override

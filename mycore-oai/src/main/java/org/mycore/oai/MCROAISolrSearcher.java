@@ -5,15 +5,15 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
 import org.mycore.oai.pmh.Set;
-import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.MCRSolrClientFactory;
 
 public class MCROAISolrSearcher extends MCROAISearcher {
 
@@ -94,9 +94,9 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         query.setRequestHandler(getConfig().getString(getConfigPrefix() + "Search.RequestHandler", "/select"));
 
         // do the query
-        SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
+        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         try {
-            QueryResponse response = solrServer.query(query);
+            QueryResponse response = solrClient.query(query);
             return new MCROAISolrResult(response, this.deletedRecords);
         } catch (Exception exc) {
             LOGGER.error("Unable to handle solr request", exc);
@@ -134,9 +134,9 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         params.add("q", restriction);
         params.add("fl", fieldName);
         params.add("rows", "1");
-        SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
+        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         try {
-            QueryResponse response = solrServer.query(params);
+            QueryResponse response = solrClient.query(params);
             SolrDocumentList list = response.getResults();
             if (list.size() >= 1) {
                 return (Date) list.get(0).getFieldValue(fieldName);

@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -71,11 +72,11 @@ public class MCRSolrCategoryDAO extends MCRCategoryDAOImpl {
     protected void solrDelete(MCRCategoryID id, MCRCategory parent) {
         try {
             // remove all descendants and itself
-            SolrServer solrServer = MCRSolrClassificationUtil.getCore().getServer();
-            List<String> toDelete = MCRSolrSearchUtils.listIDs(solrServer,
+            HttpSolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
+            List<String> toDelete = MCRSolrSearchUtils.listIDs(solrClient,
                 "ancestor:" + MCRSolrClassificationUtil.encodeCategoryId(id));
             toDelete.add(id.toString());
-            solrServer.deleteById(toDelete);
+            solrClient.deleteById(toDelete);
             // reindex parent
             MCRSolrClassificationUtil.reindex(parent);
         } catch (Exception exc) {
@@ -91,8 +92,8 @@ public class MCRSolrCategoryDAO extends MCRCategoryDAOImpl {
 
     protected void solrMove(MCRCategoryID id, MCRCategoryID newParentID, int index) {
         try {
-            SolrServer solrServer = MCRSolrClassificationUtil.getCore().getServer();
-            List<String> reindexList = MCRSolrSearchUtils.listIDs(solrServer,
+            SolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
+            List<String> reindexList = MCRSolrSearchUtils.listIDs(solrClient,
                 "ancestor:" + MCRSolrClassificationUtil.encodeCategoryId(id));
             reindexList.add(id.toString());
             reindexList.add(newParentID.toString());

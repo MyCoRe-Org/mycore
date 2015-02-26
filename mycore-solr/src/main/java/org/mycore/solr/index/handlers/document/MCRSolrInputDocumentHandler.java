@@ -26,7 +26,7 @@ package org.mycore.solr.index.handlers.document;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.common.SolrInputDocument;
@@ -50,8 +50,8 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
         this.document = document;
     }
 
-    public MCRSolrInputDocumentHandler(SolrInputDocument document, SolrServer solrServer) {
-        super(solrServer);
+    public MCRSolrInputDocumentHandler(SolrInputDocument document, SolrClient solrClient) {
+        super(solrClient);
         this.document = document;
     }
 
@@ -63,7 +63,7 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
         LOGGER.info("Sending " + document.getFieldValue("id") + " to SOLR...");
         UpdateRequest updateRequest = getUpdateRequest(MCRSolrConstants.UPDATE_PATH);
         updateRequest.add(document);
-        updateRequest.process(getSolrServer());
+        updateRequest.process(getSolrClient());
     }
 
     /* (non-Javadoc)

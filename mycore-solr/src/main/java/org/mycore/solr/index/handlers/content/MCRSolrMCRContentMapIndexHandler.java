@@ -30,15 +30,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.document.MCRSolrInputDocumentFactory;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
@@ -59,10 +59,10 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
     private Map<MCRObjectID, MCRContent> contentMap;
 
     public MCRSolrMCRContentMapIndexHandler(Map<MCRObjectID, MCRContent> contentMap) {
-        this(contentMap, MCRSolrServerFactory.getSolrServer());
+        this(contentMap, MCRSolrClientFactory.getSolrClient());
     }
 
-    public MCRSolrMCRContentMapIndexHandler(Map<MCRObjectID, MCRContent> contentMap, SolrServer solrServer) {
+    public MCRSolrMCRContentMapIndexHandler(Map<MCRObjectID, MCRContent> contentMap, SolrClient solrClient) {
         super();
         this.contentMap = contentMap;
         this.subhandlers = new ArrayList<>(contentMap.size());
@@ -81,8 +81,8 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
         UpdateResponse updateResponse;
         try {
             Iterator<SolrInputDocument> documents = MCRSolrInputDocumentFactory.getInstance().getDocuments(contentMap);
-            SolrServer server = getSolrServer();
-            if (server instanceof ConcurrentUpdateSolrServer) {
+            SolrClient solrClient = getSolrClient();
+            if (solrClient instanceof ConcurrentUpdateSolrClient) {
                 //split up to speed up processing
                 splitup(documents);
                 return;
@@ -96,14 +96,14 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
                 //recreate documents interator;
                 documents = debugList.iterator();
             }
-            if (server instanceof HttpSolrServer) {
-                updateResponse = ((HttpSolrServer) server).add(documents);
+            if (solrClient instanceof HttpSolrClient) {
+                updateResponse = ((HttpSolrClient) solrClient).add(documents);
             } else {
                 ArrayList<SolrInputDocument> docs = new ArrayList<>(totalCount);
                 while (documents.hasNext()) {
                     docs.add(documents.next());
                 }
-                updateResponse = server.add(docs);
+                updateResponse = solrClient.add(docs);
             }
         } catch (Throwable e) {
             LOGGER.warn("Error while indexing document collection. Split and retry.", e);
@@ -132,7 +132,7 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
     private void splitup() {
         for (Map.Entry<MCRObjectID, MCRContent> entry : contentMap.entrySet()) {
             MCRSolrMCRContentIndexHandler subHandler = new MCRSolrMCRContentIndexHandler(entry.getKey(),
-                entry.getValue(), getSolrServer());
+                entry.getValue(), getSolrClient());
             subHandler.setCommitWithin(getCommitWithin());
             subhandlers.add(subHandler);
         }

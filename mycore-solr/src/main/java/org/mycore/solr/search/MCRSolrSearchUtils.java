@@ -3,7 +3,7 @@ package org.mycore.solr.search;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
@@ -15,16 +15,16 @@ public abstract class MCRSolrSearchUtils {
     /**
      * Returns the first document.
      * 
-     * @param server solr server
+     * @param solrClient solr server connection
      * @param query solr query
      * @return first solr document or null
      * @throws SolrServerException communication with the solr server failed in any way
      */
-    public static SolrDocument first(SolrServer server, String query) throws SolrServerException {
+    public static SolrDocument first(SolrClient solrClient, String query) throws SolrServerException {
         ModifiableSolrParams p = new ModifiableSolrParams();
         p.set("q", query);
         p.set("rows", 1);
-        QueryResponse response = server.query(p);
+        QueryResponse response = solrClient.query(p);
         return response.getResults().isEmpty() ? null : response.getResults().get(0);
     }
 
@@ -32,16 +32,16 @@ public abstract class MCRSolrSearchUtils {
      * Returns a list of ids found by the given query. Returns an empty list
      * when nothing is found.
      * 
-     * @param server solr server
+     * @param solrClient solr server connection
      * @param query solr query
      * @return list of id's
      * @throws SolrServerException communication with the solr server failed in any way
      */
-    public static List<String> listIDs(SolrServer server, String query) throws SolrServerException {
-        return list(server, query, new IdDocumentHandler());
+    public static List<String> listIDs(SolrClient solrClient, String query) throws SolrServerException {
+        return list(solrClient, query, new IdDocumentHandler());
     }
 
-    public static <T> List<T> list(SolrServer server, String query, DocumentHandler<T> handler)
+    public static <T> List<T> list(SolrClient solrClient, String query, DocumentHandler<T> handler)
         throws SolrServerException {
         int numPerRequest = 10000;
         List<T> resultList = new ArrayList<>();
@@ -53,7 +53,7 @@ public abstract class MCRSolrSearchUtils {
         long numFound = Integer.MAX_VALUE;
         while (start < numFound) {
             p.set("start", start);
-            QueryResponse response = server.query(p);
+            QueryResponse response = solrClient.query(p);
             numFound = response.getResults().getNumFound();
             SolrDocumentList results = response.getResults();
             for (SolrDocument doc : results) {

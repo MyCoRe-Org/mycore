@@ -29,7 +29,7 @@ public class MCRXMLFunctions {
         SolrQuery solrQuery = new SolrQuery(q);
         solrQuery.set("rows", 0);
         QueryResponse queryResponse;
-        queryResponse = MCRSolrServerFactory.getSolrServer().query(solrQuery);
+        queryResponse = MCRSolrClientFactory.getSolrClient().query(solrQuery);
         return queryResponse.getResults().getNumFound();
     }
 }

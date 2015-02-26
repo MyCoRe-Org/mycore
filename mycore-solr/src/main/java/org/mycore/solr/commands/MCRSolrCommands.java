@@ -6,8 +6,8 @@ package org.mycore.solr.commands;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.mycore.common.MCRObjectUtils;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -16,7 +16,7 @@ import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.classification.MCRSolrClassificationUtil;
 import org.mycore.solr.index.MCRSolrIndexer;
 import org.mycore.solr.search.MCRSolrSearchUtils;
@@ -83,8 +83,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(syntax = "set solr server {0}", help = "Sets a new SOLR server, {0} specifies the URL of the SOLR Server", order = 130)
-    public static void setSolrServer(String solrServerURL) {
-        MCRSolrServerFactory.setSolrServer(solrServerURL);
+    public static void setSolrServer(String solrClientURL) {
+        MCRSolrClientFactory.setSolrClient(solrClientURL);
     }
 
     @MCRCommand(syntax = "restricted rebuild solr metadata index for selected", help = "rebuilds solr's metadata index for selected objects", order = 50)
@@ -112,12 +112,12 @@ public class MCRSolrCommands extends MCRAbstractCommands {
 
     @MCRCommand(syntax = "create solr metadata and content index at {0}", help = "create solr's metadata and content index on specific solr server", order = 120)
     public static void createIndex(String url) throws Exception {
-        SolrServer cuss = MCRSolrServerFactory.getConcurrentSolrServer();
-        SolrServer hss = MCRSolrServerFactory.getSolrServer();
+        SolrClient cuss = MCRSolrClientFactory.getConcurrentSolrClient();
+        SolrClient hss = MCRSolrClientFactory.getSolrClient();
         MCRSolrIndexer.rebuildMetadataIndex(cuss);
         MCRSolrIndexer.rebuildContentIndex(hss);
-        if (cuss instanceof ConcurrentUpdateSolrServer) {
-            ((ConcurrentUpdateSolrServer) cuss).blockUntilFinished();
+        if (cuss instanceof ConcurrentUpdateSolrClient) {
+            ((ConcurrentUpdateSolrClient) cuss).blockUntilFinished();
         }
         hss.optimize();
     }
@@ -134,8 +134,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
 
     @MCRCommand(syntax = "select objects with solr query {0}", help = "selects mcr objects with a solr query", order = 180)
     public static void selectObjectsWithSolrQuery(String query) throws Exception {
-        SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
-        List<String> ids = MCRSolrSearchUtils.listIDs(solrServer, query);
+        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
+        List<String> ids = MCRSolrSearchUtils.listIDs(solrClient, query);
         MCRObjectCommands.setSelectedObjectIDs(ids);
     }
 

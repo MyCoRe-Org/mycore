@@ -3,10 +3,10 @@ package org.mycore.solr;
 import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.BinaryRequestWriter;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCRShutdownHandler;
 
@@ -25,20 +25,20 @@ public class MCRSolrCore {
 
     protected String name;
 
-    protected HttpSolrServer server;
+    protected HttpSolrClient solrClient;
 
-    protected ConcurrentUpdateSolrServer concurrentServer;
+    protected ConcurrentUpdateSolrClient concurrentClient;
 
     static {
         USE_CONCURRENT_SERVER = MCRConfiguration.instance().getBoolean(
-            CONFIG_PREFIX + "ConcurrentUpdateSolrServer.Enabled", true);
+            CONFIG_PREFIX + "ConcurrentUpdateSolrServer.Enabled");
     }
 
     /**
-     * Creates a new solr server core instance. The last part of this url
-     * should be the core.
+     * Creates a new solr server core instance. The last part of this url should be the core.
      * 
-     * @param serverURL whole url e.g. http://localhost:8296/docportal
+     * @param serverURL
+     *            whole url e.g. http://localhost:8296/docportal
      */
     public MCRSolrCore(String serverURL) {
         if (serverURL.endsWith("/")) {
@@ -51,8 +51,10 @@ public class MCRSolrCore {
     /**
      * Creates a new solr server core instance.
      * 
-     * @param serverURL base url of the solr server e.g. http://localhost:8296
-     * @param name name of the core e.g. docportal
+     * @param serverURL
+     *            base url of the solr server e.g. http://localhost:8296
+     * @param name
+     *            name of the core e.g. docportal
      */
     public MCRSolrCore(String serverURL, String name) {
         setup(serverURL, name);
@@ -67,16 +69,15 @@ public class MCRSolrCore {
         String coreURL = serverURL + name;
 
         // default server
-        server = new HttpSolrServer(coreURL);
-        server.setRequestWriter(new BinaryRequestWriter());
+        solrClient = new HttpSolrClient(coreURL);
+        solrClient.setRequestWriter(new BinaryRequestWriter());
         // concurrent server
         if (USE_CONCURRENT_SERVER) {
-            int queueSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "ConcurrentUpdateSolrServer.QueueSize",
-                100);
-            int threadSize = MCRConfiguration.instance().getInt(
-                CONFIG_PREFIX + "ConcurrentUpdateSolrServer.ThreadSize", 4);
-            concurrentServer = new ConcurrentUpdateSolrServer(coreURL, queueSize, threadSize);
-            concurrentServer.setRequestWriter(new BinaryRequestWriter());
+            int queueSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "ConcurrentUpdateSolrClient.QueueSize");
+            int threadSize = MCRConfiguration.instance()
+                .getInt(CONFIG_PREFIX + "ConcurrentUpdateSolrClient.ThreadSize");
+            concurrentClient = new ConcurrentUpdateSolrClient(coreURL, queueSize, threadSize);
+            concurrentClient.setRequestWriter(new BinaryRequestWriter());
         }
         // shutdown handler
         MCRShutdownHandler.getInstance().addCloseable(new MCRShutdownHandler.Closeable() {
@@ -92,11 +93,11 @@ public class MCRSolrCore {
 
             @Override
             public void close() {
-                SolrServer solrServer = getServer();
-                LOGGER.info("Shutting down solr server: " + solrServer);
-                solrServer.shutdown();
-                SolrServer concurrentSolrServer = getConcurrentServer();
-                LOGGER.info("Shutting down concurrent solr server: " + concurrentSolrServer);
+                SolrClient solrClient = getClient();
+                LOGGER.info("Shutting down solr client: " + solrClient);
+                solrClient.shutdown();
+                SolrClient concurrentSolrServer = getConcurrentClient();
+                LOGGER.info("Shutting down concurrent solr client: " + concurrentSolrServer);
                 concurrentSolrServer.shutdown();
                 LOGGER.info("Solr shutdown process completed.");
             }
@@ -104,11 +105,11 @@ public class MCRSolrCore {
     }
 
     public void shutdown() {
-        SolrServer solrServer = getServer();
-        LOGGER.info("Shutting down solr server: " + solrServer);
-        solrServer.shutdown();
-        SolrServer concurrentSolrServer = getConcurrentServer();
-        LOGGER.info("Shutting down concurrent solr server: " + concurrentSolrServer);
+        SolrClient solrClient = getClient();
+        LOGGER.info("Shutting down solr client: " + solrClient);
+        solrClient.shutdown();
+        SolrClient concurrentSolrServer = getConcurrentClient();
+        LOGGER.info("Shutting down concurrent solr client: " + concurrentSolrServer);
         concurrentSolrServer.shutdown();
         LOGGER.info("Solr shutdown process completed.");
     }
@@ -123,21 +124,21 @@ public class MCRSolrCore {
     }
 
     /**
-     * Returns the default solr server instance. Use this for queries.
+     * Returns the default solr client instance. Use this for queries.
      * 
      * @return
      */
-    public HttpSolrServer getServer() {
-        return server;
+    public HttpSolrClient getClient() {
+        return solrClient;
     }
 
     /**
-     * Returns the concurrent solr server instance. Use this for indexing.
+     * Returns the concurrent solr client instance. Use this for indexing.
      * 
      * @return
      */
-    public SolrServer getConcurrentServer() {
-        return concurrentServer != null ? concurrentServer : server;
+    public SolrClient getConcurrentClient() {
+        return concurrentClient != null ? concurrentClient : solrClient;
     }
 
 }

@@ -1,13 +1,13 @@
 package org.mycore.solr.index.handlers.stream;
 
-import static org.mycore.solr.MCRSolrConstants.UPDATE_PATH;
 import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
+import static org.mycore.solr.MCRSolrConstants.UPDATE_PATH;
 
 import java.io.IOException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.common.util.NamedList;
@@ -31,8 +31,8 @@ public class MCRSolrDefaultIndexHandler extends MCRSolrAbstractStreamIndexHandle
         super(stream);
     }
 
-    public MCRSolrDefaultIndexHandler(MCRSolrAbstractContentStream<?> stream, SolrServer solrServer) {
-        super(stream, solrServer);
+    public MCRSolrDefaultIndexHandler(MCRSolrAbstractContentStream<?> stream, SolrClient solrClient) {
+        super(stream, solrClient);
     }
 
     /**
@@ -40,14 +40,14 @@ public class MCRSolrDefaultIndexHandler extends MCRSolrAbstractStreamIndexHandle
      */
     public void index() throws IOException, SolrServerException {
         long tStart = System.currentTimeMillis();
-        SolrServer solrServer = getSolrServer();
+        SolrClient solrClient = getSolrClient();
         ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest(UPDATE_PATH);
         updateRequest.addContentStream(getStream());
         if (STYLESHEET.length() > 0) {
             updateRequest.setParam("tr", STYLESHEET);
         }
         updateRequest.setCommitWithin(getCommitWithin());
-        NamedList<Object> request = solrServer.request(updateRequest);
+        NamedList<Object> request = solrClient.request(updateRequest);
         if (LOGGER.isDebugEnabled()) {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("Solr: indexing data of \"");

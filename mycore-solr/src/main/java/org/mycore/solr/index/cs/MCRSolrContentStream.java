@@ -17,8 +17,6 @@ import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.datamodel.metadata.MCRBase;
 
-import com.google.common.base.Charsets;
-
 /**
  * Content stream suitable for wrapping {@link MCRBase} and {@link Document} objects.
  * 

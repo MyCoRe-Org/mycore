@@ -29,14 +29,14 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
+import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrConstants;
-import org.mycore.solr.MCRSolrServerFactory;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
@@ -57,11 +57,11 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
      * @param documents
      */
     public MCRSolrInputDocumentsHandler(Collection<SolrInputDocument> documents) {
-        this(documents, MCRSolrServerFactory.getSolrServer());
+        this(documents, MCRSolrClientFactory.getSolrClient());
     }
 
-    public MCRSolrInputDocumentsHandler(Collection<SolrInputDocument> documents, SolrServer solrServer) {
-        super(solrServer);
+    public MCRSolrInputDocumentsHandler(Collection<SolrInputDocument> documents, SolrClient solrClient) {
+        super(solrClient);
         this.documents = documents;
     }
 
@@ -84,9 +84,9 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
         }
         int totalCount = documents.size();
         LOGGER.info("Handling " + totalCount + " documents");
-        SolrServer server = getSolrServer();
-        if (server instanceof ConcurrentUpdateSolrServer) {
-            LOGGER.info("Detected ConcurrentUpdateSolrServer. Split up batch update.");
+        SolrClient solrClient = getSolrClient();
+        if (solrClient instanceof ConcurrentUpdateSolrClient) {
+            LOGGER.info("Detected ConcurrentUpdateSolrClient. Split up batch update.");
             splitDocuments();
             //for statistics:
             documents.clear();
@@ -96,7 +96,7 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
         try {
             UpdateRequest updateRequest = getUpdateRequest(MCRSolrConstants.UPDATE_PATH);
             updateRequest.add(documents);
-            updateResponse = updateRequest.process(getSolrServer());
+            updateResponse = updateRequest.process(getSolrClient());
         } catch (Throwable e) {
             LOGGER.warn("Error while indexing document collection. Split and retry.");
             splitDocuments();
@@ -114,7 +114,7 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
     private void splitDocuments() {
         subHandlerList = new ArrayList<>(documents.size());
         for (SolrInputDocument document : documents) {
-            MCRSolrInputDocumentHandler subHandler = new MCRSolrInputDocumentHandler(document, getSolrServer());
+            MCRSolrInputDocumentHandler subHandler = new MCRSolrInputDocumentHandler(document, getSolrClient());
             subHandler.setCommitWithin(getCommitWithin());
             this.subHandlerList.add(subHandler);
         }

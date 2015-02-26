@@ -1,8 +1,8 @@
 package org.mycore.solr;
 
-import static org.mycore.solr.MCRSolrConstants.SERVER_URL;
 import static org.mycore.solr.MCRSolrConstants.CORE;
 import static org.mycore.solr.MCRSolrConstants.SERVER_BASE_URL;
+import static org.mycore.solr.MCRSolrConstants.SERVER_URL;
 
 import java.text.MessageFormat;
 import java.util.Collections;
@@ -10,16 +10,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 
 /**
  * @author shermann
  * @author Thomas Scheffler (yagee)
  * @author Matthias Eichner
  */
-public abstract class MCRSolrServerFactory {
+public abstract class MCRSolrClientFactory {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRSolrServerFactory.class);
+    private static final Logger LOGGER = Logger.getLogger(MCRSolrClientFactory.class);
 
     private static String DEFAULT_CORE_NAME;
 
@@ -29,14 +29,14 @@ public abstract class MCRSolrServerFactory {
         try {
             CORE_MAP = Collections.synchronizedMap(new HashMap<String, MCRSolrCore>());
             if (CORE != null) {
-                setSolrServer(SERVER_BASE_URL, CORE);
+                setSolrClient(SERVER_BASE_URL, CORE);
             } else {
-                setSolrServer(SERVER_URL);
+                setSolrClient(SERVER_URL);
             }
         } catch (Throwable t) {
-            LOGGER.error("Exception creating solr server object", t);
+            LOGGER.error("Exception creating solr client object", t);
         } finally {
-            LOGGER.info(MessageFormat.format("Using server at address \"{0}\"", getDefaultSolrCore().getServer()
+            LOGGER.info(MessageFormat.format("Using server at address \"{0}\"", getDefaultSolrCore().getClient()
                 .getBaseURL()));
         }
     }
@@ -58,21 +58,21 @@ public abstract class MCRSolrServerFactory {
     }
 
     /**
-     * Returns the solr server of the default core.
+     * Returns the solr client of the default core.
      * 
      * @return an instance of {@link SolrServer}
      */
-    public static SolrServer getSolrServer() {
-        return getDefaultSolrCore().getServer();
+    public static SolrClient getSolrClient() {
+        return getDefaultSolrCore().getClient();
     }
 
     /**
-     * Returns the concurrent solr server of the default core.
+     * Returns the concurrent solr client of the default core.
      * 
      * @return
      */
-    public static SolrServer getConcurrentSolrServer() {
-        return getDefaultSolrCore().getConcurrentServer();
+    public static SolrClient getConcurrentSolrClient() {
+        return getDefaultSolrCore().getConcurrentClient();
     }
 
     /**
@@ -80,7 +80,7 @@ public abstract class MCRSolrServerFactory {
      * 
      * @param serverURL
      */
-    public static void setSolrServer(String serverURL) {
+    public static void setSolrClient(String serverURL) {
         removeDefaultCore();
         MCRSolrCore defaultCore = new MCRSolrCore(serverURL);
         add(defaultCore);
@@ -93,7 +93,7 @@ public abstract class MCRSolrServerFactory {
      * @param serverURL base solr url
      * @param core core of the server
      */
-    public static void setSolrServer(String serverURL, String core) {
+    public static void setSolrClient(String serverURL, String core) {
         removeDefaultCore();
         add(new MCRSolrCore(serverURL, core));
         DEFAULT_CORE_NAME = core;
