@@ -23,6 +23,8 @@
 
 package org.mycore.common;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
@@ -66,8 +68,6 @@ public class MCRCalendar {
 
     public static final String TAG_ISLAMIC = "islamic";
 
-    public static final String TAG_ISLAMIC_CIVIL = "islamic-civil";
-
     public static final String TAG_JAPANESE = "japanese";
 
     public static final String TAG_JULIAN = "julian";
@@ -81,355 +81,269 @@ public class MCRCalendar {
     /** Minimum Julian Day number is 0 = 01.01.4713 BC */
     public static final int MIN_JULIAN_DAY_NUMBER = 0;
 
-    /** Maximum Julian Day number is 3182057 = 31.12.3999 */
+    /** Maximum Julian Day number is 3182057 = 28.01.4000 */
     public static final int MAX_JULIAN_DAY_NUMBER = 3182057;
 
     /** all available calendars of ICU */
-    public static final String CALENDARS_ICU[] = { TAG_BUDDHIST, TAG_CHINESE, TAG_COPTIC, TAG_ETHIOPIC, TAG_GREGORIAN, TAG_HEBREW, TAG_ISLAMIC,
-            TAG_ISLAMIC_CIVIL, TAG_JAPANESE };
+    public static final String CALENDARS_ICU[] = { TAG_BUDDHIST, TAG_CHINESE, TAG_COPTIC, TAG_ETHIOPIC, TAG_GREGORIAN,
+            TAG_HEBREW, TAG_ISLAMIC, TAG_JAPANESE };
 
-    /** convert following calendars from input to gregorian */
-    public static final String CALENDARS_INPUT[] = { TAG_GREGORIAN, TAG_JULIAN, TAG_ISLAMIC, TAG_BUDDHIST, TAG_COPTIC, TAG_ETHIOPIC, TAG_PERSIC,
-            TAG_JAPANESE, TAG_ARMENIAN, TAG_EGYPTIAN };
-
-    /**
-     * This method convert a ancient date to a GregorianCalendar value. For
-     * syntax of the string see javadocs of calendar methods.
-     * 
-     * @param datestr
-     *            the date as string.
-     * @param last
-     *            the value is true if the date should be filled with the
-     *            highest value of month or day like 12 or 31 else it fill the
-     *            date with the lowest value 1 for month and day.
-     * 
-     * @return the GregorianCalendar date value or null if an error was
-     *         occurred.
-     * @exception a
-     *                MCRException if parsing has an error
-     */
-    public static GregorianCalendar getGregorianHistoryDate(String datestr, boolean last) throws MCRException {
-        return getGregorianHistoryDate(datestr, last, TAG_GREGORIAN);
-    }
-
-    /**
-     * This method convert a ancient date to a GregorianCalendar value. For
-     * syntax of the string see javadocs of calendar methods.
-     * 
-     * @param datestr
-     *            the date as string.
-     * @param last
-     *            the value is true if the date should be filled with the
-     *            highest value of month or day like 12 or 31 else it fill the
-     *            date with the lowest value 1 for month and day.
-     * @param calstr
-     *            the calendar as String, kind of the calendar name
-     *            ('gregorian', 'julian', 'islamic', 'coptic', 'ethiopic',
-     *            'buddhist', 'japanese', 'persic', 'armenian', 'egyptian')
-     * 
-     * @return the GregorianCalendar date value or null if an error was
-     *         occurred.
-     * @exception a
-     *                MCRException if parsing has an error
-     */
-    public static GregorianCalendar getGregorianHistoryDate(String datestr, boolean last, String calstr) throws MCRException {
-        // check input
-        String calstrtmp = checkCalendarName(calstr);
-        Calendar cal = checkHistoryDate(datestr, last, calstrtmp);
-
-        GregorianCalendar gcal = new GregorianCalendar();
-        int year = 0;
-        int mon = 0;
-        int day = 0;
-        int area = 0;
-
-        try {
-            if (cal instanceof GregorianCalendar
-                    && (calstrtmp.equals(TAG_GREGORIAN) || calstrtmp.equals(TAG_JULIAN) || calstrtmp.equals(TAG_PERSIC)
-                            || calstrtmp.equals(TAG_ARMENIAN) || calstrtmp.equals(TAG_EGYPTIAN))) {
-                gcal = (GregorianCalendar) cal;
-            } else if (cal instanceof IslamicCalendar) {
-                gcal.setTime(cal.getTime());
-
-                year = gcal.get(Calendar.YEAR);
-                mon = gcal.get(Calendar.MONTH) + 1;
-                day = gcal.get(Calendar.DATE);
-                area = gcal.get(Calendar.ERA);
-
-                if (10000 * year + 100 * mon + day <= 15821004) {
-                    // Change Julian to Gregorian
-                    int TD = 0;
-                    int jh;
-                    if (year % 100 == 0 && mon <= 2) {
-                        jh = (year - 1) / 100;
-                    } else {
-                        jh = year / 100;
-                    }
-                    int a = jh / 4;
-                    int b = jh % 4;
-                    TD = 3 * a + b - 2;
-                    if (area == 1) { // AD
-                        if (year == 1582 && mon == 9 && day > 24) {
-                            gcal.set(year, mon - 1, day + TD + 35 - day);
-                            TD = 0;
-                        }
-                        if (year == 1582 && mon == 10 && day < 5) {
-                            gcal.set(year, mon - 1, day + TD + 5 - day);
-                            TD = 0;
-                        }
-                        if (year == 1582 && mon == 10 && day >= 5 && day < 15) {
-                            gcal.set(year, mon - 1, day + TD);
-                            TD = 0;
-                        }
-                    } else {
-                        TD = -TD - 4; // BC
-                    }
-                    gcal.add(Calendar.DATE, TD);
-                }
-            } else if (cal instanceof CopticCalendar && calstrtmp.equals(TAG_COPTIC)) {
-                gcal.setTime(cal.getTime());
-                year = gcal.get(Calendar.YEAR);
-                mon = gcal.get(Calendar.MONTH) + 1;
-                day = gcal.get(Calendar.DATE);
-                area = gcal.get(Calendar.ERA);
-                if (10000 * year + 100 * mon + day <= 15821004) {
-                    // Change julian to gregorian
-                    int TD = 0;
-                    int jh;
-                    if (year % 100 == 0 && mon <= 2) {
-                        jh = (year - 1) / 100;
-                    } else {
-                        jh = year / 100;
-                    }
-                    int a = jh / 4;
-                    int b = jh % 4;
-                    TD = 3 * a + b - 2;
-                    if (area == 1) { // AD
-                        if (year == 1582 && mon == 9 && day > 24) {
-                            gcal.set(year, mon - 1, day + TD + 35 - day);
-                            TD = 0;
-                        }
-                        if (year == 1582 && mon == 10 && day < 5) {
-                            gcal.set(year, mon - 1, day + TD + 5 - day);
-                            TD = 0;
-                        }
-                        if (year == 1582 && mon == 10 && day >= 5 && day < 15) {
-                            gcal.set(year, mon - 1, day + TD);
-                            TD = 0;
-                        }
-                    } else {
-                        TD = -TD - 4; // BC
-                    }
-                    gcal.add(Calendar.DATE, TD);
-                }
-            } else if (cal instanceof EthiopicCalendar && calstrtmp.equals(TAG_ETHIOPIC)) {
-                gcal.setTime(cal.getTime());
-                year = gcal.get(Calendar.YEAR);
-                mon = gcal.get(Calendar.MONTH) + 1;
-                day = gcal.get(Calendar.DATE);
-                area = gcal.get(Calendar.ERA);
-                if (10000 * year + 100 * mon + day <= 15821004) {
-                    // Change julian to gregorian
-                    int TD = 0;
-                    int jh;
-                    if (year % 100 == 0 && mon <= 2) {
-                        jh = (year - 1) / 100;
-                    } else {
-                        jh = year / 100;
-                    }
-                    int a = jh / 4;
-                    int b = jh % 4;
-                    TD = 3 * a + b - 2;
-                    if (area == 1) { // AD
-                        if (year == 1582 && mon == 9 && day > 24) {
-                            gcal.set(year, mon - 1, day + TD + 35 - day);
-                            TD = 0;
-                        }
-                        if (year == 1582 && mon == 10 && day < 5) {
-                            gcal.set(year, mon - 1, day + TD + 5 - day);
-                            TD = 0;
-                        }
-                        if (year == 1582 && mon == 10 && day >= 5 && day < 15) {
-                            gcal.set(year, mon - 1, day + TD);
-                            TD = 0;
-                        }
-                    } else {
-                        TD = -TD - 4; // BC
-                    }
-                    gcal.add(Calendar.DATE, TD);
-                }
-            } else if (cal instanceof BuddhistCalendar && calstrtmp.equals(TAG_BUDDHIST)) {
-                gcal.setTime(cal.getTime());
-                gcal.add(Calendar.DATE, 0);
-            } else if (cal instanceof GregorianCalendar && calstrtmp.equals(TAG_JAPANESE)) {
-                gcal.setTime(cal.getTime());
-                gcal.add(Calendar.DATE, 0);
-            } else if (cal instanceof HebrewCalendar && calstrtmp.equals(TAG_HEBREW)) {
-                gcal.setTime(cal.getTime());
-                year = gcal.get(Calendar.YEAR);
-                mon = gcal.get(Calendar.MONTH) + 1;
-                day = gcal.get(Calendar.DATE);
-                if (10000 * year + 100 * mon + day <= 15821004) {
-                    // 
-                    int TD = 0;
-                    int jh;
-                    if (year % 100 == 0 && mon <= 2) {
-                        jh = (year - 1) / 100;
-                    } else {
-                        jh = year / 100;
-                    }
-                    int a = jh / 4;
-                    int b = jh % 4;
-                    TD = 3 * a + b - 2;
-                    if (year == 1582 && mon == 9 && day > 24) {
-                        gcal.set(year, mon - 1, day + TD + 35 - day);
-                        TD = 0;
-                    }
-                    if (year == 1582 && mon == 10 && day < 5) {
-                        gcal.set(year, mon - 1, day + TD + 5 - day);
-                        TD = 0;
-                    }
-                    if (year == 1582 && mon == 10 && day >= 5 && day < 15) {
-                        gcal.set(year, mon - 1, day + TD);
-                        TD = 0;
-                    }
-                    gcal.add(Calendar.DATE, TD);
-                }
-            }
-
-        } catch (MCRException ex) {
-        }
-        return gcal;
-    }
-
-    /**
-     * This method test a ancient date string. For syntax of the string see
-     * javadocs of calendar methods.
-     * 
-     * @param datestr
-     *            the date as string.
-     * @param last
-     *            the value is true if the date should be filled with the
-     *            highest value of month or day like 12 or 31 else it fill the
-     *            date with the lowest value 1 for month and day.
-     * @param calstr
-     *            the calendar as String, kind of the calendar ('gregorian',
-     *            'julian', 'islamic', 'coptic', 'ethiopic', 'buddhist',
-     *            'japanese', 'persic', ''armenian, 'egyptian')
-     * 
-     * @return the GregorianCalendar date value or null if an error was
-     *         occurred.
-     */
-    public static boolean testHistoryDate(String datestr, boolean last, String calstr) {
-        try {
-            Calendar cal = checkHistoryDate(datestr, last, calstr);
-            return cal != null;
-        } catch (MCRException ex) {
-            return false;
-        }
-    }
-
-    /**
-     * This method check the String of the calendar name.
-     * 
-     * @param calstr
-     *            the calendar name as String, kind of the calendars are
-     *            ('gregorian', 'julian', 'islamic', 'buddhist', 'coptic',
-     *            'ethiopic', 'persic', 'japanese', 'armenian' or 'egyptian' )
-     * @return the calendar string or gregorian if an error was occurred
-     * @exception a
-     *                MCRException if parsing has an error
-     */
-    private static String checkCalendarName(String calstr) {
-        if (calstr == null || calstr.trim().length() == 0) {
-            throw new MCRException("The calendar name is null or empty.");
-        }
-        for (String element : CALENDARS_INPUT) {
-            if (element.equals(calstr)) {
-                return calstr;
-            }
-        }
-        throw new MCRException("Can't find the calendar name " + calstr + ".");
-    }
+    /** convert following calendars from input to calendar */
+    public static final ArrayList<String> CALENDARS_LIST = new ArrayList<String>(Arrays.asList(TAG_GREGORIAN,
+            TAG_JULIAN, TAG_ISLAMIC, TAG_BUDDHIST, TAG_COPTIC, TAG_ETHIOPIC, TAG_PERSIC, TAG_JAPANESE, TAG_ARMENIAN,
+            TAG_EGYPTIAN));
 
     /**
      * This method check a ancient date string for the given calendar. For
      * syntax of the string see javadocs of calendar methods.
      * 
-     * @param datestr
+     * @param date_string
      *            the date as string.
      * @param last
      *            the value is true if the date should be filled with the
      *            highest value of month or day like 12 or 31 else it fill the
      *            date with the lowest value 1 for month and day.
-     * @param calstr
+     * @param calendar_string
      *            the calendar name as String, kind of the calendars are
      *            ('gregorian', 'julian', 'islamic', 'buddhist', 'coptic',
      *            'ethiopic', 'persic', 'japanese', 'armenian' or 'egyptian' )
      * 
-     * @return the ICU Calendar date value or null if an error was occurred.
+     * @return the ICU Calendar instance of the concrete calendar type or null if an error was occurred.
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static Calendar checkHistoryDate(String datestr, boolean last, String calstr) throws MCRException {
+    public static Calendar getHistoryDateAsCalendar(String date_string, boolean last, String calendar_string)
+            throws MCRException {
         Calendar out = null;
-        // check datestr String
-        LOGGER.debug("Input checkHistoryDate " + datestr + "  " + calstr + "  " + Boolean.toString(last));
-        if (datestr == null || datestr.trim().length() == 0) {
+        // check date_string
+        LOGGER.debug("Input of getHistoryDateAsCalendar: " + date_string + "  " + calendar_string + "  "
+                + Boolean.toString(last));
+        if (date_string == null || date_string.trim().length() == 0) {
             throw new MCRException("The ancient date string is null or empty");
         }
+        date_string = date_string.trim();
+        if (calendar_string == null || calendar_string.trim().length() == 0) {
+            throw new MCRException("The calendar string is null or empty");
+        }
+        if (date_string.equals("4713-01-01 BC")) {
+            LOGGER.debug("Date string contains MIN_JULIAN_DAY_NUMBER");
+            out = new GregorianCalendar();
+            out.set(Calendar.JULIAN_DAY, MCRCalendar.MIN_JULIAN_DAY_NUMBER);
+            return out;
+        }
+        if (date_string.equals("4000-01-28 AD")) {
+            LOGGER.debug("Date string contains MAX_JULIAN_DAY_NUMBER");
+            out = new GregorianCalendar();
+            out.set(Calendar.JULIAN_DAY, MCRCalendar.MAX_JULIAN_DAY_NUMBER);
+            return out;
+        }
         // Check calendar string
-        String caltmp = checkCalendarName(calstr);
+        if (!CALENDARS_LIST.contains(calendar_string)) {
+            throw new MCRException("The calendar string " + calendar_string + " is not supported");
+        }
         // select for calendar
-        if (caltmp.equals(TAG_GREGORIAN)) {
-            return getCalendarFromGregorianDate(datestr, last);
+        if (calendar_string.equals(TAG_GREGORIAN)) {
+            out = getCalendarFromGregorianDate(date_string, last);
         }
-        if (caltmp.equals(TAG_JULIAN)) {
-            return getCalendarFromJulianDate(datestr, last);
+        if (calendar_string.equals(TAG_JULIAN)) {
+            out = getCalendarFromJulianDate(date_string, last);
         }
-        if (caltmp.equals(TAG_ISLAMIC)) {
-            return getCalendarFromIslamicDate(datestr, last);
+        if (calendar_string.equals(TAG_ISLAMIC)) {
+            out = getCalendarFromIslamicDate(date_string, last);
         }
-        if (caltmp.equals(TAG_COPTIC)) {
-            return getCalendarFromCopticDate(datestr, last);
+        if (calendar_string.equals(TAG_COPTIC)) {
+            out = getCalendarFromCopticDate(date_string, last);
         }
-        if (caltmp.equals(TAG_ETHIOPIC)) {
-            return getCalendarFromEthiopicDate(datestr, last);
+        if (calendar_string.equals(TAG_ETHIOPIC)) {
+            out = getCalendarFromEthiopicDate(date_string, last);
         }
-        if (caltmp.equals(TAG_BUDDHIST)) {
-            return getCalendarFromBuddhistDate(datestr, last);
+        if (calendar_string.equals(TAG_BUDDHIST)) {
+            out = getCalendarFromBuddhistDate(date_string, last);
         }
-        if (caltmp.equals(TAG_PERSIC)) {
-            return getCalendarFromPersicDate(datestr, last);
+        if (calendar_string.equals(TAG_PERSIC)) {
+            out = getCalendarFromPersicDate(date_string, last);
         }
-        if (caltmp.equals(TAG_ARMENIAN)) {
-            return getCalendarFromArmenianDate(datestr, last);
+        if (calendar_string.equals(TAG_ARMENIAN)) {
+            out = getCalendarFromArmenianDate(date_string, last);
         }
-        if (caltmp.equals(TAG_EGYPTIAN)) {
-            return getCalendarFromEgyptianDate(datestr, last);
+        if (calendar_string.equals(TAG_EGYPTIAN)) {
+            out = getCalendarFromEgyptianDate(date_string, last);
         }
-        if (caltmp.equals(TAG_JAPANESE)) {
-            return getCalendarFromJapaneseDate(datestr, last);
+        if (calendar_string.equals(TAG_JAPANESE)) {
+            out = getCalendarFromJapaneseDate(date_string, last);
         }
-        if (caltmp.equals(TAG_HEBREW)) {
-            return getCalendarFromHebrewDate(datestr, last);
+        if (calendar_string.equals(TAG_HEBREW)) {
+            out = getCalendarFromHebrewDate(date_string, last);
         }
+        LOGGER.debug("Output of getHistoryDateAsCalendar: " + getCalendarDateToFormattedString(out));
         return out;
     }
 
     /**
-     * This method convert a ancient date to a GregorianCalendar value. The
+     * Check the date string for julian or gregorian calendar
+     * 
+     * @param date_string the date string
+     * @param last the flag for first / last day
+     * @return an integer array with [0] = year; [1] = month; [2] = day; [3] = era : -1 = BC : +1 = AC
+     * @throws Exception
+     */
+    private static int[] checkDateStringForJulianCalendar(String date_string, boolean last) throws Exception {
+        int[] fields = new int[4];
+        // look for BC
+        date_string = date_string.toUpperCase(Locale.ROOT);
+        boolean bc = false;
+        int start = 0;
+        int ende = date_string.length();
+        if (date_string.substring(0, 1).equals("-")) {
+            bc = true;
+            start = 1;
+        } else {
+            if (date_string.length() > 2) {
+                int i = date_string.indexOf("AD");
+                if (i != -1) {
+                    if (i == 0) {
+                        bc = false;
+                        start = 2;
+                    } else {
+                        bc = false;
+                        start = 0;
+                        ende = i - 1;
+                    }
+                }
+                i = date_string.indexOf("BC");
+                if (i != -1) {
+                    if (i == 0) {
+                        bc = true;
+                        start = 2;
+                    } else {
+                        bc = true;
+                        start = 0;
+                        ende = i - 1;
+                    }
+                }
+            }
+            if (date_string.length() > 7) {
+                int i = date_string.indexOf("N. CHR");
+                if (i != -1) {
+                    if (i == 0) {
+                        bc = false;
+                        start = 7;
+                    } else {
+                        bc = false;
+                        start = 0;
+                        ende = i - 1;
+                    }
+                }
+                i = date_string.indexOf("V. CHR");
+                if (i != -1) {
+                    if (i == 0) {
+                        bc = true;
+                        start = 7;
+                    } else {
+                        bc = true;
+                        start = 0;
+                        ende = i - 1;
+                    }
+                }
+            }
+        }
+        date_string = date_string.substring(start, ende).trim();
+
+        // German, English or ISO?
+        start = 0;
+        boolean iso = false;
+        String token = ".";
+        if (date_string.indexOf("-", start + 1) != -1) {
+            iso = true;
+            token = "-";
+        }
+        if (date_string.indexOf("/", start + 1) != -1) {
+            token = "/";
+        }
+
+        // only a year?
+        int firstdot = date_string.indexOf(token, start + 1);
+        int secdot = -1;
+        if (firstdot != -1) {
+            secdot = date_string.indexOf(token, firstdot + 1);
+        }
+        int day = 1;
+        int mon = 0;
+        int year = 0;
+        if (secdot != -1) {
+            if (iso) {
+                year = Integer.parseInt(date_string.substring(start, firstdot));
+                mon = Integer.parseInt(date_string.substring(firstdot + 1, secdot)) - 1;
+                day = Integer.parseInt(date_string.substring(secdot + 1, date_string.length()));
+            } else {
+                day = Integer.parseInt(date_string.substring(start, firstdot));
+                mon = Integer.parseInt(date_string.substring(firstdot + 1, secdot)) - 1;
+                year = Integer.parseInt(date_string.substring(secdot + 1, date_string.length()));
+            }
+        } else {
+            if (firstdot != -1) {
+                if (iso) {
+                    year = Integer.parseInt(date_string.substring(start, firstdot));
+                    mon = Integer.parseInt(date_string.substring(firstdot + 1, date_string.length())) - 1;
+                } else {
+                    mon = Integer.parseInt(date_string.substring(start, firstdot)) - 1;
+                    year = Integer.parseInt(date_string.substring(firstdot + 1, date_string.length()));
+                }
+                if (last) {
+                    if (mon == 0 || mon == 2 || mon == 4 || mon == 6 || mon == 7 || mon == 9 || mon == 11) {
+                        day = 31;
+                    }
+                    if (mon == 1) {
+                        day = 28;
+                    }
+
+                    if (mon == 3 || mon == 5 || mon == 8 || mon == 10) {
+                        day = 30;
+                    }
+
+                }
+            } else {
+                year = Integer.parseInt(date_string.substring(start, date_string.length()));
+                if (last) {
+                    mon = 11;
+                    day = 31;
+                }
+            }
+        }
+
+        // test of the monthly
+        if (mon > 11 || mon < 0) {
+            throw new MCRException("The month of the date is inadmissible.");
+        }
+
+        // Test of the daily
+        if ((mon == 0 || mon == 2 || mon == 4 || mon == 6 || mon == 7 || mon == 9 || mon == 11) && day > 31
+                || (mon == 3 || mon == 5 || mon == 8 || mon == 10) && day > 30 || mon == 1 && day > 29 && year % 4 == 0
+                || mon == 1 && day > 28 && year % 4 > 0 || day < 1) {
+            throw new MCRException("The day of the date is inadmissible.");
+        }
+        fields[0] = year;
+        fields[1] = mon;
+        fields[2] = day;
+        fields[3] = bc ? -1 : 1;
+        return fields;
+    }
+
+    /**
+     * This method convert a ancient date to a general Calendar value. The
      * syntax for the gregorian input is: <br />
      * <ul>
      * <li> [[[t]t.][m]m.][yyy]y [v. Chr.]</li>
      * <li> [[[t]t.][m]m.][yyy]y [AD|BC]</li>
      * <li> [-|AD|BC] [[[t]t.][m]m.][yyy]y</li>
+     * <li> [[[t]t/][m]m/][yyy]y [AD|BC]</li>
+     * <li> [-|AD|BC] [[[t]t/][m]m/][yyy]y</li>
      * <li> y[yyy][-m[m][-t[t]]] [v. Chr.]</li>
      * <li> y[yyy][-m[m][-t[t]]] [AD|BC]</li>
      * <li> [-|AD|BC] y[yyy][-m[m][-t[t]]]</li>
      * </ul>
      * 
-     * @param indatestr
+     * @param date_string
      *            the date as string.
      * @param last
      *            the value is true if the date should be filled with the
@@ -441,169 +355,32 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static GregorianCalendar getCalendarFromGregorianDate(String datestr, boolean last) throws MCRException {
+    private static GregorianCalendar getCalendarFromGregorianDate(String date_string, boolean last) throws MCRException {
         try {
-            // look for BC
-            datestr = datestr.toUpperCase(Locale.ROOT); //limited cases: AD, BC, V. CHR, N. CHR
-            boolean bc = false;
-            int start = 0;
-            int ende = datestr.length();
-            if (datestr.substring(0, 1).equals("-")) {
-                bc = true;
-                start = 1;
+            int fields[] = checkDateStringForJulianCalendar(date_string, last);
+            GregorianCalendar calendar = new GregorianCalendar();
+            calendar.set(fields[0], fields[1], fields[2]);
+            if (fields[3] == -1) {
+                calendar.set(GregorianCalendar.ERA, GregorianCalendar.BC);
             } else {
-                if (datestr.length() > 2) {
-                    int i = datestr.indexOf("AD");
-                    if (i != -1) {
-                        if (i == 0) {
-                            bc = false;
-                            start = 2;
-                        } else {
-                            bc = false;
-                            start = 0;
-                            ende = i - 1;
-                        }
-                    }
-                    i = datestr.indexOf("BC");
-                    if (i != -1) {
-                        if (i == 0) {
-                            bc = true;
-                            start = 2;
-                        } else {
-                            bc = true;
-                            start = 0;
-                            ende = i - 1;
-                        }
-                    }
-                }
-                if (datestr.length() > 7) {
-                    int i = datestr.indexOf("N. CHR");
-                    if (i != -1) {
-                        if (i == 0) {
-                            bc = false;
-                            start = 7;
-                        } else {
-                            bc = false;
-                            start = 0;
-                            ende = i - 1;
-                        }
-                    }
-                    i = datestr.indexOf("V. CHR");
-                    if (i != -1) {
-                        if (i == 0) {
-                            bc = true;
-                            start = 7;
-                        } else {
-                            bc = true;
-                            start = 0;
-                            ende = i - 1;
-                        }
-                    }
-                }
+                calendar.set(GregorianCalendar.ERA, GregorianCalendar.AD);
             }
-            datestr = datestr.substring(start, ende).trim();
-
-            // german or ISO?
-            start = 0;
-            boolean iso = false;
-            String token = ".";
-            if (datestr.indexOf("-", start + 1) != -1) {
-                iso = true;
-                token = "-";
-            }
-            // only a year?
-            int firstdot = datestr.indexOf(token, start + 1);
-            int secdot = -1;
-            if (firstdot != -1) {
-                secdot = datestr.indexOf(token, firstdot + 1);
-            }
-            int day = 0;
-            int mon = 0;
-            int year = 0;
-            if (secdot != -1) {
-                if (iso) {
-                    year = Integer.parseInt(datestr.substring(start, firstdot));
-                    mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot)) - 1;
-                    day = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
-                } else {
-                    day = Integer.parseInt(datestr.substring(start, firstdot));
-                    mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot)) - 1;
-                    year = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
-                }
-
-                if (year == 1582 && mon == 9 && day >= 5 && day < 15) {
-                    day = 15;
-                } // the problem on the year 1582
-            } else {
-                if (firstdot != -1) {
-                    if (iso) {
-                        year = Integer.parseInt(datestr.substring(start, firstdot));
-                        mon = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length())) - 1;
-                    } else {
-                        mon = Integer.parseInt(datestr.substring(start, firstdot)) - 1;
-                        year = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length()));
-                    }
-                    if (last) {
-                        if (mon == 0 || mon == 2 || mon == 4 || mon == 6 || mon == 7 || mon == 9 || mon == 11) {
-                            day = 31;
-                        }
-                        if (mon == 1) {
-                            day = 28;
-                        }
-
-                        if (mon == 3 || mon == 5 || mon == 8 || mon == 10) {
-                            day = 30;
-                        }
-
-                    } else {
-                        day = 1;
-                    }
-                } else {
-                    year = Integer.parseInt(datestr.substring(start, datestr.length()));
-                    if (last) {
-                        mon = 11;
-                        day = 31;
-                    } else {
-                        mon = 0;
-                        day = 1;
-                    }
-                }
-            }
-            GregorianCalendar newdate = new GregorianCalendar();
-            // test of the monthly
-            if (mon > 11 || mon < 0) {
-
-                throw new MCRException("The month of the date is inadmissible.");
-            }
-
-            // Test of the daily
-            if ((mon == 0 || mon == 2 || mon == 4 || mon == 6 || mon == 7 || mon == 9 || mon == 11) && day > 31
-                    || (mon == 3 || mon == 5 || mon == 8 || mon == 10) && day > 30 || mon == 1 && day > 29 && year % 4 == 0 || mon == 1
-                    && day > 28 && year % 4 > 0 || day < 1) {
-                throw new MCRException("The day of the date is inadmissible.");
-            }
-            // set AD/BC
-            newdate.set(year, mon, day);
-            if (bc) {
-                newdate.set(GregorianCalendar.ERA, GregorianCalendar.BC);
-            } else {
-                newdate.set(GregorianCalendar.ERA, GregorianCalendar.AD);
-            }
-            newdate.add(Calendar.DATE, 0);
-            return newdate;
+            return calendar;
         } catch (Exception e) {
             throw new MCRException("The ancient gregorian date is false.", e);
         }
     }
 
     /**
-     * This method convert a JulianCalendar date to a GregorianCalendar value.
+     * This method convert a JulianCalendar date to a general Calendar value.
      * The syntax for the julian input is: <br />
      * <ul>
-     * <li> [[[t]t.][m]m.][yyy]y [v.Chr.]</li>
+     * <li> [[[t]t.][m]m.][yyy]y [v. Chr.|n. Chr.]</li>
      * <li> [[[t]t.][m]m.][yyy]y [AD|BC]</li>
      * <li> [-|AD|BC] [[[t]t.][m]m.][yyy]y</li>
-     * <li> y[yyy][-m[m][-t[t]]] [v.Chr.]</li>
+     * <li> [[[t]t/][m]m/][yyy]y [AD|BC]</li>
+     * <li> [-|AD|BC] [[[t]t/][m]m/][yyy]y</li>
+     * <li> y[yyy][-m[m][-t[t]]] [v. Chr.|n. Chr.]</li>
      * <li> y[yyy][-m[m][-t[t]]] [AD|BC]</li>
      * <li> [-|AD|BC] y[yyy][-m[m][-t[t]]]</li>
      * </ul>
@@ -620,207 +397,66 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static GregorianCalendar getCalendarFromJulianDate(String datestr, boolean last) throws MCRException {
+    private static Calendar getCalendarFromJulianDate(String date_string, boolean last) throws MCRException {
         try {
-            // look for v. Chr.
-            datestr = datestr.toUpperCase(Locale.ROOT); //limited cases: AD, BC, V. CHR, N. CHR
-            boolean bc = false;
-            int start = 0;
-            int ende = datestr.length();
-            if (datestr.substring(0, 1).equals("-")) {
-                bc = true;
-                start = 1;
+            int fields[] = checkDateStringForJulianCalendar(date_string, last);
+            Calendar calendar = new GregorianCalendar();
+            calendar.set(fields[0], fields[1], fields[2]);
+            if (fields[3] == -1) {
+                calendar.set(Calendar.ERA, GregorianCalendar.BC);
             } else {
-                if (datestr.length() > 2) {
-                    int i = datestr.indexOf("AD");
-                    if (i != -1) {
-                        if (i == 0) {
-                            bc = false;
-                            start = 2;
-                        } else {
-                            bc = false;
-                            start = 0;
-                            ende = i - 1;
-                        }
-                    }
-                    i = datestr.indexOf("BC");
-                    if (i != -1) {
-                        if (i == 0) {
-                            bc = true;
-                            start = 2;
-                        } else {
-                            bc = true;
-                            start = 0;
-                            ende = i - 1;
-                        }
-                    }
-                }
-                if (datestr.length() > 7) {
-                    int i = datestr.indexOf("N. CHR");
-                    if (i != -1) {
-                        if (i == 0) {
-                            bc = false;
-                            start = 7;
-                        } else {
-                            bc = false;
-                            start = 0;
-                            ende = i - 1;
-                        }
-                    }
-                    i = datestr.indexOf("V. CHR");
-                    if (i != -1) {
-                        if (i == 0) {
-                            bc = true;
-                            start = 7;
-                        } else {
-                            bc = true;
-                            start = 0;
-                            ende = i - 1;
-                        }
-                    }
-                }
+                calendar.set(Calendar.ERA, GregorianCalendar.AD);
             }
-            datestr = datestr.substring(start, ende).trim();
-
-            // german or ISO?
-            start = 0;
-            boolean iso = false;
-            String token = ".";
-
-            if (datestr.indexOf("-", start + 1) != -1) {
-                iso = true;
-                token = "-";
-            }
-
-            // only a year
-            int firstdot = datestr.indexOf(token, start + 1);
-            int secdot = -1;
-            if (firstdot != -1) {
-                secdot = datestr.indexOf(token, firstdot + 1);
-            }
-
-            int day = 0;
-            int mon = 0;
-            int year = 0;
-            int TD = 0; // day for correction
-            if (secdot != -1) {
-                try {
-                    if (iso) {
-                        year = Integer.parseInt(datestr.substring(start, firstdot));
-                        mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot)) - 1;
-                        day = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
-                    } else {
-                        day = Integer.parseInt(datestr.substring(start, firstdot));
-                        mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot)) - 1;
-                        year = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
-                    }
-                    // Change Julian to Gregorian
-                    int jh;
-                    if (year % 100 == 0 && mon <= 2) {
-                        jh = (year - 1) / 100;
-                    } else {
-                        jh = year / 100;
-                    }
-                    int a = jh / 4;
-                    int b = jh % 4;
-                    TD = 3 * a + b - 2;
-                    if (year == 1582 && mon == 8 && day > 24) {
-                        mon = 9;
-                        day = day + TD + 5 - day;
-                        TD = 0;
-                    }
-                    if (year == 1582 && mon == 9 && day < 5) {
-                        day = day + TD + 5 - day;
-                        TD = 0;
-                    }
-                    if (year == 1582 && mon == 9 && day >= 5 && day < 15) {
-                        day = day + TD;
-                        TD = 0;
-                    }
-                } catch (Exception ex) {
-                }
-            } else {
-                if (firstdot != -1) {
-                    if (iso) {
-                        year = Integer.parseInt(datestr.substring(start, firstdot));
-                        mon = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length())) - 1;
-                    } else {
-                        mon = Integer.parseInt(datestr.substring(start, firstdot)) - 1;
-                        year = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length()));
-                    }
-
-                    if (last) {
-                        if (mon == 0 || mon == 2 || mon == 4 || mon == 6 || mon == 7 || mon == 9 || mon == 11) {
-                            day = 31;
-                        }
-
-                        if (mon == 1) {
-                            day = 28;
-                        }
-
-                        if (mon == 3 || mon == 5 || mon == 8 || mon == 10) {
-                            day = 30;
-                        }
-
-                    } else {
-                        day = 1;
-                    }
-
-                } else {
-                    year = Integer.parseInt(datestr.substring(start, datestr.length()));
-
-                    if (last) {
-                        mon = 11;
-                        day = 31;
-                    } else {
-                        mon = 0;
-                        day = 1;
-                    }
-                }
-            }
-            // test of the monthly
-            if (mon > 11 || mon < 0) {
-                throw new MCRException("The month of the date is inadmissible.");
-            }
-
-            // Test of the daily
-            if ((mon == 0 || mon == 2 || mon == 4 || mon == 6 || mon == 7 || mon == 9 || mon == 11) && day > 31
-                    || (mon == 3 || mon == 5 || mon == 8 || mon == 10) && day > 30 || mon == 1 && day > 29 && year % 4 == 0 || mon == 1
-                    && day > 28 && year % 4 > 0 || day < 1) {
-                throw new MCRException("The day of the date is inadmissible.");
-            }
-            // set AD/BC
-            GregorianCalendar newdate = new GregorianCalendar();
-            newdate.set(year, mon, day);
-            if (bc) {
-                newdate.set(GregorianCalendar.ERA, GregorianCalendar.BC);
-                TD = -TD - 4; // Calendar correction reversible
-            } else {
-                newdate.set(GregorianCalendar.ERA, GregorianCalendar.AD);
-
-            }
-
-            newdate.add(Calendar.DATE, TD); // Calendar correction
-            return (GregorianCalendar) newdate;
+            // correct data
+            int julian_day = calendar.get(Calendar.JULIAN_DAY);
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 6 && fields[3] == 1)
+                julian_day = 2299162;
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 7 && fields[3] == 1)
+                julian_day = 2299163;
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 8 && fields[3] == 1)
+                julian_day = 2299164;
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 9 && fields[3] == 1)
+                julian_day = 2299165;
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 10 && fields[3] == 1)
+                julian_day = 2299166;
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 11 && fields[3] == 1)
+                julian_day = 2299167;
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 12 && fields[3] == 1)
+                julian_day = 2299168;
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 13 && fields[3] == 1)
+                julian_day = 2299169;
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 14 && fields[3] == 1)
+                julian_day = 2299170;
+            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 15 && fields[3] == 1)
+                julian_day = 2299171;
+            if ((fields[0] > 1582 || (fields[0] == 1582 && fields[1] > 9) || (fields[0] == 1582 && fields[1] == 9 && fields[2] > 15))
+                    && fields[3] == 1)
+                julian_day += 10;
+            if ((fields[0] > 1700 || (fields[0] == 1700 && fields[1] >= 2)) && fields[3] == 1)
+                julian_day += 1;
+            if ((fields[0] > 1800 || (fields[0] == 1800 && fields[1] >= 2)) && fields[3] == 1)
+                julian_day += 1;
+            if ((fields[0] > 1900 || (fields[0] == 1900 && fields[1] >= 2)) && fields[3] == 1)
+                julian_day += 1;
+            if ((fields[0] > 2100 || (fields[0] == 2100 && fields[1] >= 2)) && fields[3] == 1)
+                julian_day += 1;
+            calendar.set(Calendar.JULIAN_DAY, julian_day);
+            return calendar;
         } catch (Exception e) {
             throw new MCRException("The ancient julian date is false.", e);
         }
     }
 
     /**
-     * This method convert a IslamicCalendar date to a IslamicCalendar value.
+     * This method convert a islamic calendar date to a IslamicCalendar valuei civil mode.
      * The syntax for the islamic input is: <br />
      * <ul>
-     * <li> [[[t]t.][m]m.][yyy]y [v.]H.</li>
-     * <li> [[[t]t.][m]m.][yyy]y [b.]H.</li>
-     * <li> [-] [[[t]t.][m]m.][yyy]y</li>
+     * <li> [[[t]t.][m]m.][yyy]y [H.|h.]</li>
      * <li> [.\u0647 | .\u0647 .\u0642] [[[t]t.][m]m.][yyy]y</li>
-     * <li> y[yyy][-m[m][-t[t]]] [v.]H.</li>
-     * <li> y[yyy][-m[m][-t[t]]] [b.]H.</li>
-     * <li> [-] y[yyy][-m[m][-t[t]]]</li>
+     * <li> y[yyy][-m[m][-t[t]]] H.|h.</li>
      * </ul>
      * 
-     * @param datestr
+     * @param date_string
      *            the date as string.
      * @param last
      *            the value is true if the date should be filled with the
@@ -831,99 +467,67 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static IslamicCalendar getCalendarFromIslamicDate(String datestr, boolean last) {
+    private static IslamicCalendar getCalendarFromIslamicDate(String date_string, boolean last) {
         try {
-            // test before Hidschra
-            boolean bh = false;
+            date_string = date_string.toUpperCase(Locale.ROOT);
             int start = 0;
-            int ende = datestr.length();
-            if (datestr.substring(0, 1).equals("-")) {
-                bh = true;
-                start = 1;
-            } else {
-                if (datestr.length() > 4) {
-                    int i = datestr.indexOf("v.H.");
+            int ende = date_string.length();
+            int i = date_string.indexOf("H.");
+            if (i != -1) {
+                ende = i;
+            }
+            if (date_string.length() > 10) {
+                i = date_string.indexOf(".\u0647.\u0642");
+                if (i != -1) {
+                    start = 3;
+                } else {
+                    i = date_string.indexOf(".\u0647");
                     if (i != -1) {
-                        bh = true;
-                        start = 0;
-                        ende = i - 1;
-                    }
-                    i = datestr.indexOf("b.H.");
-                    if (i != -1) {
-                        bh = true;
-                        start = 0;
-                        ende = i - 1;
-                    }
-                    if (!bh) {
-                        i = datestr.indexOf("H.");
-                        if (i != -1) {
-                            bh = false;
-                            start = 0;
-                            ende = i;
-                        }
-                        if (datestr.length() > 10) {
-
-                            i = datestr.indexOf(".\u0647.\u0642");
-                            if (i != -1) {
-                                if (i == 0) {
-                                    bh = true;
-                                    start = 4;
-                                }
-                            }
-                        }
-                        if (!bh) {
-                            i = datestr.indexOf(".\u0647");
-                            if (i != -1) {
-                                if (i == 0) {
-                                    bh = false;
-                                    start = 2;
-                                }
-                            }
-                        }
+                        start = 2;
                     }
                 }
             }
 
-            datestr = datestr.substring(start, ende).trim();
+            date_string = date_string.substring(start, ende).trim();
 
             // german or ISO?
             start = 0;
             boolean iso = false;
             String token = ".";
 
-            if (datestr.indexOf("-", start + 1) != -1) {
+            if (date_string.indexOf("-", start + 1) != -1) {
                 iso = true;
                 token = "-";
             }
             // 
-            int firstdot = datestr.indexOf(token, start + 1);
+            int firstdot = date_string.indexOf(token, start + 1);
             int secdot = -1;
 
             if (firstdot != -1) {
-                secdot = datestr.indexOf(token, firstdot + 1);
+                secdot = date_string.indexOf(token, firstdot + 1);
             }
 
-            int day = 0;
+            int day = 1;
             int mon = 0;
             int year = 0;
             if (secdot != -1) { // day month year
                 if (iso) {
-                    year = Integer.parseInt(datestr.substring(start, firstdot));
-                    mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot)) - 1;
-                    day = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
+                    year = Integer.parseInt(date_string.substring(start, firstdot));
+                    mon = Integer.parseInt(date_string.substring(firstdot + 1, secdot)) - 1;
+                    day = Integer.parseInt(date_string.substring(secdot + 1, date_string.length()));
                 } else {
-                    day = Integer.parseInt(datestr.substring(start, firstdot));
-                    mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot)) - 1;
-                    year = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
+                    day = Integer.parseInt(date_string.substring(start, firstdot));
+                    mon = Integer.parseInt(date_string.substring(firstdot + 1, secdot)) - 1;
+                    year = Integer.parseInt(date_string.substring(secdot + 1, date_string.length()));
                 }
             } else {
                 if (firstdot != -1) { // month year
                     if (iso) {
-                        year = Integer.parseInt(datestr.substring(start, firstdot));
-                        mon = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length())) - 1;
+                        year = Integer.parseInt(date_string.substring(start, firstdot));
+                        mon = Integer.parseInt(date_string.substring(firstdot + 1, date_string.length())) - 1;
                     } else {
-                        mon = Integer.parseInt(datestr.substring(start, firstdot)) - 1;
-                        year = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length()));
+                        mon = Integer.parseInt(date_string.substring(start, firstdot)) - 1;
+                        year = Integer.parseInt(date_string.substring(firstdot + 1, date_string.length()));
                     }
 
                     if (last) {
@@ -934,18 +538,13 @@ public class MCRCalendar {
                             day = 29;
                         }
 
-                    } else {
-                        day = 1;
                     }
                 } else { // year
-                    year = Integer.parseInt(datestr.substring(start, datestr.length()));
+                    year = Integer.parseInt(date_string.substring(start, date_string.length()));
 
                     if (last) {
                         mon = 11;
                         day = 29;
-                    } else {
-                        mon = 0;
-                        day = 1;
                     }
                 }
             }
@@ -957,17 +556,12 @@ public class MCRCalendar {
             if (day > 30 || mon % 2 == 1 && mon < 11 && day > 29 || day < 1) {
                 throw new MCRException("The day of the date is inadmissible.");
             }
-            if (bh) {
-                year = -year + 1; // if before Hidschra
-            }
-            IslamicCalendar ical = new IslamicCalendar();
-            ical.set(year, mon, day);
-            ical.add(Calendar.DATE, 0); // Calendar correction
-
-            return ical;
-
+            IslamicCalendar calendar = new IslamicCalendar();
+            calendar.setCivil(true);
+            calendar.set(year, mon, day);
+            return calendar;
         } catch (Exception e) {
-            throw new MCRException("The ancient islamic is false.", e);
+            throw new MCRException("The ancient islamic date is false.", e);
         }
 
     }
@@ -1066,18 +660,121 @@ public class MCRCalendar {
     }
 
     /**
+     * Check the date string for ethiopic or coptic calendar
+     * 
+     * @param date_string the date string
+     * @param last the flag for first / last day
+     * @return an integer array with [0] = year; [1] = month; [2] = day; [3] = era : -1 = B.M.: +1 = A.M.
+     * @throws Exception
+     */
+    private static int[] checkDateStringForCopticCalendar(String date_string, boolean last) {
+        int[] fields = new int[4];
+        date_string = date_string.trim();
+        // test before Martyrium
+        boolean bm = false;
+        int start = 0;
+        int ende = date_string.length();
+        ende = date_string.length();
+        if (date_string.length() > 4) {
+            int i = date_string.indexOf("A.M.");
+            if (i != -1) {
+                start = 0;
+                ende = i - 1;
+            }
+            i = date_string.indexOf("a.M.");
+            if (i != -1) {
+                start = 0;
+                ende = i - 1;
+            }
+            i = date_string.indexOf("E.E.");
+            if (i != -1) {
+                start = 0;
+                ende = i - 1;
+            }
+        }
+        date_string = date_string.substring(start, ende).trim();
+
+        // german or ISO?
+        start = 0;
+        boolean iso = false;
+        String token = ".";
+
+        if (date_string.indexOf("-", start + 1) != -1) {
+            iso = true;
+            token = "-";
+        }
+        // 
+        int firstdot = date_string.indexOf(token, start + 1);
+        int secdot = -1;
+
+        if (firstdot != -1) {
+            secdot = date_string.indexOf(token, firstdot + 1);
+        }
+        int day = 1;
+        int mon = 0;
+        int year = 0;
+        if (secdot != -1) { // day, mon, year
+            if (iso) {
+                year = Integer.parseInt(date_string.substring(start, firstdot));
+                mon = Integer.parseInt(date_string.substring(firstdot + 1, secdot)) - 1;
+                day = Integer.parseInt(date_string.substring(secdot + 1, date_string.length()));
+            } else {
+                day = Integer.parseInt(date_string.substring(start, firstdot));
+                mon = Integer.parseInt(date_string.substring(firstdot + 1, secdot)) - 1;
+                year = Integer.parseInt(date_string.substring(secdot + 1, date_string.length()));
+            }
+        } else {
+            if (firstdot != -1) { // mon, year
+                if (iso) {
+                    year = Integer.parseInt(date_string.substring(start, firstdot));
+                    mon = Integer.parseInt(date_string.substring(firstdot + 1, date_string.length())) - 1;
+                } else {
+                    mon = Integer.parseInt(date_string.substring(start, firstdot)) - 1;
+                    year = Integer.parseInt(date_string.substring(firstdot + 1, date_string.length()));
+                }
+
+                if (last) {
+                    if (mon <= 11) {
+                        day = 30;
+                    } else {
+                        day = 5;
+                    }
+                }
+            } else { // year
+                year = Integer.parseInt(date_string.substring(start, date_string.length()));
+
+                if (last) {
+                    mon = 12;
+                    day = 5;
+                }
+            }
+        }
+        // test of the monthly
+        if (mon > 12 || mon < 0) {
+            throw new MCRException("The month of the date is inadmissible.");
+        }
+        // Test of the daily
+        if (day > 30 || day < 1 || day > 6 && mon == 12) {
+            throw new MCRException("The day of the date is inadmissible.");
+        }
+        if (bm) {
+            year = -year + 1; // if before Matyrium
+        }
+        fields[0] = year;
+        fields[1] = mon;
+        fields[2] = day;
+        return fields;
+    }
+    
+    /**
      * This method convert a CopticCalendar date to a CopticCalendar value. The
      * syntax for the coptic input is: <br />
      * <ul>
      * <li> [[[t]t.][m]m.][yyy]y [[A.|a.]M.]</li>
-     * <li> [[[t]t.][m]m.][yyy]y [B.M.]</li>
-     * <li> [-] [[[t]t.][m]m.][yyy]y</li>
      * <li> y[yyy][-m[m][-t[t]]] [A.|a.]M.]</li>
-     * <li> y[yyy][-m[m][-t[t]]] [B.M.]</li>
-     * <li> [-] y[yyy][-m[m][-t[t]]]</li>
      * </ul>
      * 
-     * @param datestr
+     * @param date_string
      *            the date as string.
      * @param last
      *            the value is true if the date should be filled with the
@@ -1088,123 +785,44 @@ public class MCRCalendar {
      * @exception a
      *                MCRException if parsing has an error
      */
-    private static CopticCalendar getCalendarFromCopticDate(String datestr, boolean last) {
+    private static CopticCalendar getCalendarFromCopticDate(String date_string, boolean last) {
         try {
-            datestr = datestr.trim();
-            // test before Martyrium
-            boolean bm = false;
-            int start = 0;
-            int ende = datestr.length();
-            if (datestr.substring(0, 1).equals("-")) {
-                bm = true;
-                start = 1;
-            }
-            datestr = datestr.substring(start).trim();
-            start = 0;
-            ende = datestr.length();
-            if (datestr.length() > 4) {
-                int i = datestr.indexOf("B.M.");
-                if (i != -1) {
-                    bm = true;
-                    start = 0;
-                    ende = i - 1;
-                }
-                i = datestr.indexOf("A.M.");
-                if (i != -1) {
-                    start = 0;
-                    ende = i - 1;
-                }
-                i = datestr.indexOf("a.M.");
-                if (i != -1) {
-                    start = 0;
-                    ende = i - 1;
-                }
-            }
-
-            datestr = datestr.substring(start, ende).trim();
-
-            // german or ISO?
-            start = 0;
-            boolean iso = false;
-            String token = ".";
-
-            if (datestr.indexOf("-", start + 1) != -1) {
-                iso = true;
-                token = "-";
-            }
-            // 
-            int firstdot = datestr.indexOf(token, start + 1);
-            int secdot = -1;
-
-            if (firstdot != -1) {
-                secdot = datestr.indexOf(token, firstdot + 1);
-            }
-
-            int day = 0;
-            int mon = 0;
-            int year = 0;
-
-            if (secdot != -1) { // day, mon, year
-                if (iso) {
-                    year = Integer.parseInt(datestr.substring(start, firstdot));
-                    mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot)) - 1;
-                    day = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
-                } else {
-                    day = Integer.parseInt(datestr.substring(start, firstdot));
-                    mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot)) - 1;
-                    year = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
-                }
-            } else {
-                if (firstdot != -1) { // mon, year
-                    if (iso) {
-                        year = Integer.parseInt(datestr.substring(start, firstdot));
-                        mon = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length())) - 1;
-                    } else {
-                        mon = Integer.parseInt(datestr.substring(start, firstdot)) - 1;
-                        year = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length()));
-                    }
-
-                    if (last) {
-                        if (mon <= 11) {
-                            day = 30;
-                        } else {
-                            day = 5;
-                        }
-                    } else {
-                        day = 1;
-                    }
-                } else { // year
-                    year = Integer.parseInt(datestr.substring(start, datestr.length()));
-
-                    if (last) {
-                        mon = 12;
-                        day = 5;
-                    } else {
-                        mon = 0;
-                        day = 1;
-                    }
-                }
-            }
-            // test of the monthly
-            if (mon > 12 || mon < 0) {
-                throw new MCRException("The month of the date is inadmissible.");
-            }
-            // Test of the daily
-            if (day > 30 || day < 1 || day > 6 && mon == 12) {
-                throw new MCRException("The day of the date is inadmissible.");
-            }
-            if (bm) {
-                year = -year + 1; // if before Matyrium
-            }
-            CopticCalendar ccal = new CopticCalendar();
-            ccal.set(year, mon, day);
-
-            ccal.add(Calendar.DATE, 0); // Calendar correction
-
-            return ccal;
-
+            int fields[] = checkDateStringForCopticCalendar(date_string, last);
+            CopticCalendar calendar = new CopticCalendar();
+            calendar.set(fields[0], fields[1], fields[2]);
+            return calendar;
         } catch (Exception e) {
-            throw new MCRException("The ancient coptic date is false.", e);
+            throw new MCRException("The ancient coptic calendar date is false.", e);
+        }
+    }
+
+    /**
+     * This method convert a EthiopicCalendar date to a EthiopicCalendar value.
+     * The syntax for the ethiopic input is: <br />
+     * <ul>
+     * <li> [[[t]t.][m]m.][yyy]y [E.E.]</li>
+     * <li> y[yyy][-m[m][-t[t]]] [E.E.]</li>
+     * </ul>
+     * 
+     * @param datestr
+     *            the date as string.
+     * @param last
+     *            the value is true if the date should be filled with the
+     *            highest value of month or day like 13 or 30 else it fill the
+     *            date with the lowest value 1 for month and day.
+     * 
+     * @return the EthiopicCalendar date value or null if an error was occurred.
+     * @exception a
+     *                MCRException if parsing has an error
+     */
+    private static EthiopicCalendar getCalendarFromEthiopicDate(String date_string, boolean last) {
+        try {
+            int fields[] = checkDateStringForCopticCalendar(date_string, last);
+            EthiopicCalendar calendar = new EthiopicCalendar();
+            calendar.set(fields[0], fields[1], fields[2]);
+            return calendar;
+        } catch (Exception e) {
+            throw new MCRException("The ancient ethiopic calendar date is false.", e);
         }
     }
 
@@ -1334,135 +952,6 @@ public class MCRCalendar {
     }
 
     /**
-     * This method convert a EthiopicCalendar date to a EthiopicCalendar value.
-     * The syntax for the ethiopic input is: <br />
-     * <ul>
-     * <li> [[[t]t.][m]m.][yyy]y [E.E.]</li>
-     * <li> [-] [[[t]t.][m]m.][yyy]y</li>
-     * <li> y[yyy][-m[m][-t[t]]] [E.E.]</li>
-     * <li> [-] y[yyy][-m[m][-t[t]]]</li>
-     * </ul>
-     * 
-     * @param datestr
-     *            the date as string.
-     * @param last
-     *            the value is true if the date should be filled with the
-     *            highest value of month or day like 13 or 30 else it fill the
-     *            date with the lowest value 1 for month and day.
-     * 
-     * @return the EthiopicCalendar date value or null if an error was occurred.
-     * @exception a
-     *                MCRException if parsing has an error
-     */
-    private static EthiopicCalendar getCalendarFromEthiopicDate(String datestr, boolean last) {
-        try {
-            datestr = datestr.trim();
-            // test before Christi
-            boolean bc = false;
-            int start = 0;
-            int ende = datestr.length();
-            if (datestr.substring(0, 1).equals("-")) {
-                bc = true;
-                start = 1;
-            }
-            datestr = datestr.substring(start).trim();
-            start = 0;
-            ende = datestr.length();
-            if (datestr.length() > 4) {
-                int i = datestr.indexOf("E.E.");
-                if (i != -1) {
-                    start = 0;
-                    ende = i - 1;
-                }
-                datestr = datestr.substring(start, ende).trim();
-            }
-
-            // german or ISO?
-            start = 0;
-            boolean iso = false;
-            String token = ".";
-
-            if (datestr.indexOf("-", start + 1) != -1) {
-                iso = true;
-                token = "-";
-            }
-            // 
-            int firstdot = datestr.indexOf(token, start + 1);
-            int secdot = -1;
-
-            if (firstdot != -1) {
-                secdot = datestr.indexOf(token, firstdot + 1);
-            }
-
-            int day = 0;
-            int mon = 0;
-            int year = 0;
-
-            if (secdot != -1) { // day, mon, year
-                if (iso) {
-                    year = Integer.parseInt(datestr.substring(start, firstdot));
-                    mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot)) - 1;
-                    day = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
-                } else {
-                    day = Integer.parseInt(datestr.substring(start, firstdot));
-                    mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot)) - 1;
-                    year = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
-                }
-            } else {
-                if (firstdot != -1) { // mon, year
-                    if (iso) {
-                        year = Integer.parseInt(datestr.substring(start, firstdot));
-                        mon = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length())) - 1;
-                    } else {
-                        mon = Integer.parseInt(datestr.substring(start, firstdot)) - 1;
-                        year = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length()));
-                    }
-
-                    if (last) {
-                        if (mon <= 11) {
-                            day = 30;
-                        } else {
-                            day = 5;
-                        }
-                    } else {
-                        day = 1;
-                    }
-                } else { // year
-                    year = Integer.parseInt(datestr.substring(start, datestr.length()));
-
-                    if (last) {
-                        mon = 12;
-                        day = 5;
-                    } else {
-                        mon = 0;
-                        day = 1;
-                    }
-                }
-            }
-            // test of the monthly
-            if (mon > 12 || mon < 0) {
-                throw new MCRException("The month of the date is inadmissible.");
-            }
-            // Test of the daily
-            if (day > 30 || day < 1 || day > 6 && mon == 12) {
-                throw new MCRException("The day of the date is inadmissible.");
-            }
-            if (bc) {
-                year = -year + 1; // if before Christi
-            }
-            EthiopicCalendar ecal = new EthiopicCalendar();
-            ecal.set(year, mon, day);
-
-            ecal.add(Calendar.DATE, 0); // Calendar correction
-
-            return ecal;
-
-        } catch (Exception e) {
-            throw new MCRException("The ancient ethiopic date is false.", e);
-        }
-    }
-
-    /**
      * This method convert a BuddhistCalendar date to a IslamicCalendar value.
      * The syntax for the buddhist input is: <br />
      * <ul>
@@ -1581,8 +1070,8 @@ public class MCRCalendar {
 
             // Test of the daily
             if ((mon == 0 || mon == 2 || mon == 4 || mon == 6 || mon == 7 || mon == 9 || mon == 11) && day > 31
-                    || (mon == 3 || mon == 5 || mon == 8 || mon == 10) && day > 30 || mon == 1 && day > 29 && year % 4 == 0 || mon == 1
-                    && day > 28 && year % 4 > 0 || day < 1) {
+                    || (mon == 3 || mon == 5 || mon == 8 || mon == 10) && day > 30 || mon == 1 && day > 29
+                    && year % 4 == 0 || mon == 1 && day > 28 && year % 4 > 0 || day < 1) {
                 throw new MCRException("The day of the date is inadmissible.");
             }
             if (bb) {
@@ -2127,50 +1616,106 @@ public class MCRCalendar {
      * 
      * @param date
      *            an instance of a Calendar
-     * @return the Julian Day number
+     * @return the Julian Day number as Integer
      */
     public static int getJulianDayNumber(Calendar date) {
         return date.get(Calendar.JULIAN_DAY);
     }
 
     /**
-     * This method returns the date as string in format 'dd.MM.yyyy G'.
+     * This method return the Julian Day number for a given Calendar instance.
      * 
      * @param date
-     *            the GregorianCalendar date
+     *            an instance of a Calendar
+     * @return the Julian Day number as String
+     */
+    public static String getJulianDayNumberAsString(Calendar date) {
+        return Integer.toString(date.get(Calendar.JULIAN_DAY));
+    }
+
+    /**
+     * This method returns the date as string in format 'yy-MM-dd G'.
+     * 
+     * @param date
+     *            the Calendar date
      * 
      * @return the date string
      */
-    public static String getDateToFormattedString(Calendar date) {
-        return getDateToFormattedString(date, "dd.MM.yyyy G");
+    public static String getCalendarDateToFormattedString(Calendar calendar) {
+        if (calendar instanceof IslamicCalendar) {
+            return getCalendarDateToFormattedString(calendar, "dd.MM.yyyy");
+        } else if (calendar instanceof GregorianCalendar) {
+            return getCalendarDateToFormattedString(calendar, "yyyy-MM-dd G");
+        }
+        return getCalendarDateToFormattedString(calendar, "yyyy-MM-dd G");
     }
 
     /**
      * This method returns the date as string.
      * 
-     * @param date
-     *            the GregorianCalendar date
+     * @param calendar
+     *            the Calendar date
      * @param format
      *            the format of the date as String
      * 
      * @return the date string in the format. If the format is wrong dd.MM.yyyy
      *         G is set. If the date is wrong an empty string will be returned.
+     *         The output is depending on calendar type. For Calendar it will use 
+     *         the Julian Calendar to 05.10.1582. Then it use the Gregorian Calendar.
      */
-    public static String getDateToFormattedString(Calendar date, String format) {
-        if (date == null || format == null || format.trim().length() == 0) {
+    public static String getCalendarDateToFormattedString(Calendar calendar, String format) {
+        if (calendar == null || format == null || format.trim().length() == 0) {
             return "";
         }
         SimpleDateFormat formatter = null;
         try {
-            formatter = new SimpleDateFormat(format, new Locale("en"));
+            if (calendar instanceof IslamicCalendar) {
+                formatter = new SimpleDateFormat(format, new Locale("en"));
+            } else if (calendar instanceof GregorianCalendar) {
+                formatter = new SimpleDateFormat(format, new Locale("en"));
+            } else {
+                formatter = new SimpleDateFormat(format, new Locale("en"));
+            }
         } catch (Exception e) {
             formatter = new SimpleDateFormat("dd.MM.yyyy G", new Locale("en"));
         }
         try {
-            formatter.setCalendar(date);
-            return formatter.format(date.getTime());
+            formatter.setCalendar(calendar);
+            if (calendar instanceof IslamicCalendar) {
+                return formatter.format(calendar.getTime()) + " h.";
+            } else if (calendar instanceof CopticCalendar) {
+                return formatter.format(calendar.getTime()) + " A.M.";
+            } else if (calendar instanceof EthiopicCalendar) {
+                return formatter.format(calendar.getTime()) + " E.E.";
+            } else {
+                return formatter.format(calendar.getTime());
+            }
         } catch (Exception e) {
             return "";
+        }
+    }
+
+    /**
+     * This method returns the calendar type as string.
+     * 
+     * @param calendar
+     *            the Calendar date
+     * @return The clendar type as string. If Calendar is empty an empty string will be returned.
+     */
+    public static String getCalendarTypeString(Calendar calendar) {
+        if (calendar == null) {
+            return "";
+        }
+        if (calendar instanceof IslamicCalendar) {
+            return TAG_ISLAMIC;
+        } else if (calendar instanceof CopticCalendar) {
+            return TAG_COPTIC;
+        } else if (calendar instanceof EthiopicCalendar) {
+            return TAG_ETHIOPIC;
+        } else if (calendar instanceof GregorianCalendar) {
+            return TAG_GREGORIAN;
+        } else {
+            return TAG_JULIAN;
         }
     }
 
