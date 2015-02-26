@@ -24,7 +24,6 @@
 package org.mycore.services.fieldquery;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -43,6 +42,7 @@ import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.parsers.bool.MCRParseException;
 import org.mycore.parsers.bool.MCRSetCondition;
 
+import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.GregorianCalendar;
 
 /**
@@ -338,19 +338,19 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
      * @return the julian day number, as a String
      */
     private static String normalizeHistoryDate(String operator, String date) {
-        GregorianCalendar cal = null;
+        Calendar calendar = null;
         if (operator.equals(">")) {
-            cal = MCRCalendar.getGregorianHistoryDate(date, true);
+            calendar = MCRCalendar.getHistoryDateAsCalendar(date, true, "gregorian");
         }
         if (operator.equals("<")) {
-            cal = MCRCalendar.getGregorianHistoryDate(date, false);
+            calendar = MCRCalendar.getHistoryDateAsCalendar(date, false, "gregorian");
         }
         if (operator.equals(">=")) {
-            cal = MCRCalendar.getGregorianHistoryDate(date, false);
+            calendar = MCRCalendar.getHistoryDateAsCalendar(date, false, "gregorian");
         }
         if (operator.equals("<=")) {
-            cal = MCRCalendar.getGregorianHistoryDate(date, true);
+            calendar = MCRCalendar.getHistoryDateAsCalendar(date, true, "gregorian");
         }
-        return String.valueOf(MCRCalendar.getJulianDayNumber(cal));
+        return String.valueOf(MCRCalendar.getJulianDayNumber(calendar));
     }
 }

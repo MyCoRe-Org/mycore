@@ -76,7 +76,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     public MCRMetaHistoryDate() {
         super();
         texts = new ArrayList<MCRMetaHistoryDateText>();
-        calendar = MCRCalendar.CALENDARS_INPUT[0];
+        calendar = MCRCalendar.CALENDARS_LIST.get(0);
         setDefaultVon();
         setDefaultBis();
     }
@@ -101,7 +101,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     public MCRMetaHistoryDate(String set_subtag, String set_type, int set_inherted) throws MCRException {
         super(set_subtag, null, set_type, set_inherted);
         texts = new ArrayList<MCRMetaHistoryDateText>();
-        calendar = MCRCalendar.CALENDARS_INPUT[0];
+        calendar = MCRCalendar.CALENDARS_LIST.get(0);
         setDefaultVon();
         setDefaultBis();
     }
@@ -231,51 +231,41 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      *            the calendar as String, one of CALENDARS.
      */
     public final void setCalendar(String calstr) {
-        if (calstr == null) {
+        if (calstr == null || calstr.trim().length() == 0 || (!MCRCalendar.CALENDARS_LIST.contains(calstr))) {
             calendar = MCRCalendar.TAG_GREGORIAN;
-            LOGGER.warn("The calendar field of MCRMeataHistoryDate is set to default " + MCRCalendar.TAG_GREGORIAN + ".");
+            LOGGER.warn("The calendar field of MCRMeataHistoryDate is set to default " + MCRCalendar.TAG_GREGORIAN
+                    + ".");
             return;
         }
-        for (String element : MCRCalendar.CALENDARS_INPUT) {
-            if (element.equals(calstr)) {
-                calendar = calstr;
-                return;
-            }
-        }
-        calendar = MCRCalendar.TAG_GREGORIAN;
-        LOGGER.warn("The calendar field of MCRMeataHistoryDate is set to default " + MCRCalendar.TAG_GREGORIAN + ".");
+        calendar = calstr;
     }
 
     /**
      * The method set the calendar String value.
      * 
-     * @param cal
+     * @param calendar
      *            the date of the calendar.
      */
-    public final void setCalendar(Calendar cal) {
-        if (cal instanceof GregorianCalendar) {
-            calendar = MCRCalendar.TAG_GREGORIAN;
-            return;
-        }
-        calendar = MCRCalendar.TAG_GREGORIAN;
+    public final void setCalendar(Calendar calendar) {
+        this.calendar = MCRCalendar.getCalendarTypeString(calendar);
     }
 
     /**
      * The method set the von values to the default.
      */
     public final void setDefaultVon() {
-        ivon = MCRCalendar.MIN_JULIAN_DAY_NUMBER;
         von = new GregorianCalendar();
         von.set(Calendar.JULIAN_DAY, MCRCalendar.MIN_JULIAN_DAY_NUMBER);
+        ivon = MCRCalendar.MIN_JULIAN_DAY_NUMBER;
     }
 
     /**
      * The method set the bis values to the default.
      */
     public final void setDefaultBis() {
-        ibis = MCRCalendar.MAX_JULIAN_DAY_NUMBER;
         bis = new GregorianCalendar();
         bis.set(Calendar.JULIAN_DAY, MCRCalendar.MAX_JULIAN_DAY_NUMBER);
+        ibis = MCRCalendar.MAX_JULIAN_DAY_NUMBER;
     }
 
     /**
@@ -284,50 +274,50 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * @param set_date
      *            the date of a ICU supported calendar.
      */
-    public final void setVonDate(Calendar set_date) {
-        if (set_date == null) {
+    public final void setVonDate(Calendar calendar) {
+        if (calendar == null) {
             setDefaultVon();
             LOGGER.warn("The calendar to set 'von' is null, default is set.");
-            return;
+        } else {
+            von = calendar;
+            ivon = von.get(Calendar.JULIAN_DAY);
         }
-        ivon = set_date.get(Calendar.JULIAN_DAY);
-        von = set_date;
-
     }
 
     /**
      * This method set the von to the given date.
      * 
-     * @param set_date
+     * @param date_string
      *            a date string
-     * @param calstr
+     * @param calendar_string
      *            the calendar as String, one of CALENDARS.
      */
-    public final void setVonDate(String set_date, String calstr) {
-        Calendar c = von;
+    public final void setVonDate(String date_string, String calendar_string) {
         try {
-            c = MCRCalendar.getGregorianHistoryDate(set_date, false, calstr);
+            von = MCRCalendar.getHistoryDateAsCalendar(date_string, false, calendar_string);
+            ivon = von.get(Calendar.JULIAN_DAY);
         } catch (Exception e) {
-            LOGGER.warn("The von date " + set_date + " for calendar " + calstr + " is false.");
-            c = null;
+            e.printStackTrace();
+            LOGGER.warn("The von date " + date_string + " for calendar " + calendar_string
+                    + " is false. Set to default!");
+            setDefaultVon();
         }
-        setVonDate(c);
     }
 
     /**
      * This method set the bis to the given date of a supported calendar.
      * 
-     * @param set_date
+     * @param calendar
      *            the date of a ICU supported calendar
      */
-    public final void setBisDate(Calendar set_date) {
-        if (set_date == null) {
+    public final void setBisDate(Calendar calendar) {
+        if (calendar == null) {
             setDefaultBis();
             LOGGER.warn("The calendar to set 'bis' is null, default is set.");
-            return;
+        } else {
+            bis = calendar;
+            ibis = bis.get(Calendar.JULIAN_DAY);
         }
-        ibis = set_date.get(Calendar.JULIAN_DAY);
-        bis = set_date;
     }
 
     /**
@@ -341,7 +331,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     public final void setBisDate(String set_date, String calstr) {
         Calendar c = bis;
         try {
-            c = MCRCalendar.getGregorianHistoryDate(set_date, true, calstr);
+            c = MCRCalendar.getHistoryDateAsCalendar(set_date, true, calstr);
         } catch (Exception e) {
             LOGGER.warn("The bis date " + set_date + " for calendar " + calstr + " is false.");
             c = null;
@@ -391,8 +381,8 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * 
      * @return the date
      */
-    public final String getVonToGregorianString() {
-        return MCRCalendar.getDateToFormattedString(von);
+    public final String getVonToString() {
+        return MCRCalendar.getCalendarDateToFormattedString(von);
     }
 
     /**
@@ -418,8 +408,8 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * 
      * @return the date
      */
-    public final String getBisToGregorianString() {
-        return MCRCalendar.getDateToFormattedString(bis);
+    public final String getBisToString() {
+        return MCRCalendar.getCalendarDateToFormattedString(bis);
     }
 
     /**
@@ -474,13 +464,14 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             elmt.setAttribute("lang", text.getLang(), Namespace.XML_NAMESPACE);
             elm.addContent(elmt);
         }
+        /** use gregorian for claendar string; wrong output; ToDo : get function for calendar string */
         elm.addContent(new org.jdom2.Element("calendar").addContent(calendar));
 
         elm.addContent(new org.jdom2.Element("ivon").addContent(Integer.toString(ivon)));
-        elm.addContent(new org.jdom2.Element("von").addContent(getVonToGregorianString()));
+        elm.addContent(new org.jdom2.Element("von").addContent(getVonToString()));
 
         elm.addContent(new org.jdom2.Element("ibis").addContent(Integer.toString(ibis)));
-        elm.addContent(new org.jdom2.Element("bis").addContent(getBisToGregorianString()));
+        elm.addContent(new org.jdom2.Element("bis").addContent(getBisToString()));
         return elm;
     }
 
@@ -546,13 +537,9 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             LOGGER.debug("Text / lang         = " + text.getText() + " / " + text.getLang());
         }
         LOGGER.debug("Calendar           = " + calendar);
-        if (calendar.equals(MCRCalendar.TAG_GREGORIAN)) {
-            LOGGER.debug("Von (String)       = " + getVonToGregorianString());
-        }
+        LOGGER.debug("Von (String)       = " + getVonToString());
         LOGGER.debug("Von (JulianDay)    = " + ivon);
-        if (calendar.equals(MCRCalendar.TAG_GREGORIAN)) {
-            LOGGER.debug("Bis (String)       = " + getBisToGregorianString());
-        }
+        LOGGER.debug("Bis (String)       = " + getBisToString());
         LOGGER.debug("Bis (JulianDay)    = " + ibis);
         LOGGER.debug("Stop");
         LOGGER.debug("");
