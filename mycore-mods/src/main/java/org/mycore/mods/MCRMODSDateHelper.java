@@ -22,85 +22,49 @@
 
 package org.mycore.mods;
 
+import static org.mycore.mods.MCRMODSDateFormat.DATE_LOCALE;
+import static org.mycore.mods.MCRMODSDateFormat.MODS_TIMEZONE;
+
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.Objects;
 
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.common.MCRISO8601Date;
+
+import com.google.common.base.MoreObjects;
 
 /**
  * Helper class to parse and build MODS date elements, see
  * http://www.loc.gov/standards/mods/userguide/generalapp.html#encoding
- *  
+ * 
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRMODSDateHelper {
 
-    private static final String ISO8601 = "iso8601";
-
-    private static final TimeZone MODS_TIMEZONE = TimeZone.getTimeZone("UTC");
-
-    private static final Locale DATE_LOCALE = Locale.ROOT;
-
-    private final static Map<String, String> formats = new HashMap<String, String>();
-
-    static {
-        formats.put(ISO8601, null);
-        formats.put("w3cdtf-10", "yyyy-MM-dd");
-        formats.put("w3cdtf-19", "yyyy-MM-dd'T'HH:mm:ss");
-        formats.put("marc-4", "yyyy");
-        formats.put("iso8601-4", "yyyy");
-        formats.put("iso8601-7", "yyyy-MM");
-        formats.put("iso8601-8", "yyyyMMdd");
-        formats.put("iso8601-15", "yyyyMMdd'T'HHmmss");
-
-        // Try to guess encoding from date length 
-        formats.put("unknown-4", "yyyy");
-        formats.put("unknown-8", "yyyyMMdd");
-        formats.put("unknown-10", "yyyy-MM-dd");
-        formats.put("unknown-19", "yyyy-MM-dd'T'HH:mm:ss");
-        formats.put("unknown-15", "yyyyMMdd'T'HHmmss");
-    }
-
     public static Date getDate(Element element) {
-        if (element == null)
+        if (element == null) {
             return null;
+        }
 
         String text = element.getTextTrim();
-        if ((text == null) || text.isEmpty())
+        if ((text == null) || text.isEmpty()) {
             return null;
+        }
 
         String encoding = element.getAttributeValue("encoding", "unknown").toLowerCase(DATE_LOCALE);
         String key = encoding + "-" + text.length();
-
-        String format = formats.get(key);
+        MCRMODSDateFormat format = MoreObjects.firstNonNull(MCRMODSDateFormat.getFormat(key),
+            MCRMODSDateFormat.getFormat(encoding));
         if (format == null) {
-            if (encoding.equals(ISO8601)) {
-                MCRISO8601Date isoDate = new MCRISO8601Date(text);
-                return isoDate.getDate();
-            }
             throw reportParseException(encoding, text, null);
         }
-
         try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat(format, DATE_LOCALE);
-            dateFormat.setTimeZone(MODS_TIMEZONE);
-            return dateFormat.parse(text);
+            return format.parseDate(text);
         } catch (ParseException ex) {
             throw reportParseException(encoding, text, ex);
         }
-    }
-
-    private static MCRException reportParseException(String encoding, String text, ParseException ex) {
-        String msg = "Unable to parse MODS date encoded " + encoding + " " + text;
-        return new MCRException(msg, ex);
     }
 
     public static GregorianCalendar getCalendar(Element element) {
@@ -108,29 +72,47 @@ public class MCRMODSDateHelper {
         if (date == null) {
             return null;
         }
-
         GregorianCalendar cal = new GregorianCalendar(MODS_TIMEZONE, DATE_LOCALE);
         cal.setTime(date);
         return cal;
     }
 
+    /**
+     * @deprecated use {@link #setDate(Element, Date, MCRMODSDateFormat)} instead
+     */
     public static void setDate(Element element, Date date, String encoding) {
-        String format = formats.get(encoding);
-        if (format != null) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat(format, DATE_LOCALE);
-            dateFormat.setTimeZone(MODS_TIMEZONE);
-            String text = dateFormat.format(date);
-            element.setText(text);
-            encoding = encoding.split("-")[0];
-        } else {
-            MCRISO8601Date isoDate = new MCRISO8601Date();
-            isoDate.setDate(date);
-            element.setText(isoDate.getISOString());
-        }
-        element.setAttribute("encoding", encoding);
+        MCRMODSDateFormat format = Objects.requireNonNull(MCRMODSDateFormat.getFormat(encoding), "No such encoding: "
+            + encoding);
+        setDate(element, date, format);
     }
 
+    public static void setDate(Element element, Date date, MCRMODSDateFormat encoding) {
+        Objects.requireNonNull(encoding, "encoding is required: " + encoding);
+        element.setText(encoding.formatDate(date));
+        element.setAttribute("encoding", encoding.asEncodingAttributeValue());
+    }
+
+    /**
+     * @deprecated use {@link #setDate(Element, GregorianCalendar, MCRMODSDateFormat)} instead
+     */
     public static void setDate(Element element, GregorianCalendar cal, String encoding) {
-        setDate(element, cal.getTime(), encoding);
+        setDate(element, cal, MCRMODSDateFormat.getFormat(encoding));
+    }
+
+    public static void setDate(Element element, GregorianCalendar cal, MCRMODSDateFormat encoding) {
+        setDate(element, encoding.isDateOnly() ? adjustTimeOffset(cal) : cal.getTime(), encoding);
+    }
+
+    private static Date adjustTimeOffset(GregorianCalendar cal) {
+        GregorianCalendar clone = new GregorianCalendar(MODS_TIMEZONE, DATE_LOCALE);
+        clone.set(cal.get(GregorianCalendar.YEAR),
+            cal.get(GregorianCalendar.MONTH),
+            cal.get(GregorianCalendar.DAY_OF_MONTH));
+        return clone.getTime();
+    }
+
+    private static MCRException reportParseException(String encoding, String text, ParseException ex) {
+        String msg = "Unable to parse MODS date encoded " + encoding + " " + text;
+        return new MCRException(msg, ex);
     }
 }
