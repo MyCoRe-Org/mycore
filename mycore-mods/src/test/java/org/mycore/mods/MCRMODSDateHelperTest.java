@@ -100,6 +100,23 @@ public class MCRMODSDateHelperTest extends MCRTestCase {
     }
 
     @Test
+    public void testDateFormatsWithoutTimezone() {
+        // Christmas :-) 
+        int year=2015, month=12, day=25;
+        
+        GregorianCalendar gIn = new GregorianCalendar(year,month-1,day);
+        Element element = new Element("date");
+        MCRMODSDateHelper.setDate(element, gIn, "w3cdtf-10");
+
+        // Not christmas :-( ?
+        assertEquals(year + "-" + month + "-" + day, element.getText() );
+
+        // Not christmas :-( ?
+        GregorianCalendar gOut = MCRMODSDateHelper.getCalendar(element);
+        assertEquals( day, gOut.get( Calendar.DAY_OF_MONTH ) );
+    }
+    
+    @Test
     public void testW3CDTFDate19() {
         String date = "2011-09-29T13:14:15";
         Element element = new Element("date").setText(date);
