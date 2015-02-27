@@ -74,9 +74,9 @@ public class MCRSolrCore {
         // concurrent server
         if (USE_CONCURRENT_SERVER) {
             int queueSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "ConcurrentUpdateSolrClient.QueueSize");
-            int threadSize = MCRConfiguration.instance()
-                .getInt(CONFIG_PREFIX + "ConcurrentUpdateSolrClient.ThreadSize");
-            concurrentClient = new ConcurrentUpdateSolrClient(coreURL, queueSize, threadSize);
+            int threadCount = MCRConfiguration.instance()
+                .getInt(CONFIG_PREFIX + "ConcurrentUpdateSolrClient.ThreadCount");
+            concurrentClient = new ConcurrentUpdateSolrClient(coreURL, queueSize, threadCount);
             concurrentClient.setRequestWriter(new BinaryRequestWriter());
         }
         // shutdown handler
