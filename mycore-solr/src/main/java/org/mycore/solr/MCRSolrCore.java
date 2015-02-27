@@ -31,7 +31,7 @@ public class MCRSolrCore {
 
     static {
         USE_CONCURRENT_SERVER = MCRConfiguration.instance().getBoolean(
-            CONFIG_PREFIX + "ConcurrentUpdateSolrServer.Enabled");
+            CONFIG_PREFIX + "ConcurrentUpdateSolrClient.Enabled");
     }
 
     /**
