@@ -4,6 +4,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,11 +46,9 @@ public class MCRTestCase {
     }
 
     /**
-     * initializes MCRConfiguration with an empty property file.
-     * 
-     * This can be used to test MyCoRe classes without any propties set, using
-     * default. You may want to set Properties per TestCase with the
-     * set() method of <code>MCRConfiguration</code>
+     * initializes MCRConfiguration with an empty property file. This can be used to test MyCoRe classes without any
+     * propties set, using default. You may want to set Properties per TestCase with the set() method of
+     * <code>MCRConfiguration</code>
      * 
      * @see MCRConfiguration#set(String, String)
      */
@@ -89,12 +91,16 @@ public class MCRTestCase {
     }
 
     /**
-     * Creates a temporary properties file if the system variable MCR.Configuration.File
-     * is not set.
-     * @throws IOException Thrown if the creation of the temporary properties file failed.
+     * Creates a temporary properties file if the system variable MCR.Configuration.File is not set.
+     * 
+     * @throws IOException
+     *             Thrown if the creation of the temporary properties file failed.
      * @author Marcel Heusinger <marcel.heusinger[at]uni-due.de>
      */
     protected void initProperties() throws IOException {
+        String userDir = System.getProperty("user.dir");
+        String currentComponent = Paths.get(userDir).getFileName().toString();
+        System.setProperty("MCRRuntimeComponentDetector.underTesting", currentComponent);
         System.setProperty(MCRConfigurationDir.DISABLE_CONFIG_DIR_PROPERTY, "");
         oldProperties = System.getProperties().getProperty(MCR_CONFIGURATION_FILE);
         if (oldProperties == null && getClass().getClassLoader().getResource("mycore.properties") != null) {
@@ -134,12 +140,10 @@ public class MCRTestCase {
     }
 
     /**
-     * Retrieve the resource file</br>
-     * Example: /Classname/recource.file
+     * Retrieve the resource file</br> Example: /Classname/recource.file
      * 
      * @param fileName
-     * @return 
-     *        the resource file as InputStream
+     * @return the resource file as InputStream
      */
     protected InputStream getResourceAsStream(String fileName) {
         String fileLocation = buildFileLocation(fileName);
@@ -147,9 +151,20 @@ public class MCRTestCase {
         return Class.class.getResourceAsStream(fileLocation);
     }
 
+    /**
+     * Retrieve the resource file as URI. Example: /Classname/recource.file
+     * 
+     * @param fileName
+     * @return the resource file as URL
+     */
+    protected URL getResourceAsURL(String fileName) {
+        String fileLocation = buildFileLocation(fileName);
+        System.out.println("File location: " + fileLocation);
+        return Class.class.getResource(fileLocation);
+    }
+
     private String buildFileLocation(String fileName) {
-        String pathseparator = File.separator;
-        return pathseparator + this.getClass().getSimpleName() + pathseparator + fileName;
+        return MessageFormat.format("/{0}/{1}", this.getClass().getSimpleName(), fileName);
     }
 
 }

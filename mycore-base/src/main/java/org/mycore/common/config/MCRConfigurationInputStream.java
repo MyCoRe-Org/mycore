@@ -43,14 +43,14 @@ import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRURLContent;
 
 /**
- * A InputStream from (preferably) property files.
- * All available InputStreams are combined in this order:
+ * A InputStream from (preferably) property files. All available InputStreams are combined in this order:
  * <ol>
- *  <li> mycore-base </li>
- *  <li> other mycore-components </li>
- *  <li> application modules </li>
- *  <li> installation specific files </li>
+ * <li>mycore-base</li>
+ * <li>other mycore-components</li>
+ * <li>application modules</li>
+ * <li>installation specific files</li>
  * </ol>
+ * 
  * @author Thomas Scheffler (yagee)
  * @since 2013.12
  */
@@ -67,9 +67,11 @@ public class MCRConfigurationInputStream extends InputStream {
     private boolean empty;
 
     /**
-     * Combined Stream of all config files named <code>filename</code>
-     * available via {@link MCRRuntimeComponentDetector#getAllComponents()}.
-     * @param filename, e.g. mycore.properties or messages_de.properties
+     * Combined Stream of all config files named <code>filename</code> available via
+     * {@link MCRRuntimeComponentDetector#getAllComponents()}.
+     * 
+     * @param filename
+     *            , e.g. mycore.properties or messages_de.properties
      * @throws IOException
      */
     public MCRConfigurationInputStream(String filename) throws IOException {
@@ -78,19 +80,18 @@ public class MCRConfigurationInputStream extends InputStream {
 
     private MCRConfigurationInputStream(String filename, InputStream initStream) throws IOException {
         super();
+        this.empty = true;
         this.e = getInputStreams(filename, initStream);
         if (e.hasMoreElements()) {
-            this.empty = false;
             nextStream();
-        } else {
-            this.empty = true;
         }
     }
 
     /**
-     * {@link InputStream} that includes all properties from {@link MCRRuntimeComponentDetector#getAllComponents()} and <strong>mycore.properties</strong>.
+     * {@link InputStream} that includes all properties from {@link MCRRuntimeComponentDetector#getAllComponents()} and
+     * <strong>mycore.properties</strong>. Use system property <code>MCR.Configuration.File</code> to configure
+     * alternative property file.
      * 
-     * Use system property <code>MCR.Configuration.File</code> to configure alternative property file.
      * @since 2014.04
      */
     public static MCRConfigurationInputStream getMyCoRePropertiesInstance() throws IOException {
@@ -111,17 +112,19 @@ public class MCRConfigurationInputStream extends InputStream {
         return empty;
     }
 
-    private static Enumeration<? extends InputStream> getInputStreams(String filename, InputStream initStream)
+    private Enumeration<? extends InputStream> getInputStreams(String filename, InputStream initStream)
         throws IOException {
         LinkedList<InputStream> cList = new LinkedList<>();
         if (initStream != null) {
+            empty = false;
             cList.add(initStream);
         }
         for (MCRComponent component : MCRRuntimeComponentDetector.getAllComponents()) {
-            String comment = "\n\n#\n#\n# Component: " + component.getName() + "\n#\n#\n";
-            cList.add(new ByteArrayInputStream(comment.getBytes(StandardCharsets.ISO_8859_1)));
             InputStream is = component.getConfigFileStream(filename);
             if (is != null) {
+                empty = false;
+                String comment = "\n\n#\n#\n# Component: " + component.getName() + "\n#\n#\n";
+                cList.add(new ByteArrayInputStream(comment.getBytes(StandardCharsets.ISO_8859_1)));
                 cList.add(is);
                 //workaround if last property is not terminated with line break
                 cList.add(new ByteArrayInputStream(lbr));
@@ -132,11 +135,13 @@ public class MCRConfigurationInputStream extends InputStream {
         }
         InputStream propertyStream = getPropertyStream(filename);
         if (propertyStream != null) {
+            empty = false;
             cList.add(propertyStream);
             cList.add(new ByteArrayInputStream(lbr));
         }
         File localProperties = MCRConfigurationDir.getConfigFile(filename);
         if (localProperties != null && localProperties.canRead()) {
+            empty = false;
             logInfo("Loading additional properties from " + localProperties.getAbsolutePath());
             cList.add(new FileInputStream(localProperties));
             cList.add(new ByteArrayInputStream(lbr));
@@ -169,7 +174,7 @@ public class MCRConfigurationInputStream extends InputStream {
     }
 
     /**
-     *  Continues reading in the next stream if an EOF is reached.
+     * Continues reading in the next stream if an EOF is reached.
      */
     final void nextStream() throws IOException {
         if (in != null) {

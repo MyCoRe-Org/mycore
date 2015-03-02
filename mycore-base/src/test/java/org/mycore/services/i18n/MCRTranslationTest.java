@@ -51,7 +51,7 @@ public class MCRTranslationTest extends MCRTestCase {
     public void getAvailableLanguages() {
         Set<String> availableLanguages = MCRTranslation.getAvailableLanguages();
         System.out.println(availableLanguages);
-        assertEquals(2, availableLanguages.size());
+        assertEquals(5, availableLanguages.size());
     }
 
     @Test

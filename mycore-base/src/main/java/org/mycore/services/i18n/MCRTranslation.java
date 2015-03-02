@@ -42,8 +42,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
@@ -52,10 +50,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * provides services for internationalization in mycore application.
- * 
- * You have to provide a property file named messages.properties in your
- * classpath for this class to work.
+ * provides services for internationalization in mycore application. You have to provide a property file named
+ * messages.properties in your classpath for this class to work.
  * 
  * @author Radi Radichev
  * @author Thomas Scheffler (yagee)
@@ -79,10 +75,8 @@ public class MCRTranslation {
     private static Set<String> AVAILABLE_LANGUAGES = loadAvailableLanguages();
 
     /**
-     * provides translation for the given label (property key).
-     * 
-     * The current locale that is needed for translation is gathered by the
-     * language of the current MCRSession.
+     * provides translation for the given label (property key). The current locale that is needed for translation is
+     * gathered by the language of the current MCRSession.
      * 
      * @param label
      * @return translated String
@@ -93,7 +87,7 @@ public class MCRTranslation {
     }
 
     /**
-     * Checks whether there is a value for the given key and current locale. 
+     * Checks whether there is a value for the given key and current locale.
      * 
      * @param key
      * @return <code>true</code> if there is a value, <code>false</code> otherwise
@@ -116,13 +110,12 @@ public class MCRTranslation {
     }
 
     /**
-     * provides translation for the given label (property key).
-     * 
-     * The current locale that is needed for translation is gathered by the
-     * language of the current MCRSession.
+     * provides translation for the given label (property key). The current locale that is needed for translation is
+     * gathered by the language of the current MCRSession.
      * 
      * @param label
-     * @param baseName a fully qualified class name 
+     * @param baseName
+     *            a fully qualified class name
      * @return translated String
      */
 
@@ -135,7 +128,8 @@ public class MCRTranslation {
      * provides translation for the given label (property key).
      * 
      * @param label
-     * @param locale target locale of translation 
+     * @param locale
+     *            target locale of translation
      * @return translated String
      */
     public static String translate(String label, Locale locale) {
@@ -146,8 +140,10 @@ public class MCRTranslation {
      * provides translation for the given label (property key).
      * 
      * @param label
-     * @param locale target locale of translation 
-     * @param baseName a fully qualified class name 
+     * @param locale
+     *            target locale of translation
+     * @param baseName
+     *            a fully qualified class name
      * @return translated String
      */
     public static String translate(String label, Locale locale, String baseName) {
@@ -168,7 +164,7 @@ public class MCRTranslation {
             // try to get new key if 'label' is deprecated
             if (!DEPRECATED_MESSAGES_PRESENT) {
                 LOGGER.warn("Could not load resource '" + DEPRECATED_MESSAGES_PROPERTIES
-                        + "' to check for depreacted I18N keys.");
+                    + "' to check for depreacted I18N keys.");
             } else if (DEPRECATED_MAPPING.keySet().contains(label)) {
                 String newLabel = DEPRECATED_MAPPING.getProperty(label);
                 try {
@@ -187,12 +183,11 @@ public class MCRTranslation {
     }
 
     /**
-     * Returns a map of label/value pairs which match with the given prefix.
+     * Returns a map of label/value pairs which match with the given prefix. The current locale that is needed for
+     * translation is gathered by the language of the current MCRSession.
      * 
-     * The current locale that is needed for translation is gathered by the
-     * language of the current MCRSession.
-     * 
-     * @param prefix label starts with
+     * @param prefix
+     *            label starts with
      * @return map of labels with translated values
      */
     public static Map<String, String> translatePrefix(String prefix) {
@@ -203,8 +198,10 @@ public class MCRTranslation {
     /**
      * Returns a map of label/value pairs which match with the given prefix.
      * 
-     * @param prefix label starts with
-     * @param locale target locale of translation 
+     * @param prefix
+     *            label starts with
+     * @param locale
+     *            target locale of translation
      * @return map of labels with translated values
      */
     public static Map<String, String> translatePrefix(String prefix, Locale locale) {
@@ -222,15 +219,12 @@ public class MCRTranslation {
     }
 
     /**
-     * provides translation for the given label (property key).
-     * 
-     * The current locale that is needed for translation is gathered by the
-     * language of the current MCRSession.
+     * provides translation for the given label (property key). The current locale that is needed for translation is
+     * gathered by the language of the current MCRSession.
      * 
      * @param label
      * @param arguments
-     *            Objects that are inserted instead of placeholders in the
-     *            property values
+     *            Objects that are inserted instead of placeholders in the property values
      * @return translated String
      */
     public static String translate(String label, Object... arguments) {
@@ -243,18 +237,14 @@ public class MCRTranslation {
     }
 
     /**
-     * provides translation for the given label (property key).
-     * 
-     * The current locale that is needed for translation is gathered by the
-     * language of the current MCRSession. Be aware that any occurence of ';'
-     * and '\' in <code>argument</code> has to be masked by '\'. You can use
-     * ';' to build an array of arguments: "foo;bar" would result in
-     * {"foo","bar"} (the array)
+     * provides translation for the given label (property key). The current locale that is needed for translation is
+     * gathered by the language of the current MCRSession. Be aware that any occurence of ';' and '\' in
+     * <code>argument</code> has to be masked by '\'. You can use ';' to build an array of arguments: "foo;bar" would
+     * result in {"foo","bar"} (the array)
      * 
      * @param label
      * @param argument
-     *            String that is inserted instead of placeholders in the
-     *            property values
+     *            String that is inserted instead of placeholders in the property values
      * @return translated String
      * @see #translate(String, Object[])
      */
@@ -312,26 +302,26 @@ public class MCRTranslation {
         } else {
             for (int i = 0; i < masked.length(); i++) {
                 switch (masked.charAt(i)) {
-                case ';':
-                    if (mask) {
-                        buf.append(';');
-                        mask = false;
-                    } else {
-                        a.add(buf.toString());
-                        buf.setLength(0);
-                    }
-                    break;
-                case '\\':
-                    if (mask) {
-                        buf.append('\\');
-                        mask = false;
-                    } else {
-                        mask = true;
-                    }
-                    break;
-                default:
-                    buf.append(masked.charAt(i));
-                    break;
+                    case ';':
+                        if (mask) {
+                            buf.append(';');
+                            mask = false;
+                        } else {
+                            a.add(buf.toString());
+                            buf.setLength(0);
+                        }
+                        break;
+                    case '\\':
+                        if (mask) {
+                            buf.append('\\');
+                            mask = false;
+                        } else {
+                            mask = true;
+                        }
+                        break;
+                    default:
+                        buf.append(masked.charAt(i));
+                        break;
                 }
             }
             a.add(buf.toString());
@@ -362,7 +352,7 @@ public class MCRTranslation {
         Properties deprecatedMapping = new Properties();
         try {
             final InputStream propertiesStream = MCRTranslation.class
-                    .getResourceAsStream(DEPRECATED_MESSAGES_PROPERTIES);
+                .getResourceAsStream(DEPRECATED_MESSAGES_PROPERTIES);
             if (propertiesStream == null) {
                 LOGGER.warn("Could not find resource '" + DEPRECATED_MESSAGES_PROPERTIES + "'.");
                 return deprecatedMapping;
@@ -392,7 +382,7 @@ public class MCRTranslation {
 
     public static ResourceBundle getResourceBundle(String baseName, Locale locale) {
         return baseName.contains(".") ? ResourceBundle.getBundle(baseName, locale) : ResourceBundle.getBundle(
-                "stacked:" + baseName, locale, CONTROL);
+            "stacked:" + baseName, locale, CONTROL);
     }
 
 }
