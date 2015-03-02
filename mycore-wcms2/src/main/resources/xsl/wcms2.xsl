@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-  xmlns:property="xalan://org.mycore.common.xml.PropertyFunctions" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
+  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
   xmlns:acl="xalan://org.mycore.access.MCRAccessManager">
   <xsl:output method="html" indent="yes" doctype-public="-//IETF//DTD HTML 5.0//EN" />
 
