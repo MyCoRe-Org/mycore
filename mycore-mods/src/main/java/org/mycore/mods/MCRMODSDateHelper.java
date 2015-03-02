@@ -33,8 +33,6 @@ import java.util.Objects;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
-import com.google.common.base.MoreObjects;
-
 /**
  * Helper class to parse and build MODS date elements, see
  * http://www.loc.gov/standards/mods/userguide/generalapp.html#encoding
@@ -55,8 +53,7 @@ public class MCRMODSDateHelper {
 
         String encoding = element.getAttributeValue("encoding", "unknown").toLowerCase(DATE_LOCALE);
         String key = encoding + "-" + text.length();
-        MCRMODSDateFormat format = MoreObjects.firstNonNull(MCRMODSDateFormat.getFormat(key),
-            MCRMODSDateFormat.getFormat(encoding));
+        MCRMODSDateFormat format = firstNonNull(MCRMODSDateFormat.getFormat(key), MCRMODSDateFormat.getFormat(encoding));
         if (format == null) {
             throw reportParseException(encoding, text, null);
         }
@@ -65,6 +62,16 @@ public class MCRMODSDateHelper {
         } catch (ParseException ex) {
             throw reportParseException(encoding, text, ex);
         }
+    }
+
+    @SafeVarargs
+    private static <T> T firstNonNull(T... o) {
+        for (T test : Objects.requireNonNull(o)) {
+            if (test != null) {
+                return test;
+            }
+        }
+        throw new NullPointerException();
     }
 
     public static GregorianCalendar getCalendar(Element element) {
