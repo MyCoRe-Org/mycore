@@ -40,11 +40,9 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
 
 /**
- * On first access this class detects all components,
- * that is either MyCoRe components or application modules, that are available via the current ClassLoader.
- * 
- * Every {@link Manifest} of the jar file requires to have a main attribute "POM" and application modules
- * also need to have a "MCR-Application-Module" main attribute present.
+ * On first access this class detects all components, that is either MyCoRe components or application modules, that are
+ * available via the current ClassLoader. Every {@link Manifest} of the jar file requires to have a main attribute "POM"
+ * and application modules also need to have a "MCR-Application-Module" main attribute present.
  * 
  * @author Thomas Scheffler (yagee)
  * @since 2013.12
@@ -60,29 +58,30 @@ public class MCRRuntimeComponentDetector {
     private static final Name ATT_MCR_ARTIFACT_ID = new Name("MCR-Artifact-Id");
 
     private static SortedSet<MCRComponent> ALL_COMPONENTS = Collections
-            .unmodifiableSortedSet(getConfiguredComponents());
+        .unmodifiableSortedSet(getConfiguredComponents());
 
     private static SortedSet<MCRComponent> MYCORE_COMPONENTS = Collections.unmodifiableSortedSet(Sets.filter(
-            ALL_COMPONENTS, new Predicate<MCRComponent>() {
-                @Override
-                public boolean apply(MCRComponent input) {
-                    return input.isMyCoReComponent();
-                }
-            }));
+        ALL_COMPONENTS, new Predicate<MCRComponent>() {
+            @Override
+            public boolean apply(MCRComponent input) {
+                return input.isMyCoReComponent();
+            }
+        }));
 
     private static SortedSet<MCRComponent> APP_MODULES = Collections.unmodifiableSortedSet(Sets.filter(ALL_COMPONENTS,
-            new Predicate<MCRComponent>() {
-                @Override
-                public boolean apply(MCRComponent input) {
-                    return input.isAppModule();
-                }
-            }));
+        new Predicate<MCRComponent>() {
+            @Override
+            public boolean apply(MCRComponent input) {
+                return input.isAppModule();
+            }
+        }));
 
     private static SortedSet<MCRComponent> getConfiguredComponents() {
         try {
+            String underTesting = System.getProperty("MCRRuntimeComponentDetector.underTesting");
             Enumeration<URL> resources = MCRRuntimeComponentDetector.class.getClassLoader().getResources(
-                    "META-INF/MANIFEST.MF");
-            if (!resources.hasMoreElements()) {
+                "META-INF/MANIFEST.MF");
+            if (!resources.hasMoreElements() && underTesting == null) {
                 LOGGER.warn("Did not find any Manifests.");
                 //TODO: JDK 8 will include Collections.emtpySortedSet()
                 return Sets.newTreeSet();
@@ -98,6 +97,11 @@ public class MCRRuntimeComponentDetector {
                         components.add(component);
                     }
                 }
+            }
+            if (underTesting != null) {
+                //support JUnit-Tests
+                MCRComponent component = new MCRComponent(underTesting, new Manifest());
+                components.add(component);
             }
             return components;
         } catch (IOException e) {
@@ -122,10 +126,10 @@ public class MCRRuntimeComponentDetector {
             }
 
             try (InputStream pi = MCRRuntimeComponentDetector.class.getClassLoader().getResourceAsStream(
-                    pomPropertiesPath)) {
+                pomPropertiesPath)) {
                 if (pi == null) {
                     LOGGER.warn("Manifest entry " + ATT_POM + " set to \"" + pomPropertiesPath
-                            + "\", but resource could not be loaded.");
+                        + "\", but resource could not be loaded.");
                     return null;
                 }
                 Properties pomProperties = new Properties();
@@ -136,10 +140,10 @@ public class MCRRuntimeComponentDetector {
         }
 
         if (artifactId != null && artifactId.startsWith("mycore-")
-                || mainAttributes.containsKey(ATT_MCR_APPLICATION_MODULE)) {
+            || mainAttributes.containsKey(ATT_MCR_APPLICATION_MODULE)) {
             if (usePomProperties) {
                 LOGGER.warn("No Attribute \"" + ATT_MCR_ARTIFACT_ID + "\" in Manifest of "
-                        + mainAttributes.getValue(ATT_MCR_APPLICATION_MODULE) + ".");
+                    + mainAttributes.getValue(ATT_MCR_APPLICATION_MODULE) + ".");
                 LOGGER.warn("Change this in the future, pom.properties path definition is deprecated.");
                 LOGGER.info("Using artifactId in " + pomPropertiesPath + ".");
             }
