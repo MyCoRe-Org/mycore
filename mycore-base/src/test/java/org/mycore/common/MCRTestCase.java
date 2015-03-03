@@ -41,7 +41,7 @@ public class MCRTestCase {
         }
         if (System.getProperties().getProperty("MCR.AppName") == null) {
             String  currentComponentName = getCurrentComponentName();
-            System.out.println("Setting MCR.AppName= "+ currentComponentName);
+            System.out.println("Setting MCR.AppName="+ currentComponentName);
             System.getProperties().setProperty("MCR.AppName", getCurrentComponentName());
         }
         File configDir=new File(System.getProperties().getProperty("MCR.Home"), System.getProperties().getProperty("MCR.AppName"));
