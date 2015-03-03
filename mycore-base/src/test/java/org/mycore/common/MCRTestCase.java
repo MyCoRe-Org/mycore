@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.Collections;
@@ -18,7 +17,6 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.config.MCRConfigurationLoader;
 import org.mycore.common.config.MCRConfigurationLoaderFactory;
 
@@ -36,13 +34,19 @@ public class MCRTestCase {
 
     @BeforeClass
     public static void initBaseDir() throws IOException {
-        if (System.getProperties().getProperty("MCR.basedir") == null) {
-            File baseDir = junitFolder.newFolder("baseDir");
-            File dataDir = new File(baseDir, "data");
-            dataDir.mkdir();
-            System.out.println("Setting MCR.basedir=" + baseDir.getAbsolutePath());
-            System.getProperties().setProperty("MCR.basedir", baseDir.getAbsolutePath());
+        if (System.getProperties().getProperty("MCR.Home") == null) {
+            File baseDir = junitFolder.newFolder("mcrhome");
+            System.out.println("Setting MCR.Home=" + baseDir.getAbsolutePath());
+            System.getProperties().setProperty("MCR.Home", baseDir.getAbsolutePath());
         }
+        if (System.getProperties().getProperty("MCR.AppName") == null) {
+            String  currentComponentName = getCurrentComponentName();
+            System.out.println("Setting MCR.AppName= "+ currentComponentName);
+            System.getProperties().setProperty("MCR.AppName", getCurrentComponentName());
+        }
+        File configDir=new File(System.getProperties().getProperty("MCR.Home"), System.getProperties().getProperty("MCR.AppName"));
+        System.out.println("Creating config directory: "+ configDir);
+        configDir.mkdirs();
     }
 
     /**
@@ -74,7 +78,6 @@ public class MCRTestCase {
             System.setProperty(MCR_CONFIGURATION_FILE, oldProperties);
         }
         MCRConfiguration.instance().initialize(Collections.<String, String> emptyMap(), true);
-        System.getProperties().remove(MCRConfigurationDir.DISABLE_CONFIG_DIR_PROPERTY);
     }
 
     protected Map<String, String> getTestProperties() {
@@ -98,10 +101,8 @@ public class MCRTestCase {
      * @author Marcel Heusinger <marcel.heusinger[at]uni-due.de>
      */
     protected void initProperties() throws IOException {
-        String userDir = System.getProperty("user.dir");
-        String currentComponent = Paths.get(userDir).getFileName().toString();
+        String currentComponent = getCurrentComponentName();
         System.setProperty("MCRRuntimeComponentDetector.underTesting", currentComponent);
-        System.setProperty(MCRConfigurationDir.DISABLE_CONFIG_DIR_PROPERTY, "");
         oldProperties = System.getProperties().getProperty(MCR_CONFIGURATION_FILE);
         if (oldProperties == null && getClass().getClassLoader().getResource("mycore.properties") != null) {
             return;
@@ -115,6 +116,12 @@ public class MCRTestCase {
                 throw new FileNotFoundException("File does not exist: " + properties.getAbsolutePath());
             }
         }
+    }
+
+    private static String getCurrentComponentName() {
+        String userDir = System.getProperty("user.dir");
+        String currentComponent = Paths.get(userDir).getFileName().toString();
+        return currentComponent;
     }
 
     private File getPropertiesFile() throws IOException {
