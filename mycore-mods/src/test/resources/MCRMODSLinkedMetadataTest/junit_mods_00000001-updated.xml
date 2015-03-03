@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreobject xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="datamodel-mods.xsd" ID="junit_mods_00000001" label="" version="2015.01-SNAPSHOT">
+  <structure />
+  <metadata>
+    <def.modsContainer class="MCRMetaXML" heritable="false" notinherit="true">
+      <modsContainer inherited="0">
+        <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+          <mods:genre usage="primary">series</mods:genre>
+          <mods:titleInfo supplied="yes" usage="primary">
+            <mods:title>Updated series title</mods:title>
+          </mods:titleInfo>
+        </mods:mods>
+      </modsContainer>
+    </def.modsContainer>
+  </metadata>
+  <service />
+</mycoreobject>
