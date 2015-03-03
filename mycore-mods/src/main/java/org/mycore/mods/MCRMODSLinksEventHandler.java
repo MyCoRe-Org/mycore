@@ -23,16 +23,20 @@
 
 package org.mycore.mods;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jdom2.Element;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -40,10 +44,14 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * Eventhandler for linking MODS_OBJECTTYPE document to MyCoRe classifications.
+ * 
  * @author Thomas Scheffler (yagee)
- *
  */
 public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
+
+    public enum RelationshipType {
+        preceeding, original, series, references, reviewOf;
+    }
 
     /* (non-Javadoc)
      * @see org.mycore.common.events.MCREventHandlerBase#handleObjectCreated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
@@ -54,7 +62,8 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
             return;
         }
         MCRMODSWrapper modsWrapper = new MCRMODSWrapper(obj);
-        final List<Element> categoryNodes = modsWrapper.getElements("mods:typeOfResource | .//*[(@authority or @authorityURI) and not(ancestor::mods:relatedItem[@type='host'])]");
+        final List<Element> categoryNodes = modsWrapper
+            .getElements("mods:typeOfResource | .//*[(@authority or @authorityURI) and not(ancestor::mods:relatedItem[@type='host'])]");
         final HashSet<MCRCategoryID> categories = new HashSet<MCRCategoryID>();
         for (Element node : categoryNodes) {
             final MCRCategoryID categoryID = MCRMODSClassificationSupport.getCategoryID(node);
@@ -65,6 +74,27 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
         if (!categories.isEmpty()) {
             final MCRCategLinkReference objectReference = new MCRCategLinkReference(obj.getId());
             MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categories);
+        }
+        List<Element> linkingNodes = modsWrapper.getElements("mods:relatedItem[contains(@xlink:href,'_mods_')]");
+        if (!linkingNodes.isEmpty()) {
+            MCRLinkTableManager linkTableManager = MCRLinkTableManager.instance();
+            for (Element linkingNode : linkingNodes) {
+                String targetID = linkingNode.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
+                String relationshipTypeRaw = linkingNode.getAttributeValue("type", "");
+                try {
+                    RelationshipType relType = RelationshipType.valueOf(relationshipTypeRaw);
+                    linkTableManager.addReferenceLink(obj.getId(),
+                        MCRObjectID.getInstance(targetID),
+                        MCRLinkTableManager.ENTRY_TYPE_REFERENCE, relType.toString());
+                } catch (IllegalArgumentException e) {
+                    if (!"host".equals(relationshipTypeRaw)) {
+                        //'host' is valid for parent child relationships
+                        Logger.getLogger(getClass()).warn(
+                            "Unsupported value of type:" + relationshipTypeRaw + ". Supported: "
+                                + Arrays.asList(RelationshipType.values()));
+                    }
+                }
+            }
         }
     }
 

@@ -21,7 +21,7 @@
           <mods:language usage="primary">
             <mods:languageTerm authority="rfc4646" type="code">de</mods:languageTerm>
           </mods:language>
-          <mods:relatedItem type="series" xlink:href="junit_mods_00000002">
+          <mods:relatedItem type="series" xlink:href="junit_mods_00000001">
             <mods:genre usage="primary">series</mods:genre>
             <mods:titleInfo supplied="yes" usage="primary">
               <mods:title>Series title</mods:title>

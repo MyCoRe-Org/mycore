@@ -59,7 +59,6 @@ public class MCRMODSLinkedMetadataTest extends MCRHibTestCase {
     }
 
     @Test
-    @Ignore("MCR-910 currently not implemented")
     public void testLinks() {
         Assert.assertEquals("There should be a reference link from +" + bookID + " to " + seriesID + ".", 1,
             MCRLinkTableManager.instance().countReferenceLinkTo(seriesID));
