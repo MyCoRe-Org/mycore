@@ -59,8 +59,7 @@ import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
 import org.xml.sax.SAXException;
 
 /**
- * Delivers persistence operations for {@link MCRObject} and {@link MCRDerivate}
- * .
+ * Delivers persistence operations for {@link MCRObject} and {@link MCRDerivate} .
  * 
  * @author Thomas Scheffler (yagee)
  * @since 2.0.92
@@ -83,8 +82,11 @@ public final class MCRMetadataManager {
 
     /**
      * Returns the MCRObjectID of the object containing derivate with the given ID.
-     * @param derivateID derivateID
-     * @param expire when should lastModified information expire
+     * 
+     * @param derivateID
+     *            derivateID
+     * @param expire
+     *            when should lastModified information expire
      * @return null if derivateID has no object referenced
      * @see #getDerivateIds(MCRObjectID, long)
      */
@@ -120,8 +122,11 @@ public final class MCRMetadataManager {
 
     /**
      * Returns a list of MCRObjectID of the derivates contained in the object with the given ID.
-     * @param objectId objectId
-     * @param expire when should lastModified information expire
+     * 
+     * @param objectId
+     *            objectId
+     * @param expire
+     *            when should lastModified information expire
      * @return null if object with objectId does not exist
      * @see #getObjectId(MCRObjectID, long)
      */
@@ -163,7 +168,7 @@ public final class MCRMetadataManager {
      *            derivate instance to store
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
-     * @throws IOException 
+     * @throws IOException
      */
     public static void create(final MCRDerivate mcrDerivate) throws MCRPersistenceException, IOException {
         // exist the derivate?
@@ -314,9 +319,10 @@ public final class MCRMetadataManager {
         }
 
         // prepare this object with parent metadata
-        final MCRObjectID parent_id = mcrObject.getStructure().getParentID();
-        MCRObject parent = shareMetadata(mcrObject, parent_id);
+        receiveMetadata(mcrObject);
 
+        final MCRObjectID parent_id = mcrObject.getStructure().getParentID();
+        MCRObject parent = null;
         if (parent_id != null) {
             LOGGER.debug("Parent ID = " + parent_id.toString());
 
@@ -542,8 +548,8 @@ public final class MCRMetadataManager {
     }
 
     /**
-     * Fires {@link MCREvent#UPDATE_EVENT} for given object. If
-     * {@link MCRObject#isImportMode()} modifydate will not be updated.
+     * Fires {@link MCREvent#UPDATE_EVENT} for given object. If {@link MCRObject#isImportMode()} modifydate will not be
+     * updated.
      * 
      * @param mcrObject
      *            TODO
@@ -562,8 +568,7 @@ public final class MCRMetadataManager {
     }
 
     /**
-     * Retrieves instance of {@link MCRDerivate} with the given
-     * {@link MCRObjectID}
+     * Retrieves instance of {@link MCRDerivate} with the given {@link MCRObjectID}
      * 
      * @param id
      *            the derivate ID
@@ -579,8 +584,7 @@ public final class MCRMetadataManager {
     }
 
     /**
-     * Retrieves instance of {@link MCRObject} with the given
-     * {@link MCRObjectID}
+     * Retrieves instance of {@link MCRObject} with the given {@link MCRObjectID}
      * 
      * @param id
      *            the object ID
@@ -598,7 +602,6 @@ public final class MCRMetadataManager {
     /**
      * @param id
      * @return a {@link MCRObject} if there is an object with the id given or <code>null</code> otherwise
-     * 
      * @throws MCRPersistenceException
      */
     public static MCRObject retrieveMCRObject(final String id) throws MCRPersistenceException {
@@ -610,8 +613,7 @@ public final class MCRMetadataManager {
     }
 
     /**
-     * Retrieves instance of {@link MCRObject} or {@link MCRDerivate} depending
-     * on {@link MCRObjectID#getTypeId()}
+     * Retrieves instance of {@link MCRObject} or {@link MCRDerivate} depending on {@link MCRObjectID#getTypeId()}
      * 
      * @param id
      *            derivate or object id
@@ -631,7 +633,7 @@ public final class MCRMetadataManager {
      * @param mcrDerivate
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
-     * @throws IOException 
+     * @throws IOException
      */
     public static void update(final MCRDerivate mcrDerivate) throws MCRPersistenceException, IOException {
         if (!MCRMetadataManager.exists(mcrDerivate.getId())) {
@@ -660,7 +662,7 @@ public final class MCRMetadataManager {
         if (!oldLink.equals(newLink)) {
             MCRObjectID oldMetadataObjectID = oldLink.getXLinkHrefID();
             MCRObjectID newMetadataObjectID = newLink.getXLinkHrefID();
-            if(!oldMetadataObjectID.equals(newLink.getXLinkHrefID())) {
+            if (!oldMetadataObjectID.equals(newLink.getXLinkHrefID())) {
                 try {
                     MCRMetadataManager.removeDerivateFromObject(oldMetadataObjectID, mcrDerivate.getId());
                 } catch (final MCRException e) {
@@ -668,7 +670,8 @@ public final class MCRMetadataManager {
                 }
             }
             // add the link to metadata
-            final MCRMetaLinkID der = new MCRMetaLinkID("derobject", mcrDerivate.getId(), null, mcrDerivate.getLabel(), newLink.getXLinkRole());
+            final MCRMetaLinkID der = new MCRMetaLinkID("derobject", mcrDerivate.getId(), null, mcrDerivate.getLabel(),
+                newLink.getXLinkRole());
             addOrUpdateDerivateToObject(newMetadataObjectID, der);
         }
         // update the derivate
@@ -690,8 +693,7 @@ public final class MCRMetadataManager {
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
      * @throws MCRActiveLinkException
-     *             if object is created (no real update), see
-     *             {@link #create(MCRObject)}
+     *             if object is created (no real update), see {@link #create(MCRObject)}
      */
     public static void update(final MCRObject mcrObject) throws MCRPersistenceException, MCRActiveLinkException {
         if (!MCRMetadataManager.exists(mcrObject.getId())) {
@@ -706,22 +708,22 @@ public final class MCRMetadataManager {
         // save the order of derivates and clean the structure
         mcrObject.getStructure().clearChildren();
         List<String> derOrder = new ArrayList<String>();
-        for(MCRMetaLinkID derID: mcrObject.getStructure().getDerivates()){
-        	derOrder.add(derID.getXLinkHref());
+        for (MCRMetaLinkID derID : mcrObject.getStructure().getDerivates()) {
+            derOrder.add(derID.getXLinkHref());
         }
         mcrObject.getStructure().clearDerivates();
 
         // set the derivate data in structure
         mcrObject.getStructure().getDerivates().addAll(old.getStructure().getDerivates());
-        
+
         //set the new order of derivates
-        for(int newPos=0;newPos<derOrder.size();newPos++){
-        	for(int pos=0; pos<mcrObject.getStructure().getDerivates().size();pos++){
-        		if(derOrder.get(newPos).equals(mcrObject.getStructure().getDerivates().get(pos).getXLinkHref())){
-        			Collections.swap(mcrObject.getStructure().getDerivates(), pos, newPos);
-        			break;
-        		}
-        	}
+        for (int newPos = 0; newPos < derOrder.size(); newPos++) {
+            for (int pos = 0; pos < mcrObject.getStructure().getDerivates().size(); pos++) {
+                if (derOrder.get(newPos).equals(mcrObject.getStructure().getDerivates().get(pos).getXLinkHref())) {
+                    Collections.swap(mcrObject.getStructure().getDerivates(), pos, newPos);
+                    break;
+                }
+            }
         }
         // set the parent from the original and this update
         boolean setparent = false;
@@ -750,7 +752,6 @@ public final class MCRMetadataManager {
         mcrObject.getStructure().getChildren().addAll(old.getStructure().getChildren());
 
         // import all herited matadata from the parent
-        MCRObject newParent = shareMetadata(mcrObject, newParentID);
 
         // if not imported via cli, createdate remains unchanged
         if (!mcrObject.isImportMode() || mcrObject.getService().getDate("createdate") == null) {
@@ -763,6 +764,7 @@ public final class MCRMetadataManager {
         // check if the parent was new set and set them
         if (setparent) {
             try {
+                MCRObject newParent = retrieveMCRObject(newParentID);
                 newParent.getStructure().addChild(
                     new MCRMetaLinkID("child", mcrObject.getId(), null, mcrObject.getLabel()));
                 MCRMetadataManager.fireUpdateEvent(newParent);
@@ -785,20 +787,13 @@ public final class MCRMetadataManager {
         return metadataShareAgent.shareableMetadataChanged(old, mcrObject);
     }
 
-    private static MCRObject shareMetadata(final MCRObject recipient, final MCRObjectID holderID) {
-        //TODO: handle inheritance of mycore-mods in that component
-        MCRObject parent = null;
-        if (holderID != null) {
-            LOGGER.debug("Parent ID = " + holderID);
-            try {
-                parent = MCRMetadataManager.retrieveMCRObject(holderID);
-                MCRMetadataShareAgent metadataShareAgent = MCRMetadataShareAgentFactory.getAgent(holderID);
-                metadataShareAgent.receiveMetadata(parent, recipient);
-            } catch (final Exception e) {
-                LOGGER.error("Error while merging metadata in this object.", e);
-            }
+    private static void receiveMetadata(final MCRObject recipient) {
+        try {
+            MCRMetadataShareAgent metadataShareAgent = MCRMetadataShareAgentFactory.getAgent(recipient.getId());
+            metadataShareAgent.receiveMetadata(recipient);
+        } catch (final Exception e) {
+            LOGGER.error("Error while merging metadata in this object.", e);
         }
-        return parent;
     }
 
     /**
@@ -816,8 +811,7 @@ public final class MCRMetadataManager {
     }
 
     /**
-     * Adds a derivate MCRMetaLinkID to the structure part and updates the
-     * object with the ID in the data store.
+     * Adds a derivate MCRMetaLinkID to the structure part and updates the object with the ID in the data store.
      * 
      * @param id
      *            the object ID
@@ -843,17 +837,16 @@ public final class MCRMetadataManager {
     }
 
     /**
-     * Adds or updates a derivate MCRMetaLinkID to the structure part and updates the
-     * object with the ID in the data store.
+     * Adds or updates a derivate MCRMetaLinkID to the structure part and updates the object with the ID in the data
+     * store.
      * 
      * @param id
      *            the object ID
      * @param link
      *            a link to a derivate as MCRMetaLinkID
-     * @return
-     *            True if the link is added or updated, false if nothing changed.
+     * @return True if the link is added or updated, false if nothing changed.
      * @throws MCRPersistenceException
-     *            if a persistence problem is occurred
+     *             if a persistence problem is occurred
      */
     public static boolean addOrUpdateDerivateToObject(final MCRObjectID id, final MCRMetaLinkID link)
         throws MCRPersistenceException {

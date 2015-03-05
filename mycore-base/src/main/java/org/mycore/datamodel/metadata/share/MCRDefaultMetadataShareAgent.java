@@ -32,11 +32,11 @@ import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectMetadata;
 
 /**
  * @author Thomas Scheffler (yagee)
- *
  */
 class MCRDefaultMetadataShareAgent implements MCRMetadataShareAgent {
 
@@ -105,7 +105,13 @@ class MCRDefaultMetadataShareAgent implements MCRMetadataShareAgent {
      * @see org.mycore.datamodel.metadata.share.MCRMetadataShareAgent#inheritMetadata(org.mycore.datamodel.metadata.MCRObject, org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
-    public void receiveMetadata(MCRObject parent, MCRObject child) {
+    public void receiveMetadata(MCRObject child) {
+        MCRObjectID parentID = child.getStructure().getParentID();
+        if (parentID == null) {
+            return;
+        }
+        LOGGER.debug("Parent ID = " + parentID);
+        MCRObject parent = MCRMetadataManager.retrieveMCRObject(parentID);
         // remove already embedded inherited tags
         child.getMetadata().removeInheritedMetadata();
         // insert heritable tags

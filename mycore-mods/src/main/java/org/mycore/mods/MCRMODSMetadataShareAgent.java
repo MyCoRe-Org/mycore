@@ -34,6 +34,7 @@ import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectMetadata;
 import org.mycore.datamodel.metadata.share.MCRMetadataShareAgent;
 
@@ -91,7 +92,12 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
      * @see org.mycore.datamodel.metadata.share.MCRMetadataShareAgent#inheritMetadata(org.mycore.datamodel.metadata.MCRObject, org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
-    public void receiveMetadata(MCRObject parent, MCRObject child) {
+    public void receiveMetadata(MCRObject child) {
+        MCRObjectID parentID = child.getStructure().getParentID();
+        if (parentID == null) {
+            return;
+        }
+        MCRObject parent = MCRMetadataManager.retrieveMCRObject(parentID);
         MCRMODSWrapper parentWrapper = new MCRMODSWrapper(parent);
         MCRMODSWrapper childWrapper = new MCRMODSWrapper(child);
         inheritToChild(parentWrapper, childWrapper);

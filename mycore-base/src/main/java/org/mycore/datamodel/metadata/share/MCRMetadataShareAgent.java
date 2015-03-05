@@ -47,8 +47,7 @@ public interface MCRMetadataShareAgent {
 
     /**
      * Include shareable metadata from <code>holder</code> before persisting <code>recipient</code>.
-     * @param holder parent or any holder to get shareable metadata from.
      * @param recipient on update/create before handling events.
      */
-    public void receiveMetadata(MCRObject holder, MCRObject recipient);
+    public void receiveMetadata(MCRObject recipient);
 }
