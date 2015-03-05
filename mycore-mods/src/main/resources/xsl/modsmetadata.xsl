@@ -7,6 +7,7 @@
   <xsl:param name="MCR.Handle.Resolver.MasterURL" />
   <xsl:param name="MCR.Mods.SherpaRomeo.ApiKey" select="''" />
   <xsl:param name="ServletsBaseURL" />
+  <xsl:param name="wcms.useTargets" select="'no'" /><!-- TODO: refacture! -->
 
   <xsl:key use="mods:role/mods:roleTerm" name="name-by-role" match="mods:mods/mods:name" />
 
