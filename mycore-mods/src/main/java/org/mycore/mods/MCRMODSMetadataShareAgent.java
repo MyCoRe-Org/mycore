@@ -35,24 +35,24 @@ import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectMetadata;
-import org.mycore.datamodel.metadata.inheritance.MCRInheritanceManager;
+import org.mycore.datamodel.metadata.share.MCRMetadataShareAgent;
 
 /**
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRMODSInheritanceManager implements MCRInheritanceManager {
-    private static Logger LOGGER = Logger.getLogger(MCRMODSInheritanceManager.class);
+public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
+    private static Logger LOGGER = Logger.getLogger(MCRMODSMetadataShareAgent.class);
 
     private static final String HOST_SECTION_XPATH = "mods:relatedItem[@type='host']";
 
     private static final String SERIES_SECTION_XPATH = "mods:relatedItem[@type='series']";
 
     /* (non-Javadoc)
-     * @see org.mycore.datamodel.metadata.inheritance.MCRInheritanceManager#inheritableMetadataChanged(org.mycore.datamodel.metadata.MCRObject, org.mycore.datamodel.metadata.MCRObject)
+     * @see org.mycore.datamodel.metadata.share.MCRMetadataShareAgent#inheritableMetadataChanged(org.mycore.datamodel.metadata.MCRObject, org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
-    public boolean inheritableMetadataChanged(MCRObject oldVersion, MCRObject newVersion) {
+    public boolean shareableMetadataChanged(MCRObject oldVersion, MCRObject newVersion) {
         final MCRObjectMetadata md = newVersion.getMetadata();
         final MCRObjectMetadata mdold = oldVersion.getMetadata();
         //if any metadata changed we need to update children
@@ -64,10 +64,10 @@ public class MCRMODSInheritanceManager implements MCRInheritanceManager {
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.datamodel.metadata.inheritance.MCRInheritanceManager#inheritMetadata(org.mycore.datamodel.metadata.MCRObject)
+     * @see org.mycore.datamodel.metadata.share.MCRMetadataShareAgent#inheritMetadata(org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
-    public void inheritMetadata(MCRObject parent) {
+    public void distributeMetadata(MCRObject parent) {
         MCRMODSWrapper parentWrapper = new MCRMODSWrapper(parent);
         List<MCRMetaLinkID> children = parentWrapper.getMCRObject().getStructure().getChildren();
         if (!children.isEmpty()) {
@@ -88,10 +88,10 @@ public class MCRMODSInheritanceManager implements MCRInheritanceManager {
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.datamodel.metadata.inheritance.MCRInheritanceManager#inheritMetadata(org.mycore.datamodel.metadata.MCRObject, org.mycore.datamodel.metadata.MCRObject)
+     * @see org.mycore.datamodel.metadata.share.MCRMetadataShareAgent#inheritMetadata(org.mycore.datamodel.metadata.MCRObject, org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
-    public void inheritMetadata(MCRObject parent, MCRObject child) {
+    public void receiveMetadata(MCRObject parent, MCRObject child) {
         MCRMODSWrapper parentWrapper = new MCRMODSWrapper(parent);
         MCRMODSWrapper childWrapper = new MCRMODSWrapper(child);
         inheritToChild(parentWrapper, childWrapper);

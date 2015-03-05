@@ -21,42 +21,42 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.datamodel.metadata.inheritance;
+package org.mycore.datamodel.metadata.share;
 
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
- * This factory creates {@link MCRInheritanceManager} instances.
+ * This factory creates {@link MCRMetadataShareAgent} instances.
  * 
- * To configure a custom inheritance manager define a property <code>MCR.Metadata.Inheritance.{objectType}</code>
- * that points to a class that implements the {@link MCRInheritanceManager} interface.
+ * To configure a custom metadata share agent define a property <code>MCR.Metadata.ShareAgent.{objectType}</code>
+ * that points to a class that implements the {@link MCRMetadataShareAgent} interface.
  * @author Thomas Scheffler (yagee)
  * 
  */
-public class MCRInheritanceManagerFactory {
+public class MCRMetadataShareAgentFactory {
 
-    private final static String CONFIG_PREFIX = "MCR.Metadata.Inheritance.";
+    private final static String CONFIG_PREFIX = "MCR.Metadata.ShareAgent.";
 
-    private static final MCRDefaultInheritanceManager DEFAULT_MANAGER = new MCRDefaultInheritanceManager();
+    private static final MCRDefaultMetadataShareAgent DEFAULT_AGENT = new MCRDefaultMetadataShareAgent();
 
-    public static MCRInheritanceManager getManager(MCRObjectID objectId) {
+    public static MCRMetadataShareAgent getAgent(MCRObjectID objectId) {
         String propertyName = CONFIG_PREFIX + objectId.getTypeId();
         String propertyValue = MCRConfiguration.instance().getString(propertyName, null);
         if (propertyValue != null) {
             //we will not get undefined problems here
-            MCRInheritanceManager inheritanceManager = MCRConfiguration.instance().<MCRInheritanceManager> getSingleInstanceOf(propertyName, (String) null);
-            return inheritanceManager;
+            MCRMetadataShareAgent metadataShareAgent = MCRConfiguration.instance().<MCRMetadataShareAgent> getSingleInstanceOf(propertyName, (String) null);
+            return metadataShareAgent;
         }
-        return getDefaultManager();
+        return getDefaultAgent();
 
     }
 
     /**
-     * Standard manager that uses <code>org.mycore.datamodel.MCRMeta*</code> classes.
+     * Standard agent that uses <code>org.mycore.datamodel.MCRMeta*</code> classes.
      */
-    public static MCRInheritanceManager getDefaultManager() {
-        return DEFAULT_MANAGER;
+    public static MCRMetadataShareAgent getDefaultAgent() {
+        return DEFAULT_AGENT;
     }
 
 }

@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.datamodel.metadata.inheritance;
+package org.mycore.datamodel.metadata.share;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
@@ -38,15 +38,15 @@ import org.mycore.datamodel.metadata.MCRObjectMetadata;
  * @author Thomas Scheffler (yagee)
  *
  */
-class MCRDefaultInheritanceManager implements MCRInheritanceManager {
+class MCRDefaultMetadataShareAgent implements MCRMetadataShareAgent {
 
-    private final static Logger LOGGER = Logger.getLogger(MCRDefaultInheritanceManager.class);
+    private final static Logger LOGGER = Logger.getLogger(MCRDefaultMetadataShareAgent.class);
 
     /* (non-Javadoc)
-     * @see org.mycore.datamodel.metadata.inheritance.MCRInheritanceManager#inheritableMetadataChanged(org.mycore.datamodel.metadata.MCRObject, org.mycore.datamodel.metadata.MCRObject)
+     * @see org.mycore.datamodel.metadata.share.MCRMetadataShareAgent#inheritableMetadataChanged(org.mycore.datamodel.metadata.MCRObject, org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
-    public boolean inheritableMetadataChanged(MCRObject oldVersion, MCRObject newVersion) {
+    public boolean shareableMetadataChanged(MCRObject oldVersion, MCRObject newVersion) {
         final MCRObjectMetadata md = newVersion.getMetadata();
         final MCRObjectMetadata mdold = oldVersion.getMetadata();
         //simple save without changes, this is also a short-path for mycore-mods
@@ -85,10 +85,10 @@ class MCRDefaultInheritanceManager implements MCRInheritanceManager {
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.datamodel.metadata.inheritance.MCRInheritanceManager#inheritMetadata(org.mycore.datamodel.metadata.MCRObject)
+     * @see org.mycore.datamodel.metadata.share.MCRMetadataShareAgent#inheritMetadata(org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
-    public void inheritMetadata(MCRObject parent) {
+    public void distributeMetadata(MCRObject parent) {
         for (MCRMetaLinkID childId : parent.getStructure().getChildren()) {
             LOGGER.debug("Update metadata from Child " + childId);
             final MCRObject child = MCRMetadataManager.retrieveMCRObject(childId.getXLinkHrefID());
@@ -102,10 +102,10 @@ class MCRDefaultInheritanceManager implements MCRInheritanceManager {
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.datamodel.metadata.inheritance.MCRInheritanceManager#inheritMetadata(org.mycore.datamodel.metadata.MCRObject, org.mycore.datamodel.metadata.MCRObject)
+     * @see org.mycore.datamodel.metadata.share.MCRMetadataShareAgent#inheritMetadata(org.mycore.datamodel.metadata.MCRObject, org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
-    public void inheritMetadata(MCRObject parent, MCRObject child) {
+    public void receiveMetadata(MCRObject parent, MCRObject child) {
         // remove already embedded inherited tags
         child.getMetadata().removeInheritedMetadata();
         // insert heritable tags

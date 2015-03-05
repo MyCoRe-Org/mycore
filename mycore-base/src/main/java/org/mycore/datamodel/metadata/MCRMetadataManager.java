@@ -52,8 +52,8 @@ import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.metadata.inheritance.MCRInheritanceManager;
-import org.mycore.datamodel.metadata.inheritance.MCRInheritanceManagerFactory;
+import org.mycore.datamodel.metadata.share.MCRMetadataShareAgent;
+import org.mycore.datamodel.metadata.share.MCRMetadataShareAgentFactory;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
 import org.xml.sax.SAXException;
@@ -315,7 +315,7 @@ public final class MCRMetadataManager {
 
         // prepare this object with parent metadata
         final MCRObjectID parent_id = mcrObject.getStructure().getParentID();
-        MCRObject parent = inheritMetadata(mcrObject, parent_id);
+        MCRObject parent = shareMetadata(mcrObject, parent_id);
 
         if (parent_id != null) {
             LOGGER.debug("Parent ID = " + parent_id.toString());
@@ -750,7 +750,7 @@ public final class MCRMetadataManager {
         mcrObject.getStructure().getChildren().addAll(old.getStructure().getChildren());
 
         // import all herited matadata from the parent
-        MCRObject newParent = inheritMetadata(mcrObject, newParentID);
+        MCRObject newParent = shareMetadata(mcrObject, newParentID);
 
         // if not imported via cli, createdate remains unchanged
         if (!mcrObject.isImportMode() || mcrObject.getService().getDate("createdate") == null) {
@@ -773,27 +773,27 @@ public final class MCRMetadataManager {
         }
 
         // update all children
-        boolean updatechildren = inheritableMetadataChanged(mcrObject, old);
+        boolean updatechildren = shareableMetadataChanged(mcrObject, old);
         if (updatechildren) {
-            MCRInheritanceManager inheritanceManager = MCRInheritanceManagerFactory.getManager(mcrObject.getId());
-            inheritanceManager.inheritMetadata(mcrObject);
+            MCRMetadataShareAgent metadataShareAgent = MCRMetadataShareAgentFactory.getAgent(mcrObject.getId());
+            metadataShareAgent.distributeMetadata(mcrObject);
         }
     }
 
-    private static boolean inheritableMetadataChanged(final MCRObject mcrObject, MCRObject old) {
-        MCRInheritanceManager inheritanceManager = MCRInheritanceManagerFactory.getManager(mcrObject.getId());
-        return inheritanceManager.inheritableMetadataChanged(old, mcrObject);
+    private static boolean shareableMetadataChanged(final MCRObject mcrObject, MCRObject old) {
+        MCRMetadataShareAgent metadataShareAgent = MCRMetadataShareAgentFactory.getAgent(mcrObject.getId());
+        return metadataShareAgent.shareableMetadataChanged(old, mcrObject);
     }
 
-    private static MCRObject inheritMetadata(final MCRObject mcrObject, final MCRObjectID parentID) {
+    private static MCRObject shareMetadata(final MCRObject recipient, final MCRObjectID holderID) {
         //TODO: handle inheritance of mycore-mods in that component
         MCRObject parent = null;
-        if (parentID != null) {
-            LOGGER.debug("Parent ID = " + parentID);
+        if (holderID != null) {
+            LOGGER.debug("Parent ID = " + holderID);
             try {
-                parent = MCRMetadataManager.retrieveMCRObject(parentID);
-                MCRInheritanceManager inheritanceManager = MCRInheritanceManagerFactory.getManager(parentID);
-                inheritanceManager.inheritMetadata(parent, mcrObject);
+                parent = MCRMetadataManager.retrieveMCRObject(holderID);
+                MCRMetadataShareAgent metadataShareAgent = MCRMetadataShareAgentFactory.getAgent(holderID);
+                metadataShareAgent.receiveMetadata(parent, recipient);
             } catch (final Exception e) {
                 LOGGER.error("Error while merging metadata in this object.", e);
             }

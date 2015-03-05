@@ -21,34 +21,10 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.datamodel.metadata.inheritance;
-
-import org.mycore.datamodel.metadata.MCRObject;
-
 /**
+ * Contains classes dealing with sharing of metadata.
+ * 
  * @author Thomas Scheffler (yagee)
- * @see MCRInheritanceManagerFactory
+ * @since 2015.03
  */
-public interface MCRInheritanceManager {
-
-    /**
-     * Determines if inheritable metadata changed from <code>oldVersion</code> to <code>newVersion</code>
-     * @param oldVersion
-     * @param newVersion
-     * @return
-     */
-    public boolean inheritableMetadataChanged(MCRObject oldVersion, MCRObject newVersion);
-
-    /**
-     * updates all children with heritable metadata from <code>parent</code>.
-     * @param parent
-     */
-    public void inheritMetadata(MCRObject parent);
-
-    /**
-     * Include inheritable metadata from <code>parent</code> before persisting <code>child</code>.
-     * @param parent parent to get inheritable metadata from.
-     * @param child on update/create before handling events.
-     */
-    public void inheritMetadata(MCRObject parent, MCRObject child);
-}
+package org.mycore.datamodel.metadata.share;

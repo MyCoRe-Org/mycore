@@ -21,10 +21,34 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
+package org.mycore.datamodel.metadata.share;
+
+import org.mycore.datamodel.metadata.MCRObject;
+
 /**
- * Contains classes dealing with inheritance of metadata.
- * 
  * @author Thomas Scheffler (yagee)
- * @since 2013.10
+ * @see MCRMetadataShareAgentFactory
  */
-package org.mycore.datamodel.metadata.inheritance;
+public interface MCRMetadataShareAgent {
+
+    /**
+     * Determines if shareable metadata changed from <code>oldVersion</code> to <code>newVersion</code>
+     * @param oldVersion
+     * @param newVersion
+     * @return
+     */
+    public boolean shareableMetadataChanged(MCRObject oldVersion, MCRObject newVersion);
+
+    /**
+     * updates all recipients of shareable metadata from <code>holder</code>.
+     * @param holder
+     */
+    public void distributeMetadata(MCRObject holder);
+
+    /**
+     * Include shareable metadata from <code>holder</code> before persisting <code>recipient</code>.
+     * @param holder parent or any holder to get shareable metadata from.
+     * @param recipient on update/create before handling events.
+     */
+    public void receiveMetadata(MCRObject holder, MCRObject recipient);
+}
