@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
+import org.mycore.common.MCRCalendar;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -174,7 +175,9 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                                                 }
                                                 String condfield = incond.getAttributeValue("field");
                                                 if (condfield.equals("date")) {
-                                                    if (MCRUtils.convertDateToISO(condvalue) == null) {
+                                                	try {
+                                                		MCRCalendar.getHistoryDateAsCalendar(condvalue,false,MCRCalendar.TAG_GREGORIAN);
+                                                	} catch (MCRException e) {
                                                         anInbool.removeContent(incond);
                                                         k--;
                                                         l--;
