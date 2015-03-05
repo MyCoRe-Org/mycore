@@ -23,7 +23,6 @@
 
 package org.mycore.common;
 
-import static org.mycore.common.MCRConstants.DATE_FORMAT;
 import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
 
 import java.io.BufferedOutputStream;
@@ -46,21 +45,13 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.DateFormat;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Properties;
-import java.util.TimeZone;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;

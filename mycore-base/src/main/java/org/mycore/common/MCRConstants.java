@@ -170,12 +170,4 @@ public final class MCRConstants {
     /** The default encoding */
     public final static String DEFAULT_ENCODING = "UTF-8";
 
-    /** The date format for the supported languages
-     * @deprecated undefined behavior of code as first DateFormat is not fixed.
-     **/
-    public static DateFormat[] DATE_FORMAT = { DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()), // x-...
-            DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.GERMAN), // de,ch,au
-            DateFormat.getDateInstance(DateFormat.SHORT, Locale.UK), // ar,en-UK
-            DateFormat.getDateInstance(DateFormat.SHORT, Locale.US), // en-US
-    };
 }
