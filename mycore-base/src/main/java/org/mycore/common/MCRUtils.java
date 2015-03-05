@@ -123,60 +123,6 @@ public class MCRUtils {
     }
 
     /**
-     * The methode convert the input date string to the ISO output string. If
-     * the input can't convert, the output is null.
-     * 
-     * @param indate
-     *            the date input
-     * @return the ISO output or null
-     */
-    public static String convertDateToISO(String indate) {
-        if (indate == null || (indate = indate.trim()).length() == 0) {
-            return null;
-        }
-
-        int form = indate.split("-").length;
-        String format = "";
-        switch (form) {
-        case 1:
-            format = "yyyy";
-            break;
-        case 2:
-            format = "yyyy-MM";
-            break;
-        default:
-            format = "yyyy-MM-dd";
-        }
-
-        SimpleDateFormat formatter = new SimpleDateFormat(format, Locale.ROOT);
-        Date d = null;
-        try {
-            d = formatter.parse(indate);
-            if (d != null) {
-                return indate;
-            }
-        } catch (ParseException e) {
-            LOGGER.debug("Could not parse input date \"" + indate + "\"");
-        }
-
-        // try other date formats
-        for (DateFormat df : DATE_FORMAT) {
-            // btw. not threadsafe
-            df.setLenient(false);
-
-            try {
-                return formatter.format(df.parse(indate));
-            } catch (ParseException e) {
-                LOGGER.debug("Could not parse date " + indate);
-                LOGGER.debug("Will try next date format");
-            }
-        }
-
-        LOGGER.warn("Could not parse date " + indate);
-        return null;
-    }
-
-    /**
      * This methode replace any characters to XML entity references.
      * <p>
      * <ul>
