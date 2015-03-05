@@ -17,7 +17,7 @@ public class MCRURNProvider extends MCRAbstractURNProvider {
      * @see fsu.archiv.mycore.urn.IURNProvider#generateURN()
      */
     public MCRURN generateURN() {
-        String urn = MCRURNManager.buildURN("UBL");
+        String urn = MCRURNManager.buildURN("Default");
         return MCRURN.valueOf(urn);
     }
 
