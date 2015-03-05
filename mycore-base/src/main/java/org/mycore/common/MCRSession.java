@@ -39,21 +39,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Transaction;
+import org.hibernate.TransactionException;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRSessionListener;
 
 /**
- * Instances of this class collect information kept during a session like the
- * currently active user, the preferred language etc.
+ * Instances of this class collect information kept during a session like the currently active user, the preferred
+ * language etc.
  * 
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
- * 
- * @version $Revision$ $Date: 2008-03-17 17:12:15 +0100 (Mo, 17 Mrz
- *          2008) $
+ * @version $Revision$ $Date$
  */
 public class MCRSession implements Cloneable {
     /** A map storing arbitrary session data * */
@@ -108,8 +107,8 @@ public class MCRSession implements Cloneable {
     private static MCRUserInformation guestUserInformation = MCRSystemUserInformation.getGuestInstance();
 
     /**
-     * The constructor of a MCRSession. As default the user ID is set to the
-     * value of the property variable named 'MCR.Users.Guestuser.UserName'.
+     * The constructor of a MCRSession. As default the user ID is set to the value of the property variable named
+     * 'MCR.Users.Guestuser.UserName'.
      */
     MCRSession() {
         MCRConfiguration config = MCRConfiguration.instance();
@@ -139,8 +138,8 @@ public class MCRSession implements Cloneable {
     }
 
     /**
-     * Constructs a unique session ID for this session, based on current time
-     * and IP address of host where the code runs.
+     * Constructs a unique session ID for this session, based on current time and IP address of host where the code
+     * runs.
      */
     private static String buildSessionID() {
         return UUID.randomUUID().toString();
@@ -154,19 +153,17 @@ public class MCRSession implements Cloneable {
     }
 
     /**
-     * Returns a list of all stored object keys within MCRSession.
-     * This method is not thread safe.
-     * I you need thread safe access to all stored objects use {@link MCRSession#getMapEntries()} instead.
-     * @return Returns a list of all stored object keys within MCRSession as
-     *         java.util.Ierator
+     * Returns a list of all stored object keys within MCRSession. This method is not thread safe. I you need thread
+     * safe access to all stored objects use {@link MCRSession#getMapEntries()} instead.
+     * 
+     * @return Returns a list of all stored object keys within MCRSession as java.util.Ierator
      */
     public Iterator<Object> getObjectsKeyList() {
         return Collections.unmodifiableSet(map.keySet()).iterator();
     }
 
     /**
-     * Returns an unmodifiable list of all entries in this MCRSession
-     * This method is thread safe.
+     * Returns an unmodifiable list of all entries in this MCRSession This method is thread safe.
      */
     public List<Map.Entry<Object, Object>> getMapEntries() {
         if (mapChanged) {
@@ -178,7 +175,9 @@ public class MCRSession implements Cloneable {
         return mapEntries;
     }
 
-    /** returns the current user ID
+    /**
+     * returns the current user ID
+     * 
      * @deprecated use {@link #getUserInformation()}.getUserID() instead;
      */
     public final String getCurrentUserID() {
@@ -195,28 +194,36 @@ public class MCRSession implements Cloneable {
         this.language = language;
     }
 
-    /** returns the current document ID
+    /**
+     * returns the current document ID
+     * 
      * @deprecated without replacement
      */
     public final String getCurrentDocumentID() {
         return CurrentDocumentID;
     }
 
-    /** returns the current document ID
+    /**
+     * returns the current document ID
+     * 
      * @deprecated without replacement
      */
     public final String getCurrentUserName() {
         return FullName;
     }
 
-    /** sets the current user fullname
-     * @deprecated without replacement 
+    /**
+     * sets the current user fullname
+     * 
+     * @deprecated without replacement
      */
     public final void setCurrentUserName(String userName) {
         FullName = userName;
     }
 
-    /** sets the current document ID
+    /**
+     * sets the current document ID
+     * 
      * @deprecated without replacement
      */
     public final void setCurrentDocumentID(String DocumentID) {
@@ -247,7 +254,9 @@ public class MCRSession implements Cloneable {
         map.remove(key);
     }
 
-    /** Get the ip value to the local IP
+    /**
+     * Get the ip value to the local IP
+     * 
      * @deprecated without replacement
      */
     public static String getLocalIP() {
@@ -280,7 +289,7 @@ public class MCRSession implements Cloneable {
             }
             ip = newip;
         }
-        
+
         //IPV6,z.B: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
         st = new java.util.StringTokenizer(newip, ":");
         if (st.countTokens() == 8) {
@@ -345,7 +354,7 @@ public class MCRSession implements Cloneable {
             fireSessionEvent(activated, concurrentAccess.incrementAndGet());
         } else {
             MCRException e = new MCRException("Cannot activate a Session more than once per thread: "
-                    + currentThreadCount.get().get());
+                + currentThreadCount.get().get());
             LOGGER.warn("Too many activate() calls stacktrace:", e);
             LOGGER.warn("First activate() call stacktrace:", lastActivatedStackTrace.get());
         }
@@ -366,17 +375,13 @@ public class MCRSession implements Cloneable {
     }
 
     /**
-     * Fire MCRSessionEvents.
-     * 
-     * This is a common method that fires all types of MCRSessionEvent.
-     * 
-     * Mainly for internal use of MCRSession and MCRSessionMgr.
+     * Fire MCRSessionEvents. This is a common method that fires all types of MCRSessionEvent. Mainly for internal use
+     * of MCRSession and MCRSessionMgr.
      * 
      * @param type
      *            type of event
      * @param concurrentAccessors
-     *            number of concurrentThreads (passivateEvent gets 0 for
-     *            singleThread)
+     *            number of concurrentThreads (passivateEvent gets 0 for singleThread)
      */
     void fireSessionEvent(MCRSessionEvent.Type type, int concurrentAccessors) {
         List<MCRSessionListener> listeners = MCRSessionMgr.getListeners();
@@ -406,13 +411,25 @@ public class MCRSession implements Cloneable {
      */
     public void beginTransaction() {
         if (dataBaseAccess) {
-            transaction.set(MCRHIBConnection.instance().getSession().beginTransaction());
+            Transaction newTransaction;
+            try {
+                newTransaction = MCRHIBConnection.instance().getSession().beginTransaction();
+            } catch (TransactionException e) {
+                //fix for MCR-902
+                if (e.getMessage().equals("Already have an associated managed connection")) {
+                    LOGGER.warn("Stalled connection detected, while starting new transaction");
+                } else {
+                    LOGGER.warn("Error while starting new transaction", e);
+                }
+                MCRHIBConnection.instance().getSession().close();
+                newTransaction = MCRHIBConnection.instance().getSession().beginTransaction();
+            }
+            transaction.set(newTransaction);
         }
     }
 
     /**
-     * commits the database transaction.
-     * Commit is only done if {@link #isTransactionActive()} returns true.
+     * commits the database transaction. Commit is only done if {@link #isTransactionActive()} returns true.
      */
     public void commitTransaction() {
         if (isTransactionActive()) {
@@ -425,8 +442,8 @@ public class MCRSession implements Cloneable {
     }
 
     /**
-     * forces the database transaction to roll back.
-     * Roll back is only performed if {@link #isTransactionActive()} returns true.
+     * forces the database transaction to roll back. Roll back is only performed if {@link #isTransactionActive()}
+     * returns true.
      */
     public void rollbackTransaction() {
         if (isTransactionActive()) {
@@ -438,6 +455,7 @@ public class MCRSession implements Cloneable {
 
     /**
      * Is the transaction still alive?
+     * 
      * @return true if the transaction is still alive
      */
     public boolean isTransactionActive() {
@@ -462,7 +480,8 @@ public class MCRSession implements Cloneable {
     }
 
     /**
-     * @param userSystemAdapter the userInformation to set
+     * @param userSystemAdapter
+     *            the userInformation to set
      */
     public void setUserInformation(MCRUserInformation userSystemAdapter) {
         this.userInformation = userSystemAdapter;
