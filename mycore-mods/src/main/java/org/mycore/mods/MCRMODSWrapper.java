@@ -50,6 +50,9 @@ import org.mycore.datamodel.metadata.MCRObjectService;
  */
 public class MCRMODSWrapper {
 
+    private static final String LINKED_RELATED_ITEMS = "mods:relatedItem[@type='host' or contains(@xlink:href,'_mods_') and contains('"
+        + MCRMODSRelationshipType.xPathList() + "', @type)]";
+
     private static final String MODS_CONTAINER = "modsContainer";
 
     private static final String DEF_MODS_CONTAINER = "def.modsContainer";
@@ -129,7 +132,8 @@ public class MCRMODSWrapper {
     }
 
     private XPathExpression<Element> buildXPath(String xPath) throws JDOMException {
-        return XPathFactory.instance().compile(xPath, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
+        return XPathFactory.instance().compile(xPath, Filters.element(), null, MCRConstants.MODS_NAMESPACE,
+            MCRConstants.XLINK_NAMESPACE);
     }
 
     public Element getElement(String xPath) {
@@ -148,6 +152,10 @@ public class MCRMODSWrapper {
             String msg = "Could not get elements at " + xPath;
             throw new MCRException(msg, ex);
         }
+    }
+
+    public List<Element> getLinkedRelatedItems() {
+        return getElements(LINKED_RELATED_ITEMS);
     }
 
     public String getElementValue(String xPath) {
@@ -250,10 +258,10 @@ public class MCRMODSWrapper {
             element.detach();
         }
     }
-    
+
     public void removeInheritedMetadata() {
-        String xPath="mods:relatedItem[@type='host']/*[local-name()!='part']";
-        removeElements(xPath);;
+        String xPath = LINKED_RELATED_ITEMS + "/*[local-name()!='part']";
+        removeElements(xPath);
     }
 
     public String getServiceFlag(String type) {

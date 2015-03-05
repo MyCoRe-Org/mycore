@@ -16,16 +16,18 @@ import org.jdom2.xpath.XPathFactory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRHibTestCase;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.ifs2.MCRMetadataStore;
+import org.mycore.datamodel.ifs2.MCRStoreManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -33,6 +35,7 @@ import org.xml.sax.SAXException;
 
 /**
  * Tests for MCR-910 (Link MODS documents to other MODS documents)
+ * 
  * @author Thomas Scheffler (yagee)
  */
 public class MCRMODSLinkedMetadataTest extends MCRHibTestCase {
@@ -55,6 +58,8 @@ public class MCRMODSLinkedMetadataTest extends MCRHibTestCase {
     public void tearDown() throws Exception {
         MCRMetadataManager.deleteMCRObject(bookID);
         MCRMetadataManager.deleteMCRObject(seriesID);
+        MCRMetadataStore metadataStore = MCRXMLMetadataManager.instance().getStore(seriesID);
+        MCRStoreManager.removeStore(metadataStore.getID());
         super.tearDown();
     }
 
@@ -65,7 +70,6 @@ public class MCRMODSLinkedMetadataTest extends MCRHibTestCase {
     }
 
     @Test
-    @Ignore("MCR-910 currently not implemented")
     public void testUpdate() throws IOException, URISyntaxException, MCRPersistenceException,
         MCRActiveLinkException, JDOMException, SAXException {
         MCRObject seriesNew = new MCRObject(getResourceAsURL(seriesID + "-updated.xml").toURI());
@@ -77,7 +81,7 @@ public class MCRMODSLinkedMetadataTest extends MCRHibTestCase {
         builder.setNamespace(MCRConstants.MODS_NAMESPACE);
         XPathExpression<Element> seriesTitlePath = builder.compileWith(XPathFactory.instance());
         Element titleElement = seriesTitlePath.evaluateFirst(bookNew);
-        Assert.assertNotNull(titleElement);
+        Assert.assertNotNull("No title element in related item: " + MCRUtils.asString(bookNew), titleElement);
         Assert.assertEquals("Title update from series was not promoted to book of series.",
             "Updated series title", titleElement.getText());
     }
