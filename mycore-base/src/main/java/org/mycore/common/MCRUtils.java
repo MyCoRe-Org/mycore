@@ -70,7 +70,6 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.streams.MCRDevNull;
 import org.mycore.common.content.streams.MCRMD5InputStream;
-import org.mycore.datamodel.language.MCRLanguageFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
@@ -97,21 +96,6 @@ public class MCRUtils {
 
     // public constant data
     private static final Logger LOGGER = Logger.getLogger(MCRUtils.class);
-
-    /**
-     * This method check the language string base on RFC 1766 to the supported
-     * languages in MyCoRe in a current application environment. Without appending 
-     * this MCRLanguageFactory only ENGLISH and GERMAN are supported. 
-     * 
-     * @param code
-     *            the language string in RFC 1766 syntax
-     * @return true if the language code is supported. It return true too if the code starts
-     *            with x- or i-, otherwise return false;
-     * @deprecated use {@link MCRLanguageFactory.instance()#isSupportedLanguage(String)} instead
-     */
-    public static boolean isSupportedLang(String code) {
-        return MCRLanguageFactory.instance().isSupportedLanguage(code);
-    }
 
     /**
      * This methode replace any characters to XML entity references.
