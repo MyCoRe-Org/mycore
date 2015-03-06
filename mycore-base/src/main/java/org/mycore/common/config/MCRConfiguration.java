@@ -661,8 +661,7 @@ public class MCRConfiguration {
         MCRProperties properties = getResolvedProperties();
         String newName = getDeprecatedProperties().getProperty(name);
         if (newName != null) {
-            String msg = "DEPRECATED: Developer should rename property " + name + " to "
-                + getDeprecatedProperties().getProperty(name);
+            String msg = "DEPRECATED: Developer should rename property " + name + " to " + newName;
             logWarn(msg, null);
         }
         String value = properties.getProperty(name);
