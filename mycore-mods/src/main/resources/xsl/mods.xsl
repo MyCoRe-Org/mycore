@@ -5,7 +5,6 @@
   xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mcrurn="xalan://org.mycore.urn.MCRXMLFunctions" exclude-result-prefixes="xalan xlink mcr i18n acl mods mcrxsl mcrurn encoder" version="1.0">
   <xsl:param select="'local'" name="objectHost" />
   <xsl:param name="MCR.Users.Superuser.UserName" />
-  <xsl:param name="template" select="''" /><!-- TODO: refacture! -->
   <xsl:include href="mods-utils.xsl" />
   <xsl:include href="mods2html.xsl" />
   <xsl:include href="modsmetadata.xsl" />
@@ -338,8 +337,9 @@
 
                 <xsl:if test="acl:checkPermission(./@xlink:href,'writedb')">
                   <div class="derivate_options">
-                    <img class="button_options" src="{$WebApplicationBaseURL}templates/master/{$template}/IMAGES/icon_arrow_circled_red_down.png"
-                         alt="" title="{i18n:translate('component.mods.metaData.options')}" />
+                    <!-- TODO: refacture! -->
+                    <img class="button_options" src="{$WebApplicationBaseURL}images/icon_arrow_circled_red_down.png"
+                         alt="show derivate options" title="{i18n:translate('component.mods.metaData.options')}" />
                     <div class="options">
                       <ul>
                         <xsl:if test="$derivateWithURN=false()">
@@ -444,8 +444,9 @@
           </xsl:variable>
 
           <div class="document_options">
-            <img class="button_options" src="{$WebApplicationBaseURL}templates/master/{$template}/IMAGES/icon_arrow_circled_red_down.png"
-              alt="" title="{i18n:translate('component.mods.metaData.options')}" />
+            <!-- TODO: refacture! -->
+            <img class="button_options" src="{$WebApplicationBaseURL}images/icon_arrow_circled_red_down.png"
+              alt="show document options" title="{i18n:translate('component.mods.metaData.options')}" />
             <div class="options">
               <ul>
                 <xsl:if test="$accessedit or $accesscreate">
