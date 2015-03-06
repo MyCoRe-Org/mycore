@@ -1618,8 +1618,8 @@ public class MCRCalendar {
      *            an instance of a Calendar
      * @return the Julian Day number as Integer
      */
-    public static int getJulianDayNumber(Calendar date) {
-        return date.get(Calendar.JULIAN_DAY);
+    public static int getJulianDayNumber(Calendar input_calendar) {
+        return input_calendar.get(Calendar.JULIAN_DAY);
     }
 
     /**
@@ -1629,10 +1629,24 @@ public class MCRCalendar {
      *            an instance of a Calendar
      * @return the Julian Day number as String
      */
-    public static String getJulianDayNumberAsString(Calendar date) {
-        return Integer.toString(date.get(Calendar.JULIAN_DAY));
+    public static String getJulianDayNumberAsString(Calendar input_calendar) {
+        return Integer.toString(input_calendar.get(Calendar.JULIAN_DAY));
     }
-
+    
+    /**
+     * This method get the Gregorian calendar form a given calendar
+     * 
+     * @param input_calendar
+     *            an instance of a Calendar
+     * @return a Gregorian calendar
+     */
+     public static GregorianCalendar getGregorianCalendarOfACalendar(Calendar input_calendar) {
+    	 int julian_day = getJulianDayNumber(input_calendar);
+    	 GregorianCalendar ret = new GregorianCalendar();
+    	 ret.set(Calendar.JULIAN_DAY, julian_day);
+    	 return ret;
+     }
+     
     /**
      * This method returns the date as string in format 'yy-MM-dd G'.
      * 

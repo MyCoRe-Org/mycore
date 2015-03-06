@@ -55,11 +55,15 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import com.ibm.icu.util.Calendar;
+import com.ibm.icu.util.GregorianCalendar;
+
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.jdom2.output.DOMOutputter;
 import org.joda.time.DateTimeZone;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.MCRCalendar;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
 import org.mycore.common.MCRSessionMgr;
@@ -235,16 +239,31 @@ public class MCRXMLFunctions {
         return getISODate(simpleDate, simpleFormat, null);
     }
 
-    public static String getISODateFromMCRHistoryDate(String simpleDate) throws ParseException {
-        String[] dates = simpleDate.split("\\.");
-        if (dates[2].endsWith("BC")) {
-            dates[2] = dates[2].replace(" BC", "");
-            dates[2] = "-" + dates[2];
-        } else {
-            dates[2] = dates[2].replace(" AD", "");
-        }
-        String Date = dates[2] + "-" + dates[1] + "-" + dates[0] + "T00:00:00.000Z";
-        return Date;
+    /**
+     * The method get a date String in format yyyy-MM-ddThh:mm:ssZ for ancient date values.
+     * 
+     * @param date_value the date string
+     * @param field_name the name of field of MCRMetaHistoryDate, it should be 'von' or 'bis'
+     * @param calendar_name the name if the calendar defined in MCRCalendar
+     * @return the date in format yyyy-MM-ddThh:mm:ssZ
+     */
+    public static String getISODateFromMCRHistoryDate(String date_value, String field_name, String calendar_name) throws ParseException {
+    	String formatted_date = "";
+    	if (field_name == null || field_name.trim().length() == 0) {
+    		return "";
+    	}
+    	boolean use_last_value = false;
+    	if (field_name.equals("bis"))
+    		use_last_value = true;
+    	try {
+          Calendar calendar = MCRCalendar.getHistoryDateAsCalendar(date_value,use_last_value,calendar_name);
+          GregorianCalendar g_calendar = MCRCalendar.getGregorianCalendarOfACalendar(calendar);
+          formatted_date = MCRCalendar.getCalendarDateToFormattedString(g_calendar,"yyyy-MM-dd") + "T00:00:00.000Z";
+    	} catch (Exception e) {
+    	  e.printStackTrace();
+    	  return "";
+	    }
+        return formatted_date;
     }
 
     /**

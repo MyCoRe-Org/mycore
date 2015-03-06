@@ -20,7 +20,7 @@
         <xsl:choose>
           <xsl:when test="(($element = 'von') or ($element = 'bis'))">
             <field name="{$element}">
-              <xsl:value-of select="mcrxsl:getISODateFromMCRHistoryDate(.)" />
+              <xsl:value-of select="mcrxsl:getISODateFromMCRHistoryDate(.,$element,../calendar/text())" />
             </field>
             <xsl:for-each select="./@*">
               <!-- <elementName>.<attribute.name>.<attrVal> -->
