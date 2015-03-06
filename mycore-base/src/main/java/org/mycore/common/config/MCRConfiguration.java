@@ -659,13 +659,14 @@ public class MCRConfiguration {
             throw new MCRConfigurationException("MCRConfiguration is still not initialized");
         }
         MCRProperties properties = getResolvedProperties();
-        if (getDeprecatedProperties().containsKey(name)) {
+        String newName = getDeprecatedProperties().getProperty(name);
+        if (newName != null) {
             String msg = "DEPRECATED: Developer should rename property " + name + " to "
                 + getDeprecatedProperties().getProperty(name);
             logWarn(msg, null);
         }
         String value = properties.getProperty(name);
-        return value == null ? defaultValue : value.trim();
+        return value == null ? newName == null ? defaultValue : getString(newName, defaultValue) : value.trim();
     }
 
     /**
