@@ -118,9 +118,10 @@
       </xsl:if>
     </xsl:for-each>
     <!-- add allMeta from parent -->
-    <xsl:for-each select="mods:relatedItem[@type='host']">
+    <xsl:for-each select="mods:relatedItem">
+      <xsl:variable name="type" select="@type" />
       <xsl:for-each select="mods:titleInfo/descendant-or-self::*[text()]">
-        <field name="mods.title.host">
+        <field name="mods.title.{$type}">
           <xsl:value-of select="text()" />
         </field>
       </xsl:for-each>
@@ -135,10 +136,33 @@
         </xsl:for-each>
       </xsl:for-each>
       <xsl:for-each select="mods:identifier">
-        <field name="mods.identifier.host">
+        <field name="mods.identifier.{$type}">
           <xsl:value-of select="text()" />
         </field>
       </xsl:for-each>
+      <!-- START MCR-888 -->
+      <xsl:variable name="relatedID">
+        <xsl:choose>
+          <xsl:when test="contains(@xlink:href,'_mods_')">
+            <xsl:value-of select="@xlink:href" />
+          </xsl:when>
+          <xsl:when test="@type='host'">
+            <xsl:value-of select="ancestor-or-self::mycoreobject/structure/parents/parent/@xlink:href" />
+          </xsl:when>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:if test="$relatedID">
+        <field name="mods.relatedItem">
+          <xsl:value-of select="$relatedID" />
+        </field>
+        <field name="mods.relatedItem.{$type}">
+          <xsl:value-of select="$relatedID" />
+        </field>
+        <field name="mods.relatedItem.{$relatedID}">
+          <xsl:value-of select="$type" />
+        </field>
+      </xsl:if>
+      <!-- END MCR-888 -->
     </xsl:for-each>
     <xsl:for-each select="mods:accessCondition[@type='embargo']">
       <field name="mods.embargo">
