@@ -35,12 +35,14 @@ import org.apache.log4j.Logger;
 
 /**
  * Invalidates a session and sends redirect to referring page.
+ * 
  * @author Thomas Scheffler (yagee)
- *
  */
 public class MCRLogoutServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
+
+    private static final String LOGOUT_REDIRECT_URL_PARAMETER = "url";
 
     private static final Logger LOGGER = Logger.getLogger(MCRLogoutServlet.class);
 
@@ -57,12 +59,18 @@ public class MCRLogoutServlet extends HttpServlet {
             LOGGER.debug("Invalidate HTTP-Session: " + session.getId());
             session.invalidate();
         }
-        String returnURL = req.getHeader("Referer");
-        if (returnURL == null) {
-            returnURL = req.getContextPath() + "/";
-        }
+        String returnURL = getReturnURL(req);
         LOGGER.debug("Redirect to: " + returnURL);
         resp.sendRedirect(returnURL);
+    }
+
+    static String getReturnURL(HttpServletRequest req) {
+        String returnURL = req.getParameter(LOGOUT_REDIRECT_URL_PARAMETER);
+        if (returnURL == null) {
+            String referer = req.getHeader("Referer");
+            returnURL = (referer != null) ? referer : req.getContextPath() + "/";
+        }
+        return returnURL;
     }
 
 }

@@ -142,7 +142,7 @@ public class MCRLoginServlet extends MCRServlet {
         String returnURL = req.getParameter(LOGIN_REDIRECT_URL_PARAMETER);
         if (returnURL == null) {
             String referer = req.getHeader("Referer");
-            returnURL = (referer != null) ? referer : MCRFrontendUtil.getBaseURL();
+            returnURL = (referer != null) ? referer : req.getContextPath() + "/";
         }
         return returnURL;
     }
