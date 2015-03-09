@@ -96,10 +96,6 @@ public class MCRLoginServlet extends MCRServlet {
      * changes the current login user and redirects
      * to the stored url.
      * 
-     * MCRLoginServlet?action=logout
-     * changes to guest user and redirects to 
-     * the stored url.
-     * 
      * MCRLoginServlet?action=cancel
      * does not change login user, just
      * redirects to the target url
