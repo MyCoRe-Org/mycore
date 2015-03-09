@@ -69,6 +69,7 @@
           <xsl:value-of select="@href" />
         </xsl:attribute>
       </xsl:if>
+      <xsl:copy-of select="@id" />
       <xed:output i18n="{@i18n}" />
     </button>
   </xsl:template>
