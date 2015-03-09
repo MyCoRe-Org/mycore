@@ -51,9 +51,8 @@ import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.frontend.cli.MCRAbstractCommands;
-import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.frontend.cli.annotation.MCRCommand;
-import org.mycore.user2.utils.MCRRoleTransformer;
+import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.user2.utils.MCRUserTransformer;
 import org.xml.sax.SAXParseException;
 
@@ -151,71 +150,6 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
         LOGGER.info(MessageFormat.format("The user {0} with password {1} is installed.", suser, spasswd));
         return Arrays.asList("change to user " + suser + " with " + spasswd);
-    }
-
-    /**
-     * This method invokes {@link MCRRoleManager#deleteRole(String)} and
-     * permanently removes a role from the system.
-     * 
-     * @param roleID
-     *            the ID of the role which will be deleted
-     */
-    @MCRCommand(syntax = "delete role {0}",
-            help = "Deletes the role {0} from the user system, but only if it has no user assigned.", order = 80)
-    public static void deleteRole(String roleID) {
-        MCRRoleManager.deleteRole(roleID);
-    }
-
-    /**
-     * Loads XML from a user and looks for roles currently not present in the
-     * system and creates them.
-     * 
-     * @param fileName
-     *            a valid user XML file
-     * @throws IOException
-     * @throws SAXParseException
-     */
-    @MCRCommand(syntax = "add roles from user file {0}", help = "Adds roles found in user file {0} that do not exist",
-            order = 100)
-    public static void addRoles(String fileName) throws SAXParseException, IOException {
-        LOGGER.info("Reading file " + fileName + " ...");
-        Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(fileName));
-        Element user = doc.getRootElement();
-        Element roles = user.getChild("roles");
-        if (roles == null) {
-            return;
-        }
-        List<Element> roleList = roles.getChildren("role");
-        for (Element role : roleList) {
-            String name = role.getAttributeValue("name");
-            MCRRole mcrRole = MCRRoleManager.getRole(name);
-            if (mcrRole == null) {
-                mcrRole = MCRRoleTransformer.buildMCRRole(role);
-                MCRRoleManager.addRole(mcrRole);
-            }
-        }
-    }
-
-    /**
-     * Loads XML from a user and looks for roles currently not present in the
-     * system and creates them.
-     * 
-     * @param fileName
-     *            a valid user XML file
-     * @throws IOException
-     * @throws SAXParseException
-     */
-    @MCRCommand(syntax = "import role from file {0}", help = "Imports a role from file, if that role does not exist",
-            order = 90)
-    public static void addRole(String fileName) throws SAXParseException, IOException {
-        LOGGER.info("Reading file " + fileName + " ...");
-        Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(fileName));
-        MCRRole role = MCRRoleTransformer.buildMCRRole(doc.getRootElement());
-        if (MCRRoleManager.getRole(role.getName()) == null) {
-            MCRRoleManager.addRole(role);
-        } else {
-            LOGGER.info("Role " + role.getName() + " does already exist.");
-        }
     }
 
     /**
