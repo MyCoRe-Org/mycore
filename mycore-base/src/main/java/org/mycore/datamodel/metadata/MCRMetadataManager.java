@@ -676,6 +676,12 @@ public final class MCRMetadataManager {
         }
         // update the derivate
         mcrDerivate.getService().setDate("createdate", old.getService().getDate("createdate"));
+        if(!mcrDerivate.getService().isFlagTypeSet(MCRObjectService.FLAG_TYPE_CREATEDBY)){
+            for(String flagCreatedBy : old.getService().getFlags(MCRObjectService.FLAG_TYPE_CREATEDBY)){
+                mcrDerivate.getService().addFlag(MCRObjectService.FLAG_TYPE_CREATEDBY, flagCreatedBy);
+            }
+        }
+
         MCRMetadataManager.updateMCRDerivateXML(mcrDerivate);
 
         // update to IFS
@@ -757,6 +763,11 @@ public final class MCRMetadataManager {
         if (!mcrObject.isImportMode() || mcrObject.getService().getDate("createdate") == null) {
             mcrObject.getService().setDate("createdate", old.getService().getDate("createdate"));
         }
+        if(!mcrObject.isImportMode() && !mcrObject.getService().isFlagTypeSet(MCRObjectService.FLAG_TYPE_CREATEDBY)){
+            for(String flagCreatedBy : old.getService().getFlags(MCRObjectService.FLAG_TYPE_CREATEDBY)){
+                mcrObject.getService().addFlag(MCRObjectService.FLAG_TYPE_CREATEDBY, flagCreatedBy);
+            }
+        } 
 
         // update this dataset
         MCRMetadataManager.fireUpdateEvent(mcrObject);
