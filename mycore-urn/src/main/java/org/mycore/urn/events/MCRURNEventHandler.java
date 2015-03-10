@@ -85,7 +85,7 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
             String type = obj.getId().getTypeId();
 
             MCRConfiguration conf = MCRConfiguration.instance();
-            String xPathString = conf.getString(" MCR.Persistence.URN.XPath." + type,
+            String xPathString = conf.getString("MCR.Persistence.URN.XPath." + type,
                 conf.getString("MCR.Persistence.URN.XPath", ""));
 
             if (!xPathString.isEmpty()) {
