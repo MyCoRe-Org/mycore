@@ -38,12 +38,13 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectMetadata;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.xml.sax.SAXException;
 
 /**
  * This class provides methods for adding URN to mycore objects and derivates.
- * 
+ *
  * @author shermann
  */
 public class MCRURNAdder {
@@ -52,7 +53,7 @@ public class MCRURNAdder {
 
     /**
      * This methods adds an URN to the metadata of a mycore object.
-     * 
+     *
      * @param objectId
      * @return
      * @throws Exception
@@ -104,7 +105,7 @@ public class MCRURNAdder {
     /**
      * This methods adds an URN to the metadata of a mycore object. The urn is
      * stored under the given xpath in the mycore object given by its id.
-     * 
+     *
      * @param objectId
      *            the id of the mycore object (not to be a derivate)
      * @param xpath
@@ -113,22 +114,21 @@ public class MCRURNAdder {
      *            attribute to set the attributes must be separated by an
      *            " and ". E.g. invoking with <code>
      *              <pre>
-     *                  .mycoreobject/metadata/def.identifier/identifier[@type='aType']
+     *                  /mycoreobject/metadata/def.identifier/identifier[@type='aType']
      *              </pre>
      *            </code>as xpath parameter will lead to the following Element<br/>
      *            <code>
      *              <pre>
      *                  &lt;def.identifier&gt;
      *                      &lt;identifier type="aType"&gt;urn:foo:bar&lt;/identifier&gt;
-     *                  &lt;/def.identifier&gt; 
-     *              </pre>    
-     *            </code> stored directly under ./mycoreobject/metadata.<br/>
-     *            Please note, only xpath starting with ./mycoreobject/metadata
+     *                  &lt;/def.identifier&gt;
+     *              </pre>
+     *            </code> stored directly under /mycoreobject/metadata.<br/>
+     *            Please note, only xpath starting with /mycoreobject/metadata
      *            will be accepted.
      * @return <code>true</code> if successful, <code>false</code> otherwise
      * @throws Exception
-     * 
-     * @deprecated will be deleted without replacement
+     *
      */
     public boolean addURN(String objectId, String xpath) throws Exception {
         MCRObjectID id = MCRObjectID.getInstance(objectId);
@@ -139,21 +139,18 @@ public class MCRURNAdder {
         }
 
         MCRObject mcrobj = MCRMetadataManager.retrieveMCRObject(id);
-        XPathExpression<Element> xp = XPathFactory.instance().compile("./mycoreobject/metadata", Filters.element());
-        Document xml = mcrobj.createXML();
-        Element metaData = xp.evaluateFirst(xml);
+        MCRObjectMetadata mcrmetadata = mcrobj.getMetadata();
 
-        if (metaData == null) {
-            LOGGER.error("Could not resolve metadata element");
-            return false;
-        }
         String urn = generateURN();
         Element urnHoldingElement = createElementByXPath(xpath, urn);
-        metaData.addContent(urnHoldingElement);
+        //metaData.addContent(urnHoldingElement);
+        MCRObjectMetadata urnmetadata = new MCRObjectMetadata();
+        urnmetadata.setFromDOM(urnHoldingElement);
 
         try {
             LOGGER.info("Updating metadata of object " + objectId + " with URN " + urn + " [" + xpath + "]");
-            MCRXMLMetadataManager.instance().update(id, xml, new Date());
+            //MCRXMLMetadataManager.instance().update(id, xml, new Date());
+            mcrmetadata.mergeMetadata(urnmetadata);
         } catch (Exception ex) {
             LOGGER.error("Updating metadata of object " + objectId + " with URN " + urn + " failed. [" + xpath + "]",
                 ex);
@@ -172,30 +169,32 @@ public class MCRURNAdder {
 
     /**
      * Creates an {@link Element} given by an xpath.
-     * 
+     *
      * @param xpath
      *            the xpath
      * @return an Element as specified by the given xpath
      * @throws Exception
      */
     private Element createElementByXPath(String xpath, String urn) {
-        String prefix = ".mycoreobject/metadata/";
+        String prefix = "/mycoreobject/metadata/";
         if (!xpath.startsWith(prefix)) {
             throw new IllegalArgumentException("XPath does not start with '" + prefix + "'");
         }
 
-        String[] parts = xpath.substring(prefix.length()).split("/");
-        /* build the root element */
-        Element toReturn = getElement(parts[0]);
-        for (Attribute a : getAttributes(parts[0])) {
+        String[] parts = xpath.split("/");
+        /* build the element starting with metadata */
+        Element toReturn = getElement(parts[2]);
+        for (Attribute a : getAttributes(parts[2])) {
             toReturn.setAttribute(a);
         }
+        LOGGER.info("URN-Element - root node: " + parts[2]);
 
         Element predecessor = toReturn;
 
         /* add the children */
-        for (int i = 1; i < parts.length; i++) {
+        for (int i = 3; i < parts.length; i++) {
             List<Attribute> attributes = getAttributes(parts[i]);
+            LOGGER.info("URN-Element - add node: " + parts[i]);
             Element element = getElement(parts[i]);
             for (Attribute a : attributes) {
                 element.setAttribute(a);
@@ -214,7 +213,7 @@ public class MCRURNAdder {
 
     /**
      * Creates the element name from the given string which is part of an xpath.
-     * 
+     *
      * @param s
      *            source string, part of an xpath
      * @return the element name
@@ -247,7 +246,7 @@ public class MCRURNAdder {
     /**
      * Creates a list of {@link Attribute} from the given string which is part
      * of an xpath.
-     * 
+     *
      * @param s
      *            source string, part of an xpath
      * @return a list of {@link Attribute}, or an empty list, if there are no
@@ -291,7 +290,7 @@ public class MCRURNAdder {
 
     /**
      * Method generates a single URN with attached checksum.
-     * 
+     *
      * @return an URN, as specified by the urn provider (class to be set in
      *         mycore.properties)
      * @throws Exception
@@ -306,12 +305,12 @@ public class MCRURNAdder {
     /**
      * This methods adds a URN to the derivate of a mycore object and to all
      * files within this derivate
-     * 
+     *
      * @param derivateId
      *            the derivate id
-     * @throws SAXException 
-     * @throws JDOMException 
-     * @throws IOException 
+     * @throws SAXException
+     * @throws JDOMException
+     * @throws IOException
      */
     public boolean addURNToDerivates(String derivateId) throws IOException, JDOMException, SAXException {
         MCRObjectID id = MCRObjectID.getInstance(derivateId);
@@ -441,7 +440,7 @@ public class MCRURNAdder {
 
     /**
      * Checks whether it is allowed to add URN to derivates.
-     * 
+     *
      * @return <code>true</code> if it allowed to add urn to the owner of the
      *         derivate,<code>false</code> otherwise
      */
@@ -454,7 +453,7 @@ public class MCRURNAdder {
 
     /**
      * Reads the property "URN.Enabled.Objects".
-     * 
+     *
      * @param givenType
      *            the type of the mycore object to check
      * @return <code>true</code> if the given type is in the list of allowed
@@ -484,9 +483,9 @@ public class MCRURNAdder {
 
     /**
      * @return
-     * @throws ClassNotFoundException 
-     * @throws IllegalAccessException 
-     * @throws InstantiationException 
+     * @throws ClassNotFoundException
+     * @throws IllegalAccessException
+     * @throws InstantiationException
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
