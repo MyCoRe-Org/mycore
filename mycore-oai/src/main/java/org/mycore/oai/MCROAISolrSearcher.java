@@ -105,7 +105,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
     }
 
     private String buildFromUntilCondition(Date from, Date until) {
-        String fieldFromUntil = getConfig().getString(getConfigPrefix() + "Search.FromUntil");
+        String fieldFromUntil = getConfig().getString(getConfigPrefix() + "Search.FromUntil", "modified");
         StringBuilder query = new StringBuilder(" +").append(fieldFromUntil).append(":[");
         if (from == null) {
             query.append("* TO ");
@@ -126,8 +126,8 @@ public class MCROAISolrSearcher extends MCROAISearcher {
 
     @Override
     public Date getEarliestTimestamp() {
-        String sortBy = getConfig().getString(getConfigPrefix() + "EarliestDatestamp.SortBy");
-        String fieldName = getConfig().getString(getConfigPrefix() + "EarliestDatestamp.FieldName");
+        String sortBy = getConfig().getString(getConfigPrefix() + "EarliestDatestamp.SortBy", "modified asc");
+        String fieldName = getConfig().getString(getConfigPrefix() + "EarliestDatestamp.fieldName", "modified");
         String restriction = getConfig().getString(getConfigPrefix() + "Search.Restriction", null);
         ModifiableSolrParams params = new ModifiableSolrParams();
         params.add("sort", sortBy);

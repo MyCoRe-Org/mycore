@@ -57,18 +57,17 @@ public class MCROAIIdentify extends SimpleIdentify {
         this.configPrefix = configPrefix;
 
         this.setBaseURL(baseURL);
-        this.setRepositoryName(this.config.getString(configPrefix + "RepositoryName"));
-        
-        String adminMail = this.config.getString(configPrefix + "AdminEmail");
-        this.getAdminEmailList().add(adminMail);
-        
-        this.setEarliestDatestamp(calculateEarliestTimestamp());
-        
-        String deletedRecordPolicy = this.config.getString(configPrefix + "DeletedRecord");
+        this.setRepositoryName(this.config.getString(configPrefix + "RepositoryName", "Undefined repository name"));
+        String deletedRecordPolicy = this.config.getString(configPrefix + "DeletedRecord",
+            DeletedRecordPolicy.Transient.name());
         this.setDeletedRecordPolicy(DeletedRecordPolicy.get(deletedRecordPolicy));
-        String granularity = this.config.getString(configPrefix + "Granularity");
+        String granularity = this.config.getString(configPrefix + "Granularity", Granularity.YYYY_MM_DD.name());
         this.setGranularity(Granularity.valueOf(granularity));
-        
+        String adminMail = this.config.getString(configPrefix + "AdminEmail",
+            config.getString("MCR.Mail.Sender"));
+
+        this.setEarliestDatestamp(calculateEarliestTimestamp());
+        this.getAdminEmailList().add(adminMail);
         this.getDescriptionList().add(getIdentifierDescription());
         this.getDescriptionList().add(getFriendsDescription());
     }
@@ -82,11 +81,7 @@ public class MCROAIIdentify extends SimpleIdentify {
     public FriendsDescription getFriendsDescription() {
         FriendsDescription desc = new FriendsDescription();
         Map<String, String> friends = this.config.getPropertiesMap(this.configPrefix + "Friends.");
-        for (String value : friends.values()) {
-            if(value.trim().length()>0){
-                desc.getFriendsList().add(value);
-            }
-        }
+        desc.getFriendsList().addAll(friends.values());
         return desc;
     }
 

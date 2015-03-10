@@ -39,6 +39,7 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.oai.pmh.dataprovider.OAIAdapter;
 import org.mycore.oai.pmh.dataprovider.OAIRequest;
 import org.mycore.oai.pmh.dataprovider.OAIResponse;
 import org.mycore.oai.pmh.dataprovider.OAIXMLProvider;
@@ -123,7 +124,8 @@ public class MCROAIDataProvider extends MCRServlet {
      * Add link to XSL stylesheet for displaying OAI response in web browser.
      */
     private Document addXSLStyle(Document doc) {
-        String xsl = MCRConfiguration.instance().getString( getOAIAdapter().getConfigPrefix() + "ResponseStylesheet");
+        String styleSheet = MCROAIAdapter.PREFIX + getServletName() + ".ResponseStylesheet";
+        String xsl = MCRConfiguration.instance().getString(styleSheet, "oai/oai2.xsl");
         if (!xsl.isEmpty()) {
             Map<String, String> pairs = new HashMap<String, String>();
             pairs.put("type", "text/xsl");
@@ -133,7 +135,7 @@ public class MCROAIDataProvider extends MCRServlet {
         return doc;
     }
 
-    private MCROAIAdapter getOAIAdapter() {
+    private OAIAdapter getOAIAdapter() {
         String oaiAdapterKey = getServletName();
         MCROAIAdapter oaiAdapter = mcrOAIAdapterMap.get(oaiAdapterKey);
         if (oaiAdapter == null) {
