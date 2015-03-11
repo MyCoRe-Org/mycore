@@ -39,6 +39,7 @@ import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.output.Format;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
@@ -48,8 +49,7 @@ import org.mycore.frontend.editor.MCREditorServlet;
 import org.xml.sax.SAXException;
 
 /**
- * This servlet displays static *.xml files stored in the web application by
- * sending them to MCRLayoutService.
+ * This servlet displays static *.xml files stored in the web application by sending them to MCRLayoutService.
  * 
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
@@ -75,6 +75,9 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
     @Override
     public void doGetPost(MCRServletJob job) throws java.io.IOException, MCRException, SAXException, JDOMException,
         URISyntaxException, TransformerException {
+        if (!MCRAccessManager.checkPermission("website:" + job.getRequest().getServletPath())) {
+            job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
+        }
         URL resource = resolveResource(job);
         if (resource != null) {
             HttpServletRequest request = job.getRequest();
@@ -115,7 +118,8 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
     }
 
     /** For defined document types like static webpages, replace editor elements with complete editor definition */
-    protected MCRContent expandEditorElements(HttpServletRequest request, HttpServletResponse response, URL resource) throws IOException,
+    protected MCRContent expandEditorElements(HttpServletRequest request, HttpServletResponse response, URL resource)
+        throws IOException,
         JDOMException, SAXException, MalformedURLException {
         MCRContent content = new MCRURLContent(resource);
         if (mayContainEditorForm(content)) {
