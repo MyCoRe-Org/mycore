@@ -58,10 +58,10 @@ public final class MCRMODSClassificationSupport {
     }
 
     /**
-     * Inspects the authority information in the given MODS XML element and
-     * returns a category ID which matches.
+     * Inspects the authority information in the given MODS XML element and returns a category ID which matches.
      * 
-     * @param modsElement MODS element
+     * @param modsElement
+     *            MODS element
      * @return {@link MCRCategoryID} instance or null if no such category exists
      */
     public static MCRCategoryID getCategoryID(Element modsElement) {
@@ -70,10 +70,10 @@ public final class MCRMODSClassificationSupport {
     }
 
     /**
-     * Inspects the authority information in the given MODS XML element and
-     * returns a category ID which matches.
+     * Inspects the authority information in the given MODS XML element and returns a category ID which matches.
      * 
-     * @param modsElement MODS element
+     * @param modsElement
+     *            MODS element
      * @return {@link MCRCategoryID} instance or null if no such category exists
      */
     public static MCRCategoryID getCategoryID(org.jdom2.Element modsElement) {
@@ -82,23 +82,27 @@ public final class MCRMODSClassificationSupport {
     }
 
     /**
-     * For a category ID, looks up the authority information for
-     * that category and sets the attributes in the given MODS element so that
-     * it represents that category.
+     * For a category ID, looks up the authority information for that category and sets the attributes in the given MODS
+     * element so that it represents that category.
      * 
-     * @param categoryID the ID of the category that is set 
-     * @param inElement the element in which authority/authorityURI/valueURI should be set.
+     * @param categoryID
+     *            the ID of the category that is set
+     * @param inElement
+     *            the element in which authority/authorityURI/valueURI should be set.
      */
     public static void setAuthorityInfo(MCRCategoryID categoryID, org.jdom2.Element inElement) {
         MCRAuthorityInfo.getAuthorityInfo(categoryID).setInElement(inElement);
     }
 
     /**
-     * For a category ID, looks up the authority information for
-     * that category and returns the attributes in the given MODS element so that
-     * it represents that category. This is used as a Xalan extension.
+     * For a category ID, looks up the authority information for that category and returns the attributes in the given
+     * MODS element so that it represents that category. This is used as a Xalan extension.
      */
     public static NodeList getClassNodes(final NodeList sources) {
+        if (sources.getLength() == 0) {
+            LOGGER.warn("Cannot get first element of node list 'sources'.");
+            return null;
+        }
         DocumentBuilder documentBuilder = MCRDOMUtils.getDocumentBuilderUnchecked();
         try {
             Document document = documentBuilder.newDocument();
@@ -118,6 +122,10 @@ public final class MCRMODSClassificationSupport {
     }
 
     public static NodeList getMCRClassNodes(final NodeList sources) {
+        if (sources.getLength() == 0) {
+            LOGGER.warn("Cannot get first element of node list 'sources'.");
+            return null;
+        }
         DocumentBuilder documentBuilder = MCRDOMUtils.getDocumentBuilderUnchecked();
         try {
             final Document document = documentBuilder.newDocument();
@@ -138,6 +146,10 @@ public final class MCRMODSClassificationSupport {
     }
 
     public static String getClassCategLink(final NodeList sources) {
+        if (sources.getLength() == 0) {
+            LOGGER.warn("Cannot get first element of node list 'sources'.");
+            return "";
+        }
         final Element source = (Element) sources.item(0);
         MCRCategoryID category = getCategoryID(source);
         if (category == null) {
@@ -148,6 +160,10 @@ public final class MCRMODSClassificationSupport {
     }
 
     public static String getClassCategParentLink(final NodeList sources) {
+        if (sources.getLength() == 0) {
+            LOGGER.warn("Cannot get first element of node list 'sources'.");
+            return "";
+        }
         final Element source = (Element) sources.item(0);
         MCRCategoryID category = getCategoryID(source);
         if (category == null) {
@@ -171,20 +187,17 @@ public final class MCRMODSClassificationSupport {
     }
 
     /**
-     * MCRAuthorityInfo holds a combination of either authority ID and value code, or
-     * authorityURI and valueURI. In MODS, this combination typically represents 
-     * a value from a normed vocabulary like a classification. The AuthorityInfo
-     * can be mapped to a MCRCategory in MyCoRe.  
+     * MCRAuthorityInfo holds a combination of either authority ID and value code, or authorityURI and valueURI. In
+     * MODS, this combination typically represents a value from a normed vocabulary like a classification. The
+     * AuthorityInfo can be mapped to a MCRCategory in MyCoRe.
      * 
      * @see http://www.loc.gov/standards/mods/userguide/classification.html
-     * 
      * @author Frank L\u00FCtzenkirchen
      */
     private static abstract class MCRAuthorityInfo {
 
         /**
-         * Inspects the attributes in the given MODS XML element and returns the
-         * AuthorityInfo given there.
+         * Inspects the attributes in the given MODS XML element and returns the AuthorityInfo given there.
          */
         public static MCRAuthorityInfo getAuthorityInfo(org.jdom2.Element modsElement) {
             MCRAuthorityInfo authorityInfo = MCRTypeOfResource.getAuthorityInfo(modsElement);
@@ -196,8 +209,7 @@ public final class MCRMODSClassificationSupport {
         }
 
         /**
-         * Inspects the attributes in the given MODS XML element and returns the
-         * AuthorityInfo given there.
+         * Inspects the attributes in the given MODS XML element and returns the AuthorityInfo given there.
          */
         public static MCRAuthorityInfo getAuthorityInfo(Element modsElement) {
             MCRAuthorityInfo authorityInfo = MCRTypeOfResource.getAuthorityInfo(modsElement);
@@ -229,8 +241,8 @@ public final class MCRMODSClassificationSupport {
         }
 
         /**
-         * Builds the authority information that represents the category with the given ID,
-         * by looking up x-auth and x-uri labels set in the classification and category.
+         * Builds the authority information that represents the category with the given ID, by looking up x-auth and
+         * x-uri labels set in the classification and category.
          */
         private static MCRAuthorityInfo buildAuthorityInfo(MCRCategoryID categoryID) {
             LOGGER.debug("build authority info for " + categoryID.toString());
@@ -253,8 +265,8 @@ public final class MCRMODSClassificationSupport {
         }
 
         /**
-         * Returns the label value of the given type ("language"), or the given default if
-         * that label does not exist in the category. 
+         * Returns the label value of the given type ("language"), or the given default if that label does not exist in
+         * the category.
          */
         protected static String getLabel(MCRCategory category, String labelType, String defaultLabel) {
             MCRLabel label = category.getLabel(labelType);
@@ -268,7 +280,7 @@ public final class MCRMODSClassificationSupport {
             "Category ID by authority info");
 
         /**
-         * Used in the cache to indicate the case when no category ID maps to the given authority info 
+         * Used in the cache to indicate the case when no category ID maps to the given authority info
          */
         private final static String NULL = "null";
 
@@ -298,30 +310,28 @@ public final class MCRMODSClassificationSupport {
         }
 
         /**
-         * Sets this authority information in the given MODS XML element by setting
-         * authority/authorityURI/valueURI attributes and/or value code as text. 
+         * Sets this authority information in the given MODS XML element by setting authority/authorityURI/valueURI
+         * attributes and/or value code as text.
          */
         public abstract void setInElement(org.jdom2.Element modsElement);
 
         /**
-         * Sets this authority information in the given MODS XML element by setting
-         * authority/authorityURI/valueURI attributes and/or value code as text. 
+         * Sets this authority information in the given MODS XML element by setting authority/authorityURI/valueURI
+         * attributes and/or value code as text.
          */
         public abstract void setInElement(Element modsElement);
     }
 
     /**
-     * Authority information that is represented by authority ID and code value.
-     * Such authority info comes from a standardized vocabulary registered at the
-     * Library of Congress.
+     * Authority information that is represented by authority ID and code value. Such authority info comes from a
+     * standardized vocabulary registered at the Library of Congress.
      * 
      * @author Frank L\u00FCtzenkirchen
      */
     private static class MCRAuthorityAndCode extends MCRAuthorityInfo {
 
         /**
-         * Inspects the attributes in the given MODS XML element and returns the
-         * AuthorityInfo given there.
+         * Inspects the attributes in the given MODS XML element and returns the AuthorityInfo given there.
          */
         public static MCRAuthorityAndCode getAuthorityInfo(org.jdom2.Element modsElement) {
             String authority = modsElement.getAttributeValue("authority");
@@ -331,8 +341,7 @@ public final class MCRMODSClassificationSupport {
         }
 
         /**
-         * Inspects the attributes in the given MODS XML element and returns the
-         * AuthorityInfo given there.
+         * Inspects the attributes in the given MODS XML element and returns the AuthorityInfo given there.
          */
         public static MCRAuthorityAndCode getAuthorityInfo(Element modsElement) {
             String authority = modsElement.getAttribute("authority");
@@ -394,7 +403,8 @@ public final class MCRMODSClassificationSupport {
         /**
          * Returns the classification associated with the given authority.
          * 
-         * @param authority a valid MODS authority like "lcc"
+         * @param authority
+         *            a valid MODS authority like "lcc"
          * @return a MCRCategory that should be a root category, or null if no such category exists.
          */
         private MCRCategory getCategoryByAuthority(final String authority) {
@@ -416,10 +426,9 @@ public final class MCRMODSClassificationSupport {
     }
 
     /**
-     * Authority information that is represented by authorityURI and valueURI.
-     * Such authority info comes from a vocabulary that is not registered at the
-     * Library of Congress, but maintained by an external authority like 
-     * the MyCoRe application.
+     * Authority information that is represented by authorityURI and valueURI. Such authority info comes from a
+     * vocabulary that is not registered at the Library of Congress, but maintained by an external authority like the
+     * MyCoRe application.
      * 
      * @author Frank L\u00FCtzenkirchen
      */
@@ -432,8 +441,7 @@ public final class MCRMODSClassificationSupport {
         private static final String ATTRIBUTE_AUTHORITY_URI = "authorityURI";
 
         /**
-         * Inspects the attributes in the given MODS XML element and returns the
-         * AuthorityInfo given there.
+         * Inspects the attributes in the given MODS XML element and returns the AuthorityInfo given there.
          */
         public static MCRAuthorityWithURI getAuthorityInfo(org.jdom2.Element element) {
             String authorityURI = element.getAttributeValue(ATTRIBUTE_AUTHORITY_URI);
@@ -442,8 +450,7 @@ public final class MCRMODSClassificationSupport {
         }
 
         /**
-         * Inspects the attributes in the given MODS XML element and returns the
-         * AuthorityInfo given there.
+         * Inspects the attributes in the given MODS XML element and returns the AuthorityInfo given there.
          */
         public static MCRAuthorityWithURI getAuthorityInfo(Element element) {
             String authorityURI = element.getAttribute(ATTRIBUTE_AUTHORITY_URI);
@@ -474,7 +481,7 @@ public final class MCRMODSClassificationSupport {
 
         private static final String CLASS_URI_PART = "classifications/";
 
-        /** 
+        /**
          * Returns the authority URI for the given classification.
          */
         protected static String getAuthorityURI(MCRCategory classification) {
@@ -483,7 +490,7 @@ public final class MCRMODSClassificationSupport {
         }
 
         /**
-         * Returns the value URI for the given category and authority URI 
+         * Returns the value URI for the given category and authority URI
          */
         protected static String getValueURI(MCRCategory category, String authorityURI) {
             String defaultURI = authorityURI + "#" + category.getId().getID();
@@ -491,12 +498,12 @@ public final class MCRMODSClassificationSupport {
         }
 
         /**
-         * The authority URI 
+         * The authority URI
          */
         private String authorityURI;
 
         /**
-         * The value URI 
+         * The value URI
          */
         private String valueURI;
 
@@ -566,16 +573,16 @@ public final class MCRMODSClassificationSupport {
     }
 
     /**
-     * Authority information that is a static mapping for mods:typeOfResource.
-     * This element is always mapped to a classification with the ID typeOfResource.
+     * Authority information that is a static mapping for mods:typeOfResource. This element is always mapped to a
+     * classification with the ID typeOfResource.
      * 
      * @author Frank L\u00FCtzenkirchen
      */
     private static class MCRTypeOfResource extends MCRAuthorityInfo {
 
-        /** 
-         * The name of the MODS element typeOfResource, which is same as the 
-         * classification ID used to map the codes to categories. 
+        /**
+         * The name of the MODS element typeOfResource, which is same as the classification ID used to map the codes to
+         * categories.
          */
         public final static String TYPE_OF_RESOURCE = "typeOfResource";
 
