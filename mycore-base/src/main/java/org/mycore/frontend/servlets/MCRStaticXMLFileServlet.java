@@ -78,6 +78,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
         String ruleID = "website:" + job.getRequest().getServletPath();
         if (MCRAccessManager.hasRule(ruleID, "read") && !MCRAccessManager.checkPermission(ruleID, "read")) {
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
         }
         URL resource = resolveResource(job);
         if (resource != null) {
