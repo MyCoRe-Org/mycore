@@ -75,7 +75,8 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
     @Override
     public void doGetPost(MCRServletJob job) throws java.io.IOException, MCRException, SAXException, JDOMException,
         URISyntaxException, TransformerException {
-        if (!MCRAccessManager.checkPermission("website:" + job.getRequest().getServletPath())) {
+        String ruleID = "website:" + job.getRequest().getServletPath();
+        if (MCRAccessManager.hasRule(ruleID, "read") && !MCRAccessManager.checkPermission(ruleID, "read")) {
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
         }
         URL resource = resolveResource(job);
