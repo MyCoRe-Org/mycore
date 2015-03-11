@@ -9,6 +9,7 @@
 	{id:"provenance", name:"Besitznachweis"},
 	{id:"collation", name:"Bogensignatur"},
 	{id:"ornament", name:"Buchschmuck"},
+    {id: "letter", name: "Brief"},
 	{id:"cover", name:"Deckel"},
 	{id:"- cover_front", name:"- Vorderdeckel"},
 	{id:"- cover_back", name:"- Rückdeckel"},
