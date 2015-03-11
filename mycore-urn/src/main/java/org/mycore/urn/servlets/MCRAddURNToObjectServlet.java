@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.mycore.urn.servlets;
 
@@ -12,14 +12,23 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.urn.services.MCRURNAdder;
 import org.mycore.urn.services.MCRURNManager;
 
 /**
- * Class is responsible for adding urns to the metadata of a mycore object
- * 
+ * Class is responsible for adding urns to the metadata of a mycore object, to derivate and / or to files within a derivate.
+ * For usage you have three URL parameters <code>object</code>, <code>target</code> and <code>path</code>. The <code>object</code>
+ * parameter is required and contains the objectID or derivateID. The <code>target</code> parameter provides the following cases:
+ * <ul>
+ *   <li>empty/missing: derivate including all files gets an urn or if object contains an objectID,
+ *     urn is added to metadata at /mycoreobject/metadata/def.identifier/identifier[@type='urn']</li>
+ *   <li>file: object has to be derivateID, than the <code>path</code> parameter gives the path to file within this derivate</li>
+ *   <li>derivate: generates an urn to the given derivateID</li>
+ * </ul>
+ *
  * @author shermann
  */
 public class MCRAddURNToObjectServlet extends MCRServlet {
@@ -48,29 +57,57 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
             return;
         }
 
+        // checking if URN already assigned
+        if (MCRURNManager.hasURNAssigned(object) && target != "file") {
+            LOGGER.error("Error while assigning urn to object '" + object + "'. It already has an urn.");
+            return;
+        }
+
+        // set default target if not given
+        if (target == null) {
+            target = "";
+        }
+
         MCRURNAdder urnAdder = new MCRURNAdder();
 
-        if (target != null && target.equals("file")) {
-            try {
-                LOGGER.info("Adding URN to single file");
-                String path = job.getRequest().getParameter("path");
-                if (path == null) {
-                    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + USERERRORPAGE));
-                    return;
-                }
+        switch (target) {
+            case "file":
+                try {
+                    LOGGER.info("Adding URN to single file");
+                    String path = job.getRequest().getParameter("path");
+                    if (path == null) {
+                        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USERERRORPAGE));
+                        return;
+                    }
 
-                urnAdder.addURNToSingleFile(object, path);
-            } catch (Exception e) {
-                LOGGER.error("Error while assigning urn to single file", e);
-            }
-        } else {
-            if (!MCRURNManager.hasURNAssigned(object)) {
+                    urnAdder.addURNToSingleFile(object, path);
+                } catch (Exception e) {
+                    LOGGER.error("Error while assigning urn to single file", e);
+                }
+                break;
+            case "derivate":
+                if (object.contains("_derivate_")) {
+                    try {
+                        LOGGER.info("Adding URN to derivate " + object);
+                        if (!urnAdder.addURNToDerivate(object)) {
+                            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USERERRORPAGE));
+                            return;
+                        }
+                    } catch (Exception e) {
+                        LOGGER.error("Error while assigning urn to derivate '" + object + "'", e);
+                    }
+                }
+                else {
+                    LOGGER.error("Error while assigning urn to derivate '" + object + "'. No derivateID given.");
+                }
+                break;
+            default:
                 /* assign urn to derivate */
                 if (object.contains("_derivate_")) {
                     try {
-                        LOGGER.info("Adding URN to all files in derivate " + object);
+                        LOGGER.info("Adding URN to all files in derivate (urn granular) " + object);
                         if (!urnAdder.addURNToDerivates(object)) {
-                            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + USERERRORPAGE));
+                            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USERERRORPAGE));
                             return;
                         }
                     } catch (Exception e) {
@@ -78,19 +115,17 @@ public class MCRAddURNToObjectServlet extends MCRServlet {
                     }
                 } else {
                     /* assign urn to a mycore object */
-                    boolean assignmentSuccessful = false;
                     try {
-                        LOGGER.info("Assigning urn to object '" + object + "'");
-                        assignmentSuccessful = urnAdder.addURN(object);
+                        LOGGER.info("Assigning urn to object '" + object);
+                        if (!urnAdder.addURN(object)) {
+                            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + USERERRORPAGE));
+                            return;
+                        }
                     } catch (Exception e) {
-                        LOGGER.info("Error while assigning urn to object '" + object + "'");
-                    }
-                    if (!assignmentSuccessful) {
-                        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + USERERRORPAGE));
-                        return;
+                        LOGGER.error("Error while assigning urn to object '" + object, e);
                     }
                 }
-            }
+                break;
         }
 
         String referrer = job.getRequest().getHeader("referer"); // yes, with misspelling.

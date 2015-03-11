@@ -10,24 +10,18 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Attribute;
-import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
-import org.jdom2.filter.Filters;
-import org.jdom2.xpath.XPathExpression;
-import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRFileMetadata;
 import org.mycore.datamodel.metadata.MCRMetaElement;
@@ -40,12 +34,14 @@ import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectMetadata;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.xml.sax.SAXException;
 
 /**
  * This class provides methods for adding URN to mycore objects and derivates.
  *
  * @author shermann
+ * @author Kathleen Neumann (kkrebs)
  */
 public class MCRURNAdder {
 
@@ -129,6 +125,8 @@ public class MCRURNAdder {
      * @return <code>true</code> if successful, <code>false</code> otherwise
      * @throws Exception
      *
+     * @deprecated doesn't work that generic, need another solution
+     *
      */
     public boolean addURN(String objectId, String xpath) throws Exception {
         MCRObjectID id = MCRObjectID.getInstance(objectId);
@@ -143,13 +141,11 @@ public class MCRURNAdder {
 
         String urn = generateURN();
         Element urnHoldingElement = createElementByXPath(xpath, urn);
-        //metaData.addContent(urnHoldingElement);
         MCRObjectMetadata urnmetadata = new MCRObjectMetadata();
         urnmetadata.setFromDOM(urnHoldingElement);
 
         try {
             LOGGER.info("Updating metadata of object " + objectId + " with URN " + urn + " [" + xpath + "]");
-            //MCRXMLMetadataManager.instance().update(id, xml, new Date());
             mcrmetadata.mergeMetadata(urnmetadata);
         } catch (Exception ex) {
             LOGGER.error("Updating metadata of object " + objectId + " with URN " + urn + " failed. [" + xpath + "]",
@@ -187,14 +183,12 @@ public class MCRURNAdder {
         for (Attribute a : getAttributes(parts[2])) {
             toReturn.setAttribute(a);
         }
-        LOGGER.info("URN-Element - root node: " + parts[2]);
 
         Element predecessor = toReturn;
 
         /* add the children */
         for (int i = 3; i < parts.length; i++) {
             List<Attribute> attributes = getAttributes(parts[i]);
-            LOGGER.info("URN-Element - add node: " + parts[i]);
             Element element = getElement(parts[i]);
             for (Attribute a : attributes) {
                 element.setAttribute(a);
@@ -304,7 +298,7 @@ public class MCRURNAdder {
 
     /**
      * This methods adds a URN to the derivate of a mycore object and to all
-     * files within this derivate
+     * files within this derivate.
      *
      * @param derivateId
      *            the derivate id
@@ -313,6 +307,75 @@ public class MCRURNAdder {
      * @throws IOException
      */
     public boolean addURNToDerivates(String derivateId) throws IOException, JDOMException, SAXException {
+        // create parent URN and add it to derivate
+        addURNToDerivate(derivateId);
+
+        MCRObjectID id = MCRObjectID.getInstance(derivateId);
+        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(id);
+        MCRPath rootPath = MCRPath.getPath(derivateId, "/");
+
+        final List<MCRPath> files = new ArrayList<>();
+
+        final String metsFileName = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
+        Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                if (!file.getFileName().toString().equalsIgnoreCase(metsFileName)) {
+                    files.add(MCRPath.toMCRPath(file));
+                }
+                return super.visitFile(file, attrs);
+            }
+
+        });
+
+        MCRIURNProvider urnProvider;
+        try {
+            urnProvider = this.getURNProvider();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            throw new MCRException("Could not get URN Provider.", e);
+        }
+        MCRURN parentURN = MCRURN.valueOf(derivate.getDerivate().getURN());
+
+        Collections.sort(files);
+        /* generate the urn based on the parent urn */
+        String setId = derivate.getId().getNumberAsString();
+        MCRURN[] urnToSet = urnProvider.generateURN(files.size(), parentURN, setId);
+        for (int i = 0; i < urnToSet.length; i++) {
+            MCRPath currentFile = files.get(i);
+            MCRURN currentURN = urnToSet[i];
+            String urnString = currentURN.toString() + currentURN.checksum();
+            LOGGER.info("Assigning urn " + urnString + " to " + currentFile);
+            /* save the urn in the database here */
+            try {
+                MCRURNManager.assignURN(urnString, currentFile);
+                /*
+                 * updating the fileset element, with the current file and
+                 * urn
+                 */
+                MCRFileMetadata fileMetadata = derivate.getDerivate().getOrCreateFileMetadata(currentFile);
+                fileMetadata.setUrn(urnString);
+            } catch (Exception ex) {
+                LOGGER.error("Assigning urn " + urnString + " to " + currentFile + " failed.", ex);
+                handleError(derivate);
+                return false;
+            }
+        }
+
+        updateDerivateInDB(derivate);
+        return true;
+    }
+
+    /**
+     * This method adds a URN to the derivate of a mycore object.
+     *
+     * @param derivateId
+     *          the id of the derivate
+     * @throws IOException
+     * @throws JDOMException
+     * @throws SAXException
+     */
+    public boolean addURNToDerivate(String derivateId) throws IOException, JDOMException, SAXException {
         MCRObjectID id = MCRObjectID.getInstance(derivateId);
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(id);
 
@@ -344,49 +407,7 @@ public class MCRURNAdder {
             return false;
         }
 
-        MCRPath rootPath = MCRPath.getPath(derivateId, "/");
-
-        final List<MCRPath> files = new ArrayList<>();
-
-        final String metsFileName = MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
-        Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
-
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                if (!file.getFileName().toString().equalsIgnoreCase(metsFileName)) {
-                    files.add(MCRPath.toMCRPath(file));
-                }
-                return super.visitFile(file, attrs);
-            }
-
-        });
-
-        Collections.sort(files);
-        /* generate the urn based on the parent urn */
-        String setId = derivate.getId().getNumberAsString();
-        MCRURN[] urnToSet = urnProvider.generateURN(files.size(), parentURN, setId);
         derivate.getDerivate().setURN(parentURN.toString());
-        for (int i = 0; i < urnToSet.length; i++) {
-            MCRPath currentFile = files.get(i);
-            MCRURN currentURN = urnToSet[i];
-            String urnString = currentURN.toString() + currentURN.checksum();
-            LOGGER.info("Assigning urn " + urnString + " to " + currentFile);
-            /* save the urn in the database here */
-            try {
-                MCRURNManager.assignURN(urnString, currentFile);
-                /*
-                 * updating the fileset element, with the current file and
-                 * urn
-                 */
-                MCRFileMetadata fileMetadata = derivate.getDerivate().getOrCreateFileMetadata(currentFile);
-                fileMetadata.setUrn(urnString);
-            } catch (Exception ex) {
-                LOGGER.error("Assigning urn " + urnString + " to " + currentFile + " failed.", ex);
-                handleError(derivate);
-                return false;
-            }
-        }
-
         updateDerivateInDB(derivate);
         return true;
     }
@@ -500,7 +521,7 @@ public class MCRURNAdder {
 
     /**
      * Deletes the entries in the database. to be called if the changing of the
-     * derivate metadata xml failes
+     * derivate metadata xml fails
      */
     private void handleError(MCRDerivate derivate) {
         LOGGER.error("Removing already assigned urn from derivate with id " + derivate.getId() + ".");
@@ -517,7 +538,7 @@ public class MCRURNAdder {
      */
     private void updateDerivateInDB(MCRDerivate derivate) {
         try {
-            // just update modified XML here, no new import of files pleaze
+            // just update modified XML here, no new import of files please
             MCRMetadataManager.updateMCRDerivateXML(derivate);
         } catch (Exception ex) {
             LOGGER.error("An exception occured while updating the object " + derivate.getId()
