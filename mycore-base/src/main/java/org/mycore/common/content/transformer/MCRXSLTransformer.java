@@ -67,11 +67,9 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
- * Transforms XML content using a static XSL stylesheet.
- * The stylesheet is configured via
- * 
+ * Transforms XML content using a static XSL stylesheet. The stylesheet is configured via
  * MCR.ContentTransformer.{ID}.Stylesheet
-
+ * 
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRXSLTransformer extends MCRParameterizedTransformer {
@@ -410,7 +408,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
                     MCRErrorListener el = (MCRErrorListener) transformerHandler.getTransformer().getErrorListener();
                     if (el != null && e.getCause() == null && el.getExceptionThrown() != null) {
                         //typically if a RuntimeException has no cause, we can get the "real cause" from MCRErrorListener, yeah!!!
-                        throw new RuntimeException(e.getMessage(), el.getExceptionThrown());
+                        throw new RuntimeException(MCRErrorListener.getMyMessageAndLocation(el.getExceptionThrown()),
+                            el.getExceptionThrown());
                     }
                     throw e;
                 }

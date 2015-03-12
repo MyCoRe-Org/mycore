@@ -43,7 +43,6 @@ import org.w3c.dom.Node;
 
 /**
  * @author Thomas Scheffler (yagee)
- *
  */
 public class MCRSourceContent extends MCRWrappedContent {
     private static final MCRURIResolver URI_RESOLVER = MCRURIResolver.instance();
@@ -97,12 +96,14 @@ public class MCRSourceContent extends MCRWrappedContent {
                     URL url = new URL(source.getSystemId());
                     baseContent = new MCRURLContent(url);
                 } catch (MalformedURLException e) {
-                    throw new MCRException("Could not create instance of MCRURLContent for SYSTEMID: " + source.getSystemId(), e);
+                    throw new MCRException("Could not create instance of MCRURLContent for SYSTEMID: "
+                        + source.getSystemId(), e);
                 }
             }
         }
         if (baseContent == null) {
-            throw new MCRException("Could not get MCRContent from " + source.getClass().getCanonicalName());
+            throw new MCRException("Could not get MCRContent from " + source.getClass().getCanonicalName()
+                + ", systemId:" + source.getSystemId());
         }
         baseContent.setSystemId(getSystemId());
         this.setBaseContent(baseContent);
@@ -110,8 +111,10 @@ public class MCRSourceContent extends MCRWrappedContent {
 
     /**
      * Build instance of MCRSourceContent by resolving via {@link MCRURIResolver}
+     * 
      * @param uri
-     * @throws TransformerException thrown by {@link MCRURIResolver#resolve(String, String)}
+     * @throws TransformerException
+     *             thrown by {@link MCRURIResolver#resolve(String, String)}
      */
     public static MCRSourceContent getInstance(String uri) throws TransformerException {
         Source source = URI_RESOLVER.resolve(uri, null);

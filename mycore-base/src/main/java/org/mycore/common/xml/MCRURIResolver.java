@@ -96,14 +96,11 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
- * Reads XML documents from various URI types. This resolver is used to read
- * DTDs, XML Schema files, XSL document() usages, xsl:include usages and MyCoRe
- * Editor include declarations. DTDs and Schema files are read from the
- * CLASSPATH of the application when XML is parsed. XML document() calls and
- * xsl:include calls within XSL stylesheets can be read from URIs of type
- * resource, webapp, file, session, query or mcrobject. MyCoRe editor include
- * declarations can read XML files from resource, webapp, file, session, http or
- * https, query, or mcrobject URIs.
+ * Reads XML documents from various URI types. This resolver is used to read DTDs, XML Schema files, XSL document()
+ * usages, xsl:include usages and MyCoRe Editor include declarations. DTDs and Schema files are read from the CLASSPATH
+ * of the application when XML is parsed. XML document() calls and xsl:include calls within XSL stylesheets can be read
+ * from URIs of type resource, webapp, file, session, query or mcrobject. MyCoRe editor include declarations can read
+ * XML files from resource, webapp, file, session, http or https, query, or mcrobject URIs.
  * 
  * @author Frank L\u00FCtzenkirchen
  * @author Thomas Scheffler (yagee)
@@ -224,9 +221,8 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * Compatibility method to convert a {@link MCRResolver} into a
-     * {@link URIResolver}. You may use this in a transition phase for your
-     * convenience. It actually just wraps the {@link Element} returned by
+     * Compatibility method to convert a {@link MCRResolver} into a {@link URIResolver}. You may use this in a
+     * transition phase for your convenience. It actually just wraps the {@link Element} returned by
      * {@link MCRResolver#resolveElement(String)} in a {@link JDOMSource}.
      * 
      * @param mcrResolver
@@ -339,8 +335,7 @@ public final class MCRURIResolver implements URIResolver {
             return content == null ? null : content.asXML().getRootElement().detach();
         } catch (Exception e) {
             /**
-             * rethrow Exception as RuntimException TODO: need to refactor this and
-             * declare throw in method signature
+             * rethrow Exception as RuntimException TODO: need to refactor this and declare throw in method signature
              */
             throw new MCRException("Error while resolving " + uri, e);
         }
@@ -411,18 +406,16 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * provides a URI -- Resolver Mapping One can implement this interface to
-     * provide additional URI schemes this MCRURIResolver should handle, too. To
-     * add your mapping you have to set the
-     * <code>MCR.URIResolver.ExternalResolver.Class</code> property to the
-     * implementing class.
+     * provides a URI -- Resolver Mapping One can implement this interface to provide additional URI schemes this
+     * MCRURIResolver should handle, too. To add your mapping you have to set the
+     * <code>MCR.URIResolver.ExternalResolver.Class</code> property to the implementing class.
      * 
      * @author Thomas Scheffler
      */
     public static interface MCRResolverProvider {
         /**
-         * provides a Map of Resolver mappings. Key is the scheme, e.g.
-         * <code>http</code>, where value is an instance of MCRResolver.
+         * provides a Map of Resolver mappings. Key is the scheme, e.g. <code>http</code>, where value is an instance of
+         * MCRResolver.
          * 
          * @see MCRResolver
          * @return a Map of Resolver mappings
@@ -431,9 +424,8 @@ public final class MCRURIResolver implements URIResolver {
         public Map<String, MCRResolver> getResolverMapping();
 
         /**
-         * provides a Map of URIResolver mappings. Key is the scheme, e.g.
-         * <code>http</code>, where value is an implementation of
-         * {@link URIResolver}.
+         * provides a Map of URIResolver mappings. Key is the scheme, e.g. <code>http</code>, where value is an
+         * implementation of {@link URIResolver}.
          * 
          * @see URIResolver
          * @return a Map of URIResolver mappings
@@ -560,8 +552,7 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * Reads XML from a static file within the web application. the URI in the
-     * format webapp:path/to/servlet
+     * Reads XML from a static file within the web application. the URI in the format webapp:path/to/servlet
      */
     private static class MCRWebAppResolver implements URIResolver {
 
@@ -660,8 +651,7 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * Reads XML from the CLASSPATH of the application. the location of the file
-     * in the format resource:path/to/file
+     * Reads XML from the CLASSPATH of the application. the location of the file in the format resource:path/to/file
      */
     private static class MCRResourceResolver implements URIResolver {
 
@@ -691,9 +681,8 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * Delivers a jdom Element created by any local class that implements
-     * MCRResolver (deprecated) or URIResolver interface. the class name of the
-     * file in the format localclass:org.mycore.ClassName?mode=getAll
+     * Delivers a jdom Element created by any local class that implements MCRResolver (deprecated) or URIResolver
+     * interface. the class name of the file in the format localclass:org.mycore.ClassName?mode=getAll
      */
     private static class MCRLocalClassResolver implements URIResolver {
 
@@ -726,8 +715,8 @@ public final class MCRURIResolver implements URIResolver {
     private static class MCRSessionResolver implements MCRResolver {
 
         /**
-         * Reads XML from URIs of type session:key. The method MCRSession.get(
-         * key ) is called and must return a JDOM element.
+         * Reads XML from URIs of type session:key. The method MCRSession.get( key ) is called and must return a JDOM
+         * element.
          * 
          * @see org.mycore.common.MCRSession#get(java.lang.String )
          * @param uri
@@ -898,8 +887,7 @@ public final class MCRURIResolver implements URIResolver {
          * @param uri
          *            URI in the syntax above
          * @return the root element of the XML document
-         * @see ClassificationTransformer#getEditorDocument(Classification,
-         *      String)
+         * @see ClassificationTransformer#getEditorDocument(Classification, String)
          */
         public Element resolveElement(String uri) {
             LOGGER.debug("start resolving " + uri);
@@ -1025,9 +1013,8 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * Ensures that the return of the given uri is never null. When the return
-     * is null, or the uri throws an exception, this resolver will return an
-     * empty XML element instead. Usage: notnull:<anyMyCoReURI>
+     * Ensures that the return of the given uri is never null. When the return is null, or the uri throws an exception,
+     * this resolver will return an empty XML element instead. Usage: notnull:<anyMyCoReURI>
      */
     private static class MCRNotNullResolver implements URIResolver {
 
@@ -1060,8 +1047,8 @@ public final class MCRURIResolver implements URIResolver {
 
     /**
      * Transform result of other resolver with stylesheet. Usage:
-     * xslStyle:<stylesheet><,stylesheet><?param1=value1<&param2=value2>>:<anyMyCoReURI> To
-     * <stylesheet> is extension .xsl added. File is searched in classpath.
+     * xslStyle:<stylesheet><,stylesheet><?param1=value1<&param2=value2>>:<anyMyCoReURI> To <stylesheet> is extension
+     * .xsl added. File is searched in classpath.
      */
     private static class MCRXslStyleResolver implements URIResolver {
 
@@ -1089,6 +1076,9 @@ public final class MCRURIResolver implements URIResolver {
 
             try {
                 if (resolved != null) {
+                    if (resolved.getSystemId() == null) {
+                        resolved.setSystemId(target);
+                    }
                     MCRSourceContent content = new MCRSourceContent(resolved);
                     MCRXSLTransformer transformer = getTransformer(stylesheets.split(","));
                     MCRParameterCollector paramcollector = MCRParameterCollector.getInstanceFromUserSession();
@@ -1188,9 +1178,9 @@ public final class MCRURIResolver implements URIResolver {
      * </p>
      * Example: MCR.URIResolver.xslIncludes.components=iview.xsl,wcms.xsl
      * <p>
-     * Or retrieve the include hrefs from a class implementing 
-     * {@link org.mycore.common.xml.MCRURIResolver.MCRXslIncludeHrefs}.
-     * The class. part have to be set, everything after class. can be freely choosen.
+     * Or retrieve the include hrefs from a class implementing
+     * {@link org.mycore.common.xml.MCRURIResolver.MCRXslIncludeHrefs}. The class. part have to be set, everything after
+     * class. can be freely choosen.
      * </p>
      * Example: MCR.URIResolver.xslIncludes.class.template=org.foo.XSLHrefs
      * 
@@ -1235,11 +1225,10 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * Imports xsl files which are set in the mycore.properties file.
-     *
-     * Example: MCR.URIResolver.xslImports.components=first.xsl,second.xsl
+     * Imports xsl files which are set in the mycore.properties file. Example:
+     * MCR.URIResolver.xslImports.components=first.xsl,second.xsl Every file must import this URIResolver to form a
+     * import chain:
      * 
-     * Every file must import this URIResolver to form a import chain:
      * <pre>
      *  &lt;xsl:import href="xslImport:components:first.xsl"&gt;
      * </pre>
@@ -1266,12 +1255,10 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * Builds XML trees from a string representation. Multiple XPath expressions
-     * can be separated by &amp; Example:
-     * buildxml:_rootName_=mycoreobject&metadata/parents/parent/@href=
-     * 'FooBar_Document_4711' This will return: &lt;mycoreobject&gt;
-     * &lt;metadata&gt; &lt;parents&gt; &lt;parent href="FooBar_Document_4711"
-     * /&gt; &lt;/parents&gt; &lt;/metadata&gt; &lt;/mycoreobject&gt;
+     * Builds XML trees from a string representation. Multiple XPath expressions can be separated by &amp; Example:
+     * buildxml:_rootName_=mycoreobject&metadata/parents/parent/@href= 'FooBar_Document_4711' This will return:
+     * &lt;mycoreobject&gt; &lt;metadata&gt; &lt;parents&gt; &lt;parent href="FooBar_Document_4711" /&gt;
+     * &lt;/parents&gt; &lt;/metadata&gt; &lt;/mycoreobject&gt;
      */
     private static class MCRBuildXMLResolver implements MCRResolver {
 
@@ -1413,9 +1400,8 @@ public final class MCRURIResolver implements URIResolver {
     private static class MCRDeletedObjectResolver implements URIResolver {
 
         /**
-         * Returns a deleted mcr object xml for the given id. If there is no
-         * such object a dummy object with an empty metadata element is
-         * returned.
+         * Returns a deleted mcr object xml for the given id. If there is no such object a dummy object with an empty
+         * metadata element is returned.
          * 
          * @param href
          *            an uri starting with <code>deletedMcrObject:</code>
@@ -1467,11 +1453,8 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * Redirect to different URIResolver that is defined via property.
-     * 
-     * This resolver is meant to serve static content as no variable substitution takes place
-     * 
-     * Example: MCR.URIResolver.redirect.alias=webapp:path/to/alias.xml
+     * Redirect to different URIResolver that is defined via property. This resolver is meant to serve static content as
+     * no variable substitution takes place Example: MCR.URIResolver.redirect.alias=webapp:path/to/alias.xml
      */
     private static class MCRRedirectResolver implements URIResolver {
         private static Logger LOGGER = Logger.getLogger(MCRRedirectResolver.class);
