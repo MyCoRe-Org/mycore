@@ -34,7 +34,7 @@
         <li>
           <xsl:choose>
             <xsl:when test="@children = 'true'">
-              <a href="#" onclick="toggleClass('{@id}','{$folder.closed}','{$folder.open}');">
+              <a id="f{$id}" href="#" onclick="toggleClass('{@id}','{$folder.closed}','{$folder.open}');">
                 <i class="{$folder.closed}" id="cbButton_{$id}" />
               </a>
             </xsl:when>
@@ -42,7 +42,7 @@
               <i class="{$folder.leaf}" id="cbButton_{$id}" />
             </xsl:otherwise>
           </xsl:choose>
-          <a>
+          <a id="r{$id}">
             <xsl:attribute name="href">
               <xsl:variable name="groupName">
                 <xsl:choose>
