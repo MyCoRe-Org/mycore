@@ -39,9 +39,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSWrapper;
 
 /**
- * Extracts occurences of mods:relatedItem and stores them as separate MCRObjects.
- * For mods:relatedItem/@type='host', sets the extracted object as parent.
- * Always, sets @xlink:href of mods:relatedItem to the extracted object's ID.
+ * Extracts occurences of mods:relatedItem and stores them as separate MCRObjects. For mods:relatedItem/@type='host',
+ * sets the extracted object as parent. Always, sets @xlink:href of mods:relatedItem to the extracted object's ID.
  *
  * @author Frank L\u00FCtzenkirchen
  */
@@ -109,6 +108,9 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
         MCRMODSWrapper wrapper = new MCRMODSWrapper();
         MCRObject object = wrapper.getMCRObject();
         MCRObjectID oid = MCRObjectID.getNextFreeId(childID.getBase());
+        if (oid.equals(childID)) {
+            oid = MCRObjectID.getNextFreeId(childID.getBase());
+        }
         object.setId(oid);
 
         if (isParent(relatedItem)) {
@@ -117,7 +119,9 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
 
         Element mods = cloneRelatedItem(relatedItem);
         wrapper.setMODS(mods);
-        object.getService().setState(new MCRCategoryID(MCRConfiguration.instance().getString("MCR.Metadata.Service.State.Classification.ID", "state"), "published"));
+        object.getService().setState(
+            new MCRCategoryID(MCRConfiguration.instance().getString("MCR.Metadata.Service.State.Classification.ID",
+                "state"), "published"));
 
         LOGGER.info("create object " + oid.toString());
         MCRMetadataManager.create(object);
