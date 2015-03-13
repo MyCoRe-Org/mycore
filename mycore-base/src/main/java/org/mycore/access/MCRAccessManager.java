@@ -35,15 +35,10 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
- * 
  * @author Thomas Scheffler
- * 
  * @version $Revision$ $Date$
  */
 public class MCRAccessManager {
-
-    private static final MCRAccessCheckStrategy ACCESS_STRATEGY = (MCRAccessCheckStrategy) MCRConfiguration.instance()
-        .getInstanceOf("MCR.Access.Strategy.Class", MCRDerivateIDStrategy.class.getName());
 
     private static final MCRAccessCacheManager ACCESS_CACHE = new MCRAccessCacheManager();
 
@@ -58,6 +53,11 @@ public class MCRAccessManager {
     public static MCRAccessInterface getAccessImpl() {
         return MCRConfiguration.instance().<MCRAccessInterface> getSingleInstanceOf("MCR.Access.Class",
             MCRAccessBaseImpl.class.getName());
+    }
+
+    private static MCRAccessCheckStrategy getAccessStrategy() {
+        return MCRConfiguration.instance().getInstanceOf("MCR.Access.Strategy.Class",
+            MCRDerivateIDStrategy.class.getName());
     }
 
     /**
@@ -184,8 +184,7 @@ public class MCRAccessManager {
     }
 
     /**
-     * determines whether the current user has the permission to perform a
-     * certain action.
+     * determines whether the current user has the permission to perform a certain action.
      * 
      * @param id
      *            the MCRObjectID of the object
@@ -199,8 +198,7 @@ public class MCRAccessManager {
     }
 
     /**
-     * determines whether the current user has the permission to perform a
-     * certain action.
+     * determines whether the current user has the permission to perform a certain action.
      * 
      * @param id
      *            the MCRObjectID of the object
@@ -211,7 +209,7 @@ public class MCRAccessManager {
     public static boolean checkPermission(String id, String permission) {
         Boolean value = ACCESS_CACHE.isPermitted(id, permission);
         if (value == null) {
-            value = ACCESS_STRATEGY.checkPermission(id, permission);
+            value = getAccessStrategy().checkPermission(id, permission);
             ACCESS_CACHE.cachePermission(id, permission, value);
         }
         if (LOGGER.isDebugEnabled()) {
@@ -221,8 +219,7 @@ public class MCRAccessManager {
     }
 
     /**
-     * determines whether the current user has the permission to perform a
-     * certain action.
+     * determines whether the current user has the permission to perform a certain action.
      * 
      * @param permission
      *            the access permission for the rule
@@ -241,12 +238,12 @@ public class MCRAccessManager {
     }
 
     /**
-     * checks whether the current user has the permission to read/see a derivate
-     *        check is also against the mcrobject, the derivate belongs to
-     *        both checks must return true <br />
-     *        it is needed in MCRFileNodeServlet and MCRZipServlet
+     * checks whether the current user has the permission to read/see a derivate check is also against the mcrobject,
+     * the derivate belongs to both checks must return true <br />
+     * it is needed in MCRFileNodeServlet and MCRZipServlet
+     * 
      * @param derID
-     *        String ID of a MyCoRe-Derivate
+     *            String ID of a MyCoRe-Derivate
      * @return true if the access is allowed otherwise it return false
      */
     public static boolean checkPermissionForReadingDerivate(String derID) {
@@ -266,9 +263,8 @@ public class MCRAccessManager {
      * lists all permissions defined for the <code>id</code>.
      * 
      * @param id
-     *           the ID of the object as String
-     * @return a <code>List</code> of all for <code>id</code> defined
-     *         permissions
+     *            the ID of the object as String
+     * @return a <code>List</code> of all for <code>id</code> defined permissions
      */
     public static Collection<String> getPermissionsForID(String id) {
         return getAccessImpl().getPermissionsForID(id);
@@ -278,9 +274,8 @@ public class MCRAccessManager {
      * lists all permissions defined for the <code>id</code>.
      * 
      * @param id
-     *           the MCRObjectID of the object
-     * @return a <code>List</code> of all for <code>id</code> defined
-     *         permissions
+     *            the MCRObjectID of the object
+     * @return a <code>List</code> of all for <code>id</code> defined permissions
      */
     public static Collection<String> getPermissionsForID(MCRObjectID id) {
         return getAccessImpl().getPermissionsForID(id.toString());
@@ -318,7 +313,7 @@ public class MCRAccessManager {
      * return true if a rule for the id exist
      * 
      * @param id
-     *           the MCRObjectID of the object
+     *            the MCRObjectID of the object
      * @param permission
      *            the access permission for the rule
      */
