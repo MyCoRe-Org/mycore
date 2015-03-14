@@ -73,12 +73,17 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         if (!singleQueue && action != null) {
             this.action = action;
             CONFIG_PREFIX_ADD = action.getSimpleName();
-            waitTime = MCRConfiguration.instance().getInt(CONFIG_PREFIX + CONFIG_PREFIX_ADD + "TimeTillReset", waitTime);
+            if (CONFIG_PREFIX_ADD.length() > 0) {
+                CONFIG_PREFIX_ADD = CONFIG_PREFIX_ADD.concat(".");
+            }
+            waitTime = MCRConfiguration.instance()
+                    .getInt(CONFIG_PREFIX + CONFIG_PREFIX_ADD + "TimeTillReset", waitTime);
         }
         waitTime = waitTime * 60;
 
         StalledJobScheduler = Executors.newSingleThreadScheduledExecutor();
-        StalledJobScheduler.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(this.action), waitTime, waitTime, TimeUnit.SECONDS);
+        StalledJobScheduler.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(this.action), waitTime, waitTime,
+                TimeUnit.SECONDS);
         preFetch = new ConcurrentLinkedQueue<MCRJob>();
         running = true;
         pollLock = new ReentrantLock();
@@ -264,7 +269,8 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
      * @return
      * @throws NoSuchElementException
      */
-    public MCRJob getElementOutOfOrder(Class<? extends MCRJobAction> action, Map<String, String> params) throws NoSuchElementException {
+    public MCRJob getElementOutOfOrder(Class<? extends MCRJobAction> action, Map<String, String> params)
+            throws NoSuchElementException {
         if (!running)
             return null;
         MCRJob job = getJob(action, params);
@@ -294,7 +300,8 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
         Session session = MCRHIBConnection.instance().getSession();
 
-        StringBuilder qStr = new StringBuilder("FROM MCRJob job JOIN FETCH job.parameters WHERE action = '" + action.getName() + "' ");
+        StringBuilder qStr = new StringBuilder("FROM MCRJob job JOIN FETCH job.parameters WHERE action = '"
+                + action.getName() + "' ");
         for (String paramKey : params.keySet()) {
             qStr.append(" AND job.parameters['" + paramKey + "'] = '" + params.get(paramKey) + "'");
         }
