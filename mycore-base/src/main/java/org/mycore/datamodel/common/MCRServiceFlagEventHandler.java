@@ -20,51 +20,65 @@
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
- 
+
 package org.mycore.datamodel.common;
- 
+
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectService;
- 
+
 /**
- * This event handler sets the service flags "createdby" and "modifiedby" 
- * for users who created / modified a MyCoReObject.
+ * This event handler sets the service flags "createdby" and "modifiedby"
+ * for users who created / modified a MyCoReObject and also added a state
+ * service flag using classification defined in "MCR.Metadata.Service.State.Classification.ID"
+ * (default "state") and category defined in "MCR.Metadata.Service.State.Category.Default" (default "submitted").
  *
  * @author Robert Stephan
  */
 public class MCRServiceFlagEventHandler extends MCREventHandlerBase {
- 
+
     @Override
     protected final void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        if(!obj.isImportMode()){
-            obj.getService().removeFlags(MCRObjectService.FLAG_TYPE_CREATEDBY);
-            obj.getService().addFlag(MCRObjectService.FLAG_TYPE_CREATEDBY, MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
-            obj.getService().removeFlags(MCRObjectService.FLAG_TYPE_MODIFIEDBY);
-            obj.getService().addFlag(MCRObjectService.FLAG_TYPE_MODIFIEDBY, MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
-        }
-     }
- 
-    @Override
-    protected final void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        if(!obj.isImportMode()){
-            obj.getService().removeFlags(MCRObjectService.FLAG_TYPE_MODIFIEDBY);
-            obj.getService().addFlag(MCRObjectService.FLAG_TYPE_MODIFIEDBY, MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
+        if (!obj.isImportMode()) {
+            MCRObjectService objService = obj.getService();
+            objService.removeFlags(MCRObjectService.FLAG_TYPE_CREATEDBY);
+            objService.addFlag(MCRObjectService.FLAG_TYPE_CREATEDBY, MCRSessionMgr.getCurrentSession()
+                .getUserInformation().getUserID());
+            objService.removeFlags(MCRObjectService.FLAG_TYPE_MODIFIEDBY);
+            objService.addFlag(MCRObjectService.FLAG_TYPE_MODIFIEDBY, MCRSessionMgr.getCurrentSession()
+                .getUserInformation().getUserID());
+            if (objService.getState() == null) {
+                objService.setState(new MCRCategoryID(
+                    MCRConfiguration.instance().getString("MCR.Metadata.Service.State.Classification.ID"),
+                    MCRConfiguration.instance().getString("MCR.Metadata.Service.State.Category.Default")));
+            }
         }
     }
- 
+
+    @Override
+    protected final void handleObjectUpdated(MCREvent evt, MCRObject obj) {
+        if (!obj.isImportMode()) {
+            obj.getService().removeFlags(MCRObjectService.FLAG_TYPE_MODIFIEDBY);
+            obj.getService().addFlag(MCRObjectService.FLAG_TYPE_MODIFIEDBY,
+                MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
+        }
+    }
+
     @Override
     protected final void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         //nothing todo
     }
- 
+
     @Override
     protected final void handleObjectRepaired(MCREvent evt, MCRObject obj) {
-        if(obj.isImportMode()){
+        if (obj.isImportMode()) {
             obj.getService().removeFlags(MCRObjectService.FLAG_TYPE_MODIFIEDBY);
-            obj.getService().addFlag(MCRObjectService.FLAG_TYPE_MODIFIEDBY, MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
+            obj.getService().addFlag(MCRObjectService.FLAG_TYPE_MODIFIEDBY,
+                MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
         }
     }
 }

@@ -28,10 +28,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
-import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -119,9 +117,6 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
 
         Element mods = cloneRelatedItem(relatedItem);
         wrapper.setMODS(mods);
-        object.getService().setState(
-            new MCRCategoryID(MCRConfiguration.instance().getString("MCR.Metadata.Service.State.Classification.ID",
-                "state"), "published"));
 
         LOGGER.info("create object " + oid.toString());
         MCRMetadataManager.create(object);
