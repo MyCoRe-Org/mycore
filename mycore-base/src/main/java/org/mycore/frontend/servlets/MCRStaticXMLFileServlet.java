@@ -45,6 +45,7 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRURLContent;
+import org.mycore.frontend.MCRLayoutUtilities;
 import org.mycore.frontend.editor.MCREditorServlet;
 import org.xml.sax.SAXException;
 
@@ -55,6 +56,8 @@ import org.xml.sax.SAXException;
  * @version $Revision$ $Date$
  */
 public class MCRStaticXMLFileServlet extends MCRServlet {
+
+    private static final String READ_WEBPAGE_PERMISSION = MCRLayoutUtilities.getPermission2ReadWebpage();
 
     private static final long serialVersionUID = -9213353868244605750L;
 
@@ -75,8 +78,9 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
     @Override
     public void doGetPost(MCRServletJob job) throws java.io.IOException, MCRException, SAXException, JDOMException,
         URISyntaxException, TransformerException {
-        String ruleID = "website:" + job.getRequest().getServletPath();
-        if (MCRAccessManager.hasRule(ruleID, "read") && !MCRAccessManager.checkPermission(ruleID, "read")) {
+        String ruleID = MCRLayoutUtilities.getWebpageACLID(job.getRequest().getServletPath());
+        if (MCRAccessManager.hasRule(ruleID, READ_WEBPAGE_PERMISSION)
+            && !MCRAccessManager.checkPermission(ruleID, READ_WEBPAGE_PERMISSION)) {
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
