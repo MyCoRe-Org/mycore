@@ -80,15 +80,18 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
             String href = relatedItem.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
             LOGGER.info("Found related item in " + object.getId().toString() + ", href=" + href);
             if ((href == null) || href.isEmpty()) {
-                MCRObjectID relatedID = createRelatedObject(relatedItem, oid);
+                //MCR-931: check for type='host' and present parent document
+                if (!isParent(relatedItem) || object.getStructure().getParentID() == null) {
+                    MCRObjectID relatedID = createRelatedObject(relatedItem, oid);
 
-                href = relatedID.toString();
-                LOGGER.info("Setting href of related item to " + href);
-                relatedItem.setAttribute("href", href, MCRConstants.XLINK_NAMESPACE);
+                    href = relatedID.toString();
+                    LOGGER.info("Setting href of related item to " + href);
+                    relatedItem.setAttribute("href", href, MCRConstants.XLINK_NAMESPACE);
 
-                if (isParent(relatedItem)) {
-                    LOGGER.info("Setting " + href + " as parent of " + oid);
-                    object.getStructure().setParent(relatedID);
+                    if (isParent(relatedItem)) {
+                        LOGGER.info("Setting " + href + " as parent of " + oid);
+                        object.getStructure().setParent(relatedID);
+                    }
                 }
             }
         }
