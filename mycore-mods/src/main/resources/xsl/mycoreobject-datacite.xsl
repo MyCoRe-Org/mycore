@@ -143,7 +143,9 @@
     <xsl:variable name="rolepath" select="document(concat('classification:editor:-1:parents:marcrelator:',$marcrelator))" />
     <xsl:if test="$rolepath/items/item/@value='cre'">
       <creator>
-        <creatorName><xsl:value-of select="mods:displayForm" /></creatorName>
+        <creatorName>
+          <xsl:value-of select="mods:displayForm" />
+        </creatorName>
       </creator>
     </xsl:if>
   </xsl:template>
@@ -222,7 +224,7 @@
   <xsl:template name="resourceType">
     <resourceType resourceTypeGeneral="Text" />
   </xsl:template>
-
+  
   <!-- ========== descriptions ========== -->
 
   <xsl:template name="descriptions">
@@ -232,7 +234,7 @@
   </xsl:template>
 
   <xsl:template match="mods:abstract">
-    <description descriptionType="abstract">
+    <description descriptionType="Abstract">
       <xsl:copy-of select="@xml:lang" />
       <xsl:value-of select="text()" />
     </description>
@@ -253,7 +255,7 @@
   </xsl:template>
 
   <xsl:template match="mods:dateModified">
-    <date dateType="Modified">
+    <date dateType="Updated">
       <xsl:value-of select="text()" />
     </date>
   </xsl:template>
