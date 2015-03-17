@@ -143,7 +143,7 @@
     <xsl:variable name="rolepath" select="document(concat('classification:editor:-1:parents:marcrelator:',$marcrelator))" />
     <xsl:if test="$rolepath/items/item/@value='cre'">
       <creator>
-        <xsl:value-of select="mods:displayForm" />
+        <creatorName><xsl:value-of select="mods:displayForm" /></creatorName>
       </creator>
     </xsl:if>
   </xsl:template>
