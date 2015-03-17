@@ -14,15 +14,17 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -30,6 +32,7 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -41,9 +44,11 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.xml.MCREntityResolver;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
+import org.mycore.common.xsl.MCRErrorListener;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
@@ -55,7 +60,10 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.tools.MCRTopologicalSort;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * Provides static methods that implement commands for the MyCoRe command line interface.
@@ -759,27 +767,38 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param xslFilePath path to xsl file
      * @throws Exception
      */
-    @MCRCommand(syntax = "xslt {0} with file {1}", help = "transforms a mycore object {0} with the given file {1}", order = 280)
+    @MCRCommand(syntax = "xslt {0} with file {1}", help = "transforms a mycore object {0} with the given file or URL {1}", order = 280)
     public static void xslt(String objectId, String xslFilePath) throws Exception {
         File xslFile = new File(xslFilePath);
+        URL xslURL;
         if (!xslFile.exists()) {
-            LOGGER.error("XSLT file not found " + xslFilePath);
-            return;
+            try {
+                xslURL = new URL(xslFilePath);
+            } catch (MalformedURLException e) {
+                LOGGER.error("XSL parameter is not a file or URL: " + xslFilePath);
+                return;
+            }
+        } else {
+            xslURL = xslFile.toURI().toURL();
         }
         MCRObjectID mcrId = MCRObjectID.getInstance(objectId);
         Document document = MCRXMLMetadataManager.instance().retrieveXML(mcrId);
         // do XSL transform
-        Transformer transformer = TransformerFactory.newInstance().newTransformer(new StreamSource(xslFile));
-        transformer.setURIResolver(MCRURIResolver.instance());
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setErrorListener(MCRErrorListener.getInstance());
+        transformerFactory.setURIResolver(MCRURIResolver.instance());
+        XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+        xmlReader.setEntityResolver(MCREntityResolver.instance());
+        SAXSource styleSource=new SAXSource(xmlReader, new InputSource(xslURL.toURI().toString()));
+        Transformer transformer = transformerFactory.newTransformer(styleSource);
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
         transformer.setOutputProperty(OutputKeys.INDENT, "no");
         JDOMResult result = new JDOMResult();
         transformer.transform(new JDOMSource(document), result);
-        Document resultDocument = result.getDocument();
+        Document resultDocument = Objects.requireNonNull(result.getDocument(),"Could not get transformation result");
         // update on diff
         if(!MCRXMLHelper.deepEqual(document, resultDocument)) {
-            MCRXMLMetadataManager.instance().update(mcrId, resultDocument, new Date(System.currentTimeMillis()));
-            MCRMetadataManager.fireUpdateEvent(MCRMetadataManager.retrieveMCRObject(mcrId));
+            MCRMetadataManager.update(new MCRObject(resultDocument));
         }
     }
 
