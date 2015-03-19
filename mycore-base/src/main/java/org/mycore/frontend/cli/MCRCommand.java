@@ -25,6 +25,7 @@ package org.mycore.frontend.cli;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.text.Format;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
@@ -36,15 +37,14 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.lang.ClassUtils;
 import org.apache.log4j.Logger;
+import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfigurationException;
 
 /**
- * Represents a command understood by the command line interface. A command has
- * an external input syntax that the user uses to invoke the command and points
- * to a method in a class that implements the command.
+ * Represents a command understood by the command line interface. A command has an external input syntax that the user
+ * uses to invoke the command and points to a method in a class that implements the command.
  * 
  * @see MCRCommandLineInterface
- * 
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
@@ -57,7 +57,7 @@ public class MCRCommand {
     protected MessageFormat messageFormat;
 
     /** The java method that implements this command */
-    protected Method method;
+    private Method method;
 
     /** The types of the invocation parameters */
     protected Class<?>[] parameterTypes;
@@ -86,8 +86,7 @@ public class MCRCommand {
      * @param format
      *            the command syntax, e.g. "save document {0} to directory {1}"
      * @param methodSignature
-     *            the method to invoke, e.g.
-     *            "miless.commandline.DocumentCommands.saveDoc int String"
+     *            the method to invoke, e.g. "miless.commandline.DocumentCommands.saveDoc int String"
      * @param helpText
      *            the helpt text for this command
      */
@@ -148,7 +147,7 @@ public class MCRCommand {
             .getAnnotation(org.mycore.frontend.cli.annotation.MCRCommand.class);
         help = cmdAnnotation.help();
         messageFormat = new MessageFormat(cmdAnnotation.syntax(), Locale.ROOT);
-        method = cmd;
+        setMethod(cmd);
 
         for (int i = 0; i < parameterTypes.length; i++) {
             Class<?> paramtype = parameterTypes[i];
@@ -175,7 +174,7 @@ public class MCRCommand {
      */
     private void initMethod(ClassLoader classLoader) throws ClassNotFoundException, NoSuchMethodException {
         if (method == null) {
-            method = Class.forName(className, true, classLoader).getMethod(methodName, parameterTypes);
+            setMethod(Class.forName(className, true, classLoader).getMethod(methodName, parameterTypes));
         }
     }
 
@@ -189,13 +188,12 @@ public class MCRCommand {
     }
 
     /**
-     * Parses an input string and tries to match it with the message format used
-     * to invoke this command.
+     * Parses an input string and tries to match it with the message format used to invoke this command.
      * 
      * @param commandLine
      *            The input from the command line
-     * @return null, if the input does not match the message format; otherwise
-     *         an array holding the parameter values from the command line
+     * @return null, if the input does not match the message format; otherwise an array holding the parameter values
+     *         from the command line
      */
     protected Object[] parseCommandLine(String commandLine) {
         try {
@@ -206,12 +204,11 @@ public class MCRCommand {
     }
 
     /**
-     * Transforms the parameters found by the MessageFormat parse method into
-     * such that can be used to invoke the method implementing this command
+     * Transforms the parameters found by the MessageFormat parse method into such that can be used to invoke the method
+     * implementing this command
      * 
      * @param commandParameters
-     *            The parameters as returned by the
-     *            <code>parseCommandLine</code> method
+     *            The parameters as returned by the <code>parseCommandLine</code> method
      */
     private void prepareInvocationParameters(Object[] commandParameters) {
 
@@ -223,14 +220,11 @@ public class MCRCommand {
     }
 
     /**
-     * Tries to invoke the method that implements the behavior of this command
-     * given the user input from the command line. This is only done when the
-     * command line syntax matches the syntax used by this command.
+     * Tries to invoke the method that implements the behavior of this command given the user input from the command
+     * line. This is only done when the command line syntax matches the syntax used by this command.
      * 
-     * @return null, if the command syntax did not match and the command was not
-     *         invoked, otherwise a List of commands is returned which may be
-     *         empty or otherwise contains commands that should be processed
-     *         next
+     * @return null, if the command syntax did not match and the command was not invoked, otherwise a List of commands
+     *         is returned which may be empty or otherwise contains commands that should be processed next
      * @param input
      *            The command entered by the user at the command prompt
      * @throws IllegalAccessException
@@ -273,8 +267,7 @@ public class MCRCommand {
     }
 
     /**
-     * Returns the input syntax to be used for invoking this command from the
-     * command prompt.
+     * Returns the input syntax to be used for invoking this command from the command prompt.
      * 
      * @return the input syntax for this command
      */
@@ -286,5 +279,16 @@ public class MCRCommand {
         MCRCommandLineInterface.output(getSyntax());
         MCRCommandLineInterface.output("    " + getHelpText());
         MCRCommandLineInterface.output("");
+    }
+
+    /**
+     * @param method
+     *            the method to set
+     */
+    public void setMethod(Method method) {
+        if (!Modifier.isStatic(method.getModifiers())) {
+            throw new MCRException("MCRCommand method needs to be static: " + method);
+        }
+        this.method = method;
     }
 }
