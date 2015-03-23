@@ -110,18 +110,34 @@ public class MCRURN {
          * get the String representation of this urn and split it. Every single
          * part of the string is one element in the array
          */
+
         String[] urn = toString().split("");
+
+        // since java 8 the first entry is not empty as it used to be in previous java versions
+        if (urn[0].length() == 0) {
+            String[] intermediate = new String[urn.length - 1];
+            System.arraycopy(urn, 1, intermediate, 0, intermediate.length);
+            urn = intermediate;
+        }
 
         /* Convert the String into an integer representation */
         StringBuilder sourceURNConverted = new StringBuilder();
-        for (int i = 1; i < urn.length; i++) {
-            sourceURNConverted.append(getIntegerAlias(urn[i]));
+        for (int i = 1; i <= urn.length; i++) {
+            sourceURNConverted.append(getIntegerAlias(urn[i - 1]));
         }
         /* Split the string again to calculate the product sum */
         urn = sourceURNConverted.toString().split("");
+
+        // since java 8 the first entry is not empty as it used to be in previous java versions
+        if (urn[0].length() == 0) {
+            String[] intermediate = new String[urn.length - 1];
+            System.arraycopy(urn, 1, intermediate, 0, intermediate.length);
+            urn = intermediate;
+        }
+
         int productSum = 0;
-        for (int i = 1; i < urn.length; i++) {
-            productSum += i * Integer.parseInt(urn[i]);
+        for (int i = 1; i <= urn.length; i++) {
+            productSum += i * Integer.parseInt(urn[i - 1]);
         }
         /*
          * calculation of the ratio, dividing the productSum by the last element
