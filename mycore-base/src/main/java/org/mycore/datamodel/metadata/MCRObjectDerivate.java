@@ -320,7 +320,8 @@ public class MCRObjectDerivate {
      * Removes file metadata (urn information) from the {@link MCRObjectDerivate}
      */
     public void removeFileMetadata() {
-        files = Collections.emptyList();
+        this.files = Collections.emptyList();
+        this.derivateURN = null;
     }
 
     /**
