@@ -317,6 +317,13 @@ public class MCRObjectDerivate {
     }
 
     /**
+     * Removes file metadata (urn information) from the {@link MCRObjectDerivate}
+     */
+    public void removeFileMetadata() {
+        files = Collections.emptyList();
+    }
+
+    /**
      * Deletes file metadata of file idendified by absolute path.
      * @param path {@link MCRFile#getAbsolutePath()}
      * @return true if metadata was deleted and false if file has no metadata.
