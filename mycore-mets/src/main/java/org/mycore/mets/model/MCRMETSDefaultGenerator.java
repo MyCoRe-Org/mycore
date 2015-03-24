@@ -191,7 +191,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
     }
 
     private MCRILogicalStructMapTypeProvider getTypeProvider() {
-        String className = MCRConfiguration.instance().getString("MCR.Component.MetsMods.LogigalStructMapTypeProvider",
+        String className = MCRConfiguration.instance().getString("MCR.Component.MetsMods.LogicalStructMapTypeProvider",
                 MCRDefaultLogicalStructMapTypeProvider.class.getName());
 
         MCRILogicalStructMapTypeProvider typeProvider = null;
