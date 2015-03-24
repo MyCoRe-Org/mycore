@@ -35,6 +35,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -68,7 +69,8 @@ import org.mycore.mets.tools.MCRMetsSave;
 public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
 
     private static final Logger LOGGER = Logger.getLogger(MCRMETSGenerator.class);
-    private static final List<String> EXCLUDED_ROOT_FOLDERS = Arrays.asList(new String[]{"alto", "tei"});
+
+    private static final List<String> EXCLUDED_ROOT_FOLDERS = Arrays.asList(new String[] { "alto", "tei" });
 
     public Mets getMETS(MCRPath dir, Set<MCRPath> ignoreNodes) throws IOException {
         // add dmdsec
@@ -84,9 +86,12 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         PhysicalDiv physicalDiv = new PhysicalDiv("phys_dmd_" + dir.getOwner(), "physSequence");
         physicalStructMap.setDivContainer(physicalDiv);
         // logical structure
+
+        MCRILogicalStructMapTypeProvider typeProvider = getTypeProvider();
         LogicalStructMap logicalStructMap = new LogicalStructMap();
-        LogicalDiv logicalDiv = new LogicalDiv("log_" + dir.getOwner(), "monograph", dir.getOwner(), 1, amdSec.getId(),
-                dmdSec.getId());
+
+        LogicalDiv logicalDiv = new LogicalDiv("log_" + dir.getOwner(), typeProvider.getType(MCRObjectID.getInstance(dir.getOwner())),
+                dir.getOwner(), 1, amdSec.getId(), dmdSec.getId());
         logicalDiv.setDmdId(dmdSec.getId());
         logicalStructMap.setDivContainer(logicalDiv);
         // struct Link
@@ -116,8 +121,8 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         return mets;
     }
 
-    private void createMets(MCRPath dir, Set<MCRPath> ignoreNodes, FileGrp fileGrp, PhysicalDiv physicalDiv,
-                            AbstractLogicalDiv logicalDiv, StructLink structLink, int logOrder) throws IOException {
+    private void createMets(MCRPath dir, Set<MCRPath> ignoreNodes, FileGrp fileGrp, PhysicalDiv physicalDiv, AbstractLogicalDiv logicalDiv,
+            StructLink structLink, int logOrder) throws IOException {
         SortedMap<MCRPath, BasicFileAttributes> files = new TreeMap<>(), directories = new TreeMap<>();
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(dir)) {
             for (Path child : dirStream) {
@@ -160,8 +165,8 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         for (Map.Entry<MCRPath, BasicFileAttributes> directory : directories.entrySet()) {
             // TODO: Add excluded files to extra section and link them to physical page
             if (!(logOrder == 0 && isExcludedRootFolder(directory.getKey()))) {
-                LogicalSubDiv section = new LogicalSubDiv("log_" + Integer.toString(++logOrder), "section", directory
-                        .getKey().getFileName().toString(), logOrder);
+                LogicalSubDiv section = new LogicalSubDiv("log_" + Integer.toString(++logOrder), "section", directory.getKey()
+                        .getFileName().toString(), logOrder);
                 logicalDiv.add(section);
                 createMets(directory.getKey(), ignoreNodes, fileGrp, physicalDiv, section, structLink, logOrder);
             }
@@ -185,4 +190,18 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         return isExcluded;
     }
 
+    private MCRILogicalStructMapTypeProvider getTypeProvider() {
+        String className = MCRConfiguration.instance().getString("MCR.Component.MetsMods.LogigalStructMapTypeProvider",
+                MCRDefaultLogicalStructMapTypeProvider.class.getName());
+
+        MCRILogicalStructMapTypeProvider typeProvider = null;
+        try {
+            typeProvider = (MCRILogicalStructMapTypeProvider) Class.forName(className).newInstance();
+        } catch (Exception e) {
+            LOGGER.warn("Could not load class " + className);
+            return new MCRDefaultLogicalStructMapTypeProvider();
+        }
+
+        return typeProvider;
+    }
 }
