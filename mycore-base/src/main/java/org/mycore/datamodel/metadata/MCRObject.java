@@ -210,6 +210,10 @@ final public class MCRObject extends MCRBase {
         return getStructure().getParentID() != null;
     }
 
+    public MCRObjectID getParent() {
+        return getStructure().getParentID();
+    }
+
     public void checkLinkTargets() {
         for (int i = 0; i < getMetadata().size(); i++) {
             MCRMetaElement elm = getMetadata().getMetadataElement(i);
@@ -222,7 +226,8 @@ final public class MCRObject extends MCRBase {
                     if (exists) {
                         continue;
                     }
-                    MCRActiveLinkException activeLink = new MCRActiveLinkException("Failure while adding link!. Destination does not exist.");
+                    MCRActiveLinkException activeLink = new MCRActiveLinkException(
+                            "Failure while adding link!. Destination does not exist.");
                     String destination = classID + "##" + categID;
                     activeLink.addLink(getId().toString(), destination);
                     // throw activeLink;
@@ -233,7 +238,8 @@ final public class MCRObject extends MCRBase {
                     if (!MCRXMLMetadataManager.instance().exists(destination)) {
                         continue;
                     }
-                    MCRActiveLinkException activeLink = new MCRActiveLinkException("Failure while adding link!. Destination does not exist.");
+                    MCRActiveLinkException activeLink = new MCRActiveLinkException(
+                            "Failure while adding link!. Destination does not exist.");
                     activeLink.addLink(getId().toString(), destination.toString());
                     // throw activeLink;
                     // TODO: should trigger undo-Event
