@@ -758,6 +758,7 @@ public final class MCRMetadataManager {
         mcrObject.getStructure().getChildren().addAll(old.getStructure().getChildren());
 
         // import all herited matadata from the parent
+        receiveMetadata(mcrObject);
 
         // if not imported via cli, createdate remains unchanged
         if (!mcrObject.isImportMode() || mcrObject.getService().getDate("createdate") == null) {
