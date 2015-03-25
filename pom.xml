@@ -107,7 +107,7 @@
               <template>announcement.vm</template>
               <useJql>true</useJql>
               <templateDirectory>src/changes</templateDirectory>
-<!--               <statusIds>10002,Done</statusIds> -->
+              <!-- <statusIds>10002,Done</statusIds> -->
               <!-- due to: http://jira.codehaus.org/browse/MCHANGES-333 -->
               <maxEntries>1000</maxEntries>
             </configuration>
@@ -630,7 +630,7 @@
       <dependency>
         <groupId>org.mycore.mets</groupId>
         <artifactId>mets-model</artifactId>
-        <version>0.6</version>
+        <version>0.7-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.mycore.mets</groupId>
