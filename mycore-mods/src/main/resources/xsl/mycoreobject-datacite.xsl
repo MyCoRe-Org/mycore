@@ -169,16 +169,16 @@
 
   <xsl:template name="publicationYear">
     <xsl:choose>
-      <xsl:when test="mods:originInfo/mods:dateCreated">
-        <xsl:apply-templates select="mods:originInfo/mods:dateCreated" mode="publicationYear" />
+      <xsl:when test="mods:originInfo/mods:dateIssued">
+        <xsl:apply-templates select="mods:originInfo/mods:dateIssued" mode="publicationYear" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:apply-templates select="mods:originInfo/mods:dateModified" mode="publicationYear" />
+        <xsl:apply-templates select="mods:originInfo/mods:dateCreated" mode="publicationYear" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="mods:dateCreated|mods:dateModified" mode="publicationYear">
+  <xsl:template match="mods:dateCreated|mods:dateIssued" mode="publicationYear">
     <publicationYear>
       <xsl:value-of select="substring(text(),1,4)" />
     </publicationYear>
@@ -224,7 +224,7 @@
   <xsl:template name="resourceType">
     <resourceType resourceTypeGeneral="Text" />
   </xsl:template>
-  
+
   <!-- ========== descriptions ========== -->
 
   <xsl:template name="descriptions">
@@ -244,8 +244,14 @@
 
   <xsl:template name="dates">
     <dates>
-      <xsl:apply-templates select="mods:originInfo/mods:dateOther|mods:originInfo/mods:dateCreated|mods:originInfo/mods:dateModified" />
+      <xsl:apply-templates select="mods:originInfo/mods:dateOther|mods:originInfo/mods:dateIssued|mods:originInfo/mods:dateCreated|mods:originInfo/mods:dateModified" />
     </dates>
+  </xsl:template>
+
+  <xsl:template match="mods:dateIssued">
+    <date dateType="Issued">
+      <xsl:value-of select="text()" />
+    </date>
   </xsl:template>
 
   <xsl:template match="mods:dateCreated">
