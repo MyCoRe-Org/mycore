@@ -259,6 +259,8 @@ public class MCRXMLFunctions {
           Calendar calendar = MCRCalendar.getHistoryDateAsCalendar(date_value,use_last_value,calendar_name);
           GregorianCalendar g_calendar = MCRCalendar.getGregorianCalendarOfACalendar(calendar);
           formatted_date = MCRCalendar.getCalendarDateToFormattedString(g_calendar,"yyyy-MM-dd") + "T00:00:00.000Z";
+          if (g_calendar.get(GregorianCalendar.ERA) == GregorianCalendar.BC)
+        	  formatted_date = "-" + formatted_date;
     	} catch (Exception e) {
     	  e.printStackTrace();
     	  return "";
