@@ -86,7 +86,7 @@
       </label>
       <div class="col-md-9 row">
         <mcruser:template name="textInput" xpath="@name" id="userName" inline="true" colsize="sm" colwidth="9"
-          i18n.error="component.user2.admin.inputhints.username" required="true" maxlength="16" />
+          i18n.error="component.user2.admin.inputhints.username" required="true" matches="[a-z0-9]*" maxlength="16" />
         <mcruser:template name="selectInput" xpath="realm/@id" default="local" id="realmId" inline="true" colsize="sm" colwidth="3"
           uri="xslStyle:items2options:xslStyle:realms2items:realm:all" />
       </div>
