@@ -60,7 +60,7 @@
 
   <xed:template id="editor4admins">
     <mcruser:template name="checkboxList" inline="true" xpath="@locked" id="locked">
-      <option value="true" i18n="component.user2.admin.user.locked" />
+      <option value="true" i18n="component.user2.admin.user.locked.true" />
     </mcruser:template>
     <mcruser:template name="checkboxList" inline="true" xpath="@disabled" id="disabled">
       <option value="true" i18n="component.user2.admin.user.disabled" />
