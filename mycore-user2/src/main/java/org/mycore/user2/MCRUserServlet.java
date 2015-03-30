@@ -419,7 +419,8 @@ public class MCRUserServlet extends MCRServlet {
             return;
         }
         boolean allowed = MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION)
-                || currentUser.equals(user.getOwner()) || (currentUser.equals(user) && currentUser.hasNoOwner());
+                || currentUser.equals(user.getOwner())
+                || (currentUser.equals(user) && currentUser.hasNoOwner() || !currentUser.isLocked());
         if (!allowed) {
             String msg = MCRTranslation.translate("component.user2.UserServlet.noAdminPermission");
             res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
