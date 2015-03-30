@@ -477,8 +477,7 @@ public class MCRUserServlet extends MCRServlet {
         List<MCRUser> ownUsers = MCRUserManager.listUsers(currentUser);
         boolean hasAdminPermission = MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION);
         boolean allowed = hasAdminPermission
-                || MCRAccessManager.checkPermission(MCRUser2Constants.USER_CREATE_PERMISSION) || ownUsers != null
-                && ownUsers.size() > 0;
+                || MCRAccessManager.checkPermission(MCRUser2Constants.USER_CREATE_PERMISSION) || !ownUsers.isEmpty();
         if (!allowed) {
             String msg = MCRTranslation.translate("component.user2.UserServlet.noCreatePermission");
             res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
