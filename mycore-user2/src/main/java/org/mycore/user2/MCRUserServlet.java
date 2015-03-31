@@ -238,7 +238,7 @@ public class MCRUserServlet extends MCRServlet {
         if (checkUserIsLocked(res, currentUser) || checkUserIsDisabled(res, currentUser)) {
             return;
         }
-        if (!currentUser.hasNoOwner()) {
+        if (!currentUser.hasNoOwner() && currentUser.isLocked()) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
