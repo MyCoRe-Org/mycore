@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -43,11 +43,11 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
      * 
      * @param mcrID id of the derivate or mcrobject, if you put a mcrobject id here
      * all files of each derivate are indexed
-     * @param solrServer where to index
+     * @param solrClient where to index
      */
-    public MCRSolrFilesIndexHandler(String mcrID, SolrServer solrServer) {
+    public MCRSolrFilesIndexHandler(String mcrID, SolrClient solrClient) {
         this.mcrID = mcrID;
-        this.solrServer = solrServer;
+        this.solrClient = solrClient;
         this.subHandlerList = new ArrayList<>();
         this.commitWithin = -1;
     }
@@ -67,7 +67,7 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
         final MCRSolrIndexHandlerFactory ihf = MCRSolrIndexHandlerFactory.getInstance();
         final List<MCRSolrIndexHandler> subHandlerList = this.subHandlerList;
         final List<SolrInputDocument> docs = new ArrayList<>();
-        final SolrServer solrServer = this.solrServer;
+        final SolrClient solrClient = this.solrClient;
         Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
 
             @Override
@@ -75,7 +75,7 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
                 boolean sendContent = ihf.checkFile(file, attrs);
                 try {
                     if (sendContent) {
-                        subHandlerList.add(ihf.getIndexHandler(file, attrs, solrServer, true));
+                        subHandlerList.add(ihf.getIndexHandler(file, attrs, solrClient, true));
                     } else {
                         SolrInputDocument fileDoc = MCRSolrPathDocumentFactory.getInstance().getDocument(file, attrs);
                         docs.add(fileDoc);
@@ -90,7 +90,7 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
         int fileCount = subHandlerList.size() + docs.size();
         LOGGER.info("Sending " + fileCount + " file(s) for derivate \"" + derivateID + "\"");
         if (!docs.isEmpty()) {
-            MCRSolrInputDocumentsHandler subHandler = new MCRSolrInputDocumentsHandler(docs, solrServer);
+            MCRSolrInputDocumentsHandler subHandler = new MCRSolrInputDocumentsHandler(docs, solrClient);
             subHandler.setCommitWithin(getCommitWithin());
             this.subHandlerList.add(subHandler);
         }

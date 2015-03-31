@@ -1,8 +1,8 @@
 package org.mycore.solr.index.handlers.stream;
 
 
-import org.apache.solr.client.solrj.SolrServer;
-import org.mycore.solr.MCRSolrServerFactory;
+import org.apache.solr.client.solrj.SolrClient;
+import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.cs.MCRSolrAbstractContentStream;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
@@ -16,12 +16,12 @@ public abstract class MCRSolrAbstractStreamIndexHandler extends MCRSolrAbstractI
     }
 
     public MCRSolrAbstractStreamIndexHandler(MCRSolrAbstractContentStream<?> stream) {
-        this(stream, MCRSolrServerFactory.getSolrServer());
+        this(stream, MCRSolrClientFactory.getSolrClient());
     }
 
-    public MCRSolrAbstractStreamIndexHandler(MCRSolrAbstractContentStream<?> stream, SolrServer solrServer) {
+    public MCRSolrAbstractStreamIndexHandler(MCRSolrAbstractContentStream<?> stream, SolrClient solrClient) {
         this.stream = stream;
-        this.solrServer = solrServer;
+        this.solrClient = solrClient;
         this.commitWithin = -1;
     }
 

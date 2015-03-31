@@ -15,7 +15,7 @@ import java.text.MessageFormat;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 
 /**
  * Convenience class for holding the parameters for the solr search url.
@@ -27,7 +27,7 @@ public class MCRSolrURL {
 
     public static final String FIXED_URL_PART = MessageFormat.format("{0}?version={1}", QUERY_PATH, QUERY_XML_PROTOCOL_VERSION);
 
-    private HttpSolrServer solrServer;
+    private HttpSolrClient solrClient;
 
     private String urlQuery, q, sortOptions, wt;
 
@@ -36,10 +36,10 @@ public class MCRSolrURL {
     boolean returnScore;
 
     /**
-     * @param solrServer the solr server to use
+     * @param solrClient the solr server connection to use
      */
-    public MCRSolrURL(HttpSolrServer solrServer) {
-        this.solrServer = solrServer;
+    public MCRSolrURL(HttpSolrClient solrClient) {
+        this.solrClient = solrClient;
         start = 0;
         rows = 10;
         q = null;
@@ -53,20 +53,20 @@ public class MCRSolrURL {
      * use the MCRSolrURL setter methods to edit your request. Only the urlQuery is
      * used.
      * 
-     * @param solrServer the solr server to use
+     * @param solrClient the solr server connection to use
      * @param urlQuery e.g. q=allMeta:Hello&rows=20&defType=edismax
      */
-    public MCRSolrURL(HttpSolrServer solrServer, String urlQuery) {
-        this.solrServer = solrServer;
+    public MCRSolrURL(HttpSolrClient solrClient, String urlQuery) {
+        this.solrClient = solrClient;
         this.urlQuery = urlQuery;
     }
 
     /**
-     * @param solrServer
+     * @param solrClient the solr server connection to use
      * @param returnScore specify whether to return the score with results;
      */
-    public MCRSolrURL(HttpSolrServer solrServer, boolean returnScore) {
-        this(solrServer);
+    public MCRSolrURL(HttpSolrClient solrClient, boolean returnScore) {
+        this(solrClient);
         this.returnScore = returnScore;
     }
 
@@ -76,11 +76,11 @@ public class MCRSolrURL {
     public URL getUrl() {
         try {
             if (this.urlQuery == null) {
-                return new URL(solrServer.getBaseURL() + FIXED_URL_PART + "&q=" + URLEncoder.encode(q, "UTF-8") + "&start=" + start
+                return new URL(solrClient.getBaseURL() + FIXED_URL_PART + "&q=" + URLEncoder.encode(q, "UTF-8") + "&start=" + start
                     + "&rows=" + rows + "&sort=" + URLEncoder.encode(sortOptions, "UTF-8") + (returnScore ? "&fl=*,score" : "")
                     + (wt != null ? "&wt=" + wt : ""));
             } else {
-                return new URL(solrServer.getBaseURL() + FIXED_URL_PART + "&" + urlQuery);
+                return new URL(solrClient.getBaseURL() + FIXED_URL_PART + "&" + urlQuery);
             }
         } catch (Exception urlException) {
             LOGGER.error("Error building solr url", urlException);
@@ -97,7 +97,7 @@ public class MCRSolrURL {
      */
     public URL getLukeURL() {
         try {
-            return new URL(solrServer.getBaseURL() + "/admin/luke");
+            return new URL(solrClient.getBaseURL() + "/admin/luke");
         } catch (MalformedURLException e) {
             LOGGER.error("Error building solr luke url", e);
         }

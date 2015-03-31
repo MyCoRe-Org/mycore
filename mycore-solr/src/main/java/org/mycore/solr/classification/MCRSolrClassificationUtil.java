@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.config.MCRConfiguration;
@@ -21,7 +21,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRCategoryLink;
 import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.MCRSolrCore;
-import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.MCRSolrClientFactory;
 
 import com.google.common.collect.Lists;
 
@@ -39,7 +39,7 @@ public abstract class MCRSolrClassificationUtil {
     public static final String CLASSIFICATION_CORE_NAME;
 
     static {
-        MCRSolrCore defaultCore = MCRSolrServerFactory.getDefaultSolrCore();
+        MCRSolrCore defaultCore = MCRSolrClientFactory.getDefaultSolrCore();
         CLASSIFICATION_CORE_NAME = MCRConfiguration.instance().getString("MCR.Module-solr.Classification.Core",
             defaultCore != null ? defaultCore.getName() + "_class" : "classification");
     }
@@ -82,20 +82,20 @@ public abstract class MCRSolrClassificationUtil {
      * @param solrDocumentList the list to index
      */
     public static void bulkIndex(List<SolrInputDocument> solrDocumentList) {
-        SolrServer server = getCore().getConcurrentServer();
+        SolrClient solrClient = getCore().getConcurrentClient();
         List<List<SolrInputDocument>> partitionList = Lists.partition(solrDocumentList, 1000);
         int docNum = solrDocumentList.size();
         int added = 0;
         for (List<SolrInputDocument> part : partitionList) {
             try {
-                server.add(part);
+                solrClient.add(part);
                 LOGGER.info("Added " + (added += part.size()) + "/" + docNum + " documents");
             } catch (SolrServerException | IOException e) {
                 LOGGER.error("Unable to add classification documents.", e);
             }
         }
         try {
-            server.commit();
+            solrClient.commit();
         } catch (SolrServerException | IOException e) {
             LOGGER.error("Unable to commit classification documents.", e);
         }
@@ -106,8 +106,8 @@ public abstract class MCRSolrClassificationUtil {
      */
     public static void dropIndex() {
         try {
-            SolrServer server = getCore().getConcurrentServer();
-            server.deleteByQuery("*:*");
+            SolrClient solrClient = getCore().getConcurrentClient();
+            solrClient.deleteByQuery("*:*");
         } catch (Exception exc) {
             LOGGER.error("Unable to drop solr classification index", exc);
         }
@@ -187,20 +187,20 @@ public abstract class MCRSolrClassificationUtil {
      * @param categories the categories to reindex
      */
     public static void reindex(MCRCategory... categories) {
-        SolrServer server = getCore().getServer();
+        SolrClient solrClient = getCore().getClient();
         for (MCRCategory category : categories) {
             if (category == null) {
                 continue;
             }
             MCRSolrCategory solrCategory = new MCRSolrCategory(category);
             try {
-                server.add(solrCategory.toSolrDocument());
+                solrClient.add(solrCategory.toSolrDocument());
             } catch (Exception exc) {
                 LOGGER.error("Unable to reindex " + category.getId(), exc);
             }
         }
         try {
-            server.commit();
+            solrClient.commit();
         } catch (Exception exc) {
             LOGGER.error("Unable to commit reindexed categories", exc);
         }
@@ -235,10 +235,10 @@ public abstract class MCRSolrClassificationUtil {
      * @return
      */
     public static MCRSolrCore getCore() {
-        MCRSolrCore classCore = MCRSolrServerFactory.get(CLASSIFICATION_CORE_NAME);
+        MCRSolrCore classCore = MCRSolrClientFactory.get(CLASSIFICATION_CORE_NAME);
         if (classCore == null) {
             synchronized (CREATE_LOCK) {
-                classCore = MCRSolrServerFactory.get(CLASSIFICATION_CORE_NAME);
+                classCore = MCRSolrClientFactory.get(CLASSIFICATION_CORE_NAME);
                 if (classCore == null) {
                     classCore = new MCRSolrCore(MCRSolrConstants.SERVER_BASE_URL, CLASSIFICATION_CORE_NAME);
                 }

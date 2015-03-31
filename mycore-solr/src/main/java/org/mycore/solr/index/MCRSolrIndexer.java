@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
@@ -29,7 +29,7 @@ import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
 import org.mycore.solr.index.handlers.MCRSolrOptimizeIndexHandler;
@@ -88,7 +88,7 @@ public class MCRSolrIndexer {
                     metadataStats, fileStats, operationsStats);
                 LOGGER.info(msg);
                 try {
-                    MCRSolrServerFactory.getSolrServer().commit();
+                    MCRSolrClientFactory.getSolrClient().commit();
                 } catch (SolrServerException | IOException e) {
                     LOGGER.warn("Error while closing MCRSolrIndexer executor service.", e);
                 }
@@ -99,8 +99,8 @@ public class MCRSolrIndexer {
     }
 
     public static UpdateResponse deleteOrphanedNestedDocuments() throws SolrServerException, IOException {
-        SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
-        return solrServer.deleteByQuery("-({!join from=id to=_root_}_root_:*) +_root_:*", 0);
+        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
+        return solrClient.deleteByQuery("-({!join from=id to=_root_}_root_:*) +_root_:*", 0);
     }
 
     /**
@@ -113,7 +113,7 @@ public class MCRSolrIndexer {
         if (solrIDs == null || solrIDs.length == 0) {
             return null;
         }
-        SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
+        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         UpdateResponse updateResponse = null;
         long start = System.currentTimeMillis();
         try {
@@ -133,8 +133,8 @@ public class MCRSolrIndexer {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Delete request: " + req.getXML());
             }
-            updateResponse = req.process(solrServer);
-            solrServer.commit();
+            updateResponse = req.process(solrClient);
+            solrClient.commit();
         } catch (Exception e) {
             LOGGER.error("Error deleting document from solr", e);
         }
@@ -156,8 +156,8 @@ public class MCRSolrIndexer {
     /**
      * Rebuilds solr's metadata index.
      */
-    public static void rebuildMetadataIndex(SolrServer solrServer) {
-        rebuildMetadataIndex(MCRXMLMetadataManager.instance().listIDs(), solrServer);
+    public static void rebuildMetadataIndex(SolrClient cuss) {
+        rebuildMetadataIndex(MCRXMLMetadataManager.instance().listIDs(), cuss);
     }
 
     /**
@@ -172,7 +172,7 @@ public class MCRSolrIndexer {
     }
 
     public static void rebuildMetadataIndex(List<String> list) {
-        rebuildMetadataIndex(list, MCRSolrServerFactory.getConcurrentSolrServer());
+        rebuildMetadataIndex(list, MCRSolrClientFactory.getConcurrentSolrClient());
     }
 
     /**
@@ -180,10 +180,10 @@ public class MCRSolrIndexer {
      * 
      * @param list
      *            list of identifiers of the objects to index
-     * @param solrServer
+     * @param solrClient
      *            solr server to index
      */
-    public static void rebuildMetadataIndex(List<String> list, SolrServer solrServer) {
+    public static void rebuildMetadataIndex(List<String> list, SolrClient solrClient) {
         LOGGER.info("Re-building Metadata Index");
         if (list.isEmpty()) {
             LOGGER.info("Sorry, no documents to index");
@@ -210,7 +210,7 @@ public class MCRSolrIndexer {
                     MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(
                         contentMap);
                     indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
-                    indexHandler.setSolrServer(solrServer);
+                    indexHandler.setSolrServer(solrClient);
                     statistic = indexHandler.getStatistic();
                     submitIndexHandler(indexHandler);
                     contentMap.clear();
@@ -229,12 +229,12 @@ public class MCRSolrIndexer {
      * Rebuilds solr's content index.
      */
     public static void rebuildContentIndex() {
-        rebuildContentIndex(MCRSolrServerFactory.getSolrServer(),
+        rebuildContentIndex(MCRSolrClientFactory.getSolrClient(),
             MCRXMLMetadataManager.instance().listIDsOfType("derivate"));
     }
 
-    public static void rebuildContentIndex(SolrServer solrServer) {
-        rebuildContentIndex(solrServer, MCRXMLMetadataManager.instance().listIDsOfType("derivate"));
+    public static void rebuildContentIndex(SolrClient hss) {
+        rebuildContentIndex(hss, MCRXMLMetadataManager.instance().listIDsOfType("derivate"));
     }
 
     /**
@@ -245,13 +245,13 @@ public class MCRSolrIndexer {
      *            containing mycore object id's
      */
     public static void rebuildContentIndex(List<String> list) {
-        rebuildContentIndex(MCRSolrServerFactory.getSolrServer(), list);
+        rebuildContentIndex(MCRSolrClientFactory.getSolrClient(), list);
     }
 
     /**
      * Rebuilds solr's content index.
      */
-    public static void rebuildContentIndex(SolrServer solrServer, List<String> list) {
+    public static void rebuildContentIndex(SolrClient solrClient, List<String> list) {
         LOGGER.info("Re-building Content Index");
 
         if (list.isEmpty()) {
@@ -264,7 +264,7 @@ public class MCRSolrIndexer {
         LOGGER.info("Sending content of " + totalCount + " derivates to solr for reindexing");
 
         for (String id : list) {
-            MCRSolrFilesIndexHandler indexHandler = new MCRSolrFilesIndexHandler(id, solrServer);
+            MCRSolrFilesIndexHandler indexHandler = new MCRSolrFilesIndexHandler(id, solrClient);
             indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
             submitIndexHandler(indexHandler);
         }
@@ -311,8 +311,8 @@ public class MCRSolrIndexer {
      */
     public static void dropIndex() throws Exception {
         LOGGER.info("Dropping solr index...");
-        SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
-        solrServer.deleteByQuery("*:*", BATCH_AUTO_COMMIT_WITHIN_MS);
+        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
+        solrClient.deleteByQuery("*:*", BATCH_AUTO_COMMIT_WITHIN_MS);
         LOGGER.info("Dropping solr index...done");
     }
 
@@ -328,7 +328,7 @@ public class MCRSolrIndexer {
 
         LOGGER.info("Dropping solr index for type " + type + "...");
         String deleteQuery = MessageFormat.format("objectType:{0} _root_:*_{1}_*", type, type);
-        MCRSolrServerFactory.getSolrServer().deleteByQuery(deleteQuery, BATCH_AUTO_COMMIT_WITHIN_MS);
+        MCRSolrClientFactory.getSolrClient().deleteByQuery(deleteQuery, BATCH_AUTO_COMMIT_WITHIN_MS);
         LOGGER.info("Dropping solr index for type " + type + "...done");
     }
 
@@ -375,8 +375,8 @@ public class MCRSolrIndexer {
         LOGGER.info("there are " + storeList.size() + " mycore objects");
         // get ids from solr
         LOGGER.info("fetching solr...");
-        SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
-        List<String> solrList = MCRSolrSearchUtils.listIDs(solrServer, "objectType:" + objectType);
+        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
+        List<String> solrList = MCRSolrSearchUtils.listIDs(solrClient, "objectType:" + objectType);
         LOGGER.info("there are " + solrList.size() + " solr objects");
 
         // documents to remove

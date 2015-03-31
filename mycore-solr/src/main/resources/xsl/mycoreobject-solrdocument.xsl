@@ -13,7 +13,7 @@
     <!-- batch processing -->
     <xsl:for-each select="*">
       <doc>
-        <xsl:apply-templates />
+        <xsl:apply-templates select="." />
       </doc>
     </xsl:for-each>
   </xsl:template>

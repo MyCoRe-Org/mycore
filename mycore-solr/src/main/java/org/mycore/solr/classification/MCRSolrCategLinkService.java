@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
@@ -37,9 +37,9 @@ public class MCRSolrCategLinkService extends MCRCategLinkServiceImpl {
         super.deleteLink(reference);
         // solr
         try {
-            SolrServer solrServer = MCRSolrClassificationUtil.getCore().getServer();
-            delete(solrServer, reference);
-            solrServer.commit();
+            SolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
+            delete(solrClient, reference);
+            solrClient.commit();
         } catch (Exception exc) {
             LOGGER.error("Unable to delete links of object " + reference.getObjectID(), exc);
         }
@@ -49,16 +49,16 @@ public class MCRSolrCategLinkService extends MCRCategLinkServiceImpl {
     public void deleteLinks(Collection<MCRCategLinkReference> references) {
         super.deleteLinks(references);
         // solr
-        SolrServer solrServer = MCRSolrClassificationUtil.getCore().getServer();
+        SolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
         for (MCRCategLinkReference reference : references) {
             try {
-                delete(solrServer, reference);
+                delete(solrClient, reference);
             } catch (Exception exc) {
                 LOGGER.error("Unable to delete links of object " + reference.getObjectID(), exc);
             }
         }
         try {
-            solrServer.commit();
+            solrClient.commit();
         } catch (SolrServerException | IOException e) {
             LOGGER.error("Unable to commit.", e);
         }
@@ -67,14 +67,14 @@ public class MCRSolrCategLinkService extends MCRCategLinkServiceImpl {
     /**
      * Delete the given reference in solr.
      * 
-     * @param solrServer
+     * @param solrClient
      * @param reference
      * @throws SolrServerException
      * @throws IOException
      */
-    protected void delete(SolrServer solrServer, MCRCategLinkReference reference) throws SolrServerException,
+    protected void delete(SolrClient solrClient, MCRCategLinkReference reference) throws SolrServerException,
         IOException {
-        solrServer.deleteByQuery("+type:link +object:" + reference.getObjectID());
+        solrClient.deleteByQuery("+type:link +object:" + reference.getObjectID());
     }
 
 }

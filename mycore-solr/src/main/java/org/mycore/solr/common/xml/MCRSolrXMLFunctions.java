@@ -3,7 +3,7 @@ package org.mycore.solr.common.xml;
 import java.io.IOException;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.MCRSolrClientFactory;
 
 public class MCRSolrXMLFunctions {
 
@@ -15,7 +15,7 @@ public class MCRSolrXMLFunctions {
      * @throws IOException
      */
     public static void delete(String id) throws SolrServerException, IOException {
-        MCRSolrServerFactory.getSolrServer().deleteById(id);
+        MCRSolrClientFactory.getSolrClient().deleteById(id);
     }
 
 }

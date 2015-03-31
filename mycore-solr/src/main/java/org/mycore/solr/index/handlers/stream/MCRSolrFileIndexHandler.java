@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.common.SolrInputDocument;
@@ -31,8 +31,8 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
         super(stream);
     }
 
-    public MCRSolrFileIndexHandler(MCRSolrPathContentStream stream, SolrServer solrServer) {
-        super(stream, solrServer);
+    public MCRSolrFileIndexHandler(MCRSolrPathContentStream stream, SolrClient solrClient) {
+        super(stream, solrClient);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
         }
         long t = System.currentTimeMillis();
         /* actually send the request */
-        getSolrServer().request(updateRequest);
+        getSolrClient().request(updateRequest);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Solr: sending binary data \"" + file.toString() + " (" + solrID + ")\"" + " done in "
                 + (System.currentTimeMillis() - t) + "ms");

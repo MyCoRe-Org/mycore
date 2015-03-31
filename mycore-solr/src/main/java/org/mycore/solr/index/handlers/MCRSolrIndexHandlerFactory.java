@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRBaseContent;
@@ -97,12 +97,12 @@ public abstract class MCRSolrIndexHandlerFactory {
         return MCRSolrIndexStrategyManager.checkFile(file, attrs);
     }
 
-    public MCRSolrIndexHandler getIndexHandler(Path file, BasicFileAttributes attrs, SolrServer solrServer)
+    public MCRSolrIndexHandler getIndexHandler(Path file, BasicFileAttributes attrs, SolrClient solrClient)
         throws IOException {
-        return this.getIndexHandler(file, attrs, solrServer, checkFile(file, attrs));
+        return this.getIndexHandler(file, attrs, solrClient, checkFile(file, attrs));
     }
 
-    public MCRSolrIndexHandler getIndexHandler(Path file, BasicFileAttributes attrs, SolrServer solrServer,
+    public MCRSolrIndexHandler getIndexHandler(Path file, BasicFileAttributes attrs, SolrClient solrClient,
         boolean sendContent) throws IOException {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Solr: submitting file \"" + file.toString() + " for indexing");
@@ -111,10 +111,10 @@ public abstract class MCRSolrIndexHandlerFactory {
         long start = System.currentTimeMillis();
         if (sendContent) {
             /* extract metadata with tika */
-            indexHandler = new MCRSolrFileIndexHandler(new MCRSolrPathContentStream(file, attrs), solrServer);
+            indexHandler = new MCRSolrFileIndexHandler(new MCRSolrPathContentStream(file, attrs), solrClient);
         } else {
             SolrInputDocument doc = MCRSolrPathDocumentFactory.getInstance().getDocument(file, attrs);
-            indexHandler = new MCRSolrInputDocumentHandler(doc, solrServer);
+            indexHandler = new MCRSolrInputDocumentHandler(doc, solrClient);
         }
         long end = System.currentTimeMillis();
         indexHandler.getStatistic().addTime(end - start);

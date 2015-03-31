@@ -6,10 +6,10 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.mycore.common.content.MCRURLContent;
-import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.search.MCRSolrURL;
 
 /**
@@ -21,8 +21,8 @@ public class MCRSolrQueryResolver implements URIResolver {
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         String urlQuery = href.substring(href.indexOf(":") + 1);
-        SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
-        MCRSolrURL solrURL = new MCRSolrURL((HttpSolrServer) solrServer, urlQuery);
+        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
+        MCRSolrURL solrURL = new MCRSolrURL((HttpSolrClient) solrClient, urlQuery);
         try {
             MCRURLContent result = new MCRURLContent(solrURL.getUrl());
             return result.getSource();

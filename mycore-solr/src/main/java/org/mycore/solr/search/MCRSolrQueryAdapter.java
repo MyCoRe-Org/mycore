@@ -12,7 +12,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.mycore.frontend.servlets.MCRClassificationBrowser2.MCRQueryAdapter;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.solr.MCRSolrConstants;
-import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.MCRSolrClientFactory;
 
 public class MCRSolrQueryAdapter implements MCRQueryAdapter {
     private static final Logger LOGGER = Logger.getLogger(MCRSolrQueryAdapter.class);
@@ -60,7 +60,7 @@ public class MCRSolrQueryAdapter implements MCRQueryAdapter {
         solrQuery.set("rows", 0);
         QueryResponse queryResponse;
         try {
-            queryResponse = MCRSolrServerFactory.getSolrServer().query(solrQuery);
+            queryResponse = MCRSolrClientFactory.getSolrClient().query(solrQuery);
         } catch (SolrServerException e) {
             LOGGER.warn("Could not query SOLR.", e);
             return -1;

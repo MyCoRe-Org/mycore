@@ -27,12 +27,12 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.document.MCRSolrInputDocumentFactory;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
@@ -54,11 +54,11 @@ public class MCRSolrMCRContentIndexHandler extends MCRSolrAbstractIndexHandler {
     private SolrInputDocument document;
 
     public MCRSolrMCRContentIndexHandler(MCRObjectID id, MCRContent content) {
-        this(id, content, MCRSolrServerFactory.getSolrServer());
+        this(id, content, MCRSolrClientFactory.getSolrClient());
     }
 
-    public MCRSolrMCRContentIndexHandler(MCRObjectID id, MCRContent content, SolrServer solrServer) {
-        super(solrServer);
+    public MCRSolrMCRContentIndexHandler(MCRObjectID id, MCRContent content, SolrClient solrClient) {
+        super(solrClient);
         this.id = id;
         this.content = content;
     }
@@ -82,7 +82,7 @@ public class MCRSolrMCRContentIndexHandler extends MCRSolrAbstractIndexHandler {
 
     @Override
     public List<MCRSolrIndexHandler> getSubHandlers() {
-        MCRSolrIndexHandler mcrSolrIndexHandler = new MCRSolrInputDocumentHandler(document, getSolrServer());
+        MCRSolrIndexHandler mcrSolrIndexHandler = new MCRSolrInputDocumentHandler(document, getSolrClient());
         mcrSolrIndexHandler.setCommitWithin(getCommitWithin());
         return Arrays.asList(mcrSolrIndexHandler);
     }
