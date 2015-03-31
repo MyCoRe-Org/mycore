@@ -21,8 +21,8 @@
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
     <uniqueVersion>false</uniqueVersion>
     <hibernate.version>4.3.8.Final</hibernate.version>
-    <httpcomponents.version>4.3.6</httpcomponents.version>
-    <httpcore.version>4.3.2</httpcore.version>
+    <httpcomponents.version>4.4</httpcomponents.version>
+    <httpcore.version>4.4</httpcore.version>
     <xalan.version>2.7.2</xalan.version>
     <jersey.version>1.18.3</jersey.version>
     <changelog.since>2014-12-04</changelog.since>
