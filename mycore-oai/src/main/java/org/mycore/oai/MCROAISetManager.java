@@ -54,7 +54,7 @@ import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRSortBy;
-import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.legacy.MCRConditionTransformer;
 
 /**
@@ -295,7 +295,7 @@ public class MCROAISetManager {
         SolrQuery solrQuery = MCRConditionTransformer.getSolrQuery(query.getCondition(),
             Collections.<MCRSortBy> emptyList(), 1);
         try {
-            QueryResponse queryResponse = MCRSolrServerFactory.getSolrServer().query(solrQuery);
+            QueryResponse queryResponse = MCRSolrClientFactory.getSolrClient().query(solrQuery);
             return queryResponse.getResults().isEmpty();
         } catch (SolrServerException e) {
             throw new MCRException(e);

@@ -39,8 +39,8 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
@@ -60,7 +60,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
-import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
 
 import com.google.gson.stream.JsonWriter;
@@ -401,7 +401,7 @@ public class MCRRestAPIClassifications extends HttpServlet {
     }
 
     private void filterNonEmpty(String classId, Element e) {
-        SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
+        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         for (int i = 0; i < e.getChildren("category").size(); i++) {
             Element cat = e.getChildren("category").get(i);
 
@@ -410,7 +410,7 @@ public class MCRRestAPIClassifications extends HttpServlet {
                 + MCRSolrUtils.escapeSearchValue(classId + ":" + cat.getAttributeValue("ID")) + "\"");
             solrQquery.setRows(0);
             try {
-                QueryResponse response = solrServer.query(solrQquery);
+                QueryResponse response = solrClient.query(solrQquery);
                 SolrDocumentList solrResults = response.getResults();
                 if (solrResults.getNumFound() == 0) {
                     e.removeContent(cat);

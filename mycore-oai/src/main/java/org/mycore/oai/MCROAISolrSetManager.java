@@ -1,9 +1,9 @@
 package org.mycore.oai;
 
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.ModifiableSolrParams;
-import org.mycore.solr.MCRSolrServerFactory;
+import org.mycore.solr.MCRSolrClientFactory;
 
 /**
  * Same as {@link MCROAISetManager}. Uses solr for checking if a set is empty.
@@ -14,7 +14,7 @@ public class MCROAISolrSetManager extends MCROAISetManager {
 
     @Override
     protected boolean isEmptySet(String setSpec) {
-        SolrServer solrServer = MCRSolrServerFactory.getSolrServer();
+        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         ModifiableSolrParams p = new ModifiableSolrParams();
         p.set("q", MCROAIUtils.getDefaultSetQuery(setSpec, configPrefix));
         String restriction = MCROAIUtils.getDefaultRestriction(this.configPrefix);
@@ -24,7 +24,7 @@ public class MCROAISolrSetManager extends MCROAISetManager {
         p.set("rows", 1);
         p.set("fl", "id");
         try {
-            QueryResponse response = solrServer.query(p);
+            QueryResponse response = solrClient.query(p);
             return response.getResults().isEmpty();
         } catch (Exception exc) {
             LOGGER.error("Unable to get results of solr server", exc);
