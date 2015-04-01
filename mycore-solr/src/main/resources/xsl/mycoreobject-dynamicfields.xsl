@@ -100,6 +100,7 @@
           <xsl:variable name="class" select="document($uri)" />
           <xsl:variable name="classid" select="document($uri)/mycoreclass/@ID" />
           <xsl:variable name="classTree" select="$class/mycoreclass/categories//category" />
+          <xsl:variable name="withTopField" select="not(ancestor::mods:relatedItem)" />
           <xsl:for-each select="$classTree">
             <!-- classid as fieldname -->
             <field name="{$classid}">
@@ -114,10 +115,11 @@
                 <xsl:value-of select="@text" />
               </field>
             </xsl:for-each>
-            <!-- TODO: Currently we do not have to think of releatedItem[@type='host'] here -->
-            <field name="{$classid}.top">
-              <xsl:value-of select="@ID" />
-            </field>
+            <xsl:if test="$withTopField">
+              <field name="{$classid}.top">
+                <xsl:value-of select="@ID" />
+              </field>
+            </xsl:if>
           </xsl:for-each>
         </xsl:if>
       </xsl:for-each>

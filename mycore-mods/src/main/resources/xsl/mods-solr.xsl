@@ -31,7 +31,7 @@
   <xsl:template match="mods:*[@authority or @authorityURI]">
     <xsl:variable name="uri" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport" select="mcrmods:getClassCategParentLink(.)" />
     <xsl:if test="string-length($uri) &gt; 0">
-      <xsl:variable name="topField" select="not(ancestor::mods:relatedItem[@type='host'])" />
+      <xsl:variable name="topField" select="not(ancestor::mods:relatedItem)" />
       <xsl:variable name="classdoc" select="document($uri)" />
       <xsl:variable name="classid" select="$classdoc/mycoreclass/@ID" />
       <xsl:apply-templates select="$classdoc//category" mode="category">
@@ -190,7 +190,7 @@
     </xsl:for-each>
   </xsl:template>
   <xsl:template match="mods:name" mode="childdoc">
-    <xsl:variable name="topField" select="not(ancestor::mods:relatedItem[@type='host'])" />
+    <xsl:variable name="topField" select="not(ancestor::mods:relatedItem)" />
     <doc>
       <field name="id">
         <xsl:value-of select="concat(ancestor::mycoreobject/@ID,'-',generate-id(.))" />
