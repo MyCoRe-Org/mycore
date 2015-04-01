@@ -69,15 +69,13 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
- * This is the superclass of all MyCoRe servlets. It provides helper methods for
- * logging and managing the current session data. Part of the code has been
- * taken from MilessServlet.java written by Frank Lützenkirchen.
+ * This is the superclass of all MyCoRe servlets. It provides helper methods for logging and managing the current
+ * session data. Part of the code has been taken from MilessServlet.java written by Frank Lützenkirchen.
  * 
  * @author Detlev Degenhardt
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date: 2008-02-06 17:27:24 +0000 (Mi, 06 Feb
- *          2008) $
+ * @version $Revision$ $Date$
  */
 public class MCRServlet extends HttpServlet {
     private static final String CURRENT_THREAD_NAME_KEY = "currentThreadName";
@@ -115,7 +113,7 @@ public class MCRServlet extends HttpServlet {
         }
     }
 
-    /** 
+    /**
      * Returns the base URL of the mycore system
      * 
      * @deprecated use {@link MCRFrontendUtil#getBaseURL()}
@@ -139,8 +137,7 @@ public class MCRServlet extends HttpServlet {
     }
 
     /**
-     * Initialisation of the static values for the base URL and servlet URL of
-     * the mycore system.
+     * Initialisation of the static values for the base URL and servlet URL of the mycore system.
      */
     private static synchronized void prepareBaseURLs(ServletContext context, HttpServletRequest req) {
         String contextPath = req.getContextPath() + "/";
@@ -259,8 +256,7 @@ public class MCRServlet extends HttpServlet {
     }
 
     /**
-     * This private method handles both GET and POST requests and is invoked by
-     * doGet() and doPost().
+     * This private method handles both GET and POST requests and is invoked by doGet() and doPost().
      * 
      * @param req
      *            the HTTP request instance
@@ -308,10 +304,18 @@ public class MCRServlet extends HttpServlet {
             // first phase completed, start rendering phase
             processRenderingPhase(job, thinkException);
         } catch (Exception ex) {
-            LOGGER.error("Exception while in rendering phase: " + ex.getMessage());
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
                 session.rollbackTransaction();
+            }
+            if (isBrokenPipe(ex)) {
+                LOGGER.info("Ignore broken pipe.");
+                return;
+            }
+            if (ex.getMessage() == null) {
+                LOGGER.error("Exception while in rendering phase.", ex);
+            } else {
+                LOGGER.error("Exception while in rendering phase: " + ex.getMessage());
             }
             if (ex instanceof ServletException) {
                 throw (ServletException) ex;
@@ -335,6 +339,14 @@ public class MCRServlet extends HttpServlet {
                 MCRSessionMgr.releaseCurrentSession();
             }
         }
+    }
+
+    private static boolean isBrokenPipe(Throwable throwable) {
+        String message = throwable.getMessage();
+        if (message != null && throwable instanceof IOException && message.contains("Broken pipe")) {
+            return true;
+        }
+        return throwable.getCause() != null ? isBrokenPipe(throwable.getCause()) : false;
     }
 
     private void configureSession(MCRServletJob job) {
@@ -382,8 +394,8 @@ public class MCRServlet extends HttpServlet {
     }
 
     /**
-     * 1st phase of doGetPost. This method has a seperate transaction. Per
-     * default id does nothing as a fallback to the old behaviour.
+     * 1st phase of doGetPost. This method has a seperate transaction. Per default id does nothing as a fallback to the
+     * old behaviour.
      * 
      * @param job
      * @throws Exception
@@ -410,8 +422,9 @@ public class MCRServlet extends HttpServlet {
     }
 
     /**
-     * Returns true if this servlet allows Cross-domain requests.
-     * The default value defined by {@link MCRServlet} is <code>false</code>.
+     * Returns true if this servlet allows Cross-domain requests. The default value defined by {@link MCRServlet} is
+     * <code>false</code>.
+     * 
      * @return
      */
     protected boolean allowCrossDomainRequests() {
@@ -419,19 +432,16 @@ public class MCRServlet extends HttpServlet {
     }
 
     /**
-     * 2nd phase of doGetPost This method has a seperate transaction and gets
-     * the same MCRServletJob from the first phase (think) and any exception
-     * that occurs at the first phase. By default this method calls
+     * 2nd phase of doGetPost This method has a seperate transaction and gets the same MCRServletJob from the first
+     * phase (think) and any exception that occurs at the first phase. By default this method calls
      * doGetPost(MCRServletJob) as a fallback to the old behaviour.
      * 
      * @param job
      *            same instance as of think(MCRServlet job)
      * @param ex
-     *            any exception thrown by think(MCRServletJob) or transaction
-     *            commit
+     *            any exception thrown by think(MCRServletJob) or transaction commit
      * @throws Exception
-     *             if render could not handle <code>ex</code> to produce a nice
-     *             user page
+     *             if render could not handle <code>ex</code> to produce a nice user page
      */
     protected void render(MCRServletJob job, Exception ex) throws Exception {
         // no info here how to handle
@@ -445,8 +455,8 @@ public class MCRServlet extends HttpServlet {
     }
 
     /**
-     * This method should be overwritten by other servlets. As a default
-     * response we indicate the HTTP 1.1 status code 501 (Not Implemented).
+     * This method should be overwritten by other servlets. As a default response we indicate the HTTP 1.1 status code
+     * 501 (Not Implemented).
      */
     protected void doGetPost(MCRServletJob job) throws Exception {
         job.getResponse().sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
@@ -470,8 +480,7 @@ public class MCRServlet extends HttpServlet {
     }
 
     /**
-     * @deprecated use {@link HttpServletResponse#sendError(int, String)}
-     *             instead or throw Exception
+     * @deprecated use {@link HttpServletResponse#sendError(int, String)} instead or throw Exception
      */
     @Deprecated()
     protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, int error, String msg,
@@ -526,9 +535,8 @@ public class MCRServlet extends HttpServlet {
     }
 
     /**
-     * This method builds a URL that can be used to redirect the client browser
-     * to another page, thereby including http request parameters. The request
-     * parameters will be encoded as http get request.
+     * This method builds a URL that can be used to redirect the client browser to another page, thereby including http
+     * request parameters. The request parameters will be encoded as http get request.
      * 
      * @param baseURL
      *            the base url of the target webpage
@@ -576,9 +584,8 @@ public class MCRServlet extends HttpServlet {
     }
 
     /**
-     * allows browser to cache requests. This method is usefull as it allows
-     * browsers to cache content that is not changed. Please overwrite this
-     * method in every Servlet that depends on "remote" data.
+     * allows browser to cache requests. This method is usefull as it allows browsers to cache content that is not
+     * changed. Please overwrite this method in every Servlet that depends on "remote" data.
      */
     @Override
     protected long getLastModified(HttpServletRequest request) {
@@ -594,7 +601,6 @@ public class MCRServlet extends HttpServlet {
     }
 
     /**
-     * 
      * @param request
      * @param name
      * @return
@@ -604,13 +610,10 @@ public class MCRServlet extends HttpServlet {
     }
 
     /**
-     * Returns the IP address of the client that made the request. When a
-     * trusted proxy server was used, e. g. a local Apache mod_proxy in front of
-     * Tomcat, the value of the last entry in the HTTP header X_FORWARDED_FOR is
-     * returned, otherwise the REMOTE_ADDR is returned. The list of trusted
-     * proxy IPs can be configured using the property
-     * MCR.Request.TrustedProxies, which is a List of IP addresses separated by
-     * blanks and/or comma.
+     * Returns the IP address of the client that made the request. When a trusted proxy server was used, e. g. a local
+     * Apache mod_proxy in front of Tomcat, the value of the last entry in the HTTP header X_FORWARDED_FOR is returned,
+     * otherwise the REMOTE_ADDR is returned. The list of trusted proxy IPs can be configured using the property
+     * MCR.Request.TrustedProxies, which is a List of IP addresses separated by blanks and/or comma.
      * 
      * @deprecated use {@link MCRFrontendUtil#getRemoteAddr(HttpServletRequest)}
      */
@@ -620,14 +623,13 @@ public class MCRServlet extends HttpServlet {
     }
 
     /**
-     * returns a translated error message for the current Servlet. I18N keys are
-     * of form 'error.'{SimpleServletClassName}'.'{subIdentifier}
+     * returns a translated error message for the current Servlet. I18N keys are of form
+     * 'error.'{SimpleServletClassName}'.'{subIdentifier}
      * 
      * @param subIdentifier
      *            last part of I18n key
      * @param args
-     *            any arguments that should be passed to
-     *            {@link MCRTranslation#translate(String, Object...)}
+     *            any arguments that should be passed to {@link MCRTranslation#translate(String, Object...)}
      * @deprecated use {@link MCRServlet#getErrorI18N(String, String, Object...)} instead
      */
     protected String getErrorI18N(String subIdentifier, Object... args) {
@@ -636,16 +638,15 @@ public class MCRServlet extends HttpServlet {
     }
 
     /**
-     * returns a translated error message for the current Servlet. I18N keys are
-     * of form {prefix}'.'{SimpleServletClassName}'.'{subIdentifier}
+     * returns a translated error message for the current Servlet. I18N keys are of form
+     * {prefix}'.'{SimpleServletClassName}'.'{subIdentifier}
      * 
      * @param prefix
-     *            a prefix of the message property like component.base.error 
+     *            a prefix of the message property like component.base.error
      * @param subIdentifier
      *            last part of I18n key
      * @param args
-     *            any arguments that should be passed to
-     *            {@link MCRTranslation#translate(String, Object...)}
+     *            any arguments that should be passed to {@link MCRTranslation#translate(String, Object...)}
      */
     protected String getErrorI18N(String prefix, String subIdentifier, Object... args) {
         String key = MessageFormat.format("{0}.{1}.{2}", prefix, getClass().getSimpleName(), subIdentifier);
@@ -665,6 +666,7 @@ public class MCRServlet extends HttpServlet {
 
     /**
      * Returns the referer of the given request.
+     * 
      * @param request
      */
     protected URL getReferer(HttpServletRequest request) {
@@ -687,7 +689,8 @@ public class MCRServlet extends HttpServlet {
      * 
      * @param url
      *            the source URL
-     * @deprecated use {@link MCRXMLFunctions#encodeURIPath(String)}, {@link MCRXMLFunctions#normalizeAbsoluteURL(String)} or {@link URI} directly   
+     * @deprecated use {@link MCRXMLFunctions#encodeURIPath(String)},
+     *             {@link MCRXMLFunctions#normalizeAbsoluteURL(String)} or {@link URI} directly
      */
     public static String encodeURL(String url) throws URISyntaxException {
         try {
@@ -702,8 +705,8 @@ public class MCRServlet extends HttpServlet {
     }
 
     /**
-     * If a referrer is available this method redirects to the url given by the referrer 
-     * otherwise method redirects to the application base url.
+     * If a referrer is available this method redirects to the url given by the referrer otherwise method redirects to
+     * the application base url.
      * 
      * @param request
      * @param response
@@ -720,8 +723,8 @@ public class MCRServlet extends HttpServlet {
     }
 
     /**
-     * If a referrer is available this method redirects to the url given by the referrer 
-     * otherwise method redirects to the alternative-url.
+     * If a referrer is available this method redirects to the url given by the referrer otherwise method redirects to
+     * the alternative-url.
      * 
      * @param request
      * @param response
