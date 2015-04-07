@@ -3,6 +3,7 @@
   xmlns:xalan="http://xml.apache.org/xalan" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
   xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" exclude-result-prefixes="acl mcrxsl encoder xalan i18n">
   <xsl:param name="RequestURL" />
+
   <xsl:variable name="response" select="/response|/mycoreobject/response" />
   <xsl:variable name="loginURL"
     select="concat( $ServletsBaseURL, 'MCRLoginServlet',$HttpSession,'?url=', encoder:encode( string( $RequestURL ) ) )" />
@@ -204,16 +205,13 @@
         <!-- current printed page number is smaller than current displayed page -->
         <xsl:when test="$i &lt; $currentpage">
           <xsl:choose>
-            <!-- This is to support a bigger PageWindow at the end of page listing and
-                to skip a jump of 2
-            -->
+            <!-- This is to support a bigger PageWindow at the end of page listing and to skip a jump of 2 -->
             <xsl:when
               test="(($totalpage - $PageWindowSize - 1) &lt;= $i) or
                                   (($currentpage - floor(($PageWindowSize -1) div 2) - 1) = 2)">
               <xsl:value-of select="1" />
             </xsl:when>
-                    <!-- This is to support a bigger PageWindow at the begin of page listing
-                    -->
+            <!-- This is to support a bigger PageWindow at the begin of page listing -->
             <xsl:when test="($totalpage - $currentpage) &lt; $PageWindowSize">
               <xsl:value-of select="($totalpage - $PageWindowSize - 1)" />
             </xsl:when>
@@ -227,11 +225,7 @@
         </xsl:when>
         <xsl:when test="$i &gt; $currentpage">
           <xsl:choose>
-            <!-- jump only one if your near currentpage,
-                or at last page
-                or to support bigger window at beginning
-                or to skip a jump of 2
-            -->
+            <!-- jump only one if your near currentpage, or at last page or to support bigger window at beginning or to skip a jump of 2 -->
             <xsl:when
               test="( (($i - $currentpage) &lt; round(($PageWindowSize -1) div 2)) or ($i = $totalpage) or ($currentpage &lt;=$PageWindowSize and $i &lt;= $PageWindowSize) or ($totalpage - $i = 2))">
               <xsl:value-of select="1" />
@@ -278,6 +272,21 @@
     </xsl:if>
   </xsl:template>
 
+  <xsl:template match="doc" mode="displayText">
+    <xsl:variable name="identifier" select="@id" />
+    <xsl:choose>
+      <xsl:when test="./str[@name='search_result_link_text']">
+        <xsl:value-of select="./str[@name='search_result_link_text']" />
+      </xsl:when>
+      <xsl:when test="./str[@name='fileName']">
+        <xsl:value-of select="./str[@name='fileName']" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$identifier" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template match="doc" mode="linkTo">
     <xsl:variable name="identifier" select="@id" />
     <xsl:variable name="linkTo">
@@ -297,19 +306,11 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+
     <xsl:variable name="displayText">
-      <xsl:choose>
-        <xsl:when test="./str[@name='search_result_link_text']">
-          <xsl:value-of select="./str[@name='search_result_link_text']" />
-        </xsl:when>
-        <xsl:when test="./str[@name='fileName']">
-          <xsl:value-of select="./str[@name='fileName']" />
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="$identifier" />
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:apply-templates mode="displayText" select="." />
     </xsl:variable>
+
     <xsl:choose>
       <xsl:when test="$linkTo = $loginURL">
         <span itemprop="name">
@@ -371,7 +372,7 @@
               <xsl:otherwise>
                 <xsl:if test="$isDisplayedEnabled = 'true'">
                   <span>
-                  <!-- Zugriff auf 'Abbildung' gesperrt -->
+                    <!-- Zugriff auf 'Abbildung' gesperrt -->
                     <xsl:value-of select="i18n:translate('metaData.derivateLocked',i18n:translate(concat('metaData.',$objectType,'.[derivates]')))" />
                   </span>
                 </xsl:if>
