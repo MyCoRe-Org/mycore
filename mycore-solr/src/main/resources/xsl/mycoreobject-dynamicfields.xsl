@@ -1,14 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xalan="http://xml.apache.org/xalan" xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions"
-  exclude-result-prefixes="xalan xlink mods mcrxsl">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3"
+  xmlns:xalan="http://xml.apache.org/xalan" xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" exclude-result-prefixes="xalan xlink mods mcrxsl"
+>
 
   <xsl:import href="xslImport:solr-document:mycoreobject-dynamicfields.xsl" />
+
   <xsl:param name="MCR.Module-solr.DynamicFields" select="'true'" />
+  <xsl:param name="MCR.Module-solr.DynamicFields.exceptions" select="''" />
+
+  <xsl:template name="check.exceptions">
+    <xsl:param name="exceptions" select="normalize-space($MCR.Module-solr.DynamicFields.exceptions)" />
+    <xsl:variable name="exception" select="substring-before($exceptions, ',')" />
+    <xsl:variable name="otherExceptions" select="substring-after($exceptions, ',')" />
+
+    <xsl:choose>
+      <xsl:when test="contains(@ID, $exception)">
+        <xsl:value-of select="true()" />
+      </xsl:when>
+      <xsl:when test="string-length(normalize-space($otherExceptions))=0">
+        <xsl:value-of select="false()" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="check.exceptions">
+          <xsl:with-param name="exceptions" select="$otherExceptions" />
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
 
   <xsl:template match="mycoreobject">
     <xsl:apply-imports />
-    <xsl:if test="$MCR.Module-solr.DynamicFields='true'">
+    <xsl:variable name="isException">
+      <xsl:call-template name="check.exceptions" />
+    </xsl:variable>
+    <xsl:if test="$MCR.Module-solr.DynamicFields='true' and not($isException)">
       <xsl:comment>
         Start of dynamic fields:
         Set 'MCR.Module-solr.DynamicFields=false' to exclude these:
@@ -52,8 +77,7 @@
 
       <!-- dynamic class fields -->
       <xsl:for-each select="metadata/*[@class='MCRMetaClassification']/*">
-        <xsl:variable name="classTree"
-          select="document(concat('classification:metadata:0:parents:', @classid, ':', @categid))/mycoreclass/categories//category" />
+        <xsl:variable name="classTree" select="document(concat('classification:metadata:0:parents:', @classid, ':', @categid))/mycoreclass/categories//category" />
         <xsl:variable name="classid" select="@classid" />
         <xsl:variable name="notInherited" select="@inherited = '0'" />
 
