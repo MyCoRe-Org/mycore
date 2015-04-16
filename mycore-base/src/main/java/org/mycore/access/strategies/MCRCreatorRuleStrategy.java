@@ -53,7 +53,9 @@ import com.google.common.cache.LoadingCache;
  * fallback is done against <code>default</code>.
  *
  * Specify classification and category for status "submitted":
- * MCR.Access.Strategy.SubmittedCategory=status:submitted
+ * MCR.Access.Strategy.SubmittedCategory=state:submitted
+ *
+ * You can also specify a comma separated list of categories like: <code>state:submitted,state:new</code>
  *
  * @author Thomas Scheffler (yagee)
  * @author Kathleen Neumann (mcrkrebs)
@@ -63,8 +65,7 @@ import com.google.common.cache.LoadingCache;
 public class MCRCreatorRuleStrategy implements MCRAccessCheckStrategy {
     private static final Logger LOGGER = Logger.getLogger(MCRCreatorRuleStrategy.class);
 
-    private static final MCRCategoryID SUBMITTED_CATEGORY = MCRCategoryID.fromString(MCRConfiguration.instance()
-        .getString("MCR.Access.Strategy.SubmittedCategory", "status:submitted"));
+    private static final String SUBMITTED_CATEGORY = MCRConfiguration.instance().getString("MCR.Access.Strategy.SubmittedCategory", "state:submitted");
 
     private static final String CREATOR_ROLE = MCRConfiguration.instance().getString("MCR.Access.Strategy.CreatorRole",
         "submitter");
@@ -136,7 +137,19 @@ public class MCRCreatorRuleStrategy implements MCRAccessCheckStrategy {
 
     private static boolean objectStatusIsSubmitted(MCRObjectID mcrObjectID) {
         MCRCategLinkReference reference = new MCRCategLinkReference(mcrObjectID);
-        return LINK_SERVICE.isInCategory(reference, SUBMITTED_CATEGORY);
+        boolean isSubmitted = false;
+        if (SUBMITTED_CATEGORY == null) {
+            return false;
+        }
+        String[] submittedCategoriesSplitted = SUBMITTED_CATEGORY.split(",");
+        for (String submittedCategoryID : submittedCategoriesSplitted) {
+            String categoryId = submittedCategoryID.trim();
+            MCRCategoryID submittedCategory = MCRCategoryID.fromString(categoryId);
+            if (LINK_SERVICE.isInCategory(reference, submittedCategory)) {
+                isSubmitted = true;
+            }
+        }
+        return isSubmitted;
     }
 
     private static boolean isCurrentUserCreator(MCRObjectID mcrObjectID, MCRUserInformation currentUser) {
