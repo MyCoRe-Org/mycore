@@ -43,7 +43,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * This servlet is used in the role sub select for when administrate a user.
- * The property <code>MCR.user2.RoleCategegories</code> can hold any category IDs
+ * The property <code>MCR.user2.RoleCategories</code> can hold any category IDs
  * that could be possible roots for roles.
  * @author Thomas Scheffler (yagee)
  *
@@ -70,7 +70,7 @@ public class MCRRoleServlet extends MCRServlet {
         roleCategories = new ArrayList<MCRCategoryID>();
         roleCategories.add(MCRUser2Constants.ROLE_CLASSID);
         MCRConfiguration config = MCRConfiguration.instance();
-        String roleCategoriesValue = config.getString(MCRUser2Constants.CONFIG_PREFIX + "RoleCategegories", null);
+        String roleCategoriesValue = config.getString(MCRUser2Constants.CONFIG_PREFIX + "RoleCategories", null);
         if (roleCategoriesValue == null) {
             return;
         }
