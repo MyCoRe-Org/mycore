@@ -38,10 +38,10 @@ import org.mycore.solr.proxy.MCRSolrProxyServlet;
  * <dd>They are used to sort the results in the right order. They start with
  * "sort."</dd>
  * <dt><strong>Query parameters</strong></dt>
- * <dd>They are used to build the query for solr. All parameters wich arent
+ * <dd>They are used to build the query for solr. All parameters which are not
  * reserved, type or sort parameters will be stored here.</dd>
  * </dl>
- * 
+ *
  * @author mcrshofm
  * @author mcrsherm
  */
@@ -77,9 +77,9 @@ public class MCRSolrSearchServlet extends MCRServlet {
     }
 
     /**
-     * Adds a field with all values to a {@link StringBuilder} A empty field
+     * Adds a field with all values to a {@link StringBuilder} An empty field
      * value will be skipped.
-     * 
+     *
      * @param query
      *            represents a solr query
      * @param fieldValues
@@ -159,7 +159,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
     }
 
     /**
-     * 
+     *
      * @param sortParameters
      * @return
      */
@@ -213,7 +213,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
     /**
      * This method is used to create a map wich contains all fields as key and
      * the type of the field as value.
-     * 
+     *
      * @param typeParameters
      * @return
      */
@@ -261,7 +261,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
 
     /**
      * Splits the parameters into three groups.
-     * 
+     *
      * @param requestParameter
      *            the map of parameters to split.
      * @param queryParameter
@@ -318,7 +318,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
 
     /**
      * Returns the {@link SolrParameterGroup} for a specific parameter name.
-     * 
+     *
      * @param parameterName
      *            the name of the parameter
      * @return the parameter group enum
@@ -345,7 +345,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
 
     /**
      * Detects if a parameter is a solr parameter
-     * 
+     *
      * @param parameterName
      *            the name of the parameter
      * @return true if the parameter is a solr parameter
@@ -363,7 +363,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
 
     /**
      * Detects if a parameter is a sort parameter
-     * 
+     *
      * @param parameterName
      *            the name of the parameter
      * @return true if the parameter is a sort parameter
@@ -373,8 +373,8 @@ public class MCRSolrSearchServlet extends MCRServlet {
     }
 
     /**
-     * Detects if a parameter is a Type parameter
-     * 
+     * Detects if a parameter is a type parameter
+     *
      * @param parameterName
      *            the name of the parameter
      * @return true if the parameter is a type parameter
