@@ -88,7 +88,7 @@ public class MCRSolrIndexer {
                     metadataStats, fileStats, operationsStats);
                 LOGGER.info(msg);
                 try {
-                    MCRSolrClientFactory.getSolrClient().commit();
+                    MCRSolrClientFactory.getSolrClient().commit(false, false); //do not wait to complete (MCR-948)
                 } catch (SolrServerException | IOException e) {
                     LOGGER.warn("Error while closing MCRSolrIndexer executor service.", e);
                 }
