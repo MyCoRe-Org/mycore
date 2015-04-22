@@ -26,7 +26,7 @@
     <property name="lastLogin" access="field" />
     <property name="validUntil" access="field" />
     <property name="locked" not-null="false"/>
-    <many-to-one name="owner" class="MCRUser" not-null="false" />
+    <many-to-one name="owner" class="MCRUser" not-null="false" lazy="false" />
     <map name="attributes" table="MCRUserAttr" fetch="join" lazy="false" cascade="">
       <key column="id" />
       <map-key column="name" type="string" />

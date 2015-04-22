@@ -26,7 +26,7 @@
 
     <xed:validate xpath="/user[realm/@id = 'local']/@name" display="global" class="org.mycore.user2.MCRUserServlet" method="checkUserName" i18n="component.user2.admin.inputhints.sameUsername" />
   </xed:template>
-  
+
   <xed:template id="editor4changeReadUser">
     <mcruser:template name="textInput" xpath="@name" id="userName" i18n="component.user2.admin.userAccount" i18n.error="component.user2.admin.inputhints.username"
       required="true" maxlength="16" />
@@ -43,7 +43,7 @@
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="email" />
 
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="editor4admins" />
-    
+
     <xed:validate xpath="/user[realm/@id = 'local']/@name" display="global" class="org.mycore.user2.MCRUserServlet" method="checkUserName" i18n="component.user2.admin.inputhints.sameUsername" />
   </xed:template>
 
@@ -52,13 +52,13 @@
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="passwordHint" />
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="realName" />
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="email" />
-    
+
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="editor4admins" />
   </xed:template>
 
   <xed:template id="editor4admins">
     <mcruser:template name="checkboxList" inline="true" xpath="@locked" id="locked">
-      <option value="true" i18n="component.user2.admin.user.locked" />
+      <option value="true" i18n="component.user2.admin.user.locked.true" />
     </mcruser:template>
     <mcruser:template name="textInput" xpath="validUntil" id="validUntil" i18n="component.user2.admin.user.validUntil" i18n.error="component.user2.admin.inputhints.date"
       validate="true" type="datetime" format="yyyy-MM-dd;yyyy-MM-dd'T'HH:mm:ss'Z'" maxlength="20" />
@@ -70,7 +70,7 @@
   <xed:template id="buttons">
     <mcruser:template name="submitButton" i18n="component.user2.button.save" target="servlet" href="MCRUserServlet" />
     <mcruser:template name="cancelButton" i18n="component.user2.button.cancel" />
-  </xed:template>  
+  </xed:template>
 
   <!-- editor elements -->
 
