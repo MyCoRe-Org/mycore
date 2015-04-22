@@ -6,23 +6,26 @@
   <xsl:import href="xslImport:solr-document:mycoreobject-dynamicfields.xsl" />
 
   <xsl:param name="MCR.Module-solr.DynamicFields" select="'true'" />
-  <xsl:param name="MCR.Module-solr.DynamicFields.exceptions" select="''" />
+  <xsl:param name="MCR.Module-solr.DynamicFields.excludes" select="''" />
 
-  <xsl:template name="check.exceptions">
-    <xsl:param name="exceptions" select="concat(normalize-space($MCR.Module-solr.DynamicFields.exceptions), ',')" />
-    <xsl:variable name="exception" select="substring-before($exceptions, ',')" />
-    <xsl:variable name="otherExceptions" select="substring-after($exceptions, ',')" />
+  <xsl:template name="check.excludes">
+    <xsl:param name="excludes" select="concat(normalize-space($MCR.Module-solr.DynamicFields.excludes), ',')" />
+    <xsl:variable name="exclude" select="substring-before($excludes, ',')" />
+    <xsl:variable name="otherExcludes" select="substring-after($excludes, ',')" />
 
     <xsl:choose>
-      <xsl:when test="contains(@ID, $exception)">
+      <xsl:when test="string-length(normalize-space($exclude))=0">
+        <xsl:text>false</xsl:text>
+      </xsl:when>
+      <xsl:when test="contains(@ID, $exclude)">
         <xsl:text>true</xsl:text>
       </xsl:when>
-      <xsl:when test="string-length(normalize-space($otherExceptions))=0">
+      <xsl:when test="string-length(normalize-space($otherExcludes))=0">
         <xsl:text>false</xsl:text>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:call-template name="check.exceptions">
-          <xsl:with-param name="exceptions" select="$otherExceptions" />
+        <xsl:call-template name="check.excludes">
+          <xsl:with-param name="excludes" select="$otherExcludes" />
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
@@ -30,10 +33,10 @@
 
   <xsl:template match="mycoreobject">
     <xsl:apply-imports />
-    <xsl:variable name="isException">
-      <xsl:call-template name="check.exceptions" />
+    <xsl:variable name="isExcluded">
+      <xsl:call-template name="check.excludes" />
     </xsl:variable>
-    <xsl:if test="$MCR.Module-solr.DynamicFields='true' and $isException = 'false'">
+    <xsl:if test="$MCR.Module-solr.DynamicFields='true' and $isExcluded = 'false'">
       <xsl:comment>
         Start of dynamic fields:
         Set 'MCR.Module-solr.DynamicFields=false' to exclude these:
