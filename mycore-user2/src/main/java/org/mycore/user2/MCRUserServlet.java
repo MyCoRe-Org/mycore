@@ -238,7 +238,7 @@ public class MCRUserServlet extends MCRServlet {
         if (checkUserIsLocked(res, currentUser) || checkUserIsDisabled(res, currentUser)) {
             return;
         }
-        if (!currentUser.hasNoOwner()) {
+        if (!currentUser.hasNoOwner() && currentUser.isLocked()) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -419,7 +419,8 @@ public class MCRUserServlet extends MCRServlet {
             return;
         }
         boolean allowed = MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION)
-                || currentUser.equals(user.getOwner()) || (currentUser.equals(user) && currentUser.hasNoOwner());
+                || currentUser.equals(user.getOwner())
+                || (currentUser.equals(user) && currentUser.hasNoOwner() || !currentUser.isLocked());
         if (!allowed) {
             String msg = MCRTranslation.translate("component.user2.UserServlet.noAdminPermission");
             res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
@@ -473,9 +474,11 @@ public class MCRUserServlet extends MCRServlet {
      */
     private void listUsers(HttpServletRequest req, HttpServletResponse res) throws Exception {
         MCRUser currentUser = MCRUserManager.getCurrentUser();
+        List<MCRUser> ownUsers = MCRUserManager.listUsers(currentUser);
         boolean hasAdminPermission = MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION);
         boolean allowed = hasAdminPermission
-                || MCRAccessManager.checkPermission(MCRUser2Constants.USER_CREATE_PERMISSION);
+                || MCRAccessManager.checkPermission(MCRUser2Constants.USER_CREATE_PERMISSION) || ownUsers != null
+                && ownUsers.size() > 0;
         if (!allowed) {
             String msg = MCRTranslation.translate("component.user2.UserServlet.noCreatePermission");
             res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
@@ -506,7 +509,7 @@ public class MCRUserServlet extends MCRServlet {
             users.setAttribute("max", String.valueOf(max));
         } else {
             LOGGER.info("list owned users of " + currentUser.getUserName() + " " + currentUser.getRealmID());
-            results = MCRUserManager.listUsers(currentUser);
+            results = ownUsers;
         }
 
         if (results != null)

@@ -58,7 +58,7 @@ public class MCRUserManager {
     private static final MCRHIBConnection MCRHIB_CONNECTION = MCRHIBConnection.instance();
 
     private static final int HASH_ITERATIONS = MCRConfiguration.instance().getInt(
-        MCRUser2Constants.CONFIG_PREFIX + "HashIterations", 1000);
+            MCRUser2Constants.CONFIG_PREFIX + "HashIterations", 1000);
 
     private static final Logger LOGGER = Logger.getLogger(MCRUserManager.class);
 
@@ -68,7 +68,7 @@ public class MCRUserManager {
             SECURE_RANDOM = SecureRandom.getInstance("SHA1PRNG");
         } catch (NoSuchAlgorithmException e) {
             throw new InstantiationException("Could not initialize secure SECURE_RANDOM number", MCRUserManager.class,
-                e);
+                    e);
         }
     }
 
@@ -402,50 +402,50 @@ public class MCRUserManager {
                 LOGGER.warn("User " + user.getUserID() + " was disabled!");
             } else {
                 LOGGER.warn("Password expired for user " + user.getUserID() + " on "
-                    + MCRXMLFunctions.getISODate(user.getValidUntil(), MCRISO8601Format.F_COMPLETE_HH_MM_SS));
+                        + MCRXMLFunctions.getISODate(user.getValidUntil(), MCRISO8601Format.F_COMPLETE_HH_MM_SS));
             }
             return null;
         }
         try {
             switch (user.getHashType()) {
-                case crypt:
-                    //Wahh! did we ever thought about what "salt" means for passwd management?
-                    String passwdHash = user.getPassword();
-                    String salt = passwdHash.substring(0, 3);
-                    if (!MCRUtils.asCryptString(salt, password).equals(passwdHash)) {
-                        //login failed
-                        waitLoginPanalty();
-                        return null;
-                    }
-                    //update to SHA-256
-                    updatePasswordHashToSHA256(user, password);
-                    break;
-                case md5:
-                    if (!MCRUtils.asMD5String(1, null, password).equals(user.getPassword())) {
-                        waitLoginPanalty();
-                        return null;
-                    }
-                    //update to SHA-256
-                    updatePasswordHashToSHA256(user, password);
-                    break;
-                case sha1:
-                    if (!MCRUtils.asSHA1String(HASH_ITERATIONS, MCRUtils.fromBase64String(user.getSalt()), password)
+            case crypt:
+                //Wahh! did we ever thought about what "salt" means for passwd management?
+                String passwdHash = user.getPassword();
+                String salt = passwdHash.substring(0, 3);
+                if (!MCRUtils.asCryptString(salt, password).equals(passwdHash)) {
+                    //login failed
+                    waitLoginPanalty();
+                    return null;
+                }
+                //update to SHA-256
+                updatePasswordHashToSHA256(user, password);
+                break;
+            case md5:
+                if (!MCRUtils.asMD5String(1, null, password).equals(user.getPassword())) {
+                    waitLoginPanalty();
+                    return null;
+                }
+                //update to SHA-256
+                updatePasswordHashToSHA256(user, password);
+                break;
+            case sha1:
+                if (!MCRUtils.asSHA1String(HASH_ITERATIONS, MCRUtils.fromBase64String(user.getSalt()), password)
                         .equals(user.getPassword())) {
-                        waitLoginPanalty();
-                        return null;
-                    }
-                    //update to SHA-256
-                    updatePasswordHashToSHA256(user, password);
-                    break;
-                case sha256:
-                    if (!MCRUtils.asSHA256String(HASH_ITERATIONS, MCRUtils.fromBase64String(user.getSalt()), password)
+                    waitLoginPanalty();
+                    return null;
+                }
+                //update to SHA-256
+                updatePasswordHashToSHA256(user, password);
+                break;
+            case sha256:
+                if (!MCRUtils.asSHA256String(HASH_ITERATIONS, MCRUtils.fromBase64String(user.getSalt()), password)
                         .equals(user.getPassword())) {
-                        waitLoginPanalty();
-                        return null;
-                    }
-                    break;
-                default:
-                    throw new MCRException("Cannot validate hash type " + user.getHashType());
+                    waitLoginPanalty();
+                    return null;
+                }
+                break;
+            default:
+                throw new MCRException("Cannot validate hash type " + user.getHashType());
             }
         } catch (NoSuchAlgorithmException e) {
             throw new MCRException("Error while validating login", e);
@@ -472,7 +472,8 @@ public class MCRUserManager {
         MCRUserInformation currentUser = session.getUserInformation();
         MCRUser myUser = getUser(user.getUserName(), user.getRealmID()); //only update password
         boolean allowed = MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION)
-            || currentUser.equals(myUser.getOwner()) || (currentUser.equals(user) && myUser.hasNoOwner());
+                || currentUser.equals(myUser.getOwner())
+                || (currentUser.equals(user) && myUser.hasNoOwner() || !myUser.isLocked());
         if (!allowed) {
             throw new MCRException("You are not allowed to change password of user: " + user);
         }
