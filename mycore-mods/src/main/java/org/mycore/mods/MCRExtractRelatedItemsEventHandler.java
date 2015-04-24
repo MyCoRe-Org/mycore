@@ -81,17 +81,26 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
             LOGGER.info("Found related item in " + object.getId().toString() + ", href=" + href);
             if ((href == null) || href.isEmpty()) {
                 //MCR-931: check for type='host' and present parent document
-                if (!isParent(relatedItem) || object.getStructure().getParentID() == null) {
+                if (!isHost(relatedItem) || object.getStructure().getParentID() == null) {
                     MCRObjectID relatedID = createRelatedObject(relatedItem, oid);
 
                     href = relatedID.toString();
                     LOGGER.info("Setting href of related item to " + href);
                     relatedItem.setAttribute("href", href, MCRConstants.XLINK_NAMESPACE);
 
-                    if (isParent(relatedItem)) {
+                    if (isHost(relatedItem)) {
                         LOGGER.info("Setting " + href + " as parent of " + oid);
                         object.getStructure().setParent(relatedID);
                     }
+                }
+            } else if (isParentExists(relatedItem)) {
+                MCRObjectID relatedID = MCRObjectID.getInstance(href);
+                if (object.getStructure().getParentID() == null) {
+                    LOGGER.info("Setting " + href + " as parent of " + oid);
+                    object.getStructure().setParent(relatedID);
+                } else if (!object.getStructure().getParentID().equals(relatedID)) {
+                    LOGGER.info("Setting " + href + " as parent of " + oid);
+                    object.getStructure().setParent(relatedID);
                 }
             }
         }
@@ -101,7 +110,7 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
         return "mods".equals(obj.getId().getTypeId());
     }
 
-    private boolean isParent(Element relatedItem) {
+    private boolean isHost(Element relatedItem) {
         return "host".equals(relatedItem.getAttributeValue("type"));
     }
 
@@ -114,7 +123,7 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
         }
         object.setId(oid);
 
-        if (isParent(relatedItem)) {
+        if (isHost(relatedItem)) {
             object.getStructure().addChild(new MCRMetaLinkID("child", childID, childID.toString(), childID.toString()));
         }
 
@@ -132,5 +141,21 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
         mods.removeAttribute("type");
         mods.removeChildren("part", MCRConstants.MODS_NAMESPACE);
         return mods;
+    }
+
+    /**
+     * Checks if the given related item is if type host and contains a valid
+     * MCRObjectID from an existing object.
+     *
+     * @param relatedItem
+     * @return true if @type='host' and MCRObjectID in @href contains is valid and this MCRObject exists
+     */
+    private boolean isParentExists(Element relatedItem) {
+        String href = relatedItem.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
+        if (isHost(relatedItem) && href != null && !href.isEmpty()) {
+            MCRObjectID relatedID = MCRObjectID.getInstance(href);
+            return relatedID != null;
+        }
+        return false;
     }
 }
