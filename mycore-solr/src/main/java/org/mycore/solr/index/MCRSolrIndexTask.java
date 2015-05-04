@@ -12,37 +12,33 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.util.concurrent.MCRPrioritizable;
 
 /**
- * Solr index task which handles <code>MCRSolrIndexHandler</code>'s.
- * Surrounds the indexHandler with a hibernate session.
+ * Solr index task which handles <code>MCRSolrIndexHandler</code>'s. Surrounds the indexHandler with a hibernate
+ * session.
  * 
  * @author Matthias Eichner
  */
-public class MCRSolrIndexTask implements Callable<List<MCRSolrIndexHandler>>, MCRPrioritizable<Integer> {
+public class MCRSolrIndexTask implements Callable<List<MCRSolrIndexHandler>> {
 
     final static Logger LOGGER = Logger.getLogger(MCRSolrIndexTask.class);
 
     protected MCRSolrIndexHandler indexHandler;
 
-    protected int priority;
-
     /**
      * Creates a new solr index task.
      * 
-     * @param indexHandler handles the index process
-     * @param priority tasks with higher value are handled first
+     * @param indexHandler
+     *            handles the index process
      */
-    public MCRSolrIndexTask(MCRSolrIndexHandler indexHandler, int priority) {
+    public MCRSolrIndexTask(MCRSolrIndexHandler indexHandler) {
         this.indexHandler = indexHandler;
-        this.priority = priority;
     }
 
     @Override
     public List<MCRSolrIndexHandler> call() throws SolrServerException, IOException {
         //this.indexHandler.index() creates a session anyway
-        MCRSession mcrSession=MCRSessionMgr.getCurrentSession();
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
         Session session = null;
         Transaction transaction = null;
@@ -67,11 +63,6 @@ public class MCRSolrIndexTask implements Callable<List<MCRSolrIndexHandler>>, MC
                 mcrSession.close();
             }
         }
-    }
-
-    @Override
-    public Integer getPriority() {
-        return this.priority;
     }
 
 }
