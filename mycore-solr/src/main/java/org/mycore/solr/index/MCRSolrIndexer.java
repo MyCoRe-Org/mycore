@@ -41,6 +41,7 @@ import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
 import org.mycore.solr.search.MCRSolrSearchUtils;
 
+import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
@@ -58,6 +59,8 @@ public class MCRSolrIndexer {
 
     final static ExecutorService PARALLEL_SERVICE;
 
+    final static ExecutorService SERIAL_SERVICE = MoreExecutors.newDirectExecutorService();
+
     private static final int BATCH_AUTO_COMMIT_WITHIN_MS = 60000;
 
     static {
@@ -69,6 +72,7 @@ public class MCRSolrIndexer {
             @Override
             public void prepareClose() {
                 PARALLEL_SERVICE.shutdown();
+                SERIAL_SERVICE.shutdown();
             }
 
             @Override
@@ -78,9 +82,14 @@ public class MCRSolrIndexer {
 
             @Override
             public void close() {
-                if (!PARALLEL_SERVICE.isTerminated()) {
+                waitForShutdown(SERIAL_SERVICE);
+                waitForShutdown(PARALLEL_SERVICE);
+            }
+
+            private void waitForShutdown(ExecutorService service) {
+                if (!service.isTerminated()) {
                     try {
-                        PARALLEL_SERVICE.awaitTermination(10, TimeUnit.MINUTES);
+                        service.awaitTermination(10, TimeUnit.MINUTES);
                     } catch (InterruptedException e) {
                         LOGGER.warn("Error while waiting for shutdown.", e);
                     }
@@ -237,7 +246,7 @@ public class MCRSolrIndexer {
                     indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
                     indexHandler.setSolrServer(solrClient);
                     statistic = indexHandler.getStatistic();
-                    submitIndexHandler(indexHandler);
+                    submitIndexHandler(indexHandler, true);
                     contentMap.clear();
                 }
             } catch (Exception ex) {
@@ -291,7 +300,7 @@ public class MCRSolrIndexer {
         for (String id : list) {
             MCRSolrFilesIndexHandler indexHandler = new MCRSolrFilesIndexHandler(id, solrClient);
             indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
-            submitIndexHandler(indexHandler);
+            submitIndexHandler(indexHandler, true);
         }
 
         long tStop = System.currentTimeMillis();
@@ -299,43 +308,35 @@ public class MCRSolrIndexer {
     }
 
     /**
-     * Submits the index handler to the executor service (execute as a thread) with priority zero.
-     * 
-     * @param indexHandler
-     *            index handler to submit
-     */
-    public static void submitIndexHandler(MCRSolrIndexHandler indexHandler) {
-        submitIndexHandler(indexHandler, 0);
-    }
-
-    /**
      * Submits a index handler to the executor service (execute as a thread) with the given priority.
      * 
      * @param indexHandler
      *            index handler to submit
-     * @param priority
-     *            priority
+     * @param parallel
+     *            if current transaction is read-only, save to say 'true' here
      */
-    public static void submitIndexHandler(MCRSolrIndexHandler indexHandler, int priority) {
+    public static void submitIndexHandler(MCRSolrIndexHandler indexHandler, boolean parallel) {
         MCRSolrIndexTask indexTask = new MCRSolrIndexTask(indexHandler);
-        Future<List<MCRSolrIndexHandler>> future = PARALLEL_SERVICE.submit(indexTask);
+        ExecutorService es = parallel ? PARALLEL_SERVICE : SERIAL_SERVICE;
+        Future<List<MCRSolrIndexHandler>> future = es.submit(indexTask);
         try {
             List<MCRSolrIndexHandler> handlerList = future.get();
             if (handlerList != null) {
                 //TODO: Java 8: fire an wait to finish
-                indexAndWait(handlerList);
+                indexAndWait(handlerList, es);
             }
         } catch (InterruptedException | ExecutionException e) {
             LOGGER.error("Error while submitting index handler.", e);
         }
     }
 
-    private static void indexAndWait(List<MCRSolrIndexHandler> handlerList) throws InterruptedException,
+    private static void indexAndWait(List<MCRSolrIndexHandler> handlerList, ExecutorService es)
+        throws InterruptedException,
         ExecutionException {
         if (handlerList == null || handlerList.isEmpty()) {
             return;
         }
-        CompletionService<List<MCRSolrIndexHandler>> cs = new ExecutorCompletionService<>(PARALLEL_SERVICE);
+        CompletionService<List<MCRSolrIndexHandler>> cs = new ExecutorCompletionService<>(es);
         for (MCRSolrIndexHandler handler : handlerList) {
             cs.submit(new MCRSolrIndexTask(handler));
         }
@@ -343,7 +344,7 @@ public class MCRSolrIndexer {
         LOGGER.info("Waiting for " + count + " index handler to complete");
         for (int i = 0; i < count; i++) {
             List<MCRSolrIndexHandler> handlers = cs.take().get();
-            indexAndWait(handlers);
+            indexAndWait(handlers, es);
         }
     }
 
@@ -389,7 +390,7 @@ public class MCRSolrIndexer {
         try {
             MCRSolrOptimizeIndexHandler indexHandler = new MCRSolrOptimizeIndexHandler();
             indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
-            submitIndexHandler(indexHandler);
+            submitIndexHandler(indexHandler, false);
         } catch (Exception ex) {
             LOGGER.error("Could not optimize solr index", ex);
         }
