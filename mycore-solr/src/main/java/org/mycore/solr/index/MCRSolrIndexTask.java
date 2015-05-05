@@ -44,6 +44,7 @@ public class MCRSolrIndexTask implements Callable<List<MCRSolrIndexHandler>> {
         Transaction transaction = null;
         try {
             session = MCRHIBConnection.instance().getSession();
+            session.setDefaultReadOnly(true);
             transaction = session.beginTransaction();
             long start = System.currentTimeMillis();
             this.indexHandler.index();
