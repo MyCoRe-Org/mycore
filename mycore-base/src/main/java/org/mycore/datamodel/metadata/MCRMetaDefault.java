@@ -274,7 +274,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     public Element createXML() throws MCRException {
         if (!isValid()) {
             debug();
-            throw new MCRException("The content of MCRMetaLangText is not valid.");
+            throw new MCRException("The content of MCRMetaDefault is not valid.");
         }
         Element elm = new Element(subtag);
         if (getLang() != null && getLang().length() > 0)
