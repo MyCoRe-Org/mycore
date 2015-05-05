@@ -33,7 +33,7 @@
       <xsl:call-template name="titles" />
       <xsl:call-template name="publisher" />
       <xsl:call-template name="publicationYear" />
-      <xsl:call-template name="hostingInstitution" />
+      <xsl:call-template name="contributors" />
       <xsl:call-template name="subjects" />
       <xsl:call-template name="dates" />
       <xsl:apply-templates select="mods:language" />
@@ -184,17 +184,38 @@
     </publicationYear>
   </xsl:template>
 
-  <!-- ========== hostingInstitution ========== -->
 
-  <xsl:template name="hostingInstitution">
+  <!-- ========== contributors ========== -->
+  <xsl:template name="contributors">
     <contributors>
-      <contributor contributorType="HostingInstitution">
-        <contributorName>
-          <xsl:value-of select="$MCR.DOI.HostingInstitution" />
-        </contributorName>
-      </contributor>
+      <xsl:call-template name="hostingInstitution" />
+      <xsl:if test="mods:identifier[@type='project'][contains(text(), 'FP7')]" >
+        <xsl:call-template name="fundingInformation" />
+      </xsl:if>
     </contributors>
   </xsl:template>
+
+  <!-- ========== hostingInstitution ========== -->
+  <xsl:template name="hostingInstitution">
+    <contributor contributorType="HostingInstitution">
+      <contributorName>
+        <xsl:value-of select="$MCR.DOI.HostingInstitution" />
+      </contributorName>
+    </contributor>
+  </xsl:template>
+
+  <!-- ========== Funding information ========== -->
+  <xsl:template name="fundingInformation">
+    <contributor contributorType="Funder">
+      <contributorName>
+        <xsl:value-of select="'European Commission'" />
+      </contributorName>
+      <nameIdentifier nameIdentifierScheme="info">
+        <xsl:value-of select="mods:identifier[@type='project'][contains(text(), 'FP7')]" />
+      </nameIdentifier>
+    </contributor>
+  </xsl:template>
+
 
   <!-- ========== subjects ========== -->
 
