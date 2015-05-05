@@ -54,7 +54,6 @@ public class MCRSolrIndexTask implements Callable<List<MCRSolrIndexHandler>> {
             return this.indexHandler.getSubHandlers();
         } finally {
             try {
-                session.clear();
                 if (transaction != null) {
                     transaction.commit();
                 }
