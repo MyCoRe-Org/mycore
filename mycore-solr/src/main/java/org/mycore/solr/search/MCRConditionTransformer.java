@@ -236,13 +236,13 @@ public class MCRConditionTransformer {
         return q;
     }
 
-    protected static String getQueryString(@SuppressWarnings("rawtypes") MCRCondition condition) {
+    public static String getQueryString(@SuppressWarnings("rawtypes") MCRCondition condition) {
         Set<String> usedFields = new HashSet<>();
         String queryString = MCRConditionTransformer.toSolrQueryString(condition, usedFields);
         return queryString;
     }
 
-    protected static SolrQuery applySortOptions(SolrQuery q, List<MCRSortBy> sortBy) {
+    public static SolrQuery applySortOptions(SolrQuery q, List<MCRSortBy> sortBy) {
         for (MCRSortBy option : sortBy) {
             SortClause sortClause = new SortClause(option.getFieldName(), option.getSortOrder() ? ORDER.asc
                 : ORDER.desc);
