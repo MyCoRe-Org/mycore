@@ -182,16 +182,19 @@ public class MCRSolrIndexer {
 
     /**
      * Rebuilds solr's metadata index.
+     * 
+     * @param parallel
      */
-    public static void rebuildMetadataIndex() {
-        rebuildMetadataIndex(MCRXMLMetadataManager.instance().listIDs());
+    public static void rebuildMetadataIndex(boolean parallel) {
+        rebuildMetadataIndex(MCRXMLMetadataManager.instance().listIDs(), parallel);
     }
 
     /**
      * Rebuilds solr's metadata index.
+     * @param parallel 
      */
-    public static void rebuildMetadataIndex(SolrClient cuss) {
-        rebuildMetadataIndex(MCRXMLMetadataManager.instance().listIDs(), cuss);
+    public static void rebuildMetadataIndex(SolrClient cuss, boolean parallel) {
+        rebuildMetadataIndex(MCRXMLMetadataManager.instance().listIDs(), cuss, parallel);
     }
 
     /**
@@ -199,14 +202,15 @@ public class MCRSolrIndexer {
      * 
      * @param type
      *            of the objects to index
+     * @param parallel
      */
-    public static void rebuildMetadataIndex(String type) {
+    public static void rebuildMetadataIndex(String type, boolean parallel) {
         List<String> identfiersOfType = MCRXMLMetadataManager.instance().listIDsOfType(type);
-        rebuildMetadataIndex(identfiersOfType);
+        rebuildMetadataIndex(identfiersOfType, parallel);
     }
 
-    public static void rebuildMetadataIndex(List<String> list) {
-        rebuildMetadataIndex(list, MCRSolrClientFactory.getConcurrentSolrClient());
+    public static void rebuildMetadataIndex(List<String> list, boolean parallel) {
+        rebuildMetadataIndex(list, MCRSolrClientFactory.getConcurrentSolrClient(), parallel);
     }
 
     /**
@@ -216,8 +220,10 @@ public class MCRSolrIndexer {
      *            list of identifiers of the objects to index
      * @param solrClient
      *            solr server to index
+     * @param parallel
+     *            TODO
      */
-    public static void rebuildMetadataIndex(List<String> list, SolrClient solrClient) {
+    public static void rebuildMetadataIndex(List<String> list, SolrClient solrClient, boolean parallel) {
         LOGGER.info("Re-building Metadata Index");
         if (list.isEmpty()) {
             LOGGER.info("Sorry, no documents to index");
@@ -246,7 +252,7 @@ public class MCRSolrIndexer {
                     indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
                     indexHandler.setSolrServer(solrClient);
                     statistic = indexHandler.getStatistic();
-                    submitIndexHandler(indexHandler, true);
+                    submitIndexHandler(indexHandler, parallel);
                     contentMap.clear();
                 }
             } catch (Exception ex) {
@@ -261,14 +267,16 @@ public class MCRSolrIndexer {
 
     /**
      * Rebuilds solr's content index.
+     * 
+     * @param parallel
      */
-    public static void rebuildContentIndex() {
+    public static void rebuildContentIndex(boolean parallel) {
         rebuildContentIndex(MCRSolrClientFactory.getSolrClient(),
-            MCRXMLMetadataManager.instance().listIDsOfType("derivate"));
+            MCRXMLMetadataManager.instance().listIDsOfType("derivate"), parallel);
     }
 
-    public static void rebuildContentIndex(SolrClient hss) {
-        rebuildContentIndex(hss, MCRXMLMetadataManager.instance().listIDsOfType("derivate"));
+    public static void rebuildContentIndex(SolrClient hss, boolean parallel) {
+        rebuildContentIndex(hss, MCRXMLMetadataManager.instance().listIDsOfType("derivate"), parallel);
     }
 
     /**
@@ -277,15 +285,16 @@ public class MCRSolrIndexer {
      * 
      * @param list
      *            containing mycore object id's
+     * @param parallel
      */
-    public static void rebuildContentIndex(List<String> list) {
-        rebuildContentIndex(MCRSolrClientFactory.getSolrClient(), list);
+    public static void rebuildContentIndex(List<String> list, boolean parallel) {
+        rebuildContentIndex(MCRSolrClientFactory.getSolrClient(), list, parallel);
     }
 
     /**
      * Rebuilds solr's content index.
      */
-    public static void rebuildContentIndex(SolrClient solrClient, List<String> list) {
+    public static void rebuildContentIndex(SolrClient solrClient, List<String> list, boolean parallel) {
         LOGGER.info("Re-building Content Index");
 
         if (list.isEmpty()) {
@@ -300,7 +309,7 @@ public class MCRSolrIndexer {
         for (String id : list) {
             MCRSolrFilesIndexHandler indexHandler = new MCRSolrFilesIndexHandler(id, solrClient);
             indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
-            submitIndexHandler(indexHandler, true);
+            submitIndexHandler(indexHandler, parallel);
         }
 
         long tStop = System.currentTimeMillis();
@@ -350,10 +359,12 @@ public class MCRSolrIndexer {
 
     /**
      * Rebuilds and optimizes solr's metadata and content index.
+     * 
+     * @param parallel
      */
-    public static void rebuildMetadataAndContentIndex() throws Exception {
-        MCRSolrIndexer.rebuildMetadataIndex();
-        MCRSolrIndexer.rebuildContentIndex();
+    public static void rebuildMetadataAndContentIndex(boolean parallel) throws Exception {
+        MCRSolrIndexer.rebuildMetadataIndex(parallel);
+        MCRSolrIndexer.rebuildContentIndex(parallel);
         MCRSolrIndexer.optimize();
     }
 
@@ -399,14 +410,15 @@ public class MCRSolrIndexer {
     /**
      * Synchronizes the solr server with the database. As a result the solr server contains the same documents as the
      * database. All solr zombie documents will be removed, and all not indexed mycore objects will be indexed.
+     * @param parallel 
      * 
      * @throws IOException
      * @throws SolrServerException
      */
-    public static void synchronizeMetadataIndex() throws IOException, SolrServerException {
+    public static void synchronizeMetadataIndex(boolean parallel) throws IOException, SolrServerException {
         Collection<String> objectTypes = MCRXMLMetadataManager.instance().getObjectTypes();
         for (String objectType : objectTypes) {
-            synchronizeMetadataIndex(objectType);
+            synchronizeMetadataIndex(objectType, parallel);
         }
     }
 
@@ -414,11 +426,12 @@ public class MCRSolrIndexer {
      * Synchronizes the solr server with the mycore store for a given object type. As a result the solr server contains
      * the same documents as the store. All solr zombie documents will be removed, and all not indexed mycore objects
      * will be indexed.
+     * @param parallel 
      * 
      * @throws IOException
      * @throws SolrServerException
      */
-    public static void synchronizeMetadataIndex(String objectType) throws IOException, SolrServerException {
+    public static void synchronizeMetadataIndex(String objectType, boolean parallel) throws IOException, SolrServerException {
         LOGGER.info("synchronize " + objectType);
         // get ids from store
         LOGGER.info("fetching mycore store...");
@@ -446,7 +459,7 @@ public class MCRSolrIndexer {
         storeList.removeAll(solrList);
         if (!storeList.isEmpty()) {
             LOGGER.info("index " + storeList.size() + " mycore objects");
-            rebuildMetadataIndex(storeList);
+            rebuildMetadataIndex(storeList, parallel);
         }
     }
 
