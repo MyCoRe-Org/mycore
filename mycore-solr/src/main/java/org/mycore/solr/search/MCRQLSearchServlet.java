@@ -40,16 +40,15 @@ import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryCondition;
 import org.mycore.services.fieldquery.MCRQueryParser;
 import org.mycore.services.fieldquery.MCRSortBy;
-import org.mycore.solr.legacy.MCRConditionTransformer;
 //import org.mycore.services.fieldquery.MCRSearchServlet;
 import org.mycore.solr.proxy.MCRSolrProxyServlet;
 import org.xml.sax.SAXException;
 
-public class MCRSolrLegacySearchServlet extends MCRServlet {//extends MCRSearchServlet {
+public class MCRQLSearchServlet extends MCRServlet {//extends MCRSearchServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRSolrLegacySearchServlet.class);
+    private static final Logger LOGGER = Logger.getLogger(MCRQLSearchServlet.class);
 
     /** Default search field */
     private String defaultSearchField;

@@ -1,4 +1,4 @@
-package org.mycore.solr.legacy;
+package org.mycore.solr.search;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -11,6 +11,7 @@ import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRNotCondition;
 import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.services.fieldquery.MCRQueryCondition;
+import org.mycore.solr.search.MCRConditionTransformer;
 
 public class MCRConditionTransformerTest extends MCRTestCase {
 

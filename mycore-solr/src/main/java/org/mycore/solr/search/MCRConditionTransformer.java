@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.solr.legacy;
+package org.mycore.solr.search;
 
 import java.util.ArrayList;
 import java.util.HashMap;

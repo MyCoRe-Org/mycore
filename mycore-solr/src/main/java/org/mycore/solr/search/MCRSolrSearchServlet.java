@@ -23,7 +23,6 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.solr.legacy.MCRConditionTransformer;
 import org.mycore.solr.proxy.MCRSolrProxyServlet;
 
 /**
