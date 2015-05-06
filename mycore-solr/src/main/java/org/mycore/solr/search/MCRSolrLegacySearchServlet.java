@@ -120,7 +120,7 @@ public class MCRSolrLegacySearchServlet extends MCRServlet {//extends MCRSearchS
     }
 
     @SuppressWarnings("rawtypes")
-    private SolrQuery getSolrQuery(MCRQuery query, Document input, HttpServletRequest request) {
+    protected SolrQuery getSolrQuery(MCRQuery query, Document input, HttpServletRequest request) {
         int rows = Integer.parseInt(input.getRootElement().getAttributeValue("numPerPage", "10"));
         MCRCondition condition = query.getCondition();
         HashMap<String, List<MCRCondition>> table;
@@ -162,7 +162,7 @@ public class MCRSolrLegacySearchServlet extends MCRServlet {//extends MCRSearchS
      * @param requestParameter the map of parameters (not XSL parameter will be skipped)
      * @return a string wich contains all parameters with a leading &
      */
-    private String getReservedParameterString(Map<String, String[]> requestParameter) {
+    protected String getReservedParameterString(Map<String, String[]> requestParameter) {
         StringBuilder sb = new StringBuilder();
 
         Set<Entry<String, String[]>> requestEntrys = requestParameter.entrySet();
