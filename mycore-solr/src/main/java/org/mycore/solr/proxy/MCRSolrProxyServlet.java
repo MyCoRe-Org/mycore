@@ -34,6 +34,8 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.params.ModifiableSolrParams;
+import org.apache.solr.common.params.MultiMapSolrParams;
+import org.apache.solr.common.util.NamedList;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.common.config.MCRConfiguration;
@@ -50,17 +52,13 @@ public class MCRSolrProxyServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Attribute key to store Query parameters as
-     * <code>Map&lt;String, String[]&gt;</code> for SOLR.
-     * 
-     * This takes precedence over any {@link HttpServletRequest} parameter.
+     * Attribute key to store Query parameters as <code>Map&lt;String, String[]&gt;</code> for SOLR. This takes
+     * precedence over any {@link HttpServletRequest} parameter.
      */
     public static final String MAP_KEY = MCRSolrProxyServlet.class.getName() + ".map";
 
     /**
-     * Attribute key to store a {@link SolrQuery}.
-     * 
-     * This takes precedence over {@link #MAP_KEY} or any
+     * Attribute key to store a {@link SolrQuery}. This takes precedence over {@link #MAP_KEY} or any
      * {@link HttpServletRequest} parameter.
      */
     public static final String QUERY_KEY = MCRSolrProxyServlet.class.getName() + ".query";
@@ -126,8 +124,31 @@ public class MCRSolrProxyServlet extends MCRServlet {
         ModifiableSolrParams solrQueryParameter = getSolrQueryParameter(request);
         String queryHandlerPath = solrQueryParameter.get(QUERY_HANDLER_PAR_NAME, QUERY_PATH);
         solrQueryParameter.remove(QUERY_HANDLER_PAR_NAME);
-        Map<String, String[]> parameters = ModifiableSolrParams.toMultiMap(solrQueryParameter.toNamedList());
+        Map<String, String[]> parameters = toMultiMap(solrQueryParameter);
         doRedirectToQueryHandler(resp, queryHandlerPath, parameters);
+    }
+
+    static Map<String, String[]> toMultiMap(ModifiableSolrParams solrQueryParameter) {
+        NamedList<Object> namedList = solrQueryParameter.toNamedList();
+        //disabled for MCR-953 and https://issues.apache.org/jira/browse/SOLR-7508
+        //Map<String, String[]> parameters = ModifiableSolrParams.toMultiMap(namedList);
+        HashMap<String, String[]> parameters = new HashMap<>();
+        for (int i = 0; i < namedList.size(); i++) {
+            String name = namedList.getName(i);
+            Object val = namedList.getVal(i);
+            if (val instanceof String[]) {
+                //TODO: SOLRJ 5.1 fix
+                //SolrParams.addParam(name, (String[]) val, parameters);
+                //FIX for SOLR 5.0
+                for (String v : (String[]) val) {
+                    MultiMapSolrParams.addParam(name, v, parameters);
+                }
+            } else {
+                MultiMapSolrParams.addParam(name, val.toString(), parameters);
+            }
+        }
+        //end of fix
+        return parameters;
     }
 
     /**
@@ -149,7 +170,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
     }
 
     /**
-     * used by 
+     * used by
      */
     private static void doRedirectToQueryHandler(HttpServletResponse resp, String queryHandlerPath,
         Map<String, String[]> parameters) throws IOException {
@@ -218,7 +239,6 @@ public class MCRSolrProxyServlet extends MCRServlet {
      * Gets a HttpGet to make a request to the Solr-Server.
      * 
      * @param queryHandler
-     * 
      * @param parameterMap
      *            Parameters to use with the Request
      * @return a method to make the request
