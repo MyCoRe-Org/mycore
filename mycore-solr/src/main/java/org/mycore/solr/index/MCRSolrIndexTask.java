@@ -12,66 +12,65 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.util.concurrent.MCRPrioritizable;
 
 /**
- * Solr index task which handles <code>MCRSolrIndexHandler</code>'s.
- * Surrounds the indexHandler with a hibernate session.
+ * Solr index task which handles <code>MCRSolrIndexHandler</code>'s. Surrounds the indexHandler with a hibernate
+ * session.
  * 
  * @author Matthias Eichner
  */
-public class MCRSolrIndexTask implements Callable<List<MCRSolrIndexHandler>>, MCRPrioritizable<Integer> {
+public class MCRSolrIndexTask implements Callable<List<MCRSolrIndexHandler>> {
 
     final static Logger LOGGER = Logger.getLogger(MCRSolrIndexTask.class);
 
     protected MCRSolrIndexHandler indexHandler;
 
-    protected int priority;
-
     /**
      * Creates a new solr index task.
      * 
-     * @param indexHandler handles the index process
-     * @param priority tasks with higher value are handled first
+     * @param indexHandler
+     *            handles the index process
      */
-    public MCRSolrIndexTask(MCRSolrIndexHandler indexHandler, int priority) {
+    public MCRSolrIndexTask(MCRSolrIndexHandler indexHandler) {
         this.indexHandler = indexHandler;
-        this.priority = priority;
     }
 
     @Override
     public List<MCRSolrIndexHandler> call() throws SolrServerException, IOException {
+        //Can run in current thread or parallel executor
+        boolean reUseSession = MCRSessionMgr.hasCurrentSession();
         //this.indexHandler.index() creates a session anyway
-        MCRSession mcrSession=MCRSessionMgr.getCurrentSession();
-        mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        if (!reUseSession) {
+            mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
+        }
         Session session = null;
         Transaction transaction = null;
+        boolean readOnly;
         try {
             session = MCRHIBConnection.instance().getSession();
-            transaction = session.beginTransaction();
+            transaction = reUseSession ? null : session.beginTransaction();
+            readOnly = session.isDefaultReadOnly();
+            session.setDefaultReadOnly(true);
             long start = System.currentTimeMillis();
             this.indexHandler.index();
             long end = System.currentTimeMillis();
             indexHandler.getStatistic().addDocument(indexHandler.getDocuments());
             indexHandler.getStatistic().addTime(end - start);
+            session.setDefaultReadOnly(readOnly);
             return this.indexHandler.getSubHandlers();
         } finally {
             try {
-                session.clear();
                 if (transaction != null) {
                     transaction.commit();
                 }
             } finally {
-                session.close();
-                MCRSessionMgr.releaseCurrentSession();
-                mcrSession.close();
+                if (!reUseSession) {
+                    session.close();
+                    MCRSessionMgr.releaseCurrentSession();
+                    mcrSession.close();
+                }
             }
         }
     }
-
-    @Override
-    public Integer getPriority() {
-        return this.priority;
-    }
-
 }
