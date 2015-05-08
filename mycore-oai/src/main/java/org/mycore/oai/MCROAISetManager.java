@@ -55,7 +55,7 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRSortBy;
 import org.mycore.solr.MCRSolrClientFactory;
-import org.mycore.solr.search.MCRConditionTransformer;
+import org.mycore.solr.legacy.MCRConditionTransformer;
 
 /**
  * Manager class to handle OAI-PMH set specific behavior. For a data provider instance, set support is optional and must be configured as described below.
