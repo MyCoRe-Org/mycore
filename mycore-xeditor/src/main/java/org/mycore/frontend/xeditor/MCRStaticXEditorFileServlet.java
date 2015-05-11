@@ -51,15 +51,16 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
         throws IOException, JDOMException, SAXException, MalformedURLException {
         MCRContent content = super.expandEditorElements(request, response, resource);
         if (mayContainEditorForm(content)) {
-            content = doExpandEditorElements(content, request, response, request.getRequestURL().toString());
+            content = doExpandEditorElements(content, request, response,
+                request.getParameter(MCREditorSessionStore.XEDITOR_SESSION_PARAM), request.getRequestURL().toString());
         }
         return content;
     }
 
     public static MCRContent doExpandEditorElements(MCRContent content, HttpServletRequest request,
-        HttpServletResponse response, String pageURL) throws IOException, JDOMException, SAXException, MalformedURLException {
+        HttpServletResponse response, String sessionID, String pageURL) throws IOException, JDOMException,
+        SAXException, MalformedURLException {
         MCRParameterCollector pc = new MCRParameterCollector(request, false);
-        String sessionID = request.getParameter(MCREditorSessionStore.XEDITOR_SESSION_PARAM);
         MCREditorSession session = null;
 
         if (sessionID != null) {
