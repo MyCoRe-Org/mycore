@@ -36,6 +36,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.apache.pdfbox.exceptions.CryptographyException;
 import org.apache.pdfbox.io.RandomAccess;
 import org.apache.pdfbox.io.RandomAccessBuffer;
 import org.apache.pdfbox.pdfparser.PDFParser;
@@ -49,7 +50,6 @@ import org.mycore.tools.MCRPNGTools;
 
 /**
  * @author Thomas Scheffler (yagee)
- *
  */
 class MCRPDFTools implements AutoCloseable {
 
@@ -67,6 +67,15 @@ class MCRPDFTools implements AutoCloseable {
 
     static BufferedImage getThumbnail(Path pdfFile, int thumbnailSize, boolean centered) throws IOException {
         PDDocument pdf = getPDDocument(pdfFile);
+        if (pdf.isEncrypted()) {
+            try {
+                pdf.decrypt("");
+            } catch (CryptographyException e) {
+                LOGGER.error("PDF document: " + pdfFile + " is encrypted.");
+                return null;
+            }
+            pdf.setAllSecurityToBeRemoved(true);
+        }
         BufferedImage level1Image;
         int imageType = BufferedImage.TYPE_INT_ARGB;
         try {
