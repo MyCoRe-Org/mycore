@@ -1,5 +1,6 @@
 package org.mycore.solr.search;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public abstract class MCRSolrSearchUtils {
      * @return first solr document or null
      * @throws SolrServerException communication with the solr server failed in any way
      */
-    public static SolrDocument first(SolrClient solrClient, String query) throws SolrServerException {
+    public static SolrDocument first(SolrClient solrClient, String query) throws SolrServerException, IOException {
         ModifiableSolrParams p = new ModifiableSolrParams();
         p.set("q", query);
         p.set("rows", 1);
@@ -37,12 +38,12 @@ public abstract class MCRSolrSearchUtils {
      * @return list of id's
      * @throws SolrServerException communication with the solr server failed in any way
      */
-    public static List<String> listIDs(SolrClient solrClient, String query) throws SolrServerException {
+    public static List<String> listIDs(SolrClient solrClient, String query) throws SolrServerException, IOException {
         return list(solrClient, query, new IdDocumentHandler());
     }
 
     public static <T> List<T> list(SolrClient solrClient, String query, DocumentHandler<T> handler)
-        throws SolrServerException {
+        throws SolrServerException, IOException {
         int numPerRequest = 10000;
         List<T> resultList = new ArrayList<>();
         ModifiableSolrParams p = new ModifiableSolrParams();

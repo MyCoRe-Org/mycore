@@ -1,5 +1,6 @@
 package org.mycore.solr.search;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 
@@ -61,7 +62,7 @@ public class MCRSolrQueryAdapter implements MCRQueryAdapter {
         QueryResponse queryResponse;
         try {
             queryResponse = MCRSolrClientFactory.getSolrClient().query(solrQuery);
-        } catch (SolrServerException e) {
+        } catch (SolrServerException | IOException e) {
             LOGGER.warn("Could not query SOLR.", e);
             return -1;
         }

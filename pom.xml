@@ -288,7 +288,7 @@
                 <link>http://www.jdom.org/docs/apidocs/</link>
                 <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
                 <link>http://docs.jboss.org/hibernate/core/4.3/javadocs/</link>
-                <link>http://lucene.apache.org/solr/5_0_0/solr-solrj/</link>
+                <link>http://lucene.apache.org/solr/5_1_0/solr-solrj/</link>
               </links>
             </configuration>
             <reportSets>
@@ -518,7 +518,7 @@
               <link>http://www.jdom.org/docs/apidocs/</link>
               <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
               <link>http://docs.jboss.org/hibernate/core/4.3/javadocs/</link>
-              <link>http://lucene.apache.org/solr/5_0_0/solr-solrj/</link>
+              <link>http://lucene.apache.org/solr/5_1_0/solr-solrj/</link>
             </links>
           </configuration>
         </plugin>
@@ -758,7 +758,7 @@
       <dependency>
         <groupId>org.apache.solr</groupId>
         <artifactId>solr-solrj</artifactId>
-        <version>5.0.0</version>
+        <version>5.1.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>

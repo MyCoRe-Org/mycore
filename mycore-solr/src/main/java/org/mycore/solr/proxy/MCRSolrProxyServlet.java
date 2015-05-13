@@ -137,12 +137,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
             String name = namedList.getName(i);
             Object val = namedList.getVal(i);
             if (val instanceof String[]) {
-                //TODO: SOLRJ 5.1 fix
-                //SolrParams.addParam(name, (String[]) val, parameters);
-                //FIX for SOLR 5.0
-                for (String v : (String[]) val) {
-                    MultiMapSolrParams.addParam(name, v, parameters);
-                }
+                MultiMapSolrParams.addParam(name, (String[]) val, parameters);
             } else {
                 MultiMapSolrParams.addParam(name, val.toString(), parameters);
             }

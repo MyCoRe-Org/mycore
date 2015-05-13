@@ -3,6 +3,8 @@
  */
 package org.mycore.solr;
 
+import java.io.IOException;
+
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -22,7 +24,7 @@ public class MCRXMLFunctions {
      *  
      * @throws SolrServerException
      */
-    public static long getNumFound(String q) throws SolrServerException {
+    public static long getNumFound(String q) throws SolrServerException, IOException {
         if (q == null || q.length() == 0) {
             throw new IllegalArgumentException("The query string must not be null");
         }
