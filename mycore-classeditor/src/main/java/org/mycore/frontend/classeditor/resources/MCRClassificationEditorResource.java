@@ -4,6 +4,7 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.io.InputStream;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
@@ -90,14 +91,14 @@ import com.sun.jersey.multipart.FormDataParam;
  *      ],
  *      "parentID":{"rootID":"abcd","categID":"parent"}
  *      "children:"URL"
- * 
+ *
  * }
  * ...
  * ]
  * </code>
- * 
+ *
  * @author chi
- * 
+ *
  */
 @Path("classifications")
 public class MCRClassificationEditorResource {
@@ -425,7 +426,7 @@ public class MCRClassificationEditorResource {
     @Path("link/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response retrieveLinkedObjects(@PathParam("id") String id, @QueryParam("start") Integer start,
-        @QueryParam("rows") Integer rows) throws SolrServerException, UnsupportedEncodingException {
+        @QueryParam("rows") Integer rows) throws SolrServerException, UnsupportedEncodingException, IOException {
         // do solr query
         SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         ModifiableSolrParams params = new ModifiableSolrParams();
@@ -565,7 +566,7 @@ public class MCRClassificationEditorResource {
             if (depthLevel1.getAsInt() != depthLevel2.getAsInt()) {
                 return new Integer(depthLevel1.getAsInt()).compareTo(depthLevel2.getAsInt());
             }
-            // compare index            
+            // compare index
             JsonPrimitive index1 = jsonElement1.getAsJsonObject().getAsJsonPrimitive("index");
             JsonPrimitive index2 = jsonElement2.getAsJsonObject().getAsJsonPrimitive("index");
             if (index1 == null) {
