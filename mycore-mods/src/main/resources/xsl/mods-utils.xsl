@@ -80,6 +80,12 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template mode="mods.subtitle" match="mods:mods">
+    <xsl:if test="mods:titleInfo/mods:subTitle">
+      <xsl:value-of select="mods:titleInfo/mods:subTitle[1]" />
+    </xsl:if>
+  </xsl:template>
+
   <xsl:template mode="mods.internalId" match="mods:mods">
     <xsl:choose>
       <xsl:when test="../../../../@ID">
@@ -95,7 +101,6 @@
   </xsl:template>
 
   <!-- mycoreobject templates -->
-
   <xsl:template mode="mods-type" match="mycoreobject">
     <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods" mode="mods.type" />
   </xsl:template>

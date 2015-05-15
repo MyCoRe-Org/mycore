@@ -740,20 +740,7 @@
     <xsl:param name="parentID" />
     <xsl:param name="label" />
 
-    <xsl:if test="not(./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host'])">
-      <tr>
-        <td valign="top" class="metaname">
-          <xsl:value-of select="concat($label,':')" />
-        </td>
-        <td class="metavalue">
-          <xsl:call-template name="objectLink">
-            <xsl:with-param select="$parentID" name="obj_id" />
-          </xsl:call-template>
-        </td>
-      </tr>
-    </xsl:if>
-
-    <xsl:for-each select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@type='host']">
+    <xsl:for-each select="./metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem[@xlink:href=$parentID]">
       <tr>
         <td valign="top" class="metaname">
           <xsl:value-of select="concat($label,':')" />
@@ -770,10 +757,12 @@
               <xsl:value-of select="mods:titleInfo/mods:title" />
             </xsl:otherwise>
           </xsl:choose>
-          <xsl:text disable-output-escaping="yes">&lt;br /></xsl:text>
-          <xsl:for-each select="mods:part/mods:extent[@unit='pages']">
-            <xsl:call-template name="printMetaDate.mods.extent" />
-          </xsl:for-each>
+          <xsl:if test="mods:part/mods:extent[@unit='pages']">
+            <xsl:text disable-output-escaping="yes">&lt;br /></xsl:text>
+            <xsl:for-each select="mods:part/mods:extent[@unit='pages']">
+              <xsl:call-template name="printMetaDate.mods.extent" />
+            </xsl:for-each>
+          </xsl:if>
         </td>
       </tr>
     </xsl:for-each>
