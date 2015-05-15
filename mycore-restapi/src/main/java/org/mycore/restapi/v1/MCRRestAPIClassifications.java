@@ -67,9 +67,9 @@ import com.google.gson.stream.JsonWriter;
 
 /**
  * REST API for classification objects.
- *  
+ *
  * @author Robert Stephan
- * 
+ *
  * @version $Revision: $ $Date: $
  */
 @Path("/v1/classifications")
@@ -85,10 +85,10 @@ public class MCRRestAPIClassifications extends HttpServlet {
     private static final MCRCategoryDAO DAO = new MCRCategoryDAOImpl();
 
     /**
-     * 
+     *
      * @param info - a Jersey Context Object for URI
      *     Possible values are: json | xml (required)
-     * @param format 
+     * @param format
      * @return
      */
     @GET
@@ -148,21 +148,21 @@ public class MCRRestAPIClassifications extends HttpServlet {
 
     /**
      *  returns a single classification object
-     *  
+     *
      * @param classID - the classfication id
      * @param format
      *   Possible values are: json | xml (required)
      * @param filter
      * 	 a ';'-separated list of ':'-separated key-value pairs, possible keys are:
      *      - lang - the language of the returned labels, if ommited all labels in all languages will be returned
-     *      - root - an id for a category which will be used as root     
-     *      - nonempty - hide empty categories      
+     *      - root - an id for a category which will be used as root
+     *      - nonempty - hide empty categories
      * @param style
-     * 	a ';'-separated list of values, possible keys are:		
+     * 	a ';'-separated list of values, possible keys are:
      *   	- 'checkboxtree'    - create a json syntax which can be used as input for a dojo checkboxtree;
      *      - 'checked'   - together with 'checkboxtree' all checkboxed will be checked
-     *      
-     *    
+     *
+     *
      * @return a Jersey Response object
      */
     @GET
@@ -336,7 +336,7 @@ public class MCRRestAPIClassifications extends HttpServlet {
      * @param eParent - the parent xml element
      * @param writer - the JSON writer
      * @param lang - the language to be filtered or null if all languages should be displayed
-     * 
+     *
      * @throws IOException
      */
     private static void writeChildrenAsJSON(Element eParent, JsonWriter writer, String lang) throws IOException {
@@ -372,11 +372,11 @@ public class MCRRestAPIClassifications extends HttpServlet {
 
     /**
      * output children in JSON format used as input for Dijit Checkbox Tree
-     * 
+     *
      * @param eParent - the parent xml element
      * @param writer - the JSON writer
      * @param lang - the language to be filtered or null if all languages should be displayed
-     * 
+     *
      * @throws IOException
      */
     private static void writeChildrenAsJSONCBTree(Element eParent, JsonWriter writer, String lang, boolean checked)
@@ -416,7 +416,7 @@ public class MCRRestAPIClassifications extends HttpServlet {
                     e.removeContent(cat);
                     i--;
                 }
-            } catch (SolrServerException exc) {
+            } catch (SolrServerException | IOException exc) {
                 LOGGER.error(exc);
             }
         }

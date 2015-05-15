@@ -389,7 +389,7 @@ public class MCRClassificationEditorResource {
     @GET
     @Path("filter/{text}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response filter(@PathParam("text") String text) throws SolrServerException {
+    public Response filter(@PathParam("text") String text) throws SolrServerException, IOException {
         SolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
         List<List<String>> ids = MCRSolrSearchUtils.list(solrClient, "*" + text + "*",
             new MCRSolrSearchUtils.DocumentHandler<List<String>>() {

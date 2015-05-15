@@ -1,19 +1,19 @@
 /*
  * $Revision$ $Date$
- * 
+ *
  * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
  * details.
- * 
+ *
  * This program is free software; you can use it, redistribute it and / or
  * modify it under the terms of the GNU General Public License (GPL) as
  * published by the Free Software Foundation; either version 2 of the License or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program, in a file called gpl.txt or license.txt. If not, write to the
  * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -22,6 +22,8 @@
 package org.mycore.oai;
 
 import static org.mycore.oai.pmh.OAIConstants.NS_OAI;
+
+import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -72,7 +74,7 @@ import org.mycore.solr.search.MCRConditionTransformer;
  * MCRSetManager handler filters out empty sets itself after reading in the URIs. This is done by constructing a query for each set and looking for matching
  * hits. Set queries are built using the OAI Adapter's buildSetCondition method. Filtering empty sets this way may be useful for some implementations, but it is
  * slower and should be avoided for large set hierarchies.
- * 
+ *
  * @see MCRURIResolver
  * @author Frank L\u00fctzenkirchen
  * @author Matthias Eichner
@@ -158,7 +160,7 @@ public class MCROAISetManager {
 
     /**
      * Returns a list of OAI-PMH sets defined by MyCoRe.
-     * 
+     *
      * @return
      */
     @SuppressWarnings("unchecked")
@@ -210,10 +212,10 @@ public class MCROAISetManager {
 
     /**
      * Removes all sets which are empty.
-     * 
+     *
      * <li>The parent is empty -> all child sets must be empty too</li>
      * <li>There are no results for this set</li>
-     * 
+     *
      * @param setList the list to filter
      * @return the same list filtered
      */
@@ -240,7 +242,7 @@ public class MCROAISetManager {
     /**
      * Checks if the given set has results. Returns true if there are no
      * results for this set, otherwise false.
-     * 
+     *
      * @param setSpec spec to check
      * @return
      */
@@ -258,7 +260,7 @@ public class MCROAISetManager {
 
     /**
      * Returns the set with the specified setSpec from the set list or null, if no set with that setSpec is found.
-     * 
+     *
      * @param setSpec
      *            identifier of the set
      * @param setList
@@ -276,7 +278,7 @@ public class MCROAISetManager {
 
     /**
      * Returns true if setList contains a set with specified setSpec.
-     * 
+     *
      * @param setSpec
      *            identifier of the set
      * @param setList
@@ -297,7 +299,7 @@ public class MCROAISetManager {
         try {
             QueryResponse queryResponse = MCRSolrClientFactory.getSolrClient().query(solrQuery);
             return queryResponse.getResults().isEmpty();
-        } catch (SolrServerException e) {
+        } catch (SolrServerException | IOException e) {
             throw new MCRException(e);
         }
     }
