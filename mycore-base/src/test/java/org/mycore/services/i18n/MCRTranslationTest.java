@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ** M y C o R e **
@@ -51,7 +51,7 @@ public class MCRTranslationTest extends MCRTestCase {
     public void getAvailableLanguages() {
         Set<String> availableLanguages = MCRTranslation.getAvailableLanguages();
         System.out.println(availableLanguages);
-        assertEquals(5, availableLanguages.size());
+        assertEquals(7, availableLanguages.size());
     }
 
     @Test
