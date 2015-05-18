@@ -39,7 +39,6 @@ public class MCRSolrCategLinkService extends MCRCategLinkServiceImpl {
         try {
             SolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
             delete(solrClient, reference);
-            solrClient.commit();
         } catch (Exception exc) {
             LOGGER.error("Unable to delete links of object " + reference.getObjectID(), exc);
         }
@@ -57,11 +56,6 @@ public class MCRSolrCategLinkService extends MCRCategLinkServiceImpl {
                 LOGGER.error("Unable to delete links of object " + reference.getObjectID(), exc);
             }
         }
-        try {
-            solrClient.commit();
-        } catch (SolrServerException | IOException e) {
-            LOGGER.error("Unable to commit.", e);
-        }
     }
 
     /**
@@ -74,7 +68,7 @@ public class MCRSolrCategLinkService extends MCRCategLinkServiceImpl {
      */
     protected void delete(SolrClient solrClient, MCRCategLinkReference reference) throws SolrServerException,
         IOException {
-        solrClient.deleteByQuery("+type:link +object:" + reference.getObjectID());
+        solrClient.deleteByQuery("+type:link +object:" + reference.getObjectID(),500);
     }
 
 }

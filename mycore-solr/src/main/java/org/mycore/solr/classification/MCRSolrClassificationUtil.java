@@ -88,16 +88,11 @@ public abstract class MCRSolrClassificationUtil {
         int added = 0;
         for (List<SolrInputDocument> part : partitionList) {
             try {
-                solrClient.add(part);
+                solrClient.add(part,500);
                 LOGGER.info("Added " + (added += part.size()) + "/" + docNum + " documents");
             } catch (SolrServerException | IOException e) {
                 LOGGER.error("Unable to add classification documents.", e);
             }
-        }
-        try {
-            solrClient.commit();
-        } catch (SolrServerException | IOException e) {
-            LOGGER.error("Unable to commit classification documents.", e);
         }
     }
 
