@@ -47,6 +47,9 @@
         <xsl:value-of select="text()" />
       </field>
     </xsl:for-each>
+    <field name="mods.title.main">
+      <xsl:apply-templates mode="mods.title" select="." />
+    </field>
     <xsl:for-each select=".//descendant-or-self::*[contains(@valueURI,'http://d-nb.info/gnd/')]">
       <field name="mods.gnd">
         <xsl:value-of select="substring-after(@valueURI,'http://d-nb.info/gnd/')" />

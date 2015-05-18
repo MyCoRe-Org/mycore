@@ -28,21 +28,56 @@
     </xsl:choose>
   </xsl:template>
 
+
+  <!--
+   -    Prints mods title defined by 'type' [translated|alternative|abbreviated|uniform]. If no type is given
+   -    returns main title (default). The parameter 'withSubtitle' [true|false] specifies, if the subtitle
+   -    sould be shown.
+   -->
   <xsl:template mode="mods.title" match="mods:mods">
+    <xsl:param name="type" select="''" />
+    <xsl:param name="withSubtitle" select="false()" />
+
     <xsl:variable name="mods-type">
       <xsl:apply-templates select="." mode="mods.type" />
     </xsl:variable>
+
     <xsl:choose>
       <xsl:when test="$mods-type='confpro'">
         <xsl:apply-templates select="." mode="mods.title.confpro" />
       </xsl:when>
       <xsl:when test="mods:titleInfo/mods:title">
-        <xsl:value-of select="mods:titleInfo/mods:title[1]" />
+        <xsl:choose>
+          <xsl:when test="not($type='')">
+            <xsl:apply-templates select="mods:titleInfo[@type=$type]" mode="mods.printTitle">
+              <xsl:with-param name="withSubtitle" select="$withSubtitle" />
+            </xsl:apply-templates>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="mods:titleInfo[not(@type='uniform' or @type='abbreviated' or @type='alternative' or @type='translated')]" mode="mods.printTitle">
+              <xsl:with-param name="withSubtitle" select="$withSubtitle" />
+            </xsl:apply-templates>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
         <xsl:apply-templates mode="mods.internalId" select="." />
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+
+  <xsl:template mode="mods.printTitle" match="mods:titleInfo">
+    <xsl:param name="withSubtitle" select="false()" />
+    <xsl:if test="mods:nonSort">
+      <xsl:value-of select="concat(mods:nonSort, ' ')" />
+    </xsl:if>
+    <xsl:value-of select="mods:title" />
+    <xsl:if test="$withSubtitle and mods:subTitle">
+      <span class="subtitle">
+        <xsl:text> : </xsl:text>
+        <xsl:value-of select="mods:subTitle" />
+      </span>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template mode="mods.title.confpro" match="mods:mods">
@@ -81,9 +116,16 @@
   </xsl:template>
 
   <xsl:template mode="mods.subtitle" match="mods:mods">
-    <xsl:if test="mods:titleInfo/mods:subTitle">
-      <xsl:value-of select="mods:titleInfo/mods:subTitle[1]" />
-    </xsl:if>
+    <xsl:param name="type" select="''" />
+    <xsl:choose>
+      <xsl:when test="not($type='')">
+        <xsl:value-of select="mods:titleInfo[@type=$type]/mods:subTitle" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="mods:titleInfo[not(@type='uniform' or @type='abbreviated' or @type='alternative' or @type='translated')]/mods:subTitle" />
+      </xsl:otherwise>
+    </xsl:choose>
+
   </xsl:template>
 
   <xsl:template mode="mods.internalId" match="mods:mods">
