@@ -32,7 +32,8 @@ public class MCRMigrationCommands {
     private static final Logger LOGGER = Logger.getLogger(MCRMigrationCommands.class);
 
     @MCRCommand(
-        syntax = "migrate author servflags", help = "Create missing servflags for createdby and modifiedby. (MCR-786)")
+        syntax = "migrate author servflags", help = "Create missing servflags for createdby and modifiedby. (MCR-786)",
+        order = 20)
     public static List<String> addServFlags() {
         TreeSet<String> ids = new TreeSet<>(MCRXMLMetadataManager.instance().listIDs());
         ArrayList<String> cmds = new ArrayList<>(ids.size());
@@ -44,7 +45,7 @@ public class MCRMigrationCommands {
 
     @MCRCommand(
         syntax = "migrate author servflags for {0}",
-        help = "Create missing servflags for createdby and modifiedby for object {0}. (MCR-786)")
+        help = "Create missing servflags for createdby and modifiedby for object {0}. (MCR-786)", order = 10)
     public static void addServFlags(String id) throws IOException, MCRPersistenceException, MCRActiveLinkException {
         MCRObjectID objectID = MCRObjectID.getInstance(id);
         MCRObject obj = MCRMetadataManager.retrieveMCRObject(objectID);
