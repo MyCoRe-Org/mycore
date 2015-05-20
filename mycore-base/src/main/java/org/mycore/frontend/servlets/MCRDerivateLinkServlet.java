@@ -10,6 +10,7 @@ import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.frontend.MCRFrontendUtil;
 
 /**
  * This servlet is used to display all parents of an mycore object and their
@@ -52,7 +53,7 @@ public class MCRDerivateLinkServlet extends MCRServlet {
 
         // check if root element has content -> if not, show an error page
         if (rootElement.getContentSize() == 0) {
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + derivateLinkErrorPage));
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + derivateLinkErrorPage));
             return;
         }
 

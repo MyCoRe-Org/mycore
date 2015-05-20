@@ -268,7 +268,7 @@ public class MCRLoginServlet extends MCRServlet {
         String url = (String) (MCRSessionMgr.getCurrentSession().get(LOGIN_REDIRECT_URL_KEY));
         if (url == null) {
             LOGGER.warn("Could not get redirect URL from session.");
-            url = getBaseURL();
+            url = MCRFrontendUtil.getBaseURL();
         }
         LOGGER.info("Redirecting to url: " + url);
         res.sendRedirect(res.encodeRedirectURL(url));

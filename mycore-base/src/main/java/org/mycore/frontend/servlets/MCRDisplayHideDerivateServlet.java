@@ -16,6 +16,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.frontend.MCRFrontendUtil;
 
 /**
  * @author shermann
@@ -43,7 +44,7 @@ public class MCRDisplayHideDerivateServlet extends MCRServlet {
         MCRDerivate obj = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivate));
         toggleDisplay(obj);
 
-        String url = getBaseURL() + "receive/" + getParentHref(obj);
+        String url = MCRFrontendUtil.getBaseURL() + "receive/" + getParentHref(obj);
         job.getResponse().encodeRedirectURL(url);
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(url));
     }

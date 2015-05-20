@@ -1,20 +1,20 @@
 /*
- * 
+ *
  * $Revision$ $Date$
- * 
+ *
  * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
  * details.
- * 
+ *
  * This program is free software; you can use it, redistribute it and / or
  * modify it under the terms of the GNU General Public License (GPL) as
  * published by the Free Software Foundation; either version 2 of the License or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program, in a file called gpl.txt or license.txt. If not, write to the
  * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -88,7 +88,7 @@ import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRPathXML;
-import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.tools.MCRObjectFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -101,7 +101,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * of the application when XML is parsed. XML document() calls and xsl:include calls within XSL stylesheets can be read
  * from URIs of type resource, webapp, file, session, query or mcrobject. MyCoRe editor include declarations can read
  * XML files from resource, webapp, file, session, http or https, query, or mcrobject URIs.
- * 
+ *
  * @author Frank L\u00FCtzenkirchen
  * @author Thomas Scheffler (yagee)
  */
@@ -210,7 +210,7 @@ public final class MCRURIResolver implements URIResolver {
 
     /**
      * Initializes the MCRURIResolver for servlet applications.
-     * 
+     *
      * @param ctx
      *            the servlet context of this web application
      * @param webAppBase
@@ -224,7 +224,7 @@ public final class MCRURIResolver implements URIResolver {
      * Compatibility method to convert a {@link MCRResolver} into a {@link URIResolver}. You may use this in a
      * transition phase for your convenience. It actually just wraps the {@link Element} returned by
      * {@link MCRResolver#resolveElement(String)} in a {@link JDOMSource}.
-     * 
+     *
      * @param mcrResolver
      *            a MCRResolver instance
      * @return a URIResolver adapter with mcrResolver as backend
@@ -257,7 +257,7 @@ public final class MCRURIResolver implements URIResolver {
 
     /**
      * URI Resolver that resolves XSL document() or xsl:include calls.
-     * 
+     *
      * @see javax.xml.transform.URIResolver
      */
     public Source resolve(String href, String base) throws TransformerException {
@@ -320,7 +320,7 @@ public final class MCRURIResolver implements URIResolver {
 
     /**
      * Reads XML from URIs of various type.
-     * 
+     *
      * @param uri
      *            the URI where to read the XML from
      * @return the root element of the XML document
@@ -343,7 +343,7 @@ public final class MCRURIResolver implements URIResolver {
 
     /**
      * Returns the protocol or scheme for the given URI.
-     * 
+     *
      * @param uri
      *            the URI to parse
      * @param base
@@ -374,7 +374,7 @@ public final class MCRURIResolver implements URIResolver {
 
     /**
      * Reads xml from an InputStream and returns the parsed root element.
-     * 
+     *
      * @param in
      *            the InputStream that contains the XML document
      * @return the root element of the parsed input stream
@@ -390,14 +390,14 @@ public final class MCRURIResolver implements URIResolver {
 
     /**
      * Resolver interface. use this to implement custom URI schemes.
-     * 
+     *
      * @author Thomas Scheffler (yagee)
      * @deprecated use {@link URIResolver} instead
      */
     public static interface MCRResolver {
         /**
          * resolves an Element for XSLT process
-         * 
+         *
          * @param URI
          *            String in URI Syntax
          * @throws Exception
@@ -409,14 +409,14 @@ public final class MCRURIResolver implements URIResolver {
      * provides a URI -- Resolver Mapping One can implement this interface to provide additional URI schemes this
      * MCRURIResolver should handle, too. To add your mapping you have to set the
      * <code>MCR.URIResolver.ExternalResolver.Class</code> property to the implementing class.
-     * 
+     *
      * @author Thomas Scheffler
      */
     public static interface MCRResolverProvider {
         /**
          * provides a Map of Resolver mappings. Key is the scheme, e.g. <code>http</code>, where value is an instance of
          * MCRResolver.
-         * 
+         *
          * @see MCRResolver
          * @return a Map of Resolver mappings
          * @deprecated since 2.1 use {@link #getURIResolverMapping()}
@@ -426,7 +426,7 @@ public final class MCRURIResolver implements URIResolver {
         /**
          * provides a Map of URIResolver mappings. Key is the scheme, e.g. <code>http</code>, where value is an
          * implementation of {@link URIResolver}.
-         * 
+         *
          * @see URIResolver
          * @return a Map of URIResolver mappings
          */
@@ -472,7 +472,7 @@ public final class MCRURIResolver implements URIResolver {
 
         /**
          * Reads local MCRObject with a given ID from the store.
-         * 
+         *
          * @param uri
          *            for example, "mcrobject:DocPortal_document_07910401"
          * @returns XML representation from MCRXMLContainer
@@ -502,7 +502,7 @@ public final class MCRURIResolver implements URIResolver {
 
         /**
          * Reads XML from a HTTP request to this web application.
-         * 
+         *
          * @param uri
          *            the URI in the format request:path/to/servlet
          * @return the root element of the xml document
@@ -514,7 +514,7 @@ public final class MCRURIResolver implements URIResolver {
             String path = uri.substring(uri.indexOf(":") + 1);
             LOGGER.debug("Reading xml from request " + path);
 
-            StringBuilder url = new StringBuilder(MCRServlet.getBaseURL());
+            StringBuilder url = new StringBuilder(MCRFrontendUtil.getBaseURL());
             url.append(path);
 
             final MCRSession currentSession = MCRSessionMgr.getCurrentSession();
@@ -717,7 +717,7 @@ public final class MCRURIResolver implements URIResolver {
         /**
          * Reads XML from URIs of type session:key. The method MCRSession.get( key ) is called and must return a JDOM
          * element.
-         * 
+         *
          * @see org.mycore.common.MCRSession#get(java.lang.String )
          * @param uri
          *            the URI in the format session:key
@@ -739,7 +739,7 @@ public final class MCRURIResolver implements URIResolver {
 
         /**
          * Reads XML from a http or https URL.
-         * 
+         *
          * @param uri
          *            the URL of the xml document
          * @return the root element of the xml document
@@ -784,7 +784,7 @@ public final class MCRURIResolver implements URIResolver {
                     String path = id.substring(id.indexOf("/"));
                     file = MCRPath.getPath(derivateID.toString(), path);
                 } catch (MCRException exc) {
-                    // just check if the id is valid, don't care about the exception 
+                    // just check if the id is valid, don't care about the exception
                 }
             }
             if (file == null) {
@@ -881,9 +881,9 @@ public final class MCRURIResolver implements URIResolver {
         /**
          * returns a classification in a specific format. Syntax:
          * <code>classification:{editor[Complete]['['formatAlias']']|metadata}:{Levels}[:noEmptyLeaves]:{parents|children}:{ClassID}[:CategID]
-         * 
+         *
          * formatAlias: MCRConfiguration property MCR.UURResolver.Classification.Format.FormatAlias
-         * 
+         *
          * @param uri
          *            URI in the syntax above
          * @return the root element of the XML document
@@ -1183,7 +1183,7 @@ public final class MCRURIResolver implements URIResolver {
      * class. can be freely choosen.
      * </p>
      * Example: MCR.URIResolver.xslIncludes.class.template=org.foo.XSLHrefs
-     * 
+     *
      * @return A xsl file with the includes as href.
      */
     private static class MCRXslIncludeResolver implements URIResolver {
@@ -1228,11 +1228,11 @@ public final class MCRURIResolver implements URIResolver {
      * Imports xsl files which are set in the mycore.properties file. Example:
      * MCR.URIResolver.xslImports.components=first.xsl,second.xsl Every file must import this URIResolver to form a
      * import chain:
-     * 
+     *
      * <pre>
      *  &lt;xsl:import href="xslImport:components:first.xsl"&gt;
      * </pre>
-     * 
+     *
      * @return A xsl file with the import as href.
      */
     private static class MCRXslImportResolver implements URIResolver {
@@ -1402,7 +1402,7 @@ public final class MCRURIResolver implements URIResolver {
         /**
          * Returns a deleted mcr object xml for the given id. If there is no such object a dummy object with an empty
          * metadata element is returned.
-         * 
+         *
          * @param href
          *            an uri starting with <code>deletedMcrObject:</code>
          * @param base

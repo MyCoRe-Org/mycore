@@ -1,6 +1,7 @@
 package org.mycore.frontend.editor;
 
 import org.jdom2.Element;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 
 public class MCREditorSession {
@@ -25,7 +26,7 @@ public class MCREditorSession {
 
     private void buildSourceURIandCancelURL() {
         MCRAttributeTokenSubstitutor pts = new MCRAttributeTokenSubstitutor(xml, parameters);
-        String defaultCancelURL = MCRServlet.getBaseURL();
+        String defaultCancelURL = MCRFrontendUtil.getBaseURL();
         String defaultSourceURI = "buildxml:_rootName_=emptySource";
         this.sourceURI = pts.substituteTokens("source", "uri", defaultSourceURI);
         this.cancelURL = pts.substituteTokens("cancel", "url", defaultCancelURL);

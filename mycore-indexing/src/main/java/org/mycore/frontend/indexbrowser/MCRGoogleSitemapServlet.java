@@ -31,6 +31,7 @@ import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -59,7 +60,7 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
      *            a MCRServletJob instance
      */
     public void doGetPost(MCRServletJob job) throws Exception {
-        MCRGoogleSitemapCommon common = new MCRGoogleSitemapCommon(getBaseURL());
+        MCRGoogleSitemapCommon common = new MCRGoogleSitemapCommon(MCRFrontendUtil.getBaseURL());
         int number = common.checkSitemapFile();
         LOGGER.debug("Build Google number of URL files " + Integer.toString(number) + ".");
         Document jdom = null;

@@ -61,6 +61,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.validator.MCREditorOutValidator;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.cli.MCRDerivateCommands;
 import org.mycore.frontend.cli.MCRObjectCommands;
@@ -115,7 +116,7 @@ public class MCRPersistentServlet extends MCRServlet {
     @Override
     protected void think(MCRServletJob job) throws Exception {
         //If admin mode, do not change any data
-        if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse(), getBaseURL()))
+        if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse(), MCRFrontendUtil.getBaseURL()))
             return;
         switch (operation) {
             case create:
@@ -376,7 +377,7 @@ public class MCRPersistentServlet extends MCRServlet {
                             redirectToCreateObject(job);
                         else
                             job.getResponse().sendRedirect(
-                                job.getResponse().encodeRedirectURL(getBaseURL() + "receive/" + returnID.toString()));
+                                job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString()));
                         return;
                     case derivate:
                         redirectToCreateDerivate(job);
@@ -392,7 +393,7 @@ public class MCRPersistentServlet extends MCRServlet {
                             throw new MCRException("No MCRObjectID given.");
                         } else
                             job.getResponse().sendRedirect(
-                                job.getResponse().encodeRedirectURL(getBaseURL() + "receive/" + returnID.toString()));
+                                job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString()));
                         break;
                     case derivate: {
                         returnID = (MCRObjectID) job.getRequest().getAttribute(OBJECT_ID_KEY);
@@ -402,7 +403,7 @@ public class MCRPersistentServlet extends MCRServlet {
                             return;
                         } else
                             job.getResponse().sendRedirect(
-                                job.getResponse().encodeRedirectURL(getBaseURL() + "receive/" + returnID.toString()));
+                                job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString()));
                         break;
                     }
                     default:
@@ -413,7 +414,7 @@ public class MCRPersistentServlet extends MCRServlet {
                 switch (type) {
                     case object:
                         job.getResponse().sendRedirect(
-                            job.getResponse().encodeRedirectURL(getBaseURL() + "editor_deleted.xml"));
+                            job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + "editor_deleted.xml"));
                         break;
                     case derivate:
                         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getReferer(job)));
@@ -490,7 +491,7 @@ public class MCRPersistentServlet extends MCRServlet {
             params.put(name, value);
         }
         job.getResponse().sendRedirect(
-            job.getResponse().encodeRedirectURL(buildRedirectURL(getBaseURL() + form, params)));
+            job.getResponse().encodeRedirectURL(buildRedirectURL(MCRFrontendUtil.getBaseURL() + form, params)));
     }
 
     /**
@@ -550,7 +551,7 @@ public class MCRPersistentServlet extends MCRServlet {
             params.put("sourceUri", sb.toString());
             params.put("cancelUrl", getCancelUrl(job));
             sb = new StringBuilder();
-            sb.append(getBaseURL()).append(pagedir).append("editor_form_derivate.xml");
+            sb.append(MCRFrontendUtil.getBaseURL()).append(pagedir).append("editor_form_derivate.xml");
             job.getResponse()
                 .sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));
         }
@@ -570,7 +571,7 @@ public class MCRPersistentServlet extends MCRServlet {
         String fuhid = fuh.getID();
         String page = pagedir + "fileupload_commit.xml";
 
-        String base = getBaseURL() + page;
+        String base = MCRFrontendUtil.getBaseURL() + page;
         Properties params = new Properties();
         params.put("XSL.UploadID", fuhid);
         params.put("cancelUrl", getCancelUrl(job));
@@ -645,7 +646,7 @@ public class MCRPersistentServlet extends MCRServlet {
     private String getReferer(MCRServletJob job) {
         String referer = job.getRequest().getHeader("Referer");
         if (referer == null || referer.equals("")) {
-            referer = getBaseURL();
+            referer = MCRFrontendUtil.getBaseURL();
         }
         LOGGER.debug("Referer: " + referer);
         return referer;

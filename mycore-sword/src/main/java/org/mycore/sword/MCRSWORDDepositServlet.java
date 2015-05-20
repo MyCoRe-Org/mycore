@@ -43,6 +43,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.purl.sword.atom.Generator;
@@ -264,7 +265,7 @@ public class MCRSWORDDepositServlet extends MCRServlet {
                 if (g == null) {
                     dr.getEntry().setGenerator(new Generator());
                 }
-                g.setUri(getBaseURL() + MCRConfiguration.instance().getString("MCR.SWORD.generator.uri", ""));
+                g.setUri(MCRFrontendUtil.getBaseURL() + MCRConfiguration.instance().getString("MCR.SWORD.generator.uri", ""));
                 g.setVersion(MCRConfiguration.instance().getString("MCR.SWORD.generator.version", ""));
 
                 // Echo back the user agent

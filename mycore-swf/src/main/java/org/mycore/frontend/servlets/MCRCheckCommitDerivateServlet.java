@@ -44,6 +44,7 @@ import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.editor.MCREditorSubmission;
 
 /**
@@ -109,7 +110,7 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
 
             // check access
             if (!checkAccess(objID)) {
-                job.getResponse().sendRedirect(getBaseURL() + usererrorpage);
+                job.getResponse().sendRedirect(MCRFrontendUtil.getBaseURL() + usererrorpage);
                 return;
             }
 
@@ -144,7 +145,7 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
             e.printStackTrace();
         }
         // return
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + url));
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + url));
     }
 
     /**

@@ -36,6 +36,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -269,7 +270,7 @@ public class MCRParameterCollector {
     private void setUnmodifyableParameters(MCRSession session, HttpServletRequest request) {
         parameters.put("CurrentUser", session.getUserInformation().getUserID());
         parameters.put("CurrentLang", session.getCurrentLanguage());
-        parameters.put("WebApplicationBaseURL", MCRServlet.getBaseURL());
+        parameters.put("WebApplicationBaseURL", MCRFrontendUtil.getBaseURL());
         parameters.put("ServletsBaseURL", MCRServlet.getServletBaseURL());
         String defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang",
             MCRConstants.DEFAULT_LANG);
@@ -317,7 +318,7 @@ public class MCRParameterCollector {
 
     private StringBuilder getBaseURLUpToHostName() {
         int schemeLength = "https://".length();
-        String baseURL = MCRServlet.getBaseURL();
+        String baseURL = MCRFrontendUtil.getBaseURL();
         StringBuilder buffer = new StringBuilder(baseURL);
         if (baseURL.length() < schemeLength) {
             return buffer;

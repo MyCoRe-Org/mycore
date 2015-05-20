@@ -55,6 +55,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.editor.postprocessor.MCREditorPostProcessor;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -333,7 +334,7 @@ public class MCREditorServlet extends MCRServlet {
             LOGGER.debug("Editor start subselect " + id + " at position " + var);
 
             Element subselect = MCREditorDefReader.findElementByID(id, editor);
-            StringBuilder sb = new StringBuilder(getBaseURL());
+            StringBuilder sb = new StringBuilder(MCRFrontendUtil.getBaseURL());
 
             String webpage = URLEncoder.encode(parms.getParameter("_webpage"), "UTF-8");
             if ("editor".equals(subselect.getAttributeValue("type"))) {
@@ -342,7 +343,7 @@ public class MCREditorServlet extends MCRServlet {
                 sb.append("&subselect.varpath=").append(var);
                 sb.append("&subselect.webpage=").append(webpage);
 
-                String wp = getBaseURL() + parms.getParameter("_webpage");
+                String wp = MCRFrontendUtil.getBaseURL() + parms.getParameter("_webpage");
                 if (!wp.contains("XSL.editor.session.id")) {
                     wp += "XSL.editor.session.id=" + sessionID;
                 }
@@ -404,7 +405,7 @@ public class MCREditorServlet extends MCRServlet {
             editor.addContent(sub.buildRepeatElements());
 
             // Redirect to webpage to reload editor form
-            StringBuilder sb = new StringBuilder(getBaseURL());
+            StringBuilder sb = new StringBuilder(MCRFrontendUtil.getBaseURL());
             String wp = parms.getParameter("_webpage");
             sb.append(wp);
             if (!wp.contains("XSL.editor.session.id=")) {
@@ -443,7 +444,7 @@ public class MCREditorServlet extends MCRServlet {
             String sessionID = parms.getParameter("_session");
 
             // Redirect to webpage to reload editor form
-            StringBuilder sb = new StringBuilder(getBaseURL());
+            StringBuilder sb = new StringBuilder(MCRFrontendUtil.getBaseURL());
             String wp = parms.getParameter("_webpage");
             sb.append(wp);
             if (!wp.contains("XSL.editor.session.id=")) {
@@ -595,7 +596,7 @@ public class MCREditorServlet extends MCRServlet {
         editor.addContent(subnew.buildRepeatElements());
 
         // Redirect to webpage to reload editor form
-        StringBuilder sb = new StringBuilder(getBaseURL());
+        StringBuilder sb = new StringBuilder(MCRFrontendUtil.getBaseURL());
         sb.append(webpage);
         if (!webpage.contains("XSL.editor.session.id=")) {
             sb.append("XSL.editor.session.id=");

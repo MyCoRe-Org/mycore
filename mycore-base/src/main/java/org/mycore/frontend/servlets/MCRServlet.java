@@ -114,16 +114,6 @@ public class MCRServlet extends HttpServlet {
     }
 
     /**
-     * Returns the base URL of the mycore system
-     * 
-     * @deprecated use {@link MCRFrontendUtil#getBaseURL()}
-     **/
-    @Deprecated
-    public static String getBaseURL() {
-        return MCRFrontendUtil.getBaseURL();
-    }
-
-    /**
      * Returns the servlet base URL of the mycore system
      **/
     public static String getServletBaseURL() {
@@ -718,7 +708,7 @@ public class MCRServlet extends HttpServlet {
             response.sendRedirect(response.encodeRedirectURL(referrer.toString()));
         } else {
             LOGGER.warn("Could not get referrer, returning to the application's base url");
-            response.sendRedirect(response.encodeRedirectURL(MCRServlet.getBaseURL()));
+            response.sendRedirect(response.encodeRedirectURL(MCRFrontendUtil.getBaseURL()));
         }
     }
 

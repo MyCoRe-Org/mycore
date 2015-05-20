@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.purl.sword.base.HttpHeaders;
@@ -116,7 +117,7 @@ public class MCRSWORDServiceDocumentServlet extends MCRServlet {
 
         // Set the deposit location
         String postUriAddition = MCRConfiguration.instance().getString("MCR.SWORD.post.uri", "SwordDeposit");
-        sdr.setLocation(getBaseURL() + postUriAddition);
+        sdr.setLocation(MCRFrontendUtil.getBaseURL() + postUriAddition);
 
         // Get the ServiceDocument from "SWORDServer" instance
         try {

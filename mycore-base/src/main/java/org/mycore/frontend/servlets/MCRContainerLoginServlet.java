@@ -32,6 +32,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.frontend.MCRFrontendUtil;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -62,7 +63,7 @@ public class MCRContainerLoginServlet extends MCRServlet {
 
         if (backto_url == null) {
             String referer = job.getRequest().getHeader("Referer");
-            backto_url = (referer != null) ? referer : MCRServlet.getBaseURL();
+            backto_url = (referer != null) ? referer : MCRFrontendUtil.getBaseURL();
         }
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(backto_url));
     }

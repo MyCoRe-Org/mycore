@@ -33,6 +33,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -84,7 +85,7 @@ public class MCRAclEditorResource {
             mainDiv.setAttribute("lang", lang);
             String bsPath = CONFIG.getString("MCR.bootstrap.path", "");
             if (!bsPath.equals("")) {
-                bsPath = MCRServlet.getBaseURL() + bsPath;
+                bsPath = MCRFrontendUtil.getBaseURL() + bsPath;
                 Element item = new Element("link").setAttribute("href", bsPath).setAttribute("rel", "stylesheet")
                     .setAttribute("type", "text/css");
                 mainDiv.addContent(0, item);
