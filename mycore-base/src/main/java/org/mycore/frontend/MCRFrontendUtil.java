@@ -28,11 +28,15 @@ public class MCRFrontendUtil {
 
     public static final String BASE_URL_ATTRIBUTE = "org.mycore.base.url";
 
-    public static String BASE_URL;
+    private static String BASE_URL;
 
-    public static String BASE_HOST_IP;
+    private static String BASE_HOST_IP;
 
     private static Logger LOGGER = Logger.getLogger(MCRFrontendUtil.class);
+
+    static {
+        prepareBaseURLs(""); // getBaseURL() etc. may be called before any HTTP Request    
+    }
 
     /** The IP addresses of trusted web proxies */
     protected static final Set<String> TRUSTED_PROXIES = getTrustedProxies();
@@ -48,10 +52,12 @@ public class MCRFrontendUtil {
         return BASE_URL;
     }
 
+    public static String getHostIP() {
+        return BASE_HOST_IP;
+    }
+
     /**
-     * returns the base URL of the mycore system.
-     * 
-     * This method uses the request to 'calculate' the right baseURL.
+     * returns the base URL of the mycore system. This method uses the request to 'calculate' the right baseURL.
      * Generally it is sufficent to use {@link #getBaseURL()} instead.
      */
     public static String getBaseURL(ServletRequest req) {
@@ -123,13 +129,10 @@ public class MCRFrontendUtil {
     }
 
     /**
-     * Returns the IP address of the client that made the request. When a
-     * trusted proxy server was used, e. g. a local Apache mod_proxy in front of
-     * Tomcat, the value of the last entry in the HTTP header X_FORWARDED_FOR is
-     * returned, otherwise the REMOTE_ADDR is returned. The list of trusted
-     * proxy IPs can be configured using the property
-     * MCR.Request.TrustedProxies, which is a List of IP addresses separated by
-     * blanks and/or comma.
+     * Returns the IP address of the client that made the request. When a trusted proxy server was used, e. g. a local
+     * Apache mod_proxy in front of Tomcat, the value of the last entry in the HTTP header X_FORWARDED_FOR is returned,
+     * otherwise the REMOTE_ADDR is returned. The list of trusted proxy IPs can be configured using the property
+     * MCR.Request.TrustedProxies, which is a List of IP addresses separated by blanks and/or comma.
      */
     public static String getRemoteAddr(HttpServletRequest req) {
         String remoteAddress = req.getRemoteAddr();
@@ -142,8 +145,7 @@ public class MCRFrontendUtil {
     }
 
     /**
-     * Get header to check if request comes in via a proxy.
-     * There are two possible header names
+     * Get header to check if request comes in via a proxy. There are two possible header names
      */
     private static String getXForwardedFor(HttpServletRequest req) {
         String xff = req.getHeader("X-Forwarded-For");
@@ -210,9 +212,10 @@ public class MCRFrontendUtil {
     }
 
     /**
-     * Builds a list of trusted proxy IPs from MCR.Request.TrustedProxies. The
-     * IP address of the local host is automatically added to this list.
-     * @return 
+     * Builds a list of trusted proxy IPs from MCR.Request.TrustedProxies. The IP address of the local host is
+     * automatically added to this list.
+     * 
+     * @return
      */
     private static TreeSet<String> getTrustedProxies() {
         boolean closeSession = !MCRSessionMgr.hasCurrentSession();

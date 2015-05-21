@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.frontend.MCRFrontendUtil;
 
 /**
  * This class simply is a container for objects needed during a Servlet session
@@ -74,7 +75,7 @@ public class MCRServletJob {
         try {
             String serverName = theRequest.getServerName();
             String serverIP = InetAddress.getByName(serverName).getHostAddress();
-            String remoteIP = MCRServlet.getRemoteAddr(theRequest);
+            String remoteIP = MCRFrontendUtil.getRemoteAddr(theRequest);
 
             return remoteIP.equals(serverIP) || remoteIP.equals("127.0.0.1");
         } catch (Exception ex) {

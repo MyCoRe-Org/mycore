@@ -23,8 +23,6 @@
 
 package org.mycore.frontend.servlets;
 
-import static org.mycore.frontend.MCRFrontendUtil.BASE_HOST_IP;
-import static org.mycore.frontend.MCRFrontendUtil.BASE_URL;
 import static org.mycore.frontend.MCRFrontendUtil.BASE_URL_ATTRIBUTE;
 
 import java.io.IOException;
@@ -97,10 +95,6 @@ public class MCRServlet extends HttpServlet {
 
     private static String ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
 
-    static {
-        prepareBaseURLs(""); // getBaseURL() etc. may be called before any HTTP Request    
-    }
-
     public static MCRLayoutService getLayoutService() {
         return LAYOUT_SERVICE;
     }
@@ -123,7 +117,7 @@ public class MCRServlet extends HttpServlet {
             LOGGER.debug("Returning BaseURL " + value.toString() + "servlets/ from user session.");
             return value.toString() + "servlets/";
         }
-        return SERVLET_URL;
+        return SERVLET_URL != null ? SERVLET_URL : MCRFrontendUtil.getBaseURL() + "servlets/";
     }
 
     /**
@@ -141,7 +135,7 @@ public class MCRServlet extends HttpServlet {
 
     private static void prepareBaseURLs(String baseURLofRequest) {
         MCRFrontendUtil.prepareBaseURLs(baseURLofRequest);
-        SERVLET_URL = BASE_URL + "servlets/";
+        SERVLET_URL = MCRFrontendUtil.getBaseURL() + "servlets/";
     }
 
     // The methods doGet() and doPost() simply call the private method
@@ -205,8 +199,8 @@ public class MCRServlet extends HttpServlet {
             String lastIP = session.getCurrentIP();
             if (lastIP.length() != 0) {
                 //check if request IP equals last known IP
-                String newip = getRemoteAddr(req);
-                if (!lastIP.equals(newip) && !newip.equals(BASE_HOST_IP)) {
+                String newip = MCRFrontendUtil.getRemoteAddr(req);
+                if (!lastIP.equals(newip) && !newip.equals(MCRFrontendUtil.getHostIP())) {
                     LOGGER.warn("Session steal attempt from IP " + newip + ", previous IP was " + lastIP
                         + ". Session: " + session.toString());
                     MCRSessionMgr.releaseCurrentSession();
@@ -280,7 +274,7 @@ public class MCRServlet extends HttpServlet {
             setup.startUp(getServletContext());
         }
 
-        if (BASE_URL == null) {
+        if (SERVLET_URL == null) {
             prepareBaseURLs(getServletContext(), req);
         }
 
@@ -597,19 +591,6 @@ public class MCRServlet extends HttpServlet {
      */
     public static String getProperty(HttpServletRequest request, String name) {
         return MCRFrontendUtil.getProperty(request, name);
-    }
-
-    /**
-     * Returns the IP address of the client that made the request. When a trusted proxy server was used, e. g. a local
-     * Apache mod_proxy in front of Tomcat, the value of the last entry in the HTTP header X_FORWARDED_FOR is returned,
-     * otherwise the REMOTE_ADDR is returned. The list of trusted proxy IPs can be configured using the property
-     * MCR.Request.TrustedProxies, which is a List of IP addresses separated by blanks and/or comma.
-     * 
-     * @deprecated use {@link MCRFrontendUtil#getRemoteAddr(HttpServletRequest)}
-     */
-    @Deprecated
-    public static String getRemoteAddr(HttpServletRequest req) {
-        return MCRFrontendUtil.getRemoteAddr(req);
     }
 
     /**
