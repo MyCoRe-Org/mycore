@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttributeView;
 import java.nio.file.attribute.FileStoreAttributeView;
@@ -44,6 +45,11 @@ public class MCRFileStore extends MCRAbstractFileStore {
                 + " ) has no base dir");
         }
         this.baseFileStore = getFileStore(baseDir);
+        if (baseFileStore == null) {
+            String reason = "Cannot access base directory or any parent directory of Content Store "
+                + contentStore.getID();
+            throw new NoSuchFileException(baseDir.toString(), null, reason);
+        }
     }
 
     private static FileStore getFileStore(File baseDir) throws IOException {
