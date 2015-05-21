@@ -46,7 +46,7 @@ public class MCRFileStore extends MCRAbstractFileStore {
         this.baseFileStore = getFileStore(baseDir);
     }
 
-    private FileStore getFileStore(File baseDir) throws IOException {
+    private static FileStore getFileStore(File baseDir) throws IOException {
         if (baseDir == null) {
             return null;
         }
