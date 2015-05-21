@@ -104,15 +104,13 @@ public class MCRStartupHandler {
             try {
                 autoExecutable.startUp(servletContext);
             } catch (ExceptionInInitializerError e) {
-                boolean haltOnError = servletContext.getAttribute(HALT_ON_ERROR) == null ? true : Boolean
+                boolean haltOnError = servletContext.getAttribute(HALT_ON_ERROR) == null || Boolean
                         .parseBoolean((String) servletContext.getAttribute(HALT_ON_ERROR));
 
                 if (haltOnError) {
                     throw e;
-                } else {
-                    LOGGER.warn(e.toString());
-                    continue;
                 }
+                LOGGER.warn(e.toString());
             }
         }
     }
