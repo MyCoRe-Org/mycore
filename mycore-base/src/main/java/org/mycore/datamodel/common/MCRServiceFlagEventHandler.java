@@ -28,57 +28,70 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectService;
 
 /**
- * This event handler sets the service flags "createdby" and "modifiedby"
- * for users who created / modified a MyCoReObject and also added a state
- * service flag using classification defined in "MCR.Metadata.Service.State.Classification.ID"
- * (default "state") and category defined in "MCR.Metadata.Service.State.Category.Default" (default "submitted").
+ * This event handler sets the service flags "createdby" and "modifiedby" for users who created / modified a
+ * MyCoReObject and also added a state service flag using classification defined in
+ * "MCR.Metadata.Service.State.Classification.ID" (default "state") and category defined in
+ * "MCR.Metadata.Service.State.Category.Default" (default "submitted").
  *
  * @author Robert Stephan
+ * @author Thomas Scheffler (yagee)
  */
 public class MCRServiceFlagEventHandler extends MCREventHandlerBase {
 
     @Override
     protected final void handleObjectCreated(MCREvent evt, MCRObject obj) {
         if (!obj.isImportMode()) {
-            MCRObjectService objService = obj.getService();
-            objService.removeFlags(MCRObjectService.FLAG_TYPE_CREATEDBY);
-            objService.addFlag(MCRObjectService.FLAG_TYPE_CREATEDBY, MCRSessionMgr.getCurrentSession()
-                .getUserInformation().getUserID());
-            objService.removeFlags(MCRObjectService.FLAG_TYPE_MODIFIEDBY);
-            objService.addFlag(MCRObjectService.FLAG_TYPE_MODIFIEDBY, MCRSessionMgr.getCurrentSession()
-                .getUserInformation().getUserID());
-            if (objService.getState() == null) {
-                objService.setState(new MCRCategoryID(
-                    MCRConfiguration.instance().getString("MCR.Metadata.Service.State.Classification.ID"),
-                    MCRConfiguration.instance().getString("MCR.Metadata.Service.State.Category.Default")));
-            }
+            handleCreated(obj.getService());
+            setDefaultState(obj.getService());
         }
     }
 
     @Override
     protected final void handleObjectUpdated(MCREvent evt, MCRObject obj) {
         if (!obj.isImportMode()) {
-            obj.getService().removeFlags(MCRObjectService.FLAG_TYPE_MODIFIEDBY);
-            obj.getService().addFlag(MCRObjectService.FLAG_TYPE_MODIFIEDBY,
-                MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
+            handleUpdated(obj.getService());
         }
     }
 
     @Override
-    protected final void handleObjectDeleted(MCREvent evt, MCRObject obj) {
-        //nothing todo
+    protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
+        if (!der.isImportMode()) {
+            handleCreated(der.getService());
+        }
     }
 
     @Override
-    protected final void handleObjectRepaired(MCREvent evt, MCRObject obj) {
-        if (obj.isImportMode()) {
-            obj.getService().removeFlags(MCRObjectService.FLAG_TYPE_MODIFIEDBY);
-            obj.getService().addFlag(MCRObjectService.FLAG_TYPE_MODIFIEDBY,
-                MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
+    protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
+        if (!der.isImportMode()) {
+            handleUpdated(der.getService());
         }
     }
+
+    private static void handleCreated(MCRObjectService objService) {
+        objService.removeFlags(MCRObjectService.FLAG_TYPE_CREATEDBY);
+        objService.addFlag(MCRObjectService.FLAG_TYPE_CREATEDBY, MCRSessionMgr.getCurrentSession()
+            .getUserInformation().getUserID());
+        handleUpdated(objService);
+    }
+
+    private static void setDefaultState(MCRObjectService objService) {
+        if (objService.getState() == null) {
+            MCRCategoryID defaultState = new MCRCategoryID(
+                MCRConfiguration.instance().getString("MCR.Metadata.Service.State.Classification.ID"),
+                MCRConfiguration.instance().getString("MCR.Metadata.Service.State.Category.Default"));
+            objService.setState(defaultState);
+        }
+    }
+
+    private static void handleUpdated(MCRObjectService objectService) {
+        objectService.removeFlags(MCRObjectService.FLAG_TYPE_MODIFIEDBY);
+        objectService.addFlag(MCRObjectService.FLAG_TYPE_MODIFIEDBY,
+            MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
+    }
+
 }
