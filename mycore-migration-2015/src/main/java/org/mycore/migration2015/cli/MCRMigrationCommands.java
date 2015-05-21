@@ -15,6 +15,8 @@ import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
+import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -48,7 +50,7 @@ public class MCRMigrationCommands {
         help = "Create missing servflags for createdby and modifiedby for object {0}. (MCR-786)", order = 10)
     public static void addServFlags(String id) throws IOException, MCRPersistenceException, MCRActiveLinkException {
         MCRObjectID objectID = MCRObjectID.getInstance(id);
-        MCRObject obj = MCRMetadataManager.retrieveMCRObject(objectID);
+        MCRBase obj = MCRMetadataManager.retrieve(objectID);
         MCRObjectService service = obj.getService();
         if (!service.isFlagTypeSet(MCRObjectService.FLAG_TYPE_CREATEDBY)) { //the egg
             MCRVersionedMetadata versionedMetadata = MCRXMLMetadataManager.instance().getVersionedMetaData(objectID);
@@ -78,7 +80,11 @@ public class MCRMigrationCommands {
                 service.addFlag(MCRObjectService.FLAG_TYPE_CREATEDBY, modifyUser);
             }
             obj.setImportMode(true);
-            MCRMetadataManager.update(obj);
+            if (obj instanceof MCRDerivate) {
+                MCRMetadataManager.updateMCRDerivateXML((MCRDerivate) obj);
+            } else {
+                MCRMetadataManager.update((MCRObject) obj);
+            }
         }
     }
 }
