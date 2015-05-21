@@ -123,11 +123,6 @@ public class MCRSolrIndexer {
                 String msg = MessageFormat.format("\nFinal statistics:\n{0}\n{1}\n{2}\n{3}", documentStats,
                     metadataStats, fileStats, operationsStats);
                 LOGGER.info(msg);
-                try {
-                    MCRSolrClientFactory.getSolrClient().commit(false, false); //do not wait to complete (MCR-948)
-                } catch (SolrServerException | IOException e) {
-                    LOGGER.warn("Error while closing MCRSolrIndexer executor service.", e);
-                }
             }
         });
     }
@@ -191,7 +186,8 @@ public class MCRSolrIndexer {
 
     /**
      * Rebuilds solr's metadata index.
-     * @param parallel 
+     * 
+     * @param parallel
      */
     public static void rebuildMetadataIndex(SolrClient cuss, boolean parallel) {
         rebuildMetadataIndex(MCRXMLMetadataManager.instance().listIDs(), cuss, parallel);
@@ -410,8 +406,8 @@ public class MCRSolrIndexer {
     /**
      * Synchronizes the solr server with the database. As a result the solr server contains the same documents as the
      * database. All solr zombie documents will be removed, and all not indexed mycore objects will be indexed.
-     * @param parallel 
      * 
+     * @param parallel
      * @throws IOException
      * @throws SolrServerException
      */
@@ -426,12 +422,13 @@ public class MCRSolrIndexer {
      * Synchronizes the solr server with the mycore store for a given object type. As a result the solr server contains
      * the same documents as the store. All solr zombie documents will be removed, and all not indexed mycore objects
      * will be indexed.
-     * @param parallel 
      * 
+     * @param parallel
      * @throws IOException
      * @throws SolrServerException
      */
-    public static void synchronizeMetadataIndex(String objectType, boolean parallel) throws IOException, SolrServerException {
+    public static void synchronizeMetadataIndex(String objectType, boolean parallel) throws IOException,
+        SolrServerException {
         LOGGER.info("synchronize " + objectType);
         // get ids from store
         LOGGER.info("fetching mycore store...");
