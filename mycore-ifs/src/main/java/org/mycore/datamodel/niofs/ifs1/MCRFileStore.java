@@ -43,7 +43,15 @@ public class MCRFileStore extends MCRAbstractFileStore {
             throw new IOException("Content Store " + contentStore.getID() + "(" + contentStore.getClass()
                 + " ) has no base dir");
         }
-        this.baseFileStore = Files.getFileStore(baseDir.toPath());
+        this.baseFileStore = getFileStore(baseDir);
+    }
+
+    private FileStore getFileStore(File baseDir) throws IOException {
+        if (baseDir == null) {
+            return null;
+        }
+        //fixes MCR-964
+        return baseDir.exists() ? Files.getFileStore(baseDir.toPath()) : getFileStore(baseDir.getParentFile());
     }
 
     public static MCRFileStore getInstance(String contentStoreId) throws IOException {
