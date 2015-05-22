@@ -75,7 +75,7 @@
   <xed:template id="buttons">
     <mcruser:template name="submitButton" i18n="component.user2.button.save" target="servlet" href="MCRUserServlet" />
     <mcruser:template name="cancelButton" i18n="component.user2.button.cancel" />
-  </xed:template>  
+  </xed:template>
 
   <!-- editor elements -->
 
@@ -138,7 +138,7 @@
       <div class="col-md-9">
         <xed:repeat xpath="owner" min="1" max="1">
           <div class="row">
-            <div class="col-sm-10">
+            <div class="col-sm-8">
               <mcruser:template name="submitButton" id="ownerSelect" i18n="component.user2.button.select" target="subselect"
                 href="MCRUserServlet?XSL.Style=subselect" />
               <xed:output value="@name" />
@@ -156,7 +156,7 @@
               </xed:choose>
               <xed:output value="']'" />
             </div>
-            <div class="col-sm-2">
+            <div class="col-sm-4">
               <xed:controls>remove</xed:controls>
             </div>
           </div>
@@ -166,15 +166,15 @@
   </xed:template>
 
   <xed:template id="roles">
-    <div class="form-group">
-      <label class="col-md-3 control-label" for="roleSelect">
-        <xed:output i18n="component.user2.admin.roles" />
-      </label>
-      <div class="col-md-9">
-        <xed:bind xpath="roles">
-          <xed:repeat xpath="role" min="0" max="20">
+    <xed:bind xpath="roles">
+      <xed:repeat xpath="role" min="0" max="20">
+        <div class="form-group">
+          <label class="col-md-3 control-label" for="roleSelect">
+            <xed:output i18n="component.user2.admin.roles" />
+          </label>
+          <div class="col-md-9">
             <div class="row">
-              <div class="col-sm-10">
+              <div class="col-sm-8">
                 <mcruser:template name="submitButton" id="roleSelect" i18n="component.user2.button.select" target="subselect" href="MCRRoleServlet" />
                 <xed:output value="@name" />
                 <xed:output value="' ['" />
@@ -191,13 +191,13 @@
                 </xed:choose>
                 <xed:output value="']'" />
               </div>
-              <div class="col-sm-2">
-                <xed:controls>append remove up down</xed:controls>
+              <div class="col-sm-4">
+                <xed:controls>insert remove up down</xed:controls>
               </div>
             </div>
-          </xed:repeat>
-        </xed:bind>
-      </div>
-    </div>
+          </div>
+        </div>
+       </xed:repeat>
+     </xed:bind>
   </xed:template>
 </xed:template>
