@@ -1,0 +1,732 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- <!DOCTYPE FileContentTypes SYSTEM "FileContentTypes.dtd"> -->
+
+<FileContentTypes default="unknown">
+
+<!--==== Default type =========================================-->
+
+  <type ID="unknown">
+    <label>Unbekannter Dateityp</label>
+    <mime>www/unknown</mime>
+  </type>
+  
+<!--==== Word Processors and Text types =======================-->
+
+  <type ID="html">
+    <label>HTML Dokument</label>
+    <mime>text/html</mime>
+    <rules>
+      <extension score="0.8">html</extension>
+      <extension score="0.7">htm</extension>
+    </rules>
+  </type>  
+  
+  <type ID="css">
+    <label>Cascading Stylesheet</label>
+    <mime>text/css</mime>
+    <rules>
+      <extension score="0.9">css</extension>
+    </rules>
+  </type>  
+
+  <type ID="docx">
+    <label>Microsoft Word 2007</label>
+    <url>http://www.microsoft.com/downloads/details.aspx?FamilyID=941b3470-3ae9-4aee-8f43-c6bb74cd1466&amp;displaylang=de</url>
+    <mime>application/vnd.openxmlformats-officedocument.wordprocessingml.document</mime>
+    <rules>
+      <extension score="1.0">docx</extension>
+    </rules>
+  </type>  
+
+  <type ID="msword97">
+    <label>Microsoft Word 97</label>
+    <url>http://miless.uni-essen.de/plugins/word.html</url>
+    <mime>application/ms-word</mime>
+    <rules>
+      <extension score="0.7">doc</extension>
+    </rules>
+  </type>  
+  
+  <type ID="msword95">
+    <label>Microsoft Word 6.0</label>
+    <url>http://miless.uni-essen.de/plugins/word.html</url>
+    <mime>application/ms-word</mime>
+    <rules>
+      <extension score="0.7">doc</extension>
+      <pattern score="0.9" offset="2080" format="text">Microsoft Word 6.0</pattern>
+    </rules>
+  </type>  
+
+  <type ID="ps">
+    <label>PostScript</label>
+    <url>http://www.cs.wisc.edu/~ghost/</url>
+    <mime>application/postscript</mime>
+    <rules>
+      <extension score="0.9">ps</extension>
+      <pattern score="1.0" offset="0" format="text">#!PS</pattern>
+    </rules>
+  </type>  
+  
+  <type ID="eps">
+    <label>Encapsulated PostScript</label>
+    <url>http://www.cs.wisc.edu/~ghost/</url>
+    <mime>application/postscript</mime>
+    <rules>
+      <extension score="0.9">eps</extension>
+      <pattern score="0.7" offset="0" format="text">#!PS</pattern>
+    </rules>
+  </type>  
+  
+  <type ID="pdf">
+    <label>PDF</label>
+    <url>http://www.adobe.de/products/acrobat/readstep2.html</url>
+    <mime>application/pdf</mime>
+    <rules>
+      <extension score="0.9">pdf</extension>
+      <pattern score="1.0" offset="0" format="text">%PDF-</pattern>
+    </rules>
+  </type>  
+  
+  <type ID="sxw">
+    <label>OpenOffice.org text document</label>
+    <mime>application/vnd.sun.xml.writer</mime>
+    <rules>
+      <extension score="1.0">sxw</extension>
+      <pattern score="0.6" offset="0" format="text">PK</pattern>
+    </rules>
+  </type>
+
+  <type ID="odt">
+    <label>OpenDocument Text document</label>
+    <mime>application/vnd.oasis.opendocument.text</mime>
+    <rules>
+      <extension score="1.0">odt</extension>
+      <pattern score="0.6" offset="0" format="text">PK</pattern>
+    </rules>
+  </type>
+
+  <type ID="rtf">
+    <label>Microsoft Rich Text Format</label>
+    <mime>text/rtf</mime>
+    <rules>
+      <extension score="0.9">rtf</extension>
+    </rules>
+  </type>  
+  
+  <type ID="wp">
+    <label>WordPerfect</label>
+    <rules>
+      <extension score="0.8">wp</extension>
+      <extension score="0.8">wpd</extension>
+      <extension score="0.8">wp6</extension>
+      <pattern score="0.9" offset="0" format="bytes">-1 87 80 67</pattern>
+    </rules>
+  </type>  
+  
+  <type ID="amipro">
+    <label>Ami Pro Text</label>
+    <rules>
+      <extension score="0.8">sam</extension>
+      <pattern score="0.8" offset="0" format="text">[ver]</pattern>
+    </rules>
+  </type>  
+  
+  <type ID="framemkr">
+    <label>FrameMaker Datei</label>
+    <mime>application/x-framemaker</mime>
+    <rules>
+      <extension score="0.5">book</extension>
+      <extension score="0.7">fm</extension>
+      <extension score="0.5">doc</extension>
+      <pattern score="1.0" offset="0" format="text">&lt;BookFile</pattern>
+      <pattern score="1.0" offset="0" format="text">&lt;MakerFile</pattern>
+    </rules>
+  </type>  
+  
+  <type ID="txt">
+    <label>ASCII Text</label>
+    <mime>text/plain</mime>
+    <rules>
+      <extension score="0.9">txt</extension>
+      <extension score="0.7">log</extension>
+    </rules>
+  </type>  
+  
+  <type ID="latex">
+    <label>LaTeX Quelltext</label>
+    <mime>application/x-latex</mime>
+    <rules>
+      <extension score="0.7">ltx</extension>
+      <extension score="0.7">tex</extension>
+    </rules>
+  </type>  
+  
+  <type ID="tex">
+    <label>TeX Quelltext</label>
+    <mime>application/x-tex</mime>
+    <rules>
+      <extension score="0.8">tex</extension>
+    </rules>
+  </type>  
+  
+  <type ID="dvi">
+    <label>TeX DVI-Druckdatei</label>
+    <mime>application/x-dvi</mime>
+    <rules>
+      <extension score="0.9">dvi</extension>
+      <pattern score="0.1" offset="0" format="bytes">-9</pattern>
+    </rules>
+  </type>  
+  
+  <type ID="texsty">
+    <label>TeX Style Datei</label>
+    <rules>
+      <extension score="0.7">sty</extension>
+    </rules>
+  </type>  
+  
+  <type ID="texhlp">
+    <label>TeX Hilfsdatei</label>
+    <rules>
+      <extension score="0.5">toc</extension>
+      <extension score="0.6">aux</extension>
+      <extension score="0.7">bbl</extension>
+    </rules>
+  </type>  
+  
+<!--==== Application types =========================================-->
+ 
+  <type ID="xlsx">
+    <label>Microsoft Excel 2007</label>
+    <url>http://www.microsoft.com/downloads/details.aspx?FamilyID=941b3470-3ae9-4aee-8f43-c6bb74cd1466&amp;displaylang=de</url>
+    <mime>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</mime>
+    <rules>
+      <extension score="1.0">xlsx</extension>
+    </rules>
+  </type>  
+
+  <type ID="msexcel">
+    <label>Microsoft Excel</label>
+    <url>http://miless.uni-essen.de/plugins/excel.html</url>
+    <mime>application/vnd.ms-excel</mime>
+    <rules>
+      <extension score="0.8">xls</extension>
+    </rules>
+  </type>  
+  
+  <type ID="pptx">
+    <label>Microsoft PowerPoint 2007</label>
+    <url>http://www.microsoft.com/downloads/details.aspx?FamilyID=941b3470-3ae9-4aee-8f43-c6bb74cd1466&amp;displaylang=de</url>
+    <mime>application/vnd.openxmlformats-officedocument.presentationml.presentation</mime>
+    <rules>
+      <extension score="1.0">pptx</extension>
+      <extension score="1.0">ppsx</extension>
+    </rules>
+  </type>  
+
+  <type ID="msppt">
+    <label>PowerPoint</label>
+    <url>http://www.microsoft.com/downloads/details.aspx?FamilyID=428d5727-43ab-4f24-90b7-a94784af71a4&amp;displaylang=de</url>
+    <mime>application/powerpoint</mime>
+    <rules>
+      <extension score="0.8">ppt</extension>
+      <extension score="0.7">pps</extension>
+    </rules>
+  </type>  
+
+  <type ID="xdoc">
+    <label>XDOC OCR</label>
+    <rules>
+      <extension score="0.8">xdc</extension>
+    </rules>
+  </type>  
+  
+  <type ID="djvu">
+    <label>LizardTech DjVu</label>
+    <url>http://www.lizardtech.com/cgi-bin/products/products.pl</url>
+    <rules>
+      <extension score="1.0">djvu</extension>
+    </rules>
+  </type>  
+  
+  <type ID="zip">
+    <label>ZIP Archiv</label>
+    <rules>
+      <extension score="1.0">zip</extension>
+    </rules>
+  </type>  
+  
+<!--==== Programming types =========================================-->
+    
+  <type ID="vrml1">
+    <label>VRML 1.0</label>
+    <mime>x-world/x-vrml</mime>
+    <rules>
+      <extension score="0.6">wrl</extension>
+      <pattern score="0.9" offset="0" format="text">#VRML 1.0</pattern>
+    </rules>
+  </type>  
+  
+  <type ID="vrml2">
+    <label>VRML 2.0</label>
+    <mime>model/vrml</mime>
+    <rules>
+      <extension score="0.7">wrl</extension>
+      <pattern score="0.9" offset="0" format="text">#VRML 2.0</pattern>
+    </rules>
+  </type>  
+  
+  <type ID="class">
+    <label>Java Bytecode</label>
+    <url>http://java.sun.com/j2se/1.5.0/download.jsp</url>
+    <mime>application/octet-stream</mime>
+    <rules>
+      <extension score="0.9">class</extension>
+      <pattern score="1.0" offset="0" format="hex">CAFEBABE</pattern>
+    </rules>
+  </type>  
+  
+  <type ID="java">
+    <label>Java Quellcode</label>
+    <mime>text/plain</mime>
+    <rules>
+      <extension score="0.9">java</extension>
+    </rules>
+  </type>  
+  
+  <type ID="jar">
+    <label>Java Library</label>
+    <url>http://java.sun.com/j2se/1.5.0/download.jsp</url>
+    <rules>
+      <extension score="0.9">jar</extension>
+    </rules>
+  </type>  
+  
+  <type ID="pas">
+    <label>Pascal Quellcode</label>
+    <mime>text/plain</mime>
+    <rules>
+      <extension score="0.9">pas</extension>
+    </rules>
+  </type>  
+  
+  <type ID="bgi">
+    <label>Turbo Pascal BGI</label>
+    <rules>
+      <extension score="0.9">bgi</extension>
+    </rules>
+  </type>  
+  
+  <type ID="tpu">
+    <label>Turbo Pascal TPU</label>
+    <rules>
+      <extension score="0.9">tpu</extension>
+    </rules>
+  </type>  
+  
+  <type ID="bat">
+    <label>PC Batch Datei</label>
+    <mime>text/plain</mime>
+    <rules>
+      <extension score="0.9">bat</extension>
+      <extension score="0.8">cmd</extension>
+    </rules>
+  </type>  
+  
+  <type ID="exe">
+    <label>Windows Executable</label>
+    <mime>text/plain</mime>
+    <rules>
+      <extension score="0.9">exe</extension>
+      <extension score="0.9">com</extension>
+    </rules>
+  </type>  
+  
+  <type ID="dcr">
+    <label>Shockwave</label>
+    <url>http://www.macromedia.com/de/software/shockwaveplayer/</url>
+    <mime>application/x-director</mime>
+    <rules>
+      <extension score="0.9">dcr</extension>
+      <extension score="0.9">swf</extension>
+      <extension score="0.8">dxr</extension>
+    </rules>
+  </type>  
+  
+  <type ID="xml">
+    <label>XML</label>
+    <mime>text/xml</mime>
+    <rules>
+      <extension score="0.9">xml</extension>
+      <pattern score="0.5" offset="0" format="text">&lt;?xml</pattern>
+    </rules>
+  </type>  
+  
+  <type ID="xsl">
+    <label>XSL</label>
+    <mime>text/xml</mime>
+    <rules>
+      <extension score="0.9">xsl</extension>
+      <pattern score="0.5" offset="0" format="text">&lt;?xml</pattern>
+    </rules>
+  </type>  
+  
+  <type ID="xsd">
+    <label>XML Schema</label>
+    <mime>text/xml</mime>
+    <rules>
+      <extension score="0.9">xsd</extension>
+      <pattern score="0.5" offset="0" format="text">&lt;?xml</pattern>
+    </rules>
+  </type>  
+
+  <type ID="ims">
+    <label>SCORM IMS Manifest</label>
+    <mime>text/xml</mime>
+    <rules>
+      <extension score="0.9">imsmanifest.xml</extension>
+      <pattern score="0.5" offset="0" format="text">&lt;?xml</pattern>
+    </rules>
+  </type>  
+
+  <type ID="js">
+    <label>JavaScript</label>
+    <mime>application/x-javascript</mime>
+    <rules>
+      <extension score="0.9">js</extension>
+    </rules>
+  </type>  
+
+<!--==== Audio Video types =========================================-->
+
+  <type ID="qtvid">
+    <label>Quicktime Video</label>
+    <url>http://www.apple.com/quicktime/download/win.html</url>
+    <mime>video/quicktime</mime>
+    <rules>
+      <extension score="0.7">qt</extension>
+      <extension score="0.9">mov</extension>
+    </rules>
+  </type>  
+  
+  <type ID="mpeg4">
+    <label>MPEG-4 Video</label>
+    <url>http://www.real.com/player/index.html</url>
+    <mime>video/mp4</mime>
+    <rules>
+      <extension score="1.0">mp4</extension>
+    </rules>
+  </type>  
+
+  <type ID="m4v">
+    <label>MPEG-4 Video</label>
+    <url>http://www.apple.com/de/quicktime/download/win.html</url>
+    <mime>video/x-m4v</mime>
+    <rules>
+      <extension score="1.0">m4v</extension>
+    </rules>
+  </type>  
+
+  <type ID="m4a">
+    <label>MPEG-4 Audio</label>
+    <url>http://www.apple.com/de/quicktime/download/win.html</url>
+    <mime>audio/m4a</mime>
+    <rules>
+      <extension score="1.0">m4a</extension>
+    </rules>
+  </type>  
+
+  <type ID="m4b">
+    <label>MPEG-4 Hörbuch </label>
+    <url>http://www.apple.com/de/quicktime/download/win.html</url>
+    <mime>audio/m4a</mime>
+    <rules>
+      <extension score="1.0">m4b</extension>
+    </rules>
+  </type>  
+
+  <type ID="avi">
+    <label>Windows AVI Video</label>
+    <url>ftp://ftp.software.ibm.com/ps/products/videocharger/player/v7.1/english/iscinst.msi</url>
+    <mime>video/x-msvideo</mime>
+    <rules>
+      <extension score="0.9">avi</extension>
+    </rules>
+  </type>  
+  
+  <type ID="wmv">
+    <label>WMV Video</label>
+    <url>http://www.microsoft.com/windows/windowsmedia/default.aspx</url>
+    <mime>video/x-ms-wmv</mime>
+    <rules>
+      <extension score="1.0">wmv</extension>
+    </rules>
+  </type>  
+
+  <type ID="wma">
+    <label>Windows Media Audio</label> 
+    <url>http://www.microsoft.com/windows/windowsmedia/download/</url>  
+    <mime>audio/x-ms-wma</mime> 
+    <rules>
+      <extension score="1.0">wma</extension>  
+    </rules>
+  </type>
+
+  <type ID="asf">
+    <label>Windows ASF Video</label>  
+    <url>http://www.microsoft.com/windows/windowsmedia/download/</url>  
+    <mime>video/x-ms-asf</mime>  
+    <rules>
+      <extension score="1.0">asf</extension> 
+      <extension score="1.0">asx</extension> 
+    </rules>
+  </type>
+
+  <type ID="mpegvid">
+    <label>MPEG-1 Video</label>
+    <url>http://www.microsoft.com/windows/windowsmedia/default.aspx</url>
+    <mime>video/mpeg</mime>
+    <rules>
+      <extension score="0.9">mpg</extension>
+      <extension score="0.9">mpeg</extension>
+    </rules>
+  </type>  
+
+  <type ID="mpegaud"> 
+    <label>MPEG-1 Audio</label>
+    <url>http://www.microsoft.com/windows/windowsmedia/default.aspx</url>
+    <mime>audio/x-mpeg</mime>
+    <rules>
+      <extension score="0.9">mpa</extension>
+      <extension score="0.9">mpega</extension>
+      <extension score="0.3">mpg</extension>
+      <extension score="0.3">mpeg</extension>
+    </rules>
+  </type>  
+
+  <type ID="mpegvid2">
+    <label>MPEG-2 Video</label>
+    <url>http://www.microsoft.com/windows/windowsmedia/default.aspx</url>
+    <mime>video/mpeg</mime>
+    <rules>
+      <extension score="1.0">m2p</extension>
+      <extension score="0.8">mpg</extension>
+      <extension score="0.8">mpeg</extension>
+    </rules>
+  </type>  
+
+  <type ID="mp3">
+    <label>MP3 Audio</label>
+    <url>http://www.real.com/player/index.html</url>
+    <mime>audio/mpeg</mime>
+    <rules>
+      <extension score="0.9">mp3</extension>
+    </rules>
+  </type>  
+  
+  <type ID="wav">
+    <label>Windows WAV Audio</label>
+    <mime>audio/x-wav</mime>
+    <rules>
+      <extension score="0.9">wav</extension>
+      <pattern score="0.9" offset="0" format="text">RIFF</pattern>
+    </rules>
+  </type>  
+
+  <type ID="aiff">
+    <label>AIFF Audio</label>
+    <mime>audio/x-aiff</mime>
+    <rules>
+      <extension score="1.0">aiff</extension>
+      <extension score="0.9">aif</extension>
+    </rules>
+  </type>  
+
+  <type ID="realaud">
+    <label>Real Audio</label>
+    <url>http://www.real.com/player/index.html</url>
+    <mime>audio/x-pn-realaudio</mime>
+    <rules>
+      <extension score="0.8">rm</extension>
+      <extension score="0.6">ram</extension>
+      <extension score="1.0">ra</extension>
+      <pattern score="0.9" offset="0" format="text">.RMF</pattern>
+    </rules>
+  </type>  
+  
+  <type ID="realvid">
+    <label>Real Video</label>
+    <url>http://www.real.com/player/index.html</url>
+    <mime>audio/x-pn-realaudio</mime>
+    <rules>
+      <extension score="0.9">rm</extension>
+      <extension score="1.0">rmvb</extension>
+      <extension score="0.7">ram</extension>
+      <pattern score="0.9" offset="0" format="text">.RMF</pattern>
+    </rules>
+  </type>
+ 
+  <type ID="smil">
+    <label>SMIL Synchronized Multimedia</label>
+    <url>http://www.real.com/player/index.html</url>
+    <mime>application/smil</mime>
+    <rules>
+      <extension score="0.9">smi</extension>
+      <extension score="0.9">smil</extension>
+      <extension score="0.9">ra</extension>
+      <pattern score="0.9" offset="0" format="text">&lt;smil</pattern>
+    </rules>
+  </type>  
+  
+  <type ID="3gp">
+    <label>3GP Video</label>
+    <mime>video/3gpp</mime>
+    <rules>
+      <extension score="1.0">3gp</extension>
+      <extension score="1.0">3g2</extension>
+    </rules>
+  </type>  
+
+  <type ID="flv">
+    <label>Flash Video</label>
+    <url>http://de.wikipedia.org/wiki/Flash_Video</url>
+    <mime>video/x-flv</mime>
+    <rules>
+      <extension score="1.0">flv</extension>
+    </rules>
+  </type>
+
+  <type ID="f4v">
+    <label>Flash MP4 Video</label>
+    <url>http://de.wikipedia.org/wiki/Flash_Video</url>
+    <mime>video/x-f4v</mime>
+    <rules>
+      <extension score="1.0">f4v</extension>
+    </rules>
+  </type>
+
+  <type ID="ogg-theora">
+    <label>Ogg Video</label>
+    <url>http://www.theora.org/</url>
+    <mime>video/ogg</mime>
+    <rules>
+      <extension score="1.0">ogv</extension>
+    </rules>
+  </type>
+
+  <type ID="ogg-vorbis">
+    <label>Ogg Audio</label>
+    <url>http://www.vorbis.com/</url>
+    <mime>audio/ogg</mime>
+    <rules>
+      <extension score="1.0">ogg</extension>
+    </rules>
+  </type>
+
+  <type ID="editable-flash">
+    <label>Editable Flash Video</label>
+    <url>http://en.wikipedia.org/wiki/SWF#Related_file_formats_and_extensions</url>
+    <mime>application/octet-stream</mime>
+    <rules>
+      <extension score="1.0">fla</extension>
+    </rules>
+  </type>
+
+  <type ID="webm">
+    <label>WebM Video</label>
+    <url>http://www.webmproject.org/</url>
+    <mime>video/webm</mime>
+    <rules>
+      <extension score="1.0">webm</extension>
+    </rules>
+  </type>
+
+<!--==== Graphics types =========================================-->
+
+  <type ID="plot">
+    <label>HPGL Plot</label>
+    <rules>
+      <extension score="0.9">plt</extension>
+    </rules>
+  </type>  
+  
+  <type ID="gif">
+    <label>GIF Grafik</label>
+    <mime>image/gif</mime>
+    <rules>
+      <extension score="0.9">gif</extension>
+      <pattern score="0.7" offset="0" format="text">GIF</pattern>
+    </rules>
+  </type>  
+  
+  <type ID="jpeg">
+    <label>JPEG Grafik</label>
+    <mime>image/jpeg</mime>
+    <rules>
+      <extension score="0.9">JPG</extension>
+      <extension score="0.9">jpg</extension>
+      <extension score="0.9">jpeg</extension>
+      <pattern score="0.9" offset="0" format="hex">FFD8</pattern>
+    </rules>
+  </type>  
+  
+  <type ID="png">
+    <label>PNG Grafik</label>
+    <mime>image/png</mime>
+    <rules>
+      <extension score="0.9">png</extension>
+      <pattern score="0.95" offset="0" format="hex">89504E470D0A1A0A</pattern>
+    </rules>
+  </type>  
+  
+  <type ID="cdr">
+    <label>Corel Draw Grafik</label>
+    <rules>
+      <extension score="0.9">cdr</extension>
+    </rules>
+  </type>  
+  
+  <type ID="wpg">
+    <label>DrawPerfect Grafik</label>
+    <rules>
+      <extension score="0.8">wpg</extension>
+      <pattern score="0.8" offset="0" format="bytes">-1 87 80 67</pattern>
+    </rules>
+  </type>  
+  
+  <type ID="pcx">
+    <label>PaintBrush PCX Grafik</label>
+    <rules>
+      <extension score="0.9">pcx</extension>
+      <pattern score="0.1" offset="0" format="bytes">10</pattern>
+    </rules>
+  </type>  
+  
+  <type ID="bmp">
+    <label>Windows Bitmap Grafik</label>
+    <rules>
+      <extension score="0.9">bmp</extension>
+      <pattern score="0.5" offset="0" format="text">BM</pattern>
+    </rules>
+  </type>  
+  
+  <type ID="tiff">
+    <label>TIFF Grafik</label>
+    <mime>image/tiff</mime>
+    <rules>
+      <extension score="0.9">tiff</extension>
+      <extension score="0.8">tif</extension>
+      <pattern score="0.9" offset="0" format="bytes">73 73 42 0</pattern>
+    </rules>
+  </type>  
+  
+  <type ID="ppm">
+    <label>Portable PixMap Grafik</label>
+    <rules>
+      <extension score="0.9">ppm</extension>
+      <pattern score="0.2" offset="0" format="text">P6</pattern>
+    </rules>
+  </type>  
+  
+</FileContentTypes>
+
