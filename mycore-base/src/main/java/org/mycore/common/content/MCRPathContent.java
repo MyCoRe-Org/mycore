@@ -33,6 +33,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.file.CopyOption;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -144,6 +145,11 @@ public class MCRPathContent extends MCRContent implements MCRSeekableChannelCont
     @Override
     public void sendTo(File target) throws IOException {
         Files.copy(path, target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    @Override
+    public void sendTo(Path target, CopyOption... options) throws IOException {
+        Files.copy(path, target, options);
     }
 
 }

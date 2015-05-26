@@ -38,6 +38,9 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -47,6 +50,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.log4j.Logger;
+import org.hsqldb.persist.LockFile.FileSecurityException;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRConstants;
@@ -59,9 +63,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
- * Used to read/write content from any source to any target. Sources and targets
- * can be strings, local files, Apache VFS file objects, XML documents, byte[]
- * arrays and streams. The different sources are implemented by subclasses.
+ * Used to read/write content from any source to any target. Sources and targets can be strings, local files, Apache VFS
+ * file objects, XML documents, byte[] arrays and streams. The different sources are implemented by subclasses.
  * 
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
@@ -136,13 +139,12 @@ public abstract class MCRContent {
      * Returns content as input stream. Be sure to close this stream properly!
      * 
      * @return input stream to read content from
-     * @throws IOException 
+     * @throws IOException
      */
     public abstract InputStream getInputStream() throws IOException;
 
     /**
      * Returns an readable bytechannel to this content or null if one is not available.
-     * 
      */
     public ReadableByteChannel getReadableByteChannel() throws IOException {
         InputStream inputStream = getInputStream();
@@ -150,11 +152,10 @@ public abstract class MCRContent {
     }
 
     /**
-     * Returns content as content input stream, which provides MD5
-     * functionality. Be sure to close this stream properly!
+     * Returns content as content input stream, which provides MD5 functionality. Be sure to close this stream properly!
      * 
      * @return the content input stream
-     * @throws IOException 
+     * @throws IOException
      */
     public MCRContentInputStream getContentInputStream() throws IOException {
         return new MCRContentInputStream(getInputStream());
@@ -162,6 +163,7 @@ public abstract class MCRContent {
 
     /**
      * Return the content as Source
+     * 
      * @return content as Source
      */
     public Source getSource() throws IOException {
@@ -169,8 +171,7 @@ public abstract class MCRContent {
     }
 
     /**
-     * Sends content to the given OutputStream. 
-     * The OutputStream is NOT automatically closed afterwards.
+     * Sends content to the given OutputStream. The OutputStream is NOT automatically closed afterwards.
      * 
      * @param out
      *            the OutputStream to write the content to
@@ -185,12 +186,12 @@ public abstract class MCRContent {
     }
 
     /**
-     * Sends content to the given OutputStream. 
+     * Sends content to the given OutputStream.
      * 
      * @param out
      *            the OutputStream to write the content to
-     * @param close 
-     *             if true, close OutputStream afterwards
+     * @param close
+     *            if true, close OutputStream afterwards
      */
     public void sendTo(OutputStream out, boolean close) throws IOException {
         try {
@@ -206,7 +207,7 @@ public abstract class MCRContent {
      * Returns content as SAX input source.
      * 
      * @return input source to read content from
-     * @throws IOException 
+     * @throws IOException
      */
     public InputSource getInputSource() throws IOException {
         InputSource source = new InputSource(getInputStream());
@@ -222,6 +223,18 @@ public abstract class MCRContent {
      */
     public void sendTo(File target) throws IOException {
         sendTo(new FileOutputStream(target), true);
+    }
+
+    /**
+     * Sends content to the given path.
+     * @param target target path to write content to
+     * @param options see {@link Files#copy(InputStream, Path, CopyOption...)}} for help on copy options
+     * @throws IOException
+     */
+    public void sendTo(Path target, CopyOption... options) throws IOException {
+        try (InputStream in = getInputStream()) {
+            Files.copy(in, target, options);
+        }
     }
 
     /**
@@ -247,7 +260,8 @@ public abstract class MCRContent {
     }
 
     /**
-     * Returns content as String, assuming encoding from {@link #getEncoding()} or {@link MCRConstants#DEFAULT_ENCODING}.
+     * Returns content as String, assuming encoding from {@link #getEncoding()} or {@link MCRConstants#DEFAULT_ENCODING}
+     * .
      * 
      * @return content as String
      */
@@ -259,19 +273,18 @@ public abstract class MCRContent {
      * Parses content, assuming it is XML, and returns the parsed document.
      * 
      * @return the XML document parsed from content
-     * @throws SAXParseException 
-     * @throws MCRException 
+     * @throws SAXParseException
+     * @throws MCRException
      */
     public Document asXML() throws JDOMException, IOException, SAXException {
         return MCRXMLParserFactory.getNonValidatingParser().parseXML(this);
     }
 
     /**
-     * Ensures that content is XML. The content is parsed as if asXML() is called.
-     * When content is XML, an MCRContent instance is returned that guarantees that.
-     * When XML can not be parsed, an exception is thrown.
+     * Ensures that content is XML. The content is parsed as if asXML() is called. When content is XML, an MCRContent
+     * instance is returned that guarantees that. When XML can not be parsed, an exception is thrown.
      * 
-     * @throws SAXParseException 
+     * @throws SAXParseException
      */
     public MCRContent ensureXML() throws IOException, JDOMException, SAXException {
         return new MCRJDOMContent(asXML());
@@ -300,6 +313,7 @@ public abstract class MCRContent {
 
     /**
      * Overwrites DocType detection.
+     * 
      * @see MCRContent#getDocType();
      * @param docType
      */
@@ -308,17 +322,16 @@ public abstract class MCRContent {
     }
 
     /**
-     * If true, content can be read more than once by calling getInputStream() and
-     * similar methods. If false, content may be consumed when it is read more than once.
-     * Most subclasses provide reusable content.  
+     * If true, content can be read more than once by calling getInputStream() and similar methods. If false, content
+     * may be consumed when it is read more than once. Most subclasses provide reusable content.
      */
     public boolean isReusable() {
         return true;
     }
 
     /**
-     * Returns a reusable copy of this content, that is an instance (may be the same instance)
-     * thats content can be read more than once without consuming the stream.
+     * Returns a reusable copy of this content, that is an instance (may be the same instance) thats content can be read
+     * more than once without consuming the stream.
      */
     public MCRContent getReusableCopy() throws IOException {
         if (isReusable()) {
@@ -335,6 +348,7 @@ public abstract class MCRContent {
 
     /**
      * Return the length of this content.
+     * 
      * @return -1 if length is unknown
      */
     public long length() throws IOException {
@@ -343,6 +357,7 @@ public abstract class MCRContent {
 
     /**
      * Returns the last modified time
+     * 
      * @return -1 if last modified time is unknown
      */
     public long lastModified() throws IOException {
@@ -351,6 +366,7 @@ public abstract class MCRContent {
 
     /**
      * Returns either strong or weak ETag.
+     * 
      * @return null, if no ETag could be generated
      */
     public String getETag() throws IOException {
@@ -360,9 +376,12 @@ public abstract class MCRContent {
     /**
      * Uses provided parameter to compute simple weak ETag.
      * 
-     * @param systemId != null, {@link #getSystemId()}
-     * @param length >= 0, {@link #length()}
-     * @param lastModified >= 0, {@link #lastModified()}
+     * @param systemId
+     *            != null, {@link #getSystemId()}
+     * @param length
+     *            >= 0, {@link #length()}
+     * @param lastModified
+     *            >= 0, {@link #lastModified()}
      * @return null if any preconditions are not met.
      */
     protected String getSimpleWeakETag(String systemId, long length, long lastModified) {
@@ -400,9 +419,8 @@ public abstract class MCRContent {
     }
 
     /**
-     * Tells if this content may contain data from the current MCRSession.
+     * Tells if this content may contain data from the current MCRSession. Use this information to alter cache behavior.
      * 
-     * Use this information to alter cache behavior.
      * @return true if it MAY contain session data
      */
     public boolean isUsingSession() {

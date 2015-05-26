@@ -29,6 +29,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.CopyOption;
+import java.nio.file.Path;
 
 import javax.xml.transform.Source;
 
@@ -95,6 +97,11 @@ public abstract class MCRWrappedContent extends MCRContent {
     @Override
     public void sendTo(OutputStream out, boolean close) throws IOException {
         getBaseContent().sendTo(out, close);
+    }
+    
+    @Override
+    public void sendTo(Path target, CopyOption... options) throws IOException{
+        getBaseContent().sendTo(target, options);
     }
 
     @Override
