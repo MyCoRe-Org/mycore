@@ -50,7 +50,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.log4j.Logger;
-import org.hsqldb.persist.LockFile.FileSecurityException;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRConstants;
