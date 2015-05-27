@@ -79,7 +79,16 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
         for (Element relatedItem : (List<Element>) (mods.getChildren("relatedItem", MCRConstants.MODS_NAMESPACE))) {
             String href = relatedItem.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
             LOGGER.info("Found related item in " + object.getId().toString() + ", href=" + href);
-            if ((href == null) || href.isEmpty()) {
+            //MCR-957: only create releated object if mycoreId
+            MCRObjectID mcrIdCheck;
+            try {
+                mcrIdCheck = MCRObjectID.getInstance(href);
+            } catch (Exception e) {
+                //not a valid MCRObjectID -> don't create anyway
+                continue;
+            }
+            //create if integer value == 0
+            if (mcrIdCheck.getNumberAsInteger() == 0) {
                 //MCR-931: check for type='host' and present parent document
                 if (!isHost(relatedItem) || object.getStructure().getParentID() == null) {
                     MCRObjectID relatedID = createRelatedObject(relatedItem, oid);
@@ -144,8 +153,7 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
     }
 
     /**
-     * Checks if the given related item is if type host and contains a valid
-     * MCRObjectID from an existing object.
+     * Checks if the given related item is if type host and contains a valid MCRObjectID from an existing object.
      *
      * @param relatedItem
      * @return true if @type='host' and MCRObjectID in @href contains is valid and this MCRObject exists
