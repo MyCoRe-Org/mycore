@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.hibernate.MappingNotFoundException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -97,7 +98,7 @@ public class MCRHIBConnection implements Closeable {
 
     public static boolean isEnabled() {
         return MCRConfiguration.instance().getBoolean("MCR.Persistence.Database.Enable", true)
-            && getHibernateConfig() != null;
+                && getHibernateConfig() != null;
     }
 
     private static URL getHibernateConfig() {
@@ -152,9 +153,14 @@ public class MCRHIBConnection implements Closeable {
         }
         List<String> mappings = MCRConfiguration.instance().getStrings("MCR.Hibernate.Mappings");
         for (String className : mappings) {
-            String resourceName = getResourceName(className);
-            LOGGER.info("Add mapping: " + resourceName);
-            HIBCFG.addResource(resourceName);
+            try {
+                String resourceName = getResourceName(className);
+                LOGGER.info("Add mapping: " + resourceName);
+                HIBCFG.addResource(resourceName);
+            } catch (MappingNotFoundException me) {
+                LOGGER.info("Add annotated class: " + className);
+                HIBCFG.addAnnotatedClass(getAnnotatedClass(className));
+            }
         }
         serviceRegistry = new StandardServiceRegistryBuilder().applySettings(HIBCFG.getProperties()).build();
         LOGGER.info("Hibernate configured");
@@ -162,6 +168,14 @@ public class MCRHIBConnection implements Closeable {
 
     private String getResourceName(String className) {
         return className.replaceAll("\\.", "/") + ".hbm.xml";
+    }
+
+    private Class<?> getAnnotatedClass(String className) {
+        try {
+            return Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
     }
 
     /**
@@ -176,7 +190,7 @@ public class MCRHIBConnection implements Closeable {
     public synchronized void buildSessionFactory(Configuration config) {
         sessionFactory.close();
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(HIBCFG.getProperties())
-            .build();
+                .build();
         unregisterStatisticsService();
         sessionFactory = config.buildSessionFactory(serviceRegistry);
         registerStatisticsService();
@@ -204,12 +218,12 @@ public class MCRHIBConnection implements Closeable {
         Session session = sessionFactory.getCurrentSession();
         if (!session.isOpen()) {
             LOGGER.warn(MessageFormat.format("Hibernate session {0} is closed, generating new session",
-                Integer.toHexString(session.hashCode())));
+                    Integer.toHexString(session.hashCode())));
             session = sessionFactory.openSession();
         }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(MessageFormat.format("Returning session: {0} open: {1}",
-                Integer.toHexString(session.hashCode()), session.isOpen()));
+                    Integer.toHexString(session.hashCode()), session.isOpen()));
         }
         return session;
     }
@@ -278,58 +292,62 @@ public class MCRHIBConnection implements Closeable {
         File statsFile = new File(MCRConfiguration.instance().getString("MCR.Save.FileSystem"), "hibernatestats.xml");
         Document doc = new Document(new Element("hibernatestats"));
         doc.getRootElement().addContent(
-            new Element("metric").setAttribute("connectCount", String.valueOf(stats.getConnectCount())));
+                new Element("metric").setAttribute("connectCount", String.valueOf(stats.getConnectCount())));
         doc.getRootElement().addContent(
-            new Element("metric").setAttribute("flushCount", String.valueOf(stats.getFlushCount())));
+                new Element("metric").setAttribute("flushCount", String.valueOf(stats.getFlushCount())));
         doc.getRootElement().addContent(
-            new Element("metric").setAttribute("transactionCount", String.valueOf(stats.getTransactionCount())));
+                new Element("metric").setAttribute("transactionCount", String.valueOf(stats.getTransactionCount())));
         doc.getRootElement().addContent(
-            new Element("metric").setAttribute("successfulTransactionCount",
-                String.valueOf(stats.getSuccessfulTransactionCount())));
+                new Element("metric").setAttribute("successfulTransactionCount",
+                        String.valueOf(stats.getSuccessfulTransactionCount())));
         doc.getRootElement().addContent(
-            new Element("metric").setAttribute("sessionOpenCount", String.valueOf(stats.getSessionOpenCount())));
+                new Element("metric").setAttribute("sessionOpenCount", String.valueOf(stats.getSessionOpenCount())));
         doc.getRootElement().addContent(
-            new Element("metric").setAttribute("sessionCloseCount", String.valueOf(stats.getSessionCloseCount())));
+                new Element("metric").setAttribute("sessionCloseCount", String.valueOf(stats.getSessionCloseCount())));
         doc.getRootElement().addContent(
-            new Element("metric").setAttribute("sessionOpenCount", String.valueOf(stats.getSessionOpenCount())));
+                new Element("metric").setAttribute("sessionOpenCount", String.valueOf(stats.getSessionOpenCount())));
         doc.getRootElement().addContent(
-            new Element("metric").setAttribute("QueryExecutionCount", String.valueOf(stats.getQueryExecutionCount())));
+                new Element("metric").setAttribute("QueryExecutionCount",
+                        String.valueOf(stats.getQueryExecutionCount())));
         doc.getRootElement().addContent(
-            new Element("metric").setAttribute("QueryExecutionMaxTime",
-                String.valueOf(stats.getQueryExecutionMaxTime())));
+                new Element("metric").setAttribute("QueryExecutionMaxTime",
+                        String.valueOf(stats.getQueryExecutionMaxTime())));
         if (stats.getQueryExecutionMaxTimeQueryString() != null) {
             doc.getRootElement().addContent(
-                new Element("longestQuery").setAttribute("value", stats.getQueryExecutionMaxTimeQueryString()));
+                    new Element("longestQuery").setAttribute("value", stats.getQueryExecutionMaxTimeQueryString()));
         }
-        doc.getRootElement()
-            .addContent(
+        doc.getRootElement().addContent(
                 new Element("metric").setAttribute("CollectionFetchCount",
-                    String.valueOf(stats.getCollectionFetchCount())));
+                        String.valueOf(stats.getCollectionFetchCount())));
         doc.getRootElement().addContent(
-            new Element("metric").setAttribute("CollectionLoadCount", String.valueOf(stats.getCollectionLoadCount())));
+                new Element("metric").setAttribute("CollectionLoadCount",
+                        String.valueOf(stats.getCollectionLoadCount())));
         doc.getRootElement().addContent(
-            new Element("metric").setAttribute("CollectionRecreateCount",
-                String.valueOf(stats.getCollectionRecreateCount())));
+                new Element("metric").setAttribute("CollectionRecreateCount",
+                        String.valueOf(stats.getCollectionRecreateCount())));
         doc.getRootElement().addContent(
-            new Element("metric").setAttribute("CollectionRemoveCount",
-                String.valueOf(stats.getCollectionRemoveCount())));
+                new Element("metric").setAttribute("CollectionRemoveCount",
+                        String.valueOf(stats.getCollectionRemoveCount())));
         doc.getRootElement().addContent(
-            new Element("metric").setAttribute("CollectionUpdateCount",
-                String.valueOf(stats.getCollectionUpdateCount())));
+                new Element("metric").setAttribute("CollectionUpdateCount",
+                        String.valueOf(stats.getCollectionUpdateCount())));
         doc.getRootElement().addContent(
-            new Element("metric").setAttribute("EntityDeleteCount", String.valueOf(stats.getEntityDeleteCount())));
+                new Element("metric").setAttribute("EntityDeleteCount", String.valueOf(stats.getEntityDeleteCount())));
         doc.getRootElement().addContent(
-            new Element("metric").setAttribute("EntityFetchCount", String.valueOf(stats.getEntityFetchCount())));
+                new Element("metric").setAttribute("EntityFetchCount", String.valueOf(stats.getEntityFetchCount())));
         doc.getRootElement().addContent(
-            new Element("metric").setAttribute("EntityLoadCount", String.valueOf(stats.getEntityLoadCount())));
+                new Element("metric").setAttribute("EntityLoadCount", String.valueOf(stats.getEntityLoadCount())));
         doc.getRootElement().addContent(
-            new Element("metric").setAttribute("EntityInsertCount", String.valueOf(stats.getEntityInsertCount())));
+                new Element("metric").setAttribute("EntityInsertCount", String.valueOf(stats.getEntityInsertCount())));
         doc.getRootElement().addContent(
-            new Element("metric").setAttribute("EntityUpdateCount", String.valueOf(stats.getEntityUpdateCount())));
+                new Element("metric").setAttribute("EntityUpdateCount", String.valueOf(stats.getEntityUpdateCount())));
+        doc.getRootElement()
+                .addContent(
+                        new Element("metric").setAttribute("queryCacheHitCount",
+                                String.valueOf(stats.getQueryCacheHitCount())));
         doc.getRootElement().addContent(
-            new Element("metric").setAttribute("queryCacheHitCount", String.valueOf(stats.getQueryCacheHitCount())));
-        doc.getRootElement().addContent(
-            new Element("metric").setAttribute("queryCacheMissCount", String.valueOf(stats.getQueryCacheMissCount())));
+                new Element("metric").setAttribute("queryCacheMissCount",
+                        String.valueOf(stats.getQueryCacheMissCount())));
         doc.getRootElement().addContent(addStringArray(new Element("queries"), "query", "value", stats.getQueries()));
         FileOutputStream fileOutputStream = new FileOutputStream(statsFile);
         try {
