@@ -51,7 +51,10 @@ import org.mycore.datamodel.metadata.MCRObjectService;
 public class MCRMODSWrapper {
 
     //ancestor::mycoreobject required for MCR-927
-    private static final String LINKED_RELATED_ITEMS = "mods:relatedItem[@type='host' and ancestor::mycoreobject/structure/parents/parent or contains(@xlink:href,'_mods_') and contains('"
+    private static final String LINKED_RELATED_ITEMS = "mods:relatedItem[@type='host' and ancestor::mycoreobject/structure/parents/parent or"
+        + " contains(@xlink:href,'_mods_') and"
+        + " number(substring-after(@xlink:href,'_mods_')) > 0 and"
+        + " contains('"
         + MCRMODSRelationshipType.xPathList() + "', @type)]";
 
     private static final String MODS_CONTAINER = "modsContainer";
