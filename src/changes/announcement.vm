@@ -1,6 +1,7 @@
 ## Template copied from
 ## http://svn.apache.org/repos/asf/maven/plugins/trunk/maven-changes-plugin/src/main/resources/org/apache/maven/plugin/announcement/announcement.vm
-The ${developmentTeam} is pleased to announce the ${finalName}#if($release.getDescription()) (${release.getDescription()})#end release!
+##The ${developmentTeam} is pleased to announce the ${finalName} ${release.version} #if($release.description) (${release.description})#end release!
+The ${developmentTeam} is pleased to announce the ${finalName} ${release.version} (LTS 2015) release!
 
 ${introduction}
 
