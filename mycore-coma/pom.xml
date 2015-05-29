@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore</artifactId>
-    <version>2015.05.0</version>
+    <version>2015.05.0.1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>mycore-coma</artifactId>
