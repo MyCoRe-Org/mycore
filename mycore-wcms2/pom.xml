@@ -9,7 +9,7 @@
   <parent>
     <artifactId>mycore</artifactId>
     <groupId>org.mycore</groupId>
-    <version>2015.03-SNAPSHOT</version>
+    <version>2015.05.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <dependencies>
