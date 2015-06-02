@@ -44,6 +44,7 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -232,7 +233,10 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
     private void updateMainFile() throws IOException {
         String mainFile = derivate.getDerivate().getInternals().getMainDoc();
-        if ((mainFile == null) || mainFile.trim().isEmpty()) {
+        MCRObjectDerivate der = MCRMetadataManager.retrieveMCRDerivate(getOrCreateDerivateID()).getDerivate();
+        boolean hasNoMainFile = ((der.getInternals().getMainDoc() == null) || (der.getInternals().getMainDoc().trim()
+            .isEmpty()));
+        if ((mainFile == null) || mainFile.trim().isEmpty() && hasNoMainFile) {
             mainFile = getPathOfMainFile();
             LOGGER.debug("Setting main file to " + mainFile);
             derivate.getDerivate().getInternals().setMainDoc(mainFile);
