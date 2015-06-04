@@ -238,8 +238,10 @@
 <!ENTITY % block
     "p | %heading; | div | %lists; | %blocktext; | isindex |fieldset | table">
 
+<!ENTITY % MyCore "printlatestobjects | text | textfield | submitButton | cell | hidden | editor | target | components | panel">
+
 <!-- %Flow; mixes block and inline and is used for list items etc. -->
-<!ENTITY % Flow "(#PCDATA | %block; | form | %inline; | %misc;)*">
+<!ENTITY % Flow "(#PCDATA | %block; | form | %inline; | %misc; | %MyCore;)*">
 
 <!--================== Content models for exclusions =====================-->
 
@@ -672,7 +674,7 @@
   clear       (left|all|right|none) "none"
   >
 
-<!ELEMENT em %Inline;>   <!-- emphasis -->
+<!ELEMENT em %Flow;>   <!-- emphasis -->
 <!ATTLIST em %attrs;>
 
 <!ELEMENT strong %Inline;>   <!-- strong emphasis -->
@@ -1199,3 +1201,76 @@ several semantically related columns together.
   height      %Length;       #IMPLIED
   >
 
+<!-- MyCore specific Tags -->
+<!ELEMENT printlatestobjects %Inline;>
+<!ATTLIST printlatestobjects
+  %attrs;
+  maxresults  %Number;       #IMPLIED
+  objecttype  %Text;         #IMPLIED
+  sortfield   %Text;         #IMPLIED
+  sortorder   %Text;         #IMPLIED
+  >
+
+<!ELEMENT editor %Flow;>
+<!ATTLIST editor
+  %attrs;
+  id  		  ID       		 #IMPLIED
+  >
+  
+<!ELEMENT components %Flow;>
+<!ATTLIST components
+  %attrs;
+  root  	  %Text;         #IMPLIED
+  var 		  %Text;         #IMPLIED
+  >
+  
+<!ELEMENT target %Flow;>
+<!ATTLIST target
+  %attrs;
+  type  	  %Text;         #IMPLIED
+  name 		  %Text;         #IMPLIED
+  method  	  %Text;         #IMPLIED
+  format  	  %Text;         #IMPLIED
+  >
+
+<!ELEMENT panel %Flow;>
+<!ATTLIST panel
+  %attrs;
+  id  		  ID       	     #IMPLIED
+  >
+  
+<!ELEMENT hidden %Flow;>
+<!ATTLIST hidden
+  %attrs;
+  var  		  %Text;       	 #IMPLIED
+  default 	  %Text;		 #IMPLIED
+  >
+  
+<!ELEMENT cell  %Flow;>
+<!ATTLIST cell 
+  %attrs;
+  row  	  	  %Number;       #IMPLIED
+  col 	  	  %Number;		 #IMPLIED
+  anchor  	  %Text;		 #IMPLIED
+  var 	  	  %Text;		 #IMPLIED
+  colspan 	  %Number;		 #IMPLIED
+  >
+
+<!ELEMENT text  %Flow;>
+<!ATTLIST text 
+  %attrs;
+   i18n  	  %Text;		 #IMPLIED
+  >
+  
+<!ELEMENT textfield  %Flow;>
+<!ATTLIST textfield 
+  %attrs;
+  width  	  %Length;       #IMPLIED
+  >
+  
+<!ELEMENT submitButton  %Flow;>
+<!ATTLIST submitButton 
+  %attrs;
+  width  	  %Length;       #IMPLIED
+  i18n  	  %Text;		 #IMPLIED
+  >
