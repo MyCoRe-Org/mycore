@@ -148,6 +148,8 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
         Element mods = (Element) (relatedItem.clone());
         mods.setName("mods");
         mods.removeAttribute("type");
+        mods.removeAttribute("href", MCRConstants.XLINK_NAMESPACE);
+        mods.removeAttribute("type", MCRConstants.XLINK_NAMESPACE);
         mods.removeChildren("part", MCRConstants.MODS_NAMESPACE);
         return mods;
     }
