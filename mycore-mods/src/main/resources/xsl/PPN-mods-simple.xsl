@@ -18,13 +18,23 @@
       <metadata>
         <def.modsContainer class="MCRMetaXML" heritable="false" notinherit="true">
           <modsContainer inherited="0">
-            <xsl:copy>
-              <xsl:apply-templates select='@*' />
-              <xsl:apply-templates select='node()' />
-            </xsl:copy>
+            <mods:mods>
+              <xsl:apply-templates select="mods:mods/*" />
+              <mods:identifier invalid="yes" type="uri">
+                <xsl:value-of select="concat('//gso.gbv.de/DB=2.1/PPNSET?PPN=', mods:mods/mods:recordInfo/mods:recordIdentifier[@source='DE-601'])" />
+              </mods:identifier>
+            </mods:mods>
           </modsContainer>
         </def.modsContainer>
       </metadata>
     </mycoreobject>
   </xsl:template>
+
+  <xsl:template match="*">
+    <xsl:element name="mods:{name()}">
+      <xsl:copy-of select="namespace::*" />
+      <xsl:apply-templates select="node()|@*" />
+    </xsl:element>
+  </xsl:template>
+
 </xsl:stylesheet>
