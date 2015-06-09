@@ -1,0 +1,2787 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.tei-c.org/ns/1.0" xmlns:ns1="http://www.tei-c.org/ns/1.0">
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
+  <!--
+    Schema generated from ODD source 2015-02-23T16:33:49Z. .
+    TEI Edition: Version 2.7.0. Last updated on
+    	16th September 2014, revision 13036
+    TEI Edition Location: http://www.tei-c.org/Vault/P5/Version 2.7.0/
+    
+  -->
+  <!---->
+  <xs:complexType name="tei_macro.paraContent" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="ns1:tei_model.phrase"/>
+      <xs:group ref="ns1:tei_model.inter"/>
+      <xs:group ref="ns1:tei_model.global"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="tei_macro.limitedContent" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="ns1:tei_model.limitedPhrase"/>
+      <xs:group ref="ns1:tei_model.inter"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="tei_macro.phraseSeq" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="ns1:tei_model.phrase"/>
+      <xs:group ref="ns1:tei_model.global"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="tei_macro.specialPara" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="ns1:tei_model.phrase"/>
+      <xs:group ref="ns1:tei_model.inter"/>
+      <xs:group ref="ns1:tei_model.divPart"/>
+      <xs:group ref="ns1:tei_model.global"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:simpleType name="tei_data.certainty">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="high"/>
+      <xs:enumeration value="medium"/>
+      <xs:enumeration value="low"/>
+      <xs:enumeration value="unknown"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="tei_data.probability">
+    <xs:restriction base="xs:double">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="tei_data.numeric">
+    <xs:union memberTypes="xs:double xs:decimal">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:pattern value="(\-?[\d]+/\-?[\d]+)"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+  <xs:simpleType name="tei_data.count">
+    <xs:restriction base="xs:nonNegativeInteger"/>
+  </xs:simpleType>
+  <xs:simpleType name="tei_data.temporal.w3c">
+    <xs:union memberTypes="xs:date xs:gYear xs:gMonth xs:gDay xs:gYearMonth xs:gMonthDay xs:time xs:dateTime"/>
+  </xs:simpleType>
+  <xs:simpleType name="tei_data.truthValue">
+    <xs:restriction base="xs:boolean"/>
+  </xs:simpleType>
+  <xs:simpleType name="tei_data.xTruthValue">
+    <xs:union memberTypes="xs:boolean">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="unknown"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="inapplicable"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+  <xs:simpleType name="tei_data.language">
+    <xs:union memberTypes="xs:language">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value=""/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+  <xs:simpleType name="tei_data.point">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="(\-?[0-9]+\.?[0-9]*,\-?[0-9]+\.?[0-9]*)"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="tei_data.pointer">
+    <xs:restriction base="xs:anyURI"/>
+  </xs:simpleType>
+  <xs:simpleType name="tei_data.version">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="[\d]+(\.[\d]+){0,2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="tei_data.word">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="(\p{L}|\p{N}|\p{P}|\p{S})+"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="tei_data.text">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="tei_data.name">
+    <xs:restriction base="xs:Name"/>
+  </xs:simpleType>
+  <xs:simpleType name="tei_data.enumerated">
+    <xs:restriction base="ns1:tei_data.name"/>
+  </xs:simpleType>
+  <xs:attributeGroup name="tei_att.ascribed.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.ascribed.attribute.who"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.ascribed.attribute.who">
+    <xs:attribute name="who">
+      <xs:annotation>
+        <xs:documentation>indicates the person, or group of people, to whom the element content is ascribed.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction>
+          <xs:simpleType>
+            <xs:list itemType="ns1:tei_data.pointer"/>
+          </xs:simpleType>
+          <xs:minLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.canonical.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.canonical.attribute.key"/>
+    <xs:attributeGroup ref="ns1:tei_att.canonical.attribute.ref"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.canonical.attribute.key">
+    <xs:attribute name="key" type="ns1:tei_data.text">
+      <xs:annotation>
+        <xs:documentation>provides an externally-defined means of identifying the entity (or entities) being named, using a coded value of some kind.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.canonical.attribute.ref">
+    <xs:attribute name="ref">
+      <xs:annotation>
+        <xs:documentation>(reference) provides an explicit means of locating a full definition for the entity being named by means of one or more URIs.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction>
+          <xs:simpleType>
+            <xs:list itemType="ns1:tei_data.pointer"/>
+          </xs:simpleType>
+          <xs:minLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.ranging.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.ranging.attribute.atLeast"/>
+    <xs:attributeGroup ref="ns1:tei_att.ranging.attribute.atMost"/>
+    <xs:attributeGroup ref="ns1:tei_att.ranging.attribute.min"/>
+    <xs:attributeGroup ref="ns1:tei_att.ranging.attribute.max"/>
+    <xs:attributeGroup ref="ns1:tei_att.ranging.attribute.confidence"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.ranging.attribute.atLeast">
+    <xs:attribute name="atLeast" type="ns1:tei_data.numeric">
+      <xs:annotation>
+        <xs:documentation>gives a minimum estimated value for the approximate measurement.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.ranging.attribute.atMost">
+    <xs:attribute name="atMost" type="ns1:tei_data.numeric">
+      <xs:annotation>
+        <xs:documentation>gives a maximum estimated value for the approximate measurement.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.ranging.attribute.min">
+    <xs:attribute name="min" type="ns1:tei_data.numeric">
+      <xs:annotation>
+        <xs:documentation>where the measurement summarizes more than one observation or a range, supplies the minimum value observed.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.ranging.attribute.max">
+    <xs:attribute name="max" type="ns1:tei_data.numeric">
+      <xs:annotation>
+        <xs:documentation>where the measurement summarizes more than one observation or a range, supplies the maximum value observed.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.ranging.attribute.confidence">
+    <xs:attribute name="confidence" type="ns1:tei_data.probability">
+      <xs:annotation>
+        <xs:documentation>specifies the degree of statistical confidence (between zero and one) that a value falls within the range specified by min and max, or the proportion of observed values that fall within that range.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.dimensions.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.ranging.attributes"/>
+    <xs:attributeGroup ref="ns1:tei_att.dimensions.attribute.unit"/>
+    <xs:attributeGroup ref="ns1:tei_att.dimensions.attribute.quantity"/>
+    <xs:attributeGroup ref="ns1:tei_att.dimensions.attribute.extent"/>
+    <xs:attributeGroup ref="ns1:tei_att.dimensions.attribute.precision"/>
+    <xs:attributeGroup ref="ns1:tei_att.dimensions.attribute.scope"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.dimensions.attribute.unit">
+    <xs:attribute name="unit">
+      <xs:annotation>
+        <xs:documentation>names the unit used for the measurement
+Suggested values include: 1] cm(centimetres) ; 2] mm(millimetres) ; 3] in(inches) ; 4] lines; 5] chars(characters) </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:Name">
+          <xs:simpleType>
+            <xs:restriction base="xs:token">
+              <xs:enumeration value="cm">
+                <xs:annotation>
+                  <xs:documentation>(centimetres) </xs:documentation>
+                </xs:annotation>
+              </xs:enumeration>
+            </xs:restriction>
+          </xs:simpleType>
+          <xs:simpleType>
+            <xs:restriction base="xs:token">
+              <xs:enumeration value="mm">
+                <xs:annotation>
+                  <xs:documentation>(millimetres) </xs:documentation>
+                </xs:annotation>
+              </xs:enumeration>
+            </xs:restriction>
+          </xs:simpleType>
+          <xs:simpleType>
+            <xs:restriction base="xs:token">
+              <xs:enumeration value="in">
+                <xs:annotation>
+                  <xs:documentation>(inches) </xs:documentation>
+                </xs:annotation>
+              </xs:enumeration>
+            </xs:restriction>
+          </xs:simpleType>
+          <xs:simpleType>
+            <xs:restriction base="xs:token">
+              <xs:enumeration value="lines">
+                <xs:annotation>
+                  <xs:documentation>lines of text</xs:documentation>
+                </xs:annotation>
+              </xs:enumeration>
+            </xs:restriction>
+          </xs:simpleType>
+          <xs:simpleType>
+            <xs:restriction base="xs:token">
+              <xs:enumeration value="chars">
+                <xs:annotation>
+                  <xs:documentation>(characters) characters of text</xs:documentation>
+                </xs:annotation>
+              </xs:enumeration>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:union>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.dimensions.attribute.quantity">
+    <xs:attribute name="quantity" type="ns1:tei_data.numeric">
+      <xs:annotation>
+        <xs:documentation>specifies the length in the units specified</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.dimensions.attribute.extent">
+    <xs:attribute name="extent" type="ns1:tei_data.text">
+      <xs:annotation>
+        <xs:documentation>indicates the size of the object concerned using a project-specific vocabulary combining quantity and units in a single string of words.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.dimensions.attribute.precision">
+    <xs:attribute name="precision" type="ns1:tei_data.certainty">
+      <xs:annotation>
+        <xs:documentation>characterizes the precision of the values specified by the other attributes.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.dimensions.attribute.scope">
+    <xs:attribute name="scope" type="ns1:tei_data.enumerated">
+      <xs:annotation>
+        <xs:documentation>where the measurement summarizes more than one observation, specifies the applicability of this measurement.
+Sample values include: 1] all; 2] most; 3] range</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.damaged.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.dimensions.attributes"/>
+    <xs:attributeGroup ref="ns1:tei_att.damaged.attribute.hand"/>
+    <xs:attributeGroup ref="ns1:tei_att.damaged.attribute.agent"/>
+    <xs:attributeGroup ref="ns1:tei_att.damaged.attribute.degree"/>
+    <xs:attributeGroup ref="ns1:tei_att.damaged.attribute.group"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.damaged.attribute.hand">
+    <xs:attribute name="hand" type="ns1:tei_data.pointer">
+      <xs:annotation>
+        <xs:documentation>in the case of damage (deliberate defacement, inking out, etc.) assignable to a distinct hand, signifies the hand responsible for the damage by pointing to one of the hand identifiers declared in the document header (see section ).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.damaged.attribute.agent">
+    <xs:attribute name="agent" type="ns1:tei_data.enumerated">
+      <xs:annotation>
+        <xs:documentation>categorizes the cause of the damage, if it can be identified.
+Sample values include: 1] rubbing; 2] mildew; 3] smoke</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.damaged.attribute.degree">
+    <xs:attribute name="degree">
+      <xs:annotation>
+        <xs:documentation>provides a coded representation of the degree of damage, either as a number between 0 (undamaged) and 1 (very extensively damaged), or as one of the codes high, medium, low, or unknown. The damage element with the degree attribute should only be used where the text may be read with some confidence; text supplied from other sources should be tagged as supplied.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="ns1:tei_data.probability ns1:tei_data.certainty"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.damaged.attribute.group">
+    <xs:attribute name="group" type="ns1:tei_data.count">
+      <xs:annotation>
+        <xs:documentation>assigns an arbitrary number to each stretch of damage regarded as forming part of the same physical phenomenon.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.declarable.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.declarable.attribute.default"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.declarable.attribute.default">
+    <xs:attribute name="default" default="false">
+      <xs:annotation>
+        <xs:documentation>indicates whether or not this element is selected by default when its parent is selected.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="true">
+            <xs:annotation>
+              <xs:documentation>This element is selected if its parent is selected</xs:documentation>
+            </xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="false">
+            <xs:annotation>
+              <xs:documentation>This element can only be selected explicitly, unless it is the only one of its kind, in which case it is selected if its parent is selected.</xs:documentation>
+            </xs:annotation>
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.declaring.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.declaring.attribute.decls"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.declaring.attribute.decls">
+    <xs:attribute name="decls">
+      <xs:annotation>
+        <xs:documentation>identifies one or more declarable elements within the header, which are understood to apply to the element bearing this attribute and its content.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction>
+          <xs:simpleType>
+            <xs:list itemType="ns1:tei_data.pointer"/>
+          </xs:simpleType>
+          <xs:minLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.fragmentable.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.fragmentable.attribute.part"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.fragmentable.attribute.part">
+    <xs:attribute name="part" default="N">
+      <xs:annotation>
+        <xs:documentation>specifies whether or not its parent element is fragmented in some way, typically by some other overlapping structure: for example a speech which is divided between two or more verse stanzas, a paragraph which is split across a page division, a verse line which is divided between two speakers.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="Y">
+            <xs:annotation>
+              <xs:documentation>(yes) the element is fragmented in some (unspecified) respect</xs:documentation>
+            </xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="N">
+            <xs:annotation>
+              <xs:documentation>(no) either the element is not fragmented, or no claim is made as to its completeness.</xs:documentation>
+            </xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="I">
+            <xs:annotation>
+              <xs:documentation>(initial) this is the initial part of a fragmented element</xs:documentation>
+            </xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="M">
+            <xs:annotation>
+              <xs:documentation>(medial) this is a medial part of a fragmented element</xs:documentation>
+            </xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="F">
+            <xs:annotation>
+              <xs:documentation>(final) this is the final part of a fragmented element</xs:documentation>
+            </xs:annotation>
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.divLike.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.fragmentable.attributes"/>
+    <xs:attributeGroup ref="ns1:tei_att.divLike.attribute.org"/>
+    <xs:attributeGroup ref="ns1:tei_att.divLike.attribute.sample"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.divLike.attribute.org">
+    <xs:attribute name="org" default="uniform">
+      <xs:annotation>
+        <xs:documentation>(organization) specifies how the content of the division is organized.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="composite">
+            <xs:annotation>
+              <xs:documentation>no claim is made about the sequence in which the immediate contents of this division are to be processed, or their inter-relationships.</xs:documentation>
+            </xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="uniform">
+            <xs:annotation>
+              <xs:documentation>the immediate contents of this element are regarded as forming a logical unit, to be processed in sequence.</xs:documentation>
+            </xs:annotation>
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.divLike.attribute.sample">
+    <xs:attribute name="sample" default="complete">
+      <xs:annotation>
+        <xs:documentation>indicates whether this division is a sample of the original source and if so, from which part.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="initial">
+            <xs:annotation>
+              <xs:documentation>division lacks material present at end in source.</xs:documentation>
+            </xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="medial">
+            <xs:annotation>
+              <xs:documentation>division lacks material at start and end.</xs:documentation>
+            </xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="final">
+            <xs:annotation>
+              <xs:documentation>division lacks material at start.</xs:documentation>
+            </xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="unknown">
+            <xs:annotation>
+              <xs:documentation>position of sampled material within original unknown.</xs:documentation>
+            </xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="complete">
+            <xs:annotation>
+              <xs:documentation>division is not a sample.</xs:documentation>
+            </xs:annotation>
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.docStatus.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.docStatus.attribute.status"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.docStatus.attribute.status">
+    <xs:attribute name="status" default="draft" type="ns1:tei_data.enumerated">
+      <xs:annotation>
+        <xs:documentation>describes the status of a document either currently or, when associated with a dated element, at the time indicated.
+Sample values include: 1] approved; 2] candidate; 3] cleared; 4] deprecated; 5] draft; 6] embargoed; 7] expired; 8] frozen; 9] galley; 10] proposed; 11] published; 12] recommendation; 13] submitted; 14] unfinished; 15] withdrawn</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.responsibility.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.source.attributes"/>
+    <xs:attributeGroup ref="ns1:tei_att.responsibility.attribute.cert"/>
+    <xs:attributeGroup ref="ns1:tei_att.responsibility.attribute.resp"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.responsibility.attribute.cert">
+    <xs:attribute name="cert" type="ns1:tei_data.certainty">
+      <xs:annotation>
+        <xs:documentation>(certainty) signifies the degree of certainty associated with the intervention or interpretation.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.responsibility.attribute.resp">
+    <xs:attribute name="resp">
+      <xs:annotation>
+        <xs:documentation>(responsible party) indicates the agency responsible for the intervention or interpretation, for example an editor or transcriber.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction>
+          <xs:simpleType>
+            <xs:list itemType="ns1:tei_data.pointer"/>
+          </xs:simpleType>
+          <xs:minLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.editLike.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.dimensions.attributes"/>
+    <xs:attributeGroup ref="ns1:tei_att.responsibility.attributes"/>
+    <xs:attributeGroup ref="ns1:tei_att.editLike.attribute.evidence"/>
+    <xs:attributeGroup ref="ns1:tei_att.editLike.attribute.instant"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.editLike.attribute.evidence">
+    <xs:attribute name="evidence">
+      <xs:annotation>
+        <xs:documentation>indicates the nature of the evidence supporting the reliability or accuracy of the intervention or interpretation.
+Suggested values include: 1] internal; 2] external; 3] conjecture</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction>
+          <xs:simpleType>
+            <xs:list>
+              <xs:simpleType>
+                <xs:union memberTypes="xs:Name">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:enumeration value="internal">
+                        <xs:annotation>
+                          <xs:documentation>there is internal evidence to support the intervention.</xs:documentation>
+                        </xs:annotation>
+                      </xs:enumeration>
+                    </xs:restriction>
+                  </xs:simpleType>
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:enumeration value="external">
+                        <xs:annotation>
+                          <xs:documentation>there is external evidence to support the intervention.</xs:documentation>
+                        </xs:annotation>
+                      </xs:enumeration>
+                    </xs:restriction>
+                  </xs:simpleType>
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:enumeration value="conjecture">
+                        <xs:annotation>
+                          <xs:documentation>the intervention or interpretation has been made by the editor, cataloguer, or scholar on the basis of their expertise.</xs:documentation>
+                        </xs:annotation>
+                      </xs:enumeration>
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:union>
+              </xs:simpleType>
+            </xs:list>
+          </xs:simpleType>
+          <xs:minLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.editLike.attribute.instant">
+    <xs:attribute name="instant" default="false" type="ns1:tei_data.xTruthValue">
+      <xs:annotation>
+        <xs:documentation>indicates whether this is an instant revision or not.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.global.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.global.facs.attributes"/>
+    <xs:attributeGroup ref="ns1:tei_att.global.change.attributes"/>
+    <xs:attributeGroup ref="ns1:tei_att.global.attribute.xmlid"/>
+    <xs:attributeGroup ref="ns1:tei_att.global.attribute.n"/>
+    <xs:attributeGroup ref="ns1:tei_att.global.attribute.xmllang"/>
+    <xs:attributeGroup ref="ns1:tei_att.global.attribute.rend"/>
+    <xs:attributeGroup ref="ns1:tei_att.global.attribute.style"/>
+    <xs:attributeGroup ref="ns1:tei_att.global.attribute.rendition"/>
+    <xs:attributeGroup ref="ns1:tei_att.global.attribute.xmlbase"/>
+    <xs:attributeGroup ref="ns1:tei_att.global.attribute.xmlspace"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.global.attribute.xmlid">
+    <xs:attribute ref="xml:id"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.global.attribute.n">
+    <xs:attribute name="n" type="ns1:tei_data.text">
+      <xs:annotation>
+        <xs:documentation>(number) gives a number (or other label) for an element, which is not necessarily unique within the document.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.global.attribute.xmllang">
+    <xs:attribute ref="xml:lang"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.global.attribute.rend">
+    <xs:attribute name="rend">
+      <xs:annotation>
+        <xs:documentation>(rendition) indicates how the element in question was rendered or presented in the source text.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction>
+          <xs:simpleType>
+            <xs:list itemType="ns1:tei_data.word"/>
+          </xs:simpleType>
+          <xs:minLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.global.attribute.style">
+    <xs:attribute name="style" type="ns1:tei_data.text">
+      <xs:annotation>
+        <xs:documentation>contains an expression in some formal style definition language which defines the rendering or presentation used for this element in the source text</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.global.attribute.rendition">
+    <xs:attribute name="rendition">
+      <xs:annotation>
+        <xs:documentation>points to a description of the rendering or presentation used for this element in the source text.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction>
+          <xs:simpleType>
+            <xs:list itemType="ns1:tei_data.pointer"/>
+          </xs:simpleType>
+          <xs:minLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.global.attribute.xmlbase">
+    <xs:attribute ref="xml:base"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.global.attribute.xmlspace">
+    <xs:attribute ref="xml:space"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.naming.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.canonical.attributes"/>
+    <xs:attributeGroup ref="ns1:tei_att.naming.attribute.role"/>
+    <xs:attributeGroup ref="ns1:tei_att.naming.attribute.nymRef"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.naming.attribute.role">
+    <xs:attribute name="role">
+      <xs:annotation>
+        <xs:documentation>may be used to specify further information about the entity referenced by this name in the form of a set of whitespace-separated values, for example the occupation of a person, or the status of a place.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction>
+          <xs:simpleType>
+            <xs:list itemType="ns1:tei_data.enumerated"/>
+          </xs:simpleType>
+          <xs:minLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.naming.attribute.nymRef">
+    <xs:attribute name="nymRef">
+      <xs:annotation>
+        <xs:documentation>(reference to the canonical name) provides a means of locating the canonical form (nym) of the names associated with the object named by the element bearing it.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction>
+          <xs:simpleType>
+            <xs:list itemType="ns1:tei_data.pointer"/>
+          </xs:simpleType>
+          <xs:minLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.placement.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.placement.attribute.place"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.placement.attribute.place">
+    <xs:attribute name="place">
+      <xs:annotation>
+        <xs:documentation>specifies where this item is placed
+Suggested values include: 1] below; 2] bottom; 3] margin; 4] top; 5] opposite; 6] overleaf; 7] above; 8] end; 9] inline; 10] inspace</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction>
+          <xs:simpleType>
+            <xs:list>
+              <xs:simpleType>
+                <xs:union memberTypes="xs:Name">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:enumeration value="below">
+                        <xs:annotation>
+                          <xs:documentation>below the line</xs:documentation>
+                        </xs:annotation>
+                      </xs:enumeration>
+                    </xs:restriction>
+                  </xs:simpleType>
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:enumeration value="bottom">
+                        <xs:annotation>
+                          <xs:documentation>at the foot of the page</xs:documentation>
+                        </xs:annotation>
+                      </xs:enumeration>
+                    </xs:restriction>
+                  </xs:simpleType>
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:enumeration value="margin">
+                        <xs:annotation>
+                          <xs:documentation>in the margin (left, right, or both)</xs:documentation>
+                        </xs:annotation>
+                      </xs:enumeration>
+                    </xs:restriction>
+                  </xs:simpleType>
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:enumeration value="top">
+                        <xs:annotation>
+                          <xs:documentation>at the top of the page</xs:documentation>
+                        </xs:annotation>
+                      </xs:enumeration>
+                    </xs:restriction>
+                  </xs:simpleType>
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:enumeration value="opposite">
+                        <xs:annotation>
+                          <xs:documentation>on the opposite, i.e. facing, page</xs:documentation>
+                        </xs:annotation>
+                      </xs:enumeration>
+                    </xs:restriction>
+                  </xs:simpleType>
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:enumeration value="overleaf">
+                        <xs:annotation>
+                          <xs:documentation>on the other side of the leaf</xs:documentation>
+                        </xs:annotation>
+                      </xs:enumeration>
+                    </xs:restriction>
+                  </xs:simpleType>
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:enumeration value="above">
+                        <xs:annotation>
+                          <xs:documentation>above the line</xs:documentation>
+                        </xs:annotation>
+                      </xs:enumeration>
+                    </xs:restriction>
+                  </xs:simpleType>
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:enumeration value="end">
+                        <xs:annotation>
+                          <xs:documentation>at the end of e.g. chapter or volume.</xs:documentation>
+                        </xs:annotation>
+                      </xs:enumeration>
+                    </xs:restriction>
+                  </xs:simpleType>
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:enumeration value="inline">
+                        <xs:annotation>
+                          <xs:documentation>within the body of the text.</xs:documentation>
+                        </xs:annotation>
+                      </xs:enumeration>
+                    </xs:restriction>
+                  </xs:simpleType>
+                  <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                      <xs:enumeration value="inspace">
+                        <xs:annotation>
+                          <xs:documentation>in a predefined space, for example left by an earlier scribe.</xs:documentation>
+                        </xs:annotation>
+                      </xs:enumeration>
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:union>
+              </xs:simpleType>
+            </xs:list>
+          </xs:simpleType>
+          <xs:minLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.typed.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.typed.attribute.type"/>
+    <xs:attributeGroup ref="ns1:tei_att.typed.attribute.subtype"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.typed.attribute.type">
+    <xs:attribute name="type" type="ns1:tei_data.enumerated">
+      <xs:annotation>
+        <xs:documentation>characterizes the element in some sense, using any convenient classification scheme or typology.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.typed.attribute.subtype">
+    <xs:attribute name="subtype" type="ns1:tei_data.enumerated">
+      <xs:annotation>
+        <xs:documentation>provides a sub-categorization of the element, if needed</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.pointing.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.pointing.attribute.targetLang"/>
+    <xs:attributeGroup ref="ns1:tei_att.pointing.attribute.target"/>
+    <xs:attributeGroup ref="ns1:tei_att.pointing.attribute.evaluate"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.pointing.attribute.targetLang">
+    <xs:attribute name="targetLang" type="ns1:tei_data.language">
+      <xs:annotation>
+        <xs:documentation>specifies the language of the content to be found at the destination referenced by target, using a language tag generated according to BCP 47.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.pointing.attribute.target">
+    <xs:attribute name="target">
+      <xs:annotation>
+        <xs:documentation>specifies the destination of the reference by supplying one or more URI References</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction>
+          <xs:simpleType>
+            <xs:list itemType="ns1:tei_data.pointer"/>
+          </xs:simpleType>
+          <xs:minLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.pointing.attribute.evaluate">
+    <xs:attribute name="evaluate">
+      <xs:annotation>
+        <xs:documentation>specifies the intended meaning when the target of a pointer is itself a pointer.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="all">
+            <xs:annotation>
+              <xs:documentation>if the element pointed to is itself a pointer, then the target of that pointer will be taken, and so on, until an element is found which is not a pointer.</xs:documentation>
+            </xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="one">
+            <xs:annotation>
+              <xs:documentation>if the element pointed to is itself a pointer, then its target (whether a pointer or not) is taken as the target of this pointer.</xs:documentation>
+            </xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="none">
+            <xs:annotation>
+              <xs:documentation>no further evaluation of targets is carried out beyond that needed to find the element specified in the pointer's target.</xs:documentation>
+            </xs:annotation>
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.spanning.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.spanning.attribute.spanTo"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.spanning.attribute.spanTo">
+    <xs:attribute name="spanTo" type="ns1:tei_data.pointer">
+      <xs:annotation>
+        <xs:documentation>indicates the end of a span initiated by the element bearing this attribute.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.tableDecoration.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.tableDecoration.attribute.role"/>
+    <xs:attributeGroup ref="ns1:tei_att.tableDecoration.attribute.rows"/>
+    <xs:attributeGroup ref="ns1:tei_att.tableDecoration.attribute.cols"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.tableDecoration.attribute.role">
+    <xs:attribute name="role" default="data">
+      <xs:annotation>
+        <xs:documentation>indicates the kind of information held in this cell or in each cell of this row.
+Suggested values include: 1] label; 2] data</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:Name">
+          <xs:simpleType>
+            <xs:restriction base="xs:token">
+              <xs:enumeration value="label">
+                <xs:annotation>
+                  <xs:documentation>labelling or descriptive information only.</xs:documentation>
+                </xs:annotation>
+              </xs:enumeration>
+            </xs:restriction>
+          </xs:simpleType>
+          <xs:simpleType>
+            <xs:restriction base="xs:token">
+              <xs:enumeration value="data">
+                <xs:annotation>
+                  <xs:documentation>data values.</xs:documentation>
+                </xs:annotation>
+              </xs:enumeration>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:union>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.tableDecoration.attribute.rows">
+    <xs:attribute name="rows" default="1" type="ns1:tei_data.count">
+      <xs:annotation>
+        <xs:documentation>indicates the number of rows occupied by this cell or row.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.tableDecoration.attribute.cols">
+    <xs:attribute name="cols" default="1" type="ns1:tei_data.count">
+      <xs:annotation>
+        <xs:documentation>(columns) indicates the number of columns occupied by this cell or row.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.transcriptional.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.editLike.attributes"/>
+    <xs:attributeGroup ref="ns1:tei_att.transcriptional.attribute.hand"/>
+    <xs:attributeGroup ref="ns1:tei_att.transcriptional.attribute.status"/>
+    <xs:attributeGroup ref="ns1:tei_att.transcriptional.attribute.cause"/>
+    <xs:attributeGroup ref="ns1:tei_att.transcriptional.attribute.seq"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.transcriptional.attribute.hand">
+    <xs:attribute name="hand" type="ns1:tei_data.pointer">
+      <xs:annotation>
+        <xs:documentation>indicates the hand of the agent which made the intervention.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.transcriptional.attribute.status">
+    <xs:attribute name="status" default="unremarkable" type="ns1:tei_data.enumerated">
+      <xs:annotation>
+        <xs:documentation>indicates the effect of the intervention, for example in the case of a deletion, strikeouts which include too much or too little text, or in the case of an addition, an insertion which duplicates some of the text already present.
+Sample values include: 1] duplicate; 2] duplicate-partial; 3] excessStart; 4] excessEnd; 5] shortStart; 6] shortEnd; 7] partial; 8] unremarkable</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.transcriptional.attribute.cause">
+    <xs:attribute name="cause">
+      <xs:annotation>
+        <xs:documentation>documents the presumed cause for the intervention.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="fix">
+            <xs:annotation>
+              <xs:documentation>repeated for the purpose of fixation</xs:documentation>
+            </xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="unclear">
+            <xs:annotation>
+              <xs:documentation>repeated to clarify a previously illegible or badly written text or mark</xs:documentation>
+            </xs:annotation>
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.transcriptional.attribute.seq">
+    <xs:attribute name="seq" type="ns1:tei_data.count">
+      <xs:annotation>
+        <xs:documentation>(sequence) assigns a sequence number related to the order in which the encoded features carrying this attribute are believed to have occurred.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.translatable.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.translatable.attribute.versionDate"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.translatable.attribute.versionDate">
+    <xs:attribute name="versionDate" type="ns1:tei_data.temporal.w3c">
+      <xs:annotation>
+        <xs:documentation>specifies the date on which the source text was extracted and sent to the translator</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:group name="tei_model.hiLike">
+    <xs:sequence>
+      <xs:element ref="ns1:hi"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.hiLike_alternation">
+    <xs:sequence>
+      <xs:element ref="ns1:hi"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.hiLike_sequence">
+    <xs:sequence>
+      <xs:element ref="ns1:hi"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.hiLike_sequenceOptional">
+    <xs:sequence>
+      <xs:element minOccurs="0" ref="ns1:hi"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.hiLike_sequenceOptionalRepeatable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:hi"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.hiLike_sequenceRepeatable">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" ref="ns1:hi"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.emphLike">
+    <xs:sequence>
+      <xs:element ref="ns1:title"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.emphLike_alternation">
+    <xs:sequence>
+      <xs:element ref="ns1:title"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.emphLike_sequence">
+    <xs:sequence>
+      <xs:element ref="ns1:title"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.emphLike_sequenceOptional">
+    <xs:sequence>
+      <xs:element minOccurs="0" ref="ns1:title"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.emphLike_sequenceOptionalRepeatable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:title"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.emphLike_sequenceRepeatable">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" ref="ns1:title"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.highlighted">
+    <xs:choice>
+      <xs:group ref="ns1:tei_model.hiLike"/>
+      <xs:group ref="ns1:tei_model.emphLike"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="tei_model.pPart.editorial">
+    <xs:choice>
+      <xs:element ref="ns1:choice"/>
+      <xs:element ref="ns1:subst"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="tei_model.pPart.editorial_alternation">
+    <xs:choice>
+      <xs:element ref="ns1:choice"/>
+      <xs:element ref="ns1:subst"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="tei_model.pPart.editorial_sequence">
+    <xs:sequence>
+      <xs:element ref="ns1:choice"/>
+      <xs:element ref="ns1:subst"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.pPart.editorial_sequenceOptional">
+    <xs:sequence>
+      <xs:element minOccurs="0" ref="ns1:choice"/>
+      <xs:element minOccurs="0" ref="ns1:subst"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.pPart.editorial_sequenceOptionalRepeatable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:choice"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:subst"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.pPart.editorial_sequenceRepeatable">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" ref="ns1:choice"/>
+      <xs:element maxOccurs="unbounded" ref="ns1:subst"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.pPart.transcriptional">
+    <xs:choice>
+      <xs:element ref="ns1:corr"/>
+      <xs:element ref="ns1:add"/>
+      <xs:element ref="ns1:del"/>
+      <xs:element ref="ns1:damage"/>
+      <xs:element ref="ns1:mod"/>
+      <xs:element ref="ns1:undo"/>
+      <xs:element ref="ns1:app"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="tei_model.pPart.transcriptional_alternation">
+    <xs:choice>
+      <xs:element ref="ns1:corr"/>
+      <xs:element ref="ns1:add"/>
+      <xs:element ref="ns1:del"/>
+      <xs:element ref="ns1:damage"/>
+      <xs:element ref="ns1:mod"/>
+      <xs:element ref="ns1:undo"/>
+      <xs:element ref="ns1:app"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="tei_model.pPart.transcriptional_sequence">
+    <xs:sequence>
+      <xs:element ref="ns1:corr"/>
+      <xs:element ref="ns1:add"/>
+      <xs:element ref="ns1:del"/>
+      <xs:element ref="ns1:damage"/>
+      <xs:element ref="ns1:mod"/>
+      <xs:element ref="ns1:undo"/>
+      <xs:element ref="ns1:app"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.pPart.transcriptional_sequenceOptional">
+    <xs:sequence>
+      <xs:element minOccurs="0" ref="ns1:corr"/>
+      <xs:element minOccurs="0" ref="ns1:add"/>
+      <xs:element minOccurs="0" ref="ns1:del"/>
+      <xs:element minOccurs="0" ref="ns1:damage"/>
+      <xs:element minOccurs="0" ref="ns1:mod"/>
+      <xs:element minOccurs="0" ref="ns1:undo"/>
+      <xs:element minOccurs="0" ref="ns1:app"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.pPart.transcriptional_sequenceOptionalRepeatable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:corr"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:add"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:del"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:damage"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:mod"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:undo"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:app"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.pPart.transcriptional_sequenceRepeatable">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" ref="ns1:corr"/>
+      <xs:element maxOccurs="unbounded" ref="ns1:add"/>
+      <xs:element maxOccurs="unbounded" ref="ns1:del"/>
+      <xs:element maxOccurs="unbounded" ref="ns1:damage"/>
+      <xs:element maxOccurs="unbounded" ref="ns1:mod"/>
+      <xs:element maxOccurs="unbounded" ref="ns1:undo"/>
+      <xs:element maxOccurs="unbounded" ref="ns1:app"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.pPart.edit">
+    <xs:choice>
+      <xs:group ref="ns1:tei_model.pPart.editorial"/>
+      <xs:group ref="ns1:tei_model.pPart.transcriptional"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="tei_model.linePart">
+    <xs:choice>
+      <xs:group ref="ns1:tei_model.hiLike"/>
+      <xs:group ref="ns1:tei_model.pPart.transcriptional"/>
+      <xs:element ref="ns1:choice"/>
+      <xs:element ref="ns1:zone"/>
+      <xs:element ref="ns1:line"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="tei_model.headLike">
+    <xs:sequence>
+      <xs:element ref="ns1:head"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.headLike_alternation">
+    <xs:sequence>
+      <xs:element ref="ns1:head"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.headLike_sequence">
+    <xs:sequence>
+      <xs:element ref="ns1:head"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.headLike_sequenceOptional">
+    <xs:sequence>
+      <xs:element minOccurs="0" ref="ns1:head"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.headLike_sequenceOptionalRepeatable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:head"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.headLike_sequenceRepeatable">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" ref="ns1:head"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.labelLike">
+    <xs:sequence>
+      <xs:element ref="ns1:desc"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.labelLike_alternation">
+    <xs:sequence>
+      <xs:element ref="ns1:desc"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.labelLike_sequence">
+    <xs:sequence>
+      <xs:element ref="ns1:desc"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.labelLike_sequenceOptional">
+    <xs:sequence>
+      <xs:element minOccurs="0" ref="ns1:desc"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.labelLike_sequenceOptionalRepeatable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:desc"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.labelLike_sequenceRepeatable">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" ref="ns1:desc"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.listLike">
+    <xs:sequence>
+      <xs:element ref="ns1:table"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.listLike_alternation">
+    <xs:sequence>
+      <xs:element ref="ns1:table"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.listLike_sequence">
+    <xs:sequence>
+      <xs:element ref="ns1:table"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.listLike_sequenceOptional">
+    <xs:sequence>
+      <xs:element minOccurs="0" ref="ns1:table"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.listLike_sequenceOptionalRepeatable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:table"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.listLike_sequenceRepeatable">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" ref="ns1:table"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.noteLike">
+    <xs:sequence>
+      <xs:element ref="ns1:note"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.pLike">
+    <xs:sequence>
+      <xs:element ref="ns1:p"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.pLike_alternation">
+    <xs:sequence>
+      <xs:element ref="ns1:p"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.pLike_sequence">
+    <xs:sequence>
+      <xs:element ref="ns1:p"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.pLike_sequenceOptional">
+    <xs:sequence>
+      <xs:element minOccurs="0" ref="ns1:p"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.pLike_sequenceOptionalRepeatable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:p"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.pLike_sequenceRepeatable">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" ref="ns1:p"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.global.edit">
+    <xs:choice>
+      <xs:element ref="ns1:addSpan"/>
+      <xs:element ref="ns1:damageSpan"/>
+      <xs:element ref="ns1:delSpan"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="tei_model.divPart">
+    <xs:sequence>
+      <xs:group ref="ns1:tei_model.pLike"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.quoteLike">
+    <xs:sequence>
+      <xs:element ref="ns1:quote"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.quoteLike_alternation">
+    <xs:sequence>
+      <xs:element ref="ns1:quote"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.quoteLike_sequence">
+    <xs:sequence>
+      <xs:element ref="ns1:quote"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.quoteLike_sequenceOptional">
+    <xs:sequence>
+      <xs:element minOccurs="0" ref="ns1:quote"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.quoteLike_sequenceOptionalRepeatable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:quote"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.quoteLike_sequenceRepeatable">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" ref="ns1:quote"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.qLike">
+    <xs:choice>
+      <xs:group ref="ns1:tei_model.quoteLike"/>
+      <xs:element ref="ns1:q"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="tei_model.qLike_alternation">
+    <xs:choice>
+      <xs:group ref="ns1:tei_model.quoteLike_alternation"/>
+      <xs:element ref="ns1:q"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="tei_model.qLike_sequence">
+    <xs:sequence>
+      <xs:group ref="ns1:tei_model.quoteLike_sequence"/>
+      <xs:element ref="ns1:q"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.qLike_sequenceOptional">
+    <xs:sequence>
+      <xs:group minOccurs="0" ref="ns1:tei_model.quoteLike_sequenceOptional"/>
+      <xs:element minOccurs="0" ref="ns1:q"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.qLike_sequenceOptionalRepeatable">
+    <xs:sequence>
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.quoteLike_sequenceOptionalRepeatable"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:q"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.qLike_sequenceRepeatable">
+    <xs:sequence>
+      <xs:group maxOccurs="unbounded" ref="ns1:tei_model.quoteLike_sequenceRepeatable"/>
+      <xs:element maxOccurs="unbounded" ref="ns1:q"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.respLike">
+    <xs:sequence>
+      <xs:element ref="ns1:author"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.divTopPart">
+    <xs:sequence>
+      <xs:group ref="ns1:tei_model.headLike"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.divTop">
+    <xs:sequence>
+      <xs:group ref="ns1:tei_model.divTopPart"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.choicePart">
+    <xs:sequence>
+      <xs:element ref="ns1:corr"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.global">
+    <xs:choice>
+      <xs:group ref="ns1:tei_model.noteLike"/>
+      <xs:group ref="ns1:tei_model.global.edit"/>
+      <xs:element ref="ns1:figure"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="tei_model.inter">
+    <xs:choice>
+      <xs:group ref="ns1:tei_model.labelLike"/>
+      <xs:group ref="ns1:tei_model.listLike"/>
+      <xs:group ref="ns1:tei_model.qLike"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="tei_model.common">
+    <xs:choice>
+      <xs:group ref="ns1:tei_model.divPart"/>
+      <xs:group ref="ns1:tei_model.inter"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="tei_model.phrase">
+    <xs:choice>
+      <xs:group ref="ns1:tei_model.highlighted"/>
+      <xs:group ref="ns1:tei_model.pPart.edit"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="tei_model.limitedPhrase">
+    <xs:choice>
+      <xs:group ref="ns1:tei_model.hiLike"/>
+      <xs:group ref="ns1:tei_model.emphLike"/>
+      <xs:group ref="ns1:tei_model.pPart.editorial"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="tei_model.divLike">
+    <xs:sequence>
+      <xs:element ref="ns1:div"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.div1Like">
+    <xs:sequence>
+      <xs:element ref="ns1:div1"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.div2Like">
+    <xs:sequence>
+      <xs:element ref="ns1:div2"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.div3Like">
+    <xs:sequence>
+      <xs:element ref="ns1:div3"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.div4Like">
+    <xs:sequence>
+      <xs:element ref="ns1:div4"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.div5Like">
+    <xs:sequence>
+      <xs:element ref="ns1:div5"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.div6Like">
+    <xs:sequence>
+      <xs:element ref="ns1:div6"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="tei_model.div7Like">
+    <xs:sequence>
+      <xs:element ref="ns1:div7"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:attributeGroup name="tei_att.source.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.source.attribute.source"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.source.attribute.source">
+    <xs:attribute name="source">
+      <xs:annotation>
+        <xs:documentation>provides a pointer to the bibliographical source from which a quotation or citation is drawn.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction>
+          <xs:simpleType>
+            <xs:list itemType="ns1:tei_data.pointer"/>
+          </xs:simpleType>
+          <xs:minLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:group name="tei_model.resourceLike">
+    <xs:choice>
+      <xs:element ref="ns1:facsimile"/>
+      <xs:element ref="ns1:sourceDoc"/>
+    </xs:choice>
+  </xs:group>
+  <xs:element name="p">
+    <xs:annotation>
+      <xs:documentation>(paragraph) marks paragraphs in prose. [3.1.  7.2.5. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ns1:tei_macro.paraContent">
+          <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.declaring.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.fragmentable.attributes"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="hi">
+    <xs:annotation>
+      <xs:documentation>(highlighted) marks a word or phrase as graphically distinct from the surrounding text, for reasons concerning which no claim is made. [3.3.2.2.  3.3.2. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ns1:tei_macro.paraContent">
+          <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="quote">
+    <xs:annotation>
+      <xs:documentation>(quotation) contains a phrase or passage attributed by the narrator or author to some agency external to the text. [3.3.3.  4.3.1. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ns1:tei_macro.specialPara">
+          <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.source.attributes"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="q">
+    <xs:annotation>
+      <xs:documentation>(quoted) contains material which is distinguished from the surrounding text using quotation marks or a similar method, for any one of a variety of reasons including, but not limited to: direct speech or thought, technical terms or jargon, authorial distance, quotations from elsewhere, and passages that are mentioned but not used. [3.3.3. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ns1:tei_macro.specialPara">
+          <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.ascribed.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.source.attributes"/>
+          <xs:attribute name="type">
+            <xs:annotation>
+              <xs:documentation>may be used to indicate whether the offset passage is spoken or thought, or to characterize it more finely.
+Suggested values include: 1] spoken; 2] thought; 3] written; 4] soCalled; 5] foreign; 6] distinct; 7] term; 8] emph; 9] mentioned</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:union memberTypes="xs:Name">
+                <xs:simpleType>
+                  <xs:restriction base="xs:token">
+                    <xs:enumeration value="spoken">
+                      <xs:annotation>
+                        <xs:documentation>representation of speech</xs:documentation>
+                      </xs:annotation>
+                    </xs:enumeration>
+                  </xs:restriction>
+                </xs:simpleType>
+                <xs:simpleType>
+                  <xs:restriction base="xs:token">
+                    <xs:enumeration value="thought">
+                      <xs:annotation>
+                        <xs:documentation>representation of thought, e.g. internal monologue</xs:documentation>
+                      </xs:annotation>
+                    </xs:enumeration>
+                  </xs:restriction>
+                </xs:simpleType>
+                <xs:simpleType>
+                  <xs:restriction base="xs:token">
+                    <xs:enumeration value="written">
+                      <xs:annotation>
+                        <xs:documentation>quotation from a written source</xs:documentation>
+                      </xs:annotation>
+                    </xs:enumeration>
+                  </xs:restriction>
+                </xs:simpleType>
+                <xs:simpleType>
+                  <xs:restriction base="xs:token">
+                    <xs:enumeration value="soCalled">
+                      <xs:annotation>
+                        <xs:documentation>authorial distance</xs:documentation>
+                      </xs:annotation>
+                    </xs:enumeration>
+                  </xs:restriction>
+                </xs:simpleType>
+                <xs:simpleType>
+                  <xs:restriction base="xs:token">
+                    <xs:enumeration value="foreign"/>
+                  </xs:restriction>
+                </xs:simpleType>
+                <xs:simpleType>
+                  <xs:restriction base="xs:token">
+                    <xs:enumeration value="distinct">
+                      <xs:annotation>
+                        <xs:documentation>linguistically distinct</xs:documentation>
+                      </xs:annotation>
+                    </xs:enumeration>
+                  </xs:restriction>
+                </xs:simpleType>
+                <xs:simpleType>
+                  <xs:restriction base="xs:token">
+                    <xs:enumeration value="term">
+                      <xs:annotation>
+                        <xs:documentation>technical term</xs:documentation>
+                      </xs:annotation>
+                    </xs:enumeration>
+                  </xs:restriction>
+                </xs:simpleType>
+                <xs:simpleType>
+                  <xs:restriction base="xs:token">
+                    <xs:enumeration value="emph">
+                      <xs:annotation>
+                        <xs:documentation>rhetorically emphasized</xs:documentation>
+                      </xs:annotation>
+                    </xs:enumeration>
+                  </xs:restriction>
+                </xs:simpleType>
+                <xs:simpleType>
+                  <xs:restriction base="xs:token">
+                    <xs:enumeration value="mentioned">
+                      <xs:annotation>
+                        <xs:documentation>refering to itself, not its normal referent</xs:documentation>
+                      </xs:annotation>
+                    </xs:enumeration>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:union>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="desc">
+    <xs:annotation>
+      <xs:documentation>(description) contains a brief description of the object documented by its parent element, including its intended usage, purpose, or application where this is appropriate. [22.4.1. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ns1:tei_macro.limitedContent">
+          <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.translatable.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="corr">
+    <xs:annotation>
+      <xs:documentation>(correction) contains the correct form of a passage apparently erroneous in the copy text. [3.4.1. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ns1:tei_macro.paraContent">
+          <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.editLike.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="choice">
+    <xs:annotation>
+      <xs:documentation>groups a number of alternative encodings for the same point in a text. [3.4. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="ns1:tei_model.choicePart"/>
+        <xs:element ref="ns1:choice"/>
+      </xs:choice>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="add">
+    <xs:annotation>
+      <xs:documentation>(addition) contains letters, words, or phrases inserted in the source text by an author, scribe, or a previous annotator or corrector. [3.4.3. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ns1:tei_macro.paraContent">
+          <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.transcriptional.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.placement.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="del">
+    <xs:annotation>
+      <xs:documentation>(deletion) contains a letter, word, or passage deleted, marked as deleted, or otherwise indicated as superfluous or spurious in the copy text by an author, scribe, or a previous annotator or corrector. [3.4.3. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ns1:tei_macro.paraContent">
+          <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.transcriptional.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="head">
+    <xs:annotation>
+      <xs:documentation>(heading) contains any type of heading, for example the title of a section, or the heading of a list, glossary, manuscript description, etc. [4.2.1. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="ns1:tei_model.phrase"/>
+        <xs:group ref="ns1:tei_model.inter"/>
+        <xs:group ref="ns1:tei_model.global"/>
+      </xs:choice>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="note">
+    <xs:annotation>
+      <xs:documentation>contains a note or annotation. [3.8.1.  2.2.6.  3.11.2.8.  9.3.5.4. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ns1:tei_macro.specialPara">
+          <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.placement.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.pointing.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.responsibility.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+          <xs:attribute name="anchored" default="true" type="ns1:tei_data.truthValue">
+            <xs:annotation>
+              <xs:documentation>indicates whether the copy text shows the exact place of reference for the note.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="targetEnd">
+            <xs:annotation>
+              <xs:documentation>points to the end of the span to which the note is attached, if the note is not embedded in the text at that point.</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction>
+                <xs:simpleType>
+                  <xs:list itemType="ns1:tei_data.pointer"/>
+                </xs:simpleType>
+                <xs:minLength value="1"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="author">
+    <xs:annotation>
+      <xs:documentation>in a bibliographic reference, contains the name(s) of an author, personal or corporate, of a work; for example in the same form as that provided by a recognized bibliographic name authority. [3.11.2.2.  2.2.1. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ns1:tei_macro.phraseSeq">
+          <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.naming.attributes"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="title">
+    <xs:annotation>
+      <xs:documentation>contains a title for any kind of work. [3.11.2.2.  2.2.1.  2.2.5. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ns1:tei_macro.paraContent">
+          <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.canonical.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.typed.attribute.subtype"/>
+          <xs:attribute name="type" type="ns1:tei_data.enumerated">
+            <xs:annotation>
+              <xs:documentation>classifies the title according to some convenient typology.
+Sample values include: 1] main; 2] sub(subordinate) ; 3] alt(alternate) ; 4] short; 5] desc(descriptive) </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="level">
+            <xs:annotation>
+              <xs:documentation>indicates the bibliographic level for a title, that is, whether it identifies an article, book, journal, series, or unpublished material.</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:token">
+                <xs:enumeration value="a">
+                  <xs:annotation>
+                    <xs:documentation>(analytic) the title applies to an analytic item, such as an article, poem, or other work published as part of a larger item.</xs:documentation>
+                  </xs:annotation>
+                </xs:enumeration>
+                <xs:enumeration value="m">
+                  <xs:annotation>
+                    <xs:documentation>(monographic) the title applies to a monograph such as a book or other item considered to be a distinct publication, including single volumes of multi-volume works</xs:documentation>
+                  </xs:annotation>
+                </xs:enumeration>
+                <xs:enumeration value="j">
+                  <xs:annotation>
+                    <xs:documentation>(journal) the title applies to any serial or periodical publication such as a journal, magazine, or newspaper</xs:documentation>
+                  </xs:annotation>
+                </xs:enumeration>
+                <xs:enumeration value="s">
+                  <xs:annotation>
+                    <xs:documentation>(series) the title applies to a series of otherwise distinct publications such as a collection</xs:documentation>
+                  </xs:annotation>
+                </xs:enumeration>
+                <xs:enumeration value="u">
+                  <xs:annotation>
+                    <xs:documentation>(unpublished) the title applies to any unpublished material (including theses and dissertations unless published by a commercial press)</xs:documentation>
+                  </xs:annotation>
+                </xs:enumeration>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="TEI">
+    <xs:annotation>
+      <xs:documentation>(TEI document) contains a single TEI-conformant document, comprising a TEI header and a text, either in isolation or as part of a teiCorpus element. [4.  15.1. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:teiHeader"/>
+        <xs:choice>
+          <xs:sequence>
+            <xs:group maxOccurs="unbounded" ref="ns1:tei_model.resourceLike"/>
+            <xs:element minOccurs="0" ref="ns1:text"/>
+          </xs:sequence>
+          <xs:element ref="ns1:text"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attribute name="version" type="ns1:tei_data.version">
+        <xs:annotation>
+          <xs:documentation>specifies the major version number of the TEI Guidelines against which this document is valid.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="text">
+    <xs:annotation>
+      <xs:documentation>contains a single text of any kind, whether unitary or composite, for example a poem or drama, a collection of essays, a novel, a dictionary, or a corpus sample. [4.  15.1. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+        <xs:element ref="ns1:body"/>
+        <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.declaring.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="body">
+    <xs:annotation>
+      <xs:documentation>(text body) contains the whole body of a single unitary text, excluding any front or back matter. [4. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+        <xs:sequence minOccurs="0">
+          <xs:group ref="ns1:tei_model.divTop"/>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="ns1:tei_model.global"/>
+            <xs:group ref="ns1:tei_model.divTop"/>
+          </xs:choice>
+        </xs:sequence>
+        <xs:choice>
+          <xs:sequence maxOccurs="unbounded">
+            <xs:group ref="ns1:tei_model.divLike"/>
+            <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+          </xs:sequence>
+          <xs:sequence maxOccurs="unbounded">
+            <xs:group ref="ns1:tei_model.div1Like"/>
+            <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+          </xs:sequence>
+          <xs:sequence>
+            <xs:sequence maxOccurs="unbounded">
+              <xs:group ref="ns1:tei_model.common"/>
+              <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+            </xs:sequence>
+            <xs:choice minOccurs="0">
+              <xs:sequence maxOccurs="unbounded">
+                <xs:group ref="ns1:tei_model.divLike"/>
+                <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+              </xs:sequence>
+              <xs:sequence maxOccurs="unbounded">
+                <xs:group ref="ns1:tei_model.div1Like"/>
+                <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+              </xs:sequence>
+            </xs:choice>
+          </xs:sequence>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.declaring.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="div">
+    <xs:annotation>
+      <xs:documentation>(text division) contains a subdivision of the front, body, or back of a text. [4.1. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:group ref="ns1:tei_model.divTop"/>
+          <xs:group ref="ns1:tei_model.global"/>
+        </xs:choice>
+        <xs:choice minOccurs="0">
+          <xs:sequence maxOccurs="unbounded">
+            <xs:group ref="ns1:tei_model.divLike"/>
+            <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+          </xs:sequence>
+          <xs:sequence>
+            <xs:sequence maxOccurs="unbounded">
+              <xs:group ref="ns1:tei_model.common"/>
+              <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+            </xs:sequence>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+              <xs:group ref="ns1:tei_model.divLike"/>
+              <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+            </xs:sequence>
+          </xs:sequence>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.divLike.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.declaring.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="div1">
+    <xs:annotation>
+      <xs:documentation>(level-1 text division) contains a first-level subdivision of the front, body, or back of a text. [4.1.2. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:group ref="ns1:tei_model.divTop"/>
+          <xs:group ref="ns1:tei_model.global"/>
+        </xs:choice>
+        <xs:choice minOccurs="0">
+          <xs:sequence maxOccurs="unbounded">
+            <xs:group ref="ns1:tei_model.div2Like"/>
+            <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+          </xs:sequence>
+          <xs:sequence>
+            <xs:sequence maxOccurs="unbounded">
+              <xs:group ref="ns1:tei_model.common"/>
+              <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+            </xs:sequence>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+              <xs:group ref="ns1:tei_model.div2Like"/>
+              <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+            </xs:sequence>
+          </xs:sequence>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.divLike.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.declaring.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="div2">
+    <xs:annotation>
+      <xs:documentation>(level-2 text division) contains a second-level subdivision of the front, body, or back of a text. [4.1.2. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:group ref="ns1:tei_model.divTop"/>
+          <xs:group ref="ns1:tei_model.global"/>
+        </xs:choice>
+        <xs:choice minOccurs="0">
+          <xs:sequence maxOccurs="unbounded">
+            <xs:group ref="ns1:tei_model.div3Like"/>
+            <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+          </xs:sequence>
+          <xs:sequence>
+            <xs:sequence maxOccurs="unbounded">
+              <xs:group ref="ns1:tei_model.common"/>
+              <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+            </xs:sequence>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+              <xs:group ref="ns1:tei_model.div3Like"/>
+              <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+            </xs:sequence>
+          </xs:sequence>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.divLike.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.declaring.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="div3">
+    <xs:annotation>
+      <xs:documentation>(level-3 text division) contains a third-level subdivision of the front, body, or back of a text. [4.1.2. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:group ref="ns1:tei_model.divTop"/>
+          <xs:group ref="ns1:tei_model.global"/>
+        </xs:choice>
+        <xs:choice minOccurs="0">
+          <xs:sequence maxOccurs="unbounded">
+            <xs:group ref="ns1:tei_model.div4Like"/>
+            <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+          </xs:sequence>
+          <xs:sequence>
+            <xs:sequence maxOccurs="unbounded">
+              <xs:group ref="ns1:tei_model.common"/>
+              <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+            </xs:sequence>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+              <xs:group ref="ns1:tei_model.div4Like"/>
+              <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+            </xs:sequence>
+          </xs:sequence>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.divLike.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.declaring.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="div4">
+    <xs:annotation>
+      <xs:documentation>(level-4 text division) contains a fourth-level subdivision of the front, body, or back of a text. [4.1.2. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:group ref="ns1:tei_model.divTop"/>
+          <xs:group ref="ns1:tei_model.global"/>
+        </xs:choice>
+        <xs:choice minOccurs="0">
+          <xs:sequence maxOccurs="unbounded">
+            <xs:group ref="ns1:tei_model.div5Like"/>
+            <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+          </xs:sequence>
+          <xs:sequence>
+            <xs:sequence maxOccurs="unbounded">
+              <xs:group ref="ns1:tei_model.common"/>
+              <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+            </xs:sequence>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+              <xs:group ref="ns1:tei_model.div5Like"/>
+              <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+            </xs:sequence>
+          </xs:sequence>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.divLike.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.declaring.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="div5">
+    <xs:annotation>
+      <xs:documentation>(level-5 text division) contains a fifth-level subdivision of the front, body, or back of a text. [4.1.2. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:group ref="ns1:tei_model.divTop"/>
+          <xs:group ref="ns1:tei_model.global"/>
+        </xs:choice>
+        <xs:choice minOccurs="0">
+          <xs:sequence maxOccurs="unbounded">
+            <xs:group ref="ns1:tei_model.div6Like"/>
+            <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+          </xs:sequence>
+          <xs:sequence>
+            <xs:sequence maxOccurs="unbounded">
+              <xs:group ref="ns1:tei_model.common"/>
+              <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+            </xs:sequence>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+              <xs:group ref="ns1:tei_model.div6Like"/>
+              <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+            </xs:sequence>
+          </xs:sequence>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.divLike.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.declaring.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="div6">
+    <xs:annotation>
+      <xs:documentation>(level-6 text division) contains a sixth-level subdivision of the front, body, or back of a text. [4.1.2. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:group ref="ns1:tei_model.divTop"/>
+          <xs:group ref="ns1:tei_model.global"/>
+        </xs:choice>
+        <xs:choice minOccurs="0">
+          <xs:sequence maxOccurs="unbounded">
+            <xs:group ref="ns1:tei_model.div7Like"/>
+            <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+          </xs:sequence>
+          <xs:sequence>
+            <xs:sequence maxOccurs="unbounded">
+              <xs:group ref="ns1:tei_model.common"/>
+              <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+            </xs:sequence>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+              <xs:group ref="ns1:tei_model.div7Like"/>
+              <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+            </xs:sequence>
+          </xs:sequence>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.divLike.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.declaring.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="div7">
+    <xs:annotation>
+      <xs:documentation>(level-7 text division) contains the smallest possible subdivision of the front, body or back of a text, larger than a paragraph. [4.1.2. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:group ref="ns1:tei_model.divTop"/>
+          <xs:group ref="ns1:tei_model.global"/>
+        </xs:choice>
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+          <xs:group ref="ns1:tei_model.common"/>
+          <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+        </xs:sequence>
+      </xs:sequence>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.divLike.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.declaring.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tei_att.global.facs.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.global.facs.attribute.facs"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.global.facs.attribute.facs">
+    <xs:attribute name="facs">
+      <xs:annotation>
+        <xs:documentation>(facsimile) points to all or part of an image which corresponds with the content of the element.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction>
+          <xs:simpleType>
+            <xs:list itemType="ns1:tei_data.pointer"/>
+          </xs:simpleType>
+          <xs:minLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.global.change.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.global.change.attribute.change"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.global.change.attribute.change">
+    <xs:attribute name="change">
+      <xs:annotation>
+        <xs:documentation>points to one or more change elements documenting a state or revision campaign to which the element bearing this attribute and its children have been assigned by the encoder.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction>
+          <xs:simpleType>
+            <xs:list itemType="ns1:tei_data.pointer"/>
+          </xs:simpleType>
+          <xs:minLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.coordinated.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.coordinated.attribute.start"/>
+    <xs:attributeGroup ref="ns1:tei_att.coordinated.attribute.ulx"/>
+    <xs:attributeGroup ref="ns1:tei_att.coordinated.attribute.uly"/>
+    <xs:attributeGroup ref="ns1:tei_att.coordinated.attribute.lrx"/>
+    <xs:attributeGroup ref="ns1:tei_att.coordinated.attribute.lry"/>
+    <xs:attributeGroup ref="ns1:tei_att.coordinated.attribute.points"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.coordinated.attribute.start">
+    <xs:attribute name="start" type="ns1:tei_data.pointer">
+      <xs:annotation>
+        <xs:documentation>indicates the element within a transcription of the text containing at least the start of the writing represented by this zone or surface.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.coordinated.attribute.ulx">
+    <xs:attribute name="ulx" type="ns1:tei_data.numeric">
+      <xs:annotation>
+        <xs:documentation>gives the x coordinate value for the upper left corner of a rectangular space.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.coordinated.attribute.uly">
+    <xs:attribute name="uly" type="ns1:tei_data.numeric">
+      <xs:annotation>
+        <xs:documentation>gives the y coordinate value for the upper left corner of a rectangular space.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.coordinated.attribute.lrx">
+    <xs:attribute name="lrx" type="ns1:tei_data.numeric">
+      <xs:annotation>
+        <xs:documentation>gives the x coordinate value for the lower right corner of a rectangular space.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.coordinated.attribute.lry">
+    <xs:attribute name="lry" type="ns1:tei_data.numeric">
+      <xs:annotation>
+        <xs:documentation>gives the y coordinate value for the lower right corner of a rectangular space.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.coordinated.attribute.points">
+    <xs:attribute name="points">
+      <xs:annotation>
+        <xs:documentation>identifies a two dimensional area within the bounding box specified by the other attributes by means of a series of pairs of numbers, each of which gives the x,y coordinates of a point on a line enclosing the area.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction>
+          <xs:simpleType>
+            <xs:list>
+              <xs:simpleType>
+                <xs:union memberTypes="ns1:tei_data.point ns1:tei_data.point ns1:tei_data.point ns1:tei_data.point"/>
+              </xs:simpleType>
+            </xs:list>
+          </xs:simpleType>
+          <xs:minLength value="3"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="facsimile">
+    <xs:annotation>
+      <xs:documentation>contains a representation of some written source in the form of a set of images rather than as transcribed or encoded text. [11.1. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element ref="ns1:surface"/>
+        <xs:element ref="ns1:surfaceGrp"/>
+      </xs:choice>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.declaring.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="sourceDoc">
+    <xs:annotation>
+      <xs:documentation>contains a transcription or other representation of a single source document potentially forming part of a dossier génétique or collection of sources. [11.1.  11.2.2. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded">
+        <xs:group ref="ns1:tei_model.global"/>
+        <xs:element ref="ns1:surface"/>
+        <xs:element ref="ns1:surfaceGrp"/>
+      </xs:choice>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.declaring.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="surface">
+    <xs:annotation>
+      <xs:documentation>defines a written surface as a two-dimensional coordinate space, optionally grouping one or more graphic representations of that space, zones of interest within that space, and transcriptions of the writing within them. [11.1.  11.2.2. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:group ref="ns1:tei_model.global"/>
+          <xs:group ref="ns1:tei_model.labelLike"/>
+        </xs:choice>
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+          <xs:choice>
+            <xs:element ref="ns1:zone"/>
+            <xs:element ref="ns1:line"/>
+            <xs:element ref="ns1:surface"/>
+            <xs:element ref="ns1:surfaceGrp"/>
+          </xs:choice>
+          <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+        </xs:sequence>
+      </xs:sequence>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.coordinated.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.declaring.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+      <xs:attribute name="attachment" type="ns1:tei_data.enumerated">
+        <xs:annotation>
+          <xs:documentation>describes the method by which this surface is or was connected to the main surface
+Sample values include: 1] glued; 2] pinned; 3] sewn</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="flipping" type="ns1:tei_data.truthValue">
+        <xs:annotation>
+          <xs:documentation>indicates whether the surface is attached and folded in such a way as to provide two writing surfaces</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="surfaceGrp">
+    <xs:annotation>
+      <xs:documentation>defines any kind of useful grouping of written surfaces, for example the recto and verso of a single leaf, which the encoder wishes to treat as a single unit. [11.1. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded">
+        <xs:group ref="ns1:tei_model.global"/>
+        <xs:element ref="ns1:surface"/>
+        <xs:element ref="ns1:surfaceGrp"/>
+      </xs:choice>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.declaring.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="zone">
+    <xs:annotation>
+      <xs:documentation>defines any two-dimensional area within a surface element. [11.1.  11.2.2. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="ns1:tei_model.global"/>
+        <xs:element ref="ns1:surface"/>
+        <xs:group ref="ns1:tei_model.linePart"/>
+      </xs:choice>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.coordinated.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+      <xs:attribute name="rotate" default="0" type="ns1:tei_data.count">
+        <xs:annotation>
+          <xs:documentation>indicates the amount by which this zone has been rotated clockwise, with respect to the normal orientation of the parent surface element as implied by the dimensions given in the msDesc element or by the coordinates of the surface itself. The orientation is expressed in arc degrees.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="addSpan">
+    <xs:annotation>
+      <xs:documentation>(added span of text) marks the beginning of a longer sequence of text added by an author, scribe, annotator or corrector (see also add). [11.3.1.4. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.transcriptional.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.placement.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.spanning.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="damage">
+    <xs:annotation>
+      <xs:documentation>contains an area of damage to the text witness. [11.3.3.1. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ns1:tei_macro.paraContent">
+          <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.damaged.attributes"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="damageSpan">
+    <xs:annotation>
+      <xs:documentation>(damaged span of text) marks the beginning of a longer sequence of text which is damaged in some way but still legible. [11.3.3.1. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.damaged.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.spanning.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="delSpan">
+    <xs:annotation>
+      <xs:documentation>(deleted span of text) marks the beginning of a longer sequence of text deleted, marked as deleted, or otherwise signaled as superfluous or spurious by an author, scribe, annotator, or corrector. [11.3.1.4. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.transcriptional.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.spanning.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="subst">
+    <xs:annotation>
+      <xs:documentation>(substitution) groups one or more deletions with one or more additions when the combination is to be regarded as a single intervention in the text. [11.3.1.5. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element ref="ns1:add"/>
+        <xs:element ref="ns1:del"/>
+      </xs:choice>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.transcriptional.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="line">
+    <xs:annotation>
+      <xs:documentation>contains the transcription of a topographic line in the source document [11.2.2. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="ns1:tei_model.global"/>
+        <xs:group ref="ns1:tei_model.linePart"/>
+      </xs:choice>
+      <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.coordinated.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="mod">
+    <xs:annotation>
+      <xs:documentation>represents any kind of modification identified within a single document. [11.3.4.1. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ns1:tei_macro.paraContent">
+          <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.transcriptional.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.spanning.attributes"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="undo">
+    <xs:annotation>
+      <xs:documentation>indicates one or more marked-up interventions in a document which have subsequently been marked for cancellation. [11.3.4.4. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.spanning.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.transcriptional.attributes"/>
+      <xs:attribute name="target">
+        <xs:annotation>
+          <xs:documentation>points to one or more elements representing the interventions which are to be reverted or undone.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction>
+            <xs:simpleType>
+              <xs:list itemType="ns1:tei_data.pointer"/>
+            </xs:simpleType>
+            <xs:minLength value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="teiHeader">
+    <xs:annotation>
+      <xs:documentation>(TEI header) supplies the descriptive and declarative information making up an electronic title page for every TEI-conformant document. [2.1.1.  15.1. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:fileDesc"/>
+        <xs:element minOccurs="0" ref="ns1:revisionDesc"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attribute name="type" default="text" type="ns1:tei_data.enumerated">
+        <xs:annotation>
+          <xs:documentation>specifies the kind of document to which the header is attached, for example whether it is a corpus or individual text.
+Sample values include: 1] text; 2] corpus</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="fileDesc">
+    <xs:annotation>
+      <xs:documentation>(file description) contains a full bibliographic description of an electronic file. [2.2.  2.1.1. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:sequence>
+          <xs:element ref="ns1:titleStmt"/>
+          <xs:element minOccurs="0" ref="ns1:editionStmt"/>
+          <xs:element ref="ns1:publicationStmt"/>
+        </xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns1:sourceDesc"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="titleStmt">
+    <xs:annotation>
+      <xs:documentation>(title statement) groups information about the title of a work and those responsible for its content. [2.2.1.  2.2. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns1:title"/>
+        <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.respLike"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="editionStmt">
+    <xs:annotation>
+      <xs:documentation>(edition statement) groups information relating to one edition of a text. [2.2.2.  2.2. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice>
+        <xs:group maxOccurs="unbounded" ref="ns1:tei_model.pLike"/>
+        <xs:sequence>
+          <xs:element ref="ns1:edition"/>
+          <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.respLike"/>
+        </xs:sequence>
+      </xs:choice>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="edition">
+    <xs:annotation>
+      <xs:documentation>describes the particularities of one edition of a text. [2.2.2. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ns1:tei_macro.phraseSeq">
+          <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="publicationStmt">
+    <xs:annotation>
+      <xs:documentation>(publication statement) groups information concerning the publication or distribution of an electronic or other text. [2.2.4.  2.2. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:group maxOccurs="unbounded" ref="ns1:tei_model.pLike"/>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="sourceDesc">
+    <xs:annotation>
+      <xs:documentation>(source description) describes the source from which an electronic text was derived or generated, typically a bibliographic description in the case of a digitized text, or a phrase such as "born digital" for a text which has no previous existence. [2.2.7. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice>
+        <xs:group maxOccurs="unbounded" ref="ns1:tei_model.pLike"/>
+        <xs:group maxOccurs="unbounded" ref="ns1:tei_model.listLike"/>
+      </xs:choice>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.declarable.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="revisionDesc">
+    <xs:annotation>
+      <xs:documentation>(revision description) summarizes the revision history for a file. [2.5.  2.1.1. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.docStatus.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="table">
+    <xs:annotation>
+      <xs:documentation>contains text displayed in tabular form, in rows and columns. [14.1.1. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:group ref="ns1:tei_model.headLike"/>
+          <xs:group ref="ns1:tei_model.global"/>
+        </xs:choice>
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element ref="ns1:row"/>
+          <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+        </xs:sequence>
+      </xs:sequence>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attribute name="rows" type="ns1:tei_data.count">
+        <xs:annotation>
+          <xs:documentation>indicates the number of rows in the table.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="cols" type="ns1:tei_data.count">
+        <xs:annotation>
+          <xs:documentation>(columns) indicates the number of columns in each row of the table.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="row">
+    <xs:annotation>
+      <xs:documentation>contains one row of a table. [14.1.1. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns1:cell"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.tableDecoration.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="cell">
+    <xs:annotation>
+      <xs:documentation>contains one cell of a table. [14.1.1. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ns1:tei_macro.specialPara">
+          <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+          <xs:attributeGroup ref="ns1:tei_att.tableDecoration.attributes"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="figure">
+    <xs:annotation>
+      <xs:documentation>groups elements representing or containing graphic information such as an illustration, formula, or figure. [14.4. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="ns1:tei_model.headLike"/>
+        <xs:group ref="ns1:tei_model.common"/>
+        <xs:element ref="ns1:figDesc"/>
+        <xs:group ref="ns1:tei_model.global"/>
+      </xs:choice>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.placement.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.typed.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="figDesc">
+    <xs:annotation>
+      <xs:documentation>(description of figure) contains a brief prose description of the appearance or content of a graphic figure, for use when documenting an image without displaying it. [14.4. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ns1:tei_macro.limitedContent">
+          <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:group name="tei_model.rdgLike">
+    <xs:sequence>
+      <xs:element ref="ns1:rdg"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:attributeGroup name="tei_att.witnessed.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.witnessed.attribute.wit"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.witnessed.attribute.wit">
+    <xs:attribute name="wit">
+      <xs:annotation>
+        <xs:documentation>(witness or witnesses) contains a space-delimited list of one or more pointers indicating the witnesses which attest to a given reading.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction>
+          <xs:simpleType>
+            <xs:list itemType="ns1:tei_data.pointer"/>
+          </xs:simpleType>
+          <xs:minLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.textCritical.attributes">
+    <xs:attributeGroup ref="ns1:tei_att.responsibility.attributes"/>
+    <xs:attributeGroup ref="ns1:tei_att.textCritical.attribute.type"/>
+    <xs:attributeGroup ref="ns1:tei_att.textCritical.attribute.cause"/>
+    <xs:attributeGroup ref="ns1:tei_att.textCritical.attribute.varSeq"/>
+    <xs:attributeGroup ref="ns1:tei_att.textCritical.attribute.hand"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.textCritical.attribute.type">
+    <xs:attribute name="type" type="ns1:tei_data.enumerated">
+      <xs:annotation>
+        <xs:documentation>classifies the reading according to some useful typology.
+Sample values include: 1] substantive; 2] orthographic</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.textCritical.attribute.cause">
+    <xs:attribute name="cause" type="ns1:tei_data.enumerated">
+      <xs:annotation>
+        <xs:documentation>classifies the cause for the variant reading, according to any appropriate typology of possible origins.
+Sample values include: 1] homeoteleuton; 2] homeoarchy; 3] paleographicConfusion; 4] haplography; 5] dittography; 6] falseEmendation</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.textCritical.attribute.varSeq">
+    <xs:attribute name="varSeq" type="ns1:tei_data.count">
+      <xs:annotation>
+        <xs:documentation>(variant sequence) provides a number indicating the position of this reading in a sequence, when there is reason to presume a sequence to the variants. </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tei_att.textCritical.attribute.hand">
+    <xs:attribute name="hand" type="ns1:tei_data.pointer">
+      <xs:annotation>
+        <xs:documentation>indicates the hand responsible for a particular reading in the witness.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="app">
+    <xs:annotation>
+      <xs:documentation>(apparatus entry) contains one entry in a critical apparatus, with an optional lemma and usually one or more readings or notes on the relevant passage. [12.1.1. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+        <xs:sequence minOccurs="0">
+          <xs:element ref="ns1:lem"/>
+          <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+        </xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:sequence>
+            <xs:group ref="ns1:tei_model.rdgLike"/>
+            <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+          </xs:sequence>
+          <xs:group minOccurs="0" maxOccurs="unbounded" ref="ns1:tei_model.global"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attribute name="type" type="ns1:tei_data.enumerated">
+        <xs:annotation>
+          <xs:documentation>classifies the variation contained in this element according to some convenient typology.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="from" type="ns1:tei_data.pointer">
+        <xs:annotation>
+          <xs:documentation>identifies the beginning of the lemma in the base text.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="to" type="ns1:tei_data.pointer">
+        <xs:annotation>
+          <xs:documentation>identifies the endpoint of the lemma in the base text.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="loc">
+        <xs:annotation>
+          <xs:documentation>(location) indicates the location of the variation, when the location-referenced method of apparatus markup is used.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction>
+            <xs:simpleType>
+              <xs:list itemType="ns1:tei_data.word"/>
+            </xs:simpleType>
+            <xs:minLength value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="lem">
+    <xs:annotation>
+      <xs:documentation>(lemma) contains the lemma, or base text, of a textual variation. [12.1. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="ns1:tei_model.phrase"/>
+        <xs:group ref="ns1:tei_model.inter"/>
+        <xs:group ref="ns1:tei_model.global"/>
+      </xs:choice>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.textCritical.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.witnessed.attributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="rdg">
+    <xs:annotation>
+      <xs:documentation>(reading) contains a single reading within a textual variation. [12.1. ]</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="ns1:tei_model.phrase"/>
+        <xs:group ref="ns1:tei_model.inter"/>
+        <xs:group ref="ns1:tei_model.global"/>
+      </xs:choice>
+      <xs:attributeGroup ref="ns1:tei_att.global.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.textCritical.attributes"/>
+      <xs:attributeGroup ref="ns1:tei_att.witnessed.attributes"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Untitled Document</title>
+        <author>Scherer</author>
+      </titleStmt>
+      <publicationStmt>
+        <p>no publication statement available</p>
+      </publicationStmt>
+      <sourceDesc>
+        <p>Written by OpenOffice</p>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <text>
+    <body>
+      <p>
+        <hi rend="italic">This is a invalid (mycore)-TEI</hi>
+        <graph type="undirected" xml:id="CUG1"
+               order="5" size="4">
+          <label>Airline Connections in Southwestern USA</label>
+          <node xml:id="LAX" degree="2">
+            <label>LAX</label>
+          </node>
+          <node xml:id="LVG" degree="2">
+            <label>LVG</label>
+          </node>
+          <node xml:id="PHX" degree="3">
+            <label>PHX</label>
+          </node>
+          <node xml:id="TUS" degree="1">
+            <label>TUS</label>
+          </node>
+          <node xml:id="CIB" degree="0">
+            <label>CIB</label>
+          </node>
+          <arc from="#LAX" to="#LVG"/>
+          <arc from="#LAX" to="#PHX"/>
+          <arc from="#LVG" to="#PHX"/>
+          <arc from="#PHX" to="#TUS"/>
+        </graph>
+      </p>
+    </body>
+  </text>
+</TEI>

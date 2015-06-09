@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Untitled Document</title>
+        <author>Scherer</author>
+      </titleStmt>
+      <publicationStmt>
+        <p>no publication statement available</p>
+      </publicationStmt>
+      <sourceDesc>
+        <p>Written by OpenOffice</p>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <text>
+    <body>
+      <p>
+        <hi rend="italic">This is a valid TEI</hi>
+      </p>
+    </body>
+  </text>
+</TEI>
