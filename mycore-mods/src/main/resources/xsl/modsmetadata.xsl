@@ -547,7 +547,7 @@
   <xsl:template match="mods:name[@type='corporate' and not(@ID)]" mode="present">
     <tr>
       <td valign="top" class="metaname">
-        <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.institution.label'),':')" />
+        <xsl:value-of select="concat(i18n:translate(concat('component.mods.metaData.dictionary.institution.', mods:role/mods:roleTerm[@type='code' and @authority='marcrelator'], '.label')),':')" />
       </td>
       <td class="metavalue">
         <xsl:apply-templates select="." mode="printName" />
