@@ -514,13 +514,14 @@
     </tr>
   </xsl:template>
 
+  <!-- TODO: OpenAgrar specific solution -->
   <xsl:template match="mods:name[@type='corporate' and @ID]" mode="present">
     <xsl:variable name="id" select="concat('#', @ID)" />
     <tr>
       <td valign="top" class="metaname">
         <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.institution.label'),':')" />
       </td>
-      <td class="metavalue"><!-- ToDo: Ausgabe der Einrichtung mit jeweils oberster Einrichtung (Max Rubner-Institut, Institut für ...) -->
+      <td class="metavalue">
         <xsl:apply-templates select="." mode="printName" />
       </td>
     </tr>
@@ -541,6 +542,17 @@
         </td>
       </tr>
     </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="mods:name[@type='corporate' and not(@ID)]" mode="present">
+    <tr>
+      <td valign="top" class="metaname">
+        <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.institution.label'),':')" />
+      </td>
+      <td class="metavalue">
+        <xsl:apply-templates select="." mode="printName" />
+      </td>
+    </tr>
   </xsl:template>
 
   <xsl:template match="mods:identifier[@type='hdl']" mode="present">
