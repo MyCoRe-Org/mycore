@@ -10,9 +10,10 @@
   xmlns:xalan="http://xml.apache.org/xalan"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:mods="http://www.loc.gov/mods/v3"
+  xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="http://datacite.org/schema/kernel-3"
-  exclude-result-prefixes="xsl xlink mods xalan">
+  exclude-result-prefixes="xsl xlink mods xalan mcrmods">
 
   <xsl:include href="coreFunctions.xsl" />
 
@@ -36,14 +37,14 @@
       <xsl:call-template name="contributors" />
       <xsl:call-template name="subjects" />
       <xsl:call-template name="dates" />
-      <xsl:apply-templates select="mods:language" />
+      <xsl:call-template name="language" />
       <xsl:call-template name="resourceType" />
       <xsl:call-template name="descriptions" />
       <xsl:call-template name="alternateIdentifiers" />
     </resource>
   </xsl:template>
 
-  <!-- ========== identifier ========== -->
+  <!-- ========== identifier (1) ========== -->
 
   <xsl:template name="identifier">
     <identifier identifierType="DOI">
@@ -78,7 +79,7 @@
     </xsl:call-template>
   </xsl:template>
 
-  <!-- ========== titles ========== -->
+  <!-- ========== titles (1-n) ========== -->
 
   <xsl:template name="titles">
     <titles>
@@ -130,27 +131,40 @@
     </xsl:if>
   </xsl:template>
 
-  <!-- ========== creators ========== -->
+  <!-- ========== creators (1-n) ========== -->
 
   <xsl:template name="creators">
     <creators>
-      <xsl:apply-templates select="mods:name" />
+      <xsl:apply-templates select="mods:name[mods:role/mods:roleTerm='aut' or mods:role/mods:roleTerm='cre']" />
     </creators>
   </xsl:template>
 
   <xsl:template match="mods:name">
-    <xsl:variable name="marcrelator" select="mods:role/mods:roleTerm[@type='code' and @authority='marcrelator']" />
-    <xsl:variable name="rolepath" select="document(concat('classification:editor:-1:parents:marcrelator:',$marcrelator))" />
-    <xsl:if test="$rolepath/items/item/@value='cre'">
+    <xsl:if test="mods:displayForm or @valueURI">
       <creator>
         <creatorName>
-          <xsl:value-of select="mods:displayForm" />
+          <xsl:choose>
+            <xsl:when test="mods:displayForm">
+              <xsl:value-of select="mods:displayForm" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:variable name="classlink" select="mcrmods:getClassCategParentLink(.)" />
+              <xsl:if test="string-length($classlink) &gt; 0">
+                <xsl:for-each select="document($classlink)/mycoreclass//category[position()=1 or position()=last()]">
+                  <xsl:if test="position() > 1">
+                    <xsl:value-of select="', '" />
+                  </xsl:if>
+                  <xsl:value-of select="./label[lang($CurrentLang)]/@text" />
+                </xsl:for-each>
+              </xsl:if>
+            </xsl:otherwise>
+          </xsl:choose>
         </creatorName>
       </creator>
     </xsl:if>
   </xsl:template>
 
-  <!-- ========== publisher ========== -->
+  <!-- ========== publisher (1) ========== -->
 
   <xsl:template name="publisher">
     <publisher>
@@ -165,7 +179,7 @@
     </publisher>
   </xsl:template>
 
-  <!-- ========== publicationYear ========== -->
+  <!-- ========== publicationYear (1) ========== -->
 
   <xsl:template name="publicationYear">
     <xsl:choose>
@@ -185,7 +199,7 @@
   </xsl:template>
 
 
-  <!-- ========== contributors ========== -->
+  <!-- ========== contributors (0-n) ========== -->
   <xsl:template name="contributors">
     <contributors>
       <xsl:call-template name="hostingInstitution" />
@@ -195,7 +209,6 @@
     </contributors>
   </xsl:template>
 
-  <!-- ========== hostingInstitution ========== -->
   <xsl:template name="hostingInstitution">
     <contributor contributorType="HostingInstitution">
       <contributorName>
@@ -204,7 +217,6 @@
     </contributor>
   </xsl:template>
 
-  <!-- ========== Funding information ========== -->
   <xsl:template name="fundingInformation">
     <contributor contributorType="Funder">
       <contributorName>
@@ -217,12 +229,14 @@
   </xsl:template>
 
 
-  <!-- ========== subjects ========== -->
+  <!-- ========== subjects (0-n)========== -->
 
   <xsl:template name="subjects">
-    <subjects>
-      <xsl:apply-templates select="mods:subject/mods:topic" />
-    </subjects>
+    <xsl:if test="mods:subject/mods:topic">
+      <subjects>
+        <xsl:apply-templates select="mods:subject/mods:topic" />
+      </subjects>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="mods:subject/mods:topic">
@@ -231,27 +245,33 @@
     </subject>
   </xsl:template>
 
-  <!-- ========== language ========== -->
 
-  <xsl:template match="mods:language[mods:languageTerm[@authority='rfc4646' and @type='code']]">
-    <language>
-      <xsl:variable name="uri" select="concat('language:',mods:languageTerm[@authority='rfc4646' and @type='code'])" />
-      <xsl:value-of select="document($uri)/language/@biblCode" />
-    </language>
+  <!-- ========== language (0-n) ========== -->
+
+  <xsl:template name="language">
+    <xsl:if test="mods:language/mods:languageTerm[@authority='rfc4646' and @type='code']">
+      <language>
+        <xsl:value-of select="mods:language/mods:languageTerm[@authority='rfc4646' and @type='code']" />
+      </language>
+    </xsl:if>
   </xsl:template>
 
-  <!-- ========== resourceType ========== -->
+  <!-- ========== resourceType (0-n) ========== -->
 
   <xsl:template name="resourceType">
-    <resourceType resourceTypeGeneral="Text" />
+    <resourceType resourceTypeGeneral="Text">
+      <xsl:value-of select="substring-after(mods:genre/@valueURI, '#')" />
+    </resourceType>
   </xsl:template>
 
-  <!-- ========== descriptions ========== -->
+  <!-- ========== descriptions (0-n) ========== -->
 
   <xsl:template name="descriptions">
-    <descriptions>
-      <xsl:apply-templates select="mods:abstract" />
-    </descriptions>
+    <xsl:if test="mods:abstract">
+      <descriptions>
+        <xsl:apply-templates select="mods:abstract" />
+      </descriptions>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="mods:abstract">
@@ -261,7 +281,7 @@
     </description>
   </xsl:template>
 
-  <!-- ========== dates ========== -->
+  <!-- ========== dates (0-n) ========== -->
 
   <xsl:template name="dates">
     <dates>
@@ -299,7 +319,7 @@
     </date>
   </xsl:template>
 
-  <!-- ========== alternateIdentifiers ========== -->
+  <!-- ========== alternateIdentifiers (0-n) ========== -->
 
   <xsl:template name="alternateIdentifiers">
     <alternateIdentifiers>
