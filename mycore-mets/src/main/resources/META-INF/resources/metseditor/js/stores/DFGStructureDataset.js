@@ -26,11 +26,13 @@
 	{id:"imprint", name:"Impressum"},
 	{id:"contents", name:"Inhaltsverzeichnis"},
 	{id:"initial_decoration", name:"Initialschmuck"},
+    {id:"year", name:"Jahr"},
 	{id:"chapter", name:"Kapitel"},
 	{id:"map", name:"Karte"},
 	{id:"colophon", name:"Kolophon"},
 	{id:"engraved_titlepage", name:"Kupfertitel"},
 	{id:"multivolume_work", name:"Mehrbändiges Werk"},
+    {id:"month", name:"Monat"},
 	{id:"monograph", name:"Monographie"},
 	{id:"musical_notation", name:"Musiknotation"},
 	{id:"periodical", name:"Periodica"},
@@ -42,10 +44,12 @@
 	{id:"paste_down", name:"Spiegel"},
 	{id:"stamp", name:"Stempel"},
 	{id:"table", name:"Tabelle"},
+    {id:"day", name:"Tag"},
 	{id:"text", name:"Text"},
 	{id:"title_page", name:"Titelblatt"},
 	{id:"verse", name:"Verse"},
 	{id:"endsheet", name:"Vorsatz"},
 	{id:"preface", name:"Vorwort"},
-	{id:"dedication", name:"Widmung"}]
-}                               
+	{id:"dedication", name:"Widmung"},
+	{id:"newspaper", name:"Zeitung"}]
+}
