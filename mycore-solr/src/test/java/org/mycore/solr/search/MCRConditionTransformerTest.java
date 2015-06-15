@@ -11,7 +11,6 @@ import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRNotCondition;
 import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.services.fieldquery.MCRQueryCondition;
-import org.mycore.solr.search.MCRConditionTransformer;
 
 public class MCRConditionTransformerTest extends MCRTestCase {
 
@@ -24,7 +23,8 @@ public class MCRConditionTransformerTest extends MCRTestCase {
         MCRQueryCondition inner2 = new MCRQueryCondition("objectType", "=", "cbu");
         MCROrCondition<Object> orCond = new MCROrCondition<>(inner1, inner2);
         usedFields.clear();
-        assertEquals("objectType:\"mods\" objectType:\"cbu\"",
+        //MCR-973 check for surrounding brackets on single OR query 
+        assertEquals("+(objectType:\"mods\" objectType:\"cbu\")",
             MCRConditionTransformer.toSolrQueryString(orCond, usedFields));
         assertTrue("usedFields did not contain 'objectType'", usedFields.contains("objectType"));
         MCRQueryCondition inner3 = new MCRQueryCondition("derCount", ">", "0");
@@ -48,7 +48,6 @@ public class MCRConditionTransformerTest extends MCRTestCase {
         andCondition.getChildren().add(0, notCond);
         assertEquals("-(objectType:\"mods\" objectType:\"cbu\") +derCount:[* TO 0]",
             MCRConditionTransformer.toSolrQueryString(andCondition, usedFields));
-        System.out.println(MCRConditionTransformer.toSolrQueryString(andCondition, usedFields));
     }
 
 }
