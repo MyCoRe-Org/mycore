@@ -183,8 +183,11 @@
 
   <xsl:template name="publicationYear">
     <xsl:choose>
-      <xsl:when test="mods:originInfo/mods:dateIssued">
-        <xsl:apply-templates select="mods:originInfo/mods:dateIssued" mode="publicationYear" />
+      <xsl:when test="mods:originInfo/mods:dateIssued[@encoding='w3cdtf']">
+        <xsl:apply-templates select="mods:originInfo/mods:dateIssued[@encoding='w3cdtf']" mode="publicationYear" />
+      </xsl:when>
+      <xsl:when test="mods:originInfo/mods:dateIssued[@encoding='marc']">
+        <xsl:apply-templates select="mods:originInfo/mods:dateIssued[@encoding='marc']" mode="publicationYear" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:apply-templates select="mods:originInfo/mods:dateCreated" mode="publicationYear" />
@@ -289,31 +292,31 @@
     </dates>
   </xsl:template>
 
-  <xsl:template match="mods:dateIssued">
+  <xsl:template match="mods:dateIssued[@encoding='w3cdtf']">
     <date dateType="Issued">
       <xsl:value-of select="text()" />
     </date>
   </xsl:template>
 
-  <xsl:template match="mods:dateCreated">
+  <xsl:template match="mods:dateCreated[@encoding='w3cdtf']">
     <date dateType="Created">
       <xsl:value-of select="text()" />
     </date>
   </xsl:template>
 
-  <xsl:template match="mods:dateModified">
+  <xsl:template match="mods:dateModified[@encoding='w3cdtf']">
     <date dateType="Updated">
       <xsl:value-of select="text()" />
     </date>
   </xsl:template>
 
-  <xsl:template match="mods:dateOther[@type='accepted']">
+  <xsl:template match="mods:dateOther[@type='accepted'][@encoding='w3cdtf']">
     <date dateType="Accepted">
       <xsl:value-of select="text()" />
     </date>
   </xsl:template>
 
-  <xsl:template match="mods:dateOther[@type='submitted']">
+  <xsl:template match="mods:dateOther[@type='submitted'][@encoding='w3cdtf']">
     <date dateType="Submitted">
       <xsl:value-of select="text()" />
     </date>
