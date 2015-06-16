@@ -32,22 +32,49 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.access.mcrimpl.MCRAccessRule;
 import org.mycore.access.mcrimpl.MCRRuleStore;
 import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 /**
  * Hibernate implementation for RuleStore, storing access rules
  * 
  * @author Arne Seifert
- * 
  */
 public class MCRHIBRuleStore extends MCRRuleStore {
     private static final Logger LOGGER = Logger.getLogger(MCRHIBRuleStore.class);
+
+    private static int CACHE_SIZE = MCRConfiguration.instance().getInt("MCR.AccessPool.CacheSize", 2048);
+
+    private static LoadingCache<String, MCRAccessRule> ruleCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE)
+        .build(new CacheLoader<String, MCRAccessRule>() {
+            @Override
+            public MCRAccessRule load(String ruleid) {
+                Session session = MCRHIBConnection.instance().getSession();
+                MCRAccessRule rule = null;
+                MCRACCESSRULE hibrule = (MCRACCESSRULE) session.createCriteria(MCRACCESSRULE.class)
+                    .add(Restrictions.eq("rid", ruleid)).uniqueResult();
+                LOGGER.debug("Getting MCRACCESSRULE done");
+
+                if (hibrule != null) {
+                    LOGGER.debug("new MCRAccessRule");
+                    rule = new MCRAccessRule(ruleid, hibrule.getCreator(), hibrule.getCreationdate(),
+                        hibrule.getRule(),
+                        hibrule.getDescription());
+                    LOGGER.debug("new MCRAccessRule done");
+                }
+                return rule;
+            }
+        });
 
     /**
      * Method creates new rule in database by given rule-object
@@ -75,9 +102,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
     }
 
     /**
-     * Method retrieves the ruleIDs of rules, whose string-representation starts
-     * with given data
-     * 
+     * Method retrieves the ruleIDs of rules, whose string-representation starts with given data
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -93,8 +118,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
     }
 
     /**
-     * Method updates accessrule by given rule. internal: get rule object from session
-     * set values, update via session
+     * Method updates accessrule by given rule. internal: get rule object from session set values, update via session
      */
     @Override
     public void updateRule(MCRAccessRule rule) {
@@ -106,6 +130,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
         hibrule.setCreator(rule.getCreator());
         hibrule.setRule(rule.getRuleString());
         hibrule.setDescription(rule.getDescription());
+        ruleCache.put(rule.getId(), rule);
     }
 
     /**
@@ -115,18 +140,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
     public void deleteRule(String ruleid) {
         Session session = MCRHIBConnection.instance().getSession();
         session.createQuery("delete MCRACCESSRULE where RID = '" + ruleid + "'").executeUpdate();
-    }
-
-    /**
-     * Method returns accessrule for given ruleid
-     * 
-     * @param ruleid
-     *            as string
-     * @return MCRAccessRule object with database values or null
-     */
-    @Override
-    public MCRAccessRule retrieveRule(String ruleid) {
-        return getRule(ruleid);
+        ruleCache.invalidate(ruleid);
     }
 
     /**
@@ -138,32 +152,14 @@ public class MCRHIBRuleStore extends MCRRuleStore {
      */
     @Override
     public MCRAccessRule getRule(String ruleid) {
-        Session session = MCRHIBConnection.instance().getSession();
-        MCRAccessRule rule = null;
-        MCRACCESSRULE hibrule = (MCRACCESSRULE) session.createCriteria(MCRACCESSRULE.class)
-            .add(Restrictions.eq("rid", ruleid)).uniqueResult();
-        LOGGER.debug("Getting MCRACCESSRULE done");
-
-        if (hibrule != null) {
-            LOGGER.debug("new MCRAccessRule");
-            rule = new MCRAccessRule(ruleid, hibrule.getCreator(), hibrule.getCreationdate(), hibrule.getRule(),
-                hibrule.getDescription());
-            LOGGER.debug("new MCRAccessRule done");
-        }
-
-        return rule;
+        return ruleCache.getUnchecked(ruleid);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Collection<String> retrieveAllIDs() {
         Session session = MCRHIBConnection.instance().getSession();
-        ArrayList<String> ret = new ArrayList<String>();
-        List<MCRACCESSRULE> l = session.createCriteria(MCRACCESSRULE.class).list();
-        for (MCRACCESSRULE aL : l) {
-            ret.add(aL.getRid());
-        }
-        return ret;
+        return session.createCriteria(MCRACCESSRULE.class).setProjection(Projections.id()).list();
     }
 
     /**
@@ -177,24 +173,13 @@ public class MCRHIBRuleStore extends MCRRuleStore {
     @Override
     @SuppressWarnings("unchecked")
     public boolean existsRule(String ruleid) throws MCRException {
+        if (ruleCache.getIfPresent(ruleid) != null) {
+            return true;
+        }
 
         Session session = MCRHIBConnection.instance().getSession();
         List<MCRACCESSRULE> l = session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).list();
         return l.size() == 1;
-    }
-
-    /**
-     * Checks if a rule mappings uses the rule.
-     * 
-     * @param ruleid the rule id to check
-     * @return true if the rule exists and is used, otherwise false
-     */
-    @Override
-    public boolean isRuleInUse(String ruleid) {
-
-        Session session = MCRHIBConnection.instance().getSession();
-        Query query = session.createQuery("from MCRACCESS as accdef where accdef.rule.rid = '" + ruleid + "'");
-        return !query.list().isEmpty();
     }
 
     @Override

@@ -62,6 +62,8 @@ public abstract class MCRAccessStore {
 
     public abstract boolean existsRule(String objid, String pool);
 
+    public abstract boolean isRuleInUse(String ruleid);
+
     /**
      * 
      * @return a collection of all String IDs an access rule is assigned to
