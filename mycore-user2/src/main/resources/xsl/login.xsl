@@ -28,8 +28,9 @@
 | Last changes: 2012-03-16
 + -->
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:encoder="xalan://java.net.URLEncoder" exclude-result-prefixes="xlink encoder i18n">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
+  xmlns:encoder="xalan://java.net.URLEncoder" exclude-result-prefixes="xlink encoder i18n"
+>
   &html-output;
   <xsl:include href="MyCoReLayout.xsl" />
   <xsl:param name="FormTarget" select="concat($ServletsBaseURL,'MCRLoginServlet')" />
@@ -66,7 +67,8 @@
             <xsl:value-of select="concat($userNameText,' :')" />
           </label>
           <div class="controls">
-            <input type="text" name="uid" class="form-control input-large" placeholder="{$userNameText}" title="{$userNameText}" />
+            <input type="text" name="uid" class="form-control input-large" placeholder="{$userNameText}" title="{$userNameText}" autocorrect="off"
+              autocapitalize="off" />
           </div>
         </div>
         <div>
@@ -112,7 +114,7 @@
         </strong>
         <xsl:choose>
           <xsl:when test="errorMessage">
-            <br/>
+            <br />
             <xsl:value-of select="i18n:translate('component.user2.login.failed.reason', errorMessage)" />
           </xsl:when>
           <xsl:otherwise>
