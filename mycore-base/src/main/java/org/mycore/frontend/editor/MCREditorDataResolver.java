@@ -26,31 +26,37 @@ package org.mycore.frontend.editor;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.URIResolver;
+
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
+import org.jdom2.transform.JDOMSource;
 import org.jdom2.xpath.XPath;
-import org.mycore.common.xml.MCRURIResolver.MCRResolver;
 
 /**
- * Returns input data entered in any recently used editor form, 
- * given a valid editor session ID.
+ * Returns input data entered in any recently used editor form, given a valid editor session ID.
  * 
  * @author Frank L\u00fctzenkirchen
  */
-public class MCREditorDataResolver implements MCRResolver {
+public class MCREditorDataResolver implements URIResolver {
     protected final static Logger LOGGER = Logger.getLogger(MCREditorDataResolver.class);
 
     /**
      * Returns the current editor input from the form with the given editor session ID.
      * 
-     * @param uri Syntax: editorData:[sessionID]:[xPath]
-     * 
+     * @param uri
+     *            Syntax: editorData:[sessionID]:[xPath]
      * @see org.mycore.common.xml.MCRURIResolver.MCRResolver#resolveElement(java.lang.String)
      */
-    public Element resolveElement(String uri) throws Exception {
-        String[] tokens = uri.split(":", 3);
+    @Override
+    public Source resolve(String href, String base) throws TransformerException {
+        String[] tokens = href.split(":", 3);
         String sessionID = tokens[1];
         String xPath = tokens[2];
         xPath = fixAttributeConditionsInXPath(xPath);
@@ -61,12 +67,16 @@ public class MCREditorDataResolver implements MCRResolver {
         Element editor = MCREditorSessionCache.instance().getEditorSession(sessionID).getXML();
         MCREditorSubmission sub = new MCREditorSubmission(editor);
         Document xml = sub.getXML();
-        XPath xp = XPath.newInstance(xPath);
-        for (Entry<String, Namespace> entry : sub.getNamespaceMap().entrySet())
-            xp.addNamespace(entry.getValue());
+        try {
+            XPath xp = XPath.newInstance(xPath);
+            for (Entry<String, Namespace> entry : sub.getNamespaceMap().entrySet())
+                xp.addNamespace(entry.getValue());
 
-        Element resolved = (Element) (xp.selectSingleNode(xml));
-        return (resolved == null ? new Element("nothingFound") : resolved);
+            Element resolved = (Element) (xp.selectSingleNode(xml));
+            return new JDOMSource(resolved == null ? new Element("nothingFound") : resolved);
+        } catch (JDOMException e) {
+            throw new TransformerException("Could not get XPath instance for: " + xPath, e);
+        }
     }
 
     private String fixAttributeConditionsInXPath(String xPath) {
@@ -83,4 +93,5 @@ public class MCREditorDataResolver implements MCRResolver {
         xPath = sb.toString();
         return xPath;
     }
+
 }

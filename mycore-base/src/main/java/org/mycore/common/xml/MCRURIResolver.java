@@ -60,7 +60,6 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration;
@@ -88,7 +87,6 @@ import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRPathXML;
-import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.tools.MCRObjectFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -140,10 +138,6 @@ public final class MCRURIResolver implements URIResolver {
         String externalClassName = MCRConfiguration.instance()
             .getString(CONFIG_PREFIX + "ExternalResolver.Class", null);
         final MCRResolverProvider emptyResolver = new MCRResolverProvider() {
-            public Map<String, MCRResolver> getResolverMapping() {
-                return new HashMap<String, MCRResolver>();
-            }
-
             public Map<String, URIResolver> getURIResolverMapping() {
                 return new HashMap<String, URIResolver>();
             }
@@ -179,13 +173,12 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("ifs", new MCRIFSResolver());
         supportedSchemes.put("mcrfile", new MCRMCRFileResolver());
         supportedSchemes.put("mcrobject", new MCRObjectResolver());
-        supportedSchemes.put("request", getURIResolver(new MCRRequestResolver()));
-        supportedSchemes.put("session", getURIResolver(new MCRSessionResolver()));
-        supportedSchemes.put("access", getURIResolver(new MCRACLResolver()));
+        supportedSchemes.put("session", new MCRSessionResolver());
+        supportedSchemes.put("access", new MCRACLResolver());
         supportedSchemes.put("resource", new MCRResourceResolver());
         supportedSchemes.put("localclass", new MCRLocalClassResolver());
-        supportedSchemes.put("classification", getURIResolver(new MCRClassificationResolver()));
-        supportedSchemes.put("buildxml", getURIResolver(new MCRBuildXMLResolver()));
+        supportedSchemes.put("classification", new MCRClassificationResolver());
+        supportedSchemes.put("buildxml", new MCRBuildXMLResolver());
         supportedSchemes.put("notnull", new MCRNotNullResolver());
         supportedSchemes.put("xslStyle", new MCRXslStyleResolver());
         supportedSchemes.put("xslTransform", new MCRLayoutTransformerResolver());
@@ -218,29 +211,6 @@ public final class MCRURIResolver implements URIResolver {
      */
     public static synchronized void init(ServletContext ctx) {
         context = ctx;
-    }
-
-    /**
-     * Compatibility method to convert a {@link MCRResolver} into a {@link URIResolver}. You may use this in a
-     * transition phase for your convenience. It actually just wraps the {@link Element} returned by
-     * {@link MCRResolver#resolveElement(String)} in a {@link JDOMSource}.
-     *
-     * @param mcrResolver
-     *            a MCRResolver instance
-     * @return a URIResolver adapter with mcrResolver as backend
-     * @deprecated please implement {@link URIResolver} in your resolver classes
-     * @since 2.0.91
-     */
-    public static URIResolver getURIResolver(final MCRResolver mcrResolver) {
-        return new URIResolver() {
-            public Source resolve(String href, String base) throws TransformerException {
-                try {
-                    return new JDOMSource(mcrResolver.resolveElement(href));
-                } catch (Exception e) {
-                    throw new TransformerException("Error while resolving: " + href, e);
-                }
-            }
-        };
     }
 
     public static Hashtable<String, String> getParameterMap(String key) {
@@ -389,23 +359,6 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * Resolver interface. use this to implement custom URI schemes.
-     *
-     * @author Thomas Scheffler (yagee)
-     * @deprecated use {@link URIResolver} instead
-     */
-    public static interface MCRResolver {
-        /**
-         * resolves an Element for XSLT process
-         *
-         * @param URI
-         *            String in URI Syntax
-         * @throws Exception
-         */
-        public Element resolveElement(String URI) throws Exception;
-    }
-
-    /**
      * provides a URI -- Resolver Mapping One can implement this interface to provide additional URI schemes this
      * MCRURIResolver should handle, too. To add your mapping you have to set the
      * <code>MCR.URIResolver.ExternalResolver.Class</code> property to the implementing class.
@@ -413,16 +366,6 @@ public final class MCRURIResolver implements URIResolver {
      * @author Thomas Scheffler
      */
     public static interface MCRResolverProvider {
-        /**
-         * provides a Map of Resolver mappings. Key is the scheme, e.g. <code>http</code>, where value is an instance of
-         * MCRResolver.
-         *
-         * @see MCRResolver
-         * @return a Map of Resolver mappings
-         * @deprecated since 2.1 use {@link #getURIResolverMapping()}
-         */
-        public Map<String, MCRResolver> getResolverMapping();
-
         /**
          * provides a Map of URIResolver mappings. Key is the scheme, e.g. <code>http</code>, where value is an
          * implementation of {@link URIResolver}.
@@ -434,10 +377,6 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     private static class MCRModuleResolverProvider implements MCRResolverProvider {
-
-        public Map<String, MCRResolver> getResolverMapping() {
-            throw new UnsupportedOperationException("use getURIResolverMapping()");
-        }
 
         public Map<String, URIResolver> getURIResolverMapping() {
             Map<String, String> props = MCRConfiguration.instance().getPropertiesMap(CONFIG_PREFIX + "ModuleResolver.");
@@ -451,12 +390,7 @@ public final class MCRURIResolver implements URIResolver {
                     scheme = scheme.substring(scheme.lastIndexOf('.') + 1);
                     LOGGER.debug("Adding Resolver " + entry.getValue() + " for URI scheme " + scheme);
                     Object newInstance = MCRConfiguration.instance().getInstanceOf(entry.getKey());
-                    if (newInstance instanceof URIResolver) {
-                        map.put(scheme, (URIResolver) newInstance);
-                    } else {
-                        // add adapter for backward compatibility
-                        map.put(scheme, MCRURIResolver.getURIResolver((MCRResolver) newInstance));
-                    }
+                    map.put(scheme, (URIResolver) newInstance);
                 } catch (Exception e) {
                     LOGGER.error("Cannot instantiate " + entry.getValue() + " for URI scheme " + entry.getKey());
                     throw new MCRException("Cannot instantiate " + entry.getValue() + " for URI scheme "
@@ -495,60 +429,6 @@ public final class MCRURIResolver implements URIResolver {
             }
         }
 
-    }
-
-    @Deprecated
-    private static class MCRRequestResolver implements MCRResolver {
-
-        /**
-         * Reads XML from a HTTP request to this web application.
-         *
-         * @param uri
-         *            the URI in the format request:path/to/servlet
-         * @return the root element of the xml document
-         * @throws Exception
-         */
-        public Element resolveElement(String uri) throws Exception {
-            LOGGER.warn("This type of URIResolver is deprecated, please replace use of " + uri);
-
-            String path = uri.substring(uri.indexOf(":") + 1);
-            LOGGER.debug("Reading xml from request " + path);
-
-            StringBuilder url = new StringBuilder(MCRFrontendUtil.getBaseURL());
-            url.append(path);
-
-            final MCRSession currentSession = MCRSessionMgr.getCurrentSession();
-            final Object httpSessionID = currentSession.get("http.session");
-            final String finalURL;
-            if (httpSessionID == null) {
-                finalURL = url.toString();
-            } else {
-                finalURL = toEncoded(url.toString(), httpSessionID.toString());
-            }
-
-            InputStream is = new URL(finalURL).openStream();
-            return MCRURIResolver.instance().parseStream(is);
-        }
-
-        private String toEncoded(String url, String sessionId) {
-
-            if (url == null || sessionId == null) {
-                return url;
-            }
-            String path = url;
-            String query = "";
-            int queryPos = url.indexOf('?');
-            if (queryPos >= 0) {
-                path = url.substring(0, queryPos);
-                query = url.substring(queryPos);
-            }
-            StringBuilder sb = new StringBuilder(path);
-            sb.append(";jsessionid=");
-            sb.append(sessionId);
-            sb.append(query);
-            return sb.toString();
-
-        }
     }
 
     /**
@@ -698,21 +578,13 @@ public final class MCRURIResolver implements URIResolver {
             } catch (Exception e) {
                 throw new TransformerException(e);
             }
-            if (o instanceof URIResolver) {
-                URIResolver resolver = (URIResolver) o;
-                return resolver.resolve(href, base);
-            }
-            MCRResolver resolver = (MCRResolver) o;
-            try {
-                return new JDOMSource(resolver.resolveElement(href));
-            } catch (Exception e) {
-                throw new TransformerException(e);
-            }
+            URIResolver resolver = (URIResolver) o;
+            return resolver.resolve(href, base);
         }
 
     }
 
-    private static class MCRSessionResolver implements MCRResolver {
+    private static class MCRSessionResolver implements URIResolver {
 
         /**
          * Reads XML from URIs of type session:key. The method MCRSession.get( key ) is called and must return a JDOM
@@ -723,14 +595,12 @@ public final class MCRURIResolver implements URIResolver {
          *            the URI in the format session:key
          * @return the root element of the xml document
          */
-        public Element resolveElement(String uri) {
-            String key = uri.substring(uri.indexOf(":") + 1);
-
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            String key = href.substring(href.indexOf(":") + 1);
             LOGGER.debug("Reading xml from session using key " + key);
-
-            Object value = MCRSessionMgr.getCurrentSession().get(key);
-
-            return (Element) ((Element) value).clone();
+            Element value = (Element) MCRSessionMgr.getCurrentSession().get(key);
+            return new JDOMSource(value.clone());
         }
 
     }
@@ -798,7 +668,7 @@ public final class MCRURIResolver implements URIResolver {
         }
     }
 
-    private static class MCRACLResolver implements MCRResolver {
+    private static class MCRACLResolver implements URIResolver {
 
         private static final String ACTION_PARAM = "action";
 
@@ -807,8 +677,8 @@ public final class MCRURIResolver implements URIResolver {
         /**
          * Returns access controll rules as XML
          */
-        public Element resolveElement(String uri) {
-            String key = uri.substring(uri.indexOf(":") + 1);
+        public Source resolve(String href, String base) throws TransformerException {
+            String key = href.substring(href.indexOf(":") + 1);
             LOGGER.debug("Reading xml from query result using key :" + key);
 
             String[] param;
@@ -840,7 +710,7 @@ public final class MCRURIResolver implements URIResolver {
                 addRule(container, action, MCRAccessManager.getAccessImpl().getRule(objId, action));
             }
 
-            return container;
+            return new JDOMSource(container);
         }
 
         private void addRule(Element root, String pool, Element rule) {
@@ -853,7 +723,7 @@ public final class MCRURIResolver implements URIResolver {
 
     }
 
-    private static class MCRClassificationResolver implements MCRResolver {
+    private static class MCRClassificationResolver implements URIResolver {
 
         private static final Pattern EDITORFORMAT_PATTERN = Pattern.compile("(\\[)([^\\]]*)(\\])");
 
@@ -881,7 +751,7 @@ public final class MCRURIResolver implements URIResolver {
         /**
          * returns a classification in a specific format. Syntax:
          * <code>classification:{editor[Complete]['['formatAlias']']|metadata}:{Levels}[:noEmptyLeaves]:{parents|children}:{ClassID}[:CategID]
-         *
+         * 
          * formatAlias: MCRConfiguration property MCR.UURResolver.Classification.Format.FormatAlias
          *
          * @param uri
@@ -889,17 +759,17 @@ public final class MCRURIResolver implements URIResolver {
          * @return the root element of the XML document
          * @see ClassificationTransformer#getEditorDocument(Classification, String)
          */
-        public Element resolveElement(String uri) {
-            LOGGER.debug("start resolving " + uri);
-            String cacheKey = getCacheKey(uri);
+        public Source resolve(String href, String base) throws TransformerException {
+            LOGGER.debug("start resolving " + href);
+            String cacheKey = getCacheKey(href);
             Element returns = categoryCache.getIfUpToDate(cacheKey, getSystemLastModified());
             if (returns == null) {
-                returns = getClassElement(uri);
+                returns = getClassElement(href);
                 if (returns != null) {
                     categoryCache.put(cacheKey, returns);
                 }
             }
-            return returns;
+            return new JDOMSource(returns);
         }
 
         protected String getCacheKey(String uri) {
@@ -1260,13 +1130,13 @@ public final class MCRURIResolver implements URIResolver {
      * &lt;mycoreobject&gt; &lt;metadata&gt; &lt;parents&gt; &lt;parent href="FooBar_Document_4711" /&gt;
      * &lt;/parents&gt; &lt;/metadata&gt; &lt;/mycoreobject&gt;
      */
-    private static class MCRBuildXMLResolver implements MCRResolver {
+    private static class MCRBuildXMLResolver implements URIResolver {
 
         /**
          * Builds a simple xml node tree on basis of name value pair
          */
-        public Element resolveElement(String uri) {
-            String key = uri.substring(uri.indexOf(":") + 1);
+        public Source resolve(String href, String base) throws TransformerException {
+            String key = href.substring(href.indexOf(":") + 1);
             LOGGER.debug("Building xml from " + key);
 
             Hashtable<String, String> params = getParameterMap(key);
@@ -1284,9 +1154,9 @@ public final class MCRURIResolver implements URIResolver {
             }
             if (root == defaultRoot && root.getChildren().size() > 1) {
                 LOGGER.warn("More than 1 root node defined, returning first");
-                return (Element) ((Element) root.getChildren().get(0)).detach();
+                return new JDOMSource(root.getChildren().get(0).detach());
             }
-            return root;
+            return new JDOMSource(root);
         }
 
         private static Hashtable<String, String> getParameterMap(String key) {
@@ -1352,6 +1222,7 @@ public final class MCRURIResolver implements URIResolver {
                 return name.split(":")[1];
             }
         }
+
     }
 
     private static class MCRVersionInfoResolver implements URIResolver {
