@@ -99,4 +99,10 @@ class MCRAccessCacheManager implements MCRSessionListener {
         accessCache.get().put(handle, permitted);
     }
 
+    public void removePermission(String id, String permission) {
+        MCRPermissionHandle handle = new MCRPermissionHandle(id, permission);
+        MCRCache<MCRPermissionHandle, Boolean> permissionCache = accessCache.get();
+        permissionCache.remove(handle);
+    }
+
 }

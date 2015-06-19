@@ -52,12 +52,12 @@ public class MCRAccessManager {
 
     public static MCRAccessInterface getAccessImpl() {
         return MCRConfiguration.instance().<MCRAccessInterface> getSingleInstanceOf("MCR.Access.Class",
-            MCRAccessBaseImpl.class.getName());
+                MCRAccessBaseImpl.class.getName());
     }
 
     private static MCRAccessCheckStrategy getAccessStrategy() {
         return MCRConfiguration.instance().getInstanceOf("MCR.Access.Strategy.Class",
-            MCRDerivateIDStrategy.class.getName());
+                MCRDerivateIDStrategy.class.getName());
     }
 
     /**
@@ -76,7 +76,7 @@ public class MCRAccessManager {
      * @see MCRAccessInterface#addRule(String, String, org.jdom2.Element, String)
      */
     public static void addRule(MCRObjectID id, String permission, org.jdom2.Element rule, String description)
-        throws MCRException {
+            throws MCRException {
         getAccessImpl().addRule(id.toString(), permission, rule, description);
     }
 
@@ -96,7 +96,7 @@ public class MCRAccessManager {
      * @see MCRAccessInterface#addRule(String, String, org.jdom2.Element, String)
      */
     public static void addRule(String id, String permission, org.jdom2.Element rule, String description)
-        throws MCRException {
+            throws MCRException {
         getAccessImpl().addRule(id, permission, rule, description);
     }
 
@@ -159,7 +159,7 @@ public class MCRAccessManager {
      * @see MCRAccessInterface#updateRule(String, String, Element, String)
      */
     public static void updateRule(MCRObjectID id, String permission, org.jdom2.Element rule, String description)
-        throws MCRException {
+            throws MCRException {
         getAccessImpl().updateRule(id.toString(), permission, rule, description);
     }
 
@@ -179,7 +179,7 @@ public class MCRAccessManager {
      * @see MCRAccessInterface#updateRule(String, String, Element, String)
      */
     public static void updateRule(String id, String permission, org.jdom2.Element rule, String description)
-        throws MCRException {
+            throws MCRException {
         getAccessImpl().updateRule(id, permission, rule, description);
     }
 
@@ -235,6 +235,25 @@ public class MCRAccessManager {
             LOGGER.debug("checkPermission permission:" + permission + " --> " + value);
         }
         return value;
+    }
+
+    /**
+     * Invalidates the permission for current user from cache.
+     *  
+     * @param id the {@link MCRObjectID}
+     * @param permission the access permission
+     */
+    public static void invalidPermissionCache(String id, String permission) {
+        ACCESS_CACHE.removePermission(id, permission);
+    }
+
+    /**
+     * Invalidates the permission for current user from cache.
+     *  
+     * @param permission the access permission
+     */
+    public static void invalidPermissionCache(String permission) {
+        invalidPermissionCache(null, permission);
     }
 
     /**
