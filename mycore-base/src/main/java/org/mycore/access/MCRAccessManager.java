@@ -238,7 +238,7 @@ public class MCRAccessManager {
     }
 
     /**
-     * Invalidates the permission for current user from cache.
+     * Invalidates the permission for current user on cache.
      *  
      * @param id the {@link MCRObjectID}
      * @param permission the access permission
@@ -248,7 +248,7 @@ public class MCRAccessManager {
     }
 
     /**
-     * Invalidates the permission for current user from cache.
+     * Invalidates the permission for current user on cache.
      *  
      * @param permission the access permission
      */
