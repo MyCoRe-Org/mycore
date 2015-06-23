@@ -23,8 +23,10 @@
             <link href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet" type="text/css" />
           </xsl:when>
           <xsl:otherwise>
-            <script type="text/javascript" src="{$MCR.Module-iview2.bootstrapURL}/js/bootstrap.min.js"></script>
-            <link href="{$MCR.Module-iview2.bootstrapURL}/css/bootstrap.css" type="text/css" rel="stylesheet"></link>
+            <xsl:if test="string-length($MCR.Module-iview2.bootstrapURL)&gt;0">
+              <script type="text/javascript" src="{$MCR.Module-iview2.bootstrapURL}/js/bootstrap.min.js"></script>
+              <link href="{$MCR.Module-iview2.bootstrapURL}/css/bootstrap.css" type="text/css" rel="stylesheet"></link>
+            </xsl:if>
           </xsl:otherwise>
         </xsl:choose>
 
