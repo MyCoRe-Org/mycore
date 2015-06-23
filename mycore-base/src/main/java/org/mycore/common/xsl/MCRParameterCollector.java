@@ -294,6 +294,7 @@ public class MCRParameterCollector {
     private void setFromRequestHeader(HttpServletRequest request) {
         parameters.put("RequestURL", getCompleteURL(request));
         parameters.put("Referer", request.getHeader("Referer") != null ? request.getHeader("Referer") : "");
+        parameters.put("UserAgent", request.getHeader("User-Agent") != null ? request.getHeader("User-Agent") : "" );
     }
 
     /** 
