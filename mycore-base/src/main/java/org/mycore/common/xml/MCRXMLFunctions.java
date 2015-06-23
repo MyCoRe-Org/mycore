@@ -647,6 +647,15 @@ public class MCRXMLFunctions {
     }
 
     /**
+     * Checks if the User-Agent is sent from a mobile device
+     * @param UserAgent
+     * @return true if the User-Agent is sent from a mobile device
+     */
+    public static boolean isMobileDevice(String UserAgent){
+        return UserAgent.toLowerCase(Locale.ROOT).contains("mobile");
+    }
+
+    /**
      * @param classificationId
      * @param categoryId
      * @return
