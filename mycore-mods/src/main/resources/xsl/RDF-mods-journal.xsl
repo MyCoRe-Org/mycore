@@ -50,7 +50,7 @@
     </mods:titleInfo>
   </xsl:template>
   <xsl:template match="bibo:shortTitle">
-    <mods:titleInfo displayLabel="Short form of the title" type="alternative">
+    <mods:titleInfo displayLabel="Short form of the title" type="abbreviated">
       <mods:title>
         <xsl:value-of select="." />
       </mods:title>
