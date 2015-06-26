@@ -1,28 +1,34 @@
 package org.mycore.coma.frontend;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.FileTime;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.TransformerException;
+
 import org.apache.log4j.Logger;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.servlets.MCRContentServlet;
+import org.xml.sax.SAXException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.TransformerException;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.attribute.FileTime;
-
+/**
+ * This servlet transforms and delivers xml content from a derivate.
+ * usage: <code>servlet/derivate_id/path/to/file.xml</code>
+ *
+ * @author mcrshofm
+ */
 public class MCRDerivateContentTransformerServlet extends MCRContentServlet {
 
+    private static final int CACHE_TIME = 24 * 60 * 60;
     private static final Logger LOGGER = Logger.getLogger(MCRDerivateContentTransformerServlet.class);
-    public static final int CACHE_TIME = 24 * 60 * 60;
 
     @Override
-    /**
-     * Gets content from a derivate
-     */
-    public MCRContent getContent(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public MCRContent getContent(HttpServletRequest req, HttpServletResponse resp) throws IOException,
+            TransformerException, SAXException {
         String pathInfo = req.getPathInfo();
         if (pathInfo.startsWith("/")) {
             pathInfo = pathInfo.substring(1);
@@ -32,8 +38,8 @@ public class MCRDerivateContentTransformerServlet extends MCRContentServlet {
         String derivate = pathTokens[0];
         String path = pathInfo.substring(derivate.length());
 
-        LOGGER.info("derivate : " + derivate);
-        LOGGER.info("path : " + path);
+        LOGGER.debug("Derivate : " + derivate);
+        LOGGER.debug("Path : " + path);
 
         MCRPath mcrPath = MCRPath.getPath(derivate, path);
         MCRContent pc = new MCRPathContent(mcrPath);
@@ -41,13 +47,7 @@ public class MCRDerivateContentTransformerServlet extends MCRContentServlet {
         FileTime lastModifiedTime = Files.getLastModifiedTime(mcrPath);
 
         writeCacheHeaders(resp, CACHE_TIME, lastModifiedTime.toMillis(), true);
-        try {
-            pc = getLayoutService().getTransformedContent(req, resp, pc);
-        } catch (TransformerException e) {
-            LOGGER.error("error while doing layout!", e);
-        } finally {
-            return pc;
-        }
+        return getLayoutService().getTransformedContent(req, resp, pc);
     }
 
 }
