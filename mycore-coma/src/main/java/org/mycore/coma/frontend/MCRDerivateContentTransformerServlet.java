@@ -27,8 +27,7 @@ public class MCRDerivateContentTransformerServlet extends MCRContentServlet {
     private static final Logger LOGGER = Logger.getLogger(MCRDerivateContentTransformerServlet.class);
 
     @Override
-    public MCRContent getContent(HttpServletRequest req, HttpServletResponse resp) throws IOException,
-            TransformerException, SAXException {
+    public MCRContent getContent(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String pathInfo = req.getPathInfo();
         if (pathInfo.startsWith("/")) {
             pathInfo = pathInfo.substring(1);
@@ -47,7 +46,12 @@ public class MCRDerivateContentTransformerServlet extends MCRContentServlet {
         FileTime lastModifiedTime = Files.getLastModifiedTime(mcrPath);
 
         writeCacheHeaders(resp, CACHE_TIME, lastModifiedTime.toMillis(), true);
-        return getLayoutService().getTransformedContent(req, resp, pc);
+
+        try {
+            return getLayoutService().getTransformedContent(req, resp, pc);
+        } catch (TransformerException|SAXException e) {
+            throw new IOException("could not transform content", e);
+        }
     }
 
 }
