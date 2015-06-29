@@ -25,6 +25,8 @@ package org.mycore.frontend.classeditor.access;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -40,6 +42,7 @@ import com.sun.jersey.spi.container.ContainerRequest;
  *
  */
 public class MCRClassificationWritePermission implements MCRResourceAccessChecker {
+    public static final String PERMISSION_CREATE = "create-class";
 
     private static Logger LOGGER = Logger.getLogger(MCRClassificationWritePermission.class);
 
@@ -49,17 +52,29 @@ public class MCRClassificationWritePermission implements MCRResourceAccessChecke
     @Override
     public boolean isPermitted(ContainerRequest request) {
         String value = request.getEntity(String.class);
-        Set<MCRCategoryID> categories = MCRCategUtils.getRootCategoryIDs(value);
+//        Set<MCRCategoryID> categories = MCRCategUtils.getRootCategoryIDs(value);
+        HashMap<MCRCategoryID, String> categories = MCRCategUtils.getCategoryIDMap(value);
         if (categories == null) {
             LOGGER.error("Could not parse: " + value);
             return false;
         }
-        for (MCRCategoryID category : categories) {
-            if (!MCRAccessManager.checkPermission(category.getRootID(), PERMISSION_WRITE)) {
+        for (Map.Entry<MCRCategoryID, String> categoryEntry : categories.entrySet()) {
+            MCRCategoryID category = categoryEntry.getKey();
+            String state = categoryEntry.getValue();
+
+            if (!hasPermission(category, state)) {
                 LOGGER.info("Permission denied on classification: " + category);
                 return false;
             }
         }
         return true;
+    }
+
+    private boolean hasPermission(MCRCategoryID category, String state) {
+        if(state.equals("new")){
+            return MCRAccessManager.checkPermission(PERMISSION_CREATE);
+        }
+
+        return MCRAccessManager.checkPermission(category.getRootID(), PERMISSION_WRITE);
     }
 }

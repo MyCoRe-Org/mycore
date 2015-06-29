@@ -1,5 +1,6 @@
 package org.mycore.frontend.classeditor.utils;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,6 +46,31 @@ public class MCRCategUtils {
                 String rootId = root.getAsJsonObject("item").getAsJsonObject("id").getAsJsonPrimitive("rootid")
                     .getAsString();
                 categories.add(MCRCategoryID.rootID(rootId));
+            }
+        } else {
+            return null;
+        }
+        return categories;
+    }
+
+    public static HashMap<MCRCategoryID, String> getCategoryIDMap(String json) {
+        HashMap<MCRCategoryID, String> categories = new HashMap<>();
+        JsonStreamParser jsonStreamParser = new JsonStreamParser(json);
+        if (jsonStreamParser.hasNext()) {
+            JsonArray saveObjArray = jsonStreamParser.next().getAsJsonArray();
+            for (JsonElement jsonElement : saveObjArray) {
+                //jsonObject.item.id.rootid
+                JsonObject root = jsonElement.getAsJsonObject();
+                String rootId = root.getAsJsonObject("item").getAsJsonObject("id").getAsJsonPrimitive("rootid")
+                        .getAsString();
+
+                String state = root.getAsJsonPrimitive("state").getAsString();
+                String parentId = root.getAsJsonPrimitive("parentId").getAsString();
+                if(parentId.equals("_placeboid_")){
+                    state = "new";
+                }
+
+                categories.put(MCRCategoryID.rootID(rootId), state);
             }
         } else {
             return null;
