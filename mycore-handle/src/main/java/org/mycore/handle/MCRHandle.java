@@ -3,6 +3,14 @@
  */
 package org.mycore.handle;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 /**
  * Class wraps a handle. 
@@ -11,56 +19,72 @@ package org.mycore.handle;
  * 
  * @see http://www.handle.net/rfc/rfc3651.html
  */
+@Entity
+@Table(name = "MCRHandle", uniqueConstraints = @UniqueConstraint(columnNames = { "mcrid", "path" }) , indexes = {
+        @Index(columnList = "object_signature", name = "mcrhandle_objectSignature_idx"),
+        @Index(columnList = "message_signature", name = "mcrhandle_messageSignature_idx") })
 public class MCRHandle {
 
     /**
      * Hibernate primary key
      */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column
     private long id;
 
     /**
      * The schema part of the handle
      */
+    @Column(name = "schema_attr", length = 64)
     private String schema;
 
     /**
      * The naming authority part of the handle
      */
+    @Column(name = "naming_authority")
     private String namingAuthority;
 
     /**
      * The naming authority segment part of the handle
      */
+    @Column(name = "naming_authority_segment")
     private String namingAuthoritySegment;
 
     /**
      * The local part of the handle
      */
+    @Column(name = "local_name")
     private String localName;
 
     /**
      * mycore related, the path of the file addressed by this handle
      */
+    @Column(length = 255)
     private String path;
 
     /**
      * mycore related, the mcrid implicitly addressed by this handle (a derivate or a mycore object) 
      * */
+    @Column(length = 64)
     private String mcrid;
 
     /**
      * The checksum of this handle, must be calulated by a {@link MCRIHandleProvider}.
      * */
+    @Column(scale = 16)
     private int checksum;
 
     /**
      * 
      */
+    @Column(name = "object_signature")
     private String objectSignature;
 
     /**
      * 
      */
+    @Column(name = "message_signature")
     private String messageSignature;
 
     /**
