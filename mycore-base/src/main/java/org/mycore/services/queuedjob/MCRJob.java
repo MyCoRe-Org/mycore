@@ -30,15 +30,19 @@ import java.util.Map;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  * Container class handled by hibernate to store and retrieve job information.
@@ -46,6 +50,7 @@ import javax.persistence.MapKeyColumn;
  * @author Ren\u00E9 Adler
  */
 @Entity
+@Table(name = "MCRJob")
 public class MCRJob implements Cloneable {
     private long id;
 
@@ -74,7 +79,7 @@ public class MCRJob implements Cloneable {
      * @return the job Id
      */
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     public long getId() {
         return id;
@@ -95,6 +100,7 @@ public class MCRJob implements Cloneable {
      * @return the action class
      */
     @Column(name = "action", nullable = false)
+    @Convert(converter = MCRJobActionConverter.class)
     public Class<? extends MCRJobAction> getAction() {
         return action;
     }
@@ -213,6 +219,7 @@ public class MCRJob implements Cloneable {
      * @param key - the parameter name.
      * @return the value of the parameter.
      */
+    @Transient
     public String getParameter(String key) {
         if (parameters == null)
             return null;
@@ -257,8 +264,8 @@ public class MCRJob implements Cloneable {
      */
     @Override
     public String toString() {
-        return MessageFormat.format("MCRJob [id:{0}, action:{1}, status:{2}, added:{3}, parameters:{4}]", getId(), getAction().getName(),
-                getStatus(), getAdded(), getParameters());
+        return MessageFormat.format("MCRJob [id:{0}, action:{1}, status:{2}, added:{3}, parameters:{4}]", getId(),
+                getAction().getName(), getStatus(), getAdded(), getParameters());
     }
 
 }
