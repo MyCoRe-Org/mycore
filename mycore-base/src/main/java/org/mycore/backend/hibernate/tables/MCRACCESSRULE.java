@@ -23,36 +23,31 @@
 
 package org.mycore.backend.hibernate.tables;
 
-/*
- * This file is part of ** M y C o R e ** Visit our homepage at
- * http://www.mycore.de/ for details.
- * 
- * This program is free software; you can use it, redistribute it and / or
- * modify it under the terms of the GNU General Public License (GPL) as
- * published by the Free Software Foundation; either version 2 of the License or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * this program, normally in the file license.txt. If not, write to the Free
- * Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307
- * USA
- */
 import java.sql.Timestamp;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "MCRACCESSRULE")
 public class MCRACCESSRULE {
+
+    @Id
+    @Column(name = "RID")
     private String rid;
 
+    @Column(name = "CREATOR", length = 64, nullable = false)
     private String creator;
 
+    @Column(name = "CREATIONDATE", length = 64, nullable = false)
     private Timestamp creationdate;
 
+    @Column(name = "RULE", length = 2048000, nullable = false)
     private String rule;
 
+    @Column(name = "DESCRIPTION", length = 255, nullable = false)
     private String description;
 
     public Timestamp getCreationdate() {

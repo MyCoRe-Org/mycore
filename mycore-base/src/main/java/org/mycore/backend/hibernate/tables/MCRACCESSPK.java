@@ -25,12 +25,18 @@ package org.mycore.backend.hibernate.tables;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
+@Embeddable
 public class MCRACCESSPK implements Serializable {
 
     private static final long serialVersionUID = 1177905976922683366L;
 
+    @Column(name = "ACPOOL")
     private String acpool;
 
+    @Column(name = "OBJID")
     private String objid;
 
     public MCRACCESSPK() {

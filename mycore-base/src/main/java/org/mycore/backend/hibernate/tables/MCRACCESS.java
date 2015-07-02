@@ -25,13 +25,27 @@ package org.mycore.backend.hibernate.tables;
 
 import java.sql.Timestamp;
 
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "MCRACCESS")
 public class MCRACCESS {
+    @EmbeddedId
     private MCRACCESSPK key;
 
+    @ManyToOne
+    @JoinColumn(name = "rid", nullable = false)
     private MCRACCESSRULE rule;
 
+    @Column(name = "CREATOR", length = 64, nullable = false)
     private String creator;
 
+    @Column(name = "CREATIONDATE", length = 64, nullable = false)
     private Timestamp creationdate;
 
     public MCRACCESS() {
