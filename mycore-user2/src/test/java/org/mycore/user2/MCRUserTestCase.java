@@ -59,7 +59,7 @@ public class MCRUserTestCase extends MCRHibTestCase {
         MCRHIBConnection connection = MCRHIBConnection.instance();
         Configuration configuration = super.getHibernateConfiguration();
         if (!connection.containsMapping("MCRUser")) {
-            configuration.addResource("org/mycore/user2/MCRUser.hbm.xml");
+            configuration.addAnnotatedClass(MCRUser.class);
             MCRHIBConnection.instance().buildSessionFactory(configuration);
             sessionFactory = MCRHIBConnection.instance().getSessionFactory();
         }

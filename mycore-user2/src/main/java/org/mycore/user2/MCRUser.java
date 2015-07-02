@@ -31,6 +31,24 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -39,6 +57,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUserInformation;
 
@@ -50,6 +70,11 @@ import org.mycore.common.MCRUserInformation;
  * @author Frank L\u00fctzenkirchen
  * @author Thomas Scheffler (yagee)
  */
+@Entity
+@Access(AccessType.PROPERTY)
+@Table(name = "MCRUser", uniqueConstraints = @UniqueConstraint(columnNames = { "userName", "realmID" }))
+// TODO use @Cacheable instead
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @XmlRootElement(name = "user")
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(propOrder = { "ownerId", "realName", "eMail", "lastLogin", "validUntil", "roles", "attributesMap", "password" })
@@ -90,15 +115,20 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     /** The last time the user logged in */
     @XmlElement
-    private Date lastLogin, validUntil;
+    private Date lastLogin;
+
+    @XmlElement
+    private Date validUntil;
 
     /**
      * 
      */
     private Map<String, String> attributes;
 
+    @Transient
     private Collection<String> systemRoles;
 
+    @Transient
     private Collection<String> externalRoles;
 
     protected MCRUser() {
@@ -139,6 +169,23 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         this(userName, MCRRealmFactory.getLocalRealm().getID());
     }
 
+    /**
+     * @return the internalID
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column
+    int getInternalID() {
+        return internalID;
+    }
+
+    /**
+     * @param internalID the internalID to set
+     */
+    void setInternalID(int internalID) {
+        this.internalID = internalID;
+    }
+
     public boolean isLocked() {
         return locked;
     }
@@ -148,7 +195,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     }
 
     /* Getter for hibernate */
-    @SuppressWarnings("unused")
+    @Column(name = "locked", nullable = true)
     private Boolean getLocked() {
         return this.locked;
     }
@@ -168,7 +215,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     }
 
     /* Getter for hibernate */
-    @SuppressWarnings("unused")
+    @Column(name = "disabled", nullable = true)
     private Boolean getDisabled() {
         return this.disabled;
     }
@@ -179,6 +226,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      *  
      * @return the login user name.
      */
+    @Column(name = "userName", nullable = false)
     public String getUserName() {
         return userName;
     }
@@ -199,6 +247,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * 
      * @return the realm the user belongs to.
      */
+    @Transient
     public MCRRealm getRealm() {
         return MCRRealmFactory.getRealm(realmID);
     }
@@ -208,6 +257,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * 
      * @return the ID of the realm the user belongs to.
      */
+    @Column(name = "realmID", length = 128, nullable = false)
     public String getRealmID() {
         return realmID;
     }
@@ -241,6 +291,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     /**
      * @return the hash
      */
+    @Column(name = "password", nullable = true)
     public String getPassword() {
         return password == null ? null : password.hash;
     }
@@ -255,6 +306,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     /**
      * @return the salt
      */
+    @Column(name = "salt", nullable = true)
     public String getSalt() {
         return password == null ? null : password.salt;
     }
@@ -269,6 +321,8 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     /**
      * @return the hashType
      */
+    @Column(name = "hashType", nullable = true)
+    @Enumerated(EnumType.STRING)
     public MCRPasswordHashType getHashType() {
         return password == null ? null : password.hashType;
     }
@@ -286,6 +340,8 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      *  
      * @return the user that owns this user.
      */
+    @ManyToOne
+    @JoinColumn(name = "owner", nullable = true)
     public MCRUser getOwner() {
         return owner;
     }
@@ -307,6 +363,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * 
      * @return the name of the person this login user represents.
      */
+    @Column(name = "realName", nullable = true)
     public String getRealName() {
         return realName;
     }
@@ -316,7 +373,13 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * 
      * @return the E-Mail address of the person this login user represents.
      */
+    @Transient
     public String getEMailAddress() {
+        return eMail;
+    }
+
+    @Column(name = "eMail", nullable = true)
+    private String getEMail() {
         return eMail;
     }
 
@@ -325,6 +388,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * 
      * @return a hint the user has stored in case of forgotten hash.
      */
+    @Column(name = "hint", nullable = true)
     public String getHint() {
         return password == null ? null : password.hint;
     }
@@ -334,6 +398,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * 
      * @return the last time the user has logged in.
      */
+    @Column(name = "lastLogin", nullable = true)
     public Date getLastLogin() {
         if (lastLogin == null) {
             return null;
@@ -438,6 +503,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         return result;
     }
 
+    @Transient
     @Override
     public String getUserID() {
         String cuid = this.getUserName();
@@ -472,6 +538,10 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     /**
      * @return the attributes
      */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "MCRUserAttr", joinColumns = @JoinColumn(name = "id"))
+    @MapKeyColumn(name = "name", length = 128)
+    @Column(name = "value", length = 255)
     public Map<String, String> getAttributes() {
         return attributes;
     }
@@ -487,6 +557,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * Returns a collection any system role ID this user is member of.
      * @see MCRRole#isSystemRole()
      */
+    @Transient
     public Collection<String> getSystemRoleIDs() {
         return systemRoles;
     }
@@ -495,6 +566,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * Returns a collection any external role ID this user is member of.
      * @see MCRRole#isSystemRole()
      */
+    @Transient
     public Collection<String> getExternalRoleIDs() {
         return externalRoles;
     }
@@ -560,6 +632,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     /**
      * Returns a {@link Date} when this user can not login anymore.
      */
+    @Column(name = "validUntil", nullable = true)
     public Date getValidUntil() {
         if (validUntil == null) {
             return null;
@@ -611,6 +684,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         public String realm;
     }
 
+    @Transient
     @XmlElementWrapper(name = "roles")
     @XmlElement(name = "role")
     private MCRRole[] getRoles() {
@@ -644,6 +718,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         }
     }
 
+    @Transient
     @XmlElementWrapper(name = "attributes")
     @XmlElement(name = "attribute")
     private MapEntry[] getAttributesMap() {
@@ -667,6 +742,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         }
     }
 
+    @Transient
     @XmlElement(name = "owner")
     private UserIdentifier getOwnerId() {
         if (owner == null) {
@@ -717,6 +793,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * </ul>
      * @return a clone copy of this instance
      */
+    @Transient
     public MCRUser getBasicCopy() {
         MCRUser copy = new MCRUser(userName, realmID);
         copy.locked = locked;
@@ -737,6 +814,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * </ul>
      * @return a clone copy of this instance
      */
+    @Transient
     public MCRUser getSafeCopy() {
         MCRUser copy = getBasicCopy();
         if (getHint() != null) {
