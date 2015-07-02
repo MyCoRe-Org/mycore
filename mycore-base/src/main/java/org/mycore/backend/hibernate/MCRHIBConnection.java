@@ -174,6 +174,7 @@ public class MCRHIBConnection implements Closeable {
         try {
             return Class.forName(className);
         } catch (ClassNotFoundException e) {
+            LOGGER.error("Class not found: " + className);
             return null;
         }
     }
