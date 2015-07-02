@@ -3,33 +3,56 @@ package org.mycore.iview2.services;
 import java.text.MessageFormat;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
 /**
  * Container class handled by hibernate to store and retrieve job information for the next tiling request.
  * @author Thomas Scheffler (yagee)
  *
  */
+@Entity
+@Table(name = "MCRTileJob", uniqueConstraints = @UniqueConstraint(columnNames = { "derivate", "path" }) )
 public class MCRTileJob implements Cloneable {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column
     private long id;
 
+    @Column(length = 64)
     private String derivate;
 
+    @Column(length = 255)
     private String path;
 
+    @Column
     private char status;
 
+    @Column
     private Date added;
 
+    @Column
     private Date start;
 
+    @Column
     private Date finished;
 
+    @Column
     private long tiles;
 
+    @Column
     private long width;
 
+    @Column
     private long height;
 
+    @Column
     private long zoomLevel;
 
     /**
@@ -182,7 +205,8 @@ public class MCRTileJob implements Cloneable {
      */
     @Override
     public String toString() {
-        return MessageFormat.format("MCRTileJob [derivate:{0}, path:{1}, added:{2}]", getDerivate(), getPath(), getAdded());
+        return MessageFormat.format("MCRTileJob [derivate:{0}, path:{1}, added:{2}]", getDerivate(), getPath(),
+                getAdded());
     }
 
 }
