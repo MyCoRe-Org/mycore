@@ -23,6 +23,11 @@
 
 package org.mycore.urn.hibernate;
 
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 /**
  * This class implements the data structure of the MCRURN table.
  * 
@@ -30,14 +35,23 @@ package org.mycore.urn.hibernate;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
+@Entity
+@Table(name = "MCRURN")
 public class MCRURN {
+    @EmbeddedId
     private MCRURNPK key;
 
+    @Column(name = "PATH")
     private String path;
 
+    @Column(name = "FILENAME")
     private String filename;
 
-    private boolean registered, dfg;
+    @Column(name = "REGISTERED")
+    private boolean registered;
+
+    @Column(name = "DFG")
+    private boolean dfg;
 
     /**
      * The constructor of the class MCRURN

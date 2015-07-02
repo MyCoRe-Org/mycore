@@ -25,6 +25,9 @@ package org.mycore.urn.hibernate;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
@@ -35,12 +38,15 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
+@Embeddable
 public class MCRURNPK implements Serializable {
 
     private static final long serialVersionUID = 8252257587972286981L;
 
+    @Column(name = "MCRID", length = 64, nullable = false)
     private String mcrid;
 
+    @Column(name = "MCRURN", length = 194, nullable = false)
     private String mcrurn;
 
     /**
@@ -95,7 +101,8 @@ public class MCRURNPK implements Serializable {
 
         MCRURNPK castother = (MCRURNPK) other;
 
-        return new EqualsBuilder().append(getMcrid(), castother.getMcrid()).append(getMcrurn(), castother.getMcrurn()).isEquals();
+        return new EqualsBuilder().append(getMcrid(), castother.getMcrid()).append(getMcrurn(), castother.getMcrurn())
+                .isEquals();
     }
 
     /**
