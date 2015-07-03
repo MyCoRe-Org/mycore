@@ -22,6 +22,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
@@ -84,6 +86,15 @@ public class MCRCommandLineInterface {
      */
     public static void main(String[] args) {
         MCRStartupHandler.startUp(null/*no servlet context here*/);
+        //BUG: try to track down https://bamboo.mycore.de/browse/DP-TEST-234
+        if (MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName", null) == null) {
+            try {
+                MCRConfiguration.instance().store(System.err, "I'm going die soon, this should be my gravestone quote:");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        //BUG DEBUG END
         system = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName") + ":";
 
         initSession();
