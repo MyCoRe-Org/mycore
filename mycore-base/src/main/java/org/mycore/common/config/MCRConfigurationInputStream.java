@@ -162,13 +162,10 @@ public class MCRConfigurationInputStream extends InputStream {
     private static InputStream getPropertyStream(String filename) throws IOException {
         File mycoreProperties = new File(filename);
         MCRContent input = null;
-        //DEBUG-CODE: logInfo()
         if (mycoreProperties.canRead()) {
-            logInfo("Loading properties from file: " + mycoreProperties.getAbsolutePath());
             input = new MCRFileContent(mycoreProperties);
         } else {
             URL url = MCRConfigurationInputStream.class.getClassLoader().getResource(filename);
-            logInfo("Loading properties from url: " + url);
             if (url != null) {
                 input = new MCRURLContent(url);
             }
