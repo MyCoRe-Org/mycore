@@ -30,7 +30,7 @@ public class MCRQLSearchUtilsTest extends MCRTestCase {
             MCRQLSearchUtils.getSolrQuery(andQuery, andQuery.buildXML(), null).getQuery());
         //MCR-994
         MCRQuery orQuery = getMCRQuery("(state = \"submitted\") OR (state = \"published\")");
-        assertEquals("state:\"submitted\" state:\"published\"",
+        assertEquals("+(state:\"submitted\" state:\"published\")",
             MCRQLSearchUtils.getSolrQuery(orQuery, orQuery.buildXML(), null).getQuery());
     }
 
