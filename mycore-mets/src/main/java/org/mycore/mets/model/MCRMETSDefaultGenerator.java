@@ -25,7 +25,9 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -68,9 +70,15 @@ import org.mycore.mets.tools.MCRMetsSave;
  */
 public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
 
+    private static final String TRANSCRIPTION = "transcription";
+
+    private static final String TRANSLATION = "translation";
+
     private static final Logger LOGGER = Logger.getLogger(MCRMETSGenerator.class);
 
     private static final List<String> EXCLUDED_ROOT_FOLDERS = Arrays.asList(new String[] { "alto", "tei" });
+
+    private static HashMap<String, String> HREF_ID_MAP = new HashMap<String, String>();
 
     public Mets getMETS(MCRPath dir, Set<MCRPath> ignoreNodes) throws IOException {
         // add dmdsec
@@ -80,7 +88,13 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         // file sec
         FileSec fileSec = new FileSec();
         FileGrp fileGrp = new FileGrp(FileGrp.USE_MASTER);
+        FileGrp transcritionGrp = new FileGrp("TRANSCRIPTION");
+        FileGrp translationGrp = new FileGrp("TRANSLATION");
+        FileGrp altoGrp = new FileGrp("ALTO");
         fileSec.addFileGrp(fileGrp);
+        fileSec.addFileGrp(altoGrp);
+        fileSec.addFileGrp(transcritionGrp);
+        fileSec.addFileGrp(translationGrp);
         // physical structure
         PhysicalStructMap physicalStructMap = new PhysicalStructMap();
         PhysicalDiv physicalDiv = new PhysicalDiv("phys_dmd_" + dir.getOwner(), "physSequence");
@@ -90,21 +104,23 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         MCRILogicalStructMapTypeProvider typeProvider = getTypeProvider();
         LogicalStructMap logicalStructMap = new LogicalStructMap();
 
-        LogicalDiv logicalDiv = new LogicalDiv("log_" + dir.getOwner(), typeProvider.getType(MCRObjectID.getInstance(dir.getOwner())),
-                dir.getOwner(), 1, amdSec.getId(), dmdSec.getId());
+        LogicalDiv logicalDiv = new LogicalDiv("log_" + dir.getOwner(), typeProvider.getType(MCRObjectID
+            .getInstance(dir.getOwner())), dir.getOwner(), 1, amdSec.getId(), dmdSec.getId());
         logicalDiv.setDmdId(dmdSec.getId());
         logicalStructMap.setDivContainer(logicalDiv);
         // struct Link
         StructLink structLink = new StructLink();
 
         // create
-        createMets(dir, ignoreNodes, fileGrp, physicalDiv, logicalDiv, structLink, 0);
+        createMets(dir, ignoreNodes, fileGrp, altoGrp, transcritionGrp, translationGrp, physicalDiv, logicalDiv,
+            structLink, 0);
 
         // add to mets
         Mets mets = new Mets();
         mets.addDmdSec(dmdSec);
         mets.addAmdSec(amdSec);
         mets.setFileSec(fileSec);
+        sortByOrder(physicalStructMap.getDivContainer());
         mets.addStructMap(physicalStructMap);
         mets.addStructMap(logicalStructMap);
         mets.setStructLink(structLink);
@@ -121,8 +137,20 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         return mets;
     }
 
-    private void createMets(MCRPath dir, Set<MCRPath> ignoreNodes, FileGrp fileGrp, PhysicalDiv physicalDiv, AbstractLogicalDiv logicalDiv,
-            StructLink structLink, int logOrder) throws IOException {
+    private void sortByOrder(PhysicalDiv physicalDiv) {
+        List<PhysicalSubDiv> sortedSubDivs = new ArrayList<PhysicalSubDiv>(physicalDiv.getChildren());
+        for (PhysicalSubDiv physSubDiv : physicalDiv.getChildren()) {
+            sortedSubDivs.set(physSubDiv.getOrder() - 1, physSubDiv);
+            physicalDiv.remove(physSubDiv);
+        }
+        for (PhysicalSubDiv physicalSubDiv : sortedSubDivs) {
+            physicalDiv.add(physicalSubDiv);
+        }
+    }
+
+    private void createMets(MCRPath dir, Set<MCRPath> ignoreNodes, FileGrp fileGrp, FileGrp altoGrp,
+        FileGrp transcritionGrp, FileGrp translationGrp, PhysicalDiv physicalDiv, AbstractLogicalDiv logicalDiv,
+        StructLink structLink, int logOrder) throws IOException {
         SortedMap<MCRPath, BasicFileAttributes> files = new TreeMap<>(), directories = new TreeMap<>();
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(dir)) {
             for (Path child : dirStream) {
@@ -140,35 +168,80 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         }
         for (Map.Entry<MCRPath, BasicFileAttributes> file : files.entrySet()) {
             final UUID uuid = UUID.randomUUID();
-            final String fileID = "master_" + uuid.toString();
-            final String physicalID = "phys_" + uuid.toString();
+            final UUID uuid2 = UUID.randomUUID();
+            String fileID = "master_" + uuid.toString();
+            final String physicalID = "phys_" + uuid2.toString();
+            String href2 = "";
             try {
                 final String href = MCRXMLFunctions.encodeURIPath(file.getKey().getOwnerRelativePath().substring(1));
+                int beginIndex = href.lastIndexOf("/") == -1 ? 0 : href.lastIndexOf("/") + 1;
+                href2 = href.substring(beginIndex, href.length() - 4);
+                LOGGER.debug("Created href2: " + href2);
+                if (!(HREF_ID_MAP.containsKey(href2) || HREF_ID_MAP.containsValue(uuid2.toString())
+                    && isExcludedRootFolder(dir))) {
+                    HREF_ID_MAP.put(href2, uuid2.toString());
+                }
+
+                if (href.contains(TRANSLATION)) {
+                    fileID = TRANSLATION + "_" + uuid.toString();
+                } else if (href.contains(TRANSCRIPTION)) {
+                    fileID = TRANSCRIPTION + "_" + uuid.toString();
+                } else if (href.contains("alto")) {
+                    fileID = "alto_" + uuid.toString();
+                }
+
                 // file
                 File metsFile = new File(fileID, MCRContentTypes.probeContentType(file.getKey()));
                 FLocat fLocat = new FLocat(LOCTYPE.URL, href);
                 metsFile.setFLocat(fLocat);
-                fileGrp.addFile(metsFile);
+                if (href.contains(TRANSLATION)) {
+                    translationGrp.addFile(metsFile);
+                } else if (href.contains(TRANSCRIPTION)) {
+                    transcritionGrp.addFile(metsFile);
+                } else if (href.contains("alto")) {
+                    altoGrp.addFile(metsFile);
+                } else {
+                    fileGrp.addFile(metsFile);
+                }
             } catch (URISyntaxException uriSyntaxException) {
                 LOGGER.error("invalid href", uriSyntaxException);
                 continue;
             }
             // physical
-            PhysicalSubDiv pyhsicalPage = new PhysicalSubDiv(physicalID, "page", physicalDiv.getChildren().size() + 1);
-            Fptr fptr = new Fptr(fileID);
-            pyhsicalPage.add(fptr);
-            physicalDiv.add(pyhsicalPage);
+            if (!href2.isEmpty() && HREF_ID_MAP.containsKey(href2)
+                && (isExcludedRootFolder(dir) || isExcludedRootFolder(dir.getParent()))) {
+                for (PhysicalSubDiv physSubDiv : physicalDiv.getChildren()) {
+                    if (physSubDiv.getId().contains(HREF_ID_MAP.get(href2))) {
+                        physicalDiv.remove(physSubDiv);
+                        Fptr fptr = new Fptr(fileID);
+                        physSubDiv.add(fptr);
+                        physicalDiv.add(physSubDiv);
+                    }
+                }
+            } else {
+                PhysicalSubDiv pyhsicalPage = new PhysicalSubDiv(physicalID, "page",
+                    physicalDiv.getChildren().size() + 1);
+                Fptr fptr = new Fptr(fileID);
+                pyhsicalPage.add(fptr);
+                physicalDiv.add(pyhsicalPage);
+            }
             // struct link
+            if (!(isExcludedRootFolder(dir) || isExcludedRootFolder(dir.getParent()))) {
             SmLink smLink = new SmLink(logicalDiv.getId(), physicalID);
-            structLink.addSmLink(smLink);
+                structLink.addSmLink(smLink);
+            }
         }
         for (Map.Entry<MCRPath, BasicFileAttributes> directory : directories.entrySet()) {
-            // TODO: Add excluded files to extra section and link them to physical page
-            if (!(logOrder == 0 && isExcludedRootFolder(directory.getKey()))) {
-                LogicalSubDiv section = new LogicalSubDiv("log_" + Integer.toString(++logOrder), "section", directory.getKey()
-                        .getFileName().toString(), logOrder);
+            String dirName = directory.getKey().getFileName().toString();
+            if (isExcludedRootFolder(directory.getKey()) || isExcludedRootFolder(directory.getKey().getParent())) {
+                createMets(directory.getKey(), ignoreNodes, fileGrp, altoGrp, transcritionGrp, translationGrp,
+                    physicalDiv, logicalDiv, structLink, logOrder);
+            } else {
+                LogicalSubDiv section = new LogicalSubDiv("log_" + Integer.toString(++logOrder), "section", dirName,
+                    logOrder);
                 logicalDiv.add(section);
-                createMets(directory.getKey(), ignoreNodes, fileGrp, physicalDiv, section, structLink, logOrder);
+                createMets(directory.getKey(), ignoreNodes, fileGrp, altoGrp, transcritionGrp, translationGrp,
+                    physicalDiv, section, structLink, logOrder);
             }
         }
     }
@@ -180,7 +253,8 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
      * @return true if the directory should be excluded
      */
     private boolean isExcludedRootFolder(MCRPath directory) {
-        String fileName = directory.getFileName().toString();
+        String fileName = directory == null || directory.getFileName() == null ? "" : directory.getFileName()
+            .toString();
         boolean isExcluded = MCRMETSDefaultGenerator.EXCLUDED_ROOT_FOLDERS.contains(fileName);
 
         if (LOGGER.isDebugEnabled()) {
@@ -192,7 +266,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
 
     private MCRILogicalStructMapTypeProvider getTypeProvider() {
         String className = MCRConfiguration.instance().getString("MCR.Component.MetsMods.LogicalStructMapTypeProvider",
-                MCRDefaultLogicalStructMapTypeProvider.class.getName());
+            MCRDefaultLogicalStructMapTypeProvider.class.getName());
 
         MCRILogicalStructMapTypeProvider typeProvider = null;
         try {
