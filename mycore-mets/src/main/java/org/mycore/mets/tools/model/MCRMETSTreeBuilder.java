@@ -3,8 +3,10 @@ package org.mycore.mets.tools.model;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.mycore.mets.model.Mets;
 import org.mycore.mets.model.files.File;
 import org.mycore.mets.model.files.FileGrp;
+import org.mycore.mets.model.struct.Fptr;
 import org.mycore.mets.model.struct.LogicalStructMap;
 import org.mycore.mets.model.struct.LogicalSubDiv;
 import org.mycore.mets.model.struct.PhysicalStructMap;
@@ -24,6 +27,7 @@ import org.mycore.mets.tools.MCRJSONTools;
 
 /**
  * Builds the {@link MCRMETSTree} from a {@link Mets} Object.
+ *
  * @author Sebastian Hofmann
  */
 public class MCRMETSTreeBuilder {
@@ -50,7 +54,8 @@ public class MCRMETSTreeBuilder {
     }
 
     /**
-     * Builds the {@link MCRMETSTree} for Metseditor. 
+     * Builds the {@link MCRMETSTree} for Metseditor.
+     *
      * @return the builded tree
      */
     public MCRMETSTree buildTree() {
@@ -106,6 +111,7 @@ public class MCRMETSTreeBuilder {
     /**
      * Used to sort the Children of a {@link MCRMETSNode}. Works recursive.
      * Uses the {@link Comparable} interface and the order attribute of a {@link MCRMETSNode}
+     *
      * @param listToSort the list of Children that should be sorted.
      */
     private void sort(List<MCRMETSNode> listToSort) {
@@ -119,6 +125,7 @@ public class MCRMETSTreeBuilder {
 
     /**
      * Creates the Children and links them to the right Folders.
+     *
      * @param metsSmLink the {@link SmLink} wich contains the source and the destination node
      */
     private void linkStructure(SmLink metsSmLink) {
@@ -163,7 +170,8 @@ public class MCRMETSTreeBuilder {
 
     /**
      * Creates the folders and add them to the root node. Works recursive.
-     * @param root the root node to add the folders.
+     *
+     * @param root           the root node to add the folders.
      * @param metsFolderList the folders that should be added to the root node.
      */
     private void buildFolderTree(MCRMETSNode root, List<LogicalSubDiv> metsFolderList) {
@@ -191,38 +199,50 @@ public class MCRMETSTreeBuilder {
     /**
      * Detects the files which are not present in the struct map and adds them to the root node.
      * The hidden elements gets the hide true attribute.
+     *
      * @param root the node were the {@link MCRMETSNode} should be added.
      */
     private void addHiddenNodes(MCRMETSNode root) {
         Set<String> fileIds = this.idFileMap.keySet();
 
-        for (String currentFileId : fileIds) {
-            if (!idDivMap.containsKey(currentFileId.replace("master_", "phys_")) && !idDivMap.containsKey("phys_" + currentFileId)) {
-                LOGGER.info(MessageFormat.format("{0} is a hidden File!", currentFileId));
-                // file does not appear in structmap -> hidden file
-                File metsFile = this.idFileMap.get(currentFileId);
+        HashSet<String> notLinkedFiles = new HashSet<>(fileIds);
+        Collection<PhysicalSubDiv> physicalSubDivs = this.idDivMap.values();
 
-                MCRMETSNode destinationNode = new MCRMETSNode();
-                String fileHref = metsFile.getFLocat().getHref();
-
-                String path = MCRJSONTools.stripBracketsAndQuotes(fileHref);
-                int index = path.lastIndexOf("/");
-
-                destinationNode.setId(currentFileId);
-                String name = path.substring(index == -1 ? 0 : index + 1);
-                try {
-                    destinationNode.setPath(URLDecoder.decode(path, "UTF-8"));
-                    destinationNode.setName(URLDecoder.decode(name, "UTF-8"));
-                } catch (UnsupportedEncodingException e) {
-                    LOGGER.error(MessageFormat.format("Could not decode path \"{0}\" or name \"{1}\"", path, name), e);
+        for (PhysicalSubDiv subDiv : physicalSubDivs) {
+            List<Fptr> children = subDiv.getChildren();
+            for (Fptr child : children) {
+                String fileId = child.getFileId();
+                if (notLinkedFiles.contains(fileId)) {
+                    notLinkedFiles.remove(fileId);
                 }
-
-                destinationNode.setStructureType("page");
-                destinationNode.setType(MCRMETSNode.ITEM);
-                destinationNode.setHide(true);
-
-                root.addChild(destinationNode);
             }
+        }
+
+
+        for (String currentFileId : notLinkedFiles) {
+            LOGGER.info(MessageFormat.format("{0} is a hidden File!", currentFileId));
+            File metsFile = this.idFileMap.get(currentFileId);
+
+            MCRMETSNode destinationNode = new MCRMETSNode();
+            String fileHref = metsFile.getFLocat().getHref();
+
+            String path = MCRJSONTools.stripBracketsAndQuotes(fileHref);
+            int index = path.lastIndexOf("/");
+
+            destinationNode.setId(currentFileId);
+            String name = path.substring(index == -1 ? 0 : index + 1);
+            try {
+                destinationNode.setPath(URLDecoder.decode(path, "UTF-8"));
+                destinationNode.setName(URLDecoder.decode(name, "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                LOGGER.error(MessageFormat.format("Could not decode path \"{0}\" or name \"{1}\"", path, name), e);
+            }
+
+            destinationNode.setStructureType("page");
+            destinationNode.setType(MCRMETSNode.ITEM);
+            destinationNode.setHide(true);
+
+            root.addChild(destinationNode);
         }
     }
 }
