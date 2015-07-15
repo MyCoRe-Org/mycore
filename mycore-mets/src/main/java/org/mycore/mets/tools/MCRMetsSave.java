@@ -187,7 +187,7 @@ public class MCRMetsSave {
             String fileId = org.mycore.mets.model.files.File.PREFIX_MASTER + uuid;
 
             // check for file existance (if a derivate with mets.xml is uploaded
-            String relPath = file.getOwnerRelativePath().substring(1);
+            String relPath = MCRXMLFunctions.encodeURIPath(file.getOwnerRelativePath().substring(1));
 
             // Check if file already exists -> if yes do nothing
             String fileExistPathString = "mets:mets/mets:fileSec/mets:fileGrp/mets:file/mets:FLocat[@xlink:href='"
