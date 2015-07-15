@@ -78,52 +78,15 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
 
     private static final List<String> EXCLUDED_ROOT_FOLDERS = Arrays.asList(new String[] { "alto", "tei" });
 
-    private HashMap<String, String> HREF_ID_MAP = new HashMap<String, String>();
+    private HashMap<String, String> hrefIdMap = new HashMap<String, String>();
+
+    private enum FileStatus {
+        TRANSLATION, TRANSCRIPTION, ALTO, DEFAULT
+    }
 
     public Mets getMETS(MCRPath dir, Set<MCRPath> ignoreNodes) throws IOException {
-        // add dmdsec
-        DmdSec dmdSec = new DmdSec("dmd_" + dir.getOwner());
-        // add amdsec
-        AmdSec amdSec = new AmdSec("amd_" + dir.getOwner());
-        // file sec
-        FileSec fileSec = new FileSec();
-        FileGrp fileGrp = new FileGrp(FileGrp.USE_MASTER);
-        FileGrp transcritionGrp = new FileGrp("TRANSCRIPTION");
-        FileGrp translationGrp = new FileGrp("TRANSLATION");
-        FileGrp altoGrp = new FileGrp("ALTO");
-        fileSec.addFileGrp(fileGrp);
-        fileSec.addFileGrp(altoGrp);
-        fileSec.addFileGrp(transcritionGrp);
-        fileSec.addFileGrp(translationGrp);
-        // physical structure
-        PhysicalStructMap physicalStructMap = new PhysicalStructMap();
-        PhysicalDiv physicalDiv = new PhysicalDiv("phys_dmd_" + dir.getOwner(), "physSequence");
-        physicalStructMap.setDivContainer(physicalDiv);
-        // logical structure
-
-        MCRILogicalStructMapTypeProvider typeProvider = getTypeProvider();
-        LogicalStructMap logicalStructMap = new LogicalStructMap();
-
-        LogicalDiv logicalDiv = new LogicalDiv("log_" + dir.getOwner(), typeProvider.getType(MCRObjectID
-            .getInstance(dir.getOwner())), dir.getOwner(), 1, amdSec.getId(), dmdSec.getId());
-        logicalDiv.setDmdId(dmdSec.getId());
-        logicalStructMap.setDivContainer(logicalDiv);
-        // struct Link
-        StructLink structLink = new StructLink();
-
-        // create
-        createMets(dir, ignoreNodes, fileGrp, altoGrp, transcritionGrp, translationGrp, physicalDiv, logicalDiv,
-            structLink, 0);
-        HREF_ID_MAP.clear();
-        // add to mets
         Mets mets = new Mets();
-        mets.addDmdSec(dmdSec);
-        mets.addAmdSec(amdSec);
-        mets.setFileSec(fileSec);
-        sortByOrder(physicalStructMap.getDivContainer());
-        mets.addStructMap(physicalStructMap);
-        mets.addStructMap(logicalStructMap);
-        mets.setStructLink(structLink);
+        createMets(dir, ignoreNodes, mets);
 
         MCRDerivate owner = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(dir.getOwner()));
         Map<String, String> urnFileMap = owner.getUrnMap();
@@ -137,24 +100,133 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         return mets;
     }
 
-    private void sortByOrder(PhysicalDiv physicalDiv) {
-        List<PhysicalSubDiv> sortedSubDivs = new ArrayList<PhysicalSubDiv>(physicalDiv.getChildren());
-        for (PhysicalSubDiv physSubDiv : physicalDiv.getChildren()) {
-            sortedSubDivs.set(physSubDiv.getOrder() - 1, physSubDiv);
-            physicalDiv.remove(physSubDiv);
+    private void createMets(MCRPath dir, Set<MCRPath> ignoreNodes, Mets mets) throws IOException {
+        // add dmdsec
+        DmdSec dmdSec = new DmdSec("dmd_" + dir.getOwner());
+        // add amdsec
+        AmdSec amdSec = new AmdSec("amd_" + dir.getOwner());
+        // file sec
+        FileSec fileSec = new FileSec();
+        FileGrp fileGrp = new FileGrp(FileGrp.USE_MASTER);
+        FileGrp transcriptionGrp = new FileGrp("TRANSCRIPTION");
+        FileGrp translationGrp = new FileGrp("TRANSLATION");
+        FileGrp altoGrp = new FileGrp("ALTO");
+        fileSec.addFileGrp(fileGrp);
+        fileSec.addFileGrp(altoGrp);
+        fileSec.addFileGrp(transcriptionGrp);
+        fileSec.addFileGrp(translationGrp);
+
+        // physical structure
+        PhysicalStructMap physicalStructMap = new PhysicalStructMap();
+        PhysicalDiv physicalDiv = new PhysicalDiv("phys_dmd_" + dir.getOwner(), "physSequence");
+        physicalStructMap.setDivContainer(physicalDiv);
+
+        // logical structure
+        MCRILogicalStructMapTypeProvider typeProvider = getTypeProvider();
+        LogicalStructMap logicalStructMap = new LogicalStructMap();
+
+        LogicalDiv logicalDiv = new LogicalDiv("log_" + dir.getOwner(), typeProvider.getType(MCRObjectID
+            .getInstance(dir.getOwner())), dir.getOwner(), 1, amdSec.getId(), dmdSec.getId());
+        logicalDiv.setDmdId(dmdSec.getId());
+        logicalStructMap.setDivContainer(logicalDiv);
+        // struct Link
+        StructLink structLink = new StructLink();
+
+        // create internal structure
+        structureMets(dir, ignoreNodes, fileGrp, altoGrp, transcriptionGrp, translationGrp, physicalDiv, logicalDiv,
+            structLink, 0);
+        hrefIdMap.clear();
+        sortByOrder(physicalStructMap.getDivContainer());
+
+        // add to mets
+        mets.addDmdSec(dmdSec);
+        mets.addAmdSec(amdSec);
+        mets.setFileSec(fileSec);
+        mets.addStructMap(physicalStructMap);
+        mets.addStructMap(logicalStructMap);
+        mets.setStructLink(structLink);
+    }
+
+    private void structureMets(MCRPath dir, Set<MCRPath> ignoreNodes, FileGrp fileGrp, FileGrp altoGrp,
+        FileGrp transcriptionGrp, FileGrp translationGrp, PhysicalDiv physicalDiv, AbstractLogicalDiv logicalDiv,
+        StructLink structLink, int logOrder) throws IOException {
+        SortedMap<MCRPath, BasicFileAttributes> files = new TreeMap<>(), directories = new TreeMap<>();
+
+        fillFileMap(ignoreNodes, files, directories, dir);
+
+        for (Map.Entry<MCRPath, BasicFileAttributes> file : files.entrySet()) {
+            final UUID fileUUID = UUID.randomUUID();
+            final UUID physUUID = UUID.randomUUID();
+            final String physicalID = "phys_" + physUUID.toString();
+            String fileID = "master_" + fileUUID.toString();
+            String fileName = "";
+
+            try {
+                final String href = MCRXMLFunctions.encodeURIPath(file.getKey().getOwnerRelativePath().substring(1));
+                int beginIndex = href.lastIndexOf("/") == -1 ? 0 : href.lastIndexOf("/") + 1;
+                int endIndex = (href.lastIndexOf(".") == -1 || href.lastIndexOf(".") <= beginIndex) ? href.length()
+                    : href.lastIndexOf(".");
+                fileName = href.substring(beginIndex, endIndex);
+                LOGGER.debug("Created href2: " + fileName);
+
+                if (!(hrefIdMap.containsKey(fileName) || hrefIdMap.containsValue(physUUID.toString())
+                    && isExcludedRootFolder(dir))) {
+                    hrefIdMap.put(fileName, physUUID.toString());
+                }
+
+                FileStatus fStatus = getFileStatus(href);
+
+                switch (fStatus) {
+                    case TRANSLATION:
+                        fileID = TRANSLATION + "_" + fileUUID.toString();
+                        break;
+                    case TRANSCRIPTION:
+                        fileID = TRANSCRIPTION + "_" + fileUUID.toString();
+                        break;
+                    case ALTO:
+                        fileID = "alto_" + fileUUID.toString();
+                    default:
+                        break;
+                }
+
+                //files
+                sortFileToGrp(fileGrp, altoGrp, transcriptionGrp, translationGrp, file, fileID, href, fStatus);
+            } catch (URISyntaxException uriSyntaxException) {
+                LOGGER.error("invalid href", uriSyntaxException);
+                continue;
+            }
+
+            // physical
+            buldPhysDivs(dir, physicalDiv, fileID, physicalID, fileName);
+
+            // struct link
+            if (!(isExcludedRootFolder(dir) || isExcludedRootFolder(dir.getParent()))) {
+                SmLink smLink = new SmLink(logicalDiv.getId(), physicalID);
+                structLink.addSmLink(smLink);
+            }
         }
-        for (PhysicalSubDiv physicalSubDiv : sortedSubDivs) {
-            physicalDiv.add(physicalSubDiv);
+        for (Map.Entry<MCRPath, BasicFileAttributes> directory : directories.entrySet()) {
+            String dirName = directory.getKey().getFileName().toString();
+
+            if (isExcludedRootFolder(directory.getKey()) || isExcludedRootFolder(directory.getKey().getParent())) {
+                structureMets(directory.getKey(), ignoreNodes, fileGrp, altoGrp, transcriptionGrp, translationGrp,
+                    physicalDiv, logicalDiv, structLink, logOrder);
+            } else {
+                LogicalSubDiv section = new LogicalSubDiv("log_" + Integer.toString(++logOrder), "section", dirName,
+                    logOrder);
+                logicalDiv.add(section);
+                structureMets(directory.getKey(), ignoreNodes, fileGrp, altoGrp, transcriptionGrp, translationGrp,
+                    physicalDiv, section, structLink, logOrder);
+            }
         }
     }
 
-    private void createMets(MCRPath dir, Set<MCRPath> ignoreNodes, FileGrp fileGrp, FileGrp altoGrp,
-        FileGrp transcritionGrp, FileGrp translationGrp, PhysicalDiv physicalDiv, AbstractLogicalDiv logicalDiv,
-        StructLink structLink, int logOrder) throws IOException {
-        SortedMap<MCRPath, BasicFileAttributes> files = new TreeMap<>(), directories = new TreeMap<>();
+    private void fillFileMap(Set<MCRPath> ignoreNodes, SortedMap<MCRPath, BasicFileAttributes> files,
+        SortedMap<MCRPath, BasicFileAttributes> directories, Path dir) throws IOException {
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(dir)) {
             for (Path child : dirStream) {
                 MCRPath path = MCRPath.toMCRPath(child);
+
                 if (ignoreNodes.contains(path)) {
                     continue;
                 }
@@ -166,99 +238,69 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
                 }
             }
         }
-        for (Map.Entry<MCRPath, BasicFileAttributes> file : files.entrySet()) {
-            final UUID uuid = UUID.randomUUID();
-            final UUID uuid2 = UUID.randomUUID();
-            String fileID = "master_" + uuid.toString();
-            final String physicalID = "phys_" + uuid2.toString();
-            String href2 = "";
-            try {
-                final String href = MCRXMLFunctions.encodeURIPath(file.getKey().getOwnerRelativePath().substring(1));
-                int beginIndex = href.lastIndexOf("/") == -1 ? 0 : href.lastIndexOf("/") + 1;
-                int endIndex = (href.lastIndexOf(".") == -1 || href.lastIndexOf(".") <= beginIndex) ? href.length()
-                    : href.lastIndexOf(".");
-                href2 = href.substring(beginIndex, endIndex);
-                LOGGER.debug("Created href2: " + href2);
-                if (!(HREF_ID_MAP.containsKey(href2) || HREF_ID_MAP.containsValue(uuid2.toString())
-                    && isExcludedRootFolder(dir))) {
-                    HREF_ID_MAP.put(href2, uuid2.toString());
-                }
+    }
 
-                int hrefStatus = 0;
-                if (href.startsWith("tei/" + TRANSLATION))
-                    hrefStatus = 1;
-                if (href.startsWith("tei/" + TRANSCRIPTION))
-                    hrefStatus = 2;
-                if (href.startsWith("alto"))
-                    hrefStatus = 3;
-
-                switch (hrefStatus) {
-                    case 1:
-                        fileID = TRANSLATION + "_" + uuid.toString();
-                        break;
-                    case 2:
-                        fileID = TRANSCRIPTION + "_" + uuid.toString();
-                        break;
-                    case 3:
-                        fileID = "alto_" + uuid.toString();
+    private void buldPhysDivs(MCRPath dir, PhysicalDiv physicalDiv, String fileID, final String physicalID,
+        String fileName) {
+        if (!fileName.isEmpty() && hrefIdMap.containsKey(fileName)
+            && (isExcludedRootFolder(dir) || isExcludedRootFolder(dir.getParent()))) {
+            for (PhysicalSubDiv physSubDiv : physicalDiv.getChildren()) {
+                if (physSubDiv.getId().contains(hrefIdMap.get(fileName))) {
+                    physicalDiv.remove(physSubDiv);
+                    Fptr fptr = new Fptr(fileID);
+                    physSubDiv.add(fptr);
+                    physicalDiv.add(physSubDiv);
                 }
-                // file
-                File metsFile = new File(fileID, MCRContentTypes.probeContentType(file.getKey()));
-                FLocat fLocat = new FLocat(LOCTYPE.URL, href);
-                metsFile.setFLocat(fLocat);
-                switch (hrefStatus) {
-                    case 1:
-                        translationGrp.addFile(metsFile);
-                        break;
-                    case 2:
-                        transcritionGrp.addFile(metsFile);
-                        break;
-                    case 3:
-                        altoGrp.addFile(metsFile);
-                        break;
-                    default:
-                        fileGrp.addFile(metsFile);
-                }
-            } catch (URISyntaxException uriSyntaxException) {
-                LOGGER.error("invalid href", uriSyntaxException);
-                continue;
             }
-            // physical
-            if (!href2.isEmpty() && HREF_ID_MAP.containsKey(href2)
-                && (isExcludedRootFolder(dir) || isExcludedRootFolder(dir.getParent()))) {
-                for (PhysicalSubDiv physSubDiv : physicalDiv.getChildren()) {
-                    if (physSubDiv.getId().contains(HREF_ID_MAP.get(href2))) {
-                        physicalDiv.remove(physSubDiv);
-                        Fptr fptr = new Fptr(fileID);
-                        physSubDiv.add(fptr);
-                        physicalDiv.add(physSubDiv);
-                    }
-                }
-            } else {
-                PhysicalSubDiv pyhsicalPage = new PhysicalSubDiv(physicalID, "page",
-                    physicalDiv.getChildren().size() + 1);
-                Fptr fptr = new Fptr(fileID);
-                pyhsicalPage.add(fptr);
-                physicalDiv.add(pyhsicalPage);
-            }
-            // struct link
-            if (!(isExcludedRootFolder(dir) || isExcludedRootFolder(dir.getParent()))) {
-                SmLink smLink = new SmLink(logicalDiv.getId(), physicalID);
-                structLink.addSmLink(smLink);
-            }
+        } else {
+            PhysicalSubDiv pyhsicalPage = new PhysicalSubDiv(physicalID, "page", physicalDiv.getChildren().size() + 1);
+            Fptr fptr = new Fptr(fileID);
+            pyhsicalPage.add(fptr);
+            physicalDiv.add(pyhsicalPage);
         }
-        for (Map.Entry<MCRPath, BasicFileAttributes> directory : directories.entrySet()) {
-            String dirName = directory.getKey().getFileName().toString();
-            if (isExcludedRootFolder(directory.getKey()) || isExcludedRootFolder(directory.getKey().getParent())) {
-                createMets(directory.getKey(), ignoreNodes, fileGrp, altoGrp, transcritionGrp, translationGrp,
-                    physicalDiv, logicalDiv, structLink, logOrder);
-            } else {
-                LogicalSubDiv section = new LogicalSubDiv("log_" + Integer.toString(++logOrder), "section", dirName,
-                    logOrder);
-                logicalDiv.add(section);
-                createMets(directory.getKey(), ignoreNodes, fileGrp, altoGrp, transcritionGrp, translationGrp,
-                    physicalDiv, section, structLink, logOrder);
-            }
+    }
+
+    private void sortFileToGrp(FileGrp fileGrp, FileGrp altoGrp, FileGrp transcriptionGrp, FileGrp translationGrp,
+        Map.Entry<MCRPath, BasicFileAttributes> file, String fileID, final String href, FileStatus fStatus)
+        throws IOException {
+        // file
+        File metsFile = new File(fileID, MCRContentTypes.probeContentType(file.getKey()));
+        FLocat fLocat = new FLocat(LOCTYPE.URL, href);
+        metsFile.setFLocat(fLocat);
+
+        switch (fStatus) {
+            case TRANSLATION:
+                translationGrp.addFile(metsFile);
+                break;
+            case TRANSCRIPTION:
+                transcriptionGrp.addFile(metsFile);
+                break;
+            case ALTO:
+                altoGrp.addFile(metsFile);
+                break;
+            default:
+                fileGrp.addFile(metsFile);
+        }
+    }
+
+    private FileStatus getFileStatus(final String href) {
+        if (href.startsWith("tei/" + TRANSLATION))
+            return FileStatus.TRANSLATION;
+        if (href.startsWith("tei/" + TRANSCRIPTION))
+            return FileStatus.TRANSCRIPTION;
+        if (href.startsWith("alto"))
+            return FileStatus.ALTO;
+        return FileStatus.DEFAULT;
+    }
+
+    private void sortByOrder(PhysicalDiv physicalDiv) {
+        List<PhysicalSubDiv> sortedSubDivs = new ArrayList<PhysicalSubDiv>(physicalDiv.getChildren());
+        for (PhysicalSubDiv physSubDiv : physicalDiv.getChildren()) {
+            sortedSubDivs.set(physSubDiv.getOrder() - 1, physSubDiv);
+            physicalDiv.remove(physSubDiv);
+        }
+        for (PhysicalSubDiv physicalSubDiv : sortedSubDivs) {
+            physicalDiv.add(physicalSubDiv);
         }
     }
 
