@@ -78,7 +78,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
 
     private static final List<String> EXCLUDED_ROOT_FOLDERS = Arrays.asList(new String[] { "alto", "tei" });
 
-    private static HashMap<String, String> HREF_ID_MAP = new HashMap<String, String>();
+    private HashMap<String, String> HREF_ID_MAP = new HashMap<String, String>();
 
     public Mets getMETS(MCRPath dir, Set<MCRPath> ignoreNodes) throws IOException {
         // add dmdsec
@@ -114,7 +114,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         // create
         createMets(dir, ignoreNodes, fileGrp, altoGrp, transcritionGrp, translationGrp, physicalDiv, logicalDiv,
             structLink, 0);
-
+        HREF_ID_MAP.clear();
         // add to mets
         Mets mets = new Mets();
         mets.addDmdSec(dmdSec);
@@ -175,33 +175,49 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
             try {
                 final String href = MCRXMLFunctions.encodeURIPath(file.getKey().getOwnerRelativePath().substring(1));
                 int beginIndex = href.lastIndexOf("/") == -1 ? 0 : href.lastIndexOf("/") + 1;
-                href2 = href.substring(beginIndex, href.length() - 4);
+                int endIndex = (href.lastIndexOf(".") == -1 || href.lastIndexOf(".") <= beginIndex) ? href.length()
+                    : href.lastIndexOf(".");
+                href2 = href.substring(beginIndex, endIndex);
                 LOGGER.debug("Created href2: " + href2);
                 if (!(HREF_ID_MAP.containsKey(href2) || HREF_ID_MAP.containsValue(uuid2.toString())
                     && isExcludedRootFolder(dir))) {
                     HREF_ID_MAP.put(href2, uuid2.toString());
                 }
 
-                if (href.contains(TRANSLATION)) {
-                    fileID = TRANSLATION + "_" + uuid.toString();
-                } else if (href.contains(TRANSCRIPTION)) {
-                    fileID = TRANSCRIPTION + "_" + uuid.toString();
-                } else if (href.contains("alto")) {
-                    fileID = "alto_" + uuid.toString();
-                }
+                int hrefStatus = 0;
+                if (href.startsWith("tei/" + TRANSLATION))
+                    hrefStatus = 1;
+                if (href.startsWith("tei/" + TRANSCRIPTION))
+                    hrefStatus = 2;
+                if (href.startsWith("alto"))
+                    hrefStatus = 3;
 
+                switch (hrefStatus) {
+                    case 1:
+                        fileID = TRANSLATION + "_" + uuid.toString();
+                        break;
+                    case 2:
+                        fileID = TRANSCRIPTION + "_" + uuid.toString();
+                        break;
+                    case 3:
+                        fileID = "alto_" + uuid.toString();
+                }
                 // file
                 File metsFile = new File(fileID, MCRContentTypes.probeContentType(file.getKey()));
                 FLocat fLocat = new FLocat(LOCTYPE.URL, href);
                 metsFile.setFLocat(fLocat);
-                if (href.contains(TRANSLATION)) {
-                    translationGrp.addFile(metsFile);
-                } else if (href.contains(TRANSCRIPTION)) {
-                    transcritionGrp.addFile(metsFile);
-                } else if (href.contains("alto")) {
-                    altoGrp.addFile(metsFile);
-                } else {
-                    fileGrp.addFile(metsFile);
+                switch (hrefStatus) {
+                    case 1:
+                        translationGrp.addFile(metsFile);
+                        break;
+                    case 2:
+                        transcritionGrp.addFile(metsFile);
+                        break;
+                    case 3:
+                        altoGrp.addFile(metsFile);
+                        break;
+                    default:
+                        fileGrp.addFile(metsFile);
                 }
             } catch (URISyntaxException uriSyntaxException) {
                 LOGGER.error("invalid href", uriSyntaxException);
@@ -227,7 +243,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
             }
             // struct link
             if (!(isExcludedRootFolder(dir) || isExcludedRootFolder(dir.getParent()))) {
-            SmLink smLink = new SmLink(logicalDiv.getId(), physicalID);
+                SmLink smLink = new SmLink(logicalDiv.getId(), physicalID);
                 structLink.addSmLink(smLink);
             }
         }
