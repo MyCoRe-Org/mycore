@@ -184,7 +184,6 @@ public class MCRMetsSave {
     private static Document updateOnFileAdd(Document mets, MCRPath file) {
         try {
             UUID uuid = UUID.randomUUID();
-            String fileId = org.mycore.mets.model.files.File.PREFIX_MASTER + uuid;
 
             // check for file existance (if a derivate with mets.xml is uploaded
             String relPath = MCRXMLFunctions.encodeURIPath(file.getOwnerRelativePath().substring(1));
@@ -207,13 +206,14 @@ public class MCRMetsSave {
             // add to file section
             String contentType = MCRContentTypes.probeContentType(file);
             LOGGER.warn(MessageFormat.format("Content Type is : {0}", contentType));
+            String fileGrpUSE = getFileGroupUse(file);
 
+            String fileId = MessageFormat.format("{0}_{1}", fileGrpUSE.toLowerCase(Locale.ROOT), uuid);
             org.mycore.mets.model.files.File fileAsMetsFile = new org.mycore.mets.model.files.File(fileId, contentType);
 
             FLocat fLocat = new FLocat(LOCTYPE.URL, relPath);
             fileAsMetsFile.setFLocat(fLocat);
 
-            String fileGrpUSE = getFileGroupUse(file);
             Element fileSec = getFileGroup(mets, fileGrpUSE);
             fileSec.addContent(fileAsMetsFile.asElement());
 
