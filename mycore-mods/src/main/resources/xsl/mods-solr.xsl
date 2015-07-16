@@ -29,7 +29,7 @@
   </xsl:template>
 
   <xsl:template match="mods:*[@authority or @authorityURI]">
-    <xsl:variable name="uri" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport" select="mcrmods:getClassCategParentLink(.)" />
+    <xsl:variable name="uri" xmlns:mcrmods="xalan://org.mycore.mods.classification.MCRMODSClassificationSupport" select="mcrmods:getClassCategParentLink(.)" />
     <xsl:if test="string-length($uri) &gt; 0">
       <xsl:variable name="topField" select="not(ancestor::mods:relatedItem)" />
       <xsl:variable name="classdoc" select="document($uri)" />

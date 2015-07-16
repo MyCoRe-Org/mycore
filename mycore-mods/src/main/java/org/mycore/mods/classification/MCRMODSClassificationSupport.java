@@ -1,0 +1,178 @@
+/*
+ * $Id$
+ * $Revision: 5697 $ $Date: 07.04.2011 $
+ *
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * This program is free software; you can use it, redistribute it
+ * and / or modify it under the terms of the GNU General Public License
+ * (GPL) as published by the Free Software Foundation; either version 2
+ * of the License or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program, in a file called gpl.txt or license.txt.
+ * If not, write to the Free Software Foundation Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ */
+
+package org.mycore.mods.classification;
+
+import java.text.MessageFormat;
+
+import javax.xml.parsers.DocumentBuilder;
+
+import org.apache.log4j.Logger;
+import org.mycore.common.MCRConstants;
+import org.mycore.common.xml.MCRDOMUtils;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+/**
+ * @author Thomas Scheffler (yagee)
+ * @author Frank L\u00FCtzenkirchen
+ */
+public final class MCRMODSClassificationSupport {
+
+    private static final Logger LOGGER = Logger.getLogger(MCRMODSClassificationSupport.class);
+
+    private MCRMODSClassificationSupport() {
+    }
+
+    /**
+     * Inspects the authority information in the given MODS XML element and returns a category ID which matches.
+     * 
+     * @param modsElement
+     *            MODS element
+     * @return {@link MCRCategoryID} instance or null if no such category exists
+     */
+    public static MCRCategoryID getCategoryID(Element modsElement) {
+        MCRAuthorityInfo mCRAuthorityInfo = MCRAuthorityInfo.getAuthorityInfo(modsElement);
+        return mCRAuthorityInfo == null ? null : mCRAuthorityInfo.getCategoryID();
+    }
+
+    /**
+     * Inspects the authority information in the given MODS XML element and returns a category ID which matches.
+     * 
+     * @param modsElement
+     *            MODS element
+     * @return {@link MCRCategoryID} instance or null if no such category exists
+     */
+    public static MCRCategoryID getCategoryID(org.jdom2.Element modsElement) {
+        MCRAuthorityInfo mCRAuthorityInfo = MCRAuthorityInfo.getAuthorityInfo(modsElement);
+        return mCRAuthorityInfo == null ? null : mCRAuthorityInfo.getCategoryID();
+    }
+
+    /**
+     * For a category ID, looks up the authority information for that category and sets the attributes in the given MODS
+     * element so that it represents that category.
+     * 
+     * @param categoryID
+     *            the ID of the category that is set
+     * @param inElement
+     *            the element in which authority/authorityURI/valueURI should be set.
+     */
+    public static void setAuthorityInfo(MCRCategoryID categoryID, org.jdom2.Element inElement) {
+        MCRAuthorityInfo.getAuthorityInfo(categoryID).setInElement(inElement);
+    }
+
+    /**
+     * For a category ID, looks up the authority information for that category and returns the attributes in the given
+     * MODS element so that it represents that category. This is used as a Xalan extension.
+     */
+    public static NodeList getClassNodes(final NodeList sources) {
+        if (sources.getLength() == 0) {
+            LOGGER.warn("Cannot get first element of node list 'sources'.");
+            return null;
+        }
+        DocumentBuilder documentBuilder = MCRDOMUtils.getDocumentBuilderUnchecked();
+        try {
+            Document document = documentBuilder.newDocument();
+            final Element source = (Element) sources.item(0);
+            final String categId = source.getAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "categId");
+            final MCRCategoryID categoryID = MCRCategoryID.fromString(categId);
+            final MCRAuthorityInfo mCRAuthorityInfo = MCRAuthorityInfo.getAuthorityInfo(categoryID);
+            final Element returns = document.createElement("returns");
+            mCRAuthorityInfo.setInElement(returns);
+            return returns.getChildNodes();
+        } catch (Throwable e) {
+            LOGGER.warn("Error in Xalan Extension", e);
+            return null;
+        } finally {
+            MCRDOMUtils.releaseDocumentBuilder(documentBuilder);
+        }
+    }
+
+    public static NodeList getMCRClassNodes(final NodeList sources) {
+        if (sources.getLength() == 0) {
+            LOGGER.warn("Cannot get first element of node list 'sources'.");
+            return null;
+        }
+        DocumentBuilder documentBuilder = MCRDOMUtils.getDocumentBuilderUnchecked();
+        try {
+            final Document document = documentBuilder.newDocument();
+            final Element source = (Element) sources.item(0);
+            MCRCategoryID category = getCategoryID(source);
+            if (category == null) {
+                return null;
+            }
+            final Element returns = document.createElement("returns");
+            returns.setAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "mcr:categId", category.toString());
+            return returns.getChildNodes();
+        } catch (Throwable e) {
+            LOGGER.warn("Error in Xalan Extension", e);
+            return null;
+        } finally {
+            MCRDOMUtils.releaseDocumentBuilder(documentBuilder);
+        }
+    }
+
+    public static String getClassCategLink(final NodeList sources) {
+        if (sources.getLength() == 0) {
+            LOGGER.warn("Cannot get first element of node list 'sources'.");
+            return "";
+        }
+        final Element source = (Element) sources.item(0);
+        MCRCategoryID category = getCategoryID(source);
+        if (category == null) {
+            return "";
+        }
+        return MessageFormat.format("classification:metadata:0:children:{0}:{1}", category.getRootID(),
+            category.getID());
+    }
+
+    public static String getClassCategParentLink(final NodeList sources) {
+        if (sources.getLength() == 0) {
+            LOGGER.warn("Cannot get first element of node list 'sources'.");
+            return "";
+        }
+        final Element source = (Element) sources.item(0);
+        MCRCategoryID category = getCategoryID(source);
+        if (category == null) {
+            return "";
+        }
+        return MessageFormat
+            .format("classification:metadata:0:parents:{0}:{1}", category.getRootID(), category.getID());
+    }
+
+    static String getText(final Element element) {
+        final StringBuilder sb = new StringBuilder();
+        final NodeList nodeList = element.getChildNodes();
+        final int length = nodeList.getLength();
+        for (int i = 0; i < length; i++) {
+            final Node node = nodeList.item(i);
+            if (node.getNodeType() == Node.TEXT_NODE) {
+                sb.append(node.getNodeValue());
+            }
+        }
+        return sb.toString();
+    }
+}

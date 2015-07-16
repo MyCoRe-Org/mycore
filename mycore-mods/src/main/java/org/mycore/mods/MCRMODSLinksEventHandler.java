@@ -39,6 +39,7 @@ import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.mods.classification.MCRMODSClassificationSupport;
 
 /**
  * Eventhandler for linking MODS_OBJECTTYPE document to MyCoRe classifications.
