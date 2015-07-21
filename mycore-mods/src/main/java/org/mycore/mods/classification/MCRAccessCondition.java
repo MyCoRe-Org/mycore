@@ -59,7 +59,7 @@ public class MCRAccessCondition extends MCRAuthorityInfo {
             categId = href.substring(authorityURI.length() + 1);
         } catch (RuntimeException e) {
             LOGGER.warn("authorityURI:" + authorityURI + ", valueURI:" + href);
-            throw e;
+            return null;
         }
         int internalStylePos = authorityURI.indexOf(MCRAuthorityWithURI.CLASS_URI_PART);
         if (internalStylePos > 0) {

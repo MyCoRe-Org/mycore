@@ -125,7 +125,7 @@ public class MCRClassMapper {
                 authInfo = new MCRAuthorityAndCode(authority, code);
             } else if (modsElement.getName().equals(ACCESS_CONDITION)) {
                 //accessDefinition
-                String href = modsElement.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
+                String href = modsElement.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE, "");
                 authInfo = new MCRAccessCondition(href);
             } else if (modsElement.getName().equals(TYPE_OF_RESOURCE)) {
                 //typeOfResource
