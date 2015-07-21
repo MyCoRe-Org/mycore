@@ -25,7 +25,9 @@ package org.mycore.user2;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -57,12 +59,13 @@ import org.mycore.datamodel.common.MCRISO8601Format;
 public class MCRUserManager {
     private static final MCRHIBConnection MCRHIB_CONNECTION = MCRHIBConnection.instance();
 
-    private static final int HASH_ITERATIONS = MCRConfiguration.instance().getInt(
-            MCRUser2Constants.CONFIG_PREFIX + "HashIterations", 1000);
+    private static final int HASH_ITERATIONS = MCRConfiguration.instance()
+            .getInt(MCRUser2Constants.CONFIG_PREFIX + "HashIterations", 1000);
 
     private static final Logger LOGGER = Logger.getLogger(MCRUserManager.class);
 
     private static final SecureRandom SECURE_RANDOM;
+
     static {
         try {
             SECURE_RANDOM = SecureRandom.getInstance("SHA1PRNG");
@@ -182,6 +185,41 @@ public class MCRUserManager {
         Session session = MCRHIB_CONNECTION.getSession();
         session.save(user);
         MCRRoleManager.storeRoleAssignments(user);
+    }
+
+    /**
+     * Creates and store a new login user in the database, do also attribute mapping is needed.
+     * This will also store role membership information.
+     * 
+     * @param user the user to create in the database.
+     */
+    public static void createUser(MCRTransientUser user) {
+        if (isInvalidUser(user)) {
+            throw new MCRException("User is invalid: " + user.getUserID());
+        }
+
+        if (user.getRealm() != null && !MCRRealmFactory.getLocalRealm().equals(user.getRealm())) {
+            MCRUserAttributeMapper attributeMapper = MCRRealmFactory.getAttributeMapper(user.getRealmID());
+            if (attributeMapper != null) {
+                MCRUser u = new MCRUser(user.getUserID(), user.getRealmID());
+                Map<String, Object> attributes = new HashMap<String, Object>();
+                for (String key : attributeMapper.getMappedAttributes()) {
+                    MCRUserInformation userInfo = user.getUserInformation();
+                    attributes.put(key, userInfo.getUserAttribute(key));
+                }
+
+                try {
+                    attributeMapper.mapAttributes(u, attributes);
+                } catch (Exception e) {
+                    throw new MCRException(e.getMessage(), e);
+                }
+
+                createUser(u);
+                return;
+            }
+        }
+
+        createUser(user);
     }
 
     /**

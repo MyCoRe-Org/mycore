@@ -62,4 +62,8 @@ public class MCRTransientUser extends MCRUser {
         return this.userInfo.getUserAttribute(attribute);
     }
 
+    MCRUserInformation getUserInformation() {
+        return userInfo;
+    }
+
 }

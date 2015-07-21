@@ -36,6 +36,7 @@ import org.mycore.user2.MCRRealmFactory;
 import org.mycore.user2.MCRTransientUser;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserAttributeMapper;
+import org.mycore.user2.MCRUserManager;
 import org.mycore.user2.MCRUserTestCase;
 import org.mycore.user2.login.MCRShibbolethUserInformation;
 
@@ -103,5 +104,27 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
         assertEquals(mcrUser.getUserName(), user.getUserName());
         assertEquals(mcrUser.getRealName(), user.getRealName());
         assertEquals(mcrUser.getSystemRoleIDs(), user.getSystemRoleIDs());
+    }
+
+    @Test
+    public void testUserCreate() throws Exception {
+        Map<String, Object> attributes = new HashMap<String, Object>();
+        attributes.put("eduPersonPrincipalName", mcrUser.getUserName() + "@" + realmId);
+        attributes.put("displayName", mcrUser.getRealName());
+        attributes.put("mail", mcrUser.getEMailAddress());
+        attributes.put("eduPersonAffiliation", roles);
+
+        MCRUserInformation userInfo = new MCRShibbolethUserInformation(mcrUser.getUserID(), realmId, attributes);
+
+        MCRTransientUser user = new MCRTransientUser(userInfo);
+
+        assertEquals(mcrUser.getUserName(), user.getUserName());
+        assertEquals(mcrUser.getRealName(), user.getRealName());
+        assertEquals(mcrUser.getSystemRoleIDs(), user.getSystemRoleIDs());
+
+        MCRUserManager.createUser(user);
+
+        MCRUser storedUser = MCRUserManager.getUser(user.getUserName(), realmId);
+        assertEquals(mcrUser.getEMailAddress(), storedUser.getEMailAddress());
     }
 }
