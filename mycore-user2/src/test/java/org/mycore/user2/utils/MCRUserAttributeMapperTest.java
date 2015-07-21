@@ -22,8 +22,7 @@
  */
 package org.mycore.user2.utils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,9 +50,9 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
 
     private static String realmId = "mycore.de";
 
-    private MCRUser mcrUser;
+    private static String roles = "staff,member";
 
-    private String roles;
+    private MCRUser mcrUser;
 
     @Before
     @Override
@@ -61,14 +60,6 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
         super.setUp();
 
         mcrUser = MCRUserTransformer.buildMCRUser(MCRURIResolver.instance().resolve("resource:test-user.xml"));
-
-        roles = "";
-        for (String role : mcrUser.getSystemRoleIDs()) {
-            if (!roles.isEmpty())
-                roles += ",";
-
-            roles += role;
-        }
     }
 
     @Test
@@ -89,7 +80,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
         assertEquals(mcrUser.getUserName(), user.getUserName());
         assertEquals(mcrUser.getRealName(), user.getRealName());
         assertEquals(mcrUser.getEMailAddress(), user.getEMailAddress());
-        assertEquals(mcrUser.getSystemRoleIDs(), user.getSystemRoleIDs());
+        assertTrue(user.isUserInRole("editor"));
     }
 
     @Test
@@ -106,7 +97,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
 
         assertEquals(mcrUser.getUserName(), user.getUserName());
         assertEquals(mcrUser.getRealName(), user.getRealName());
-        assertEquals(mcrUser.getSystemRoleIDs(), user.getSystemRoleIDs());
+        assertTrue(user.isUserInRole("editor"));
     }
 
     @Test
@@ -123,7 +114,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
 
         assertEquals(mcrUser.getUserName(), user.getUserName());
         assertEquals(mcrUser.getRealName(), user.getRealName());
-        assertEquals(mcrUser.getSystemRoleIDs(), user.getSystemRoleIDs());
+        assertTrue(user.isUserInRole("editor"));
 
         Map<String, String> extraAttribs = new HashMap<String, String>();
         extraAttribs.put("attrib1", "test123");
@@ -131,6 +122,8 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
         user.setAttributes(extraAttribs);
 
         MCRUserManager.createUser(user);
+
+        startNewTransaction();
 
         MCRUser storedUser = MCRUserManager.getUser(user.getUserName(), realmId);
 

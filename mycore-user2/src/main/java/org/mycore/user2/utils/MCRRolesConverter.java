@@ -23,8 +23,11 @@
 package org.mycore.user2.utils;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 
+import org.mycore.common.config.MCRConfiguration;
+import org.mycore.user2.MCRUser2Constants;
 import org.mycore.user2.MCRUserAttributeConverter;
 
 /**
@@ -33,12 +36,16 @@ import org.mycore.user2.MCRUserAttributeConverter;
  */
 public class MCRRolesConverter implements MCRUserAttributeConverter<String, Collection<String>> {
 
+    static final String CONFIG_GROUP_PREFIX = MCRUser2Constants.CONFIG_PREFIX + "Shibboleth.roles.";
+
     @Override
     public Collection<String> convert(String value, String separator) throws Exception {
         Collection<String> roles = new HashSet<String>();
 
         for (final String v : value.split(separator)) {
-            roles.add(v);
+            final String role = v.contains("@") ? v.substring(0, v.indexOf("@")) : v;
+            roles.addAll(MCRConfiguration.instance().getStrings(CONFIG_GROUP_PREFIX + role,
+                    Collections.<String> emptyList()));
         }
 
         return roles;
