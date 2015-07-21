@@ -80,6 +80,7 @@ public class MCRClassMapper {
                     switch (attrDeclaration.getName()) {
                         case "authority":
                             authority.add(o.getName());
+                            break;
                         case "authorityURI":
                             authorityURI.add(o.getName());
                             break;
