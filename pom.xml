@@ -1457,7 +1457,6 @@
     <module>mycore-wcms2</module>
     <module>mycore-webcli</module>
     <module>mycore-wfc</module>
-    <!-- <module>mycore-z3950</module> -->
     <module>mycore-xeditor</module>
     <module>mycore-complete</module>
     <module>iview2-addons</module>
