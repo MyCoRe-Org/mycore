@@ -9,11 +9,11 @@
     <items>
     <!-- Display local realm as first choice -->
       <xsl:apply-templates select="realm[@id = /realms/@local]" />
-      <xsl:apply-templates select="realm[@id != /realms/@local]" />
+      <xsl:apply-templates select="realm[@id != /realms/@local and string-length(login/@url) &gt; 0]" />
     </items>
   </xsl:template>
 
-  <xsl:template match="realm[string-length(login/@url) &gt; 0]">
+  <xsl:template match="realm">
     <item value="{@id}">
       <xsl:copy-of select="label" />
     </item>

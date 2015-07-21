@@ -12,7 +12,9 @@ import org.mycore.common.MCRUserInformation;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.user2.MCRRealmFactory;
+import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserAttributeMapper;
+import org.mycore.user2.MCRUserManager;
 
 /**
  * 
@@ -50,6 +52,12 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
                 }
 
                 MCRUserInformation userinfo = new MCRShibbolethUserInformation(userId, realmId, attributes);
+
+                MCRUser user = MCRUserManager.getUser(userId, realmId);
+                if (user != null) {
+                    LOGGER.debug("Login existing user!");
+                    userinfo = user;
+                }
 
                 MCRSessionMgr.getCurrentSession().setUserInformation(userinfo);
 
