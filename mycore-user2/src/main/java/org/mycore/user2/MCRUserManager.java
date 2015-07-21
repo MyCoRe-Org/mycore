@@ -182,6 +182,12 @@ public class MCRUserManager {
         if (isInvalidUser(user)) {
             throw new MCRException("User is invalid: " + user.getUserID());
         }
+
+        if (user instanceof MCRTransientUser) {
+            createUser((MCRTransientUser) user);
+            return;
+        }
+
         Session session = MCRHIB_CONNECTION.getSession();
         session.save(user);
         MCRRoleManager.storeRoleAssignments(user);
@@ -198,10 +204,11 @@ public class MCRUserManager {
             throw new MCRException("User is invalid: " + user.getUserID());
         }
 
+        MCRUser u = user.clone();
+
         if (user.getRealm() != null && !MCRRealmFactory.getLocalRealm().equals(user.getRealm())) {
             MCRUserAttributeMapper attributeMapper = MCRRealmFactory.getAttributeMapper(user.getRealmID());
             if (attributeMapper != null) {
-                MCRUser u = user.clone();
                 Map<String, Object> attributes = new HashMap<String, Object>();
                 for (String key : attributeMapper.getMappedAttributes()) {
                     MCRUserInformation userInfo = user.getUserInformation();
@@ -213,13 +220,10 @@ public class MCRUserManager {
                 } catch (Exception e) {
                     throw new MCRException(e.getMessage(), e);
                 }
-
-                createUser(u);
-                return;
             }
         }
 
-        createUser(user);
+        createUser(u);
     }
 
     /**
