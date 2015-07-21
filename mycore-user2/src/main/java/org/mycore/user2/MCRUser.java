@@ -727,7 +727,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         }
     }
 
-    @MCRUserAttribute
+    @MCRUserAttribute(separator = ";")
     @MCRUserAttributeJavaConverter(MCRRolesConverter.class)
     private void setRoles(Collection<String> roles) {
         for (String role : roles) {
