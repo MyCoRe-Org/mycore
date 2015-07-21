@@ -242,12 +242,11 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
      * Creates the logical structure recursive. 
      * 
      * @param parentObject mycore object
-     * @param derId 
      * @param parentLogicalDiv
      */
     private void createLogicalStruct(MCRObject parentObject, AbstractLogicalDiv parentLogicalDiv) {
         // run through all children
-        List<MCRMetaLinkID> links = parentObject.getStructure().getChildren();
+        List<MCRMetaLinkID> links = getChildren(parentObject);
         for (int i = 0; i < links.size(); i++) {
             MCRMetaLinkID linkId = links.get(i);
             MCRObjectID childId = MCRObjectID.getInstance(linkId.getXLinkHref());
@@ -276,6 +275,16 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
             // do recursive call for children
             createLogicalStruct(childObject, logicalChildDiv);
         }
+    }
+
+    /**
+     * Get children objects from parentObject
+     *
+     * @param parentObject
+     * @return
+     */
+    protected List<MCRMetaLinkID> getChildren(MCRObject parentObject) {
+        return parentObject.getStructure().getChildren();
     }
 
     /**
