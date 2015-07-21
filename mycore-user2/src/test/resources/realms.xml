@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<realms local="local">
+  <realm id="local">
+    <label xml:lang="de">lokal</label>
+    <label xml:lang="en">local</label>
+    <login url="MCRLoginServlet?action=login" redirectParameter="url" realmParameter="realm">
+      <label xml:lang="de">Anmeldung mit lokaler Nutzerkennung</label>
+      <label xml:lang="en">Login with local user account</label>
+      <info>
+        <label xml:lang="de">
+          Diese Kennung gilt nur für diese Anwendung.
+        </label>
+        <label xml:lang="en">
+          This account is local for this application only.
+        </label>
+      </info>
+    </login>
+    <passwordChangeURL>../authorization/change-password.xed?action=password</passwordChangeURL>
+  </realm>
+  <realm id="mycore.de">
+    <attributeMapping>
+      <attribute name="userName">eduPersonPrincipalName</attribute>
+      <attribute name="realName">displayName</attribute>
+      <attribute name="eMail">mail</attribute>
+      <attribute name="roles" separator=",">eduPersonAffiliation</attribute>
+    </attributeMapping>
+  </realm>
+</realms>

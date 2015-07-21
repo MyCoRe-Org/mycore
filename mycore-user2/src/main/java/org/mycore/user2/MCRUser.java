@@ -61,6 +61,10 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.user2.annotation.MCRUserAttribute;
+import org.mycore.user2.annotation.MCRUserAttributeJavaConverter;
+import org.mycore.user2.utils.MCRRolesConverter;
+import org.mycore.user2.utils.MCRUserNameConverter;
 
 /**
  * Represents a login user. Each user has a unique numerical ID.
@@ -72,27 +76,30 @@ import org.mycore.common.MCRUserInformation;
  */
 @Entity
 @Access(AccessType.PROPERTY)
-@Table(name = "MCRUser", uniqueConstraints = @UniqueConstraint(columnNames = { "userName", "realmID" }))
+@Table(name = "MCRUser", uniqueConstraints = @UniqueConstraint(columnNames = { "userName", "realmID" }) )
 // TODO use @Cacheable instead
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @XmlRootElement(name = "user")
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlType(propOrder = { "ownerId", "realName", "eMail", "lastLogin", "validUntil", "roles", "attributesMap", "password" })
+@XmlType(propOrder = { "ownerId", "realName", "eMail", "lastLogin", "validUntil", "roles", "attributesMap",
+        "password" })
 public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     private static final long serialVersionUID = 3378645055646901800L;
 
     /** The unique user ID */
     int internalID;
 
-    @XmlAttribute(name = "locked")
     /** if locked, user may not change this instance */
+    @XmlAttribute(name = "locked")
     private boolean locked;
 
     @XmlAttribute(name = "disabled")
     private boolean disabled;
 
-    @XmlAttribute(name = "name")
     /** The login user name */
+    @MCRUserAttribute
+    @MCRUserAttributeJavaConverter(MCRUserNameConverter.class)
+    @XmlAttribute(name = "name")
     private String userName;
 
     @XmlElement
@@ -106,10 +113,12 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     private MCRUser owner;
 
     /** The name of the person that this login user represents */
+    @MCRUserAttribute
     @XmlElement
     private String realName;
 
     /** The E-Mail address of the person that this login user represents */
+    @MCRUserAttribute
     @XmlElement
     private String eMail;
 
@@ -539,7 +548,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * @return the attributes
      */
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "MCRUserAttr", joinColumns = @JoinColumn(name = "id"))
+    @CollectionTable(name = "MCRUserAttr", joinColumns = @JoinColumn(name = "id") )
     @MapKeyColumn(name = "name", length = 128)
     @Column(name = "value", length = 255)
     public Map<String, String> getAttributes() {
@@ -714,6 +723,14 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
             if (role == null) {
                 throw new MCRException("Could not load role: " + roleName);
             }
+            assignRole(role);
+        }
+    }
+
+    @MCRUserAttribute
+    @MCRUserAttributeJavaConverter(MCRRolesConverter.class)
+    private void setRoles(Collection<String> roles) {
+        for (String role : roles) {
             assignRole(role);
         }
     }

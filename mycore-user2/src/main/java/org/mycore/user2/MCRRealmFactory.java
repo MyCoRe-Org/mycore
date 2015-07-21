@@ -70,6 +70,8 @@ public class MCRRealmFactory {
     /** Map of defined realms, key is the ID of the realm */
     private static HashMap<String, MCRRealm> realmsMap = new HashMap<String, MCRRealm>();
 
+    private static HashMap<String, MCRUserAttributeMapper> attributeMapper = new HashMap<String, MCRUserAttributeMapper>();
+
     /** List of defined realms */
     private static List<MCRRealm> realmsList = new ArrayList<MCRRealm>();
 
@@ -128,6 +130,8 @@ public class MCRRealmFactory {
         /** Map of defined realms, key is the ID of the realm */
         HashMap<String, MCRRealm> realmsMap = new HashMap<String, MCRRealm>();
 
+        HashMap<String, MCRUserAttributeMapper> attributeMapper = new HashMap<String, MCRUserAttributeMapper>();
+
         /** List of defined realms */
         List<MCRRealm> realmsList = new ArrayList<MCRRealm>();
 
@@ -145,12 +149,19 @@ public class MCRRealmFactory {
 
             realm.setPasswordChangeURL(child.getChildTextTrim("passwordChangeURL"));
             Element login = child.getChild("login");
-            realm.setLoginURL(login.getAttributeValue("url"));
-            realm.setRedirectParameter(login.getAttributeValue("redirectParameter"));
-            realm.setRealmParameter(login.getAttributeValue("realmParameter"));
+            if (login != null) {
+                realm.setLoginURL(login.getAttributeValue("url"));
+                realm.setRedirectParameter(login.getAttributeValue("redirectParameter"));
+                realm.setRealmParameter(login.getAttributeValue("realmParameter"));
+            }
             Element createElement = child.getChild("create");
             if (createElement != null) {
                 realm.setCreateURL(createElement.getAttributeValue("url"));
+            }
+
+            Element attrMapping = child.getChild("attributeMapping");
+            if (attrMapping != null) {
+                attributeMapper.put(id, MCRUserAttributeMapper.instance(attrMapping));
             }
 
             realmsMap.put(id, realm);
@@ -162,6 +173,7 @@ public class MCRRealmFactory {
         MCRRealmFactory.realmsDocument = root.getDocument();
         MCRRealmFactory.realmsMap = realmsMap;
         MCRRealmFactory.realmsList = realmsList;
+        MCRRealmFactory.attributeMapper = attributeMapper;
     }
 
     private static Document getRealms() throws JDOMException, TransformerException, SAXException, IOException {
@@ -186,6 +198,11 @@ public class MCRRealmFactory {
     public static MCRRealm getRealm(String id) {
         reInitIfNeeded();
         return realmsMap.get(id);
+    }
+
+    public static MCRUserAttributeMapper getAttributeMapper(String id) {
+        reInitIfNeeded();
+        return attributeMapper.get(id);
     }
 
     /**

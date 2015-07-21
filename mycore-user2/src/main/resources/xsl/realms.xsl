@@ -2,8 +2,7 @@
 
 <!-- XSL to display login options as defined in realms.xml -->
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
-  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation">
 
   <xsl:include href="MyCoReLayout.xsl" />
 
@@ -28,8 +27,7 @@
             </xsl:choose>
             <xsl:value-of select="'&lt;/strong&gt;'" />
           </xsl:variable>
-          <xsl:value-of select="i18n:translate('component.user2.login.currentAccount', $currentAccount)"
-            disable-output-escaping="yes" />
+          <xsl:value-of select="i18n:translate('component.user2.login.currentAccount', $currentAccount)" disable-output-escaping="yes" />
         </p>
       </div>
       <div class="section" id="sectionlast">
@@ -55,7 +53,7 @@
             </dl>
           </xsl:if>
           <dl class="realms">
-            <xsl:apply-templates select="realm" />
+            <xsl:apply-templates select="realm[string-length(login/@url) &gt; 0]" />
           </dl>
         </p>
         <p>

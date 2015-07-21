@@ -75,7 +75,7 @@ public class MCRLoginServlet extends MCRServlet {
     public void init() throws ServletException {
         if (!LOCAL_LOGIN_SECURE_ONLY) {
             LOGGER.warn("Login over unsecure connection is permitted. Set '" + HTTPS_ONLY_PROPERTY
-                + "=true' to prevent cleartext transmissions of passwords.");
+                    + "=true' to prevent cleartext transmissions of passwords.");
         }
         super.init();
     }
@@ -90,7 +90,7 @@ public class MCRLoginServlet extends MCRServlet {
      * MCRLoginServlet?url=foo&realm=ID
      * stores foo as redirect url and redirects
      * to the login URL of the given realm.
-
+    
      * MCRLoginServlet?action=login
      * checks input from editor login form and
      * changes the current login user and redirects
@@ -176,8 +176,8 @@ public class MCRLoginServlet extends MCRServlet {
         getLayoutService().doLayout(req, res, new MCRJDOMContent(root));
     }
 
-    private void listRealms(HttpServletRequest req, HttpServletResponse res) throws IOException, TransformerException,
-        SAXException {
+    private void listRealms(HttpServletRequest req, HttpServletResponse res)
+            throws IOException, TransformerException, SAXException {
         String redirectURL = getReturnURL(req);
         Document realmsDoc = MCRRealmFactory.getRealmsDocument();
         Element realms = realmsDoc.getRootElement();
@@ -186,7 +186,8 @@ public class MCRLoginServlet extends MCRServlet {
         for (Element realm : realmList) {
             String realmID = realm.getAttributeValue("id");
             Element login = realm.getChild("login");
-            login.setAttribute("url", MCRRealmFactory.getRealm(realmID).getLoginURL(redirectURL));
+            if (login != null)
+                login.setAttribute("url", MCRRealmFactory.getRealm(realmID).getLoginURL(redirectURL));
         }
         getLayoutService().doLayout(req, res, new MCRJDOMContent(realmsDoc));
     }
@@ -194,8 +195,8 @@ public class MCRLoginServlet extends MCRServlet {
     static void addCurrentUserInfo(Element rootElement) {
         MCRUserInformation userInfo = MCRSessionMgr.getCurrentSession().getUserInformation();
         rootElement.setAttribute("user", userInfo.getUserID());
-        String realmId = (userInfo instanceof MCRUser) ? ((MCRUser) userInfo).getRealm().getLabel() : userInfo
-            .getUserAttribute(MCRRealm.USER_INFORMATION_ATTR);
+        String realmId = (userInfo instanceof MCRUser) ? ((MCRUser) userInfo).getRealm().getLabel()
+                : userInfo.getUserAttribute(MCRRealm.USER_INFORMATION_ATTR);
         if (realmId == null) {
             realmId = MCRRealmFactory.getLocalRealm().getLabel();
         }
@@ -205,7 +206,7 @@ public class MCRLoginServlet extends MCRServlet {
 
     private static boolean currentUserIsGuest() {
         return MCRSessionMgr.getCurrentSession().getUserInformation()
-            .equals(MCRSystemUserInformation.getGuestInstance());
+                .equals(MCRSystemUserInformation.getGuestInstance());
     }
 
     private int getNumLoginOptions() {
@@ -236,7 +237,7 @@ public class MCRLoginServlet extends MCRServlet {
             url = MCRFrontendUtil.getBaseURL();
         else if (url.startsWith(MCRFrontendUtil.getBaseURL()) && !url.equals(MCRFrontendUtil.getBaseURL())) {
             String rest = url.substring(MCRFrontendUtil.getBaseURL().length());
-            url = MCRFrontendUtil.getBaseURL()+ encodePath(rest);
+            url = MCRFrontendUtil.getBaseURL() + encodePath(rest);
         }
         LOGGER.info("Storing redirect URL to session: " + url);
         MCRSessionMgr.getCurrentSession().put(LOGIN_REDIRECT_URL_KEY, url);

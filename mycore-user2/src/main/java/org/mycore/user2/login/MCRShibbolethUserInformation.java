@@ -3,28 +3,43 @@
  */
 package org.mycore.user2.login;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.mycore.common.MCRUserInformation;
+import org.mycore.user2.MCRRealm;
+import org.mycore.user2.MCRRealmFactory;
+import org.mycore.user2.MCRUserAttributeMapper;
+import org.mycore.user2.annotation.MCRUserAttribute;
+import org.mycore.user2.annotation.MCRUserAttributeJavaConverter;
+import org.mycore.user2.utils.MCRRolesConverter;
 
 /**
- * @author daniel
- *
+ * 
+ * @author Ren\u00E9 Adler (eagle)
  */
 public class MCRShibbolethUserInformation implements MCRUserInformation {
     private String userId;
 
-    private Map<String, String> attributes;
+    private String realmId;
 
-    private Set<String> roles;
+    private Map<String, Object> attributes;
 
-    public MCRShibbolethUserInformation(String userId, Set<String> roles, Map<String, String> attributes) {
+    @MCRUserAttribute
+    @MCRUserAttributeJavaConverter(MCRRolesConverter.class)
+    private Set<String> roles = new HashSet<String>();
+
+    public MCRShibbolethUserInformation(String userId, String realmId, Map<String, Object> attributes)
+            throws Exception {
         this.userId = userId;
-        this.roles = new HashSet<>(roles);
-        this.attributes = new HashMap<String, String>(attributes);
+        this.realmId = realmId;
+        this.attributes = attributes;
+
+        MCRUserAttributeMapper attributeMapper = MCRRealmFactory.getAttributeMapper(this.realmId);
+        if (attributeMapper != null) {
+            attributeMapper.mapAttributes(this, attributes);
+        }
     }
 
     /* (non-Javadoc)
@@ -50,14 +65,19 @@ public class MCRShibbolethUserInformation implements MCRUserInformation {
     public String getUserAttribute(String attribute) {
         String key;
         switch (attribute) {
-            case MCRUserInformation.ATT_REAL_NAME:
-                key = "displayName";
-                break;
-            default:
-                key = attribute;
-                break;
+        case MCRUserInformation.ATT_REAL_NAME:
+            key = "displayName";
+            break;
+        case MCRRealm.USER_INFORMATION_ATTR:
+            return this.realmId;
+        default:
+            key = attribute;
+            break;
         }
-        return attributes.get(key);
+
+        Object value = attributes.get(key);
+
+        return value != null ? value.toString() : null;
     }
 
 }
