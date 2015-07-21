@@ -37,6 +37,10 @@ import java.util.Vector;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.xerces.util.XMLCatalogResolver;
+import org.apache.xerces.xni.XMLResourceIdentifier;
+import org.apache.xerces.xni.XNIException;
+import org.apache.xerces.xni.parser.XMLEntityResolver;
+import org.apache.xerces.xni.parser.XMLInputSource;
 import org.mycore.common.MCRCache;
 import org.mycore.common.config.MCRConfiguration;
 import org.w3c.dom.ls.LSInput;
@@ -50,7 +54,7 @@ import org.xml.sax.ext.EntityResolver2;
  * @author Thomas Scheffler (yagee)
  * @since 2013.10
  */
-public class MCREntityResolver implements EntityResolver2, LSResourceResolver {
+public class MCREntityResolver implements EntityResolver2, LSResourceResolver, XMLEntityResolver {
 
     public static final Logger LOGGER = Logger.getLogger(MCREntityResolver.class);
 
@@ -196,6 +200,18 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver {
         int pos = posA == -1 ? posB : posA;
 
         return pos == -1 ? path : path.substring(pos + 1);
+    }
+
+    @Override
+    public XMLInputSource resolveEntity(XMLResourceIdentifier resourceIdentifier) throws XNIException, IOException {
+        XMLInputSource entity = catalogResolver.resolveEntity(resourceIdentifier);
+        if (entity == null){
+            LOGGER.info("Could not resolve entity: "+resourceIdentifier.getBaseSystemId());
+            LOGGER.info("Identifer: "+catalogResolver.resolveIdentifier(resourceIdentifier));
+            return null;
+        }
+        LOGGER.info("Resolve entity: "+resourceIdentifier.getBaseSystemId()+" --> "+entity.getBaseSystemId());
+        return entity;
     }
 
 }

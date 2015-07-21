@@ -48,43 +48,6 @@ public final class MCRMODSClassificationSupport {
     }
 
     /**
-     * Inspects the authority information in the given MODS XML element and returns a category ID which matches.
-     * 
-     * @param modsElement
-     *            MODS element
-     * @return {@link MCRCategoryID} instance or null if no such category exists
-     */
-    public static MCRCategoryID getCategoryID(Element modsElement) {
-        MCRAuthorityInfo mCRAuthorityInfo = MCRAuthorityInfo.getAuthorityInfo(modsElement);
-        return mCRAuthorityInfo == null ? null : mCRAuthorityInfo.getCategoryID();
-    }
-
-    /**
-     * Inspects the authority information in the given MODS XML element and returns a category ID which matches.
-     * 
-     * @param modsElement
-     *            MODS element
-     * @return {@link MCRCategoryID} instance or null if no such category exists
-     */
-    public static MCRCategoryID getCategoryID(org.jdom2.Element modsElement) {
-        MCRAuthorityInfo mCRAuthorityInfo = MCRAuthorityInfo.getAuthorityInfo(modsElement);
-        return mCRAuthorityInfo == null ? null : mCRAuthorityInfo.getCategoryID();
-    }
-
-    /**
-     * For a category ID, looks up the authority information for that category and sets the attributes in the given MODS
-     * element so that it represents that category.
-     * 
-     * @param categoryID
-     *            the ID of the category that is set
-     * @param inElement
-     *            the element in which authority/authorityURI/valueURI should be set.
-     */
-    public static void setAuthorityInfo(MCRCategoryID categoryID, org.jdom2.Element inElement) {
-        MCRAuthorityInfo.getAuthorityInfo(categoryID).setInElement(inElement);
-    }
-
-    /**
      * For a category ID, looks up the authority information for that category and returns the attributes in the given
      * MODS element so that it represents that category. This is used as a Xalan extension.
      */
@@ -99,9 +62,10 @@ public final class MCRMODSClassificationSupport {
             final Element source = (Element) sources.item(0);
             final String categId = source.getAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "categId");
             final MCRCategoryID categoryID = MCRCategoryID.fromString(categId);
-            final MCRAuthorityInfo mCRAuthorityInfo = MCRAuthorityInfo.getAuthorityInfo(categoryID);
-            final Element returns = document.createElement("returns");
-            mCRAuthorityInfo.setInElement(returns);
+            final Element returns = (Element) source.cloneNode(false);
+            returns.removeAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "categId");
+            document.appendChild(returns);
+            MCRClassMapper.assignCategory(returns, categoryID);
             return returns.getChildNodes();
         } catch (Throwable e) {
             LOGGER.warn("Error in Xalan Extension", e);
@@ -120,7 +84,7 @@ public final class MCRMODSClassificationSupport {
         try {
             final Document document = documentBuilder.newDocument();
             final Element source = (Element) sources.item(0);
-            MCRCategoryID category = getCategoryID(source);
+            MCRCategoryID category = MCRClassMapper.getCategoryID(source);
             if (category == null) {
                 return null;
             }
@@ -141,7 +105,7 @@ public final class MCRMODSClassificationSupport {
             return "";
         }
         final Element source = (Element) sources.item(0);
-        MCRCategoryID category = getCategoryID(source);
+        MCRCategoryID category = MCRClassMapper.getCategoryID(source);
         if (category == null) {
             return "";
         }
@@ -155,7 +119,7 @@ public final class MCRMODSClassificationSupport {
             return "";
         }
         final Element source = (Element) sources.item(0);
-        MCRCategoryID category = getCategoryID(source);
+        MCRCategoryID category = MCRClassMapper.getCategoryID(source);
         if (category == null) {
             return "";
         }

@@ -18,24 +18,22 @@ import org.w3c.dom.Element;
  * @author Frank L\u00FCtzenkirchen
  */
 class MCRAuthorityWithURI extends MCRAuthorityInfo {
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
-
-    private static final Logger LOGGER = Logger.getLogger(MCRMODSClassificationSupport.class);
+    /** The attribute holding the authority URI in XML */
+    private static final String ATTRIBUTE_AUTHORITY_URI = "authorityURI";
 
     /** The attribute holding the value URI in XML */
     private static final String ATTRIBUTE_VALUE_URI = "valueURI";
 
-    /** The attribute holding the authority URI in XML */
-    private static final String ATTRIBUTE_AUTHORITY_URI = "authorityURI";
+    static final String CLASS_URI_PART = "classifications/";
+
+    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
     /**
-     * Inspects the attributes in the given MODS XML element and returns the AuthorityInfo given there.
+     * xml:lang value of category or classification <label> for MODS @authorityURI or @valueURI.
      */
-    public static MCRAuthorityWithURI getAuthorityInfo(org.jdom2.Element element) {
-        String authorityURI = element.getAttributeValue(ATTRIBUTE_AUTHORITY_URI);
-        String valueURI = element.getAttributeValue(ATTRIBUTE_VALUE_URI);
-        return getAuthorityInfo(authorityURI, valueURI);
-    }
+    private static final String LABEL_LANG_URI = "x-uri";
+
+    private static final Logger LOGGER = Logger.getLogger(MCRMODSClassificationSupport.class);
 
     /**
      * Inspects the attributes in the given MODS XML element and returns the AuthorityInfo given there.
@@ -43,6 +41,15 @@ class MCRAuthorityWithURI extends MCRAuthorityInfo {
     public static MCRAuthorityWithURI getAuthorityInfo(Element element) {
         String authorityURI = element.getAttribute(ATTRIBUTE_AUTHORITY_URI);
         String valueURI = element.getAttribute(ATTRIBUTE_VALUE_URI);
+        return getAuthorityInfo(authorityURI, valueURI);
+    }
+
+    /**
+     * Inspects the attributes in the given MODS XML element and returns the AuthorityInfo given there.
+     */
+    public static MCRAuthorityWithURI getAuthorityInfo(org.jdom2.Element element) {
+        String authorityURI = element.getAttributeValue(ATTRIBUTE_AUTHORITY_URI);
+        String valueURI = element.getAttributeValue(ATTRIBUTE_VALUE_URI);
         return getAuthorityInfo(authorityURI, valueURI);
     }
 
@@ -63,18 +70,18 @@ class MCRAuthorityWithURI extends MCRAuthorityInfo {
     }
 
     /**
-     * xml:lang value of category or classification <label> for MODS @authorityURI or @valueURI.
-     */
-    private static final String LABEL_LANG_URI = "x-uri";
-
-    private static final String CLASS_URI_PART = "classifications/";
-
-    /**
      * Returns the authority URI for the given classification.
      */
     protected static String getAuthorityURI(MCRCategory classification) {
         String defaultURI = MCRFrontendUtil.getBaseURL() + CLASS_URI_PART + classification.getId().getRootID();
         return getLabel(classification, LABEL_LANG_URI, defaultURI);
+    }
+
+    /**
+     * Returns the categories which have the given URI as label.
+     */
+    static Collection<MCRCategory> getCategoryByURI(final String uri) {
+        return DAO.getCategoriesByLabel(LABEL_LANG_URI, uri);
     }
 
     /**
@@ -98,11 +105,6 @@ class MCRAuthorityWithURI extends MCRAuthorityInfo {
     public MCRAuthorityWithURI(String authorityURI, String valueURI) {
         this.authorityURI = authorityURI;
         this.valueURI = valueURI;
-    }
-
-    @Override
-    public String toString() {
-        return authorityURI + "#" + valueURI;
     }
 
     @Override
@@ -140,11 +142,10 @@ class MCRAuthorityWithURI extends MCRAuthorityInfo {
         return null;
     }
 
-    /**
-     * Returns the categories which have the given URI as label.
-     */
-    private static Collection<MCRCategory> getCategoryByURI(final String uri) {
-        return DAO.getCategoriesByLabel(LABEL_LANG_URI, uri);
+    @Override
+    public void setInElement(Element element) {
+        element.setAttribute(ATTRIBUTE_AUTHORITY_URI, authorityURI);
+        element.setAttribute(ATTRIBUTE_VALUE_URI, valueURI);
     }
 
     @Override
@@ -154,8 +155,7 @@ class MCRAuthorityWithURI extends MCRAuthorityInfo {
     }
 
     @Override
-    public void setInElement(Element element) {
-        element.setAttribute(ATTRIBUTE_AUTHORITY_URI, authorityURI);
-        element.setAttribute(ATTRIBUTE_VALUE_URI, valueURI);
+    public String toString() {
+        return authorityURI + "#" + valueURI;
     }
 }

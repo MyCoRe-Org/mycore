@@ -39,6 +39,7 @@ import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.mods.classification.MCRClassMapper;
 import org.mycore.mods.classification.MCRMODSClassificationSupport;
 
 /**
@@ -58,10 +59,10 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
         }
         MCRMODSWrapper modsWrapper = new MCRMODSWrapper(obj);
         final List<Element> categoryNodes = modsWrapper
-            .getElements("mods:typeOfResource | .//*[(@authority or @authorityURI) and not(ancestor::mods:relatedItem[@type='host'])]");
+            .getElements("mods:typeOfResource | mods:accessCondition | .//*[(@authority or @authorityURI) and not(ancestor::mods:relatedItem[@type='host'])]");
         final HashSet<MCRCategoryID> categories = new HashSet<MCRCategoryID>();
         for (Element node : categoryNodes) {
-            final MCRCategoryID categoryID = MCRMODSClassificationSupport.getCategoryID(node);
+            final MCRCategoryID categoryID = MCRClassMapper.getCategoryID(node);
             if (categoryID != null) {
                 categories.add(categoryID);
             }
