@@ -45,7 +45,12 @@ public class MCRTransientUser extends MCRUser {
         super();
         this.userInfo = userInfo;
         setLocked(true);
-        super.setUserName(userInfo.getUserID());
+
+        String userName = userInfo.getUserID();
+        if (userName.contains("@"))
+            userName = userName.substring(0, userName.indexOf("@"));
+        
+        super.setUserName(userName);
         super.setLastLogin(new Date(MCRSessionMgr.getCurrentSession().getLoginTime()));
         super.setRealName(getUserAttribute(MCRUserInformation.ATT_REAL_NAME));
         super.setRealmID(getUserAttribute(MCRRealm.USER_INFORMATION_ATTR));

@@ -91,7 +91,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
         attributes.put("mail", mcrUser.getEMailAddress());
         attributes.put("eduPersonAffiliation", roles);
 
-        MCRUserInformation userInfo = new MCRShibbolethUserInformation(mcrUser.getUserID(), realmId, attributes);
+        MCRUserInformation userInfo = new MCRShibbolethUserInformation(mcrUser.getUserName(), realmId, attributes);
 
         MCRTransientUser user = new MCRTransientUser(userInfo);
 
@@ -108,7 +108,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
         attributes.put("mail", mcrUser.getEMailAddress());
         attributes.put("eduPersonAffiliation", roles);
 
-        MCRUserInformation userInfo = new MCRShibbolethUserInformation(mcrUser.getUserID(), realmId, attributes);
+        MCRUserInformation userInfo = new MCRShibbolethUserInformation(mcrUser.getUserName(), realmId, attributes);
 
         MCRTransientUser user = new MCRTransientUser(userInfo);
 
