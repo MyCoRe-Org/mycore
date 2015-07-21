@@ -28,6 +28,9 @@ import static org.junit.Assert.assertNotNull;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jdom2.Document;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRUserInformation;
@@ -122,9 +125,21 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
         assertEquals(mcrUser.getRealName(), user.getRealName());
         assertEquals(mcrUser.getSystemRoleIDs(), user.getSystemRoleIDs());
 
+        Map<String, String> extraAttribs = new HashMap<String, String>();
+        extraAttribs.put("attrib1", "test123");
+        extraAttribs.put("attrib2", "test321");
+        user.setAttributes(extraAttribs);
+
         MCRUserManager.createUser(user);
 
         MCRUser storedUser = MCRUserManager.getUser(user.getUserName(), realmId);
+
         assertEquals(mcrUser.getEMailAddress(), storedUser.getEMailAddress());
+
+        assertEquals(extraAttribs.get("attrib1"), storedUser.getAttributes().get("attrib1"));
+        assertEquals(extraAttribs.get("attrib2"), storedUser.getAttributes().get("attrib2"));
+
+        Document exportableXML = MCRUserTransformer.buildExportableXML(storedUser);
+        new XMLOutputter(Format.getPrettyFormat()).output(exportableXML, System.out);
     }
 }

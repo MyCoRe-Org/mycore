@@ -201,7 +201,7 @@ public class MCRUserManager {
         if (user.getRealm() != null && !MCRRealmFactory.getLocalRealm().equals(user.getRealm())) {
             MCRUserAttributeMapper attributeMapper = MCRRealmFactory.getAttributeMapper(user.getRealmID());
             if (attributeMapper != null) {
-                MCRUser u = new MCRUser(user.getUserID(), user.getRealmID());
+                MCRUser u = user.clone();
                 Map<String, Object> attributes = new HashMap<String, Object>();
                 for (String key : attributeMapper.getMappedAttributes()) {
                     MCRUserInformation userInfo = user.getUserInformation();
