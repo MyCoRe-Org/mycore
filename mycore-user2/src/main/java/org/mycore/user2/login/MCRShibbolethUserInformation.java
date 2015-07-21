@@ -47,7 +47,7 @@ public class MCRShibbolethUserInformation implements MCRUserInformation {
      */
     @Override
     public String getUserID() {
-        return userId;
+        return userId + "@" + realmId;
     }
 
     /* (non-Javadoc)
