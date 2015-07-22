@@ -277,7 +277,7 @@ public class MCRUserServlet extends MCRServlet {
 
         String realmID = MCRRealmFactory.getLocalRealm().getID();
         if (hasAdminPermission) {
-            realmID = u.getChild("realm").getAttributeValue("id");
+            realmID = u.getAttributeValue("realm");
         }
 
         MCRUser user;
