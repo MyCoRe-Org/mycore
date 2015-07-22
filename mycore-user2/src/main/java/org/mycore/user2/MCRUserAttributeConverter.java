@@ -22,6 +22,8 @@
  */
 package org.mycore.user2;
 
+import java.util.Map;
+
 /**
  * @author Ren\u00E9 Adler (eagle)
  *
@@ -33,8 +35,10 @@ public interface MCRUserAttributeConverter<ValueType, BoundType> {
      * 
      * @param value the value of type <code>&lt;ValueType&gt;</code>, to convert
      * @param separator the value separator or <code>null</code>
+     * @param valueMapping the value mapping or <code>null</code>
      * @return the converted value of type <code>&lt;BoundType&gt;</code>
      * @throws Exception if there's an error during the conversion.
      */
-    public abstract BoundType convert(ValueType value, String separator) throws Exception;
+    public abstract BoundType convert(ValueType value, String separator, Map<String, String> valueMapping)
+            throws Exception;
 }

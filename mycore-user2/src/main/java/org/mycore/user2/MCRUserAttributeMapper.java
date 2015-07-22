@@ -32,12 +32,24 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlValue;
+
+import org.apache.log4j.Logger;
 import org.jdom2.Element;
+import org.jdom2.transform.JDOMSource;
 import org.mycore.user2.annotation.MCRUserAttribute;
 import org.mycore.user2.annotation.MCRUserAttributeJavaConverter;
 
 /**
- * This attribute mapper is used to map attributes to {@link Object} properties or methods.
+ * This class is used to map attributes on {@link MCRUser} or {@link MCRUserInformation} to annotated properties or methods.
  * <br><br>
  * You can configure the mapping within <code>realms.xml</code> like this:
  * <br>
@@ -46,14 +58,17 @@ import org.mycore.user2.annotation.MCRUserAttributeJavaConverter;
  *  &lt;realms local="local"&gt;
  *      ...
  *      &lt;realm ...&gt;
+ *          ...
  *          &lt;attributeMapping&gt;
- *              &lt;attribute name="userName"&gt;eduPersonPrincipalName&lt;/attribute&gt;
- *              &lt;attribute name="realName"&gt;displayName&lt;/attribute&gt;
- *              &lt;attribute name="eMail"&gt;mail&lt;/attribute&gt;
- *              &lt;attribute name="systemRoles" separator=","&gt;eduPersonAffiliation&lt;/attribute&gt;
- *              &lt;attribute name="externalRoles" separator="," 
- *                  converter="org.mycore.user2.utils.MCRExternalRolesConverter"&gt;eduPersonAffiliation&lt;/attribute&gt;
+ *              &lt;attribute name="userName" mapping="eduPersonPrincipalName" /&gt;
+ *              &lt;attribute name="realName" mapping="displayName" /&gt;
+ *              &lt;attribute name="eMail" mapping="mail" /&gt;
+ *              &lt;attribute name="roles" mapping="eduPersonAffiliation" separator="," 
+ *                  converter="org.mycore.user2.utils.MCRRolesConverter"&gt;
+ *                  &lt;valueMapping name="employee"&gt;editor&lt;/valueMapping&gt;
+ *              &lt;/attribute&gt;
  *          &lt;/attributeMapping&gt;
+ *          ...
  *      &lt;/realm&gt;
  *      ...
  *  &lt;/realms&gt;
@@ -65,26 +80,24 @@ import org.mycore.user2.annotation.MCRUserAttributeJavaConverter;
  */
 public class MCRUserAttributeMapper {
 
+    private static Logger LOGGER = Logger.getLogger(MCRUserAttributeMapper.class);
+
     private HashMap<String, Attribute> attributeMapping = new HashMap<String, Attribute>();
 
     public static MCRUserAttributeMapper instance(Element attributeMapping) {
-        MCRUserAttributeMapper uam = new MCRUserAttributeMapper();
+        try {
+            JAXBContext jaxb = JAXBContext.newInstance(Mappings.class.getPackage().getName(),
+                    Mappings.class.getClassLoader());
 
-        for (Element child : attributeMapping.getChildren("attribute")) {
-            final String name = child.getAttributeValue("name");
-            if (name != null && !name.isEmpty()) {
-                Attribute attr = new Attribute();
+            Unmarshaller unmarshaller = jaxb.createUnmarshaller();
+            Mappings mappings = (Mappings) unmarshaller.unmarshal(new JDOMSource(attributeMapping));
 
-                attr.mapping = child.getTextTrim();
-                attr.separator = child.getAttributeValue("separator");
-                attr.nullable = Boolean.getBoolean(child.getAttributeValue("nullable"));
-                attr.converter = child.getAttributeValue("converter");
-
-                uam.attributeMapping.put(name, attr);
-            }
+            MCRUserAttributeMapper uam = new MCRUserAttributeMapper();
+            uam.attributeMapping.putAll(mappings.getAttributeMap());
+            return uam;
+        } catch (Exception e) {
+            return null;
         }
-
-        return uam;
     }
 
     /**
@@ -131,12 +144,15 @@ public class MCRUserAttributeMapper {
 
                         if (convCls != null) {
                             MCRUserAttributeConverter converter = convCls.newInstance();
-                            value = converter.convert(value, attribute.separator);
+                            value = converter.convert(value, attribute.separator, attribute.getValueMap());
                         }
 
                         if (value != null || ((attrAnno.nullable() || attribute.nullable) && value == null)) {
                             if (annotated instanceof Field) {
                                 final Field field = (Field) annotated;
+
+                                LOGGER.debug("map attribute \"" + attribute.mapping + "\" with value \""
+                                        + value.toString() + "\" to field \"" + field.getName() + "\"");
 
                                 boolean accState = field.isAccessible();
                                 field.setAccessible(true);
@@ -144,6 +160,9 @@ public class MCRUserAttributeMapper {
                                 field.setAccessible(accState);
                             } else if (annotated instanceof Method) {
                                 final Method method = (Method) annotated;
+
+                                LOGGER.debug("map attribute \"" + attribute.mapping + "\" with value \""
+                                        + value.toString() + "\" to method \"" + method.getName() + "\"");
 
                                 boolean accState = method.isAccessible();
                                 method.setAccessible(true);
@@ -160,11 +179,11 @@ public class MCRUserAttributeMapper {
     }
 
     /**
-     * Returns a collection of mapped attributes.
+     * Returns a collection of mapped attribute names.
      * 
-     * @return a collection of mapped attributes
+     * @return a collection of mapped attribute names
      */
-    public Set<String> getMappedAttributes() {
+    public Set<String> getAttributeNames() {
         Set<String> mAtt = new HashSet<String>();
 
         for (final String name : attributeMapping.keySet()) {
@@ -205,14 +224,62 @@ public class MCRUserAttributeMapper {
         return null;
     }
 
-    private static class Attribute {
-        String mapping;
+    @XmlRootElement(name = "realm")
+    @XmlAccessorType(XmlAccessType.FIELD)
+    private static class Mappings {
+        @XmlElementWrapper(name = "attributeMapping")
+        @XmlElement(name = "attribute")
+        List<Attribute> attributes;
 
-        String separator;
-
-        boolean nullable;
-
-        String converter;
+        Map<String, Attribute> getAttributeMap() {
+            Map<String, Attribute> map = new HashMap<String, Attribute>();
+            for (Attribute attrib : attributes) {
+                map.put(attrib.name, attrib);
+            }
+            return map;
+        }
     }
 
+    @XmlRootElement(name = "attribute")
+    @XmlAccessorType(XmlAccessType.FIELD)
+    private static class Attribute {
+        @XmlAttribute(required = true)
+        String name;
+
+        @XmlAttribute(required = true)
+        String mapping;
+
+        @XmlAttribute
+        String separator;
+
+        @XmlAttribute
+        boolean nullable;
+
+        @XmlAttribute
+        String converter;
+
+        @XmlElement
+        List<ValueMapping> valueMapping;
+
+        Map<String, String> getValueMap() {
+            if (valueMapping == null)
+                return null;
+
+            Map<String, String> map = new HashMap<String, String>();
+            for (ValueMapping vm : valueMapping) {
+                map.put(vm.name, vm.mapping);
+            }
+            return map;
+        }
+    }
+
+    @XmlRootElement(name = "valueMapping")
+    @XmlAccessorType(XmlAccessType.FIELD)
+    private static class ValueMapping {
+        @XmlAttribute(required = true)
+        String name;
+
+        @XmlValue
+        String mapping;
+    }
 }

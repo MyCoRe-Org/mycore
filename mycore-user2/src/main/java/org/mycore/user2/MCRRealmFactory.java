@@ -159,10 +159,7 @@ public class MCRRealmFactory {
                 realm.setCreateURL(createElement.getAttributeValue("url"));
             }
 
-            Element attrMapping = child.getChild("attributeMapping");
-            if (attrMapping != null) {
-                attributeMapper.put(id, MCRUserAttributeMapper.instance(attrMapping));
-            }
+            attributeMapper.put(id, MCRUserAttributeMapper.instance(child));
 
             realmsMap.put(id, realm);
             realmsList.add(realm);

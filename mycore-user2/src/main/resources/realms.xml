@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <realms local="local">
   <realm id="local">
@@ -9,7 +9,7 @@
       <label xml:lang="en">Login with local user account</label>
       <info>
         <label xml:lang="de">
-          Diese Kennung gilt nur für diese Anwendung.
+          Diese Kennung gilt nur fÃ¼r diese Anwendung.
         </label>
         <label xml:lang="en">
           This account is local for this application only.
@@ -18,10 +18,10 @@
     </login>
     <!--
     <create url="../authorization/create-account.xed">
-      <label xml:lang="de">Neue persönliche Benutzerkennung einrichten</label>
+      <label xml:lang="de">Neue persÃ¶nliche Benutzerkennung einrichten</label>
       <label xml:lang="en">Generate a new personal user account</label>
       <info>
-        <label xml:lang="de">Sie können Sie hier selbst eine neue Benutzerkennung nur für diese Anwendung erstellen.</label>
+        <label xml:lang="de">Sie kÃ¶nnen Sie hier selbst eine neue Benutzerkennung nur fÃ¼r diese Anwendung erstellen.</label>
         <label xml:lang="en">If you still have no user account for this application, here you can generate yourself a personal user
           account.
           You need an own, personal user account, however, only if you want to place documents in this application.
@@ -40,7 +40,7 @@
       <label xml:lang="en">Login with servlet container user account (Servlet 3)</label>
       <info>
         <label xml:lang="de">
-          Diese Kennung gilt für alle Anwendungen innerhalb des Servlet-Containers.
+          Diese Kennung gilt fÃ¼r alle Anwendungen innerhalb des Servlet-Containers.
         </label>
         <label xml:lang="en">
           This account is available to all applications of this servlet container.
@@ -58,7 +58,7 @@
       <label xml:lang="en">Login with your user credentials of your home institution</label>
       <info>
         <label xml:lang="de">
-          Falls unterstützt, müssen Sie sich ggf. nur einmalig anmelden.
+          Falls unterstÃ¼tzt, mÃ¼ssen Sie sich ggf. nur einmalig anmelden.
         </label>
         <label xml:lang="en">
           This login uses single-sign-on facilities provided by your home institution.

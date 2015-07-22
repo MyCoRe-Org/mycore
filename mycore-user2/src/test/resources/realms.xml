@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <realms local="local">
   <realm id="local">
@@ -9,7 +9,7 @@
       <label xml:lang="en">Login with local user account</label>
       <info>
         <label xml:lang="de">
-          Diese Kennung gilt nur für diese Anwendung.
+          Diese Kennung gilt nur fÃ¼r diese Anwendung.
         </label>
         <label xml:lang="en">
           This account is local for this application only.
@@ -20,10 +20,12 @@
   </realm>
   <realm id="mycore.de">
     <attributeMapping>
-      <attribute name="userName">eduPersonPrincipalName</attribute>
-      <attribute name="realName">displayName</attribute>
-      <attribute name="eMail">mail</attribute>
-      <attribute name="roles" separator=",">eduPersonAffiliation</attribute>
+      <attribute name="userName" mapping="eduPersonPrincipalName" />
+      <attribute name="realName" mapping="displayName" />
+      <attribute name="eMail" mapping="mail" />
+      <attribute name="roles" mapping="eduPersonAffiliation" separator=",">
+        <valueMapping name="staff">editor</valueMapping>
+      </attribute>
     </attributeMapping>
   </realm>
 </realms>

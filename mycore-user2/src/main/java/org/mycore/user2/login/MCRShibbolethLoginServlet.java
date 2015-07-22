@@ -43,7 +43,7 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
                 final Map<String, Object> attributes = new HashMap<String, Object>();
 
                 final MCRUserAttributeMapper attributeMapper = MCRRealmFactory.getAttributeMapper(realmId);
-                for (final String key : attributeMapper.getMappedAttributes()) {
+                for (final String key : attributeMapper.getAttributeNames()) {
                     final Object value = req.getAttribute(key);
                     if (value != null) {
                         LOGGER.info("received " + key + ":" + value);

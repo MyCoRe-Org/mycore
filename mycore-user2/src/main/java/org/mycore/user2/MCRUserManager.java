@@ -210,7 +210,7 @@ public class MCRUserManager {
             MCRUserAttributeMapper attributeMapper = MCRRealmFactory.getAttributeMapper(user.getRealmID());
             if (attributeMapper != null) {
                 Map<String, Object> attributes = new HashMap<String, Object>();
-                for (String key : attributeMapper.getMappedAttributes()) {
+                for (String key : attributeMapper.getAttributeNames()) {
                     MCRUserInformation userInfo = user.getUserInformation();
                     attributes.put(key, userInfo.getUserAttribute(key));
                 }
