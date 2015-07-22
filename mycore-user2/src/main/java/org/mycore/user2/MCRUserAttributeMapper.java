@@ -23,6 +23,7 @@
 package org.mycore.user2;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -105,10 +106,13 @@ public class MCRUserAttributeMapper {
      * 
      * @param object the {@link Object}
      * @param attributes a collection of attributes to map
+     * @return <code>true</code> if any attribute was changed
      * @throws Exception
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public void mapAttributes(final Object object, final Map<String, ?> attributes) throws Exception {
+    public boolean mapAttributes(final Object object, final Map<String, ?> attributes) throws Exception {
+        boolean changed = false;
+
         for (Object annotated : getAnnotated(object)) {
             MCRUserAttribute attrAnno = null;
 
@@ -150,6 +154,10 @@ public class MCRUserAttributeMapper {
                         }
 
                         if (value != null || ((attrAnno.nullable() || attribute.nullable) && value == null)) {
+                            Object oldValue = getValue(object, annotated);
+                            if (oldValue != null && oldValue.equals(value))
+                                continue;
+
                             if (annotated instanceof Field) {
                                 final Field field = (Field) annotated;
 
@@ -160,6 +168,8 @@ public class MCRUserAttributeMapper {
                                 field.setAccessible(true);
                                 field.set(object, value);
                                 field.setAccessible(accState);
+
+                                changed = true;
                             } else if (annotated instanceof Method) {
                                 final Method method = (Method) annotated;
 
@@ -170,6 +180,8 @@ public class MCRUserAttributeMapper {
                                 method.setAccessible(true);
                                 method.invoke(object, value);
                                 method.setAccessible(accState);
+
+                                changed = true;
                             }
                         } else {
                             throw new IllegalArgumentException("A not nullable attribute \"" + name + "\" was null.");
@@ -178,6 +190,8 @@ public class MCRUserAttributeMapper {
                 }
             }
         }
+
+        return changed;
     }
 
     /**
@@ -224,6 +238,36 @@ public class MCRUserAttributeMapper {
         }
 
         return null;
+    }
+
+    private Object getValue(final Object object, final Object annotated) throws IllegalArgumentException,
+            IllegalAccessException, InvocationTargetException, NoSuchMethodException, SecurityException {
+        Object value = null;
+
+        if (annotated instanceof Field) {
+            final Field field = (Field) annotated;
+
+            boolean accState = field.isAccessible();
+            field.setAccessible(true);
+            value = field.get(object);
+            field.setAccessible(accState);
+        } else if (annotated instanceof Method) {
+            Method method = null;
+            String name = ((Method) annotated).getName();
+            if (name.startsWith("get")) {
+                name = "s" + name.substring(1);
+                method = object.getClass().getMethod(name);
+            }
+
+            if (method != null) {
+                boolean accState = method.isAccessible();
+                method.setAccessible(true);
+                value = method.invoke(object);
+                method.setAccessible(accState);
+            }
+        }
+
+        return value;
     }
 
     @XmlRootElement(name = "realm")

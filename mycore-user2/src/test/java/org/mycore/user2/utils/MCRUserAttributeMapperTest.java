@@ -135,4 +135,47 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
         Document exportableXML = MCRUserTransformer.buildExportableXML(storedUser);
         new XMLOutputter(Format.getPrettyFormat()).output(exportableXML, System.out);
     }
+
+    @Test
+    public void testUserUpdate() throws Exception {
+        Map<String, Object> attributes = new HashMap<String, Object>();
+        attributes.put("eduPersonPrincipalName", mcrUser.getUserName() + "@" + realmId);
+        attributes.put("displayName", mcrUser.getRealName());
+        attributes.put("mail", mcrUser.getEMailAddress());
+        attributes.put("eduPersonAffiliation", roles);
+
+        MCRUserInformation userInfo = new MCRShibbolethUserInformation(mcrUser.getUserName(), realmId, attributes);
+
+        MCRTransientUser user = new MCRTransientUser(userInfo);
+
+        assertEquals(mcrUser.getUserName(), user.getUserName());
+        assertEquals(mcrUser.getRealName(), user.getRealName());
+        assertTrue(user.isUserInRole("editor"));
+
+        Map<String, String> extraAttribs = new HashMap<String, String>();
+        extraAttribs.put("attrib1", "test123");
+        extraAttribs.put("attrib2", "test321");
+        user.setAttributes(extraAttribs);
+
+        MCRUserManager.createUser(user);
+
+        startNewTransaction();
+
+        attributes = new HashMap<String, Object>();
+        attributes.put("eduPersonPrincipalName", mcrUser.getUserName() + "@" + realmId);
+        attributes.put("displayName", mcrUser.getRealName());
+        attributes.put("mail", "new@mycore.de");
+        attributes.put("eduPersonAffiliation", "admin");
+
+        MCRUser storedUser = MCRUserManager.getUser(user.getUserName(), realmId);
+
+        MCRUserAttributeMapper attributeMapper = MCRRealmFactory.getAttributeMapper(realmId);
+        boolean changed = attributeMapper.mapAttributes(storedUser, attributes);
+
+        assertTrue("should changed", changed);
+        assertNotEquals(user.getEMailAddress(), storedUser.getEMailAddress());
+
+        Document exportableXML = MCRUserTransformer.buildExportableXML(storedUser);
+        new XMLOutputter(Format.getPrettyFormat()).output(exportableXML, System.out);
+    }
 }

@@ -25,6 +25,7 @@
       <attribute name="eMail" mapping="mail" />
       <attribute name="roles" mapping="eduPersonAffiliation" separator=",">
         <valueMapping name="staff">editor</valueMapping>
+        <valueMapping name="admin">admin</valueMapping>
       </attribute>
     </attributeMapping>
   </realm>

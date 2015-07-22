@@ -727,9 +727,18 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         }
     }
 
-    @MCRUserAttribute(separator = ";")
+    @Transient
+    Collection<String> getRolesCollection() {
+        Collection<String> roles = new HashSet<String>();
+        for (MCRRole role : getRoles()) {
+            roles.add(role.getName());
+        }
+        return roles;
+    }
+
+    @MCRUserAttribute(name = "roles", separator = ";")
     @MCRUserAttributeJavaConverter(MCRRolesConverter.class)
-    private void setRoles(Collection<String> roles) {
+    void setRolesCollection(Collection<String> roles) {
         for (String role : roles) {
             assignRole(role);
         }
