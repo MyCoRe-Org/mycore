@@ -2,11 +2,9 @@
 
   <xsl:output method="html" indent="yes"/>
 
-  <!-- parse Document -->
+  <xsl:strip-space elements="*" />
+
   <xsl:template match="tei:TEI">
-    <xsl:comment>
-      mcrtranscr-html.xsl
-    </xsl:comment>
     <div>
       <xsl:apply-templates select="tei:text/tei:body/*"/>
       <xsl:if test="//tei:note">
@@ -30,12 +28,10 @@
 
 
   <xsl:template match="tei:div">
-    <xsl:comment>tei:div</xsl:comment>
     <xsl:apply-templates select="*"/>
   </xsl:template>
 
   <xsl:template match="tei:head">
-    <xsl:comment>tei:head</xsl:comment>
     <xsl:variable name="headerContent">
       <xsl:choose>
         <xsl:when test="p">
@@ -53,7 +49,6 @@
   </xsl:template>
 
   <xsl:template match="tei:p">
-    <xsl:comment>tei:p</xsl:comment>
     <xsl:element name="span">
       <xsl:attribute name="class">
         <xsl:value-of select="'teiLine '"/>
@@ -70,7 +65,6 @@
   </xsl:template>
 
   <xsl:template match="tei:hi">
-    <xsl:comment>tei:hi</xsl:comment>
     <xsl:element name="span">
       <xsl:if test="@rend">
         <xsl:attribute name="style">
@@ -97,7 +91,6 @@
 
   <xsl:template match="tei:note[@place='foot']">
     <span id="{concat('fnt',@n)}" class="popupTrigger">
-      <!--href="{concat('#fnb', @n)}"-->
       <a style="vertical-align:top; font-size:0.8em; line-height:100%;">
         <xsl:value-of select="@n"/>
       </a>
@@ -120,7 +113,6 @@
   </xsl:template>
 
   <xsl:template match="tei:app">
-    <xsl:comment><!-- TEI APP--></xsl:comment>
     <xsl:variable name="href" select="concat('#',@n)"/>
     <span class="popupTrigger">
       <a>
