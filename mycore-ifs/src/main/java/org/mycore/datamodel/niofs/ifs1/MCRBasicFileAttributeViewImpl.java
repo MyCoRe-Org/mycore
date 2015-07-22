@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
+import java.text.MessageFormat;
 
 import org.apache.log4j.Logger;
 import org.mycore.datamodel.ifs.MCRDirectory;
@@ -31,6 +32,11 @@ abstract class MCRBasicFileAttributeViewImpl implements BasicFileAttributeView {
                 LOGGER.warn("lastModified time is before creation time: " + node.toPath().toString());
             }
             FileTime lastAccessTime = localFileAttributes.lastAccessTime(); //unavailable in IFS1
+            if (localFileAttributes.size() != file.getSize()) {
+                throw new IOException(MessageFormat.format(
+                    "File size mismatch detected for {0}. Local file should be {1} bytes long but is {2} bytes long.",
+                    node.getPath(), file.getSize(), localFileAttributes.size()));
+            }
             return MCRFileAttributes.file(file.getID(), file.getSize(), file.getMD5(), creationTime,
                 lastModified, lastAccessTime);
         }
