@@ -144,7 +144,9 @@ public class MCRUserAttributeMapper {
 
                         if (convCls != null) {
                             MCRUserAttributeConverter converter = convCls.newInstance();
-                            value = converter.convert(value, attribute.separator, attribute.getValueMap());
+                            value = converter.convert(value,
+                                    attribute.separator != null ? attribute.separator : attrAnno.separator(),
+                                    attribute.getValueMap());
                         }
 
                         if (value != null || ((attrAnno.nullable() || attribute.nullable) && value == null)) {
