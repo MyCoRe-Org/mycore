@@ -114,6 +114,7 @@ label{
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    position: relative;
 }
 
 #acle2-access-table th:nth-child(1) {
@@ -330,8 +331,9 @@ select, textarea, input[type="text"]{
 
 .acle2-button-edit{
 	opacity: 0;
-	float: right;
-	margin-top: -15px;
+	position: absolute;
+	right: 0;
+	top: 10px;
 }
 
 .acle2-table-access-entry-td:hover .acle2-button-edit{
@@ -354,6 +356,7 @@ select, textarea, input[type="text"]{
     left: 0;
     line-height: 1.5;
     padding: 5px 10px;
+    font-size: 12px
 }
 
 .twitter-typeahead .tt-hint {
