@@ -19,19 +19,19 @@
   <xed:template id="editor4newReadUser">
     <mcruser:template name="textInput" xpath="@name" id="userName" i18n="component.user2.admin.userAccount" i18n.error="component.user2.admin.inputhints.username"
       required="true" maxlength="16" />
-    <xed:bind xpath="realm/@id" default="local" />
+    <xed:bind xpath="@realm" default="local" />
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="passwords" />
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="passwordHint" />
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="realName" />
 
-    <xed:validate xpath="/user[realm/@id = 'local']/@name" display="global" class="org.mycore.user2.MCRUserServlet" method="checkUserName"
+    <xed:validate xpath="/user[@realm = 'local']/@name" display="global" class="org.mycore.user2.MCRUserServlet" method="checkUserName"
       i18n="component.user2.admin.inputhints.sameUsername" />
   </xed:template>
 
   <xed:template id="editor4changeReadUser">
     <mcruser:template name="textInput" xpath="@name" id="userName" i18n="component.user2.admin.userAccount" i18n.error="component.user2.admin.inputhints.username"
       required="true" maxlength="16" />
-    <xed:bind xpath="realm/@id" default="local" />
+    <xed:bind xpath="@realm" default="local" />
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="passwordHint" />
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="realName" />
   </xed:template>
@@ -45,7 +45,7 @@
 
     <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="editor4admins" />
 
-    <xed:validate xpath="/user[realm/@id = 'local']/@name" display="global" class="org.mycore.user2.MCRUserServlet" method="checkUserName"
+    <xed:validate xpath="/user[@realm = 'local']/@name" display="global" class="org.mycore.user2.MCRUserServlet" method="checkUserName"
       i18n="component.user2.admin.inputhints.sameUsername" />
   </xed:template>
 
@@ -87,7 +87,7 @@
       <div class="col-md-9 row">
         <mcruser:template name="textInput" xpath="@name" id="userName" inline="true" colsize="sm" colwidth="9"
           i18n.error="component.user2.admin.inputhints.username" required="true" matches="[a-z0-9\._-]*" maxlength="16" />
-        <mcruser:template name="selectInput" xpath="realm/@id" default="local" id="realmId" inline="true" colsize="sm" colwidth="3"
+        <mcruser:template name="selectInput" xpath="@realm" default="local" id="realmId" inline="true" colsize="sm" colwidth="3"
           uri="xslStyle:items2options:xslStyle:realms2items:realm:all" />
       </div>
     </div>
@@ -101,7 +101,7 @@
       <div class="col-md-9 row">
         <mcruser:template name="textInput" xpath="@name" id="userName" disabled="true" inline="true" colsize="sm" colwidth="9"
           i18n.error="component.user2.admin.inputhints.username" required="true" maxlength="16" />
-        <mcruser:template name="selectInput" xpath="realm/@id" default="local" id="realmId" disabled="true" inline="true" colsize="sm"
+        <mcruser:template name="selectInput" xpath="@realm" default="local" id="realmId" disabled="true" inline="true" colsize="sm"
           colwidth="3" uri="xslStyle:items2options:xslStyle:realms2items:realm:all" />
       </div>
     </div>
@@ -113,7 +113,7 @@
     <mcruser:template name="passwordInput" xpath="password2" id="password2" i18n="component.user2.admin.passwordRepeat" i18n.error="component.user2.admin.inputhints.password"
       required="true" matches="[\S]*" maxlength="16" />
 
-    <xed:validate xpath="user" display="global" test="(realm/@id != 'local') or ((string-length(password) &gt; 0) and (password = password2 ))"
+    <xed:validate xpath="user" display="global" test="(user/@realm != 'local') or ((string-length(password) &gt; 0) and (password = password2 ))"
       i18n="component.user2.admin.inputhints.passwordLocalUsers" />
   </xed:template>
 
