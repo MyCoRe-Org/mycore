@@ -59,7 +59,7 @@
         <p>
           <form method="get" action="{$ServletsBaseURL}MCRLoginServlet" class="action">
             <input value="cancel" name="action" type="hidden" />
-            <input value="{i18n:translate('component.user2.button.cancel')}" class="action" type="submit" />
+            <input value="{i18n:translate('component.user2.button.cancel')}" class="btn btn-default" type="submit" />
           </form>
         </p>
       </div>
