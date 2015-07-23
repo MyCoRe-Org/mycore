@@ -66,6 +66,7 @@ import org.mycore.mets.tools.MCRMetsSave;
  * @author Thomas Scheffler (yagee)
  * @author Matthias Eichner
  * @author Sebastian Hofmann
+ * @author Sebastian Röher (basti890)
  */
 public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
 
@@ -80,7 +81,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
     private HashMap<String, String> hrefIdMap = new HashMap<String, String>();
 
     /**
-     * This enum is used to craete fileGroups in the File and 
+     * This enum is used to create fileGroups in the File and 
      * @author Sebastian Röher (basti890)
      *
      */
