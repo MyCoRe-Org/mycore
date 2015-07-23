@@ -139,7 +139,6 @@ public class MCRUserAttributeMapper {
                         }
 
                         Class<? extends MCRUserAttributeConverter> convCls = null;
-
                         if (attribute.converter != null) {
                             convCls = (Class<? extends MCRUserAttributeConverter>) Class.forName(attribute.converter);
                         } else if (aConv != null) {
@@ -148,6 +147,7 @@ public class MCRUserAttributeMapper {
 
                         if (convCls != null) {
                             MCRUserAttributeConverter converter = convCls.newInstance();
+                            LOGGER.debug("convert value with \"" + converter.getClass().getName() + "\"");
                             value = converter.convert(value,
                                     attribute.separator != null ? attribute.separator : attrAnno.separator(),
                                     attribute.getValueMap());
