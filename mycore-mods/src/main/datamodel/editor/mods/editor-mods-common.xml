@@ -447,6 +447,28 @@
     </cell>
   </panel>
 
+  <panel id="mods.person.optional">
+    <cell anchor="NORTHWEST" var="mods:name[@type='personal']">
+      <repeater min="1" pos="right">
+        <panel>
+          <cell col="1" row="1" anchor="NORTHEAST" var="mods:role/mods:roleTerm[@type='code']">
+            <panel>
+              <hidden var="@authority" default="marcrelator" />
+              <cell>
+                <list type="dropdown" default="aut" id="mods.person.list" style="width:120px;">
+                  <include uri="classification:editor:-1:children:marcrelator" cacheable="false" />
+                    <label xml:lang="de">Bitte wählen Sie einen Wert aus!</label>
+                    <label xml:lang="en">Please select one entry!</label>
+                </list>
+              </cell>
+            </panel>
+          </cell>
+          <cell col="2" row="1" anchor="NORTHEAST" ref="mods.name" />
+        </panel>
+      </repeater>
+    </cell>
+  </panel>
+
   <panel id="mods.person.publisher">
     <cell anchor="NORTHWEST" var="mods:name[@type='personal']">
       <repeater min="1" pos="right">
