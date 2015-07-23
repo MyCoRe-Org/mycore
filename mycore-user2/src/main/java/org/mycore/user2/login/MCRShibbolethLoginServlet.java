@@ -56,10 +56,11 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
                 MCRUser user = MCRUserManager.getUser(userId, realmId);
                 if (user != null) {
                     LOGGER.debug("login existing user \"" + user.getUserID() + "\"");
-                    if (attributeMapper.mapAttributes(user, attributes)) {
-                        LOGGER.debug("update changed user \"" + user.getUserID() + "\"");
-                        MCRUserManager.updateUser(user);
-                    }
+                    
+                    attributeMapper.mapAttributes(user, attributes);
+                    user.setLastLogin();
+                    MCRUserManager.updateUser(user);
+                    
                     userinfo = user;
                 }
 
