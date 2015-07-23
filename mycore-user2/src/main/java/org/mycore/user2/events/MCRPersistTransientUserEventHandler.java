@@ -34,7 +34,7 @@ import org.mycore.user2.MCRUserManager;
  * @author Ren\u00E9 Adler (eagle)
  *
  */
-public class MCRPersitsTransientUserEventHandler extends MCREventHandlerBase {
+public class MCRPersistTransientUserEventHandler extends MCREventHandlerBase {
 
     /**
      * Persists {@link MCRTransientUser} if an {@link MCRObject} was created.
