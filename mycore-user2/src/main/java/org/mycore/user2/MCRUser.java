@@ -71,8 +71,10 @@ import org.mycore.user2.utils.MCRUserNameConverter;
  * Each user belongs to a realm. The user name must be unique within a realm.
  * Any changes made to an instance of this class does not persist automatically.
  * Use {@link MCRUserManager#updateUser(MCRUser)} to achieve this.
+ * 
  * @author Frank L\u00fctzenkirchen
  * @author Thomas Scheffler (yagee)
+ * @author Ren\u00E9 Adler (eagle)
  */
 @Entity
 @Access(AccessType.PROPERTY)
@@ -203,7 +205,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         this.locked = locked == null ? false : locked;
     }
 
-    /* Getter for hibernate */
+    /* Getter for JPA */
     @Column(name = "locked", nullable = true)
     private Boolean getLocked() {
         return this.locked;
@@ -223,7 +225,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         this.disabled = disabled == null ? false : disabled;
     }
 
-    /* Getter for hibernate */
+    /* Getter for JPA */
     @Column(name = "disabled", nullable = true)
     private Boolean getDisabled() {
         return this.disabled;
@@ -657,6 +659,25 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         this.validUntil = validUntil == null ? null : new Date(validUntil.getTime());
     }
 
+    //This is used for MCRUserAttributeMapper
+
+    @Transient
+    Collection<String> getRolesCollection() {
+        Collection<String> roles = new HashSet<String>();
+        for (MCRRole role : getRoles()) {
+            roles.add(role.getName());
+        }
+        return roles;
+    }
+
+    @MCRUserAttribute(name = "roles", separator = ";")
+    @MCRUserAttributeJavaConverter(MCRRolesConverter.class)
+    void setRolesCollection(Collection<String> roles) {
+        for (String role : roles) {
+            assignRole(role);
+        }
+    }
+
     //This is code to get JAXB work
 
     private static class Password {
@@ -723,23 +744,6 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
             if (role == null) {
                 throw new MCRException("Could not load role: " + roleName);
             }
-            assignRole(role);
-        }
-    }
-
-    @Transient
-    Collection<String> getRolesCollection() {
-        Collection<String> roles = new HashSet<String>();
-        for (MCRRole role : getRoles()) {
-            roles.add(role.getName());
-        }
-        return roles;
-    }
-
-    @MCRUserAttribute(name = "roles", separator = ";")
-    @MCRUserAttributeJavaConverter(MCRRolesConverter.class)
-    void setRolesCollection(Collection<String> roles) {
-        for (String role : roles) {
             assignRole(role);
         }
     }
