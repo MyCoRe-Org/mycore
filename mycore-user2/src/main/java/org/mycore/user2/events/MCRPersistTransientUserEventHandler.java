@@ -22,12 +22,12 @@
  */
 package org.mycore.user2.events;
 
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRUserInformation;
+import org.apache.log4j.Logger;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.user2.MCRTransientUser;
+import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
 /**
@@ -36,6 +36,8 @@ import org.mycore.user2.MCRUserManager;
  */
 public class MCRPersistTransientUserEventHandler extends MCREventHandlerBase {
 
+    private static Logger LOGGER = Logger.getLogger(MCRPersistTransientUserEventHandler.class);
+
     /**
      * Persists {@link MCRTransientUser} if an {@link MCRObject} was created.
      * 
@@ -43,8 +45,9 @@ public class MCRPersistTransientUserEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        MCRUserInformation currentUser = MCRSessionMgr.getCurrentSession().getUserInformation();
-        if (currentUser instanceof MCRTransientUser) {
+        MCRUser currentUser = MCRUserManager.getCurrentUser();
+        if (MCRUserManager.getUser(currentUser.getUserID()) == null) {
+            LOGGER.info("create new user \"" + currentUser.getUserID() + "\"");
             MCRUserManager.createUser((MCRTransientUser) currentUser);
         }
     }
