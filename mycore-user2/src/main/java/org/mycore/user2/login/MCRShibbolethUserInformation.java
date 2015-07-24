@@ -29,7 +29,7 @@ public class MCRShibbolethUserInformation implements MCRUserInformation {
     @MCRUserAttribute
     private String realName;
 
-    @MCRUserAttribute
+    @MCRUserAttribute(separator = ";")
     @MCRUserAttributeJavaConverter(MCRRolesConverter.class)
     private Set<String> roles = new HashSet<String>();
 
