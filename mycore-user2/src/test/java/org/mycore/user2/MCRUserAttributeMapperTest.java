@@ -20,9 +20,12 @@
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
-package org.mycore.user2.utils;
+package org.mycore.user2;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,8 +42,8 @@ import org.mycore.user2.MCRTransientUser;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserAttributeMapper;
 import org.mycore.user2.MCRUserManager;
-import org.mycore.user2.MCRUserTestCase;
 import org.mycore.user2.login.MCRShibbolethUserInformation;
+import org.mycore.user2.utils.MCRUserTransformer;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
