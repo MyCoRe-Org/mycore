@@ -46,6 +46,7 @@ import javax.xml.bind.annotation.XmlValue;
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
+import org.mycore.common.MCRUserInformation;
 import org.mycore.user2.annotation.MCRUserAttribute;
 import org.mycore.user2.annotation.MCRUserAttributeJavaConverter;
 
@@ -147,7 +148,8 @@ public class MCRUserAttributeMapper {
 
                         if (convCls != null) {
                             MCRUserAttributeConverter converter = convCls.newInstance();
-                            LOGGER.debug("convert value with \"" + converter.getClass().getName() + "\"");
+                            LOGGER.debug(
+                                    "convert value \"" + value + "\" with \"" + converter.getClass().getName() + "\"");
                             value = converter.convert(value,
                                     attribute.separator != null ? attribute.separator : attrAnno.separator(),
                                     attribute.getValueMap());
@@ -212,19 +214,38 @@ public class MCRUserAttributeMapper {
     private List<Object> getAnnotated(final Object obj) {
         List<Object> al = new ArrayList<Object>();
 
-        for (Field field : obj.getClass().getDeclaredFields()) {
-            if (field.getAnnotation(MCRUserAttribute.class) != null) {
-                al.add(field);
-            }
-        }
+        al.addAll(getAnnotatedFields(obj.getClass()));
+        al.addAll(getAnnotatedMethods(obj.getClass()));
 
-        for (Method method : obj.getClass().getDeclaredMethods()) {
-            if (method.getAnnotation(MCRUserAttribute.class) != null) {
-                al.add(method);
-            }
+        if (obj.getClass().getSuperclass() != null) {
+            al.addAll(getAnnotatedFields(obj.getClass().getSuperclass()));
+            al.addAll(getAnnotatedMethods(obj.getClass().getSuperclass()));
         }
 
         return al;
+    }
+
+    private List<Object> getAnnotatedFields(final Class<?> cls) {
+        List<Object> fields = new ArrayList<Object>();
+
+        for (Field field : cls.getDeclaredFields()) {
+            if (field.getAnnotation(MCRUserAttribute.class) != null) {
+                fields.add(field);
+            }
+        }
+
+        return fields;
+    }
+
+    private List<Object> getAnnotatedMethods(final Class<?> cls) {
+        List<Object> methods = new ArrayList<Object>();
+        for (Method method : cls.getDeclaredMethods()) {
+            if (method.getAnnotation(MCRUserAttribute.class) != null) {
+                methods.add(method);
+            }
+        }
+
+        return methods;
     }
 
     private String getAttriutebName(final Object annotated) {

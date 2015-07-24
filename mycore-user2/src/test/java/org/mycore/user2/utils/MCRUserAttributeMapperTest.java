@@ -97,6 +97,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
 
         assertEquals(mcrUser.getUserName(), user.getUserName());
         assertEquals(mcrUser.getRealName(), user.getRealName());
+        assertEquals(mcrUser.getEMailAddress(), user.getEMailAddress());
         assertTrue(user.isUserInRole("editor"));
     }
 

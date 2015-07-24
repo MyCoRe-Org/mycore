@@ -25,9 +25,7 @@ package org.mycore.user2;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -204,26 +202,7 @@ public class MCRUserManager {
             throw new MCRException("User is invalid: " + user.getUserID());
         }
 
-        MCRUser u = user.clone();
-
-        if (user.getRealm() != null && !MCRRealmFactory.getLocalRealm().equals(user.getRealm())) {
-            MCRUserAttributeMapper attributeMapper = MCRRealmFactory.getAttributeMapper(user.getRealmID());
-            if (attributeMapper != null) {
-                Map<String, Object> attributes = new HashMap<String, Object>();
-                for (String key : attributeMapper.getAttributeNames()) {
-                    MCRUserInformation userInfo = user.getUserInformation();
-                    attributes.put(key, userInfo.getUserAttribute(key));
-                }
-
-                try {
-                    attributeMapper.mapAttributes(u, attributes);
-                } catch (Exception e) {
-                    throw new MCRException(e.getMessage(), e);
-                }
-            }
-        }
-
-        createUser(u);
+        createUser(user.clone());
     }
 
     /**

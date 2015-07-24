@@ -24,8 +24,11 @@
 package org.mycore.user2;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 
@@ -49,26 +52,41 @@ public class MCRTransientUser extends MCRUser {
         String userName = userInfo.getUserID();
         if (userName.contains("@"))
             userName = userName.substring(0, userName.indexOf("@"));
-        
+        String realmId = getUserAttribute(MCRRealm.USER_INFORMATION_ATTR);
+
         super.setUserName(userName);
+        super.setRealmID(realmId);
         super.setLastLogin(new Date(MCRSessionMgr.getCurrentSession().getLoginTime()));
-        super.setRealName(getUserAttribute(MCRUserInformation.ATT_REAL_NAME));
-        super.setRealmID(getUserAttribute(MCRRealm.USER_INFORMATION_ATTR));
-        for (MCRRole role : MCRRoleManager.listSystemRoles()) {
-            LOGGER.debug("Test is in role: " + role.getName());
-            if (userInfo.isUserInRole(role.getName())) {
-                assignRole(role.getName());
+
+        if (realmId != null && !MCRRealmFactory.getLocalRealm().equals(MCRRealmFactory.getRealm(realmId))) {
+            MCRUserAttributeMapper attributeMapper = MCRRealmFactory.getAttributeMapper(realmId);
+            if (attributeMapper != null) {
+                Map<String, Object> attributes = new HashMap<String, Object>();
+                for (String key : attributeMapper.getAttributeNames()) {
+                    attributes.put(key, userInfo.getUserAttribute(key));
+                }
+
+                try {
+                    attributeMapper.mapAttributes(this, attributes);
+                } catch (Exception e) {
+                    throw new MCRException(e.getMessage(), e);
+                }
             }
+        } else {
+            super.setRealName(getUserAttribute(MCRUserInformation.ATT_REAL_NAME));
+            for (MCRRole role : MCRRoleManager.listSystemRoles()) {
+                LOGGER.debug("Test is in role: " + role.getName());
+                if (userInfo.isUserInRole(role.getName())) {
+                    assignRole(role.getName());
+                }
+            }
+
         }
     }
 
     @Override
     public String getUserAttribute(String attribute) {
         return this.userInfo.getUserAttribute(attribute);
-    }
-
-    MCRUserInformation getUserInformation() {
-        return userInfo;
     }
 
 }
