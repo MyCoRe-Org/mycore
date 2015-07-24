@@ -129,8 +129,7 @@ public class MCRXMLFunctions {
 
     private static final Logger LOGGER = Logger.getLogger(MCRXMLFunctions.class);
 
-    private static MCRCache<String, Boolean> DISPLAY_DERIVATE_CACHE = new MCRCache<>(10000,
-        "Derivate display value cache");
+    private static MCRCache<String, Boolean> DISPLAY_DERIVATE_CACHE = new MCRCache<>(10000, "Derivate display value cache");
 
     /**
      * returns the given String trimmed
@@ -179,7 +178,7 @@ public class MCRXMLFunctions {
     public static StringBuffer getBaseLink(String hostAlias) {
         StringBuffer returns = new StringBuffer();
         returns.append(CONFIG.getString(HOST_PREFIX + hostAlias + PROTOCOLL_SUFFIX, "http")).append("://")
-            .append(CONFIG.getString(HOST_PREFIX + hostAlias + HOST_SUFFIX));
+                .append(CONFIG.getString(HOST_PREFIX + hostAlias + HOST_SUFFIX));
         String port = CONFIG.getString(HOST_PREFIX + hostAlias + PORT_SUFFIX, DEFAULT_PORT);
         if (!port.equals(DEFAULT_PORT)) {
             returns.append(":").append(port);
@@ -187,22 +186,20 @@ public class MCRXMLFunctions {
         return returns;
     }
 
-    public static String formatISODate(String isoDate, String simpleFormat, String iso639Language)
-        throws ParseException {
+    public static String formatISODate(String isoDate, String simpleFormat, String iso639Language) throws ParseException {
         return formatISODate(isoDate, null, simpleFormat, iso639Language);
     }
 
-    public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language)
-        throws ParseException {
+    public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language) throws ParseException {
         return formatISODate(isoDate, isoFormat, simpleFormat, iso639Language, DateTimeZone.getDefault().getID());
     }
 
-    public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language,
-        String timeZone) throws ParseException {
+    public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language, String timeZone)
+            throws ParseException {
         if (LOGGER.isDebugEnabled()) {
             StringBuilder sb = new StringBuilder("isoDate=");
             sb.append(isoDate).append(", simpleFormat=").append(simpleFormat).append(", isoFormat=").append(isoFormat)
-                .append(", iso649Language=").append(iso639Language).append(", timeZone=").append(timeZone);
+                    .append(", iso649Language=").append(iso639Language).append(", timeZone=").append(timeZone);
             LOGGER.debug(sb.toString());
         }
         Locale locale = new Locale(iso639Language);
@@ -248,23 +245,23 @@ public class MCRXMLFunctions {
      * @return the date in format yyyy-MM-ddThh:mm:ssZ
      */
     public static String getISODateFromMCRHistoryDate(String date_value, String field_name, String calendar_name) throws ParseException {
-    	String formatted_date = "";
-    	if (field_name == null || field_name.trim().length() == 0) {
-    		return "";
-    	}
-    	boolean use_last_value = false;
-    	if (field_name.equals("bis"))
-    		use_last_value = true;
-    	try {
-          Calendar calendar = MCRCalendar.getHistoryDateAsCalendar(date_value,use_last_value,calendar_name);
-          GregorianCalendar g_calendar = MCRCalendar.getGregorianCalendarOfACalendar(calendar);
-          formatted_date = MCRCalendar.getCalendarDateToFormattedString(g_calendar,"yyyy-MM-dd") + "T00:00:00.000Z";
-          if (g_calendar.get(GregorianCalendar.ERA) == GregorianCalendar.BC)
-        	  formatted_date = "-" + formatted_date;
-    	} catch (Exception e) {
-    	  e.printStackTrace();
-    	  return "";
-	    }
+        String formatted_date = "";
+        if (field_name == null || field_name.trim().length() == 0) {
+            return "";
+        }
+        boolean use_last_value = false;
+        if (field_name.equals("bis"))
+            use_last_value = true;
+        try {
+            Calendar calendar = MCRCalendar.getHistoryDateAsCalendar(date_value, use_last_value, calendar_name);
+            GregorianCalendar g_calendar = MCRCalendar.getGregorianCalendarOfACalendar(calendar);
+            formatted_date = MCRCalendar.getCalendarDateToFormattedString(g_calendar, "yyyy-MM-dd") + "T00:00:00.000Z";
+            if (g_calendar.get(GregorianCalendar.ERA) == GregorianCalendar.BC)
+                formatted_date = "-" + formatted_date;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
         return formatted_date;
     }
 
@@ -302,8 +299,15 @@ public class MCRXMLFunctions {
         return s1.compareTo(s2);
     }
 
-    public static String regexp(String orig, String match, String replace) {
-        return orig.replaceAll(match, replace);
+    /**
+     * @param source the source string to operate on
+     * @param regex the regular expression to apply
+     * @param replace 
+     * @return
+     */
+    public static String regexp(String source, String regex, String replace) {
+        String regexApplied = source.replaceAll(regex, replace);
+        return regexApplied;
     }
 
     public static boolean classAvailable(String className) {
@@ -358,8 +362,8 @@ public class MCRXMLFunctions {
             return new URI(url).toASCIIString();
         } catch (Exception e) {
             URL testURL = new URL(url);
-            URI uri = new URI(testURL.getProtocol(), testURL.getUserInfo(), testURL.getHost(), testURL.getPort(),
-                testURL.getPath(), testURL.getQuery(), testURL.getRef());
+            URI uri = new URI(testURL.getProtocol(), testURL.getUserInfo(), testURL.getHost(), testURL.getPort(), testURL.getPath(),
+                    testURL.getQuery(), testURL.getRef());
             return uri.toASCIIString();
         }
     }
@@ -402,8 +406,7 @@ public class MCRXMLFunctions {
 
     public static boolean isDisplayedEnabledDerivate(String derivateId) {
         MCRObjectID derId = MCRObjectID.getInstance(derivateId);
-        ModifiedHandle modifiedHandle = MCRXMLMetaDataManagerHolder.instance.getLastModifiedHandle(derId, 30,
-            TimeUnit.SECONDS);
+        ModifiedHandle modifiedHandle = MCRXMLMetaDataManagerHolder.instance.getLastModifiedHandle(derId, 30, TimeUnit.SECONDS);
         Boolean result;
         try {
             result = DISPLAY_DERIVATE_CACHE.getIfUpToDate(derivateId, modifiedHandle);
@@ -476,8 +479,8 @@ public class MCRXMLFunctions {
                 return true;
             }
         }
-        LOGGER.info("URN assignment disabled as the object type " + givenType
-            + " is not in the list of allowed objects. See property \"" + propertyName + "\"");
+        LOGGER.info("URN assignment disabled as the object type " + givenType + " is not in the list of allowed objects. See property \""
+                + propertyName + "\"");
         return false;
     }
 
@@ -611,13 +614,11 @@ public class MCRXMLFunctions {
     }
 
     public static boolean isCurrentUserSuperUser() {
-        return MCRSessionMgr.getCurrentSession().getUserInformation()
-            .equals(MCRSystemUserInformation.getSuperUserInstance());
+        return MCRSessionMgr.getCurrentSession().getUserInformation().equals(MCRSystemUserInformation.getSuperUserInstance());
     }
 
     public static boolean isCurrentUserGuestUser() {
-        return MCRSessionMgr.getCurrentSession().getUserInformation()
-            .equals(MCRSystemUserInformation.getGuestInstance());
+        return MCRSessionMgr.getCurrentSession().getUserInformation().equals(MCRSystemUserInformation.getGuestInstance());
     }
 
     /**
@@ -651,7 +652,7 @@ public class MCRXMLFunctions {
      * @param UserAgent
      * @return true if the User-Agent is sent from a mobile device
      */
-    public static boolean isMobileDevice(String UserAgent){
+    public static boolean isMobileDevice(String UserAgent) {
         return UserAgent.toLowerCase(Locale.ROOT).contains("mobile");
     }
 
@@ -665,8 +666,7 @@ public class MCRXMLFunctions {
         MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
         //fast way
         if (dao instanceof MCRCategoryDAOImpl) {
-            MCRCategoryImpl categoryImpl = MCRCategoryDAOImpl.getByNaturalID(MCRHIBConnection.instance().getSession(),
-                categID);
+            MCRCategoryImpl categoryImpl = MCRCategoryDAOImpl.getByNaturalID(MCRHIBConnection.instance().getSession(), categID);
             //root category has level 0
             return categoryImpl.getLevel() > 1;
         }
@@ -740,8 +740,7 @@ public class MCRXMLFunctions {
      * Same as {@link MCRMetadataManager#getObjectId(MCRObjectID, long)} with String representation.
      */
     public static String getMCRObjectID(final String derivateID, final long expire) {
-        return MCRMetadataManager.getObjectId(MCRObjectID.getInstance(derivateID), expire, TimeUnit.MILLISECONDS)
-            .toString();
+        return MCRMetadataManager.getObjectId(MCRObjectID.getInstance(derivateID), expire, TimeUnit.MILLISECONDS).toString();
     }
 
     /**
