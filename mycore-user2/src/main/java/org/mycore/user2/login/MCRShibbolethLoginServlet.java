@@ -51,7 +51,7 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
                     }
                 }
 
-                MCRUserInformation userinfo = new MCRShibbolethUserInformation(userId, realmId, attributes);
+                MCRUserInformation userinfo;
 
                 MCRUser user = MCRUserManager.getUser(userId, realmId);
                 if (user != null) {
@@ -62,6 +62,8 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
                     MCRUserManager.updateUser(user);
                     
                     userinfo = user;
+                } else {
+                    userinfo = new MCRShibbolethUserInformation(userId, realmId, attributes);
                 }
 
                 MCRSessionMgr.getCurrentSession().setUserInformation(userinfo);
