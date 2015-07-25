@@ -463,7 +463,7 @@
               </cell>
             </panel>
           </cell>
-          <cell col="2" row="1" anchor="NORTHEAST" ref="mods.name" />
+          <cell col="2" row="1" anchor="NORTHEAST" ref="mods.name.optional" />
         </panel>
       </repeater>
     </cell>
