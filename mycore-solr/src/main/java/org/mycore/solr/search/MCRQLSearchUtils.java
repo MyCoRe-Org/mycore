@@ -56,7 +56,9 @@ public class MCRQLSearchUtils {
 
         }
 
-        SolrQuery mergedSolrQuery = MCRConditionTransformer.buildMergedSolrQuery(query.getSortBy(), false, true, table,
+        boolean booleanAnd = !(condition instanceof MCROrCondition<?>);
+        SolrQuery mergedSolrQuery = MCRConditionTransformer.buildMergedSolrQuery(query.getSortBy(), false, booleanAnd,
+            table,
             rows);
         String mask = input.getRootElement().getAttributeValue("mask");
         if (mask != null) {
@@ -109,8 +111,7 @@ public class MCRQLSearchUtils {
     }
 
     /**
-     * Rename elements conditionN to condition. 
-     * Transform condition with multiple child values to OR-condition.
+     * Rename elements conditionN to condition. Transform condition with multiple child values to OR-condition.
      */
     protected static void renameElements(Element element) {
         if (element.getName().startsWith("condition")) {
