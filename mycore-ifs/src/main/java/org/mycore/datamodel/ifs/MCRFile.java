@@ -179,11 +179,12 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
      */
     private void initContentFields() {
         storageID = "";
-        storeID = "";
-        contentTypeID = MCRFileContentTypeFactory.getDefaultType().getID();
+        contentTypeID = MCRFileContentTypeFactory.detectType(name, null).getID();
         md5 = "d41d8cd98f00b204e9800998ecf8427e"; // md5 of empty file
         size = 0;
         avExtender = null;
+        MCRContentStore store = MCRContentStoreFactory.selectStore(this);
+        storeID = store.getID();
     }
 
     /**
