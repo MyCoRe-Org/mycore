@@ -2,7 +2,8 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:acl="xalan://org.mycore.access.MCRAccessManager" xmlns:mcr="http://www.mycore.org/"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:encoder="xalan://java.net.URLEncoder"
-  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mcrurn="xalan://org.mycore.urn.MCRXMLFunctions" exclude-result-prefixes="xalan xlink mcr i18n acl mods mcrxsl mcrurn encoder" version="1.0">
+  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mcrurn="xalan://org.mycore.urn.MCRXMLFunctions" xmlns:exslt="http://exslt.org/common"
+  exclude-result-prefixes="xalan xlink mcr i18n acl mods mcrxsl mcrurn encoder exslt" version="1.0">
   <xsl:param select="'local'" name="objectHost" />
   <xsl:param name="MCR.Users.Superuser.UserName" />
   <xsl:include href="mods-utils.xsl" />
@@ -286,37 +287,6 @@
           </h4>
           <div id="derivate_content" class="block_content">
             <table class="metaData">
-              <!--*** List children per object type ************************************* -->
-              <!-- 1.) get a list of objectTypes of all child elements 2.) remove duplicates from this list 3.) for-each objectTyp id list child elements -->
-              <xsl:variable name="objectTypes">
-                <xsl:for-each select="./structure/children/child/@xlink:href">
-                  <id>
-                    <xsl:copy-of select="substring-before(substring-after(.,'_'),'_')" />
-                  </id>
-                </xsl:for-each>
-              </xsl:variable>
-              <xsl:variable select="xalan:nodeset($objectTypes)/id[not(.=following::id)]" name="unique-ids" />
-              <!-- the for-each would iterate over <id> with root not beeing /mycoreobject so we save the current node in variable context to access
-                needed nodes -->
-              <xsl:variable select="." name="context" />
-              <xsl:for-each select="$unique-ids">
-                <xsl:variable select="." name="thisObjectType" />
-                <xsl:variable name="label">
-                  <xsl:choose>
-                    <xsl:when test="count($context/structure/children/child[contains(@xlink:href,$thisObjectType)])=1">
-                      <xsl:value-of select="i18n:translate(concat('component.',$thisObjectType,'.metaData.[singular]'))" />
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:value-of select="i18n:translate(concat('component.',$thisObjectType,'.metaData.[plural]'))" />
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </xsl:variable>
-                <xsl:call-template name="printMetaDate">
-                  <xsl:with-param select="$context/structure/children/child[contains(@xlink:href, concat('_',$thisObjectType,'_'))]"
-                    name="nodes" />
-                  <xsl:with-param select="$label" name="label" />
-                </xsl:call-template>
-              </xsl:for-each>
               <xsl:apply-templates mode="printDerivates" select=".">
                 <xsl:with-param select="$staticURL" name="staticURL" />
               </xsl:apply-templates>
@@ -467,7 +437,6 @@
     <xsl:param name="accessdelete" select="acl:checkPermission($id,'deletedb')" />
     <xsl:param name="accesscreate" select="acl:checkPermission('create-mods')" />
     <xsl:param name="hasURN" select="'false'" />
-    <xsl:param name="displayAddDerivate" select="acl:checkPermission($id,'writedb')" />
     <xsl:param name="layout" select="'$'" />
     <xsl:param name="mods-type" select="'report'" />
     <xsl:variable name="layoutparam">
@@ -521,10 +490,10 @@
               alt="" title="{i18n:translate('component.mods.metaData.options')}" />
             <div class="options">
               <ul>
-                <xsl:if test="$accessedit or $accesscreate">
+                <xsl:if test="$accessedit">
                   <li>
                     <xsl:if test="not($CurrentUser=$MCR.Users.Superuser.UserName) and
-                                  $displayAddDerivate!='true' and
+                                  $accessedit!='true' and
                                   $accessdelete and $hasDerivateWithURN and
                                   string-length($child-layout)=0 and not($accesscreate)">
                       <xsl:attribute name="class">last</xsl:attribute>
@@ -540,21 +509,23 @@
                       </xsl:otherwise>
                     </xsl:choose>
                   </li>
+                </xsl:if>
 
+                <xsl:if test="$accessedit or $accesscreate">
                   <xsl:apply-templates select="." mode="externalObjectActions" />
+                </xsl:if>
 
-                  <xsl:if test="$displayAddDerivate='true'">
-                    <li>
-                      <xsl:if test="not($CurrentUser=$MCR.Users.Superuser.UserName) and
-                                    $accessdelete and $hasDerivateWithURN and
-                                    string-length($child-layout)=0 and not(acl:checkPermission(./@ID,'writedb'))">
-                        <xsl:attribute name="class">last</xsl:attribute>
-                      </xsl:if>
-                      <a href="{$ServletsBaseURL}derivate/create{$HttpSession}?id={$id}">
-                        <xsl:value-of select="i18n:translate('derivate.addDerivate')" />
-                      </a>
-                    </li>
-                  </xsl:if>
+                <xsl:if test="$accessedit and string-length($editURL) &gt; 0">
+                  <li>
+                    <xsl:if test="not($CurrentUser=$MCR.Users.Superuser.UserName) and
+                                  $accessdelete and $hasDerivateWithURN and
+                                  string-length($child-layout)=0 and not(acl:checkPermission(./@ID,'writedb'))">
+                      <xsl:attribute name="class">last</xsl:attribute>
+                    </xsl:if>
+                    <a href="{$ServletsBaseURL}derivate/create{$HttpSession}?id={$id}">
+                      <xsl:value-of select="i18n:translate('derivate.addDerivate')" />
+                    </a>
+                  </li>
                 </xsl:if>
                 <xsl:if test="$accessdelete and string-length($hasDerivateWithURN)=0">
                   <li>
@@ -573,34 +544,24 @@
                     </xsl:choose>
                   </li>
                 </xsl:if>
-                <xsl:if test="string-length($child-layout) &gt; 0 and $accesscreate">
-                  <xsl:choose>
-                    <xsl:when test="$mods-type = 'series'">
-                      <li>
-                        <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=book&amp;parentId={./@ID}">
-                          <xsl:value-of select="i18n:translate('component.mods.metaData.types.book')" />
-                        </a>
-                      </li>
-                      <li>
-                        <xsl:if test="not($CurrentUser=$MCR.Users.Superuser.UserName)">
-                          <xsl:attribute name="class">last</xsl:attribute>
-                        </xsl:if>
-                        <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=confpro&amp;parentId={./@ID}">
-                          <xsl:value-of select="i18n:translate('component.mods.metaData.types.confpro')" />
-                        </a>
-                      </li>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <li>
-                        <xsl:if test="not($CurrentUser=$MCR.Users.Superuser.UserName)">
-                          <xsl:attribute name="class">last</xsl:attribute>
-                        </xsl:if>
-                        <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;parentId={./@ID}">
-                          <xsl:value-of select="i18n:translate(concat('component.mods.metaData.types.',$child-layout))" />
-                        </a>
-                      </li>
-                    </xsl:otherwise>
-                  </xsl:choose>
+                <xsl:if test="string-length($child-layout) &gt; 0 and $accesscreate and $accessedit">
+                  <xsl:variable name="parentId" select="./@ID" />
+                  <xsl:variable name="child-layout-splitted">
+                    <xsl:call-template name="Tokenizer"><!-- use split function from mycore-base/coreFunctions.xsl -->
+                      <xsl:with-param name="string" select="$child-layout"/>
+                      <xsl:with-param name="delimiter" select="'|'" />
+                    </xsl:call-template>
+                  </xsl:variable>
+                  <xsl:for-each select="exslt:node-set($child-layout-splitted)/token">
+                    <li>
+                      <xsl:if test="not($CurrentUser=$MCR.Users.Superuser.UserName) and position()=last()">
+                        <xsl:attribute name="class">last</xsl:attribute>
+                      </xsl:if>
+                      <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={.}&amp;parentId={$parentId}">
+                        <xsl:value-of select="i18n:translate(concat('component.mods.metaData.types.',.))" />
+                      </a>
+                    </li>
+                  </xsl:for-each>
                 </xsl:if>
                 <xsl:if test="$CurrentUser=$MCR.Users.Superuser.UserName">
                   <li class="last">
