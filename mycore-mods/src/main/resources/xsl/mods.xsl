@@ -508,10 +508,10 @@
                 <xsl:value-of select="'confpub'" />
               </xsl:when>
               <xsl:when test="$mods-type = 'journal'">
-                <xsl:value-of select="'article'" />
+                <xsl:value-of select="'article|confpro'" />
               </xsl:when>
               <xsl:when test="$mods-type = 'series'">
-                <xsl:value-of select="'book|confpro'" />
+                <xsl:value-of select="'book|confpro|report'" />
               </xsl:when>
             </xsl:choose>
           </xsl:variable>
