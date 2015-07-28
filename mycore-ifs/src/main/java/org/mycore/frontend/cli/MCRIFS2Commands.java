@@ -95,30 +95,36 @@ public class MCRIFS2Commands {
 
     @MCRCommand(syntax = "check mcrfsnodes of content store {0} for project id {1}", help = "check the entries of MCRFNODES with data from content store {0} for project ID {1}")
     public static void checkMCRFSNODESForProject(String content_store, String project_id) {
+        LOGGER.info("Start check of MCRFSNODES for project " + project_id);
         ArrayList<String> derivates = getDetivatesOfProject(content_store, project_id);
         for (String derivate : derivates) {
             checkMCRFSNODESForDreivate(content_store, derivate);
         }
+        LOGGER.info("Stop check of MCRFSNODES for project " + project_id);
     }
 
     @MCRCommand(syntax = "check mcrfsnodes of content store {0} for derivate {1}", help = "check the entries of MCRFSNODES with data from content store {0} for derivate {1}")
     public static void checkMCRFSNODESForDreivate(String content_store, String derivate_id) {
-        LOGGER.info("Start repair of MCRFSNODES for derivate " + derivate_id);
+        LOGGER.info("Start check of MCRFSNODES for derivate " + derivate_id);
         fixMCRFSNODESForDreivate(content_store, derivate_id, true);
+        LOGGER.info("Stop check of MCRFSNODES for derivate " + derivate_id);
     }
 
     @MCRCommand(syntax = "repair mcrfsnodes of content store {0} for project id {1}", help = "repair the entries of MCRFNODES with data from content store {0} for project ID {1}")
     public static void repairMCRFSNODESForProject(String content_store, String project_id) {
+        LOGGER.info("Start repair of MCRFSNODES for project " + project_id);
         ArrayList<String> derivates = getDetivatesOfProject(content_store, project_id);
         for (String derivate : derivates) {
             repairMCRFSNODESForDreivate(content_store, derivate);
         }
+        LOGGER.info("Stop repair of MCRFSNODES for project " + project_id);
     }
 
     @MCRCommand(syntax = "repair mcrfsnodes of content store {0} for derivate {1}", help = "repair the entries of MCRFSNODES with data from content store {0} for derivate {1}")
     public static void repairMCRFSNODESForDreivate(String content_store, String derivate_id) {
         LOGGER.info("Start repair of MCRFSNODES for derivate " + derivate_id);
         fixMCRFSNODESForDreivate(content_store, derivate_id, false);
+        LOGGER.info("Stop repair of MCRFSNODES for derivate " + derivate_id);
     }
 
     private static void fixMCRFSNODESForDreivate(String content_store, String derivate_id, boolean check_only) {
