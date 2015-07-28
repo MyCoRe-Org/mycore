@@ -28,8 +28,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.net.URISyntaxException;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.Vector;
@@ -50,7 +54,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.ext.EntityResolver2;
 
 /**
- * MCREntityResolver uses {@link XMLCatalogResolver} for resolving entities or - for compatibility reasons - looks in classpath to resolve XSD and DTD files.
+ * MCREntityResolver uses {@link XMLCatalogResolver} for resolving entities or - for compatibility reasons - looks in
+ * classpath to resolve XSD and DTD files.
+ * 
  * @author Thomas Scheffler (yagee)
  * @since 2013.10
  */
@@ -103,7 +109,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
         if (entity != null) {
             return resolvedEntity(entity);
         }
-        return resolveEntity(null, publicId, null, getFileName(systemId));
+        return resolveEntity(null, publicId, null, systemId);
     }
 
     /* (non-Javadoc)
@@ -143,11 +149,53 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
             // if you overwrite SYSTEM by empty String in XSL
             return new InputSource(new StringReader(""));
         }
+
+        //resolve against base:
+        URI absoluteSystemId = resolveRelativeURI(baseURI, systemId);
+        if (absoluteSystemId.isAbsolute() && uriExists(absoluteSystemId)) {
+            InputSource inputSource = new InputSource(absoluteSystemId.toString());
+            inputSource.setPublicId(publicId);
+            return resolvedEntity(inputSource);
+        }
+        //required for XSD files that are usually classpath resources
         InputStream is = getCachedResource("/" + systemId);
         if (is == null) {
             return null;
         }
-        return new InputSource(is);
+        InputSource inputSource = new InputSource(is);
+        inputSource.setPublicId(publicId);
+        inputSource.setSystemId(systemId);
+        return resolvedEntity(inputSource);
+    }
+
+    private boolean uriExists(URI absoluteSystemId) {
+        if (absoluteSystemId.getScheme().equals("jar")) {
+            //multithread issues, when using ZIP filesystem with second check
+            try {
+                URL jarURL = absoluteSystemId.toURL();
+                try (InputStream is = jarURL.openStream()) {
+                    return is != null;
+                }
+            } catch (IOException e) {
+                LOGGER.error("Error while checking (URL) URI: " + absoluteSystemId, e);
+            }
+        }
+        try {
+            Path pathTest = Paths.get(absoluteSystemId);
+            LOGGER.debug("Checking: " + pathTest);
+            return Files.exists(pathTest);
+        } catch (Exception e) {
+            LOGGER.error("Error while checking (Path) URI: " + absoluteSystemId, e);
+        }
+        return false;
+    }
+
+    private URI resolveRelativeURI(String baseURI, String systemId) {
+        if (baseURI == null || isAbsoluteURL(systemId)) {
+            return URI.create(systemId);
+        }
+        URI resolved = URI.create(baseURI).resolve(systemId);
+        return resolved;
     }
 
     @Override
@@ -186,32 +234,28 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
         return new ByteArrayInputStream(bytes);
     }
 
-    /**
-     * Returns the filename part of a path if path is absolute URI
-     * 
-     * @param path
-     *            the path of a file
-     * @return the part after the last / or \\
-     * @throws URISyntaxException 
-     */
-    private String getFileName(String path) {
-        int posA = path.lastIndexOf("/");
-        int posB = path.lastIndexOf("\\");
-        int pos = posA == -1 ? posB : posA;
-
-        return pos == -1 ? path : path.substring(pos + 1);
-    }
-
     @Override
     public XMLInputSource resolveEntity(XMLResourceIdentifier resourceIdentifier) throws XNIException, IOException {
         XMLInputSource entity = catalogResolver.resolveEntity(resourceIdentifier);
-        if (entity == null){
-            LOGGER.info("Could not resolve entity: "+resourceIdentifier.getBaseSystemId());
-            LOGGER.info("Identifer: "+catalogResolver.resolveIdentifier(resourceIdentifier));
+        if (entity == null) {
+            LOGGER.info("Could not resolve entity: " + resourceIdentifier.getBaseSystemId());
+            LOGGER.info("Identifer: " + catalogResolver.resolveIdentifier(resourceIdentifier));
             return null;
         }
-        LOGGER.info("Resolve entity: "+resourceIdentifier.getBaseSystemId()+" --> "+entity.getBaseSystemId());
+        LOGGER.info("Resolve entity: " + resourceIdentifier.getBaseSystemId() + " --> " + entity.getBaseSystemId());
         return entity;
+    }
+
+    private static boolean isAbsoluteURL(String url) {
+        try {
+            URL baseHttp = new URL("http://www.mycore.org");
+            URL baseFile = new URL("file:///");
+            URL relativeHttp = new URL(baseHttp, url);
+            URL relativeFile = new URL(baseFile, url);
+            return relativeFile.equals(relativeHttp);
+        } catch (MalformedURLException e) {
+            return false;
+        }
     }
 
 }
