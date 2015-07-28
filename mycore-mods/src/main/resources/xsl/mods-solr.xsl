@@ -80,6 +80,13 @@
           <xsl:value-of select="concat(' ',mcrxsl:normalizeUnicode(.))" />
         </xsl:for-each>
       </field>
+      <xsl:if test="position()=1">
+        <field name="mods.mainAuthor">
+          <xsl:for-each select="mods:displayForm | mods:namePart | text()">
+            <xsl:value-of select="concat(' ',mcrxsl:normalizeUnicode(.))" />
+          </xsl:for-each>
+        </field>
+      </xsl:if>
     </xsl:for-each>
     <xsl:for-each select=".//mods:originInfo/mods:place/mods:placeTerm[not(@type='code')]">
       <field name="mods.place">
