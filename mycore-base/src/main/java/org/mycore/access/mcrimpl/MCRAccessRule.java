@@ -60,9 +60,7 @@ public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
         setRule(rule);
         setDescription(description);
 
-        if (this.rule != null) {
-            parsedRule = parser.parse(this.rule);
-        }
+
     }
 
     public boolean checkAccess(String userID, Date date, MCRIPAddress ip) {
@@ -94,6 +92,7 @@ public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
      */
     public void setRule(String rule) {
         this.rule = rule;
+        parsedRule = rule == null ? null : parser.parse(rule);
     }
 
     public String getRuleString() {
