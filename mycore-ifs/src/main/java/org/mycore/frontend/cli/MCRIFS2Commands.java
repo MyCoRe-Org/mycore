@@ -56,7 +56,7 @@ public class MCRIFS2Commands {
 
     private static Logger LOGGER = Logger.getLogger(MCRIFSCommands.class);
 
-    @MCRCommand(syntax = "repair mcrdata.xml in content store {0} for project ID {1}", help = "repair the entries in mcrdata.xml with data from content store {0} for project ID {1}")
+    @MCRCommand(syntax = "repair mcrdata.xml in content store {0} for project id {1}", help = "repair the entries in mcrdata.xml with data from content store {0} for project ID {1}")
     public static void repairMcrdataXmlForProject(String content_store, String project_id) {
         ArrayList<String> derivates = getDetivatesOfProject(content_store, project_id);
         for (String derivate : derivates) {
@@ -93,7 +93,7 @@ public class MCRIFS2Commands {
         }
     }
 
-    @MCRCommand(syntax = "check mcrfsnodes of content store {0} for project ID {1}", help = "check the entries of MCRFNODES with data from content store {0} for project ID {1}")
+    @MCRCommand(syntax = "check mcrfsnodes of content store {0} for project id {1}", help = "check the entries of MCRFNODES with data from content store {0} for project ID {1}")
     public static void checkMCRFSNODESForProject(String content_store, String project_id) {
         ArrayList<String> derivates = getDetivatesOfProject(content_store, project_id);
         for (String derivate : derivates) {
@@ -107,7 +107,7 @@ public class MCRIFS2Commands {
         fixMCRFSNODESForDreivate(content_store, derivate_id, true);
     }
 
-    @MCRCommand(syntax = "repair mcrfsnodes of content store {0} for project ID {1}", help = "repair the entries of MCRFNODES with data from content store {0} for project ID {1}")
+    @MCRCommand(syntax = "repair mcrfsnodes of content store {0} for project id {1}", help = "repair the entries of MCRFNODES with data from content store {0} for project ID {1}")
     public static void repairMCRFSNODESForProject(String content_store, String project_id) {
         ArrayList<String> derivates = getDetivatesOfProject(content_store, project_id);
         for (String derivate : derivates) {
@@ -147,7 +147,7 @@ public class MCRIFS2Commands {
             storage_base = storage_base.substring(0, storage_base.length() - derivate_id.length());
             fixMCRFSNODESForNode(root_node, content_store, derivate_id, storage_base, check_only);
         } catch (IOException e) {
-            LOGGER.error("Erroe while list all files of derivate with ID " + mcr_derivate_id.toString());
+            LOGGER.error("Error while list all files of derivate with ID " + mcr_derivate_id.toString());
             e.printStackTrace();
         }
         Session session = MCRHIBConnection.instance().getSession();
