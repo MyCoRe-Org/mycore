@@ -87,6 +87,10 @@ public class MCRPathXML {
             addString(root, "parentPath", toStringValue(relativePath.getParent()), true);
         }
         addBasicAttributes(root, attr, path);
+        Element numChildren = new Element("numChildren");
+        Element here = new Element("here");
+        root.addContent(numChildren);
+        numChildren.addContent(here);
 
         Element nodes = new Element("children");
         root.addContent(nodes);
@@ -102,6 +106,9 @@ public class MCRPathXML {
                 }
             }
         }
+        //store current directory statistics
+        addString(here, "directories", Integer.toString(directories.size()), false);
+        addString(here, "files", Integer.toString(files.size()), false);
         for (Map.Entry<MCRPath, MCRFileAttributes<?>> dirEntry : directories.entrySet()) {
             Element child = new Element("child");
             child.setAttribute("type", "directory");
