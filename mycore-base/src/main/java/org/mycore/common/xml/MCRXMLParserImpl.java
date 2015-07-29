@@ -24,6 +24,8 @@
 package org.mycore.common.xml;
 
 import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 
 import org.apache.log4j.Logger;
@@ -38,8 +40,8 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.ext.EntityResolver2;
 
 /**
- * Parses XML content using specified {@link XMLReaderJDOMFactory}. 
- *  
+ * Parses XML content using specified {@link XMLReaderJDOMFactory}.
+ * 
  * @author Frank L\u00FCtzenkirchen
  * @author Thomas Scheffler (yagee)
  */
@@ -88,15 +90,18 @@ public class MCRXMLParserImpl implements MCRXMLParser {
     }
 
     /**
-     * Xerces 2.11.0 does not provide a relative systemId if baseURI is a XML file to be validated by a schema specified in systemId.
-     * This EntityResolver makes a relative systemId so that the fallback could conform to the defined interface.
+     * Xerces 2.11.0 does not provide a relative systemId if baseURI is a XML file to be validated by a schema specified
+     * in systemId. This EntityResolver makes a relative systemId so that the fallback could conform to the defined
+     * interface.
+     * 
      * @author Thomas Scheffler (yagee)
-     *
      */
     private static class XercesBugFixResolver implements EntityResolver2 {
         private EntityResolver2 fallback;
 
         private static Logger LOGGER = Logger.getLogger(MCRXMLParserImpl.class);
+
+        private static URI baseDirURI = Paths.get("").toAbsolutePath().toUri();
 
         public XercesBugFixResolver(EntityResolver2 fallback) {
             this.fallback = fallback;
@@ -113,7 +118,19 @@ public class MCRXMLParserImpl implements MCRXMLParser {
         }
 
         @Override
-        public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId) throws SAXException, IOException {
+        public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId)
+            throws SAXException, IOException {
+            if (baseURI == null) {
+                //check if baseDirURI is part of systemID and seperate
+                try {
+                    String relativeURI = baseDirURI.relativize(URI.create(systemId)).toString();
+                    if (!systemId.equals(relativeURI)) {
+                        return resolveEntity(name, publicId, baseDirURI.toString(), relativeURI);
+                    }
+                } catch (RuntimeException e) {
+                    LOGGER.debug("Could not separate baseURI from " + systemId, e);
+                }
+            }
             String prefix = getPrefix(baseURI);
             LOGGER.debug(MessageFormat.format("systemId: {0} prefixed? {1}", systemId, systemId.startsWith(prefix)));
             if (prefix.length() > 0 && systemId.startsWith(prefix)) {

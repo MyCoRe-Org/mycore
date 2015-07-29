@@ -66,7 +66,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
 
     private static final String CONFIG_PREFIX = "MCR.URIResolver.";
 
-    private MCRCache<String, byte[]> bytesCache;
+    private MCRCache<String, InputSourceProvider> bytesCache;
 
     XMLCatalogResolver catalogResolver;
 
@@ -94,7 +94,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
         String[] catalogs = catalogURIs.toArray(new String[catalogURIs.size()]);
         catalogResolver = new XMLCatalogResolver(catalogs);
         int cacheSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "StaticFiles.CacheSize", 100);
-        bytesCache = new MCRCache<String, byte[]>(cacheSize, "URIResolver Resources");
+        bytesCache = new MCRCache<String, InputSourceProvider>(cacheSize, "EntityResolver Resources");
     }
 
     /* (non-Javadoc)
@@ -158,18 +158,16 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
             return resolvedEntity(inputSource);
         }
         //required for XSD files that are usually classpath resources
-        InputStream is = getCachedResource("/" + systemId);
+        InputSource is = getCachedResource("/" + systemId);
         if (is == null) {
             return null;
         }
-        InputSource inputSource = new InputSource(is);
-        inputSource.setPublicId(publicId);
-        inputSource.setSystemId(systemId);
-        return resolvedEntity(inputSource);
+        is.setPublicId(publicId);
+        return resolvedEntity(is);
     }
 
     private boolean uriExists(URI absoluteSystemId) {
-        if (absoluteSystemId.getScheme().startsWith("http")){
+        if (absoluteSystemId.getScheme().startsWith("http")) {
             return false; //default resolver handles http anyway
         }
         if (absoluteSystemId.getScheme().equals("jar")) {
@@ -217,24 +215,25 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
         return entity;
     }
 
-    private InputStream getCachedResource(String classResource) throws IOException {
-        byte[] bytes = bytesCache.get(classResource);
-
-        if (bytes == null) {
+    private InputSource getCachedResource(String classResource) throws IOException {
+        URL resourceURL = this.getClass().getResource(classResource);
+        if (resourceURL == null) {
+            LOGGER.debug(classResource + " not found");
+            return null;
+        }
+        InputSourceProvider is = bytesCache.get(classResource);
+        if (is == null) {
             LOGGER.debug("Resolving resource " + classResource);
+            final byte[] bytes;
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                InputStream in = this.getClass().getResourceAsStream(classResource)) {
-                if (in == null) {
-                    LOGGER.debug(classResource + " not found");
-                    return null;
-                }
+                InputStream in = resourceURL.openStream()) {
                 IOUtils.copy(in, baos);
                 bytes = baos.toByteArray();
             }
-            bytesCache.put(classResource, bytes);
+            is = new InputSourceProvider(bytes, resourceURL);
+            bytesCache.put(classResource, is);
         }
-
-        return new ByteArrayInputStream(bytes);
+        return is.newInputSource();
     }
 
     @Override
@@ -261,4 +260,20 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
         }
     }
 
+    private static class InputSourceProvider {
+        byte[] bytes;
+
+        URL url;
+
+        public InputSourceProvider(byte[] bytes, URL url) {
+            this.bytes = bytes;
+            this.url = url;
+        }
+
+        public InputSource newInputSource() {
+            InputSource is = new InputSource(url.toString());
+            is.setByteStream(new ByteArrayInputStream(bytes));
+            return is;
+        }
+    }
 }
