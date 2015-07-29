@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xalan="http://xml.apache.org/xalan" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" exclude-result-prefixes="xalan">
-	<!-- standard copy template -->
+  <!-- standard copy template -->
   <xsl:template match="@*|node()">
     <xsl:copy>
       <xsl:apply-templates select="@*" />
@@ -19,20 +19,38 @@
       </xsl:if>
     </xsl:copy>
   </xsl:template>
-  
+
   <xsl:template match="mods:detail/mods:caption">
   </xsl:template>
 
-  <xsl:template match="mods:genre[@authority='marcgt']">
-    <xsl:copy>
-      <xsl:apply-templates select="@*" />
-      <xsl:apply-templates />
-    </xsl:copy>
+  <xsl:template match="mods:relatedItem/mods:genre[@authority='marcgt']">
     <xsl:choose>
+      <!-- bibutils does not detect article on RIS or Endnote export -->
       <xsl:when test="text()='journal'">
-        <!-- bibutils does not detect article on RIS or Endnote export -->
+        <mods:genre authority="marcgt">periodical</mods:genre>
         <mods:genre>academic journal</mods:genre>
       </xsl:when>
+      <xsl:otherwise>
+        <xsl:copy>
+          <xsl:apply-templates select="@*" />
+          <xsl:apply-templates />
+        </xsl:copy>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="mods:mods/mods:genre">
+    <xsl:choose>
+      <!-- bibutils does not like genre in article, this is implicit via relatedItem -->
+      <xsl:when test="text()='article' or contains(@authorityURI, 'genres')">
+        <!-- do nothing -->
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:copy>
+          <xsl:apply-templates select="@*" />
+          <xsl:apply-templates />
+        </xsl:copy>
+      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
