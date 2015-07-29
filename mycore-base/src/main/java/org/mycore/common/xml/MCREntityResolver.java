@@ -169,6 +169,9 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
     }
 
     private boolean uriExists(URI absoluteSystemId) {
+        if (absoluteSystemId.getScheme().startsWith("http")){
+            return false; //default resolver handles http anyway
+        }
         if (absoluteSystemId.getScheme().equals("jar")) {
             //multithread issues, when using ZIP filesystem with second check
             try {
