@@ -142,6 +142,9 @@ public class MCRFileNodeServlet extends MCRContentServlet {
         String pI = request.getPathInfo();
         String ownerID = getOwnerID(request);
         int pos = pI.indexOf(ownerID) + ownerID.length() + 1;
+        if (pos -1 >= pI.length()) {
+        	return "/";
+        }
         String path = pI.substring(pos);
         if (path.endsWith("/")) {
             path = path.substring(0, path.length() - 1);
