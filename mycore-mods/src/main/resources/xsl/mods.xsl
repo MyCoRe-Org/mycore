@@ -544,7 +544,7 @@
                     </xsl:choose>
                   </li>
                 </xsl:if>
-                <xsl:if test="string-length($child-layout) &gt; 0 and $accesscreate and $accessedit">
+                <xsl:if test="string-length($child-layout) &gt; 0 and $accesscreate">
                   <xsl:variable name="parentId" select="./@ID" />
                   <xsl:variable name="child-layout-splitted">
                     <xsl:call-template name="Tokenizer"><!-- use split function from mycore-base/coreFunctions.xsl -->
