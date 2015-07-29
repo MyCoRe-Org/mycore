@@ -1,8 +1,6 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tei="http://www.tei-c.org/ns/1.0">
 
-  <xsl:output method="html" indent="yes"/>
-
-  <xsl:strip-space elements="*" />
+  <xsl:output method="html" indent="no" />
 
   <xsl:template match="tei:TEI">
     <div>
@@ -26,6 +24,9 @@
     </div>
   </xsl:template>
 
+  <xsl:template match="text()">
+    <xsl:value-of select="translate(., '&#10;&#13;', '')" />
+  </xsl:template>
 
   <xsl:template match="tei:div">
     <xsl:apply-templates select="*"/>
