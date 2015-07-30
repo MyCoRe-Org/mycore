@@ -124,7 +124,8 @@ public class MCRConditionTransformer {
             return null;
         }
         StringBuilder sb = new StringBuilder();
-        if (subCondition) {
+        boolean groupRequired = subCondition || setCond instanceof MCROrCondition;
+        if (groupRequired) {
             sb.append("+(");
         }
         Iterator<MCRCondition<MCRCondition>> iterator = children.iterator();
@@ -135,7 +136,7 @@ public class MCRConditionTransformer {
             subSb = toSolrQueryString(iterator.next(), usedFields, true);
             sb.append(stripPlus ? stripPlus(subSb) : subSb);
         }
-        if (subCondition) {
+        if (groupRequired) {
             sb.append(")");
         }
         return sb;
@@ -253,11 +254,11 @@ public class MCRConditionTransformer {
 
     /**
      * Builds SOLR query.
-     * 
+     *
      * Automatically builds JOIN-Query if content search fields are used in query.
      * @param sortBy sort criteria
      * @param not true, if all conditions should be negated
-     * @param and AND or OR connective between conditions  
+     * @param and AND or OR connective between conditions
      * @param table conditions per "content" or "metadata"
      * @param maxHits maximum hits
      * @return

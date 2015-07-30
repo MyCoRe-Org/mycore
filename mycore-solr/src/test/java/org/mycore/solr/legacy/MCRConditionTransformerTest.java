@@ -23,7 +23,8 @@ public class MCRConditionTransformerTest extends MCRTestCase {
         MCRQueryCondition inner2 = new MCRQueryCondition("objectType", "=", "cbu");
         MCROrCondition<Object> orCond = new MCROrCondition<>(inner1, inner2);
         usedFields.clear();
-        assertEquals("objectType:\"mods\" objectType:\"cbu\"",
+        //MCR-973 check for surrounding brackets on single OR query
+        assertEquals("+(objectType:\"mods\" objectType:\"cbu\")",
             MCRConditionTransformer.toSolrQueryString(orCond, usedFields));
         assertTrue("usedFields did not contain 'objectType'", usedFields.contains("objectType"));
         MCRQueryCondition inner3 = new MCRQueryCondition("derCount", ">", "0");
