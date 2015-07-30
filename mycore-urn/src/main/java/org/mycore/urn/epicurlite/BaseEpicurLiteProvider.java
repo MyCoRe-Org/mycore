@@ -6,6 +6,7 @@ package org.mycore.urn.epicurlite;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.concurrent.TimeUnit;
 
@@ -18,10 +19,10 @@ import org.mycore.datamodel.ifs.MCRFileNodeServlet;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
-import org.mycore.iview2.services.MCRIView2Tools;
 import org.mycore.urn.hibernate.MCRURN;
 
 /**
@@ -29,6 +30,8 @@ import org.mycore.urn.hibernate.MCRURN;
  *
  */
 public class BaseEpicurLiteProvider implements IEpicurLiteProvider {
+    
+    private static String SUPPORTED_CONTENT_TYPE = MCRConfiguration.instance().getString("MCR.URN.URNGranular.SupportedContentTypes", "");
 
     static final Logger LOGGER = Logger.getLogger(BaseEpicurLiteProvider.class);
 
@@ -91,7 +94,7 @@ public class BaseEpicurLiteProvider implements IEpicurLiteProvider {
      * @throws IOException
      */
     private static String getViewerURL(MCRPath file) throws URISyntaxException, IOException {
-        if (!MCRIView2Tools.isFileSupported(file)) {
+        if (!isFileSupported(file)) {
             return null;
         }
 
@@ -108,5 +111,18 @@ public class BaseEpicurLiteProvider implements IEpicurLiteProvider {
         }
 
         return url;
+    }
+    
+
+    /**
+     * @param file
+     *            image file
+     * @return if content type is in property <code>MCR.URN.URNGranular.SupportedContentTypes</code>
+     * @throws IOException
+     * @see {@link MCRContentTypes#probeContentType(Path)}
+     * @see {@link MCRIview2Tools#isFileSupported(Path)}
+     */
+    public static boolean isFileSupported(Path file) throws IOException {
+        return file == null ? false : SUPPORTED_CONTENT_TYPE.contains(MCRContentTypes.probeContentType(file));
     }
 }
