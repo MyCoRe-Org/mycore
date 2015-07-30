@@ -437,6 +437,13 @@ public class MCRObjectStructure {
         }
 
         Element elm = new Element("structure");
+        
+        if (parent != null) {
+            Element elmm = new Element("parents");
+            elmm.setAttribute("class", "MCRMetaLinkID");
+            elmm.addContent(parent.createXML());
+            elm.addContent(elmm);
+        }
 
         if (children.size() > 0) {
             Element elmm = new Element("children");
@@ -444,13 +451,6 @@ public class MCRObjectStructure {
             for (MCRMetaLinkID child : getChildren()) {
                 elmm.addContent(child.createXML());
             }
-            elm.addContent(elmm);
-        }
-
-        if (parent != null) {
-            Element elmm = new Element("parents");
-            elmm.setAttribute("class", "MCRMetaLinkID");
-            elmm.addContent(parent.createXML());
             elm.addContent(elmm);
         }
 
