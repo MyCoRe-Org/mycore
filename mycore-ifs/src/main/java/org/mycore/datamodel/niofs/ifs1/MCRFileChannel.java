@@ -59,8 +59,8 @@ public class MCRFileChannel extends FileChannel {
     }
 
     public void implCloseChannel() throws IOException {
+        baseChannel.close(); //MCR-1003 close before updating metadata, as we read attributes from this file later
         updateMetadata();
-        baseChannel.close();
     }
 
     private void updateMetadata() throws IOException {
