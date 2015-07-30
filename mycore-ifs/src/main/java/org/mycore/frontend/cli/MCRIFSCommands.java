@@ -8,11 +8,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileTime;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -49,12 +52,14 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRContentStore;
 import org.mycore.datamodel.ifs.MCRContentStoreFactory;
+import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileMetadataManager;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
@@ -73,6 +78,8 @@ public class MCRIFSCommands {
     private static final String ATT_FILE_NAME = "name";
 
     private static final String NS_URI = "";
+    public static final String MCRFILESYSTEMNODE_SIZE_FIELD_NAME = "size";
+    public static final String MCRFILESYSTEMNODE_TOUCH_METHOD_NAME = "touch";
 
     private static Logger LOGGER = Logger.getLogger(MCRIFSCommands.class);
 
@@ -555,6 +562,63 @@ public class MCRIFSCommands {
         } else {
             LOGGER.info("File is not affected: " + file.getName());
         }
+    }
+
+    @MCRCommand(syntax = "repair directory sizes of derivate {0}", help = "Fixes the directory sizes of a derivate.")
+    public static void fixDirectorysOfDerivate(String id) {
+        MCRDirectory mcrDirectory = (MCRDirectory) MCRFilesystemNode.getRootNode(id);
+
+        if (mcrDirectory == null) {
+            throw new IllegalArgumentException(MessageFormat.format("Could not get root node for {0}", id));
+        }
+
+        fixDirectorySize(mcrDirectory);
+    }
+
+    private static long fixDirectorySize(MCRDirectory directory) {
+        long directorySize = 0;
+
+        for (MCRFilesystemNode child : directory.getChildren()) {
+            if (child instanceof MCRDirectory) {
+                directorySize += fixDirectorySize((MCRDirectory) child);
+            } else if (child instanceof MCRFile) {
+                MCRFile file = (MCRFile) child;
+                directorySize += file.getSize();
+            }
+        }
+        /*
+            There is no setSize method on MCRFileSystemNode and there should not be one.
+            But in this repair command we need to set the size, so we use reflection.
+         */
+        try {
+            Field privateLongField = MCRFilesystemNode.class.getDeclaredField(MCRFILESYSTEMNODE_SIZE_FIELD_NAME);
+            privateLongField.setAccessible(true);
+            privateLongField.set(directory, directorySize);
+
+        } catch (NoSuchFieldException e) {
+            String message = MessageFormat.format("There is no field named {0} in MCRFileSystemNode!", MCRFILESYSTEMNODE_SIZE_FIELD_NAME);
+            throw new MCRException(message, e);
+        } catch (IllegalAccessException e) {
+            String message = MessageFormat.format("Could not acces filed {0} in {1}!", MCRFILESYSTEMNODE_SIZE_FIELD_NAME, directory.toString());
+            throw new MCRException(message, e);
+        }
+
+        // now call touch with the old date of MCRFSN to apply the changes to the DB
+        GregorianCalendar lastModified = directory.getLastModified();
+        FileTime LastModifiedFileTime = FileTime.fromMillis(lastModified.getTimeInMillis());
+
+        try {
+            Method touchMethod = MCRFilesystemNode.class.getDeclaredMethod(MCRFILESYSTEMNODE_TOUCH_METHOD_NAME, FileTime.class, boolean.class);
+            touchMethod.setAccessible(true);
+            touchMethod.invoke(directory, LastModifiedFileTime, false);
+        } catch (NoSuchMethodException e) {
+            throw new MCRException(MessageFormat.format("There is no {0}-method..", MCRFILESYSTEMNODE_TOUCH_METHOD_NAME));
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new MCRException(MessageFormat.format("Error while calling {0}-method..", MCRFILESYSTEMNODE_TOUCH_METHOD_NAME));
+        }
+
+        LOGGER.info(MessageFormat.format("Changed size of directory {0} to {1} Bytes", directory.getName(), directorySize));
+        return directorySize;
     }
 
     /**
