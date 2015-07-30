@@ -551,7 +551,14 @@ public class MCRPersistentServlet extends MCRServlet {
             params.put("sourceUri", sb.toString());
             params.put("cancelUrl", getCancelUrl(job));
             sb = new StringBuilder();
-            sb.append(MCRFrontendUtil.getBaseURL()).append(pagedir).append("editor_form_derivate.xml");
+            sb.append(MCRFrontendUtil.getBaseURL()).append(pagedir);
+            try {
+                MCRURIResolver.instance().resolve("webapp:/editor_form_derivate.xed");
+                sb.append("editor_form_derivate.xed");
+            } catch (MCRException e) {
+                LOGGER.warn("Can't find editor_form_derivate.xed, now we try it with editor_form_derivate.xml");
+                sb.append("editor_form_derivate.xml");
+            }
             job.getResponse()
                 .sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));
         }
