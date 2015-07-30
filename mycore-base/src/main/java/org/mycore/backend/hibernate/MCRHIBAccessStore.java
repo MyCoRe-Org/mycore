@@ -32,6 +32,7 @@ import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -237,6 +238,19 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         @SuppressWarnings("unchecked")
         List<String> ret = criteria.list();
         return ret;
+    }
+
+    /**
+     * Checks if a rule mappings uses the rule.
+     * 
+     * @param ruleid the rule id to check
+     * @return true if the rule exists and is used, otherwise false
+     */
+    @Override
+    public boolean isRuleInUse(String ruleid) {
+        Session session = MCRHIBConnection.instance().getSession();
+        Query query = session.createQuery("from MCRACCESS as accdef where accdef.rule.rid = '" + ruleid + "'");
+        return !query.list().isEmpty();
     }
 
     private static MCRACCESSRULE getAccessRule(String rid) {

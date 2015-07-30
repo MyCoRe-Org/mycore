@@ -36,7 +36,6 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
-import org.mycore.frontend.servlets.MCRServlet;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -245,7 +244,7 @@ public class MCRAclEditorResource {
         JsonObject jsonObject = jsonParser.parse(data).getAsJsonObject();
         String ruleID = jsonObject.get("ruleID").getAsString();
 
-        if (!RULE_STORE.isRuleInUse(ruleID)) {
+        if (!ACCESS_STORE.isRuleInUse(ruleID)) {
             RULE_STORE.deleteRule(ruleID);
             return Response.ok().build();
         } else {

@@ -48,15 +48,11 @@ public abstract class MCRRuleStore {
 
     public abstract boolean existsRule(String ruleid);
     
-    public abstract boolean isRuleInUse(String ruleid);
-
     public abstract Collection<String> retrieveAllIDs();
 
     public abstract Collection<String> retrieveRuleIDs(String ruleExpression, String description);
 
     public abstract int getNextFreeRuleID(String prefix);
-
-    public abstract MCRAccessRule retrieveRule(String ruleid);
 
     private static final Logger LOGGER = Logger.getLogger(MCRRuleStore.class);
 
@@ -66,7 +62,7 @@ public abstract class MCRRuleStore {
             "MCRACCESSRULE");
 
     static private MCRRuleStore implementation;
-
+    
     public static MCRRuleStore getInstance() {
         try {
             if (implementation == null) {

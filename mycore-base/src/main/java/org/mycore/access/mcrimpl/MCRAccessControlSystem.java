@@ -38,7 +38,6 @@ import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.MCRAccessInterface;
-import org.mycore.common.MCRCache;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -46,9 +45,7 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration;
 
 /**
- * MyCoRe-Standard Implementation of the MCRAccessInterface
- * 
- * Maps object ids to rules
+ * MyCoRe-Standard Implementation of the MCRAccessInterface Maps object ids to rules
  * 
  * @author Matthias Kramm
  * @author Heiko Helmbrecht
@@ -60,8 +57,6 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     public static final String poolPrivilegeID = "POOLPRIVILEGE";
 
     public static final String lexicographicalPattern = "0000000000";
-
-    static MCRCache<String, MCRAccessRule> cache;
 
     MCRAccessStore accessStore;
 
@@ -77,14 +72,12 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     private MCRAccessControlSystem() {
         MCRConfiguration config = MCRConfiguration.instance();
-        int size = config.getInt("MCR.AccessPool.CacheSize", 2048);
         String pools = config.getString("MCR.Access.AccessPermissions", "read,write,delete");
 
         if (pools.trim().length() == 0) {
             disabled = true;
         }
 
-        cache = new MCRCache<String, MCRAccessRule>(size, "Access Rules");
         accessStore = MCRAccessStore.getInstance();
         ruleStore = MCRRuleStore.getInstance();
         accessComp = new MCRAccessConditionsComparator();
@@ -288,16 +281,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         } else {
             LOGGER.debug("accessStore.getRuleID() done with " + ruleID);
         }
-        MCRAccessRule a = cache.get(ruleID);
-        if (a == null) {
-            LOGGER.debug("ruleStore.getRule()");
-            a = ruleStore.getRule(ruleID);
-            LOGGER.debug("ruleStore.getRule() done");
-            if (a != null) {
-                cache.put(ruleID, a);
-            }
-        }
-        return a;
+        return ruleStore.getRule(ruleID);
     }
 
     /**
@@ -325,8 +309,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     }
 
     /**
-     * method that delivers the next free ruleID for a given Prefix and sets the
-     * counter to counter + 1
+     * method that delivers the next free ruleID for a given Prefix and sets the counter to counter + 1
      * 
      * @param prefix
      *            String
@@ -347,8 +330,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     }
 
     /**
-     * delivers the rule as string, after normalizing it via sorting with
-     * MCRAccessConditionsComparator
+     * delivers the rule as string, after normalizing it via sorting with MCRAccessConditionsComparator
      * 
      * @param rule
      *            Jdom-Element
@@ -365,8 +347,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     }
 
     /**
-     * returns a auto-generated MCRRuleMapping, needed to create Access
-     * Definitions
+     * returns a auto-generated MCRRuleMapping, needed to create Access Definitions
      * 
      * @param rule
      *            JDOM-Representation of a MCRAccess Rule
@@ -404,8 +385,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     }
 
     /**
-     * method, that normalizes the jdom-representation of a mycore access
-     * condition
+     * method, that normalizes the jdom-representation of a mycore access condition
      * 
      * @param rule
      *            condition-JDOM of an access-rule
@@ -432,9 +412,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     }
 
     /**
-     * A Comparator for the Condition Elements for normalizing the access
-     * conditions
-     * 
+     * A Comparator for the Condition Elements for normalizing the access conditions
      */
     private static class MCRAccessConditionsComparator implements Comparator<Element> {
 
@@ -463,10 +441,6 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
             }
             return 0;
         }
-    }
-
-    public static MCRCache<String, MCRAccessRule> getCache() {
-        return cache;
     }
 
 }
