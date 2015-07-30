@@ -28,8 +28,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.net.URISyntaxException;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.Vector;
@@ -46,7 +50,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.ext.EntityResolver2;
 
 /**
- * MCREntityResolver uses {@link XMLCatalogResolver} for resolving entities or - for compatibility reasons - looks in classpath to resolve XSD and DTD files.
+ * MCREntityResolver uses {@link XMLCatalogResolver} for resolving entities or - for compatibility reasons - looks in
+ * classpath to resolve XSD and DTD files.
+ *
  * @author Thomas Scheffler (yagee)
  * @since 2013.10
  */
@@ -56,7 +62,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver {
 
     private static final String CONFIG_PREFIX = "MCR.URIResolver.";
 
-    private MCRCache<String, byte[]> bytesCache;
+    private MCRCache<String, InputSourceProvider> bytesCache;
 
     XMLCatalogResolver catalogResolver;
 
@@ -84,7 +90,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver {
         String[] catalogs = catalogURIs.toArray(new String[catalogURIs.size()]);
         catalogResolver = new XMLCatalogResolver(catalogs);
         int cacheSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "StaticFiles.CacheSize", 100);
-        bytesCache = new MCRCache<String, byte[]>(cacheSize, "URIResolver Resources");
+        bytesCache = new MCRCache<String, InputSourceProvider>(cacheSize, "EntityResolver Resources");
     }
 
     /* (non-Javadoc)
@@ -99,7 +105,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver {
         if (entity != null) {
             return resolvedEntity(entity);
         }
-        return resolveEntity(null, publicId, null, getFileName(systemId));
+        return resolveEntity(null, publicId, null, systemId);
     }
 
     /* (non-Javadoc)
@@ -139,11 +145,54 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver {
             // if you overwrite SYSTEM by empty String in XSL
             return new InputSource(new StringReader(""));
         }
-        InputStream is = getCachedResource("/" + systemId);
+
+        //resolve against base:
+        URI absoluteSystemId = resolveRelativeURI(baseURI, systemId);
+        if (absoluteSystemId.isAbsolute() && uriExists(absoluteSystemId)) {
+            InputSource inputSource = new InputSource(absoluteSystemId.toString());
+            inputSource.setPublicId(publicId);
+            return resolvedEntity(inputSource);
+        }
+        //required for XSD files that are usually classpath resources
+        InputSource is = getCachedResource("/" + systemId);
         if (is == null) {
             return null;
         }
-        return new InputSource(is);
+        is.setPublicId(publicId);
+        return resolvedEntity(is);
+    }
+
+    private boolean uriExists(URI absoluteSystemId) {
+        if (absoluteSystemId.getScheme().startsWith("http")) {
+            return false; //default resolver handles http anyway
+        }
+        if (absoluteSystemId.getScheme().equals("jar")) {
+            //multithread issues, when using ZIP filesystem with second check
+            try {
+                URL jarURL = absoluteSystemId.toURL();
+                try (InputStream is = jarURL.openStream()) {
+                    return is != null;
+                }
+            } catch (IOException e) {
+                LOGGER.error("Error while checking (URL) URI: " + absoluteSystemId, e);
+            }
+        }
+        try {
+            Path pathTest = Paths.get(absoluteSystemId);
+            LOGGER.debug("Checking: " + pathTest);
+            return Files.exists(pathTest);
+        } catch (Exception e) {
+            LOGGER.error("Error while checking (Path) URI: " + absoluteSystemId, e);
+        }
+        return false;
+    }
+
+    private URI resolveRelativeURI(String baseURI, String systemId) {
+        if (baseURI == null || isAbsoluteURL(systemId)) {
+            return URI.create(systemId);
+        }
+        URI resolved = URI.create(baseURI).resolve(systemId);
+        return resolved;
     }
 
     @Override
@@ -162,40 +211,53 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver {
         return entity;
     }
 
-    private InputStream getCachedResource(String classResource) throws IOException {
-        byte[] bytes = bytesCache.get(classResource);
-
-        if (bytes == null) {
-            LOGGER.debug("Resolving resource " + classResource);
-            try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                InputStream in = this.getClass().getResourceAsStream(classResource)) {
-                if (in == null) {
+    private InputSource getCachedResource(String classResource) throws IOException {
+        URL resourceURL = this.getClass().getResource(classResource);
+        if (resourceURL == null) {
                     LOGGER.debug(classResource + " not found");
                     return null;
                 }
+        InputSourceProvider is = bytesCache.get(classResource);
+        if (is == null) {
+            LOGGER.debug("Resolving resource " + classResource);
+            final byte[] bytes;
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                InputStream in = resourceURL.openStream()) {
                 IOUtils.copy(in, baos);
                 bytes = baos.toByteArray();
             }
-            bytesCache.put(classResource, bytes);
+            is = new InputSourceProvider(bytes, resourceURL);
+            bytesCache.put(classResource, is);
+        }
+        return is.newInputSource();
+    }
+
+    private static boolean isAbsoluteURL(String url) {
+        try {
+            URL baseHttp = new URL("http://www.mycore.org");
+            URL baseFile = new URL("file:///");
+            URL relativeHttp = new URL(baseHttp, url);
+            URL relativeFile = new URL(baseFile, url);
+            return relativeFile.equals(relativeHttp);
+        } catch (MalformedURLException e) {
+            return false;
+        }
+    }
+
+    private static class InputSourceProvider {
+        byte[] bytes;
+
+        URL url;
+
+        public InputSourceProvider(byte[] bytes, URL url) {
+            this.bytes = bytes;
+            this.url = url;
         }
 
-        return new ByteArrayInputStream(bytes);
+        public InputSource newInputSource() {
+            InputSource is = new InputSource(url.toString());
+            is.setByteStream(new ByteArrayInputStream(bytes));
+            return is;
+        }
     }
-
-    /**
-     * Returns the filename part of a path if path is absolute URI
-     * 
-     * @param path
-     *            the path of a file
-     * @return the part after the last / or \\
-     * @throws URISyntaxException 
-     */
-    private String getFileName(String path) {
-        int posA = path.lastIndexOf("/");
-        int posB = path.lastIndexOf("\\");
-        int pos = posA == -1 ? posB : posA;
-
-        return pos == -1 ? path : path.substring(pos + 1);
-    }
-
 }
