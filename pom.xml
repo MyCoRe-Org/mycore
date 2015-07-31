@@ -17,7 +17,7 @@
     applications, for example metadata management, querying, OAI harvesting interface, or an image viewer module.
   </description>
   <properties>
-    <java.target.version>1.7</java.target.version>
+    <java.target.version>1.8</java.target.version>
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
     <uniqueVersion>false</uniqueVersion>
     <hibernate.version>4.3.8.Final</hibernate.version>
@@ -282,7 +282,7 @@
                 </tag>
               </tags>
               <links>
-                <link>http://docs.oracle.com/javase/7/docs/api/</link>
+                <link>http://docs.oracle.com/javase/8/docs/api/</link>
                 <link>http://tomcat.apache.org/tomcat-8.0-doc/servletapi/</link>
                 <link>http://www.jdom.org/docs/apidocs/</link>
                 <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
@@ -512,7 +512,7 @@
               </tag>
             </tags>
             <links>
-              <link>http://docs.oracle.com/javase/7/docs/api/</link>
+              <link>http://docs.oracle.com/javase/8/docs/api/</link>
               <link>http://tomcat.apache.org/tomcat-8.0-doc/servletapi/</link>
               <link>http://www.jdom.org/docs/apidocs/</link>
               <link>http://logging.apache.org/log4j/1.2/apidocs/</link>

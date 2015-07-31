@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
+import java.util.Spliterator;
 
 import org.jdom2.Element;
 
@@ -276,5 +277,11 @@ public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
             if (content == null)
                 entry.resolveContent();
         }
+    }
+
+    @Override
+    public Spliterator<MCRBasketEntry> spliterator() {
+        // TODO: check if we should go like this..
+        return List.super.spliterator();
     }
 }
