@@ -23,30 +23,31 @@
 
 package org.mycore.user2.utils;
 
+import java.time.Instant;
+import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.joda.time.DateTime;
 import org.mycore.datamodel.common.MCRISO8601Format;
 import org.mycore.datamodel.common.MCRISO8601FormatChooser;
 
 /**
  * @author Thomas Scheffler (yagee)
- *
  */
 public class MCRDateXMLAdapter extends XmlAdapter<String, Date> {
 
     @Override
     public Date unmarshal(String v) throws Exception {
-        DateTime dateTime = new DateTime(v);
-        return dateTime.toDate();
+        TemporalAccessor dateTime = MCRISO8601FormatChooser.getFormatter(v, null).parse(v);
+        Instant instant = Instant.from(dateTime);
+        return Date.from(instant);
     }
 
     @Override
     public String marshal(Date v) throws Exception {
-        DateTime dt = new DateTime(v.getTime());
-        return dt.toString(MCRISO8601FormatChooser.getFormatter(null, MCRISO8601Format.COMPLETE_HH_MM_SS));
+        TemporalAccessor dt = v.toInstant();
+        return MCRISO8601FormatChooser.getFormatter(null, MCRISO8601Format.COMPLETE_HH_MM_SS).format(dt);
     }
 
 }

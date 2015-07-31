@@ -55,17 +55,13 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
-import com.ibm.icu.util.Calendar;
-import com.ibm.icu.util.GregorianCalendar;
-
 import org.apache.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.jdom2.output.DOMOutputter;
-import org.joda.time.DateTimeZone;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.common.MCRCalendar;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
+import org.mycore.common.MCRCalendar;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUtils;
@@ -94,6 +90,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.ibm.icu.util.Calendar;
+import com.ibm.icu.util.GregorianCalendar;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -191,7 +190,7 @@ public class MCRXMLFunctions {
     }
 
     public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language) throws ParseException {
-        return formatISODate(isoDate, isoFormat, simpleFormat, iso639Language, DateTimeZone.getDefault().getID());
+        return formatISODate(isoDate, isoFormat, simpleFormat, iso639Language, TimeZone.getDefault().getID());
     }
 
     public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language, String timeZone)

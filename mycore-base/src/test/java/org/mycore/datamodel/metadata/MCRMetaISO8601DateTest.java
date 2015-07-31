@@ -30,6 +30,7 @@ import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Map;
 
@@ -37,7 +38,6 @@ import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.joda.time.format.DateTimeFormatter;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
