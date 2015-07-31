@@ -4,7 +4,7 @@
   <parent>
     <artifactId>mycore</artifactId>
     <groupId>org.mycore</groupId>
-    <version>2015.06-SNAPSHOT</version>
+    <version>2015.07</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>mycore-mets</artifactId>
