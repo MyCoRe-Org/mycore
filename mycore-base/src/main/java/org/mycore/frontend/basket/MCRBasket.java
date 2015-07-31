@@ -281,7 +281,6 @@ public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
 
     @Override
     public Spliterator<MCRBasketEntry> spliterator() {
-        // TODO: check if we should go like this..
-        return List.super.spliterator();
+        return list.spliterator();
     }
 }
