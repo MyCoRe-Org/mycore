@@ -283,7 +283,7 @@
               </tags>
               <links>
                 <link>http://docs.oracle.com/javase/7/docs/api/</link>
-                <link>http://tomcat.apache.org/tomcat-7.0-doc/servletapi/</link>
+                <link>http://tomcat.apache.org/tomcat-8.0-doc/servletapi/</link>
                 <link>http://www.jdom.org/docs/apidocs/</link>
                 <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
                 <link>http://docs.jboss.org/hibernate/core/4.3/javadocs/</link>
@@ -513,7 +513,7 @@
             </tags>
             <links>
               <link>http://docs.oracle.com/javase/7/docs/api/</link>
-              <link>http://tomcat.apache.org/tomcat-7.0-doc/servletapi/</link>
+              <link>http://tomcat.apache.org/tomcat-8.0-doc/servletapi/</link>
               <link>http://www.jdom.org/docs/apidocs/</link>
               <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
               <link>http://docs.jboss.org/hibernate/core/4.3/javadocs/</link>
@@ -882,7 +882,7 @@
       <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
-        <version>3.0.1</version>
+        <version>3.1.0</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
