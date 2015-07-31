@@ -120,7 +120,7 @@
                   <goal>checkstyle</goal>
                 </goals>
                 <configuration>
-                  <configLocation>org/mycore/checkstyle.xml</configLocation>
+<!--                   <configLocation>org/mycore/checkstyle.xml</configLocation> -->
                 </configuration>
               </execution>
             </executions>
@@ -850,11 +850,6 @@
         <version>4.1.0</version>
         <optional>true</optional>
         <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>joda-time</groupId>
-        <artifactId>joda-time</artifactId>
-        <version>2.8.1</version>
       </dependency>
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
