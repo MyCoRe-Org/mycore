@@ -54,9 +54,7 @@ import org.mycore.datamodel.niofs.MCRPath;
  * 
  * @author Thomas Scheffler (yagee)
  * @author Frank L\u00FCtzenkirchen
- * 
  * @version $Revision$ $Date$
- * 
  * @see MCRUploadHandler
  */
 public class MCRUploadHandlerIFS extends MCRUploadHandler {
@@ -184,6 +182,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             }
             startTransaction();
             MCRPath file = getFile(path);
+            LOGGER.info("Moving " + tempFile + " to " + file + ".");
             Files.copy(tempFile, file, StandardCopyOption.REPLACE_EXISTING);
             commitTransaction();
             return myLength;
