@@ -2,10 +2,12 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:mcrmods="xalan://org.mycore.mods.MCRMODSClassificationSupport"
   xmlns:acl="xalan://org.mycore.access.MCRAccessManager" xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mcr="http://www.mycore.org/"
-  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" exclude-result-prefixes="xalan xlink mcr mcrxsl i18n acl mods mcrmods"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:mcrurn="xalan://org.mycore.urn.MCRXMLFunctions"
+  exclude-result-prefixes="xalan xlink mcr mcrxsl i18n acl mods mcrmods mcrurn"
   version="1.0">
   <xsl:param name="MCR.Handle.Resolver.MasterURL" />
   <xsl:param name="MCR.Users.Guestuser.UserName" />
+  <xsl:param name="MCR.URN.Resolver.MasterURL" select="'https://nbn-resolving.org/'" />
   <xsl:param name="MCR.Mods.SherpaRomeo.ApiKey" select="''" />
   <xsl:param name="ServletsBaseURL" />
 
@@ -607,7 +609,7 @@
             </a>
           </xsl:when>
           <xsl:when test="@type='urn' and not(contains($link,'http'))">
-            <a href="http://nbn-resolving.de/{$link}">
+            <a href="{$MCR.URN.Resolver.MasterURL}{$link}">
               <xsl:value-of select="$link" />
             </a>
           </xsl:when>
@@ -854,9 +856,42 @@
         <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.permalink'),':')" />
       </td>
       <td class="metavalue">
-        <a href="{$WebApplicationBaseURL}receive/{@ID}">
-          <xsl:value-of select="concat($WebApplicationBaseURL,'receive/',@ID)" />
-        </a>
+
+        <xsl:variable name="hasURN">
+          <xsl:for-each select="./structure/derobjects/derobject">
+            <xsl:value-of select="mcrurn:hasURNDefined(@xlink:href)" />
+            <xsl:if test="position()!=last()">
+              <xsl:text>|</xsl:text>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:variable>
+
+        <xsl:choose>
+          <xsl:when test="contains($hasURN, 'true')">
+
+            <xsl:variable name="derivateURN">
+              <xsl:for-each select="./structure/derobjects/derobject">
+                <xsl:variable select="@xlink:href" name="deriv" />
+                <xsl:if test="mcrurn:hasURNDefined($deriv)">
+                  <xsl:variable select="concat('mcrobject:',$deriv)" name="derivlink" />
+                  <xsl:variable select="document($derivlink)" name="derivate" />
+                  <xsl:value-of select="$derivate/mycorederivate/derivate/fileset/@urn" />
+                </xsl:if>
+              </xsl:for-each>
+            </xsl:variable>
+
+            <a href="{$MCR.URN.Resolver.MasterURL}{$derivateURN}">
+              <xsl:value-of select="$derivateURN" />
+            </a>
+          </xsl:when>
+          <xsl:otherwise>
+            <a href="{$WebApplicationBaseURL}receive/{@ID}">
+              <xsl:value-of select="concat($WebApplicationBaseURL,'receive/',@ID)" />
+            </a>
+          </xsl:otherwise>
+        </xsl:choose>
+
+
 <!--         <xsl:text> | </xsl:text>
         <xsl:call-template name="shareButton">
           <xsl:with-param name="linkURL" select="concat($ServletsBaseURL,'receive/',@ID)" />

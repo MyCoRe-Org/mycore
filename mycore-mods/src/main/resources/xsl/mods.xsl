@@ -6,6 +6,8 @@
   exclude-result-prefixes="xalan xlink mcr i18n acl mods mcrxsl mcrurn encoder exslt" version="1.0">
   <xsl:param select="'local'" name="objectHost" />
   <xsl:param name="MCR.Users.Superuser.UserName" />
+  <xsl:param name="MCR.URN.Resolver.MasterURL" select="'https://nbn-resolving.org/'" />
+
   <xsl:include href="mods-utils.xsl" />
   <xsl:include href="mods2html.xsl" />
   <xsl:include href="modsmetadata.xsl" />
@@ -367,7 +369,7 @@
                 <xsl:apply-templates select="$derivate/mycorederivate/derivate/internals" />
                 <xsl:if test="$derivateWithURN">
                   <xsl:variable name="derivateURN" select="$derivate/mycorederivate/derivate/fileset/@urn" />
-                  <a href="{concat('http://nbn-resolving.de/urn/resolver.pl?urn=',$derivateURN)}">
+                  <a href="{$MCR.URN.Resolver.MasterURL}{$derivateURN}">
                     <xsl:value-of select="$derivateURN" />
                   </a>
                 </xsl:if>
