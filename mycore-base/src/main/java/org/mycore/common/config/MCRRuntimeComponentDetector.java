@@ -30,13 +30,14 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.jar.Attributes;
 import java.util.jar.Attributes.Name;
 import java.util.jar.Manifest;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
 
 /**
@@ -60,21 +61,15 @@ public class MCRRuntimeComponentDetector {
     private static SortedSet<MCRComponent> ALL_COMPONENTS = Collections
         .unmodifiableSortedSet(getConfiguredComponents());
 
-    private static SortedSet<MCRComponent> MYCORE_COMPONENTS = Collections.unmodifiableSortedSet(Sets.filter(
-        ALL_COMPONENTS, new Predicate<MCRComponent>() {
-            @Override
-            public boolean apply(MCRComponent input) {
-                return input.isMyCoReComponent();
-            }
-        }));
+    private static SortedSet<MCRComponent> MYCORE_COMPONENTS = Collections.unmodifiableSortedSet(
+        ALL_COMPONENTS.stream()
+            .filter(MCRComponent::isMyCoReComponent)
+            .collect(Collectors.toCollection(TreeSet::new)));
 
-    private static SortedSet<MCRComponent> APP_MODULES = Collections.unmodifiableSortedSet(Sets.filter(ALL_COMPONENTS,
-        new Predicate<MCRComponent>() {
-            @Override
-            public boolean apply(MCRComponent input) {
-                return input.isAppModule();
-            }
-        }));
+    private static SortedSet<MCRComponent> APP_MODULES = Collections.unmodifiableSortedSet(
+        ALL_COMPONENTS.stream()
+            .filter(MCRComponent::isAppModule)
+            .collect(Collectors.toCollection(TreeSet::new)));
 
     private static SortedSet<MCRComponent> getConfiguredComponents() {
         try {

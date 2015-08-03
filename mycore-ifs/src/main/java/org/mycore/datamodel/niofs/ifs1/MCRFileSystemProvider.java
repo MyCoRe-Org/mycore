@@ -39,7 +39,6 @@ import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.FileSystemNotFoundException;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.LinkOption;
@@ -47,7 +46,6 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributeView;
@@ -63,6 +61,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.mycore.datamodel.ifs.MCRContentStoreFactory;
@@ -74,12 +73,10 @@ import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRMD5AttributeView;
 import org.mycore.datamodel.niofs.MCRPath;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
 
 /**
  * @author Thomas Scheffler (yagee)
- *
  */
 public class MCRFileSystemProvider extends FileSystemProvider {
 
@@ -170,12 +167,9 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             throw new UnsupportedOperationException("Atomically setting of file attributes is not supported.");
         }
         MCRPath ifsPath = MCRFileSystemUtils.checkPathAbsolute(path);
-        Set<? extends OpenOption> fileOpenOptions = Sets.filter(options, new Predicate<OpenOption>() {
-            @Override
-            public boolean apply(OpenOption option) {
-                return !(option == StandardOpenOption.CREATE || option == StandardOpenOption.CREATE_NEW);
-            }
-        });
+        Set<? extends OpenOption> fileOpenOptions = options.stream()
+            .filter(option -> !(option == StandardOpenOption.CREATE || option == StandardOpenOption.CREATE_NEW))
+            .collect(Collectors.toSet());
         boolean create = options.contains(StandardOpenOption.CREATE);
         boolean createNew = options.contains(StandardOpenOption.CREATE_NEW);
         if (create || createNew) {
@@ -385,13 +379,14 @@ public class MCRFileSystemProvider extends FileSystemProvider {
     @Override
     public void move(Path source, Path target, CopyOption... options) throws IOException {
         HashSet<CopyOption> copyOptions = Sets.newHashSet(options);
-        if (copyOptions.contains(StandardCopyOption.ATOMIC_MOVE)){
-            throw new AtomicMoveNotSupportedException(source.toString(), target.toString(), "ATOMIC_MOVE not supported yet");
+        if (copyOptions.contains(StandardCopyOption.ATOMIC_MOVE)) {
+            throw new AtomicMoveNotSupportedException(source.toString(), target.toString(),
+                "ATOMIC_MOVE not supported yet");
         }
-        if (Files.isDirectory(source)){
+        if (Files.isDirectory(source)) {
             MCRPath src = MCRFileSystemUtils.checkPathAbsolute(source);
             MCRDirectory srcRootDirectory = getRootDirectory(src);
-            if (srcRootDirectory.hasChildren()){
+            if (srcRootDirectory.hasChildren()) {
                 throw new IOException("Directory is not empty");
             }
         }

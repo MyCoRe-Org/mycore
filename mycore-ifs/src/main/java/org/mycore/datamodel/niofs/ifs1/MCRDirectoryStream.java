@@ -43,6 +43,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
@@ -53,14 +54,11 @@ import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRMD5AttributeView;
 import org.mycore.datamodel.niofs.MCRPath;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Sets;
-
 /**
- * A {@link SecureDirectoryStream} on internal file system.
- * This implementation uses IFS directly. Do use this class but stick to the interface.
+ * A {@link SecureDirectoryStream} on internal file system. This implementation uses IFS directly. Do use this class but
+ * stick to the interface.
+ * 
  * @author Thomas Scheffler (yagee)
- *
  */
 public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
     static Logger LOGGER = Logger.getLogger(MCRDirectoryStream.class);
@@ -70,9 +68,8 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
     private Iterator<Path> iterator;
 
     /**
-     * @throws IOException 
-     *         if 'path' is not from {@link MCRIFSFileSystem}
-     * 
+     * @throws IOException
+     *             if 'path' is not from {@link MCRIFSFileSystem}
      */
     public MCRDirectoryStream(MCRDirectory dir) throws IOException {
         this.dir = Objects.requireNonNull(dir, "'dir' may not be null");
@@ -137,12 +134,9 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
         if (mcrPath.isAbsolute()) {
             return mcrPath.getFileSystem().provider().newByteChannel(mcrPath, options, attrs);
         }
-        Set<? extends OpenOption> fileOpenOptions = Sets.filter(options, new Predicate<OpenOption>() {
-            @Override
-            public boolean apply(OpenOption option) {
-                return !(option == StandardOpenOption.CREATE || option == StandardOpenOption.CREATE_NEW);
-            }
-        });
+        Set<? extends OpenOption> fileOpenOptions = options.stream()
+            .filter(option -> !(option == StandardOpenOption.CREATE || option == StandardOpenOption.CREATE_NEW))
+            .collect(Collectors.toSet());
         boolean create = options.contains(StandardOpenOption.CREATE);
         boolean createNew = options.contains(StandardOpenOption.CREATE_NEW);
         if (create || createNew) {
@@ -168,8 +162,10 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
 
     /**
      * Deletes {@link MCRFilesystemNode} if it exists.
-     * @param path relative or absolute
-     * @throws IOException 
+     * 
+     * @param path
+     *            relative or absolute
+     * @throws IOException
      */
     private void deleteFileSystemNode(MCRPath path) throws IOException {
         checkClosed();
@@ -232,6 +228,7 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
         boolean hasNextCalled;
 
         private MCRDirectoryStream mcrDirectoryStream;
+
         MCRFilesystemNode[] children;
 
         private int pos;
