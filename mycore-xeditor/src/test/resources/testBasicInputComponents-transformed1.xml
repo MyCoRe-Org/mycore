@@ -4,7 +4,7 @@
   <body>
     <form action="http://localhost:8291/servlets/XEditor" method="post">
       <input name="/document/title" value="" type="text" />
-      <input name="/document/author/firstName" value="" type="text" id="firstName" />
+      <input name="/document/author/firstName" value="" id="firstName" />
       <input name="/document/author/lastName" value="" type="text" id="lastName" />
       <textarea name="/document/abstract" />
       <select name="/document/type" id="type">
