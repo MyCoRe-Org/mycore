@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.ConsoleAppender;
@@ -54,7 +55,6 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPropertiesResolver;
 
 import com.google.common.base.Predicates;
-import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 
 /**
@@ -112,6 +112,7 @@ import com.google.common.collect.Maps;
  * @version $Revision$ $Date$
  */
 public class MCRConfiguration {
+
     /**
      * The single instance of this class that will be used at runtime
      */
@@ -121,7 +122,7 @@ public class MCRConfiguration {
 
     private File lastModifiedFile;
 
-    private static Splitter PROPERTY_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
+    private static final Pattern PROPERTY_SPLITTER = Pattern.compile(",");
 
     /**
      * The properties instance that stores the values that have been read from every configuration file. These
@@ -597,7 +598,10 @@ public class MCRConfiguration {
     }
 
     private List<String> splitString(String value) {
-        return PROPERTY_SPLITTER.splitToList(value);
+        return PROPERTY_SPLITTER.splitAsStream(value)
+            .map(String::trim)
+            .filter(s -> !s.isEmpty())
+            .collect(Collectors.toList());
     }
 
     /**
