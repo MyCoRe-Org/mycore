@@ -49,15 +49,16 @@ import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Properties;
 
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.IOUtils;
@@ -805,15 +806,15 @@ public class MCRUtils {
     }
 
     public static String toHexString(byte[] data) {
-        return Hex.encodeHexString(data);
+        return DatatypeConverter.printHexBinary(data).toLowerCase(Locale.ROOT);
     }
 
     public static String toBase64String(byte[] data) {
-        return Base64.encodeBase64String(data);
+        return Base64.getEncoder().encodeToString(data);
     }
 
     public static byte[] fromBase64String(String base64) {
-        return Base64.decodeBase64(base64);
+        return Base64.getDecoder().decode(base64);
     }
 
     /**

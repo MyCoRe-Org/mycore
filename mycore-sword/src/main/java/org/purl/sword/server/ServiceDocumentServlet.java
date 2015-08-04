@@ -39,6 +39,7 @@ package org.purl.sword.server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Base64;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
@@ -46,7 +47,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.purl.sword.base.HttpHeaders;
@@ -212,8 +212,7 @@ public class ServiceDocumentServlet extends HttpServlet {
 					String basic = st.nextToken();
 					if (basic.equalsIgnoreCase("Basic")) {
 						String credentials = st.nextToken();
-						String userPass = new String(Base64
-								.decodeBase64(credentials.getBytes()));
+                        String userPass = new String(Base64.getDecoder().decode(credentials.getBytes()));
 						return userPass;
 					}
 				}

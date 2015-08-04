@@ -46,6 +46,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.StringTokenizer;
@@ -55,7 +56,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -453,8 +453,7 @@ public class DepositServlet extends MCRServlet {
 					String basic = st.nextToken();
 					if (basic.equalsIgnoreCase("Basic")) {
 						String credentials = st.nextToken();
-						String userPass = new String(Base64
-								.decodeBase64(credentials.getBytes()));
+						String userPass = new String(Base64.getDecoder().decode(credentials.getBytes()));
 						return userPass;
 					}
 				}

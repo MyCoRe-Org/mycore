@@ -35,7 +35,7 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 
-import org.apache.commons.codec.digest.DigestUtils;
+import org.mycore.common.content.streams.MCRMD5InputStream;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRFile;
 
@@ -65,7 +65,7 @@ public class MCRFileChannel extends FileChannel {
         if (!write) {
             return;
         }
-        MessageDigest md5Digest = DigestUtils.getMd5Digest();
+        MessageDigest md5Digest = MCRMD5InputStream.buildMD5Digest();
         FileChannel md5Channel = (FileChannel) Files.newByteChannel(file.getLocalFile().toPath(),
             StandardOpenOption.READ);
         try {

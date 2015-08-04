@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.LinkedList;
 import java.util.Properties;
 import java.util.TooManyListenersException;
@@ -43,7 +44,6 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.apache.xalan.trace.TraceManager;
@@ -388,7 +388,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             StringBuilder b = new StringBuilder('"');
             byte[] unencodedETag = ByteBuffer.allocate(Long.SIZE / 4).putLong(lastModified ^ parameterHashCode)
                 .putLong(systemLastModified ^ parameterHashCode).array();
-            b.append(Base64.encodeBase64String(unencodedETag));
+            b.append(Base64.getEncoder().encodeToString(unencodedETag));
             b.append('"');
             return b.toString();
         }

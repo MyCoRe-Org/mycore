@@ -41,11 +41,11 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Base64;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.FileObject;
@@ -392,7 +392,7 @@ public abstract class MCRContent {
         long lhash = systemId.hashCode();
         byte[] unencodedETag = ByteBuffer.allocate(Long.SIZE / 4).putLong(lastModified ^ lhash).putLong(length ^ lhash)
             .array();
-        b.append(Base64.encodeBase64String(unencodedETag));
+        b.append(Base64.getEncoder().encodeToString(unencodedETag));
         b.append('"');
         return b.toString();
     }

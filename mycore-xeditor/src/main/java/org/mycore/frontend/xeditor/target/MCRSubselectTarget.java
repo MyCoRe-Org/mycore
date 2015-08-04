@@ -26,11 +26,10 @@ package org.mycore.frontend.xeditor.target;
 import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletContext;
+import javax.xml.bind.DatatypeConverter;
 
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
@@ -68,14 +67,10 @@ public class MCRSubselectTarget implements MCREditorTarget {
     }
 
     public static String encode(String href) {
-        return Hex.encodeHexString(href.getBytes(StandardCharsets.UTF_8));
+        return MCRUtils.toHexString(href.getBytes(StandardCharsets.UTF_8));
     }
 
     public static String decode(String href) {
-        try {
-            return new String(Hex.decodeHex(href.toCharArray()), StandardCharsets.UTF_8);
-        } catch (DecoderException ex) {
-            throw new MCRException(ex);
-        }
+        return new String(DatatypeConverter.parseHexBinary(href), StandardCharsets.UTF_8);
     }
 }
