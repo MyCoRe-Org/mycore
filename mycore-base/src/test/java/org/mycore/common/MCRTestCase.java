@@ -10,15 +10,18 @@ import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
+import org.mycore.common.config.MCRComponent;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationLoader;
 import org.mycore.common.config.MCRConfigurationLoaderFactory;
+import org.mycore.common.config.MCRRuntimeComponentDetector;
 
 public class MCRTestCase {
     protected static final String MCR_CONFIGURATION_FILE = "MCR.Configuration.File";
@@ -47,6 +50,17 @@ public class MCRTestCase {
         File configDir=new File(System.getProperties().getProperty("MCR.Home"), System.getProperties().getProperty("MCR.AppName"));
         System.out.println("Creating config directory: "+ configDir);
         configDir.mkdirs();
+        String mcrComp = MCRRuntimeComponentDetector.getMyCoReComponents()
+            .stream()
+            .map(MCRComponent::toString)
+            .collect(Collectors.joining(", "));
+        String appMod = MCRRuntimeComponentDetector.getApplicationModules()
+            .stream()
+            .map(MCRComponent::toString)
+            .collect(Collectors.joining(", "));
+        System.out.printf("MyCoRe components detected: %s\nApplications modules detected: %s\n",
+            mcrComp.isEmpty() ? "'none'" : mcrComp,
+            appMod.isEmpty() ? "'none'" : appMod);
     }
 
     /**
