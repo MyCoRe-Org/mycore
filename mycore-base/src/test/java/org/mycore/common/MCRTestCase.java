@@ -50,17 +50,6 @@ public class MCRTestCase {
         File configDir=new File(System.getProperties().getProperty("MCR.Home"), System.getProperties().getProperty("MCR.AppName"));
         System.out.println("Creating config directory: "+ configDir);
         configDir.mkdirs();
-        String mcrComp = MCRRuntimeComponentDetector.getMyCoReComponents()
-            .stream()
-            .map(MCRComponent::toString)
-            .collect(Collectors.joining(", "));
-        String appMod = MCRRuntimeComponentDetector.getApplicationModules()
-            .stream()
-            .map(MCRComponent::toString)
-            .collect(Collectors.joining(", "));
-        System.out.printf("MyCoRe components detected: %s\nApplications modules detected: %s\n",
-            mcrComp.isEmpty() ? "'none'" : mcrComp,
-            appMod.isEmpty() ? "'none'" : appMod);
     }
 
     /**
@@ -73,6 +62,17 @@ public class MCRTestCase {
     @Before
     public void setUp() throws Exception {
         initProperties();
+        String mcrComp = MCRRuntimeComponentDetector.getMyCoReComponents()
+            .stream()
+            .map(MCRComponent::toString)
+            .collect(Collectors.joining(", "));
+        String appMod = MCRRuntimeComponentDetector.getApplicationModules()
+            .stream()
+            .map(MCRComponent::toString)
+            .collect(Collectors.joining(", "));
+        System.out.printf("MyCoRe components detected: %s\nApplications modules detected: %s\n",
+            mcrComp.isEmpty() ? "'none'" : mcrComp,
+            appMod.isEmpty() ? "'none'" : appMod);
         config = MCRConfiguration.instance();
         MCRConfigurationLoader configurationLoader = MCRConfigurationLoaderFactory.getConfigurationLoader();
         HashMap<String, String> testProperties = new HashMap<>(configurationLoader.load());
