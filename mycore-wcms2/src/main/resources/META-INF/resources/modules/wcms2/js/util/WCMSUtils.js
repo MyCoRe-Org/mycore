@@ -133,6 +133,19 @@ function arrayRemoveById(/* Array */array, /*int*/ id) {
 	return tempArr;
 }
 
+/**
+ * Deletes all properties of an object which are undefined or null.
+ * 
+ * @param o
+ */
+function deleteUndefinedProperties(/*Object*/ o) {
+	for (var i in o) {
+		if (o[i] === null || o[i] === undefined) {
+			delete o[i];
+		}
+	}
+}
+
 /*-------------------------------------------------------------------------
  * MyCoRe utils
  *------------------------------------------------------------------------*/

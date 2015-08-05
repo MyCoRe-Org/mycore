@@ -1,5 +1,7 @@
 package org.mycore.wcms2.resources;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -15,6 +17,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 import org.mycore.wcms2.access.MCRWCMSPermission;
@@ -31,6 +38,12 @@ import com.google.gson.JsonStreamParser;
 @Path("wcms/navigation")
 @MCRRestrictedAccess(MCRWCMSPermission.class)
 public class MCRWCMSNavigationResource {
+
+    private final static XPathExpression<Element> TEMPLATE_PATH;
+
+    static {
+        TEMPLATE_PATH = XPathFactory.instance().compile("*[@template]", Filters.element());
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -71,18 +84,40 @@ public class MCRWCMSNavigationResource {
         return Response.ok().build();
     }
 
+    /**
+     * Returns a json object containing all available templates. 
+     * 
+     * @param servletContext
+     * @return
+     * @throws Exception
+     */
     @GET
     @Path("templates")
     @Produces(MediaType.APPLICATION_JSON)
     public String getTemplates(@Context ServletContext servletContext) throws Exception {
+        HashSet<String> entries = new HashSet<String>();
+
+        // templates of navigation.xml
+        Document xml = MCRWCMSNavigationManager.getNavigationAsXML();
+        List<Element> elementList = TEMPLATE_PATH.evaluate(xml);
+        for (Element e : elementList) {
+            entries.add(e.getAttributeValue("template"));
+        }
+
+        // templates by folder
         String templatePath = MCRConfiguration.instance().getString("MCR.WCMS2.templatePath", "/templates/master/");
         Set<String> resourcePaths = servletContext.getResourcePaths(templatePath);
-        JsonArray returnArr = new JsonArray();
         if (resourcePaths != null) {
             for (String resourcepath : resourcePaths) {
                 resourcepath = resourcepath.substring(templatePath.length(), resourcepath.length() - 1);
-                returnArr.add(new JsonPrimitive(resourcepath));
+                entries.add(resourcepath);
             }
+        }
+
+        // create returning json
+        JsonArray returnArr = new JsonArray();
+        for (String entry : entries) {
+            returnArr.add(new JsonPrimitive(entry));
         }
         return returnArr.toString();
     }

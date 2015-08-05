@@ -383,25 +383,31 @@ wcms.navigation.Tree = function() {
 
 	function getLabel(/* TreeItem */ treeItem) {
 		var item = this.content.getItem(treeItem.wcmsId);
-		if(item != undefined) {
-			var label = "";
-			if(item.dirty == true)
-				label ="> ";
-
-			if(item.wcmsType == "root") {
-				return label + "Navigation";
-			} else if(item.wcmsType == "insert") {
-				return label + item.uri;
-			}
-
-			var currentLang = I18nManager.getInstance().getLang();
-			var langText = eval("item.labelMap." + currentLang);
-			if(langText != undefined)
-				return label + langText;
-			// no i18n label for the current lang
-			return label + "undefined";
+		if(item == undefined) {
+			return "Error: no linked item found (wcmsId: " + treeItem.wcmsId + ")";
 		}
-		return "Error: no linked item found (wcmsId: " + treeItem.wcmsId + ")";
+		var label = "";
+		if(item.dirty == true)
+			label ="> ";
+
+		if(item.wcmsType == "root") {
+			return label + "Navigation";
+		} else if(item.wcmsType == "insert") {
+			return label + item.uri;
+		}
+
+		var currentLang = I18nManager.getInstance().getLang();
+		var langText = eval("item.labelMap." + currentLang);
+		if(langText != undefined) {
+			return label + langText;
+		}
+
+		if(item.wcmsType == "group") {
+			return item.id;
+		}
+
+		// no i18n label for the current lang
+		return label + "undefined";
 	}
 	
 	function getLabelStyle(/* TreeItem */ treeItem) {

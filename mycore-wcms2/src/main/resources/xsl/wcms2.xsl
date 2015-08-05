@@ -7,7 +7,8 @@
   <xsl:param name="RequestURL" />
   <xsl:param name="CurrentLang" />
   <xsl:param name="WebApplicationBaseURL" />
-  <xsl:param name="returnUrl" select="$WebApplicationBaseURL" />
+  <xsl:param name="Referer" />
+  <xsl:param name="returnUrl" select="$Referer" />
 
   <xsl:variable name="dojoV" select="'1.6.2'" />
 

@@ -234,6 +234,10 @@ wcms.navigation.NavigationContent = function() {
 	// maybe its better to write a own class for loading and saving navigation
 	// this class shouldn't use xhrget/post methods or error dialogs
 	function save(/*JSON*/ treeHierarchy) {
+		// delete all undefined and null properties
+		for(var i = 0; i < this.itemList.length; i++) {
+			deleteUndefinedProperties(this.itemList[i]);
+		}
 		// save navigation
 		var saveObject = {
 			items: this.itemList,
