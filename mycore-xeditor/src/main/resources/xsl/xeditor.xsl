@@ -172,7 +172,7 @@
   <!-- ========== <input /> ========== -->
 
   <xsl:template
-    match="input[contains('text,password,hidden,file,color,date,datetime,datetime-local,email,month,number,range,search,tel,time,url,week',@type)]"
+    match="input[contains(',,text,password,hidden,file,color,date,datetime,datetime-local,email,month,number,range,search,tel,time,url,week,',concat(',',@type,','))]"
     mode="add-attributes">
     <xsl:attribute name="name">
       <xsl:value-of select="transformer:getAbsoluteXPath($transformer)" />
@@ -182,7 +182,7 @@
     </xsl:attribute>
   </xsl:template>
 
-  <xsl:template match="input[contains('checkbox,radio',@type)]" mode="add-attributes">
+  <xsl:template match="input[contains(',checkbox,radio,',concat(',',@type,','))]" mode="add-attributes">
     <xsl:attribute name="name">
       <xsl:value-of select="transformer:getAbsoluteXPath($transformer)" />
     </xsl:attribute>

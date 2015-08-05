@@ -10,7 +10,7 @@
         </xed:bind>
         <xed:bind xpath="author">
           <xed:bind xpath="firstName">
-            <input type="text" id="firstName" />
+            <input id="firstName" />
           </xed:bind>
           <xed:bind xpath="lastName">
             <input type="text" id="lastName" />
