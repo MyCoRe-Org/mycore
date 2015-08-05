@@ -41,7 +41,6 @@ import org.mycore.datamodel.ifs.MCRFile;
 
 /**
  * @author Thomas Scheffler (yagee)
- *
  */
 public class MCRFileChannel extends FileChannel {
 
@@ -49,12 +48,11 @@ public class MCRFileChannel extends FileChannel {
 
     private MCRFile file;
 
-    private boolean read, write;
+    private boolean write;
 
-    public MCRFileChannel(MCRFile file, FileChannel baseChannel, boolean read, boolean write) {
+    public MCRFileChannel(MCRFile file, FileChannel baseChannel, boolean write) {
         this.file = file;
         this.baseChannel = baseChannel;
-        this.read = read;
         this.write = write;
     }
 
@@ -68,12 +66,18 @@ public class MCRFileChannel extends FileChannel {
             return;
         }
         MessageDigest md5Digest = DigestUtils.getMd5Digest();
-        FileChannel md5Channel = (FileChannel) ((read && baseChannel instanceof FileChannel) ? this : Files
-            .newByteChannel(file.getLocalFile().toPath(), StandardOpenOption.READ));
+        FileChannel md5Channel = (FileChannel) Files.newByteChannel(file.getLocalFile().toPath(),
+            StandardOpenOption.READ);
         try {
-            ByteBuffer byteBuffer = md5Channel.map(FileChannel.MapMode.READ_ONLY, 0, md5Channel.size());
-            while (byteBuffer.hasRemaining()) {
-                md5Digest.update(byteBuffer);
+            long position = 0, size = md5Channel.size();
+            while (position < size) {
+                long remainingSize = size - position;
+                final ByteBuffer byteBuffer = md5Channel.map(FileChannel.MapMode.READ_ONLY, position,
+                    Math.min(remainingSize, Integer.MAX_VALUE));
+                while (byteBuffer.hasRemaining()) {
+                    md5Digest.update(byteBuffer);
+                }
+                position += byteBuffer.limit();
             }
         } finally {
             if (md5Channel != baseChannel) {

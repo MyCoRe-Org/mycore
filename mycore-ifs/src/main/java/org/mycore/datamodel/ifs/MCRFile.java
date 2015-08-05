@@ -272,7 +272,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         FileChannel fileChannel = FileChannel.open(localFile.toPath(), options);
         boolean write = options.contains(StandardOpenOption.WRITE) || options.contains(StandardOpenOption.APPEND);
         boolean read = options.contains(StandardOpenOption.READ) || !write;
-        return new MCRFileChannel(this, (FileChannel) fileChannel, read, write);
+        return new MCRFileChannel(this, (FileChannel) fileChannel, write);
     }
 
     /**
