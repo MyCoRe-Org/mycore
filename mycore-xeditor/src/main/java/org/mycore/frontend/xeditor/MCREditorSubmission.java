@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.jaxen.JaxenException;
 import org.jdom2.JDOMException;
+import org.mycore.common.xml.MCRXMLFunctions;
 
 public class MCREditorSubmission {
 
@@ -115,6 +116,7 @@ public class MCREditorSubmission {
 
         for (int i = 0; i < values.length; i++) {
             String value = values[i] == null ? "" : values[i].trim();
+            value = MCRXMLFunctions.normalizeUnicode(value);
             binding.setValue(i, value);
         }
 

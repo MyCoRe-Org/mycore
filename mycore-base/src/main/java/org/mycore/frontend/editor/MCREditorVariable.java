@@ -29,6 +29,7 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.fileupload.FileItem;
 import org.jdom2.Element;
+import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.common.xml.MCRXMLHelper;
 
 /**
@@ -64,7 +65,10 @@ public class MCREditorVariable implements Comparable {
     }
 
     void setValue(String value) {
-        this.value = MCRXMLHelper.removeIllegalChars( value.trim() );
+        value = value.trim();
+        value = MCRXMLFunctions.normalizeUnicode( value );
+        value = MCRXMLHelper.removeIllegalChars(value);
+        this.value = value;
     }
 
     public String getValue() {
