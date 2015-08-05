@@ -34,6 +34,10 @@ public class MyCoReWebPageProviderTest extends MCRTestCase {
         assertEquals(2, section4.getChildren().size());
         // check section count
         assertEquals(4, wp.getXML().getRootElement().getContentSize());
+        // entities
+        wp.addSection("title5", "&nbsp;&amp;&auml;Hallo", "de");
+        // custom tags
+        wp.addSection("title6", "<p><printlatestobjects /></p>", "de");
     }
 
     @Test

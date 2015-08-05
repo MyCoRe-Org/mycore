@@ -3,11 +3,13 @@
  */
 package org.mycore.tools;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -15,11 +17,13 @@ import org.jdom2.Content;
 import org.jdom2.DocType;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
-import org.jdom2.filter.ElementFilter;
-import org.mycore.common.content.MCRStringContent;
-import org.mycore.common.xml.MCRXMLParserFactory;
+import org.jdom2.input.SAXBuilder;
 import org.mycore.frontend.servlets.MCRServlet;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -91,22 +95,32 @@ public class MyCoReWebPageProvider {
      * @param lang the language of the section specified by a language key.
      * @return added section
      */
-    public Element addSection(String title, String xmlAsString, String lang) throws IOException, SAXParseException {
-        StringBuilder sb = new StringBuilder("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\" ");
-        sb.append("\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
-        sb.append("<html><head><meta content=\"text/html; charset=UTF-8\"/><title>temp</title></head><body>");
-        sb.append(xmlAsString);
-        sb.append("</body></html>");
-        Document doc = MCRXMLParserFactory.getParser().parseXML(new MCRStringContent(sb.toString()));
+    public Element addSection(String title, String xmlAsString, String lang) throws IOException, SAXParseException,
+        JDOMException {
+        StringBuilder sb = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        sb.append("<!DOCTYPE MyCoReWebPage PUBLIC \"-//MYCORE//DTD MYCOREWEBPAGE 1.0//DE\" ");
+        sb.append("\"http://www.mycore.org/mycorewebpage.dtd\">");
+        sb.append("<MyCoReWebPage>").append(xmlAsString).append("</MyCoReWebPage>");
+        SAXBuilder saxBuilder = new SAXBuilder();
+        saxBuilder.setEntityResolver(new EntityResolver() {
+            @Override
+            public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+                String resource = systemId.substring(systemId.lastIndexOf("/"));
+                InputStream is = getClass().getResourceAsStream(resource);
+                if (is == null) {
+                    throw new IOException(new FileNotFoundException("Unable to locate resource " + resource));
+                }
+                return new InputSource(is);
+            }
+        });
+        StringReader reader = new StringReader(sb.toString());
+        Document doc = saxBuilder.build(reader);
         Element tmpRoot = doc.getRootElement();
-        Element body = tmpRoot.getChild("body", Namespace.getNamespace("http://www.w3.org/1999/xhtml"));
-        List<Content> bodyContent = new ArrayList<>();
-        for (int i = 0; i < body.getContentSize(); i++) {
-            Content content = body.getContent(i).detach();
-            getRidOfXHTMLNamespace(content);
-            bodyContent.add(content);
+        List<Content> contentList = new ArrayList<>();
+        for (int i = 0; i < tmpRoot.getContentSize(); i++) {
+            contentList.add(tmpRoot.getContent(i).detach());
         }
-        return this.addSection(title, bodyContent, lang);
+        return this.addSection(title, contentList, lang);
     }
 
     /**
@@ -181,23 +195,4 @@ public class MyCoReWebPageProvider {
         return this.xml;
     }
 
-    /**
-     * Remove xhtml namespace of all children.
-     * 
-     * @param e
-     */
-    private void getRidOfXHTMLNamespace(Content c) {
-        if (!(c instanceof Element)) {
-            return;
-        }
-        Element e = (Element) c;
-        String xhtmlURI = "http://www.w3.org/1999/xhtml";
-        if (e.getNamespace().getURI().equals(xhtmlURI)) {
-            e.setNamespace(Namespace.NO_NAMESPACE);
-        }
-        Iterator<Element> iterator = e.getDescendants(new ElementFilter(Namespace.getNamespace(xhtmlURI))).iterator();
-        while (iterator.hasNext()) {
-            iterator.next().setNamespace(Namespace.NO_NAMESPACE);
-        }
-    }
 }
