@@ -113,8 +113,9 @@
     <mcruser:template name="passwordInput" xpath="password2" id="password2" i18n="component.user2.admin.passwordRepeat" i18n.error="component.user2.admin.inputhints.password"
       required="true" matches="[\S]*" maxlength="16" />
 
-    <xed:validate xpath="user" display="global" test="(realm/@id != 'local') or ((string-length(password) &gt; 0) and (password = password2 ))"
+    <xed:validate xpath="user/password" display="global" test="(../realm/@id != 'local') or ((string-length(.) &gt; 0) and (. = ../password2 ))"
       i18n="component.user2.admin.inputhints.passwordLocalUsers" />
+    <xed:validate xpath="user/password2" display="global" test="(../realm/@id != 'local') or ((string-length(.) &gt; 0) and (../password = . ))" />
   </xed:template>
 
   <xed:template id="passwordHint">
