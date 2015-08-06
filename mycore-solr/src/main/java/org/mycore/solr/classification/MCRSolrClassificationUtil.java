@@ -236,6 +236,7 @@ public abstract class MCRSolrClassificationUtil {
                 classCore = MCRSolrClientFactory.get(CLASSIFICATION_CORE_NAME);
                 if (classCore == null) {
                     classCore = new MCRSolrCore(MCRSolrConstants.SERVER_BASE_URL, CLASSIFICATION_CORE_NAME);
+                    MCRSolrClientFactory.add(classCore);
                 }
             }
         }
