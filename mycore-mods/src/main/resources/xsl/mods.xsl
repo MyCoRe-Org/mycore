@@ -6,7 +6,7 @@
   exclude-result-prefixes="xalan xlink mcr i18n acl mods mcrxsl mcrurn encoder exslt" version="1.0">
   <xsl:param select="'local'" name="objectHost" />
   <xsl:param name="MCR.Users.Superuser.UserName" />
-  <xsl:param name="MCR.URN.Resolver.MasterURL" select="'https://nbn-resolving.org/'" />
+  <xsl:param name="MCR.URN.Resolver.MasterURL" select="'http://nbn-resolving.org/'" />
 
   <xsl:include href="mods-utils.xsl" />
   <xsl:include href="mods2html.xsl" />
