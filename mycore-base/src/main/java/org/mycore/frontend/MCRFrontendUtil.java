@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,6 +14,7 @@ import java.util.TreeSet;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRSession;
@@ -272,6 +274,26 @@ public class MCRFrontendUtil {
             MCRSessionMgr.getCurrentSession().close();
         }
         return sortedAdresses;
+    }
+
+    /**
+     * Sets cache-control, last-modified and expires parameter to the response header.
+     * Use this method when the client should cache the response data.
+     * 
+     * @param response the response data to cache
+     * @param CACHE_TIME how long to cache
+     * @param lastModified when the data was last modified
+     * @param useExpire
+     */
+    public static void writeCacheHeaders(HttpServletResponse response, long CACHE_TIME, long lastModified,
+        boolean useExpire) {
+        response.setHeader("Cache-Control", "public, max-age=" + CACHE_TIME);
+        response.setDateHeader("Last-Modified", lastModified);
+        if (useExpire) {
+            Date expires = new Date(System.currentTimeMillis() + CACHE_TIME * 1000);
+            LOGGER.info("Last-Modified: " + new Date(lastModified) + ", expire on: " + expires);
+            response.setDateHeader("Expires", expires.getTime());
+        }
     }
 
 }

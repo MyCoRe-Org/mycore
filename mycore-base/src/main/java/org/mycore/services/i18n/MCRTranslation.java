@@ -26,6 +26,7 @@ package org.mycore.services.i18n;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,6 +46,7 @@ import javax.xml.parsers.DocumentBuilder;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRDOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -366,6 +368,16 @@ public class MCRTranslation {
     }
 
     static Set<String> loadAvailableLanguages() {
+        // try to load application relevant languages
+        String languagesString = MCRConfiguration.instance().getString("MCR.Metadata.Languages", null);
+        if (languagesString == null) {
+            // just load all languages by available messages_*.properties
+            return loadLanguagesByMessagesBundle();
+        }
+        return new HashSet<String>(Arrays.asList(languagesString.trim().split(",")));
+    }
+
+    static Set<String> loadLanguagesByMessagesBundle() {
         Set<String> languages = new HashSet<String>();
         for (Locale locale : Locale.getAvailableLocales()) {
             try {
