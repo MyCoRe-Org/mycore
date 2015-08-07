@@ -96,6 +96,36 @@ public class MCRSessionMgr {
     }
 
     /**
+     * This method can be used to set a MyCoRe session object for the current thread
+     * In a web application it is possible that multiple threads are
+     * involved handling a request.
+     * This method can be used to "inject" the MyCoRe session Object
+     * which could come from a HTTP request from one thread to the other.
+     * 
+     * The session will only be activated if necessary.
+     * 
+     * @param theSession - a MyCoRe Session Object
+     * 
+     * @author Robert Stephan
+     */
+    public static void switchCurrentSession(MCRSession theSession) {
+        if (hasCurrentSession()) {
+            if (theSession != null && theSession.getID() != null && theSession.getID().equals(getCurrentSessionID())) {
+                return; //the session is set ... nothing to do
+            } else {
+                releaseCurrentSession();
+            }
+        }
+        if (theSession != null) {
+            if (theSession.currentThreadCount.get().get() == 0) {
+                theSession.activate();
+            }
+            theThreadLocalSession.set(theSession);
+            isSessionAttached.set(Boolean.TRUE);
+        }
+    }
+
+    /**
      * Releases the MyCoRe session from its current thread. Subsequent calls of getCurrentSession() will return a
      * different MCRSession object than before for the current Thread. One use for this method is to reset the session
      * inside a Thread-pooling environment like Servlet engines. This method fires a "passivated" event, when called the
