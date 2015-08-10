@@ -7,7 +7,7 @@
   version="1.0">
   <xsl:param name="MCR.Handle.Resolver.MasterURL" />
   <xsl:param name="MCR.Users.Guestuser.UserName" />
-  <xsl:param name="MCR.URN.Resolver.MasterURL" select="'http://nbn-resolving.org/'" />
+  <xsl:param name="MCR.URN.Resolver.MasterURL" select="'https://nbn-resolving.org/'" />
   <xsl:param name="MCR.Mods.SherpaRomeo.ApiKey" select="''" />
   <xsl:param name="ServletsBaseURL" />
 
