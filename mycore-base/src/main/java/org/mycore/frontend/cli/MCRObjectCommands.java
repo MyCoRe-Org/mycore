@@ -888,7 +888,11 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRObject oldParentMCRObject = null;
 
         if (oldParentId != null) {
-            oldParentMCRObject = MCRMetadataManager.retrieveMCRObject(oldParentId);
+            try {
+                oldParentMCRObject = MCRMetadataManager.retrieveMCRObject(oldParentId);
+            } catch (Exception exc) {
+                LOGGER.error("Unable to get old parent object " + oldParentId + ", its probably deleted.", exc);
+            }
         }
 
         // change href to new parent
