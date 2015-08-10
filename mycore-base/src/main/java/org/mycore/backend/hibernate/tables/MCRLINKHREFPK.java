@@ -25,9 +25,6 @@ package org.mycore.backend.hibernate.tables;
 
 import java.io.Serializable;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-
 /**
  * This class hold all primary keys of MCRLINKHREF
  * 
@@ -122,32 +119,50 @@ public class MCRLINKHREFPK implements Serializable {
         this.mcrtype = mcrtype;
     }
 
-    /**
-     * This method check the equalance of the given Object with this class. The
-     * Object must be an instance of the class MCRLINKHREFPK.
-     * 
-     * @return Returns true if the object is equal.
-     */
-    @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof MCRLINKHREFPK)) {
-            return false;
-        }
-
-        MCRLINKHREFPK castother = (MCRLINKHREFPK) other;
-
-        return new EqualsBuilder().append(getMcrfrom(), castother.getMcrfrom()).append(getMcrto(), castother.getMcrto()).append(
-                getMcrtype(), castother.getMcrtype()).isEquals();
-    }
-
-    /**
-     * This method return the hash code of this class as append of MCRFROM +
-     * MCRTO + MCRTYPE
-     * 
-     * @return Returns the hash code.
-     */
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(getMcrfrom()).append(getMcrto()).append(getMcrtype()).toHashCode();
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((mcrfrom == null) ? 0 : mcrfrom.hashCode());
+        result = prime * result + ((mcrto == null) ? 0 : mcrto.hashCode());
+        result = prime * result + ((mcrtype == null) ? 0 : mcrtype.hashCode());
+        return result;
     }
-}
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        MCRLINKHREFPK other = (MCRLINKHREFPK) obj;
+        if (mcrfrom == null) {
+            if (other.mcrfrom != null) {
+                return false;
+            }
+        } else if (!mcrfrom.equals(other.mcrfrom)) {
+            return false;
+        }
+        if (mcrto == null) {
+            if (other.mcrto != null) {
+                return false;
+            }
+        } else if (!mcrto.equals(other.mcrto)) {
+            return false;
+        }
+        if (mcrtype == null) {
+            if (other.mcrtype != null) {
+                return false;
+            }
+        } else if (!mcrtype.equals(other.mcrtype)) {
+            return false;
+        }
+        return true;
+    }
+
+ }

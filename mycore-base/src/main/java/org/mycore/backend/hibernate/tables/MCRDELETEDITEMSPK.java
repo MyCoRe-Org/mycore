@@ -6,9 +6,6 @@ package org.mycore.backend.hibernate.tables;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-
 /**
  * @author shermann
  * @version $Revision: 13085 $ $Date: 2008-02-06 18:27:24 +0100 (Wed, 06 Feb 2008) $
@@ -59,17 +56,42 @@ public class MCRDELETEDITEMSPK implements Serializable {
         this.identifier = identifier;
     }
 
-    public boolean equals(Object other) {
-        if (!(other instanceof MCRDELETEDITEMSPK)) {
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((dateDeleted == null) ? 0 : dateDeleted.hashCode());
+        result = prime * result + ((identifier == null) ? 0 : identifier.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
             return false;
         }
-
-        MCRDELETEDITEMSPK castother = (MCRDELETEDITEMSPK) other;
-
-        return new EqualsBuilder().append(this.getIdentifier(), castother.getIdentifier()).append(this.getDateDeleted(), castother.getDateDeleted()).isEquals();
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        MCRDELETEDITEMSPK other = (MCRDELETEDITEMSPK) obj;
+        if (dateDeleted == null) {
+            if (other.dateDeleted != null) {
+                return false;
+            }
+        } else if (!dateDeleted.equals(other.dateDeleted)) {
+            return false;
+        }
+        if (identifier == null) {
+            if (other.identifier != null) {
+                return false;
+            }
+        } else if (!identifier.equals(other.identifier)) {
+            return false;
+        }
+        return true;
     }
 
-    public int hashCode() {
-        return new HashCodeBuilder().append(getIdentifier()).append(getDateDeleted()).toHashCode();
-    }
 }
