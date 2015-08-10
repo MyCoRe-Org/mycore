@@ -17,6 +17,9 @@
     <hidden var="metadata/def.modsContainer/@notinherit" default="true" />
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
 
+    <!-- erschienen in (Verweis auf MyCoRe-ID) -->
+    <cell row="1" colspan="3" anchor="NORTHWEST" ref="displayParent" />
+
     <!-- Basisangaben zum Dokument -->
     <cell row="10" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
       <text id="avmedium.titles" i18n="component.mods.metaData.dictionary.av" />

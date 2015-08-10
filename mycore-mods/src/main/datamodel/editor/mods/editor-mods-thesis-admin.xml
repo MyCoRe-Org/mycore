@@ -9,7 +9,7 @@
     <hidden var="@version" />
     <hidden var="service" descendants="true" />
     <hidden var="metadata/@xml:lang" default="de" />
-    
+
     <include uri="redirect:editor-mods-external" ref="mods.additional.admin" />
 
     <cell col="1" colspan="3" row="350" anchor="NORTHEAST" ref="mods.genre.thesis" />
@@ -18,6 +18,9 @@
     <hidden var="metadata/def.modsContainer/@class" default="MCRMetaXML" />
     <hidden var="metadata/def.modsContainer/@notinherit" default="true" />
     <hidden var="metadata/def.modsContainer/@heritable" default="false" />
+
+    <!-- erschienen in (Verweis auf MyCoRe-ID) -->
+    <cell row="1" colspan="3" anchor="NORTHWEST" ref="displayParent" />
 
     <!-- Basisangaben zum Dokument -->
     <cell row="9" colspan="3" anchor="NORTHWEST" class="editorSubHeadlines">
