@@ -24,11 +24,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.log4j.Logger;
@@ -298,15 +300,10 @@ public class MCRCommandLineInterface {
      *            the filename
      */
     public static void show(String fname) throws Exception {
-        //TODO Java 8 Files.readAllLines()
-        try (BufferedReader br = Files.newBufferedReader(new File(fname).toPath(), Charset.defaultCharset())) {
-            System.out.println();
-            String line;
-            int i = 1;
-            while ((line = br.readLine()) != null) {
-                System.out.printf(Locale.ROOT, "%04d: %s\n", i++, line);
-            }
-        }
+        AtomicInteger ln=new AtomicInteger();
+        System.out.println();
+        Files.readAllLines(Paths.get(fname), Charset.defaultCharset())
+            .forEach(l->System.out.printf(Locale.ROOT,"%04d: %s\n",ln.incrementAndGet(),l));
         System.out.println();
     }
 

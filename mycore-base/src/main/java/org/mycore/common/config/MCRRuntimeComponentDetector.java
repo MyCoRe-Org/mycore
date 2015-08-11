@@ -78,8 +78,7 @@ public class MCRRuntimeComponentDetector {
                 "META-INF/MANIFEST.MF");
             if (!resources.hasMoreElements() && underTesting == null) {
                 LOGGER.warn("Did not find any Manifests.");
-                //TODO: JDK 8 will include Collections.emtpySortedSet()
-                return Sets.newTreeSet();
+                return Collections.emptySortedSet();
             }
             SortedSet<MCRComponent> components = Sets.newTreeSet();
             while (resources.hasMoreElements()) {
