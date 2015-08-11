@@ -26,8 +26,6 @@ public class MCRListeningPriorityExecutorService extends AbstractListeningExecut
 
     /**
      * Create a new executor service. The delegate should use a {@link PriorityBlockingQueue}.
-     * 
-     * @param delegate
      */
     public MCRListeningPriorityExecutorService(ExecutorService delegate) {
         this.delegate = checkNotNull(delegate);

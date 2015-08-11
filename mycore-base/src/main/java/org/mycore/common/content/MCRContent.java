@@ -53,13 +53,11 @@ import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 /**
  * Used to read/write content from any source to any target. Sources and targets can be strings, local files, Apache VFS
@@ -138,7 +136,6 @@ public abstract class MCRContent {
      * Returns content as input stream. Be sure to close this stream properly!
      * 
      * @return input stream to read content from
-     * @throws IOException
      */
     public abstract InputStream getInputStream() throws IOException;
 
@@ -154,7 +151,6 @@ public abstract class MCRContent {
      * Returns content as content input stream, which provides MD5 functionality. Be sure to close this stream properly!
      * 
      * @return the content input stream
-     * @throws IOException
      */
     public MCRContentInputStream getContentInputStream() throws IOException {
         return new MCRContentInputStream(getInputStream());
@@ -206,7 +202,6 @@ public abstract class MCRContent {
      * Returns content as SAX input source.
      * 
      * @return input source to read content from
-     * @throws IOException
      */
     public InputSource getInputSource() throws IOException {
         InputSource source = new InputSource(getInputStream());
@@ -228,7 +223,6 @@ public abstract class MCRContent {
      * Sends content to the given path.
      * @param target target path to write content to
      * @param options see {@link Files#copy(InputStream, Path, CopyOption...)}} for help on copy options
-     * @throws IOException
      */
     public void sendTo(Path target, CopyOption... options) throws IOException {
         try (InputStream in = getInputStream()) {
@@ -272,8 +266,6 @@ public abstract class MCRContent {
      * Parses content, assuming it is XML, and returns the parsed document.
      * 
      * @return the XML document parsed from content
-     * @throws SAXParseException
-     * @throws MCRException
      */
     public Document asXML() throws JDOMException, IOException, SAXException {
         return MCRXMLParserFactory.getNonValidatingParser().parseXML(this);
@@ -282,8 +274,6 @@ public abstract class MCRContent {
     /**
      * Ensures that content is XML. The content is parsed as if asXML() is called. When content is XML, an MCRContent
      * instance is returned that guarantees that. When XML can not be parsed, an exception is thrown.
-     * 
-     * @throws SAXParseException
      */
     public MCRContent ensureXML() throws IOException, JDOMException, SAXException {
         return new MCRJDOMContent(asXML());
@@ -313,8 +303,7 @@ public abstract class MCRContent {
     /**
      * Overwrites DocType detection.
      * 
-     * @see MCRContent#getDocType();
-     * @param docType
+     * @see MCRContent#getDocType()
      */
     public void setDocType(String docType) {
         this.docType = docType;
@@ -378,9 +367,9 @@ public abstract class MCRContent {
      * @param systemId
      *            != null, {@link #getSystemId()}
      * @param length
-     *            >= 0, {@link #length()}
+     *            &gt;= 0, {@link #length()}
      * @param lastModified
-     *            >= 0, {@link #lastModified()}
+     *            &gt;= 0, {@link #lastModified()}
      * @return null if any preconditions are not met.
      */
     protected String getSimpleWeakETag(String systemId, long length, long lastModified) {

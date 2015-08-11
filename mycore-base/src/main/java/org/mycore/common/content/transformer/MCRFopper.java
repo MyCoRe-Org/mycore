@@ -36,7 +36,7 @@ import org.mycore.common.fo.MCRFoFactory;
 /**
  * Transforms XSL-FO xml content to PDF. 
  * 
- * @see org.mycore.common.fo.MCRFoFormatterInterface;
+ * @see org.mycore.common.fo.MCRFoFormatterInterface
  *
  * @author Frank L\u00FCtzenkirchen
  */

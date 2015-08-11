@@ -41,7 +41,6 @@ public abstract class MCRJobAction {
     
     /**
      * The constructor of the job action with specific {@link MCRJob}.
-     * @param job
      */
     public MCRJobAction(MCRJob job) {
         this.job = job;
@@ -63,8 +62,6 @@ public abstract class MCRJobAction {
     
     /**
      * Does the work for given {@link MCRJob}.
-     * 
-     * @throws ExecutionException
      */
     abstract public void execute() throws ExecutionException;
     

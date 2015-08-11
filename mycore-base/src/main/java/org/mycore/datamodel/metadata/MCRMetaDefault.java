@@ -106,11 +106,11 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      * is null or empty an exception was throwed. The type element was set to
      * the value of <em>set_type<em>, if it is null, an empty string was set
      * to the type element. The datapart element was set. If the value of
-     * <em>set_datapart,/em> is null or empty the default was set.
+     * <em>set_datapart,</em> is null or empty the default was set.
      * @param set_subtag       the name of the subtag
      * @param default_lang     the default language
      * @param set_type         the optional type string
-     * @param set_inherited     a int value , > 0 if the data are inherited,
+     * @param set_inherited     a int value , &gt; 0 if the data are inherited,
      *                         else = 0.
      *
      * @exception MCRException if the set_subtag value is null or empty
@@ -127,7 +127,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      * 0.
      * 
      * @param value
-     *            the inherited level value, if it is < 0, 0 was set
+     *            the inherited level value, if it is &lt; 0, 0 is set
      */
     public final void setInherited(int value) {
         inherited = value;

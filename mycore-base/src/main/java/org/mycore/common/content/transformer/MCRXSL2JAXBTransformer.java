@@ -62,18 +62,11 @@ public class MCRXSL2JAXBTransformer<T> extends MCRXSLTransformer {
         super();
     }
 
-    /**
-     * @param stylesheets
-     */
     public MCRXSL2JAXBTransformer(JAXBContext context, String... stylesheets) {
         super(stylesheets);
         this.context = context;
     }
 
-    /**
-     * @param stylesheets
-     * @param context
-     */
     public MCRXSL2JAXBTransformer(JAXBContext context) {
         super();
         this.context = context;

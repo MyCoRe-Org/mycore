@@ -52,19 +52,16 @@ public class MCRStartupHandler {
     public static interface AutoExecutable {
         /**
          * returns a name to display on start-up.
-         * @return
          */
         public String getName();
 
         /**
          * If order is important returns as 'heigher' priority.
-         * @return
          */
         public int getPriority();
 
         /**
-         * This method get executed by {@link MCRStartupHandler#startUp()}
-         * @param servletContext 
+         * This method get executed by {@link MCRStartupHandler#startUp(ServletContext)}
          */
         public void startUp(ServletContext servletContext);
     }

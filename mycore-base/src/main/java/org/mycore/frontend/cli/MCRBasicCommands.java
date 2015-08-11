@@ -193,8 +193,6 @@ public class MCRBasicCommands {
      * 
      * @param fileName
      *            the location of the xml file
-     * @throws SAXParseException 
-     * @throws MCRException 
      */
     @MCRCommand(syntax = "check file {0}", help = "Checks the data file {0} against the XML Schema.", order = 160)
     public static boolean checkXMLFile(String fileName) throws MCRException, SAXParseException, IOException {

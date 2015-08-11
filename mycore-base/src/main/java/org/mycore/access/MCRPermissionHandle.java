@@ -23,8 +23,6 @@
 
 package org.mycore.access;
 
-import org.mycore.common.MCRUserInformation;
-
 /**
  * @author Thomas Scheffler (yagee)
  *
@@ -33,10 +31,6 @@ class MCRPermissionHandle {
     
     private String id;
     private String permission;
-    /**
-     * @param id
-     * @param permission
-     */
     public MCRPermissionHandle(String id, String permission) {
         this.id = id;
         this.permission = permission.intern();

@@ -36,7 +36,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
  * 
  * @author Thomas Scheffler (yagee)
  * @author shermann
- * @see MCRObjectDerivate;
+ * @see MCRObjectDerivate
  */
 public class MCRFileMetadata implements Comparable<MCRFileMetadata> {
 
@@ -66,11 +66,6 @@ public class MCRFileMetadata implements Comparable<MCRFileMetadata> {
         this(null, null, null);
     }
 
-    /**
-     * @param name
-     * @param urn
-     * @param categories
-     */
     public MCRFileMetadata(String name, String urn, Collection<MCRCategoryID> categories) {
         super();
         setName(name);
@@ -79,12 +74,6 @@ public class MCRFileMetadata implements Comparable<MCRFileMetadata> {
         setCategories(categories);
     }
 
-    /**
-     * @param name
-     * @param urn
-     * @param handle
-     * @param categories
-     */
     public MCRFileMetadata(String name, String urn, String handle, Collection<MCRCategoryID> categories) {
         this(name, urn, categories);
         setHandle(handle);

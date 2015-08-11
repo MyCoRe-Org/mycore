@@ -176,7 +176,6 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
     /**
      * The method returns a Map of all counted distinct references
      * 
-     * @param mcrtoPrefix
      * @return
      * 
      * the result-map of (key,value)-pairs can be visualized as<br />

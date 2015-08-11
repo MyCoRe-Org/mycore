@@ -11,11 +11,6 @@ public class MCRGeoUtilities {
     /**
      * Converts coordinates to decimal degree (as used by google maps).
      * 
-     * @param degree
-     * @param minutes
-     * @param seconds
-     * 
-     * @return
      */
     public static double toDecimalDegrees(int degree, int minutes, double seconds) {
         return (((seconds / 60) + minutes) / 60) + degree;
@@ -24,8 +19,6 @@ public class MCRGeoUtilities {
     /**
      * Converts coordinates in pica format to decimal degree (as used by google maps).
      *
-     * @param picaValue
-     * 
      * @return the decimal degree representation of the coordinates
      */
     public static double toDecimalDegrees(String picaValue) {
@@ -52,9 +45,6 @@ public class MCRGeoUtilities {
     /**
      * Converts decimal degree to ordinary coordinates.
      * 
-     * @param inDecimalDegree
-     * 
-     * @return
      */
     public static String toDegreeMinuteSecond(double inDecimalDegree) {
         int degree = (int) inDecimalDegree;
@@ -68,7 +58,7 @@ public class MCRGeoUtilities {
      * @param picaValue the value as stored in opac/pica
      * @return a human readable form like 38° 22′ S
      * 
-     * @see {@link MCRGeoUtilities#toDegreeMinuteSecond(double)}
+     * @see #toDegreeMinuteSecond(double)
      */
     public static String toDegreeMinuteSecond(String picaValue) {
         if (picaValue == null || picaValue.length() == 0 || (!isValid(picaValue))) {

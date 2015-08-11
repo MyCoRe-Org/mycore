@@ -54,9 +54,6 @@ public class MCRCategoryDAOFactory {
      * with mock objects.
      * 
      * @param daoClass new dao class
-     * 
-     * @throws IllegalAccessException
-     * @throws InstantiationException
      */
     public static synchronized void set(Class<? extends MCRCategoryDAO> daoClass) throws IllegalAccessException,
         InstantiationException {

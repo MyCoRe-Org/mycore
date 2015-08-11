@@ -31,7 +31,7 @@ import org.mycore.datamodel.ifs.MCRContentInputStream;;
 /**
  * Reads MCRContent from an input stream. Typically, this content is not reusable, so that
  * content can only be read once. Please be aware that an instance of this object contains an 
- * open input stream. Thus one has to invoke {@link MCRStreamContent#getInputStream()#close()} when 
+ * open input stream. Thus one has to invoke {@link MCRStreamContent#getInputStream()}.close() when 
  * finished with this object.
  * 
  * @author Frank L\u00FCtzenkichen

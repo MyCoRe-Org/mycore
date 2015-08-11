@@ -123,7 +123,6 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
      * 
      * @return the SVN repository used to manage metadata versions in this
      *         store.
-     * @throws SVNException 
      */
     SVNRepository getRepository() throws SVNException {
         SVNRepository repository = SVNRepositoryFactory.create(repURL);

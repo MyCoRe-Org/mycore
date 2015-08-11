@@ -626,9 +626,6 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
 
     /**
      * Updates the index content of the given file.
-     * 
-     * @param evt
-     * @param file
      */
     protected void updateDerivateFileIndex(MCREvent evt, MCRDerivate file) {
         doNothing(evt, file);

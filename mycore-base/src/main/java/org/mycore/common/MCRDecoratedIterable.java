@@ -23,10 +23,7 @@
 
 package org.mycore.common;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * This class acts as an {@link Iterable} on top of another instance.
@@ -35,7 +32,7 @@ import java.util.List;
  * <br/>This example will print which file for a file name exists and which not:
  * <pre>
  * private void testExistence(List&lt;String&gt; fileNames) {
- *     for (File file : new MCRDecoratedIterable<String, File>(fileNames) {
+ *     for (File file : new MCRDecoratedIterable&lt;String, File&gt;(fileNames) {
  *         {@literal @}Override
  *         protected File getInstance(String source) {
  *             return new File(source);

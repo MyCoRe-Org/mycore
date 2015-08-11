@@ -46,7 +46,7 @@ public class MCRSortBy {
     /** 
      * Creates a new sort criteria
      * 
-     * @param fieldNAme the field to sort by
+     * @param fieldName the field to sort by
      * @param order the sort order (ascending or descending)
      * 
      * @see #ASCENDING

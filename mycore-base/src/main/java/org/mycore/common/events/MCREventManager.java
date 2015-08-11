@@ -238,7 +238,6 @@ public class MCREventManager {
      * Appends the event handler to the end of the list.
      * 
      * @param type type of event e.g. MCRObject
-     * @param handler
      */
     public MCREventManager addEventHandler(String type, MCREventHandler handler) {
         getOrCreateEventHandlerListOfType(type).add(handler);
@@ -249,7 +248,6 @@ public class MCREventManager {
      * Inserts the event handler at the specified position.
      * 
      * @param type type of event e.g. MCRObject
-     * @param handler
      * @param index index at which the specified element is to be inserted
      */
     public MCREventManager addEventHandler(String type, MCREventHandler handler, int index) {

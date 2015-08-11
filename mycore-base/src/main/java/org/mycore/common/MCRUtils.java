@@ -485,7 +485,6 @@ public class MCRUtils {
      * @param fileName
      *            the name of the file to write to, given as absolute path
      * @return a handle to the written file
-     * @throws IOException
      */
     public static Path writeTextToFile(String textToWrite, String fileName, Charset cs) throws IOException {
         Path file = Paths.get(fileName);
@@ -760,7 +759,6 @@ public class MCRUtils {
      * Transforms the given Element into a String
      * 
      * @return the xml element as {@link String}
-     * @throws IOException 
      */
     public static String asString(Element elm) {
         XMLOutputter op = new XMLOutputter(Format.getPrettyFormat());
@@ -821,10 +819,6 @@ public class MCRUtils {
      * Calculates md5 sum of InputStream.
      * 
      * InputStream is consumed after calling this method and automatically closed.
-     * @param inputStream
-     * @return
-     * @throws IOException 
-     * @throws NoSuchAlgorithmException 
      */
     public static String getMD5Sum(InputStream inputStream) throws IOException, NoSuchAlgorithmException {
         MCRMD5InputStream md5InputStream = null;

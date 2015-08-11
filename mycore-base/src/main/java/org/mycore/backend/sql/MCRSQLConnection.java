@@ -312,7 +312,6 @@ public class MCRSQLConnection {
     /**
      * Checks existence of table
      * 
-     * @param tablename
      * @throws MCRPersistenceException
      *             if the JDBC driver could not be loaded or initial connections
      *             could not be created or can not get a connection

@@ -34,7 +34,6 @@ import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.datamodel.ifs2.MCRFile;
 import org.mycore.datamodel.niofs.MCRPath;
 
 /**
@@ -231,9 +230,8 @@ public class MCRObjectDerivate {
     /**
      * @param file the file to add
      * @param urn the urn of the file, if already known, if not provide null
-     * @return
      * 
-     * @throws @{@link NullPointerException} if first argument is null
+     * @throws NullPointerException if first argument is null
      */
     public MCRFileMetadata getOrCreateFileMetadata(MCRPath file, String urn) {
         return getOrCreateFileMetadata(file, urn, null);
@@ -277,19 +275,10 @@ public class MCRObjectDerivate {
         return newFileMetadata;
     }
 
-    /**
-     * TODO 
-     * @param path
-     * @return
-     */
     public final MCRFileMetadata getOrCreateFileMetadata(String path) {
         return getOrCreateFileMetadata(MCRPath.getPath(derivateID.toString(), path), null, null);
     }
 
-    /**
-     * @param file
-     * @return
-     */
     public MCRFileMetadata getOrCreateFileMetadata(MCRPath file) {
         return getOrCreateFileMetadata(file, null, null);
     }
@@ -309,9 +298,6 @@ public class MCRObjectDerivate {
         return newFileMetadata;
     }
 
-    /**
-     * @return
-     */
     public List<MCRFileMetadata> getFileMetadata() {
         return Collections.unmodifiableList(files);
     }
@@ -326,7 +312,7 @@ public class MCRObjectDerivate {
 
     /**
      * Deletes file metadata of file idendified by absolute path.
-     * @param path {@link MCRFile#getAbsolutePath()}
+     * @param path absolute path of this node starting with a '/'
      * @return true if metadata was deleted and false if file has no metadata.
      */
     public boolean deleteFileMetaData(String path) {

@@ -88,9 +88,6 @@ public class MCRProperties extends Properties {
     /**
      * Creates a new <code>MCRProperties</code> instance with the values
      * of the given properties.
-     * 
-     * @param properties
-     * @return
      */
     public static MCRProperties copy(Properties properties) {
         MCRProperties p = new MCRProperties();

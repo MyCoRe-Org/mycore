@@ -62,7 +62,7 @@ public class MCRMetaNBN extends MCRMetaDefault {
      * <em>set_text<em>, if it is null, an empty string was set
      * to the text element.
      * @param set_subtag       the name of the subtag
-     * @param set_inherted     a value >= 0
+     * @param set_inherted     a value &gt;= 0
      * @param set_nbn         the NBN string
      *
      * @exception MCRException if the set_subtag value is null or empty

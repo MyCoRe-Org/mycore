@@ -68,8 +68,6 @@ public class MCRPathXML {
 
     /**
      * Sends the contents of an MCRDirectory as XML data to the client
-     * 
-     * @throws IOException
      */
     public static Document getDirectoryXML(MCRPath path, BasicFileAttributes attr) throws IOException {
         LOGGER.debug("MCRDirectoryXML: start listing of directory " + path.toString());

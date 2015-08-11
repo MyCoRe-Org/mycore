@@ -265,9 +265,6 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
      * get the specific job and alters it status to {@link MCRJobStatus#PROCESSING}
      * 
      * @param action the {@link MCRJobAction}
-     * @param params
-     * @return
-     * @throws NoSuchElementException
      */
     public MCRJob getElementOutOfOrder(Class<? extends MCRJobAction> action, Map<String, String> params)
             throws NoSuchElementException {

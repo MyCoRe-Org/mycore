@@ -27,7 +27,6 @@ import java.io.File;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.transform.Source;
@@ -184,7 +183,6 @@ public class MCRXSLTransformation {
      * Method getTransformerHandler. Returns a TransformerHandler for the given
      * Template.
      * 
-     * @param stylesheet
      * @return TransformerHandler
      */
     public TransformerHandler getTransformerHandler(Templates stylesheet) {
@@ -203,8 +201,6 @@ public class MCRXSLTransformation {
      * Method setParameters. Set some parameters which can be used by the
      * Stylesheet for the transformation.
      * 
-     * @param handler
-     * @param parameters
      */
     public static void setParameters(TransformerHandler handler, Map parameters) {
         setParameters(handler.getTransformer(), parameters);
@@ -226,9 +222,6 @@ public class MCRXSLTransformation {
     /**
      * Method transform. Transforms a JDOM-Document to the given OutputStream
      * 
-     * @param in
-     * @param handler
-     * @param out
      */
     public void transform(org.jdom2.Document in, TransformerHandler handler, OutputStream out) {
         handler.setResult(new StreamResult(out));

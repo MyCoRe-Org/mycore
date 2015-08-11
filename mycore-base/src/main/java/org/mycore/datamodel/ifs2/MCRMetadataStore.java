@@ -103,8 +103,6 @@ public class MCRMetadataStore extends MCRStore {
      * @param xml
      *            the XML document to be stored
      * @return the stored metadata object
-     * @throws JDOMException 
-     * @throws IOException 
      */
     public MCRStoredMetadata create(MCRContent xml) throws IOException, JDOMException {
         int id = getNextFreeID();
@@ -119,7 +117,6 @@ public class MCRMetadataStore extends MCRStore {
      * @param id
      *            the ID under which the document should be stored
      * @return the stored metadata object
-     * @throws JDOMException 
      */
     public MCRStoredMetadata create(MCRContent xml, int id) throws IOException, JDOMException {
         if (id <= 0) {

@@ -15,10 +15,6 @@ class MCRCategoryChildList extends ArrayList<MCRCategory> {
 
     private MCRCategory thisCategory;
 
-    /**
-     * @param root
-     * @param thisCategory
-     */
     public MCRCategoryChildList(MCRCategory root, MCRCategory thisCategory) {
         super();
         this.root = root;

@@ -42,7 +42,6 @@ public interface MCRAccessInterface {
      * 
      * @param rule
      *              the rule string in plain text
-     * @param creator
      * @param description
      *              a String description of the rule in prosa 
      */
@@ -53,7 +52,6 @@ public interface MCRAccessInterface {
      * 
      * @param rule
      *              the rule string as xml
-     * @param creator
      * @param description
      *              a String description of the rule in prosa 
      */
@@ -62,7 +60,6 @@ public interface MCRAccessInterface {
     /**
      * generate rule string from xml
      * 
-     * @param rule
      * @return the normalized rule string
      */
     public String getNormalizedRuleString(Element rule);
@@ -329,7 +326,6 @@ public interface MCRAccessInterface {
      * The parameter <code>id</code> serves as an identifier for the concrete
      * underlying rule, e.g. a MCRObjectID.
      * 
-     * @param id
      * @return a <code>List</code> of all for <code>id</code> defined
      *         permission
      */

@@ -32,7 +32,6 @@ import java.util.LinkedList;
 import java.util.Properties;
 import java.util.TooManyListenersException;
 
-import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Result;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
@@ -295,11 +294,6 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         return xslSteps;
     }
 
-    /**
-     * @param transformHandlerList
-     * @return
-     * @throws SAXException
-     */
     protected XMLReader getXMLReader(LinkedList<TransformerHandler> transformHandlerList) throws SAXException {
         XMLReader reader = XMLReaderFactory.createXMLReader();
         reader.setEntityResolver(ENTITY_RESOLVER);

@@ -311,7 +311,6 @@ public class MCRObjectStructure {
      * Checks if the derivate is in the derivate vector.
      * 
      * @param derivateId derivate to check
-     * @return
      */
     public final boolean containsDerivate(MCRObjectID derivateId) {
         return getDerivateLink(derivateId) != null;
@@ -319,9 +318,6 @@ public class MCRObjectStructure {
 
     /**
      * Returns the derivate link by id or null.
-     * 
-     * @param derivateId
-     * @return
      */
     public final MCRMetaLinkID getDerivateLink(MCRObjectID derivateId) {
         for (MCRMetaLinkID derivate : getDerivates()) {

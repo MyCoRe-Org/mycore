@@ -50,9 +50,8 @@ public class MCREditorDataResolver implements URIResolver {
     /**
      * Returns the current editor input from the form with the given editor session ID.
      * 
-     * @param uri
+     * @param href
      *            Syntax: editorData:[sessionID]:[xPath]
-     * @see org.mycore.common.xml.MCRURIResolver.MCRResolver#resolveElement(java.lang.String)
      */
     @Override
     public Source resolve(String href, String base) throws TransformerException {

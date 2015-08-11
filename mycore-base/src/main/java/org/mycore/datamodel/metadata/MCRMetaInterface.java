@@ -27,7 +27,7 @@ import org.mycore.common.MCRException;
 
 /**
  * This interface is designed to to have a general description of the common
- * methode set of all metadata classes.
+ * method set of all metadata classes.
  * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
@@ -66,7 +66,7 @@ public interface MCRMetaInterface extends Cloneable {
      * 0.
      * 
      * @param value
-     *            the inherited level value, if it is < 0, 0 was set
+     *            the inherited level value, if it is &lt; 0, 0 is set
      */
     public void setInherited(int value);
 
@@ -90,7 +90,7 @@ public interface MCRMetaInterface extends Cloneable {
 
     /**
      * This method set the subtag element. If the value of <em>set_subtag</em>
-     * is null or empty an exception was throwed.
+     * is null or empty an exception is throwed.
      * 
      * @param set_subtag
      *            the subtag
@@ -109,7 +109,7 @@ public interface MCRMetaInterface extends Cloneable {
     public void setType(String set_type);
 
     /**
-     * This methode read the XML input stream part from a DOM part for the
+     * This method read the XML input stream part from a DOM part for the
      * metadata of the document.
      * 
      * @param element
@@ -118,7 +118,7 @@ public interface MCRMetaInterface extends Cloneable {
     public void setFromDOM(org.jdom2.Element element);
 
     /**
-     * This methode create a XML stream for a metadata part.
+     * This method create a XML stream for a metadata part.
      * 
      * @exception MCRException
      *                if the content of this class is not valid
@@ -127,7 +127,7 @@ public interface MCRMetaInterface extends Cloneable {
     public org.jdom2.Element createXML() throws MCRException;
 
     /**
-     * This methode check the validation of the content of this class.
+     * This method check the validation of the content of this class.
      * 
      * @return a boolean value
      */

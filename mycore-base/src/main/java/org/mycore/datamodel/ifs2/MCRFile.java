@@ -23,17 +23,13 @@
 
 package org.mycore.datamodel.ifs2;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.provider.local.LocalFile;
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.streams.MCRDevNull;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 
@@ -117,7 +113,7 @@ public class MCRFile extends MCRStoredNode {
     /**
      * Sets the content of this file.
      * 
-     * @param content
+     * @param source
      *            the content to be read
      * @return the MD5 checksum of the stored content
      */

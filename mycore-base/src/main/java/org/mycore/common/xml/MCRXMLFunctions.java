@@ -273,7 +273,7 @@ public class MCRXMLFunctions {
      * @param format
      *            the format in which the date should be formatted
      * @return the current date in the desired format
-     * @see {@link SimpleDateFormat} for how to provide the format string
+     * @see SimpleDateFormat format description
      */
     public static String getCurrentDate(String format) {
         SimpleDateFormat sdf = null;
@@ -290,8 +290,6 @@ public class MCRXMLFunctions {
     /**
      * A delegate for {@link String#compareTo(String)}.
      * 
-     * @param s1
-     * @param s2
      * @return s1.compareTo(s2)
      */
     public static int compare(String s1, String s2) {
@@ -301,8 +299,6 @@ public class MCRXMLFunctions {
     /**
      * @param source the source string to operate on
      * @param regex the regular expression to apply
-     * @param replace 
-     * @return
      */
     public static String regexp(String source, String regex, String replace) {
         String regexApplied = source.replaceAll(regex, replace);
@@ -336,7 +332,6 @@ public class MCRXMLFunctions {
      * Encodes the given url so that one can safely embed that string in a part
      * of an URI
      * 
-     * @param source
      * @return the encoded source
      */
     public static String encodeURL(String source, String encoding) {
@@ -351,10 +346,6 @@ public class MCRXMLFunctions {
 
     /**
      * Encodes the given URL so, that it is a valid RFC 2396 URL.
-     * @param url
-     * @return
-     * @throws MalformedURLException 
-     * @throws URISyntaxException 
      */
     public static String normalizeAbsoluteURL(String url) throws MalformedURLException, URISyntaxException {
         try {
@@ -370,9 +361,7 @@ public class MCRXMLFunctions {
     /**
      * Encodes the path so that it can be safely used in an URI.
      * Same as calling {@link #encodeURIPath(String, boolean)} with boolean parameter set to false.
-     * @param path
      * @return encoded path as described in RFC 2396
-     * @throws URISyntaxException
      */
     public static String encodeURIPath(String path) throws URISyntaxException {
         return encodeURIPath(path, false);
@@ -380,11 +369,9 @@ public class MCRXMLFunctions {
 
     /**
      * Encodes the path so that it can be safely used in an URI.
-     * @param path
      * @param asciiOnly
      *          if true, return only ASCII characters (e.g. encode umlauts)
      * @return encoded path as described in RFC 2396
-     * @throws URISyntaxException
      */
     public static String encodeURIPath(String path, boolean asciiOnly) throws URISyntaxException {
         URI relativeURI = new URI(null, null, path, null, null);
@@ -396,7 +383,6 @@ public class MCRXMLFunctions {
      * @param path
      *            encoded path as described in RFC 2396
      * @return decoded path
-     * @throws URISyntaxException
      */
     public static String decodeURIPath(String path) throws URISyntaxException {
         URI relativeURI = new URI(path);
@@ -540,7 +526,6 @@ public class MCRXMLFunctions {
      * same as {@link #getLinkSources(String, String)} with
      * <code>sourceType</code>=<em>null</em>
      * 
-     * @param mcrid
      */
     public static NodeList getLinkSources(String mcrid) {
         return getLinkSources(mcrid, null);
@@ -620,16 +605,13 @@ public class MCRXMLFunctions {
         return MCRSessionMgr.getCurrentSession().getUserInformation().equals(MCRSystemUserInformation.getGuestInstance());
     }
 
-    /**
-     * @param objectId
-     */
     public static boolean exists(String objectId) {
         return MCRMetadataManager.exists(MCRObjectID.getInstance(objectId));
     }
 
     /**
      * Verifies if object is in specified category.
-     * @see MCRCategLinkService#isInCategory(MCRCategLinkReference, MCRCategoryID);
+     * @see MCRCategLinkService#isInCategory(MCRCategLinkReference, MCRCategoryID)
      * @param objectId valid MCRObjectID as String
      * @param categoryId valid MCRCategoryID as String
      * @return true if object is in category, else false
@@ -648,18 +630,12 @@ public class MCRXMLFunctions {
 
     /**
      * Checks if the User-Agent is sent from a mobile device
-     * @param UserAgent
      * @return true if the User-Agent is sent from a mobile device
      */
     public static boolean isMobileDevice(String UserAgent) {
         return UserAgent.toLowerCase(Locale.ROOT).contains("mobile");
     }
 
-    /**
-     * @param classificationId
-     * @param categoryId
-     * @return
-     */
     public static boolean hasParentCategory(String classificationId, String categoryId) {
         MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
         MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
@@ -675,11 +651,6 @@ public class MCRXMLFunctions {
         return parents.size() > 1;
     }
 
-    /**
-     * @param classificationId
-     * @param categoryId
-     * @return
-     */
     public static String getDisplayName(String classificationId, String categoryId) {
         MCRCategoryID categID = MCRCategoryID.fromString(classificationId + ":" + categoryId);
         MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
@@ -688,11 +659,6 @@ public class MCRXMLFunctions {
         return category.getCurrentLabel().getText();
     }
 
-    /**
-     * @param classificationId
-     * @param categoryId
-     * @return
-     */
     public static boolean isCategoryID(String classificationId, String categoryId) {
         MCRCategoryID categID = MCRCategoryID.fromString(classificationId + ":" + categoryId);
         MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
@@ -709,7 +675,6 @@ public class MCRXMLFunctions {
      * @param derivateId
      *            the derivate id for which the size should be returned
      * @return the size as formatted string
-     * @throws IOException 
      */
     public static String getSize(String derivateId) throws IOException {
         MCRPath rootPath = MCRPath.getPath(derivateId, "/");
@@ -736,7 +701,7 @@ public class MCRXMLFunctions {
     }
 
     /**
-     * Same as {@link MCRMetadataManager#getObjectId(MCRObjectID, long)} with String representation.
+     * Same as {@link MCRMetadataManager#getObjectId(MCRObjectID, long, TimeUnit)} with String representation.
      */
     public static String getMCRObjectID(final String derivateID, final long expire) {
         return MCRMetadataManager.getObjectId(MCRObjectID.getInstance(derivateID), expire, TimeUnit.MILLISECONDS).toString();
@@ -744,8 +709,6 @@ public class MCRXMLFunctions {
 
     /**
      * @param uri the uri to resolve
-     * @return
-     * @throws JDOMException
      */
     public static NodeList resolve(String uri) throws JDOMException {
         org.jdom2.Element element = MCRURIResolver.instance().resolve(uri);

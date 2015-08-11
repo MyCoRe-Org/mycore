@@ -65,9 +65,8 @@ public class MCRXSLTransformerFactory {
         return templates;
     }
 
-    /** Returns a transformer for the given XSL source 
-     * @throws IOException 
-     * @throws TransformerConfigurationException */
+    /** Returns a transformer for the given XSL source
+     */
     public static Transformer getTransformer(MCRTemplatesSource source) throws IOException, TransformerConfigurationException {
         Templates templates = getCachedTemplates(source);
         if (templates == null) {

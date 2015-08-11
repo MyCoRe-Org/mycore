@@ -43,7 +43,7 @@ public interface MCRExternalCommandInterface {
     public ArrayList<MCRCommand> getPossibleCommands();
 
     /**
-     * Returns the display name of the external commands. If the dispaly name
+     * Returns the display name of the external commands. If the display name
      * has not been set the simple class name is returned
      * 
      * @return the display name of the external commands
@@ -52,8 +52,6 @@ public interface MCRExternalCommandInterface {
 
     /**
      * Sets the display name.
-     * 
-     * @param s
      */
     public void setDisplayName(String s);
 }

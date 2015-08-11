@@ -80,7 +80,6 @@ public class MCRXMLHelper {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the XML file as a DOM object
-     * @throws SAXParseException 
      * @deprecated use MCRXMLParserFactory.getParser().parseXML(MCRContent xml)
      */
     public static Document parseURI(URI uri) throws MCRException, SAXParseException {
@@ -104,7 +103,6 @@ public class MCRXMLHelper {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the XML file as a DOM object
-     * @throws SAXParseException 
      * @deprecated use MCRXMLParserFactory.getParser(boolean validate).parseXML(MCRContent xml)
      */
     public static Document parseURI(URI uri, boolean valid) throws MCRException, SAXParseException {
@@ -126,7 +124,6 @@ public class MCRXMLHelper {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the XML file as a DOM object
-     * @throws SAXParseException 
      * @deprecated use MCRXMLParserFactory.getParser().parseXML(MCRContent xml)
      */
     public static Document parseXML(String xml) throws MCRException, SAXParseException {
@@ -159,7 +156,6 @@ public class MCRXMLHelper {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the XML file as a DOM object
-     * @throws SAXParseException 
      * @deprecated use MCRXMLParserFactory.getParser().parseXML(MCRContent xml)
      */
     public static Document parseXML(byte[] xml) throws MCRException, SAXParseException {
@@ -177,7 +173,6 @@ public class MCRXMLHelper {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the XML file as a DOM object
-     * @throws SAXParseException 
      * @deprecated use MCRXMLParserFactory.getParser(boolean validate).parseXML(MCRContent xml)
      */
     public static Document parseXML(byte[] xml, boolean valid) throws MCRException, SAXParseException {

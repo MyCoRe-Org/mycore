@@ -100,8 +100,6 @@ public class MCREditorOutValidator {
      * 
      * @param jdom_in
      *            editor input
-     * @throws IOException 
-     * @throws JDOMException 
      */
     public MCREditorOutValidator(Document jdom_in, MCRObjectID id) throws JDOMException, IOException {
         errorlog = new ArrayList<String>();
@@ -120,8 +118,6 @@ public class MCREditorOutValidator {
      * tries to generate a valid MCRObject as JDOM Document.
      * 
      * @return MCRObject
-     * @throws JDOMException 
-     * @throws SAXParseException 
      */
     public Document generateValidMyCoReObject() throws JDOMException, SAXParseException, IOException {
         MCRObject obj;
@@ -545,10 +541,6 @@ public class MCREditorOutValidator {
         }
     }
 
-    /**
-     * @param structure
-     */
-    @SuppressWarnings("unchecked")
     private void checkObjectStructure(Element structure) {
         List<Element> structurelist = structure.getChildren();
         Iterator<Element> structIt = structurelist.iterator();
@@ -564,8 +556,6 @@ public class MCREditorOutValidator {
 
     /**
      * The method add a default ACL-block.
-     * 
-     * @param service
      */
     public static void setDefaultDerivateACLs(org.jdom2.Element service) {
         // Read stylesheet and add user

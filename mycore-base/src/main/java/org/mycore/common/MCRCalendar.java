@@ -109,8 +109,7 @@ public class MCRCalendar {
      *            'ethiopic', 'persic', 'japanese', 'armenian' or 'egyptian' )
      * 
      * @return the ICU Calendar instance of the concrete calendar type or null if an error was occurred.
-     * @exception a
-     *                MCRException if parsing has an error
+     * @exception MCRException if parsing has an error
      */
     public static Calendar getHistoryDateAsCalendar(String date_string, boolean last, String calendar_string)
             throws MCRException {
@@ -1614,8 +1613,6 @@ public class MCRCalendar {
     /**
      * This method return the Julian Day number for a given Calendar instance.
      * 
-     * @param date
-     *            an instance of a Calendar
      * @return the Julian Day number as Integer
      */
     public static int getJulianDayNumber(Calendar input_calendar) {
@@ -1625,8 +1622,6 @@ public class MCRCalendar {
     /**
      * This method return the Julian Day number for a given Calendar instance.
      * 
-     * @param date
-     *            an instance of a Calendar
      * @return the Julian Day number as String
      */
     public static String getJulianDayNumberAsString(Calendar input_calendar) {
@@ -1649,9 +1644,6 @@ public class MCRCalendar {
      
     /**
      * This method returns the date as string in format 'yy-MM-dd G'.
-     * 
-     * @param date
-     *            the Calendar date
      * 
      * @return the date string
      */

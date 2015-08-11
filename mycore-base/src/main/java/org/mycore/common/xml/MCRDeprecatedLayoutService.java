@@ -35,7 +35,7 @@ public class MCRDeprecatedLayoutService {
 
     /**
      * Sends a JDOM document as a response. 
-     * @deprecated use {@link #sendXML(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
+     * @deprecated use {@link MCRLayoutService#sendXML(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
      */
     @Deprecated
     public void sendXML(HttpServletRequest req, HttpServletResponse res, org.jdom2.Document jdom) throws IOException {
@@ -44,7 +44,7 @@ public class MCRDeprecatedLayoutService {
 
     /**
      * Sends a DOM document as a response. 
-     * @deprecated use {@link #sendXML(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
+     * @deprecated use {@link MCRLayoutService#sendXML(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
      */
     @Deprecated
     public void sendXML(HttpServletRequest req, HttpServletResponse res, org.w3c.dom.Document dom) throws IOException {
@@ -53,7 +53,7 @@ public class MCRDeprecatedLayoutService {
 
     /**
      * Sends a document from an InputStream as a response. 
-     * @deprecated use {@link #sendXML(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
+     * @deprecated use {@link MCRLayoutService#sendXML(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
      */
     @Deprecated
     public void sendXML(HttpServletRequest req, HttpServletResponse res, InputStream in) throws IOException {
@@ -62,7 +62,7 @@ public class MCRDeprecatedLayoutService {
 
     /**
      * Sends a document from a File as a response. 
-     * @deprecated use {@link #sendXML(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
+     * @deprecated use {@link MCRLayoutService#sendXML(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
      */
     @Deprecated
     public void sendXML(HttpServletRequest req, HttpServletResponse res, File file) throws IOException {
@@ -71,7 +71,7 @@ public class MCRDeprecatedLayoutService {
 
     /**
      * 
-     * @deprecated use {@link #doLayout(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
+     * @deprecated use {@link MCRLayoutService#doLayout(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
      */
     @Deprecated
     public void doLayout(HttpServletRequest req, HttpServletResponse res, org.jdom2.Document jdom) throws IOException {
@@ -128,7 +128,7 @@ public class MCRDeprecatedLayoutService {
 
     /**
      * 
-     * @deprecated use {@link #doLayout(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
+     * @deprecated use {@link MCRLayoutService#doLayout(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
      */
     @Deprecated
     public void doLayout(HttpServletRequest req, HttpServletResponse res, org.w3c.dom.Document dom) throws IOException,
@@ -142,7 +142,7 @@ public class MCRDeprecatedLayoutService {
 
     /**
      * 
-     * @deprecated use {@link #doLayout(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
+     * @deprecated use {@link MCRLayoutService#doLayout(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
      */
     @Deprecated
     public void doLayout(HttpServletRequest req, HttpServletResponse res, InputStream is) throws IOException,
@@ -156,7 +156,7 @@ public class MCRDeprecatedLayoutService {
 
     /**
      * 
-     * @deprecated use {@link #doLayout(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
+     * @deprecated use {@link MCRLayoutService#doLayout(HttpServletRequest, HttpServletResponse, MCRContent)} instead.
      */
     @Deprecated
     public void doLayout(HttpServletRequest req, HttpServletResponse res, File file) throws IOException {

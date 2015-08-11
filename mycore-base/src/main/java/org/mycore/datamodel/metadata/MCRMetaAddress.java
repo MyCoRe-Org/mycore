@@ -73,7 +73,7 @@ final public class MCRMetaAddress extends MCRMetaDefault {
      * @param set_subtag      the name of the subtag
      * @param default_lang    the default language
      * @param set_type        the optional type string
-     * @param set_inherted    a value >= 0
+     * @param set_inherted    a value &gt;= 0
      * @param set_country     the country name
      * @param set_state       the state name
      * @param set_zipcode     the zipCode string

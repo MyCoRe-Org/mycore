@@ -104,8 +104,6 @@ import com.google.common.collect.Maps;
  * java -DMCR.Configuration.Class=MCRConfigurationSubclass MyCoReSample
  * </PRE>
  * 
- * @see #loadFromFile
- * @see #reload
  * @see #list(PrintStream)
  * @see #store
  * @author Frank Lützenkirchen
@@ -223,8 +221,6 @@ public class MCRConfiguration {
 
     /**
      * Protected constructor to create the singleton instance
-     * 
-     * @throws IOException
      */
     protected MCRConfiguration() throws IOException {
         baseProperties = new MCRProperties();
@@ -236,8 +232,6 @@ public class MCRConfiguration {
 
     /**
      * Creates a new .systemTime file in MCR.datadir.
-     * 
-     * @throws IOException
      */
     protected void createLastModifiedFile() throws IOException {
         final String dataDirKey = "MCR.datadir";
@@ -498,7 +492,7 @@ public class MCRConfiguration {
      * 
      * @param name
      *            the non-null and non-empty qualified name of the configuration property
-     * @param defaulObj
+     * @param defaultObj
      *            the default object;
      * @return Instance of the value of the configuration property
      * @throws MCRConfigurationException

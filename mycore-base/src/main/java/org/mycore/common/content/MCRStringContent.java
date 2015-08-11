@@ -57,7 +57,6 @@ public class MCRStringContent extends MCRContent {
     /** 
      * Sets the character encoding to use when transforming the text to a byte stream.
      * By default, this is {@link MCRConstants#DEFAULT_ENCODING}.
-     * @throws IOException 
      */
     @Override
     public void setEncoding(String encoding) throws UnsupportedEncodingException {

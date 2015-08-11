@@ -32,7 +32,6 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRCalendar;
-import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRBooleanClauseParser;
@@ -47,8 +46,6 @@ import com.ibm.icu.util.GregorianCalendar;
 
 /**
  * Parses query conditions for use in MCRSearcher.
- * 
- * @see MCRSearcher
  * 
  * @author Frank Lützenkirchen
  */

@@ -22,8 +22,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
@@ -298,9 +296,9 @@ public class MCRCommandLineInterface {
      * 
      * @param fname
      *            the filename
-     * @throws Exception
      */
     public static void show(String fname) throws Exception {
+        //TODO Java 8 Files.readAllLines()
         try (BufferedReader br = Files.newBufferedReader(new File(fname).toPath(), Charset.defaultCharset())) {
             System.out.println();
             String line;

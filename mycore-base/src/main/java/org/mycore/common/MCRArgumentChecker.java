@@ -40,7 +40,7 @@ import java.util.Objects;
  * }
  * </pre>
  * 
- * @deprecated
+ * @deprecated without replacement
  */
 @Deprecated
 public abstract class MCRArgumentChecker {

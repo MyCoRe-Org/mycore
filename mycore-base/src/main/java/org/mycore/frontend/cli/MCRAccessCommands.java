@@ -45,7 +45,6 @@ import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.xml.sax.SAXParseException;
 
 /**
  * This class provides a set of commands for the org.mycore.access management
@@ -86,8 +85,6 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * 
      * @param filename
      *            the filename of the file that contains the mcrpermissions
-     * @throws SAXParseException
-     * @throws MCRException
      * 
      */
     public static void createPermissionsFromFile(String filename) throws Exception {
@@ -255,8 +252,6 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      *            String the id of the object the rule is assigned to
      * @param strFileRule
      *            String the path to the xml file, that contains the rule
-     * @throws SAXParseException
-     * @throws MCRException
      */
     @MCRCommand(syntax = "update permission {0} for id {1} with rulefile {2}",
             help = "The command updates access rule for a given id of a given permission with a given special rule",
@@ -278,8 +273,6 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * @param description
      *            String give a special description, if the semantics of your
      *            rule is multiple used
-     * @throws SAXParseException
-     * @throws MCRException
      */
     @MCRCommand(syntax = "update permission {0} for id {1} with rulefile {2} described by {3}",
             help = "The command updates access rule for a given id of a given permission with a given special rule",
@@ -303,8 +296,6 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      *            String type of permission like read, writedb, etc.
      * @param strFileRule
      *            String the path to the xml file, that contains the rule
-     * @throws SAXParseException
-     * @throws MCRException
      */
     @MCRCommand(
             syntax = "update permission {0} for selected with rulefile {1}",
@@ -325,8 +316,6 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * @param description
      *            String give a special description, if the semantics of your
      *            rule is multiple used
-     * @throws SAXParseException
-     * @throws MCRException
      */
 
     @MCRCommand(

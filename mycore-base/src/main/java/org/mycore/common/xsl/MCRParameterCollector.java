@@ -153,7 +153,6 @@ public class MCRParameterCollector {
 
     /**
      * Sets all parameters from the given map
-     * @param param
      */
     public void setParameters(Map<String, String> param) {
         parameters.putAll(param);
@@ -342,9 +341,6 @@ public class MCRParameterCollector {
         }
     }
 
-    /**
-     * @return
-     */
     public static MCRParameterCollector getInstanceFromUserSession() {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         MCRServletJob job = (MCRServletJob) mcrSession.get("MCRServletJob");

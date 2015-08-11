@@ -36,10 +36,6 @@ public class MCRConfigurationException extends org.mycore.common.config.MCRConfi
         // TODO Auto-generated constructor stub
     }
 
-    /**
-     * @param message
-     * @param cause
-     */
     public MCRConfigurationException(String message, Throwable cause) {
         super(message, cause);
         // TODO Auto-generated constructor stub

@@ -70,7 +70,7 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
      * @param set_subtag      the name of the subtag
      * @param default_lang    the default language
      * @param set_type        the optional type string
-     * @param set_inherted    a value >= 0
+     * @param set_inherted    a value &gt;= 0
      * @param set_fullname    the full name
      * @param set_nickname    the nickname
      * @param set_property       the property title

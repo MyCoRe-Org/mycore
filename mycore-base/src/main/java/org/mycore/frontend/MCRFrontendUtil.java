@@ -283,7 +283,7 @@ public class MCRFrontendUtil {
      * @param response the response data to cache
      * @param CACHE_TIME how long to cache
      * @param lastModified when the data was last modified
-     * @param useExpire
+     * @param useExpire true if 'Expire' header should be set
      */
     public static void writeCacheHeaders(HttpServletResponse response, long CACHE_TIME, long lastModified,
         boolean useExpire) {

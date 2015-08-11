@@ -96,7 +96,8 @@ public class MCRCategoryTransformer {
      *            if true, sort items
      * @param emptyLeaves
      *            if true, also include empty leaves
-     * @param completeId 
+     * @param completeId
+     *            if true, category ID is given in form {classID}':'{categID} 
      */
     public static Element getEditorItems(MCRCategory cl, boolean sort, boolean emptyLeaves, boolean completeId) {
         return new ItemElementFactory(cl, STANDARD_LABEL, sort, emptyLeaves, completeId).getResult();

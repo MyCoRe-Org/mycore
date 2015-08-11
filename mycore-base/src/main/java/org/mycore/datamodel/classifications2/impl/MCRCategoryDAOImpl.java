@@ -596,10 +596,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     /**
      * returns database backed MCRCategoryImpl
      * 
-     * every change to the returned MCRCategory is refelected in the database.
-     * 
-     * @param session
-     * @param id
+     * every change to the returned MCRCategory is reflected in the database.
      */
     public static MCRCategoryImpl getByNaturalID(Session session, MCRCategoryID id) {
         return (MCRCategoryImpl) session.byNaturalId(CATEGRORY_CLASS).setSynchronizationEnabled(false)
@@ -774,14 +771,6 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      */
     synchronized protected void updateLastModified(String root) {
         LAST_MODIFIED_MAP.put(root, System.currentTimeMillis());
-    }
-
-    private int getNodesCount(MCRCategory category) {
-        int nodes = 1;
-        for (MCRCategory child : category.getChildren()) {
-            nodes += getNodesCount(child);
-        }
-        return nodes;
     }
 
     /**

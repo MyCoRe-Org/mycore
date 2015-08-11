@@ -92,7 +92,7 @@ public class MCRTemplatesCompiler {
     }
 
     /** Returns a new transformer for the compiled XSL templates 
-     * @throws TransformerConfigurationException */
+     */
     public static Transformer getTransformer(Templates templates) throws TransformerConfigurationException {
         Transformer tf = factory.newTransformerHandler(templates).getTransformer();
 

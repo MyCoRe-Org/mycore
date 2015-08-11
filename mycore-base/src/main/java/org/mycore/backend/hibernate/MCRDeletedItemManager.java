@@ -34,7 +34,6 @@ public class MCRDeletedItemManager {
      *            the identifier of the MCRObject or MCRDerivate
      * @param dateDeleted
      *            the current date
-     * @throws MCRPersistenceException
      */
     public synchronized final void addEntry(String identifier, Date dateDeleted) throws MCRPersistenceException {
         if (identifier == null) {

@@ -87,7 +87,7 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
      * @param set_subtag
      *            the name of the subtag
      * @param set_inherted
-     *            a value >= 0
+     *            a value &gt;= 0
      * 
      * @exception MCRException
      *                if the parameter values are invalid
@@ -118,8 +118,6 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
 
     /**
      * This method set the first name text element.
-     * 
-     * @param set_firstname
      */
     public final void setFirstName(String set_firstname) {
         if (set_firstname != null) {
@@ -140,8 +138,6 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
 
     /**
      * This method set the call name text element.
-     * 
-     * @param set_callname
      */
     public final void setCallName(String set_callname) {
         if (set_callname != null) {
@@ -162,8 +158,6 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
 
     /**
      * This method set the surname text element.
-     * 
-     * @param set_surname
      */
     public final void setSurName(String set_surname) {
         if (set_surname != null) {
@@ -184,8 +178,6 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
 
     /**
      * This method set the full name text element.
-     * 
-     * @param set_fullname
      */
     public final void setFullName(String set_fullname) {
         if (set_fullname != null) {
@@ -206,8 +198,6 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
 
     /**
      * This method set the academic text element.
-     * 
-     * @param set_academic
      */
     public final void setAcademic(String set_academic) {
         if (set_academic != null) {
@@ -228,8 +218,6 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
 
     /**
      * This method set the peerage text element.
-     * 
-     * @param set_peerage
      */
     public final void setPeerage(String set_peerage) {
         if (set_peerage != null) {
@@ -250,8 +238,6 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
 
     /**
      * This method set the numeration text element.
-     * 
-     * @param set_numeration
      */
     public final void setNumeration(String set_numeration) {
         if (set_numeration != null) {
@@ -272,8 +258,6 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
 
     /**
      * This method set the title text element.
-     * 
-     * @param set_title
      */
     public final void setTitle(String set_title) {
         if (set_title != null) {
@@ -294,8 +278,6 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
 
     /**
      * This method set the prefix text element.
-     * 
-     * @param set_prefix
      */
     public final void setPrefix(String set_prefix) {
         if (set_prefix != null) {
@@ -316,8 +298,6 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
 
     /**
      * This method set the affix text element.
-     * 
-     * @param set_affix
      */
     public final void setAffix(String set_affix) {
         if (set_affix != null) {

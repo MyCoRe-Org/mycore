@@ -38,7 +38,7 @@ import org.mycore.common.events.MCRSessionListener;
  * many Servlet engines. In this case it is possible for the session object to stay attached to a thread where it should
  * not be. Use the {@link #releaseCurrentSession()}method to reset the session object for a Thread to its default
  * values. The basic idea for the implementation of this class is taken from an apache project, namely the class
- * org.apache.common.latka.LatkaProperties.java written by Morgan Delagrange. Please see <http://www.apache.org/>.
+ * org.apache.common.latka.LatkaProperties.java written by Morgan Delagrange.
  * 
  * @author Detlev Degenhardt
  * @author Thomas Scheffler (yagee)
@@ -205,8 +205,8 @@ public class MCRSessionMgr {
      * readLock() and use the writeLock() if you want to modify the list. Using locks will allow a high degree of
      * concurrent access. Mainly for internal use of MCRSession.
      * 
-     * @see ReentrantReadWriteLock#readLock();
-     * @see ReentrantReadWriteLock#writeLock();
+     * @see ReentrantReadWriteLock#readLock()
+     * @see ReentrantReadWriteLock#writeLock()
      */
     static ReentrantReadWriteLock getListenersLock() {
         return listenersLock;

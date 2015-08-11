@@ -75,7 +75,7 @@ public class MCRMetaLink extends MCRMetaDefault {
      * @param set_subtag
      *            the name of the subtag
      * @param set_inherted
-     *            a value >= 0
+     *            a value &gt;= 0
      * @exception MCRException
      *                if the set_datapart or set_subtag value is null or empty
      */
@@ -212,7 +212,6 @@ public class MCRMetaLink extends MCRMetaDefault {
     /**
      * This method sets the xlink:role.
      * 
-     * @param role
      */
     public void setXLinkRole(String role) {
         this.role = role;
@@ -221,7 +220,6 @@ public class MCRMetaLink extends MCRMetaDefault {
     /**
      * This method get the xlink:role element as string.
      * 
-     * @return
      */
     public String getXLinkRole() {
         return role;

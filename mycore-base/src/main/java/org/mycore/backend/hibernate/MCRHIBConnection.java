@@ -120,8 +120,6 @@ public class MCRHIBConnection implements Closeable {
 
     /**
      * This method initializes the connection to the database
-     * 
-     * @throws MCRPersistenceException
      */
     protected MCRHIBConnection() throws MCRPersistenceException {
         try {
@@ -382,7 +380,6 @@ public class MCRHIBConnection implements Closeable {
      * if a query with name <code>name.&lt;DBDialect&gt;</code> exists it takes
      * precedence over a query named <code>name</code>
      * 
-     * @param name
      * @return Query defined in mapping
      */
     public Query getNamedQuery(String name) {

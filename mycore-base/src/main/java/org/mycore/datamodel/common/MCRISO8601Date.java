@@ -79,7 +79,7 @@ public class MCRISO8601Date {
      * formats the date to a String.
      * 
      * @param format
-     *            as in {@link DateTimeFormat}
+     *            as in {@link MCRISO8601Format}
      * @param locale
      *            used by format process
      * @return null if date is not set yet
@@ -92,7 +92,7 @@ public class MCRISO8601Date {
      * formats the date to a String.
      * 
      * @param format
-     *            as in {@link DateTimeFormat}
+     *            as in {@link MCRISO8601Format}
      * @param locale
      *            used by format process
      * @param timeZone

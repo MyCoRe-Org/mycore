@@ -53,7 +53,7 @@ public class MCRTextResolver {
     /**
      * Retains the text if a variable couldn't be resolved.
      * Example if {Variable} could not be resolved:
-     * true: "Hello {Variable}" -> "Hello {Variable}"
+     * true: "Hello {Variable}" -&gt; "Hello {Variable}"
      * false: "Hello "
      * <p>By default retainText is true</p>
      */
@@ -71,10 +71,6 @@ public class MCRTextResolver {
     /**
      * Creates the term list for the text resolver and adds
      * the default terms.
-     * @throws InstantiationException 
-     * @throws IllegalAccessException 
-     * @throws InvocationTargetException 
-     * @throws NoSuchMethodException 
      */
     protected void registerDefaultTerms() throws NoSuchMethodException, InvocationTargetException,
         IllegalAccessException, InstantiationException {
@@ -87,10 +83,6 @@ public class MCRTextResolver {
      * Register a new term. The resolver invokes the term via reflection.
      * 
      * @param termClass the term class to register. 
-     * @throws NoSuchMethodException
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
-     * @throws InstantiationException
      */
     public void registerTerm(Class<? extends Term> termClass) throws NoSuchMethodException, InvocationTargetException,
         IllegalAccessException, InstantiationException {
@@ -101,10 +93,6 @@ public class MCRTextResolver {
      * Unregister a term.
      * 
      * @param termClass this class is unregistered
-     * @throws NoSuchMethodException
-     * @throws InvocationTargetException
-     * @throws InstantiationException
-     * @throws IllegalAccessException
      */
     public void unregisterTerm(Class<? extends Term> termClass) throws NoSuchMethodException,
         InvocationTargetException, InstantiationException, IllegalAccessException {
@@ -122,10 +110,6 @@ public class MCRTextResolver {
 
     /**
      * Creates a new text resolver with a map of variables.
-     * 
-     * @param variablesMap a hash map of variables
-     * @param depth how deep the text is resolved
-     * @param retainText if the original text is retained if a variable coulnd't be resolved
      */
     public MCRTextResolver() {
         this.variablesMap = new HashMap<>();
@@ -150,11 +134,6 @@ public class MCRTextResolver {
         mixin(variablesMap);
     }
 
-    /**
-     * 
-     * 
-     * @param properties
-     */
     public MCRTextResolver(Properties properties) {
         this();
         mixin(properties);
@@ -187,8 +166,8 @@ public class MCRTextResolver {
     /**
      * Sets if the text should be retained if a variable couldn't be resolved.
      * <p>
-     * Example:<br />
-     * true: "Hello {Variable}" -> "Hello {Variable}"<br />
+     * Example:<br>
+     * true: "Hello {Variable}" -&gt; "Hello {Variable}"<br>
      * false: "Hello "
      * </p>
      * <p>By default retainText is true</p>
@@ -389,8 +368,6 @@ public class MCRTextResolver {
         /**
          * Does term specific resolving for the current character.
          * 
-         * @param text
-         * @param pos
          * @return true if the end string is reached, otherwise false
          */
         protected abstract boolean resolveInternal(String text, int pos);

@@ -50,7 +50,7 @@ public interface MCRUserInformation {
     
     /**
      * Get additional attributes if they are provided by the underlying user system
-     * @param attribute
+     * @param attribute user attribute name
      * @return attribute value as String or null if no value is defined;
      */
     public String getUserAttribute(String attribute);

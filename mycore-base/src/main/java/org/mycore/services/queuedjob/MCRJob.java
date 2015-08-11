@@ -108,7 +108,7 @@ public class MCRJob implements Cloneable {
     /**
      * Set the action class ({@link MCRJobAction}).
      * 
-     * @param action - the action class to set
+     * @param actionClass - the action class to set
      */
     public void setAction(Class<? extends MCRJobAction> actionClass) {
         this.action = actionClass;
@@ -117,7 +117,6 @@ public class MCRJob implements Cloneable {
     /**
      * Returns the current state ({@link MCRJobStatus}) of the job.
      * 
-     * @return
      */
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -147,7 +146,6 @@ public class MCRJob implements Cloneable {
     /**
      * Set the adding date.
      * 
-     * @param added
      */
     public void setAdded(Date added) {
         this.added = added;

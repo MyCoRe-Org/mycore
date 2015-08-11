@@ -38,7 +38,6 @@ public interface MCREditorMetadataValidator {
      * If an element is not valid it is removed from the JDOM document.
      * The returned String then can give a hint to the form developer, why it is removed.
      * This method may throw a {@link RuntimeException} in which case the whole validation process will fail.
-     * @param datasubtag
      * @return 
      *  null, everything is OK
      *  validation error message

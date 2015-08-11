@@ -119,8 +119,6 @@ public class MCRXMLResource {
      *         resource is not found
      * @throws IOException
      *             if resource cannot be loaded
-     * @throws JDOMException
-     *             if resource cannot be parsed
      */
     public MCRContent getResource(String name, ClassLoader classLoader) throws IOException {
         ResourceModifiedHandle modifiedHandle = getModifiedHandle(name, classLoader, 10000);

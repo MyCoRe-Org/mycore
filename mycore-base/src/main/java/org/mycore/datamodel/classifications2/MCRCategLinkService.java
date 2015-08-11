@@ -46,7 +46,6 @@ public interface MCRCategLinkService {
     /**
      * Checks if the category with the given id is liked with an object
      * 
-     * @param classif
      * @return
      *      true if is linked otherwise false
      */
@@ -90,7 +89,7 @@ public interface MCRCategLinkService {
      * 
      * @param ids
      *            a collection of {@link MCRCategLinkReference}
-     * @see #deleteLink(String)
+     * @see #deleteLink(MCRCategLinkReference)
      */
     public abstract void deleteLinks(Collection<MCRCategLinkReference> ids);
 
@@ -134,22 +133,18 @@ public interface MCRCategLinkService {
 
     /**
      * Return a collection of all category link references for the given type
-     * @param type
      */
     public abstract Collection<MCRCategLinkReference> getReferences(String type);
 
     /**
      * Return a collection of all link types.
      * 
-     * @return
      */
     public abstract Collection<String> getTypes();
 
     /**
      * Returns a collection of all links for the given type.
      * 
-     * @param type
-     * @return
      */
     public abstract Collection<MCRCategoryLink> getLinks(String type);
 
@@ -163,8 +158,8 @@ public interface MCRCategLinkService {
      *            reference to a Object
      * @param categories
      *            a collection of categoryIDs to be linked to
-     * @see #countLinks(category, childrenOnly)
-     * @see #countLinksForType(category, type, childrenOnly)
+     * @see #countLinks(MCRCategory, boolean)
+     * @see #countLinksForType(MCRCategory, String, boolean)
      */
     public abstract void setLinks(MCRCategLinkReference objectReference, Collection<MCRCategoryID> categories);
 

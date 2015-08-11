@@ -85,11 +85,6 @@ public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
         return parsedRule;
     }
 
-    /**
-     * rule
-     * 
-     * @param rule
-     */
     public void setRule(String rule) {
         this.rule = rule;
         parsedRule = rule == null ? null : parser.parse(rule);

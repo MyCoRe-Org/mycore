@@ -68,29 +68,16 @@ final public class MCRDerivate extends MCRBase {
         mcr_derivate = new MCRObjectDerivate(getId());
     }
 
-    /**
-     * @param bytes
-     * @param valid
-     * @throws SAXParseException
-     */
     public MCRDerivate(byte[] bytes, boolean valid) throws SAXParseException, IOException {
         this();
         setFromXML(bytes, valid);
     }
 
-    /**
-     * @param doc
-     * @throws SAXParseException
-     */
     public MCRDerivate(Document doc) {
         this();
         setFromJDOM(doc);
     }
 
-    /**
-     * @param uri
-     * @throws SAXParseException
-     */
     public MCRDerivate(URI uri) throws SAXParseException, IOException {
         this();
         setFromURI(uri);

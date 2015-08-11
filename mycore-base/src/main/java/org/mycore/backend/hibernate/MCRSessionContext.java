@@ -25,8 +25,8 @@ package org.mycore.backend.hibernate;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.context.internal.ThreadLocalSessionContext;
+import org.hibernate.context.spi.CurrentSessionContext;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;

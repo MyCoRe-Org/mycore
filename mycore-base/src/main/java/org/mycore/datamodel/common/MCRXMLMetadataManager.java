@@ -259,8 +259,6 @@ public class MCRXMLMetadataManager {
      * 
      * @param project the project, e.g. DocPortal
      * @param type the object type, e.g. document
-     * @throws IllegalAccessException 
-     * @throws InstantiationException 
      */
     public MCRMetadataStore getStore(String project, String type) {
         String projectType = getStoryKey(project, type);
@@ -533,7 +531,7 @@ public class MCRXMLMetadataManager {
      * Retrieves stored metadata xml as JDOM document
      * 
      * @param mcrid the MCRObjectID
-     * @returns null if metadata is not present 
+     * @return null if metadata is not present 
      */
     public Document retrieveXML(MCRObjectID mcrid) throws IOException, JDOMException, SAXException {
         MCRContent metadata = retrieveContent(mcrid);
@@ -544,8 +542,7 @@ public class MCRXMLMetadataManager {
      * Retrieves stored metadata xml as byte[] BLOB.
      * 
      * @param mcrid the MCRObjectID 
-     * @throws IOException 
-     * @returns null if metadata is not present 
+     * @return null if metadata is not present 
      */
     public byte[] retrieveBLOB(MCRObjectID mcrid) throws IOException {
         MCRContent metadata = retrieveContent(mcrid);
@@ -571,7 +568,6 @@ public class MCRXMLMetadataManager {
      * @return a {@link MCRContent} representing the {@link MCRObject} of the
      *         given revision or <code>null</code> if there is no such object
      *         with the given revision
-     * @throws IOException 
      */
     public MCRContent retrieveContent(MCRObjectID mcrid, long revision) throws IOException {
         LOGGER.info("Getting object " + mcrid + " in revision " + revision);
@@ -612,7 +608,6 @@ public class MCRXMLMetadataManager {
      * @return {@link List} with all {@link MCRMetadataVersion} of
      *         the given object or null if the id is null or the metadata
      *         store doesn't support versioning
-     * @throws IOException
      */
     public List<MCRMetadataVersion> listRevisions(MCRObjectID id) throws IOException {
         MCRVersionedMetadata vm = getVersionedMetaData(id);
@@ -622,11 +617,6 @@ public class MCRXMLMetadataManager {
         return vm.listVersions();
     }
 
-    /**
-     * @param id
-     * @return
-     * @throws IOException
-     */
     public MCRVersionedMetadata getVersionedMetaData(MCRObjectID id) throws IOException {
         if (id == null) {
             return null;
@@ -748,7 +738,7 @@ public class MCRXMLMetadataManager {
      * Returns all stored object types of MCRObjects.
      * 
      * @return collection of object types
-     * @see MCRObjectID#getTypeId();
+     * @see MCRObjectID#getTypeId()
      */
     public Collection<String> getObjectTypes() {
         Set<String> set = new java.util.HashSet<>();
@@ -829,7 +819,6 @@ public class MCRXMLMetadataManager {
 
     /**
      * Returns the time when the xml data of a MCRObject was last modified.
-     * @param id
      * @return output of {@link MCRStoredMetadata#getLastModified()}
      * @throws IOException thrown by {@link MCRMetadataStore#retrieve(int)}
      */

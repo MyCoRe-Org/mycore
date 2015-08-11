@@ -168,7 +168,6 @@ public class MCRHIBRuleStore extends MCRRuleStore {
      * @param ruleid
      *            id as string
      * @return boolean value
-     * @throws MCRException
      */
     @Override
     @SuppressWarnings("unchecked")

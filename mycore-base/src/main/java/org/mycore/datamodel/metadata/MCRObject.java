@@ -73,29 +73,16 @@ final public class MCRObject extends MCRBase {
         mcr_metadata = new MCRObjectMetadata();
     }
 
-    /**
-     * @param bytes
-     * @param valid
-     * @throws SAXParseException
-     */
     public MCRObject(byte[] bytes, boolean valid) throws SAXParseException, IOException {
         this();
         setFromXML(bytes, valid);
     }
 
-    /**
-     * @param doc
-     * @throws SAXParseException
-     */
     public MCRObject(Document doc) {
         this();
         setFromJDOM(doc);
     }
 
-    /**
-     * @param uri
-     * @throws SAXParseException
-     */
     public MCRObject(URI uri) throws SAXParseException, IOException {
         this();
         setFromURI(uri);

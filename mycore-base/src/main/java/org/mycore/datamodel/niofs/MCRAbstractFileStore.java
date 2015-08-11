@@ -15,8 +15,6 @@ public abstract class MCRAbstractFileStore extends FileStore {
 
     /**
      * Returns base directory of this filestore.
-     * @return
-     * @throws IOException 
      */
     public abstract Path getBaseDirectory() throws IOException;
 

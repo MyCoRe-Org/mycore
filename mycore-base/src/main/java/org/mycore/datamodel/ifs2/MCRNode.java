@@ -80,7 +80,6 @@ public abstract class MCRNode {
      * Path always start with a slash, slash is used as directory delimiter.
      * 
      * @return the absolute path of this node
-     * @throws IOException
      */
     public String getPath() throws IOException {
         if (parent != null) {

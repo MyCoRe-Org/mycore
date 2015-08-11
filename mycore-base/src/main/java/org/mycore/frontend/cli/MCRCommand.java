@@ -163,15 +163,6 @@ public class MCRCommand {
         suffix = pos == -1 ? cmdAnnotation.syntax() : cmdAnnotation.syntax().substring(0, pos);
     }
 
-    /**
-     * Returns the method implementing the command behavior.
-     * 
-     * @return The method to be invoked for executing the command
-     * @throws ClassNotFoundException
-     *             when the class that implements the method was not found
-     * @throws NoSuchMethodException
-     *             When the method specified in the constructor was not found
-     */
     private void initMethod(ClassLoader classLoader) throws ClassNotFoundException, NoSuchMethodException {
         if (method == null) {
             setMethod(Class.forName(className, true, classLoader).getMethod(methodName, parameterTypes));

@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
@@ -39,6 +40,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
+import org.jdom2.JDOMException;
 import org.jdom2.transform.JDOMResult;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRException;
@@ -63,6 +65,7 @@ import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.tools.MCRTopologicalSort;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
@@ -187,7 +190,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * 
      * @param directory
      *            the directory containing the XML files
-     * @throws MCRActiveLinkException
      */
     @MCRCommand(
         syntax = "load all objects in topological order from directory {0}",
@@ -202,7 +204,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * 
      * @param directory
      *            the directory containing the XML files
-     * @throws MCRActiveLinkException
      */
     @MCRCommand(
         syntax = "update all objects in topological order from directory {0}",
@@ -217,7 +218,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * 
      * @param directory
      *            the directory containing the XML files
-     * @throws MCRActiveLinkException
      */
     @MCRCommand(
         syntax = "load all objects from directory {0}",
@@ -231,7 +231,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * 
      * @param directory
      *            the directory containing the XML files
-     * @throws MCRActiveLinkException
      */
     @MCRCommand(
         syntax = "update all objects from directory {0}",
@@ -299,9 +298,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * 
      * @param file
      *            the location of the xml file
-     * @throws MCRActiveLinkException
-     * @throws SAXParseException
-     * @throws MCRException
      */
     @MCRCommand(
         syntax = "load object from file {0}", help = "Adds a MCRObject from the file {0} to the system.", order = 60)
@@ -317,9 +313,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the location of the xml file
      * @param importMode
      *            if true, servdates are taken from xml file
-     * @throws MCRActiveLinkException
-     * @throws SAXParseException
-     * @throws MCRException
      */
     public static boolean loadFromFile(String file, boolean importMode) throws MCRActiveLinkException, MCRException,
         SAXParseException, IOException {
@@ -331,9 +324,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * 
      * @param file
      *            the location of the xml file
-     * @throws MCRActiveLinkException
-     * @throws SAXParseException
-     * @throws MCRException
      */
     @MCRCommand(
         syntax = "update object from file {0}", help = "Updates a MCRObject from the file {0} in the system.",
@@ -350,9 +340,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the location of the xml file
      * @param importMode
      *            if true, servdates are taken from xml file
-     * @throws MCRActiveLinkException
-     * @throws SAXParseException
-     * @throws MCRException
      */
     public static boolean updateFromFile(String file, boolean importMode) throws MCRActiveLinkException, MCRException,
         SAXParseException, IOException {
@@ -817,12 +804,14 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            object to transform
      * @param xslFilePath
      *            path to xsl file
-     * @throws Exception
+     * @throws URISyntaxException if xslFilePath is not a valid file or URL
+     * @throws MCRActiveLinkException see {@link MCRMetadataManager#update(MCRObject)}
+     * @throws MCRPersistenceException see {@link MCRMetadataManager#update(MCRObject)}
      */
     @MCRCommand(
         syntax = "xslt {0} with file {1}", help = "transforms a mycore object {0} with the given file or URL {1}",
         order = 280)
-    public static void xslt(String objectId, String xslFilePath) throws Exception {
+    public static void xslt(String objectId, String xslFilePath) throws IOException, JDOMException, SAXException, URISyntaxException, TransformerException, MCRPersistenceException, MCRActiveLinkException {
         File xslFile = new File(xslFilePath);
         URL xslURL;
         if (!xslFile.exists()) {
@@ -866,8 +855,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            object that should be attached to new parent
      * @param newParentId
      *            the ID of the new parent
-     * @throws MCRPersistenceException
-     * @throws MCRActiveLinkException
      */
     @MCRCommand(
         syntax = "set parent of {0} to {1}",

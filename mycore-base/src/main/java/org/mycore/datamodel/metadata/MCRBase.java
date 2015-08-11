@@ -194,7 +194,6 @@ public abstract class MCRBase {
      *            an URI
      * @exception MCRException
      *                general Exception of MyCoRe
-     * @throws SAXParseException 
      */
     protected final void setFromURI(URI uri) throws MCRException, SAXParseException, IOException {
         Document jdom = MCRXMLParserFactory.getParser().parseXML(new MCRVFSContent(uri));
@@ -209,7 +208,6 @@ public abstract class MCRBase {
      *            a XML string
      * @exception MCRException
      *                general Exception of MyCoRe
-     * @throws SAXParseException 
      */
     protected final void setFromXML(byte[] xml, boolean valid) throws MCRException, SAXParseException, IOException {
         Document jdom = MCRXMLParserFactory.getParser(valid).parseXML(new MCRByteContent(xml));
@@ -241,8 +239,7 @@ public abstract class MCRBase {
     }
 
     /**
-     * This methode set the MyCoRe version to the string 'Version 1.3'.
-     * @param version
+     * This methods set the MyCoRe version to the string 'Version 1.3'.
      */
     public final void setVersion(String version) {
         mcr_version = version != null ? version : MCRCoreVersion.getVersion();

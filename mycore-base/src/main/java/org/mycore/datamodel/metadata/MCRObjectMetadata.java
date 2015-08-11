@@ -81,9 +81,8 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      * containing all the heritable MetaElement's of this object.
      * 
      * @return MCRObjectMetadata the heritable part of this MCRObjectMetadata
-     * @exception MCRConfigurationException
      */
-    public final MCRObjectMetadata getHeritableMetadata() throws MCRConfigurationException {
+    public final MCRObjectMetadata getHeritableMetadata() {
         MCRObjectMetadata heritMeta = new MCRObjectMetadata();
 
         for (int i = 0; i < size(); ++i) {

@@ -159,10 +159,7 @@ public final class MCRObjectID {
     /**
      * Returns the next free MCRObjectID based on the given type string.
      *  
-     * @param type
-     * 
-     * @see @link {@link MCRObjectID#getNextFreeId(String)} 
-     * 
+     * @see MCRObjectID#getNextFreeId(String) 
      */
     public static synchronized MCRObjectID getNextFreeIdByType(String type) {
         String prefix = CONFIG.getString("MCR.SWF.Project.ID." + type, CONFIG.getString("MCR.SWF.Project.ID"));
@@ -289,10 +286,6 @@ public final class MCRObjectID {
     /**
      * Normalizes to a object ID of form <em>project_id</em>_ <em>type_id</em>_
      * <em>number</em>, where number has leading zeros.
-     * 
-     * @param projectID
-     * @param type
-     * @param number
      * @return <em>project_id</em>_<em>type_id</em>_<em>number</em>
      */
     public static String formatID(String projectID, String type, int number) {
@@ -314,7 +307,6 @@ public final class MCRObjectID {
      * 
      * @param baseID
      *            is <em>project_id</em>_<em>type_id</em>
-     * @param number
      * @return <em>project_id</em>_<em>type_id</em>_<em>number</em>
      */
     public static String formatID(String baseID, int number) {
@@ -444,8 +436,6 @@ public final class MCRObjectID {
 
     /**
      * Returns a list of available mycore object types.
-     * 
-     * @return
      */
     public static List<String> listTypes() {
         return new ArrayList<String>(VALID_TYPE_LIST);

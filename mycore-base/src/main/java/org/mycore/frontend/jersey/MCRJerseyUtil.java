@@ -29,8 +29,6 @@ public abstract class MCRJerseyUtil {
      * 
      * @param document the document to transform
      * @param request the http request
-     * @return 
-     * @throws Exception
      */
     public static MCRContent transform(Document document, HttpServletRequest request) throws Exception {
         MCRParameterCollector parameter = new MCRParameterCollector(request);

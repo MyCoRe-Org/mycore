@@ -92,9 +92,8 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * The text element is set to an empty string. The calendar is set to 'Gregorian Calendar'. The von value 
      * is set to MIN_JULIAN_DAY_NUMBER, the bis value is set to MAX_JULIAN_DAY_NUMBER;
      * @param set_subtag      the name of the subtag
-     * @param default_lang    the default language
      * @param set_type        the optional type string
-     * @param set_inherted    a value >= 0
+     * @param set_inherted    a value &gt;= 0
      *
      * @exception MCRException if the parameter values are invalid
      */
@@ -271,7 +270,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     /**
      * This method set the von to the given date of a supported calendar.
      * 
-     * @param set_date
+     * @param calendar
      *            the date of a ICU supported calendar.
      */
     public final void setVonDate(Calendar calendar) {
@@ -343,7 +342,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * This method get the 'text' text element.
      * 
      * @return the text String of the default language or an empty String
-     * @deprecated
+     * @deprecated use {@link #getTexts()} or {@link #getText(String)} instead
      */
     @Deprecated
     public final String getText() {

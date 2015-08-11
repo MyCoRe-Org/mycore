@@ -58,7 +58,6 @@ public class MCRLayoutTransformerFactory {
     /** 
      * Returns the transformer with the given ID. If the transformer is not instantiated yet,
      * it is created and initialized.
-     * @throws Exception 
      */
     public static MCRContentTransformer getTransformer(String id) throws Exception {
         MCRContentTransformer transformer = transformers.get(id);

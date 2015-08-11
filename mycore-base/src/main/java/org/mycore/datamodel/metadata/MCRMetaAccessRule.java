@@ -66,7 +66,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      * <em>set_condition<em>, if it is null, an exception will be throwed.
      * @param set_subtag       the name of the subtag
      * @param set_type         the optional type string
-     * @param set_inherted     a value >= 0
+     * @param set_inherted     a value &gt;= 0
      * @param set_permission   permission
      * @param set_condition    the JDOM Element included the condition tree
      * @exception MCRException if the set_subtag value or set_condition is null or empty

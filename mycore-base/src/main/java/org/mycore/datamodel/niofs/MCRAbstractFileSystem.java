@@ -54,7 +54,8 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
 
     /**
      * Returns any subclass that implements and handles the given scheme.
-     * @param scheme
+     * @param scheme a valid {@link URI} scheme
+     * @see FileSystemProvider#getScheme()
      * @throws FileSystemNotFoundException if no filesystem handles this scheme
      */
     public static MCRAbstractFileSystem getInstance(String scheme) {
@@ -102,7 +103,6 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
      * This should check if the file is still completely readable and the MD5 sum still matches the recorded value.
      * @param path Path to the file to check
      * @return if the file is still in good condition
-     * @throws NoSuchFileException
      */
     public boolean verifies(MCRPath path) throws NoSuchFileException {
         try {
@@ -122,8 +122,6 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
      * This method does the same as {@link #verifies(MCRPath)} but uses the given attributes to save a file access.
      * @param path Path to the file to check
      * @param attrs matching attributes to file
-     * @return
-     * @throws NoSuchFileException 
      */
     public boolean verifies(MCRPath path, MCRFileAttributes<?> attrs) throws NoSuchFileException {
         if (Files.notExists(Objects.requireNonNull(path, "Path may not be null."))) {

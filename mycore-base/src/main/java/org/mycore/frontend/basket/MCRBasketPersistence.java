@@ -83,7 +83,6 @@ public class MCRBasketPersistence {
      * 
      * @param basket the basket to store in a new file in a new derivate
      * @param ownerID the ID of the MCRObject owning the new derivate 
-     * @throws IOException 
      */
     public static void createDerivateWithBasket(MCRBasket basket, MCRObjectID ownerID) throws IOException {
         String base = ownerID.getProjectId() + "_derivate";

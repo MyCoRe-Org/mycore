@@ -50,7 +50,6 @@ import org.jdom2.output.XMLOutputter;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
-import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLParserFactory;
@@ -64,7 +63,6 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.common.MCRActiveLinkException;
-import org.mycore.frontend.MCRURL;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.xml.sax.SAXParseException;
@@ -86,7 +84,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     /**
      * Deletes a classification
      *
-     * @param classID
+     * @param classID classification ID
      * @see MCRCategoryDAO#deleteCategory(MCRCategoryID)
      */
     @MCRCommand(syntax = "delete classification {0}", help = "The command remove the classification with MCRObjectID {0} from the system.", order = 30)
@@ -95,14 +93,13 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     }
 
     /**
-     * Deletes a classification
+     * Counts the classification categories on top level
      *
-     * @param classID
-     * @see MCRCategoryDAO#deleteCategory(MCRCategoryID)
+     * @param classID classification ID
      */
     @MCRCommand(syntax = "count classification children of {0}", help = "The command count the categoies of the classification with MCRObjectID {0} in the system.", order = 80)
     public static void countChildren(String classID) {
-        MCRCategory category = DAO.getCategory(MCRCategoryID.rootID(classID), -1);
+        MCRCategory category = DAO.getCategory(MCRCategoryID.rootID(classID), 1);
         System.out.printf(Locale.ROOT, "%s has %d children", category.getId(), category.getChildren().size());
     }
 
@@ -113,9 +110,6 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      *
      * @param filename
      *            file in mcrclass xml format
-     * @throws URISyntaxException
-     * @throws SAXParseException
-     * @throws MCRException
      * @see MCRCategoryDAO#addCategory(MCRCategoryID, MCRCategory)
      */
     @MCRCommand(syntax = "load classification from file {0}", help = "The command adds a new classification from file {0} to the system.", order = 10)
@@ -137,9 +131,6 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      *
      * @param filename
      *            file in mcrclass xml format
-     * @throws URISyntaxException
-     * @throws SAXParseException
-     * @throws MCRException
      * @see MCRCategoryDAO#replaceCategory(MCRCategory)
      */
     @MCRCommand(syntax = "update classification from file {0}", help = "The command updates a classification from file {0} to the system.", order = 20)
@@ -166,7 +157,6 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      *
      * @param directory
      *            the directory containing the XML files
-     * @throws MCRActiveLinkException
      */
     @MCRCommand(syntax = "load all classifications from directory {0}", help = "The command add all classifications in the directory {0} to the system.", order = 40)
     public static List<String> loadFromDirectory(String directory) throws MCRActiveLinkException {
@@ -178,7 +168,6 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      *
      * @param directory
      *            the directory containing the XML files
-     * @throws MCRActiveLinkException
      */
     @MCRCommand(syntax = "update all classifications from directory {0}", help = "The command update all classifications in the directory {0} to the system.", order = 50)
     public static List<String> updateFromDirectory(String directory) throws MCRActiveLinkException {

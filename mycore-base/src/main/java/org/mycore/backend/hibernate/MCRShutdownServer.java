@@ -34,7 +34,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.jdom2.JDOMException;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -52,14 +51,6 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class MCRShutdownServer {
 
-    /**
-     * @param args
-     * @throws SQLException
-     * @throws ClassNotFoundException
-     * @throws JDOMException
-     * @throws IOException
-     * @throws SAXException 
-     */
     public static void main(String[] args) throws IOException, SAXException {
         Map<String, String> properties = getConnectionProperties();
         String dbURL = properties.get("connection.url");

@@ -90,7 +90,6 @@ public class MCRFileStore extends MCRStore {
     /**
      * Repairs metadata of all file collections stored here
      * 
-     * @throws IOException
      */
     public void repairAllMetadata() throws IOException {
         for (Iterator<Integer> e = listIDs(MCRStore.ASCENDING); e.hasNext();) {

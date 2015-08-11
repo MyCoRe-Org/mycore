@@ -110,7 +110,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *             ,
      *             "Stores all derivates to the directory {0} with the stylesheet mcr_{1}-derivate.xsl. For {1} save is the default."
      *             ); command.add(com);
-     * @throws MCRPersistenceException
      */
     @MCRCommand(syntax = "delete derivate {0}", help = "The command remove a derivate with the MCRObjectID {0}", order = 30)
     public static void delete(String ID) throws MCRPersistenceException, MCRActiveLinkException {
@@ -126,8 +125,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the start ID for deleting the MCRDerivate
      * @param IDto
      *            the stop ID for deleting the MCRDerivate
-     * @throws MCRActiveLinkException
-     * @throws MCRPersistenceException
      */
     @MCRCommand(syntax = "delete derivate from {0} to {1}", help = "The command remove derivates in the number range between the MCRObjectID {0} and {1}.", order = 20)
     public static void delete(String IDfrom, String IDto) throws MCRPersistenceException, MCRActiveLinkException {
@@ -219,7 +216,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * 
      * @param file
      *            the location of the xml file
-     * @throws SAXParseException
      */
     @MCRCommand(syntax = "load derivate from file {0}", help = "The command add a derivate form the file {0} to the system.", order = 40)
     public static boolean loadFromFile(String file) throws SAXParseException, IOException {
@@ -233,7 +229,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the location of the xml file
      * @param importMode
      *            if true, servdates are taken from xml file
-     * @throws SAXParseException
      */
     public static boolean loadFromFile(String file, boolean importMode) throws SAXParseException, IOException {
         return processFromFile(new File(file), false, importMode);
@@ -244,7 +239,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * 
      * @param file
      *            the location of the xml file
-     * @throws SAXParseException
      */
 
     @MCRCommand(syntax = "update derivate from file {0}", help = "The command update a derivate form the file {0} in the system.", order = 50)
@@ -259,7 +253,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the location of the xml file
      * @param importMode
      *            if true, servdates are taken from xml file
-     * @throws SAXParseException
      */
     public static boolean updateFromFile(String file, boolean importMode) throws SAXParseException, IOException {
         return processFromFile(new File(file), true, importMode);
@@ -602,7 +595,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * 
      * @param id
      *            the MCRObjectID as String
-     * @throws IOException 
      */
     @MCRCommand(syntax = "repair derivate search of ID {0}", help = "The command read the Content store for MCRObjectID {0} and reindex the derivate search store.", order = 150)
     public static void repairDerivateSearchForID(String id) throws IOException {
@@ -696,9 +688,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
     /**
      * Links the given derivate to the given object.
-     * 
-     * @param derivateId
-     * @param objectId
      */
     @MCRCommand(syntax = "link derivate {0} to {1}", help = "links the given derivate {0} to the given mycore object {1}", order = 180)
     public static void linkDerivateToObject(String derivateId, String objectId) throws Exception {

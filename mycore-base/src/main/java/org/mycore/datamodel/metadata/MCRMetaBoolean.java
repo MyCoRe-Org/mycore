@@ -67,7 +67,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      * was set to a boolean element, if it is null, false was set.
      * @param set_subtag       the name of the subtag
      * @param set_type         the optional type string
-     * @param set_inherted     a value >= 0
+     * @param set_inherted     a value &gt;= 0
      * @param set_value        the boolean value (true or false) as string
      *
      * @exception MCRException if the set_subtag value is null or empty
@@ -88,7 +88,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
      * was set to a boolean element, if it is null, false was set.
      * @param set_subtag       the name of the subtag
      * @param set_type         the optional type string
-     * @param set_inherted     a value >= 0
+     * @param set_inherted     a value &gt;= 0
      * @param set_value        the boolean value (true or false)
      * @exception MCRException if the set_subtag value is null or empty
      */

@@ -79,7 +79,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      * was set to the number element, if it is null or not a number, a
      * MCRException was thowed.
      * @param set_subtag       the name of the subtag
-     * @param set_inherted     a value >= 0
+     * @param set_inherted     a value &gt;= 0
      * @param set_dimension    the optional dimension string
      * @param set_measurement  the optional measurement string
      * @param set_number       the number string
@@ -103,7 +103,7 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      * to the measurement element.  The number <em>set_number</em>
      * was set to the number element.
      * @param set_subtag       the name of the subtag
-     * @param set_inherted     a value >= 0
+     * @param set_inherted     a value &gt;= 0
      * @param set_dimension    the optional dimension string
      * @param set_measurement  the optional measurement string
      * @param set_number       the number value

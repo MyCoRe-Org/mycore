@@ -32,9 +32,6 @@ public class Counter {
 
     private int value;
 
-    /**
-     * @param value
-     */
     public Counter() {
         this.value = 0;
     }

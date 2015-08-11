@@ -272,7 +272,7 @@ public interface MCRCategoryDAO {
     /**
      * Gets the last modified timestamp for the given root id. If there is no timestamp at the moment -1 is returned.
      * 
-     * @param root
+     * @param root ID of root category
      * 
      * @return the last modified timestamp (if any) or -1
      */

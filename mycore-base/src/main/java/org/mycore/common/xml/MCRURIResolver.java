@@ -206,8 +206,6 @@ public final class MCRURIResolver implements URIResolver {
      *
      * @param ctx
      *            the servlet context of this web application
-     * @param webAppBase
-     *            the base URL of this web application
      */
     public static synchronized void init(ServletContext ctx) {
         context = ctx;
@@ -348,8 +346,6 @@ public final class MCRURIResolver implements URIResolver {
      * @param in
      *            the InputStream that contains the XML document
      * @return the root element of the parsed input stream
-     * @throws IOException
-     * @throws JDOMException
      */
     protected Element parseStream(InputStream in) throws JDOMException, IOException {
         SAXBuilder builder = new SAXBuilder(XMLReaders.NONVALIDATING);
@@ -407,7 +403,7 @@ public final class MCRURIResolver implements URIResolver {
         /**
          * Reads local MCRObject with a given ID from the store.
          *
-         * @param uri
+         * @param href
          *            for example, "mcrobject:DocPortal_document_07910401"
          * @returns XML representation from MCRXMLContainer
          */
@@ -590,8 +586,8 @@ public final class MCRURIResolver implements URIResolver {
          * Reads XML from URIs of type session:key. The method MCRSession.get( key ) is called and must return a JDOM
          * element.
          *
-         * @see org.mycore.common.MCRSession#get(java.lang.String )
-         * @param uri
+         * @see org.mycore.common.MCRSession#get(Object)
+         * @param href
          *            the URI in the format session:key
          * @return the root element of the xml document
          */
@@ -610,7 +606,7 @@ public final class MCRURIResolver implements URIResolver {
         /**
          * Reads XML from a http or https URL.
          *
-         * @param uri
+         * @param href
          *            the URL of the xml document
          * @return the root element of the xml document
          */
@@ -754,10 +750,10 @@ public final class MCRURIResolver implements URIResolver {
          * 
          * formatAlias: MCRConfiguration property MCR.UURResolver.Classification.Format.FormatAlias
          *
-         * @param uri
+         * @param href
          *            URI in the syntax above
          * @return the root element of the XML document
-         * @see ClassificationTransformer#getEditorDocument(Classification, String)
+         * @see MCRCategoryTransformer
          */
         public Source resolve(String href, String base) throws TransformerException {
             LOGGER.debug("start resolving " + href);
@@ -1054,7 +1050,7 @@ public final class MCRURIResolver implements URIResolver {
      * </p>
      * Example: MCR.URIResolver.xslIncludes.class.template=org.foo.XSLHrefs
      *
-     * @return A xsl file with the includes as href.
+     * @returns A xsl file with the includes as href.
      */
     private static class MCRXslIncludeResolver implements URIResolver {
         private static Logger LOGGER = Logger.getLogger(MCRXslIncludeResolver.class);
@@ -1103,7 +1099,7 @@ public final class MCRURIResolver implements URIResolver {
      *  &lt;xsl:import href="xslImport:components:first.xsl"&gt;
      * </pre>
      *
-     * @return A xsl file with the import as href.
+     * @returns A xsl file with the import as href.
      */
     private static class MCRXslImportResolver implements URIResolver {
 

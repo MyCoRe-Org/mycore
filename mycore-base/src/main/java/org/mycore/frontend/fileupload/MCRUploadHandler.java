@@ -101,7 +101,6 @@ public abstract class MCRUploadHandler {
      *            the length of the file in bytes (file size)
      * @return true, if the file should be uploaded, false if the file should be
      *         skipped
-     * @throws Exception
      */
     public boolean acceptFile(String path, String checksum, long length) throws Exception {
         return true;
@@ -132,7 +131,6 @@ public abstract class MCRUploadHandler {
      *            may be null, meaning that the md5 checksum is not known.
      * @return 
      *            the number of bytes that have been stored.
-     * @throws Exception
      */
     public abstract long receiveFile(String path, InputStream in, long length, String md5) throws Exception;
 
@@ -141,7 +139,6 @@ public abstract class MCRUploadHandler {
      * that the UploadHandler subclass can finish work and commit all saved
      * files.
      * 
-     * @throws Exception
      */
     public abstract void finishUpload() throws Exception;
 
@@ -151,7 +148,6 @@ public abstract class MCRUploadHandler {
      * or cancel work. The implementation is optional, by default finishUpload()
      * is called 
      * 
-     * @throws Exception
      */
     public void cancelUpload() throws Exception {
         finishUpload();

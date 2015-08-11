@@ -193,7 +193,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
 
     /**
      * formats the date to a String
-     * @param format as in {@link DateTimeFormat}
+     * @param format as in {@link MCRISO8601Format}
      * @param locale used by format process
      * @return null if date is not set yet
      */

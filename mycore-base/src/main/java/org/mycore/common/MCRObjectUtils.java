@@ -20,7 +20,6 @@ public abstract class MCRObjectUtils {
      * is the parent object, the last entry is the root node. Returns an empty
      * list if no ancestor is found.
      * 
-     * @param mcrObject
      * @return list of ancestors
      */
     public static List<MCRObject> getAncestors(MCRObject mcrObject) {
@@ -39,7 +38,6 @@ public abstract class MCRObjectUtils {
      * is the object itself, the last entry is the root node. Returns a list
      * with one entry if no ancestor is found.
      * 
-     * @param mcrObject
      * @return list of ancestors
      */
     public static List<MCRObject> getAncestorsAndSelf(MCRObject mcrObject) {
@@ -65,7 +63,6 @@ public abstract class MCRObjectUtils {
      * Returns a list of all descendants and the object itself. For more information
      * see {@link MCRObjectUtils#getDescendants}.
      * 
-     * @param mcrObject
      * @return list of all descendants and the object itself
      */
     public static List<MCRObject> getDescendantsAndSelf(MCRObject mcrObject) {
@@ -79,7 +76,6 @@ public abstract class MCRObjectUtils {
      * there is no specific order. The list is empty if the object has no
      * children.
      * 
-     * @param mcrObject
      * @return list of all descendants 
      */
     public static List<MCRObject>  getDescendants(MCRObject mcrObject) {

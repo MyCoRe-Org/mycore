@@ -21,8 +21,7 @@ public class MCRGlobPathMatcher extends MCRPathMatcher {
 
     /**
      * A {@link PathMatcher} that accepts 'glob' syntax
-     * See {@link FileSystem#getPathMatcher(String)} for 'glob' syntax
-     * @param globPattern
+     * @param globPattern pattern in {@link FileSystem#getPathMatcher(String) 'glob' syntax}
      */
     public MCRGlobPathMatcher(final String globPattern) {
         super(globPattern);

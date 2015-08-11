@@ -26,9 +26,8 @@ package org.mycore.common.config;
 import org.mycore.common.MCRException;
 
 /**
- * Instances of this class represent an exception thrown because of an error in
- * the MyCoRe configuration. Normally this will be the case when a configuration
- * property that is required is not set or has an illegal value.
+ * Instances of this class represent an exception thrown because of an error in the MyCoRe configuration. Normally this
+ * will be the case when a configuration property that is required is not set or has an illegal value.
  * 
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
@@ -48,12 +47,12 @@ public class MCRConfigurationException extends MCRException {
     }
 
     /**
-     * Creates a new MCRConfigurationException with an error message and a
-     * reference to an exception thrown by an underlying system.
+     * Creates a new MCRConfigurationException with an error message and a reference to an exception thrown by an
+     * underlying system.
      * 
      * @param message
      *            the error message for this exception
-     * @param exception
+     * @param cause
      *            the exception that was thrown by an underlying system
      */
     public MCRConfigurationException(String message, Throwable cause) {

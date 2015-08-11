@@ -33,15 +33,14 @@ public interface MCRMetadataShareAgent {
 
     /**
      * Determines if shareable metadata changed from <code>oldVersion</code> to <code>newVersion</code>
-     * @param oldVersion
-     * @param newVersion
-     * @return
+     * @param oldVersion previous version of MCRObject
+     * @param newVersion new version of MCRObject
      */
     public boolean shareableMetadataChanged(MCRObject oldVersion, MCRObject newVersion);
 
     /**
      * updates all recipients of shareable metadata from <code>holder</code>.
-     * @param holder
+     * @param holder usually the parent object that can distrivute metadata
      */
     public void distributeMetadata(MCRObject holder);
 

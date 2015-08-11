@@ -112,7 +112,6 @@ public class MCRSourceContent extends MCRWrappedContent {
     /**
      * Build instance of MCRSourceContent by resolving via {@link MCRURIResolver}
      * 
-     * @param uri
      * @throws TransformerException
      *             thrown by {@link MCRURIResolver#resolve(String, String)}
      */

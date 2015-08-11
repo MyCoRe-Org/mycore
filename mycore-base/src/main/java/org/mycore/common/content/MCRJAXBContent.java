@@ -49,10 +49,6 @@ public class MCRJAXBContent<T> extends MCRXMLContent {
 
     T jaxbObject;
 
-    /**
-     * @param ctx
-     * @param jaxbObject
-     */
     public MCRJAXBContent(JAXBContext ctx, T jaxbObject) {
         super();
         this.ctx = ctx;

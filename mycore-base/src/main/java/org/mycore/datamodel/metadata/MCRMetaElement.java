@@ -93,8 +93,6 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      *            his parent object
      * @param set_list
      *            a list of MCRMeta... data lines to add in this element (can be null)
-     * @param set_classname
-     *            the name of the MCRMeta... class
      */
     public MCRMetaElement(Class<? extends MCRMetaInterface> clazz, String set_tag, boolean set_heritable, boolean set_notinherit,
         List<? extends MCRMetaInterface> set_list) {

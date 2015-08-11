@@ -72,7 +72,6 @@ public class MCRConfigurationInputStream extends InputStream {
      * 
      * @param filename
      *            , e.g. mycore.properties or messages_de.properties
-     * @throws IOException
      */
     public MCRConfigurationInputStream(String filename) throws IOException {
         this(filename, null);

@@ -86,10 +86,6 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
         return condition;
     }
 
-    /**
-     * @param e
-     * @return 
-     */
     protected MCRCondition<?> parseElement(Element e) {
         String field = e.getAttributeValue("field").toLowerCase(Locale.ROOT).trim();
         String operator = e.getAttributeValue("operator").trim();
@@ -129,10 +125,6 @@ public class MCRRuleParser extends MCRBooleanClauseParser {
 
     }
 
-    /**
-     * @param s
-     * @return
-     */
     protected MCRCondition<?> parseString(String s) {
         /* handle specific rules */
         if (s.equalsIgnoreCase("false")) {

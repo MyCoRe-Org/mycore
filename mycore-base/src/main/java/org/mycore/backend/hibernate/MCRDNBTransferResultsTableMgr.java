@@ -36,15 +36,6 @@ public class MCRDNBTransferResultsTableMgr {
         return (_instance = new MCRDNBTransferResultsTableMgr());
     }
 
-    /**
-     * @param protocolType
-     * @param deliveryRole
-     * @param objectId
-     * @param transferPackageArchived
-     * @param errorMessage
-     * @param errorModule
-     * @throws MCRPersistenceException
-     */
     public synchronized void addEntry(String protocolType, String tpName, String deliveryRole, String objectId,
             boolean transferPackageArchived, String errorMessage, String errorModule, Date date) {
 
@@ -73,16 +64,6 @@ public class MCRDNBTransferResultsTableMgr {
         }
     }
 
-    /**
-     * @param protocolType
-     * @param tpName
-     * @param deliveryRole
-     * @param objectId
-     * @param transferPackageArchived
-     * @param errorMessage
-     * @param errorModule
-     * @throws MCRPersistenceException
-     */
     public synchronized void addEntry(String protocolType, String tpName, String deliveryRole, String objectId,
             boolean transferPackageArchived, String errorMessage, String errorModule) {
         addEntry(protocolType, tpName, deliveryRole, objectId, transferPackageArchived, errorMessage, errorModule, new Date());

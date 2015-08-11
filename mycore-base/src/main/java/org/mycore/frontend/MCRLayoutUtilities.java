@@ -210,11 +210,9 @@ public class MCRLayoutUtilities {
      * Returns all labels of the ancestor axis for the given item within
      * navigation.xml
      * 
-     * @param item
-     * @return Label as String, like "labelRoot > labelChild >
+     * @param item a navigation item
+     * @return Label as String, like "labelRoot &gt; labelChild &gt;
      *         labelChildOfChild"
-     * @throws JDOMException
-     * @throws IOException
      */
     public static String getAncestorLabels(Element item) {
         String label = "";
@@ -249,8 +247,8 @@ public class MCRLayoutUtilities {
      * @param permission
      *            permission to look for
      * @param strategy
-     *            ALLTRUE => all ancestor items of webpageID must have the
-     *            permission, ONETRUE_ALLTRUE => only 1 ancestor item must have
+     *            ALLTRUE =&gt; all ancestor items of webpageID must have the
+     *            permission, ONETRUE_ALLTRUE =&gt; only 1 ancestor item must have
      *            the permission
      * @return true, if access, false if no access
      */
@@ -281,7 +279,7 @@ public class MCRLayoutUtilities {
      * @param permission
      *            permission to look for
      * @param strategy
-     *            ALL2BLOCKER_TRUE => all ancestor items of webpageID till and
+     *            ALL2BLOCKER_TRUE =&gt; all ancestor items of webpageID till and
      *            exlusiv $blockerWebpageID must have the permission
      * @param blockerWebpageID
      *            any ancestor item of webpageID from navigation.xml
@@ -322,11 +320,10 @@ public class MCRLayoutUtilities {
     /**
      * Verifies a single item on access according to $permission
      * 
-     * @param permission
-     * @param item
+     * @param permission an ACL permission
+     * @param item element to check
      * @param access
      *            initial value
-     * @return
      */
     public static boolean itemAccess(String permission, Element item, boolean access) {
         String objID = getWebpageACLID(item);
@@ -340,11 +337,11 @@ public class MCRLayoutUtilities {
      * Verifies a single item on access according to $permission and for a given
      * user
      * 
-     * @param permission
-     * @param item
+     * @param permission an ACL permission
+     * @param item element to check
      * @param access
      *            initial value
-     * @param userID
+     * @param userID a user id
      */
     public static boolean itemAccess(String permission, Element item, boolean access, String userID) {
         MCRAccessInterface am = MCRAccessManager.getAccessImpl();
@@ -381,7 +378,6 @@ public class MCRLayoutUtilities {
      * Returns the navigation.xml as File.
      * This file may not exist yet as navigation.xml may be served as a web resource.
      * Use {@link #getNavigationURL()} to get access to the actual web resource.
-     * @return
      */
     public static File getNavigationFile() {
         String realPath = SERVLET_CONTEXT.getRealPath(NAV_RESOURCE);
@@ -395,7 +391,6 @@ public class MCRLayoutUtilities {
      * Returns the navigation.xml as URL.
      * 
      * Use this method if you need to parse it on your own.
-     * @return
      */
     public static URL getNavigationURL() {
         try {

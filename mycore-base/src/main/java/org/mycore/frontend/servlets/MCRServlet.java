@@ -34,7 +34,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
@@ -381,8 +380,6 @@ public class MCRServlet extends HttpServlet {
      * 1st phase of doGetPost. This method has a seperate transaction. Per default id does nothing as a fallback to the
      * old behaviour.
      * 
-     * @param job
-     * @throws Exception
      * @see #render(MCRServletJob, Exception)
      */
     protected void think(MCRServletJob job) throws Exception {
@@ -409,7 +406,6 @@ public class MCRServlet extends HttpServlet {
      * Returns true if this servlet allows Cross-domain requests. The default value defined by {@link MCRServlet} is
      * <code>false</code>.
      * 
-     * @return
      */
     protected boolean allowCrossDomainRequests() {
         return false;
@@ -584,11 +580,6 @@ public class MCRServlet extends HttpServlet {
         return -1; // time is not known
     }
 
-    /**
-     * @param request
-     * @param name
-     * @return
-     */
     public static String getProperty(HttpServletRequest request, String name) {
         return MCRFrontendUtil.getProperty(request, name);
     }
@@ -629,8 +620,6 @@ public class MCRServlet extends HttpServlet {
      * 
      * @param response response to cache
      * @param CACHE_TIME time to cache
-     * @param lastModified
-     * @param useExpire
      * @deprecated use {@link MCRFrontendUtil#writeCacheHeaders(HttpServletResponse, long, long, boolean)}
      */
     @Deprecated
@@ -642,7 +631,6 @@ public class MCRServlet extends HttpServlet {
     /**
      * Returns the referer of the given request.
      * 
-     * @param request
      */
     protected URL getReferer(HttpServletRequest request) {
         String referer;
@@ -683,9 +671,6 @@ public class MCRServlet extends HttpServlet {
      * If a referrer is available this method redirects to the url given by the referrer otherwise method redirects to
      * the application base url.
      * 
-     * @param request
-     * @param response
-     * @throws IOException
      */
     protected void toReferrer(HttpServletRequest request, HttpServletResponse response) throws IOException {
         URL referrer = getReferer(request);
@@ -701,10 +686,6 @@ public class MCRServlet extends HttpServlet {
      * If a referrer is available this method redirects to the url given by the referrer otherwise method redirects to
      * the alternative-url.
      * 
-     * @param request
-     * @param response
-     * @param altURL
-     * @throws IOException
      */
     protected void toReferrer(HttpServletRequest request, HttpServletResponse response, String altURL)
         throws IOException {

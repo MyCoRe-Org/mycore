@@ -88,7 +88,7 @@ public final class MCRMetadataManager {
      * @param expire
      *            when should lastModified information expire
      * @return null if derivateID has no object referenced
-     * @see #getDerivateIds(MCRObjectID, long)
+     * @see #getDerivateIds(MCRObjectID, long, TimeUnit)
      */
     public static MCRObjectID getObjectId(final MCRObjectID derivateID, final long expire, TimeUnit unit) {
         ModifiedHandle modifiedHandle = XML_MANAGER.getLastModifiedHandle(derivateID, expire, unit);
@@ -128,7 +128,7 @@ public final class MCRMetadataManager {
      * @param expire
      *            when should lastModified information expire
      * @return null if object with objectId does not exist
-     * @see #getObjectId(MCRObjectID, long)
+     * @see #getObjectId(MCRObjectID, long, TimeUnit)
      */
     public static List<MCRObjectID> getDerivateIds(final MCRObjectID objectId, final long expire, final TimeUnit unit) {
         ModifiedHandle modifiedHandle = XML_MANAGER.getLastModifiedHandle(objectId, expire, unit);
@@ -168,7 +168,6 @@ public final class MCRMetadataManager {
      *            derivate instance to store
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
-     * @throws IOException
      */
     public static void create(final MCRDerivate mcrDerivate) throws MCRPersistenceException, IOException {
         // exist the derivate?
@@ -301,8 +300,6 @@ public final class MCRMetadataManager {
      *            object instance to store
      * @exception MCRPersistenceException
      *                if a persistence problem is occured
-     * @throws MCRActiveLinkException
-     *             if current object links to nonexistent
      */
     public static void create(final MCRObject mcrObject) throws MCRPersistenceException {
         // exist the object?
@@ -511,7 +508,6 @@ public final class MCRMetadataManager {
     /**
      * Fires {@link MCREvent#REPAIR_EVENT} for given derivate.
      * 
-     * @param mcrDerivate
      */
     public static void fireRepairEvent(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
         // handle events
@@ -521,7 +517,6 @@ public final class MCRMetadataManager {
     /**
      * Fires {@link MCREvent#REPAIR_EVENT} for given object.
      * 
-     * @param mcrBaseObj
      */
     public static void fireRepairEvent(final MCRBase mcrBaseObj) throws MCRPersistenceException {
         if (mcrBaseObj instanceof MCRDerivate) {
@@ -534,7 +529,6 @@ public final class MCRMetadataManager {
     /**
      * Fires {@link MCREvent#REPAIR_EVENT} for given object.
      * 
-     * @param mcrObject
      */
     public static void fireRepairEvent(final MCRObject mcrObject) throws MCRPersistenceException {
         // check derivate link
@@ -600,9 +594,7 @@ public final class MCRMetadataManager {
     }
 
     /**
-     * @param id
      * @return a {@link MCRObject} if there is an object with the id given or <code>null</code> otherwise
-     * @throws MCRPersistenceException
      */
     public static MCRObject retrieveMCRObject(final String id) throws MCRPersistenceException {
         if (!MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
@@ -630,10 +622,8 @@ public final class MCRMetadataManager {
     /**
      * Updates the derivate or creates it if it does not exist yet.
      * 
-     * @param mcrDerivate
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
-     * @throws IOException
      */
     public static void update(final MCRDerivate mcrDerivate) throws MCRPersistenceException, IOException {
         if (!MCRMetadataManager.exists(mcrDerivate.getId())) {
@@ -695,7 +685,6 @@ public final class MCRMetadataManager {
     /**
      * Updates the object or creates it if it does not exist yet.
      * 
-     * @param mcrObject
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
      * @throws MCRActiveLinkException
@@ -811,7 +800,6 @@ public final class MCRMetadataManager {
     /**
      * Updates only the XML part of the derivate.
      * 
-     * @param mcrDerivate
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
      */

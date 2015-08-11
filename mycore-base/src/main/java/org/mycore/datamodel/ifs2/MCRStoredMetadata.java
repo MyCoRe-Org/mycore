@@ -143,7 +143,6 @@ public class MCRStoredMetadata {
      * Returns the date this metadata document was last modified
      * 
      * @return the date this metadata document was last modified
-     * @throws IOException 
      */
     public Date getLastModified() throws IOException {
         FileContent fileContent = fo.getContent();
@@ -176,7 +175,6 @@ public class MCRStoredMetadata {
      * Deletes the metadata document. This object is invalid afterwards, do not
      * use it any more.
      * 
-     * @throws IOException
      */
     public void delete() throws IOException {
         if (!isDeleted()) {

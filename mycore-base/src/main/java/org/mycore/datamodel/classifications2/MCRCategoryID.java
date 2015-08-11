@@ -64,7 +64,7 @@ public class MCRCategoryID implements Serializable {
      *            aka Category ID
      */
     public MCRCategoryID(String rootID, String id) {
-        super();
+        this();
         setID(id);
         setRootID(rootID);
     }
@@ -77,8 +77,6 @@ public class MCRCategoryID implements Serializable {
     /**
      * @param categoryId must be in format classificationId:categoryId
      * @return the {@link MCRCategoryID} if any
-     * 
-     * @throws IllegalArgumentException
      */
     public static MCRCategoryID fromString(String categoryId) {
         StringTokenizer tok = new StringTokenizer(categoryId, ":");

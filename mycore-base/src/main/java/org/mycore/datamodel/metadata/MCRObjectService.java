@@ -213,7 +213,8 @@ public class MCRObjectService {
      *            the type of the date 
      * @return the date as GregorianCalendar
      * 
-     * @see {@link MCRObjectService#DATE_TYPE_CREATEDATE} and {@link MCRObjectService#DATE_TYPE_MODIFYDATE} 
+     * @see MCRObjectService#DATE_TYPE_CREATEDATE
+     * @see MCRObjectService#DATE_TYPE_MODIFYDATE 
      */
     public final Date getDate(String type) {
         MCRMetaISO8601Date isoDate = getISO8601Date(type);
@@ -257,9 +258,6 @@ public class MCRObjectService {
     
     /**
      * This method sets the status classification
-     * 
-     * @param classid
-     * @param categid
      */
     public final void setState(MCRCategoryID state) {
     	if(state==null){

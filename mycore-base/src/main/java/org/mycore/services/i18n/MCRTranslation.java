@@ -80,7 +80,7 @@ public class MCRTranslation {
      * provides translation for the given label (property key). The current locale that is needed for translation is
      * gathered by the language of the current MCRSession.
      * 
-     * @param label
+     * @param label property key
      * @return translated String
      */
     public static String translate(String label) {
@@ -89,12 +89,12 @@ public class MCRTranslation {
     }
 
     /**
-     * Checks whether there is a value for the given key and current locale.
+     * Checks whether there is a value for the given label and current locale.
      * 
-     * @param key
+     * @param label property key
      * @return <code>true</code> if there is a value, <code>false</code> otherwise
      */
-    public static boolean exists(String key) {
+    public static boolean exists(String label) {
         ResourceBundle message;
         try {
             message = getResourceBundle(MESSAGES_BUNDLE, getCurrentLocale());
@@ -103,7 +103,7 @@ public class MCRTranslation {
         }
         String result = null;
         try {
-            result = message.getString(key);
+            result = message.getString(label);
         } catch (MissingResourceException mre) {
             LOGGER.debug(mre);
             return false;
@@ -115,7 +115,7 @@ public class MCRTranslation {
      * provides translation for the given label (property key). The current locale that is needed for translation is
      * gathered by the language of the current MCRSession.
      * 
-     * @param label
+     * @param label property key
      * @param baseName
      *            a fully qualified class name
      * @return translated String
@@ -129,7 +129,7 @@ public class MCRTranslation {
     /**
      * provides translation for the given label (property key).
      * 
-     * @param label
+     * @param label property key
      * @param locale
      *            target locale of translation
      * @return translated String
@@ -141,7 +141,7 @@ public class MCRTranslation {
     /**
      * provides translation for the given label (property key).
      * 
-     * @param label
+     * @param label property key
      * @param locale
      *            target locale of translation
      * @param baseName
@@ -224,7 +224,7 @@ public class MCRTranslation {
      * provides translation for the given label (property key). The current locale that is needed for translation is
      * gathered by the language of the current MCRSession.
      * 
-     * @param label
+     * @param label property key
      * @param arguments
      *            Objects that are inserted instead of placeholders in the property values
      * @return translated String
@@ -244,7 +244,7 @@ public class MCRTranslation {
      * <code>argument</code> has to be masked by '\'. You can use ';' to build an array of arguments: "foo;bar" would
      * result in {"foo","bar"} (the array)
      * 
-     * @param label
+     * @param label property key
      * @param argument
      *            String that is inserted instead of placeholders in the property values
      * @return translated String

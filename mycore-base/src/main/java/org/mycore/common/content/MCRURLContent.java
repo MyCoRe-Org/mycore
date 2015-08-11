@@ -42,9 +42,6 @@ public class MCRURLContent extends MCRContent {
 
     private URL url;
 
-    /**
-     * @param url
-     */
     public MCRURLContent(URL url) {
         super();
         this.url = url;

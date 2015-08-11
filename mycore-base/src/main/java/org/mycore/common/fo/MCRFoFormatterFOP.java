@@ -61,9 +61,8 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
 
     /**
      * Protected constructor to create the singleton instance
-     * @throws IOException 
      */
-    public MCRFoFormatterFOP() throws Exception {
+    public MCRFoFormatterFOP() {
         fopFactory = FopFactory.newInstance();
         fopFactory.setURIResolver(MCRURIResolver.instance());
         String fo_cfg = MCRConfiguration.instance().getString("MCR.LayoutService.FoFormatter.FOP.config",null);

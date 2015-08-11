@@ -94,7 +94,6 @@ public abstract class MCRContentTransformer {
 
     /**
      * Returns the file extension that is usually related to the transformed content.
-     * @return
      */
     public String getFileExtension() throws Exception {
         return fileExtension;

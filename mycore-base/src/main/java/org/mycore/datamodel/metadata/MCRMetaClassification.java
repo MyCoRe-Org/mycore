@@ -65,7 +65,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
      * the <em>set_classid</em> and the <em>categid</em> must be not null
      * or empty!
      * @param set_subtag       the name of the subtag
-     * @param set_inherted     a value >= 0
+     * @param set_inherted     a value &gt;= 0
      * @param set_type         the type attribute
      * @param set_classid      the classification ID
      * @param set_categid      the category ID
@@ -87,7 +87,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
      * the <em>set_classid</em> and the <em>categid</em> must be not null
      * or empty!
      * @param set_subtag       the name of the subtag
-     * @param set_inherted     a value >= 0
+     * @param set_inherted     a value &gt;= 0
      * @param set_type         the type attribute
      * @param category         a category id
      *
