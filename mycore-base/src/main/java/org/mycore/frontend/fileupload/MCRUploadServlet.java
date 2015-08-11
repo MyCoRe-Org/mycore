@@ -414,7 +414,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             } else {
                 checkPathName(path);
                 LOGGER.info("UploadServlet unpacking ZIP entry " + path);
-                handler.receiveFile(path, nis, 0, null);
+                handler.receiveFile(path, nis, entry.getSize(), null);
             }
         }
         nis.reallyClose();
