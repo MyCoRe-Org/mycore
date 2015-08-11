@@ -1,5 +1,5 @@
 /*
- * $Revision$ 
+ * $Revision$
  * $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -23,11 +23,20 @@
 
 package org.mycore.frontend.editor.postprocessor;
 
+import java.io.IOException;
+import java.util.Iterator;
+
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.Text;
+import org.jdom2.filter.Filters;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
+import org.mycore.common.xml.MCRXMLFunctions;
+import org.xml.sax.SAXException;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -45,7 +54,26 @@ public class MCREditorPostProcessorXSL implements MCREditorPostProcessor {
 
     public Document process(Document input) throws Exception {
         MCRJDOMContent source = new MCRJDOMContent(input);
-        MCRContent result = transformer.transform(source);
-        return result.asXML();
+        MCRContent transformed = transformer.transform(source);
+        MCRContent normalized = new MCRNormalizeUnicodeTransformer().transform(transformed);
+        return normalized.asXML();
+    }
+}
+
+class MCRNormalizeUnicodeTransformer extends MCRContentTransformer {
+
+    public MCRJDOMContent transform(MCRContent source) throws IOException {
+        try {
+            Element root = source.asXML().getRootElement().clone();
+            for (Iterator<Text> iter = root.getDescendants(Filters.text()).iterator(); iter.hasNext();) {
+                Text text = iter.next();
+                text.setText(MCRXMLFunctions.normalizeUnicode(text.getText()));
+            }
+            return new MCRJDOMContent(root);
+        } catch (JDOMException ex) {
+            throw new IOException(ex);
+        } catch (SAXException ex) {
+            throw new IOException(ex);
+        }
     }
 }
