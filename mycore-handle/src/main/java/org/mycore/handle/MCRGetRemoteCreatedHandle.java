@@ -30,7 +30,7 @@ import com.google.gson.JsonParser;
 /**
  * Class responsible for retrieving and storing the remotely created handle. 
  * 
- * @see MCRGbvHandleProvider#EDA_REPOS_URL
+ * @see MCRHandleCommons#EDA_REPOS_URL
  * @author shermann
  */
 public class MCRGetRemoteCreatedHandle extends TimerTask {
@@ -182,10 +182,6 @@ public class MCRGetRemoteCreatedHandle extends TimerTask {
         return false;
     }
 
-    /**
-     * @param message
-     * @return
-     */
     String getStatus(JsonObject message) {
         JsonElement statusElement = message.get("status");
         if (statusElement == null) {

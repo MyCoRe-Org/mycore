@@ -21,9 +21,6 @@ public class MCRGbvHandleChecksumProvider {
 
     /**
      * Calculates the checksum of the given handle. 
-     * 
-     * @param handle
-     * @return
      */
     public int checksum(MCRHandle handle) {
         String combine = MCRGbvHandleProvider.URN_PREFIX + handle.getLocalName();
@@ -37,9 +34,7 @@ public class MCRGbvHandleChecksumProvider {
     }
 
     /**
-     * Calculates the checksum of the given handle as described in {@link http://www.persistent-identifier.de/?link=316}
-     * 
-     * @param handle
+     * Calculates the checksum of the given handle as described in <a href="http://www.persistent-identifier.de/?link=316">"Beschreibung des Algorithmus zur Berechnung der URN-Prüfziffer "</a>
      * @return the single digit checksum for this handle
      */
     public int checksum2(MCRHandle handle) {

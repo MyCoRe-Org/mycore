@@ -17,7 +17,7 @@ import javax.persistence.UniqueConstraint;
  * 
  * @author shermann
  * 
- * @see http://www.handle.net/rfc/rfc3651.html
+ * @see <a href="http://www.handle.net/rfc/rfc3651.html">RFC3651</a>
  */
 @Entity
 @Table(name = "MCRHandle", uniqueConstraints = @UniqueConstraint(columnNames = { "mcrid", "path" }) , indexes = {
@@ -94,21 +94,10 @@ public class MCRHandle {
         checksum = -1;
     }
 
-    /**
-     * @param namingAuthority
-     * @param namingAuthoritySegment
-     * @param localName
-     */
     public MCRHandle(String namingAuthority, String namingAuthoritySegment, String localName) {
         this(null, namingAuthority, namingAuthoritySegment, localName);
     }
 
-    /**
-     * @param schema
-     * @param namingAuthority
-     * @param namingAuthoritySegment
-     * @param localName
-     */
     public MCRHandle(String protocol, String namingAuthority, String namingAuthoritySegment, String localName) {
         this();
         this.schema = protocol;

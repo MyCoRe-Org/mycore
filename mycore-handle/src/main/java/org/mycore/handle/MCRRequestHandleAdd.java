@@ -30,7 +30,7 @@ import com.google.gson.JsonObject;
 /**
  * Class responsible for storing object signatures in a remote system.
  *
- * @see MCRGbvHandleProvider#GBV_OBJECT_REPOS_URL
+ * @see MCRHandleCommons#GBV_OBJECT_REPOS_URL
  * @author shermann
  */
 public class MCRRequestHandleAdd extends TimerTask {
@@ -56,7 +56,7 @@ public class MCRRequestHandleAdd extends TimerTask {
     /**
      * Method reads from the mcrhandle table to get pending handle requests
      * (handles with an object signature but with no message signature). A request for each object
-     * given by its signature is then send to {@link MCRGbvHandleProvider#EDA_REPOS_URL}
+     * given by its signature is then send to {@link MCRHandleCommons#EDA_REPOS_URL}
      * */
     @SuppressWarnings("unchecked")
     public void run() {

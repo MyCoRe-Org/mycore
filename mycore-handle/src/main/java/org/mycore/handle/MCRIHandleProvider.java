@@ -15,10 +15,6 @@ public interface MCRIHandleProvider {
     /** Generates a single handle */
     public MCRHandle generateHandle();
 
-    /**
-     * @param file
-     * @return
-     */
     public MCRHandle requestHandle(MCRPath file);
 
     /**
