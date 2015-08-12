@@ -1,6 +1,7 @@
 package org.mycore.iview2.services;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
@@ -98,7 +99,7 @@ public class MCRTilingAction implements Runnable {
 
     /**
      * @return MCRImage instance based on the information provided by {@link #tileJob}
-     * @throws IOException thrown by {@link MCRImage#getInstance(java.io.File, String, String)}
+     * @throws IOException thrown by {@link MCRImage#getInstance(Path, String, String)}
      */
     protected MCRImage getMCRImage() throws IOException {
         MCRPath file = MCRPath.getPath(tileJob.getDerivate(), tileJob.getPath());

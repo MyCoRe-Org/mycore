@@ -65,7 +65,6 @@ public class MCRIView2RemoteFunctions {
     /**
      * Asks web service to get next image in the tiling queue.
      * @return Info about next image to be tiled
-     * @throws Exception 
      */
     @WebMethod(operationName = "next-tile-job")
     @WebResult(name = "tile-job")

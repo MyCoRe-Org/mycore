@@ -12,9 +12,6 @@ public interface MCRViewerConfigurationStrategy {
 
     /**
      * Gets the image view configuration.
-     * 
-     * @param request
-     * @return
      */
     public MCRViewerConfiguration get(HttpServletRequest request);
 

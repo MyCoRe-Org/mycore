@@ -187,10 +187,6 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
 
     /**
      * get the specific job and alters it status to {@link MCRJobState#PROCESSING}
-     * @param derivate
-     * @param path
-     * @return
-     * @throws NoSuchElementException
      */
     public MCRTileJob getElementOutOfOrder(String derivate, String path) throws NoSuchElementException {
         if (!running)

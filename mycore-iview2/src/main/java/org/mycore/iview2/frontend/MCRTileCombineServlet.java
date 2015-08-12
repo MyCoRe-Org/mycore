@@ -124,8 +124,6 @@ public class MCRTileCombineServlet extends MCRServlet {
      * </table>
      * 
      * See {@link #init()} how to attach a footer to every generated image.
-     * @throws JDOMException 
-     * @throws IOException 
      */
     @Override
     protected void think(final MCRServletJob job) throws IOException, JDOMException {

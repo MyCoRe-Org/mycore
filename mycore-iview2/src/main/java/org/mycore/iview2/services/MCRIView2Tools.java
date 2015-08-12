@@ -25,7 +25,6 @@ package org.mycore.iview2.services;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -123,15 +122,13 @@ public class MCRIView2Tools {
      * @param file
      *            image file
      * @return if content type is in property <code>MCR.Module-iview2.SupportedContentTypes</code>
-     * @throws IOException
-     * @see {@link MCRContentTypes#probeContentType(Path)}
+     * @see MCRContentTypes#probeContentType(Path)
      */
     public static boolean isFileSupported(Path file) throws IOException {
         return file == null ? false : SUPPORTED_CONTENT_TYPE.contains(MCRContentTypes.probeContentType(file));
     }
 
     /**
-     * @param filename
      * @return true if the file is supported, false otherwise
      */
     public static boolean isFileSupported(String filename) {
@@ -141,9 +138,7 @@ public class MCRIView2Tools {
     /**
      * Checks for a given derivate id whether all files in that derivate are tiled.
      * 
-     * @param derivateId
      * @return true if all files in belonging to the derivate are tiled, false otherwise
-     * @throws IOException
      */
     public static boolean isCompletelyTiled(String derivateId) throws IOException {
         if (!MCRMetadataManager.exists(MCRObjectID.getInstance(derivateId))) {
@@ -179,7 +174,7 @@ public class MCRIView2Tools {
     /**
      * @param file
      *            image file
-     * @return true if {@link MCRImage#getTiledFile(File, String, String)} exists
+     * @return true if {@link MCRImage#getTiledFile(Path, String, String)} exists
      * @see #getTileDir()
      */
     public static boolean isTiled(MCRPath file) {
@@ -220,7 +215,7 @@ public class MCRIView2Tools {
      * 
      * @param iviewFileRoot
      *            root directory of .iview2 file
-     * @param imagePropertiess
+     * @param imageProperties
      *            imageProperties, if available or null
      * @param zoomLevel
      *            the zoom level where 0 is thumbnail size
@@ -262,11 +257,6 @@ public class MCRIView2Tools {
         }
     }
 
-    /**
-     * @param iviewFile
-     * @return
-     * @throws IOException
-     */
     public static FileSystem getFileSystem(Path iviewFile) throws IOException {
         URI uri = URI.create("jar:" + iviewFile.toUri().toString());
         try {
@@ -292,22 +282,10 @@ public class MCRIView2Tools {
         }
     }
 
-    /**
-     * @return
-     */
     public static ImageReader getTileImageReader() {
         return ImageIO.getImageReadersByMIMEType("image/jpeg").next();
     }
 
-    /**
-     * @param iviewFileRoot
-     * @param imageReader
-     * @param zoomLevel
-     * @param x
-     * @param y
-     * @return
-     * @throws IOException
-     */
     public static BufferedImage readTile(Path iviewFileRoot, ImageReader imageReader, int zoomLevel, int x, int y)
         throws IOException {
         String tileName = MessageFormat.format("{0}/{1}/{2}.jpg", zoomLevel, y, x);
@@ -375,8 +353,7 @@ public class MCRIView2Tools {
      *            the file to display
      * @return the url to the image viewer displaying given file unless {@link MCRIView2Tools#isFileSupported(Path)}
      *         returns <code>false</code> in this case <code>null</code> is returned
-     * @throws IOException
-     * @see {@link MCRIView2Tools#isFileSupported(Path)}
+     * @see MCRIView2Tools#isFileSupported(Path)
      */
     public static String getViewerURL(MCRPath file) throws URISyntaxException, IOException {
         if (!MCRIView2Tools.isFileSupported(file)) {

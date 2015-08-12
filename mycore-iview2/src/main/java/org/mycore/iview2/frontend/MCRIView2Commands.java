@@ -149,7 +149,6 @@ public class MCRIView2Commands extends MCRAbstractCommands {
      * meta command to tile all images of this derivate.
      * @param derivateID a derivate ID
      * @return list of commands to execute.
-     * @throws IOException 
      */
     @MCRCommand(syntax = TILE_DERIVATE_TILES_COMMAND_SYNTAX, help = "tiles all images of derivate {0} with a supported image type as main document", order = 60)
     public static List<String> tileDerivate(String derivateID) throws IOException {
@@ -162,7 +161,6 @@ public class MCRIView2Commands extends MCRAbstractCommands {
      * meta command to check (and repair) all tiles of all images of this derivate.
      * @param derivateID a derivate ID
      * @return list of commands to execute.
-     * @throws IOException 
      */
     @MCRCommand(syntax = CHECK_TILES_OF_DERIVATE_COMMAND_SYNTAX, help = "checks if all images of derivate {0} with a supported image type as main document have valid iview2 files and start tiling if not ", order = 20)
     public static List<String> checkTilesOfDerivate(String derivateID) throws IOException {
@@ -195,7 +193,6 @@ public class MCRIView2Commands extends MCRAbstractCommands {
      * checks and repairs tile of this derivate.
      * @param derivate derivate ID
      * @param absoluteImagePath absolute path to image file
-     * @throws IOException 
      */
     @MCRCommand(syntax = CHECK_TILES_OF_IMAGE_COMMAND_SYNTAX, help = "checks if tiles a specific file identified by its derivate {0} and absolute path {1} are valid or generates new one", order = 30)
     public static void checkImage(String derivate, String absoluteImagePath) throws IOException {
@@ -307,8 +304,6 @@ public class MCRIView2Commands extends MCRAbstractCommands {
 
     /**
      * Tiles this {@link MCRPath}
-     * @param file
-     * @throws IOException 
      */
     public static void tileImage(MCRPath file) throws IOException {
         if (MCRIView2Tools.isFileSupported(file)) {
@@ -331,7 +326,6 @@ public class MCRIView2Commands extends MCRAbstractCommands {
 
     /**
      * Deletes all image tiles.
-     * @throws IOException 
      */
     @MCRCommand(syntax = "delete all tiles", help = "removes all tiles of all derivates", order = 80)
     public static void deleteAllTiles() throws IOException {
@@ -373,7 +367,6 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     /**
      * Deletes all image tiles of this derivate.
      * @param derivateID a derivate ID
-     * @throws IOException 
      */
     @MCRCommand(syntax = DEL_DERIVATE_TILES_COMMAND_SYNTAX, help = "removes tiles of a specific file identified by its derivate ID {0}", order = 100)
     public static void deleteDerivateTiles(String derivateID) throws IOException {
@@ -386,7 +379,6 @@ public class MCRIView2Commands extends MCRAbstractCommands {
      * Deletes all image tiles of this derivate.
      * @param derivate derivate ID
      * @param absoluteImagePath absolute path to image file
-     * @throws IOException 
      */
     @MCRCommand(syntax = "delete tiles of image {0} {1}", help = "removes tiles of a specific file identified by its derivate ID {0} and absolute path {1}", order = 110)
     public static void deleteImageTiles(String derivate, String absoluteImagePath) throws IOException {

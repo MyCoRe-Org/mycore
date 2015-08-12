@@ -65,8 +65,6 @@ public class MCRViewerConfiguration {
 
     /**
      * Returns the properties of this configuration.
-     * 
-     * @return
      */
     public Map<String, Object> getProperties() {
         return properties;
@@ -74,8 +72,6 @@ public class MCRViewerConfiguration {
 
     /**
      * Returns a multimap containing all resources (javascript and css url's).
-     * 
-     * @return
      */
     public Multimap<ResourceType, String> getResources() {
         return resources;
@@ -93,8 +89,6 @@ public class MCRViewerConfiguration {
 
     /**
      * return true if iview2.debug=true
-     * @param request
-     * @return
      */
     protected boolean isDebugParameterSet(HttpServletRequest request) {
         return Boolean.TRUE.toString().toLowerCase(Locale.ROOT).equals(request.getParameter("iview2.debug"));
@@ -102,8 +96,6 @@ public class MCRViewerConfiguration {
 
     /**
      * Returns true if the debug/developer mode is active.
-     * 
-     * @return
      */
     public static boolean isDebugMode() {
         return DEBUG_MODE;
@@ -142,8 +134,6 @@ public class MCRViewerConfiguration {
 
     /**
      * Adds a new javascript file which should be included by the image viewer.
-     * 
-     * @param url 
      */
     public void addScript(final String url) {
         this.resources.put(ResourceType.script, url);
@@ -181,8 +171,6 @@ public class MCRViewerConfiguration {
 
     /**
      * Adds a new css file which should be included by the image viewer.
-     * 
-     * @param url
      */
     public void addCSS(final String url) {
         this.resources.put(ResourceType.css, url);
@@ -232,9 +220,6 @@ public class MCRViewerConfiguration {
 
     /**
      * Returns the configuration in xml content format.
-     * 
-     * @return
-     * @throws JAXBException
      */
     public MCRXMLContent toXML() throws JAXBException {
         MCRIViewClientXMLConfiguration xmlConfig = new MCRIViewClientXMLConfiguration(resources, properties);

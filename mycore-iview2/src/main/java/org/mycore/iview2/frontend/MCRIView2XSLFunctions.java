@@ -62,7 +62,6 @@ public class MCRIView2XSLFunctions {
     /**
      * Get the full path of the main file of the first derivate.
      * 
-     * @param mcrID
      * @return the mainfile of the first derivate related to the given mcrid or
      *         null if there are no derivates related to the given mcrid
      */

@@ -42,8 +42,6 @@ public class MCRViewerConfigurationBuilder {
 
     /**
      * Gets the configuration.
-     * 
-     * @return
      */
     public MCRViewerConfiguration get() {
         return internalConfig;
@@ -51,9 +49,6 @@ public class MCRViewerConfigurationBuilder {
 
     /**
      * Mix in the second configuration into the first.
-     * 
-     * @param conf1
-     * @param conf2
      */
     public static void mixin(MCRViewerConfiguration conf1, MCRViewerConfiguration conf2) {
         Map<String, Object> conf2Props = conf2.getProperties();
@@ -83,9 +78,6 @@ public class MCRViewerConfigurationBuilder {
 
     /**
      * Builds the default mets configuration without any plugins.
-     * 
-     * @param request
-     * @return
      */
     public static MCRViewerConfigurationBuilder mets(HttpServletRequest request) {
         MCRViewerMetsConfiguration metsConfig = new MCRViewerMetsConfiguration();
@@ -94,9 +86,6 @@ public class MCRViewerConfigurationBuilder {
 
     /**
      * Builds the mets configuration with the metadata, piwik and logo plugin.
-     * 
-     * @param request
-     * @return
      */
     public static MCRViewerConfigurationBuilder metsAndPlugins(HttpServletRequest request) {
         return mets(request).mixin(plugins(request).get());
@@ -104,9 +93,6 @@ public class MCRViewerConfigurationBuilder {
 
     /**
      * Builds the default pdf configuration without any plugins.
-     * 
-     * @param request
-     * @return
      */
     public static MCRViewerConfigurationBuilder pdf(HttpServletRequest request) {
         MCRViewerPDFConfiguration pdfConfig = new MCRViewerPDFConfiguration();
@@ -115,9 +101,6 @@ public class MCRViewerConfigurationBuilder {
 
     /**
      * Builds just the plugins (metadata, piwik, logo).
-     * 
-     * @param request
-     * @return
      */
     public static MCRViewerConfigurationBuilder plugins(HttpServletRequest request) {
         return MCRViewerConfigurationBuilder.build(request).mixin(new MCRViewerLogoConfiguration())
