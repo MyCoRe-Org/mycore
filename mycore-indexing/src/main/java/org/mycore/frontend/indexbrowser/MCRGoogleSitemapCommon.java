@@ -152,14 +152,13 @@ public final class MCRGoogleSitemapCommon {
     }
 
     /**
-     * The method compute the number of sitemap files. If we have less than
+     * The method computes the number of sitemap files. If we have less than
      * <em>numberOfURLs</em> URLs and only one MyCoRe type the sitemap_google.xml
-     * containted all URSs. Otherwise it split the sitemap in an sitemap_google.xml
+     * contained all URLs. Otherwise it split the sitemap in an sitemap_google.xml
      * index file and a lot of sitemap_google_xxxx.xml URL files.
      * 
      * @return the number of files, one for a single sitemap_google.xml file, more than
      *         one for the index and all parts.
-     * @throws IOException 
      */
     protected final int checkSitemapFile() throws IOException {
         int number = 0;
@@ -181,7 +180,7 @@ public final class MCRGoogleSitemapCommon {
      * The method return the path to the sitemap_google.xml file.
      * 
      * @param number
-     *            number of this file - 1 = sitemap_google.xml - >1 sitemap_google_xxx.xml
+     *            number of this file - '1' = sitemap_google.xml - '&gt; 1' sitemap_google_xxx.xml
      * @param withpath
      *            true for the full path, false for the file name
      * @return a path to sitemap_google.xml
@@ -223,7 +222,7 @@ public final class MCRGoogleSitemapCommon {
      * The method call the database and build the sitemap_google.xml JDOM document.
      * 
      * @param number
-     *            number of this file - 1 = sitemap_google.xml - > 1 sitemap_google_xxx.xml
+     *            number of this file - '1' = sitemap_google.xml - '&gt; 1' sitemap_google_xxx.xml
      * @return The sitemap.xml as JDOM document
      */
     protected final Document buildPartSitemap(int number) throws Exception {
