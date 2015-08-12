@@ -86,7 +86,6 @@ public class MCRFileImportExport {
      * @param ownerID
      *            the ID of the logical owner of the content that will be stored
      * @return a new MCRDirectory that will contain all imported files and directories as instances of MCRFilesystemNode children.
-     * @throws IOException 
      */
     public static MCRDirectory addFiles(File local, String ownerID) throws IOException {
         MCRArgumentChecker.ensureNotEmpty(ownerID, "owner ID");
@@ -109,7 +108,6 @@ public class MCRFileImportExport {
      *            the local file or directory
      * @param dir
      *            an existing MCRDirectory where to store the imported contents of the local filesystem.
-     * @throws IOException 
      */
     public static void importFiles(File local, MCRDirectory dir) throws IOException {
         Objects.requireNonNull(local, "local file is null");

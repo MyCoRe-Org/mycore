@@ -79,8 +79,7 @@ public interface MCRFileReader {
     public String getContentTypeID();
     
     /**
-     * Returns MD5 checksum ot this file
-     * @return
+     * Returns MD5 checksum of this file
      */
     public String getMD5();
 

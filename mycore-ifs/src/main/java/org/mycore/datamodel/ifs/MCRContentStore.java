@@ -117,11 +117,6 @@ public abstract class MCRContentStore {
 
     /**
      * checks md5 sum
-     * @param file
-     * @return
-     * @throws Exception 
-     * @throws IOException 
-     * @throws  
      */
     public boolean isValid(MCRFileReader file) throws IOException {
         if (!exists(file)) {
@@ -136,7 +131,6 @@ public abstract class MCRContentStore {
 
     /**
      * Checks if the content of the file is accessible.
-     * @param file
      */
     protected abstract boolean exists(MCRFileReader file);
 
@@ -287,7 +281,6 @@ public abstract class MCRContentStore {
      * Returns the base dir as {@link File} if available or null if the base directory is no local file.
      * 
      * All files handled by this content store instance must resist under this directory.
-     * @throws IOException
      */
     public abstract File getBaseDir() throws IOException;
 

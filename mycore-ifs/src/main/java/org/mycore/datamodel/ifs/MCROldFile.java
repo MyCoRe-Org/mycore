@@ -443,7 +443,6 @@ public class MCROldFile implements MCRFileReader {
      * reading content from it.
      * 
      * @return an InputStream to read the file's content from
-     * @throws IOException
      */
     public InputStream getContentAsInputStream() throws IOException {
         return getContentStore().retrieveContent(this);

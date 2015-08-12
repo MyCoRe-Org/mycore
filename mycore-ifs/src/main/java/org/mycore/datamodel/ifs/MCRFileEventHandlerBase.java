@@ -300,9 +300,6 @@ public class MCRFileEventHandlerBase extends MCREventHandlerBase {
 
     /**
      * Updates the index content of the given file.
-     * 
-     * @param evt
-     * @param file
      */
     protected void updateFileIndex(MCREvent evt, MCRFile file) {
         doNothing(evt, file);

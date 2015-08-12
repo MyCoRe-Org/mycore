@@ -517,8 +517,6 @@ public abstract class MCRFilesystemNode {
      * @return the additional XML data document that was stored, or null
      * @throws IOException
      *             if the XML data can not be retrieved
-     * @throws JDOMException
-     *             if the XML data can not be parsed
      */
     public MCRContent getAllAdditionalData() throws IOException {
         MCRFile dataFile = MCRFile.getRootFile(ID);

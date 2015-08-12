@@ -248,8 +248,6 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     /**
      * Opens a file, returning a seekable byte channel to access the file.
      * See 
-     * @param options
-     * @return
      * @throws  IllegalArgumentException
      *          if the set contains an invalid combination of options
      * @throws  UnsupportedOperationException
@@ -276,8 +274,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     /**
-     * checks if 
-     * @param option
+     * checks if supplied {@link OpenOption} is supported by {@link #getFileChannel(Set)}.
      */
     public static void checkOpenOption(OpenOption option) {
         if (!supportedOptions.contains(option)) {
@@ -498,7 +495,6 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 
     /**
      * Returns the content of this file as MCRContent instance.
-     * @throws IOException
      */
     public MCRContent getContent() throws IOException {
         return getContentStore().doRetrieveMCRContent(this);
@@ -509,7 +505,6 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
      * content from it.
      * 
      * @return an InputStream to read the file's content from
-     * @throws IOException
      */
     public InputStream getContentAsInputStream() throws IOException {
         return getContent().getInputStream();

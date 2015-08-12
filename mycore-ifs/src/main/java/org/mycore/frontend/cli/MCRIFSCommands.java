@@ -414,10 +414,6 @@ public class MCRIFSCommands {
         }
     }
 
-    /**
-     * @param targetDirectory
-     * @return
-     */
     static File getDirectory(String targetDirectory) {
         File targetDir = new File(targetDirectory);
         if (!targetDir.isDirectory()) {

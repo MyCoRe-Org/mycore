@@ -103,7 +103,6 @@ public interface MCRFileMetadataStore {
     
     /**
      * Returns an object to iterate over the owner IDs.
-     * @throws MCRPersistenceException
      */
     public Iterable<String> getOwnerIDs() throws MCRPersistenceException;
 }

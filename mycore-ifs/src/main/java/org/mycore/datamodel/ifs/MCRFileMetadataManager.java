@@ -252,7 +252,6 @@ public class MCRFileMetadataManager {
     
     /**
      * Returns an object to iterate over the owner IDs.
-     * @throws MCRPersistenceException
      */
     public Iterable<String> getOwnerIDs(){
         return store.getOwnerIDs();
