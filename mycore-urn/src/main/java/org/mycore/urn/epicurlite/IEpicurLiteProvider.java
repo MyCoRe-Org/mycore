@@ -16,15 +16,8 @@ public interface IEpicurLiteProvider {
 
     /**
      * Creates the {@link EpicurLite} for the given {@link MCRURN}.
-     * 
-     * @param urn
-     * @return
      */
     public EpicurLite getEpicurLite(MCRURN urn);
 
-    /**
-     * @param urn
-     * @return
-     */
     public URL getURL(MCRURN urn);
 }

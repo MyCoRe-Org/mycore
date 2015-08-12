@@ -77,7 +77,6 @@ public class DefaultURNServerConfiguration implements URNServerConfiguration {
     /**
      * Sets a new password.
      * 
-     * @param password
      * @return itself
      */
     public DefaultURNServerConfiguration setPassword(String password) {

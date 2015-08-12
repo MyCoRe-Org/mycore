@@ -277,8 +277,7 @@ public class MCRURNManager {
     }
 
     /**
-     * @param derivateId
-     * @param path complete path to file
+     * @param filePath complete path to file
      * @return the URN for the given file if any
      */
     public static String getURNForFile(String derivateId, String filePath) {
@@ -295,12 +294,6 @@ public class MCRURNManager {
         return pathParts;
     }
 
-    /**
-     * @param derivateId
-     * @param path
-     * @param fileName
-     * @return
-     */
     public static String getURNForFile(String derivateId, String path, String fileName) {
         return store.getURNForFile(derivateId, path, fileName);
     }
@@ -350,47 +343,29 @@ public class MCRURNManager {
     }
 
     /**
-     * @param registered
      * @return the count of urn matching the given 'registered' attribute
      */
     public static long getCount(boolean registered) {
         return store.getCount(registered);
     }
 
-    /**
-     * @param registered
-     * @param start
-     * @param rows
-     * @return
-     */
     public static List<MCRURN> get(boolean registered, int start, int rows) {
         return store.get(registered, start, rows);
     }
 
-    /**
-     * @param urn
-     */
     public static void update(MCRURN urn) {
         store.update(urn);
     }
 
     /**
      * Get all URN for the given object id.
-     * 
-     * @param id
-     * @return
      */
     public static List<MCRURN> get(MCRObjectID id) {
         return store.get(id);
     }
 
     /**
-     * @param registered
-     * @param dfg
-     * @param start
-     * @param rows
-     * 
-     * @return a {@link List<MCRURN>} of {@link MCRURN} where path and file name are just blanks or null;
+     * @return a {@link List} of {@link MCRURN} where path and file name are just blanks or null;
      */
     public static List<MCRURN> getBaseURN(boolean registered, boolean dfg, int start, int rows) {
         return store.getBaseURN(registered, dfg, start, rows);

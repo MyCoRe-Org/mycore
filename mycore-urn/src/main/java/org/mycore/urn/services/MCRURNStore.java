@@ -80,48 +80,24 @@ public interface MCRURNStore {
     /**Checks wether an object or derivate has an urn assigned*/
     public boolean hasURNAssigned(String objId);
 
-    /**
-     * @param derivateId
-     * @param path
-     * @param fileName
-     * @return
-     */
     public String getURNForFile(String derivateId, String path, String fileName);
 
     /**
-     * @param registered
      * @return the count of urn matching the given 'registered' attribute
      */
     public long getCount(boolean registered);
 
-    /**
-     * @param registered
-     * @param start
-     * @param rows
-     * @return
-     */
     public List<MCRURN> get(boolean registered, int start, int rows);
 
-    /**
-     * @param urn
-     */
     public void update(MCRURN urn);
 
     /**
      * Get all URN for the given object id.
-     * 
-     * @param id
-     * @return
      */
     public List<MCRURN> get(MCRObjectID id);
 
     /**
-     * @param registered
-     * @param dfg
-     * @param start
-     * @param rows
-     * 
-     * @return a {@link List<MCRURN>} of {@link MCRURN} where path and file name are just blanks or null;
+     * @return a {@link List} of {@link MCRURN} where path and file name are just blanks or null;
      */
     public List<MCRURN> getBaseURN(boolean registered, boolean dfg, int start, int rows);
 }

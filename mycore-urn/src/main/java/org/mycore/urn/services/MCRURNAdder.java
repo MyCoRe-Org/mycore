@@ -34,7 +34,6 @@ import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectMetadata;
 import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.frontend.MCRFrontendUtil;
 import org.xml.sax.SAXException;
 
 /**
@@ -49,10 +48,6 @@ public class MCRURNAdder {
 
     /**
      * This methods adds an URN to the metadata of a mycore object.
-     *
-     * @param objectId
-     * @return
-     * @throws Exception
      */
     public boolean addURN(String objectId) throws Exception {
         // checking access right
@@ -123,12 +118,11 @@ public class MCRURNAdder {
      *            Please note, only xpath starting with /mycoreobject/metadata
      *            will be accepted.
      * @return <code>true</code> if successful, <code>false</code> otherwise
-     * @throws Exception
      *
      * @deprecated doesn't work that generic, need another solution
      *
      */
-    public boolean addURN(String objectId, String xpath) throws Exception {
+    public boolean addURN(String objectId, String xpath) {
         MCRObjectID id = MCRObjectID.getInstance(objectId);
         // checking access right
         if (!(MCRAccessManager.checkPermission(objectId, PERMISSION_WRITE) || isAllowedObject(id.getTypeId()))) {
@@ -139,7 +133,13 @@ public class MCRURNAdder {
         MCRObject mcrobj = MCRMetadataManager.retrieveMCRObject(id);
         MCRObjectMetadata mcrmetadata = mcrobj.getMetadata();
 
-        String urn = generateURN();
+        String urn;
+        try {
+            urn = generateURN();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            LOGGER.error("Could not generate URN", e);
+            return false;
+        }
         Element urnHoldingElement = createElementByXPath(xpath, urn);
         MCRObjectMetadata urnmetadata = new MCRObjectMetadata();
         urnmetadata.setFromDOM(urnHoldingElement);
@@ -287,9 +287,8 @@ public class MCRURNAdder {
      *
      * @return an URN, as specified by the urn provider (class to be set in
      *         mycore.properties)
-     * @throws Exception
      */
-    private String generateURN() throws Exception {
+    private String generateURN() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         MCRIURNProvider urnProvider = this.getURNProvider();
         MCRURN myURN = urnProvider.generateURN();
         String myURNString = myURN.toString() + myURN.checksum();
@@ -302,9 +301,6 @@ public class MCRURNAdder {
      *
      * @param derivateId
      *            the derivate id
-     * @throws SAXException
-     * @throws JDOMException
-     * @throws IOException
      */
     public boolean addURNToDerivates(String derivateId) throws IOException, JDOMException, SAXException {
         // create parent URN and add it to derivate
@@ -371,9 +367,6 @@ public class MCRURNAdder {
      *
      * @param derivateId
      *          the id of the derivate
-     * @throws IOException
-     * @throws JDOMException
-     * @throws SAXException
      */
     public boolean addURNToDerivate(String derivateId) throws IOException, JDOMException, SAXException {
         MCRObjectID id = MCRObjectID.getInstance(derivateId);

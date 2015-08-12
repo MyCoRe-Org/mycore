@@ -339,12 +339,6 @@ public class MCRHIBURNStore implements MCRURNStore {
         return urn;
     }
 
-    /**
-     * @param derivateId
-     * @param path
-     * @param fileName
-     * @return
-     */
     public String getURNForFile(String derivateId, String path, String fileName) {
         if (derivateId == null || fileName == null) {
             return null;
@@ -375,7 +369,6 @@ public class MCRHIBURNStore implements MCRURNStore {
     }
 
     /**
-     * @param registered
      * @return the count of urn matching the given 'registered' attribute
      */
     public long getCount(boolean registered) {
@@ -399,12 +392,6 @@ public class MCRHIBURNStore implements MCRURNStore {
         return 0;
     }
 
-    /**
-     * @param registered
-     * @param start
-     * @param rows
-     * @return
-     */
     @SuppressWarnings("unchecked")
     public List<MCRURN> get(boolean registered, int start, int rows) {
         Session session = MCRHIBConnection.instance().getSession();
@@ -429,9 +416,6 @@ public class MCRHIBURNStore implements MCRURNStore {
         return new ArrayList<MCRURN>();
     }
 
-    /**
-     * @param urn
-     */
     public void update(MCRURN urn) {
         Session session = MCRHIBConnection.instance().getSession();
         session.saveOrUpdate(urn);
@@ -439,9 +423,6 @@ public class MCRHIBURNStore implements MCRURNStore {
 
     /**
      * Get all URN for the given object id.
-     *
-     * @param id
-     * @return
      */
     @SuppressWarnings("unchecked")
     public List<MCRURN> get(MCRObjectID id) {
@@ -453,12 +434,7 @@ public class MCRHIBURNStore implements MCRURNStore {
     }
 
     /**
-     * @param registered
-     * @param dfg
-     * @param start
-     * @param rows
-     *
-     * @return a {@link List<MCRURN>} of {@link MCRURN} where path and file name are just blanks or null;
+     * @return a {@link List} of {@link MCRURN} where path and file name are just blanks or null;
      */
     @SuppressWarnings("unchecked")
     public List<MCRURN> getBaseURN(boolean registered, boolean dfg, int start, int rows) {

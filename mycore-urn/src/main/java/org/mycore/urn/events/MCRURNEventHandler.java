@@ -249,13 +249,10 @@ public class MCRURNEventHandler extends MCREventHandlerBase {
 
     /**
      * When overriding an existing file with urn, this method ensures the urn remaining in the derivate xml.
-     * @param evt
-     * @param path
-     *
-     * TODO handle directory structures 
      * */
     @Override
     protected void handlePathCreated(MCREvent evt, Path path, BasicFileAttributes attrs) {
+        //TODO handle directory structures
         if (!(path instanceof MCRPath)) {
             return;
         }

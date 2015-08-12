@@ -32,8 +32,6 @@ public class EpicurLite {
 
     /**
      * Creates an {@link EpicurLite} where frontpage is set to false and primary set to true.
-     * 
-     * @param urn
      */
     public EpicurLite(MCRURN urn) {
         this.urn = urn;
@@ -44,11 +42,7 @@ public class EpicurLite {
     /**
      * Creates an {@link EpicurLite} where frontpage is set to false and primary set to true.
      * 
-     * @param urn
-     * @param login
-     * @param password
-     * 
-     * @see {@link EpicurLite(MCRURN urn)}
+     * @see EpicurLite#EpicurLite(MCRURN)
      */
     public EpicurLite(MCRURN urn, String login, String password) {
         this(urn);
@@ -58,12 +52,9 @@ public class EpicurLite {
 
     /**
      * Creates the epicur lite xml.
-     * 
-     * @return epicur lite xml
-     * 
-     * TODO support multiple url elements
      */
     public Document getEpicurLite() {
+        //TODO support multiple url elements
         if (url == null) {
             return null;
         }
@@ -128,16 +119,10 @@ public class EpicurLite {
         this.url = url;
     }
 
-    /**
-     * @param login
-     */
     public void setLogin(String login) {
         this.login = login;
     }
 
-    /**
-     * @param password
-     */
     public void setPassword(String password) {
         this.password = password;
     }

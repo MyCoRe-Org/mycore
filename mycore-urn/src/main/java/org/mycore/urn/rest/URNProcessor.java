@@ -116,7 +116,6 @@ public class URNProcessor {
 
     /**
      * @param dfgURN
-     * @return
      */
     private void modifyToOriginalURN(MCRURN dfgURN) {
         // set dfg state 

@@ -66,7 +66,6 @@ public class URNServer {
      * 404 Not Found: The given URN is not registered in system.<br/>
      * 410 Gone: The given URN is registered in system but marked inactive.<br/>
      * 
-     * @param urn
      * @return the status code of the request
      */
     public int head(MCRURN urn) {
@@ -88,8 +87,6 @@ public class URNServer {
      * 303 See other: At least one of the given URLs is already registered under another URN, which means you should use this existing URN instead of assigning a new one<br/>
      * 409 Conflict: URN-Record already exists and can not be created again.<br/>
      * 
-     * @param elp
-     * @param updateURLs
      * @return the status code of the request
      */
     public int put(EpicurLite elp) {
@@ -125,8 +122,6 @@ public class URNServer {
      * 301 URN has a newer version<br/>
      * 303 URL is registered for another URN<br/>
      * 
-     * @param elp
-     * @param updateURLs
      * @return the status code of the request
      */
     public int post(EpicurLite elp) {

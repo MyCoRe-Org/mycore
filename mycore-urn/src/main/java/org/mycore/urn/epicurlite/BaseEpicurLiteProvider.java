@@ -118,9 +118,7 @@ public class BaseEpicurLiteProvider implements IEpicurLiteProvider {
      * @param file
      *            image file
      * @return if content type is in property <code>MCR.URN.URNGranular.SupportedContentTypes</code>
-     * @throws IOException
-     * @see {@link MCRContentTypes#probeContentType(Path)}
-     * @see {@link MCRIview2Tools#isFileSupported(Path)}
+     * @see MCRContentTypes#probeContentType(Path)
      */
     public static boolean isFileSupported(Path file) throws IOException {
         return file == null ? false : SUPPORTED_CONTENT_TYPE.contains(MCRContentTypes.probeContentType(file));
