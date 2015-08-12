@@ -107,15 +107,13 @@ public class MCRRestAPIObjects {
 
     /**
      * returns a single object in XML Format
-     * @param an object identifier of syntax [id] or [prefix]:[id]
+     * @param id an object identifier of syntax [id] or [prefix]:[id]
      * 
      * Allowed Prefixes are "mcr"
      * "mcr" is the default prefix for MyCoRe IDs.
      * 
      * @param style allowed values are "derivatedetails"
      * derivate details will be integrated into the output.
-     * 
-     * @return
      */
     @GET
     @Produces(MediaType.TEXT_XML)
@@ -128,15 +126,13 @@ public class MCRRestAPIObjects {
 
     /**
      * returns a single object in XML Format
-     * @param an object identifier of syntax [id] or [prefix]:[id]
+     * @param mcrid an object identifier of syntax [id] or [prefix]:[id]
      * 
      * Allowed Prefixes are "mcr"
      * "mcr" is the default prefix for MyCoRe IDs.
      * 
      * @param style allowed values are "derivatedetails"
      * derivate details will be integrated into the output.
-     * 
-     * @return
      */
     @GET
     @Produces(MediaType.TEXT_XML)

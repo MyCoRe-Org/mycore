@@ -88,8 +88,6 @@ public class MCRRestAPIClassifications extends HttpServlet {
      *
      * @param info - a Jersey Context Object for URI
      *     Possible values are: json | xml (required)
-     * @param format
-     * @return
      */
     @GET
     @Path("/")

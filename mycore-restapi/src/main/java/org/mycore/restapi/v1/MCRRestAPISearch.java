@@ -74,7 +74,6 @@ public class MCRRestAPISearch extends HttpServlet {
      *      the start parameter (number) - syntax as defined by SOLR      
      * @param rows
      *      the rows parameter (number) - syntax as defined by SOLR              
-     * @return
      */
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",

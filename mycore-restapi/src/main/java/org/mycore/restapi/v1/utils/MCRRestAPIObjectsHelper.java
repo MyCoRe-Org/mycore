@@ -275,14 +275,7 @@ public class MCRRestAPIObjectsHelper {
     }
 
     /**
-     * 
-     * @param info
-     * @param format
-     * @param filter
-     * @param sort
-     * @return
-     * 
-     * @see MCRRestAPIObjects.listObjects()
+     * @see MCRRestAPIObjects#listObjects(UriInfo, String, String, String)
      */
     public static Response listObjects(UriInfo info, String format, String filter, String sort) {
         //analyze sort
@@ -489,14 +482,7 @@ public class MCRRestAPIObjectsHelper {
     }
 
     /**
-     * 
-     * @param info
-     * @param format
-     * @param filter
-     * @param sort
-     * @return
-     * 
-     * @see MCRRestAPIObjects.listObjects()
+     * @see MCRRestAPIObjects#listDerivates(UriInfo, String, String, String)
      */
     public static Response listDerivates(UriInfo info, String mcrIDString, String format, String sort) {
         //analyze sort

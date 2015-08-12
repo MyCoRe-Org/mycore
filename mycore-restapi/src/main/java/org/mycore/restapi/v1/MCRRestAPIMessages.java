@@ -79,7 +79,6 @@ public class MCRRestAPIMessages extends HttpServlet {
      * 		Possible values are: props (default) | json | xml
      * @param filter
      * 		';'-separated list of message key prefixes
-     * @return
      */
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
@@ -134,9 +133,8 @@ public class MCRRestAPIMessages extends HttpServlet {
      * returns a single messages entry.
      * 
      * @param info - a Jersey Context Object for URI
-     *     Possible values are: props (default) | json | xml (required)
      * @param format 
-     * @return
+     *     Possible values are: props (default) | json | xml (required)
      */
     @GET
     @Path("/{value}")
