@@ -97,11 +97,6 @@ public class MCRMETSServlet extends MCRServlet {
 
     /**
      * Returns the mets document wrapped in a {@link MCRContent} object.
-     * 
-     * @param job
-     * @param useExistingMets
-     * @return
-     * @throws Exception
      */
     static MCRContent getMetsSource(MCRServletJob job, boolean useExistingMets, String derivate) throws Exception {
         MCRPath metsPath = MCRPath.getPath(derivate, "/mets.xml");

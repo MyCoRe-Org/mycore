@@ -39,7 +39,6 @@ public class MCRJSONProvider {
      *            the Mets document, must be non null
      * @param derivate
      *            the derivate id
-     * @throws Exception 
      */
     public MCRJSONProvider(Document mets, String derivate) throws Exception  {
         this.mets = new Mets(mets);

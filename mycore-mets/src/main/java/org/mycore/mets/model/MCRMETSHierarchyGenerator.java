@@ -144,7 +144,6 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
      * @param dir the root directoy
      * @param ignoreNodes nodes to ignored
      * @return generated file secion.
-     * @throws IOException 
      */
     protected FileSec createFileSection(MCRPath dir, Set<MCRPath> ignoreNodes) throws IOException {
         FileSec fsec = new FileSec();
@@ -279,9 +278,6 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
 
     /**
      * Get children objects from parentObject
-     *
-     * @param parentObject
-     * @return
      */
     protected List<MCRMetaLinkID> getChildren(MCRObject parentObject) {
         return parentObject.getStructure().getChildren();
@@ -355,9 +351,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
     /**
      * Returns the file name of a derivate link.
      * 
-     * @param derId derivate which contains the file
      * @param mcrObj object which contains the derivate link
-     * @return
      */
     protected String getLinkedFile(MCRObject mcrObj) {
         MCRMetaElement me = mcrObj.getMetadata().getMetadataElement(getEnclosingDerivateLinkName());
@@ -389,32 +383,22 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
     /**
      * Type attribute used in logical structure. Something like journal, article,
      * book...
-     * 
-     * @param obj
-     * @return
      */
     protected abstract String getType(MCRObject obj);
 
     /**
      * Returns the label of an object. Used in logical structure.
-     * 
-     * @param obj
-     * @return
      */
     protected abstract String getLabel(MCRObject obj);
 
     /**
      * Enclosing name of the derivate link element.
      * In journals this is 'derivateLinks', in archive 'def.derivateLink'.
-     * 
-     * @return
      */
     protected abstract String getEnclosingDerivateLinkName();
 
     /**
      * Name of the derivate link element. E.g. 'derivateLink'.
-     * 
-     * @return
      */
     protected abstract String getDerivateLinkName();
 

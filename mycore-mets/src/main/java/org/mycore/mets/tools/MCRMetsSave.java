@@ -87,9 +87,6 @@ public class MCRMetsSave {
      * the derivate with the given id. The name of the file depends on property
      * 'MCR.Mets.Filename'. If this property has not been set 'mets.xml' is used
      * as a default filename.
-     * 
-     * @param document
-     * @param derivateId
      */
     public static synchronized void saveMets(Document document, MCRObjectID derivateId) {
         saveMets(document, derivateId, true);
@@ -100,9 +97,6 @@ public class MCRMetsSave {
      * the derivate with the given id. The name of the file depends on property
      * 'MCR.Mets.Filename'. If this property has not been set 'mets.xml' is used
      * as a default filename.
-     * 
-     * @param document
-     * @param derivateId
      * @param overwrite 
      *          if true existing mets-file will be overwritten
      */
@@ -135,7 +129,6 @@ public class MCRMetsSave {
      *
      * @param file
      *            a handle for the file to add to the mets.xml
-     * @throws Exception
      */
     public static void updateMetsOnFileAdd(MCRPath file) throws Exception {
         MCRObjectID derivateID = MCRObjectID.getInstance(file.getOwner());
@@ -466,7 +459,6 @@ public class MCRMetsSave {
      *
      * @param file
      *            a handle for the file to add to the mets.xml
-     * @throws Exception
      */
     public static void updateMetsOnFileDelete(MCRPath file) throws Exception {
         MCRObjectID derivateID = MCRObjectID.getInstance(file.getOwner());
@@ -485,7 +477,6 @@ public class MCRMetsSave {
      * Inserts the given URNs into the Mets document.
      * @param derivateID The {@link MCRObjectID} of the Derivate wich contains the METs file
      * @param fileUrnMap a {@link Map} wich contains the file as key and the urn as  as value
-     * @throws Exception
      */
     public static void updateMetsOnUrnGenerate(MCRObjectID derivateID, Map<String, String> fileUrnMap) throws Exception {
         Document mets = getCurrentMets(derivateID.toString());
@@ -504,7 +495,6 @@ public class MCRMetsSave {
      * Inserts the given URNs into the {@link Mets} Object.
      * @param mets the {@link Mets} object were the URNs should be inserted.
      * @param fileUrnMap a {@link Map} wich contains the file as key and the urn as  as value
-     * @throws Exception
      */
     public static void updateURNsInMetsDocument(Mets mets, Map<String, String> fileUrnMap) throws Exception {
         // put all files of the mets in a list
@@ -680,9 +670,6 @@ public class MCRMetsSave {
     }
 
     /**
-     * @param mets
-     * @param derivateId
-     * 
      * @return true if all files owned by the derivate appearing in the master file group or false otherwise 
      */
     public static boolean isComplete(Mets mets, MCRObjectID derivateId) {
@@ -697,9 +684,6 @@ public class MCRMetsSave {
     }
 
     /**
-     * 
-     * @param fileGroup
-     * @param ifs
      * @return true if all files in the {@link MCRDirectory} appears in the fileGroup
      */
     public static boolean isComplete(final FileGrp fileGroup, MCRPath rootDir) {

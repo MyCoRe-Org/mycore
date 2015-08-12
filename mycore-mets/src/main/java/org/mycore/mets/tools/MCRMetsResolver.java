@@ -45,7 +45,7 @@ import org.mycore.mets.model.MCRMETSGenerator;
 
 /**
  * returns a structured METS document for any valid MyCoRe ID (object or
- * derivate). May return empty <mets:mets/> if no derivate is present. No
+ * derivate). May return empty &lt;mets:mets/&gt; if no derivate is present. No
  * metadata is attached.
  * 
  * @author Thomas Scheffler (yagee)

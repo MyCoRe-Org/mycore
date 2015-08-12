@@ -12,7 +12,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 public interface MCRILogicalStructMapTypeProvider {
 
     /**
-     * @param objectId
      * @return the type depending on metadata given by an object id
      */
     public String getType(MCRObjectID objectId);

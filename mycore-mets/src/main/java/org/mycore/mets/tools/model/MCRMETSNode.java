@@ -51,7 +51,7 @@ public class MCRMETSNode implements Comparable<MCRMETSNode> {
     }
 
     /**
-     * Sets the contentId attribute of the sub <code><mets:div/> </code>
+     * Sets the contentId attribute of the sub <code>&lt;mets:div/&gt;</code>
      * @param contentIds the contentId that should be set
      */
     public void setContentIds(String contentIds) {
@@ -62,10 +62,6 @@ public class MCRMETSNode implements Comparable<MCRMETSNode> {
         return path;
     }
 
-    /**
-     * @param path
-     * 
-     */
     public void setPath(String path) {
         this.path = path;
     }
@@ -84,7 +80,6 @@ public class MCRMETSNode implements Comparable<MCRMETSNode> {
 
     /**
      * Sets the type. This is not the TYPE attribute. Its only for METS-Editor.
-     * @param type
      */
     public void setType(String type) {
         this.type = type;
@@ -94,10 +89,6 @@ public class MCRMETSNode implements Comparable<MCRMETSNode> {
         return name;
     }
 
-    /**
-     * @param name
-     * 
-     */
     public void setName(String name) {
         this.name = name;
     }
@@ -107,8 +98,8 @@ public class MCRMETSNode implements Comparable<MCRMETSNode> {
     }
 
     /**
-     * Sets the order of the <code><mets:div/> </code>. The Items will be shown in the order from lower to higher number.
-     * @param order the ordner number that should be set
+     * Sets the order of the <code>&lt;mets:div/&gt;</code>. The Items will be shown in the order from lower to higher number.
+     * @param order the order number that should be set
      */
     public void setOrder(int order) {
         this.order = order;
