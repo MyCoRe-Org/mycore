@@ -75,7 +75,6 @@ public class MCRMediaParser {
     /**
      * Checks if given file is supported.
      * 
-     * @param File file
      * @return boolean if true
      */
     public boolean isFileSupported(File file) {
@@ -90,7 +89,6 @@ public class MCRMediaParser {
     /**
      * Checks if given file is supported.
      * 
-     * @param MCROldFile file
      * @return boolean if true
      */
     public boolean isFileSupported(MCROldFile file) {
@@ -105,7 +103,6 @@ public class MCRMediaParser {
     /**
      * Checks if given file is supported.
      * 
-     * @param MCRFile file
      * @return boolean if true
      */
     public boolean isFileSupported(org.mycore.datamodel.ifs.MCRFile file) {
@@ -120,7 +117,6 @@ public class MCRMediaParser {
     /**
      * Checks if given file is supported.
      * 
-     * @param MCRFileReader file
      * @return boolean if true
      */
     public boolean isFileSupported(MCRFileReader file) {
@@ -135,7 +131,6 @@ public class MCRMediaParser {
     /**
      * Parse the given file and store metadata in related Object.
      * 
-     * @param File file
      * @return MCRMediaObject
      *              can be held any MCRMediaObject
      * @see MCRMediaObject#clone()
@@ -161,7 +156,6 @@ public class MCRMediaParser {
     /**
      * Parse the given file and store metadata in related Object.
      * 
-     * @param MCROldFile file
      * @return MCRMediaObject
      *              can be held any MCRMediaObject
      * @see MCRMediaObject#clone()
@@ -187,7 +181,6 @@ public class MCRMediaParser {
     /**
      * Parse the given file and store metadata in related Object.
      * 
-     * @param MCRFile file
      * @return MCRMediaObject
      *              can be held any MCRMediaObject
      * @see MCRMediaObject#clone()
@@ -213,7 +206,6 @@ public class MCRMediaParser {
     /**
      * Parse the given file and store metadata in related Object.
      * 
-     * @param MCRFileReader file
      * @return MCRMediaObject
      *              can be held any MCRMediaObject
      * @see MCRMediaObject#clone()
@@ -269,7 +261,6 @@ public class MCRMediaParser {
      *              set to keep aspect ratio
      * @return
      *              the snapshot
-     * @throws Exception
      */
     public synchronized static byte[] getThumbnail(MCRMediaObject media, long seek, int maxWidth, int maxHeight,
         boolean keepAspect) throws Exception {
@@ -285,10 +276,8 @@ public class MCRMediaParser {
     /**
      * Take a Snapshot from a supported MediaObject.
      * 
-     * @param media
      * @return
      *              the snapshot
-     * @throws Exception
      * @see #getThumbnail( MCRMediaObject , long, int, int, boolean )
      */
     public synchronized static byte[] getThumbnail(MCRMediaObject media) throws Exception {
@@ -299,12 +288,9 @@ public class MCRMediaParser {
     /**
      * Take multiple Snapshots from a supported MediaObject.
      * 
-     * @param media
      * @param steps
      *              count of steps to take a snapshot
-     * @return ArrayList<bytes[]>
-     *              a Array of snapshots  
-     * @throws Exception
+     * @return an ArrayList of snapshots  
      * @see #getThumbnail( MCRMediaObject , long, int, int, boolean )
      */
     public synchronized static ArrayList<byte[]> getThumbnail(MCRMediaObject media, int steps) throws Exception {

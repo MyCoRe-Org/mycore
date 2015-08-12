@@ -81,7 +81,6 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
     /**
      * Checks if given file is supported.
      * 
-     * @param String fileName
      * @return boolean if true
      */
     public boolean isFileSupported(String fileName) {
@@ -106,7 +105,6 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
     /**
      * Checks if given file is supported.
      * 
-     * @param file
      * @return boolean if true
      */
     public boolean isFileSupported(File file) {
@@ -116,7 +114,6 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
     /**
      * Checks if given file is supported.
      * 
-     * @param MCROldFile file
      * @return boolean if true
      */
     public boolean isFileSupported(MCROldFile file) {
@@ -126,7 +123,6 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
     /**
      * Checks if given file is supported.
      * 
-     * @param MCRFile file
      * @return boolean if true
      */
     public boolean isFileSupported(org.mycore.datamodel.ifs.MCRFile file) {
@@ -136,7 +132,6 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
     /**
      * Checks if given file is supported.
      * 
-     * @param MCRFileReader file
      * @return boolean if true
      */
     public boolean isFileSupported(MCRFileReader file) {

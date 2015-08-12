@@ -153,7 +153,6 @@ public class MCRVideoObject extends MCRMediaObject {
      *              maximum output height
      * @param keepAspect
      *              set to keep aspect ratio
-     * @throws Exception
      */
     public synchronized byte[] getThumbnail( MCRMediaObject media, long seek, int maxWidth, int maxHeight, boolean keepAspect ) throws Exception {
         MCRExternalProcess ep;

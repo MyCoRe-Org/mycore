@@ -219,13 +219,7 @@ public class MCRMediaObject implements Cloneable {
     /**
      * Returns an ByteArray with the thumbnail in PNG format.
      * 
-     * @param media
-     * @param seek
-     * @param maxWidth
-     * @param maxHeight
-     * @param keepAspect
      * @return the Image in PNG format
-     * @throws Exception
      */
     public synchronized byte[] getThumbnail( MCRMediaObject media, long seek, int maxWidth, int maxHeight, boolean keepAspect ) throws Exception {
         return null;

@@ -89,7 +89,6 @@ public class MCRPDFObject extends MCRMediaObject {
      *              maximum output height
      * @param keepAspect
      *              set to keep aspect ratio
-     * @throws Exception
      */
     @SuppressWarnings("unchecked")
     public synchronized byte[] getThumbnail(MCRMediaObject media, long seek, int maxWidth, int maxHeight, boolean keepAspect)
@@ -159,7 +158,6 @@ public class MCRPDFObject extends MCRMediaObject {
     /**
      * Builds PDFObject from XML.
      * 
-     * @param xml
      * @return the PDFObject
      */
     public static MCRPDFObject buildFromXML(Element xml) {

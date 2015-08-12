@@ -152,7 +152,6 @@ public class MCRAudioObject  extends MCRMediaObject {
      * 
      * @param withRoot
      *                  complete output or only stream info
-     * @return
      */
     public Element toXML( boolean withRoot ) {
         Element xml;
