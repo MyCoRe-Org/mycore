@@ -14,7 +14,7 @@ import org.apache.solr.common.util.ContentStreamBase;
 /**
  * Wraps objects to be sent to solr in a content stream.
  * 
- * @see {@link ContentStream}
+ * @see ContentStream
  * 
  * @author shermann
  * @author Matthias Eichner

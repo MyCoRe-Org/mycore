@@ -60,11 +60,6 @@ public class MCRSolrCategLinkService extends MCRCategLinkServiceImpl {
 
     /**
      * Delete the given reference in solr.
-     * 
-     * @param solrClient
-     * @param reference
-     * @throws SolrServerException
-     * @throws IOException
      */
     protected void delete(SolrClient solrClient, MCRCategLinkReference reference) throws SolrServerException,
         IOException {

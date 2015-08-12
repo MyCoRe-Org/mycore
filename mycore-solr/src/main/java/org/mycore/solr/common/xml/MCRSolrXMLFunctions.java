@@ -11,8 +11,6 @@ public class MCRSolrXMLFunctions {
      * Deletes the given MyCoRe object from the solr index.
      * 
      * @param id MyCoRe ID
-     * @throws SolrServerException
-     * @throws IOException
      */
     public static void delete(String id) throws SolrServerException, IOException {
         MCRSolrClientFactory.getSolrClient().deleteById(id);

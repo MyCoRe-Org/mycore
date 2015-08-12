@@ -21,8 +21,6 @@ public class MCRXMLFunctions {
      * @param q the query to execute (in solr syntax)
      * 
      * @return the amount of documents matching the given query
-     *  
-     * @throws SolrServerException
      */
     public static long getNumFound(String q) throws SolrServerException, IOException {
         if (q == null || q.length() == 0) {

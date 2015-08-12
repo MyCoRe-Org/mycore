@@ -53,9 +53,6 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
 
     private static Logger LOGGER = Logger.getLogger(MCRSolrInputDocumentsHandler.class);
 
-    /**
-     * @param documents
-     */
     public MCRSolrInputDocumentsHandler(Collection<SolrInputDocument> documents) {
         this(documents, MCRSolrClientFactory.getSolrClient());
     }

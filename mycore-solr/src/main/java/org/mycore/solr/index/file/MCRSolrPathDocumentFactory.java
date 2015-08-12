@@ -53,7 +53,6 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs2.MCRFile;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRContentTypes;
@@ -93,15 +92,11 @@ public class MCRSolrPathDocumentFactory {
     }
 
     /**
-     * Generates a {@link SolrInputDocument} from a {@link MCRFile} instance.
+     * Generates a {@link SolrInputDocument} from a {@link MCRPath} instance.
      * 
      * @see MCRSolrFileIndexHandler
      * @see MCRSolrFilesIndexHandler
      * @see MCRSolrIndexHandlerFactory
-     * @param input
-     * @return
-     * @throws IOException
-     * @throws MCRPersistenceException
      */
     public SolrInputDocument getDocument(Path input, BasicFileAttributes attr) throws IOException,
         MCRPersistenceException {

@@ -104,9 +104,9 @@ public class MCRQLSearchServlet extends MCRServlet {//extends MCRSearchServlet {
     }
 
     /**
-     * This method is used to convert all parameters wich starts with XSL. to a {@link String}.
+     * This method is used to convert all parameters which starts with XSL. to a {@link String}.
      * @param requestParameter the map of parameters (not XSL parameter will be skipped)
-     * @return a string wich contains all parameters with a leading &
+     * @return a string which contains all parameters with a leading &amp;
      */
     protected String getReservedParameterString(Map<String, String[]> requestParameter) {
         StringBuilder sb = new StringBuilder();

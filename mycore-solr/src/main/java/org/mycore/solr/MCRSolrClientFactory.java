@@ -59,8 +59,6 @@ public abstract class MCRSolrClientFactory {
 
     /**
      * Returns the solr client of the default core.
-     * 
-     * @return an instance of {@link SolrServer}
      */
     public static SolrClient getSolrClient() {
         return getDefaultSolrCore().getClient();
@@ -68,8 +66,6 @@ public abstract class MCRSolrClientFactory {
 
     /**
      * Returns the concurrent solr client of the default core.
-     * 
-     * @return
      */
     public static SolrClient getConcurrentSolrClient() {
         return getDefaultSolrCore().getConcurrentClient();
@@ -77,8 +73,6 @@ public abstract class MCRSolrClientFactory {
 
     /**
      * Sets the new solr url including the core.
-     * 
-     * @param serverURL
      */
     public static void setSolrClient(String serverURL) {
         removeDefaultCore();

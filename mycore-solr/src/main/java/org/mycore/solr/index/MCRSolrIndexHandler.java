@@ -16,9 +16,6 @@ public interface MCRSolrIndexHandler {
 
     /**
      * Commits something to solr.
-     * 
-     * @throws IOException
-     * @throws SolrServerException
      */
     public void index() throws IOException, SolrServerException;
 

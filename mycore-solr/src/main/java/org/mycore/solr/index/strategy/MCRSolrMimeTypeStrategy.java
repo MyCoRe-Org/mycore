@@ -8,13 +8,12 @@ import java.util.regex.Pattern;
 
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRXMLFunctions;
-import org.mycore.datamodel.ifs2.MCRFile;
 
 /**
  * Strategy that depends on a files mime type. By default images are
  * ignored. You can use the MCR.Module-solr.MimeTypeStrategy.Pattern property to
  * set an application specific pattern. Be aware that this is the ignore
- * pattern, the {@link #check(MCRFile)} method will return false if it
+ * pattern, the {@link #check(Path, BasicFileAttributes)} method will return false if it
  * matches.
  * 
  * @author Matthias Eichner

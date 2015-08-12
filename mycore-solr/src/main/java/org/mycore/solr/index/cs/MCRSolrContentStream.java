@@ -35,10 +35,6 @@ public class MCRSolrContentStream extends MCRSolrAbstractContentStream<MCRConten
         TRANSFORMER = MCRContentTransformerFactory.getTransformer(transformerId);
     }
 
-    /**
-     * @param objectOrDerivate
-     * @param content
-     */
     public MCRSolrContentStream(String id, MCRContent content) {
         super(content);
         this.setName(id);

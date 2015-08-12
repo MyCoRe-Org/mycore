@@ -114,9 +114,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
      * @param typeParameters
      *            all parameter where
      *            <code>getParameterGroup.equals(TypeParameter)</code>
-     * @param phraseQuery
-     * @return a map wich can be forwarded to {@link MCRSolrProxyServlet}
-     * @throws ServletException
+     * @return a map which can be forwarded to {@link MCRSolrProxyServlet}
      */
     protected Map<String, String[]> buildSelectParameterMap(Map<String, String[]> queryParameters,
         Map<String, String[]> typeParameters, Map<String, String[]> sortParameters, Set<String> phraseQuery)

@@ -111,7 +111,6 @@ public abstract class MCRSolrClassificationUtil {
     /**
      * Returns a list of all descendants. The list is unordered.
      * 
-     * @param category
      * @return list of descendants.
      */
     public static List<MCRCategory> getDescendants(MCRCategory category) {
@@ -130,7 +129,6 @@ public abstract class MCRSolrClassificationUtil {
      * always the root node and the last element is always the parent. If the
      * element has no ancestor an empty list is returned.
      * 
-     * @param category
      * @return list of ancestors
      */
     public static LinkedList<MCRCategory> getAncestors(MCRCategory category) {
@@ -145,9 +143,6 @@ public abstract class MCRSolrClassificationUtil {
 
     /**
      * Creates a new list of {@link SolrInputDocument} based on the given category list.
-     * 
-     * @param categoryList
-     * @return
      */
     public static List<SolrInputDocument> toSolrDocument(Collection<MCRCategory> categoryList) {
         List<SolrInputDocument> solrDocumentList = new ArrayList<>();
@@ -160,10 +155,6 @@ public abstract class MCRSolrClassificationUtil {
 
     /**
      * Creates a new list of {@link SolrInputDocument} based on the given categories and the link.
-     * 
-     * @param linkReference
-     * @param categories
-     * @return
      */
     public static List<SolrInputDocument> toSolrDocument(MCRCategLinkReference linkReference,
         Collection<MCRCategoryID> categories) {
@@ -226,8 +217,6 @@ public abstract class MCRSolrClassificationUtil {
 
     /**
      * Returns the solr classification core.
-     * 
-     * @return
      */
     public static MCRSolrCore getCore() {
         MCRSolrCore classCore = MCRSolrClientFactory.get(CLASSIFICATION_CORE_NAME);
@@ -247,7 +236,6 @@ public abstract class MCRSolrClassificationUtil {
      * Encodes the mycore category id to a solr usable one.
      * 
      * @param classId the id to encode
-     * @return
      */
     public static String encodeCategoryId(MCRCategoryID classId) {
         return classId.toString().replaceAll("\\:", "\\\\:");

@@ -261,7 +261,6 @@ public class MCRConditionTransformer {
      * @param and AND or OR connective between conditions  
      * @param table conditions per "content" or "metadata"
      * @param maxHits maximum hits
-     * @return
      */
     @SuppressWarnings("rawtypes")
     public static SolrQuery buildMergedSolrQuery(List<MCRSortBy> sortBy, boolean not, boolean and,

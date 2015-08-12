@@ -54,7 +54,7 @@ public class MCRSolrURL {
      * used.
      * 
      * @param solrClient the solr server connection to use
-     * @param urlQuery e.g. q=allMeta:Hello&rows=20&defType=edismax
+     * @param urlQuery e.g. q=allMeta:Hello&amp;rows=20&amp;defType=edismax
      */
     public MCRSolrURL(HttpSolrClient solrClient, String urlQuery) {
         this.solrClient = solrClient;
@@ -105,9 +105,7 @@ public class MCRSolrURL {
     }
 
     /**
-     * An abbrevation for getUrl().openStream();
-     * 
-     * @throws IOException
+     * An abbreviation for getUrl().openStream();
      */
     public InputStream openStream() throws IOException {
         URL url = this.getUrl();
@@ -145,8 +143,6 @@ public class MCRSolrURL {
 
     /**
      * Sets the unencoded query parameter.
-     * 
-     * @param query
      */
     public void setQueryParamter(String query) {
         this.q = query;
@@ -175,8 +171,6 @@ public class MCRSolrURL {
 
     /**
      * Sets the start parameter.
-     * 
-     * @param start
      */
     public void setStart(int start) {
         this.start = start;
@@ -185,26 +179,19 @@ public class MCRSolrURL {
 
     /**
      * Sets the rows parameter.
-     * 
-     * @param rows
      */
     public void setRows(int rows) {
         this.rows = rows;
     }
 
-    /**
-     * @param yesOrNo
-     */
     public void setReturnScore(boolean yesOrNo) {
         this.returnScore = yesOrNo;
     }
 
     /**
      * The wt (writer type) parameter is used by Solr to determine which QueryResponseWriter should be
-     * used to process the request. Valid values are any of the names specified by <queryResponseWriter... />
+     * used to process the request. Valid values are any of the names specified by &lt;queryResponseWriter... /&gt;
      * declarations in solrconfig.xml. The default value is "standard" (xml).
-     * 
-     * @param wt
      */
     public void setWriterType(String wt) {
         this.wt = wt;

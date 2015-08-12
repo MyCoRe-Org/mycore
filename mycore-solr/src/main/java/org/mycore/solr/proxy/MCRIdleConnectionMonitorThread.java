@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.http.conn.HttpClientConnectionManager;
 
 /**
- * Monitors a {@link ClientConnectionManager} for expired or idle connections.
+ * Monitors a {@link HttpClientConnectionManager} for expired or idle connections.
  * 
  * These connections will be closed every 5 seconds.
  * @author Thomas Scheffler (yagee)

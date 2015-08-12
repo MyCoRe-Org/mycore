@@ -136,8 +136,6 @@ public class MCRSolrCore {
 
     /**
      * Returns the name of the core.
-     * 
-     * @return
      */
     public String getName() {
         return name;
@@ -145,8 +143,6 @@ public class MCRSolrCore {
 
     /**
      * Returns the default solr client instance. Use this for queries.
-     * 
-     * @return
      */
     public HttpSolrClient getClient() {
         return solrClient;
@@ -154,8 +150,6 @@ public class MCRSolrCore {
 
     /**
      * Returns the concurrent solr client instance. Use this for indexing.
-     * 
-     * @return
      */
     public SolrClient getConcurrentClient() {
         return concurrentClient != null ? concurrentClient : solrClient;
