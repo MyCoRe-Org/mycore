@@ -14,7 +14,7 @@ import org.w3c.dom.Element;
  * this combination typically represents a value from a normed vocabulary like a classification. The AuthorityInfo can
  * be mapped to a MCRCategory in MyCoRe.
  * 
- * @see http://www.loc.gov/standards/mods/userguide/classification.html
+ * @see <a href="http://www.loc.gov/standards/mods/userguide/classification.html">MODS classification guidelines</a>
  * @author Frank L\u00FCtzenkirchen
  */
 abstract class MCRAuthorityInfo {
