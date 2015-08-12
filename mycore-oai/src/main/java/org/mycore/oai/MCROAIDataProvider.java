@@ -107,9 +107,6 @@ public class MCROAIDataProvider extends MCRServlet {
         return rMap;
     }
 
-    /**
-     * @param req
-     */
     protected void logRequest(HttpServletRequest req) {
         StringBuilder log = new StringBuilder(this.getServletName());
         for (Object o : req.getParameterMap().keySet()) {

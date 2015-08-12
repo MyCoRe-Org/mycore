@@ -29,7 +29,7 @@ public abstract class MCROAISearcher {
     protected final String id;
 
     /**
-     * increase every time a {@link #getHit(int)} is called
+     * increase every time a {@link #query(int)} is called
      */
     protected long runningExpirationTimer;
 

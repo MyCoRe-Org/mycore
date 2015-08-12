@@ -160,8 +160,6 @@ public class MCROAISetManager {
 
     /**
      * Returns a list of OAI-PMH sets defined by MyCoRe.
-     *
-     * @return
      */
     @SuppressWarnings("unchecked")
     public OAIDataList<Set> get() {
@@ -212,10 +210,10 @@ public class MCROAISetManager {
 
     /**
      * Removes all sets which are empty.
-     *
-     * <li>The parent is empty -> all child sets must be empty too</li>
-     * <li>There are no results for this set</li>
-     *
+     * <ul>
+     *   <li>The parent is empty -&gt; all child sets must be empty too</li>
+     *   <li>There are no results for this set</li>
+     * </ul>
      * @param setList the list to filter
      * @return the same list filtered
      */
@@ -244,7 +242,6 @@ public class MCROAISetManager {
      * results for this set, otherwise false.
      *
      * @param setSpec spec to check
-     * @return
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     protected boolean isEmptySet(String setSpec) {

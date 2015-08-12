@@ -71,7 +71,6 @@ public class MCROAIObjectManager {
      * Initialize the object mananger. Its important to call this method before you
      * can retrieve records or headers!
      * 
-     * @param configPrefix
      * @param repositoryIdentifier identifier of the repository, use the {@link MCROAIIdentify} to retrieve it
      */
     public void init(String configPrefix, String repositoryIdentifier) {

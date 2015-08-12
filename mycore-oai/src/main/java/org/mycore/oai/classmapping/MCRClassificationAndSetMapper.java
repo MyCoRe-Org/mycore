@@ -48,7 +48,6 @@ public class MCRClassificationAndSetMapper {
      * maps a classification name to an OAI set name
      * @param prefix - the properties prefix of the OAIAdapter
      * @param classid - the classification name
-     * @return
      */
     public static String mapClassificationToSet(String prefix, String classid) {
         Map<String, String> props = config.getPropertiesMap(prefix + PROP_SUFFIX);
@@ -64,7 +63,6 @@ public class MCRClassificationAndSetMapper {
      * maps an OAI set name to a classification name
      * @param prefix - the property prefix for the OAIAdapter
      * @param setid - the set name
-     * @return
      */
     public static String mapSetToClassification(String prefix, String setid) {
         try {
