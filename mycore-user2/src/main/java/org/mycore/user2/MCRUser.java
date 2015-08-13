@@ -150,7 +150,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * Creates a new user.
      * 
      * @param userName the login user name
-     * @param realm the realm this user belongs to
+     * @param mcrRealm the realm this user belongs to
      */
     public MCRUser(String userName, MCRRealm mcrRealm) {
         this(userName, mcrRealm.getID());
@@ -308,7 +308,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     }
 
     /**
-     * @param hash the hash to set
+     * @param password the hash value to set
      */
     public void setPassword(String password) {
         this.password.hash = password;
@@ -421,7 +421,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * Sets the user that owns this user. 
      * Setting this to null makes the user independent.
      * 
-     * @param ownerID the ID of the owner of the user.
+     * @param owner the owner of the user.
      */
     public void setOwner(MCRUser owner) {
         this.owner = owner;
@@ -634,7 +634,6 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     /**
      * Returns true if logins are allowed for this user.
-     * @return
      */
     public boolean loginAllowed() {
         return !disabled && (validUntil == null || validUntil.after(new Date()));

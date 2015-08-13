@@ -207,7 +207,6 @@ public class MCRRoleManager {
      * Adds <code>role</code> to the classification system.
      * If the representing {@link MCRCategory} already exists this method does nothing.
      * It will create any category if necessary. 
-     * @param role
      */
     public static void addRole(MCRRole role) {
         MCRCategoryID categoryID = null;
@@ -239,7 +238,6 @@ public class MCRRoleManager {
      * Deletes a role from the system.
      * If the role is currently not stored in the classification system this method does nothing.
      * This method will fail if any objects (e.g. users) are linked to it.
-     * @param roleID
      */
     public static void deleteRole(String roleID) {
         MCRRole role = MCRRoleManager.getRole(roleID);

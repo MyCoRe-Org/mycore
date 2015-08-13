@@ -485,8 +485,6 @@ public class MCRUserManager {
      * Sets password of 'user' to 'password'.
      * 
      * Automatically updates the user in database.
-     * @param user
-     * @param password
      */
     public static void setPassword(MCRUser user, String password) {
         MCRSession session = MCRSessionMgr.getCurrentSession();

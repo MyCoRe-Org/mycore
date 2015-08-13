@@ -108,7 +108,6 @@ public class MCRUserAttributeMapper {
      * @param object the {@link Object}
      * @param attributes a collection of attributes to map
      * @return <code>true</code> if any attribute was changed
-     * @throws Exception
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public boolean mapAttributes(final Object object, final Map<String, ?> attributes) throws Exception {

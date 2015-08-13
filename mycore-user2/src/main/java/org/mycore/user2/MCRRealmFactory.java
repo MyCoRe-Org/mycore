@@ -222,7 +222,6 @@ public class MCRRealmFactory {
 
     /**
      * Returns the Realms JDOM document as a {@link Source} useful for transformation processes.
-     * @return
      */
     static Source getRealmsSource() {
         reInitIfNeeded();

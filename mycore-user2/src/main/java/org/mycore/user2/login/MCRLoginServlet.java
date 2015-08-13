@@ -87,7 +87,7 @@ public class MCRLoginServlet extends MCRServlet {
      * stores foo as redirect url and displays
      * a list of login method options.
      * 
-     * MCRLoginServlet?url=foo&realm=ID
+     * MCRLoginServlet?url=foo&amp;realm=ID
      * stores foo as redirect url and redirects
      * to the login URL of the given realm.
     

@@ -58,8 +58,8 @@ public class MCRRole {
     /**
      * Creates a new role instance. 
      * 
-     * @param id the unique role ID
-     * @param name the unique role name
+     * @param name the unique role ID
+     * @param labels a set of MCRLabel in different languages
      */
     public MCRRole(String name, Set<MCRLabel> labels) {
         this();

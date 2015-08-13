@@ -172,10 +172,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
     /**
      * Exports a single role to the specified directory.
-     * @param roleID
-     * @param directory
      * @throws FileNotFoundException if target directory does not exist
-     * @throws IOException
      */
     @MCRCommand(
         syntax = "export role {0} to directory {1}",
@@ -194,8 +191,6 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * 
      * @param fileName
      *            a valid user XML file
-     * @throws IOException
-     * @throws SAXParseException
      */
     @MCRCommand(
         syntax = "import role from file {0}", help = "Imports a role from file, if that role does not exist",
@@ -246,9 +241,6 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the filename of the user data input
      * @param newFile
      *            the filename of the user data output (encrypted passwords)
-     * @throws IOException
-     * @throws SAXParseException
-     * @throws MCRException
      */
     @MCRCommand(
         syntax = "encrypt passwords in user xml file {0} to file {1}",
@@ -397,8 +389,6 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * 
      * @param filename
      *            Name of the file to import user from
-     * @throws IOException
-     * @throws SAXParseException
      */
     @MCRCommand(
         syntax = "import user from file {0}", help = "Imports a user from file {0}.")
@@ -509,7 +499,6 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * 
      * @param filename
      *            the filename of the user data input
-     * @throws SAXParseException
      */
     public static void createUserFromFile(String filename) throws SAXParseException, IOException {
         MCRUser user = getMCRUserFromFile(filename);
@@ -548,7 +537,6 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the ID of the user which will be a member of the role represented by roleID
      * @param roleID
      *            the ID of the role to which the user with ID mbrUserID will be added
-     * @throws MCRException
      */
     @MCRCommand(
         syntax = "assign user {0} to role {1}", help = "Adds a user {0} as secondary member in the role {1}.",
@@ -570,7 +558,6 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the ID of the user which will be removed from the role represented by roleID
      * @param roleID
      *            the ID of the role from which the user with ID mbrUserID will be removed
-     * @throws MCRException
      */
     @MCRCommand(
         syntax = "unassign user {0} from role {1}",

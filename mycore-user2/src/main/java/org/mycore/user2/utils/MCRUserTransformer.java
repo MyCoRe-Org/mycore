@@ -93,7 +93,7 @@ public abstract class MCRUserTransformer {
 
     /**
      * Builds an xml element containing all information on the given user except password info.
-     * same as {@link #buildXML(MCRUser)} without owned users resolved
+     * same as {@link #buildExportableXML(MCRUser)} without owned users resolved
      */
     public static Document buildExportableSafeXML(MCRUser mcrUser) {
         return getDocument(mcrUser.getSafeCopy());
