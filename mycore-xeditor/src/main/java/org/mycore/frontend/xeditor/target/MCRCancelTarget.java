@@ -36,7 +36,7 @@ import org.mycore.frontend.xeditor.MCREditorSession;
  * @author Frank L\u00FCtzenkirchen
  * 
  * Implements the "cancel" target to redirect when cancel button is clicked.
- * The target URL is set by <xed:cancel url="..." /> 
+ * The target URL is set by <code>&lt;xed:cancel url="..." /&gt;</code> 
  * 
  * When no URL is set, the web application base URL is used.
  * When a complete URL is given, it is used as is.
