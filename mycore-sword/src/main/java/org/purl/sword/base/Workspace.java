@@ -169,7 +169,7 @@ public class Workspace extends XmlElement implements SwordElementInterface
    /**
     * Get a list of the collections
     * 
-    * @ return A list.
+    * @return A list.
     */
    public List<Collection> getCollections( )
    {
@@ -213,13 +213,6 @@ public class Workspace extends XmlElement implements SwordElementInterface
       unmarshall(workspace, null);
    }
 
-   /**
-    *
-    * @param workspace
-    * @param validate
-    * @return
-    * @throws org.purl.sword.base.UnmarshallException
-    */
    public SwordValidationInfo unmarshall( Element workspace, Properties validationProperties )
    throws UnmarshallException
    {
@@ -299,11 +292,6 @@ public class Workspace extends XmlElement implements SwordElementInterface
        return validate(null, validationContext);
    }
 
-   /**
-    * 
-    * @param existing
-    * @return
-    */
    protected SwordValidationInfo validate(ArrayList<SwordValidationInfo> existing,
            Properties validationContext)
    {

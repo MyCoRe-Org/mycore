@@ -97,8 +97,6 @@ public class SWORDErrorDocument extends SWORDEntry
 
    /**
     * Get the element name.
-    * 
-    * @return
     */
    public static XmlName elementName()
    {
@@ -145,13 +143,6 @@ public class SWORDErrorDocument extends SWORDEntry
        unmarshall(entry, null);
    }
 
-   /**
-    * 
-    * @param entry
-    * @param validationProperties
-    * @return
-    * @throws org.purl.sword.base.UnmarshallException
-    */
    public SwordValidationInfo unmarshall(Element entry, Properties validationProperties)
    throws UnmarshallException
    {
@@ -201,31 +192,16 @@ public class SWORDErrorDocument extends SWORDEntry
        }
    }
 
-   /**
-    *
-    * @param elementName
-    * @return
-    */
    protected boolean isElementChecked(XmlName elementName)
    {
        return super.isElementChecked(elementName);
    }
 
-   /**
-    *
-    * @return
-    */
    public SwordValidationInfo validate(Properties validationContext)
    {
        return validate(null, validationContext);
    }
 
-   /**
-    * 
-    * @param elements
-    * @param attributes
-    * @return
-    */
    protected SwordValidationInfo validate(SwordValidationInfo info, Properties validationContext)
    {
       

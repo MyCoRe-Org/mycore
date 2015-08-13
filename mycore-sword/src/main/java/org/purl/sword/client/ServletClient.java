@@ -124,9 +124,6 @@ public class ServletClient extends HttpServlet {
 	 * 
 	 * @param request The request details
 	 * @param response The response to write to.
-	 * 
-	 * @throws ServletException
-	 * @throws IOException
 	 */
 	protected void doGet(HttpServletRequest request,
 	                     HttpServletResponse response) throws ServletException, IOException {
@@ -141,9 +138,6 @@ public class ServletClient extends HttpServlet {
 	 * 
 	 * @param request The request details.
 	 * @param response The response to write to.
-	 * 
-	 * @throws ServletException
-	 * @throws IOException
 	 */
 
 	protected void doPost(HttpServletRequest request,

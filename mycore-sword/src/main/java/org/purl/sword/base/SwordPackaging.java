@@ -60,8 +60,6 @@ public class SwordPackaging extends BasicStringContentElement
 
     /**
      * Get the name of this element.
-     *
-     * @return
      */
     public static XmlName elementName()
     {

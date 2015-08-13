@@ -79,8 +79,6 @@ public class ServiceDocumentServlet extends HttpServlet {
 
 	/**
 	 * Initialise the servlet.
-	 * 
-	 * @throws ServletException
 	 */
 	public void init() throws ServletException {
 		// Instantiate the correct SWORD Server class

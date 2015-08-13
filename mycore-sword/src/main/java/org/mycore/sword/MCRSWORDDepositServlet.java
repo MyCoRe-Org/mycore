@@ -105,8 +105,6 @@ public class MCRSWORDDepositServlet extends MCRServlet {
 
     /**
      * Initialise the servlet
-     * 
-     * @throws ServletException
      */
     public void init() throws ServletException {
         super.init();

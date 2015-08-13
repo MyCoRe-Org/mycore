@@ -109,7 +109,7 @@ public class Service extends XmlElement implements SwordElementInterface
    /**
     * Create a new instance. 
     * 
-    * @param complianceLevel The service compliance level. 
+    * @param version The service compliance level. 
     */
    public Service(String version)
    {
@@ -121,7 +121,7 @@ public class Service extends XmlElement implements SwordElementInterface
     * Create a new instance with the specified compliance level, noOp and 
     * verbose values. 
     * 
-    * @param complianceLevel  The service compliance level. 
+    * @param version          The service compliance level. 
     * @param noOp             The noOp.
     * @param verbose          The verbose element. 
     */
@@ -407,13 +407,6 @@ public class Service extends XmlElement implements SwordElementInterface
       unmarshall(service, null);
    }
 
-   /**
-    * 
-    * @param service
-    * @param validate
-    * @return
-    * @throws org.purl.sword.base.UnmarshallException
-    */
    public SwordValidationInfo unmarshall( Element service, Properties validationProperties)
    throws UnmarshallException
    {
@@ -562,11 +555,6 @@ public class Service extends XmlElement implements SwordElementInterface
        return validate(null, validationContext);
    }
 
-   /**
-    *
-    * @param existing
-    * @return
-    */
    protected SwordValidationInfo validate(ArrayList<SwordValidationInfo> existing,
            Properties validationContext)
    {

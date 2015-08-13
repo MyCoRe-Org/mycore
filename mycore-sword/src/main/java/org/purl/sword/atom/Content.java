@@ -38,19 +38,18 @@ package org.purl.sword.atom;
 
 import java.util.ArrayList;
 import java.util.Properties;
-import nu.xom.Attribute;
-import nu.xom.Element;
-
-import nu.xom.Node;
-import org.purl.sword.base.Namespaces;
-import org.purl.sword.base.SwordElementInterface;
-import org.purl.sword.base.UnmarshallException;
-import org.purl.sword.base.XmlElement;
 
 import org.apache.log4j.Logger;
+import org.purl.sword.base.Namespaces;
+import org.purl.sword.base.SwordElementInterface;
 import org.purl.sword.base.SwordValidationInfo;
 import org.purl.sword.base.SwordValidationInfoType;
+import org.purl.sword.base.UnmarshallException;
+import org.purl.sword.base.XmlElement;
 import org.purl.sword.base.XmlName;
+
+import nu.xom.Attribute;
+import nu.xom.Element;
 
 /**
  * Represents an ATOM Content element. 
@@ -270,12 +269,6 @@ public class Content extends XmlElement implements SwordElementInterface
        return validate(null, null, validationContext);
    }
 
-   /**
-    * 
-    * @param elements
-    * @param attributes
-    * @return
-    */
    protected SwordValidationInfo validate(ArrayList<SwordValidationInfo> elements,
            ArrayList<SwordValidationInfo> attributes,
            Properties validationContext)

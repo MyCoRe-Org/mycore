@@ -149,9 +149,6 @@ public class Client implements SWORDClient {
 
 	/**
 	 * Initialise the server that will be used to send the network access.
-	 * 
-	 * @param server
-	 * @param port
 	 */
 	public void setServer(String server, int port) {
 		this.server = server;
@@ -353,10 +350,6 @@ public class Client implements SWORDClient {
 
     private SwordValidationInfo lastUnmarshallInfo;
 
-    /**
-     * 
-     * @return
-     */
     public SwordValidationInfo getLastUnmarshallInfo()
     {
         return lastUnmarshallInfo;

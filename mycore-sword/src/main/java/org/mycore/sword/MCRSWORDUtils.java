@@ -224,7 +224,6 @@ public class MCRSWORDUtils {
      *            The HttpServletRequest object
      * @param response
      *            The HttpServletResponse to send the error document to
-     * @throws IOException
      */
     public static void makeErrorDocument(String errorURI, int status, String summary, HttpServletRequest request, HttpServletResponse response) throws IOException {
         SWORDErrorDocument sed = new SWORDErrorDocument(errorURI);

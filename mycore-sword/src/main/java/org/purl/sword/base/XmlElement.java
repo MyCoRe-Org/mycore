@@ -112,10 +112,6 @@ public abstract class XmlElement
        this.xmlName = new XmlName(prefix, localName, namespaceUri);
    }
 
-   /**
-    * 
-    * @param name
-    */
    public XmlElement(XmlName name)
    {
        xmlName = name; 
@@ -271,12 +267,6 @@ public abstract class XmlElement
               namespaceURI.equals(element.getNamespaceURI()) );
    }
 
-   /**
-    * 
-    * @param element
-    * @param xmlName
-    * @return
-    */
    protected boolean isInstanceOf(Element element, XmlName xmlName)
    {
        return (xmlName.getLocalName().equals(element.getLocalName()) &&
@@ -345,9 +335,6 @@ public abstract class XmlElement
    /**
     * Add the information to the unmarshall attribute section of the specified
     * info object.
-    * 
-    * @param element
-    * @param info
     */
    protected void processUnexpectedAttributes(Element element, SwordValidationInfo info)
    {

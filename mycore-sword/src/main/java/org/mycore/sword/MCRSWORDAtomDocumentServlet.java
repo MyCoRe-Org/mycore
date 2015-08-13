@@ -62,8 +62,6 @@ public class MCRSWORDAtomDocumentServlet extends MCRServlet {
 
     /**
      * Initialise the servlet.
-     * 
-     * @throws ServletException
      */
     public void init() throws ServletException {
 

@@ -23,18 +23,18 @@ public interface MCRSWORDIngester {
      * @param deposit
      *            contains the {@link Deposit} object which should be deposited
      * @param response
-     *            contains the {@link SWORDResponse} to use for adding deposit
+     *            contains the SWORDResponse to use for adding deposit
      *            information into
      * @param verboseInfo
      *            verbose info to fill if the client asked for it.
      * @param job
-     *            contains the {@link MCRServletJob} develivered from the
+     *            contains the {@link MCRServletJob} delivered from the
      *            servlets
-     * @see {@link MCRSWORDServer}
+     * @see MCRSWORDServer
      * @throws IOException
-     *             thrown if any {@link IOException} occured
+     *             thrown if any {@link IOException} occurred
      * @throws SWORDException
-     *             thrown if any internal error occured during ingest
+     *             thrown if any internal error occurred during ingest
      * @throws SWORDErrorException
      *             thrown if any information given inside deposit or package
      *             descriptor is invalid

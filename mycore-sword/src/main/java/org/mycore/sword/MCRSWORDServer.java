@@ -125,7 +125,7 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
      * Inside a deposited file the mets.xml must contain this string as
      * <code>PROFILE</code>-attribute inside roots mets element.
      */
-    private static final String METS_PROFILE = "DSpace METS SIP Profile 1.0";
+    static final String METS_PROFILE = "DSpace METS SIP Profile 1.0";
 
     /** Line separator of this system. */
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
@@ -133,9 +133,6 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
     /** Counter counts op deposits. */
     private int counter;
 
-    /**
-     * @category SWORDServer
-     */
     public AtomDocumentResponse doAtomDocument(AtomDocumentRequest adr, MCRServletJob job) throws SWORDAuthenticationException, SWORDErrorException,
             SWORDException {
 
@@ -151,7 +148,7 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
      * <dd>&lt;atom:title&gt; of used workspace</dd>
      * <dt>MCR.SWORD.default.collection.title</dt>
      * <dd>&lt;atom:title&gt; of used collection</dd>
-     * <dt>MCR.SWORD.default.collection.policy/dt>
+     * <dt>MCR.SWORD.default.collection.policy</dt>
      * <dd>&lt;sword:collectionPolicy&gt; of used collection. Used for a
      * human-readable description of collection policy. Include either a text
      * description or a URI.</dd>
@@ -174,7 +171,6 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
      * DSpace METS SIP 1.0, the service version is 1.3 and a mediation is not
      * allowed.
      * 
-     * @category SWORDServer
      * @see <a
      *      href="http://www.swordapp.org/docs/sword-profile-1.3.html#b.8">Service
      *      Documents</a>
@@ -220,14 +216,12 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
      * <dt>1. {@link #validateDeposit(Deposit)}</dt>
      * <dd>When overriding be sure to throw a {@link SWORDErrorException}, so a
      * {@link SWORDErrorDocument} is delivered to the client</dd>
-     * <dt>2. {@link #persistDeposit(Deposit, SWORDEntry, StringBuffer)}</dt>
+     * <dt>2. {@link #persistDeposit(Deposit, SWORDEntry, StringBuffer, MCRServletJob)}</dt>
      * <dd>When overriding use given {@link SWORDEntry} and {@link StringBuffer}
      * for providing verbose info and document response data.</dd>
      * <dt>3. {@link #createDepositResponse(StringBuffer, Deposit, SWORDEntry)}</dt>
      * <dd>When overriding provide a proper {@link DepositResponse}</dd>
      * </dl>
-     * 
-     * @category SWORDServer
      */
     public DepositResponse doDeposit(Deposit deposit, MCRServletJob job) throws SWORDAuthenticationException, SWORDErrorException, SWORDException {
 
@@ -259,7 +253,6 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
      *            the deposit to validate
      * @throws SWORDErrorException
      *             thrown if invalid information is given inside the deposit
-     * @category Helper
      */
     protected void validateDeposit(Deposit deposit) throws SWORDErrorException {
 
@@ -297,7 +290,6 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
      *             thrown if error occured during deposit
      * @throws SWORDErrorException
      *             thrown if content inside the deposit contains invalid data
-     * @category Helper
      */
     protected void persistDeposit(Deposit deposit, SWORDEntry responseEntry, StringBuffer verboseInfo, MCRServletJob job) throws SWORDErrorException, SWORDException {
 
@@ -332,7 +324,6 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
      * Performs the deposit for a {@link #METS_PROFILE}. Inside ingest validation of the
      * package profile is done. If valid profile is given a specific implementation of
      * {@link MCRSWORDIngester} is used, which is able to handle the {@link #METS_PROFILE}. 
-     * @category MCRSWORDIngester
      */
     @Override
     public void ingest(Deposit deposit, SWORDEntry response, StringBuffer verboseInfo, MCRServletJob job) throws IOException, SWORDException,
@@ -391,7 +382,7 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
      * dereferences to such a description.
      * </p>
      * <p>
-     * If overridden be sure to set {@link #HttpServletResponse.SC_CREATED} to returned
+     * If overridden be sure to set {@link HttpServletResponse#SC_CREATED} to returned
      * response if it was created.
      * </p>
      * 
@@ -402,12 +393,7 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
      *            the {@link Deposit} to perform
      * @param swordEntry
      *            the {@link SWORDEntry} which should be filled
-     * @return
-     * @see <a
-     *      href="http://www.ukoln.ac.uk/repositories/digirep/index/SWORD_APP_Profile_1.2#Response"
-     *      >Example response</a>. Inside the document various information is
-     *      given to provide a response.
-     * @category Helper
+     * @see <a href="http://www.ukoln.ac.uk/repositories/digirep/index/SWORD_APP_Profile_1.2#Response">Example response</a>
      */
     protected DepositResponse createDepositResponse(StringBuffer verboseInfo, Deposit deposit, SWORDEntry swordEntry) {
 
@@ -470,9 +456,7 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
      *            should contain a not null <code>StringBuffer</code> where
      *            information can be added to
      * 
-     * @return the package descriptor for files inside the zip
      * @throws IOException
-     * @category Helper
      */
     private static void decompressZipToTemp(Deposit deposit, StringBuffer verboseInfo) throws IOException {
 
@@ -534,15 +518,13 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
      * 
      * @param packageDescriptor
      *            contains the package descriptor in deposited file
-     * @param files
+     * @param extractedFiles
      *            contains a list with all decompressed files
      * @throws SWORDErrorException
      *             thrown if one of the previous details is invalid
      * @throws SWORDException
      *             thrown if a internal error occured
-     * @category Helper
      */
-    @SuppressWarnings("unchecked")
     protected void validatePackageProfile(File packageDescriptor, Map<File, String> extractedFiles) throws SWORDErrorException, SWORDException {
         SAXBuilder parser = new SAXBuilder();
         try {

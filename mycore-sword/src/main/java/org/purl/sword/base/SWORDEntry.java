@@ -150,8 +150,6 @@ public class SWORDEntry extends Entry
     * Call this method to set noOp. It should be called even by internal 
     * methods so that the object can determine if the value has been set 
     * or whether it just holds the default value.  
-    * 
-    * @param noOp
     */
    public void setNoOp(boolean noOp)
    {
@@ -468,11 +466,6 @@ public class SWORDEntry extends Entry
       return result;
    }
 
-   /**
-    * 
-    * @param elementName
-    * @return
-    */
    protected boolean isElementChecked(XmlName elementName)
    {
        if( elementName == null )

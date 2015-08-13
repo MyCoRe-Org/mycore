@@ -157,13 +157,6 @@ public class ServiceDocument {
        unmarshall(xml, null);
     }
 
-    /**
-     * 
-     * @param xml
-     * @param validationProperties
-     * @return
-     * @throws org.purl.sword.base.UnmarshallException
-     */
     public SwordValidationInfo unmarshall(String xml, Properties validationProperties)
     throws UnmarshallException
     {
@@ -183,9 +176,6 @@ public class ServiceDocument {
     /**
      * Unmarshall the specified element. This version does not generate any
      * valiation information.
-     *
-     * @param element
-     * @throws org.purl.sword.base.UnmarshallException
      */
 	public void unmarshall(Element element)
     throws UnmarshallException
@@ -196,11 +186,6 @@ public class ServiceDocument {
     /**
      * Unmarshall the specified element, and return the generated validation
      * information.
-     * 
-     * @param element
-     * @param validationProperties
-     * @return
-     * @throws org.purl.sword.base.UnmarshallException
      */
     public SwordValidationInfo unmarshall(Element element, Properties validationProperties)
     throws UnmarshallException

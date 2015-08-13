@@ -103,8 +103,6 @@ public class DepositServlet extends MCRServlet {
 
 	/**
 	 * Initialise the servlet
-	 * 
-	 * @throws ServletException
 	 */
 	public void init() throws ServletException {
 		// Instantiate the correct SWORD Server class
@@ -410,7 +408,6 @@ public class DepositServlet extends MCRServlet {
 	 * @param summary The textual description to give the user
 	 * @param request The HttpServletRequest object
 	 * @param response The HttpServletResponse to send the error document to
-	 * @throws IOException 
 	 */
 	protected void makeErrorDocument(String errorURI, int status, String summary, 
 			                       HttpServletRequest request, HttpServletResponse response) throws IOException
@@ -441,7 +438,6 @@ public class DepositServlet extends MCRServlet {
 	 * Utility method to return the username and password (separated by a colon
 	 * ':')
 	 * 
-	 * @param request
 	 * @return The username and password combination
 	 */
 	protected String getUsernamePassword(HttpServletRequest request) {

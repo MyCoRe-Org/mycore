@@ -198,7 +198,7 @@ public class Entry extends XmlElement implements SwordElementInterface
     * Create a new instance of the class an initalise it, setting the
     * element namespace and name.
     * 
-     * @param namespace The namespace of the element
+    * @param prefix The namespace of the element
     * @param element The element name
     */
    public Entry(String prefix, String element)
@@ -206,12 +206,6 @@ public class Entry extends XmlElement implements SwordElementInterface
 	   this(prefix, element, XML_NAME.getNamespace());
    }
 
-   /**
-    * 
-    * @param prefix
-    * @param element
-    * @param namespaceUri
-    */
    public Entry(String prefix, String element, String namespaceUri)
    {
        super(prefix, element, namespaceUri);
@@ -594,21 +588,11 @@ public class Entry extends XmlElement implements SwordElementInterface
       return result; 
    }
 
-   /**
-    *
-    * @return
-    */
    public SwordValidationInfo validate(Properties validationContext)
    {
        return validate(null, validationContext);
    }
 
-   /**
-    *
-    * @param elementsInfo
-    * @param attributeInfo
-    * @return
-    */
    protected SwordValidationInfo validate(SwordValidationInfo info, Properties validationContext)
    {
        // determine if a full validation is required 
@@ -796,7 +780,6 @@ public class Entry extends XmlElement implements SwordElementInterface
 
    /**
     * Set the content element for this Entry. 
-    * @param content
     */
    public void setContent(Content content) 
    {
@@ -815,7 +798,6 @@ public class Entry extends XmlElement implements SwordElementInterface
 
    /**
     * Set the generator for this Entry. 
-    * @param generator
     */
    public void setGenerator(Generator generator) 
    {
@@ -921,8 +903,7 @@ public class Entry extends XmlElement implements SwordElementInterface
     * is in the correct format. 
     * 
     * @param published The string. 
-    * @see org.purl.sword.base.XmlElement#stringToDate(String) stringToDate
-    * @see Entry#setPublished(Date) setPublished
+    * @see Entry#setPublished(String) setPublished
     */
    public void setPublished(String published) 
    {
@@ -949,7 +930,6 @@ public class Entry extends XmlElement implements SwordElementInterface
    /**
     * Get the source for this Entry. 
     * @return The source.
-    * @Deprecated
     */
    @Deprecated
    public Source getSource() {
@@ -960,7 +940,6 @@ public class Entry extends XmlElement implements SwordElementInterface
     * Set the source for this entry. 
     * 
     * @param source The source.
-    * @Deprecated
     */
    @Deprecated
    public void setSource(Source source) 
@@ -1031,8 +1010,7 @@ public class Entry extends XmlElement implements SwordElementInterface
     * string. 
     * 
     * @param updated The string. 
-    * @see org.purl.sword.base.XmlElement#stringToDate(String) stringToDate
-    * @see Entry#setPublished(Date) setPublished
+    * @see Entry#setPublished(String) setPublished
     */ 
    public void setUpdated(String updated) 
    {

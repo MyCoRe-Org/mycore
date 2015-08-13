@@ -89,8 +89,6 @@ implements SwordElementInterface
     * recognise the three different type elements of text, html and xhtml. This
     * is an area that can be improved in a future implementation, if necessary. 
     * 
-    * @param text The text element. 
-    * 
     * @throws UnmarshallException If the specified element is not of
     *                             the correct type, where the localname is used
     *                             to specify the valid name. Also thrown 
@@ -165,12 +163,6 @@ implements SwordElementInterface
        return validate(null, null, validationContext);
    }
 
-   /**
-    *
-    * @param existing
-    * @param attributeItems
-    * @return
-    */
    protected SwordValidationInfo validate(ArrayList<SwordValidationInfo> existing,
            ArrayList<SwordValidationInfo> attributeItems,
            Properties validationContext)

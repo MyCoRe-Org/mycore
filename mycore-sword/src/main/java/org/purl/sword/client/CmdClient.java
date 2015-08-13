@@ -338,7 +338,7 @@ public class CmdClient implements ClientType
 	 * for the post. The method will then print out the details of the 
 	 * response. 
 	 * 
-	 * @parma message The post options. 
+	 * @param message The post options. 
 	 *  
 	 * @exception SWORDClientException if there is an error accessing the 
 	 *                                 post response. 

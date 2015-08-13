@@ -135,12 +135,6 @@ public class Author extends XmlElement implements SwordElementInterface
       this(prefix, localName, XML_NAME.getNamespace());
    }
 
-   /**
-    *
-    * @param prefix
-    * @param localName
-    * @param namespaceUri
-    */
    public Author(String prefix, String localName, String namespaceUri)
    {
       super(prefix, localName, XML_NAME.getNamespace());

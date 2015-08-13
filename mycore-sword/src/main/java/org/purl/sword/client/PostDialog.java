@@ -204,10 +204,6 @@ implements ActionListener, ChangeListener
     */
    private JPanel controls = null; 
 
-   /**
-    * 
-    * @param parentFrame
-    */
    public PostDialog(JFrame parentFrame)
    {
       this.parentFrame = parentFrame; 

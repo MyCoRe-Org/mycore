@@ -110,12 +110,6 @@ implements SwordElementInterface
     {
        this(name.getPrefix(), name.getLocalName(), name.getNamespace());
     }
-    /**
-     * 
-     * @param prefix
-     * @param name
-     * @param namespaceUri
-     */
     public TextConstruct(String prefix, String name, String namespaceUri)
     {
         super(prefix, name, namespaceUri);
@@ -172,13 +166,6 @@ implements SwordElementInterface
        unmarshall(text, null);
    }
 
-   /**
-    * 
-    * @param text
-    * @param validate
-    * @return
-    * @throws org.purl.sword.base.UnmarshallException
-    */
    public SwordValidationInfo unmarshall(Element text, Properties validationProperties)
    throws UnmarshallException
    {

@@ -49,9 +49,8 @@ import org.purl.sword.server.SWORDServer;
  * of this class is able to generate a service document with one workspace and
  * one collection.
  * 
- * @see The <a href="http://www.swordapp.org/docs/sword-profile-1.3.html">SWORD
- *      APP Profile</a> describes which elements SHOULD, MUST etc. be present to
- *      correctly describe the service
+ * @see <a href="http://www.swordapp.org/docs/sword-profile-1.3.html">SWORD
+ *      APP Profile</a>
  * @author Nils Verheyen
  * 
  */

@@ -240,21 +240,11 @@ public class Generator extends XmlElement implements SwordElementInterface
       return result;
    }
 
-   /**
-    *
-    * @return
-    */
    public SwordValidationInfo validate(Properties validationContext)
    {
        return validate(null, null, validationContext);
    }
 
-   /**
-    * 
-    * @param existing
-    * @param attributeItems
-    * @return
-    */
    public SwordValidationInfo validate(ArrayList<SwordValidationInfo> existing,
            ArrayList<SwordValidationInfo> attributeItems,
            Properties validationContext)
@@ -367,8 +357,6 @@ public class Generator extends XmlElement implements SwordElementInterface
    
    /**
     * Get a string representation. 
-    * 
-    * @param The string. 
     */
    public String toString()
    {

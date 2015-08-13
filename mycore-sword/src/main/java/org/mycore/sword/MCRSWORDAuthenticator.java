@@ -99,7 +99,6 @@ public class MCRSWORDAuthenticator {
      *            unencrypted, unhashed password for auth
      * @return <code>true</code> if the user could be authenticated,
      *         <code>false</code> otherwise
-     * @throws IOException
      */
     public boolean authenticate(String username, String password) throws IOException {
 

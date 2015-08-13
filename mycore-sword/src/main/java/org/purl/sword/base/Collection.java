@@ -192,10 +192,6 @@ public class Collection extends XmlElement implements SwordElementInterface
       return items;
    }   
 
-   /**
-    *
-    * @return
-    */
    public List<Accept> getAcceptList()
    {
       return accepts;
@@ -712,21 +708,12 @@ public class Collection extends XmlElement implements SwordElementInterface
 
    }
 
-   /**
-    *
-    * @return
-    */
    @Override
    public SwordValidationInfo validate(Properties validationContext)
    {
        return validate(null, null, validationContext);
    }
 
-   /**
-    *
-    * @param existing
-    * @return
-    */
    protected SwordValidationInfo validate(ArrayList<SwordValidationInfo> existing,
            ArrayList<SwordValidationInfo> attributes,
            Properties validationContext)

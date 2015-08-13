@@ -93,10 +93,6 @@ public class SwordContentPackageTypes {
         return types.isEmpty();
     }
 
-    /**
-     *
-     * @return
-     */
     public Enumeration elements()
     {
 

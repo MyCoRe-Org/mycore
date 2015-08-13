@@ -246,7 +246,7 @@ public class PropertiesDialog
 		 * @param row The cell row. 
 		 * @param col The cell column. 
 		 * 
-		 * @param True if the cell can be edited. Otherwise, false. 
+		 * @return true if the cell can be edited. Otherwise, false. 
 		 */
 		public boolean isCellEditable(int row, int col) 
 		{
