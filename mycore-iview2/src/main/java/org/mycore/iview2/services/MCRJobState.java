@@ -33,6 +33,7 @@ public enum MCRJobState {
      * returns character representing the status
      * @return
      * <table>
+     *  <caption>returned characters depending on current state</caption>
      *  <tr>
      *   <th>{@link #NEW}</th>
      *   <td>'n'</td>
