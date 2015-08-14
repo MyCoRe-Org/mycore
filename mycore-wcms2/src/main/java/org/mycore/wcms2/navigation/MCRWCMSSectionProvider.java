@@ -26,9 +26,9 @@ public interface MCRWCMSSectionProvider extends MCRWCMSJSONProvider<Element, Jso
      * Converts a MyCoRe Webpage to a json array. The array contains
      * all the section elements of the webpage including their content.
      * <p>
-     * [<br/> 
-     *   {title: "title of section", lang: "de", data: "&lt;xml&gt;content of section&lt;/xml&gt;"},<br/> 
-     *   {title: "title of section 2", lang: "en", data: "&lt;xml&gt;content of section 2&lt;/xml&gt;"}<br/> 
+     * [<br> 
+     *   {title: "title of section", lang: "de", data: "&lt;xml&gt;content of section&lt;/xml&gt;"},<br> 
+     *   {title: "title of section 2", lang: "en", data: "&lt;xml&gt;content of section 2&lt;/xml&gt;"}<br> 
      * ]
      * </p>
      */

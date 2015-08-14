@@ -65,7 +65,7 @@ public class MCRWCMSContentManager {
      * </p>
      * <p>
      * If an error occur (e.g. file not exist) the returning json
-     * looks like:<br />
+     * looks like:<br>
      * {
      *  type: "error",
      *  errorType: "invalidFile"
@@ -123,7 +123,7 @@ public class MCRWCMSContentManager {
      * 
      * <p>
      * If one or more files could'nt be saved because of an error the returning
-     * json looks like:<br />
+     * json looks like:<br>
      * {
      *   type: "error",
      *   errorArray: [

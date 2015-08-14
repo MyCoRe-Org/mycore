@@ -27,7 +27,7 @@ public interface MCRWCMSNavigationProvider extends MCRWCMSJSONProvider<MCRNaviga
 
     /**
      * <p>
-     * Converts a <code>Navigation<code> object to a json one. The structure of the json is:
+     * Converts a <code>Navigation</code> object to a json one. The structure of the json is:
      * </p>
      * <pre>
      * {

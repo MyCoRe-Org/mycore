@@ -32,7 +32,7 @@ public class JSONSectionProviderTest {
         JsonObject section1 = (JsonObject)sectionArray.get(0);
         assertEquals("Title one", section1.getAsJsonPrimitive("title").getAsString());
         assertEquals("de", section1.getAsJsonPrimitive("lang").getAsString());
-        assertEquals("<div><p>Content one</p><br /></div>", section1.getAsJsonPrimitive("data").getAsString());
+        assertEquals("<div><p>Content one</p><br></div>", section1.getAsJsonPrimitive("data").getAsString());
         // test section two
         JsonObject section2 = (JsonObject)sectionArray.get(1);
         assertEquals("Title two", section2.getAsJsonPrimitive("title").getAsString());
