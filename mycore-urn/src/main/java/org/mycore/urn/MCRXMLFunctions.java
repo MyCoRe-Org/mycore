@@ -68,8 +68,8 @@ public class MCRXMLFunctions {
     /**
      * Method generates an alternative urn to a given urn by adding additional
      * text to the namespace specific part. Then a new checksum is calculated
-     * and attached to the new generated urn<br/>
-     * <br/>
+     * and attached to the new generated urn<br>
+     * <br>
      * Invoking method with
      * <code>"urn:nbn:de:urmel-37e1f5f1-54df-4a9c-8e54-c576f46c01f73"</code> and
      * <code>"dfg"</code> leads to

@@ -60,11 +60,11 @@ public class URNServer {
 
     /**
      * Please see list of status codes and their meaning:
-     * <br/><br/>
-     * 204 No Content: URN is in database. No further information asked.<br/> 
-     * 301 Moved Permanently: The given URN is replaced with a newer version. This newer version should be used instead.<br/> 
-     * 404 Not Found: The given URN is not registered in system.<br/>
-     * 410 Gone: The given URN is registered in system but marked inactive.<br/>
+     * <br><br>
+     * 204 No Content: URN is in database. No further information asked.<br> 
+     * 301 Moved Permanently: The given URN is replaced with a newer version. This newer version should be used instead.<br> 
+     * 404 Not Found: The given URN is not registered in system.<br>
+     * 410 Gone: The given URN is registered in system but marked inactive.<br>
      * 
      * @return the status code of the request
      */
@@ -82,10 +82,10 @@ public class URNServer {
 
     /**
      * Registers a new URN.
-     * <br/><br/>
-     * 201 Created: URN-Record is successfully created.<br/>
-     * 303 See other: At least one of the given URLs is already registered under another URN, which means you should use this existing URN instead of assigning a new one<br/>
-     * 409 Conflict: URN-Record already exists and can not be created again.<br/>
+     * <br><br>
+     * 201 Created: URN-Record is successfully created.<br>
+     * 303 See other: At least one of the given URLs is already registered under another URN, which means you should use this existing URN instead of assigning a new one<br>
+     * 409 Conflict: URN-Record already exists and can not be created again.<br>
      * 
      * @return the status code of the request
      */
@@ -117,10 +117,10 @@ public class URNServer {
 
     /**
      * Updates all URLS to a given URN.
-     * <br/><br/>
-     * 204 URN was updated successfully<br/>
-     * 301 URN has a newer version<br/>
-     * 303 URL is registered for another URN<br/>
+     * <br><br>
+     * 204 URN was updated successfully<br>
+     * 301 URN has a newer version<br>
+     * 303 URL is registered for another URN<br>
      * 
      * @return the status code of the request
      */

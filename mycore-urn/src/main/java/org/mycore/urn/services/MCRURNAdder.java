@@ -103,18 +103,16 @@ public class MCRURNAdder {
      *            only xpath without wildcards etc. will work, attributes are
      *            allowed and so are namespaces. If there is more than one
      *            attribute to set the attributes must be separated by an
-     *            " and ". E.g. invoking with <code>
-     *              <pre>
+     *            " and ". E.g. invoking with
+     *              <code>
      *                  /mycoreobject/metadata/def.identifier/identifier[@type='aType']
-     *              </pre>
-     *            </code>as xpath parameter will lead to the following Element<br/>
-     *            <code>
+     *              </code>
+     *            as xpath parameter will lead to the following Element<br>
      *              <pre>
-     *                  &lt;def.identifier&gt;
-     *                      &lt;identifier type="aType"&gt;urn:foo:bar&lt;/identifier&gt;
-     *                  &lt;/def.identifier&gt;
-     *              </pre>
-     *            </code> stored directly under /mycoreobject/metadata.<br/>
+     * &lt;def.identifier&gt;
+     *  &lt;identifier type="aType"&gt;urn:foo:bar&lt;/identifier&gt;
+     * &lt;/def.identifier&gt;</pre>
+     *            stored directly under /mycoreobject/metadata.<br>
      *            Please note, only xpath starting with /mycoreobject/metadata
      *            will be accepted.
      * @return <code>true</code> if successful, <code>false</code> otherwise

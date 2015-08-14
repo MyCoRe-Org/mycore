@@ -38,8 +38,8 @@ public class DefaultURNServerConfiguration implements URNServerConfiguration {
     }
 
     /**
-     * Creates a new configuration with login and password from mycore.properties.<br />
-     * MCR.URN.DNB.Credentials.Login<br/>
+     * Creates a new configuration with login and password from mycore.properties.<br>
+     * MCR.URN.DNB.Credentials.Login<br>
      * MCR.URN.DNB.Credentials.Password
      */
     public DefaultURNServerConfiguration() {
