@@ -152,7 +152,7 @@ public final class MCRConstants {
     /**
      * Returns a list of standard namespaces used in MyCoRe. Additional
      * namespaces can be configured using properties like
-     * MCR.Namespace.<prefix>=<uri>
+     * MCR.Namespace.&lt;prefix&gt;=&lt;uri&gt;
      */
     public static List<Namespace> getStandardNamespaces() {
         return namespaces;
@@ -161,7 +161,7 @@ public final class MCRConstants {
     /**
      * Returns the namespace with the given standard prefix. Additional
      * namespaces can be configured using properties like
-     * MCR.Namespace.<prefix>=<uri>
+     * MCR.Namespace.&lt;prefix&gt;=&lt;uri&gt;
      */
     public static Namespace getStandardNamespace(String prefix) {
         return namespacesByPrefix.get(prefix);

@@ -24,7 +24,7 @@
 package org.mycore.services.queuedjob;
 
 /**
- * Possible states of the job can be:<br />
+ * Possible states of the job can be:<br>
  * <table>
  *  <tr>
  *   <th>{@link #NEW}</th>

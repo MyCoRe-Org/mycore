@@ -64,7 +64,7 @@ final public class MCRMetaIFS extends MCRMetaDefault {
     /**
      * This is the constructor. <br>
      * The language element was set to <b>en </b>. The subtag element was set to
-     * the value of <em>set_subtag<em>. If the
+     * the value of <em>set_subtag</em>. If the
      * value of <em>set_subtag</em> is null or empty an exception was throwed.
      * The type element was set empty.
      * The sourcepath must be NOT null or empty.

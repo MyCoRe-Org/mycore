@@ -85,10 +85,10 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * This is the constructor. <br>
      * The language element was set. If the value of <em>default_lang</em> is
      * null, empty or false <b>en </b> was set. The subtag element was set to
-     * the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
+     * the value of <em>set_subtag</em>. If the value of <em>set_subtag</em>
      * is null or empty an exception was throwed. The type element was set to
-     * the value of <em>set_type<em>, if it is null, an empty string was set
-     * to the type element.<br />
+     * the value of <em>set_type</em>, if it is null, an empty string was set
+     * to the type element.<br>
      * The text element is set to an empty string. The calendar is set to 'Gregorian Calendar'. The von value 
      * is set to MIN_JULIAN_DAY_NUMBER, the bis value is set to MAX_JULIAN_DAY_NUMBER;
      * @param set_subtag      the name of the subtag

@@ -330,7 +330,7 @@ public class MCRCalendar {
 
     /**
      * This method convert a ancient date to a general Calendar value. The
-     * syntax for the gregorian input is: <br />
+     * syntax for the gregorian input is: <br>
      * <ul>
      * <li> [[[t]t.][m]m.][yyy]y [v. Chr.]</li>
      * <li> [[[t]t.][m]m.][yyy]y [AD|BC]</li>
@@ -372,7 +372,7 @@ public class MCRCalendar {
 
     /**
      * This method convert a JulianCalendar date to a general Calendar value.
-     * The syntax for the julian input is: <br />
+     * The syntax for the julian input is: <br>
      * <ul>
      * <li> [[[t]t.][m]m.][yyy]y [v. Chr.|n. Chr.]</li>
      * <li> [[[t]t.][m]m.][yyy]y [AD|BC]</li>
@@ -448,7 +448,7 @@ public class MCRCalendar {
 
     /**
      * This method convert a islamic calendar date to a IslamicCalendar valuei civil mode.
-     * The syntax for the islamic input is: <br />
+     * The syntax for the islamic input is: <br>
      * <ul>
      * <li> [[[t]t.][m]m.][yyy]y [H.|h.]</li>
      * <li> [.\u0647 | .\u0647 .\u0642] [[[t]t.][m]m.][yyy]y</li>
@@ -767,7 +767,7 @@ public class MCRCalendar {
     
     /**
      * This method convert a CopticCalendar date to a CopticCalendar value. The
-     * syntax for the coptic input is: <br />
+     * syntax for the coptic input is: <br>
      * <ul>
      * <li> [[[t]t.][m]m.][yyy]y [[A.|a.]M.]</li>
      * <li> y[yyy][-m[m][-t[t]]] [A.|a.]M.]</li>
@@ -797,7 +797,7 @@ public class MCRCalendar {
 
     /**
      * This method convert a EthiopicCalendar date to a EthiopicCalendar value.
-     * The syntax for the ethiopic input is: <br />
+     * The syntax for the ethiopic input is: <br>
      * <ul>
      * <li> [[[t]t.][m]m.][yyy]y [E.E.]</li>
      * <li> y[yyy][-m[m][-t[t]]] [E.E.]</li>
@@ -827,7 +827,7 @@ public class MCRCalendar {
 
     /**
      * This method convert a JapaneseCalendar date to a JapaneseCalendar value.
-     * The syntax for the japanese input is: <br />
+     * The syntax for the japanese input is: <br>
      * <ul>
      * <li> [[[t]t.][m]m.][H|M|S|T][yyy]y</li>
      * H: Heisei; M: Meiji, S: Showa, T: Taiso
@@ -952,7 +952,7 @@ public class MCRCalendar {
 
     /**
      * This method convert a BuddhistCalendar date to a IslamicCalendar value.
-     * The syntax for the buddhist input is: <br />
+     * The syntax for the buddhist input is: <br>
      * <ul>
      * <li> [-][[[t]t.][m]m.][yyy]y [B.E.]</li>
      * <li> [-] [[[t]t.][m]m.][yyy]y</li>
@@ -1090,7 +1090,7 @@ public class MCRCalendar {
 
     /**
      * This method convert a PersicCalendar date to a GregorianCalendar value.
-     * The The syntax for the persian input is: <br />
+     * The The syntax for the persian input is: <br>
      * <ul>
      * <li> [-] [[[t]t.][m]m.][yyy]y</li>
      * <li> [-] y[yyy][-m[m][-t[t]]]</li>
@@ -1432,7 +1432,7 @@ public class MCRCalendar {
 
     /**
      * This method convert a EgyptianCalendar date to a GregorianCalendar value.
-     * The The syntax for the egyptian (Nabonassar) input is: <br />
+     * The The syntax for the egyptian (Nabonassar) input is: <br>
      * <ul>
      * <li> [-][[[t]t.][m]m.][yyy]y [A.N.]</li>
      * <li> [-] [[[t]t.][m]m.][yyy]y</li>

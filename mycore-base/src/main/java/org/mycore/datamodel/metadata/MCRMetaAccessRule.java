@@ -59,11 +59,11 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      * The language element was set. If the value of <em>default_lang</em> is
      * null, empty or false <b>en</b> was set. This is not use in other methods
      * of this class. The subtag element was set to the value of
-     * <em>set_subtag<em>. If the value of <em>set_subtag</em>
+     * <em>set_subtag</em>. If the value of <em>set_subtag</em>
      * is null or empty an exception will be throwed. The type element was set to
-     * the value of <em>set_type<em>, if it is null, an empty string was set
+     * the value of <em>set_type</em>, if it is null, an empty string was set
      * to the type element. The condition element was set to the value of
-     * <em>set_condition<em>, if it is null, an exception will be throwed.
+     * <em>set_condition</em>, if it is null, an exception will be throwed.
      * @param set_subtag       the name of the subtag
      * @param set_type         the optional type string
      * @param set_inherted     a value &gt;= 0

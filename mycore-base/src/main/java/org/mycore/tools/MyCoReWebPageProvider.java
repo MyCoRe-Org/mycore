@@ -30,8 +30,7 @@ import org.xml.sax.SAXParseException;
  * This class provides a simple way to dynamically create MyCoRe webpages. These pages might be rendered 
  * through the layout service.
  * 
- * <br/>Example:
- * <code>
+ * <br>Example:
  *  <pre>
  *   MyCoReWebPageProvider wp = new MyCoReWebPageProvider();
  *   wp.addSection("Section Title", "Section Text", MyCoReWebPageProvider.DE);
@@ -40,9 +39,6 @@ import org.xml.sax.SAXParseException;
  *   //call the layout service of an {@link MCRServlet}
  *   getLayoutService().doLayout(job.getRequest(), job.getResponse(), xml);
  *  </pre>
- *
- *   
- * </code>
  * 
  * @author shermann
  * @author Matthias Eichner

@@ -112,7 +112,7 @@ public class MCRJobMaster implements Runnable, Closeable {
     /**
      * Starts the local {@link MCRJobMaster}.
      * Can be auto started if <code>"MCR.QueuedJob.{?MCRJobAction?.}autostart"</code> 
-     * is set to </code>true</code>.
+     * is set to <code>true</code>.
      */
     public static void startMasterThread(Class<? extends MCRJobAction> action) {
         if (!isRunning(action)) {
@@ -125,7 +125,7 @@ public class MCRJobMaster implements Runnable, Closeable {
 
     /**
      * Starts local threads ({@link MCRJobThread}) and gives {@link MCRJob} instances to them.
-     * Use property <code>"MCR.QueuedJob.JobThreads"</code> to specify how many concurrent threads should be running.<br />
+     * Use property <code>"MCR.QueuedJob.JobThreads"</code> to specify how many concurrent threads should be running.<br>
      * <code>"MCR.QueuedJob.activated"</code> can be used activate or deactivate general {@link MCRJob} running. 
      */
     @Override

@@ -106,7 +106,7 @@ public class MCRUtils {
      * <li>&gt; to &amp;gt;
      * <li>&amp; to &amp;amp;
      * <li>&quot; to &amp;quot;
-     * <li>&apos; to &amp;apos;
+     * <li>' to &amp;apos;
      * </ul>
      * 
      * @param in

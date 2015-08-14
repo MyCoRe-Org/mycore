@@ -61,11 +61,11 @@ final public class MCRMetaInstitutionName extends MCRMetaDefault {
      * This is the constructor. <br>
      * The language element was set. If the value of <em>default_lang</em> is
      * null, empty or false <b>en </b> was set. The subtag element was set to
-     * the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
+     * the value of <em>set_subtag</em>. If the value of <em>set_subtag</em>
      * is null or empty an exception was throwed. The type element was set to
-     * the value of <em>set_type<em>, if it is null, an empty string was set
+     * the value of <em>set_type</em>, if it is null, an empty string was set
      * to the type element. The fullname, nickname  and property element
-     * was set to the value of <em>set_...<em>, if they are null,
+     * was set to the value of <em>set_...</em>, if they are null,
      * an empty string was set to this element.
      * @param set_subtag      the name of the subtag
      * @param default_lang    the default language

@@ -71,7 +71,7 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     /**
      * This is the constructor. <br>
-     * The language element was set. If the value of <em>default_lang</em> is null, empty or false <b>en </b> was set. The subtag element was set to the value of <em>set_subtag<em>. If the value of <em>set_subtag</em> is null or empty an exception was throwed.
+     * The language element was set. If the value of <em>default_lang</em> is null, empty or false <b>en </b> was set. The subtag element was set to the value of <em>set_subtag</em>. If the value of <em>set_subtag</em> is null or empty an exception was throwed.
      * @param set_subtag
      *            the name of the subtag
      * @param set_inherted
@@ -228,11 +228,8 @@ public class MCRMetaLink extends MCRMetaDefault {
     /**
      * The method compare this instance of MCRMetaLink with a input object of the class type MCRMetaLink. The both instances are equal, if: <br>
      * <ul>
-     * <br>
      * <li>for the type 'arc' the 'from' and 'to' element is equal</li>
-     * <br>
      * <li>for the type 'locator' the 'href' element is equal</li>
-     * <br>
      * </ul>
      * <br>
      * 

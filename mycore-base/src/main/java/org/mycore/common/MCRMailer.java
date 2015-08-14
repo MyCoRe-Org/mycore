@@ -222,15 +222,16 @@ public class MCRMailer extends MCRServlet {
 
     /**
      * Send email from a given XML document. See the sample mail below:
-     * 
-     * <email><from>bingo@bongo.com</from>
-     *   <to>jim.knopf@lummerland.de</to>
-     *   <bcc>frau.waas@lummerland.de</bcc>
-     *   <subject>Grüße aus der Stadt der Drachen</subject>
-     *   <body>Es ist recht bewölkt. Alles Gute, Jim.</body>
-     *   <part>http://upload.wikimedia.org/wikipedia/de/f/f7/JimKnopf.jpg</part>
-     * </email>
-     *
+     * <pre>
+     * &lt;email&gt;
+     *   &lt;from&gt;bingo@bongo.com&lt;/from&gt;
+     *   &lt;to&gt;jim.knopf@lummerland.de&lt;/to&gt;
+     *   &lt;bcc&gt;frau.waas@lummerland.de&lt;/bcc&gt;
+     *   &lt;subject&gt;Grüße aus der Stadt der Drachen&lt;/subject&gt;
+     *   &lt;body&gt;Es ist recht bewölkt. Alles Gute, Jim.&lt;/body&gt;
+     *   &lt;part&gt;http://upload.wikimedia.org/wikipedia/de/f/f7/JimKnopf.jpg&lt;/part&gt;
+     * &lt;/email&gt;
+     * </pre>
      * @param email the email as JDOM element.
      */
     public static void send(Element email) {

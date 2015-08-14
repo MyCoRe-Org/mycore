@@ -463,7 +463,7 @@ public final class MCRMetadataManager {
     }
 
     /**
-     * Delete the derivate. The order of delete steps is:<br />
+     * Delete the derivate. The order of delete steps is:<br>
      * <ul>
      * <li>remove link in object metadata</li>
      * <li>remove all files from IFS</li>

@@ -37,7 +37,7 @@ import org.mycore.common.MCRException;
  * the <em>MCRMetaLink</em> class. For links to another object, there are
  * "locators" in use only, and the href variable gives the ID of the linked
  * object, while the label and title attributes can be used freely. Subtag name = "
- * <child>" means a child link from a "parent" object (collected in the
+ * &lt;child&gt;" means a child link from a "parent" object (collected in the
  * "children" and "parents" section of the "structure" part, respectively). The
  * child inherits all heritable metadata of the parent. If the parent itself is
  * a child of another parent, the heritable metadata of this "grand parent" is

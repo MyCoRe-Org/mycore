@@ -33,8 +33,8 @@ import org.apache.log4j.Logger;
  * <b>\:</b> Use the escape character to use all predefined characters.
  * </p>
  * <p>
- * Sample:</br>
- * "Lastname: {lastName}[, Firstname: {firstName}]"<br/>
+ * Sample:<br>
+ * "Lastname: {lastName}[, Firstname: {firstName}]"<br>
  * </p>
  * 
  * @author Matthias Eichner
@@ -61,8 +61,10 @@ public class MCRTextResolver {
 
     /**
      * Defines how deep the text is resolved.
-     * <li><b>Deep</b> - everything is resolved</li>
-     * <li><b>NoVariables</b> - the value of variables is not being resolved</li>
+     * <dl>
+     * <dt>Deep</dt><dd>everything is resolved</dd>
+     * <dt>NoVariables</dt><dd>the value of variables is not being resolved</dd>
+     * </dl>
      */
     protected ResolveDepth resolveDepth;
 
@@ -101,8 +103,10 @@ public class MCRTextResolver {
 
     /**
      * Defines how deep the text is resolved.
-     * <li><b>Deep</b> - everything is resolved</li>
-     * <li><b>NoVariables</b> - the value of variables is not being resolved</li>
+     * <dl>
+     * <dt>Deep</dt><dd>everything is resolved</dd>
+     * <dt>NoVariables</dt><dd>the value of variables is not being resolved</dd>
+     * </dl>
      */
     public enum ResolveDepth {
         Deep, NoVariables

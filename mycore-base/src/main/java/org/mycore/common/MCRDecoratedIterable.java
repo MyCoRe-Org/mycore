@@ -29,7 +29,7 @@ import java.util.Iterator;
  * This class acts as an {@link Iterable} on top of another instance.
  * 
  * Use this if you want to convert every element of a source into a different target object.
- * <br/>This example will print which file for a file name exists and which not:
+ * <br>This example will print which file for a file name exists and which not:
  * <pre>
  * private void testExistence(List&lt;String&gt; fileNames) {
  *     for (File file : new MCRDecoratedIterable&lt;String, File&gt;(fileNames) {

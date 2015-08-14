@@ -38,7 +38,7 @@ import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
 /**
  * This {@link AutoExecutable} checks if the {@link FileSystem} implementations are available.
  * 
- * There is a <s>bug</s>feature in OpenJDK 7 that only {@link FileSystemProvider} available to the system {@link ClassLoader} are available.
+ * There is a documented "feature" in OpenJDK 8 that only {@link FileSystemProvider} available to the system {@link ClassLoader} are available.
  * We try to fix (a.k.a. hack) it right.
  * @author Thomas Scheffler (yagee)
  *

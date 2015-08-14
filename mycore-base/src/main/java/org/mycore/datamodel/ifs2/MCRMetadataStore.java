@@ -51,7 +51,7 @@ public class MCRMetadataStore extends MCRStore {
      * If true (which is default), store will enforce it gets
      * XML to store, otherwise any binary content can be stored here.
      * 
-     * Override with MCR.IFS2.Store.<ObjectType>.ForceXML=true|false
+     * Override with MCR.IFS2.Store.&lt;ObjectType&gt;.ForceXML=true|false
      */
     protected boolean forceXML = true;
 

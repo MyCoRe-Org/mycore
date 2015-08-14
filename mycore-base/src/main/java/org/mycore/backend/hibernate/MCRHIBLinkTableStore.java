@@ -178,7 +178,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      * 
      * @return
      * 
-     * the result-map of (key,value)-pairs can be visualized as<br />
+     * the result-map of (key,value)-pairs can be visualized as<br>
      * select count(mcrfrom) as value, mcrto as key from
      * mcrlinkclass|mcrlinkhref where mcrto like mcrtoPrefix + '%' group by
      * mcrto;

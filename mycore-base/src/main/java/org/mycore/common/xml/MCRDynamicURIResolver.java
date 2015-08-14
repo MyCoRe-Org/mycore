@@ -24,6 +24,7 @@ import org.mycore.common.MCRTextResolver;
  * </p><p>
  * The dynamic comes into play by the variables that can be defined for the
  * uri. In general they are set directly behind the uri prefix. For example:
+ * </p>
  * <pre>
  * uriprefix:value1:value2:value3... or
  * uriprefix:varname1=varvalue1:varname2=varvalue2:varname3=varname3...
@@ -32,17 +33,15 @@ import org.mycore.common.MCRTextResolver;
  * For more informations about the syntax see
  * <code>MCRTextResolver</code>. Heres only a short example
  * what is possible:
- * <p>
  * <p>myURIResolver:classId=class_000_1:levels=-1:axis=children</p>
- * <code>
- *   &lt;dynIncl&gt;<br/>
- *    &nbsp;&lt;panel&gt;<br/>
- *     &nbsp;&nbsp;&lt;hidden var="@classid" default="{classId}"/&gt;<br/>
- *     &nbsp;&nbsp;&lt;include uri="dynClassification:editor:{levels}:{axis}:{classId}[:{categId}]"/&gt;<br/>
- *    &nbsp;&lt;panel/&gt;<br/>
- *   &lt;/dynIncl&gt;
- * </code>
- * </p>
+ * <pre>
+ * &lt;dynIncl&gt;
+ *  &nbsp;&lt;panel&gt;
+ *   &nbsp;&nbsp;&lt;hidden var="@classid" default="{classId}"/&gt;
+ *   &nbsp;&nbsp;&lt;include uri="dynClassification:editor:{levels}:{axis}:{classId}[:{categId}]"/&gt;
+ *  &nbsp;&lt;panel/&gt;
+ * &lt;/dynIncl&gt;
+ * </pre>
  * 
  * @see MCRTextResolver
  * @author Matthias Eichner
@@ -111,7 +110,7 @@ public abstract class MCRDynamicURIResolver implements URIResolver {
      * <li>uriprefix:value1:value2:value3</li>
      * <li>uriprefix:varname1=varvalue1:varname2=varvalue2:varname3=varname3</li>
      * </ol>
-     * Both options can be mixed, but this is not recommended.<br/>
+     * Both options can be mixed, but this is not recommended.<br>
      * For the first option the name of the variables is 'x', where 'x' is a number
      * for the position in the uri. To get the first value use {1}, to get the second
      * one use {2} and so on.

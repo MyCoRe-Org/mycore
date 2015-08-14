@@ -10,10 +10,10 @@ import java.util.Properties;
  * The <code>MCRPropertiesResolver</code> supports substitution of any %reference%
  * in a <code>String</code> or <code>Property</code> instance.
  * <p>
- * // possible use case<br />
- * Properties p = MCRConfiguration.instance().getProperties();<br />
- * MCRPropertiesResolver r = new MCRPropertiesResolver(p);<br />
- * Properties resolvedProperties = r.resolveAll(p);<br />
+ * // possible use case<br>
+ * Properties p = MCRConfiguration.instance().getProperties();<br>
+ * MCRPropertiesResolver r = new MCRPropertiesResolver(p);<br>
+ * Properties resolvedProperties = r.resolveAll(p);<br>
  * </p>
  * 
  * @author Matthias Eichner

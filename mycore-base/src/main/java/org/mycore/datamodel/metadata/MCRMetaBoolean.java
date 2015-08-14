@@ -60,10 +60,10 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
     /**
      * This is the constructor. <br>
      * The language element was set to <b>en </b>. The subtag element was set to
-     * the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
+     * the value of <em>set_subtag</em>. If the value of <em>set_subtag</em>
      * is null or empty an exception was throwed. The type element was set to
-     * the value of <em>set_type<em>, if it is null, an empty string was set
-     * to the type element. The boolean string <em>set_value<em>
+     * the value of <em>set_type</em>, if it is null, an empty string was set
+     * to the type element. The boolean string <em>set_value</em>
      * was set to a boolean element, if it is null, false was set.
      * @param set_subtag       the name of the subtag
      * @param set_type         the optional type string
@@ -81,10 +81,10 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
     /**
      * This is the constructor. <br>
      * The language element was set to <b>en </b>. The subtag element was set to
-     * the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
+     * the value of <em>set_subtag</em>. If the value of <em>set_subtag</em>
      * is null or empty an exception was throwed. The type element was set to
-     * the value of <em>set_type<em>, if it is null, an empty string was set
-     * to the type element. The boolean string <em>set_value<em>
+     * the value of <em>set_type</em>, if it is null, an empty string was set
+     * to the type element. The boolean string <em>set_value</em>
      * was set to a boolean element, if it is null, false was set.
      * @param set_subtag       the name of the subtag
      * @param set_type         the optional type string

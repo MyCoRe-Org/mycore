@@ -70,11 +70,11 @@ final public class MCRMetaNumber extends MCRMetaDefault {
     /**
      * The language element was set. If the value of <em>default_lang</em> is
      * null, empty or false <b>en </b> was set. The subtag element was set to
-     * the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
+     * the value of <em>set_subtag</em>. If the value of <em>set_subtag</em>
      * is null or empty an exception was throwed. The dimension element was set to
-     * the value of <em>set_dimension<em>, if it is null, an empty string was set
+     * the value of <em>set_dimension</em>, if it is null, an empty string was set
      * to the type element. The measurement element was set to the value of
-     * <em>set_measurement<em>, if it is null, an empty string was set
+     * <em>set_measurement</em>, if it is null, an empty string was set
      * to the measurement element.  The number string <em>set_number</em>
      * was set to the number element, if it is null or not a number, a
      * MCRException was thowed.
@@ -95,11 +95,11 @@ final public class MCRMetaNumber extends MCRMetaDefault {
      * This is the constructor. <br>
      * The language element was set. If the value of <em>default_lang</em> is
      * null, empty or false <b>en </b> was set. The subtag element was set to
-     * the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
+     * the value of <em>set_subtag</em>. If the value of <em>set_subtag</em>
      * is null or empty an exception was throwed. The dimension element was set to
-     * the value of <em>set_dimension<em>, if it is null, an empty string was set
+     * the value of <em>set_dimension</em>, if it is null, an empty string was set
      * to the type element. The measurement element was set to the value of
-     * <em>set_measurement<em>, if it is null, an empty string was set
+     * <em>set_measurement</em>, if it is null, an empty string was set
      * to the measurement element.  The number <em>set_number</em>
      * was set to the number element.
      * @param set_subtag       the name of the subtag

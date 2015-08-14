@@ -258,7 +258,7 @@ public class MCRAccessManager {
 
     /**
      * checks whether the current user has the permission to read/see a derivate check is also against the mcrobject,
-     * the derivate belongs to both checks must return true <br />
+     * the derivate belongs to both checks must return true <br>
      * it is needed in MCRFileNodeServlet and MCRZipServlet
      * 
      * @param derID
