@@ -79,10 +79,8 @@ class MCRWebCLIContainer {
     /**
      * Will instantiate this container with a list of supported commands.
      * 
-     * @param knownCommands
-     *            commands that are supported by the web gui.
      * @param session
-     *            the current HttpSession of the usere using the gui.
+     *            the current HttpSession of the user using the gui.
      */
     public MCRWebCLIContainer(HttpSession session) {
         processCallable = new ProcessCallable(MCRSessionMgr.getCurrentSession(), session);
@@ -95,7 +93,7 @@ class MCRWebCLIContainer {
      * 
      * @param cmd
      *            a valid String representation of a
-     *            {@link #MCRWebCLIContainer(List, HttpSession) known}
+     *            {@link #MCRWebCLIContainer(HttpSession) known}
      *            <code>MCRCommand</code>
      */
     public void addCommand(String cmd) {
@@ -128,10 +126,10 @@ class MCRWebCLIContainer {
      * Returns all logs that were grabbed in the command execution thread. This
      * method is backed by a queue that will be empty after the method returns.
      * 
-     * @return {"logs": {<br/>
-     *         &#160;&#160;&#160;&#160;"logLevel": <code>logLevel</code>,<br/>
-     *         &#160;&#160;&#160;&#160;"message": <code>message</code>,<br/>
-     *         &#160;&#160;&#160;&#160;"exception": <code>exception</code><br/>
+     * @return {"logs": {<br>
+     *         &#160;&#160;&#160;&#160;"logLevel": <code>logLevel</code>,<br>
+     *         &#160;&#160;&#160;&#160;"message": <code>message</code>,<br>
+     *         &#160;&#160;&#160;&#160;"exception": <code>exception</code><br>
      *         }}
      */
     public JsonObject getLogs() {

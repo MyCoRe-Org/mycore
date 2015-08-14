@@ -46,6 +46,7 @@ public class MCRWebCLIServlet extends MCRServlet {
      * <p>
      * On the other hand: <code>request</code> can be used to receive some
      * information from the command execution.
+     * </p>
      * <ul>
      *  <li><code>getStatus</code> will return
      *      <p>
@@ -56,8 +57,8 @@ public class MCRWebCLIServlet extends MCRServlet {
      *  </li>
      *  <li><code>getKnownCommands</code> will return
      *      <p>
-     *          {"commands":[<br/>
-     *          &#160;&#160;&#160;&#160;simple class name of <code>MCR.CLI.Classes.Internal</code>: [commands return by {@link MCRExternalCommandInterface#getPossibleCommands()}]]<br/>
+     *          {"commands":[<br>
+     *          &#160;&#160;&#160;&#160;simple class name of <code>MCR.CLI.Classes.Internal</code>: [commands return by {@link MCRExternalCommandInterface#getPossibleCommands()}]]<br>
      *          ]}
      *      </p>
      *  </li>
@@ -67,6 +68,7 @@ public class MCRWebCLIServlet extends MCRServlet {
      *      </p>
      *  </li>
      * </ul>
+     * <p>
      * The content type of the {@link HttpServletResponse#SC_OK OK} response is <code>application/x-json</code>.
      * </p>
      */
