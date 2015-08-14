@@ -8,14 +8,15 @@ import org.mycore.frontend.servlets.MCRServlet;
 
 /**
  * Base configuration for the mycore image viewer. Sets the following parameter:
- * <li><b>webApplicationBaseURL:</b> base URL of the mycore system</li>
- * <li><b>derivate:</b> name of the derivate which should be displayed.</li>
- * <li><b>filePath: path of the file which should be displayed (in the derivate)</b></li>
- * <li><b>doctype:</b> the type of the structure e.g. (mets/pdf) </li>
- * <li><b>mobile:</b> should the mobile or the desktop client started.</li>
- * <li><b>i18nURL:</b> URL to the i18n.json</li>
- * <li><b>lang:</b> current selected language</li>
- *
+ * <dl>
+ * <dt>webApplicationBaseURL</dt><dd>base URL of the mycore system</dd>
+ * <dt>derivate</dt><dd>name of the derivate which should be displayed.</dd>
+ * <dt>filePath</dt><dd>path of the file which should be displayed (in the derivate)</dd>
+ * <dt>doctype</dt><dd>the type of the structure e.g. (mets/pdf) </dd>
+ * <dt>mobile</dt><dd>should the mobile or the desktop client started.</dd>
+ * <dt>i18nURL</dt><dd>URL to the i18n.json</dd>
+ * <dt>lang</dt><dd>current selected language</dd>
+ * </dl>
  * @author Matthias Eichner
  */
 public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration {
