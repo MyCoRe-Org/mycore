@@ -55,11 +55,13 @@ public abstract class MCRSolrAbstractContentStream<T> extends ContentStreamBase 
     /**
      * Sets certain properties on a contentStream object. Subclasses must override this method.
      * <p>Its important to call the following setter methods:
+     * </p>
+     * <ul>
      * <li>setName</li>
      * <li>setSize</li>
      * <li>setSourceInfo</li>
      * <li>setContentType</li>
-     * <li>setInputStream</li></p>
+     * <li>setInputStream</li></ul>
      */
     abstract protected void setup() throws IOException;
 

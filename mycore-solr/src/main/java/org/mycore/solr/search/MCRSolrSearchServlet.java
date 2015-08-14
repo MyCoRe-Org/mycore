@@ -26,7 +26,10 @@ import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.solr.proxy.MCRSolrProxyServlet;
 
 /**
- * Used to map a formular-post to a solr request. </br></br> <b>Parameters</b>
+ * Used to map a formular-post to a solr request.
+ * <p>
+ * <b>Parameters</b>
+ * </p>
  * <dl>
  * <dt><strong>Solr reserved parameters</strong></dt>
  * <dd>They will directly forwarded to the server.</dd>
@@ -40,7 +43,6 @@ import org.mycore.solr.proxy.MCRSolrProxyServlet;
  * <dd>They are used to build the query for solr. All parameters which are not
  * reserved, type or sort parameters will be stored here.</dd>
  * </dl>
- *
  * @author mcrshofm
  * @author mcrsherm
  */
