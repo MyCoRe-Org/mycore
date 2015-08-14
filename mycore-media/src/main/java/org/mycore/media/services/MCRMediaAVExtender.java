@@ -45,7 +45,7 @@ import org.mycore.media.MCRVideoObject;
  * Currently only used within MILESS projects.
  * 
  * <code>
- *   MCR.IFS.AVExtender.<StoreID>.Class  set with this class to use
+ *   MCR.IFS.AVExtender.&lt;StoreID&gt;.Class  set with this class to use
  * </code>
  * 
  * @author Ren\u00E9 Adler (Eagle)
