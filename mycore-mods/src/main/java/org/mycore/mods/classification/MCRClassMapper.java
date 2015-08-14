@@ -195,7 +195,7 @@ public class MCRClassMapper {
                 && categID.getRootID().equals(MCRTypeOfResource.TYPE_OF_RESOURCE)) {
                 authInfo = new MCRTypeOfResource(categID.getID().replace('_', ' '));
             }
-            if (authInfo != null) {
+            if (authInfo == null) {
                 boolean supportCode = authorityElements.contains(elementLocalName);
                 boolean supportURI = authorityURIElements.contains(elementLocalName);
                 if (supportCode) {
@@ -204,13 +204,13 @@ public class MCRClassMapper {
                         authInfo = new MCRAuthorityAndCode(authority, categID.getID());
                     }
                 }
-                if (authInfo != null && supportURI) {
+                if (authInfo == null && supportURI) {
                     String authURI = getAuthorityURI(categID.getRootID());
                     String valueURI = MCRAuthorityWithURI.getValueURI(DAO.getCategory(categID, 0), authURI);
                     authInfo = new MCRAuthorityWithURI(authURI, valueURI);
                 }
             }
-            if (authInfo != null && elementLocalName.equals(ACCESS_CONDITION)) {
+            if (authInfo == null && elementLocalName.equals(ACCESS_CONDITION)) {
                 String authURI = getAuthorityURI(categID.getRootID());
                 String valueURI = MCRAuthorityWithURI.getValueURI(DAO.getCategory(categID, 0), authURI);
                 authInfo = new MCRAccessCondition(valueURI);

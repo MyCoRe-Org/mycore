@@ -62,9 +62,7 @@ public final class MCRMODSClassificationSupport {
             final Element source = (Element) sources.item(0);
             final String categId = source.getAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "categId");
             final MCRCategoryID categoryID = MCRCategoryID.fromString(categId);
-            final Element returns = (Element) source.cloneNode(false);
-            returns.removeAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "categId");
-            document.appendChild(returns);
+            final Element returns = document.createElementNS(source.getNamespaceURI(), source.getLocalName());
             MCRClassMapper.assignCategory(returns, categoryID);
             return returns.getChildNodes();
         } catch (Throwable e) {
@@ -110,7 +108,7 @@ public final class MCRMODSClassificationSupport {
             return "";
         }
         return MessageFormat.format("classification:metadata:0:children:{0}:{1}", category.getRootID(),
-            category.getID());
+                category.getID());
     }
 
     public static String getClassCategParentLink(final NodeList sources) {
@@ -124,7 +122,7 @@ public final class MCRMODSClassificationSupport {
             return "";
         }
         return MessageFormat
-            .format("classification:metadata:0:parents:{0}:{1}", category.getRootID(), category.getID());
+                .format("classification:metadata:0:parents:{0}:{1}", category.getRootID(), category.getID());
     }
 
     static String getText(final Element element) {
