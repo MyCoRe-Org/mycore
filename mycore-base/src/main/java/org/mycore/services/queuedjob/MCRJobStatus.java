@@ -24,21 +24,15 @@
 package org.mycore.services.queuedjob;
 
 /**
- * Possible states of the job can be:<br>
- * <table>
- *  <tr>
- *   <th>{@link #NEW}</th>
- *   <td>job added to queue</td>
- *  </tr>
- *  <tr>
- *   <th>{@link #PROCESSING}</th>
- *   <td>job currently on processing</td>
- *  </tr>
- *  <tr>
- *   <th>{@link #FINISHED}</th>
- *   <td>job processing is finished</td>
- *  </tr>
- * </table>  
+ * Possible states of the job can be:
+ * <dl>
+ *   <dt>{@link #NEW}</dt>
+ *   <dd>job added to queue</dd>
+ *   <dt>{@link #PROCESSING}</dt>
+ *   <dd>job currently on processing</dd>
+ *   <dt>{@link #FINISHED}</dt>
+ *   <dd>job processing is finished</dd>
+ * </dl>  
  */
 public enum MCRJobStatus {
     NEW, PROCESSING, FINISHED
