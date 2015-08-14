@@ -937,7 +937,6 @@ public class MCRStartEditorServlet extends MCRServlet {
      * 
      * @param job
      *            the MCRServletJob instance
-     * @throws SAXParseException 
      */
     public void wcommit(MCRServletJob job, CommonData cd) throws IOException, SAXParseException {
         org.jdom2.Element rule = WFM.getRuleFromFile(cd.mysemcrid, PERMISSION_WRITE);
@@ -1263,8 +1262,6 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the common data stack
      * @param job
      *            the MCRServletJob instance
-     * @throws SAXParseException 
-     * @throws MCRException 
      */
     public void wcopyobj(MCRServletJob job, CommonData cd) throws IOException, MCRException, SAXParseException {
         org.jdom2.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "writewf");
@@ -1399,7 +1396,6 @@ public class MCRStartEditorServlet extends MCRServlet {
      * 
      * @param job
      *            the MCRServletJob instance
-     * @throws SAXParseException 
      */
     public void wsetfile(MCRServletJob job, CommonData cd) throws IOException, SAXParseException {
         org.jdom2.Element rule = WFM.getRuleFromFile(cd.myremcrid, "writewf");

@@ -210,9 +210,6 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
      *            the MCRServletJob data
      * @param lang
      *            the current language
-     * @throws IOException 
-     * @throws SAXException 
-     * @throws TransformerException 
      */
     protected org.jdom2.Document prepareMetadata(org.jdom2.Document jdom_in, MCRObjectID ID, MCRServletJob job, String lang)
             throws IOException, TransformerException, SAXException {

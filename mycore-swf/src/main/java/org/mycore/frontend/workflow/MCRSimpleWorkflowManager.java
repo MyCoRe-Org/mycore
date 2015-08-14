@@ -116,7 +116,7 @@ public class MCRSimpleWorkflowManager {
      * The method return the workflow directory path for a given MCRObjectID
      * type.
      * 
-     * @param type
+     * @param base
      *            the MCRObjectID type
      * @return the string of the workflow directory path
      */
@@ -242,7 +242,7 @@ public class MCRSimpleWorkflowManager {
      * The method return a ArrayList of file names form derivates they are under
      * .../workflow/ <em>type/...derivate...</em>.
      * 
-     * @param type
+     * @param base
      *            the MCRObjectID type attribute
      * @return an ArrayList of file names
      */
@@ -434,8 +434,6 @@ public class MCRSimpleWorkflowManager {
      *            the ID of the metadata object
      * @throws MCRActiveLinkException
      *             if links to the object exist prior loading
-     * @throws SAXParseException 
-     * @throws MCRException 
      */
     public final boolean commitMetadataObject(MCRObjectID ID) throws MCRActiveLinkException, MCRException,
         SAXParseException, IOException {
@@ -478,7 +476,6 @@ public class MCRSimpleWorkflowManager {
      * 
      * @param ID
      *            the MCRObjectID as String of the derivate object
-     * @throws SAXParseException 
      */
     public final boolean commitDerivateObject(MCRObjectID ID) throws SAXParseException, IOException {
         String fn = getDirectoryPath(ID.getBase()) + File.separator + ID.toString() + ".xml";
@@ -591,7 +588,7 @@ public class MCRSimpleWorkflowManager {
      * The method return the conditione XML tree from a XML file in the workflow
      * for a given permission.
      * 
-     * @param id
+     * @param mcrid
      *            the MCRObjectID 
      * @param permission
      *            the permission for the ACL system

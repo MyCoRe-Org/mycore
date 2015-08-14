@@ -113,8 +113,6 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
      *            the MCRServletJob instance
      * @param ID
      *            the MCRObjectID
-     * @throws SAXParseException 
-     * @throws MCRException 
      */
     public final boolean storeService(org.jdom2.Element outelm, MCRServletJob job, MCRObjectID ID) throws MCRException, SAXParseException, IOException {
         File impex = new File(WFM.getDirectoryPath(ID.getBase()), ID.toString() + ".xml");

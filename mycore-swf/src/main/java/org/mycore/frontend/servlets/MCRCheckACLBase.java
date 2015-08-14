@@ -121,8 +121,6 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
      *            the MCRServletJob instance
      * @param ID
      *            the MCRObjectID
-     * @throws SAXParseException 
-     * @throws MCRException 
      */
     abstract public boolean storeService(Element outelm, MCRServletJob job, MCRObjectID ID) throws MCRException, SAXParseException, IOException;
 
