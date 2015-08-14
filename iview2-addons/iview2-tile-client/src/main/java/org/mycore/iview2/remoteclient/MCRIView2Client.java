@@ -61,10 +61,6 @@ public class MCRIView2Client {
 
     private static ExecutorService EXECUTOR_SERVICE;
 
-    /**
-     * @param args
-     * @throws Throwable 
-     */
     public static void main(String[] args) throws Throwable {
         if (args.length < 1) {
             printHelp();
