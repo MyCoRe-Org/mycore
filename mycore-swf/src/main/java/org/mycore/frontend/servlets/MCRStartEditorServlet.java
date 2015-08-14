@@ -71,16 +71,17 @@ import org.xml.sax.SAXParseException;
 
 /**
  * The servlet start the MyCoRe editor session or other workflow actions with
- * some parameters from a HTML form. The parameters are: <br />
- * <li>type - the MCRObjectID type like schrift, text ...</li> <br />
- * <li>step - the name of the step like author, editor ...</li> <br />
- * <li>layout - the name of the layout like firststep, secondstep ...</li> <br />
- * <li>todo - the mode of the editor start like new or edit or change or delete</li>
- * <br />
- * <li>tf_mcrid - the MCRObjectID of the data they came from a input field</li> <br />
- * <li>se_mcrid - the MCRObjectID of the data they came from a select field</li> <br />
- * <li>re_mcrid - the MCRObjectID of the data they is in relation to
- * tf_mcrid/se_mcrid</li> <br />
+ * some parameters from a HTML form. The parameters are:
+ * <dl>
+ * <dt>type</dt><dd>the MCRObjectID type like schrift, text ...</dd>
+ * <dt>step</dt><dd>the name of the step like author, editor ...</dd>
+ * <dt>layout</dt><dd>the name of the layout like firststep, secondstep ...</dd>
+ * <dt>todo</dt><dd>the mode of the editor start like new or edit or change or delete</dd>
+ * <dt>tf_mcrid</dt><dd>the MCRObjectID of the data they came from a input field</dd>
+ * <dt>se_mcrid</dt><dd>the MCRObjectID of the data they came from a select field</dd>
+ * <dt>re_mcrid</dt><dd>the MCRObjectID of the data they is in relation to
+ * tf_mcrid/se_mcrid</dd>
+ * </dl>
  * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date: 2009-01-26 12:02:59 +0100 (Mo, 26. Jan
@@ -171,23 +172,23 @@ public class MCRStartEditorServlet extends MCRServlet {
     }
 
     /**
-     * This method overrides doGetPost of MCRServlet. <br />
-     * <br />
+     * This method overrides doGetPost of MCRServlet. <br>
+     * <br>
      * The <b>todo </b> value corresponds with <b>tf_mcrid</b> or
      * <b>se_mcridor</b> value and with the type of the data model for the
      * permissions that the user need. For some actions you need a third value
-     * of <b>re_mcrid</b> for relations (object - derivate). <br />
-     * 
+     * of <b>re_mcrid</b> for relations (object - derivate). <br>
+     * <ul>
      * <li>If the permission is not correct it calls
-     * <em>editor_error_user.xml</em>.</li> <br />
+     * <em>editor_error_user.xml</em>.</li>
      * <li>If the MCRObjectID is not correct it calls
-     * <em>editor_error_mcrid.xml</em>.</li> <br />
+     * <em>editor_error_mcrid.xml</em>.</li>
      * <li>If a store error is occurred it calls <em>editor_error_store.xml</em>
-     * .</li> <br />
+     * .</li>
      * <li>If <b>CANCEL </b> was pressed it calls <em>editor_cancel.xml</em>.</li>
-     * <br />
      * <li>If the permission is correct it starts the file editor_form_
-     * <em>step-type</em> .xml.</li> <br />
+     * <em>step-type</em>.xml.</li>
+     * </ul>
      */
     public void doGetPost(MCRServletJob job) throws Exception {
 

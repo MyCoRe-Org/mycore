@@ -41,7 +41,7 @@ import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 
 /**
- * This servlet read a digital object from the workflow and put it to the web. <br />
+ * This servlet read a digital object from the workflow and put it to the web. <br>
  * Call this servlet with <b>.../servlets/MCRFileViewWorkflowServlet/
  * <em>path_to_file</em> ?[base=... | type=...]</b>
  * 

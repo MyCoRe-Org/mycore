@@ -71,7 +71,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
     private static Logger LOGGER = Logger.getLogger(MCRCheckDataBase.class);
 
     /**
-      * This method overrides doGetPost of MCRServlet. <br />
+      * This method overrides doGetPost of MCRServlet. <br>
       */
     public void doGetPost(MCRServletJob job) throws Exception {
         // read the XML data
@@ -195,12 +195,12 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
     /**
      * The method read the incoming JDOM tree in a MCRObject and prepare this by
      * the following rules. After them it return a JDOM as result of
-     * MCRObject.createXML(). <br/>
+     * MCRObject.createXML().
+     * <ul>
      * <li>remove all target of MCRMetaClassification they have not a categid
      * attribute.</li>
-     * <br/>
      * <li>remove all target of MCRMetaLangText they have an empty text</li>
-     * <br/>
+     * </ul>
      * 
      * @param jdom_in
      *            the JDOM tree from the editor

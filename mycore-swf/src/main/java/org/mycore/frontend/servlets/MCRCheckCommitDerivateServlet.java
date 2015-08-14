@@ -63,7 +63,7 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
     private static Logger LOGGER = Logger.getLogger(MCRCheckCommitDerivateServlet.class);
 
     /**
-     * This method overrides doGetPost of MCRServlet. <br />
+     * This method overrides doGetPost of MCRServlet. <br>
      */
     public void doGetPost(MCRServletJob job) throws Exception {
         // read the XML data
