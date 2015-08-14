@@ -29,24 +29,23 @@ public interface MCRWCMSNavigationProvider extends MCRWCMSJSONProvider<MCRNaviga
      * <p>
      * Converts a <code>Navigation<code> object to a json one. The structure of the json is:
      * </p>
-     * <p>
-     * {<br />
-     *   hierarchy: [<br />
-     *     {"wcmsId":0,"children":[<br />
-     *       {"wcmsId":1,"children":[<br />
-     *         {"wcmsId":2}<br />
-     *       ]}<br />
-     *     ]}<br />
-     *   }<br />
-     *   items: [<br />
-     *     {"wcmsId" : "0", "wcmsType" : "root", "mainTitle" : "My Main Title", "dir" : "/content" ...},<br />
-     *     {"wcmsId" : "1", "wcmsType" : "menu", "id" : "main", "labelMap":{"de":"Hauptmenü links","en":"Main menu left"} ... }<br />
-     *     {"wcmsId" : "2", "wcmsType" : "item", "type" : "intern", "style" : "bold" ...}<br />
-     *     ...<br />
-     *   ]<br />
+     * <pre>
+     * {
+     *   hierarchy: [
+     *     {"wcmsId":0,"children":[
+     *       {"wcmsId":1,"children":[
+     *         {"wcmsId":2}
+     *       ]}
+     *     ]}
+     *   }
+     *   items: [
+     *     {"wcmsId" : "0", "wcmsType" : "root", "mainTitle" : "My Main Title", "dir" : "/content" ...},
+     *     {"wcmsId" : "1", "wcmsType" : "menu", "id" : "main", "labelMap":{"de":"Hauptmenü links","en":"Main menu left"} ... }
+     *     {"wcmsId" : "2", "wcmsType" : "item", "type" : "intern", "style" : "bold" ...}
+     *     ...
+     *   ]
      * }
-     * </p>
-     * @param navigation
+     * </pre>
      * @return the generated json
      */
     @Override
@@ -56,9 +55,6 @@ public interface MCRWCMSNavigationProvider extends MCRWCMSJSONProvider<MCRNaviga
      * Converts an WCMS JSON Object to an <code>Navigation</code> object.
      * 
      * TODO: json data structure
-     * 
-     * @param navigation
-     * @return
      */
     @Override
     public MCRNavigation fromJSON(JsonObject jsonNavigation);

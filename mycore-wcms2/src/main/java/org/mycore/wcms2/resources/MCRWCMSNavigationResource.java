@@ -86,10 +86,6 @@ public class MCRWCMSNavigationResource {
 
     /**
      * Returns a json object containing all available templates. 
-     * 
-     * @param servletContext
-     * @return
-     * @throws Exception
      */
     @GET
     @Path("templates")

@@ -114,10 +114,6 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
     /**
      * Returns the content of an element as string. The element itself
      * is ignored.
-     * 
-     * @param e
-     * @return
-     * @throws IOException
      */
     protected String getContent(Element e) throws IOException {
         XMLOutputter out = new XMLOutputter();

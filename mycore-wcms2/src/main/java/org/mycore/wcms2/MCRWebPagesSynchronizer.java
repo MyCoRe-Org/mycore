@@ -101,10 +101,6 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
         return new File(MCRConfiguration.instance().getString("MCR.WCMS2.DataDir"));
     }
 
-    /**
-     * @return
-     * @throws IOException 
-     */
     public static File getWebAppBaseDir() throws IOException {
         if (SERVLET_CONTEXT == null) {
             throw new IOException("ServletContext is not initialized.");
@@ -119,9 +115,6 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
 
     /**
      * Returns an OuputStream that writes to local webapp and to file inside <code>MCR.WCMS2.DataDir</code>.
-     * @param path
-     * @return
-     * @throws IOException 
      */
     public static OutputStream getOutputStream(String path) throws IOException {
         String cleanPath = path.startsWith("/") ? path.substring(1) : path;
@@ -154,7 +147,6 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
      * This URL may point to a file inside a JAR file in <code>WEB-INF/lib</code>.
      * @param path should start with '/'
      * @return null, if no resource with that path could be found
-     * @throws MalformedURLException
      */
     public static URL getURL(String path) throws MalformedURLException {
         String cleanPath = path.startsWith("/") ? path : String.format(Locale.ROOT, "/%s", path);

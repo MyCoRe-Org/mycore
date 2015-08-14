@@ -50,10 +50,6 @@ public abstract class MCRWCMSUtil {
     /**
      * Save navigation.xml with JAXB.
      * If MCR.navigationFile.SaveInOldFormat is true the navigation is stored in the old format.
-     * @throws TransformerException 
-     * @throws IOException 
-     * @throws SAXException 
-     * @throws ParserConfigurationException 
      */
     public static void save(MCRNavigation navigation, OutputStream out) throws JAXBException, IOException,
         JDOMException {

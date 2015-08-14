@@ -75,10 +75,6 @@ public class MCRWCMSContentManager {
      *
      * @param webpageId id of the webpage
      * @return json object
-     * @throws IOException
-     * @throws SAXException 
-     * @throws JDOMException 
-     * @throws jdomException
      * @see ErrorType
      */
     public JsonObject getContent(String webpageId) throws IOException, JDOMException, SAXException {
@@ -138,7 +134,6 @@ public class MCRWCMSContentManager {
      * }
      * </p>
      * 
-     * @param items
      */
     public void save(JsonArray items) {
         XMLOutputter out = new XMLOutputter(Format.getCompactFormat().setEncoding("UTF-8"));
@@ -209,10 +204,10 @@ public class MCRWCMSContentManager {
 
     /**
      * Throws a new webapplication exception with given error type.
+     * <code>{ type: "error", errorType: "typeOfError", webpageId: "abc.xml" }</code>
      * 
      * @param errorType type of the error
      * @param webpageId webpageId where the error occur
-     * @return { type: "error", errorType: "typeOfError", webpageId: "abc.xml" }
      */
     private void throwError(ErrorType errorType, String webpageId) {
         JsonObject error = new JsonObject();

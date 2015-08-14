@@ -5,8 +5,6 @@ import com.google.gson.JsonElement;
 /**
  *
  * @author Matthias Eichner
- * @param <O>
- * @param <J>
  */
 public interface MCRWCMSJSONProvider<O, J extends JsonElement> {
 

@@ -45,8 +45,6 @@ public class MCRWCMSNavigationManager {
     /**
      * 
      * @see MCRWCMSNavigationProvider#toJSON(MCRNavigation)
-     * @param navigation
-     * @return
      */
     public synchronized static JsonObject toJSON(MCRNavigation navigation) {
         return NAVIGATION_PROVIDER.toJSON(navigation);
@@ -58,11 +56,6 @@ public class MCRWCMSNavigationManager {
 
     /**
      * Saves the given navigation
-     * 
-     * @param navigation
-     * @throws IOException
-     * @throws JAXBException
-     * @throws JDOMException
      */
     public static void save(MCRNavigation navigation) throws IOException, JAXBException, JDOMException {
         OutputStream out = MCRWebPagesSynchronizer.getOutputStream(MCRLayoutUtilities.NAV_RESOURCE);
@@ -73,12 +66,6 @@ public class MCRWCMSNavigationManager {
 
     /**
      * Returns the navigation as json.
-     * 
-     * @return
-     * @throws IOException
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     * @throws JAXBException
      */
     public synchronized static JsonObject getNavigationAsJSON() throws IOException, ParserConfigurationException,
         SAXException, JAXBException {
@@ -87,8 +74,6 @@ public class MCRWCMSNavigationManager {
 
     /**
      * Returns the navigation as jdom document.
-     * 
-     * @return
      */
     public synchronized static Document getNavigationAsXML() {
         return MCRLayoutUtilities.getNavi();
@@ -96,12 +81,6 @@ public class MCRWCMSNavigationManager {
 
     /**
      * Returns the navigation as pojo.
-     * 
-     * @return
-     * @throws IOException
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     * @throws JAXBException
      */
     public static MCRNavigation getNavigation() throws IOException, ParserConfigurationException, SAXException,
         JAXBException {
