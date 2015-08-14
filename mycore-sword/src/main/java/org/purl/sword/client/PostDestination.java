@@ -40,7 +40,7 @@ package org.purl.sword.client;
  * Details for a destination.  This is used to represent a destination. If 
  * expressed as a string, the destination looks like: 
  * <pre>
- * <user>[<onBehalfOf>]:<password>@<url>
+ * &lt;user&gt;[&lt;onBehalfOf&gt;]:&lt;password&gt;@&lt;url&gt;
  * </pre>
  * 
  * @author Neil Taylor

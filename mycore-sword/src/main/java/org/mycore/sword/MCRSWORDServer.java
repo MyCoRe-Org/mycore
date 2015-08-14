@@ -364,6 +364,7 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
      * <p>
      * The resposne can be configured through mycores configuration with the
      * following parameters:
+     * </p>
      * <dl>
      * <dt>MCR.SWORD.generator.content</dt>
      * <dd>The generator element is best described in <a
@@ -377,6 +378,7 @@ public class MCRSWORDServer implements SWORDServer, MCRSWORDIngester {
      * <dt>MCR.SWORD.treatment.persisted</dt>
      * <dd>&lt;sword:treatment&gt; contains treatment for a performed deposit.</dd>
      * </dl>
+     * <p>
      * Treatment must be present and contain either a human-readable statement
      * describing treatment the deposited resource has received or a URI that
      * dereferences to such a description.
