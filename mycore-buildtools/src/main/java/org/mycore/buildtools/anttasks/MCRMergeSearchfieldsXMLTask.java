@@ -88,8 +88,6 @@ public class MCRMergeSearchfieldsXMLTask extends Task {
     /**
      * sets the overwrite flag when set exisiting object type and path values
      * will be overwritten
-     * 
-     * @param b
      */
     public void setOverwrite(boolean b) {
         overwrite = b;

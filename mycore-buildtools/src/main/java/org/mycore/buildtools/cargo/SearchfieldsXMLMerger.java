@@ -46,14 +46,14 @@ import org.jdom2.output.XMLOutputter;
  * (http://cargo.codehaus.org/Maven2+plugin)
  * where different WAR files are merged together.
  * 
- * <br/>
+ * <br>
  * Use the following configuration in merge.xml:
- * <br/>
- * <br/>&lt;merge&gt;
- * <br/>&nbsp;&nbsp; &lt;document&gt;WEB-INF/classes/searchfields.xml&lt;/document&gt;
- * <br/>&nbsp;&nbsp; &lt;classname&gt;org.mycore.buildtools.cargo.SearchfieldsXMLMerger&lt;/classname&gt;
- * <br/>&lt;/merge&gt;
- * 
+ * <pre>
+ * &lt;merge&gt;
+ *   &lt;document&gt;WEB-INF/classes/searchfields.xml&lt;/document&gt;
+ *   &lt;classname&gt;org.mycore.buildtools.cargo.SearchfieldsXMLMerger&lt;/classname&gt;
+ * &lt;/merge&gt;
+ * </pre>
  * 
  * @see MergeProcessor
  * 

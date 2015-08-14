@@ -45,7 +45,6 @@ public class MCRExecuteCommandTask extends Task {
 	private String commands;
 	/**
 	 * method used, to read the body of an ant task xml element
-	 * @param commands
 	 */
 	public void addText(String commands) {
 		this.commands = commands;
