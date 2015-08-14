@@ -45,13 +45,13 @@ import org.mycore.datamodel.ifs.MCRFileReader;
  * gets a player starter file using the "/ramgen/" mount point. The parameters
  * can be configured in mycore.properties:
  * 
- * <code>
- *   MCR.IFS.AVExtender.<StoreID>.RamGenBaseURL      URL of ramgen mount point
- *   MCR.IFS.AVExtender.<StoreID>.AsxGenBaseURL      URL of asxgen mount point
- *   MCR.IFS.AVExtender.<StoreID>.ViewSourceBaseURL  URL of view source function
- *   MCR.IFS.AVExtender.<StoreID>.RealPlayerURL      Download URL for RealOne Player
- *   MCR.IFS.AVExtender.<StoreID>.MediaPlayerURL     Download URL for Microsoft Player
- * </code>
+ * <pre>
+ *   MCR.IFS.AVExtender.&lt;StoreID&gt;.RamGenBaseURL      URL of ramgen mount point
+ *   MCR.IFS.AVExtender.&lt;StoreID&gt;.AsxGenBaseURL      URL of asxgen mount point
+ *   MCR.IFS.AVExtender.&lt;StoreID&gt;.ViewSourceBaseURL  URL of view source function
+ *   MCR.IFS.AVExtender.&lt;StoreID&gt;.RealPlayerURL      Download URL for RealOne Player
+ *   MCR.IFS.AVExtender.&lt;StoreID&gt;.MediaPlayerURL     Download URL for Microsoft Player
+ * </pre>
  * 
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$

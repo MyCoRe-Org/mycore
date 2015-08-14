@@ -73,7 +73,7 @@ public class MCRContentStoreFactory {
     /**
      * Returns the MCRContentStore instance that is configured for this StoreID.
      * The instance that is returned is configured by the property
-     * <tt>MCR.IFS.ContentStore.<StoreID>.Class</tt> in mycore.properties.
+     * <tt>MCR.IFS.ContentStore.&lt;StoreID&gt;.Class</tt> in mycore.properties.
      * 
      * @param storeID
      *            the non-null ID of the MCRContentStore implementation
@@ -148,7 +148,7 @@ public class MCRContentStoreFactory {
     /**
      * Returns the Class instance that implements the MCRAudioVideoExtender for
      * the MCRContentStore with the given ID. That class is configured by the
-     * property <tt>MCR.IFS.AVExtender.<StoreID>.Class</tt> in
+     * property <tt>MCR.IFS.AVExtender.&lt;StoreID&gt;.Class</tt> in
      * mycore.properties.
      * 
      * @param storeID
@@ -193,7 +193,7 @@ public class MCRContentStoreFactory {
      * Returns true if the MCRContentStore with the given StoreID provides an
      * MCRAudioVideoExtender implementation, false otherwise. The
      * MCRAudioVideoExtender for a certain MCRContentStore is configured by the
-     * property <tt>MCR.IFS.AVExtender.<StoreID>.Class</tt> in
+     * property <tt>MCR.IFS.AVExtender.&lt;StoreID&gt;.Class</tt> in
      * mycore.properties.
      * 
      * @param storeID
@@ -212,7 +212,7 @@ public class MCRContentStoreFactory {
      * MCRAudioVideoExtender implementation, this method creates and initializes
      * the MCRAudioVideoExtender instance for the MCRFile. The instance that is
      * returned is configured by the property
-     * <tt>MCR.IFS.AVExtender.<StoreID>.Class</tt> in mycore.properties.
+     * <tt>MCR.IFS.AVExtender.&lt;StoreID&gt;.Class</tt> in mycore.properties.
      * 
      * @param file
      *            the non-null MCRFile that should get an MCRAudioVideoExtender

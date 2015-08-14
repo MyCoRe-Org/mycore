@@ -57,7 +57,7 @@ import org.mycore.datamodel.ifs.MCRFileReader;
  * VFS. The connection URI is configured in mycore.properties:
  * 
  * <code>
- *   MCR.IFS.ContentStore.<StoreID>.URI   the base directory in Apache Commons VFS syntax
+ *   MCR.IFS.ContentStore.&lt;StoreID&gt;.URI   the base directory in Apache Commons VFS syntax
  *   
  *   Local filesystem:
  *     [file://]/absolute-path
@@ -68,7 +68,7 @@ import org.mycore.datamodel.ifs.MCRFileReader;
  *   CIFS / Samba / Windows share:
  *     smb://[username[:password]@]hostname[:port][/absolute-path]
  *     
- *    MCR.IFS.ContentStore.<StoreID>.StrictHostKeyChecking=yes|no 
+ *    MCR.IFS.ContentStore.&lt;StoreID&gt;.StrictHostKeyChecking=yes|no 
  *      for SFTP: controls the use of known_hosts file, default is "no"
  * </code>
  * 
