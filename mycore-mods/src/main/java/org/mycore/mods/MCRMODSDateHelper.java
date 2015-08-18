@@ -84,26 +84,10 @@ public class MCRMODSDateHelper {
         return cal;
     }
 
-    /**
-     * @deprecated use {@link #setDate(Element, Date, MCRMODSDateFormat)} instead
-     */
-    public static void setDate(Element element, Date date, String encoding) {
-        MCRMODSDateFormat format = Objects.requireNonNull(MCRMODSDateFormat.getFormat(encoding), "No such encoding: "
-            + encoding);
-        setDate(element, date, format);
-    }
-
     public static void setDate(Element element, Date date, MCRMODSDateFormat encoding) {
         Objects.requireNonNull(encoding, "encoding is required: " + encoding);
         element.setText(encoding.formatDate(date));
         element.setAttribute("encoding", encoding.asEncodingAttributeValue());
-    }
-
-    /**
-     * @deprecated use {@link #setDate(Element, GregorianCalendar, MCRMODSDateFormat)} instead
-     */
-    public static void setDate(Element element, GregorianCalendar cal, String encoding) {
-        setDate(element, cal, MCRMODSDateFormat.getFormat(encoding));
     }
 
     public static void setDate(Element element, GregorianCalendar cal, MCRMODSDateFormat encoding) {
