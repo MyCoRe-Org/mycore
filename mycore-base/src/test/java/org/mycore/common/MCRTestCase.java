@@ -161,7 +161,7 @@ public class MCRTestCase {
     }
 
     /**
-     * Retrieve the resource file</br> Example: /Classname/recource.file
+     * Retrieve the resource file<br> Example: /Classname/recource.file
      * 
      * @param fileName
      * @return the resource file as InputStream
