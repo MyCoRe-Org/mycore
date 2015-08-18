@@ -51,15 +51,6 @@ public interface MCRURNStore {
     public String getURNforDocument(String documentID);
 
     /**
-     * Retrieves the URN that is assigned to the given file
-     * 
-     * @return the URN for the given file within the given derivate
-     * 
-     * @deprecated use {@link MCRURNStore#getURNForFile(String, String, String)}
-     */
-    public String getURNForFile(String derivateId, String fileName);
-
-    /**
      * Retrieves the document ID that is assigned to the given urn
      * 
      * @return the ID, or null if no ID is assigned to this urn
