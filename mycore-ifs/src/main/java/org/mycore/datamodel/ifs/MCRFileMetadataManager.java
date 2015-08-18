@@ -79,8 +79,7 @@ public class MCRFileMetadataManager {
         MCRConfiguration config = MCRConfiguration.instance();
 
         // The FileMetadataStore to use
-        Object object = config.getInstanceOf("MCR.Persistence.IFS.FileMetadataStore.Class");
-        store = (MCRFileMetadataStore) object;
+        store = config.getInstanceOf("MCR.Persistence.IFS.FileMetadataStore.Class");
 
         // The cache size for the MCRFilesystemNode cache
         int size = config.getInt("MCR.IFS.FileMetadataStore.CacheSize", 500);

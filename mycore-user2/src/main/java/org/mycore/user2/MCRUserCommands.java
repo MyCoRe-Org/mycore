@@ -364,13 +364,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         if (!dir.isDirectory()) {
             throw new FileNotFoundException(dir.getAbsolutePath() + " is not a directory.");
         }
-        File[] listFiles = dir.listFiles(new FileFilter() {
-
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.isFile() && pathname.getName().endsWith(".xml");
-            }
-        });
+        File[] listFiles = dir.listFiles((FileFilter) pathname -> pathname.isFile() && pathname.getName().endsWith(".xml"));
         if (listFiles.length == 0) {
             LOGGER.warn("Did not find any user files in " + dir.getAbsolutePath());
             return null;

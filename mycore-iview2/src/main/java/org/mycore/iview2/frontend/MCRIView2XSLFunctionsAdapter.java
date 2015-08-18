@@ -48,8 +48,7 @@ public class MCRIView2XSLFunctionsAdapter {
     private static final MCRLinkTableManager LINK_TABLE_MANAGER = MCRLinkTableManager.instance();
 
     public static MCRIView2XSLFunctionsAdapter getInstance() {
-        return (MCRIView2XSLFunctionsAdapter) MCRConfiguration.instance()
-            .getInstanceOf(MCRIView2Tools.CONFIG_PREFIX + "MCRIView2XSLFunctionsAdapter",
+        return MCRConfiguration.instance().getInstanceOf(MCRIView2Tools.CONFIG_PREFIX + "MCRIView2XSLFunctionsAdapter",
                 MCRIView2XSLFunctionsAdapter.class.getName());
     }
 

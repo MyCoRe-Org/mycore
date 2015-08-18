@@ -12,7 +12,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -632,12 +631,7 @@ public class MCRMetsSave {
     private static void correctSubDivOrder(PhysicalDiv physicalDiv) {
         List<PhysicalSubDiv> children = physicalDiv.getChildren();
 
-        Collections.sort(children, new Comparator<PhysicalSubDiv>() {
-            @Override
-            public int compare(PhysicalSubDiv o1, PhysicalSubDiv o2) {
-                return o1.getOrder() - o2.getOrder();
-            }
-        });
+        Collections.sort(children, (o1, o2) -> o1.getOrder() - o2.getOrder());
 
         for (int i = 1; i <= children.size(); i++) {
             children.get(i - 1).setOrder(i);

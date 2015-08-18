@@ -110,8 +110,7 @@ public class MCRContentStoreFactory {
             String storeClass = CONFIG_PREFIX + storeID + CLASS_SUFFIX;
             LOGGER.debug("getting StoreClass: " + storeClass);
 
-            Object obj = MCRConfiguration.instance().getInstanceOf(storeClass);
-            MCRContentStore s = (MCRContentStore) obj;
+            MCRContentStore s = MCRConfiguration.instance().getInstanceOf(storeClass);
             s.init(storeID);
             STORES.put(storeID, s);
 
@@ -141,8 +140,7 @@ public class MCRContentStoreFactory {
 
     private static void initStoreSelector() {
         String property = "MCR.IFS.ContentStoreSelector.Class";
-        Object obj = MCRConfiguration.instance().getInstanceOf(property);
-        STORE_SELECTOR = (MCRContentStoreSelector) obj;
+        STORE_SELECTOR = MCRConfiguration.instance().getInstanceOf(property);
     }
 
     /**

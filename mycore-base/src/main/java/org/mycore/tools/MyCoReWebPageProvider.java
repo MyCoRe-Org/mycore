@@ -21,9 +21,7 @@ import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.input.SAXBuilder;
 import org.mycore.frontend.servlets.MCRServlet;
-import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -98,16 +96,13 @@ public class MyCoReWebPageProvider {
         sb.append("\"http://www.mycore.org/mycorewebpage.dtd\">");
         sb.append("<MyCoReWebPage>").append(xmlAsString).append("</MyCoReWebPage>");
         SAXBuilder saxBuilder = new SAXBuilder();
-        saxBuilder.setEntityResolver(new EntityResolver() {
-            @Override
-            public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
-                String resource = systemId.substring(systemId.lastIndexOf("/"));
-                InputStream is = getClass().getResourceAsStream(resource);
-                if (is == null) {
-                    throw new IOException(new FileNotFoundException("Unable to locate resource " + resource));
-                }
-                return new InputSource(is);
+        saxBuilder.setEntityResolver((publicId, systemId) -> {
+            String resource = systemId.substring(systemId.lastIndexOf("/"));
+            InputStream is = getClass().getResourceAsStream(resource);
+            if (is == null) {
+                throw new IOException(new FileNotFoundException("Unable to locate resource " + resource));
             }
+            return new InputSource(is);
         });
         StringReader reader = new StringReader(sb.toString());
         Document doc = saxBuilder.build(reader);

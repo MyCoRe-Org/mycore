@@ -37,9 +37,6 @@ import org.mycore.common.config.MCRConfiguration;
  */
 public class MCRFoFactory {
 
-    /** The default class implementing the MCRFoFormatterInterface */
-    private final static String defaultFo = "org.mycore.common.fo.MCRFoFormatterFOP";
-
     /** The configuration property */
     private final static String property = "MCR.LayoutService.FoFormatter.class";
 
@@ -49,8 +46,7 @@ public class MCRFoFactory {
     /** Returns the XSL-FO formatter instance configured */
     public static synchronized MCRFoFormatterInterface getFoFormatter() {
         if (formatter == null) {
-            Object instance = MCRConfiguration.instance().getInstanceOf(property, defaultFo);
-            formatter = (MCRFoFormatterInterface) instance;
+            formatter = MCRConfiguration.instance().getInstanceOf(property, MCRFoFormatterFOP.class.getName());
         }
         return formatter;
     }

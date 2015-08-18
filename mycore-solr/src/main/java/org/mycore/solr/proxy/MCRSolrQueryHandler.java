@@ -114,12 +114,7 @@ class MCRSolrQueryHandler {
     }
 
     public static Comparator<MCRSolrQueryHandler> getPathComparator() {
-        return new Comparator<MCRSolrQueryHandler>() {
-            @Override
-            public int compare(MCRSolrQueryHandler o1, MCRSolrQueryHandler o2) {
-                return o1.getPath().compareTo(o2.getPath());
-            }
-        };
+        return (o1, o2) -> o1.getPath().compareTo(o2.getPath());
     }
 
 }

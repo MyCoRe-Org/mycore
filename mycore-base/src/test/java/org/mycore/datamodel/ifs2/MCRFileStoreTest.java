@@ -32,7 +32,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -283,12 +282,10 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         ArrayList<Element> copy = new ArrayList<Element>();
         copy.addAll(children);
 
-        Collections.sort(copy, new Comparator<Element>() {
-            public int compare(Element a, Element b) {
-                String sa = a.getName() + "/" + a.getAttributeValue("name");
-                String sb = b.getName() + "/" + b.getAttributeValue("name");
-                return sa.compareTo(sb);
-            }
+        Collections.sort(copy, (a, b) -> {
+            String sa = a.getName() + "/" + a.getAttributeValue("name");
+            String sb = b.getName() + "/" + b.getAttributeValue("name");
+            return sa.compareTo(sb);
         });
 
         parent.removeContent();

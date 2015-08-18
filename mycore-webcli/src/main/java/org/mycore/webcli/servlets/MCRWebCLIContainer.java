@@ -32,7 +32,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
 
 import javax.servlet.http.HttpSession;
 
@@ -68,13 +67,7 @@ class MCRWebCLIContainer {
 
     private static final Logger LOGGER = Logger.getLogger(MCRWebCLIContainer.class);
 
-    private static final ExecutorService executor = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
-
-        @Override
-        public Thread newThread(Runnable r) {
-            return new Thread(r, "WebCLI");
-        }
-    });
+    private static final ExecutorService executor = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "WebCLI"));
 
     /**
      * Will instantiate this container with a list of supported commands.

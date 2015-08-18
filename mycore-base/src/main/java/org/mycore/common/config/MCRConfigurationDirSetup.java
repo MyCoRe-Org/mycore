@@ -80,12 +80,7 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
     private void loadExternalLibs() {
         File libDir = MCRConfigurationDir.getConfigFile("lib");
         if (libDir != null && libDir.isDirectory()) {
-            File[] listFiles = libDir.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.toLowerCase(Locale.ROOT).endsWith(".jar");
-                }
-            });
+            File[] listFiles = libDir.listFiles((FilenameFilter) (dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(".jar"));
             if (listFiles.length > 0) {
                 ClassLoader classLoader = this.getClass().getClassLoader();
                 Class<? extends ClassLoader> classLoaderClass = classLoader.getClass();

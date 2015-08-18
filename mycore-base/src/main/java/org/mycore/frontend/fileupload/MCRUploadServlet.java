@@ -209,11 +209,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
                 socket.setSendBufferSize(bufferSize);
                 LOGGER.debug("Socket receive buffer size is " + socket.getReceiveBufferSize());
 
-                Thread handlerThread = new Thread(new Runnable() {
-                    public void run() {
-                        handleUpload(socket);
-                    }
-                });
+                Thread handlerThread = new Thread(() -> handleUpload(socket));
                 handlerThread.start();
             } catch (Exception ex) {
                 LOGGER.error("Exception while waiting for client connect to socket", ex);

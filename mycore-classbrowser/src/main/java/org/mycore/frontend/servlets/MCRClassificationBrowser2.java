@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -193,15 +192,13 @@ public class MCRClassificationBrowser2 extends MCRServlet {
     private void sortCategories(HttpServletRequest req, List<Element> data) {
         final String sortBy = req.getParameter("sortby");
         if (sortBy != null)
-            Collections.sort(data, new Comparator<Element>() {
-                public int compare(Element a, Element b) {
-                    if ("id".equals(sortBy))
-                        return (a.getAttributeValue("id").compareTo(b.getAttributeValue("id")));
-                    else if ("label".equals(sortBy))
-                        return (a.getChildText("label").compareToIgnoreCase(b.getChildText("label")));
-                    else
-                        return 0;
-                }
+            Collections.sort(data, (a, b) -> {
+                if ("id".equals(sortBy))
+                    return (a.getAttributeValue("id").compareTo(b.getAttributeValue("id")));
+                else if ("label".equals(sortBy))
+                    return (a.getChildText("label").compareToIgnoreCase(b.getChildText("label")));
+                else
+                    return 0;
             });
     }
 

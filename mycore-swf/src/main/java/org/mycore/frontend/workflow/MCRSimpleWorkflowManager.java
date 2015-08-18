@@ -530,11 +530,7 @@ public class MCRSimpleWorkflowManager {
             workdirs.add(dir);
         }
 
-        FilenameFilter derivateFilenameFilter = new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.startsWith(myproject) && name.endsWith(".xml");
-            }
-        };
+        FilenameFilter derivateFilenameFilter = (dir, name) -> name.startsWith(myproject) && name.endsWith(".xml");
 
         String max = myproject + "_0.xml";
         for (File workdir : workdirs) {

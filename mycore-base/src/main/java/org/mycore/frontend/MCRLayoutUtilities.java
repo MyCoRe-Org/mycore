@@ -10,10 +10,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
@@ -119,12 +117,7 @@ public class MCRLayoutUtilities {
     private static final LoadingCache<String, DocumentHolder> NAV_DOCUMENT_CACHE = CacheBuilder.newBuilder()
         .refreshAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS).build(new CacheLoader<String, DocumentHolder>() {
 
-            Executor executor = Executors.newSingleThreadExecutor(new ThreadFactory() {
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, "navigation.xml refresh");
-                }
-            });
+            Executor executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "navigation.xml refresh"));
 
             @Override
             public DocumentHolder load(String key) throws Exception {
@@ -145,12 +138,7 @@ public class MCRLayoutUtilities {
                     LOGGER.info("Keeping " + url + " in cache");
                     return Futures.immediateFuture(oldValue);
                 }
-                ListenableFutureTask<DocumentHolder> task = ListenableFutureTask.create(new Callable<DocumentHolder>() {
-                    @Override
-                    public DocumentHolder call() throws Exception {
-                        return load(key);
-                    }
-                });
+                ListenableFutureTask<DocumentHolder> task = ListenableFutureTask.create(() -> load(key));
                 executor.execute(task);
                 return task;
             }

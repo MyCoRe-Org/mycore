@@ -20,7 +20,6 @@ package org.mycore.frontend.cli;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -108,18 +107,15 @@ public class MCRCommandManager {
         }
         Method[] methods = cliClass.getDeclaredMethods();
         final Class<org.mycore.frontend.cli.annotation.MCRCommand> mcrCommandAnnotation = org.mycore.frontend.cli.annotation.MCRCommand.class;
-        Arrays.sort(methods, new Comparator<Method>() {
-            @Override
-            public int compare(Method m1, Method m2) {
-                int im1 = -1, im2 = -1;
-                if (m1.isAnnotationPresent(mcrCommandAnnotation)) {
-                    im1 = m1.getAnnotation(mcrCommandAnnotation).order();
-                }
-                if (m2.isAnnotationPresent(mcrCommandAnnotation)) {
-                    im2 = m2.getAnnotation(mcrCommandAnnotation).order();
-                }
-                return im1 - im2;
+        Arrays.sort(methods, (m1, m2) -> {
+            int im1 = -1, im2 = -1;
+            if (m1.isAnnotationPresent(mcrCommandAnnotation)) {
+                im1 = m1.getAnnotation(mcrCommandAnnotation).order();
             }
+            if (m2.isAnnotationPresent(mcrCommandAnnotation)) {
+                im2 = m2.getAnnotation(mcrCommandAnnotation).order();
+            }
+            return im1 - im2;
         });
         for (Method method : methods) {
             if (method.isAnnotationPresent(mcrCommandAnnotation)) {

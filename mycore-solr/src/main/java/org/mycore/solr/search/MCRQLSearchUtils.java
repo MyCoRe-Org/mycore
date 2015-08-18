@@ -3,7 +3,6 @@ package org.mycore.solr.search;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -230,12 +229,10 @@ public class MCRQLSearchUtils {
         }
 
         if (sortFields.size() > 0) {
-            Collections.sort(sortFields, new Comparator<String>() {
-                public int compare(String arg0, String arg1) {
-                    String s0 = arg0.substring(arg0.indexOf(".sortField"));
-                    String s1 = arg1.substring(arg1.indexOf(".sortField"));
-                    return s0.compareTo(s1);
-                }
+            Collections.sort(sortFields, (arg0, arg1) -> {
+                String s0 = arg0.substring(arg0.indexOf(".sortField"));
+                String s1 = arg1.substring(arg1.indexOf(".sortField"));
+                return s0.compareTo(s1);
             });
             List<MCRSortBy> sortBy = new ArrayList<MCRSortBy>();
             for (String name : sortFields) {

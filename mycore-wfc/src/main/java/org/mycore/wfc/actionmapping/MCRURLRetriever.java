@@ -25,8 +25,10 @@ package org.mycore.wfc.actionmapping;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
@@ -41,7 +43,6 @@ import org.mycore.wfc.MCRConstants;
 
 /**
  * @author Thomas Scheffler (yagee)
- *
  */
 public final class MCRURLRetriever {
     private MCRURLRetriever() {
@@ -51,15 +52,14 @@ public final class MCRURLRetriever {
 
     private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
 
-    private static HashMap<String, MCRCollection> COLLECTION_MAP = initActionsMappings();
+    private static Map<String, MCRCollection> COLLECTION_MAP = initActionsMappings();
 
-    private static HashMap<String, MCRCollection> initActionsMappings() {
+    private static Map<String, MCRCollection> initActionsMappings() {
         try {
             MCRActionMappings actionMappings = MCRActionMappingsManager.getActionMappings();
-            HashMap<String, MCRCollection> collectionMap = new HashMap<String, MCRCollection>();
-            for (MCRCollection collection : actionMappings.getCollections()) {
-                collectionMap.put(collection.getName(), collection);
-            }
+            Map<String, MCRCollection> collectionMap = Arrays
+                .stream(actionMappings.getCollections())
+                .collect(Collectors.toMap(MCRCollection::getName, c -> c));
             return collectionMap;
         } catch (Exception e) {
             throw new MCRException(e);
@@ -69,32 +69,15 @@ public final class MCRURLRetriever {
     public static String getURLforID(String action, String mcrID, boolean absolute) {
         final MCRObjectID objID = MCRObjectID.getInstance(mcrID);
         String collectionName = MCRClassificationUtils.getCollection(mcrID);
-        WorkflowDataProvider wfDataProvider = new WorkflowDataProvider() {
-            @Override
-            public MCRWorkflowData getWorkflowData() {
-                MCRWorkflowData workflowData = new MCRWorkflowData();
-                MCRCategLinkReference categoryReference = new MCRCategLinkReference(objID);
-                workflowData.setCategoryReference(categoryReference);
-                return workflowData;
-            }
-        };
-        return getURL(action, collectionName, wfDataProvider, absolute);
+        return getURL(action, collectionName, new MCRCategLinkReference(objID), absolute);
     }
 
     public static String getURLforCollection(String action, String collection, boolean absolute) {
-        WorkflowDataProvider wfDataProvider = new WorkflowDataProvider() {
-            @Override
-            public MCRWorkflowData getWorkflowData() {
-                MCRWorkflowData workflowData = new MCRWorkflowData();
-                return workflowData;
-            }
-        };
-        return getURL(action, collection, wfDataProvider, absolute);
+        return getURL(action, collection, null, absolute);
     }
 
-    private static String getURL(String action, String collectionName, WorkflowDataProvider wfDataProvider,
+    private static String getURL(String action, String collectionName, MCRCategLinkReference reference,
         boolean absolute) {
-        MCRCategLinkReference reference = wfDataProvider.getWorkflowData().getCategoryReference();
         MCRCollection defaultCollection = reference != null ? getCollectionWithAction(reference.getType(), action, null)
             : null;
         MCRCollection collection = getCollectionWithAction(collectionName, action, defaultCollection);
@@ -103,21 +86,19 @@ public final class MCRURLRetriever {
                 .format("Could not find action ''{0}'' in collection: {1}", action, collectionName));
             return null;
         }
-        return getURL(action, collection, wfDataProvider, absolute);
+        return getURL(action, collection, reference, absolute);
     }
 
-    private static String getURL(String action, MCRCollection collection, WorkflowDataProvider wfDataProvider,
+    private static String getURL(String action, MCRCollection collection, MCRCategLinkReference categoryReference,
         boolean absolute) {
         for (MCRAction act : collection.getActions()) {
             if (act.getAction().equals(action)) {
-                MCRWorkflowData workflowData = wfDataProvider.getWorkflowData();
                 if (LOGGER.isDebugEnabled()) {
-                    MCRCategLinkReference categoryReference = workflowData.getCategoryReference();
                     String mcrId = categoryReference == null ? null : categoryReference.getObjectID();
                     LOGGER.debug(MessageFormat.format("Collection: {0}, Action: {1}, Object: {2}",
                         collection.getName(), action, mcrId));
                 }
-                String url = act.getURL(workflowData);
+                String url = act.getURL(new MCRWorkflowData(categoryReference));
                 if (absolute && url != null && url.startsWith("/")) {
                     url = MCRFrontendUtil.getBaseURL() + url.substring(1);
                 }
@@ -131,10 +112,12 @@ public final class MCRURLRetriever {
         MCRCollection defaultCollection) {
         MCRCollection mcrCollection = COLLECTION_MAP.get(collection);
         if (mcrCollection != null) {
-            for (MCRAction act : mcrCollection.getActions()) {
-                if (act.getAction().equals(action)) {
-                    return mcrCollection;
-                }
+            Optional<MCRAction> firstAction = Arrays
+                .stream(mcrCollection.getActions())
+                .filter(a -> a.getAction().equals(action))
+                .findFirst();
+            if (firstAction.isPresent()) {
+                return mcrCollection;
             }
         }
         //did not find a collection with that action, checking parent
@@ -174,9 +157,5 @@ public final class MCRURLRetriever {
             return null;
         }
         return parents.iterator().next().getId().getID();
-    }
-
-    private static interface WorkflowDataProvider {
-        public MCRWorkflowData getWorkflowData();
     }
 }

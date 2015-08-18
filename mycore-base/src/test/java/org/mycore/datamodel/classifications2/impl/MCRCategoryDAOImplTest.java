@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -44,7 +43,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
-import org.hibernate.jdbc.Work;
 import org.jdom2.Document;
 import org.junit.After;
 import org.junit.Before;
@@ -598,23 +596,19 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
 
     private void printCategoryTable() {
         Session session = sessionFactory.getCurrentSession();
-        session.doWork(new Work() {
-
-            @Override
-            public void execute(Connection connection) throws SQLException {
+        session.doWork(connection -> {
+            try {
+                Statement statement = connection.createStatement();
                 try {
-                    Statement statement = connection.createStatement();
-                    try {
-                        ResultSet resultSet = statement.executeQuery("SELECT * FROM MCRCategory");
-                        printResultSet(resultSet, System.out);
-                    } catch (SQLException e) {
-                        Logger.getLogger(getClass()).warn("Error while querying MCRCategory", e);
-                    } finally {
-                        statement.close();
-                    }
-                } catch (SQLException e) {
-                    Logger.getLogger(getClass()).warn("Error while querying MCRCategory", e);
+                    ResultSet resultSet = statement.executeQuery("SELECT * FROM MCRCategory");
+                    printResultSet(resultSet, System.out);
+                } catch (SQLException e1) {
+                    Logger.getLogger(getClass()).warn("Error while querying MCRCategory", e1);
+                } finally {
+                    statement.close();
                 }
+            } catch (SQLException e2) {
+                Logger.getLogger(getClass()).warn("Error while querying MCRCategory", e2);
             }
         });
     }

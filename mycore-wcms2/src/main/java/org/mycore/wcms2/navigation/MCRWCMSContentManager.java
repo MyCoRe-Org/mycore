@@ -46,13 +46,8 @@ public class MCRWCMSContentManager {
 
     public MCRWCMSContentManager() {
         MCRConfiguration conf = MCRConfiguration.instance();
-        Object sectionProvider = conf.getInstanceOf("MCR.WCMS2.sectionProvider",
+        this.sectionProvider = conf.getInstanceOf("MCR.WCMS2.sectionProvider",
             MCRWCMSDefaultSectionProvider.class.getName());
-        if (!(sectionProvider instanceof MCRWCMSSectionProvider)) {
-            LOGGER.error("MCR.WCMS2.sectionProvider is not an instance of SectionProvider");
-            return;
-        }
-        this.sectionProvider = (MCRWCMSSectionProvider) sectionProvider;
     }
 
     /**

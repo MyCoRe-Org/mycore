@@ -66,8 +66,7 @@ public class MCRFileContentTypeFactory {
     static {
         MCRConfiguration config = MCRConfiguration.instance();
 
-        Object obj = config.getInstanceOf("MCR.IFS.FileContentTypes.DetectorClass");
-        detector = (MCRFileContentTypeDetector) obj;
+        detector = config.getInstanceOf("MCR.IFS.FileContentTypes.DetectorClass");
 
         String file = config.getString("MCR.IFS.FileContentTypes.DefinitionFile");
 

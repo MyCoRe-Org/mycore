@@ -4,6 +4,7 @@
 package org.mycore.mods.classification;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
@@ -13,9 +14,6 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
 
 /**
  * Translates <code>&lt;mods:accessCondition /&gt;</code> into mycore classifications
@@ -40,14 +38,7 @@ public class MCRAccessCondition extends MCRAuthorityInfo {
     protected MCRCategoryID lookupCategoryID() {
         Collection<MCRCategory> categoryByURI = MCRAuthorityWithURI.getCategoryByURI(href);
         if (categoryByURI.size() > 1) {
-            throw new MCRException(href + " is ambigous: "
-                + Collections2.transform(categoryByURI, new Function<MCRCategory, MCRCategoryID>() {
-
-                    @Override
-                    public MCRCategoryID apply(MCRCategory input) {
-                        return input.getId();
-                    }
-                }));
+            throw new MCRException(href + " is ambigous: " + categoryByURI.stream().map(c->c.getId()).collect(Collectors.toList()));
         }
         if (!categoryByURI.isEmpty()) {
             return categoryByURI.iterator().next().getId();

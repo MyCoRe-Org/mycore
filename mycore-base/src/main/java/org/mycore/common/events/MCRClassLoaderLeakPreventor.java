@@ -33,13 +33,10 @@ class MCRClassLoaderLeakPreventor extends ClassLoaderLeakPreventor {
         IIORegistry registry = IIORegistry.getDefaultInstance();
         Iterator<Class<?>> categories = registry.getCategories();
         final ClassLoader webClassLoader = getWebApplicationClassLoader();
-        ServiceRegistry.Filter classLoaderFilter = new ServiceRegistry.Filter() {
-            @Override
-            public boolean filter(Object provider) {
-                //remove all service provider loaded by the current ClassLoader
-                boolean loadedByWebApp = webClassLoader.equals(provider.getClass().getClassLoader());
-                return loadedByWebApp;
-            }
+        ServiceRegistry.Filter classLoaderFilter = provider -> {
+            //remove all service provider loaded by the current ClassLoader
+            boolean loadedByWebApp = webClassLoader.equals(provider.getClass().getClassLoader());
+            return loadedByWebApp;
         };
         while (categories.hasNext()) {
             @SuppressWarnings("unchecked")

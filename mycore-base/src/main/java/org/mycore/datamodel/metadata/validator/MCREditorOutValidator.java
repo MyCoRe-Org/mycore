@@ -266,36 +266,20 @@ public class MCREditorOutValidator {
     }
 
     static MCREditorMetadataValidator getObjectCheckInstance(final Class<? extends MCRMetaInterface> clazz) {
-        return new MCREditorMetadataValidator() {
-            public String checkDataSubTag(Element datasubtag) {
-                return MCREditorOutValidator.checkMetaObject(datasubtag, clazz, false);
-            }
-        };
+        return datasubtag -> MCREditorOutValidator.checkMetaObject(datasubtag, clazz, false);
     }
 
     static MCREditorMetadataValidator getObjectCheckWithLangInstance(final Class<? extends MCRMetaInterface> clazz) {
-        return new MCREditorMetadataValidator() {
-            public String checkDataSubTag(Element datasubtag) {
-                return MCREditorOutValidator.checkMetaObjectWithLang(datasubtag, clazz);
-            }
-        };
+        return datasubtag -> MCREditorOutValidator.checkMetaObjectWithLang(datasubtag, clazz);
     }
 
     static MCREditorMetadataValidator getObjectCheckWithLangNotEmptyInstance(
         final Class<? extends MCRMetaInterface> clazz) {
-        return new MCREditorMetadataValidator() {
-            public String checkDataSubTag(Element datasubtag) {
-                return MCREditorOutValidator.checkMetaObjectWithLangNotEmpty(datasubtag, clazz);
-            }
-        };
+        return datasubtag -> MCREditorOutValidator.checkMetaObjectWithLangNotEmpty(datasubtag, clazz);
     }
 
     static MCREditorMetadataValidator getObjectCheckWithLinksInstance(final Class<? extends MCRMetaInterface> clazz) {
-        return new MCREditorMetadataValidator() {
-            public String checkDataSubTag(Element datasubtag) {
-                return MCREditorOutValidator.checkMetaObjectWithLinks(datasubtag, clazz);
-            }
-        };
+        return datasubtag -> MCREditorOutValidator.checkMetaObjectWithLinks(datasubtag, clazz);
     }
 
     static class MCRMetaHistoryDateCheck implements MCREditorMetadataValidator {

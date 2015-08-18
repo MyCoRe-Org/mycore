@@ -23,7 +23,6 @@
 package org.mycore.user2.utils;
 
 import java.io.IOException;
-import java.util.Comparator;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -75,12 +74,7 @@ public abstract class MCRUserTransformer {
         if (attributes == null) {
             return;
         }
-        attributes.sortChildren(new Comparator<Element>() {
-            @Override
-            public int compare(Element o1, Element o2) {
-                return o1.getAttributeValue("name").compareTo(o2.getAttributeValue("name"));
-            }
-        });
+        attributes.sortChildren((o1, o2) -> o1.getAttributeValue("name").compareTo(o2.getAttributeValue("name")));
     }
 
     /**

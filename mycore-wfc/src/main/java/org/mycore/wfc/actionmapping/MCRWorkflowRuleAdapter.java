@@ -43,7 +43,7 @@ public class MCRWorkflowRuleAdapter extends XmlAdapter<String, MCRCondition<?>> 
 
     /**
      * Returns a parser instance that is used in {@link #unmarshal(String)}.
-     * @return
+     * @return instance of {@link MCRWorkflowRuleParser}
      */
     protected MCRBooleanClauseParser getClauseParser() {
         return new MCRWorkflowRuleParser();

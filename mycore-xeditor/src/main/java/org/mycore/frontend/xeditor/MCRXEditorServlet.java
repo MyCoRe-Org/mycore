@@ -86,6 +86,6 @@ public class MCRXEditorServlet extends MCRServlet {
 
     private MCREditorTarget getTarget(String targetID) {
         String property = "MCR.XEditor.Target." + targetID + ".Class";
-        return (MCREditorTarget) (MCRConfiguration.instance().getInstanceOf(property));
+        return MCRConfiguration.instance().getInstanceOf(property);
     }
 }

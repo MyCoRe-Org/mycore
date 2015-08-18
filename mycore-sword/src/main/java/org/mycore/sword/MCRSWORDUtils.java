@@ -66,7 +66,7 @@ public class MCRSWORDUtils {
         SWORDServer myRepository = null;
         try {
 
-            myRepository = (SWORDServer) MCRConfiguration.instance().getInstanceOf("MCR.SWORD.server.class", MCRSWORDServer.class.getName());
+            myRepository = MCRConfiguration.instance().getInstanceOf("MCR.SWORD.server.class", MCRSWORDServer.class.getName());
             LOG.info("Using " + myRepository.getClass().getName() + " as the SWORDServer");
         } catch (MCRConfigurationException e) {
             String repositoryClassName = MCRConfiguration.instance().getString("MCR.SWORD.server.class");
@@ -88,15 +88,8 @@ public class MCRSWORDUtils {
     public static MCRSWORDAuthenticator createAuthenticator() {
         // Instantiate the correct SWORD Server class
         MCRSWORDAuthenticator authenticator = null;
-        try {
-
-            authenticator = (MCRSWORDAuthenticator) MCRConfiguration.instance().getInstanceOf("MCR.SWORD.auth.class", MCRSWORDAuthenticator.class.getName());
-            LOG.info("Using " + authenticator.getClass().getName() + " as the MCRSWORDAuthenticator");
-        } catch (MCRConfigurationException e) {
-            String repositoryClassName = MCRConfiguration.instance().getString("MCR.SWORD.auth.class");
-            LOG.fatal("Unable to instantiate class from 'MCR.SWORD.server.class': " + repositoryClassName);
-            throw new MCRConfigurationException("Unable to instantiate class from 'MCR.SWORD.auth.class': " + repositoryClassName);
-        }
+        authenticator = MCRConfiguration.instance().getInstanceOf("MCR.SWORD.auth.class", MCRSWORDAuthenticator.class.getName());
+        LOG.info("Using " + authenticator.getClass().getName() + " as the MCRSWORDAuthenticator");
         return authenticator;
     }
 

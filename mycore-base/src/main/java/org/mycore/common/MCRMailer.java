@@ -317,23 +317,21 @@ public class MCRMailer extends MCRServlet {
                 return;
             }
 
-            Thread t = new Thread(new Runnable() {
-                public void run() {
-                    for (int i = numTries - 1; i > 0; i--) {
-                        LOGGER.info("Retrying in 5 minutes...");
-                        try {
-                            Thread.sleep(300000);
-                        } // wait 5 minutes
-                        catch (InterruptedException ignored) {
-                        }
+            Thread t = new Thread(() -> {
+                for (int i = numTries - 1; i > 0; i--) {
+                    LOGGER.info("Retrying in 5 minutes...");
+                    try {
+                        Thread.sleep(300000);
+                    } // wait 5 minutes
+                    catch (InterruptedException ignored) {
+                    }
 
-                        try {
-                            trySending(from, replyTo, to, bcc, subject, body, parts);
-                            LOGGER.info("Successfully resended e-mail.");
-                            break;
-                        } catch (Exception ex) {
-                            LOGGER.info("Sending e-mail failed: ", ex);
-                        }
+                    try {
+                        trySending(from, replyTo, to, bcc, subject, body, parts);
+                        LOGGER.info("Successfully resended e-mail.");
+                        break;
+                    } catch (Exception ex1) {
+                        LOGGER.info("Sending e-mail failed: ", ex1);
                     }
                 }
             });

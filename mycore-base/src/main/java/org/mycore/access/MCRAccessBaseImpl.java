@@ -325,12 +325,6 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
 
     @Override
     public MCRAccessRule getAccessRule(String id, String permission) {
-        return new MCRAccessRule() {
-
-            @Override
-            public boolean validate() {
-                return true;
-            }
-        };
+        return () -> true;
     }
 }

@@ -102,7 +102,7 @@ public class MCRCategoryTypeAdapter extends MCRJSONTypeAdapter<MCRJSONCategory> 
     private MCRCategLinkService getLinkService() {
         if (linkService == null) {
             try {
-                linkService = (MCRCategLinkService) MCRConfiguration.instance().getInstanceOf("Category.Link.Service");
+                linkService = MCRConfiguration.instance().getInstanceOf("Category.Link.Service");
             } catch (MCRConfigurationException e) {
                 linkService = MCRCategLinkServiceFactory.getInstance();
             }

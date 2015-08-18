@@ -7,7 +7,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.config.MCRConfiguration;
@@ -27,23 +26,15 @@ import com.google.gson.JsonObject;
 
 public class MCRWCMSNavigationManager {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRWCMSNavigationManager.class);
-
     private static MCRWCMSNavigationProvider NAVIGATION_PROVIDER;
 
     static {
         MCRConfiguration conf = MCRConfiguration.instance();
-        Object navProvider = conf.getInstanceOf("MCR.WCMS2.navigationProvider",
+        NAVIGATION_PROVIDER = conf.getInstanceOf("MCR.WCMS2.navigationProvider",
             MCRWCMSDefaultNavigationProvider.class.getName());
-        if (!(navProvider instanceof MCRWCMSNavigationProvider)) {
-            LOGGER.error("MCR.WCMS2.navigationProvider is not an instance of NavigationProvider");
-        } else {
-            NAVIGATION_PROVIDER = (MCRWCMSNavigationProvider) navProvider;
-        }
     }
 
     /**
-     * 
      * @see MCRWCMSNavigationProvider#toJSON(MCRNavigation)
      */
     public synchronized static JsonObject toJSON(MCRNavigation navigation) {
@@ -105,12 +96,14 @@ public class MCRWCMSNavigationManager {
     }
 
     /**
-     * Runs recursive through the item tree and changes each href and hrefStartingPage
-     * attribute to the new href.
+     * Runs recursive through the item tree and changes each href and hrefStartingPage attribute to the new href.
      * 
-     * @param item navigation item to change (and all its children)
-     * @param from which href to change
-     * @param to new value of href
+     * @param item
+     *            navigation item to change (and all its children)
+     * @param from
+     *            which href to change
+     * @param to
+     *            new value of href
      * @return if something in the tree was changed
      */
     public static boolean updateHref(MCRNavigationBaseItem item, String from, String to) {

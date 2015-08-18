@@ -137,11 +137,7 @@ public final class MCRURIResolver implements URIResolver {
     private static MCRResolverProvider getExternalResolverProvider() {
         String externalClassName = MCRConfiguration.instance()
             .getString(CONFIG_PREFIX + "ExternalResolver.Class", null);
-        final MCRResolverProvider emptyResolver = new MCRResolverProvider() {
-            public Map<String, URIResolver> getURIResolverMapping() {
-                return new HashMap<String, URIResolver>();
-            }
-        };
+        final MCRResolverProvider emptyResolver = () -> new HashMap<String, URIResolver>();
         if (externalClassName == null) {
             return emptyResolver;
         }
@@ -385,8 +381,7 @@ public final class MCRURIResolver implements URIResolver {
                     String scheme = entry.getKey();
                     scheme = scheme.substring(scheme.lastIndexOf('.') + 1);
                     LOGGER.debug("Adding Resolver " + entry.getValue() + " for URI scheme " + scheme);
-                    Object newInstance = MCRConfiguration.instance().getInstanceOf(entry.getKey());
-                    map.put(scheme, (URIResolver) newInstance);
+                    map.put(scheme, MCRConfiguration.instance().getInstanceOf(entry.getKey()));
                 } catch (Exception e) {
                     LOGGER.error("Cannot instantiate " + entry.getValue() + " for URI scheme " + entry.getKey());
                     throw new MCRException("Cannot instantiate " + entry.getValue() + " for URI scheme "
@@ -746,9 +741,9 @@ public final class MCRURIResolver implements URIResolver {
 
         /**
          * returns a classification in a specific format. Syntax:
-         * <code>classification:{editor[Complete]['['formatAlias']']|metadata}:{Levels}[:noEmptyLeaves]:{parents|children}:{ClassID}[:CategID]
-         * 
-         * formatAlias: MCRConfiguration property MCR.UURResolver.Classification.Format.FormatAlias
+         * <code>classification:{editor[Complete]['['formatAlias']']|metadata}:{Levels}[:noEmptyLeaves]:{parents|
+         * children}:{ClassID}[:CategID] formatAlias: MCRConfiguration property
+         * MCR.UURResolver.Classification.Format.FormatAlias
          *
          * @param href
          *            URI in the syntax above
@@ -912,9 +907,8 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * Transform result of other resolver with stylesheet. Usage:
-     * xslStyle:<stylesheet><,stylesheet><?param1=value1<&param2=value2>>:<anyMyCoReURI> To <stylesheet> is extension
-     * .xsl added. File is searched in classpath.
+     * Transform result of other resolver with stylesheet. Usage: xslStyle:<stylesheet><,stylesheet><?param1=value1
+     * <&param2=value2>>:<anyMyCoReURI> To <stylesheet> is extension .xsl added. File is searched in classpath.
      */
     private static class MCRXslStyleResolver implements URIResolver {
 
@@ -977,8 +971,8 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * Transform result of other resolver with stylesheet. Usage:
-     * xslTransform:<transformer><?param1=value1<&param2=value2>>:<anyMyCoReURI>
+     * Transform result of other resolver with stylesheet. Usage: xslTransform:<transformer><?param1=value1
+     * <&param2=value2>>:<anyMyCoReURI>
      */
     private static class MCRLayoutTransformerResolver implements URIResolver {
 
