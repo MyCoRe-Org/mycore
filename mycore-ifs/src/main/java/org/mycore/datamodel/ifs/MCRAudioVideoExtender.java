@@ -305,23 +305,6 @@ public abstract class MCRAudioVideoExtender {
     }
 
     /**
-     * Writes a metafile that starts a streaming player for this asset to an
-     * OutputStream, e. g. a ServletOutputStream. The browser then streams the
-     * asset. The client may provide a start and stop position to play only a
-     * certain part of the asset.
-     * 
-     * @param out
-     *            the OutputStream to write the player starter to
-     * @param startPos
-     *            the optional start position in the format "hh:mm:ss"
-     * @param stopPos
-     *            the optional stop position in the format "hh:mm:ss"
-     */
-    @Deprecated
-    public abstract void getPlayerStarterTo(OutputStream out, String startPos, String stopPos)
-        throws MCRPersistenceException;
-
-    /**
      * Gets a metafile that starts a streaming player for this asset. The browser then streams the
      * asset. The client may provide a start and stop position to play only a
      * certain part of the asset.

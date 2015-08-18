@@ -24,9 +24,7 @@
 package org.mycore.backend.filesystem;
 
 import java.io.File;
-import java.io.FilterInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -120,26 +118,6 @@ public class MCRCStoreVFS extends MCRContentStore {
         } else {
             LOGGER.warn("Delete of " + targetObject + " was NOT successful (w/o errors given).");
         }
-    }
-
-    @Override
-    @Deprecated
-    protected void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception {
-        doRetrieveMCRContent(file).sendTo(target);
-    }
-
-    @Override
-    @Deprecated
-    protected InputStream doRetrieveContent(MCRFileReader file) throws IOException {
-        FileObject targetObject = fsManager.resolveFile(getBase(), file.getStorageID());
-        final FileContent targetContent = targetObject.getContent();
-        return new FilterInputStream(targetContent.getInputStream()) {
-            @Override
-            public void close() throws IOException {
-                super.close();
-                targetContent.close();
-            }
-        };
     }
 
     protected MCRContent doRetrieveMCRContent(MCRFileReader file) throws IOException {

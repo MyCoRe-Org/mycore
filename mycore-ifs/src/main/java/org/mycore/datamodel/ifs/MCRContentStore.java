@@ -26,7 +26,6 @@ package org.mycore.datamodel.ifs;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -34,7 +33,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
 
-import org.apache.commons.io.IOUtils;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
@@ -124,7 +122,7 @@ public abstract class MCRContentStore {
             return false;
         }
         try {
-            return MCRUtils.getMD5Sum(doRetrieveContent(file)).equals(file.getMD5());
+            return MCRUtils.getMD5Sum(doRetrieveMCRContent(file).getInputStream()).equals(file.getMD5());
         } catch (NoSuchAlgorithmException e) {
             throw new IOException(e);
         }
@@ -180,61 +178,6 @@ public abstract class MCRContentStore {
     protected abstract void doDeleteContent(String storageID) throws Exception;
 
     /**
-     * Retrieves the content of an MCRFile to an OutputStream. Uses the
-     * StorageID to indentify the place where the file content was stored in
-     * this store instance.
-     * 
-     * @param file
-     *            the MCRFile thats content should be retrieved
-     * @param target
-     *            the OutputStream to write the file content to
-     * @deprecated
-     *        use {@link #doRetrieveMCRContent(MCRFileReader)} instead
-     */
-    @Deprecated
-    public void retrieveContent(MCRFileReader file, OutputStream target) throws MCRException, IOException {
-        InputStream in = null;
-        try {
-            in = retrieveContent(file);
-            IOUtils.copy(in, target);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (Exception ignored) {
-                }
-            }
-        }
-    }
-
-    /**
-     * Retrieves the content of an MCRFile to an OutputStream. Uses the
-     * StorageID to indentify the place where the file content was stored in
-     * this store instance.
-     * 
-     * @param file
-     *          the MCRFile thats content should be retrieved
-     * @param target
-     *          the OutputStream to write the file content to
-     * @deprecated 
-     *          use {@link #doRetrieveMCRContent(MCRFileReader)} instead
-     */
-    @Deprecated
-    protected abstract void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception;
-
-    /**
-     * Retrieves the content of an MCRFile. Uses the
-     * StorageID to indentify the place where the file content was stored in
-     * this store instance.
-     * 
-     * @param file
-     *            the MCRFile thats content should be retrieved
-     * @since 1.3
-     * @deprecated use {@link #doRetrieveMCRContent(MCRFileReader)} instead
-     */
-    protected abstract InputStream doRetrieveContent(MCRFileReader file) throws IOException;
-
-    /**
      * Retrieves the content of an MCRFile. Uses the
      * StorageID to indentify the place where the file content was stored in
      * this store instance.
@@ -253,7 +196,7 @@ public abstract class MCRContentStore {
      */
     public InputStream retrieveContent(MCRFileReader file) throws MCRException {
         try {
-            return doRetrieveContent(file);
+            return doRetrieveMCRContent(file).getInputStream();
         } catch (Exception exc) {
             if (!(exc instanceof MCRException)) {
                 StringBuilder msg = new StringBuilder();

@@ -230,10 +230,6 @@ public class MCRMediaAVExtender extends MCRAudioVideoExtender {
     }
 
     @Override
-    public void getPlayerStarterTo(OutputStream out, String startPos, String stopPos) throws MCRPersistenceException {
-    }
-
-    @Override
     public MCRContent getPlayerStarter(String startPos, String stopPos) throws IOException {
         return null;
     }

@@ -25,8 +25,6 @@ package org.mycore.datamodel.ifs2;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
@@ -215,16 +213,6 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         MCRDirectory parent = (MCRDirectory) (dir.getParent());
         dir.delete();
         deleteEmptyParents(parent);
-    }
-
-    @Override
-    protected void doRetrieveContent(MCRFileReader fr, OutputStream target) throws Exception {
-        doRetrieveMCRContent(fr).sendTo(target);
-    }
-
-    @Override
-    protected InputStream doRetrieveContent(MCRFileReader fr) throws IOException {
-        return doRetrieveMCRContent(fr).getInputStream();
     }
 
     @Override

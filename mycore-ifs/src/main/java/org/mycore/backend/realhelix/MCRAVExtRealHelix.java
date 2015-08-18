@@ -24,7 +24,6 @@
 package org.mycore.backend.realhelix;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.StringTokenizer;
@@ -157,23 +156,6 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
         } catch (Exception exc) {
             String msg = "Error parsing metadata from Real Server ViewSource: " + file.getStorageID();
             LOGGER.warn(msg, exc);
-        }
-    }
-
-    @Override
-    public void getPlayerStarterTo(OutputStream out, String startPos, String stopPos) throws MCRPersistenceException {
-        if (basePlayerStarter == null || basePlayerStarter.length() < 8) {
-            String msg = "Temporary Failure. Could not start streaming of file: " + file.getPath();
-            throw new MCRPersistenceException(msg);
-        }
-
-        try {
-            String url = getURL(startPos, stopPos);
-            URLConnection connection = getConnection(url);
-            forwardData(connection, out);
-        } catch (IOException exc) {
-            String msg = "Could not send player starter file";
-            throw new MCRPersistenceException(msg, exc);
         }
     }
 
