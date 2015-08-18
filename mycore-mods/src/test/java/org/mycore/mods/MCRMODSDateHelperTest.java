@@ -56,7 +56,7 @@ public class MCRMODSDateHelperTest extends MCRTestCase {
         Date date = new Date();
         int fullYear = 1900 + date.getYear();
 
-        MCRMODSDateHelper.setDate(element, date, "iso8601-4");
+        MCRMODSDateHelper.setDate(element, date, MCRMODSDateFormat.iso8601_4);
 
         String year = element.getText();
         assertEquals(fullYear, Integer.parseInt(year));
@@ -79,7 +79,7 @@ public class MCRMODSDateHelperTest extends MCRTestCase {
         assertEquals(9 - 1, parsed.get(Calendar.MONTH));
         assertEquals(29, parsed.get(Calendar.DAY_OF_MONTH));
 
-        MCRMODSDateHelper.setDate(element, parsed, "iso8601-8");
+        MCRMODSDateHelper.setDate(element, parsed, MCRMODSDateFormat.iso8601_8);
         assertEquals("iso8601", element.getAttributeValue("encoding"));
         assertEquals(date, element.getText());
     }
@@ -94,7 +94,7 @@ public class MCRMODSDateHelperTest extends MCRTestCase {
         assertEquals(9 - 1, parsed.get(Calendar.MONTH));
         assertEquals(29, parsed.get(Calendar.DAY_OF_MONTH));
 
-        MCRMODSDateHelper.setDate(element, parsed, "w3cdtf-10");
+        MCRMODSDateHelper.setDate(element, parsed, MCRMODSDateFormat.w3cdtf_10);
         assertEquals("w3cdtf", element.getAttributeValue("encoding"));
         assertEquals(date, element.getText());
     }
@@ -102,20 +102,20 @@ public class MCRMODSDateHelperTest extends MCRTestCase {
     @Test
     public void testDateFormatsWithoutTimezone() {
         // Christmas :-) 
-        int year=2015, month=12, day=25;
-        
-        GregorianCalendar gIn = new GregorianCalendar(year,month-1,day);
+        int year = 2015, month = 12, day = 25;
+
+        GregorianCalendar gIn = new GregorianCalendar(year, month - 1, day);
         Element element = new Element("date");
-        MCRMODSDateHelper.setDate(element, gIn, "w3cdtf-10");
+        MCRMODSDateHelper.setDate(element, gIn, MCRMODSDateFormat.w3cdtf_10);
 
         // Not christmas :-( ?
-        assertEquals(year + "-" + month + "-" + day, element.getText() );
+        assertEquals(year + "-" + month + "-" + day, element.getText());
 
         // Not christmas :-( ?
         GregorianCalendar gOut = MCRMODSDateHelper.getCalendar(element);
-        assertEquals( day, gOut.get( Calendar.DAY_OF_MONTH ) );
+        assertEquals(day, gOut.get(Calendar.DAY_OF_MONTH));
     }
-    
+
     @Test
     public void testW3CDTFDate19() {
         String date = "2011-09-29T13:14:15";
@@ -129,7 +129,7 @@ public class MCRMODSDateHelperTest extends MCRTestCase {
         assertEquals(14, parsed.get(Calendar.MINUTE));
         assertEquals(15, parsed.get(Calendar.SECOND));
 
-        MCRMODSDateHelper.setDate(element, parsed, "w3cdtf-19");
+        MCRMODSDateHelper.setDate(element, parsed, MCRMODSDateFormat.w3cdtf_19);
         assertEquals("w3cdtf", element.getAttributeValue("encoding"));
         assertEquals(date, element.getText());
     }
