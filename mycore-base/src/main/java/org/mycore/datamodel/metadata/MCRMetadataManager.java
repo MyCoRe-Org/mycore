@@ -811,32 +811,6 @@ public final class MCRMetadataManager {
     }
 
     /**
-     * Adds a derivate MCRMetaLinkID to the structure part and updates the object with the ID in the data store.
-     * 
-     * @param id
-     *            the object ID
-     * @param link
-     *            a link to a derivate as MCRMetaLinkID
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occurred
-     * @deprecated use {@link #addOrUpdateDerivateToObject(MCRObjectID, MCRMetaLinkID)}
-     */
-    @Deprecated
-    public static void addDerivateToObject(final MCRObjectID id, final MCRMetaLinkID link)
-        throws MCRPersistenceException {
-        final MCRObject object = MCRMetadataManager.retrieveMCRObject(id);
-        // don't put the same derivates twice in an object!
-        if (!object.getStructure().addDerivate(link))
-            return;
-        // add link
-        if (!object.isImportMode()) {
-            object.getService().setDate("modifydate");
-        }
-        object.getStructure().addDerivate(link);
-        MCRMetadataManager.fireUpdateEvent(object);
-    }
-
-    /**
      * Adds or updates a derivate MCRMetaLinkID to the structure part and updates the object with the ID in the data
      * store.
      * 

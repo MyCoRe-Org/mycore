@@ -40,7 +40,6 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.output.XMLOutputter;
-import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRContent;
@@ -336,8 +335,12 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
      */
     public void setContentFrom(File source) throws MCRPersistenceException {
         Objects.requireNonNull(source, "source file is null");
-        MCRArgumentChecker.ensureIsTrue(source.exists(), "source file does not exist:" + source.getPath());
-        MCRArgumentChecker.ensureIsTrue(source.canRead(), "source file not readable:" + source.getPath());
+        if (!source.exists()) {
+            throw new MCRUsageException("source file does not exist:" + source.getPath());
+        }
+        if (!source.canRead()) {
+            throw new MCRUsageException("source file not readable:" + source.getPath());
+        }
         FileInputStream fin = null;
 
         try {

@@ -23,9 +23,7 @@
 
 package org.mycore.common;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -71,17 +69,6 @@ public class MCRException extends RuntimeException {
      */
     public MCRException(String message, Throwable cause) {
         super(message, cause);
-    }
-
-    /**
-     * Returns the exception thrown by an underlying system
-     * 
-     * @return the exception thrown by an underlying system
-     * @deprecated use {@link Throwable#getCause()}
-     */
-    @Deprecated
-    public Exception getException() {
-        return (Exception) getCause();
     }
 
     /**

@@ -44,6 +44,7 @@ import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.mets.model.MCRMETSGenerator;
@@ -87,7 +88,7 @@ public class MCRMETSServlet extends MCRServlet {
 
         long lastModified = Files.getLastModifiedTime(rootPath).toMillis();
 
-        writeCacheHeaders(response, CACHE_TIME, lastModified, useExpire);
+        MCRFrontendUtil.writeCacheHeaders(response, (long) CACHE_TIME, lastModified, useExpire);
         long start = System.currentTimeMillis();
         MCRContent metsContent = getMetsSource(job, useExistingMets(request), derivate);
         MCRLayoutService.instance().doLayout(request, response, metsContent);

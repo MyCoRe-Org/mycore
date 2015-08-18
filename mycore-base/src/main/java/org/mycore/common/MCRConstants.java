@@ -25,11 +25,9 @@
 package org.mycore.common;
 
 import java.lang.reflect.Field;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -49,11 +47,6 @@ import org.mycore.common.config.MCRConfiguration;
  *          2011) $
  */
 public final class MCRConstants {
-    /** MyCoRe version
-     *  This sticks to "2.0"
-     * @deprecated use {@link MCRCoreVersion#getVersion()} to get mycore version 
-     */
-    public final static String VERSION = "2.0";
 
     /** MCR.Metadata.DefaultLang */
     public static final String DEFAULT_LANG = "de";
@@ -113,9 +106,6 @@ public final class MCRConstants {
     private final static String MCR_URL = "http://www.mycore.org/";
 
     public final static Namespace MCR_NAMESPACE = Namespace.getNamespace("mcr", MCR_URL);
-
-    @Deprecated
-    public final static String SUPER_USER_ID = MCRSystemUserInformation.getSuperUserInstance().getUserID();
 
     private final static List<Namespace> namespaces;
 

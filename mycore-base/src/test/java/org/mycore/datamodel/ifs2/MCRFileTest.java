@@ -34,12 +34,12 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Date;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.RandomAccessContent;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.junit.Test;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -115,9 +115,9 @@ public class MCRFileTest extends MCRIFS2TestCase {
         File src = File.createTempFile("foo", "txt");
         src.deleteOnExit();
         byte[] content = "Hello World".getBytes("UTF-8");
-        FileOutputStream fo = new FileOutputStream(src);
-        MCRUtils.copyStream(new ByteArrayInputStream(content), fo);
-        fo.close();
+        try (FileOutputStream fo = new FileOutputStream(src)) {
+            IOUtils.copy(new ByteArrayInputStream(content), fo);
+        }
         file.setContent(new MCRFileContent(src));
         assertFalse(MCRFile.MD5_OF_EMPTY_FILE.equals(file.getMD5()));
         assertEquals(11, file.getSize());

@@ -164,24 +164,6 @@ public class MCRObjectStructure {
     }
 
     /**
-     * The method appends a child ID to the child link list if and only if it is
-     * not already contained in the list, preventing from doubly-linked objects.
-     * If the link could be added a "true" will be returned, otherwise "false".
-     * 
-     * @param href
-     *            the MCRObjectID string of the child
-     * @param label
-     *            the link's label
-     * @param title
-     *            the link's title
-     * @return boolean true, if successfully done
-     * @deprecated use {@link #addChild(MCRMetaLinkID)} instead
-     */
-    public final boolean addChild(MCRObjectID href, String label, String title) {
-        return addChild(new MCRMetaLinkID("child", href, label, title));
-    }
-
-    /**
      * removes a child link to another object.
      *  If the link was found a "true" will be returned, otherwise
      * "false".
@@ -224,38 +206,6 @@ public class MCRObjectStructure {
             }
         }
         return false;
-    }
-
-    /**
-     * The method returns the number of child links.
-     * 
-     * @return int number of children
-     * @deprecated use {@link #getChildren()} instead
-     */
-    public final int getChildSize() {
-        return getChildren().size();
-    }
-
-    /**
-     * The method returns the child link at a given index.
-     * 
-     * @param index
-     *            the index in the link vector
-     * @return MCRMetaLink the corresponding link
-     * @deprecated use {@link #getChildren()} instead
-     */
-    public final MCRMetaLinkID getChild(int index) {
-        return getChildren().get(index);
-    }
-
-    /**
-     * The method return the child reference as a MCRObjectID.
-     * 
-     * @return the child MCRObjectID.
-     * @deprecated use {@link #getChildren()} and {@link MCRMetaLinkID#getXLinkHrefID()} instead
-     */
-    public final MCRObjectID getChildID(int index) {
-        return getChildren().get(index).getXLinkHrefID();
     }
 
     /**
@@ -326,45 +276,6 @@ public class MCRObjectStructure {
             }
         }
         return null;
-    }
-
-    /**
-     * The method return the size of the derivate array.
-     * 
-     * @return the size of the derivate array
-     * @deprecated use {@link #getDerivates()} instead
-     */
-    public final int getDerivateSize() {
-        return getDerivates().size();
-    }
-
-    /**
-     * The method return the derivate form the array with the given index.
-     * 
-     * @param index
-     *            the index of the list
-     * @return the derivate as MCRMetaLinkID or null
-     * @deprecated use {@link #getDerivates()} instead
-     */
-    public final MCRMetaLinkID getDerivate(int index) throws IndexOutOfBoundsException {
-        if (index > getDerivates().size()) {
-            return null;
-        }
-        return getDerivates().get(index);
-    }
-
-    /**
-     * <em>removeDerivate</em> the derivate link from the derivate vector for
-     * the given number.
-     * 
-     * @param index
-     *            the index of the link to be removed
-     * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
-     * @deprecated use {@link #getDerivate(int)} or {@link #removeDerivate(MCRObjectID)} instead                
-     */
-    public final void removeDerivate(int index) throws IndexOutOfBoundsException {
-        getDerivates().remove(index);
     }
 
     /** 

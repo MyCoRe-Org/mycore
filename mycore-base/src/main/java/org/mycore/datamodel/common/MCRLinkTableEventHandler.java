@@ -93,9 +93,9 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
         }
         // add derivate referece
         MCRObjectStructure struct = obj.getStructure();
-        int dersize = struct.getDerivateSize();
+        int dersize = struct.getDerivates().size();
         for (int i = 0; i < dersize; i++) {
-            MCRMetaLinkID lid = struct.getDerivate(i);
+            MCRMetaLinkID lid = struct.getDerivates().get(i);
             mcr_linktable.addReferenceLink(obj.getId(), lid.getXLinkHrefID(), MCRLinkTableManager.ENTRY_TYPE_DERIVATE,
                 "");
         }

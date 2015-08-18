@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRContentServlet;
 import org.xml.sax.SAXException;
 
@@ -45,7 +46,7 @@ public class MCRDerivateContentTransformerServlet extends MCRContentServlet {
 
         FileTime lastModifiedTime = Files.getLastModifiedTime(mcrPath);
 
-        writeCacheHeaders(resp, CACHE_TIME, lastModifiedTime.toMillis(), true);
+        MCRFrontendUtil.writeCacheHeaders(resp, (long) CACHE_TIME, lastModifiedTime.toMillis(), true);
 
         try {
             return getLayoutService().getTransformedContent(req, resp, pc);

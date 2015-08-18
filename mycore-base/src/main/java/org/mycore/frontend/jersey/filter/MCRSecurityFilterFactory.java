@@ -1,10 +1,8 @@
 package org.mycore.frontend.jersey.filter;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -42,17 +40,6 @@ public class MCRSecurityFilterFactory implements ResourceFilterFactory {
         } else if(restrictedAccessTYPE != null) {
             LOGGER.info("Access to " + am.getResource().getResourceClass().getName() + " is restricted by " + restrictedAccessTYPE.value().getCanonicalName());
             addFilter(filters, restrictedAccessTYPE);
-        }
-        
-        RolesAllowed ra = am.getAnnotation(RolesAllowed.class);
-        if (ra != null) {
-            LOGGER.warn(MessageFormat.format(
-                "MCRCheckAccessFilter will be removed with release version 2.2. Migrate {0} to @MCRRestrictedAccess!", am
-                    .getMethod()
-                    .toString()));
-            @SuppressWarnings("deprecation")
-            ResourceFilter filter = new MCRCheckAccessFilter(am);
-            filters.add(filter);
         }
         return filters;
     }

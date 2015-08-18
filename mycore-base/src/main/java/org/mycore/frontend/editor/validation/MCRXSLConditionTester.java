@@ -34,7 +34,7 @@ public class MCRXSLConditionTester {
         String output = transform(xml, xsl);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(MessageFormat.format("Condition: {0}Stylesheet:\n{1}\nInput:\n{2}\nResult: {3}", condition,
-                MCRUtils.documentAsString(xsl), MCRUtils.documentAsString(xml), output));
+                MCRUtils.asString(xsl), MCRUtils.asString(xml), output));
         }
         return "true".equals(output);
     }

@@ -734,7 +734,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         derivateLink.setReference(derID, oldObjectToDerivateLink.getXLinkLabel(),
             oldObjectToDerivateLink.getXLinkTitle());
         derivateLink.setSubTag("derobject");
-        MCRMetadataManager.addDerivateToObject(objID, derivateLink);
+        MCRMetadataManager.addOrUpdateDerivateToObject(objID, derivateLink);
 
         /* removing link from old parent */
         boolean flag = oldOwner.getStructure().removeDerivate(derID);

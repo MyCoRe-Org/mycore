@@ -50,7 +50,7 @@ import org.xml.sax.SAXException;
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  */
-public class MCRLayoutService extends MCRDeprecatedLayoutService {
+public class MCRLayoutService {
 
     private static final int INITIAL_BUFFER_SIZE = 32 * 1024;
 

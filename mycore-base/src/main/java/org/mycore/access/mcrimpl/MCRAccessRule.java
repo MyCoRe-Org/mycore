@@ -31,9 +31,9 @@ import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
-import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRParseException;
 
@@ -65,7 +65,7 @@ public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
 
     public boolean checkAccess(String userID, Date date, MCRIPAddress ip) {
         if (parsedRule == null) {
-            if (userID.equals(MCRConstants.SUPER_USER_ID)) {
+            if (userID.equals(MCRSystemUserInformation.getSuperUserInstance().getUserID())) {
                 Logger.getLogger(MCRAccessRule.class).debug("No rule defined, grant access to super user.");
                 return true;
             }

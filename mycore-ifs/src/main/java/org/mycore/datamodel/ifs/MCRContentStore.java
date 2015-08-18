@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
 
+import org.apache.commons.io.IOUtils;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
@@ -191,11 +192,11 @@ public abstract class MCRContentStore {
      *        use {@link #doRetrieveMCRContent(MCRFileReader)} instead
      */
     @Deprecated
-    public void retrieveContent(MCRFileReader file, OutputStream target) throws MCRException {
+    public void retrieveContent(MCRFileReader file, OutputStream target) throws MCRException, IOException {
         InputStream in = null;
         try {
             in = retrieveContent(file);
-            MCRUtils.copyStream(in, target);
+            IOUtils.copy(in, target);
         } finally {
             if (in != null) {
                 try {

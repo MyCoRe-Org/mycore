@@ -32,10 +32,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
@@ -229,62 +227,6 @@ public class MCRUtils {
 
         return returns;
     }
-
-    /**
-     * Copies all content read from the given input stream to the given output
-     * stream. Note that this method will NOT close the streams when finished
-     * copying.
-     * 
-     * @param source
-     *            the InputStream to read the bytes from
-     * @param target
-     *            out the OutputStream to write the bytes to, may be null
-     * @return true if Inputstream copied successfully to OutputStream
-     * @deprecated Use {@link IOUtils#copy(InputStream, OutputStream)} instead
-     */
-    public static boolean copyStream(InputStream source, OutputStream target) {
-        if (source == null) {
-            throw new MCRException("InputStream source is null.");
-        }
-        try {
-            int bytesRead = IOUtils.copy(source, target);
-            LOGGER.debug("copyStream(): " + bytesRead + " bytes read");
-            // C L O S E, done by caller if wanted.
-        } catch (IOException e) {
-            LOGGER.error("IOException caught while copying streams:", e);
-            return false;
-        }
-        // all was ok
-        return true;
-    } // end copy
-
-    /**
-     * Copies all content read from the given input stream to the given output
-     * stream. Note that this method will NOT close the streams when finished
-     * copying.
-     * 
-     * @param source
-     *            the InputStream to read the bytes from
-     * @param target
-     *            out the OutputStream to write the bytes to, may be null
-     * @return true if Inputstream copied successfully to OutputStream
-     * @deprecated Use {@link IOUtils#copy(Reader, Writer)} instead
-     */
-    public static boolean copyReader(Reader source, Writer target) {
-        if (source == null) {
-            throw new MCRException("Reader source is null.");
-        }
-
-        try {
-            int bytesRead = IOUtils.copy(source, target);
-            LOGGER.debug("copyReader(): " + bytesRead + " bytes read");
-        } catch (IOException e) {
-            LOGGER.error("IOException while copy reader:", e);
-            return false;
-        }
-        // all was ok
-        return true;
-    } // end copy
 
     /**
      * merges to HashSets of MyCoreIDs after specific rules
@@ -726,33 +668,10 @@ public class MCRUtils {
      * 
      * @return the xml document as {@link String} or null if an
      *         {@link Exception} occurs
-     *         
-     * @deprecated please use {@link MCRUtils#asString(Document)}
-     */
-    @Deprecated
-    public static String documentAsString(Document doc) {
-        return asString(doc);
-    }
-
-    /**
-     * Transforms the given {@link Document} into a String
-     * 
-     * @return the xml document as {@link String} or null if an
-     *         {@link Exception} occurs
      */
     public static String asString(Document doc) {
         XMLOutputter op = new XMLOutputter(Format.getPrettyFormat());
         return op.outputString(doc);
-    }
-
-    /**
-     * Transforms the given {@link Element} into a String
-     * 
-     * @return the element as {@link String}
-     */
-    @Deprecated
-    public static String elementAsString(Element element) {
-        return asString(element);
     }
 
     /**

@@ -339,25 +339,6 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     }
 
     /**
-     * This method get the 'text' text element.
-     * 
-     * @return the text String of the default language or an empty String
-     * @deprecated use {@link #getTexts()} or {@link #getText(String)} instead
-     */
-    @Deprecated
-    public final String getText() {
-        if (texts.size() > 0) {
-            MCRMetaHistoryDateText h = getText(lang);
-            if (h != null) {
-                return h.getText();
-            } else {
-                return "";
-            }
-        }
-        return "";
-    }
-
-    /**
      * This method get the 'calendar' text element.
      * 
      * @return the calendar string

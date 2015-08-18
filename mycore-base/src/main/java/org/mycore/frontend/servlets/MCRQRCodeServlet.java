@@ -76,7 +76,7 @@ public class MCRQRCodeServlet extends MCRContentServlet {
         MCRContent content = getPNGContent(url, size);
         content.setLastModified(0);
         if (!"HEAD".equals(req.getMethod())) {
-            writeCacheHeaders(resp, CACHE_TIME, 0, true);
+            MCRFrontendUtil.writeCacheHeaders(resp, CACHE_TIME, (long) 0, true);
         }
         return content;
     }

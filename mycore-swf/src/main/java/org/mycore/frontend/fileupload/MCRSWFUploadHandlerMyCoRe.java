@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.StringTokenizer;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -136,10 +137,8 @@ public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
         // store file
         File fout = new File(newdir, newfile);
 
-        try {
-            BufferedOutputStream fouts = new BufferedOutputStream(new FileOutputStream(fout));
-            MCRUtils.copyStream(in, fouts);
-            fouts.close();
+        try (BufferedOutputStream fouts = new BufferedOutputStream(new FileOutputStream(fout))) {
+            IOUtils.copy(in, fouts);
             LOGGER.info("Data object stored under " + fout.getName());
         } catch (IOException e) {
             LOGGER.error("Can't store the data object " + fout.getName());

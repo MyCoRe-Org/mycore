@@ -130,7 +130,7 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         assertNotNull("Date is null", ts.getDate());
         // this can be a different String, but point in time should be the same
         LOGGER.debug(ts.getISOString());
-        ts.setFormat(MCRISO8601Format.COMPLETE_HH_MM);
+        ts.setFormat(MCRISO8601Format.COMPLETE_HH_MM.toString());
         LOGGER.debug(ts.getISOString());
         // wrong date format for the following string should null the internal
         // date.
@@ -142,7 +142,7 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         ts.setDate(timeString);
         assertNotNull("Date is null", ts.getDate());
         // check if shorter format declarations fail if String is longer
-        ts.setFormat(MCRISO8601Format.YEAR);
+        ts.setFormat(MCRISO8601Format.YEAR.toString());
         timeString = "1997-07";
         ts.setDate(timeString);
         assertNull("Date is not null", ts.getDate());
@@ -189,8 +189,8 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
     public void getFormat() {
         MCRMetaISO8601Date ts = new MCRMetaISO8601Date();
         assertNull("Format used is not Null", ts.getFormat());
-        ts.setFormat(MCRISO8601Format.COMPLETE);
-        assertEquals("Set format differs from get format", MCRISO8601Format.COMPLETE, ts.getFormat());
+        ts.setFormat(MCRISO8601Format.COMPLETE.toString());
+        assertEquals("Set format differs from get format", MCRISO8601Format.COMPLETE.toString(), ts.getFormat());
     }
 
     @Test
@@ -222,7 +222,7 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         datum.setAttribute("format", MCRISO8601Format.COMPLETE_HH_MM.toString());
         ts.setFromDOM(datum);
         assertNull("Date should be null", ts.getDate());
-        assertEquals("Format should be set by jdom", MCRISO8601Format.COMPLETE_HH_MM, ts.getFormat());
+        assertEquals("Format should be set by jdom", MCRISO8601Format.COMPLETE_HH_MM.toString(), ts.getFormat());
     }
 
     private String getFormat(DateTimeFormatter df) {

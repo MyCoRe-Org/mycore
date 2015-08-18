@@ -26,7 +26,6 @@ package org.mycore.datamodel.metadata;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Date;
-import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
@@ -177,44 +176,9 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
     public void setFormat(String format) {
         isoDate.setFormat(format);
     }
-
-    /**
-     * sets the input and output format.
-     * 
-     * please use only the formats defined on the <a
-     * href="http://www.w3.org/TR/NOTE-datetime">W3C Page</a>, which are also
-     * exported as static fields by this class.
-     * 
-     */
-    @Deprecated
-    public void setFormat(MCRISO8601Format isoFormat) {
-        isoDate.setFormat(isoFormat);
-    }
-
-    /**
-     * formats the date to a String
-     * @param format as in {@link MCRISO8601Format}
-     * @param locale used by format process
-     * @return null if date is not set yet
-     */
-    @Deprecated
-    public String format(String format, Locale locale) {
-        return isoDate.format(format, locale);
-    }
-
-    /**
-     * gets the input and output format.
-     * 
-     * this is a String that is also exported as static fields by this class, or
-     * null if not defined.
-     * 
-     * @return a format string that is valid conforming to xsd:duration schema
-     *         type, or null if not defined.
-     * 
-     */
-    @Deprecated
-    public MCRISO8601Format getFormat() {
-        return isoDate.getIsoFormat();
+    
+    public String getFormat() {
+        return isoDate == null || isoDate.getIsoFormat() == null ? null : isoDate.getIsoFormat().toString();
     }
 
     /**

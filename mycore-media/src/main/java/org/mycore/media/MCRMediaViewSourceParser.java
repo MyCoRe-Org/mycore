@@ -25,17 +25,17 @@ package org.mycore.media;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.StringTokenizer;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.ifs.MCRFileReader;
@@ -382,9 +382,10 @@ public class MCRMediaViewSourceParser extends MCRMediaParser {
      *            the OutputStream to write the bytes to
      */
     protected void forwardData(URLConnection connection, OutputStream out) throws IOException {
-        InputStream in = connection.getInputStream();
-        MCRUtils.copyStream(in, out);
-        out.close();
+        try (InputStream in = connection.getInputStream()){
+            IOUtils.copy(in, out);
+            out.close();
+        }
     }
 
     /**

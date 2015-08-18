@@ -24,8 +24,6 @@
 package org.mycore.common.xml;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -51,10 +49,7 @@ import org.jdom2.Verifier;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMSource;
-import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRByteContent;
-import org.mycore.common.content.MCRStringContent;
-import org.mycore.common.content.MCRVFSContent;
 import org.mycore.common.content.streams.MCRByteArrayOutputStream;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -70,114 +65,6 @@ import org.xml.sax.SAXParseException;
 public class MCRXMLHelper {
 
     private static final Logger LOGGER = Logger.getLogger(MCRXMLHelper.class);
-
-    /**
-     * Parses an XML file from a URI and returns it as DOM. Use the validation
-     * value from mycore.properties.
-     * 
-     * @param uri
-     *            the URI of the XML file
-     * @throws MCRException
-     *             if XML could not be parsed
-     * @return the XML file as a DOM object
-     * @deprecated use MCRXMLParserFactory.getParser().parseXML(MCRContent xml)
-     */
-    public static Document parseURI(URI uri) throws MCRException, SAXParseException {
-        try {
-            return MCRXMLParserFactory.getParser().parseXML(new MCRVFSContent(uri));
-        } catch (MalformedURLException e) {
-            throw new MCRException(e);
-        } catch (IOException e) {
-            throw new MCRException(e);
-        }
-    }
-
-    /**
-     * Parses an XML file from a URI and returns it as DOM. Use the given
-     * validation flag.
-     * 
-     * @param uri
-     *            the URI of the XML file
-     * @param valid
-     *            the validation flag
-     * @throws MCRException
-     *             if XML could not be parsed
-     * @return the XML file as a DOM object
-     * @deprecated use MCRXMLParserFactory.getParser(boolean validate).parseXML(MCRContent xml)
-     */
-    public static Document parseURI(URI uri, boolean valid) throws MCRException, SAXParseException {
-        try {
-            return MCRXMLParserFactory.getParser(valid).parseXML(new MCRVFSContent(uri));
-        } catch (MalformedURLException e) {
-            throw new MCRException(e);
-        } catch (IOException e) {
-            throw new MCRException(e);
-        }
-    }
-
-    /**
-     * Parses an XML String and returns it as DOM. Use the validation value from
-     * mycore.properties.
-     * 
-     * @param xml
-     *            the XML String to be parsed
-     * @throws MCRException
-     *             if XML could not be parsed
-     * @return the XML file as a DOM object
-     * @deprecated use MCRXMLParserFactory.getParser().parseXML(MCRContent xml)
-     */
-    public static Document parseXML(String xml) throws MCRException, SAXParseException {
-        return MCRXMLParserFactory.getParser().parseXML(new MCRStringContent(xml));
-    }
-
-    /**
-     * Parses an XML String and returns it as DOM. Use the given validation
-     * flag.
-     * 
-     * @param xml
-     *            the XML String to be parsed
-     * @param valid
-     *            the validation flag
-     * @throws MCRException
-     *             if XML could not be parsed
-     * @return the XML file as a DOM object
-     * @deprecated use MCRXMLParserFactory.getParser(boolean validate).parseXML(MCRContent xml)
-     */
-    public static Document parseXML(String xml, boolean valid) throws MCRException, SAXParseException {
-        return MCRXMLParserFactory.getParser(valid).parseXML(new MCRStringContent(xml));
-    }
-
-    /**
-     * Parses an Byte Array and returns it as DOM. Use the validation value from
-     * mycore.properties.
-     * 
-     * @param xml
-     *            the XML Byte Array to be parsed
-     * @throws MCRException
-     *             if XML could not be parsed
-     * @return the XML file as a DOM object
-     * @deprecated use MCRXMLParserFactory.getParser().parseXML(MCRContent xml)
-     */
-    public static Document parseXML(byte[] xml) throws MCRException, SAXParseException {
-        return MCRXMLParserFactory.getParser().parseXML(new MCRByteContent(xml));
-    }
-
-    /**
-     * Parses an Byte Array and returns it as DOM. Use the given validation
-     * flag.
-     * 
-     * @param xml
-     *            the XML Byte Array to be parsed
-     * @param valid
-     *            the validation flag
-     * @throws MCRException
-     *             if XML could not be parsed
-     * @return the XML file as a DOM object
-     * @deprecated use MCRXMLParserFactory.getParser(boolean validate).parseXML(MCRContent xml)
-     */
-    public static Document parseXML(byte[] xml, boolean valid) throws MCRException, SAXParseException {
-        return MCRXMLParserFactory.getParser(valid).parseXML(new MCRByteContent(xml));
-    }
 
     /**
      * Removes characters that are illegal in XML text nodes or attribute

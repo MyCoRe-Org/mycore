@@ -23,14 +23,15 @@
 
 package org.mycore.datamodel.ifs;
 
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.HashSet;
+import java.util.Objects;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
-import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xml.MCRURIResolver;
@@ -112,7 +113,9 @@ public class MCRFileContentTypeFactory {
      *             if no such file content type is known in the system
      */
     public static MCRFileContentType getType(String ID) throws MCRConfigurationException {
-        MCRArgumentChecker.ensureNotEmpty(ID, "ID");
+        if (Objects.requireNonNull(ID, "ID" + " is null").trim().isEmpty()) {
+            throw new MCRUsageException("ID" + " is an empty String");
+        }
 
         if (typesTable.containsKey(ID)) {
             return (MCRFileContentType) typesTable.get(ID);
@@ -152,7 +155,9 @@ public class MCRFileContentTypeFactory {
      * @return true if content type is available, else false
      */
     public static boolean isTypeAvailable(String ID) throws MCRConfigurationException {
-        MCRArgumentChecker.ensureNotEmpty(ID, "ID");
+        if (Objects.requireNonNull(ID, "ID" + " is null").trim().isEmpty()) {
+            throw new MCRUsageException("ID" + " is an empty String");
+        }
 
         return typesTable.containsKey(ID);
     }

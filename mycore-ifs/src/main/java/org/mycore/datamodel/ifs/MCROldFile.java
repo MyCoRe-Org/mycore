@@ -36,8 +36,8 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
 
-import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRUsageException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 
@@ -104,7 +104,9 @@ public class MCROldFile implements MCRFileReader {
      *            the non-empty owner ID
      */
     public void setOwnerID(String ID) {
-        MCRArgumentChecker.ensureNotEmpty(ID, "ID");
+        if (Objects.requireNonNull(ID, "ID" + " is null").trim().isEmpty()) {
+            throw new MCRUsageException("ID" + " is an empty String");
+        }
         ownerID = ID;
     }
 
@@ -125,7 +127,9 @@ public class MCROldFile implements MCRFileReader {
      * Sets the relative path of this file
      */
     public void setPath(String path) {
-        MCRArgumentChecker.ensureNotEmpty(path, "path");
+        if (Objects.requireNonNull(path, "path" + " is null").trim().isEmpty()) {
+            throw new MCRUsageException("path" + " is an empty String");
+        }
         this.path = path;
     }
 
@@ -179,7 +183,9 @@ public class MCROldFile implements MCRFileReader {
      * Sets the file size
      */
     public void setSize(long size) {
-        MCRArgumentChecker.ensureNotNegative(size, "size");
+        if ((double) size < 0) {
+            throw new MCRUsageException("size" + " is negative");
+        }
         this.size = size;
     }
 
@@ -232,7 +238,9 @@ public class MCROldFile implements MCRFileReader {
      * Sets the MD5 checksum for this file
      */
     public void setChecksum(String md5) {
-        MCRArgumentChecker.ensureNotEmpty(md5, "md5 checksum");
+        if (Objects.requireNonNull(md5, "md5 checksum" + " is null").trim().isEmpty()) {
+            throw new MCRUsageException("md5 checksum" + " is an empty String");
+        }
         this.md5 = md5;
     }
 
@@ -348,9 +356,9 @@ public class MCROldFile implements MCRFileReader {
     /**
      * Writes the content of this file to a target output stream
      */
-    public void getContentTo(OutputStream target) throws MCRPersistenceException {
+    public void getContentTo(OutputStream target) throws MCRPersistenceException, IOException {
         if (storageID.length() != 0) {
-            getContentStore().retrieveContent(this, target);
+            getContentStore().doRetrieveMCRContent(this).sendTo(target);
         }
     }
 
@@ -417,7 +425,9 @@ public class MCROldFile implements MCRFileReader {
      * Sets the ID of the content type of this file
      */
     public void setContentTypeID(String ID) {
-        MCRArgumentChecker.ensureNotEmpty(ID, "content type ID");
+        if (Objects.requireNonNull(ID, "content type ID" + " is null").trim().isEmpty()) {
+            throw new MCRUsageException("content type ID" + " is an empty String");
+        }
         contentTypeID = ID;
     }
 

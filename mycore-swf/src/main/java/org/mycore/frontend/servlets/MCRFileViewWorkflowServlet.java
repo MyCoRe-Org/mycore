@@ -32,9 +32,9 @@ import java.io.OutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.streams.MCRHeaderInputStream;
 import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
@@ -137,7 +137,7 @@ public class MCRFileViewWorkflowServlet extends MCRServlet {
                 job.getResponse().setContentType(mime);
                 job.getResponse().setContentLength((int) (in.length()));
 
-                MCRUtils.copyStream(his, out);
+                IOUtils.copy(his, out);
             } finally {
                 out.close();
                 his.close();

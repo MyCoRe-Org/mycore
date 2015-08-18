@@ -88,10 +88,6 @@ public class MCRSession implements Cloneable {
     /** The unique ID of this session */
     private String sessionID = null;
 
-    private String FullName = null;
-
-    private String CurrentDocumentID = null;
-
     private String ip = null;
 
     private long loginTime, lastAccessTime, thisAccessTime, createTime;
@@ -175,15 +171,6 @@ public class MCRSession implements Cloneable {
         return mapEntries;
     }
 
-    /**
-     * returns the current user ID
-     * 
-     * @deprecated use {@link #getUserInformation()}.getUserID() instead;
-     */
-    public final String getCurrentUserID() {
-        return getUserInformation().getUserID();
-    }
-
     /** returns the current language */
     public final String getCurrentLanguage() {
         return language;
@@ -192,42 +179,6 @@ public class MCRSession implements Cloneable {
     /** sets the current language */
     public final void setCurrentLanguage(String language) {
         this.language = language;
-    }
-
-    /**
-     * returns the current document ID
-     * 
-     * @deprecated without replacement
-     */
-    public final String getCurrentDocumentID() {
-        return CurrentDocumentID;
-    }
-
-    /**
-     * returns the current document ID
-     * 
-     * @deprecated without replacement
-     */
-    public final String getCurrentUserName() {
-        return FullName;
-    }
-
-    /**
-     * sets the current user fullname
-     * 
-     * @deprecated without replacement
-     */
-    public final void setCurrentUserName(String userName) {
-        FullName = userName;
-    }
-
-    /**
-     * sets the current document ID
-     * 
-     * @deprecated without replacement
-     */
-    public final void setCurrentDocumentID(String DocumentID) {
-        CurrentDocumentID = DocumentID;
     }
 
     /** Write data to the logger for debugging purposes */
@@ -252,19 +203,6 @@ public class MCRSession implements Cloneable {
     public void deleteObject(Object key) {
         mapChanged = true;
         map.remove(key);
-    }
-
-    /**
-     * Get the ip value to the local IP
-     * 
-     * @deprecated without replacement
-     */
-    public static String getLocalIP() {
-        try {
-            return java.net.InetAddress.getLocalHost().getHostAddress();
-        } catch (java.net.UnknownHostException ignored) {
-            return "127.0.0.1";
-        }
     }
 
     /** Get the current ip value */

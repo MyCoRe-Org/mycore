@@ -17,8 +17,8 @@ import java.util.Objects;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.streams.MCRDevNull;
 import org.mycore.common.content.streams.MCRMD5InputStream;
 
@@ -48,7 +48,9 @@ public class MCRFileImportExport {
      * @return a new MCRDirectory that will contain all imported files and directories as instances of MCRFilesystemNode children.
      */
     public static MCRDirectory importFiles(File local, String ownerID) {
-        MCRArgumentChecker.ensureNotEmpty(ownerID, "owner ID");
+        if (Objects.requireNonNull(ownerID, "owner ID" + " is null").trim().isEmpty()) {
+            throw new MCRUsageException("owner ID" + " is an empty String");
+        }
 
         // Create new parent directory
         MCRDirectory dir = new MCRDirectory(ownerID);
@@ -88,7 +90,9 @@ public class MCRFileImportExport {
      * @return a new MCRDirectory that will contain all imported files and directories as instances of MCRFilesystemNode children.
      */
     public static MCRDirectory addFiles(File local, String ownerID) throws IOException {
-        MCRArgumentChecker.ensureNotEmpty(ownerID, "owner ID");
+        if (Objects.requireNonNull(ownerID, "owner ID" + " is null").trim().isEmpty()) {
+            throw new MCRUsageException("owner ID" + " is an empty String");
+        }
 
         // Get the existing parent directory
         MCRDirectory dir = MCRDirectory.getRootDirectory(ownerID);
@@ -115,8 +119,12 @@ public class MCRFileImportExport {
         String path = local.getPath();
         String name = local.getName();
 
-        MCRArgumentChecker.ensureIsTrue(local.exists(), "Not found: " + path);
-        MCRArgumentChecker.ensureIsTrue(local.canRead(), "Not readable: " + path);
+        if (!local.exists()) {
+            throw new MCRUsageException("Not found: " + path);
+        }
+        if (!local.canRead()) {
+            throw new MCRUsageException("Not readable: " + path);
+        }
 
         if (local.isFile()) // Import a local file
         {
@@ -205,7 +213,9 @@ public class MCRFileImportExport {
         Objects.requireNonNull(local, "local file is null");
 
         String path = local.getPath();
-        MCRArgumentChecker.ensureIsTrue(local.canWrite(), "Not writeable: " + path);
+        if (!local.canWrite()) {
+            throw new MCRUsageException("Not writeable: " + path);
+        }
 
         // If local is file, use its parent instead
         if (local.isFile()) {

@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRJSONUtils;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.services.i18n.MCRTranslation;
 
 public class MCRLocaleServlet extends HttpServlet {
@@ -59,7 +60,7 @@ public class MCRLocaleServlet extends HttpServlet {
             returnValue = handleGetI18n(key, lang);
             resp.setContentType("text/plain");
         }
-        MCRServlet.writeCacheHeaders(resp, cacheTime, startUpTime, true);
+        MCRFrontendUtil.writeCacheHeaders(resp, (long) cacheTime, startUpTime, true);
 
         resp.setCharacterEncoding(CHARSET);
         resp.getWriter().print(returnValue);

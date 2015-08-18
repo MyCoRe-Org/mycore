@@ -28,8 +28,6 @@ import static org.mycore.frontend.MCRFrontendUtil.BASE_URL_ATTRIBUTE;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
@@ -57,7 +55,6 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDirSetup;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRLayoutService;
-import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.common.xsl.MCRErrorListener;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -405,7 +402,6 @@ public class MCRServlet extends HttpServlet {
     /**
      * Returns true if this servlet allows Cross-domain requests. The default value defined by {@link MCRServlet} is
      * <code>false</code>.
-     * 
      */
     protected boolean allowCrossDomainRequests() {
         return false;
@@ -489,7 +485,9 @@ public class MCRServlet extends HttpServlet {
             root.addContent(exception);
 
             if (ex instanceof MCRException) {
-                ex = ((MCRException) ex).getException();
+                if (ex.getCause() instanceof Exception) {
+                    ex = (Exception) ex.getCause();
+                }
             } else {
                 ex = null;
             }
@@ -552,7 +550,8 @@ public class MCRServlet extends HttpServlet {
         MCRActiveLinkException activeLinks) throws IOException, TransformerException, SAXException {
         StringBuilder msgBuf = new StringBuilder(msg);
         msgBuf
-            .append("\nThere are links active preventing the commit of work, see error message for details. The following links where affected:");
+            .append(
+                "\nThere are links active preventing the commit of work, see error message for details. The following links where affected:");
         Map<String, Collection<String>> links = activeLinks.getActiveLinks();
         for (Map.Entry<String, Collection<String>> entry : links.entrySet()) {
             for (String source : entry.getValue()) {
@@ -573,7 +572,7 @@ public class MCRServlet extends HttpServlet {
             // we can cache every (local) request
             long lastModified = MCRSessionMgr.getCurrentSession().getLoginTime() > MCRConfiguration.instance()
                 .getSystemLastModified() ? MCRSessionMgr.getCurrentSession().getLoginTime() : MCRConfiguration
-                .instance().getSystemLastModified();
+                    .instance().getSystemLastModified();
             LOGGER.info("LastModified: " + lastModified);
             return lastModified;
         }
@@ -582,21 +581,6 @@ public class MCRServlet extends HttpServlet {
 
     public static String getProperty(HttpServletRequest request, String name) {
         return MCRFrontendUtil.getProperty(request, name);
-    }
-
-    /**
-     * returns a translated error message for the current Servlet. I18N keys are of form
-     * 'error.'{SimpleServletClassName}'.'{subIdentifier}
-     * 
-     * @param subIdentifier
-     *            last part of I18n key
-     * @param args
-     *            any arguments that should be passed to {@link MCRTranslation#translate(String, Object...)}
-     * @deprecated use {@link MCRServlet#getErrorI18N(String, String, Object...)} instead
-     */
-    protected String getErrorI18N(String subIdentifier, Object... args) {
-        String key = MessageFormat.format("error.{1}.{2}", getClass().getSimpleName(), subIdentifier);
-        return MCRTranslation.translate(key, args);
     }
 
     /**
@@ -616,21 +600,7 @@ public class MCRServlet extends HttpServlet {
     }
 
     /**
-     * Cache the response.
-     * 
-     * @param response response to cache
-     * @param CACHE_TIME time to cache
-     * @deprecated use {@link MCRFrontendUtil#writeCacheHeaders(HttpServletResponse, long, long, boolean)}
-     */
-    @Deprecated
-    protected static void writeCacheHeaders(HttpServletResponse response, long CACHE_TIME, long lastModified,
-        boolean useExpire) {
-        MCRFrontendUtil.writeCacheHeaders(response, CACHE_TIME, lastModified, useExpire);
-    }
-
-    /**
      * Returns the referer of the given request.
-     * 
      */
     protected URL getReferer(HttpServletRequest request) {
         String referer;
@@ -648,29 +618,8 @@ public class MCRServlet extends HttpServlet {
     }
 
     /**
-     * This method encodes the url. After the encoding the url is redirectable.
-     * 
-     * @param url
-     *            the source URL
-     * @deprecated use {@link MCRXMLFunctions#encodeURIPath(String)},
-     *             {@link MCRXMLFunctions#normalizeAbsoluteURL(String)} or {@link URI} directly
-     */
-    public static String encodeURL(String url) throws URISyntaxException {
-        try {
-            return MCRXMLFunctions.normalizeAbsoluteURL(url);
-        } catch (MalformedURLException | URISyntaxException e) {
-            try {
-                return MCRXMLFunctions.encodeURIPath(url);
-            } catch (URISyntaxException e2) {
-                throw e2;
-            }
-        }
-    }
-
-    /**
      * If a referrer is available this method redirects to the url given by the referrer otherwise method redirects to
      * the application base url.
-     * 
      */
     protected void toReferrer(HttpServletRequest request, HttpServletResponse response) throws IOException {
         URL referrer = getReferer(request);
@@ -685,7 +634,6 @@ public class MCRServlet extends HttpServlet {
     /**
      * If a referrer is available this method redirects to the url given by the referrer otherwise method redirects to
      * the alternative-url.
-     * 
      */
     protected void toReferrer(HttpServletRequest request, HttpServletResponse response, String altURL)
         throws IOException {
