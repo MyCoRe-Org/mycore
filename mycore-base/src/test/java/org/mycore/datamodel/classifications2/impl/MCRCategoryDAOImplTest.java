@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ** M y C o R e **
@@ -491,8 +491,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
 
     /**
      * tests relink child to grantparent and removal of parent.
-     * 
-     * @throws URISyntaxException
+     *
      */
     @Test
     public void replaceCategoryShiftCase() {
@@ -522,8 +521,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
 
     /**
      * tests top category child to new parent
-     * 
-     * @throws URISyntaxException
+     *
      */
     public void testReplaceCategoryNewParent() {
         addWorldClassification();

@@ -94,7 +94,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     }
 
     /**
-     * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#deleteLink(java.lang.String)}.
+     * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#deleteLink(MCRCategLinkReference)}.
      */
     @Test
     public void deleteLink() {
@@ -118,7 +118,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     }
 
     /**
-     * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#getLinksFromReference(java.lang.String)}.
+     * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#getLinksFromReference(MCRCategLinkReference)}.
      */
     @Test
     public void getLinksFromObject() {
@@ -170,7 +170,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     }
 
     /**
-     * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#countLinks(java.util.Collection)}.
+     * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#countLinks(MCRCategory, boolean)}.
      */
     @Test
     public void countLinks() {
@@ -190,7 +190,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     }
 
     /**
-     * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#countLinksForType(Collection, String)}.
+     * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#countLinksForType(MCRCategory, String, boolean)}.
      */
     @Test
     public void countLinksForType() {

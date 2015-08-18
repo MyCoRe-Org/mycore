@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * $Revision: 13085 $ $Date: 19.03.2010 23:42:07 $
  *
  * This file is part of ***  M y C o R e  ***
@@ -71,7 +71,7 @@ public class MCRObjectMetadataTest extends MCRTestCase {
     }
 
     /**
-     * Test method for {@link org.mycore.datamodel.metadata.MCRObjectMetadata#getMetadataTagName(int)}.
+     * Test method for {@link org.mycore.datamodel.metadata.MCRObjectMetadata#getMetadataElement(int)}.
      */
     @Test
     public void getMetadataTagName() {
@@ -162,7 +162,7 @@ public class MCRObjectMetadataTest extends MCRTestCase {
     }
 
     /**
-     * Test method for {@link org.mycore.datamodel.metadata.MCRObjectMetadata#setMetadataElement(org.mycore.datamodel.metadata.MCRMetaElement, java.lang.String)}.
+     * Test method for org.mycore.datamodel.metadata.MCRObjectMetadata#setMetadataElement(org.mycore.datamodel.metadata.MCRMetaElement, java.lang.String) (not implemented yet).
      */
     @Test
     @Ignore("not implemented")

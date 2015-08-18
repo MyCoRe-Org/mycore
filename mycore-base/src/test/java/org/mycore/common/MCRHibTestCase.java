@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * $Revision$ $Date$
  *
  * This file is part of ** M y C o R e **
@@ -42,9 +42,9 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 
 /**
  * @author Thomas Scheffler (yagee)
- * 
+ *
  *         Need to insert some things here
- * 
+ *
  */
 public abstract class MCRHibTestCase extends MCRTestCase {
 
@@ -109,8 +109,8 @@ public abstract class MCRHibTestCase extends MCRTestCase {
     }
 
     /**
-     * @throws HibernateExceptionException
-     * 
+     * @throws HibernateException
+     *
      */
     protected void endTransaction() throws HibernateException {
         if (tx != null && tx.isActive()) {

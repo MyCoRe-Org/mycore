@@ -56,7 +56,7 @@ public class MCRTestCase {
      * initializes MCRConfiguration with an empty property file. This can be used to test MyCoRe classes without any
      * propties set, using default. You may want to set Properties per TestCase with the set() method of
      * <code>MCRConfiguration</code>
-     * 
+     *
      * @see MCRConfiguration#set(String, String)
      */
     @Before
@@ -109,10 +109,10 @@ public class MCRTestCase {
 
     /**
      * Creates a temporary properties file if the system variable MCR.Configuration.File is not set.
-     * 
+     *
      * @throws IOException
      *             Thrown if the creation of the temporary properties file failed.
-     * @author Marcel Heusinger <marcel.heusinger[at]uni-due.de>
+     * @author Marcel Heusinger &lt;marcel.heusinger[at]uni-due.de&gt;
      */
     protected void initProperties() throws IOException {
         String currentComponent = getCurrentComponentName();
@@ -162,7 +162,7 @@ public class MCRTestCase {
 
     /**
      * Retrieve the resource file<br> Example: /Classname/recource.file
-     * 
+     *
      * @param fileName
      * @return the resource file as InputStream
      */
@@ -174,7 +174,7 @@ public class MCRTestCase {
 
     /**
      * Retrieve the resource file as URI. Example: /Classname/recource.file
-     * 
+     *
      * @param fileName
      * @return the resource file as URL
      */

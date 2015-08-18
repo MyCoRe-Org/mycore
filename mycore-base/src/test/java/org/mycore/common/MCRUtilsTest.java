@@ -25,8 +25,6 @@ package org.mycore.common;
 
 import static org.junit.Assert.*;
 
-import java.security.MessageDigest;
-import java.security.MessageDigestSpi;
 import java.security.NoSuchAlgorithmException;
 
 import org.apache.log4j.Logger;
@@ -45,7 +43,7 @@ public class MCRUtilsTest extends MCRTestCase {
     private static final String TEST_MD5 = "ed076287532e86365e841e92bfc50d8c";
 
     /**
-     * Test method for {@link org.mycore.common.MCRUtils#asSHA1String(java.lang.String)}.
+     * Test method for {@link org.mycore.common.MCRUtils#asSHA1String(int, byte[], String)}.
      */
     @Test
     public final void testAsSHA1String() {
@@ -59,7 +57,7 @@ public class MCRUtilsTest extends MCRTestCase {
     }
 
     /**
-     * Test method for {@link org.mycore.common.MCRUtils#asMD5String(java.lang.String)}.
+     * Test method for {@link org.mycore.common.MCRUtils#asMD5String(int, byte[], String)}.
      */
     @Test
     public final void testAsMD5String() {
