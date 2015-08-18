@@ -184,6 +184,7 @@
           <plugin>
             <artifactId>maven-javadoc-plugin</artifactId>
             <configuration>
+              <quiet>true</quiet>
               <source>${java.target.version}</source>
               <groups>
                 <group>
@@ -303,6 +304,8 @@
               <reportSet>
                 <id>aggregate</id>
                 <configuration>
+                  <!-- FIX for remote-adapter -->
+                  <additionalparam>-Xdoclint:all -Xdoclint:-syntax -Xdoclint:-reference</additionalparam>
                 </configuration>
                 <reports>
                   <report>aggregate</report>
@@ -414,6 +417,7 @@
         <plugin>
           <artifactId>maven-javadoc-plugin</artifactId>
           <configuration>
+            <quiet>true</quiet>
             <source>${java.target.version}</source>
             <groups>
               <group>
