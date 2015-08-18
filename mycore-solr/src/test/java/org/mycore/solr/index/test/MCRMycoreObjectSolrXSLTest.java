@@ -19,11 +19,12 @@ import javax.xml.transform.stream.StreamSource;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.jdom2.filter.Filters;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMResult;
 import org.jdom2.transform.JDOMSource;
-import org.jdom2.xpath.XPath;
+import org.jdom2.xpath.XPathFactory;
 import org.junit.Test;
 
 public class MCRMycoreObjectSolrXSLTest {
@@ -40,10 +41,10 @@ public class MCRMycoreObjectSolrXSLTest {
         //        XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
         //        xmlOutputter.output(resultXML, System.out);
 
-        List mycoreojectTags = XPath.selectNodes(resultXML, "/solr-document-container/source/mycoreobject");
+        List<Element> mycoreojectTags = XPathFactory.instance().compile("/solr-document-container/source/mycoreobject", Filters.element()).evaluate(resultXML);
         assertEquals(1, mycoreojectTags.size());
 
-        List userFieldTags = XPath.selectNodes(resultXML, "/solr-document-container/source/user");
+        List<Element> userFieldTags = XPathFactory.instance().compile("/solr-document-container/source/user", Filters.element()).evaluate(resultXML);
         assertEquals(1, userFieldTags.size());
     }
 
@@ -59,10 +60,10 @@ public class MCRMycoreObjectSolrXSLTest {
         //        XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
         //        xmlOutputter.output(resultXML, System.out);
 
-        List mycoreojectTags = XPath.selectNodes(resultXML, "/solr-document-container/source/mycoreobject");
+        List<Element> mycoreojectTags = XPathFactory.instance().compile("/solr-document-container/source/mycoreobject", Filters.element()).evaluate(resultXML);
         assertEquals(3, mycoreojectTags.size());
 
-        List userFieldTags = XPath.selectNodes(resultXML, "/solr-document-container/source/user");
+        List<Element> userFieldTags = XPathFactory.instance().compile("/solr-document-container/source/user", Filters.element()).evaluate(resultXML);
         assertEquals(3, userFieldTags.size());
     }
 
@@ -79,7 +80,7 @@ public class MCRMycoreObjectSolrXSLTest {
         XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
         xmlOutputter.output(resultXML, System.out);
 
-        List mycoreojectTags = XPath.selectNodes(resultXML, "/solr-document-container/source/mycorederivate");
+        List<Element> mycoreojectTags = XPathFactory.instance().compile("/solr-document-container/source/mycorederivate", Filters.element()).evaluate(resultXML);
         assertEquals(1, mycoreojectTags.size());
     }
 

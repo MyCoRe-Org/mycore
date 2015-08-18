@@ -130,7 +130,7 @@ public class MCRSolrCore {
         if (client != null) {
             LOGGER.info("Shutting down solr client: " + client);
             client.commit(false, false);
-            client.shutdown();
+            client.close();
         }
     }
 
