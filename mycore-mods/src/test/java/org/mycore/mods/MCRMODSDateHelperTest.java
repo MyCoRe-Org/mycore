@@ -25,6 +25,9 @@ package org.mycore.mods;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.time.Year;
+import java.time.ZoneId;
+import java.time.temporal.ChronoField;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -53,17 +56,16 @@ public class MCRMODSDateHelperTest extends MCRTestCase {
     public void testISO8601yearOnly() {
         Element element = new Element("date");
 
-        Date date = new Date();
-        int fullYear = 1900 + date.getYear();
+        int fullYear = Year.now().get(ChronoField.YEAR);
 
-        MCRMODSDateHelper.setDate(element, date, MCRMODSDateFormat.iso8601_4);
+        MCRMODSDateHelper.setDate(element, new Date(), MCRMODSDateFormat.iso8601_4);
 
-        String year = element.getText();
-        assertEquals(fullYear, Integer.parseInt(year));
+        int year = Integer.parseInt(element.getText());
+        assertEquals(fullYear, year);
         assertEquals("iso8601", element.getAttributeValue("encoding"));
 
         Date parsed = MCRMODSDateHelper.getDate(element);
-        assertEquals(date.getYear(), parsed.getYear());
+        assertEquals(year, parsed.toInstant().atZone(ZoneId.systemDefault()).get(ChronoField.YEAR));
 
         element.removeAttribute("encoding");
         assertEquals(fullYear, MCRMODSDateHelper.getCalendar(element).get(Calendar.YEAR));
