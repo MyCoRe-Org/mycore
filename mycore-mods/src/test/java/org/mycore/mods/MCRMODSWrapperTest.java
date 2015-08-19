@@ -34,7 +34,9 @@ import java.util.Map;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.jdom2.xpath.XPath;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
@@ -50,9 +52,6 @@ public class MCRMODSWrapperTest extends MCRTestCase {
 
     /**
      * Test method for {@link org.mycore.mods.MCRMODSWrapper#wrapMODSDocument(org.jdom2.Element, java.lang.String)}.
-     * @throws URISyntaxException 
-     * @throws SAXParseException 
-     * @throws JDOMException 
      */
     @Test
     public void testWrapMODSDocument() throws SAXParseException, URISyntaxException, JDOMException, IOException {
@@ -63,9 +62,8 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         //check load from XML throws no exception
         MCRObject mcrObj2 = new MCRObject(mcrObjXml);
         mcrObjXml = mcrObj2.createXML();
-        XPath xpathCheck = XPath.newInstance("//mods:mods");
-        xpathCheck.addNamespace(MCRConstants.MODS_NAMESPACE);
-        assertEquals("Did not find mods data", 1, xpathCheck.selectNodes(mcrObjXml).size());
+        XPathExpression<Element> xpathCheck = XPathFactory.instance().compile("//mods:mods", Filters.element(), null, MCRConstants.MODS_NAMESPACE);
+        assertEquals("Did not find mods data", 1, xpathCheck.evaluate(mcrObjXml).size());
     }
 
     private Document loadMODSDocument() throws SAXParseException, IOException {
@@ -81,9 +79,8 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         wrapper.setID("JUnit", 4711);
         wrapper.setMODS(mods);
         Document mcrObjXml = wrapper.getMCRObject().createXML();
-        XPath xpathCheck = XPath.newInstance("//mods:mods");
-        xpathCheck.addNamespace(MCRConstants.MODS_NAMESPACE);
-        assertEquals("Did not find mods data", 1, xpathCheck.selectNodes(mcrObjXml).size());
+        XPathExpression<Element> xpathCheck = XPathFactory.instance().compile("//mods:mods", Filters.element(), null, MCRConstants.MODS_NAMESPACE);
+        assertEquals("Did not find mods data", 1, xpathCheck.evaluate(mcrObjXml).size());
     }
 
     @Test
