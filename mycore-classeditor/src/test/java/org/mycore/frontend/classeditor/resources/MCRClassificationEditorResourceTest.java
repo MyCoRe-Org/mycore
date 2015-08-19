@@ -25,7 +25,6 @@ import org.junit.Test;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.common.MCRJSONManager;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.config.MCRConfigurationLoader;
 import org.mycore.common.config.MCRConfigurationLoaderFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -252,8 +251,7 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyResourceTest {
         String serializedRubric = gson.toJson(category);
         ClientResponse response = resource().path("/classifications").type(MediaType.APPLICATION_JSON)
             .post(ClientResponse.class, serializedRubric);
-        assertEquals("could not create rubric: ", Status.CREATED.getStatusCode(), response.getClientResponseStatus()
-            .getStatusCode());
+        assertEquals("could not create rubric: ", Status.CREATED.getStatusCode(), response.getStatus());
         String responseStr = resource().path("/classifications").type(MediaType.APPLICATION_JSON).get(String.class);
         List<MCRCategory> rootCategories = MCRCategoryDAOFactory.getInstance().getRootCategories();
         String rootsCategsStr = gson.toJson(rootCategories);
@@ -311,16 +309,14 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyResourceTest {
     private URI assertCreateRubric(String serializedRubric) {
         ClientResponse response = resource().path("/classifications").type(MediaType.APPLICATION_JSON)
             .post(ClientResponse.class, serializedRubric);
-        assertEquals("could not create rubric: ", Status.CREATED.getStatusCode(), response.getClientResponseStatus()
-            .getStatusCode());
+        assertEquals("could not create rubric: ", Status.CREATED.getStatusCode(), response.getStatus());
         return response.getLocation();
     }
 
     private URI assertCreateSubRubric(URI parentURI) {
         ClientResponse response = resource().path("/classifications").type(MediaType.APPLICATION_JSON)
             .post(ClientResponse.class, subRubricStr(parentURI));
-        assertEquals("could not create sub rubric: ", Status.CREATED.getStatusCode(), response
-            .getClientResponseStatus().getStatusCode());
+        assertEquals("could not create sub rubric: ", Status.CREATED.getStatusCode(), response.getStatus());
         return response.getLocation();
     }
 
