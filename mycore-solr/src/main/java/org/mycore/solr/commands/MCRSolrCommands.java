@@ -85,7 +85,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(
-        syntax = "delete index part for type {0}",
+        syntax = "delete from solr index for type {0}",
         help = "Deletes an existing index from solr but only for the given object type.", order = 100)
     public static void dropIndexByType(String type) throws Exception {
         MCRSolrIndexer.dropIndexByType(type);
