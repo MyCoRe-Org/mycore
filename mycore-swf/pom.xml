@@ -11,6 +11,7 @@
   <name>MyCoRe Simple Workflow</name>
   <properties>
     <manifest.priority>40</manifest.priority>
+    <maven.compiler.arg />
   </properties>
   <dependencies>
     <dependency>

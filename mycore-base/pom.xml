@@ -10,6 +10,7 @@
   <artifactId>mycore-base</artifactId>
   <name>MyCoRe Base Components</name>
   <properties>
+    <maven.compiler.arg />
   </properties>
   <build>
     <resources>

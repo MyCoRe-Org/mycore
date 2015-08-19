@@ -19,6 +19,7 @@
   <properties>
     <java.target.version>1.8</java.target.version>
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
+    <maven.compiler.arg>-Werror</maven.compiler.arg>
     <uniqueVersion>false</uniqueVersion>
     <hibernate.version>4.3.8.Final</hibernate.version>
     <httpcomponents.version>4.5</httpcomponents.version>
@@ -124,6 +125,14 @@
                 </configuration>
               </execution>
             </executions>
+          </plugin>
+          <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <compilerArgs>
+                <arg>${maven.compiler.arg}</arg>
+              </compilerArgs>
+            </configuration>
           </plugin>
           <plugin>
             <artifactId>maven-pmd-plugin</artifactId>

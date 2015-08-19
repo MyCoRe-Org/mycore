@@ -11,6 +11,7 @@
   <name>MyCoRe SWORD Interface</name>
   <properties>
     <forbiddenapis.skip>true</forbiddenapis.skip>
+    <maven.compiler.arg />
   </properties>
   <dependencies>
     <dependency>

@@ -10,6 +10,9 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>iview2-tile-client</artifactId>
   <name>MyCoRe IView2 Image Tile Client</name>
+  <properties>
+    <maven.compiler.arg />
+  </properties>
   <build>
     <plugins>
       <plugin>
