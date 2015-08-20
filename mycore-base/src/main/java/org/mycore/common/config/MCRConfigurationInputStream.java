@@ -34,10 +34,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedList;
-import java.util.Locale;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRURLContent;
@@ -98,7 +97,7 @@ public class MCRConfigurationInputStream extends InputStream {
         File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
         InputStream initStream = null;
         if (configurationDirectory != null) {
-            logInfo("Current configuration directory: " + configurationDirectory.getAbsolutePath());
+            LogManager.getLogger().info("Current configuration directory: " + configurationDirectory.getAbsolutePath());
             //set MCR.basedir, is normally overwritten later
             if (configurationDirectory.isDirectory()) {
                 initStream = getBaseDirInputStream(configurationDirectory);
@@ -141,7 +140,7 @@ public class MCRConfigurationInputStream extends InputStream {
         File localProperties = MCRConfigurationDir.getConfigFile(filename);
         if (localProperties != null && localProperties.canRead()) {
             empty = false;
-            logInfo("Loading additional properties from " + localProperties.getAbsolutePath());
+            LogManager.getLogger().info("Loading additional properties from " + localProperties.getAbsolutePath());
             cList.add(new FileInputStream(localProperties));
             cList.add(new ByteArrayInputStream(lbr));
         }
@@ -231,14 +230,6 @@ public class MCRConfigurationInputStream extends InputStream {
         do {
             nextStream();
         } while (in != null);
-    }
-
-    private static void logInfo(String msg) {
-        if (MCRConfiguration.isLog4JEnabled()) {
-            Logger.getLogger(MCRConfigurationInputStream.class).info(msg);
-        } else {
-            System.out.printf(Locale.ROOT, "INFO: %s\n", msg);
-        }
     }
 
 }

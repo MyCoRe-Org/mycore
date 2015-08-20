@@ -25,12 +25,10 @@ package org.mycore.common.config;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Locale;
@@ -38,16 +36,21 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.status.StatusLogger;
 import org.mycore.common.events.MCRStartupHandler;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
 
 /**
  * Called by {@link MCRStartupHandler} on start up to setup {@link MCRConfiguration}.
+ * 
  * @author Thomas Scheffler (yagee)
  * @since 2013.12
  */
 public class MCRConfigurationDirSetup implements AutoExecutable {
+
+    private static final StatusLogger LOGGER = StatusLogger.getLogger();
 
     /* (non-Javadoc)
      * @see org.mycore.common.events.MCRStartupHandler.AutoExecutable#getName()
@@ -75,6 +78,16 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
         MCRConfigurationLoader configurationLoader = MCRConfigurationLoaderFactory.getConfigurationLoader();
         Map<String, String> properties = configurationLoader.load();
         MCRConfiguration.instance().initialize(properties, true);
+        URL log4j2ConfigURL = MCRConfigurationDir.getConfigResource("log4j2.xml");
+        if (log4j2ConfigURL != null) {
+            System.out.printf(Locale.ROOT, "Using Log4J2 configuration at: %s\n", log4j2ConfigURL);
+            LoggerContext logCtx = (LoggerContext) LogManager.getContext(false);
+            try {
+                logCtx.setConfigLocation(log4j2ConfigURL.toURI());
+            } catch (URISyntaxException e) {
+                LOGGER.error("Failed to reconfigure logging", e);
+            }
+        }
     }
 
     private void loadExternalLibs() {
@@ -88,55 +101,20 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
                     Method addUrlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
                     addUrlMethod.setAccessible(true);
                     for (File jarFile : listFiles) {
-                        logInfo("Adding to CLASSPATH: " + jarFile);
+                        LOGGER.info("Adding to CLASSPATH: " + jarFile);
                         try {
                             addUrlMethod.invoke(classLoader, jarFile.toURI().toURL());
                         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
                             | MalformedURLException e) {
-                            logError("Could not add " + jarFile + " to current classloader.", e);
+                            LogManager.getLogger().error("Could not add " + jarFile + " to current classloader.", e);
                             return;
                         }
                     }
                 } catch (NoSuchMethodException | SecurityException e) {
-                    logWarn(classLoaderClass + " does not support adding additional JARs at runtime", e);
+                    LogManager.getLogger(MCRConfigurationInputStream.class)
+                        .warn(classLoaderClass + " does not support adding additional JARs at runtime", e);
                 }
             }
-        }
-    }
-
-    private static void logError(String msg, Throwable e) {
-        if (MCRConfiguration.isLog4JEnabled()) {
-            Logger.getLogger(MCRConfigurationInputStream.class).error(msg, e);
-        } else {
-            System.out.printf(Locale.ROOT,"ERROR: %s\n", msg + toString(e));
-        }
-    }
-
-    private static String toString(Throwable e) {
-        try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw)) {
-            pw.println();
-            e.printStackTrace(pw);
-            pw.flush();
-            return sw.toString();
-        } catch (IOException e1) {
-            e1.printStackTrace();
-            return "";
-        }
-    }
-
-    private static void logWarn(String msg, Throwable e) {
-        if (MCRConfiguration.isLog4JEnabled()) {
-            Logger.getLogger(MCRConfigurationInputStream.class).warn(msg, e);
-        } else {
-            System.err.printf(Locale.ROOT,"WARN: %s\n", msg + toString(e));
-        }
-    }
-
-    private static void logInfo(String msg) {
-        if (MCRConfiguration.isLog4JEnabled()) {
-            Logger.getLogger(MCRConfigurationInputStream.class).info(msg);
-        } else {
-            System.out.printf(Locale.ROOT, "INFO: %s\n", msg);
         }
     }
 }

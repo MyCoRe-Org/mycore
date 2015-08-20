@@ -30,7 +30,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.jar.Manifest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.status.StatusLogger;
 import org.mycore.common.MCRException;
 
 /**
@@ -44,6 +46,8 @@ import org.mycore.common.MCRException;
  * @see MCRRuntimeComponentDetector
  */
 public class MCRComponent implements Comparable<MCRComponent> {
+
+    private static final Logger LOGGER = StatusLogger.getLogger();
 
     private static final String ATT_PRIORITY = "Priority";
 
@@ -98,16 +102,16 @@ public class MCRComponent implements Comparable<MCRComponent> {
         this.artifactId = artifactId;
         this.manifest = manifest;
         buildSortCriteria();
-        logdebug(artifactId + " is of type " + type + " and named " + getName() + ": " + jarFile);
+        LOGGER.debug(artifactId + " is of type " + type + " and named " + getName() + ": " + jarFile);
     }
 
     private void buildSortCriteria() {
         String priorityAtt = manifest.getMainAttributes().getValue(ATT_PRIORITY);
         if (priorityAtt == null) {
             priorityAtt = DEFAULT_PRIORITY;
-            logdebug(artifactId + " has DEFAULT priority " + priorityAtt);
+            LOGGER.debug(artifactId + " has DEFAULT priority " + priorityAtt);
         } else {
-            logdebug(artifactId + " has priority " + priorityAtt);
+            LOGGER.debug(artifactId + " has priority " + priorityAtt);
         }
         int priority = Integer.parseInt(priorityAtt);
         if (priority > 99 || priority < 0) {
@@ -131,20 +135,6 @@ public class MCRComponent implements Comparable<MCRComponent> {
         this.sortCriteria = PRIORITY_FORMAT.format(priority) + getName();
     }
 
-    private static void logdebug(String msg) {
-        if (MCRConfiguration.isLog4JEnabled()) {
-            Logger.getLogger(MCRComponent.class).debug(msg);
-        }
-    }
-
-    private static void loginfo(String msg) {
-        if (MCRConfiguration.isLog4JEnabled()) {
-            Logger.getLogger(MCRComponent.class).info(msg);
-        } else {
-            System.out.printf(Locale.ROOT, "INFO: %s\n", msg);
-        }
-    }
-
     public InputStream getConfigFileStream(String filename) {
         String resourceBase = getResourceBase();
         if (resourceBase == null) {
@@ -153,7 +143,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
         String resourceName = resourceBase + filename;
         InputStream resourceStream = this.getClass().getClassLoader().getResourceAsStream(resourceName);
         if (resourceStream != null) {
-            loginfo("Reading config resource: " + resourceName);
+            LOGGER.info("Reading config resource: " + resourceName);
         }
         return resourceStream;
     }
@@ -170,7 +160,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
             case module:
                 return "config/" + getName() + "/";
             default:
-                logdebug(getName() + ": there is no resource base for type " + type);
+                LOGGER.debug(getName() + ": there is no resource base for type " + type);
                 break;
         }
         return null;

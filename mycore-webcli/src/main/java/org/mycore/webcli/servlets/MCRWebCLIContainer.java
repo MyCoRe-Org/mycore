@@ -17,6 +17,7 @@ package org.mycore.webcli.servlets;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
@@ -35,9 +36,16 @@ import java.util.concurrent.Future;
 
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.Filter;
+import org.apache.logging.log4j.core.Layout;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.AbstractConfiguration;
+import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -50,10 +58,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 /**
- * Is a wrapper class around command execution. Commands will be
- * {@link #addCommand(String) queued} and executed in a seperate thread. All
- * logging events in that thread are grabbed and can be retrieved by the
- * {@link #getLogs() getLogs} method.
+ * Is a wrapper class around command execution. Commands will be {@link #addCommand(String) queued} and executed in a
+ * seperate thread. All logging events in that thread are grabbed and can be retrieved by the {@link #getLogs() getLogs}
+ * method.
  * 
  * @author Thomas Scheffler (yagee)
  * @since 2.0
@@ -65,7 +72,7 @@ class MCRWebCLIContainer {
 
     private final ProcessCallable processCallable;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRWebCLIContainer.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final ExecutorService executor = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "WebCLI"));
 
@@ -116,8 +123,8 @@ class MCRWebCLIContainer {
     }
 
     /**
-     * Returns all logs that were grabbed in the command execution thread. This
-     * method is backed by a queue that will be empty after the method returns.
+     * Returns all logs that were grabbed in the command execution thread. This method is backed by a queue that will be
+     * empty after the method returns.
      * 
      * @return {"logs": {<br>
      *         &#160;&#160;&#160;&#160;"logLevel": <code>logLevel</code>,<br>
@@ -169,23 +176,23 @@ class MCRWebCLIContainer {
             initializeCommands();
     }
 
-    private static JsonArray getJSONLogs(Queue<LoggingEvent> events) {
+    private static JsonArray getJSONLogs(Queue<LogEvent> events) {
         JsonArray array = new JsonArray();
         while (!events.isEmpty()) {
-            LoggingEvent event = events.poll();
+            LogEvent event = events.poll();
             JsonObject json = new JsonObject();
             json.addProperty("logLevel", event.getLevel().toString());
-            json.addProperty("message", event.getRenderedMessage());
+            json.addProperty("message", event.getMessage().getFormattedMessage());
             String exception = null;
-            if (event.getThrowableInformation() != null) {
+            if (event.getThrownProxy() != null) {
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
-                event.getThrowableInformation().getThrowable().printStackTrace(pw);
+                event.getThrownProxy().getThrowable().printStackTrace(pw);
                 pw.close();
                 exception = sw.toString();
             }
             json.addProperty("exception", exception);
-            json.addProperty("time", event.timeStamp);
+            json.addProperty("time", event.getTimeMillis());
             array.add(json);
         }
         return array;
@@ -193,7 +200,7 @@ class MCRWebCLIContainer {
 
     private static class ProcessCallable implements Callable<Boolean> {
 
-        ConcurrentLinkedQueue<LoggingEvent> logs;
+        ConcurrentLinkedQueue<LogEvent> logs;
 
         CopyOnWriteArrayList<String> commands;
 
@@ -207,8 +214,10 @@ class MCRWebCLIContainer {
             this.commands = new CopyOnWriteArrayList<String>();
             this.session = session;
             this.hsession = hsession;
-            this.logs = new ConcurrentLinkedQueue<LoggingEvent>();
-            this.logGrabber = new Log4JGrabber();
+            this.logs = new ConcurrentLinkedQueue<LogEvent>();
+            this.logGrabber = new Log4JGrabber(MCRWebCLIContainer.class.getSimpleName() + session.getID(), null,
+                PatternLayout.createDefaultLayout());
+            this.logGrabber.start();
         }
 
         public Boolean call() throws Exception {
@@ -282,13 +291,13 @@ class MCRWebCLIContainer {
         protected void saveQueue(String lastCommand) throws IOException {
             // lastCommand is null if work is not stopped at first error
             if (lastCommand == null) {
-                LOGGER.error("Some commands failed.", null);
+                LOGGER.error("Some commands failed.");
             } else {
-                LOGGER.error("The following command failed: '" + lastCommand + "'", null);
+                LOGGER.printf(Level.ERROR, "The following command failed: '%s'", lastCommand);
             }
-            if (!commands.isEmpty())
-                LOGGER.info("There are " + commands.size() + " other commands still unprocessed.");
-
+            if (!commands.isEmpty()) {
+                LOGGER.printf(Level.INFO, "There are %d other commands still unprocessed.", commands.size());
+            }
             File file = new File(MCRWebCLIServlet.class.getSimpleName() + "-unprocessed-commands.txt");
             LOGGER.info("Writing unprocessed commands to file " + file.getAbsolutePath());
 
@@ -306,12 +315,14 @@ class MCRWebCLIContainer {
         }
 
         protected boolean processCommands(boolean continueIfOneFailes) throws IOException {
+            final LoggerContext logCtx = (LoggerContext) LogManager.getContext(false);
+            final AbstractConfiguration logConf = (AbstractConfiguration) logCtx.getConfiguration();
             LinkedList<String> failedQueue = new LinkedList<String>();
             int maxSessionTime = hsession.getMaxInactiveInterval();
             logGrabber.grabCurrentThread();
             logGrabber.setLogEventList(logs);
             // start grabbing logs of this thread
-            Logger.getRootLogger().addAppender(logGrabber);
+            logConf.getRootLogger().addAppender(logGrabber, logConf.getRootLogger().getLevel(), null);
             // register session to MCRSessionMgr
             MCRSessionMgr.setCurrentSession(session);
             try {
@@ -336,7 +347,7 @@ class MCRWebCLIContainer {
                 // restore old session expire time
                 hsession.setMaxInactiveInterval(maxSessionTime);
                 // stop grabbing logs of this thread
-                Logger.getRootLogger().removeAppender(logGrabber);
+                logConf.removeAppender(logGrabber.getName());
                 // release session
                 MCRSessionMgr.releaseCurrentSession();
             }
@@ -344,38 +355,44 @@ class MCRWebCLIContainer {
 
     }
 
-    private static class Log4JGrabber extends AppenderSkeleton {
+    private static class Log4JGrabber extends AbstractAppender {
+
+        private static final long serialVersionUID = 1L;
+
+        protected Log4JGrabber(String name, Filter filter, Layout<? extends Serializable> layout) {
+            super(name, filter, layout);
+        }
+
+        @Override
+        public void start() {
+            super.start();
+            grabCurrentThread();
+        }
+
+        @Override
+        public void stop() {
+            super.stop();
+            logEvents.clear();
+        }
 
         public String webCLIThread;
 
-        public Queue<LoggingEvent> logEvents;
-
-        public Log4JGrabber() {
-            grabCurrentThread();
-        }
+        public Queue<LogEvent> logEvents;
 
         public void grabCurrentThread() {
             this.webCLIThread = Thread.currentThread().getName();
         }
 
-        public void setLogEventList(Queue<LoggingEvent> logs) {
+        public void setLogEventList(Queue<LogEvent> logs) {
             logEvents = logs;
         }
 
         @Override
-        protected void append(LoggingEvent e) {
-            if (webCLIThread.equals(e.getThreadName())) {
-                logEvents.add(e);
+        public void append(LogEvent event) {
+            if (webCLIThread.equals(event.getThreadName())) {
+                logEvents.add(event);
             }
         }
 
-        @Override
-        public void close() {
-        }
-
-        @Override
-        public boolean requiresLayout() {
-            return false;
-        }
     }
 }
