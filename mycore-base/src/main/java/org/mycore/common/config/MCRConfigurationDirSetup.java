@@ -39,8 +39,10 @@ import javax.servlet.ServletContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.status.StatusLogger;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.events.MCRStartupHandler;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
+import org.mycore.common.log4j2.MCRSessionThreadContext;
 
 /**
  * Called by {@link MCRStartupHandler} on start up to setup {@link MCRConfiguration}.
@@ -87,6 +89,7 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
             } catch (URISyntaxException e) {
                 LOGGER.error("Failed to reconfigure logging", e);
             }
+            MCRSessionMgr.addSessionListener(new MCRSessionThreadContext());
         }
     }
 
