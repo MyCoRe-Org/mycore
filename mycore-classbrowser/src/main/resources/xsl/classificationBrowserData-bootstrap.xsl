@@ -12,12 +12,16 @@
   <xsl:param name="ServletsBaseURL" />
   <xsl:param name="template" />
 
+  <xsl:param name="MCR.classbrowser.folder.closed" select="'glyphicon glyphicon-expand'" />
+  <xsl:param name="MCR.classbrowser.folder.open" select="'glyphicon glyphicon-collapse-up'" />
+  <xsl:param name="MCR.classbrowser.folder.leaf" select="'glyphicon glyphicon-unchecked'" />
+
   <xsl:output method="xml" omit-xml-declaration="yes" />
 
   <xsl:template match="/classificationBrowserData">
-    <xsl:variable name="folder.closed" select="'glyphicon glyphicon-expand'" />
-    <xsl:variable name="folder.open" select="'glyphicon glyphicon-collapse-up'" />
-    <xsl:variable name="folder.leaf" select="'glyphicon glyphicon-unchecked'" />
+    <xsl:variable name="folder.closed" select="$MCR.classbrowser.folder.closed" />
+    <xsl:variable name="folder.open" select="$MCR.classbrowser.folder.open" />
+    <xsl:variable name="folder.leaf" select="$MCR.classbrowser.folder.leaf" />
     <xsl:variable name="maxLinks">
       <xsl:value-of select="category[not(@numLinks &lt; following-sibling::category/@numLinks)]/@numLinks" />
     </xsl:variable>
