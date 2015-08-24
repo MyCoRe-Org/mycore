@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.mycore.common.log4j2.lookups;
 
@@ -13,7 +13,7 @@ import org.mycore.common.MCRSessionMgr;
 
 /**
  * Allows to access information on the current user. This lookup returns <code>null</code> if <code>key == null</code>
- * or {@link MCRSessionMgr#hasCurrentSession()} returns <code>false</code>. <code>key<code> may be either
+ * or {@link MCRSessionMgr#hasCurrentSession()} returns <code>false</code>. <code>key</code> may be either
  * <dl>
  * <dt>id
  * <dt>
@@ -21,7 +21,7 @@ import org.mycore.common.MCRSessionMgr;
  * <dt>role:{role1},{role2},...,{roleN}<dt>
  * <dd>returns the first role the current user is in<dd>
  * </dl>
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 @Plugin(
