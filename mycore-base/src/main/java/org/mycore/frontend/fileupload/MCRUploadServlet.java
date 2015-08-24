@@ -53,7 +53,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
+import org.hibernate.Transaction;
 import org.jdom2.Element;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -171,14 +173,18 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
             // start transaction after MCRSession is initialized
             MCRUploadHandler uploadHandler = MCRUploadHandlerManager.getHandler(uploadId);
-            long numBytesStored = uploadHandler.receiveFile(path, zis, length, md5);
-
-            LOGGER.debug("Stored incoming file content with " + numBytesStored + " bytes");
-
-            pwOut.println(numBytesStored);
-            pwOut.flush();
-
-            LOGGER.info("File transfer completed successfully.");
+            Transaction tx = startTransaction();
+            try {
+                long numBytesStored = uploadHandler.receiveFile(path, zis, length, md5);
+                LOGGER.debug("Stored incoming file content with " + numBytesStored + " bytes");
+                pwOut.println(numBytesStored);
+                pwOut.flush();
+                commitTransaction(tx);
+                LOGGER.info("File transfer completed successfully.");
+            } catch (Exception exc) {
+                LOGGER.error("Error while uploading file: " + path, exc);
+                rollbackAnRethrow(tx, exc);
+            }
         } catch (Exception ex) {
             LOGGER.error("Exception while receiving and storing file content from applet:", ex);
         } finally {
@@ -334,7 +340,13 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
                     if (path.toLowerCase(Locale.ROOT).endsWith(".zip")) {
                         uploadZipFile(handler, in);
                     } else {
-                        handler.receiveFile(path, in, item.getSize(), null);
+                        Transaction tx = startTransaction();
+                        try {
+                            handler.receiveFile(path, in, item.getSize(), null);
+                            commitTransaction(tx);
+                        } catch (Exception exc) {
+                            rollbackAnRethrow(tx, exc);
+                        }
                     }
                 }
                 session.beginTransaction();
@@ -410,7 +422,13 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             } else {
                 checkPathName(path);
                 LOGGER.info("UploadServlet unpacking ZIP entry " + path);
-                handler.receiveFile(path, nis, entry.getSize(), null);
+                Transaction tx = startTransaction();
+                try {
+                    handler.receiveFile(path, nis, entry.getSize(), null);
+                    commitTransaction(tx);
+                } catch (Exception exc) {
+                    rollbackAnRethrow(tx, exc);
+                }
             }
         }
         nis.reallyClose();
@@ -498,5 +516,31 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
         out.write(response, 0, response.length);
         out.close();
         res.flushBuffer();
+    }
+
+    protected Transaction startTransaction() {
+        LOGGER.debug("Starting transaction");
+        return MCRHIBConnection.instance().getSession().beginTransaction();
+    }
+
+    protected void commitTransaction(Transaction tx) {
+        LOGGER.debug("Committing transaction");
+        if (tx != null) {
+            tx.commit();
+            tx = null;
+        } else {
+            LOGGER.error("Cannot commit transaction. Transaction is null.");
+        }
+    }
+
+    protected void rollbackAnRethrow(Transaction tx, Exception e) throws Exception {
+        LOGGER.debug("Rolling back transaction");
+        if (tx != null) {
+            tx.rollback();
+            tx = null;
+        } else {
+            LOGGER.error("Error while rolling back transaction. Transaction is null.");
+        }
+        throw e;
     }
 }
