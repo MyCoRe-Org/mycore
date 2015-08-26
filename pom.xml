@@ -560,6 +560,7 @@
             <failOnUnsupportedJava>false</failOnUnsupportedJava>
             <!-- compile would fail anyway and this is required for MCR-873 -->
             <failOnMissingClasses>false</failOnMissingClasses>
+            <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
             <bundledSignatures>
               <bundledSignature>jdk-unsafe</bundledSignature>
               <bundledSignature>jdk-deprecated</bundledSignature>
@@ -643,13 +644,13 @@
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-viewer</artifactId>
-        <version>0.5</version>
+        <version>0.6-Snapshot</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.mycore.mets</groupId>
         <artifactId>mets-model</artifactId>
-        <version>0.7</version>
+        <version>0.8-SNAPSHOT</version>
         <exclusions>
           <exclusion>
             <groupId>log4j</groupId>
