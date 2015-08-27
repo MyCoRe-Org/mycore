@@ -118,7 +118,7 @@ public class MCRISO8601Date {
         df = df.withZone(zone);
         if (LOGGER.isDebugEnabled()) {
             String msg = MessageFormat.format("DateTime ''{0}'', using time zone ''{1}'', formatted: {2}", dt, zone,
-                df.format(dt));
+                    dt != null ? df.format(dt) : null);
             LOGGER.debug(msg);
         }
         return dt == null ? null : format.indexOf("G") == -1 ? df.format(dt) : df.format(dt).replace("-", "");
@@ -221,7 +221,7 @@ public class MCRISO8601Date {
     private TemporalAccessor getDateTime(final String timeString) {
         dateTimeFormatter = MCRISO8601FormatChooser.getFormatter(timeString, isoFormat);
         return dateTimeFormatter.parseBest(timeString, ZonedDateTime::from, LocalDateTime::from, LocalDate::from,
-            YearMonth::from, Year::from);
+                YearMonth::from, Year::from);
     }
 
     private TemporalAccessor guessDateTime(final String date) {
