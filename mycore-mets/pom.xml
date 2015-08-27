@@ -41,8 +41,20 @@
       <artifactId>mets-model</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.mycore.mets</groupId>
+      <artifactId>mets-editor-frontend</artifactId>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>jsr311-api</artifactId>
     </dependency>
   </dependencies>
   <properties>

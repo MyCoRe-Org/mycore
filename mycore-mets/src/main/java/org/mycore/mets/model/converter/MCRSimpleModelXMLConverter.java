@@ -1,0 +1,146 @@
+package org.mycore.mets.model.converter;
+
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
+
+import org.jdom2.Document;
+import org.mycore.mets.model.Mets;
+import org.mycore.mets.model.files.FLocat;
+import org.mycore.mets.model.files.File;
+import org.mycore.mets.model.files.FileGrp;
+import org.mycore.mets.model.simple.MCRMetsFileUse;
+import org.mycore.mets.model.simple.MCRMetsPage;
+import org.mycore.mets.model.simple.MCRMetsSection;
+import org.mycore.mets.model.simple.MCRMetsSimpleModel;
+import org.mycore.mets.model.struct.AbstractLogicalDiv;
+import org.mycore.mets.model.struct.Fptr;
+import org.mycore.mets.model.struct.LOCTYPE;
+import org.mycore.mets.model.struct.LogicalDiv;
+import org.mycore.mets.model.struct.LogicalStructMap;
+import org.mycore.mets.model.struct.LogicalSubDiv;
+import org.mycore.mets.model.struct.PhysicalDiv;
+import org.mycore.mets.model.struct.PhysicalStructMap;
+import org.mycore.mets.model.struct.PhysicalSubDiv;
+import org.mycore.mets.model.struct.SmLink;
+import org.mycore.mets.model.struct.StructLink;
+
+/**
+ * This Class converts MCRMetsSimpleModel to JDOM XML.
+ * @author Sebastian Hofmann(mcrshofm)
+ */
+public class MCRSimpleModelXMLConverter {
+
+    public static final String DEFAULT_PHYSICAL_TYPE = "Page";
+    public static final String PHYSICAL_ID_PREFIX = "phys_";
+    public static final String LOGICAL_ID_PREFIX = "log_";
+
+    /**
+     * Converts MetsSimpleModel to XML
+     * @param msm the MetsSimpleModel which should be converted
+     * @return xml
+     */
+    public static Document toXML(MCRMetsSimpleModel msm) {
+        Mets mets = new Mets();
+
+        Hashtable<MCRMetsPage, String> pageIdMap = new Hashtable<>();
+        buildPhysicalPages(msm, mets, pageIdMap);
+
+        Hashtable<MCRMetsSection, String> sectionIdMap = new Hashtable<>();
+        buildLogicalPages(msm, mets, sectionIdMap);
+
+        StructLink structLink = mets.getStructLink();
+        msm.getSectionPageLinkList().stream()
+                .map((metsLink) -> {
+                    MCRMetsSection section = metsLink.getFrom();
+                    MCRMetsPage page = metsLink.getTo();
+                    String fromId = sectionIdMap.get(section);
+                    String toId = pageIdMap.get(page);
+                    return new SmLink(fromId, toId);
+                })
+                .forEach(structLink::addSmLink);
+
+        return mets.asDocument();
+    }
+
+    private static void buildPhysicalPages(MCRMetsSimpleModel msm, Mets mets, Map<MCRMetsPage, String> pageIdMap) {
+        List<MCRMetsPage> pageList = msm.getMetsPageList();
+        PhysicalStructMap structMap = (PhysicalStructMap) mets.getStructMap(PhysicalStructMap.TYPE);
+        structMap.setDivContainer(new PhysicalDiv(PHYSICAL_ID_PREFIX + UUID.randomUUID().toString(),PhysicalDiv.TYPE_PHYS_SEQ));
+
+        for (int order = 0; order < pageList.size(); order++) {
+            MCRMetsPage page = pageList.get(order);
+
+            String id = PHYSICAL_ID_PREFIX + UUID.randomUUID().toString();
+
+            PhysicalSubDiv physicalSubDiv = new PhysicalSubDiv(id, DEFAULT_PHYSICAL_TYPE, order+1);
+            String orderLabel = page.getOrderLabel();
+            if(orderLabel != null){
+                physicalSubDiv.setOrderLabel(orderLabel);
+            }
+            structMap.getDivContainer().add(physicalSubDiv);
+            pageIdMap.put(page, id);
+
+            page.getFileList().forEach((simpleFile) -> {
+                String href = simpleFile.getHref();
+                MCRMetsFileUse use = simpleFile.getUse();
+                String mimeType = simpleFile.getMimeType();
+                String fileID = use.toString().toLowerCase(Locale.ROOT) + "_"  + simpleFile.getId();
+
+                File file = new File(fileID, mimeType);
+                FLocat fLocat = new FLocat(LOCTYPE.URL, href);
+                file.setFLocat(fLocat);
+
+                FileGrp fileGrp = getFileGroup(mets, use);
+                fileGrp.addFile(file);
+
+                physicalSubDiv.add(new Fptr(fileID));
+            });
+        }
+    }
+
+    private static void buildLogicalPages(MCRMetsSimpleModel msm, Mets mets, Map<MCRMetsSection, String> sectionIdMap) {
+        LogicalStructMap logicalStructMap = (LogicalStructMap) mets.getStructMap(LogicalStructMap.TYPE);
+        MCRMetsSection rootSection = msm.getRootSection();
+        String type = rootSection.getType();
+        String label = rootSection.getLabel();
+        String id = LOGICAL_ID_PREFIX + UUID.randomUUID().toString();
+        LogicalDiv logicalDiv = new LogicalDiv(id, type, label, 1);
+        sectionIdMap.put(rootSection, id);
+
+        Integer count = 1;
+        for (MCRMetsSection metsSection : rootSection.getMetsSectionList()) {
+            buildLogicalSubDiv(metsSection, logicalDiv, count, sectionIdMap);
+            count++;
+        }
+        logicalStructMap.setDivContainer(logicalDiv);
+    }
+
+
+    private static void buildLogicalSubDiv(MCRMetsSection metsSection, AbstractLogicalDiv parent, int nthChild, Map<MCRMetsSection, String> sectionIdMap) {
+        String id = LOGICAL_ID_PREFIX + UUID.randomUUID().toString();
+        LogicalSubDiv logicalSubDiv = new LogicalSubDiv(id, metsSection.getType(), metsSection.getLabel(), nthChild);
+
+        sectionIdMap.put(metsSection, id);
+        parent.add(logicalSubDiv);
+        int count = 0;
+        for (MCRMetsSection section : metsSection.getMetsSectionList()) {
+            buildLogicalSubDiv(section, logicalSubDiv, count, sectionIdMap);
+        }
+    }
+
+    private static FileGrp getFileGroup(Mets mets, MCRMetsFileUse use) {
+        FileGrp fileGroup = mets.getFileSec().getFileGroup(use.toString());
+
+        if (fileGroup == null) {
+            fileGroup = new FileGrp(use.toString());
+            mets.getFileSec().addFileGrp(fileGroup);
+        }
+
+        return fileGroup;
+    }
+
+
+}
