@@ -10,6 +10,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.HashSet;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -137,6 +138,23 @@ public class MetsResource {
         try (OutputStream out = Files.newOutputStream(MCRPath.getPath(derivateId, METS_XML_PATH), StandardOpenOption.CREATE,
                 StandardOpenOption.TRUNCATE_EXISTING)) {
             o.output(document, out);
+        } catch (IOException e) {
+            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
+        }
+
+        return "{ \"success\": true }";
+    }
+
+    @DELETE
+    @Path("/crud/{derivateId}")
+    public String delete(@PathParam("derivateId") String derivateId) {
+        MCRObjectID derivateIdObject = MCRObjectID.getInstance(derivateId);
+
+        checkDerivateExists(derivateIdObject);
+        checkDerivateAccess(derivateIdObject, MCRAccessManager.PERMISSION_DELETE);
+
+        try {
+            Files.delete(MCRPath.getPath(derivateId, METS_XML_PATH));
         } catch (IOException e) {
             throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
         }
