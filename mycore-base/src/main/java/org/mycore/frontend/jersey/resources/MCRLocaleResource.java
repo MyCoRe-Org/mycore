@@ -13,6 +13,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.mycore.common.MCRJSONUtils;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.services.i18n.MCRTranslation;
 
@@ -68,10 +69,24 @@ public class MCRLocaleResource {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("translate/{lang}/{key: .+\\*}")
+    @Path("translate/{lang}/{key: .*\\*}")
     public String translateJSON(@PathParam("lang") String lang, @PathParam("key") String key) {
         MCRFrontendUtil.writeCacheHeaders(resp, cacheTime, startUpTime, true);
         return MCRJSONUtils.getTranslations(key.substring(0, key.length() - 1), lang);
+    }
+
+    /**
+     * Translates a set of keys to the current language.
+     *
+     * @param key message key ending with an asterisk (e.g. component.classeditor.*)
+     * @return json object containing all keys and their corresponding translation in current language
+     */
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("translate/{key: .*\\*}")
+    public String translateJSONDefault(@PathParam("key") String key) {
+        MCRFrontendUtil.writeCacheHeaders(resp, cacheTime, startUpTime, true);
+        return MCRJSONUtils.getTranslations(key.substring(0, key.length() - 1), MCRSessionMgr.getCurrentSession().getCurrentLanguage());
     }
 
     /**
@@ -83,10 +98,24 @@ public class MCRLocaleResource {
      */
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    @Path("translate/{lang}/{key: .+}")
+    @Path("translate/{lang}/{key: [^\\*]+}")
     public String translateText(@PathParam("lang") String lang, @PathParam("key") String key) {
         MCRFrontendUtil.writeCacheHeaders(resp, cacheTime, startUpTime, true);
         return MCRTranslation.translate(key, MCRTranslation.getLocale(lang));
+    }
+
+    /**
+     * Translates a single key to the current language.
+     *
+     * @param key the key to translate (e.g. component.classeditor.save.successful)
+     * @return translated plain text
+     */
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("translate/{key: [^\\*]+}")
+    public String translateTextDefault(@PathParam("key") String key) {
+        MCRFrontendUtil.writeCacheHeaders(resp, cacheTime, startUpTime, true);
+        return MCRTranslation.translate(key, MCRTranslation.getCurrentLocale());
     }
 
 }
