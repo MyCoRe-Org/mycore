@@ -46,7 +46,7 @@ public class MCRMetsLock {
      */
     public static synchronized boolean doLock(String derivateIdString) {
         MCRObjectID derivateId = MCRObjectID.getInstance(derivateIdString);
-        if (isLocked(derivateIdString)) {
+        if (isLocked(derivateIdString) && MCRMetsLock.metsAccessSessionTable.get(derivateId) != MCRSessionMgr.getCurrentSessionID()) {
             LOGGER.info(MessageFormat.format("Could not lock {0}, because its already locked.", derivateIdString));
             return false;
         } else {
