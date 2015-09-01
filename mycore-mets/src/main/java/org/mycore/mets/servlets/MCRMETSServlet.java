@@ -43,11 +43,13 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.mets.model.MCRMETSGenerator;
+import org.mycore.mets.tools.MCRMetsSave;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -57,6 +59,7 @@ public class MCRMETSServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = Logger.getLogger(MCRMETSServlet.class);
+    public static final boolean STORE_METS_ON_GENERATE = MCRConfiguration.instance().getBoolean("MCR.Mets.storeMetsOnGenerate");
 
     private boolean useExpire;
 
@@ -122,6 +125,10 @@ public class MCRMETSServlet extends MCRServlet {
             }
             Document mets = MCRMETSGenerator.getGenerator().getMETS(MCRPath.getPath(derivate, "/"), ignoreNodes)
                 .asDocument();
+
+            if(!metsExists && STORE_METS_ON_GENERATE) {
+                MCRMetsSave.saveMets(mets, MCRObjectID.getInstance(derivate));
+            }
 
             return new MCRJDOMContent(mets);
         }
