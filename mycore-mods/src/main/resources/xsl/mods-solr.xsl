@@ -64,14 +64,14 @@
     <!-- keep mods:name fields for legacy reasons -->
     <xsl:for-each select=".//mods:name">
       <field name="mods.name">
-        <xsl:for-each select="mods:displayForm | mods:namePart | text()">
+        <xsl:for-each select="mods:displayForm | mods:namePart[@type!='date'] | text()">
           <xsl:value-of select="concat(' ',mcrxsl:normalizeUnicode(.))" />
         </xsl:for-each>
       </field>
     </xsl:for-each>
     <xsl:for-each select="mods:name">
       <field name="mods.name.top">
-        <xsl:for-each select="mods:displayForm | mods:namePart | text()">
+        <xsl:for-each select="mods:displayForm | mods:namePart[@type!='date'] | text()">
           <xsl:value-of select="concat(' ',mcrxsl:normalizeUnicode(.))" />
         </xsl:for-each>
       </field>
@@ -205,7 +205,7 @@
         </field>
       </xsl:for-each>
       <field name="mods.name">
-        <xsl:for-each select="mods:displayForm | mods:namePart | text()">
+        <xsl:for-each select="mods:displayForm | mods:namePart[@type!='date'] | text()">
           <xsl:value-of select="concat(' ',.)" />
         </xsl:for-each>
       </field>
@@ -216,7 +216,7 @@
           </field>
         </xsl:for-each>
         <field name="mods.name.top">
-          <xsl:for-each select="mods:displayForm | mods:namePart | text()">
+          <xsl:for-each select="mods:displayForm | mods:namePart[@type!='date'] | text()">
             <xsl:value-of select="concat(' ',.)" />
           </xsl:for-each>
         </field>
