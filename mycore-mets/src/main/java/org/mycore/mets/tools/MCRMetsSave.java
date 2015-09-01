@@ -687,7 +687,7 @@ public class MCRMetsSave {
 
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    if (!file.getFileName().toString().equals(MCRJSONProvider.DEFAULT_METS_FILENAME)) {
+                    if (!file.getFileName().toString().equals(MCRMetsSave.getMetsFileName())) {
                         MCRPath mcrPath = MCRPath.toMCRPath(file);
                         String path;
                         try {
