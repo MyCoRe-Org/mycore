@@ -23,8 +23,6 @@
 
 package org.mycore.solr.index.file;
 
-import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.ProviderMismatchException;
@@ -68,6 +66,8 @@ import org.mycore.solr.index.handlers.stream.MCRSolrFilesIndexHandler;
 import org.mycore.urn.services.MCRURNManager;
 
 import com.google.common.io.Files;
+
+import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -167,7 +167,11 @@ public class MCRSolrPathDocumentFactory {
 
                 for (AbstractLogicalDiv abstractLogicalDiv : childs) {
                     doc.addField("content", abstractLogicalDiv.getLabel());
-                    doc.addField("mets." + abstractLogicalDiv.getType(), abstractLogicalDiv.getLabel());
+
+                    // some types contain - or other illegal character and they should be removed
+                    String cleanType = abstractLogicalDiv.getType().replaceAll("[\\-\\s]","");
+
+                    doc.addField("mets." + cleanType, abstractLogicalDiv.getLabel());
                 }
             } catch (Exception e) {
                 throw new MCRPersistenceException("could not parse mets.xml", e);
