@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<description>
+  <eprints xmlns="http://www.openarchives.org/OAI/1.1/eprints"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/1.1/eprints http://www.openarchives.org/OAI/1.1/eprints.xsd">
+    <content>
+      <text>
+        Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+      </text>
+      <URL>http://www.loremipsum.de/</URL>
+    </content>
+    <metadataPolicy>
+      <text>
+        At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+      </text>
+      <URL>http://creativecommons.org/publicdomain/zero/1.0/deed.de</URL>
+    </metadataPolicy>
+    <dataPolicy>
+      <text>
+        Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+      </text>
+      <URL>http://www.loremipsum.de/</URL>
+    </dataPolicy>
+    <submissionPolicy>
+      <text>At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+      </text>
+      <URL>http://www.loremipsum.de/</URL>
+    </submissionPolicy>
+    <comment>
+      This institutional repository is powered by the MyCoRe repository software, see http://www.mycore.de/ for more information.
+    </comment>
+  </eprints>
+</description>

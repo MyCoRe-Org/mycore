@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<description>
+  <rightsManifest xmlns="http://www.openarchives.org/OAI/2.0/rights/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/rights/ http://www.openarchives.org/OAI/2.0/rightsManifest.xsd"
+    appliesTo="http://www.openarchives.org/OAI/2.0/entity#metadata">
+    <rights>
+      <rightsDefinition>
+        <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+          <dc:description>
+            All bibliographic metadata provided via this interface, except abstracts, is hereby made available under CC0 license, free to share and re-use.
+            Full text of documents and other files must only be used according to copyright law, all rights reserved if not otherwise explicitly specified.
+          </dc:description>
+          <dc:identifier>http://creativecommons.org/publicdomain/zero/1.0/deed.de</dc:identifier>
+        </oai_dc:dc>
+      </rightsDefinition>
+    </rights>
+  </rightsManifest>
+</description>

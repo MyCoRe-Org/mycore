@@ -1,19 +1,19 @@
 /*
  * $Revision$ $Date$
- * 
+ *
  * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
  * details.
- * 
+ *
  * This program is free software; you can use it, redistribute it and / or
  * modify it under the terms of the GNU General Public License (GPL) as
  * published by the Free Software Foundation; either version 2 of the License or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program, in a file called gpl.txt or license.txt. If not, write to the
  * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -21,16 +21,20 @@
  */
 package org.mycore.oai;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
+import org.jdom2.Element;
+import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.xml.MCRURIResolver;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Projections;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRDELETEDITEMS;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.oai.pmh.DateUtils;
+import org.mycore.oai.pmh.Description;
 import org.mycore.oai.pmh.FriendsDescription;
 import org.mycore.oai.pmh.Granularity;
 import org.mycore.oai.pmh.Identify;
@@ -39,8 +43,8 @@ import org.mycore.oai.pmh.SimpleIdentify;
 
 /**
  * Simple MyCoRe implementation of a OAI-PMH {@link Identify} class. Uses the {@link MCRConfiguration} to retrieve all important settings. Earliest date stamp
- * is calculated with the 'restriction' query and sort by 'created'.
- * 
+ * is calculated with the 'restriction' query and sort by 'created'. Also adds custom description elements from URIs configured by MCR.OAIDataProvider.OAI.DescriptionURI
+ *
  * @author Matthias Eichner
  * @author Frank L\u00fctzenkirchen
  */
@@ -70,7 +74,40 @@ public class MCROAIIdentify extends SimpleIdentify {
         this.getAdminEmailList().add(adminMail);
         this.getDescriptionList().add(getIdentifierDescription());
         this.getDescriptionList().add(getFriendsDescription());
+
+        addCustomDescriptions();
     }
+
+    private void addCustomDescriptions() {
+        for (final String descriptionURI : getDescriptionURIs())
+            this.getDescriptionList().add(new CustomDescription(descriptionURI));
+    }
+
+    private Collection<String> getDescriptionURIs() {
+        String descriptionConfig = getConfigPrefix() + "DescriptionURI";
+        Collection<String> descriptionURIs = MCRConfiguration.instance().getPropertiesMap(descriptionConfig).values();
+        return descriptionURIs;
+    }
+
+    class CustomDescription implements Description {
+
+        private Element description;
+
+        CustomDescription(String descriptionURI) {
+            description = MCRURIResolver.instance().resolve(descriptionURI);
+        }
+
+        @Override
+        public Element toXML() {
+            return description.getChildren().get(0).clone();
+        }
+
+        @Override
+        public void fromXML(Element description) {
+            this.description = description;
+        }
+    }
+
 
     public OAIIdentifierDescription getIdentifierDescription() {
         String reposId = this.config.getString(this.configPrefix + "RepositoryIdentifier");
@@ -91,7 +128,7 @@ public class MCROAIIdentify extends SimpleIdentify {
 
     /**
      * Calculates the earliest date stamp.
-     * 
+     *
      * @return the create date of the oldest document within the repository
      */
     protected Date calculateEarliestTimestamp() {
