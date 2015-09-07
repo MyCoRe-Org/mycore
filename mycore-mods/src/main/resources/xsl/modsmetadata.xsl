@@ -470,6 +470,11 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
+    <xsl:variable name="gnd">
+      <xsl:if test="starts-with(@valueURI, 'http://d-nb.info/gnd/')">
+        <xsl:value-of select="substring-after(@valueURI, 'http://d-nb.info/gnd/')" />
+      </xsl:if>
+    </xsl:variable>
 
     <xsl:choose>
       <xsl:when test="mods:role/mods:roleTerm='aut'">
@@ -489,6 +494,12 @@
         <xsl:value-of select="$personName" />
       </xsl:otherwise>
     </xsl:choose>
+    <xsl:if test="string-length($gnd)&gt;0">
+      <xsl:text>&#160;</xsl:text><!-- add whitespace here -->
+      <a href="http://d-nb.info/gnd/{$gnd}" title="Link zur GND">
+        <sup>GND</sup>
+      </a>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="mods:name" mode="present"><!-- ToDo: all authors, rev ... in one column -->
