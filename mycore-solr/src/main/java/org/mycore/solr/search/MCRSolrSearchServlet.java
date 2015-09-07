@@ -69,10 +69,9 @@ public class MCRSolrSearchServlet extends MCRServlet {
     static final List<String> RESERVED_PARAMETER_KEYS;
 
     static {
-        String[] parameter = new String[] { "q", "qt", "sort", "start", "rows", "pageDoc", "pageScore", "fq", "cache",
-            "fl", "glob", "debug", "explainOther", "defType", "timeAllowed", "omitHeader", "sortOrder", "sortBy", "wt",
-            "qf", "q.alt", "mm", "pf", "ps", "qs", "tie", "bq", "bf", "lang", "facet", "facet.field", "facet.sort",
-            "facet.method", PHRASE_QUERY_PARAM };
+        String[] parameter = new String[] { "q", "qt", "sort", "start", "rows", "pageDoc", "pageScore", "fq", "cache", "fl", "glob",
+                "debug", "explainOther", "defType", "timeAllowed", "omitHeader", "sortOrder", "sortBy", "wt", "qf", "q.alt", "mm", "pf",
+                "ps", "qs", "tie", "bq", "bf", "lang", "facet", "facet.field", "facet.sort", "facet.method", PHRASE_QUERY_PARAM };
 
         RESERVED_PARAMETER_KEYS = Collections.unmodifiableList(Arrays.asList(parameter));
     }
@@ -89,21 +88,20 @@ public class MCRSolrSearchServlet extends MCRServlet {
      *            the name of the field
      * @throws ServletException
      */
-    private void addFieldToQuery(StringBuilder query, String[] fieldValues, String fieldName, QueryType queryType)
-        throws ServletException {
+    private void addFieldToQuery(StringBuilder query, String[] fieldValues, String fieldName, QueryType queryType) throws ServletException {
         for (String fieldValue : fieldValues) {
             if (fieldValue.length() == 0) {
                 continue;
             }
             switch (queryType) {
-                case term:
-                    query.append(MCRConditionTransformer.getTermQuery(fieldName, fieldValue));
-                    break;
-                case phrase:
-                    query.append(MCRConditionTransformer.getPhraseQuery(fieldName, fieldValue));
-                    break;
-                default:
-                    throw new ServletException("Query type is unsupported: " + queryType);
+            case term:
+                query.append(MCRConditionTransformer.getTermQuery(fieldName, fieldValue));
+                break;
+            case phrase:
+                query.append(MCRConditionTransformer.getPhraseQuery(fieldName, fieldValue));
+                break;
+            default:
+                throw new ServletException("Query type is unsupported: " + queryType);
             }
             query.append(' ');
         }
@@ -118,9 +116,8 @@ public class MCRSolrSearchServlet extends MCRServlet {
      *            <code>getParameterGroup.equals(TypeParameter)</code>
      * @return a map which can be forwarded to {@link MCRSolrProxyServlet}
      */
-    protected Map<String, String[]> buildSelectParameterMap(Map<String, String[]> queryParameters,
-        Map<String, String[]> typeParameters, Map<String, String[]> sortParameters, Set<String> phraseQuery)
-        throws ServletException {
+    protected Map<String, String[]> buildSelectParameterMap(Map<String, String[]> queryParameters, Map<String, String[]> typeParameters,
+            Map<String, String[]> sortParameters, Set<String> phraseQuery) throws ServletException {
         HashMap<String, String[]> queryParameterMap = new HashMap<String, String[]>();
 
         HashMap<String, String> fieldTypeMap = createFieldTypeMap(typeParameters);
@@ -197,8 +194,8 @@ public class MCRSolrSearchServlet extends MCRServlet {
             sortBuilder.append(" ");
             if (order == null) {
                 order = "asc";
-                LOGGER.warn(MessageFormat.format(
-                    "No sort order found for field with number ''{0}'' use default value : ''{1}''", position, order));
+                LOGGER.warn(MessageFormat.format("No sort order found for field with number ''{0}'' use default value : ''{1}''", position,
+                        order));
             }
             sortBuilder.append(order);
         }
@@ -243,8 +240,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
         HttpServletResponse response = job.getResponse();
 
         extractParameterList(request.getParameterMap(), queryParameters, solrParameters, typeParameters, sortParameters);
-        Map<String, String[]> buildedSolrParameters = buildSelectParameterMap(queryParameters, typeParameters,
-            sortParameters, phraseQuery);
+        Map<String, String[]> buildedSolrParameters = buildSelectParameterMap(queryParameters, typeParameters, sortParameters, phraseQuery);
         buildedSolrParameters.putAll(solrParameters);
 
         request.setAttribute(MCRSolrProxyServlet.MAP_KEY, buildedSolrParameters);
@@ -273,7 +269,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
      *            all sort-parameters will be stored here.
      */
     protected void extractParameterList(Map<String, String[]> requestParameter, Map<String, String[]> queryParameter,
-        Map<String, String[]> solrParameter, Map<String, String[]> typeParameter, Map<String, String[]> sortParameter) {
+            Map<String, String[]> solrParameter, Map<String, String[]> typeParameter, Map<String, String[]> sortParameter) {
         for (Entry<String, String[]> currentEntry : requestParameter.entrySet()) {
             String parameterName = currentEntry.getKey();
             if (PHRASE_QUERY_PARAM.equals(parameterName)) {
@@ -282,21 +278,26 @@ public class MCRSolrSearchServlet extends MCRServlet {
             SolrParameterGroup parameterGroup = getParameterType(parameterName);
 
             switch (parameterGroup) {
-                case SolrParameter:
-                    solrParameter.put(parameterName, currentEntry.getValue());
-                    break;
-                case TypeParameter:
-                    typeParameter.put(parameterName, currentEntry.getValue());
-                    break;
-                case QueryParameter:
-                    queryParameter.put(parameterName, currentEntry.getValue());
-                    break;
-                case SortParameter:
-                    sortParameter.put(parameterName, currentEntry.getValue());
-                    break;
-                default:
-                    LOGGER.warn("Unknown parameter group. That should not happen.");
-                    continue;
+            case SolrParameter:
+                solrParameter.put(parameterName, currentEntry.getValue());
+                break;
+            case TypeParameter:
+                typeParameter.put(parameterName, currentEntry.getValue());
+                break;
+            case QueryParameter:
+                String[] strings = currentEntry.getValue();
+                for (String v : strings) {
+                    if (v != null && v.length() > 0) {
+                        queryParameter.put(parameterName, currentEntry.getValue());
+                    }
+                }
+                break;
+            case SortParameter:
+                sortParameter.put(parameterName, currentEntry.getValue());
+                break;
+            default:
+                LOGGER.warn("Unknown parameter group. That should not happen.");
+                continue;
             }
         }
     }
@@ -324,20 +325,16 @@ public class MCRSolrSearchServlet extends MCRServlet {
      */
     private SolrParameterGroup getParameterType(String parameterName) {
         if (isTypeParameter(parameterName)) {
-            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName,
-                SolrParameterGroup.TypeParameter.toString()));
+            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName, SolrParameterGroup.TypeParameter.toString()));
             return SolrParameterGroup.TypeParameter;
         } else if (isSolrParameter(parameterName)) {
-            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName,
-                SolrParameterGroup.SolrParameter.toString()));
+            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName, SolrParameterGroup.SolrParameter.toString()));
             return SolrParameterGroup.SolrParameter;
         } else if (isSortParameter(parameterName)) {
-            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName,
-                SolrParameterGroup.SolrParameter.toString()));
+            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName, SolrParameterGroup.SolrParameter.toString()));
             return SolrParameterGroup.SortParameter;
         } else {
-            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName,
-                SolrParameterGroup.QueryParameter.toString()));
+            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName, SolrParameterGroup.QueryParameter.toString()));
             return SolrParameterGroup.QueryParameter;
         }
     }
@@ -352,8 +349,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
     private boolean isSolrParameter(String parameterName) {
         boolean reservedCostumKey;
         try {
-            reservedCostumKey = MCRConfiguration.instance().getStrings("MCR.Module-solr.ReservedParameterKeys")
-                .contains(parameterName);
+            reservedCostumKey = MCRConfiguration.instance().getStrings("MCR.Module-solr.ReservedParameterKeys").contains(parameterName);
         } catch (MCRConfigurationException e) {
             reservedCostumKey = false;
         }
