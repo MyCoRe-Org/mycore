@@ -547,6 +547,23 @@ public class MCRXMLFunctions {
     }
 
     /**
+     * @param derivate
+     * @return the name of the maindoc of the given derivate or null if maindoc is not set
+     */
+    public static String getMainDocName(String derivate) {
+        if (derivate == null || derivate.length() == 0) {
+            return null;
+        }
+
+        MCRObjectID objectID = MCRObjectID.getInstance(derivate);
+        if (!MCRMetadataManager.exists(objectID)) {
+            return null;
+        }
+
+        return MCRMetadataManager.retrieveMCRDerivate(objectID).getDerivate().getInternals().getMainDoc();
+    }
+
+    /**
      * The method return a org.w3c.dom.NodeList as subpath of the doc input
      * NodeList selected by a path as String.
      * 
