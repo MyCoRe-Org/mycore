@@ -195,7 +195,7 @@
 		</dc:description>
 	</xsl:template>
 
-	<xsl:template match="mods:originInfo">
+	<xsl:template match="mods:originInfo[not(@eventType) or @eventType='publication']">
 		<xsl:apply-templates select="*[@point='start']"/>
 		<xsl:for-each
 			select="mods:dateIssued[@point!='start' and @point!='end'] |mods:dateCreated[@point!='start' and @point!='end'] | mods:dateCaptured[@point!='start' and @point!='end'] | mods:dateOther[@point!='start' and @point!='end']">

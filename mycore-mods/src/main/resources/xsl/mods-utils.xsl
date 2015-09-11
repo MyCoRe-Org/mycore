@@ -20,8 +20,8 @@
 
   <xsl:template mode="mods.datePublished" match="mods:mods">
     <xsl:choose>
-      <xsl:when test="mods:originInfo/mods:dateIssued">
-        <xsl:value-of select="mods:originInfo/mods:dateIssued" />
+      <xsl:when test="mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateIssued">
+        <xsl:value-of select="mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateIssued" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:variable name="created" select="ancestor::mycoreobject/service/servdates/servdate[@type='createdate']" />

@@ -24,7 +24,7 @@
       <xsl:apply-templates select="isbd:p1005|isbd:P1005" />
       <xsl:apply-templates select="bibo:shortTitle" />
       <xsl:if test="dc:publisher | isbd:p1016 | isbd:P1016">
-        <mods:originInfo>
+        <mods:originInfo eventType="publication">
           <xsl:apply-templates select="dc:publisher" />
           <xsl:apply-templates select="isbd:p1016|isbd:P1016" />
         </mods:originInfo>

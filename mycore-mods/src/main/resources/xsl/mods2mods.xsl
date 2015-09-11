@@ -54,7 +54,7 @@
     <xsl:choose>
       <xsl:when test="contains(@valueURI,'#journal')">
       <!-- additional journals data -->
-        <mods:originInfo>
+        <mods:originInfo eventType="publication">
           <mods:issuance>continuing</mods:issuance>
         </mods:originInfo>
         <mods:genre authority="marcgt">journal</mods:genre>

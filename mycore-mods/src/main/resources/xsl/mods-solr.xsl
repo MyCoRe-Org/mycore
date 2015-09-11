@@ -84,13 +84,13 @@
         </xsl:for-each>
       </field>
     </xsl:for-each>
-    <xsl:for-each select=".//mods:originInfo/mods:place/mods:placeTerm[not(@type='code')]">
+    <xsl:for-each select=".//mods:originInfo[not(@eventType) or @eventType='publication']/mods:place/mods:placeTerm[not(@type='code')]">
       <field name="mods.place">
         <xsl:value-of select="." />
       </field>
     </xsl:for-each>
     <xsl:for-each
-      select=".//mods:originInfo/mods:publisher|.//mods:name[mods:role/mods:roleTerm[@authority='marcrelator' and (@type='text' and text()='publisher') or (@type='code' and text()='pbl')]]">
+      select=".//mods:originInfo[not(@eventType) or @eventType='publication']/mods:publisher|.//mods:name[mods:role/mods:roleTerm[@authority='marcrelator' and (@type='text' and text()='publisher') or (@type='code' and text()='pbl')]]">
       <field name="mods.publisher">
         <xsl:for-each select="mods:displayForm | mods:namePart | text()">
           <xsl:value-of select="concat(' ',.)" />
@@ -112,8 +112,8 @@
         <xsl:value-of select="text()" />
       </field>
     </xsl:for-each>
-    <xsl:for-each select=".//mods:originInfo/mods:dateIssued">
-      <xsl:sort data-type="number" select="count(ancestor::mods:originInfo)" />
+    <xsl:for-each select=".//mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateIssued">
+      <xsl:sort data-type="number" select="count(ancestor::mods:originInfo[not(@eventType) or @eventType='publication'])" />
       <xsl:if test="position()=1">
         <field name="mods.dateIssued">
           <xsl:value-of select="." />

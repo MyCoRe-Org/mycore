@@ -169,8 +169,8 @@
   <xsl:template name="publisher">
     <publisher>
       <xsl:choose>
-        <xsl:when test="mods:originInfo/mods:publisher">
-          <xsl:value-of select="mods:originInfo/mods:publisher" />
+        <xsl:when test="mods:originInfo[not(@eventType) or @eventType='publication']/mods:publisher">
+          <xsl:value-of select="mods:originInfo[not(@eventType) or @eventType='publication']/mods:publisher" />
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="$MCR.DOI.HostingInstitution" />
@@ -183,14 +183,14 @@
 
   <xsl:template name="publicationYear">
     <xsl:choose>
-      <xsl:when test="mods:originInfo/mods:dateIssued[@encoding='w3cdtf']">
-        <xsl:apply-templates select="mods:originInfo/mods:dateIssued[@encoding='w3cdtf']" mode="publicationYear" />
+      <xsl:when test="mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateIssued[@encoding='w3cdtf']">
+        <xsl:apply-templates select="mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateIssued[@encoding='w3cdtf']" mode="publicationYear" />
       </xsl:when>
-      <xsl:when test="mods:originInfo/mods:dateIssued[@encoding='marc']">
-        <xsl:apply-templates select="mods:originInfo/mods:dateIssued[@encoding='marc']" mode="publicationYear" />
+      <xsl:when test="mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateIssued[@encoding='marc']">
+        <xsl:apply-templates select="mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateIssued[@encoding='marc']" mode="publicationYear" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:apply-templates select="mods:originInfo/mods:dateCreated" mode="publicationYear" />
+        <xsl:apply-templates select="mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateCreated" mode="publicationYear" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -288,7 +288,7 @@
 
   <xsl:template name="dates">
     <dates>
-      <xsl:apply-templates select="mods:originInfo/mods:dateOther|mods:originInfo/mods:dateIssued|mods:originInfo/mods:dateCreated|mods:originInfo/mods:dateModified" />
+      <xsl:apply-templates select="mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateOther|mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateIssued|mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateCreated|mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateModified" />
     </dates>
   </xsl:template>
 

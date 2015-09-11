@@ -36,7 +36,7 @@
           <br />
         </xsl:for-each>
 <!-- Place, ?pt -->
-        <xsl:for-each select="mods:originInfo/mods:place/mods:placeTerm[@type='text']">
+        <xsl:for-each select="mods:originInfo[not(@eventType) or @eventType='publication']/mods:place/mods:placeTerm[@type='text']">
           <xsl:value-of select="." />
         </xsl:for-each>
 <!-- Author -->
