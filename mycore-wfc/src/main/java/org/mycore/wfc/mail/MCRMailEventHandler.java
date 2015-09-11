@@ -54,8 +54,8 @@ public class MCRMailEventHandler extends MCREventHandlerBase {
 
     private static final Logger LOGGER = Logger.getLogger(MCRMailEventHandler.class);
 
-    private void sendNotificationMail(MCREvent evt, MCRContent doc) throws Exception {
-        LOGGER.info("Preparing mail for: " + doc.getSystemId());
+    private void sendNotificationMail(MCREvent evt, MCRContent doc, String description) throws Exception {
+        LOGGER.info("Preparing mail for: " + description);
         HashMap<String, String> parameters = new HashMap<String, String>();
         for (Map.Entry<String, Object> entry : evt.entrySet()) {
             parameters.put(entry.getKey(), entry.getValue().toString());
@@ -68,17 +68,17 @@ public class MCRMailEventHandler extends MCREventHandlerBase {
 
     private void handleCategoryEvent(MCREvent evt, MCRCategory obj) {
         MCRContent xml = new MCRJDOMContent(MCRCategoryTransformer.getMetaDataDocument(obj, false));
-        handleEvent(evt, xml);
+        handleEvent(evt, xml, obj.toString());
     }
 
     private void handleObjectEvent(MCREvent evt, MCRObject obj) {
         MCRContent xml = new MCRJDOMContent(obj.createXML());
-        handleEvent(evt, xml);
+        handleEvent(evt, xml, obj.getId().toString());
     }
 
     private void handleDerivateEvent(MCREvent evt, MCRDerivate der) {
         MCRContent xml = new MCRJDOMContent(der.createXML());
-        handleEvent(evt, xml);
+        handleEvent(evt, xml, der.getId().toString());
     }
 
     private void handlePathEvent(MCREvent evt, Path file, BasicFileAttributes attrs) {
@@ -89,15 +89,15 @@ public class MCRMailEventHandler extends MCREventHandlerBase {
         MCRContent xml;
         try {
             xml = new MCRJDOMContent(MCRPathXML.getFileXML(path, attrs));
-            handleEvent(evt, xml);
+            handleEvent(evt, xml, path.toString());
         } catch (IOException e) {
             LOGGER.error("Error while generating mail for " + file, e);
         }
     }
 
-    private void handleEvent(MCREvent evt, MCRContent xml) {
+    private void handleEvent(MCREvent evt, MCRContent xml, String description) {
         try {
-            sendNotificationMail(evt, xml);
+            sendNotificationMail(evt, xml, description);
         } catch (Exception e) {
             LOGGER.error("Error while handling event: " + evt, e);
         }
