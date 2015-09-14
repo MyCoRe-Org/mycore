@@ -41,6 +41,7 @@
   <xsl:template mode="mods.title" match="mods:mods">
     <xsl:param name="type" select="''" />
     <xsl:param name="withSubtitle" select="false()" />
+    <xsl:param name="position" select="''" />
 
     <xsl:variable name="mods-type">
       <xsl:apply-templates select="." mode="mods.type" />
@@ -52,8 +53,13 @@
       </xsl:when>
       <xsl:when test="mods:titleInfo/mods:title">
         <xsl:choose>
-          <xsl:when test="not($type='')">
+          <xsl:when test="string-length($type) &gt; 0 and string-length($position) = 0">
             <xsl:apply-templates select="mods:titleInfo[@type=$type]" mode="mods.printTitle">
+              <xsl:with-param name="withSubtitle" select="$withSubtitle" />
+            </xsl:apply-templates>
+          </xsl:when>
+          <xsl:when test="string-length($type) &gt; 0 and string-length($position) &gt; 0">
+            <xsl:apply-templates select="mods:titleInfo[@type=$type][position()=$position]" mode="mods.printTitle">
               <xsl:with-param name="withSubtitle" select="$withSubtitle" />
             </xsl:apply-templates>
           </xsl:when>
