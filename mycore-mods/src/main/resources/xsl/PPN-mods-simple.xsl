@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:mods="http://www.loc.gov/mods/v3"
-  xmlns:xlink="http://www.w3.org/1999/xlink">
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" exclude-result-prefixes="i18n xlink xsl mods" >
   <xsl:param name="parentId" />
 
   <xsl:include href="xslInclude:PPN-mods-simple"/>
@@ -35,6 +35,19 @@
       <xsl:copy-of select="namespace::*" />
       <xsl:apply-templates select="node()|@*" />
     </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="mods:originInfo[not(@eventType)]">
+    <mods:originInfo eventType="publication">
+      <xsl:apply-templates select="node()|@*" />
+    </mods:originInfo>
+  </xsl:template>
+
+  <xsl:template match="mods:dateIssued[not(@encoding)]">
+    <!-- TODO: check date format first! -->
+    <mods:dateIssued encoding="w3cdtf">
+      <xsl:apply-templates select="node()|@*" />
+    </mods:dateIssued>
   </xsl:template>
 
 </xsl:stylesheet>
