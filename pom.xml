@@ -672,12 +672,12 @@
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>oaipmh</artifactId>
-        <version>0.4</version>
+        <version>0.6</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>oaipmh-dataprovider</artifactId>
-        <version>0.4</version>
+        <version>0.6</version>
       </dependency>
       <dependency>
         <groupId>junit</groupId>
