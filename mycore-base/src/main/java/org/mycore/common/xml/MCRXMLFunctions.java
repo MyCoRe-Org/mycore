@@ -557,15 +557,14 @@ public class MCRXMLFunctions {
     }
 
     /**
-     * @param derivate
      * @return the name of the maindoc of the given derivate or null if maindoc is not set
      */
-    public static String getMainDocName(String derivate) {
-        if (derivate == null || derivate.length() == 0) {
+    public static String getMainDocName(String derivateId) {
+        if (derivateId == null || derivateId.isEmpty()) {
             return null;
         }
 
-        MCRObjectID objectID = MCRObjectID.getInstance(derivate);
+        MCRObjectID objectID = MCRObjectID.getInstance(derivateId);
         if (!MCRMetadataManager.exists(objectID)) {
             return null;
         }
