@@ -93,8 +93,9 @@ public class MCRSecureTokenV2 {
      * @param baseURL
      *            a valid and absolute base URL
      * @param suffix
-     *            is appended to the <code>contentPath<
-     * &#64;param hashParameterName the name of the query parameter that holds the hash value
+     *            is appended to the <code>contentPath</code>
+     * @param hashParameterName
+     *            the name of the query parameter that holds the hash value
      * @return an absolute URL consisting of all elements as stated above and <code>queryParameters</code> in the
      *         <strong>given order</strong> appended by the hash parameter and the hash value from {@link #getHash()}.
      * @throws MalformedURLException
