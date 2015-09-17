@@ -28,17 +28,18 @@ import java.io.FilenameFilter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.status.StatusLogger;
+import org.apache.logging.log4j.web.Log4jServletContainerInitializer;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.events.MCRStartupHandler;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
@@ -80,15 +81,26 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
         MCRConfigurationLoader configurationLoader = MCRConfigurationLoaderFactory.getConfigurationLoader();
         Map<String, String> properties = configurationLoader.load();
         MCRConfiguration.instance().initialize(properties, true);
-        URL log4j2ConfigURL = MCRConfigurationDir.getConfigResource("log4j2.xml");
-        if (log4j2ConfigURL != null) {
-            System.out.printf(Locale.ROOT, "Using Log4J2 configuration at: %s\n", log4j2ConfigURL);
-            LoggerContext logCtx = (LoggerContext) LogManager.getContext(false);
-            try {
-                logCtx.setConfigLocation(log4j2ConfigURL.toURI());
-            } catch (URISyntaxException e) {
-                LOGGER.error("Failed to reconfigure logging", e);
+        String configFileKey = "log4j.configurationFile";
+        if (System.getProperty(configFileKey) == null) {
+            URL log4j2ConfigURL = MCRConfigurationDir.getConfigResource("log4j2.xml");
+            if (log4j2ConfigURL != null) {
+                System.setProperty(configFileKey, log4j2ConfigURL.toString());
             }
+        }
+        if (System.getProperty(configFileKey) != null) {
+            System.out.printf(Locale.ROOT, "Using Log4J2 configuration at: %s\n", System.getProperty(configFileKey));
+            if (servletContext != null) {
+                Log4jServletContainerInitializer log4jInitializer = new Log4jServletContainerInitializer();
+                try {
+                    log4jInitializer.onStartup(null, servletContext);
+                } catch (ServletException e) {
+                    System.err.println("Could not start Log4J2 context");
+                }
+            }
+
+            LoggerContext logCtx = (LoggerContext) LogManager.getContext(false);
+            logCtx.reconfigure();
             MCRSessionMgr.addSessionListener(new MCRSessionThreadContext());
         }
     }
@@ -96,7 +108,8 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
     private void loadExternalLibs() {
         File libDir = MCRConfigurationDir.getConfigFile("lib");
         if (libDir != null && libDir.isDirectory()) {
-            File[] listFiles = libDir.listFiles((FilenameFilter) (dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(".jar"));
+            File[] listFiles = libDir
+                .listFiles((FilenameFilter) (dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(".jar"));
             if (listFiles.length > 0) {
                 ClassLoader classLoader = this.getClass().getClassLoader();
                 Class<? extends ClassLoader> classLoaderClass = classLoader.getClass();

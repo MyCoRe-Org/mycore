@@ -54,7 +54,6 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
     public void onStartup(final Set<Class<?>> c, final ServletContext ctx) throws ServletException {
         ClassLoaderLeakPreventor leakPreventor = new MCRClassLoaderLeakPreventor();
         leakPreventor.contextInitialized(new ServletContextEvent(ctx));
-        final Logger LOGGER = Logger.getLogger(MCRServletContainerInitializer.class);
         MCRShutdownHandler shutdownHandler = MCRShutdownHandler.getInstance();
         shutdownHandler.isWebAppRunning = true;
         shutdownHandler.leakPreventor =leakPreventor;
@@ -62,6 +61,7 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
         //Make sure logging is configured
         //initialize MCRURIResolver
         MCRURIResolver.init(ctx);
+        final Logger LOGGER = Logger.getLogger(MCRServletContainerInitializer.class);
         if (LOGGER.isDebugEnabled()) {
             try {
                 Enumeration<URL> resources = this.getClass().getClassLoader().getResources("META-INF/web-fragment.xml");
