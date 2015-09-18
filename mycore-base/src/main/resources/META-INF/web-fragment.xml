@@ -27,6 +27,11 @@
     <filter-class>org.mycore.frontend.filter.MCRUserAgentFilter</filter-class>
   </filter>
 
+  <filter>
+    <filter-name>SecureTokenV2Filter</filter-name>
+    <filter-class>org.mycore.frontend.filter.MCRSecureTokenV2Filter</filter-class>
+  </filter>
+
   <servlet id="CreateObjectServlet">
     <servlet-name>CreateObjectServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRPersistentServlet</servlet-class>
@@ -217,6 +222,12 @@
     <filter-name>UserAgentFilter</filter-name>
     <servlet-name>MCRObjectServlet</servlet-name>
     <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>SecureTokenV2Filter</filter-name>
+    <servlet-name>MCRFileNodeServlet</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
   </filter-mapping>
   <servlet-mapping>
     <servlet-name>MCRStaticXMLFileServlet</servlet-name>
