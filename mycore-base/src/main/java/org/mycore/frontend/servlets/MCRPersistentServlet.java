@@ -96,6 +96,8 @@ public class MCRPersistentServlet extends MCRServlet {
 
     private Type type;
 
+    private boolean appendDerivate = false;
+
     private static final String OBJECT_ID_KEY = MCRPersistentServlet.class.getCanonicalName() + ".MCRObjectID";
 
     @Override
@@ -108,6 +110,10 @@ public class MCRPersistentServlet extends MCRServlet {
         String type = getInitParameter("type");
         if (type == null) {
             throw new ServletException("Parameter \"type\" is missing.");
+        }
+        String appendDerivate = getInitParameter("appendDerivate");
+        if (appendDerivate != null) {
+            this.appendDerivate = true;
         }
         this.operation = Operation.valueOf(operation);
         this.type = Type.valueOf(type);
@@ -202,8 +208,8 @@ public class MCRPersistentServlet extends MCRServlet {
      *  exception from underlying {@link MCREditorOutValidator}
      * @throws IOException
      *  exception from underlying {@link MCREditorOutValidator} or {@link XMLOutputter}
-     * @throws SAXParseException 
-     * @throws MCRException 
+     * @throws SAXParseException
+     * @throws MCRException
      */
     private MCRObject getMCRObject(Document doc) throws JDOMException, IOException, MCRException, SAXParseException {
         MCREditorOutValidator ev = null;
@@ -239,8 +245,8 @@ public class MCRPersistentServlet extends MCRServlet {
      *  from {@link #getMCRObject(Document)}
      * @throws IOException
      *  from {@link #getMCRObject(Document)}
-     * @throws SAXParseException 
-     * @throws MCRException 
+     * @throws SAXParseException
+     * @throws MCRException
      */
     private MCRObjectID createObject(MCRServletJob job, Document doc) throws MCRActiveLinkException, JDOMException,
         IOException, MCRException, SAXParseException {
@@ -267,7 +273,7 @@ public class MCRPersistentServlet extends MCRServlet {
     }
 
     /**
-     * Updates a mycore object in the persistence backend. 
+     * Updates a mycore object in the persistence backend.
      * @param doc
      *  MyCoRe object as XML
      * @return
@@ -278,8 +284,8 @@ public class MCRPersistentServlet extends MCRServlet {
      *  from {@link #getMCRObject(Document)}
      * @throws IOException
      *  from {@link #getMCRObject(Document)}
-     * @throws SAXParseException 
-     * @throws MCRException 
+     * @throws SAXParseException
+     * @throws MCRException
      */
     private MCRObjectID updateObject(Document doc) throws MCRActiveLinkException, JDOMException, IOException,
         MCRException, SAXParseException {
@@ -304,7 +310,7 @@ public class MCRPersistentServlet extends MCRServlet {
      *  MyCoRe derivate as XML
      * @return
      *  MCRObjectID of the MyCoRe object
-     * @throws SAXParseException 
+     * @throws SAXParseException
      */
     private MCRObjectID updateDerivateXML(Document editorSubmission) throws SAXParseException, IOException {
         MCRObjectID objectID;
@@ -342,8 +348,8 @@ public class MCRPersistentServlet extends MCRServlet {
      * Deletes a mycore derivate from the persistence backend.
      * @param id
      *  MyCoRe derivate ID
-     * @throws MCRActiveLinkException 
-     * @throws MCRPersistenceException 
+     * @throws MCRActiveLinkException
+     * @throws MCRPersistenceException
      */
     private void deleteDerivate(String id) throws MCRPersistenceException, MCRActiveLinkException {
         if (MCRAccessManager.checkPermission(id, PERMISSION_DELETE)) {
@@ -373,11 +379,23 @@ public class MCRPersistentServlet extends MCRServlet {
                     case object:
                         //return to object itself if created, else call editor form
                         MCRObjectID returnID = (MCRObjectID) job.getRequest().getAttribute(OBJECT_ID_KEY);
-                        if (returnID == null)
+                        if (returnID == null) {
                             redirectToCreateObject(job);
-                        else
-                            job.getResponse().sendRedirect(
-                                job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString()));
+                        }
+                        else {
+                            if (this.appendDerivate) {
+                                String parentObjectID = returnID.toString();
+                                if (!MCRAccessManager.checkPermission(parentObjectID, PERMISSION_WRITE)) {
+                                    throw new MCRPersistenceException("You do not have \"" + PERMISSION_WRITE + "\" permission on "
+                                        + parentObjectID + ".");
+                                }
+                                redirectToUploadPage(job, parentObjectID, null);
+                            }
+                            else {
+                                job.getResponse().sendRedirect(
+                                    job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + "receive/" + returnID.toString()));
+                            }
+                        }
                         return;
                     case derivate:
                         redirectToCreateDerivate(job);
@@ -429,7 +447,7 @@ public class MCRPersistentServlet extends MCRServlet {
     }
 
     /** Check for existing file type *.xed or *.xml
-     * 
+     *
      * @param file name base
      * @return the complete file name, *.xed is default
      */
@@ -447,7 +465,7 @@ public class MCRPersistentServlet extends MCRServlet {
 
     /**
      * redirects to new mcrobject form.
-     * 
+     *
      * At least "type" HTTP parameter is required to succeed.
      * <dl>
      *   <dt>type</dt>
@@ -496,7 +514,7 @@ public class MCRPersistentServlet extends MCRServlet {
 
     /**
      * redirects to new derivate upload form.
-     * 
+     *
      * At least "id" HTTP parameter is required to succeed.
      * <dl>
      *   <dt>id</dt>
@@ -516,7 +534,7 @@ public class MCRPersistentServlet extends MCRServlet {
 
     /**
      * redirects to either add files to derivate upload form or change derivate title form.
-     * 
+     *
      * At least "id" HTTP parameter is required to succeed.
      * <dl>
      *   <dt>id</dt>
@@ -566,7 +584,7 @@ public class MCRPersistentServlet extends MCRServlet {
 
     /**
      * redirects to upload form page.
-     * 
+     *
      * used by {@link #redirectToCreateDerivate(MCRServletJob)} {@link #redirectToUpdateDerivate(MCRServletJob)}
      * @param job
      * @param parentObjectID
@@ -590,9 +608,9 @@ public class MCRPersistentServlet extends MCRServlet {
 
     /**
      * handles validation errors (XML Schema) and present nice pages instead of stack traces.
-     * @throws IOException 
-     * @throws SAXException 
-     * @throws TransformerException 
+     * @throws IOException
+     * @throws SAXException
+     * @throws TransformerException
      */
     private void errorHandlerValid(MCRServletJob job, List<String> logtext) throws IOException, TransformerException,
         SAXException {
