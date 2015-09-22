@@ -19,17 +19,7 @@
   </xsl:template>
 
   <xsl:template mode="mods.datePublished" match="mods:mods">
-    <xsl:choose>
-      <xsl:when test="mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateIssued">
-        <xsl:value-of select="mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateIssued" />
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:variable name="created" select="ancestor::mycoreobject/service/servdates/servdate[@type='createdate']" />
-        <xsl:if test="string-length($created)&gt;0">
-          <xsl:value-of select="substring($created, 1,10)" />
-        </xsl:if>
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:value-of select="mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateIssued" />
   </xsl:template>
 
 
