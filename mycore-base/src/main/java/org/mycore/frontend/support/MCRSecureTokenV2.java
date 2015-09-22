@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.mycore.frontend.support;
 
@@ -17,7 +17,8 @@ import java.util.stream.Stream;
 /**
  * An implementation of SecureToken V2 used by "Wowza Streaming Engine".
  * <p>
- * A description of the algorithm:<br/>
+ * A description of the algorithm:
+ * </p>
  * <ol>
  * <li>A string is constructed by combining <code>contentPath</code>,'?' and all <strong>alphabetically sorted</strong>
  * parameters consisting of <code>ipAddress</code>, <code>sharedSecret</code> and any <code>queryParameters</code></li>
@@ -26,8 +27,7 @@ import java.util.stream.Stream;
  * <li>replace <code>'+'</code> by <code>'-'</code> and <code>'/'</code> by <code>'_'</code> to make it a safe parameter
  * value.</li>
  * </ol>
- * </p>
- * 
+ *
  * @author Thomas Scheffler (yagee)
  * @see <a href="https://mycore.atlassian.net/browse/MCR-1058">JIRA Ticket MCR-1058</a>
  */
@@ -89,7 +89,7 @@ public class MCRSecureTokenV2 {
      * Constructs an URL by using all information from the
      * {@link MCRSecureTokenV2#MCRSecureTokenV2(String, String, String, String...) constructor} except
      * <code>ipAddress</code> and <code>sharedSecret</code> and the supplied parameters.
-     * 
+     *
      * @param baseURL
      *            a valid and absolute base URL
      * @param suffix

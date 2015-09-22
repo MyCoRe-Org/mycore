@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.mycore.frontend.filter;
 
@@ -31,6 +31,7 @@ import org.mycore.frontend.support.MCRSecureTokenV2;
  * Filter for {@link MCRFileNodeServlet} that uses {@link MCRSecureTokenV2} to check access to specific file types.
  * <p>
  * used properties:
+ * </p>
  * <dl>
  * <dt>MCR.SecureTokenV2.Extensions=mp4,mpeg4</dt>
  * <dd>List of file extension. If empty, disables this filter</dd>
@@ -39,10 +40,9 @@ import org.mycore.frontend.support.MCRSecureTokenV2;
  * <dt>MCR.SecureTokenV2.SharedSecret=mySharedSecret</dt>
  * <dd>shared secret used to calculate secure token</dd>
  * </dl>
- * </p>
- * 
+ *
  * <code>contentPath</code> used for {@link MCRSecureTokenV2} is the {@link HttpServletRequest#getPathInfo() path info} without leading '/'.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 public class MCRSecureTokenV2Filter implements Filter {
