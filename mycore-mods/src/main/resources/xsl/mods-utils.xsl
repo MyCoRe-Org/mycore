@@ -48,7 +48,7 @@
     </xsl:variable>
 
     <xsl:choose>
-      <xsl:when test="$mods-type='confpro'">
+      <xsl:when test="$mods-type='confpro' or $mods-type='proceedings'">
         <xsl:apply-templates select="." mode="mods.title.confpro" />
       </xsl:when>
       <xsl:when test="mods:titleInfo/mods:title">
