@@ -44,10 +44,16 @@ public abstract class MCRSolrSearchUtils {
 
     public static <T> List<T> list(SolrClient solrClient, String query, DocumentHandler<T> handler)
         throws SolrServerException, IOException {
-        int numPerRequest = 10000;
-        List<T> resultList = new ArrayList<>();
         ModifiableSolrParams p = new ModifiableSolrParams();
         p.set("q", query);
+
+        return list(solrClient, p, handler);
+    }
+
+    public static <T> List<T> list(SolrClient solrClient, ModifiableSolrParams p, DocumentHandler<T> handler)
+        throws SolrServerException, IOException {
+        int numPerRequest = 10000;
+        List<T> resultList = new ArrayList<>();
         p.set("rows", String.valueOf(numPerRequest));
         p.set("fl", handler.fl());
         int start = 0;
