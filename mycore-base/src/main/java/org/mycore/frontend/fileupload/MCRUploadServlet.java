@@ -176,10 +176,10 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             Transaction tx = startTransaction();
             try {
                 long numBytesStored = uploadHandler.receiveFile(path, zis, length, md5);
+                commitTransaction(tx);
                 LOGGER.debug("Stored incoming file content with " + numBytesStored + " bytes");
                 pwOut.println(numBytesStored);
                 pwOut.flush();
-                commitTransaction(tx);
                 LOGGER.info("File transfer completed successfully.");
             } catch (Exception exc) {
                 LOGGER.error("Error while uploading file: " + path, exc);
