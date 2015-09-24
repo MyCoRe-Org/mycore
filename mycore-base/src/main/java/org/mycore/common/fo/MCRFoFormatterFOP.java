@@ -22,9 +22,12 @@
 
 package org.mycore.common.fo;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URL;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -40,8 +43,11 @@ import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
 import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
+import org.apache.fop.apps.FopFactoryBuilder;
 import org.apache.fop.apps.MimeConstants;
 import org.apache.log4j.Logger;
+import org.apache.xmlgraphics.io.Resource;
+import org.apache.xmlgraphics.io.ResourceResolver;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRURIResolver;
 import org.xml.sax.SAXException;
@@ -58,13 +64,23 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
     private final static Logger LOGGER = Logger.getLogger(MCRFoFormatterFOP.class);
 
     private FopFactory fopFactory;
+    
+    ResourceResolver resolver = new ResourceResolver() {
+        public OutputStream getOutputStream(URI uri) throws IOException {
+            URL url = MCRURIResolver.getServletContext().getResource(uri.toASCIIString());
+            return url.openConnection().getOutputStream();
+        }
 
+        public Resource getResource(URI uri) throws IOException {
+            return new Resource(MCRURIResolver.getServletContext().getResourceAsStream(uri.toASCIIString()));
+        }
+    };
+    
     /**
      * Protected constructor to create the singleton instance
      */
     public MCRFoFormatterFOP() {
-        fopFactory = FopFactory.newInstance();
-        fopFactory.setURIResolver(MCRURIResolver.instance());
+        FopFactoryBuilder fopFactoryBuilder = new FopFactoryBuilder(new File(".").toURI(), resolver);
         String fo_cfg = MCRConfiguration.instance().getString("MCR.LayoutService.FoFormatter.FOP.config",null);
         if ((fo_cfg != null) && (fo_cfg.length() != 0)) {
             DefaultConfigurationBuilder cfgBuilder = new DefaultConfigurationBuilder();
@@ -82,14 +98,10 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
                 LOGGER.error(e.getMessage());
             }
             if (cfg != null) {
-                try {
-                    fopFactory.setUserConfig(cfg);
-                } catch (FOPException e) {
-                    LOGGER.error("FOPException - Error while setting FOP configuration for " + fo_cfg);
-                    LOGGER.error(e.getMessage());
-                }
+                fopFactoryBuilder.setConfiguration(cfg);
             }
         }
+        fopFactory = fopFactoryBuilder.build();
     }
 
     public final void transform(InputStream in_stream, OutputStream out) throws TransformerException {
@@ -102,6 +114,12 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
             transformer.transform(src, res);
         } catch (FOPException e) {
             throw new TransformerException(e);
+        } finally {
+            try {
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
