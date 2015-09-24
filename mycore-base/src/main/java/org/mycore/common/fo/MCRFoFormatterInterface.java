@@ -22,10 +22,13 @@
 
 package org.mycore.common.fo;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.xml.transform.TransformerException;
+
+import org.mycore.common.content.MCRContent;
 
 /**
  * This is an interface to use configured XSL-FO formatters for the layout service.
@@ -36,6 +39,13 @@ import javax.xml.transform.TransformerException;
 
 public interface MCRFoFormatterInterface {
 
-    public void transform(InputStream fo_stream, OutputStream out) throws TransformerException;
+    /**
+     * @deprecated use {@link #transform(MCRContent, OutputStream)}
+     */
+    @Deprecated
+    public void transform(InputStream fo_stream, OutputStream out) throws TransformerException, IOException;
 
+    default public void transform(MCRContent input, OutputStream out) throws TransformerException, IOException{
+        transform(input.getInputStream(), out);
+    }
 }

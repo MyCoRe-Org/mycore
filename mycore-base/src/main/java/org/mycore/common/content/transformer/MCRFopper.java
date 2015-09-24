@@ -23,7 +23,6 @@
 package org.mycore.common.content.transformer;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.xml.transform.TransformerException;
@@ -45,25 +44,21 @@ public class MCRFopper extends MCRContentTransformer {
     @Override
     public MCRContent transform(MCRContent source) throws IOException {
         MCRByteArrayOutputStream pdf = new MCRByteArrayOutputStream(32 * 1024);
-        InputStream in = source.getInputStream();
         try {
-            MCRFoFactory.getFoFormatter().transform(in, pdf);
+            MCRFoFactory.getFoFormatter().transform(source, pdf);
         } catch (TransformerException e) {
             throw new IOException(e);
         }
-        in.close();
         return new MCRByteContent(pdf.getBuffer(), 0, pdf.size(), source.lastModified());
     }
 
     @Override
     public void transform(MCRContent source, OutputStream out) throws IOException {
-        InputStream in = source.getInputStream();
         try {
-            MCRFoFactory.getFoFormatter().transform(in, out);
+            MCRFoFactory.getFoFormatter().transform(source, out);
         } catch (TransformerException e) {
             throw new IOException(e);
         }
-        in.close();
     }
 
     @Override
