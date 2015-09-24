@@ -57,6 +57,7 @@ import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLParserErrorHandler;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -327,6 +328,19 @@ public class MCRPersistentServlet extends MCRServlet {
         }
         MCRMetadataManager.updateMCRDerivateXML(der);
         objectID = der.getDerivate().getMetaLink().getXLinkHrefID();
+        MCRObject obj = MCRMetadataManager.retrieveMCRObject(objectID);
+        List<MCRMetaLinkID> linkIDs = obj.getStructure().getDerivates();
+        for (MCRMetaLinkID linkID : linkIDs) {
+            if (linkID.getXLinkHrefID().equals(derivateID)) {
+                linkID.setXLinkTitle(der.getLabel());
+                try {
+                    MCRMetadataManager.update(obj);
+                } catch (MCRPersistenceException | MCRActiveLinkException e) {
+                    throw new MCRPersistenceException("Can't store label of derivate " + derivateID
+                         + " in derivate list of object " + objectID + ".", e);
+                }
+            }
+        }
         return objectID;
     }
 
