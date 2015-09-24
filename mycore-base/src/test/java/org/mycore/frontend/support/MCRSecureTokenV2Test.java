@@ -3,9 +3,9 @@
  */
 package org.mycore.frontend.support;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 
 import org.junit.Test;
 
@@ -24,10 +24,10 @@ public class MCRSecureTokenV2Test {
     }
 
     /**
-     * Test method for {@link org.mycore.frontend.support.MCRSecureTokenV2#toURL(java.lang.String, java.lang.String)}.
+     * Test method for {@link org.mycore.frontend.support.MCRSecureTokenV2#toURI(java.lang.String, java.lang.String)}.
      */
     @Test
-    public final void testToURL() throws MalformedURLException {
+    public final void testToURL() throws URISyntaxException {
         MCRSecureTokenV2 token = getWowzaSample();
         String baseURL = "http://192.168.1.1:1935/";
         String suffix = "/playlist.m3u8";
@@ -35,7 +35,7 @@ public class MCRSecureTokenV2Test {
         String expectedURL = baseURL + "vod/sample.mp4" + suffix
             + "?myTokenPrefixstarttime=1395230400&myTokenPrefixendtime=1500000000&myTokenPrefixCustomParameter=abcdef&"
             + hashParameterName + "=TgJft5hsjKyC5Rem_EoUNP7xZvxbqVPhhd0GxIcA2oo=";
-        assertEquals(expectedURL, token.toURL(baseURL, suffix, hashParameterName).toString());
+        assertEquals(expectedURL, token.toURI(baseURL, suffix, hashParameterName).toString());
     }
 
     private static MCRSecureTokenV2 getWowzaSample() {

@@ -3,8 +3,8 @@
  */
 package org.mycore.frontend.support;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -46,7 +46,8 @@ public class MCRSecureTokenV2 {
     }
 
     private void buildHash() {
-        String forHashing = Stream.concat(Stream.of(ipAddress, sharedSecret), Arrays.stream(queryParameters))
+        String forHashing = Stream.concat(Stream.of(ipAddress, sharedSecret),
+            Arrays.stream(queryParameters).filter(Objects::nonNull)) //case of HttpServletRequest.getQueryString()==null
             .sorted()
             .collect(Collectors.joining("&", contentPath + "?", ""));
         MessageDigest digest;
@@ -79,10 +80,10 @@ public class MCRSecureTokenV2 {
     }
 
     /**
-     * Same as calling {@link #toURL(String, String, String)} with <code>suffix=""</code>.
+     * Same as calling {@link #toURI(String, String, String)} with <code>suffix=""</code>.
      */
-    public URL toURL(String baseURL, String hashParameterName) throws MalformedURLException {
-        return toURL(baseURL, "", hashParameterName);
+    public URI toURI(String baseURL, String hashParameterName) throws URISyntaxException {
+        return toURI(baseURL, "", hashParameterName);
     }
 
     /**
@@ -98,20 +99,19 @@ public class MCRSecureTokenV2 {
      *            the name of the query parameter that holds the hash value
      * @return an absolute URL consisting of all elements as stated above and <code>queryParameters</code> in the
      *         <strong>given order</strong> appended by the hash parameter and the hash value from {@link #getHash()}.
-     * @throws MalformedURLException
-     *             if baseURL is not a valid URL
+     * @throws URISyntaxException  if baseURL is not a valid URI
      */
-    public URL toURL(String baseURL, String suffix, String hashParameterName) throws MalformedURLException {
+    public URI toURI(String baseURL, String suffix, String hashParameterName) throws URISyntaxException {
         Objects.requireNonNull(suffix, "'suffix' may not be null");
         Objects.requireNonNull(hashParameterName, "'hashParameterName' may not be null");
         if (hashParameterName.isEmpty()) {
             throw new IllegalArgumentException("'hashParameterName' may not be empty");
         }
-        URL context = new URL(baseURL);
-        URL completeURL = new URL(context, Stream
-            .concat(Arrays.stream(queryParameters), Stream.of(hashParameterName + "=" + hash))
-            .collect(Collectors.joining("&", contentPath + suffix + "?", "")));
-        return completeURL;
+        URI context = new URI(baseURL);
+        URI completeURI = context.resolve(Stream
+            .concat(Arrays.stream(queryParameters).filter(Objects::nonNull), Stream.of(hashParameterName + "=" + hash))
+            .collect(Collectors.joining("&", baseURL+contentPath + suffix + "?", "")));
+        return completeURI;
     }
 
     @Override
