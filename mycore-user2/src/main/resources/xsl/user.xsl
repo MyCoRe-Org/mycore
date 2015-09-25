@@ -199,7 +199,7 @@
             </tr>
             <tr>
               <th class="col-md-3">
-                <xsl:value-of select="i18n:translate('component.user2.admin.user.disabled')" />
+                <xsl:value-of select="concat(i18n:translate('component.user2.admin.user.disabled'), ':')" />
               </th>
               <td class="col-md-9">
                 <xsl:choose>
