@@ -7,14 +7,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.xml.MCRXMLFunctions;
@@ -78,7 +71,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
      * Hashmap to store logical and physical ids. An entry is added
      * for each derivate link.
      */
-    private Map<String, String> structLinkMap;
+    private Map<String, List<String>> structLinkMap;
 
     @Override
     public synchronized Mets getMETS(MCRPath dir, Set<MCRPath> ignoreNodes) throws IOException {
@@ -92,7 +85,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
 
         LOGGER.info("create mets for derivate " + derId.toString() + "...");
 
-        this.structLinkMap = new HashMap<String, String>();
+        this.structLinkMap = new HashMap<String, List<String>>();
 
         // create mets sections
         this.amdSection = createAmdSection();
@@ -264,7 +257,14 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
                     if (fileId != null) {
                         PhysicalSubDiv physicalDiv = getPhysicalDiv(fileId);
                         if (physicalDiv != null) {
-                            this.structLinkMap.put(physicalDiv.getId(), logicalChildDiv.getId());
+                            String physicalDivId = physicalDiv.getId();
+                            List<String> logChildDivIDs = this.structLinkMap.get(physicalDivId);
+                            if(logChildDivIDs == null){
+                                logChildDivIDs = new ArrayList<>();
+                            }
+
+                            logChildDivIDs.add(logicalChildDiv.getId());
+                            this.structLinkMap.put(physicalDivId, logChildDivIDs);
                         }
                     }
                 } catch (Exception exc) {
@@ -293,8 +293,12 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
      */
     private boolean validateLogicalStruct(AbstractLogicalDiv parent, LogicalSubDiv logicalDiv) {
         // has link
-        if (this.structLinkMap.containsValue(logicalDiv.getId()))
-            return true;
+        String logicalDivId = logicalDiv.getId();
+        for (List<String> logivalDivIDs : structLinkMap.values()) {
+            if(logivalDivIDs.contains(logicalDivId)){
+                return true;
+            }
+        }
         // has children with link
         Iterator<LogicalSubDiv> it = logicalDiv.getChildren().iterator();
         while (it.hasNext()) {
@@ -313,11 +317,15 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         PhysicalDiv physicalDiv = this.physicalStructMap.getDivContainer();
         List<PhysicalSubDiv> subDivList = physicalDiv.getChildren();
         for (PhysicalSubDiv physLink : subDivList) {
-            String logicalId = structLinkMap.get(physLink.getId());
-            if (logicalId != null) {
-                currentLogicalDivId = logicalId;
+            List<String> logicalIdList = structLinkMap.get(physLink.getId());
+            if (logicalIdList != null) {
+                for (String logicalId : logicalIdList) {
+                    currentLogicalDivId = logicalId;
+                    structLink.addSmLink(new SmLink(currentLogicalDivId, physLink.getId()));
+                }
+            } else {
+                structLink.addSmLink(new SmLink(currentLogicalDivId, physLink.getId()));
             }
-            structLink.addSmLink(new SmLink(currentLogicalDivId, physLink.getId()));
         }
         return structLink;
     }
