@@ -12,6 +12,9 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.jaxen.JaxenXPathFactory;
 import org.mycore.frontend.xeditor.MCRUsedNamespaces;
 
+/**
+ * @author Frank Lützenkirchen
+ */
 public class MCRJaxenXPathFactory extends JaxenXPathFactory {
 
     private final static Logger LOGGER = Logger.getLogger(MCRJaxenXPathFactory.class);
