@@ -684,7 +684,7 @@ public class MCRXMLFunctions {
         MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
         MCRCategory category = dao.getCategory(categID, 0);
 
-        return category.getCurrentLabel().getText();
+        return category.getLabel(MCRSessionMgr.getCurrentSession().getCurrentLanguage()).getText();
     }
 
     public static boolean isCategoryID(String classificationId, String categoryId) {
