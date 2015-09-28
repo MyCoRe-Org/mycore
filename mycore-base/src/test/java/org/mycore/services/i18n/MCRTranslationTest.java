@@ -28,10 +28,20 @@ import static org.junit.Assert.assertEquals;
 import java.util.Locale;
 import java.util.Set;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
 public class MCRTranslationTest extends MCRTestCase {
+
+    @Test
+    @Ignore
+    public void translate() {
+        // default locale should be 'de'
+        assertEquals("Hallo Welt", MCRTranslation.translate("junit.hello"));
+        // fall back to 'de'
+        assertEquals("Hallo Welt", MCRTranslation.translate("junit.hello", Locale.FRENCH));
+    }
 
     /*
      * Test method for 'org.mycore.services.i18n.MCRTranslation.getStringArray(String)'
