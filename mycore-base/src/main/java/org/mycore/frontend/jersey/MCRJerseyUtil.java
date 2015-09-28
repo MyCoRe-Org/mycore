@@ -1,5 +1,7 @@
 package org.mycore.frontend.jersey;
 
+import java.util.Objects;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -27,8 +29,10 @@ public abstract class MCRJerseyUtil {
     /**
      * Transforms a jdom document to a <code>MCRContent</code> via the <code>MCRLayoutService</code>.
      * 
-     * @param document the document to transform
-     * @param request the http request
+     * @param document
+     *            the document to transform
+     * @param request
+     *            the http request
      */
     public static MCRContent transform(Document document, HttpServletRequest request) throws Exception {
         MCRParameterCollector parameter = new MCRParameterCollector(request);
@@ -46,7 +50,8 @@ public abstract class MCRJerseyUtil {
     /**
      * Returns the mycore id. Throws a web application exception if the id is invalid or not found.
      * 
-     * @param id id as string
+     * @param id
+     *            id as string
      * @return mycore object id
      */
     public static MCRObjectID getID(String id) {
@@ -65,8 +70,10 @@ public abstract class MCRJerseyUtil {
     /**
      * Checks if the current user has the given permission. Throws an unauthorized exception otherwise.
      * 
-     * @param id mycore object id
-     * @param permission permission to check
+     * @param id
+     *            mycore object id
+     * @param permission
+     *            permission to check
      */
     public static void checkPermission(MCRObjectID id, String permission) {
         if (!MCRAccessManager.checkPermission(id, permission)) {
@@ -75,10 +82,26 @@ public abstract class MCRJerseyUtil {
     }
 
     /**
+     * Checks if the current user has the read permission on the given derivate. Throws an unauthorized exception
+     * otherwise.
+     * 
+     * @param id
+     *            mycore object id
+     * @see MCRAccessManager#checkPermissionForReadingDerivate(String)
+     */
+    public static void checkDerivateReadPermission(MCRObjectID id) {
+        if (!MCRAccessManager.checkPermissionForReadingDerivate(id.toString())) {
+            throw new WebApplicationException(Response.status(Status.UNAUTHORIZED).build());
+        }
+    }
+
+    /**
      * Checks if the current user has the given permission. Throws an unauthorized exception otherwise.
      * 
-     * @param id mycore object id
-     * @param permission permission to check
+     * @param id
+     *            mycore object id
+     * @param permission
+     *            permission to check
      */
     public static void checkPermission(String id, String permission) {
         if (!MCRAccessManager.checkPermission(id, permission)) {
@@ -89,7 +112,8 @@ public abstract class MCRJerseyUtil {
     /**
      * Checks if the current user has the given permission. Throws an unauthorized exception otherwise.
      * 
-     * @param permission permission to check
+     * @param permission
+     *            permission to check
      */
     public static void checkPermission(String permission) {
         if (!MCRAccessManager.checkPermission(permission)) {
@@ -98,9 +122,10 @@ public abstract class MCRJerseyUtil {
     }
 
     /**
-     * Returns a human readable message of a http status code. 
+     * Returns a human readable message of a http status code.
      * 
-     * @param statusCode http status code
+     * @param statusCode
+     *            http status code
      * @return human readable string
      */
     public static String fromStatusCode(int statusCode) {
