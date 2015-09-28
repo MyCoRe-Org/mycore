@@ -158,7 +158,10 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
                 if (attrs.isDirectory()) {
                     directories.put(path, attrs);
                 } else {
-                    files.put(path, attrs);
+                    String contentType = MCRContentTypes.probeContentType(path);
+                    if(contentType.startsWith("image")) {
+                        files.put(path, attrs);
+                    }
                 }
             }
         }
