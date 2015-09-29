@@ -151,6 +151,12 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     private void checkTemplateUptodate() throws TransformerConfigurationException, SAXException {
         boolean check = System.currentTimeMillis() - modifiedChecked > CHECK_PERIOD;
+        boolean useCache = MCRConfiguration.instance().getBoolean("MCR.UseXSLTemplateCache", true);
+        if(!useCache){
+            check = true;
+            LOGGER.info("XSL template cache OFF.");
+        }
+
         if (check) {
             for (int i = 0; i < templateSources.length; i++) {
                 long lastModified = templateSources[i].getLastModified();
