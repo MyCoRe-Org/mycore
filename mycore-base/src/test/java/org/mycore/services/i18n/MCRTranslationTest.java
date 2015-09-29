@@ -35,7 +35,6 @@ import org.mycore.common.MCRTestCase;
 public class MCRTranslationTest extends MCRTestCase {
 
     @Test
-    @Ignore
     public void translate() {
         // default locale should be 'de'
         assertEquals("Hallo Welt", MCRTranslation.translate("junit.hello"));
