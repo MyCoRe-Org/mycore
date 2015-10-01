@@ -32,6 +32,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -113,10 +114,10 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @see MCRCategoryDAO#addCategory(MCRCategoryID, MCRCategory)
      */
     @MCRCommand(syntax = "load classification from file {0}", help = "The command adds a new classification from file {0} to the system.", order = 10)
-    public static void loadFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException,
+    public static List<String> loadFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException,
         IOException {
-        String fileURL = Paths.get(filename).toAbsolutePath().toUri().toURL().toString();
-        loadFromURL(fileURL);
+        String fileURL = Paths.get(filename).toAbsolutePath().normalize().toUri().toURL().toString();
+        return Collections.singletonList("load classification from url " + fileURL);
     }
 
     @MCRCommand(syntax = "load classification from url {0}", help = "The command adds a new classification from URL {0} to the system.", order = 15)
@@ -134,10 +135,10 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @see MCRCategoryDAO#replaceCategory(MCRCategory)
      */
     @MCRCommand(syntax = "update classification from file {0}", help = "The command updates a classification from file {0} to the system.", order = 20)
-    public static void updateFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException,
+    public static List<String> updateFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException,
         IOException {
-        String fileURL = Paths.get(filename).toAbsolutePath().toUri().toURL().toString();
-        updateFromURL(fileURL);
+        String fileURL = Paths.get(filename).toAbsolutePath().normalize().toUri().toURL().toString();
+        return Collections.singletonList("update classification from url " + fileURL);
     }
 
     @MCRCommand(syntax = "update classification from url {0}", help = "The command updates a classification from URL {0} to the system.", order = 25)
