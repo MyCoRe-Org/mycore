@@ -1,20 +1,20 @@
 /*
- * 
+ *
  * $Revision$ $Date$
- * 
+ *
  * This file is part of *** M y C o R e *** See http://www.mycore.de/ for
  * details.
- * 
+ *
  * This program is free software; you can use it, redistribute it and / or
  * modify it under the terms of the GNU General Public License (GPL) as
  * published by the Free Software Foundation; either version 2 of the License or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program, in a file called gpl.txt or license.txt. If not, write to the
  * Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -132,7 +132,7 @@ public class MCRXMLFunctions {
 
     /**
      * returns the given String trimmed
-     * 
+     *
      * @param arg0
      *            String to be trimmed
      * @return trimmed copy of arg0
@@ -144,7 +144,7 @@ public class MCRXMLFunctions {
 
     /**
      * returns the given String in unicode NFC normal form.
-     * 
+     *
      * @param arg0 String to be normalized
      * @see Normalizer#normalize(CharSequence, java.text.Normalizer.Form)
      */
@@ -154,7 +154,7 @@ public class MCRXMLFunctions {
 
     /**
      * returns the QueryServlet-Link of the given hostAlias
-     * 
+     *
      * @param hostAlias
      *            remote alias
      * @return QueryServlet-Link
@@ -165,7 +165,7 @@ public class MCRXMLFunctions {
 
     /**
      * returns the FileNodeServlet-Link of the given hostAlias
-     * 
+     *
      * @param hostAlias
      *            remote alias
      * @return FileNodeServlet-Link
@@ -242,7 +242,7 @@ public class MCRXMLFunctions {
 
     /**
      * The method get a date String in format yyyy-MM-ddThh:mm:ssZ for ancient date values.
-     * 
+     *
      * @param date_value the date string
      * @param field_name the name of field of MCRMetaHistoryDate, it should be 'von' or 'bis'
      * @param calendar_name the name if the calendar defined in MCRCalendar
@@ -274,7 +274,7 @@ public class MCRXMLFunctions {
      * format of the returned string by providing a proper value for the format
      * parameter. If null or an invalid format is provided the default format
      * "yyyy-MM-dd" will be used.
-     * 
+     *
      * @param format
      *            the format in which the date should be formatted
      * @return the current date in the desired format
@@ -294,7 +294,7 @@ public class MCRXMLFunctions {
 
     /**
      * A delegate for {@link String#compareTo(String)}.
-     * 
+     *
      * @return s1.compareTo(s2)
      */
     public static int compare(String s1, String s2) {
@@ -343,7 +343,7 @@ public class MCRXMLFunctions {
     /**
      * Encodes the given url so that one can safely embed that string in a part
      * of an URI
-     * 
+     *
      * @return the encoded source
      */
     public static String encodeURL(String source, String encoding) {
@@ -453,7 +453,7 @@ public class MCRXMLFunctions {
 
     /**
      * Reads the property "URN.Enabled.Objects".
-     * 
+     *
      * @param givenType
      *            the type of the mycore object to check
      * @return <code>true</code> if the given type is in the list of allowed
@@ -507,7 +507,7 @@ public class MCRXMLFunctions {
     /**
      * Returns a list of link sources of a given MCR object type. The structure
      * is <em>link</em>. If no links are found an empty NodeList is returned.
-     * 
+     *
      * @param mcrid
      *            MCRObjectID as String as the link target
      * @param sourceType
@@ -537,7 +537,7 @@ public class MCRXMLFunctions {
     /**
      * same as {@link #getLinkSources(String, String)} with
      * <code>sourceType</code>=<em>null</em>
-     * 
+     *
      */
     public static NodeList getLinkSources(String mcrid) {
         return getLinkSources(mcrid, null);
@@ -545,7 +545,7 @@ public class MCRXMLFunctions {
 
     /**
      * Determines the mime type for the file given by its name.
-     * 
+     *
      * @param f
      *            the name of the file
      * @return the mime type of the given file
@@ -577,7 +577,7 @@ public class MCRXMLFunctions {
     /**
      * The method return a org.w3c.dom.NodeList as subpath of the doc input
      * NodeList selected by a path as String.
-     * 
+     *
      * @param doc
      *            the input org.w3c.dom.Nodelist
      * @param path
@@ -616,7 +616,7 @@ public class MCRXMLFunctions {
 
     /**
      * checks if the current user is in a specific role
-     * 
+     *
      * @param role
      *            a role name
      * @return true if user has this role
@@ -631,6 +631,10 @@ public class MCRXMLFunctions {
 
     public static boolean isCurrentUserGuestUser() {
         return MCRSessionMgr.getCurrentSession().getUserInformation().equals(MCRSystemUserInformation.getGuestInstance());
+    }
+
+    public static String getCurrentUserAttribute(String attribute) {
+        return MCRSessionMgr.getCurrentSession().getUserInformation().getUserAttribute(attribute);
     }
 
     public static boolean exists(String objectId) {
@@ -699,7 +703,7 @@ public class MCRXMLFunctions {
      * Method returns the amount of space consumed by the files contained in the
      * derivate container. The returned string is already formatted meaning it
      * has already the optimal measurement unit attached (e.g. 142 MB, ).
-     * 
+     *
      * @param derivateId
      *            the derivate id for which the size should be returned
      * @return the size as formatted string
