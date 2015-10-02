@@ -27,7 +27,10 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
@@ -52,26 +55,33 @@ public class MCRClassificationWritePermission implements MCRResourceAccessChecke
     @Override
     public boolean isPermitted(ContainerRequest request) {
         String value = request.getEntity(String.class);
-//        Set<MCRCategoryID> categories = MCRCategUtils.getRootCategoryIDs(value);
-        HashMap<MCRCategoryID, String> categories = MCRCategUtils.getCategoryIDMap(value);
-        if (categories == null) {
-            LOGGER.error("Could not parse: " + value);
-            return false;
-        }
-        for (Map.Entry<MCRCategoryID, String> categoryEntry : categories.entrySet()) {
-            MCRCategoryID category = categoryEntry.getKey();
-            String state = categoryEntry.getValue();
-
-            if (!hasPermission(category, state)) {
-                LOGGER.info("Permission denied on classification: " + category);
+        try {
+            //        Set<MCRCategoryID> categories = MCRCategUtils.getRootCategoryIDs(value);
+            HashMap<MCRCategoryID, String> categories = MCRCategUtils.getCategoryIDMap(value);
+            if (categories == null) {
+                LOGGER.error("Could not parse: " + value);
                 return false;
             }
+            for (Map.Entry<MCRCategoryID, String> categoryEntry : categories.entrySet()) {
+                MCRCategoryID category = categoryEntry.getKey();
+                String state = categoryEntry.getValue();
+
+                if (!hasPermission(category, state)) {
+                    LOGGER.info("Permission denied on classification: " + category);
+                    return false;
+                }
+            }
+            return true;
+        } catch (Exception exc) {
+            throw new WebApplicationException(exc,
+                Response.status(Status.INTERNAL_SERVER_ERROR)
+                    .entity("Unable to check permission for request " + request.getRequestUri() + " containing entity value " + value)
+                    .build());
         }
-        return true;
     }
 
     private boolean hasPermission(MCRCategoryID category, String state) {
-        if(state.equals("new")){
+        if (state.equals("new")) {
             return MCRAccessManager.checkPermission(PERMISSION_CREATE);
         }
 

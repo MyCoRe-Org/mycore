@@ -66,7 +66,7 @@ public class MCRCategUtils {
 
                 String state = root.getAsJsonPrimitive("state").getAsString();
                 JsonElement parentIdJSON = root.get("parentId");
-                if(parentIdJSON != null && parentIdJSON.isJsonPrimitive() && parentIdJSON.getAsString().equals("_placeboid_")){
+                if(parentIdJSON != null && parentIdJSON.isJsonPrimitive() && "_placeboid_".equals(parentIdJSON.getAsString())){
                     state = "new";
                 }
 
