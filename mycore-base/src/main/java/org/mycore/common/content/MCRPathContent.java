@@ -55,7 +55,7 @@ public class MCRPathContent extends MCRContent implements MCRSeekableChannelCont
     private Path path;
 
     public MCRPathContent(Path path) {
-        this.path = Objects.requireNonNull(path);
+        this.path = Objects.requireNonNull(path).toAbsolutePath().normalize();
     }
 
     /* (non-Javadoc)

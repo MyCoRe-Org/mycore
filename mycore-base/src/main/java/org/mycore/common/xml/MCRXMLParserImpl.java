@@ -131,12 +131,8 @@ public class MCRXMLParserImpl implements MCRXMLParser {
                     LOGGER.debug("Could not separate baseURI from " + systemId, e);
                 }
             }
-            String prefix = getPrefix(baseURI);
-            LOGGER.debug(MessageFormat.format("systemId: {0} prefixed? {1}", systemId, systemId.startsWith(prefix)));
-            if (prefix.length() > 0 && systemId.startsWith(prefix)) {
-                systemId = systemId.substring(prefix.length());
-                LOGGER.debug("new systemId: " + systemId);
-            } else {
+            String relativeSystemId = relativize(baseURI, systemId);
+            if (relativeSystemId.equals(systemId)) {
                 LOGGER.debug("Try to use EntityResolver interface");
                 InputSource inputSource = resolveEntity(publicId, systemId);
                 if (inputSource != null) {
@@ -144,17 +140,33 @@ public class MCRXMLParserImpl implements MCRXMLParser {
                     return inputSource;
                 }
             }
-            return fallback.resolveEntity(name, publicId, baseURI, systemId);
+            return fallback.resolveEntity(name, publicId, baseURI, relativeSystemId);
         }
 
-        private static String getPrefix(String baseURI) {
+        private static String relativize(String baseURI, String systemId) {
             if (baseURI == null) {
-                return "";
+                return systemId;
             }
+            baseURI = normalize(baseURI);
             int pos = baseURI.lastIndexOf('/');
             String prefix = baseURI.substring(0, pos + 1);
             LOGGER.debug(MessageFormat.format("prefix of baseURI ''{0}'' is: {1}", baseURI, prefix));
-            return prefix;
+            LOGGER.debug(MessageFormat.format("systemId: {0} prefixed? {1}", systemId, systemId.startsWith(prefix)));
+            if (prefix.length() > 0 && systemId.startsWith(prefix)) {
+                systemId = systemId.substring(prefix.length());
+                LOGGER.debug("new systemId: " + systemId);
+                return systemId;
+            }
+            return systemId;
+        }
+
+        private static String normalize(String baseURI) {
+            try {
+                return URI.create(baseURI).normalize().toString();
+            } catch (RuntimeException e) {
+                LOGGER.debug("Error while normalizing " + baseURI, e);
+                return baseURI;
+            }
         }
 
     }
