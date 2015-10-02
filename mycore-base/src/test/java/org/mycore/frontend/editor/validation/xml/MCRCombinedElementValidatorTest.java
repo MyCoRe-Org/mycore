@@ -30,7 +30,7 @@ public class MCRCombinedElementValidatorTest extends MCRValidatorTest {
     @Test
     public void testSingleValidator() {
         validator.setProperty("xsl", "string-length(name())=3");
-        assertTrue(validator.isValid(null));
+        assertTrue(validator.isValid((Object[])null));
         assertTrue(validator.isValid(new Element("foo")));
         assertFalse(validator.isValid(new Element("foobar")));
     }

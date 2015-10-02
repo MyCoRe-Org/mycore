@@ -28,9 +28,11 @@ import java.util.*;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.jdom2.*;
+import org.jdom2.filter.Filters;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.jdom2.xpath.XPath;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.frontend.editor.validation.MCRValidator;
@@ -453,14 +455,10 @@ public class MCREditorSubmission {
                             }
                         }
                     } else {
-
-                        Element current = null;
-                        try {
-                            XPath xpath = XPath.newInstance(path);
-                            for (Namespace namespace : getNamespaceMap().values())
-                                xpath.addNamespace(namespace);
-                            current = (Element) xpath.selectSingleNode(getXML());
-                        } catch (JDOMException ex) {
+                        XPathExpression<Element> xpath = XPathFactory.instance().compile(path, Filters.element(), null,
+                            getNamespaceMap().values());
+                        Element current = xpath.evaluateFirst(getXML());
+                        if (current == null) {
                             LOGGER.debug("Could not validate, because no element found at xpath " + path);
                             continue;
                         }

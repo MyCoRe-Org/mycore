@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.xpath.XPath;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -20,7 +19,6 @@ import org.mycore.frontend.MCRFrontendUtil;
 
 /**
  * @author shermann
- *
  */
 public class MCRDisplayHideDerivateServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
@@ -53,16 +51,14 @@ public class MCRDisplayHideDerivateServlet extends MCRServlet {
         return obj.getDerivate().getMetaLink().getXLinkHref();
     }
 
-    /** 
-     * Toggles the display attribute value of the derivate element. 
-     * */
+    /**
+     * Toggles the display attribute value of the derivate element.
+     */
     private void toggleDisplay(MCRDerivate derObj) throws Exception {
         Document xml = derObj.createXML();
-        XPath xp = XPath.newInstance("mycorederivate/derivate");
-        Element derivateNode = (Element) xp.selectSingleNode(xml);
+        Element derivateNode = xml.getRootElement().getChild("derivate");
 
-        Attribute displayAttr = null;
-        displayAttr = derivateNode.getAttribute("display");
+        Attribute displayAttr = derivateNode.getAttribute("display");
 
         /* the attributs is not existing, user wants to hide derivate */
         if (displayAttr == null) {

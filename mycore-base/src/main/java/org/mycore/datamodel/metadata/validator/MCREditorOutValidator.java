@@ -38,13 +38,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.jdom2.xpath.XPath;
+import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
@@ -122,12 +124,10 @@ public class MCREditorOutValidator {
     public Document generateValidMyCoReObject() throws JDOMException, SAXParseException, IOException {
         MCRObject obj;
         // load the JDOM object
-        XPath editorOutput = XPath.newInstance("/mycoreobject/*/*/*[@editor.output]");
-        for (Object node : editorOutput.selectNodes(input)) {
-            Element e = (Element) node;
-            LOGGER.debug("removing \"editor.output\" Attribute from " + e.getName());
-            e.removeAttribute("editor.output");
-        }
+        XPathFactory.instance()
+            .compile("/mycoreobject/*/*/*/@editor.output", Filters.attribute())
+            .evaluate(input)
+            .forEach(Attribute::detach);
         try {
             byte[] xml = MCRUtils.getByteArray(input);
             obj = new MCRObject(xml, true);

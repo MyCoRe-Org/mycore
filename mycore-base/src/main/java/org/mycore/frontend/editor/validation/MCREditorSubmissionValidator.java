@@ -6,8 +6,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.xpath.XPath;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.mycore.frontend.editor.MCREditorDefReader;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
@@ -65,10 +66,9 @@ public class MCREditorSubmissionValidator {
                 if (!field1.isEmpty()) {
                     validateConditionOnPair(parms, path, condition, field1, field2);
                 } else {
-                    Element current = null;
-                    try {
-                        current = (Element) XPath.selectSingleNode(sub.getXML(), path);
-                    } catch (JDOMException ex) {
+                    XPathExpression<Element> xp = XPathFactory.instance().compile(path, Filters.element());
+                    Element current = xp.evaluateFirst(sub.getXML());
+                    if (current == null) {
                         LOGGER.debug("Skipping further validation, because no element found at xpath " + path);
                         continue;
                     }

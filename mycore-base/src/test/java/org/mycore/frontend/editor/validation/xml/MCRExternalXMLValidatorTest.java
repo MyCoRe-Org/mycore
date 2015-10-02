@@ -26,7 +26,7 @@ public class MCRExternalXMLValidatorTest extends MCRValidatorTest {
     @Test
     public void testExternal() {
         validator.setProperty("method", "externalTest");
-        assertTrue(validator.isValid(null));
+        assertTrue(validator.isValid((Object[])null));
         assertFalse(validator.isValid(new Element("foo")));
         assertTrue(validator.isValid(new Element("mcrfoo")));
     }

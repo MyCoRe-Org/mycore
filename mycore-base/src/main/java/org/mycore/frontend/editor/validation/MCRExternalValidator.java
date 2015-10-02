@@ -11,7 +11,6 @@ public class MCRExternalValidator extends MCRValidatorBase {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected boolean isValidOrDie(Object... input) throws Exception {
         if (input == null)
             input = new Object[] { null };
@@ -21,12 +20,10 @@ public class MCRExternalValidator extends MCRValidatorBase {
         return invokeMethod(m, input);
     }
 
-    @SuppressWarnings("unchecked")
     protected Class getArgumentType() {
         return String.class;
     }
 
-    @SuppressWarnings("unchecked")
     private Class[] buildArgTypes(Object... input) {
         Class[] argTypes = new Class[input.length];
         for (int i = 0; i < argTypes.length; i++)
@@ -34,7 +31,6 @@ public class MCRExternalValidator extends MCRValidatorBase {
         return argTypes;
     }
 
-    @SuppressWarnings("unchecked")
     private Method getMethod(Class[] argTypes) throws NoSuchMethodException, ClassNotFoundException {
         String clazz = getProperty("class");
         String method = getProperty("method");

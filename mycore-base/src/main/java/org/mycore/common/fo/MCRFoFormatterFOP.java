@@ -112,6 +112,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
     }
 
     @Override
+    @Deprecated
     public final void transform(InputStream in_stream, OutputStream out) throws TransformerException, IOException {
         transform(new MCRStreamContent(in_stream), out);
     }

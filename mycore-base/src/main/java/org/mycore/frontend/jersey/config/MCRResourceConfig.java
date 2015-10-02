@@ -25,7 +25,9 @@ public class MCRResourceConfig extends ScanningResourceConfig {
 
     /**
      * Perform a new search for resource classes and provider classes.
+     * @deprecated See {@link ScanningResourceConfig#reload()} for more information
      */
+    @Deprecated
     public void reload() {
         getClasses().clear();
         init(new PackageNamesScanner(packages));

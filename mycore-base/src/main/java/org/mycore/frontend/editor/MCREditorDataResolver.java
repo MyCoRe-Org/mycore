@@ -23,7 +23,6 @@
 
 package org.mycore.frontend.editor;
 
-import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,10 +33,10 @@ import javax.xml.transform.URIResolver;
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.Namespace;
+import org.jdom2.filter.Filters;
 import org.jdom2.transform.JDOMSource;
-import org.jdom2.xpath.XPath;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 
 /**
  * Returns input data entered in any recently used editor form, given a valid editor session ID.
@@ -66,16 +65,10 @@ public class MCREditorDataResolver implements URIResolver {
         Element editor = MCREditorSessionCache.instance().getEditorSession(sessionID).getXML();
         MCREditorSubmission sub = new MCREditorSubmission(editor);
         Document xml = sub.getXML();
-        try {
-            XPath xp = XPath.newInstance(xPath);
-            for (Entry<String, Namespace> entry : sub.getNamespaceMap().entrySet())
-                xp.addNamespace(entry.getValue());
-
-            Element resolved = (Element) (xp.selectSingleNode(xml));
-            return new JDOMSource(resolved == null ? new Element("nothingFound") : resolved);
-        } catch (JDOMException e) {
-            throw new TransformerException("Could not get XPath instance for: " + xPath, e);
-        }
+        XPathExpression<Element> xp = XPathFactory.instance().compile(xPath, Filters.element(), null,
+            sub.getNamespaceMap().values());
+        Element resolved = xp.evaluateFirst(xml);
+        return new JDOMSource(resolved == null ? new Element("nothingFound") : resolved);
     }
 
     private String fixAttributeConditionsInXPath(String xPath) {
