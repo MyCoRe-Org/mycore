@@ -132,7 +132,7 @@
       <xsl:variable name="trimmedValue" select="java:trim(string(nameOrPND))" />
       <xsl:choose>
         <xsl:when test="string-length($trimmedValue)&lt;11 and string(number(translate($trimmedValue,'-Xx','')))!='NaN'">
-          <xsl:variable name="gndURL" select="concat('http://d-nb.info/gnd/',$trimmedValue,'/about/rdf')"/>
+          <xsl:variable name="gndURL" select="concat('http://d-nb.info/gnd/',$trimmedValue,'/about/lds')"/>
           <!-- PND -->
           <xsl:message>
             <xsl:value-of select="concat($gndURL,' ',ex:date-time())"/>
