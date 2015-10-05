@@ -42,6 +42,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.iview2.services.MCRIView2Tools;
 import org.mycore.iview2.services.MCRJobState;
@@ -84,7 +85,7 @@ public class MCRIView2RemoteFunctions {
             return new MCRIView2RemoteJob(derID, derPath, imagePath);
         } catch (HibernateException | IOException e) {
             LOGGER.error("Error while getting next tiling job.", e);
-            if (transaction != null && transaction.isActive()) {
+            if (transaction != null && transaction.getStatus().isOneOf(TransactionStatus.ACTIVE)) {
                 transaction.rollback();
             }
             throw e;

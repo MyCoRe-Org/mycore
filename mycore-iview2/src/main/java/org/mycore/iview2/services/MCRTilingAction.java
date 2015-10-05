@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -64,7 +65,7 @@ public class MCRTilingAction implements Runnable {
                 @Override
                 public void postImageReaderCreated() {
                     session.clear(); //beside tileJob, no write access so far
-                    if (transaction.isActive()) {
+                    if (transaction.getStatus().isOneOf(TransactionStatus.ACTIVE)) {
                         transaction.commit();
                     }
                 }
@@ -87,7 +88,7 @@ public class MCRTilingAction implements Runnable {
             transaction.commit();
         } catch (Exception e) {
             LOGGER.error("Error while getting next tiling job.", e);
-            if (transaction != null && transaction.isActive()) {
+            if (transaction != null && transaction.getStatus().isOneOf(TransactionStatus.ACTIVE)) {
                 transaction.rollback();
             }
         } finally {

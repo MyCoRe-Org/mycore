@@ -14,6 +14,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -132,7 +133,7 @@ public class MCRGetRemoteCreatedHandle extends TimerTask {
             MCRHandleManager.LOGGER.error("Could not get handles from database", ex);
             tx.rollback();
         } finally {
-            if (tx.isActive()) {
+            if (tx.getStatus().isOneOf(TransactionStatus.ACTIVE)) {
                 tx.commit();
             }
             session.disconnect();

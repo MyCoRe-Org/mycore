@@ -70,7 +70,7 @@ public class MCRShutdownServer {
     }
 
     private static Map<String, String> getConnectionProperties() throws IOException, SAXException {
-        URL hibernateCfg = MCRConfigurationDir.getConfigResource(MCRHIBConnection.getHibernateConfigResourceName());
+        URL hibernateCfg = MCRConfigurationDir.getConfigResource(MCRHibernateBootstrapper.getHibernateConfigResourceName());
         if (hibernateCfg == null) {
             throw new IOException("Could not find 'hibernate.cfg.xml'");
         }

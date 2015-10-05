@@ -26,6 +26,7 @@ import java.io.InputStream;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Transaction;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
@@ -167,7 +168,7 @@ public abstract class MCRUploadHandler {
     @Deprecated
     protected void startTransaction() {
         LOGGER.debug("Starting transaction");
-        if (tx == null || !tx.isActive()) {
+        if (tx == null || !tx.getStatus().isOneOf(TransactionStatus.ACTIVE)) {
             tx = MCRHIBConnection.instance().getSession().beginTransaction();
         } else {
             throw new MCRException("Transaction already started");

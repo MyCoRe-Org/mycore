@@ -51,21 +51,6 @@ public class MCRUserTestCase extends MCRHibTestCase {
         DAO.addCategory(null, groupsCategory);
     }
 
-    /* (non-Javadoc)
-     * @see org.mycore.common.MCRHibTestCase#getHibernateConfiguration()
-     */
-    @Override
-    protected Configuration getHibernateConfiguration() {
-        MCRHIBConnection connection = MCRHIBConnection.instance();
-        Configuration configuration = super.getHibernateConfiguration();
-        if (!connection.containsMapping("MCRUser")) {
-            configuration.addAnnotatedClass(MCRUser.class);
-            MCRHIBConnection.instance().buildSessionFactory(configuration);
-            sessionFactory = MCRHIBConnection.instance().getSessionFactory();
-        }
-        return configuration;
-    }
-
     @Override
     protected Map<String, String> getTestProperties() {
         Map<String, String> testProperties = super.getTestProperties();

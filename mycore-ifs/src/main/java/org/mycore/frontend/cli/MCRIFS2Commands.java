@@ -25,7 +25,8 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.ScrollMode;
@@ -33,6 +34,7 @@ import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
 import org.mycore.common.MCRException;
@@ -54,7 +56,7 @@ import com.google.common.io.Files;
 @MCRCommandGroup(name = "IFS2 Maintenance")
 public class MCRIFS2Commands {
 
-    private static Logger LOGGER = Logger.getLogger(MCRIFSCommands.class);
+    private static Logger LOGGER = LogManager.getLogger();
 
     @MCRCommand(syntax = "repair mcrdata.xml in content store {0} for project id {1}", help = "repair the entries in mcrdata.xml with data from content store {0} for project ID {1}")
     public static void repairMcrdataXmlForProject(String content_store, String project_id) {
@@ -158,7 +160,7 @@ public class MCRIFS2Commands {
         }
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.getTransaction();
-        if (tx.isActive()) {
+        if (tx.getStatus().isOneOf(TransactionStatus.ACTIVE)) {
             tx.commit();
         }
     }
@@ -189,7 +191,7 @@ public class MCRIFS2Commands {
         String id = "";
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.getTransaction();
-        if (!tx.isActive()) {
+        if (tx.getStatus().isNotOneOf(TransactionStatus.ACTIVE)) {
             tx.begin();
         }
         try {
@@ -269,7 +271,7 @@ public class MCRIFS2Commands {
         long size_old = 0;
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.getTransaction();
-        if (!tx.isActive()) {
+        if (tx.getStatus().isNotOneOf(TransactionStatus.ACTIVE)) {
             tx.begin();
         }
         try {

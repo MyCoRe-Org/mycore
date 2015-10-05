@@ -34,17 +34,17 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.junit.After;
 import org.junit.Before;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.hibernate.MCRHibernateBootstrapper;
 
 /**
- * @author Thomas Scheffler (yagee)
- *
- *         Need to insert some things here
- *
+ * @author Thomas Scheffler (yagee) Need to insert some things here
  */
 public abstract class MCRHibTestCase extends MCRTestCase {
 
@@ -76,22 +76,20 @@ public abstract class MCRHibTestCase extends MCRTestCase {
         // Configure logging etc.
         super.setUp();
         Logger.getLogger(MCRHibTestCase.class).debug("Setup hibernate");
+        MCRHibernateBootstrapper bootstrapper = new MCRHibernateBootstrapper();
+        bootstrapper.startUp(null);
         hibConnection = MCRHIBConnection.instance();
         sessionFactory = hibConnection.getSessionFactory();
         try {
             Logger.getLogger(MCRHibTestCase.class).debug("Prepare hibernate test", new RuntimeException());
-            SchemaExport export = new SchemaExport(getHibernateConfiguration());
-            export.create(false, true);
+            SchemaExport schemaExport = new SchemaExport((MetadataImplementor) hibConnection.getMetadata());
+            schemaExport.create(false, true);
             beginTransaction();
             sessionFactory.getCurrentSession().clear();
         } catch (RuntimeException e) {
             Logger.getLogger(MCRHibTestCase.class).error("Error while setting up hibernate JUnit test.", e);
             throw e;
         }
-    }
-
-    protected Configuration getHibernateConfiguration() {
-        return MCRHIBConnection.instance().getConfiguration();
     }
 
     @After
@@ -108,12 +106,8 @@ public abstract class MCRHibTestCase extends MCRTestCase {
         tx = currentSession.beginTransaction();
     }
 
-    /**
-     * @throws HibernateException
-     *
-     */
     protected void endTransaction() throws HibernateException {
-        if (tx != null && tx.isActive()) {
+        if (tx != null && tx.getStatus().isOneOf(TransactionStatus.ACTIVE)) {
             try {
                 tx.commit();
             } catch (HibernateException e) {

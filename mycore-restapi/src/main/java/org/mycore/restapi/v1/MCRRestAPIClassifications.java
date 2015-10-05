@@ -45,6 +45,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.hibernate.Transaction;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -198,7 +199,7 @@ public class MCRRestAPIClassifications extends HttpServlet {
         Transaction t1 = null;
         try {
             Transaction tx = MCRHIBConnection.instance().getSession().getTransaction();
-            if (tx == null || !tx.isActive()) {
+            if (tx == null || !tx.getStatus().isOneOf(TransactionStatus.ACTIVE)) {
                 t1 = MCRHIBConnection.instance().getSession().beginTransaction();
             }
             MCRCategory cl = DAO.getCategory(MCRCategoryID.rootID(classID), -1);

@@ -23,30 +23,29 @@
 
 package org.mycore.common.events;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 import javax.servlet.ServletContext;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDirSetup;
+import org.mycore.common.config.MCRConfigurationException;
 
 /**
- * Initializes classes that implement {@link AutoExecutable} interface that are defined via <code>MCR.Startup.Class</code> property.
+ * Initializes classes that implement {@link AutoExecutable} interface that are defined via
+ * <code>MCR.Startup.Class</code> property.
  * 
  * @author Thomas Scheffler (yagee)
- *
  */
 public class MCRStartupHandler {
 
     /**
-     * Can set <code>true</code> or <code>false</code> as {@link ServletContext#setAttribute(String, Object)} to skip errors on startup. 
+     * Can set <code>true</code> or <code>false</code> as {@link ServletContext#setAttribute(String, Object)} to skip
+     * errors on startup.
      */
     public static final String HALT_ON_ERROR = "MCR.Startup.haltOnError";
-    
+
     private static final Logger LOGGER = Logger.getLogger(MCRStartupHandler.class);
 
     public static interface AutoExecutable {
@@ -66,49 +65,37 @@ public class MCRStartupHandler {
         public void startUp(ServletContext servletContext);
     }
 
-    private static class AutoExecutableComparator implements Comparator<AutoExecutable> {
-        @Override
-        public int compare(AutoExecutable o1, AutoExecutable o2) {
-            //reverse ordering: highest priority first
-            return Integer.compare(o2.getPriority(), o1.getPriority());
-        }
-    }
-
     public static void startUp(ServletContext servletContext) {
         //setup configuration
         MCRConfigurationDirSetup dirSetup = new MCRConfigurationDirSetup();
         dirSetup.startUp(servletContext);
 
-        List<String> startupClasses = MCRConfiguration.instance().getStrings("MCR.Startup.Class", null);
-        if (startupClasses == null) {
-            return;
-        }
-
-        List<AutoExecutable> autoExecutables = new ArrayList<AutoExecutable>(startupClasses.size());
-
-        for (String className : startupClasses) {
-            try {
-                AutoExecutable autoExecutable = (AutoExecutable) Class.forName(className).newInstance();
-                boolean added = autoExecutables.add(autoExecutable);
-            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-                LOGGER.error("Error while starting startup class: " + className, e);
-            }
-        }
-        
-        Collections.sort(autoExecutables, new AutoExecutableComparator());
-        for (AutoExecutable autoExecutable : autoExecutables) {
-            LOGGER.info(autoExecutable.getPriority() + ": Starting " + autoExecutable.getName());
-            try {
-                autoExecutable.startUp(servletContext);
-            } catch (ExceptionInInitializerError e) {
-                boolean haltOnError = servletContext.getAttribute(HALT_ON_ERROR) == null || Boolean
+        MCRConfiguration.instance().getStrings("MCR.Startup.Class", Collections.emptyList())
+            .stream()
+            .map(MCRStartupHandler::getAutoExecutable)
+            //reverse ordering: highest priority first
+            .sorted((o1, o2) -> Integer.compare(o2.getPriority(), o1.getPriority()))
+            .forEachOrdered(autoExecutable -> {
+                LOGGER.info(autoExecutable.getPriority() + ": Starting " + autoExecutable.getName());
+                try {
+                    autoExecutable.startUp(servletContext);
+                } catch (ExceptionInInitializerError e) {
+                    boolean haltOnError = servletContext.getAttribute(HALT_ON_ERROR) == null || Boolean
                         .parseBoolean((String) servletContext.getAttribute(HALT_ON_ERROR));
 
-                if (haltOnError) {
-                    throw e;
+                    if (haltOnError) {
+                        throw e;
+                    }
+                    LOGGER.warn(e.toString());
                 }
-                LOGGER.warn(e.toString());
-            }
+            });
+    }
+
+    private static AutoExecutable getAutoExecutable(String className) {
+        try {
+            return (AutoExecutable) Class.forName(className).newInstance();
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+            throw new MCRConfigurationException("Could not initialize 'MCR.Startup.Class': " + className, e);
         }
     }
 }

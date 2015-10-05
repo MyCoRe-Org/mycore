@@ -22,7 +22,7 @@
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
     <maven.compiler.arg>-Werror</maven.compiler.arg>
     <uniqueVersion>false</uniqueVersion>
-    <hibernate.version>4.3.8.Final</hibernate.version>
+    <hibernate.version>5.0.2.Final</hibernate.version>
     <httpcomponents.version>4.5.1</httpcomponents.version>
     <httpcore.version>4.4.3</httpcore.version>
     <xalan.version>2.7.2</xalan.version>
@@ -734,7 +734,7 @@
       <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
-        <version>2.3.1</version>
+        <version>2.4</version>
       </dependency>
       <dependency>
         <groupId>com.google.zxing</groupId>

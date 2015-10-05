@@ -27,21 +27,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.MessageFormat;
-import java.util.Iterator;
-import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.hibernate.MappingNotFoundException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.mapping.Table;
-import org.hibernate.service.ServiceRegistry;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.stat.Statistics;
 import org.hibernate.type.BooleanType;
 import org.hibernate.type.DateType;
@@ -56,7 +49,6 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 
@@ -64,13 +56,8 @@ import org.mycore.common.events.MCRShutdownHandler.Closeable;
  * Class for hibernate connection to selected database
  * 
  * @author Thomas Scheffler (yagee)
- * 
  */
 public class MCRHIBConnection implements Closeable {
-    private static Configuration HIBCFG;
-
-    private ServiceRegistry serviceRegistry;
-
     private SessionFactory sessionFactory;
 
     static MCRHIBConnection SINGLETON;
@@ -79,9 +66,7 @@ public class MCRHIBConnection implements Closeable {
 
     private static String DIALECT;
 
-    private String JMX_TYPE = "Hibernate";
-
-    private String JMX_COMPONENT_STATISTICS = "Statistics";
+    private static MetadataImplementor metadata;
 
     @Override
     protected void finalize() throws Throwable {
@@ -98,118 +83,18 @@ public class MCRHIBConnection implements Closeable {
 
     public static boolean isEnabled() {
         return MCRConfiguration.instance().getBoolean("MCR.Persistence.Database.Enable", true)
-                && getHibernateConfig() != null;
-    }
-
-    private static URL getHibernateConfig() {
-        File configFile = MCRConfigurationDir.getConfigFile("hibernate.cfg.xml");
-        if (configFile != null && configFile.canRead()) {
-            try {
-                return configFile.toURI().toURL();
-            } catch (MalformedURLException e) {
-                LOGGER.warn("Error while looking for: " + configFile, e);
-            }
-        }
-        return MCRConfigurationDir.getConfigResource(getHibernateConfigResourceName());
-    }
-
-    static String getHibernateConfigResourceName() {
-        //do not query MCRConfiguration as it is maybe not yet initialized.
-        return "hibernate.cfg.xml"; //standard anyway
+            && instance().sessionFactory != null;
     }
 
     /**
      * This method initializes the connection to the database
      */
     protected MCRHIBConnection() throws MCRPersistenceException {
-        try {
-            buildConfiguration();
-            buildSessionFactory();
-            registerStatisticsService();
-        } catch (Exception exc) {
-            String msg = "Could not connect to database";
-            throw new MCRPersistenceException(msg, exc);
-        } finally {
-            MCRShutdownHandler.getInstance().addCloseable(this);
-        }
+        MCRShutdownHandler.getInstance().addCloseable(this);
     }
 
     /**
-     * This method creates the configuration needed by hibernate
-     */
-    private void buildConfiguration() {
-        URL hibernateConfig = getHibernateConfig();
-        if (hibernateConfig == null) {
-            throw new MCRPersistenceException("Could not find hibernate.cfg.xml");
-        }
-        HIBCFG = new Configuration().configure(hibernateConfig);
-        if (MCRConfiguration.instance().getBoolean("MCR.Hibernate.DialectQueries", false)) {
-            String dialect = HIBCFG.getProperty("hibernate.dialect");
-            DIALECT = dialect.substring(dialect.lastIndexOf('.') + 1);
-        } else {
-            DIALECT = null;
-        }
-        List<String> mappings = MCRConfiguration.instance().getStrings("MCR.Hibernate.Mappings");
-        for (String className : mappings) {
-            try {
-                String resourceName = getResourceName(className);
-                LOGGER.info("Add mapping: " + resourceName);
-                HIBCFG.addResource(resourceName);
-            } catch (MappingNotFoundException me) {
-                LOGGER.info("Add annotated class: " + className);
-                HIBCFG.addAnnotatedClass(getAnnotatedClass(className));
-            }
-        }
-        serviceRegistry = new StandardServiceRegistryBuilder().applySettings(HIBCFG.getProperties()).build();
-        LOGGER.info("Hibernate configured");
-    }
-
-    private String getResourceName(String className) {
-        return className.replaceAll("\\.", "/") + ".hbm.xml";
-    }
-
-    private Class<?> getAnnotatedClass(String className) {
-        try {
-            return Class.forName(className);
-        } catch (ClassNotFoundException e) {
-            LOGGER.error("Class not found: " + className);
-            return null;
-        }
-    }
-
-    /**
-     * This method creates the SessionFactory for hiberante
-     */
-    private void buildSessionFactory() {
-        if (sessionFactory == null) {
-            sessionFactory = HIBCFG.buildSessionFactory(serviceRegistry);
-        }
-    }
-
-    public synchronized void buildSessionFactory(Configuration config) {
-        sessionFactory.close();
-        ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(HIBCFG.getProperties())
-                .build();
-        unregisterStatisticsService();
-        sessionFactory = config.buildSessionFactory(serviceRegistry);
-        registerStatisticsService();
-        HIBCFG = config;
-        this.serviceRegistry = serviceRegistry;
-    }
-
-    private void registerStatisticsService() {
-        //TODO: Get this work again with hibernate 4.3
-        Statistics stats = getSessionFactory().getStatistics();
-        //MCRJMXBridge.register(stats, JMX_TYPE, JMX_COMPONENT_STATISTICS);
-    }
-
-    private void unregisterStatisticsService() {
-        //MCRJMXBridge.unregister(JMX_TYPE, JMX_COMPONENT_STATISTICS);
-    }
-
-    /**
-     * This method returns the current session for queries on the database
-     * through hibernate
+     * This method returns the current session for queries on the database through hibernate
      * 
      * @return Session current session object
      */
@@ -217,18 +102,18 @@ public class MCRHIBConnection implements Closeable {
         Session session = sessionFactory.getCurrentSession();
         if (!session.isOpen()) {
             LOGGER.warn(MessageFormat.format("Hibernate session {0} is closed, generating new session",
-                    Integer.toHexString(session.hashCode())));
+                Integer.toHexString(session.hashCode())));
             session = sessionFactory.openSession();
         }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(MessageFormat.format("Returning session: {0} open: {1}",
-                    Integer.toHexString(session.hashCode()), session.isOpen()));
+                Integer.toHexString(session.hashCode()), session.isOpen()));
         }
         return session;
     }
 
-    public Configuration getConfiguration() {
-        return HIBCFG;
+    public Metadata getMetadata() {
+        return metadata;
     }
 
     /**
@@ -239,13 +124,11 @@ public class MCRHIBConnection implements Closeable {
      * @return boolean
      */
     public boolean containsMapping(String tablename) {
-        Iterator<Table> it = HIBCFG.getTableMappings();
-        while (it.hasNext()) {
-            if (it.next().getName().equals(tablename)) {
-                return true;
-            }
-        }
-        return false;
+        return metadata.getEntityBindings()
+            .stream()
+            .filter(p -> p.getTable().getName().equals(tablename))
+            .findFirst()
+            .isPresent();
     }
 
     /**
@@ -291,62 +174,62 @@ public class MCRHIBConnection implements Closeable {
         File statsFile = new File(MCRConfiguration.instance().getString("MCR.Save.FileSystem"), "hibernatestats.xml");
         Document doc = new Document(new Element("hibernatestats"));
         doc.getRootElement().addContent(
-                new Element("metric").setAttribute("connectCount", String.valueOf(stats.getConnectCount())));
+            new Element("metric").setAttribute("connectCount", String.valueOf(stats.getConnectCount())));
         doc.getRootElement().addContent(
-                new Element("metric").setAttribute("flushCount", String.valueOf(stats.getFlushCount())));
+            new Element("metric").setAttribute("flushCount", String.valueOf(stats.getFlushCount())));
         doc.getRootElement().addContent(
-                new Element("metric").setAttribute("transactionCount", String.valueOf(stats.getTransactionCount())));
+            new Element("metric").setAttribute("transactionCount", String.valueOf(stats.getTransactionCount())));
         doc.getRootElement().addContent(
-                new Element("metric").setAttribute("successfulTransactionCount",
-                        String.valueOf(stats.getSuccessfulTransactionCount())));
+            new Element("metric").setAttribute("successfulTransactionCount",
+                String.valueOf(stats.getSuccessfulTransactionCount())));
         doc.getRootElement().addContent(
-                new Element("metric").setAttribute("sessionOpenCount", String.valueOf(stats.getSessionOpenCount())));
+            new Element("metric").setAttribute("sessionOpenCount", String.valueOf(stats.getSessionOpenCount())));
         doc.getRootElement().addContent(
-                new Element("metric").setAttribute("sessionCloseCount", String.valueOf(stats.getSessionCloseCount())));
+            new Element("metric").setAttribute("sessionCloseCount", String.valueOf(stats.getSessionCloseCount())));
         doc.getRootElement().addContent(
-                new Element("metric").setAttribute("sessionOpenCount", String.valueOf(stats.getSessionOpenCount())));
+            new Element("metric").setAttribute("sessionOpenCount", String.valueOf(stats.getSessionOpenCount())));
         doc.getRootElement().addContent(
-                new Element("metric").setAttribute("QueryExecutionCount",
-                        String.valueOf(stats.getQueryExecutionCount())));
+            new Element("metric").setAttribute("QueryExecutionCount",
+                String.valueOf(stats.getQueryExecutionCount())));
         doc.getRootElement().addContent(
-                new Element("metric").setAttribute("QueryExecutionMaxTime",
-                        String.valueOf(stats.getQueryExecutionMaxTime())));
+            new Element("metric").setAttribute("QueryExecutionMaxTime",
+                String.valueOf(stats.getQueryExecutionMaxTime())));
         if (stats.getQueryExecutionMaxTimeQueryString() != null) {
             doc.getRootElement().addContent(
-                    new Element("longestQuery").setAttribute("value", stats.getQueryExecutionMaxTimeQueryString()));
+                new Element("longestQuery").setAttribute("value", stats.getQueryExecutionMaxTimeQueryString()));
         }
         doc.getRootElement().addContent(
-                new Element("metric").setAttribute("CollectionFetchCount",
-                        String.valueOf(stats.getCollectionFetchCount())));
+            new Element("metric").setAttribute("CollectionFetchCount",
+                String.valueOf(stats.getCollectionFetchCount())));
         doc.getRootElement().addContent(
-                new Element("metric").setAttribute("CollectionLoadCount",
-                        String.valueOf(stats.getCollectionLoadCount())));
+            new Element("metric").setAttribute("CollectionLoadCount",
+                String.valueOf(stats.getCollectionLoadCount())));
         doc.getRootElement().addContent(
-                new Element("metric").setAttribute("CollectionRecreateCount",
-                        String.valueOf(stats.getCollectionRecreateCount())));
+            new Element("metric").setAttribute("CollectionRecreateCount",
+                String.valueOf(stats.getCollectionRecreateCount())));
         doc.getRootElement().addContent(
-                new Element("metric").setAttribute("CollectionRemoveCount",
-                        String.valueOf(stats.getCollectionRemoveCount())));
+            new Element("metric").setAttribute("CollectionRemoveCount",
+                String.valueOf(stats.getCollectionRemoveCount())));
         doc.getRootElement().addContent(
-                new Element("metric").setAttribute("CollectionUpdateCount",
-                        String.valueOf(stats.getCollectionUpdateCount())));
+            new Element("metric").setAttribute("CollectionUpdateCount",
+                String.valueOf(stats.getCollectionUpdateCount())));
         doc.getRootElement().addContent(
-                new Element("metric").setAttribute("EntityDeleteCount", String.valueOf(stats.getEntityDeleteCount())));
+            new Element("metric").setAttribute("EntityDeleteCount", String.valueOf(stats.getEntityDeleteCount())));
         doc.getRootElement().addContent(
-                new Element("metric").setAttribute("EntityFetchCount", String.valueOf(stats.getEntityFetchCount())));
+            new Element("metric").setAttribute("EntityFetchCount", String.valueOf(stats.getEntityFetchCount())));
         doc.getRootElement().addContent(
-                new Element("metric").setAttribute("EntityLoadCount", String.valueOf(stats.getEntityLoadCount())));
+            new Element("metric").setAttribute("EntityLoadCount", String.valueOf(stats.getEntityLoadCount())));
         doc.getRootElement().addContent(
-                new Element("metric").setAttribute("EntityInsertCount", String.valueOf(stats.getEntityInsertCount())));
+            new Element("metric").setAttribute("EntityInsertCount", String.valueOf(stats.getEntityInsertCount())));
         doc.getRootElement().addContent(
-                new Element("metric").setAttribute("EntityUpdateCount", String.valueOf(stats.getEntityUpdateCount())));
+            new Element("metric").setAttribute("EntityUpdateCount", String.valueOf(stats.getEntityUpdateCount())));
         doc.getRootElement()
-                .addContent(
-                        new Element("metric").setAttribute("queryCacheHitCount",
-                                String.valueOf(stats.getQueryCacheHitCount())));
+            .addContent(
+                new Element("metric").setAttribute("queryCacheHitCount",
+                    String.valueOf(stats.getQueryCacheHitCount())));
         doc.getRootElement().addContent(
-                new Element("metric").setAttribute("queryCacheMissCount",
-                        String.valueOf(stats.getQueryCacheMissCount())));
+            new Element("metric").setAttribute("queryCacheMissCount",
+                String.valueOf(stats.getQueryCacheMissCount())));
         doc.getRootElement().addContent(addStringArray(new Element("queries"), "query", "value", stats.getQueries()));
         FileOutputStream fileOutputStream = new FileOutputStream(statsFile);
         try {
@@ -364,28 +247,19 @@ public class MCRHIBConnection implements Closeable {
     }
 
     public SessionFactory getSessionFactory() {
-        if (sessionFactory.isClosed()) {
-            sessionFactory = null;
-            unregisterStatisticsService();
-            buildSessionFactory();
-            registerStatisticsService();
-        }
-
         return sessionFactory;
     }
 
     /**
-     * returns the named query from the hibernate mapping.
-     * 
-     * if a query with name <code>name.&lt;DBDialect&gt;</code> exists it takes
-     * precedence over a query named <code>name</code>
+     * returns the named query from the hibernate mapping. if a query with name <code>name.&lt;DBDialect&gt;</code>
+     * exists it takes precedence over a query named <code>name</code>
      * 
      * @return Query defined in mapping
      */
     public Query getNamedQuery(String name) {
         if (DIALECT != null) {
             String dialectQueryName = name + "." + DIALECT;
-            if (HIBCFG.getNamedSQLQueries().containsKey(dialectQueryName)) {
+            if (metadata.getNamedNativeQueryDefinition(dialectQueryName) != null) {
                 LOGGER.debug("Using query named:" + dialectQueryName);
                 return getSession().getNamedQuery(dialectQueryName);
             }
@@ -396,12 +270,14 @@ public class MCRHIBConnection implements Closeable {
         return getSession().getNamedQuery(name);
     }
 
-    public ServiceRegistry getServiceRegistry() {
-        return serviceRegistry;
-    }
-
     @Override
     public int getPriority() {
         return Integer.MIN_VALUE;
+    }
+
+    static void init(SessionFactory sessionFactory, MetadataImplementor metadata, String dialect) {
+        instance().sessionFactory = sessionFactory;
+        instance().metadata = metadata;
+        instance().DIALECT = dialect;
     }
 }
