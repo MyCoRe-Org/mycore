@@ -51,6 +51,36 @@ public class MCRHibernateBootstrapper implements AutoExecutable {
 
     private static Logger LOGGER = LogManager.getLogger();
 
+    private static URL getHibernateConfig() {
+        File configFile = MCRConfigurationDir.getConfigFile(getHibernateConfigResourceName());
+        if (configFile != null && configFile.canRead()) {
+            try {
+                return configFile.toURI().toURL();
+            } catch (MalformedURLException e) {
+                LOGGER.warn("Error while looking for: " + configFile, e);
+            }
+        }
+        return MCRConfigurationDir.getConfigResource(getHibernateConfigResourceName());
+    }
+
+    private static String getResourceName(String className) {
+        return className.replaceAll("\\.", "/") + ".hbm.xml";
+    }
+
+    private static Class<?> getAnnotatedClass(String className) {
+        try {
+            return Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            LOGGER.error("Class not found: " + className);
+            return null;
+        }
+    }
+
+    static String getHibernateConfigResourceName() {
+        //do not query MCRConfiguration as it is maybe not yet initialized.
+        return "hibernate.cfg.xml"; //standard anyway
+    }
+
     /* (non-Javadoc)
      * @see org.mycore.common.events.MCRStartupHandler.AutoExecutable#getName()
      */
@@ -72,8 +102,9 @@ public class MCRHibernateBootstrapper implements AutoExecutable {
      */
     @Override
     public void startUp(ServletContext servletContext) {
-        if (MCRConfiguration.instance().getBoolean("MCR.Persistence.Database.Enable", true)) {
-            StandardServiceRegistry standardRegistry = getStandardRegistry(getHibernateConfig());
+        final URL hibernateConfig = getHibernateConfig();
+        if (MCRConfiguration.instance().getBoolean("MCR.Persistence.Database.Enable", true) && hibernateConfig != null) {
+            StandardServiceRegistry standardRegistry = getStandardRegistry(hibernateConfig);
             Metadata metadata = getMetadata(standardRegistry);
             SessionFactory sessionFactory = getSessionFactory(metadata);
             String dialect = getDialect(metadata);
@@ -111,43 +142,13 @@ public class MCRHibernateBootstrapper implements AutoExecutable {
             }
         });
         return metadataSources
-            .getMetadataBuilder()
-            .applyImplicitNamingStrategy(ImplicitNamingStrategyJpaCompliantImpl.INSTANCE)
-            .build();
-    }
-
-    private static URL getHibernateConfig() {
-        File configFile = MCRConfigurationDir.getConfigFile(getHibernateConfigResourceName());
-        if (configFile != null && configFile.canRead()) {
-            try {
-                return configFile.toURI().toURL();
-            } catch (MalformedURLException e) {
-                LOGGER.warn("Error while looking for: " + configFile, e);
-            }
-        }
-        return MCRConfigurationDir.getConfigResource(getHibernateConfigResourceName());
+                .getMetadataBuilder()
+                .applyImplicitNamingStrategy(ImplicitNamingStrategyJpaCompliantImpl.INSTANCE)
+                .build();
     }
 
     private StandardServiceRegistry getStandardRegistry(URL hibernateConfigURL) {
         return new StandardServiceRegistryBuilder().configure(hibernateConfigURL).build();
-    }
-
-    private static String getResourceName(String className) {
-        return className.replaceAll("\\.", "/") + ".hbm.xml";
-    }
-
-    private static Class<?> getAnnotatedClass(String className) {
-        try {
-            return Class.forName(className);
-        } catch (ClassNotFoundException e) {
-            LOGGER.error("Class not found: " + className);
-            return null;
-        }
-    }
-
-    static String getHibernateConfigResourceName() {
-        //do not query MCRConfiguration as it is maybe not yet initialized.
-        return "hibernate.cfg.xml"; //standard anyway
     }
 
 }

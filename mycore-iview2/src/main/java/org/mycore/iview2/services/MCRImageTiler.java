@@ -89,7 +89,7 @@ public class MCRImageTiler implements Runnable, Closeable {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
         boolean activated = MCRConfiguration.instance().getBoolean(
-            MCRIView2Tools.CONFIG_PREFIX + "LocalTiler.activated", true);
+            MCRIView2Tools.CONFIG_PREFIX + "LocalTiler.activated", true) && MCRHIBConnection.isEnabled();
         LOGGER.info("Local Tiling is " + (activated ? "activated" : "deactivated"));
         ImageIO.scanForPlugins();
         LOGGER.info("Supported image file types for reading: " + Arrays.toString(ImageIO.getReaderFormatNames()));

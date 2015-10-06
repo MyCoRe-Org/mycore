@@ -60,6 +60,9 @@ public class MCRRequestHandleAdd extends TimerTask {
      * */
     @SuppressWarnings("unchecked")
     public void run() {
+        if (!MCRHIBConnection.isEnabled()){
+            return;
+        }
         LOGGER.debug("Checking for new handle:add entries...");
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
