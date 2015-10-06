@@ -27,6 +27,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.servlet.ServletContext;
 
@@ -102,20 +103,29 @@ public class MCRHibernateBootstrapper implements AutoExecutable {
      */
     @Override
     public void startUp(ServletContext servletContext) {
+        setup(MCRHibernateBootstrapper::updateSchema);
+    }
+
+    public static void setup(Consumer<Metadata> schemaupdater) {
         final URL hibernateConfig = getHibernateConfig();
-        if (MCRConfiguration.instance().getBoolean("MCR.Persistence.Database.Enable", true) && hibernateConfig != null) {
+        if (MCRConfiguration.instance().getBoolean("MCR.Persistence.Database.Enable", true)
+            && hibernateConfig != null) {
             StandardServiceRegistry standardRegistry = getStandardRegistry(hibernateConfig);
             Metadata metadata = getMetadata(standardRegistry);
             SessionFactory sessionFactory = getSessionFactory(metadata);
             String dialect = getDialect(metadata);
-            new SchemaUpdate((MetadataImplementor) metadata).execute(false, true);
+            schemaupdater.accept(metadata);
             MCRHIBConnection.init(sessionFactory, (MetadataImplementor) metadata, dialect);
         } else {
             LogManager.getLogger().warn("Hibernate is disabled or unconfigured.");
         }
     }
 
-    private String getDialect(Metadata metadata) {
+    public static void updateSchema(Metadata metadata) {
+        new SchemaUpdate((MetadataImplementor) metadata).execute(false, true);
+    }
+
+    private static String getDialect(Metadata metadata) {
         if (MCRConfiguration.instance().getBoolean("MCR.Hibernate.DialectQueries", false)) {
             return metadata.getDatabase().getDialect().getClass().getSimpleName();
         } else {
@@ -123,14 +133,14 @@ public class MCRHibernateBootstrapper implements AutoExecutable {
         }
     }
 
-    private SessionFactory getSessionFactory(Metadata metadata) {
+    private static SessionFactory getSessionFactory(Metadata metadata) {
         return metadata.getSessionFactoryBuilder().build();
     }
 
-    private Metadata getMetadata(StandardServiceRegistry standardRegistry) {
+    private static Metadata getMetadata(StandardServiceRegistry standardRegistry) {
         MetadataSources metadataSources = new MetadataSources(standardRegistry);
         List<String> mappings = MCRConfiguration.instance().getStrings("MCR.Hibernate.Mappings");
-        final ClassLoader cl = getClass().getClassLoader();
+        final ClassLoader cl = MCRHibernateBootstrapper.class.getClassLoader();
         mappings.forEach(className -> {
             String resourceName = getResourceName(className);
             if (cl.getResource(resourceName) != null) {
@@ -142,12 +152,12 @@ public class MCRHibernateBootstrapper implements AutoExecutable {
             }
         });
         return metadataSources
-                .getMetadataBuilder()
-                .applyImplicitNamingStrategy(ImplicitNamingStrategyJpaCompliantImpl.INSTANCE)
-                .build();
+            .getMetadataBuilder()
+            .applyImplicitNamingStrategy(ImplicitNamingStrategyJpaCompliantImpl.INSTANCE)
+            .build();
     }
 
-    private StandardServiceRegistry getStandardRegistry(URL hibernateConfigURL) {
+    private static StandardServiceRegistry getStandardRegistry(URL hibernateConfigURL) {
         return new StandardServiceRegistryBuilder().configure(hibernateConfigURL).build();
     }
 
