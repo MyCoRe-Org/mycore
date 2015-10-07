@@ -75,20 +75,22 @@ public class MCRStartupHandler {
             .map(MCRStartupHandler::getAutoExecutable)
             //reverse ordering: highest priority first
             .sorted((o1, o2) -> Integer.compare(o2.getPriority(), o1.getPriority()))
-            .forEachOrdered(autoExecutable -> {
-                LOGGER.info(autoExecutable.getPriority() + ": Starting " + autoExecutable.getName());
-                try {
-                    autoExecutable.startUp(servletContext);
-                } catch (ExceptionInInitializerError e) {
-                    boolean haltOnError = servletContext.getAttribute(HALT_ON_ERROR) == null || Boolean
-                        .parseBoolean((String) servletContext.getAttribute(HALT_ON_ERROR));
-
-                    if (haltOnError) {
-                        throw e;
-                    }
-                    LOGGER.warn(e.toString());
-                }
-            });
+            .forEachOrdered(autoExecutable -> startExecutable(servletContext, autoExecutable));
+    }
+    
+    private static void startExecutable(ServletContext servletContext, AutoExecutable autoExecutable){
+        LOGGER.info(autoExecutable.getPriority() + ": Starting " + autoExecutable.getName());
+        try {
+            autoExecutable.startUp(servletContext);
+        } catch (ExceptionInInitializerError e) {
+            boolean haltOnError = servletContext.getAttribute(HALT_ON_ERROR) == null || Boolean
+                .parseBoolean((String) servletContext.getAttribute(HALT_ON_ERROR));
+            
+            if (haltOnError) {
+                throw e;
+            }
+            LOGGER.warn(e.toString());
+        }
     }
 
     private static AutoExecutable getAutoExecutable(String className) {
