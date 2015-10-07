@@ -150,7 +150,12 @@ public class MCRIView2Tools {
         }
         MCRPath derivatePath = MCRPath.getPath(derivateId, "/");
         TileCompleteFileVisitor tileCompleteFileVisitor = new TileCompleteFileVisitor();
-        Files.walkFileTree(derivatePath, tileCompleteFileVisitor);
+        try {
+            Files.walkFileTree(derivatePath, tileCompleteFileVisitor);
+        } catch (Exception ex) {
+            LOGGER.warn("Could not check tile status of derivate", ex);
+            return false;
+        }
         return tileCompleteFileVisitor.isTiled();
     }
 
