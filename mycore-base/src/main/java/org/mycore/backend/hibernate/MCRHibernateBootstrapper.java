@@ -26,7 +26,6 @@ package org.mycore.backend.hibernate;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 import java.util.function.Consumer;
 
 import javax.servlet.ServletContext;
@@ -139,22 +138,26 @@ public class MCRHibernateBootstrapper implements AutoExecutable {
 
     private static Metadata getMetadata(StandardServiceRegistry standardRegistry) {
         MetadataSources metadataSources = new MetadataSources(standardRegistry);
-        List<String> mappings = MCRConfiguration.instance().getStrings("MCR.Hibernate.Mappings");
-        final ClassLoader cl = MCRHibernateBootstrapper.class.getClassLoader();
-        mappings.forEach(className -> {
-            String resourceName = getResourceName(className);
-            if (cl.getResource(resourceName) != null) {
-                LOGGER.info("Add mapping: " + resourceName);
-                metadataSources.addResource(resourceName);
-            } else {
-                LOGGER.info("Add annotated class: " + className);
-                metadataSources.addAnnotatedClass(getAnnotatedClass(className));
-            }
-        });
-        return metadataSources
+        return MCRConfiguration.instance()
+            .getStrings("MCR.Hibernate.Mappings")
+            .stream()
+            .map(className -> addMapping(metadataSources, className))
+            .reduce((l,r) -> r)
+            .get()
             .getMetadataBuilder()
             .applyImplicitNamingStrategy(ImplicitNamingStrategyJpaCompliantImpl.INSTANCE)
             .build();
+    }
+
+    private static MetadataSources addMapping(MetadataSources metadataSources, String className) {
+        String resourceName = getResourceName(className);
+        if (MCRHibernateBootstrapper.class.getClassLoader().getResource(resourceName) != null) {
+            LOGGER.info("Add mapping: " + resourceName);
+            return metadataSources.addResource(resourceName);
+        } else {
+            LOGGER.info("Add annotated class: " + className);
+            return metadataSources.addAnnotatedClass(getAnnotatedClass(className));
+        }
     }
 
     private static StandardServiceRegistry getStandardRegistry(URL hibernateConfigURL) {

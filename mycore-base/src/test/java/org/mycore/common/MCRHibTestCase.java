@@ -35,7 +35,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.spi.MetadataImplementor;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.junit.After;
@@ -76,14 +75,12 @@ public abstract class MCRHibTestCase extends MCRTestCase {
         // Configure logging etc.
         super.setUp();
         Logger.getLogger(MCRHibTestCase.class).debug("Setup hibernate");
-        MCRHibernateBootstrapper bootstrapper = new MCRHibernateBootstrapper();
-        bootstrapper.startUp(null);
+        MCRHibernateBootstrapper
+            .setup((metadata) -> new SchemaExport((MetadataImplementor) metadata).create(true, true));
         hibConnection = MCRHIBConnection.instance();
         sessionFactory = hibConnection.getSessionFactory();
         try {
             Logger.getLogger(MCRHibTestCase.class).debug("Prepare hibernate test", new RuntimeException());
-            SchemaExport schemaExport = new SchemaExport((MetadataImplementor) hibConnection.getMetadata());
-            schemaExport.create(false, true);
             beginTransaction();
             sessionFactory.getCurrentSession().clear();
         } catch (RuntimeException e) {
