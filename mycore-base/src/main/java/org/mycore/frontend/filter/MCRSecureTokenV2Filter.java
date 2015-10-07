@@ -48,8 +48,6 @@ public class MCRSecureTokenV2Filter implements Filter {
 
     private String hashParameter;
 
-    private Pattern securedExtensions;
-
     private String sharedSecret;
 
     /* (non-Javadoc)
@@ -58,6 +56,8 @@ public class MCRSecureTokenV2Filter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         filterEnabled = MCRSecureTokenV2FilterConfig.isFilterEnabled();
+        hashParameter = MCRSecureTokenV2FilterConfig.getHashParameterName();
+        sharedSecret = MCRSecureTokenV2FilterConfig.getSharedSecret();
     }
 
     @Override
@@ -66,7 +66,7 @@ public class MCRSecureTokenV2Filter implements Filter {
         if (filterEnabled) {
             HttpServletRequest httpServletRequest = (HttpServletRequest) request;
             String pathInfo = httpServletRequest.getPathInfo();
-            if (pathInfo != null && securedExtensions.matcher(pathInfo).matches()) {
+            if (pathInfo != null && MCRSecureTokenV2FilterConfig.requireHash(pathInfo)) {
                 if (!validateSecureToken(httpServletRequest)) {
                     ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
                     LOGGER.warn("Access to " + pathInfo + " forbidden by secure token check.");

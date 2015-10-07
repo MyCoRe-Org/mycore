@@ -51,6 +51,14 @@ public class MCRSecureTokenV2FilterConfig {
     public static boolean isFilterEnabled() {
         return enabled;
     }
+    
+    public static String getHashParameterName(){
+        return hashParameter;
+    }
+
+    public static String getSharedSecret(){
+        return sharedSecret;
+    }
 
     public static boolean requireHash(String filename) {
         return enabled && securedExtensions.matcher(filename).matches();
