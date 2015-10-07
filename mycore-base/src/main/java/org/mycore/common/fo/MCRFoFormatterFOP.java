@@ -22,13 +22,9 @@
 
 package org.mycore.common.fo;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
-import java.net.URL;
-import java.text.MessageFormat;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -42,17 +38,11 @@ import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
 import org.apache.fop.apps.FOPException;
-import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
-import org.apache.fop.apps.FopFactoryBuilder;
 import org.apache.fop.apps.MimeConstants;
-import org.apache.fop.apps.io.ResourceResolverFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.xmlgraphics.io.Resource;
-import org.apache.xmlgraphics.io.ResourceResolver;
-import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
@@ -64,6 +54,7 @@ import org.xml.sax.SAXException;
  * This class implements the interface to use configured XSL-FO formatters for the layout service.
  * 
  * @author Jens Kupferschmidt
+ * @author Ren\u00E9 Adler (eagle)
  * @version $Revision: 1.8 $ $Date: 2008/05/28 13:43:31 $
  */
 
@@ -73,35 +64,19 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
 
     private FopFactory fopFactory;
 
-    ResourceResolver resolver = MCRURIResolver.getServletContext() == null
-        ? ResourceResolverFactory.createDefaultResourceResolver() : new ResourceResolver() {
-            public OutputStream getOutputStream(URI uri) throws IOException {
-                URL url = MCRURIResolver.getServletContext().getResource(uri.toASCIIString());
-                return url.openConnection().getOutputStream();
-            }
-
-            public Resource getResource(URI uri) throws IOException {
-                return new Resource(MCRURIResolver.getServletContext().getResourceAsStream(uri.toASCIIString()));
-            }
-        };
-
-    /**
-     * Protected constructor to create the singleton instance
-     */
     public MCRFoFormatterFOP() {
-        FopFactoryBuilder fopFactoryBuilder = new FopFactoryBuilder(new File(".").toURI(), resolver);
+        fopFactory = FopFactory.newInstance();
+        fopFactory.setURIResolver(MCRURIResolver.instance());
         String fo_cfg = MCRConfiguration.instance().getString("MCR.LayoutService.FoFormatter.FOP.config", "");
         if (!fo_cfg.isEmpty()) {
             try {
                 DefaultConfigurationBuilder cfgBuilder = new DefaultConfigurationBuilder();
-                Configuration cfg = cfgBuilder.build(getClass().getClassLoader().getResource(fo_cfg).toString());
-                fopFactoryBuilder.setConfiguration(cfg);
+                Configuration cfg = cfgBuilder.build(getClass().getClassLoader().getResourceAsStream(fo_cfg));
+                fopFactory.setUserConfig(cfg);
             } catch (ConfigurationException | SAXException | IOException e) {
                 LOGGER.error("Exception while loading FOP configuration from {}.", fo_cfg, e);
             }
         }
-        fopFactory = fopFactoryBuilder.build();
-        getTransformerFactory();
     }
 
     private static TransformerFactory getTransformerFactory() throws TransformerFactoryConfigurationError {
@@ -120,9 +95,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
     @Override
     public void transform(MCRContent input, OutputStream out) throws TransformerException, IOException {
         try {
-            FOUserAgent userAgent = fopFactory.newFOUserAgent();
-            userAgent.setProducer(MessageFormat.format("MyCoRe {0} ({1})", MCRCoreVersion.getCompleteVersion(), userAgent.getProducer()));
-            Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, userAgent, out);
+            Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, out);
             Source src = input.getSource();
             Result res = new SAXResult(fop.getDefaultHandler());
             Transformer transformer = getTransformerFactory().newTransformer();
