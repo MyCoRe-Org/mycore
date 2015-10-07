@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -106,7 +107,8 @@ public class MCRJWPlayerResource {
             if (!wowzaBaseURL.isEmpty()) {
                 wowzaToken = new MCRSecureTokenV2(wowzaContentPathPrefix + contentPath,
                     MCRFrontendUtil.getRemoteAddr(request),
-                    wowzaSharedSecret, Arrays.stream(request.getQueryString().split("&"))
+                    wowzaSharedSecret,
+                    Arrays.stream(Optional.ofNullable(request.getQueryString()).orElse("").split("&"))
                         .filter(p -> !p.startsWith("callback="))
                         .collect(Collectors.joining("&")));
             }
