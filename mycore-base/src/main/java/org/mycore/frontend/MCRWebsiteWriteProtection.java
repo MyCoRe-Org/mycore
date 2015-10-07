@@ -73,7 +73,7 @@ public final class MCRWebsiteWriteProtection {
         // try to get file
         File configFolder = new File(CONFIG_FOLDER_PATH);
         if (!configFolder.exists()) {
-            configFolder.mkdir();
+            configFolder.mkdirs();
         }
         // file exist?, return it's content
         if (CONFIG_FILE.exists()) {
