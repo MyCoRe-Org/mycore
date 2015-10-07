@@ -30,9 +30,9 @@ import java.nio.file.FileStore;
 import java.nio.file.FileSystemException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.util.stream.StreamSupport;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRDecoratedIterable;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs.MCRContentStore;
 import org.mycore.datamodel.ifs.MCRContentStoreFactory;
@@ -67,14 +67,10 @@ public class MCRIFSFileSystem extends MCRAbstractFileSystem {
      */
     @Override
     public Iterable<Path> getRootDirectories() {
-        final MCRAbstractFileSystem that = this;
-        return new MCRDecoratedIterable<String, Path>(MCRFileMetadataManager.instance().getOwnerIDs()) {
-
-            @Override
-            protected Path getInstance(String source) {
-                return getPath(source, "", that);
-            }
-        };
+        return StreamSupport
+            .stream(MCRFileMetadataManager.instance().getOwnerIDs().spliterator(), false)
+            .map(owner -> (Path)getPath(owner, "", this))
+            ::iterator;
     }
 
     /* (non-Javadoc)
@@ -82,17 +78,21 @@ public class MCRIFSFileSystem extends MCRAbstractFileSystem {
      */
     @Override
     public Iterable<FileStore> getFileStores() {
-        return new MCRDecoratedIterable<MCRContentStore, FileStore>(MCRContentStoreFactory.getAvailableStores()
-            .values()) {
-            @Override
-            protected FileStore getInstance(MCRContentStore source) {
-                try {
-                    return MCRFileStore.getInstance(source.getID());
-                } catch (IOException e) {
-                    throw new MCRException(e);
-                }
-            }
-        };
+        return MCRContentStoreFactory
+            .getAvailableStores()
+            .values()
+            .stream()
+            .map(MCRContentStore::getID)
+            .map(MCRIFSFileSystem::getFileStore)
+            ::iterator;
+    }
+    
+    private static FileStore getFileStore(String id){
+        try {
+            return MCRFileStore.getInstance(id);
+        } catch (IOException e) {
+            throw new MCRException(e);
+        }
     }
 
     @Override
