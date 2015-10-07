@@ -23,6 +23,8 @@
 
 package org.mycore.solr.index.file;
 
+import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.ProviderMismatchException;
@@ -56,18 +58,14 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.mets.model.Mets;
-import org.mycore.mets.model.struct.AbstractLogicalDiv;
 import org.mycore.mets.model.struct.LogicalDiv;
 import org.mycore.mets.model.struct.LogicalStructMap;
-import org.mycore.mets.model.struct.LogicalSubDiv;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
 import org.mycore.solr.index.handlers.stream.MCRSolrFileIndexHandler;
 import org.mycore.solr.index.handlers.stream.MCRSolrFilesIndexHandler;
 import org.mycore.urn.services.MCRURNManager;
 
 import com.google.common.io.Files;
-
-import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -163,15 +161,15 @@ public class MCRSolrPathDocumentFactory {
                 Mets p = new Mets(d);
                 LogicalStructMap structMap = (LogicalStructMap) p.getStructMap(LogicalStructMap.TYPE);
                 LogicalDiv rootDiv = structMap.getDivContainer();
-                List<AbstractLogicalDiv> childs = getAllChilds(rootDiv);
+                List<LogicalDiv> children = getAllChilds(rootDiv);
 
-                for (AbstractLogicalDiv abstractLogicalDiv : childs) {
-                    doc.addField("content", abstractLogicalDiv.getLabel());
+                for (LogicalDiv childDiv : children) {
+                    doc.addField("content", childDiv.getLabel());
 
                     // some types contain - or other illegal character and they should be removed
-                    String cleanType = abstractLogicalDiv.getType().replaceAll("[\\-\\s]","");
+                    String cleanType = childDiv.getType().replaceAll("[\\-\\s]","");
 
-                    doc.addField("mets." + cleanType, abstractLogicalDiv.getLabel());
+                    doc.addField("mets." + cleanType, childDiv.getLabel());
                 }
             } catch (Exception e) {
                 throw new MCRPersistenceException("could not parse mets.xml", e);
@@ -185,12 +183,12 @@ public class MCRSolrPathDocumentFactory {
         return doc;
     }
 
-    private List<AbstractLogicalDiv> getAllChilds(AbstractLogicalDiv rootDiv) {
-        ArrayList<AbstractLogicalDiv> allChildren = new ArrayList<AbstractLogicalDiv>();
-        List<LogicalSubDiv> children = rootDiv.getChildren();
+    private List<LogicalDiv> getAllChilds(LogicalDiv rootDiv) {
+        ArrayList<LogicalDiv> allChildren = new ArrayList<LogicalDiv>();
+        List<LogicalDiv> children = rootDiv.getChildren();
 
         allChildren.add(rootDiv);
-        for (LogicalSubDiv logicalSubDiv : children) {
+        for (LogicalDiv logicalSubDiv : children) {
             allChildren.addAll(getAllChilds(logicalSubDiv));
         }
         return allChildren;

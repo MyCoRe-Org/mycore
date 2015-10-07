@@ -7,7 +7,15 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.xml.MCRXMLFunctions;
@@ -26,12 +34,10 @@ import org.mycore.mets.model.files.FileGrp;
 import org.mycore.mets.model.files.FileSec;
 import org.mycore.mets.model.sections.AmdSec;
 import org.mycore.mets.model.sections.DmdSec;
-import org.mycore.mets.model.struct.AbstractLogicalDiv;
 import org.mycore.mets.model.struct.Fptr;
 import org.mycore.mets.model.struct.LOCTYPE;
 import org.mycore.mets.model.struct.LogicalDiv;
 import org.mycore.mets.model.struct.LogicalStructMap;
-import org.mycore.mets.model.struct.LogicalSubDiv;
 import org.mycore.mets.model.struct.PhysicalDiv;
 import org.mycore.mets.model.struct.PhysicalStructMap;
 import org.mycore.mets.model.struct.PhysicalSubDiv;
@@ -224,9 +230,9 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
         // run through all children
         createLogicalStruct(this.rootObj, logicalDiv);
         // remove not linked logical divs
-        Iterator<LogicalSubDiv> it = logicalDiv.getChildren().iterator();
+        Iterator<LogicalDiv> it = logicalDiv.getChildren().iterator();
         while (it.hasNext()) {
-            LogicalSubDiv child = it.next();
+            LogicalDiv child = it.next();
             if (!validateLogicalStruct(logicalDiv, child))
                 it.remove();
         }
@@ -239,7 +245,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
      * @param parentObject mycore object
      * @param parentLogicalDiv
      */
-    private void createLogicalStruct(MCRObject parentObject, AbstractLogicalDiv parentLogicalDiv) {
+    private void createLogicalStruct(MCRObject parentObject, LogicalDiv parentLogicalDiv) {
         // run through all children
         List<MCRMetaLinkID> links = getChildren(parentObject);
         for (int i = 0; i < links.size(); i++) {
@@ -248,7 +254,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
             MCRObject childObject = MCRMetadataManager.retrieveMCRObject(childId);
             // create new logical sub div
             String id = "log_" + childId.toString();
-            LogicalSubDiv logicalChildDiv = new LogicalSubDiv(id, getType(childObject), getLabel(childObject), i + 1);
+            LogicalDiv logicalChildDiv = new LogicalDiv(id, getType(childObject), getLabel(childObject), i + 1);
             // add to parent
             parentLogicalDiv.add(logicalChildDiv);
             // check if a derivate link exists and get the linked file
@@ -294,7 +300,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
      * @param logicalDiv
      * @return
      */
-    private boolean validateLogicalStruct(AbstractLogicalDiv parent, LogicalSubDiv logicalDiv) {
+    private boolean validateLogicalStruct(LogicalDiv parent, LogicalDiv logicalDiv) {
         // has link
         String logicalDivId = logicalDiv.getId();
         for (List<String> logivalDivIDs : structLinkMap.values()) {
@@ -303,9 +309,9 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSGenerator {
             }
         }
         // has children with link
-        Iterator<LogicalSubDiv> it = logicalDiv.getChildren().iterator();
+        Iterator<LogicalDiv> it = logicalDiv.getChildren().iterator();
         while (it.hasNext()) {
-            LogicalSubDiv child = it.next();
+            LogicalDiv child = it.next();
             if (validateLogicalStruct(logicalDiv, child))
                 return true;
             // nothing -> delete it

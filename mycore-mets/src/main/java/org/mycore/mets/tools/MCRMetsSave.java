@@ -41,12 +41,10 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.mets.model.Mets;
 import org.mycore.mets.model.files.FLocat;
 import org.mycore.mets.model.files.FileGrp;
-import org.mycore.mets.model.struct.AbstractLogicalDiv;
 import org.mycore.mets.model.struct.Fptr;
 import org.mycore.mets.model.struct.LOCTYPE;
 import org.mycore.mets.model.struct.LogicalDiv;
 import org.mycore.mets.model.struct.LogicalStructMap;
-import org.mycore.mets.model.struct.LogicalSubDiv;
 import org.mycore.mets.model.struct.PhysicalDiv;
 import org.mycore.mets.model.struct.PhysicalStructMap;
 import org.mycore.mets.model.struct.PhysicalSubDiv;
@@ -581,16 +579,16 @@ public class MCRMetsSave {
                                 continue;
                             }
 
-                            AbstractLogicalDiv logicalDiv = logicalStructMap.getDivContainer().getLogicalSubDiv(
+                            LogicalDiv logicalDiv = logicalStructMap.getDivContainer().getLogicalSubDiv(
                                     logID);
-                            if (!(logicalDiv instanceof LogicalSubDiv)) {
-                                LOGGER.error("Could not find " + LogicalSubDiv.class.getSimpleName() + " with id "
+                            if (!(logicalDiv instanceof LogicalDiv)) {
+                                LOGGER.error("Could not find " + LogicalDiv.class.getSimpleName() + " with id "
                                         + logID);
                                 LOGGER.error("Mets document remains unchanged");
                                 return mets;
                             }
 
-                            LogicalSubDiv logicalSubDiv = (LogicalSubDiv) logicalDiv;
+                            LogicalDiv logicalSubDiv = (LogicalDiv) logicalDiv;
 
                             // there are still files for this logical sub div, nothing to do
                             if (modifiedMets.getStructLink().getSmLinkByFrom(logicalSubDiv.getId()).size() > 0) {
@@ -643,8 +641,8 @@ public class MCRMetsSave {
      * @param logDiv
      * @throws Exception
      */
-    private static void handleParents(LogicalSubDiv logDiv, Mets mets) throws Exception {
-        AbstractLogicalDiv parent = logDiv.getParent();
+    private static void handleParents(LogicalDiv logDiv, Mets mets) throws Exception {
+        LogicalDiv parent = logDiv.getParent();
 
         // there are files for the parent of the log div, thus nothing to do
         if (mets.getStructLink().getSmLinkByFrom(parent.getId()).size() > 0) {
@@ -655,11 +653,11 @@ public class MCRMetsSave {
         LogicalDiv logicalDiv = ((LogicalStructMap) mets.getStructMap(LogicalStructMap.TYPE)).getDivContainer();
         if (parent.getParent() == logicalDiv) {
             //the parent the log div container itself, thus we quit here and remove the log div
-            logicalDiv.remove((LogicalSubDiv) parent);
+            logicalDiv.remove((LogicalDiv) parent);
 
             return;
         } else {
-            handleParents((LogicalSubDiv) parent, mets);
+            handleParents((LogicalDiv) parent, mets);
         }
     }
 

@@ -89,10 +89,10 @@
       <mets:div ID="log000001" TYPE="- cover_front" LABEL="intro" ORDER="1"/>
       <mets:div ID="log000002" TYPE="contained_work" LABEL="begin" ORDER="2"/>
       <mets:div ID="log000003" TYPE="chapter" LABEL="middle" ORDER="3">
-        <mets:div ID="log000004" TYPE="map" LABEL="middlemap" ORDER="2"/>
+        <mets:div ID="log000004" TYPE="map" LABEL="middlemap" ORDER="1"/>
       </mets:div>
       <mets:div ID="log000005" TYPE="chapter" LABEL="end" ORDER="4">
-        <mets:div ID="log000006" TYPE="map" LABEL="endmap" ORDER="3"/>
+        <mets:div ID="log000006" TYPE="map" LABEL="endmap" ORDER="1"/>
       </mets:div>
       <mets:div ID="log000007" TYPE="chapter" LABEL="end2" ORDER="5"/>
     </mets:div>

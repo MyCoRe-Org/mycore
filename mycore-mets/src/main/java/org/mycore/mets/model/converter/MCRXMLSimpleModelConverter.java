@@ -15,7 +15,6 @@ import org.mycore.mets.model.simple.MCRMetsLink;
 import org.mycore.mets.model.simple.MCRMetsPage;
 import org.mycore.mets.model.simple.MCRMetsSection;
 import org.mycore.mets.model.simple.MCRMetsSimpleModel;
-import org.mycore.mets.model.struct.AbstractLogicalDiv;
 import org.mycore.mets.model.struct.IStructMap;
 import org.mycore.mets.model.struct.LogicalDiv;
 import org.mycore.mets.model.struct.LogicalStructMap;
@@ -61,7 +60,7 @@ public class MCRXMLSimpleModelConverter {
         return buildSection(divContainer, idSectionMap, null);
     }
 
-    private static MCRMetsSection buildSection(AbstractLogicalDiv current, Map<String, MCRMetsSection> idSectionMap, MCRMetsSection parent) {
+    private static MCRMetsSection buildSection(LogicalDiv current, Map<String, MCRMetsSection> idSectionMap, MCRMetsSection parent) {
         MCRMetsSection metsSection = new MCRMetsSection();
 
         metsSection.setLabel(current.getLabel());

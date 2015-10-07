@@ -49,12 +49,10 @@ import org.mycore.mets.model.files.FileGrp;
 import org.mycore.mets.model.files.FileSec;
 import org.mycore.mets.model.sections.AmdSec;
 import org.mycore.mets.model.sections.DmdSec;
-import org.mycore.mets.model.struct.AbstractLogicalDiv;
 import org.mycore.mets.model.struct.Fptr;
 import org.mycore.mets.model.struct.LOCTYPE;
 import org.mycore.mets.model.struct.LogicalDiv;
 import org.mycore.mets.model.struct.LogicalStructMap;
-import org.mycore.mets.model.struct.LogicalSubDiv;
 import org.mycore.mets.model.struct.PhysicalDiv;
 import org.mycore.mets.model.struct.PhysicalStructMap;
 import org.mycore.mets.model.struct.PhysicalSubDiv;
@@ -148,7 +146,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
     }
 
     private void structureMets(MCRPath dir, Set<MCRPath> ignoreNodes, FileSec fileSec, PhysicalDiv physicalDiv,
-        AbstractLogicalDiv logicalDiv, StructLink structLink, int logOrder) throws IOException {
+        LogicalDiv logicalDiv, StructLink structLink, int logOrder) throws IOException {
         SortedMap<MCRPath, BasicFileAttributes> files = new TreeMap<>(), directories = new TreeMap<>();
 
         fillFileMap(ignoreNodes, files, directories, dir);
@@ -162,7 +160,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
             if (isInExcludedRootFolder(directory.getKey())) {
                 structureMets(directory.getKey(), ignoreNodes, fileSec, physicalDiv, logicalDiv, structLink, logOrder);
             } else {
-                LogicalSubDiv section = new LogicalSubDiv("log_" + Integer.toString(++logOrder), "section", dirName,
+                LogicalDiv section = new LogicalDiv("log_" + Integer.toString(++logOrder), "section", dirName,
                     logOrder);
                 logicalDiv.add(section);
                 structureMets(directory.getKey(), ignoreNodes, fileSec, physicalDiv, section, structLink, logOrder);
@@ -170,7 +168,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSGenerator {
         }
     }
 
-    private void createStructure(MCRPath dir, FileSec fileSec, PhysicalDiv physicalDiv, AbstractLogicalDiv logicalDiv,
+    private void createStructure(MCRPath dir, FileSec fileSec, PhysicalDiv physicalDiv, LogicalDiv logicalDiv,
         StructLink structLink, Map.Entry<MCRPath, BasicFileAttributes> file) throws IOException {
         final UUID fileUUID = UUID.randomUUID();
         final UUID physUUID = UUID.randomUUID();
