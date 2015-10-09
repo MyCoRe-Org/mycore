@@ -44,7 +44,10 @@
         </xsl:when>
         <xsl:otherwise>
           <div>
-            <xsl:attribute name="class">form-group {$xed-validation-marker}</xsl:attribute>
+            <xsl:variable name="rclass"> 
+              <xsl:if test="@required = 'true' or @validate = 'true'"> required </xsl:if>
+            </xsl:variable>
+            <xsl:attribute name="class">form-group {$xed-validation-marker} <xsl:value-of select="$rclass"/> test2</xsl:attribute>
             <xsl:apply-templates select="." mode="formline" />
           </div>
         </xsl:otherwise>
