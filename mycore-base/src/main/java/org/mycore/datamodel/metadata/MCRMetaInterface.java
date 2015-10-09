@@ -136,7 +136,7 @@ public interface MCRMetaInterface extends Cloneable {
     /**
      * This method make a clone of this class.
      */
-    public Object clone();
+    public MCRMetaInterface clone();
 
     /**
      * This method put debug data to the logger (for the debug mode).

@@ -26,6 +26,7 @@ package org.mycore.datamodel.metadata;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Date;
+import java.util.Objects;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
@@ -237,5 +238,17 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
             return false;
         }
         return true;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final MCRMetaISO8601Date other = (MCRMetaISO8601Date) obj;
+        return Objects.equals(this.isoDate, other.isoDate);
     }
 }

@@ -23,6 +23,8 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.util.Objects;
+
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
@@ -249,5 +251,17 @@ public class MCRMetaLangText extends MCRMetaDefault {
         LOGGER.debug("Format             = " + form);
         LOGGER.debug("Text               = " + text);
         LOGGER.debug(" ");
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final MCRMetaLangText other = (MCRMetaLangText) obj;
+        return Objects.equals(this.text, other.text) && Objects.equals(this.form, other.form);
     }
 }

@@ -23,6 +23,8 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.util.Objects;
+
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
@@ -216,4 +218,17 @@ public class MCRMetaClassification extends MCRMetaDefault {
         LOGGER.debug("Category            = " + category);
         LOGGER.debug(" ");
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final MCRMetaClassification other = (MCRMetaClassification) obj;
+        return Objects.equals(this.category, other.category);
+    }
+
 }

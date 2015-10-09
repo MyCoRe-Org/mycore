@@ -15,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
@@ -252,6 +253,18 @@ public class MCRISO8601Date {
         } else {
             this.dt = dt;
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final MCRISO8601Date other = (MCRISO8601Date) obj;
+        return Objects.equals(this.dt, other.dt);
     }
 
 }
