@@ -33,6 +33,7 @@ import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRObjectMerger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 
@@ -157,6 +158,8 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      * 
      * @param input
      *            the MCRObjectMetadata, that should merged into this data set
+     *            
+     * @deprecated use {@link MCRObjectMerger#mergeMetadata(MCRObject, boolean)} instead
      */
     public final void mergeMetadata(MCRObjectMetadata input) {
 
