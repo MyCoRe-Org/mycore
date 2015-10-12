@@ -259,8 +259,6 @@ public class MCRISO8601Date {
     public boolean equals(Object obj) {
         if (obj == null)
             return false;
-        if (!super.equals(obj))
-            return false;
         if (getClass() != obj.getClass())
             return false;
         final MCRISO8601Date other = (MCRISO8601Date) obj;
