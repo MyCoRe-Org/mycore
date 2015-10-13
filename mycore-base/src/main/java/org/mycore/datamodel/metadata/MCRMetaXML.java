@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.jdom2.Content;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRJDOMEqualityComparator;
 
 /**
  * This class implements all method for handling with the MCRMetaLangText part
@@ -66,10 +67,8 @@ public class MCRMetaXML extends MCRMetaDefault {
      *            a relevant JDOM element for the metadata
      */
     @Override
-    @SuppressWarnings("unchecked")
     public void setFromDOM(org.jdom2.Element element) {
         super.setFromDOM(element);
-
         content = element.cloneContent();
     }
 
@@ -153,4 +152,17 @@ public class MCRMetaXML extends MCRMetaDefault {
         super.debugDefault();
         LOGGER.debug("Number of contents  = \n" + content.size());
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final MCRMetaXML other = (MCRMetaXML) obj;
+        return MCRJDOMEqualityComparator.equals(this.content, other.content);
+    }
+
 }
