@@ -80,7 +80,7 @@
   <!-- editor elements -->
 
   <xed:template id="userAccount">
-    <div class="form-group">
+    <div class="form-group required">
       <label class="col-md-3 control-label" for="userName">
         <xed:output i18n="component.user2.admin.userAccount" />
       </label>
