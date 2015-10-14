@@ -25,7 +25,15 @@ package org.mycore.common.xml;
 
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jdom2.Content;
+import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
@@ -43,7 +51,8 @@ public class MCRXMLHelperTest extends MCRTestCase {
         assertTrue("Elements should be equal", MCRXMLHelper.deepEqual(getSmallElement(), getSmallElement()));
         assertTrue("Elements should be equal", MCRXMLHelper.deepEqual(getBigElement(), getBigElement()));
         assertFalse("Elements should be different", MCRXMLHelper.deepEqual(getSmallElement(), getBigElement()));
-        assertFalse("Elements should be different", MCRXMLHelper.deepEqual(getSmallElement().setAttribute("j", "junit"), getSmallElement()));
+        assertFalse("Elements should be different",
+            MCRXMLHelper.deepEqual(getSmallElement().setAttribute("j", "junit"), getSmallElement()));
         assertFalse("Elements should be different", MCRXMLHelper.deepEqual(getBigElement(), getSmallElement()));
     }
 
@@ -54,11 +63,31 @@ public class MCRXMLHelperTest extends MCRTestCase {
         elm.addContent(new Element("junit"));
         return elm;
     }
-    
-    private static Element getBigElement(){
-        Element elm=getSmallElement();
+
+    private static Element getBigElement() {
+        Element elm = getSmallElement();
         elm.addContent(new Element("junit"));
         return elm;
+    }
+
+    @Test
+    public void testList() throws Exception {
+        Element child1 = new Element("child").setText("Hallo Welt");
+        Element child2 = new Element("child").setText("hello world");
+        Element child3 = new Element("child").setText("Bonjour le monde");
+        List<Content> l1 = new ArrayList<>();
+        l1.add(child1);
+        l1.add(child2);
+        l1.add(child3);
+        Element root = new Element("root");
+        root.addContent(l1);
+
+        String formattedXML = "<root>\n<child>Hallo Welt</child>\n" + "<child>hello world</child>"
+            + "<child>Bonjour le monde</child>\n</root>";
+        SAXBuilder b = new SAXBuilder();
+        Document doc = b.build(new ByteArrayInputStream(formattedXML.getBytes(Charset.forName("UTF-8"))));
+
+        assertEquals("Elements should be equal", true, MCRXMLHelper.deepEqual(root, doc.getRootElement()));
     }
 
 }

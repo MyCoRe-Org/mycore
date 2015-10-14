@@ -194,8 +194,8 @@ public class MCRXMLHelper {
             String v1 = t1.getValue();
             String v2 = t2.getValue();
             boolean equals = v1.equals(v2);
-            if (!equals) {
-                LOGGER.info("Text differs \"" + t1 + "\"!=\"" + t2 + "\"");
+            if (!equals && LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Text differs \"" + t1 + "\"!=\"" + t2 + "\"");
             }
             return equals;
         }
@@ -203,8 +203,8 @@ public class MCRXMLHelper {
         public static boolean equivalent(DocType d1, DocType d2) {
             boolean equals = (d1.getPublicID() == d2.getPublicID() || d1.getPublicID().equals(d2.getPublicID()))
                 && (d1.getSystemID() == d2.getSystemID() || d1.getSystemID().equals(d2.getSystemID()));
-            if (!equals) {
-                LOGGER.info("DocType differs \"" + d1 + "\"!=\"" + d2 + "\"");
+            if (!equals && LOGGER.isDebugEnabled()) {
+                LOGGER.debug("DocType differs \"" + d1 + "\"!=\"" + d2 + "\"");
             }
             return equals;
         }
@@ -213,8 +213,8 @@ public class MCRXMLHelper {
             String v1 = c1.getValue();
             String v2 = c2.getValue();
             boolean equals = v1.equals(v2);
-            if (!equals) {
-                LOGGER.info("Comment differs \"" + c1 + "\"!=\"" + c2 + "\"");
+            if (!equals && LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Comment differs \"" + c1 + "\"!=\"" + c2 + "\"");
             }
             return equals;
         }
@@ -225,8 +225,8 @@ public class MCRXMLHelper {
             String d1 = p1.getData();
             String d2 = p2.getData();
             boolean equals = t1.equals(t2) && d1.equals(d2);
-            if (!equals) {
-                LOGGER.info("ProcessingInstruction differs \"" + p1 + "\"!=\"" + p2 + "\"");
+            if (!equals && LOGGER.isDebugEnabled()) {
+                LOGGER.debug("ProcessingInstruction differs \"" + p1 + "\"!=\"" + p2 + "\"");
             }
             return equals;
         }
@@ -235,8 +235,10 @@ public class MCRXMLHelper {
             List<Attribute> aList1 = e1.getAttributes();
             List<Attribute> aList2 = e2.getAttributes();
             if (aList1.size() != aList2.size()) {
-                LOGGER.info("Number of attributes differ \"" + aList1 + "\"!=\"" + aList2 + "\" for element "
-                    + e1.getName());
+                if(LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Number of attributes differ \"" + aList1 + "\"!=\"" + aList2 + "\" for element "
+                        + e1.getName());
+                }
                 return false;
             }
             HashSet<String> orig = new HashSet<String>(aList1.size());
@@ -246,15 +248,17 @@ public class MCRXMLHelper {
             for (Attribute attr : aList2) {
                 orig.remove(attr.toString());
             }
-            if (!orig.isEmpty()) {
-                LOGGER.info("Attributes differ \"" + aList1 + "\"!=\"" + aList2 + "\"");
+            if (!orig.isEmpty() && LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Attributes differ \"" + aList1 + "\"!=\"" + aList2 + "\"");
             }
             return orig.isEmpty();
         }
 
         public static boolean equivalentContent(List<Content> l1, List<Content> l2) {
             if (l1.size() != l2.size()) {
-                LOGGER.debug("Number of content list elements differ " + l1.size() + "!=" + l2.size());
+                if(LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Number of content list elements differ " + l1.size() + "!=" + l2.size());
+                }
                 return false;
             }
             boolean result = true;

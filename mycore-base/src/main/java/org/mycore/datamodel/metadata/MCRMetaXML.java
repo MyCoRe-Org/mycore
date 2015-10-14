@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.jdom2.Content;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRJDOMEqualityComparator;
+import org.mycore.common.xml.MCRXMLHelper;
 
 /**
  * This class implements all method for handling with the MCRMetaLangText part
@@ -162,7 +162,7 @@ public class MCRMetaXML extends MCRMetaDefault {
         if (getClass() != obj.getClass())
             return false;
         final MCRMetaXML other = (MCRMetaXML) obj;
-        return MCRJDOMEqualityComparator.equals(this.content, other.content);
+        return MCRXMLHelper.deepEqual(this.createXML(), other.createXML());
     }
 
 }
