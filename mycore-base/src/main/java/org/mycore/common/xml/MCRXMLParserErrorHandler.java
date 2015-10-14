@@ -36,18 +36,32 @@ public class MCRXMLParserErrorHandler implements ErrorHandler {
 
     private final static Logger LOGGER = Logger.getLogger(MCRXMLParserErrorHandler.class);
 
+    protected boolean silent;
+
+    public MCRXMLParserErrorHandler() {
+        this(false);
+    }
+
+    public MCRXMLParserErrorHandler(boolean silent) {
+        this.silent = silent;
+    }
+
     /**
      * Handles parser warnings
      */
     public void warning(SAXParseException ex) {
-        LOGGER.warn(getSAXErrorMessage(ex), ex);
+        if(!silent) {
+            LOGGER.warn(getSAXErrorMessage(ex), ex);
+        }
     }
 
     /**
      * Handles parse errors
      */
     public void error(SAXParseException ex) {
-        LOGGER.error(getSAXErrorMessage(ex), ex);
+        if(!silent) {
+            LOGGER.error(getSAXErrorMessage(ex), ex);
+        }
         throw new RuntimeException(ex);
     }
 
@@ -55,7 +69,9 @@ public class MCRXMLParserErrorHandler implements ErrorHandler {
      * Handles fatal parse errors
      */
     public void fatalError(SAXParseException ex) {
-        LOGGER.fatal(getSAXErrorMessage(ex));
+        if(!silent) {
+            LOGGER.fatal(getSAXErrorMessage(ex));
+        }
         throw new RuntimeException(ex);
     }
 

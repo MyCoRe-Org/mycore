@@ -60,12 +60,16 @@ public class MCRXMLParserImpl implements MCRXMLParser {
     private SAXBuilder builder;
 
     public MCRXMLParserImpl(XMLReaderJDOMFactory factory) {
+        this(factory, false);
+    }
+
+    public MCRXMLParserImpl(XMLReaderJDOMFactory factory, boolean silent) {
         this.validate = factory.isValidating();
         builder = new SAXBuilder(factory);
         builder.setFeature(FEATURE_NAMESPACES, true);
         builder.setFeature(FEATURE_SCHEMA_SUPPORT, validate);
         builder.setFeature(FEATURE_FULL_SCHEMA_SUPPORT, false);
-        builder.setErrorHandler(new MCRXMLParserErrorHandler());
+        builder.setErrorHandler(new MCRXMLParserErrorHandler(silent));
         builder.setEntityResolver(new XercesBugFixResolver(MCREntityResolver.instance()));
     }
 

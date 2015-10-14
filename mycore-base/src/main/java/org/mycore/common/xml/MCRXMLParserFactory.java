@@ -34,11 +34,14 @@ import org.mycore.common.config.MCRConfiguration;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRXMLParserFactory {
-    private static boolean VALIDATE_BY_DEFAULT = MCRConfiguration.instance().getBoolean("MCR.XMLParser.ValidateSchema", true);
+    private static boolean VALIDATE_BY_DEFAULT = MCRConfiguration.instance().getBoolean("MCR.XMLParser.ValidateSchema",
+        true);
 
     private final static String XMLREADER_CLASS_NAME = "org.apache.xerces.parsers.SAXParser";
 
     private static XMLReaderJDOMFactory nonValidatingFactory = new XMLReaderSAX2Factory(false, XMLREADER_CLASS_NAME);
+
+    private static XMLReaderJDOMFactory validatingFactory = new XMLReaderSAX2Factory(true, XMLREADER_CLASS_NAME);
 
     private static ThreadLocal<MCRXMLParserImpl> nonValidating = new ThreadLocal<MCRXMLParserImpl>() {
         @Override
@@ -47,12 +50,24 @@ public class MCRXMLParserFactory {
         }
     };
 
-    private static XMLReaderJDOMFactory validatingFactory = new XMLReaderSAX2Factory(true, XMLREADER_CLASS_NAME);
-
     private static ThreadLocal<MCRXMLParserImpl> validating = new ThreadLocal<MCRXMLParserImpl>() {
         @Override
         protected MCRXMLParserImpl initialValue() {
             return new MCRXMLParserImpl(validatingFactory);
+        }
+    };
+
+    private static ThreadLocal<MCRXMLParserImpl> nonValidatingSilent = new ThreadLocal<MCRXMLParserImpl>() {
+        @Override
+        protected MCRXMLParserImpl initialValue() {
+            return new MCRXMLParserImpl(nonValidatingFactory, true);
+        }
+    };
+
+    private static ThreadLocal<MCRXMLParserImpl> validatingSilent = new ThreadLocal<MCRXMLParserImpl>() {
+        @Override
+        protected MCRXMLParserImpl initialValue() {
+            return new MCRXMLParserImpl(validatingFactory, true);
         }
     };
 
@@ -81,6 +96,20 @@ public class MCRXMLParserFactory {
      * @param validate if true, the parser will validate the XML against the schema.
      */
     public static MCRXMLParser getParser(boolean validate) {
-        return validate ? validating.get() : nonValidating.get();
+        return getParser(validate, false);
+    }
+
+    /** 
+     * Returns a parser.
+     * 
+     * @param validate if true, the parser will validate the XML against the schema.
+     * @param silent if true, exception's are not logged
+     */
+    public static MCRXMLParser getParser(boolean validate, boolean silent) {
+        if (silent) {
+            return validate ? validatingSilent.get() : nonValidatingSilent.get();
+        } else {
+            return validate ? validating.get() : nonValidating.get();
+        }
     }
 }

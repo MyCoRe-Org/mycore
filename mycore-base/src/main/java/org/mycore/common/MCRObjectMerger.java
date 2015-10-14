@@ -84,7 +84,7 @@ public class MCRObjectMerger {
      */
     protected boolean validate(MCRObject mcrobj) {
         try {
-            MCRXMLParserFactory.getParser(true).parseXML(new MCRJDOMContent(mcrobj.createXML()));
+            MCRXMLParserFactory.getParser(true, true).parseXML(new MCRJDOMContent(mcrobj.createXML()));
             return true;
         } catch (Exception exc) {
             return false;
