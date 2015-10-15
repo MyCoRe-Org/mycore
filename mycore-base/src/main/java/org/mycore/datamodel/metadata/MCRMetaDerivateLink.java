@@ -75,7 +75,8 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         if (!super.isValid()) {
             return false;
         }
-        if (!Files.exists(getLinkedFile())) {
+        MCRPath linkedFile = getLinkedFile();
+        if (linkedFile == null || !Files.exists(linkedFile)) {
             LOGGER.warn("File not found: " + super.href);
             return false;
         }
