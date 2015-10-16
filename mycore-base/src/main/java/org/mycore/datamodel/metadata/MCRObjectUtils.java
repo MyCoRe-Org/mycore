@@ -1,12 +1,7 @@
-package org.mycore.common;
+package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.mycore.datamodel.metadata.MCRMetaLinkID;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This class contains several helper methods for {@link MCRObject}.
