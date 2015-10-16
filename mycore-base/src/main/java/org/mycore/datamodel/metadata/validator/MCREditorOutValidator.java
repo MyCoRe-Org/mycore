@@ -50,8 +50,8 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.metadata.MCRMetaAccessRule;
 import org.mycore.datamodel.metadata.MCRMetaAddress;
 import org.mycore.datamodel.metadata.MCRMetaBoolean;
@@ -129,7 +129,7 @@ public class MCREditorOutValidator {
             .evaluate(input)
             .forEach(Attribute::detach);
         try {
-            byte[] xml = MCRUtils.getByteArray(input);
+            byte[] xml = new MCRJDOMContent(input).asByteArray();
             obj = new MCRObject(xml, true);
         } catch (SAXParseException e) {
             XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
@@ -284,7 +284,6 @@ public class MCREditorOutValidator {
 
     static class MCRMetaHistoryDateCheck implements MCREditorMetadataValidator {
         public String checkDataSubTag(Element datasubtag) {
-            @SuppressWarnings("unchecked")
             List<Element> children = datasubtag.getChildren("text");
             for (int i = 0; i < children.size(); i++) {
                 Element child = children.get(i);

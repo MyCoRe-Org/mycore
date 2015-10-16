@@ -27,7 +27,6 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
@@ -92,7 +91,7 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
                 File xml = new File(fn);
                 jdom = common.buildPartSitemap(i);
                 LOGGER.info("Write Google sitemap file " + fn + ".");
-                MCRUtils.writeJDOMToFile(jdom, xml);
+                new MCRJDOMContent(jdom).sendTo(xml);
             }
             jdom = common.buildSitemapIndex(number);
         }

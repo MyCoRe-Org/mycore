@@ -34,7 +34,6 @@ import java.util.stream.StreamSupport;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.ifs.MCRContentStore;
 import org.mycore.datamodel.ifs.MCRContentStoreFactory;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFileMetadataManager;
@@ -80,9 +79,8 @@ public class MCRIFSFileSystem extends MCRAbstractFileSystem {
     public Iterable<FileStore> getFileStores() {
         return MCRContentStoreFactory
             .getAvailableStores()
-            .values()
+            .keySet()
             .stream()
-            .map(MCRContentStore::getID)
             .map(MCRIFSFileSystem::getFileStore)
             ::iterator;
     }

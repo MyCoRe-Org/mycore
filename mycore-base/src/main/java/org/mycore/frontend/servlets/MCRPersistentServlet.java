@@ -50,7 +50,6 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRURIResolver;
@@ -319,7 +318,7 @@ public class MCRPersistentServlet extends MCRServlet {
         root.setAttribute("noNamespaceSchemaLocation", "datamodel-derivate.xsd", XSI_NAMESPACE);
         root.addNamespaceDeclaration(XLINK_NAMESPACE);
         root.addNamespaceDeclaration(XSI_NAMESPACE);
-        byte[] xml = MCRUtils.getByteArray(editorSubmission);
+        byte[] xml = new MCRJDOMContent(editorSubmission).asByteArray();
         MCRDerivate der = new MCRDerivate(xml, true);
         String derivateID = der.getId().toString();
         if (!MCRAccessManager.checkPermission(derivateID, PERMISSION_WRITE)) {

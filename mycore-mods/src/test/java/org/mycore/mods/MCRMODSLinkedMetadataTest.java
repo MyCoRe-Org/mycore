@@ -10,6 +10,8 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathBuilder;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
@@ -22,7 +24,6 @@ import org.mycore.common.MCRHibTestCase;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -81,7 +82,7 @@ public class MCRMODSLinkedMetadataTest extends MCRHibTestCase {
         builder.setNamespace(MCRConstants.MODS_NAMESPACE);
         XPathExpression<Element> seriesTitlePath = builder.compileWith(XPathFactory.instance());
         Element titleElement = seriesTitlePath.evaluateFirst(bookNew);
-        Assert.assertNotNull("No title element in related item: " + MCRUtils.asString(bookNew), titleElement);
+        Assert.assertNotNull("No title element in related item: " + new XMLOutputter(Format.getPrettyFormat()).outputString(bookNew), titleElement);
         Assert.assertEquals("Title update from series was not promoted to book of series.",
             "Updated series title", titleElement.getText());
     }

@@ -2,9 +2,10 @@ package org.mycore.urn.rest;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.log4j.Logger;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.urn.epicurlite.EpicurLite;
 import org.mycore.urn.epicurlite.IEpicurLiteProvider;
@@ -97,7 +98,7 @@ public class URNProcessor {
                     break;
                 default:
                     LOGGER.warn("Could not handle urn request: status=" + putStatus + ", urn=" + urn + ", url=" + elp.getUrl()
-                            + "\nEpicur Lite:\n\n" + MCRUtils.asString(elp.getEpicurLite()));
+                            + "\nEpicur Lite:\n\n" + new XMLOutputter(Format.getPrettyFormat()).outputString(elp.getEpicurLite()));
                 }
                 break;
             default:

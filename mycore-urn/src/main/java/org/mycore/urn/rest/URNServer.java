@@ -14,7 +14,8 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRUtils;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.urn.epicurlite.EpicurLite;
 import org.mycore.urn.hibernate.MCRURN;
 
@@ -95,7 +96,7 @@ public class URNServer {
         try {
             elp.setLogin(getConfiguration().getLogin());
             elp.setPassword(getConfiguration().getPassword());
-            String content = MCRUtils.asString(elp.getEpicurLite());
+            String content = new XMLOutputter(Format.getPrettyFormat()).outputString(elp.getEpicurLite());
 
             LOGGER.debug("EpicurLite \"put\" for urn " + elp.getUrn().toString() + "\n" + content);
 
@@ -130,7 +131,7 @@ public class URNServer {
         try {
             elp.setLogin(getConfiguration().getLogin());
             elp.setPassword(getConfiguration().getPassword());
-            String content = MCRUtils.asString(elp.getEpicurLite());
+            String content = new XMLOutputter(Format.getPrettyFormat()).outputString(elp.getEpicurLite());
 
             LOGGER.debug("EpicurLite \"posted\" for urn " + elp.getUrn().toString() + "\n" + content);
 

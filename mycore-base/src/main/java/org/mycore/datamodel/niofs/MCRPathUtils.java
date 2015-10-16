@@ -5,11 +5,13 @@ package org.mycore.datamodel.niofs;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 
@@ -48,6 +50,16 @@ public abstract class MCRPathUtils {
             Logger.getLogger(MCRPathUtils.class).info("Error while retrieving attributes of file: " + path, e);
         }
         return null;
+    }
+
+    public static Path getPath(FileSystem targetFS, String fileName) {
+        String[] nameComps = fileName.replace('\\', '/').split("/");
+        if (nameComps.length == 1) {
+            return targetFS.getPath(nameComps[0]);
+        } else {
+            return targetFS.getPath(nameComps[0], Arrays.copyOfRange(nameComps, 1, nameComps.length));
+        }
+    
     }
 
 }

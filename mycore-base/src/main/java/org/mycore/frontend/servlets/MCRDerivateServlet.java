@@ -7,10 +7,7 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +18,7 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 
 /**
  * @author Sebastian Hofmann; Silvio Hermann; Thomas Scheffler (yagee); Sebastian Röher
@@ -108,29 +106,12 @@ public class MCRDerivateServlet extends MCRServlet {
             if (!Files.isDirectory(pathToFile)) {
                 Files.delete(pathToFile);
             } else {
-                deleteDirectory(pathToFile);
+                Files.walkFileTree(pathToFile, MCRRecursiveDeleter.instance());
             }
         } else {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, MessageFormat.format("User has not the \""
                 + PERMISSION_DELETE + "\" permission on object {0}.", derivateId));
         }
-    }
-
-    private void deleteDirectory(MCRPath pathToFile) throws IOException {
-        Files.walkFileTree(pathToFile, new SimpleFileVisitor<java.nio.file.Path>() {
-
-            @Override
-            public FileVisitResult visitFile(java.nio.file.Path file, BasicFileAttributes attrs) throws IOException {
-                Files.delete(file);
-                return super.visitFile(file, attrs);
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(java.nio.file.Path dir, IOException exc) throws IOException {
-                Files.delete(dir);
-                return super.postVisitDirectory(dir, exc);
-            }
-        });
     }
 
 }

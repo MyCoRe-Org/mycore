@@ -24,6 +24,7 @@ package org.mycore.user2;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 
@@ -450,7 +451,7 @@ public class MCRUserManager {
                 updatePasswordHashToSHA256(user, password);
                 break;
             case sha1:
-                if (!MCRUtils.asSHA1String(HASH_ITERATIONS, MCRUtils.fromBase64String(user.getSalt()), password)
+                if (!MCRUtils.asSHA1String(HASH_ITERATIONS, Base64.getDecoder().decode(user.getSalt()), password)
                         .equals(user.getPassword())) {
                     waitLoginPanalty();
                     return null;
@@ -459,7 +460,7 @@ public class MCRUserManager {
                 updatePasswordHashToSHA256(user, password);
                 break;
             case sha256:
-                if (!MCRUtils.asSHA256String(HASH_ITERATIONS, MCRUtils.fromBase64String(user.getSalt()), password)
+                if (!MCRUtils.asSHA256String(HASH_ITERATIONS, Base64.getDecoder().decode(user.getSalt()), password)
                         .equals(user.getPassword())) {
                     waitLoginPanalty();
                     return null;
@@ -508,7 +509,7 @@ public class MCRUserManager {
         } catch (Exception e) {
             throw new MCRException("Could not update user password hash to SHA-256.", e);
         }
-        user.setSalt(MCRUtils.toBase64String(salt));
+        user.setSalt(Base64.getEncoder().encodeToString(salt));
         user.setHashType(MCRPasswordHashType.sha256);
         user.setPassword(newHash);
     }

@@ -27,11 +27,9 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -55,6 +53,7 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.share.MCRMetadataShareAgent;
 import org.mycore.datamodel.metadata.share.MCRMetadataShareAgentFactory;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
 import org.xml.sax.SAXException;
 
@@ -261,26 +260,7 @@ public final class MCRMetadataManager {
         if (!Files.exists(rootPath)) {
             LOGGER.info("Derivate does not exist: " + derivateID);
         }
-        Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
-
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.delete(file);
-                return super.visitFile(file, attrs);
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                if (exc != null) {
-                    throw exc;
-                }
-                if (dir.getNameCount() > 0) {
-                    Files.delete(dir);
-                }
-                return super.postVisitDirectory(dir, exc);
-            }
-
-        });
+        Files.walkFileTree(rootPath, MCRRecursiveDeleter.instance());
         rootPath.getFileSystem().removeRoot(derivateID);
     }
 

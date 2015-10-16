@@ -13,9 +13,10 @@ import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRUtils;
 
 import com.google.common.base.Optional;
 
@@ -33,8 +34,9 @@ public class MCRXSLConditionTester {
         Document xsl = buildXSLStylesheet(condition);
         String output = transform(xml, xsl);
         if (LOGGER.isDebugEnabled()) {
+            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
             LOGGER.debug(MessageFormat.format("Condition: {0}Stylesheet:\n{1}\nInput:\n{2}\nResult: {3}", condition,
-                MCRUtils.asString(xsl), MCRUtils.asString(xml), output));
+                xout.outputString(xsl), xout.outputString(xml), output));
         }
         return "true".equals(output);
     }

@@ -28,9 +28,9 @@ import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.filter.Filters;
+import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -121,7 +121,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                 LOGGER.error("Error while finding classification elements", je);
             } else {
                 LOGGER.error(
-                    "Error while finding classification elements for " + MCRUtils.asString(currentClassElement), je);
+                    "Error while finding classification elements for " + new XMLOutputter().outputString(currentClassElement), je);
             }
         } finally {
             if (mappings == null || mappings.size() == 0) {

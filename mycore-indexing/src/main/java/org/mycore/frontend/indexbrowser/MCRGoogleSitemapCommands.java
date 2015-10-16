@@ -27,7 +27,7 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
-import org.mycore.common.MCRUtils;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
@@ -70,19 +70,19 @@ public final class MCRGoogleSitemapCommands extends MCRAbstractCommands {
             File xml = new File(fn);
             Document jdom = common.buildSingleSitemap();
             LOGGER.info("Write Google sitemap file " + fn + ".");
-            MCRUtils.writeJDOMToFile(jdom, xml);
+            new MCRJDOMContent(jdom).sendTo(xml);
         } else {
             String fn = common.getFileName(1,true);
             File xml = new File(fn);
             Document jdom = common.buildSitemapIndex(number);
             LOGGER.info("Write Google sitemap file " + fn + ".");
-            MCRUtils.writeJDOMToFile(jdom, xml);
+            new MCRJDOMContent(jdom).sendTo(xml);
             for (int i = 0; i < number; i++) {
                 fn = common.getFileName(i+2,true);
                 xml = new File(fn);
                 jdom = common.buildPartSitemap(i);
                 LOGGER.info("Write Google sitemap file " + fn + ".");
-                MCRUtils.writeJDOMToFile(jdom, xml);
+                new MCRJDOMContent(jdom).sendTo(xml);
             }
         }
         // check time

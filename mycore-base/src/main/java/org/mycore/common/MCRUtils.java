@@ -28,7 +28,6 @@ import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,10 +36,15 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
+import java.nio.file.FileSystem;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileTime;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.Normalizer;
@@ -48,53 +52,63 @@ import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.streams.MCRDevNull;
 import org.mycore.common.content.streams.MCRMD5InputStream;
+import org.mycore.common.xml.MCRXMLFunctions;
+import org.mycore.datamodel.niofs.MCRPathUtils;
+import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * This class represent a general set of external methods to support the
- * programming API.
+ * This class represent a general set of external methods to support the programming API.
  * 
  * @author Jens Kupferschmidt
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date: 2010-09-07 10:54:00 +0200 (Tue, 07 Sep
- *          2010) $
+ * @version $Revision$ $Date$
  */
 public class MCRUtils {
     // The file slash
     private static String SLASH = System.getProperty("file.separator");
 
+    @Deprecated
     public final static char COMMAND_OR = 'O';
 
+    @Deprecated
     public final static char COMMAND_AND = 'A';
 
+    @Deprecated
     public final static char COMMAND_XOR = 'X';
 
     // public constant data
-    private static final Logger LOGGER = Logger.getLogger(MCRUtils.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * This methode replace any characters to XML entity references.
@@ -110,7 +124,9 @@ public class MCRUtils {
      * @param in
      *            a string
      * @return the converted string.
+     * @deprecated as it is not used anymore
      */
+    @Deprecated
     public static String stringToXML(String in) {
         if (in == null) {
             return "";
@@ -159,11 +175,11 @@ public class MCRUtils {
      * This method convert a JDOM tree to a byte array.
      * 
      * @param jdom
-     *            the JDOM tree
-     *        format
-     *            the JDOM output format    
+     *            the JDOM tree format the JDOM output format
      * @return a byte array of the JDOM tree
+     * @deprecated use {@link MCRJDOMContent#asByteArray()}
      */
+    @Deprecated
     public static byte[] getByteArray(org.jdom2.Document jdom, Format format) throws MCRPersistenceException {
         MCRConfiguration conf = MCRConfiguration.instance();
         String mcr_encoding = conf.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
@@ -185,19 +201,22 @@ public class MCRUtils {
      * @param jdom
      *            the JDOM tree
      * @return a byte array of the JDOM tree
+     * @deprecated uses {@link MCRJDOMContent#asByteArray()}
      */
+    @Deprecated
     public static byte[] getByteArray(org.jdom2.Document jdom) throws MCRPersistenceException {
         return getByteArray(jdom, Format.getRawFormat());
     }
 
     /**
-     * Converts an Array of Objects to an Array of Strings using the toString()
-     * method.
+     * Converts an Array of Objects to an Array of Strings using the toString() method.
      * 
      * @param objects
      *            Array of Objects to be converted
      * @return Array of Strings representing Objects
+     * @deprecated use {@link Stream}s to convert arrays
      */
+    @Deprecated
     public static String[] getStringArray(Object[] objects) {
         String[] returns = new String[objects.length];
 
@@ -209,14 +228,14 @@ public class MCRUtils {
     }
 
     /**
-     * Converts an Array of Objects to an Array of Strings using the toString()
-     * method.
+     * Converts an Array of Objects to an Array of Strings using the toString() method.
      * 
      * @param objects
      *            Array of Objects to be converted
      * @param maxitems
      *            The maximum of items to convert
      * @return Array of Strings representing Objects
+     * @deprecated use {@link Stream}s to convert arrays
      */
     public static String[] getStringArray(Object[] objects, int maxitems) {
         String[] returns = new String[maxitems];
@@ -241,55 +260,35 @@ public class MCRUtils {
      * @param operation
      *            available COMMAND_XYZ
      * @return merged HashSet
+     * @deprecated use {@link Stream}s for this
      */
+    @Deprecated
     public static <T> HashSet<T> mergeHashSets(HashSet<? extends T> set1, HashSet<? extends T> set2, char operation) {
-        HashSet<T> merged = new HashSet<T>();
-        T id;
+        Predicate<T> inSet1 = set1::contains;
+        Predicate<T> inSet2 = set2::contains;
+        Predicate<T> op;
 
         switch (operation) {
-        case COMMAND_OR:
-            merged.addAll(set1);
-            merged.addAll(set2);
+            case COMMAND_OR:
+                op = t -> true;//inSet1.or(inSet2);
+                break;
 
-            break;
+            case COMMAND_AND:
+                op = inSet1.and(inSet2);
+                break;
 
-        case COMMAND_AND:
+            case COMMAND_XOR:
+                op = inSet1.and(inSet2).negate();
+                break;
 
-            for (T aSet11 : set1) {
-                id = aSet11;
-
-                if (set2.contains(id)) {
-                    merged.add(id);
-                }
-            }
-
-            break;
-
-        case COMMAND_XOR:
-
-            for (T aSet1 : set1) {
-                id = aSet1;
-
-                if (!set2.contains(id)) {
-                    merged.add(id);
-                }
-            }
-
-            for (T aSet2 : set2) {
-                id = aSet2;
-
-                if (!set1.contains(id) && !merged.contains(id)) {
-                    merged.add(id);
-                }
-            }
-
-            break;
-
-        default:
-            throw new IllegalArgumentException("operation not permited: " + operation);
+            default:
+                throw new IllegalArgumentException("operation not permited: " + operation);
         }
 
-        return merged;
+        return Stream
+            .concat(set1.stream(), set2.stream())
+            .filter(op)
+            .collect(Collectors.toCollection(HashSet::new));
     }
 
     /**
@@ -300,34 +299,20 @@ public class MCRUtils {
      * @param maxitems
      *            The maximum number of items
      * @return the cutted ArrayList
+     * @deprecated use {@link List#subList(int, int)} instead
      */
-    public static <T> ArrayList<T> cutArrayList(ArrayList<? extends T> arrayin, int maxitems) {
-        if (arrayin == null) {
-            throw new MCRException("Input ArrayList is null.");
-        }
-
-        if (maxitems < 1) {
-            LOGGER.warn("The maximum items are lower then 1.");
-        }
-
-        ArrayList<T> arrayout = new ArrayList<T>();
-        int i = 0;
-
-        for (Iterator<? extends T> it = arrayin.iterator(); it.hasNext() && i < maxitems; i++) {
-            arrayout.add(it.next());
-        }
-        return arrayout;
+    @Deprecated
+    public static <T> ArrayList<T> cutArrayList(ArrayList<T> arrayin, int maxitems) {
+        return new ArrayList<>(arrayin.subList(0, Math.max(0, maxitems)));
     }
 
     /**
-     * Reads exactly <code>len</code> bytes from the input stream into the byte
-     * array. This method reads repeatedly from the underlying stream until all
-     * the bytes are read. InputStream.read is often documented to block like
-     * this, but in actuality it does not always do so, and returns early with
-     * just a few bytes. readBlockiyng blocks until all the bytes are read, the
-     * end of the stream is detected, or an exception is thrown. You will always
-     * get as many bytes as you asked for unless you get an eof or other
-     * exception. Unlike readFully, you find out how many bytes you did get.
+     * Reads exactly <code>len</code> bytes from the input stream into the byte array. This method reads repeatedly from
+     * the underlying stream until all the bytes are read. InputStream.read is often documented to block like this, but
+     * in actuality it does not always do so, and returns early with just a few bytes. readBlockiyng blocks until all
+     * the bytes are read, the end of the stream is detected, or an exception is thrown. You will always get as many
+     * bytes as you asked for unless you get an eof or other exception. Unlike readFully, you find out how many bytes
+     * you did get.
      * 
      * @param b
      *            the buffer into which the data is read.
@@ -356,14 +341,12 @@ public class MCRUtils {
     } // end readBlocking
 
     /**
-     * Reads exactly <code>len</code> bytes from the input stream into the byte
-     * array. This method reads repeatedly from the underlying stream until all
-     * the bytes are read. Reader.read is often documented to block like this,
-     * but in actuality it does not always do so, and returns early with just a
-     * few bytes. readBlockiyng blocks until all the bytes are read, the end of
-     * the stream is detected, or an exception is thrown. You will always get as
-     * many bytes as you asked for unless you get an eof or other exception.
-     * Unlike readFully, you find out how many bytes you did get.
+     * Reads exactly <code>len</code> bytes from the input stream into the byte array. This method reads repeatedly from
+     * the underlying stream until all the bytes are read. Reader.read is often documented to block like this, but in
+     * actuality it does not always do so, and returns early with just a few bytes. readBlockiyng blocks until all the
+     * bytes are read, the end of the stream is detected, or an exception is thrown. You will always get as many bytes
+     * as you asked for unless you get an eof or other exception. Unlike readFully, you find out how many bytes you did
+     * get.
      * 
      * @param c
      *            the buffer into which the data is read.
@@ -401,20 +384,23 @@ public class MCRUtils {
      *            string to match
      * @param newStr
      *            string to substitude for find
+     * @deprecated use {@link MCRXMLFunctions#regexp(String, String, String)}
      */
+    @Deprecated
     public static String replaceString(String in, String find, String newStr) {
         return in.replace(find, newStr);
     }
 
     /**
-     * The method wrap the org.jdom2.Element in a org.jdom2.Document and write it
-     * to a file.
+     * The method wrap the org.jdom2.Element in a org.jdom2.Document and write it to a file.
      * 
      * @param elm
      *            the JDOM Document
      * @param xml
      *            the File instance
+     * @deprecated use {@link MCRJDOMContent#sendTo(Path, java.nio.file.CopyOption...)}
      */
+    @Deprecated
     public static void writeElementToFile(Element elm, File xml) {
         writeJDOMToFile(new Document().addContent(elm), xml);
     }
@@ -441,7 +427,9 @@ public class MCRUtils {
      *            the JDOM Document
      * @param xml
      *            the File instance
+     * @deprecated use {@link MCRJDOMContent#sendTo(Path, java.nio.file.CopyOption...)}
      */
+    @Deprecated
     public static void writeJDOMToFile(Document jdom, File xml) {
         try {
             XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
@@ -458,12 +446,13 @@ public class MCRUtils {
     }
 
     /**
-     * The method wrap the org.jdom2.Element in a org.jdom2.Document and write it
-     * to Sysout.
+     * The method wrap the org.jdom2.Element in a org.jdom2.Document and write it to Sysout.
      * 
      * @param elm
      *            the JDOM Document
+     * @deprecated use {@link MCRJDOMContent#sendTo(java.io.OutputStream)}
      */
+    @Deprecated
     public static void writeElementToSysout(Element elm) {
         writeJDOMToSysout(new Document().addContent(elm));
     }
@@ -473,7 +462,9 @@ public class MCRUtils {
      * 
      * @param jdom
      *            the JDOM Document
+     * @deprecated use {@link MCRJDOMContent#sendTo(java.io.OutputStream)}
      */
+    @Deprecated
     public static void writeJDOMToSysout(Document jdom) {
         try {
             XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
@@ -490,8 +481,7 @@ public class MCRUtils {
     }
 
     /**
-     * The method return a list of all file names under the given directory and
-     * subdirectories of itself.
+     * The method return a list of all file names under the given directory and subdirectories of itself.
      * 
      * @param basedir
      *            the File instance of the basic directory
@@ -515,8 +505,7 @@ public class MCRUtils {
     }
 
     /**
-     * The method return a list of all file names under the given directory and
-     * subdirectories of itself.
+     * The method return a list of all file names under the given directory and subdirectories of itself.
      * 
      * @param basedir
      *            the File instance of the basic directory
@@ -542,8 +531,7 @@ public class MCRUtils {
     }
 
     /**
-     * The method return a list of all directory names under the given directory
-     * and subdirectories of itself.
+     * The method return a list of all directory names under the given directory and subdirectories of itself.
      * 
      * @param basedir
      *            the File instance of the basic directory
@@ -564,8 +552,7 @@ public class MCRUtils {
     }
 
     /**
-     * The method return a list of all directory names under the given directory
-     * and subdirectories of itself.
+     * The method return a list of all directory names under the given directory and subdirectories of itself.
      * 
      * @param basedir
      *            the File instance of the basic directory
@@ -593,6 +580,7 @@ public class MCRUtils {
      * @param dir
      *            the File instance of the directory to delete
      * @return true if the directory was deleted successfully, otherwise false
+     * @deprecated use {@link MCRRecursiveDeleter} instead
      */
     public static boolean deleteDirectory(File dir) {
         if (dir.isDirectory()) {
@@ -608,6 +596,10 @@ public class MCRUtils {
         return dir.delete();
     }
 
+    /**
+     * @deprecated use {@link Stream#collect(java.util.stream.Collector)} instead
+     */
+    @Deprecated
     public static String arrayToString(Object[] objArray, String seperator) {
         StringBuilder buf = new StringBuilder();
 
@@ -666,22 +658,23 @@ public class MCRUtils {
     /**
      * Transforms the given {@link Document} into a String
      * 
-     * @return the xml document as {@link String} or null if an
-     *         {@link Exception} occurs
+     * @return the xml document as {@link String} or null if an {@link Exception} occurs
+     * @deprecated use {@link XMLOutputter} directly
      */
+    @Deprecated
     public static String asString(Document doc) {
-        XMLOutputter op = new XMLOutputter(Format.getPrettyFormat());
-        return op.outputString(doc);
+        return new XMLOutputter(Format.getPrettyFormat()).outputString(doc);
     }
 
     /**
      * Transforms the given Element into a String
      * 
      * @return the xml element as {@link String}
+     * @deprecated use {@link XMLOutputter} directly
      */
+    @Deprecated
     public static String asString(Element elm) {
-        XMLOutputter op = new XMLOutputter(Format.getPrettyFormat());
-        return op.outputString(elm);
+        return new XMLOutputter(Format.getPrettyFormat()).outputString(elm);
     }
 
     public static String asSHA1String(int iterations, byte[] salt, String text) throws NoSuchAlgorithmException {
@@ -700,7 +693,8 @@ public class MCRUtils {
         return MCRCrypt.crypt(salt, text);
     }
 
-    private static String getHash(int iterations, byte[] salt, String text, String algorithm) throws NoSuchAlgorithmException {
+    private static String getHash(int iterations, byte[] salt, String text, String algorithm)
+        throws NoSuchAlgorithmException {
         MessageDigest digest;
         if (--iterations < 0) {
             iterations = 0;
@@ -726,18 +720,24 @@ public class MCRUtils {
         return DatatypeConverter.printHexBinary(data).toLowerCase(Locale.ROOT);
     }
 
+    /**
+     * @deprecated use {@link Base64} instead
+     */
+    @Deprecated
     public static String toBase64String(byte[] data) {
         return Base64.getEncoder().encodeToString(data);
     }
 
+    /**
+     * @deprecated use {@link Base64} instead
+     */
+    @Deprecated
     public static byte[] fromBase64String(String base64) {
         return Base64.getDecoder().decode(base64);
     }
 
     /**
-     * Calculates md5 sum of InputStream.
-     * 
-     * InputStream is consumed after calling this method and automatically closed.
+     * Calculates md5 sum of InputStream. InputStream is consumed after calling this method and automatically closed.
      */
     public static String getMD5Sum(InputStream inputStream) throws IOException, NoSuchAlgorithmException {
         MCRMD5InputStream md5InputStream = null;
@@ -753,39 +753,52 @@ public class MCRUtils {
     }
 
     /**
+     * @deprecated use {@link #untar(Path, Path)} instead
+     */
+    @Deprecated
+    public static void untar(File source, File expandToDirectory) throws IOException {
+        untar(source.toPath(), expandToDirectory.toPath());
+    }
+
+    /**
      * Extracts files in a tar archive. Currently works only on uncompressed tar files.
      * 
-     * @param source the uncompressed tar to extract
-     * @param expandToDirectory the directory to extract the tar file to
-     * 
-     * @throws IOException if the source file does not exists
-     * 
-     * @author shermann
+     * @param source
+     *            the uncompressed tar to extract
+     * @param expandToDirectory
+     *            the directory to extract the tar file to
+     * @throws IOException
+     *             if the source file does not exists
      */
-    public static void untar(File source, File expandToDirectory) throws IOException {
-        TarArchiveInputStream tarOutputStream = new TarArchiveInputStream(new FileInputStream(source));
-        try {
-            ArchiveEntry entry = null;
-            byte[] buffer = new byte[10240];
-
-            while ((entry = tarOutputStream.getNextTarEntry()) != null) {
-                String fileName = entry.getName();
-                File newFile = new File(expandToDirectory.getAbsolutePath() + File.separator + fileName);
-
-                if (entry.isDirectory()) {
-                    new File(newFile.getParent()).mkdirs();
+    public static void untar(Path source, Path expandToDirectory) throws IOException {
+        try (TarArchiveInputStream tain = new TarArchiveInputStream(Files.newInputStream(source))) {
+            TarArchiveEntry tarEntry;
+            FileSystem targetFS = expandToDirectory.getFileSystem();
+            HashMap<Path, FileTime> directoryTimes = new HashMap<>();
+            while ((tarEntry = tain.getNextTarEntry()) != null) {
+                Path target = MCRPathUtils.getPath(targetFS, tarEntry.getName());
+                Path absoluteTarget = expandToDirectory.resolve(target).normalize().toAbsolutePath();
+                if (tarEntry.isDirectory()) {
+                    Files.createDirectories(expandToDirectory.resolve(absoluteTarget));
+                    directoryTimes.put(absoluteTarget, FileTime.fromMillis(tarEntry.getLastModifiedDate().getTime()));
                 } else {
-                    new File(newFile.getParent()).mkdirs();
-                    try (FileOutputStream fileOutputStream = new FileOutputStream(newFile)) {
-                        int length = -1;
-                        while ((length = tarOutputStream.read(buffer)) > 0) {
-                            fileOutputStream.write(buffer, 0, length);
-                        }
+                    if (Files.notExists(absoluteTarget.getParent())) {
+                        Files.createDirectories(absoluteTarget.getParent());
                     }
+                    Files.copy(tain, absoluteTarget, StandardCopyOption.REPLACE_EXISTING);
+                    Files.setLastModifiedTime(absoluteTarget,
+                        FileTime.fromMillis(tarEntry.getLastModifiedDate().getTime()));
                 }
             }
-        } finally {
-            tarOutputStream.close();
+            //restore directory dates
+            Files.walkFileTree(expandToDirectory, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    Path absolutePath = dir.normalize().toAbsolutePath();
+                    Files.setLastModifiedTime(absolutePath, directoryTimes.get(absolutePath));
+                    return super.postVisitDirectory(dir, exc);
+                }
+            });
         }
     }
 
@@ -806,7 +819,8 @@ public class MCRUtils {
             }
         }
         @SuppressWarnings("unchecked")
-        Constructor<? extends Exception>[] constructors = (Constructor<? extends Exception>[]) mainExceptionClass.getConstructors();
+        Constructor<? extends Exception>[] constructors = (Constructor<? extends Exception>[]) mainExceptionClass
+            .getConstructors();
         for (Constructor<? extends Exception> c : constructors) {
             Class<?>[] parameterTypes = c.getParameterTypes();
             try {
@@ -818,7 +832,8 @@ public class MCRUtils {
                 if (parameterTypes.length == 1 && parameterTypes[0].isAssignableFrom(mainExceptionClass)) {
                     return c.newInstance(e);
                 }
-            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException ex) {
                 LOGGER.warn("Exception while initializing exception " + mainExceptionClass.getCanonicalName(), ex);
                 return e;
             }
@@ -828,10 +843,9 @@ public class MCRUtils {
     }
 
     /**
-     * Takes a file size in bytes and formats it as a string for output. For
-     * values &lt; 5 KB the output format is for example "320 Byte". For values
-     * &gt; 5 KB the output format is for example "6,8 KB". For values &gt; 1 MB
-     * the output format is for example "3,45 MB".
+     * Takes a file size in bytes and formats it as a string for output. For values &lt; 5 KB the output format is for
+     * example "320 Byte". For values &gt; 5 KB the output format is for example "6,8 KB". For values &gt; 1 MB the
+     * output format is for example "3,45 MB".
      */
     public static String getSizeFormatted(long bytes) {
         String sizeUnit;

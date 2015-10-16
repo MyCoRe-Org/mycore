@@ -53,6 +53,7 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
@@ -330,7 +331,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     @MCRCommand(syntax = "delete all tiles", help = "removes all tiles of all derivates", order = 80)
     public static void deleteAllTiles() throws IOException {
         Path storeDir = MCRIView2Tools.getTileDir();
-        deleteDirectory(storeDir);
+        Files.walkFileTree(storeDir, MCRRecursiveDeleter.instance());
         MCRTilingQueue.getInstance().clear();
     }
 
@@ -371,7 +372,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     @MCRCommand(syntax = DEL_DERIVATE_TILES_COMMAND_SYNTAX, help = "removes tiles of a specific file identified by its derivate ID {0}", order = 100)
     public static void deleteDerivateTiles(String derivateID) throws IOException {
         Path derivateDir = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivateID, null);
-        deleteDirectory(derivateDir);
+        Files.walkFileTree(derivateDir, MCRRecursiveDeleter.instance());
         MCRTilingQueue.getInstance().remove(derivateID);
     }
 
@@ -404,22 +405,6 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         if (parent != null && parent.getNameCount() > 0) {
             deleteFileAndEmptyDirectories(parent);
         }
-    }
-
-    private static void deleteDirectory(Path path) throws IOException {
-        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.delete(file);
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                Files.delete(dir);
-                return FileVisitResult.CONTINUE;
-            }
-        });
     }
 
     private static List<MCRPath> getSupportedFiles(MCRPath rootNode) throws IOException {

@@ -11,7 +11,8 @@ import java.text.MessageFormat;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRUtils;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -48,7 +49,9 @@ public class BaseEpicurLiteProvider implements IEpicurLiteProvider {
         }
         url = getURL(urn);
         elp.setUrl(url);
-        LOGGER.debug("Generated Epicur Lite for urn " + urn + " is \n" + MCRUtils.asString(elp.getEpicurLite()));
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Generated Epicur Lite for urn " + urn + " is \n" + new XMLOutputter(Format.getPrettyFormat()).outputString(elp.getEpicurLite()));
+        }
         return elp;
     }
 
