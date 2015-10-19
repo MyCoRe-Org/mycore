@@ -269,26 +269,23 @@ public class MCRUtils {
         Predicate<T> op;
 
         switch (operation) {
-            case COMMAND_OR:
-                op = t -> true;//inSet1.or(inSet2);
-                break;
+        case COMMAND_OR:
+            op = t -> true;//inSet1.or(inSet2);
+            break;
 
-            case COMMAND_AND:
-                op = inSet1.and(inSet2);
-                break;
+        case COMMAND_AND:
+            op = inSet1.and(inSet2);
+            break;
 
-            case COMMAND_XOR:
-                op = inSet1.and(inSet2).negate();
-                break;
+        case COMMAND_XOR:
+            op = inSet1.and(inSet2).negate();
+            break;
 
-            default:
-                throw new IllegalArgumentException("operation not permited: " + operation);
+        default:
+            throw new IllegalArgumentException("operation not permited: " + operation);
         }
 
-        return Stream
-            .concat(set1.stream(), set2.stream())
-            .filter(op)
-            .collect(Collectors.toCollection(HashSet::new));
+        return Stream.concat(set1.stream(), set2.stream()).filter(op).collect(Collectors.toCollection(HashSet::new));
     }
 
     /**
@@ -693,8 +690,7 @@ public class MCRUtils {
         return MCRCrypt.crypt(salt, text);
     }
 
-    private static String getHash(int iterations, byte[] salt, String text, String algorithm)
-        throws NoSuchAlgorithmException {
+    private static String getHash(int iterations, byte[] salt, String text, String algorithm) throws NoSuchAlgorithmException {
         MessageDigest digest;
         if (--iterations < 0) {
             iterations = 0;
@@ -753,9 +749,7 @@ public class MCRUtils {
     }
 
     /**
-     * @deprecated use {@link #untar(Path, Path)} instead
      */
-    @Deprecated
     public static void untar(File source, File expandToDirectory) throws IOException {
         untar(source.toPath(), expandToDirectory.toPath());
     }
@@ -786,8 +780,7 @@ public class MCRUtils {
                         Files.createDirectories(absoluteTarget.getParent());
                     }
                     Files.copy(tain, absoluteTarget, StandardCopyOption.REPLACE_EXISTING);
-                    Files.setLastModifiedTime(absoluteTarget,
-                        FileTime.fromMillis(tarEntry.getLastModifiedDate().getTime()));
+                    Files.setLastModifiedTime(absoluteTarget, FileTime.fromMillis(tarEntry.getLastModifiedDate().getTime()));
                 }
             }
             //restore directory dates
@@ -819,8 +812,7 @@ public class MCRUtils {
             }
         }
         @SuppressWarnings("unchecked")
-        Constructor<? extends Exception>[] constructors = (Constructor<? extends Exception>[]) mainExceptionClass
-            .getConstructors();
+        Constructor<? extends Exception>[] constructors = (Constructor<? extends Exception>[]) mainExceptionClass.getConstructors();
         for (Constructor<? extends Exception> c : constructors) {
             Class<?>[] parameterTypes = c.getParameterTypes();
             try {
@@ -832,8 +824,7 @@ public class MCRUtils {
                 if (parameterTypes.length == 1 && parameterTypes[0].isAssignableFrom(mainExceptionClass)) {
                     return c.newInstance(e);
                 }
-            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-                | InvocationTargetException ex) {
+            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                 LOGGER.warn("Exception while initializing exception " + mainExceptionClass.getCanonicalName(), ex);
                 return e;
             }
