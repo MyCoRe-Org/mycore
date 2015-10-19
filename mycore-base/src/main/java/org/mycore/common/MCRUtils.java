@@ -177,9 +177,7 @@ public class MCRUtils {
      * @param jdom
      *            the JDOM tree format the JDOM output format
      * @return a byte array of the JDOM tree
-     * @deprecated use {@link MCRJDOMContent#asByteArray()}
      */
-    @Deprecated
     public static byte[] getByteArray(org.jdom2.Document jdom, Format format) throws MCRPersistenceException {
         MCRConfiguration conf = MCRConfiguration.instance();
         String mcr_encoding = conf.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
@@ -201,9 +199,7 @@ public class MCRUtils {
      * @param jdom
      *            the JDOM tree
      * @return a byte array of the JDOM tree
-     * @deprecated uses {@link MCRJDOMContent#asByteArray()}
      */
-    @Deprecated
     public static byte[] getByteArray(org.jdom2.Document jdom) throws MCRPersistenceException {
         return getByteArray(jdom, Format.getRawFormat());
     }
