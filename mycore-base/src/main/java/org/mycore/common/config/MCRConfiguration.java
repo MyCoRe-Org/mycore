@@ -117,7 +117,7 @@ public class MCRConfiguration {
 
     private File lastModifiedFile;
 
-    private static final Pattern PROPERTY_SPLITTER = Pattern.compile(",");
+    static final Pattern PROPERTY_SPLITTER = Pattern.compile(",");
 
     /**
      * The properties instance that stores the values that have been read from every configuration file. These
@@ -392,7 +392,7 @@ public class MCRConfiguration {
         return this.<T> loadClass(classname);
     }
 
-    private <T> T loadClass(String classname) {
+    <T> T loadClass(String classname) {
         LogManager.getLogger().debug("Loading Class: " + classname);
 
         T o = null;
