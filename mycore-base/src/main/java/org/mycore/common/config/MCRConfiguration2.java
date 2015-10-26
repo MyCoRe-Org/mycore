@@ -65,7 +65,7 @@ public class MCRConfiguration2 {
      * 
      * @param name
      *            the non-null and non-empty name of the configuration property
-     * @return the value of the configuration property as a Optional<String>
+     * @return the value of the configuration property as an {@link Optional Optional&lt;String&gt;}
      * @throws MCRConfigurationException
      *             if the property with this name is not set
      */
