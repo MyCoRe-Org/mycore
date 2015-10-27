@@ -43,6 +43,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -136,7 +137,8 @@ public class MCRIView2Tools {
      * @return true if the file is supported, false otherwise
      */
     public static boolean isFileSupported(String filename) {
-        return SUPPORTED_CONTENT_TYPE.contains(MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(filename));
+        return SUPPORTED_CONTENT_TYPE.contains(MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(
+                filename.toLowerCase(Locale.ROOT)));
     }
 
     /**
