@@ -181,8 +181,8 @@
 
   <xsl:template match="mods:name" mode="nameLink">
     <xsl:variable name="gnd">
-      <xsl:if test="starts-with(@valueURI, 'http://d-nb.info/gnd/')">
-        <xsl:value-of select="substring-after(@valueURI, 'http://d-nb.info/gnd/')" />
+      <xsl:if test="mods:nameIdentifier/@type = 'gnd'">
+        <xsl:value-of select="mods:nameIdentifier" />
       </xsl:if>
     </xsl:variable>
     <!-- if user is in role editor or admin, show all; other users only gets their own and published publications -->
