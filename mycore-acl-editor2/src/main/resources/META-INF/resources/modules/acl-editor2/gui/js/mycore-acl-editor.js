@@ -407,7 +407,7 @@ var ACLEditor = function(){
 						showAlert(geti18n("ACLE.alert.access.edit.multi.error"));
 					}
 					ruleListInstance.updateCanDelete();
-					$(".acle2-access-select:checked").prop("checked", false);
+					uncheckAccessSelect();
 				},
 				500: function(error) {
 					showAlert(geti18n("ACLE.alert.access.edit.error"));
@@ -430,7 +430,7 @@ var ACLEditor = function(){
 					}
 					else{
 						showAlert(geti18n("ACLE.alert.access.remove.errorElm"));
-						$(".acle2-access-select:checked").prop("checked", false);
+						uncheckAccessSelect();
 					}
 					splitTable();
 					ruleListInstance.updateCanDelete();
@@ -440,6 +440,11 @@ var ACLEditor = function(){
 				}
 			}
 		});
+	}
+
+	function uncheckAccessSelect(){
+		$(".acle2-access-select:checked").prop("checked", false);
+		$('#acle2-button-select-multi-access:checked').prop("checked", false);
 	}
 	
 	function addRule(ruleDesc, ruleText){
