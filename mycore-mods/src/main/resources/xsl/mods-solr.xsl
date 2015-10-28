@@ -50,14 +50,14 @@
     <field name="mods.title.main">
       <xsl:apply-templates mode="mods.title" select="." />
     </field>
-    <xsl:for-each select=".//descendant-or-self::*[contains(@valueURI,'http://d-nb.info/gnd/')]">
+    <xsl:for-each select=".//descendant-or-self::mods:nameIdentifier[@type='gnd']">
       <field name="mods.gnd">
-        <xsl:value-of select="substring-after(@valueURI,'http://d-nb.info/gnd/')" />
+        <xsl:value-of select="." />
       </field>
     </xsl:for-each>
-    <xsl:for-each select="mods:name/descendant-or-self::*[contains(@valueURI,'http://d-nb.info/gnd/')]">
+    <xsl:for-each select="mods:name/descendant-or-self::mods:nameIdentifier[@type='gnd']">
       <field name="mods.gnd.top">
-        <xsl:value-of select="substring-after(@valueURI,'http://d-nb.info/gnd/')" />
+        <xsl:value-of select="." />
       </field>
     </xsl:for-each>
     <xsl:apply-templates select=".//mods:name" mode="childdoc" />
@@ -199,9 +199,9 @@
         <xsl:value-of select="concat(ancestor::mycoreobject/@ID,'-',generate-id(.))" />
       </field>
       <xsl:apply-templates select=".//mods:*[@authority or @authorityURI]" />
-      <xsl:for-each select=".//descendant-or-self::*[contains(@valueURI,'http://d-nb.info/gnd/')]">
+      <xsl:for-each select=".//descendant-or-self::mods:nameIdentifier[@type='gnd']">
         <field name="mods.gnd">
-          <xsl:value-of select="substring-after(@valueURI,'http://d-nb.info/gnd/')" />
+          <xsl:value-of select="." />
         </field>
       </xsl:for-each>
       <field name="mods.name">
@@ -210,9 +210,9 @@
         </xsl:for-each>
       </field>
       <xsl:if test="$topField">
-        <xsl:for-each select="mods:name/descendant-or-self::*[contains(@valueURI,'http://d-nb.info/gnd/')]">
+        <xsl:for-each select="mods:name/descendant-or-self::mods:nameIdentifier[@type='gnd']">
           <field name="mods.gnd.top">
-            <xsl:value-of select="substring-after(@valueURI,'http://d-nb.info/gnd/')" />
+            <xsl:value-of select="." />
           </field>
         </xsl:for-each>
         <field name="mods.name.top">
