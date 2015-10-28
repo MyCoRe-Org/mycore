@@ -39,6 +39,7 @@ import java.text.MessageFormat;
 import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -211,6 +212,10 @@ public class MCRXMLFunctions {
         } catch (IllegalArgumentException iae) {
             throw new IllegalArgumentException("Unable to format date " + mcrdate.getISOString() + " to " + simpleFormat + " with locale "
                     + locale + " and timezone " + timeZone, iae);
+        } catch (UnsupportedTemporalTypeException utte) {
+            LOGGER.error(MessageFormat.format("Could not format date {0}/{1}/{2}/{3}/{4}", isoDate, isoFormat, simpleFormat,
+                    iso639Language, timeZone), utte);
+            return "?";
         }
     }
 
