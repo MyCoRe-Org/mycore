@@ -122,7 +122,14 @@ public class MCRISO8601Date {
                     dt != null ? df.format(dt) : null);
             LOGGER.debug(msg);
         }
-        return dt == null ? null : format.indexOf("G") == -1 ? df.format(dt) : df.format(dt).replace("-", "");
+
+        String formatted = null;
+        try {
+            formatted = dt == null ? null : format.indexOf("G") == -1 ? df.format(dt) : df.format(dt).replace("-", "");
+        } catch (Exception e) {
+            LOGGER.error("Could not format date", e);
+        }
+        return formatted;
     }
 
     /**
@@ -221,8 +228,8 @@ public class MCRISO8601Date {
 
     private TemporalAccessor getDateTime(final String timeString) {
         dateTimeFormatter = MCRISO8601FormatChooser.getFormatter(timeString, isoFormat);
-        return dateTimeFormatter.parseBest(timeString, ZonedDateTime::from, LocalDateTime::from, LocalDate::from,
-                YearMonth::from, Year::from);
+        return dateTimeFormatter.parseBest(timeString, ZonedDateTime::from, LocalDateTime::from, LocalDate::from, YearMonth::from,
+                Year::from);
     }
 
     private TemporalAccessor guessDateTime(final String date) {
