@@ -209,12 +209,9 @@ public class MCRXMLFunctions {
         try {
             String formatted = mcrdate.format(simpleFormat, locale, timeZone);
             return formatted == null ? "?" + isoDate + "?" : formatted;
-        } catch (IllegalArgumentException iae) {
-            throw new IllegalArgumentException("Unable to format date " + mcrdate.getISOString() + " to " + simpleFormat + " with locale "
-                    + locale + " and timezone " + timeZone, iae);
-        } catch (UnsupportedTemporalTypeException utte) {
-            LOGGER.error(MessageFormat.format("Could not format date {0}/{1}/{2}/{3}/{4}", isoDate, isoFormat, simpleFormat,
-                    iso639Language, timeZone), utte);
+        } catch (RuntimeException iae) {
+            LOGGER.error("Unable to format date " + mcrdate.getISOString() + " to " + simpleFormat + " with locale " + locale
+                    + " and timezone " + timeZone, iae);
             return "?";
         }
     }
