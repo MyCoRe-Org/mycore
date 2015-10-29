@@ -50,6 +50,9 @@
     <field name="mods.title.main">
       <xsl:apply-templates mode="mods.title" select="." />
     </field>
+    <field name="mods.title.subtitle">
+      <xsl:apply-templates mode="mods.subtitle" select="." />
+    </field>
     <xsl:for-each select=".//descendant-or-self::mods:nameIdentifier[@type='gnd']">
       <field name="mods.gnd">
         <xsl:value-of select="." />
