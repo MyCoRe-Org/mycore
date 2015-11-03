@@ -11,7 +11,14 @@ MODS: Metadata Object Description Schema. See http://www.loc.gov/standards/mods/
          *                                                                                
          *                            MODS 3.6                                    
          *
-         *                           May 5, 2015                  
+         *                           May 5, 2015             
+         *****************
+         *****************         
+         ***************** modified October 7, 2015 to fix a defect,
+         *****************  usage of "fixed" in an attribute declaration, changed "fixed=" to
+         ***************** "type=" and defined three new types:  "no", "yes", and "primary"
+         *****************
+         *****************         
          *                    
           *****************************************************************w
 
@@ -29,10 +36,10 @@ Changes in version 3.6
       - Attribute @period defined. Indicates that the described entity once existed but no longer exists.  
    
 3. Four new attributes for <relatedItem>
-	•	@otherType 
-	•	@otherTypeAuth 
-	•	@otherTypeAuthURI 
-	•	@otherTypeURI
+	-	@otherType 
+	-	@otherTypeAuth 
+	-	@otherTypeAuthURI 
+	-	@otherTypeURI
 
 
 4. New element <nameIdentifier>, subelement of <name>, re-using the existing <identifier> definition
@@ -168,7 +175,11 @@ End list of "top level" MODS elements
 				<xs:attribute name="displayLabel" type="xs:string"/>
 				<xs:attribute name="type" type="xs:string"/>
 				<xs:attributeGroup ref="xlink:simpleAttrs"/>
-				<xs:attribute name="shareable" fixed="no"/>
+			    
+			    <!-- following (@shareable) changed from fixed="no"
+			        (which was a defect) to type="no". October 2015 -->
+				<xs:attribute name="shareable" type="no"/>
+			    <!-- -->
 				<xs:attribute name="altRepGroup" type="xs:string"/>
 				<xs:attributeGroup ref="altFormatAttributeGroup"/>
 			</xs:extension>
@@ -206,8 +217,11 @@ End list of "top level" MODS elements
 				<xs:attribute name="edition" type="xs:string"/>
 				<xs:attribute name="displayLabel" type="xs:string"/>
 				<xs:attribute name="altRepGroup" type="xs:string"/>
-				<xs:attribute name="usage" fixed="primary"/>
-				<xs:attribute name="generator" type="xs:string"/>
+			    <!-- following  changed from fixed="primary"
+			         to type="primary". October 2015 -->
+			    				<xs:attribute name="usage" type="primary"/>
+				<!-- -->
+			    <xs:attribute name="generator" type="xs:string"/>
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -237,7 +251,10 @@ End list of "top level" MODS elements
 				<xs:attribute name="type" type="xs:string"/>
 				<xs:attribute name="displayLabel" type="xs:string"/>
 				<xs:attribute name="altRepGroup" type="xs:string"/>
-				<xs:attribute name="usage" fixed="primary"/>
+			    <!-- following  changed from fixed="primary"
+			        (which was a defect) to type="primary". October 2015 -->
+				<xs:attribute name="usage" type="primary"/>
+			    <!-- -->
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -254,7 +271,10 @@ End list of "top level" MODS elements
 				<xs:attribute name="displayLabel" type="xs:string"/>
 				<xs:attribute name="type" type="xs:string"/>
 				<xs:attribute name="typeURI" type="xs:anyURI"/>
-				<xs:attribute name="invalid" fixed="yes"/>
+			    <!-- following changed from fixed="yes"
+			         to type="yes". October 2015 -->
+				<xs:attribute name="invalid" type="yes"/>
+			    <!-- -->
 				<xs:attribute name="altRepGroup" type="xs:string"/>
 			</xs:extension>
 		</xs:simpleContent>
@@ -275,7 +295,10 @@ End list of "top level" MODS elements
 		<xs:attributeGroup ref="languageAttributeGroup"/>
 		<xs:attribute name="displayLabel" type="xs:string"/>
 		<xs:attribute name="altRepGroup" type="xs:string"/>
-		<xs:attribute name="usage" fixed="primary"/>
+	    <!-- following changed from fixed="primary"
+			         to type="primary". October 2015 -->
+	    		<xs:attribute name="usage" type="primary"/>
+	    <!-- -->
 	</xs:complexType>
 	<!--
 
@@ -539,7 +562,10 @@ Choice two.	With <etal>.
 		<xs:attribute name="displayLabel" type="xs:string"/>
 		<xs:attribute name="altRepGroup" type="xs:string"/>
 		<xs:attribute name="nameTitleGroup" type="xs:string"/>
-		<xs:attribute name="usage" fixed="primary"/>
+	    <!-- following changed from fixed="primary"
+			         to type="primary". October 2015 -->
+	    		<xs:attribute name="usage" type="primary"/>
+	    <!-- -->
 		<xs:attribute name="type">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
@@ -668,7 +694,10 @@ Choice two.	With <etal>.
 		<xs:sequence>
 			<xs:element ref="placeTerm" maxOccurs="unbounded"/>
 		</xs:sequence>
-		<xs:attribute name="supplied" fixed="yes"/>
+	    <!-- following  changed from fixed="yes"
+			         to type="yes". October 2015 -->
+		<xs:attribute name="supplied" type="yes"/>
+	    <!-- -->
 	</xs:complexType>
 	<!-- 
 *** placeTerm ***
@@ -739,7 +768,10 @@ Choice two.	With <etal>.
 						</xs:restriction>
 					</xs:simpleType>
 				</xs:attribute>
-				<xs:attribute name="keyDate" fixed="yes"/>
+			    <!-- following  changed from fixed="yes"
+			         to type="yes". October 2015 -->
+				<xs:attribute name="keyDate" type="yes"/>
+			    <!-- -->
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -1059,7 +1091,10 @@ Choice two.	With <etal>.
 		<xs:attributeGroup ref="xlink:simpleAttrs"/>
 		<xs:attribute name="displayLabel" type="xs:string"/>
 		<xs:attribute name="altRepGroup" type="xs:string"/>
-		<xs:attribute name="usage" fixed="primary"/>
+	    <!-- following changed from fixed="primary"
+			         to type="primary". October 2015 -->
+	    		<xs:attribute name="usage" type="primary"/>
+	    <!-- -->
 	</xs:complexType>
 	<!--
 
@@ -1301,7 +1336,10 @@ Choice two.	With <etal>.
 				<xs:attribute name="displayLabel" type="xs:string"/>
 				<xs:attribute name="type" type="xs:string"/>
 				<xs:attributeGroup ref="xlink:simpleAttrs"/>
-				<xs:attribute name="shareable" fixed="no"/>
+			    <!-- following changed from fixed="no"
+			        to type="no". October 2015 -->
+				<xs:attribute name="shareable" type="no"/>
+			    <!-- -->
 				<xs:attribute name="altRepGroup" type="xs:string"/>
 				<xs:attributeGroup ref="altFormatAttributeGroup"/>
 			</xs:extension>
@@ -1349,11 +1387,17 @@ Choice two.	With <etal>.
 			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="otherType"/>
-		<xs:attribute name="supplied" fixed="yes"/>
+	    <!-- following  changed from fixed="yes"
+			         to type="yes". October 2015 -->
+		<xs:attribute name="supplied" type="yes"/>
+	    <!-- -->
 		<xs:attribute name="altRepGroup" type="xs:string"/>
 		<xs:attributeGroup ref="altFormatAttributeGroup"/>
 		<xs:attribute name="nameTitleGroup" type="xs:string"/>
-		<xs:attribute name="usage" fixed="primary"/>
+	    <!-- following changed from fixed="primary"
+			         to type="primary". October 2015 -->
+		<xs:attribute name="usage" type="primary"/>
+	    <!-- -->
 		<xs:attribute name="ID" type="xs:ID"/>
 		<xs:attributeGroup ref="authorityAttributeGroup"/>
 		<xs:attributeGroup ref="xlink:simpleAttrs"/>
@@ -1390,11 +1434,17 @@ Choice two.	With <etal>.
 	<xs:complexType name="typeOfResourceDefinition">
 		<xs:simpleContent>
 			<xs:extension base="resourceTypeDefinition">
-				<xs:attribute name="collection" fixed="yes"/>
-				<xs:attribute name="manuscript" fixed="yes"/>
+			    <!-- following two changed from fixed="yes"
+			         to type="yes". October 2015 -->
+				<xs:attribute name="collection" type="yes"/>
+				<xs:attribute name="manuscript" type="yes"/>
+			    <!-- -->
 				<xs:attribute name="displayLabel" type="xs:string"/>
 				<xs:attribute name="altRepGroup" type="xs:string"/>
-				<xs:attribute name="usage" fixed="primary"/>
+			    <!-- following changed from fixed="primary"
+			         to type="primary". October 2015 -->
+				<xs:attribute name="usage" type="primary"/>
+			    <!-- -->
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -1458,7 +1508,10 @@ String Definitions
 	<xs:complexType name="stringPlusLanguagePlusSupplied">
 		<xs:simpleContent>
 			<xs:extension base="stringPlusLanguage">
-				<xs:attribute name="supplied" fixed="yes"/>
+			    <!-- following changed from fixed="yes"
+			         to type="yes". October 2015 -->
+				<xs:attribute name="supplied" type="yes"/>
+			    <!-- -->
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -1508,5 +1561,30 @@ String Definitions
 			<xs:enumeration value="text"/>
 		</xs:restriction>
 	</xs:simpleType>
+    
+    <!-- all of the following added October 2014 as part of the fix
+    for the defect usage of "fixed" 
+    -->
+    <xs:simpleType name="no">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="no"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
 	<!-- -->
+
+    <xs:simpleType name="yes">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="yes"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <!-- -->
+    <xs:simpleType name="primary">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="primary"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <!-- -->
 </xs:schema>
